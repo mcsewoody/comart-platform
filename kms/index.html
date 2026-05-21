@@ -380,7 +380,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         <div id="portal-user-role" style="font-size:10px;color:var(--text-3);">—</div>
       </div>
     </div>
-    <button class="config-btn" onclick="openConfig()">⚙ API 設定</button>
+    <!-- API 設定已移除：Supabase URL/Key 寫死在程式碼，Claude/OpenAI Key 在 Supabase Secrets -->
   </header>
 
   <!-- Sidebar -->
@@ -733,35 +733,27 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
     <div class="field">
       <label>Supabase Project URL</label>
       <input type="text" id="cfg-supabase-url" placeholder="https://xxxx.supabase.co" />
-      <div class="hint">Supabase 專案設定 → API → Project URL</div>
+      <div class="hint">Supabase → Settings → API → Project URL</div>
     </div>
     <div class="field">
       <label>Supabase Anon Key</label>
       <input type="password" id="cfg-supabase-key" placeholder="eyJhbGci..." />
-      <div class="hint">Settings → API → anon public key</div>
-    </div>
-    <div class="field">
-      <label>Anthropic API Key</label>
-      <input type="password" id="cfg-claude-key" placeholder="sk-ant-..." />
-      <div class="hint">console.anthropic.com → API Keys（僅存本機 localStorage）</div>
-    </div>
-    <div class="field">
-      <label>OpenAI API Key（Embedding 用）</label>
-      <input type="password" id="cfg-openai-key" placeholder="sk-..." />
-      <div class="hint">用於 text-embedding-3-small，約 USD $0.02／百萬 token。<a href="https://platform.openai.com/api-keys" target="_blank" style="color:var(--blue);">取得 Key ↗</a></div>
+      <div class="hint">Supabase → Settings → API → anon public key</div>
     </div>
     <div class="field">
       <label>Embedding 模式</label>
       <select id="cfg-embed-model">
-        <option value="edge-fn">Edge Function 模式（Supabase + OpenAI，生產推薦）</option>
-        <option value="direct-openai">直接呼叫 OpenAI（測試用，有 CORS 限制）</option>
+        <option value="edge-fn">Edge Function（推薦，Key 存在 Supabase Secrets）</option>
         <option value="mock">Mock 模式（離線測試，關鍵字搜尋）</option>
       </select>
-      <div class="hint">Edge Function 模式：OpenAI Key 存在 Supabase Secrets，不會暴露到前端</div>
     </div>
 
-    <div style="background:var(--amber-bg);border:1px solid var(--amber-border);border-radius:var(--radius);padding:10px 12px;font-size:12px;color:var(--amber);margin-top:4px;">
-      ⚠ 所有 Key 只存在本機 localStorage，不會上傳任何伺服器。正式部署時改用環境變數注入。
+    <!-- 隱藏欄位保留相容性（不顯示但 saveConfig 需要） -->
+    <input type="hidden" id="cfg-claude-key" value="" />
+    <input type="hidden" id="cfg-openai-key" value="" />
+
+    <div style="background:var(--green-bg);border:1px solid #9FE1CB;border-radius:var(--radius);padding:10px 12px;font-size:12px;color:var(--green);margin-top:4px;">
+      ✓ Claude API Key 和 OpenAI Key 已安全存放在 Supabase Secrets，前端不需要填入。
     </div>
 
     <!-- 匯出 / 匯入設定 -->
@@ -863,11 +855,11 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
 // CONFIG & STATE
 // ═══════════════════════════════════════════════
 let CFG = {
-  supabaseUrl: '',
-  supabaseKey: '',
+  supabaseUrl: 'https://tcvlnpgpuphdalzvmoyo.supabase.co',
+  supabaseKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRjdmxucGdwdXBoZGFsenZtb3lvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDczOTYwNjIsImV4cCI6MjA2Mjk3MjA2Mn0.GjCBuIGFOXOUHqIkXVXXD5IfzqlxCiPFUP-WBL5LMII',
   claudeKey: '',
   openAiKey: '',
-  embedModel: 'mock',
+  embedModel: 'edge-fn',
 };
 let currentLang = 'zh-TW';
 let tiptapEditor = null;
@@ -1244,30 +1236,27 @@ window.addEventListener('DOMContentLoaded', async () => {
 });
 
 function loadConfig() {
-  // 優先順序：URL 參數 > localStorage > 預設值
+  // Supabase URL 和 Key 已寫死在程式碼，不需要從 localStorage 讀取
+  // 只讀取 embedModel 偏好設定
+  try {
+    const saved = localStorage.getItem('comart-kms-config');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (parsed.embedModel) CFG.embedModel = parsed.embedModel;
+    }
+  } catch(e) {}
 
-  // 1. 從 localStorage 讀
-  const saved = localStorage.getItem('comart-kms-config');
-  if (saved) {
-    try { CFG = { ...CFG, ...JSON.parse(saved) }; } catch(e) {}
-  }
-
-  // 2. 從 URL 參數讀（?kms_cfg=base64encoded_json）
-  //    用途：部署後直接在 URL 帶入設定，或從其他頁面跳轉時帶入
+  // 從 URL 參數讀取（一次性帶入設定用，現在主要只處理 embedModel）
   try {
     const params = new URLSearchParams(window.location.search);
     const cfgParam = params.get('kms_cfg');
     if (cfgParam) {
       const decoded = JSON.parse(atob(cfgParam));
-      CFG = { ...CFG, ...decoded };
-      // 寫入 localStorage，之後不需要再帶 URL 參數
-      localStorage.setItem('comart-kms-config', JSON.stringify(CFG));
-      // 清掉 URL 參數（避免 key 暴露在瀏覽器歷史記錄）
+      if (decoded.embedModel) CFG.embedModel = decoded.embedModel;
       const cleanUrl = window.location.pathname + window.location.hash;
       window.history.replaceState({}, '', cleanUrl);
-      console.info('[KMS] Config loaded from URL parameter and saved to localStorage.');
     }
-  } catch(e) { console.warn('[KMS] URL config param parse error:', e); }
+  } catch(e) {}
 }
 
 function updateStatus() {
@@ -1423,6 +1412,27 @@ async function sbFetch(path, options = {}) {
   const text = await res.text();
   if (!res.ok) throw new Error(`Supabase error ${res.status}: ${text}`);
   return text ? JSON.parse(text) : null;
+}
+
+// ── kmsWrite：所有寫入操作走 kms-write Edge Function（service_role，可繞過 RLS）──
+async function kmsWrite(action, table, payload = null, id = null, filters = null) {
+  if (!CFG.supabaseUrl || !CFG.supabaseKey) throw new Error('Supabase 未設定');
+  const base = CFG.supabaseUrl.replace(/\/(rest|auth|storage)\/v\d.*$/, '');
+  const url  = `${base}/functions/v1/kms-write`;
+  const res  = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${CFG.supabaseKey}`,
+      'apikey': CFG.supabaseKey,
+    },
+    body: JSON.stringify({ action, table, payload, id, filters }),
+  });
+  const text = await res.text();
+  if (!res.ok) throw new Error(`kms-write error ${res.status}: ${text}`);
+  const data = text ? JSON.parse(text) : null;
+  if (data?.error) throw new Error(data.error);
+  return data?.data || null;
 }
 
 // ═══════════════════════════════════════════════
@@ -1677,11 +1687,7 @@ async function saveDoc() {
 
       if (editingDocId) {
         // ── 更新既有文件 ──
-        await sbFetch(`/rest/v1/kms_documents?id=eq.${editingDocId}`, {
-          method: 'PATCH',
-          body: JSON.stringify(docPayload),
-          prefer: 'return=minimal',
-        });
+        await kmsWrite('update', 'kms_documents', docPayload, editingDocId);
         doc_id = editingDocId;
       } else {
         // ── 新增文件 ──
@@ -1899,9 +1905,7 @@ async function processBatchFiles(files) {
       };
 
       if (CFG.supabaseUrl && CFG.supabaseKey) {
-        const saved = await sbFetch('/rest/v1/kms_documents', {
-          method:'POST', body:JSON.stringify(docPayload), prefer:'return=representation',
-        });
+        const saved = await kmsWrite('insert', 'kms_documents', docPayload);
         const docId = saved?.[0]?.id;
         if (docId && CFG.embedModel !== 'mock') {
           try { await callEmbedEdgeFn(docId); } catch(e) {}
@@ -2452,12 +2456,8 @@ async function deleteDoc(id, title, authorName) {
 
   try {
     if (CFG.supabaseUrl && CFG.supabaseKey && !id.startsWith('demo-') && !id.startsWith('local-')) {
-      await sbFetch(`/rest/v1/kms_doc_versions?doc_id=eq.${id}`, {
-        method: 'DELETE', prefer: 'return=minimal',
-      });
-      await sbFetch(`/rest/v1/kms_documents?id=eq.${id}`, {
-        method: 'DELETE', prefer: 'return=minimal',
-      });
+      await kmsWrite('delete', 'kms_doc_versions', null, null, { doc_id: id });
+      await kmsWrite('delete', 'kms_documents', null, id);
     } else if (id.startsWith('local-')) {
       localDocs = localDocs.filter(d => d.id !== id);
       localStorage.setItem('kms-local-docs', JSON.stringify(localDocs));
@@ -2876,11 +2876,7 @@ async function saveNewProductLine() {
 
   try {
     if (CFG.supabaseUrl && CFG.supabaseKey) {
-      await sbFetch('/rest/v1/kms_product_lines', {
-        method: 'POST',
-        body: JSON.stringify({ name, sort_order: PRODUCT_LINES.length + 1, active: true }),
-        prefer: 'return=minimal',
-      });
+      await kmsWrite('insert', 'kms_product_lines', { name, sort_order: PRODUCT_LINES.length + 1, active: true });
     }
     PRODUCT_LINES.push(name);
     await loadProductLines();
@@ -3289,8 +3285,6 @@ function switchPanel(id) {
 function openConfig() {
   document.getElementById('cfg-supabase-url').value = CFG.supabaseUrl;
   document.getElementById('cfg-supabase-key').value = CFG.supabaseKey;
-  document.getElementById('cfg-claude-key').value = CFG.claudeKey;
-  document.getElementById('cfg-openai-key').value = CFG.openAiKey;
   document.getElementById('cfg-embed-model').value = CFG.embedModel;
   document.getElementById('config-modal').classList.add('show');
 }
@@ -3298,9 +3292,10 @@ function closeConfig() { document.getElementById('config-modal').classList.remov
 function saveConfig() {
   CFG.supabaseUrl = document.getElementById('cfg-supabase-url').value.trim().replace(/\/$/, '');
   CFG.supabaseKey = document.getElementById('cfg-supabase-key').value.trim();
-  CFG.claudeKey = document.getElementById('cfg-claude-key').value.trim();
-  CFG.openAiKey = document.getElementById('cfg-openai-key').value.trim();
-  CFG.embedModel = document.getElementById('cfg-embed-model').value;
+  CFG.embedModel  = document.getElementById('cfg-embed-model').value;
+  // Claude / OpenAI key 已移至 Supabase Secrets，前端不需要存
+  CFG.claudeKey = '';
+  CFG.openAiKey = '';
   localStorage.setItem('comart-kms-config', JSON.stringify(CFG));
   closeConfig();
   updateStatus();
@@ -3809,9 +3804,7 @@ async function saveExpert() {
   };
   try {
     if (CFG.supabaseUrl && CFG.supabaseKey) {
-      await sbFetch('/rest/v1/kms_experts', {
-        method:'POST', body:JSON.stringify(expert), prefer:'return=minimal',
-      });
+      await kmsWrite('insert', 'kms_experts', expert);
     } else {
       const list = JSON.parse(localStorage.getItem('kms-experts-v2') || '[]');
       list.push({ ...expert, id: 'local-' + Date.now() });
@@ -3826,7 +3819,7 @@ async function deleteExpert(id) {
   if (!confirm('確定移除此專家？')) return;
   try {
     if (CFG.supabaseUrl && CFG.supabaseKey && !String(id).startsWith('local-') && !['d1','d2','d3'].includes(id)) {
-      await sbFetch(`/rest/v1/kms_experts?id=eq.${id}`, { method:'DELETE', prefer:'return=minimal' });
+      await kmsWrite('delete', 'kms_experts', null, id);
     } else {
       const list = JSON.parse(localStorage.getItem('kms-experts-v2') || '[]');
       localStorage.setItem('kms-experts-v2', JSON.stringify(list.filter(e => e.id !== id)));
@@ -3934,24 +3927,19 @@ async function executeReview(docId, newStatus, actionLabel) {
 
   try {
     if (CFG.supabaseUrl && CFG.supabaseKey) {
-      // 先手動寫入 review_log（避免 Trigger 拿到 null actor）
-      await sbFetch('/rest/v1/kms_review_log', {
-        method: 'POST',
-        body: JSON.stringify({
-          doc_id: docId,
-          from_status: reviewingDoc?.status || 'draft',
-          to_status: newStatus,
-          actor,
-          note: note || null,
-        }),
-        prefer: 'return=minimal',
+      // 寫入 review_log
+      await kmsWrite('insert', 'kms_review_log', {
+        doc_id: docId,
+        from_status: reviewingDoc?.status || 'draft',
+        to_status: newStatus,
+        actor,
+        note: note || null,
       });
-      // 再更新文件狀態
-      await sbFetch(`/rest/v1/kms_documents?id=eq.${docId}`, {
-        method: 'PATCH',
-        body: JSON.stringify({ status: newStatus, review_note: note || null }),
-        prefer: 'return=minimal',
-      });
+      // 更新文件狀態
+      await kmsWrite('update', 'kms_documents',
+        { status: newStatus, review_note: note || null },
+        docId
+      );
     }
     if (reviewingDoc) reviewingDoc.status = newStatus;
     toast(`已執行：${actionLabel}`, 'success');
@@ -4059,9 +4047,7 @@ async function submitComment() {
 
   try {
     if (CFG.supabaseUrl && CFG.supabaseKey) {
-      await sbFetch('/rest/v1/kms_comments', {
-        method: 'POST', body: JSON.stringify(comment), prefer: 'return=minimal',
-      });
+      await kmsWrite('insert', 'kms_comments', comment);
     } else {
       const key = 'kms-comments-' + commentsDocId;
       const list = JSON.parse(localStorage.getItem(key) || '[]');

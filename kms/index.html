@@ -1274,7 +1274,7 @@ function updateStatus() {
   const sb = document.getElementById('status-supabase');
   const cl = document.getElementById('status-claude');
   sb.innerHTML = `Supabase: <span style="color:${CFG.supabaseUrl ? 'var(--green)' : 'var(--text-3)'}">${CFG.supabaseUrl ? '已設定' : '未設定'}</span>`;
-  cl.innerHTML = `Claude API: <span style="color:${CFG.claudeKey ? 'var(--green)' : 'var(--text-3)'}">${CFG.claudeKey ? '已設定' : '未設定'}</span>`;
+  cl.innerHTML = `Claude API: <span style="color:${CFG.supabaseUrl ? 'var(--green)' : (CFG.claudeKey ? 'var(--amber)' : 'var(--text-3)')}">${CFG.supabaseUrl ? 'Edge Function ✓' : (CFG.claudeKey ? '直連模式' : '未設定')}</span>`;
 }
 
 // ═══════════════════════════════════════════════
@@ -1593,25 +1593,9 @@ async function autoClassify() {
     const catList = Object.entries(CAT_NAMES_FOR_PROMPT).map(([k,v]) => `- ${k}: ${v}`).join('\n');
     const input   = `標題：${title}\n內容：${bodyTx.slice(0, 500)}`;
 
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': CFG.claudeKey,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true',
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 20,
-        system: `COMART 知識分類助理。從以下十個分類中選出最適合的一個，只回傳分類 key（英文小寫），不要其他文字。\n\n${catList}`,
-        messages: [{ role: 'user', content: input }],
-      }),
-    });
-
-    if (!res.ok) throw new Error(res.status);
-    const data      = await res.json();
-    const suggested = (data.content?.[0]?.text || '').trim().toLowerCase().replace(/[^a-z_]/g, '');
+    const system = `COMART 知識分類助理。從以下十個分類中選出最適合的一個，只回傳分類 key（英文小寫），不要其他文字。\n\n${catList}`;
+    const text = await callClaudeProxy(system, input, 20);
+    const suggested = text.trim().toLowerCase().replace(/[^a-z_]/g, '');
 
     if (!CAT_IDS.includes(suggested)) { if (indicator) indicator.textContent = ''; return; }
 
@@ -2153,10 +2137,16 @@ async function extractPdfWithClaude(file) {
 
   try {
     const base64 = await fileToBase64(file);
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    const _pdfBase = CFG.supabaseUrl?.replace(/\/(rest|auth|storage)\/v\d.*$/, '') || '';
+    const _pdfUrl = CFG.supabaseUrl ? `${_pdfBase}/functions/v1/claude-proxy` : 'https://api.anthropic.com/v1/messages';
+    const res = await fetch(_pdfUrl, {
       method: 'POST',
       signal: controller.signal,
-      headers: {
+      headers: CFG.supabaseUrl ? {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${CFG.supabaseKey}`,
+        'apikey': CFG.supabaseKey,
+      } : {
         'Content-Type': 'application/json',
         'x-api-key': CFG.claudeKey,
         'anthropic-version': '2023-06-01',
@@ -2199,37 +2189,37 @@ async function extractImageWithClaude(file, ext) {
   try {
     const base64 = await fileToBase64(file);
     const mediaType = ext === 'png' ? 'image/png' : 'image/jpeg';
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': CFG.claudeKey,
-      'anthropic-version': '2023-06-01',
-      'anthropic-dangerous-direct-browser-access': 'true',
-    },
-    body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 2048,
-      messages: [{
-        role: 'user',
-        content: [
-          {
-            type: 'image',
-            source: { type: 'base64', media_type: mediaType, data: base64 },
-          },
-          {
-            type: 'text',
-            text: '請完整描述並抽取這張圖片中的所有文字內容。如果是產品圖或規格圖，請詳細描述可見的規格、標示、數值。只輸出內容，不要加說明。',
-          },
-        ],
-      }],
-    }),
-    signal: controller.signal,
-  });
-  clearTimeout(timeoutId);
-  if (!res.ok) throw new Error(`Claude 圖片解析失敗 ${res.status}`);
-  const data = await res.json();
-  return data.content?.[0]?.text || '';
+    const _imgBase = CFG.supabaseUrl?.replace(/\/(rest|auth|storage)\/v\d.*$/, '') || '';
+    const _imgUrl = CFG.supabaseUrl ? `${_imgBase}/functions/v1/claude-proxy` : 'https://api.anthropic.com/v1/messages';
+    const res = await fetch(_imgUrl, {
+      method: 'POST',
+      signal: controller.signal,
+      headers: CFG.supabaseUrl ? {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${CFG.supabaseKey}`,
+        'apikey': CFG.supabaseKey,
+      } : {
+        'Content-Type': 'application/json',
+        'x-api-key': CFG.claudeKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true',
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 2048,
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'image', source: { type: 'base64', media_type: mediaType, data: base64 } },
+            { type: 'text', text: '請完整描述並抽取這張圖片中的所有文字內容。如果是產品圖或規格圖，請詳細描述可見的規格、標示、數值。只輸出內容，不要加說明。' },
+          ],
+        }],
+      }),
+    });
+    clearTimeout(timeoutId);
+    if (!res.ok) throw new Error(`Claude 圖片解析失敗 ${res.status}`);
+    const data = await res.json();
+    return data.content?.[0]?.text || '';
   } catch(e) {
     clearTimeout(timeoutId);
     if (e.name === 'AbortError') throw new Error('圖片解析超時（20秒），原始檔已上傳，文字請手動補充。');
@@ -2718,80 +2708,92 @@ async function retrieveChunks(query) {
 }
 
 // Stream Claude API response
-async function streamClaude(system, user) {
-  const headers = {
-    'Content-Type': 'application/json',
-    'x-api-key': CFG.claudeKey,
-    'anthropic-version': '2023-06-01',
-    'anthropic-dangerous-direct-browser-access': 'true',
-  };
+// ═══════════════════════════════════════════════
+// CLAUDE PROXY — 透過 Supabase Edge Function 呼叫
+// Key 存在 Supabase Secrets，前端不需要知道
+// ═══════════════════════════════════════════════
+async function callClaudeProxy(system, user, maxTokens = 1500) {
+  // 優先用 Edge Function（部署後）
+  // Fallback：直接呼叫（本機測試，需要 Claude Key）
+  const useProxy = CFG.supabaseUrl && CFG.supabaseKey;
+  const base = CFG.supabaseUrl?.replace(/\/(rest|auth|storage)\/v\d.*$/, '') || '';
+  const proxyUrl = `${base}/functions/v1/claude-proxy`;
 
-  const body = JSON.stringify({
+  const payload = {
     model: 'claude-sonnet-4-20250514',
-    max_tokens: 1500,
+    max_tokens: maxTokens,
     system,
     messages: [{ role: 'user', content: user }],
-    stream: false, // 統一用非 streaming，避免 file:// CORS 問題和遞迴 bug
-  });
+    stream: false,
+  };
 
   const MAX_RETRIES = 2;
-
   for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
-    const el = document.getElementById('ai-output');
-    if (!el) return;
-
     try {
-      const res = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST', headers, body,
-      });
-
-      // 429：等待後繼續迴圈
-      if (res.status === 429) {
-        if (attempt >= MAX_RETRIES) {
-          el.classList.remove('streaming');
-          el.textContent = '⚠ API 請求頻率超限，請稍後再試。';
-          return;
-        }
-        const waitSec = (attempt + 1) * 10;
-        el.classList.remove('streaming');
-        el.textContent = `⏳ 請求頻率超限，${waitSec} 秒後自動重試（${attempt + 1}/${MAX_RETRIES}）…`;
-        await new Promise(r => setTimeout(r, waitSec * 1000));
-        el.classList.add('streaming');
-        continue; // 重試
+      let res;
+      if (useProxy) {
+        // 透過 Supabase Edge Function（不需要 Claude Key 在前端）
+        res = await fetch(proxyUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${CFG.supabaseKey}`,
+            'apikey': CFG.supabaseKey,
+          },
+          body: JSON.stringify(payload),
+        });
+      } else if (CFG.claudeKey) {
+        // 本機 fallback：直接呼叫
+        res = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': CFG.claudeKey,
+            'anthropic-version': '2023-06-01',
+            'anthropic-dangerous-direct-browser-access': 'true',
+          },
+          body: JSON.stringify(payload),
+        });
+      } else {
+        throw new Error('請設定 Supabase 連線或 Claude API Key');
       }
 
+      if (res.status === 429 && attempt < MAX_RETRIES) {
+        const wait = (attempt + 1) * 10;
+        await new Promise(r => setTimeout(r, wait * 1000));
+        continue;
+      }
       if (!res.ok) {
-        const errText = await res.text();
-        throw new Error(`Claude API ${res.status}: ${errText}`);
+        const err = await res.text();
+        throw new Error(`Claude ${res.status}: ${err}`);
       }
-
       const data = await res.json();
-      const text = data.content?.[0]?.text || '（無回應）';
-
-      // 模擬逐字輸出效果
-      el.textContent = '';
-      el.classList.add('streaming');
-      const words = text.split('');
-      const chunkSize = 3;
-      for (let i = 0; i < words.length; i += chunkSize) {
-        el.textContent += words.slice(i, i + chunkSize).join('');
-        if (i % 60 === 0) await new Promise(r => setTimeout(r, 8));
-      }
-      el.classList.remove('streaming');
-      return; // 成功，結束
-
+      return data.content?.[0]?.text || '';
     } catch(e) {
-      if (attempt >= MAX_RETRIES) {
-        const el2 = document.getElementById('ai-output');
-        if (el2) {
-          el2.classList.remove('streaming');
-          el2.textContent = `⚠ 連線失敗：${e.message}`;
-        }
-        return;
-      }
-      // 其他錯誤也等一下重試
+      if (attempt >= MAX_RETRIES) throw e;
       await new Promise(r => setTimeout(r, 3000));
     }
+  }
+  return '';
+}
+
+async function streamClaude(system, user) {
+  const el = document.getElementById('ai-output');
+  if (!el) return;
+  el.textContent = '連線中…';
+  el.classList.add('streaming');
+
+  try {
+    const text = await callClaudeProxy(system, user, 1500);
+    el.textContent = '';
+    for (let i = 0; i < text.length; i += 3) {
+      el.textContent += text.slice(i, i + 3);
+      if (i % 60 === 0) await new Promise(r => setTimeout(r, 8));
+    }
+  } catch(e) {
+    el.textContent = `⚠ 連線失敗：${e.message}`;
+  } finally {
+    el.classList.remove('streaming');
   }
 }
 
@@ -3157,58 +3159,21 @@ function saveExternalAnswerToKB(query, answerId) {
 
 // 獨立的 Claude streaming，可指定目標 element id
 async function streamClaudeToElement(system, user, elementId) {
-  const headers = {
-    'Content-Type': 'application/json',
-    'x-api-key': CFG.claudeKey,
-    'anthropic-version': '2023-06-01',
-    'anthropic-dangerous-direct-browser-access': 'true',
-  };
-  const bodyStr = JSON.stringify({
-    model: 'claude-sonnet-4-20250514',
-    max_tokens: 1500,
-    system,
-    messages: [{ role: 'user', content: user }],
-    stream: false,
-  });
-
-  for (let attempt = 0; attempt <= 2; attempt++) {
-    const el = document.getElementById(elementId);
-    if (!el) return;
-    try {
-      const res = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST', headers, body: bodyStr,
-      });
-      if (res.status === 429 && attempt < 2) {
-        const wait = (attempt + 1) * 10;
-        el.textContent = `⏳ ${wait} 秒後重試…`;
-        await new Promise(r => setTimeout(r, wait * 1000));
-        continue;
-      }
-      if (!res.ok) {
-        const err = await res.text();
-        el.classList.remove('streaming');
-        el.textContent = `連線失敗：${res.status}`;
-        return;
-      }
-      const data = await res.json();
-      const text = data.content?.[0]?.text || '（無回應）';
-      el.textContent = '';
-      el.classList.add('streaming');
-      // 逐字顯示
-      for (let i = 0; i < text.length; i += 4) {
-        el.textContent += text.slice(i, i + 4);
-        if (i % 80 === 0) await new Promise(r => setTimeout(r, 8));
-      }
-      el.classList.remove('streaming');
-      return;
-    } catch(e) {
-      if (attempt >= 2) {
-        const el2 = document.getElementById(elementId);
-        if (el2) { el2.classList.remove('streaming'); el2.textContent = `連線失敗：${e.message}`; }
-        return;
-      }
-      await new Promise(r => setTimeout(r, 3000));
+  const el = document.getElementById(elementId);
+  if (!el) return;
+  el.textContent = '連線中…';
+  el.classList.add('streaming');
+  try {
+    const text = await callClaudeProxy(system, user, 1500);
+    el.textContent = '';
+    for (let i = 0; i < text.length; i += 4) {
+      el.textContent += text.slice(i, i + 4);
+      if (i % 80 === 0) await new Promise(r => setTimeout(r, 8));
     }
+  } catch(e) {
+    el.textContent = `連線失敗：${e.message}`;
+  } finally {
+    el.classList.remove('streaming');
   }
 }
 // ═══════════════════════════════════════════════

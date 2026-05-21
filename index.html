@@ -287,7 +287,30 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:
             <div style="font-size:18px;font-weight:500;">👤 名人榜 · Employee Directory</div>
             <input class="dir-search" id="dirSearch" placeholder="Search name, title…" oninput="renderDirectory()">
           </div>
-          <div class="dir-grid" id="dirGrid"><div style="color:var(--tx3);font-size:13px;padding:20px;">載入中…</div></div>
+          <!-- Tab 切換：通訊錄 / 貢獻排行榜 -->
+          <div style="display:flex;gap:6px;margin-bottom:14px;">
+            <button id="dir-tab-contacts" onclick="switchDirTab('contacts')"
+              style="padding:5px 14px;border-radius:20px;border:1px solid var(--ac);background:var(--ac);color:#fff;font-size:12px;font-weight:600;cursor:pointer;">
+              📋 通訊錄
+            </button>
+            <button id="dir-tab-ranking" onclick="switchDirTab('ranking')"
+              style="padding:5px 14px;border-radius:20px;border:1px solid var(--br);background:transparent;color:var(--tx2);font-size:12px;font-weight:600;cursor:pointer;">
+              🏆 知識貢獻排行
+            </button>
+          </div>
+          <!-- 通訊錄 -->
+          <div id="dir-contacts-view">
+            <div class="dir-grid" id="dirGrid"><div style="color:var(--tx3);font-size:13px;padding:20px;">載入中…</div></div>
+          </div>
+          <!-- 排行榜 -->
+          <div id="dir-ranking-view" style="display:none;">
+            <div style="background:var(--s1);border:1px solid var(--br);border-radius:var(--rl);overflow:hidden;">
+              <div style="padding:12px 16px;border-bottom:1px solid var(--br);font-size:12px;color:var(--tx3);">
+                以 KMS 知識庫發文數量計算 · 每月更新
+              </div>
+              <div id="rankingList"><div style="color:var(--tx3);font-size:13px;padding:20px;text-align:center;">載入中…</div></div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -595,6 +618,118 @@ function switchView(name) {
 // ═══════════════════════════════════════════════
 // DIRECTORY (名人榜)
 // ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════════
+// DIRECTORY TAB 切換
+// ═══════════════════════════════════════════════
+let _dirTab = 'contacts';
+
+function switchDirTab(tab) {
+  _dirTab = tab;
+  const isContacts = tab === 'contacts';
+
+  document.getElementById('dir-contacts-view').style.display = isContacts ? '' : 'none';
+  document.getElementById('dir-ranking-view').style.display  = isContacts ? 'none' : '';
+
+  const btnC = document.getElementById('dir-tab-contacts');
+  const btnR = document.getElementById('dir-tab-ranking');
+  if (btnC) {
+    btnC.style.background   = isContacts ? 'var(--ac)' : 'transparent';
+    btnC.style.color        = isContacts ? '#fff' : 'var(--tx2)';
+    btnC.style.borderColor  = isContacts ? 'var(--ac)' : 'var(--br)';
+  }
+  if (btnR) {
+    btnR.style.background   = !isContacts ? 'var(--ac)' : 'transparent';
+    btnR.style.color        = !isContacts ? '#fff' : 'var(--tx2)';
+    btnR.style.borderColor  = !isContacts ? 'var(--ac)' : 'var(--br)';
+  }
+
+  if (!isContacts) loadRanking();
+}
+
+// ─── 知識貢獻排行榜 — 從 Supabase 讀 kms_documents 貼文數 ───
+const SUPABASE_URL = 'https://tcvlnpgpuphdalzvmoyo.supabase.co';
+const SUPABASE_ANON_KEY_PORTAL = ''; // 留空，從 KMS localStorage 讀取
+
+async function getSupabaseKey() {
+  try {
+    const cfg = JSON.parse(localStorage.getItem('comart-kms-config') || '{}');
+    return cfg.supabaseKey || '';
+  } catch(e) { return ''; }
+}
+
+async function loadRanking() {
+  const listEl = document.getElementById('rankingList');
+  listEl.innerHTML = '<div style="color:var(--tx3);font-size:13px;padding:20px;text-align:center;">載入中…</div>';
+
+  const sbKey = await getSupabaseKey();
+  if (!sbKey) {
+    listEl.innerHTML = '<div style="color:var(--tx3);font-size:13px;padding:20px;text-align:center;">需先在 KMS 設定 Supabase Key 才能載入排行榜</div>';
+    return;
+  }
+
+  try {
+    // 從 kms_documents 抓 author_name + 發文數
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/kms_documents?select=author_name,status&status=eq.published`,
+      { headers: { 'apikey': sbKey, 'Authorization': `Bearer ${sbKey}` } }
+    );
+    if (!res.ok) throw new Error('Supabase error ' + res.status);
+    const docs = await res.json();
+
+    // 統計每人發文數
+    const counts = {};
+    for (const d of docs) {
+      const name = d.author_name || '（未署名）';
+      counts[name] = (counts[name] || 0) + 1;
+    }
+
+    const sorted = Object.entries(counts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 20); // 最多顯示 20 名
+
+    if (!sorted.length) {
+      listEl.innerHTML = '<div style="color:var(--tx3);font-size:13px;padding:20px;text-align:center;">知識庫尚無已發佈文件</div>';
+      return;
+    }
+
+    const medals = ['🥇','🥈','🥉'];
+    const maxCount = sorted[0][1];
+
+    listEl.innerHTML = sorted.map(([name, count], i) => {
+      const pct = Math.round((count / maxCount) * 100);
+      const medal = medals[i] || `${i+1}.`;
+      // 從 ALL_USERS 找對應用戶資料
+      const user = ALL_USERS.find(u =>
+        u.nameEn === name || u.nameZh === name ||
+        `${u.nameEn} / ${u.nameZh}` === name
+      );
+      const titleText = user?.titleEn || user?.titleZh || '';
+      const initial = (name || '?')[0].toUpperCase();
+
+      return `
+        <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--br);">
+          <div style="font-size:18px;width:28px;text-align:center;flex-shrink:0;">${medal}</div>
+          <div style="width:36px;height:36px;border-radius:50%;background:var(--ac2);color:var(--ac);
+            display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0;">${initial}</div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:13px;font-weight:600;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${name}</div>
+            ${titleText ? `<div style="font-size:11px;color:var(--tx3);">${titleText}</div>` : ''}
+            <div style="margin-top:5px;height:4px;border-radius:2px;background:var(--s3);overflow:hidden;">
+              <div style="height:100%;width:${pct}%;background:var(--ac);border-radius:2px;transition:width .5s;"></div>
+            </div>
+          </div>
+          <div style="text-align:right;flex-shrink:0;">
+            <div style="font-size:18px;font-weight:700;color:var(--ac);font-family:var(--fm);">${count}</div>
+            <div style="font-size:10px;color:var(--tx3);">篇文章</div>
+          </div>
+        </div>`;
+    }).join('');
+
+  } catch(e) {
+    listEl.innerHTML = `<div style="color:var(--red);font-size:13px;padding:20px;text-align:center;">載入失敗：${e.message}</div>`;
+  }
+}
+
 async function loadDirectory() {
   if (!db) { renderDirectory(); return; }
   try {

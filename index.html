@@ -119,8 +119,8 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:
 .dir-search{flex:1;max-width:300px;padding:8px 12px;border-radius:var(--r);border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;font-family:var(--ff);outline:none;}
 .dir-search:focus{border-color:var(--ac);}
 .dir-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;}
-.dir-card{background:var(--s1);border:1px solid var(--br);border-radius:var(--rl);padding:16px;text-align:center;transition:border-color .15s;}
-.dir-card:hover{border-color:var(--br2);}
+.dir-card{background:var(--s1);border:1px solid var(--br);border-radius:var(--rl);padding:16px;text-align:center;transition:border-color .15s;cursor:pointer;}
+.dir-card:hover{border-color:var(--ac);transform:translateY(-1px);}
 .dir-avatar{width:56px;height:56px;border-radius:50%;background:var(--ac2);color:var(--ac);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;margin:0 auto 10px;}
 .dir-name{font-size:14px;font-weight:600;color:var(--tx);margin-bottom:2px;}
 .dir-name-zh{font-size:12px;color:var(--tx3);}
@@ -128,6 +128,33 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:
 .dir-contacts{display:flex;flex-direction:column;gap:3px;margin-top:10px;border-top:1px solid var(--br);padding-top:10px;}
 .dir-contact{font-size:11px;color:var(--tx3);display:flex;align-items:center;gap:5px;justify-content:center;cursor:pointer;}
 .dir-contact:hover{color:var(--ac);}
+.dir-msg-count{font-size:10px;color:var(--tx3);margin-top:8px;}
+
+/* ─── Profile / Message Modal ─── */
+.profile-header{display:flex;align-items:center;gap:16px;margin-bottom:18px;}
+.profile-avatar-lg{width:64px;height:64px;border-radius:50%;background:var(--ac2);color:var(--ac);display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700;flex-shrink:0;}
+.profile-name{font-size:18px;font-weight:600;color:var(--tx);}
+.profile-title{font-size:13px;color:var(--tx2);margin-top:2px;}
+.profile-site{font-size:11px;color:var(--tx3);margin-top:2px;}
+.msg-list{max-height:340px;overflow-y:auto;margin-bottom:14px;}
+.msg-item{padding:10px 12px;border-bottom:1px solid var(--br);}
+.msg-item:last-child{border-bottom:none;}
+.msg-header{display:flex;align-items:center;gap:8px;margin-bottom:5px;}
+.msg-avatar{width:24px;height:24px;border-radius:50%;background:var(--ac2);color:var(--ac);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;}
+.msg-author{font-size:12px;font-weight:600;color:var(--tx);}
+.msg-time{font-size:10px;color:var(--tx3);margin-left:auto;}
+.msg-body{font-size:13px;color:var(--tx2);line-height:1.6;white-space:pre-wrap;}
+.msg-actions{display:flex;gap:8px;margin-top:5px;}
+.msg-like-btn{font-size:11px;padding:2px 8px;border-radius:10px;border:1px solid var(--br);background:transparent;color:var(--tx3);cursor:pointer;}
+.msg-like-btn:hover,.msg-like-btn.liked{background:var(--red2);border-color:var(--red);color:var(--red);}
+.msg-reply-btn{font-size:11px;color:var(--ac);cursor:pointer;padding:2px 0;}
+.msg-reply-btn:hover{text-decoration:underline;}
+.msg-reply-indent{margin-left:24px;border-left:2px solid var(--br);padding-left:10px;}
+.msg-compose{display:flex;gap:8px;padding-top:12px;border-top:1px solid var(--br);}
+.msg-input{flex:1;background:var(--s2);border:1px solid var(--br);border-radius:var(--r);padding:8px 12px;color:var(--tx);font-size:13px;font-family:var(--ff);resize:none;outline:none;min-height:38px;}
+.msg-input:focus{border-color:var(--ac);}
+.msg-send-btn{padding:8px 16px;background:var(--ac);color:#fff;border:none;border-radius:var(--r);cursor:pointer;font-size:13px;font-family:var(--ff);align-self:flex-end;flex-shrink:0;}
+.msg-empty{text-align:center;color:var(--tx3);font-size:13px;padding:24px 0;}
 
 /* ─── Bulletin Board View ─── */
 .bb-wrap{max-width:800px;margin:0 auto;padding:24px 20px;width:100%;}
@@ -367,6 +394,38 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:
   </div>
 
 </div><!-- end shell -->
+
+<!-- Profile / Message Modal -->
+<div class="overlay" id="profileOverlay" onclick="if(event.target===this)closeProfile()">
+  <div class="modal" style="max-width:520px;max-height:85vh;display:flex;flex-direction:column;">
+    <div class="profile-header">
+      <div class="profile-avatar-lg" id="profileAvatar">?</div>
+      <div style="flex:1;">
+        <div class="profile-name" id="profileName">—</div>
+        <div class="profile-title" id="profileTitle"></div>
+        <div class="profile-site" id="profileSite"></div>
+        <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;" id="profileContacts"></div>
+      </div>
+      <button onclick="closeProfile()" style="align-self:flex-start;padding:4px 8px;border-radius:6px;border:1px solid var(--br);background:transparent;cursor:pointer;color:var(--tx3);font-size:16px;">✕</button>
+    </div>
+
+    <div style="font-size:13px;font-weight:600;color:var(--tx);margin-bottom:10px;">
+      💬 討論留言 <span id="profileMsgCount" style="font-size:11px;color:var(--tx3);font-weight:400;"></span>
+    </div>
+
+    <div class="msg-list" id="msgList">
+      <div class="msg-empty">載入中…</div>
+    </div>
+
+    <!-- 輸入區 -->
+    <div class="msg-compose">
+      <textarea class="msg-input" id="msgInput" placeholder="留言給這位同事…" rows="2"
+        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage();}"></textarea>
+      <button class="msg-send-btn" onclick="sendMessage()">送出</button>
+    </div>
+    <div style="font-size:11px;color:var(--tx3);margin-top:6px;" id="msgReplyHint"></div>
+  </div>
+</div>
 
 <!-- User Modal -->
 <div class="overlay" id="userOverlay" onclick="if(event.target===this)closeUserModal()">
@@ -756,19 +815,23 @@ function renderDirectory() {
   grid.innerHTML = users.map(u => {
     const init = (u.nameEn || u.nameZh || u.empId || '?')[0].toUpperCase();
     const contacts = [
-      u.ext    ? `<div class="dir-contact" onclick="navigator.clipboard?.writeText('${u.ext}');toast('分機已複製','ok')">☎ Ext. ${u.ext}</div>` : '',
-      u.mobile ? `<div class="dir-contact" onclick="navigator.clipboard?.writeText('${u.mobile}');toast('手機號碼已複製','ok')">📱 ${u.mobile}</div>` : '',
-      u.email  ? `<div class="dir-contact" onclick="window.location='mailto:${u.email}'">✉ ${u.email}</div>` : '',
+      u.ext    ? `<div class="dir-contact" onclick="event.stopPropagation();navigator.clipboard?.writeText('${u.ext}');toast('分機已複製','ok')">☎ Ext. ${u.ext}</div>` : '',
+      u.mobile ? `<div class="dir-contact" onclick="event.stopPropagation();navigator.clipboard?.writeText('${u.mobile}');toast('手機號碼已複製','ok')">📱 ${u.mobile}</div>` : '',
+      u.email  ? `<div class="dir-contact" onclick="event.stopPropagation();window.location='mailto:${u.email}'">✉ ${u.email}</div>` : '',
     ].filter(Boolean).join('');
-    return `<div class="dir-card">
+    return `<div class="dir-card" onclick="openProfile('${u.empId}')">
       <div class="dir-avatar">${init}</div>
       <div class="dir-name">${u.nameEn || u.empId}</div>
       ${u.nameZh ? `<div class="dir-name-zh">${u.nameZh}</div>` : ''}
       <div class="dir-title">${u.titleEn || u.titleZh || ''}</div>
       <div style="font-size:10px;color:var(--tx3);margin-top:3px;">${siteLabel[u.site]||u.site||''} · ${u.empId}</div>
       ${contacts ? `<div class="dir-contacts">${contacts}</div>` : ''}
+      <div class="dir-msg-count" id="msgcount-${u.empId}">💬 載入中…</div>
     </div>`;
   }).join('');
+
+  // 非同步載入各員工留言數
+  loadMessageCounts(users.map(u => u.empId));
 }
 
 // ═══════════════════════════════════════════════
@@ -968,6 +1031,190 @@ async function confirmDeleteUser() {
   closeUserModal();
   await loadUsers();
   toast('User deleted','ok');
+}
+
+// ═══════════════════════════════════════════════
+// PROFILE & MESSAGING
+// ═══════════════════════════════════════════════
+const COL_MSG = 'portal_messages';
+let _profileUser = null;
+let _replyToId   = null;
+let _profileMsgs = [];
+
+async function loadMessageCounts(empIds) {
+  if (!db) {
+    empIds.forEach(id => {
+      const el = document.getElementById('msgcount-' + id);
+      if (el) el.textContent = '';
+    });
+    return;
+  }
+  for (const empId of empIds) {
+    try {
+      const snap = await db.collection(COL_MSG)
+        .where('targetEmpId','==',empId)
+        .where('parentId','==',null)
+        .get();
+      const el = document.getElementById('msgcount-' + empId);
+      if (el) el.textContent = snap.size ? `💬 ${snap.size} 則留言` : '💬 留言';
+    } catch(e) {
+      const el = document.getElementById('msgcount-' + empId);
+      if (el) el.textContent = '💬 留言';
+    }
+  }
+}
+
+async function openProfile(empId) {
+  const user = ALL_USERS.find(u => u.empId === empId);
+  if (!user) return;
+  _profileUser = user;
+  _replyToId   = null;
+
+  const init = (user.nameEn || user.empId || '?')[0].toUpperCase();
+  document.getElementById('profileAvatar').textContent = init;
+  document.getElementById('profileName').textContent   = user.nameEn || user.empId;
+  document.getElementById('profileTitle').textContent  = [user.titleEn, user.titleZh].filter(Boolean).join(' / ');
+  const siteLabel = { TW:'Taiwan HQ', CN:'Dongguan', VN:'Vietnam', HK:'Hong Kong' };
+  document.getElementById('profileSite').textContent   = siteLabel[user.site] || user.site || '';
+
+  // 聯絡方式
+  const contactsEl = document.getElementById('profileContacts');
+  contactsEl.innerHTML = [
+    user.ext    ? `<button onclick="navigator.clipboard?.writeText('${user.ext}');toast('已複製','ok')"
+      style="padding:3px 10px;border-radius:10px;border:1px solid var(--br);background:transparent;color:var(--tx3);font-size:11px;cursor:pointer;">☎ ${user.ext}</button>` : '',
+    user.mobile ? `<button onclick="navigator.clipboard?.writeText('${user.mobile}');toast('已複製','ok')"
+      style="padding:3px 10px;border-radius:10px;border:1px solid var(--br);background:transparent;color:var(--tx3);font-size:11px;cursor:pointer;">📱 ${user.mobile}</button>` : '',
+    user.email  ? `<a href="mailto:${user.email}"
+      style="padding:3px 10px;border-radius:10px;border:1px solid var(--br);color:var(--tx3);font-size:11px;text-decoration:none;">✉ Email</a>` : '',
+  ].filter(Boolean).join('');
+
+  document.getElementById('msgInput').value = '';
+  document.getElementById('msgReplyHint').textContent = '';
+  document.getElementById('profileOverlay').classList.add('show');
+
+  await loadMessages(empId);
+}
+
+function closeProfile() {
+  document.getElementById('profileOverlay').classList.remove('show');
+  _profileUser = null;
+  _replyToId   = null;
+}
+
+async function loadMessages(empId) {
+  const listEl   = document.getElementById('msgList');
+  const countEl  = document.getElementById('profileMsgCount');
+  listEl.innerHTML = '<div class="msg-empty">載入中…</div>';
+
+  if (!db) { listEl.innerHTML = '<div class="msg-empty">需要網路連線</div>'; return; }
+
+  try {
+    const snap = await db.collection(COL_MSG)
+      .where('targetEmpId','==',empId)
+      .orderBy('ts','asc')
+      .get();
+    _profileMsgs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch(e) { _profileMsgs = []; }
+
+  const roots   = _profileMsgs.filter(m => !m.parentId);
+  const replies  = _profileMsgs.filter(m => m.parentId);
+  countEl.textContent = roots.length ? `(${roots.length})` : '';
+
+  if (!_profileMsgs.length) {
+    listEl.innerHTML = '<div class="msg-empty">還沒有留言，成為第一個！</div>';
+    return;
+  }
+
+  listEl.innerHTML = roots.map(m => renderMsg(m, replies)).join('');
+}
+
+function renderMsg(m, replies) {
+  const init = (m.authorName || '?')[0].toUpperCase();
+  const dt   = new Date(m.ts).toLocaleString('zh-TW',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
+  const liked = (m.likes||[]).includes(SESSION?.empId);
+  const childReplies = replies.filter(r => r.parentId === m.id);
+
+  return `<div class="msg-item" id="msg-${m.id}">
+    <div class="msg-header">
+      <div class="msg-avatar">${init}</div>
+      <span class="msg-author">${m.authorName || m.authorId}</span>
+      <span class="msg-time">${dt}</span>
+      ${SESSION?.role === 'admin' || m.authorId === SESSION?.empId
+        ? `<button onclick="deleteMsg('${m.id}')" style="margin-left:4px;padding:1px 6px;border-radius:4px;border:1px solid var(--br);background:transparent;color:var(--tx3);font-size:10px;cursor:pointer;">✕</button>`
+        : ''}
+    </div>
+    <div class="msg-body">${escHtml(m.body)}</div>
+    <div class="msg-actions">
+      <button class="msg-like-btn${liked?' liked':''}" onclick="likeMsg('${m.id}')">❤ ${(m.likes||[]).length||''}</button>
+      <span class="msg-reply-btn" onclick="setReplyTo('${m.id}','${m.authorName||m.authorId}')">↩ 回覆</span>
+    </div>
+    ${childReplies.length ? `<div class="msg-reply-indent">${childReplies.map(r => renderMsg(r,[])).join('')}</div>` : ''}
+  </div>`;
+}
+
+function setReplyTo(msgId, authorName) {
+  _replyToId = msgId;
+  document.getElementById('msgReplyHint').textContent = `↩ 回覆 ${authorName}（按 Esc 取消）`;
+  document.getElementById('msgInput').focus();
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && _replyToId) {
+    _replyToId = null;
+    document.getElementById('msgReplyHint').textContent = '';
+  }
+});
+
+async function sendMessage() {
+  const body = document.getElementById('msgInput').value.trim();
+  if (!body || !_profileUser || !SESSION) return;
+
+  const msg = {
+    targetEmpId: _profileUser.empId,
+    authorId:    SESSION.empId,
+    authorName:  SESSION.nameEn || SESSION.nameZh || SESSION.empId,
+    body,
+    ts:       Date.now(),
+    likes:    [],
+    parentId: _replyToId || null,
+  };
+
+  try {
+    if (db) await db.collection(COL_MSG).add(msg);
+    document.getElementById('msgInput').value = '';
+    _replyToId = null;
+    document.getElementById('msgReplyHint').textContent = '';
+    await loadMessages(_profileUser.empId);
+    // 更新卡片留言數
+    const countEl = document.getElementById('msgcount-' + _profileUser.empId);
+    if (countEl) {
+      const roots = _profileMsgs.filter(m => !m.parentId);
+      countEl.textContent = `💬 ${roots.length} 則留言`;
+    }
+  } catch(e) { toast('留言失敗：' + e.message, 'err'); }
+}
+
+async function likeMsg(msgId) {
+  const msg = _profileMsgs.find(m => m.id === msgId);
+  if (!msg || !SESSION) return;
+  const empId    = SESSION.empId;
+  const likes    = msg.likes || [];
+  const newLikes = likes.includes(empId) ? likes.filter(l => l !== empId) : [...likes, empId];
+  msg.likes = newLikes;
+  if (db) { try { await db.collection(COL_MSG).doc(msgId).update({ likes: newLikes }); } catch(e){} }
+  const replies = _profileMsgs.filter(m => m.parentId);
+  document.getElementById('msgList').innerHTML =
+    _profileMsgs.filter(m => !m.parentId).map(m => renderMsg(m, replies)).join('');
+}
+
+async function deleteMsg(msgId) {
+  if (!confirm('刪除此留言？')) return;
+  if (db) { try { await db.collection(COL_MSG).doc(msgId).delete(); } catch(e) { toast('刪除失敗','err'); return; } }
+  _profileMsgs = _profileMsgs.filter(m => m.id !== msgId);
+  const replies = _profileMsgs.filter(m => m.parentId);
+  document.getElementById('msgList').innerHTML =
+    _profileMsgs.filter(m => !m.parentId).map(m => renderMsg(m, replies)).join('');
+  toast('已刪除','ok');
 }
 
 // ═══════════════════════════════════════════════

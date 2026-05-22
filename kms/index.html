@@ -1178,7 +1178,7 @@ function canEdit(docAuthorName) {
   return true; // 自己的或新文件
 }
 
-function initPortalSession() {
+async function initPortalSession() {
   const sess = readPortalSession();
   if (!sess) return;
 
@@ -1192,22 +1192,38 @@ function initPortalSession() {
   const chip = document.getElementById('portal-user-chip');
   if (chip) chip.style.display = 'flex';
 
-  const initial = (sess.nameEn || sess.empId || '?')[0].toUpperCase();
+  // ── 補齊真實姓名：若 session 沒帶 nameEn/nameZh，去 kms_users 查 ──
+  let displayName = sess.nameEn || sess.nameZh || '';
+  if (!displayName && sess.empId && CFG.supabaseUrl && CFG.supabaseKey) {
+    try {
+      const rows = await sbFetch(
+        `/rest/v1/kms_users?emp_id=eq.${encodeURIComponent(sess.empId)}&select=name_en,name_zh&limit=1`
+      );
+      if (rows && rows.length) {
+        displayName = rows[0].name_en || rows[0].name_zh || '';
+        portalUser.nameEn = rows[0].name_en || '';
+        portalUser.nameZh = rows[0].name_zh || '';
+      }
+    } catch(e) { /* 查不到就維持空白，不 fallback 到工號 */ }
+  }
+
+  const initial = (displayName || sess.empId || '?')[0].toUpperCase();
   const avatarEl = document.getElementById('portal-user-avatar');
   if (avatarEl) avatarEl.textContent = initial;
 
   const nameEl = document.getElementById('portal-user-name');
-  if (nameEl) nameEl.textContent = sess.nameEn || sess.nameZh || sess.empId;
+  // topbar：有姓名用姓名，沒有才顯示工號（僅供辨識）
+  if (nameEl) nameEl.textContent = displayName || sess.empId;
 
   const roleEl = document.getElementById('portal-user-role');
   const kmsRole = getKmsRole();
   const roleLabel = { admin:'KMS Admin', user:'KMS User' }[kmsRole] || kmsRole;
   if (roleEl) roleEl.textContent = roleLabel;
 
-  // 預填建立者姓名（只用真實姓名，不用工號）
+  // 預填建立者姓名（只填真實姓名，查不到就空白讓使用者自填）
   const authorEl = document.getElementById('doc-author');
   if (authorEl && !authorEl.value) {
-    authorEl.value = sess.nameEn || sess.nameZh || '';
+    authorEl.value = displayName;
   }
 
   // 提示目前身份
@@ -1220,7 +1236,7 @@ function initPortalSession() {
 
 window.addEventListener('DOMContentLoaded', async () => {
   loadConfig();
-  initPortalSession();
+  await initPortalSession();
   await initTipTap();
   await loadProductLines();
   loadDocs();
@@ -1690,13 +1706,9 @@ async function saveDoc() {
         await kmsWrite('update', 'kms_documents', docPayload, editingDocId);
         doc_id = editingDocId;
       } else {
-        // ── 新增文件 ──
-        const saved = await sbFetch('/rest/v1/kms_documents', {
-          method: 'POST',
-          body: JSON.stringify(docPayload),
-          prefer: 'return=representation',
-        });
-        doc_id = saved?.[0]?.id;
+        // ── 新增文件（走 kms-write Edge Function，service_role 繞過 RLS）──
+        const saved = await kmsWrite('insert', 'kms_documents', docPayload);
+        doc_id = saved?.id || saved?.[0]?.id;
         if (!doc_id) throw new Error('文件儲存後未取得 ID');
       }
 

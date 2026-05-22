@@ -1708,11 +1708,16 @@ async function saveDoc() {
         if (!doc_id) throw new Error('文件儲存後未取得 ID');
       }
 
-      // ── 步驟 2：觸發 embedding ──
+      // ── 步驟 2：觸發 embedding（失敗不擋住文件儲存）──
       if (mode === 'edge-fn') {
         btn.textContent = 'Edge Function 向量化…';
-        await callEmbedEdgeFn(doc_id);
-        toast(`已儲存並完成向量化（Edge Function） ✓`, 'success');
+        try {
+          await callEmbedEdgeFn(doc_id);
+          toast(`已儲存並完成向量化 ✓`, 'success');
+        } catch(embedErr) {
+          console.error('[embed-document]', embedErr);
+          toast(`文件已儲存 ✓，向量化失敗（${embedErr.message.slice(0,60)}）— 可稍後重新上傳觸發`, '');
+        }
 
       } else if (mode === 'direct-openai') {
         btn.textContent = 'OpenAI 向量化中…';
@@ -2203,7 +2208,7 @@ async function extractPdfWithClaude(file) {
           { type: 'text', text: '請完整抽取這份 PDF 的所有文字內容，保持原始結構（標題、段落、表格）。只輸出文字內容，不要加任何說明或前言。' },
         ],
       }],
-    }, 60000);
+    }, 120000);
     return data.content?.[0]?.text || '';
   } catch(e) {
     throw e;
@@ -3572,7 +3577,7 @@ async function openDoc(id) {
       doc = res?.[0];
     }
     if (doc) {
-      document.getElementById('doc-author').value = doc.author_name || '';
+      // doc-author 不預填既有文件的作者名（保持空白讓使用者自行填寫）
       document.getElementById('doc-reviewer').value = doc.reviewer || '';
       document.getElementById('doc-valid-until').value = doc.valid_until || '';
       document.getElementById('doc-product-line').value = doc.product_line || '';

@@ -1204,10 +1204,10 @@ function initPortalSession() {
   const roleLabel = { admin:'KMS Admin', user:'KMS User' }[kmsRole] || kmsRole;
   if (roleEl) roleEl.textContent = roleLabel;
 
-  // 預填建立者姓名
+  // 預填建立者姓名（只用真實姓名，不用工號）
   const authorEl = document.getElementById('doc-author');
   if (authorEl && !authorEl.value) {
-    authorEl.value = sess.nameEn || sess.nameZh || sess.empId;
+    authorEl.value = sess.nameEn || sess.nameZh || '';
   }
 
   // 提示目前身份
@@ -2114,19 +2114,13 @@ async function extractText(file, ext) {
     return slides.join('\n\n');
   }
 
-  // PDF：用 Claude Vision API 抽文字（需要 Claude key）
+  // PDF：呼叫 claude-proxy Edge Function 抽文字
   if (ext === 'pdf') {
-    if (!CFG.claudeKey) {
-      throw new Error('PDF 解析需要 Claude API Key，請先在 ⚙ 設定中填入');
-    }
     return await extractPdfWithClaude(file);
   }
 
-  // 圖片：用 Claude Vision API
+  // 圖片：呼叫 claude-proxy Edge Function OCR
   if (['jpg','jpeg','png'].includes(ext)) {
-    if (!CFG.claudeKey) {
-      throw new Error('圖片 OCR 需要 Claude API Key，請先在 ⚙ 設定中填入');
-    }
     return await extractImageWithClaude(file, ext);
   }
 
@@ -2545,13 +2539,13 @@ async function doSearch() {
 
     if (!chunks.length) {
       logSearchGap(q);
-      if (!CFG.claudeKey) {
+    if (!(CFG.supabaseUrl || CFG.claudeKey)) {
         const noKeyMsg = {
-          'zh-TW': `⚠ 知識庫找不到「${q}」的相關資料。請設定 Claude API Key 以啟用 AI 外部知識搜尋。`,
-          'zh-CN': `⚠ 知识库中未找到「${q}」的相关资料。请设置 Claude API Key 以启用 AI 外部知识搜索。`,
-          'en':    `⚠ No results in Knowledge Base for "${q}". Set Claude API Key to enable AI external search.`,
-          'vi':    `⚠ Không tìm thấy "${q}" trong kho kiến thức. Cấu hình Claude API Key để bật tìm kiếm AI.`,
-          'ja':    `⚠ ナレッジベースに「${q}」の関連情報がありません。Claude API Key を設定してください。`,
+          'zh-TW': `⚠ 知識庫找不到「${q}」的相關資料。請完成 Supabase 設定以啟用 AI 外部知識搜尋。`,
+          'zh-CN': `⚠ 知识库中未找到「${q}」的相关资料。请完成 Supabase 配置以启用 AI 外部知识搜索。`,
+          'en':    `⚠ No results in Knowledge Base for "${q}". Configure Supabase to enable AI external search.`,
+          'vi':    `⚠ Không tìm thấy "${q}" trong kho kiến thức. Cấu hình Supabase để bật tìm kiếm AI.`,
+          'ja':    `⚠ ナレッジベースに「${q}」の関連情報がありません。Supabase を設定してください。`,
         }[currentLang] || `⚠ 知識缺口：找不到「${q}」的相關知識條目。`;
         ragBody.innerHTML = `<div class="gap-banner">${noKeyMsg}</div>`;
         resetSearchBtn();
@@ -2616,12 +2610,12 @@ async function doSearch() {
     // 等一個 microtask，確保 DOM 已更新，ai-output 元素存在
     await new Promise(r => setTimeout(r, 0));
 
-    if (!CFG.claudeKey) {
+    if (CFG.supabaseUrl || CFG.claudeKey) {
+      await streamClaude(systemPrompt, userMsg);
+    } else {
       const mockAnswer = generateMockAnswer(q, chunks);
       const el = document.getElementById('ai-output');
       if (el) { el.classList.remove('streaming'); el.textContent = mockAnswer; }
-    } else {
-      await streamClaude(systemPrompt, userMsg);
     }
 
   } catch(e) {
@@ -2809,11 +2803,11 @@ function generateMockAnswer(query, chunks) {
   }[lang] || '';
   const body = chunks.map((c, i) => `[${docLabel}${i+1}] ${c.title}：${c.snippet.substring(0, 80)}…`).join('\n\n');
   const footer = {
-    'zh-TW': '\n\n（此為 Mock 模式回答。設定 Claude API Key 後可獲得完整 AI 彙整回答。）',
-    'zh-CN': '\n\n（此为 Mock 模式回答。配置 Claude API Key 后可获得完整 AI 汇总回答。）',
-    'en': '\n\n(This is a mock response. Configure Claude API Key for full AI-synthesized answers.)',
-    'vi': '\n\n(Đây là câu trả lời Mock. Cấu hình Claude API Key để có câu trả lời AI đầy đủ.)',
-    'ja': '\n\n（これは Mock モードの回答です。Claude API Key を設定すると、完全な AI 統合回答が得られます。）',
+    'zh-TW': '',
+    'zh-CN': '',
+    'en': '',
+    'vi': '',
+    'ja': '',
   }[lang] || '';
   return intro + body + footer;
 }

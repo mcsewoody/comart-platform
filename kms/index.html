@@ -360,7 +360,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.0</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.01</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
@@ -1241,13 +1241,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   loadDocs();
   updateStatus();
 
-  // Show SQL helper on first visit
-  if (!localStorage.getItem('kms-visited')) {
-    setTimeout(() => {
-      document.getElementById('sql-helper').style.display = 'block';
-      localStorage.setItem('kms-visited', '1');
-    }, 1500);
-  }
+  // sql-helper 已移除（系統上線後不需要初始化提示）
 });
 
 function loadConfig() {

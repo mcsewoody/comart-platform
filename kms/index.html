@@ -578,7 +578,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
 
         <!-- Meta row — 第三行：建立者、有效期、關聯文件 -->
         <div style="padding:6px 12px;border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:var(--bg);flex-shrink:0;">
-          <input class="meta-input" id="doc-author" placeholder="建立者姓名" style="width:110px;" />
+          <input class="meta-input" id="doc-author" placeholder="建立者姓名" style="width:110px;" autocomplete="off" name="kms-author-nofill" />
           <input class="meta-input" id="doc-reviewer" placeholder="審核人（選填）" style="width:120px;" />
           <input class="meta-input" id="doc-valid-until" type="date" title="文件有效期限" style="width:130px;" />
           <input class="meta-input" id="doc-related" placeholder="關聯文件標題（逗號分隔）" style="flex:1;min-width:140px;" />
@@ -1233,6 +1233,9 @@ async function initPortalSession() {
 window.addEventListener('DOMContentLoaded', async () => {
   loadConfig();
   await initPortalSession();
+  // 強制清空 doc-author（防止瀏覽器 autocomplete 或殘值）
+  const _authorEl = document.getElementById('doc-author');
+  if (_authorEl) _authorEl.value = '';
   await initTipTap();
   await loadProductLines();
   loadDocs();

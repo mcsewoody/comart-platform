@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>COMART Platform v1.11</title>
+<title>COMART Platform v1.12</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -261,7 +261,7 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:
     <div class="login-logo">
       <div class="login-mark">C</div>
       <div class="login-name">COMART Platform</div>
-      <div class="login-sub">Internal Portal · v1.11</div>
+      <div class="login-sub">Internal Portal · v1.12</div>
     </div>
     <div class="field">
       <label>Employee ID</label>
@@ -287,7 +287,7 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:
   <div class="topbar">
     <div class="topbar-logo" onclick="switchView('home')">
       <div class="topbar-mark">C</div>
-      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.11</span></div>
+      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.12</span></div>
     </div>
     <div class="topbar-right">
       <div class="lang-switcher">
@@ -2280,6 +2280,7 @@ async function saveTrip() {
   var notes    = (document.getElementById('trip-notes') || {}).value || '';
 
   if (!empId || !dateFrom || !dest) { toast('Staff, Date From, and Destination are required'); return; }
+  if (dateTo && dateTo < dateFrom) { toast('Date To cannot be earlier than Date From'); return; }
 
   function gv(id) { var el = document.getElementById(id); return el ? el.value.trim() : ''; }
   var tripData = {
@@ -2830,6 +2831,7 @@ async function saveCalEvent() {
   var notes  = document.getElementById('cal-event-notes').value.trim();
 
   if (!title || !from) { toast('Title and Date From are required', ''); return; }
+  if (to && to < from) { toast('Date To cannot be earlier than Date From', ''); return; }
 
   var cat = CAL_CATEGORIES.find(function(c) { return c.id === catId; });
   if (!cat || !cat.fbCol) { toast('Invalid calendar', ''); return; }
@@ -2892,52 +2894,79 @@ function pStartVoice() {
   var input    = document.getElementById('p-xlat-input');
 
   var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) { toast('Voice input not supported on this browser'); return; }
-
-  if (_pVoiceActive && _pVoiceSR) {
-    _pVoiceActive = false;
-    _pVoiceSR.stop();
-    if (btn)      btn.style.background = 'var(--s2)';
-    if (statusEl) statusEl.style.display = 'none';
+  if (!SR) {
+    toast('語音輸入不支援此瀏覽器，請用 Chrome');
     return;
   }
 
-  var sr = new SR();
-  sr.continuous    = true;
-  sr.interimResults = true;
-  sr.lang = 'zh-TW';  // Primary: Traditional Chinese; user can speak English too
+  // Stop if already recording
+  if (_pVoiceActive && _pVoiceSR) {
+    _pVoiceActive = false;
+    try { _pVoiceSR.stop(); } catch(_) {}
+    if (btn)      { btn.style.background = 'var(--s2)'; btn.style.color = ''; }
+    if (statusEl)   statusEl.style.display = 'none';
+    return;
+  }
+
+  // Must be triggered by user gesture — already satisfied since this is onclick
+  var sr;
+  try {
+    sr = new SR();
+  } catch(e) {
+    toast('語音初始化失敗：' + e.message);
+    return;
+  }
+
+  sr.continuous     = false;  // single utterance more compatible on mobile
+  sr.interimResults = false;
+  sr.maxAlternatives = 1;
+  sr.lang = 'zh-TW';
   _pVoiceSR = sr;
 
-  var finalTranscript = input ? input.value : '';
+  var finalTranscript = '';
 
   sr.onresult = function(e) {
-    var interim = '';
-    for (var i = e.resultIndex; i < e.results.length; i++) {
-      if (e.results[i].isFinal) { finalTranscript += e.results[i][0].transcript; }
-      else { interim += e.results[i][0].transcript; }
+    for (var i = 0; i < e.results.length; i++) {
+      if (e.results[i].isFinal) finalTranscript += e.results[i][0].transcript;
     }
-    if (input) input.value = finalTranscript + interim;
+    if (input) input.value = (input.value ? input.value + ' ' : '') + finalTranscript;
   };
 
   sr.onend = function() {
     _pVoiceActive = false;
-    if (btn)      btn.style.background = 'var(--s2)';
-    if (statusEl) statusEl.style.display = 'none';
-    if (input)    input.value = finalTranscript;
-    // Auto-run AI cleanup after voice
-    if (finalTranscript.trim()) pCleanText();
+    if (btn)      { btn.style.background = 'var(--s2)'; btn.style.color = ''; }
+    if (statusEl)   statusEl.style.display = 'none';
+    if (finalTranscript.trim()) {
+      toast('錄音完成，AI 整理中…');
+      pCleanText();
+    }
   };
 
   sr.onerror = function(e) {
     _pVoiceActive = false;
-    if (btn)      btn.style.background = 'var(--s2)';
-    if (statusEl) statusEl.style.display = 'none';
-    toast('Voice error: ' + e.error);
+    if (btn)      { btn.style.background = 'var(--s2)'; btn.style.color = ''; }
+    if (statusEl)   statusEl.style.display = 'none';
+    var msg = e.error;
+    if (msg === 'not-allowed' || msg === 'service-not-allowed') {
+      toast('請在瀏覽器設定中允許麥克風存取 platform.comart.com.tw');
+    } else if (msg === 'no-speech') {
+      toast('沒有偵測到語音，請再試一次');
+    } else if (msg === 'network') {
+      toast('語音辨識需要網路連線');
+    } else {
+      toast('語音錯誤：' + msg);
+    }
   };
 
-  sr.start();
-  _pVoiceActive = true;
-  if (btn)      { btn.style.background = '#7c3aed'; btn.style.color = '#fff'; }
+  try {
+    sr.start();
+    _pVoiceActive = true;
+    if (btn)      { btn.style.background = '#7c3aed'; btn.style.color = '#fff'; }
+    if (statusEl) { statusEl.style.display = 'block'; statusEl.textContent = '● 錄音中… (再按一次停止)'; }
+  } catch(e) {
+    toast('無法啟動語音：' + e.message);
+  }
+}
   if (statusEl)   statusEl.style.display = 'block';
 }
 

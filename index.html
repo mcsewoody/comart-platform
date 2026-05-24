@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>COMART Platform v1.10</title>
+<title>COMART Platform v1.11</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -261,7 +261,7 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:
     <div class="login-logo">
       <div class="login-mark">C</div>
       <div class="login-name">COMART Platform</div>
-      <div class="login-sub">Internal Portal · v1.10</div>
+      <div class="login-sub">Internal Portal · v1.11</div>
     </div>
     <div class="field">
       <label>Employee ID</label>
@@ -287,7 +287,7 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:
   <div class="topbar">
     <div class="topbar-logo" onclick="switchView('home')">
       <div class="topbar-mark">C</div>
-      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.10</span></div>
+      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.11</span></div>
     </div>
     <div class="topbar-right">
       <div class="lang-switcher">
@@ -583,7 +583,7 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
             <div>
               <label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px;">Date From *</label>
-              <input id="cal-event-from" type="date" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;">
+              <input id="cal-event-from" type="date" onchange="if(!document.getElementById('cal-event-to').value)document.getElementById('cal-event-to').value=this.value;" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;">
             </div>
             <div>
               <label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px;">Date To</label>
@@ -793,7 +793,7 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
             <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px;">Date From</label>
-              <input id="trip-date-from" type="date" style="width:100%;padding:9px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;"></div>
+              <input id="trip-date-from" type="date" onchange="if(!document.getElementById('trip-date-to').value)document.getElementById('trip-date-to').value=this.value;" style="width:100%;padding:9px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;"></div>
             <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px;">Date To</label>
               <input id="trip-date-to" type="date" style="width:100%;padding:9px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;"></div>
           </div>
@@ -2227,8 +2227,16 @@ function openTripModal(id) {
   }
 
   function fld(id, val) { var el = document.getElementById(id); if (el) el.value = val || ''; }
-  fld('trip-date-from',      trip && trip.dateFrom);
-  fld('trip-date-to',        trip && trip.dateTo);
+
+  // Default dates: +7 days from today for new trips
+  var defaultDate = '';
+  if (!id) {
+    var d7 = new Date(); d7.setDate(d7.getDate() + 7);
+    defaultDate = d7.toISOString().slice(0,10);
+  }
+
+  fld('trip-date-from',      trip ? trip.dateFrom : defaultDate);
+  fld('trip-date-to',        trip ? trip.dateTo   : defaultDate);
   fld('trip-dest',           trip && trip.dest);
   fld('trip-flight',         trip && trip.flight);
   fld('trip-notes',          trip && trip.notes);
@@ -2792,9 +2800,16 @@ function openCalEventModal(catId, eventId) {
   catSel.innerHTML = CAL_CATEGORIES.filter(function(c) { return c.editable && c.fbCol; })
     .map(function(c) { return '<option value="' + c.id + '"' + (c.id === calEventEditCat ? ' selected' : '') + '>' + c.icon + ' ' + c.label + '</option>'; }).join('');
 
+  // Default dates: +7 days from today for new events
+  var defaultDate = '';
+  if (!eventId) {
+    var d = new Date(); d.setDate(d.getDate() + 7);
+    defaultDate = d.toISOString().slice(0,10);
+  }
+
   document.getElementById('cal-event-title').value = event ? (event.title || '') : '';
-  document.getElementById('cal-event-from').value  = event ? (event.dateFrom || '') : '';
-  document.getElementById('cal-event-to').value    = event ? (event.dateTo   || '') : '';
+  document.getElementById('cal-event-from').value  = event ? (event.dateFrom || '') : defaultDate;
+  document.getElementById('cal-event-to').value    = event ? (event.dateTo   || '') : defaultDate;
   document.getElementById('cal-event-notes').value = event ? (event.notes    || '') : '';
   document.getElementById('cal-event-del').style.display = event ? '' : 'none';
 

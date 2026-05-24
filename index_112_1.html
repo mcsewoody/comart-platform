@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>COMART Platform v1.13</title>
+<title>COMART Platform v1.12</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -261,7 +261,7 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:
     <div class="login-logo">
       <div class="login-mark">C</div>
       <div class="login-name">COMART Platform</div>
-      <div class="login-sub">Internal Portal · v1.13</div>
+      <div class="login-sub">Internal Portal · v1.12</div>
     </div>
     <div class="field">
       <label>Employee ID</label>
@@ -287,7 +287,7 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:
   <div class="topbar">
     <div class="topbar-logo" onclick="switchView('home')">
       <div class="topbar-mark">C</div>
-      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.13</span></div>
+      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.12</span></div>
     </div>
     <div class="topbar-right">
       <div class="lang-switcher">
@@ -2893,85 +2893,78 @@ function pStartVoice() {
   var statusEl = document.getElementById('p-voice-status');
   var input    = document.getElementById('p-xlat-input');
 
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) {
+    toast('語音輸入不支援此瀏覽器，請用 Chrome');
+    return;
+  }
+
   // Stop if already recording
-  if (window._srActive && window._currentSR) {
-    window._srActive = false;
-    try { window._currentSR.stop(); } catch(_) {}
-    if (btn)      { btn.textContent = '🎙'; btn.style.background = 'var(--s2)'; btn.style.color = ''; }
+  if (_pVoiceActive && _pVoiceSR) {
+    _pVoiceActive = false;
+    try { _pVoiceSR.stop(); } catch(_) {}
+    if (btn)      { btn.style.background = 'var(--s2)'; btn.style.color = ''; }
     if (statusEl)   statusEl.style.display = 'none';
     return;
   }
 
-  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) { toast('Voice input not supported — please type or paste text.'); return; }
+  // Must be triggered by user gesture — already satisfied since this is onclick
+  var sr;
+  try {
+    sr = new SR();
+  } catch(e) {
+    toast('語音初始化失敗：' + e.message);
+    return;
+  }
 
-  var sr = new SR();
-  sr.continuous      = true;   // don't auto-stop on silence
-  sr.interimResults  = true;   // show live transcription
+  sr.continuous     = false;  // single utterance more compatible on mobile
+  sr.interimResults = false;
   sr.maxAlternatives = 1;
-  // No lang set — let browser auto-detect (better mobile compatibility)
+  sr.lang = 'zh-TW';
+  _pVoiceSR = sr;
 
-  var finalText = '';
+  var finalTranscript = '';
 
-  sr.onresult = function(ev) {
-    var interim = '';
-    for (var i = ev.resultIndex; i < ev.results.length; i++) {
-      if (ev.results[i].isFinal) finalText += ev.results[i][0].transcript;
-      else interim += ev.results[i][0].transcript;
+  sr.onresult = function(e) {
+    for (var i = 0; i < e.results.length; i++) {
+      if (e.results[i].isFinal) finalTranscript += e.results[i][0].transcript;
     }
-    if (input) input.value = finalText + (interim ? ' [' + interim + ']' : '');
-  };
-
-  sr.onerror = function(ev) {
-    if (ev.error === 'no-speech') return; // silence — ignore
-    console.warn('SR error:', ev.error);
-    window._srActive = false;
-    if (btn) { btn.textContent = '🎙'; btn.style.background = 'var(--s2)'; btn.style.color = ''; }
-    if (statusEl) statusEl.style.display = 'none';
-    var msg = ev.error;
-    if (msg === 'not-allowed' || msg === 'service-not-allowed') {
-      toast('請在瀏覽器設定中允許麥克風存取');
-    } else if (msg !== 'aborted') {
-      toast('Voice error: ' + msg);
-    }
+    if (input) input.value = (input.value ? input.value + ' ' : '') + finalTranscript;
   };
 
   sr.onend = function() {
-    if (!window._srActive) {
-      // User stopped — finalize and AI clean
-      var raw = finalText.trim().replace(/\s*\[[^\]]*\]/g, '').trim();
-      if (!raw) { if (input) input.value = ''; return; }
-      if (input) input.value = raw;
-      // AI cleanup
-      if (statusEl) { statusEl.style.display = 'block'; statusEl.textContent = '✦ AI 整理中…'; }
-      pCallClaude([{ role: 'user', content: '請將語音轉為文字，修改為合理的文字內容並加上標點符號。只輸出修改後的文字，不要加任何說明或前言。\n\n語音原文：\n' + raw }], null, 2000)
-        .then(function(cleaned) {
-          if (cleaned && input) input.value = cleaned;
-        })
-        .catch(function() {
-          if (input && !/[.!?。！？…]$/.test(raw)) input.value = raw + '。';
-        })
-        .finally(function() {
-          if (statusEl) statusEl.style.display = 'none';
-        });
-      return;
+    _pVoiceActive = false;
+    if (btn)      { btn.style.background = 'var(--s2)'; btn.style.color = ''; }
+    if (statusEl)   statusEl.style.display = 'none';
+    if (finalTranscript.trim()) {
+      toast('錄音完成，AI 整理中…');
+      pCleanText();
     }
-    // Auto-restart on mobile (browser stops after silence)
-    try { sr.start(); } catch(_) {}
   };
 
-  window._currentSR = sr;
-  window._srActive  = true;
-  sr.start();
+  sr.onerror = function(e) {
+    _pVoiceActive = false;
+    if (btn)      { btn.style.background = 'var(--s2)'; btn.style.color = ''; }
+    if (statusEl)   statusEl.style.display = 'none';
+    var msg = e.error;
+    if (msg === 'not-allowed' || msg === 'service-not-allowed') {
+      toast('請在瀏覽器設定中允許麥克風存取 platform.comart.com.tw');
+    } else if (msg === 'no-speech') {
+      toast('沒有偵測到語音，請再試一次');
+    } else if (msg === 'network') {
+      toast('語音辨識需要網路連線');
+    } else {
+      toast('語音錯誤：' + msg);
+    }
+  };
 
-  if (btn) {
-    btn.textContent = '⏹';
-    btn.style.background = '#7c3aed';
-    btn.style.color = '#fff';
-  }
-  if (statusEl) {
-    statusEl.style.display = 'block';
-    statusEl.textContent = '● Recording… 再按一次停止';
+  try {
+    sr.start();
+    _pVoiceActive = true;
+    if (btn)      { btn.style.background = '#7c3aed'; btn.style.color = '#fff'; }
+    if (statusEl) { statusEl.style.display = 'block'; statusEl.textContent = '● 錄音中… (再按一次停止)'; }
+  } catch(e) {
+    toast('無法啟動語音：' + e.message);
   }
 }
 

@@ -1,0 +1,4132 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>COMART KMS — RAG POC</title>
+
+<!-- Marked for Markdown → HTML preview (classic script, no module needed) -->
+<script src="https://cdn.jsdelivr.net/npm/marked@9.1.6/marked.min.js"></script>
+<!-- mammoth.js: Word (.docx) → text extraction -->
+<script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
+<!-- SheetJS: Excel (.xlsx/.xls) → text extraction -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<!-- JSZip: PPTX → slide text extraction -->
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+<!-- PapaParse: CSV → structured text extraction -->
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+<!-- TipTap loaded via ESM in initTipTap() using dynamic import from esm.sh -->
+
+<style>
+/* ─── Reset & Base ─── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #f7f6f3;
+  --surface: #ffffff;
+  --border: #e2e0d8;
+  --border-mid: #c8c6bc;
+  --text: #1a1917;
+  --text-2: #4a4845;
+  --text-3: #888580;
+  --blue: #185FA5;
+  --blue-bg: #E6F1FB;
+  --blue-border: #B5D4F4;
+  --green: #0F6E56;
+  --green-bg: #E1F5EE;
+  --amber: #854F0B;
+  --amber-bg: #FAEEDA;
+  --amber-border: #FAC775;
+  --red: #A32D2D;
+  --red-bg: #FCEBEB;
+  --radius: 8px;
+  --radius-lg: 12px;
+  --font: 'Segoe UI', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+}
+body { font-family: var(--font); background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.6; }
+
+/* ─── Layout ─── */
+.app { display: grid; grid-template-columns: 240px 1fr; grid-template-rows: 52px 1fr; height: 100vh; overflow: hidden; }
+.topbar { grid-column: 1/-1; background: var(--surface); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 16px; gap: 12px; z-index: 10; }
+.sidebar { background: var(--surface); border-right: 1px solid var(--border); overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 4px; }
+.main { overflow: hidden; display: flex; flex-direction: column; }
+
+/* ─── Topbar ─── */
+.logo { font-size: 15px; font-weight: 600; color: var(--text); letter-spacing: -0.3px; }
+.logo span { color: var(--blue); }
+.lang-selector { margin-left: auto; display: flex; gap: 4px; }
+.lang-btn { padding: 4px 10px; border-radius: 20px; border: 1px solid var(--border); background: transparent; cursor: pointer; font-size: 12px; color: var(--text-2); transition: all .15s; }
+.lang-btn.active, .lang-btn:hover { background: var(--blue-bg); border-color: var(--blue-border); color: var(--blue); }
+.config-btn { padding: 5px 12px; border-radius: var(--radius); border: 1px solid var(--border); background: transparent; cursor: pointer; font-size: 12px; color: var(--text-2); }
+.config-btn:hover { background: var(--bg); }
+
+/* ─── Sidebar nav ─── */
+.nav-section { font-size: 11px; color: var(--text-3); padding: 8px 8px 4px; text-transform: uppercase; letter-spacing: .06em; font-weight: 500; }
+.nav-item { display: flex; align-items: center; gap: 8px; padding: 7px 10px; border-radius: var(--radius); cursor: pointer; font-size: 13px; color: var(--text-2); border: none; background: transparent; width: 100%; text-align: left; }
+.nav-item:hover { background: var(--bg); color: var(--text); }
+.nav-item.active { background: var(--blue-bg); color: var(--blue); font-weight: 500; }
+.nav-item svg { flex-shrink: 0; opacity: .7; }
+.nav-badge { margin-left: auto; background: var(--amber-bg); color: var(--amber); font-size: 10px; padding: 1px 6px; border-radius: 10px; font-weight: 500; }
+
+/* ─── Content panels ─── */
+.panel { display: none; flex: 1; overflow: hidden; }
+.panel.active { display: flex; flex-direction: column; }
+
+/* ─── Search / RAG Panel ─── */
+.rag-wrap { display: flex; flex-direction: column; height: 100%; }
+.rag-header { padding: 16px 20px 12px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.rag-title { font-size: 16px; font-weight: 500; margin-bottom: 10px; }
+.search-row { display: flex; gap: 8px; }
+.search-input { flex: 1; padding: 9px 14px; border-radius: var(--radius); border: 1.5px solid var(--border); font-size: 14px; font-family: var(--font); outline: none; background: var(--surface); color: var(--text); }
+.search-input:focus { border-color: var(--blue); }
+.search-btn { padding: 9px 18px; background: var(--blue); color: #fff; border: none; border-radius: var(--radius); cursor: pointer; font-size: 13px; font-weight: 500; white-space: nowrap; }
+.search-btn:hover { background: #0C447C; }
+.search-btn:disabled { background: var(--border-mid); cursor: not-allowed; }
+
+.rag-body { flex: 1; overflow-y: auto; padding: 16px 20px; display: flex; flex-direction: column; gap: 12px; }
+
+/* AI Answer box */
+.ai-answer { background: var(--green-bg); border: 1px solid #9FE1CB; border-radius: var(--radius-lg); padding: 14px 16px; }
+.ai-label { font-size: 11px; color: var(--green); font-weight: 600; letter-spacing: .05em; margin-bottom: 8px; display: flex; align-items: center; gap: 5px; }
+.ai-text { font-size: 14px; color: var(--text); line-height: 1.7; white-space: pre-wrap; }
+.ai-text.streaming::after { content: '▌'; animation: blink .7s step-end infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+
+/* ─── AI Fallback — 外部 AI 知識（非知識庫） ─── */
+.ai-answer-ext { background: #FEF8ED; border: 1.5px solid var(--amber-border); border-radius: var(--radius-lg); padding: 14px 16px; }
+.ai-label-ext { font-size: 11px; color: var(--amber); font-weight: 600; letter-spacing: .05em; margin-bottom: 8px; display: flex; align-items: center; gap: 5px; }
+.ai-disclaimer { font-size: 11px; color: var(--amber); margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--amber-border); line-height: 1.6; }
+.ai-save-hint { display:flex; align-items:center; gap:8px; margin-top:8px; flex-wrap:wrap; }
+.ai-save-btn { font-size:12px; padding:4px 12px; border-radius:var(--radius); border:1px solid var(--amber-border); background:transparent; color:var(--amber); cursor:pointer; font-family:var(--font); }
+.ai-save-btn:hover { background:var(--amber-bg); }
+
+/* Source cards */
+.sources-label { font-size: 12px; color: var(--text-3); font-weight: 500; margin-top: 4px; }
+.source-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 12px; cursor: pointer; }
+.source-card:hover { border-color: var(--border-mid); }
+.source-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+.source-title { font-size: 13px; font-weight: 500; color: var(--text); }
+.source-score { font-size: 11px; color: var(--text-3); background: var(--bg); padding: 2px 7px; border-radius: 10px; }
+.source-snippet { font-size: 12px; color: var(--text-2); line-height: 1.5; }
+.source-meta { font-size: 11px; color: var(--text-3); margin-top: 4px; }
+
+/* Gap badge */
+.gap-banner { background: var(--amber-bg); border: 1px solid var(--amber-border); border-radius: var(--radius); padding: 10px 12px; font-size: 13px; color: var(--amber); }
+
+/* Loading spinner */
+.spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid var(--border); border-top-color: var(--blue); border-radius: 50%; animation: spin .6s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Empty state */
+.empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; gap: 8px; color: var(--text-3); }
+.empty-state svg { opacity: .3; }
+
+/* ─── Editor Panel ─── */
+.editor-wrap { display: flex; flex-direction: column; height: 100%; }
+.editor-toolbar { padding: 8px 12px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 2px; flex-wrap: wrap; background: var(--surface); flex-shrink: 0; }
+.tb-btn { padding: 5px 8px; border-radius: 6px; border: none; background: transparent; cursor: pointer; font-size: 13px; color: var(--text-2); line-height: 1; }
+.tb-btn:hover { background: var(--bg); color: var(--text); }
+.tb-btn.active { background: var(--blue-bg); color: var(--blue); }
+.tb-sep { width: 1px; height: 20px; background: var(--border); margin: 0 4px; }
+
+.editor-meta { padding: 10px 16px; border-bottom: 1px solid var(--border); display: flex; gap: 8px; align-items: center; flex-shrink: 0; flex-wrap: wrap; }
+.meta-input { padding: 5px 10px; border-radius: var(--radius); border: 1px solid var(--border); font-size: 13px; font-family: var(--font); outline: none; background: var(--surface); color: var(--text); }
+.meta-input:focus { border-color: var(--blue); }
+.meta-select { padding: 5px 10px; border-radius: var(--radius); border: 1px solid var(--border); font-size: 13px; font-family: var(--font); background: var(--surface); color: var(--text); outline: none; cursor: pointer; }
+.save-btn { margin-left: auto; padding: 6px 16px; background: var(--blue); color: #fff; border: none; border-radius: var(--radius); cursor: pointer; font-size: 13px; font-weight: 500; }
+.save-btn:hover { background: #0C447C; }
+.save-btn:disabled { background: var(--border-mid); cursor: not-allowed; }
+
+.tiptap-wrap { flex: 1; overflow-y: auto; padding: 24px 32px; background: var(--surface); }
+.tiptap-title { font-size: 24px; font-weight: 600; border: none; outline: none; width: 100%; margin-bottom: 16px; font-family: var(--font); color: var(--text); background: transparent; }
+.tiptap-title::placeholder { color: var(--text-3); }
+
+/* TipTap styles */
+.ProseMirror { outline: none; min-height: 300px; font-size: 14px; line-height: 1.75; color: var(--text); }
+.ProseMirror p { margin-bottom: 10px; }
+.ProseMirror h1, .ProseMirror h2, .ProseMirror h3 { font-weight: 600; margin: 20px 0 8px; }
+.ProseMirror h1 { font-size: 20px; }
+.ProseMirror h2 { font-size: 17px; }
+.ProseMirror h3 { font-size: 15px; }
+.ProseMirror ul, .ProseMirror ol { padding-left: 20px; margin-bottom: 10px; }
+.ProseMirror li { margin-bottom: 4px; }
+.ProseMirror blockquote { border-left: 3px solid var(--border-mid); padding-left: 12px; color: var(--text-2); margin: 12px 0; }
+.ProseMirror code { background: var(--bg); padding: 1px 5px; border-radius: 4px; font-family: 'Courier New', monospace; font-size: 13px; }
+.ProseMirror pre { background: var(--bg); padding: 12px; border-radius: var(--radius); margin: 10px 0; overflow-x: auto; }
+.ProseMirror pre code { background: transparent; padding: 0; }
+.ProseMirror hr { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+.ProseMirror p.is-editor-empty:first-child::before { content: attr(data-placeholder); color: var(--text-3); pointer-events: none; float: left; height: 0; }
+
+/* ─── Docs list ─── */
+.docs-wrap { flex: 1; overflow-y: auto; padding: 16px 20px; }
+.docs-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.docs-title { font-size: 16px; font-weight: 500; }
+.new-btn { padding: 6px 14px; background: var(--blue); color: #fff; border: none; border-radius: var(--radius); cursor: pointer; font-size: 13px; }
+.doc-list { display: flex; flex-direction: column; gap: 6px; }
+.doc-item { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 14px; display: flex; align-items: center; gap: 10px; cursor: pointer; }
+.doc-item:hover { border-color: var(--border-mid); }
+.doc-cat { font-size: 11px; padding: 2px 7px; border-radius: 10px; font-weight: 500; }
+.doc-cat.sop { background: var(--blue-bg); color: var(--blue); }
+.doc-cat.tacit { background: var(--amber-bg); color: var(--amber); }
+.doc-cat.product { background: var(--green-bg); color: var(--green); }
+.doc-cat.hr { background: #FBEAF0; color: #72243E; }
+.doc-cat.mfg { background: #E0F5F2; color: #0D7E6B; }
+.doc-cat.compliance { background: #F0EBF8; color: #6B4FA8; }
+.doc-cat.ai_tech { background: #E0F4FA; color: #0891B2; }
+.doc-cat.industry { background: #E0F5EC; color: #059669; }
+.doc-title { font-size: 13px; font-weight: 500; flex: 1; }
+.doc-meta { font-size: 12px; color: var(--text-3); white-space: nowrap; }
+.doc-status { font-size: 11px; padding: 2px 7px; border-radius: 10px; }
+.doc-status.published { background: var(--green-bg); color: var(--green); }
+.doc-status.draft { background: var(--bg); color: var(--text-3); border: 1px solid var(--border); }
+
+/* ─── Config Modal ─── */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.35); z-index: 100; align-items: center; justify-content: center; }
+.modal-overlay.show { display: flex; }
+.modal { background: var(--surface); border-radius: var(--radius-lg); padding: 24px; width: 480px; max-width: 95vw; }
+.modal-title { font-size: 16px; font-weight: 500; margin-bottom: 16px; }
+.field { margin-bottom: 14px; }
+.field label { font-size: 12px; color: var(--text-2); font-weight: 500; display: block; margin-bottom: 5px; }
+.field input, .field select { width: 100%; padding: 8px 12px; border-radius: var(--radius); border: 1px solid var(--border); font-size: 13px; font-family: var(--font); outline: none; background: var(--surface); color: var(--text); }
+.field input:focus { border-color: var(--blue); }
+.field .hint { font-size: 11px; color: var(--text-3); margin-top: 4px; }
+.modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; }
+.btn-cancel { padding: 7px 16px; border-radius: var(--radius); border: 1px solid var(--border); background: transparent; cursor: pointer; font-size: 13px; color: var(--text-2); }
+.btn-save { padding: 7px 16px; border-radius: var(--radius); border: none; background: var(--blue); color: #fff; cursor: pointer; font-size: 13px; font-weight: 500; }
+
+/* ─── Toast ─── */
+.toast { position: fixed; bottom: 20px; right: 20px; background: var(--text); color: #fff; padding: 10px 16px; border-radius: var(--radius); font-size: 13px; opacity: 0; transform: translateY(8px); transition: all .25s; z-index: 200; }
+.toast.show { opacity: 1; transform: translateY(0); }
+.toast.success { background: var(--green); }
+.toast.error { background: var(--red); }
+
+/* ─── Upload Zone ─── */
+.upload-zone { border: 2px dashed var(--border-mid); border-radius: var(--radius-lg); padding: 20px; text-align: center; cursor: pointer; transition: all .2s; background: var(--bg); margin-bottom: 12px; }
+.upload-zone:hover, .upload-zone.dragover { border-color: var(--blue); background: var(--blue-bg); }
+.upload-zone input[type=file] { display: none; }
+.upload-zone-icon { font-size: 28px; margin-bottom: 6px; }
+.upload-zone-text { font-size: 13px; color: var(--text-2); }
+.upload-zone-hint { font-size: 11px; color: var(--text-3); margin-top: 4px; }
+.upload-progress { margin-top: 10px; background: var(--border); border-radius: 4px; height: 4px; overflow: hidden; display: none; }
+.upload-progress-bar { height: 100%; background: var(--blue); border-radius: 4px; transition: width .3s; width: 0%; }
+.file-preview { display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); margin-top: 8px; }
+.file-preview-icon { font-size: 20px; flex-shrink: 0; }
+.file-preview-info { flex: 1; min-width: 0; }
+.file-preview-name { font-size: 13px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.file-preview-size { font-size: 11px; color: var(--text-3); }
+.file-preview-remove { padding: 3px 8px; border-radius: 5px; border: 1px solid var(--border); background: transparent; cursor: pointer; font-size: 11px; color: var(--text-3); flex-shrink: 0; }
+.file-preview-remove:hover { border-color: var(--red); color: var(--red); background: var(--red-bg); }
+
+/* ─── Source card download btn ─── */
+.dl-btn { display: inline-flex; align-items: center; gap: 4px; margin-top: 6px; padding: 4px 10px; border-radius: 5px; border: 1px solid var(--blue-border); background: var(--blue-bg); color: var(--blue); font-size: 11px; cursor: pointer; text-decoration: none; font-family: var(--font); }
+.dl-btn:hover { background: var(--blue); color: #fff; }
+
+/* ─── File type badge ─── */
+.file-badge { font-size: 10px; padding: 1px 6px; border-radius: 4px; font-weight: 600; letter-spacing: .03em; }
+.file-badge.pdf  { background: #FBEAF0; color: #72243E; }
+.file-badge.docx { background: var(--blue-bg); color: var(--blue); }
+.file-badge.xlsx { background: var(--green-bg); color: var(--green); }
+.file-badge.csv  { background: var(--green-bg); color: var(--green); }
+.file-badge.pptx { background: #FEF0E8; color: #B5410A; }
+.file-badge.img  { background: var(--amber-bg); color: var(--amber); }
+
+/* ─── Tags ─── */
+.tags-wrap { display:flex; flex-wrap:wrap; gap:4px; align-items:center; padding:6px 10px; border:1px solid var(--border); border-radius:var(--radius); background:var(--surface); }
+.tag { font-size:11px; padding:2px 7px; border-radius:20px; background:var(--blue-bg); color:var(--blue); border:1px solid var(--blue-border); display:flex; align-items:center; gap:3px; }
+.tag-remove { cursor:pointer; opacity:.6; font-size:12px; line-height:1; }
+.tag-remove:hover { opacity:1; }
+.tag-input { border:none; outline:none; font-size:12px; background:transparent; color:var(--text); min-width:80px; font-family:var(--font); }
+
+/* ─── Knowledge Map ─── */
+.kmap-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(155px,1fr)); gap:10px; padding:16px 20px; }
+.kmap-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:14px; cursor:pointer; transition:border-color .15s; }
+.kmap-card:hover { border-color:var(--border-mid); }
+.kmap-card-icon { font-size:22px; margin-bottom:8px; }
+.kmap-card-name { font-size:13px; font-weight:500; color:var(--text); margin-bottom:3px; }
+.kmap-card-count { font-size:12px; color:var(--text-3); }
+.kmap-bar { height:3px; border-radius:2px; margin-top:10px; }
+.kmap-back { display:flex; align-items:center; gap:6px; padding:10px 20px; border-bottom:1px solid var(--border); font-size:13px; color:var(--blue); cursor:pointer; flex-shrink:0; }
+.kmap-back:hover { background:var(--blue-bg); }
+
+/* ─── Analytics ─── */
+.analytics-wrap { overflow-y:auto; padding:16px 20px; }
+.stat-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(120px,1fr)); gap:10px; margin-bottom:20px; }
+.stat-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:14px; }
+.stat-label { font-size:11px; color:var(--text-3); margin-bottom:6px; text-transform:uppercase; letter-spacing:.04em; }
+.stat-val { font-size:22px; font-weight:500; color:var(--text); }
+.stat-sub { font-size:11px; color:var(--text-3); margin-top:2px; }
+.chart-row { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+.chart-label { font-size:12px; color:var(--text-2); width:110px; flex-shrink:0; text-align:right; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.chart-track { flex:1; height:8px; border-radius:4px; background:var(--bg); overflow:hidden; }
+.chart-fill { height:100%; border-radius:4px; }
+.chart-val { font-size:12px; color:var(--text-3); width:28px; text-align:right; }
+.section-hd { font-size:11px; font-weight:600; color:var(--text-3); text-transform:uppercase; letter-spacing:.06em; margin:16px 0 8px; }
+
+/* ─── Expert directory ─── */
+.expert-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:10px; padding:16px 20px; overflow-y:auto; }
+.expert-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:14px; }
+.expert-avatar { width:36px; height:36px; border-radius:50%; background:var(--blue-bg); color:var(--blue); display:flex; align-items:center; justify-content:center; font-size:15px; font-weight:600; margin-bottom:8px; }
+.expert-name { font-size:13px; font-weight:500; color:var(--text); }
+.expert-role { font-size:12px; color:var(--text-3); margin-top:2px; }
+.expert-tags { display:flex; flex-wrap:wrap; gap:3px; margin-top:8px; }
+.expert-tag { font-size:10px; padding:1px 6px; border-radius:10px; background:var(--bg); color:var(--text-2); border:1px solid var(--border); }
+.expert-contact { font-size:11px; color:var(--blue); margin-top:8px; cursor:pointer; }
+
+/* ─── Lifecycle badge ─── */
+.status-badge { font-size:11px; padding:2px 8px; border-radius:10px; font-weight:500; }
+.sb-draft    { background:var(--bg); color:var(--text-3); border:1px solid var(--border); }
+.sb-review   { background:var(--amber-bg); color:var(--amber); }
+.sb-published{ background:var(--green-bg); color:var(--green); }
+.sb-archived { background:#F0F0F0; color:#888; }
+
+/* ─── Comments ─── */
+.comment-wrap { display:flex;flex-direction:column;gap:10px;padding:16px 20px; }
+.comment-item { background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px; }
+.comment-header { display:flex;align-items:center;gap:8px;margin-bottom:6px; }
+.comment-avatar { width:24px;height:24px;border-radius:50%;background:var(--blue-bg);color:var(--blue);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0; }
+.comment-author { font-size:12px;font-weight:500;color:var(--text); }
+.comment-time { font-size:11px;color:var(--text-3);margin-left:auto; }
+.comment-body { font-size:13px;color:var(--text-2);line-height:1.6; }
+.comment-reply-btn { font-size:11px;color:var(--blue);cursor:pointer;margin-top:5px; }
+.comment-reply-btn:hover { text-decoration:underline; }
+.comment-input-wrap { display:flex;gap:8px;padding:12px 20px;border-top:1px solid var(--border);flex-shrink:0;background:var(--surface); }
+.comment-input { flex:1;padding:8px 12px;border-radius:var(--radius);border:1px solid var(--border);font-size:13px;font-family:var(--font);outline:none;resize:none;min-height:40px;max-height:100px; }
+.comment-input:focus { border-color:var(--blue); }
+.comment-submit { padding:8px 16px;background:var(--blue);color:#fff;border:none;border-radius:var(--radius);cursor:pointer;font-size:13px;align-self:flex-end;flex-shrink:0; }
+.comment-submit:hover { background:#0C447C; }
+.reply-indent { margin-left:20px;border-left:2px solid var(--border);padding-left:10px; }
+
+/* ─── Review workflow ─── */
+.review-flow { display:flex;align-items:center;gap:6px;flex-wrap:wrap; }
+.review-step { padding:5px 12px;border-radius:var(--radius);font-size:12px;font-weight:500;border:1px solid var(--border);color:var(--text-3);background:var(--bg); }
+.review-step.active { border-color:var(--blue);color:var(--blue);background:var(--blue-bg); }
+.review-step.done { border-color:var(--green);color:var(--green);background:var(--green-bg); }
+.review-arrow { color:var(--text-3);font-size:12px; }
+.review-btn { padding:5px 14px;border-radius:var(--radius);font-size:12px;font-weight:500;border:none;cursor:pointer;transition:all .15s; }
+.review-btn-submit  { background:var(--amber-bg);color:var(--amber); }
+.review-btn-approve { background:var(--green-bg);color:var(--green); }
+.review-btn-reject  { background:var(--red-bg);color:var(--red); }
+.review-btn-archive { background:#F0F0F0;color:#888; }
+.review-log-item { font-size:12px;color:var(--text-2);padding:4px 0;border-bottom:1px solid var(--border);display:flex;gap:8px; }
+.review-log-item:last-child { border-bottom:none; }
+
+/* ─── Notification dot ─── */
+.nav-dot { width:7px;height:7px;border-radius:50%;background:var(--amber);flex-shrink:0; }
+
+@media (max-width: 640px) {
+  .app { grid-template-columns: 1fr; grid-template-rows: 52px auto 1fr; }
+  .sidebar { grid-row: 2; border-right: none; border-bottom: 1px solid var(--border); flex-direction: row; overflow-x: auto; padding: 8px; gap: 2px; height: auto; }
+  .nav-section { display: none; }
+  .tiptap-wrap { padding: 16px; }
+}
+
+/* ─── Reader Modal ─── */
+.reader-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:200; align-items:flex-start; justify-content:center; padding:20px; overflow-y:auto; }
+.reader-overlay.show { display:flex; }
+.reader-box { background:var(--surface); border-radius:var(--radius-lg); width:100%; max-width:760px; margin:auto; box-shadow:0 8px 40px rgba(0,0,0,.2); display:flex; flex-direction:column; max-height:90vh; }
+.reader-header { padding:16px 20px; border-bottom:1px solid var(--border); display:flex; align-items:flex-start; gap:12px; flex-shrink:0; }
+.reader-title { font-size:18px; font-weight:600; color:var(--text); flex:1; line-height:1.4; }
+.reader-meta { display:flex; gap:8px; flex-wrap:wrap; padding:10px 20px; border-bottom:1px solid var(--border); flex-shrink:0; background:var(--bg); }
+.reader-body { flex:1; overflow-y:auto; padding:24px 28px; }
+.reader-body h1,.reader-body h2,.reader-body h3 { font-weight:600; margin:20px 0 8px; color:var(--text); }
+.reader-body h1 { font-size:20px; } .reader-body h2 { font-size:17px; border-bottom:1px solid var(--border); padding-bottom:6px; } .reader-body h3 { font-size:15px; }
+.reader-body p { margin-bottom:12px; line-height:1.75; color:var(--text); font-size:14px; }
+.reader-body ul,.reader-body ol { padding-left:20px; margin-bottom:12px; }
+.reader-body li { margin-bottom:5px; line-height:1.65; font-size:14px; color:var(--text); }
+.reader-body blockquote { border-left:3px solid var(--border-mid); padding-left:14px; color:var(--text-2); margin:12px 0; }
+.reader-body code { background:var(--bg); padding:1px 5px; border-radius:4px; font-family:'Courier New',monospace; font-size:12px; }
+.reader-body pre { background:var(--bg); padding:14px; border-radius:var(--radius); overflow-x:auto; margin:12px 0; }
+.reader-body pre code { background:transparent; padding:0; }
+.reader-body hr { border:none; border-top:1px solid var(--border); margin:16px 0; }
+.reader-body table { width:100%; border-collapse:collapse; margin-bottom:14px; font-size:13px; }
+.reader-body th { background:var(--bg); padding:8px 12px; border:1px solid var(--border); font-weight:600; text-align:left; }
+.reader-body td { padding:7px 12px; border:1px solid var(--border); }
+.reader-footer { padding:12px 20px; border-top:1px solid var(--border); display:flex; gap:8px; flex-shrink:0; background:var(--bg); border-radius:0 0 var(--radius-lg) var(--radius-lg); }
+.reader-btn { padding:7px 16px; border-radius:var(--radius); font-size:13px; cursor:pointer; font-family:var(--font); border:1px solid var(--border); background:transparent; color:var(--text-2); }
+.reader-btn:hover { background:var(--surface); }
+.reader-btn.primary { background:var(--blue); color:#fff; border-color:var(--blue); }
+.reader-btn.primary:hover { background:#0C447C; }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- Topbar -->
+  <header class="topbar">
+    <div class="logo">
+      <a href="../index.html" id="portal-back-btn"
+        style="font-size:12px;color:var(--text-3);text-decoration:none;margin-right:8px;display:none;
+               padding:4px 8px;border-radius:6px;border:1px solid var(--border);">
+        ← Portal
+      </a>
+      COMART <span>KMS</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.03</span>
+    </div>
+    <div class="lang-selector">
+      <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
+      <button class="lang-btn" onclick="setLang('zh-CN')">简中</button>
+      <button class="lang-btn" onclick="setLang('en')">EN</button>
+      <button class="lang-btn" onclick="setLang('vi')">VI</button>
+      <button class="lang-btn" onclick="setLang('ja')">日本語</button>
+    </div>
+    <!-- Portal user chip（從 portal 進來時顯示） -->
+    <div id="portal-user-chip" style="display:none;align-items:center;gap:7px;
+      padding:4px 10px 4px 6px;border-radius:20px;background:var(--bg);border:1px solid var(--border);">
+      <div id="portal-user-avatar" style="width:22px;height:22px;border-radius:50%;
+        background:var(--blue-bg);color:var(--blue);display:flex;align-items:center;
+        justify-content:center;font-size:10px;font-weight:700;">W</div>
+      <div style="line-height:1.3;">
+        <div id="portal-user-name" style="font-size:11px;font-weight:600;color:var(--text);">—</div>
+        <div id="portal-user-role" style="font-size:10px;color:var(--text-3);">—</div>
+      </div>
+    </div>
+    <!-- API 設定已移除：Supabase URL/Key 寫死在程式碼，Claude/OpenAI Key 在 Supabase Secrets -->
+  </header>
+
+  <!-- Sidebar -->
+  <nav class="sidebar">
+    <div class="nav-section" id="nav-label-main">主功能</div>
+    <button class="nav-item active" onclick="switchPanel('rag')">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <span data-i18n="nav.search">AI 問答 / 搜尋</span>
+    </button>
+    <button class="nav-item" onclick="switchPanel('editor')">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      <span data-i18n="nav.editor">建立知識條目</span>
+    </button>
+    <button class="nav-item" onclick="switchPanel('docs')">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      <span data-i18n="nav.docs">知識庫</span>
+      <span class="nav-badge" id="doc-count">0</span>
+    </button>
+    <button class="nav-item" onclick="switchPanel('kmap')">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      <span>知識地圖</span>
+    </button>
+    <button class="nav-item" onclick="switchPanel('analytics')">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      <span>分析報表</span>
+    </button>
+    <button class="nav-item" onclick="switchPanel('experts')">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <span>專家黃頁</span>
+    </button>
+    <button class="nav-item" onclick="switchPanel('review')">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      <span>審核流程</span>
+      <span class="nav-badge" id="review-count" style="display:none;">0</span>
+    </button>
+    <button class="nav-item" onclick="switchPanel('comments')">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 0 2 2z"/></svg>
+      <span>討論留言</span>
+    </button>
+
+    <div class="nav-section" style="margin-top:8px;" data-i18n-key="nav.section.info">系統資訊</div>
+    <div style="padding: 8px 10px; font-size: 12px; color: var(--text-3); line-height: 1.6;">
+      <div id="status-supabase">Supabase: <span style="color:var(--text-3)">未設定</span></div>
+      <div id="status-claude">Claude API: <span style="color:var(--text-3)">未設定</span></div>
+      <div id="status-docs" style="margin-top:4px;">文件數: <span id="docs-loaded">0</span></div>
+    </div>
+
+    <div style="margin-top: auto; padding: 8px 10px; font-size: 11px; color: var(--text-3);">
+      <div>RAG: pgvector + Claude</div>
+      <div>儲存: Supabase Postgres</div>
+    </div>
+  </nav>
+
+  <!-- Main content -->
+  <main class="main">
+
+    <!-- ═══ RAG Search Panel ═══ -->
+    <div class="panel active" id="panel-rag">
+      <div class="rag-wrap">
+        <div class="rag-header">
+          <div class="rag-title" data-i18n="rag.title">AI 問答 — 從知識庫取答案</div>
+          <div class="search-row">
+            <input class="search-input" id="search-q" data-i18n-placeholder="rag.placeholder"
+              placeholder="問任何問題，例如：Qi2 充電器良率異常如何處理？"
+              type="search"
+              autocomplete="off"
+              autocorrect="off"
+              autocapitalize="off"
+              spellcheck="false"
+              name="kms-rag-search"
+              onkeydown="if(event.key==='Enter')doSearch()"/>
+            <button class="search-btn" id="search-btn" onclick="doSearch()">
+              <span data-i18n="rag.btn">送出問題</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="rag-body" id="rag-body">
+          <!-- Empty state -->
+          <div class="empty-state" id="rag-empty">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <div style="font-size:14px;" data-i18n="rag.empty">輸入問題，AI 會從知識庫召回相關段落並彙整回答</div>
+            <div style="font-size:12px;margin-top:4px;" data-i18n="rag.empty2">需先設定 API Keys 並新增知識條目</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Editor Panel ═══ -->
+    <div class="panel" id="panel-editor">
+      <div class="editor-wrap" style="flex-direction:row;">
+        <!-- Main editor column -->
+        <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;">
+        <!-- Toolbar -->
+        <div class="editor-toolbar">
+          <button class="tb-btn" id="tb-bold" title="粗體 Ctrl+B" onclick="editorCmd('toggleBold')"><b>B</b></button>
+          <button class="tb-btn" id="tb-italic" title="斜體 Ctrl+I" onclick="editorCmd('toggleItalic')"><i>I</i></button>
+          <button class="tb-btn" id="tb-strike" title="刪除線" onclick="editorCmd('toggleStrike')"><s>S</s></button>
+          <button class="tb-btn" id="tb-code" title="行內程式碼" onclick="editorCmd('toggleCode')">{'`'}</button>
+          <div class="tb-sep"></div>
+          <button class="tb-btn" title="H1" onclick="editorCmd('toggleHeading',{level:1})">H1</button>
+          <button class="tb-btn" title="H2" onclick="editorCmd('toggleHeading',{level:2})">H2</button>
+          <button class="tb-btn" title="H3" onclick="editorCmd('toggleHeading',{level:3})">H3</button>
+          <div class="tb-sep"></div>
+          <button class="tb-btn" title="無序清單" onclick="editorCmd('toggleBulletList')">≡</button>
+          <button class="tb-btn" title="有序清單" onclick="editorCmd('toggleOrderedList')">1.</button>
+          <button class="tb-btn" title="引言" onclick="editorCmd('toggleBlockquote')">"</button>
+          <button class="tb-btn" title="程式碼區塊" onclick="editorCmd('toggleCodeBlock')">{ }</button>
+          <div class="tb-sep"></div>
+          <button class="tb-btn" title="水平線" onclick="editorCmd('setHorizontalRule')">—</button>
+          <button class="tb-btn" title="復原 Ctrl+Z" onclick="editorCmd('undo')">↩</button>
+          <button class="tb-btn" title="重做 Ctrl+Y" onclick="editorCmd('redo')">↪</button>
+          <div class="tb-sep"></div>
+          <!-- Templates -->
+          <select onchange="loadTemplate(this.value);this.value=''" style="font-size:12px;padding:4px 8px;border-radius:6px;border:1px solid var(--border);background:var(--surface);color:var(--text-2);cursor:pointer;outline:none;">
+            <option value="">套用範本…</option>
+            <option value="sop">SOP 標準作業程序</option>
+            <option value="meeting">會議紀錄</option>
+            <option value="review">專案覆盤</option>
+            <option value="tacit">內隱知識記錄</option>
+            <option value="inspection">IQC/IPQC 檢驗報告</option>
+          </select>
+        </div>
+
+        <!-- Upload Zone -->
+        <div style="padding: 10px 16px; border-bottom: 1px solid var(--border); background: var(--bg); flex-shrink:0;">
+          <div class="upload-zone" id="upload-zone"
+            onclick="document.getElementById('file-input').click()"
+            ondragover="handleDragOver(event)"
+            ondragleave="handleDragLeave(event)"
+            ondrop="handleDrop(event)">
+            <input type="file" id="file-input" accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.pptx,.ppt,.jpg,.jpeg,.png,.txt,.md"
+              multiple onchange="handleFileSelect(event)" />
+            <div class="upload-zone-icon">📎</div>
+            <div class="upload-zone-text">點擊或拖放檔案上傳（可多選）</div>
+            <div class="upload-zone-hint">PDF · Word · Excel · CSV · PowerPoint · 圖片（JPG/PNG）· TXT · Markdown</div>
+          </div>
+          <div class="upload-progress" id="upload-progress">
+            <div class="upload-progress-bar" id="upload-progress-bar"></div>
+          </div>
+          <div id="file-preview-area"></div>
+        </div>
+
+        <!-- Meta row — 第一行 -->
+        <div class="editor-meta">
+          <input class="meta-input" id="doc-title" placeholder="文件標題" style="flex:2;min-width:160px;"
+            oninput="scheduleAutoClassify()" />
+          <select class="meta-select" id="doc-cat" onchange="
+            const ind=document.getElementById('ai-cat-indicator');
+            if(ind) ind.textContent='';
+          ">
+            <option value="product">產品研發</option>
+            <option value="mfg">製造工藝</option>
+            <option value="quality">品質管理</option>
+            <option value="sales">業務客戶</option>
+            <option value="supply">供應鏈採購</option>
+            <option value="compliance">法規認證</option>
+            <option value="hr">人資培訓</option>
+            <option value="tacit">內隱知識</option>
+            <option value="ai_tech">AI 科技</option>
+            <option value="industry">產業新知</option>
+          </select>
+          <select class="meta-select" id="doc-lang">
+            <option value="zh-TW">繁體中文</option>
+            <option value="zh-CN">简体中文</option>
+            <option value="en">English</option>
+            <option value="vi">Tiếng Việt</option>
+            <option value="ja">日本語</option>
+          </select>
+          <select class="meta-select" id="doc-status">
+            <option value="published">已發佈</option>
+            <option value="draft">草稿（暫不公開）</option>
+            <option value="archived">已封存</option>
+          </select>
+          <button class="save-btn" onclick="saveDoc()" data-i18n="editor.save">儲存並向量化</button>
+          <button onclick="cancelEdit()"
+            style="padding:6px 14px;border-radius:var(--radius);border:1px solid var(--border);background:transparent;cursor:pointer;font-size:13px;color:var(--text-2);white-space:nowrap;">
+            取消
+          </button>
+        </div>
+        <!-- AI 分類建議指示器 -->
+        <div style="padding:4px 12px;font-size:11px;min-height:18px;background:var(--bg);flex-shrink:0;">
+          <span id="ai-cat-indicator" style="color:var(--blue);"></span>
+        </div>
+
+        <!-- Meta row — 第二行：產品線 + 客戶標籤 -->
+        <div style="padding:6px 12px;border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:var(--bg);flex-shrink:0;">
+          <span style="font-size:11px;color:var(--text-3);flex-shrink:0;">📦 Product Line:</span>
+          <select class="meta-select" id="doc-product-line" style="flex:1;min-width:180px;">
+            <option value="">— Select Product Line —</option>
+          </select>
+          <button onclick="openAddProductLineModal()"
+            style="padding:4px 10px;border-radius:6px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:12px;color:var(--text-2);"
+            title="新增產品線">＋</button>
+          <span style="font-size:11px;color:var(--text-3);flex-shrink:0;margin-left:8px;">🏢 Customer:</span>
+          <div class="tags-wrap" id="customer-tag-wrap" style="flex:1;min-width:140px;" onclick="document.getElementById('customer-tag-input').focus()">
+            <input class="tag-input" id="customer-tag-input" placeholder="輸入客戶名後按 Enter"
+              onkeydown="handleCustomerTagInput(event)" />
+          </div>
+        </div>
+
+        <!-- Meta row — 第三行：建立者、有效期、關聯文件 -->
+        <div style="padding:6px 12px;border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:var(--bg);flex-shrink:0;">
+          <input class="meta-input" id="doc-author" placeholder="建立者姓名" style="width:110px;" autocomplete="off" name="kms-author-nofill" />
+          <input class="meta-input" id="doc-reviewer" placeholder="審核人（選填）" style="width:120px;" />
+          <input class="meta-input" id="doc-valid-until" type="date" title="文件有效期限" style="width:130px;" />
+          <input class="meta-input" id="doc-related" placeholder="關聯文件標題（逗號分隔）" style="flex:1;min-width:140px;" />
+        </div>
+
+        <!-- Meta row — 第四行：關鍵字標籤 -->
+        <div style="padding:6px 12px;border-bottom:1px solid var(--border);display:flex;gap:6px;align-items:center;flex-shrink:0;background:var(--bg);">
+          <span style="font-size:11px;color:var(--text-3);flex-shrink:0;">🏷 關鍵字：</span>
+          <div class="tags-wrap" id="tags-wrap" style="flex:1;" onclick="document.getElementById('tag-input').focus()">
+            <input class="tag-input" id="tag-input" placeholder="輸入標籤後按 Enter"
+              onkeydown="handleTagInput(event)" />
+          </div>
+        </div>
+
+        <!-- TipTap editor area -->
+        <div class="tiptap-wrap">
+          <div id="tiptap-editor"></div>
+        </div>
+        </div><!-- end main editor column -->
+
+        <!-- Version History Sidebar -->
+        <div id="version-sidebar" style="width:220px;border-left:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;background:var(--surface);">
+          <div style="padding:10px 12px;border-bottom:1px solid var(--border);font-size:12px;font-weight:500;color:var(--text-2);display:flex;align-items:center;justify-content:space-between;">
+            版本歷史
+            <span id="ver-count" style="background:var(--bg);border:1px solid var(--border);border-radius:10px;font-size:11px;padding:1px 6px;color:var(--text-3);">0</span>
+          </div>
+          <div id="version-list" style="flex:1;overflow-y:auto;padding:8px;">
+            <div style="color:var(--text-3);font-size:12px;text-align:center;padding:20px 0;">儲存後自動記錄版本</div>
+          </div>
+          <div style="padding:8px;border-top:1px solid var(--border);">
+            <button onclick="loadVersionHistory()" style="width:100%;padding:5px;border-radius:6px;border:1px solid var(--border);background:transparent;cursor:pointer;font-size:12px;color:var(--text-2);">重新整理</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Docs List Panel ═══ -->
+    <div class="panel" id="panel-docs">
+      <div class="docs-wrap">
+        <div class="docs-header">
+          <div class="docs-title" data-i18n="docs.title">知識庫 — 所有文件</div>
+          <button class="new-btn" onclick="editingDocId=null;updateEditorModeLabel();switchPanel('editor')" data-i18n="docs.new">＋ 新增文件</button>
+        </div>
+        <!-- 篩選列：產品線 + 客戶 + 關鍵字搜尋 -->
+        <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center;">
+          <input type="text" id="docs-search" placeholder="🔍 關鍵字搜尋…"
+            oninput="loadDocs()"
+            style="flex:1;min-width:140px;padding:6px 10px;border-radius:var(--radius);border:1px solid var(--border);font-size:13px;font-family:var(--font);outline:none;background:var(--surface);color:var(--text);" />
+          <select id="docs-filter-product-line" onchange="loadDocs()"
+            style="padding:6px 10px;border-radius:var(--radius);border:1px solid var(--border);font-size:12px;font-family:var(--font);background:var(--surface);color:var(--text);outline:none;cursor:pointer;">
+            <option value="">All Product Lines</option>
+          </select>
+          <select id="docs-filter-cat" onchange="loadDocs()"
+            style="padding:6px 10px;border-radius:var(--radius);border:1px solid var(--border);font-size:12px;font-family:var(--font);background:var(--surface);color:var(--text);outline:none;cursor:pointer;">
+            <option value="">All Categories</option>
+            <option value="product">產品研發</option>
+            <option value="mfg">製造工藝</option>
+            <option value="quality">品質管理</option>
+            <option value="sales">業務客戶</option>
+            <option value="supply">供應鏈採購</option>
+            <option value="compliance">法規認證</option>
+            <option value="hr">人資培訓</option>
+            <option value="tacit">內隱知識</option>
+            <option value="ai_tech">AI 科技</option>
+            <option value="industry">產業新知</option>
+          </select>
+          <input type="text" id="docs-filter-customer" placeholder="🏢 Customer…"
+            oninput="loadDocs()"
+            style="width:130px;padding:6px 10px;border-radius:var(--radius);border:1px solid var(--border);font-size:12px;font-family:var(--font);outline:none;background:var(--surface);color:var(--text);" />
+        </div>
+        <div class="doc-list" id="doc-list">
+          <div style="text-align:center;color:var(--text-3);padding:40px 0;font-size:13px;">載入中…</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Knowledge Map Panel ═══ -->
+    <div class="panel" id="panel-kmap">
+      <div style="display:flex;flex-direction:column;height:100%;">
+        <div style="padding:12px 20px;border-bottom:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:space-between;">
+          <div style="font-size:15px;font-weight:500;" id="kmap-header-title">知識地圖 — 分類總覽</div>
+          <div id="kmap-header-actions"></div>
+        </div>
+        <div id="kmap-content" style="flex:1;overflow-y:auto;"></div>
+      </div>
+    </div>
+
+    <!-- ═══ Analytics Panel ═══ -->
+    <div class="panel" id="panel-analytics">
+      <div class="analytics-wrap" id="analytics-content">
+        <div style="text-align:center;color:var(--text-3);padding:40px 0;">載入中…</div>
+      </div>
+    </div>
+
+    <!-- ═══ Expert Directory Panel ═══ -->
+    <div class="panel" id="panel-experts">
+      <div style="display:flex;flex-direction:column;height:100%;">
+        <div style="padding:12px 20px;border-bottom:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:space-between;">
+          <div style="font-size:15px;font-weight:500;">專家黃頁</div>
+          <a href="/" onclick="event.preventDefault();toast('請至 Platform → User Management 管理人員資料','');"
+            style="font-size:11px;color:var(--text-3);text-decoration:none;padding:5px 10px;border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;">
+            ⚙ 人員管理請至 Platform
+          </a>
+        </div>
+        <div class="expert-grid" id="expert-grid"></div>
+      </div>
+    </div>
+
+    <!-- ═══ Review Workflow Panel ═══ -->
+    <div class="panel" id="panel-review">
+      <div style="display:flex;flex-direction:column;height:100%;">
+        <div style="padding:12px 20px;border-bottom:1px solid var(--border);flex-shrink:0;">
+          <div style="font-size:15px;font-weight:500;margin-bottom:10px;">審核流程管理</div>
+          <div class="review-flow">
+            <span class="review-step" id="rs-draft">草稿</span>
+            <span class="review-arrow">→</span>
+            <span class="review-step" id="rs-published">已發佈</span>
+            <span class="review-arrow">→</span>
+            <span class="review-step" id="rs-archived">已封存</span>
+            <span style="margin-left:12px;font-size:11px;color:var(--text-3);">管理員可隨時撤除任何已發佈文件</span>
+          </div>
+        </div>
+        <div style="flex:1;overflow-y:auto;padding:12px 20px;" id="review-content">
+          <div style="color:var(--text-3);font-size:13px;text-align:center;padding:30px 0;">選擇文件後可在此執行審核動作</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Comments Panel ═══ -->
+    <div class="panel" id="panel-comments">
+      <div style="display:flex;flex-direction:column;height:100%;">
+        <div style="padding:12px 20px;border-bottom:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;gap:10px;">
+          <div style="font-size:15px;font-weight:500;">討論 / 留言</div>
+          <span id="comments-doc-title" style="font-size:12px;color:var(--text-3);">— 請先從知識庫選擇文件</span>
+        </div>
+        <div class="comment-wrap" id="comment-list" style="flex:1;overflow-y:auto;">
+          <div style="color:var(--text-3);font-size:13px;text-align:center;padding:30px 0;">從知識庫點擊文件標題旁的「💬」進入討論</div>
+        </div>
+        <div class="comment-input-wrap">
+          <textarea class="comment-input" id="comment-input" placeholder="輸入留言…" rows="2"
+            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();submitComment();}"></textarea>
+          <button class="comment-submit" onclick="submitComment()">送出</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Config Modal -->
+<div class="modal-overlay" id="config-modal">
+  <div class="modal">
+    <div class="modal-title">⚙ API 設定</div>
+
+    <div class="field">
+      <label>Supabase Project URL</label>
+      <input type="text" id="cfg-supabase-url" placeholder="https://xxxx.supabase.co" />
+      <div class="hint">Supabase → Settings → API → Project URL</div>
+    </div>
+    <div class="field">
+      <label>Supabase Anon Key</label>
+      <input type="password" id="cfg-supabase-key" placeholder="eyJhbGci..." />
+      <div class="hint">Supabase → Settings → API → anon public key</div>
+    </div>
+    <div class="field">
+      <label>Embedding 模式</label>
+      <select id="cfg-embed-model">
+        <option value="edge-fn">Edge Function（推薦，Key 存在 Supabase Secrets）</option>
+        <option value="mock">Mock 模式（離線測試，關鍵字搜尋）</option>
+      </select>
+    </div>
+
+    <!-- 隱藏欄位保留相容性（不顯示但 saveConfig 需要） -->
+    <input type="hidden" id="cfg-claude-key" value="" />
+    <input type="hidden" id="cfg-openai-key" value="" />
+
+    <div style="background:var(--green-bg);border:1px solid #9FE1CB;border-radius:var(--radius);padding:10px 12px;font-size:12px;color:var(--green);margin-top:4px;">
+      ✓ Claude API Key 和 OpenAI Key 已安全存放在 Supabase Secrets，前端不需要填入。
+    </div>
+
+    <!-- 匯出 / 匯入設定 -->
+    <div style="margin-top:12px;padding:10px 12px;background:var(--bg);border-radius:var(--radius);border:1px solid var(--border);">
+      <div style="font-size:12px;font-weight:500;color:var(--text-2);margin-bottom:8px;">換檔案或換電腦時使用</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button onclick="exportConfig()"
+          style="padding:5px 12px;border-radius:6px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:12px;color:var(--text-2);">
+          📤 匯出設定
+        </button>
+        <button onclick="document.getElementById('cfg-import-file').click()"
+          style="padding:5px 12px;border-radius:6px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:12px;color:var(--text-2);">
+          📥 匯入設定
+        </button>
+        <input type="file" id="cfg-import-file" accept=".json" style="display:none"
+          onchange="importConfig(event)" />
+        <button onclick="copyConfigAsEnv()"
+          style="padding:5px 12px;border-radius:6px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:12px;color:var(--text-2);">
+          📋 複製為 URL 參數
+        </button>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeConfig()">取消</button>
+      <button class="btn-save" onclick="saveConfig()">儲存設定</button>
+    </div>
+  </div>
+</div>
+
+<!-- Reader Modal -->
+<div class="reader-overlay" id="reader-modal" onclick="if(event.target===this)closeReader()">
+  <div class="reader-box">
+    <div class="reader-header">
+      <div class="reader-title" id="reader-title">—</div>
+      <button onclick="closeReader()" style="flex-shrink:0;padding:4px 10px;border-radius:6px;border:1px solid var(--border);background:transparent;cursor:pointer;font-size:18px;color:var(--text-3);line-height:1;">✕</button>
+    </div>
+    <div class="reader-meta" id="reader-meta"></div>
+    <div class="reader-body" id="reader-body-content"></div>
+    <div class="reader-footer">
+      <button class="reader-btn primary" id="reader-edit-btn" onclick="readerEdit()">✏️ 編輯</button>
+      <button class="reader-btn" id="reader-dl-btn" style="display:none;" onclick="readerDownload()">↓ 下載原始檔</button>
+      <button class="reader-btn" onclick="closeReader()" style="margin-left:auto;">關閉</button>
+    </div>
+  </div>
+</div>
+
+<!-- Product Line Modal -->
+<div class="modal-overlay" id="product-line-modal">
+  <div class="modal" style="max-width:380px;">
+    <div class="modal-title">＋ 新增產品線</div>
+    <div class="field">
+      <label>Product Line Name（英文）</label>
+      <input type="text" id="new-product-line-input" placeholder="e.g. Smart Home Accessories" />
+    </div>
+    <div style="font-size:12px;color:var(--text-3);margin-top:-8px;margin-bottom:12px;">
+      新增後會出現在所有文件的產品線選單中
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeAddProductLineModal()">取消</button>
+      <button class="btn-save" onclick="saveNewProductLine()">新增</button>
+    </div>
+  </div>
+</div>
+
+<!-- Expert Modal 已移除：人員管理改由 Platform User Management 負責 -->
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- SQL Setup Helper -->
+<div id="sql-helper" style="display:none;position:fixed;bottom:20px;left:20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;max-width:460px;font-size:12px;z-index:50;box-shadow:0 4px 20px rgba(0,0,0,.1);">
+  <div style="font-weight:500;margin-bottom:6px;">🗄 Supabase 初始化 SQL</div>
+  <div style="color:var(--text-2);margin-bottom:8px;">在 Supabase → SQL Editor 執行 <code>setup.sql</code>（已含版本控制 + 全文搜尋 + 向量索引）</div>
+  <div style="display:flex;gap:6px;">
+    <button onclick="document.getElementById('sql-helper').style.display='none'"
+      style="padding:5px 12px;border-radius:6px;border:1px solid var(--border);background:transparent;cursor:pointer;font-size:12px;">關閉</button>
+    <button onclick="copySql()"
+      style="padding:5px 12px;border-radius:6px;border:none;background:var(--blue);color:#fff;cursor:pointer;font-size:12px;">複製 SQL</button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+// CONFIG & STATE
+// ═══════════════════════════════════════════════
+let CFG = {
+  supabaseUrl: 'https://tcvlnpgpuphdalzvmoyo.supabase.co',
+  supabaseKey: 'sb_publishable_rAVwVeUMWD-m_VTFIenMhg_Fcg6ocYJ',
+  claudeKey: '',
+  openAiKey: '',
+  embedModel: 'edge-fn',
+};
+let currentLang = 'zh-TW';
+let tiptapEditor = null;
+let localDocs = []; // fallback when Supabase not configured
+let editingDocId = null; // 正在編輯的文件 ID（null = 新增，有值 = 更新）
+let currentCustomerTags = []; // 客戶標籤
+let PRODUCT_LINES = []; // 從 Supabase 或預設值載入的產品線清單
+
+// i18n strings — 完整五語言
+const I18N = {
+  'zh-TW': {
+    'nav.search':'AI 問答 / 搜尋', 'nav.editor':'建立知識條目', 'nav.docs':'知識庫',
+    'nav.kmap':'知識地圖', 'nav.analytics':'分析報表', 'nav.experts':'專家黃頁',
+    'nav.review':'審核流程', 'nav.comments':'討論留言',
+    'rag.title':'AI 問答 — 從知識庫取答案',
+    'rag.placeholder':'問任何問題，例如：Qi2 充電器良率異常如何處理？',
+    'rag.btn':'送出問題', 'rag.empty':'輸入問題，AI 會從知識庫召回相關段落並彙整回答',
+    'rag.empty2':'需先設定 API Keys 並新增知識條目',
+    'editor.save':'儲存並向量化', 'editor.cancel':'取消', 'editor.update':'更新文件',
+    'editor.title.placeholder':'文件標題', 'editor.author.placeholder':'建立者姓名',
+    'editor.reviewer.placeholder':'審核人（選填）', 'editor.related.placeholder':'關聯文件標題（逗號分隔）',
+    'editor.tag.placeholder':'輸入標籤後按 Enter',
+    'editor.upload.text':'點擊或拖放檔案上傳', 'editor.upload.hint':'PDF · Word · Excel · CSV · PowerPoint · 圖片 · TXT · Markdown',
+    'docs.title':'知識庫 — 所有文件', 'docs.new':'＋ 新增文件',
+    'kmap.title':'知識地圖 — 分類總覽', 'kmap.back':'← 回分類總覽',
+    'analytics.title':'分析報表', 'analytics.total':'知識條目', 'analytics.published':'已發佈',
+    'analytics.views':'總閱覽數', 'analytics.gaps':'知識缺口',
+    'experts.title':'專家黃頁', 'experts.add':'＋ 新增專家', 'experts.empty':'尚無專家資料',
+    'experts.copy':'已複製聯絡方式', 'experts.remove':'移除',
+    'review.title':'審核流程管理', 'review.empty':'選擇文件後可在此執行審核動作',
+    'review.actions':'執行動作', 'review.log':'審核紀錄',
+    'review.approve':'直接發佈', 'review.reject':'退回草稿',
+    'review.archive':'封存', 'review.restore':'恢復發佈', 'review.revoke':'⚠ 撤除（強制退回草稿）',
+    'review.note.prompt':'原因（可選填）：',
+    'comments.title':'討論 / 留言', 'comments.placeholder':'請先從知識庫選擇文件',
+    'comments.input.placeholder':'輸入留言…', 'comments.submit':'送出', 'comments.reply':'↩ 回覆',
+    'comments.empty':'尚無留言，成為第一個留言的人',
+    'config.title':'⚙ API 設定', 'config.save':'儲存設定', 'config.cancel':'取消',
+    'status.draft':'草稿（暫不公開）', 'status.published':'已發佈', 'status.archived':'已封存',
+    'cat.product':'產品研發', 'cat.mfg':'製造工藝', 'cat.quality':'品質管理', 'cat.sales':'業務客戶',
+    'cat.supply':'供應鏈採購', 'cat.compliance':'法規認證', 'cat.hr':'人資培訓', 'cat.tacit':'內隱知識',
+    'cat.ai_tech':'AI 科技', 'cat.industry':'產業新知',
+    'toast.copied':'已複製聯絡方式', 'toast.saved':'已儲存', 'toast.deleted':'已刪除',
+    'confirm.delete':'確定刪除「{title}」？\n此動作無法復原，版本歷史也會一併刪除。',
+    'confirm.cancel_edit':'放棄編輯？未儲存的變更將會遺失。',
+    'sys.supabase':'Supabase', 'sys.claude':'Claude API', 'sys.docs':'文件數',
+    'sys.rag':'RAG: pgvector + Claude', 'sys.storage':'儲存: Supabase Postgres',
+  },
+  'zh-CN': {
+    'nav.search':'AI 问答 / 搜索', 'nav.editor':'创建知识条目', 'nav.docs':'知识库',
+    'nav.kmap':'知识地图', 'nav.analytics':'分析报表', 'nav.experts':'专家黄页',
+    'nav.review':'审核流程', 'nav.comments':'讨论留言',
+    'rag.title':'AI 问答 — 从知识库取答案',
+    'rag.placeholder':'输入问题，例如：Qi2 充电器良率异常如何处理？',
+    'rag.btn':'提交问题', 'rag.empty':'输入问题，AI 会从知识库召回相关段落并汇总回答',
+    'rag.empty2':'请先配置 API Keys 并添加知识条目',
+    'editor.save':'保存并向量化', 'editor.cancel':'取消', 'editor.update':'更新文档',
+    'editor.title.placeholder':'文档标题', 'editor.author.placeholder':'创建者姓名',
+    'editor.reviewer.placeholder':'审核人（可选）', 'editor.related.placeholder':'关联文档标题（逗号分隔）',
+    'editor.tag.placeholder':'输入标签后按 Enter',
+    'editor.upload.text':'点击或拖放文件上传', 'editor.upload.hint':'PDF · Word · Excel · CSV · PowerPoint · 图片 · TXT · Markdown',
+    'docs.title':'知识库 — 所有文档', 'docs.new':'＋ 新建文档',
+    'kmap.title':'知识地图 — 分类总览', 'kmap.back':'← 返回分类总览',
+    'analytics.title':'分析报表', 'analytics.total':'知识条目', 'analytics.published':'已发布',
+    'analytics.views':'总阅览数', 'analytics.gaps':'知识缺口',
+    'experts.title':'专家黄页', 'experts.add':'＋ 新增专家', 'experts.empty':'暂无专家数据',
+    'experts.copy':'已复制联系方式', 'experts.remove':'移除',
+    'review.title':'审核流程管理', 'review.empty':'选择文档后可在此执行审核操作',
+    'review.actions':'执行操作', 'review.log':'审核记录',
+    'review.approve':'直接发布', 'review.reject':'退回草稿',
+    'review.archive':'归档', 'review.restore':'恢复发布', 'review.revoke':'⚠ 撤销（强制退回草稿）',
+    'review.note.prompt':'原因（可选）：',
+    'comments.title':'讨论 / 留言', 'comments.placeholder':'请先从知识库选择文档',
+    'comments.input.placeholder':'输入留言…', 'comments.submit':'发送', 'comments.reply':'↩ 回复',
+    'comments.empty':'暂无留言',
+    'config.title':'⚙ API 设置', 'config.save':'保存设置', 'config.cancel':'取消',
+    'status.draft':'草稿（暂不公开）', 'status.published':'已发布', 'status.archived':'已归档',
+    'cat.product':'产品研发', 'cat.mfg':'制造工艺', 'cat.quality':'品质管理', 'cat.sales':'业务客户',
+    'cat.supply':'供应链采购', 'cat.compliance':'法规认证', 'cat.hr':'人事培训', 'cat.tacit':'隐性知识',
+    'cat.ai_tech':'AI 科技', 'cat.industry':'产业资讯',
+    'toast.copied':'已复制联系方式', 'toast.saved':'已保存', 'toast.deleted':'已删除',
+    'confirm.delete':'确定删除「{title}」？\n此操作不可撤销。',
+    'confirm.cancel_edit':'放弃编辑？未保存的更改将会丢失。',
+    'sys.supabase':'Supabase', 'sys.claude':'Claude API', 'sys.docs':'文档数',
+    'sys.rag':'RAG: pgvector + Claude', 'sys.storage':'存储: Supabase Postgres',
+  },
+  'en': {
+    'nav.search':'AI Q&A / Search', 'nav.editor':'Create Entry', 'nav.docs':'Knowledge Base',
+    'nav.kmap':'Knowledge Map', 'nav.analytics':'Analytics', 'nav.experts':'Expert Directory',
+    'nav.review':'Review Workflow', 'nav.comments':'Discussion',
+    'rag.title':'AI Q&A — Answers from Knowledge Base',
+    'rag.placeholder':'Ask anything, e.g.: How to handle Qi2 charger yield issues?',
+    'rag.btn':'Ask', 'rag.empty':'Enter a question. AI will retrieve relevant passages and synthesize an answer.',
+    'rag.empty2':'Configure API Keys and add documents first.',
+    'editor.save':'Save & Vectorize', 'editor.cancel':'Cancel', 'editor.update':'Update Document',
+    'editor.title.placeholder':'Document Title', 'editor.author.placeholder':'Author Name',
+    'editor.reviewer.placeholder':'Reviewer (optional)', 'editor.related.placeholder':'Related Documents (comma separated)',
+    'editor.tag.placeholder':'Type a tag and press Enter',
+    'editor.upload.text':'Click or drag files to upload', 'editor.upload.hint':'PDF · Word · Excel · CSV · PowerPoint · Image · TXT · Markdown',
+    'docs.title':'Knowledge Base — All Documents', 'docs.new':'＋ New Document',
+    'kmap.title':'Knowledge Map — Categories', 'kmap.back':'← Back to Categories',
+    'analytics.title':'Analytics', 'analytics.total':'Entries', 'analytics.published':'Published',
+    'analytics.views':'Total Views', 'analytics.gaps':'Knowledge Gaps',
+    'experts.title':'Expert Directory', 'experts.add':'＋ Add Expert', 'experts.empty':'No experts yet',
+    'experts.copy':'Contact info copied', 'experts.remove':'Remove',
+    'review.title':'Review Workflow', 'review.empty':'Select a document to manage its review',
+    'review.actions':'Actions', 'review.log':'Review History',
+    'review.approve':'Publish', 'review.reject':'Return to Draft',
+    'review.archive':'Archive', 'review.restore':'Restore to Published', 'review.revoke':'⚠ Revoke (Force to Draft)',
+    'review.note.prompt':'Reason (optional):',
+    'comments.title':'Discussion', 'comments.placeholder':'Select a document from the Knowledge Base',
+    'comments.input.placeholder':'Write a comment…', 'comments.submit':'Send', 'comments.reply':'↩ Reply',
+    'comments.empty':'No comments yet. Be the first.',
+    'config.title':'⚙ API Settings', 'config.save':'Save Settings', 'config.cancel':'Cancel',
+    'status.draft':'Draft (Hidden)', 'status.published':'Published', 'status.archived':'Archived',
+    'cat.product':'Product R&D', 'cat.mfg':'Manufacturing', 'cat.quality':'Quality', 'cat.sales':'Sales & CRM',
+    'cat.supply':'Supply Chain', 'cat.compliance':'Compliance', 'cat.hr':'HR & Training', 'cat.tacit':'Tacit Knowledge',
+    'cat.ai_tech':'AI & Technology', 'cat.industry':'Industry Insights',
+    'toast.copied':'Contact info copied', 'toast.saved':'Saved', 'toast.deleted':'Deleted',
+    'confirm.delete':'Delete "{title}"?\nThis cannot be undone.',
+    'confirm.cancel_edit':'Discard changes? Unsaved edits will be lost.',
+    'sys.supabase':'Supabase', 'sys.claude':'Claude API', 'sys.docs':'Documents',
+    'sys.rag':'RAG: pgvector + Claude', 'sys.storage':'Storage: Supabase Postgres',
+  },
+  'vi': {
+    'nav.search':'Hỏi đáp AI', 'nav.editor':'Tạo mục kiến thức', 'nav.docs':'Kho kiến thức',
+    'nav.kmap':'Bản đồ kiến thức', 'nav.analytics':'Báo cáo', 'nav.experts':'Danh bạ chuyên gia',
+    'nav.review':'Quy trình duyệt', 'nav.comments':'Thảo luận',
+    'rag.title':'Hỏi đáp AI — Từ kho kiến thức',
+    'rag.placeholder':'Đặt câu hỏi, ví dụ: Xử lý lỗi tỷ lệ đạt chuẩn Qi2 như thế nào?',
+    'rag.btn':'Gửi câu hỏi', 'rag.empty':'Nhập câu hỏi, AI sẽ tìm và tổng hợp câu trả lời từ tài liệu',
+    'rag.empty2':'Vui lòng cấu hình API Keys và thêm tài liệu trước',
+    'editor.save':'Lưu & Vector hóa', 'editor.cancel':'Hủy', 'editor.update':'Cập nhật tài liệu',
+    'editor.title.placeholder':'Tiêu đề tài liệu', 'editor.author.placeholder':'Tên tác giả',
+    'editor.reviewer.placeholder':'Người duyệt (tùy chọn)', 'editor.related.placeholder':'Tài liệu liên quan (cách nhau bằng dấu phẩy)',
+    'editor.tag.placeholder':'Nhập thẻ rồi nhấn Enter',
+    'editor.upload.text':'Nhấp hoặc kéo tệp để tải lên', 'editor.upload.hint':'PDF · Word · Excel · Hình ảnh · TXT · Markdown',
+    'docs.title':'Kho kiến thức — Tất cả tài liệu', 'docs.new':'＋ Tài liệu mới',
+    'kmap.title':'Bản đồ kiến thức — Tổng quan', 'kmap.back':'← Quay lại',
+    'analytics.title':'Báo cáo', 'analytics.total':'Mục kiến thức', 'analytics.published':'Đã xuất bản',
+    'analytics.views':'Tổng lượt xem', 'analytics.gaps':'Khoảng trống kiến thức',
+    'experts.title':'Danh bạ chuyên gia', 'experts.add':'＋ Thêm chuyên gia', 'experts.empty':'Chưa có chuyên gia',
+    'experts.copy':'Đã sao chép thông tin liên hệ', 'experts.remove':'Xóa',
+    'review.title':'Quy trình duyệt', 'review.empty':'Chọn tài liệu để quản lý quy trình duyệt',
+    'review.actions':'Hành động', 'review.log':'Lịch sử duyệt',
+    'review.approve':'Xuất bản', 'review.reject':'Trả về bản nháp',
+    'review.archive':'Lưu trữ', 'review.restore':'Khôi phục', 'review.revoke':'⚠ Thu hồi (Buộc về bản nháp)',
+    'review.note.prompt':'Lý do (tùy chọn):',
+    'comments.title':'Thảo luận', 'comments.placeholder':'Chọn tài liệu từ kho kiến thức',
+    'comments.input.placeholder':'Viết bình luận…', 'comments.submit':'Gửi', 'comments.reply':'↩ Trả lời',
+    'comments.empty':'Chưa có bình luận. Hãy là người đầu tiên.',
+    'config.title':'⚙ Cài đặt API', 'config.save':'Lưu cài đặt', 'config.cancel':'Hủy',
+    'status.draft':'Bản nháp (Ẩn)', 'status.published':'Đã xuất bản', 'status.archived':'Đã lưu trữ',
+    'cat.product':'R&D sản phẩm', 'cat.mfg':'Quy trình sản xuất', 'cat.quality':'Quản lý chất lượng', 'cat.sales':'Kinh doanh',
+    'cat.supply':'Chuỗi cung ứng', 'cat.compliance':'Tuân thủ & Chứng nhận', 'cat.hr':'Nhân sự', 'cat.tacit':'Kiến thức ngầm',
+    'cat.ai_tech':'Công nghệ AI', 'cat.industry':'Thông tin ngành',
+    'toast.copied':'Đã sao chép thông tin liên hệ', 'toast.saved':'Đã lưu', 'toast.deleted':'Đã xóa',
+    'confirm.delete':'Xóa "{title}"?\nHành động này không thể hoàn tác.',
+    'confirm.cancel_edit':'Hủy chỉnh sửa? Các thay đổi chưa lưu sẽ bị mất.',
+    'sys.supabase':'Supabase', 'sys.claude':'Claude API', 'sys.docs':'Tài liệu',
+    'sys.rag':'RAG: pgvector + Claude', 'sys.storage':'Lưu trữ: Supabase Postgres',
+  },
+  'ja': {
+    'nav.search':'AI 質問 / 検索', 'nav.editor':'ナレッジ登録', 'nav.docs':'ナレッジベース',
+    'nav.kmap':'ナレッジマップ', 'nav.analytics':'分析レポート', 'nav.experts':'専門家名鑑',
+    'nav.review':'審査ワークフロー', 'nav.comments':'ディスカッション',
+    'rag.title':'AI 質問応答 — ナレッジベースから回答',
+    'rag.placeholder':'質問を入力してください（例：Qi2充電器の歩留まり異常の対処法は？）',
+    'rag.btn':'質問する', 'rag.empty':'質問を入力すると、AIがナレッジベースから関連情報を検索して回答します',
+    'rag.empty2':'API Keys を設定し、ドキュメントを追加してください',
+    'editor.save':'保存してベクトル化', 'editor.cancel':'キャンセル', 'editor.update':'ドキュメントを更新',
+    'editor.title.placeholder':'ドキュメントタイトル', 'editor.author.placeholder':'作成者名',
+    'editor.reviewer.placeholder':'レビュアー（任意）', 'editor.related.placeholder':'関連ドキュメント（カンマ区切り）',
+    'editor.tag.placeholder':'タグを入力してEnterキーを押してください',
+    'editor.upload.text':'クリックまたはドラッグしてアップロード', 'editor.upload.hint':'PDF · Word · Excel · CSV · PowerPoint · 画像 · TXT · Markdown',
+    'docs.title':'ナレッジベース — すべてのドキュメント', 'docs.new':'＋ 新規ドキュメント',
+    'kmap.title':'ナレッジマップ — カテゴリ一覧', 'kmap.back':'← カテゴリ一覧に戻る',
+    'analytics.title':'分析レポート', 'analytics.total':'ナレッジ件数', 'analytics.published':'公開済み',
+    'analytics.views':'総閲覧数', 'analytics.gaps':'ナレッジギャップ',
+    'experts.title':'専門家名鑑', 'experts.add':'＋ 専門家を追加', 'experts.empty':'専門家データなし',
+    'experts.copy':'連絡先をコピーしました', 'experts.remove':'削除',
+    'review.title':'審査ワークフロー', 'review.empty':'ドキュメントを選択して審査を開始',
+    'review.actions':'操作', 'review.log':'審査履歴',
+    'review.approve':'公開する', 'review.reject':'草稿に戻す',
+    'review.archive':'アーカイブ', 'review.restore':'公開に戻す', 'review.revoke':'⚠ 取消（強制的に草稿に戻す）',
+    'review.note.prompt':'理由（任意）：',
+    'comments.title':'ディスカッション', 'comments.placeholder':'ナレッジベースからドキュメントを選択してください',
+    'comments.input.placeholder':'コメントを入力…', 'comments.submit':'送信', 'comments.reply':'↩ 返信',
+    'comments.empty':'まだコメントはありません。最初のコメントを投稿してください。',
+    'config.title':'⚙ API 設定', 'config.save':'設定を保存', 'config.cancel':'キャンセル',
+    'status.draft':'下書き（非公開）', 'status.published':'公開済み', 'status.archived':'アーカイブ済み',
+    'cat.product':'製品開発', 'cat.mfg':'製造工程', 'cat.quality':'品質管理', 'cat.sales':'営業・顧客',
+    'cat.supply':'サプライチェーン', 'cat.compliance':'法規・認証', 'cat.hr':'人事・研修', 'cat.tacit':'暗黙知',
+    'cat.ai_tech':'AIテクノロジー', 'cat.industry':'業界情報',
+    'toast.copied':'連絡先をコピーしました', 'toast.saved':'保存しました', 'toast.deleted':'削除しました',
+    'confirm.delete':'「{title}」を削除しますか？\n元に戻すことはできません。',
+    'confirm.cancel_edit':'編集を破棄しますか？保存されていない変更は失われます。',
+    'sys.supabase':'Supabase', 'sys.claude':'Claude API', 'sys.docs':'ドキュメント数',
+    'sys.rag':'RAG: pgvector + Claude', 'sys.storage':'ストレージ: Supabase Postgres',
+  },
+};
+
+// Templates
+const TEMPLATES = {
+  sop: {
+    title: 'SOP — [作業名稱] v1.0',
+    body: `## 目的\n\n說明此 SOP 的目的與適用範圍。\n\n## 適用範圍\n\n- 適用部門：\n- 適用產品：\n\n## 作業步驟\n\n1. **步驟一**：\n2. **步驟二**：\n3. **步驟三**：\n\n## 注意事項\n\n> 重要警示或品質要求\n\n## 版本歷史\n\n| 版本 | 日期 | 修改人 | 修改內容 |\n|------|------|--------|----------|\n| v1.0 | ${new Date().toISOString().split('T')[0]} | | 初版 |`
+  },
+  meeting: {
+    title: `[${new Date().toISOString().split('T')[0]}] 會議紀錄`,
+    body: `## 基本資訊\n\n- **出席人員**：\n- **會議時間**：\n- **地點 / 形式**：\n\n## 討論議題\n\n### 1. \n\n### 2. \n\n## 決議事項\n\n1. \n\n## 待辦事項（Action Items）\n\n| 負責人 | 任務 | 截止日期 | 狀態 |\n|--------|------|----------|------|\n| | | | 未開始 |`
+  },
+  review: {
+    title: '[專案名稱] 覆盤報告',
+    body: `## 專案背景\n\n## 預期目標 vs 實際結果\n\n| 指標 | 目標 | 實際 | 差異 |\n|------|------|------|------|\n| | | | |\n\n## 做對了什麼\n\n- \n\n## 做錯了什麼 / 可改善的地方\n\n- \n\n## 根本原因分析\n\n## 下次改進方案\n\n1. `
+  },
+  tacit: {
+    title: '[主題] 實戰心得 — [作者姓名]',
+    body: `## 情境背景\n\n（在什麼條件、什麼問題下產生這份心得）\n\n## 解決方法\n\n詳細描述如何解決，包含具體操作步驟。\n\n## 為什麼這樣做有效\n\n解釋背後的原理或邏輯。\n\n## 注意事項 / 踩過的坑\n\n- \n\n## 可適用的類似情境\n\n- \n\n## 聯絡人\n\n如需進一步了解，聯絡：`
+  },
+  inspection: {
+    title: 'IQC 入料檢驗報告 — [料號]',
+    body: `## 基本資訊\n\n- **料號**：\n- **品名**：\n- **供應商**：\n- **入料日期**：\n- **數量**：\n- **批號**：\n\n## 抽樣計畫\n\n- 抽樣標準：MIL-STD-1916\n- 抽樣數量：\n- AQL：0.65\n\n## 檢驗項目\n\n| 項目 | 規格 | 實測值 | 判定 |\n|------|------|--------|------|\n| 外觀 | 無損傷 | | PASS / FAIL |\n| 尺寸 | | | |\n\n## 判定結果\n\n- [ ] 合格（PASS）入庫\n- [ ] 特採（條件如下）\n- [ ] 不合格（FAIL）退貨\n\n## 備註`
+  }
+};
+
+// Demo documents for offline/mock mode
+const DEMO_DOCS = [
+  {
+    id: 'demo-1',
+    title: 'Qi2 25W 充電器 IQC 入料標準 v2.0',
+    body: `Qi2 充電器線圈組入料檢驗標準。偏移率控制指標：X 軸偏移 ≤ 0.3mm，Y 軸偏移 ≤ 0.3mm，Z 軸高度差 ≤ 0.1mm。良率目標：線圈偏移率 ≤ 0.8%。溫控模組焊點外觀：錫面光亮，無虛焊、冷焊、橋接。焊點強度：拉力測試 ≥ 5N。入料抽樣：依 MIL-STD-1916，AQL 0.65，每批抽驗 5%。異常處理：偏移率超標時，立即通知供應商並啟動 8D 報告，由 IQC 主管決定是否特採或退貨。`,
+    category: 'quality', lang: 'zh-TW', status: 'published',
+    embedding: null
+  },
+  {
+    id: 'demo-2',
+    title: '焊接異常處理 SOP v2.1',
+    body: `目的：規範溫控模組焊點異常的標準處理流程，確保品質一致性。適用範圍：東莞廠 SMT 線及越南廠組裝線。異常類型與處理：虛焊（冷焊）發現時立即停線，回流重焊，重焊後 100% 目視及 X-ray 確認。橋接（錫橋）使用吸錫線移除多餘錫，清洗後重新焊接，不得使用烙鐵反覆加熱。錫球散落時檢查鋼板開口，調整印錫參數。溫控模組特殊注意：焊接溫度不超過 260°C，持續時間不超過 10 秒，否則損傷 NTC 溫度感測器。Jimmy Chen 提醒：東莞廠夏季（6-9月）因車間溫度高，回流爐溫度曲線需下調 2-3°C，避免過爐後板彎。`,
+    category: 'quality', lang: 'zh-TW', status: 'published',
+    embedding: null
+  },
+  {
+    id: 'demo-3',
+    title: 'M2 Pro 磁吸支架 — 產品規格書 v1.2',
+    body: `COMART M2 Pro MagSafe 相容磁吸車架規格。磁力：N52 磁鐵，磁吸力 ≥ 1.5kg（對標 Apple MagSafe 手機）。充電支援：Qi2 15W 無線充電，相容 iPhone 12 以上。安裝方式：出風口夾式，360° 旋轉球頭，±15° 俯仰調整。材質：PC+ABS 主體，TPU 夾爪。認證：FCC / CE / ROHS。包裝：彩盒 + 說明書四語言（繁中/簡中/英/越）。EXW 東莞報價：MOQ 500 pcs USD 8.5，MOQ 1000 pcs USD 7.8，MOQ 3000 pcs USD 7.2。`,
+    category: 'product', lang: 'zh-TW', status: 'published',
+    embedding: null
+  },
+  {
+    id: 'demo-4',
+    title: 'Vietnam Factory SOP — Incoming Material Inspection',
+    body: `Purpose: Standardize incoming material inspection at COMART Vietnam facility. Applicable to all raw materials and semi-finished goods received at Hanoi warehouse. Inspection flow: Receive goods → verify packing list → visual inspection → dimensional check → functional test → IQC stamp. For Qi2 wireless charging coils: check coil offset using go/no-go gauge, measure resistance (target 3.2Ω ±0.3Ω). Pass: stamp green IQC label, enter into system. Fail: segregate, tag with red label, notify purchasing within 2 hours. Escalation: if failure rate exceeds 2% of lot, stop inspection and contact Dongguan QC supervisor (Jimmy Chen).`,
+    category: 'quality', lang: 'en', status: 'published',
+    embedding: null
+  },
+  {
+    id: 'demo-5',
+    title: '展後跟進信範本 — Booth Follow-up Email Template',
+    body: `展後客戶跟進信標準範本（英文）。Subject: Great Meeting at [Show Name] — COMART Wireless Charging & Car Mount Solutions. Dear [Name], It was a pleasure connecting with you at [Show]. As discussed, COMART specializes in ODM/OEM manufacturing of magnetic car mounts, Qi2 wireless chargers, and automotive accessories. Our Dongguan and Vietnam facilities offer flexibility for both small pilot orders and large-scale production. I'd like to schedule a 30-minute call to better understand your sourcing needs. Key capabilities: Qi2 25W certified, MagSafe-compatible, FCC/CE/ROHS, 30-day sample lead time. Please find our product catalog attached. Best regards, [Name], COMART Corporation.`,
+    category: 'sales', lang: 'en', status: 'published',
+    embedding: null
+  },
+];
+
+// ═══════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════════
+// PORTAL SESSION 整合
+// ═══════════════════════════════════════════════
+const PORTAL_SESSION_KEY = 'comart-portal-session';
+
+function readPortalSession() {
+  try {
+    const raw = localStorage.getItem(PORTAL_SESSION_KEY);
+    if (!raw) return null;
+    const s = JSON.parse(raw);
+    if (!s || !s.empId || !s.expires) return null;
+    if (Date.now() > s.expires) { localStorage.removeItem(PORTAL_SESSION_KEY); return null; }
+    return s;
+  } catch(e) { return null; }
+}
+
+// ── KMS 角色定義 ──
+// admin / dcc → 可讀取、新增、修改自己的文章、刪除任何文章
+// user        → 可讀取、新增、修改自己的文章，不能刪除
+// 任何角色都不能修改別人的文章
+const KMS_ROLE_FROM_PORTAL = {
+  admin: 'admin',
+  dcc:   'admin',
+  user:  'user',
+};
+
+let portalUser = null; // 從 portal 帶進來的使用者
+
+// 取得目前用戶的 KMS 角色
+function getKmsRole() {
+  if (!portalUser) return 'admin'; // 沒有 portal session 時預設全權（本機直接開）
+  return KMS_ROLE_FROM_PORTAL[portalUser.role] || 'user';
+}
+
+// 判斷目前用戶能否刪除某份文件
+function canDelete(docAuthorName) {
+  const role = getKmsRole();
+  if (role === 'admin') return true; // admin/dcc 可刪任何文件
+  return false; // user 不能刪除
+}
+
+// 判斷目前用戶能否編輯某份文件
+function canEdit(docAuthorName) {
+  if (!portalUser) return true; // 沒有 portal session 全權
+  const myName = portalUser.nameEn || portalUser.nameZh || portalUser.empId;
+  // 任何角色都不能修改別人的文章
+  if (docAuthorName && docAuthorName !== myName) return false;
+  return true; // 自己的或新文件
+}
+
+async function initPortalSession() {
+  const sess = readPortalSession();
+  if (!sess) return;
+
+  portalUser = sess;
+
+  // ← Portal 返回按鈕
+  const backBtn = document.getElementById('portal-back-btn');
+  if (backBtn) backBtn.style.display = '';
+
+  // 用戶 chip
+  const chip = document.getElementById('portal-user-chip');
+  if (chip) chip.style.display = 'flex';
+
+  // ── 補齊真實姓名：若 session 沒帶 nameEn/nameZh，去 kms_users 查 ──
+  let displayName = sess.nameEn || sess.nameZh || '';
+  if (!displayName && sess.empId && CFG.supabaseUrl && CFG.supabaseKey) {
+    try {
+      const rows = await sbFetch(
+        `/rest/v1/kms_users?emp_id=eq.${encodeURIComponent(sess.empId)}&select=name_en,name_zh&limit=1`
+      );
+      if (rows && rows.length) {
+        displayName = rows[0].name_en || rows[0].name_zh || '';
+        portalUser.nameEn = rows[0].name_en || '';
+        portalUser.nameZh = rows[0].name_zh || '';
+      }
+    } catch(e) { /* 查不到就維持空白，不 fallback 到工號 */ }
+  }
+
+  const initial = (displayName || sess.empId || '?')[0].toUpperCase();
+  const avatarEl = document.getElementById('portal-user-avatar');
+  if (avatarEl) avatarEl.textContent = initial;
+
+  const nameEl = document.getElementById('portal-user-name');
+  // topbar：有姓名用姓名，沒有才顯示工號（僅供辨識）
+  if (nameEl) nameEl.textContent = displayName || sess.empId;
+
+  const roleEl = document.getElementById('portal-user-role');
+  const kmsRole = getKmsRole();
+  const roleLabel = { admin:'KMS Admin', user:'KMS User' }[kmsRole] || kmsRole;
+  if (roleEl) roleEl.textContent = roleLabel;
+
+  // doc-author 進入時保持空白，由使用者自行填寫
+
+  // 提示目前身份
+  setTimeout(() => {
+    if (kmsRole === 'user') {
+      toast(`以 ${roleLabel} 身份登入 — 可新增/修改自己的文章，無法刪除`, '');
+    }
+  }, 1000);
+}
+
+window.addEventListener('DOMContentLoaded', async () => {
+  loadConfig();
+  await initPortalSession();
+  // 強制清空 doc-author（防止瀏覽器 autocomplete 或殘值）
+  const _authorEl = document.getElementById('doc-author');
+  if (_authorEl) _authorEl.value = '';
+  await initTipTap();
+  await loadProductLines();
+  loadDocs();
+  updateStatus();
+
+  // sql-helper 已移除（系統上線後不需要初始化提示）
+});
+
+function loadConfig() {
+  // Supabase URL 和 Key 已寫死在程式碼，不需要從 localStorage 讀取
+  // 只讀取 embedModel 偏好設定
+  try {
+    const saved = localStorage.getItem('comart-kms-config');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (parsed.embedModel) CFG.embedModel = parsed.embedModel;
+    }
+  } catch(e) {}
+
+  // 從 URL 參數讀取（一次性帶入設定用，現在主要只處理 embedModel）
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const cfgParam = params.get('kms_cfg');
+    if (cfgParam) {
+      const decoded = JSON.parse(atob(cfgParam));
+      if (decoded.embedModel) CFG.embedModel = decoded.embedModel;
+      const cleanUrl = window.location.pathname + window.location.hash;
+      window.history.replaceState({}, '', cleanUrl);
+    }
+  } catch(e) {}
+}
+
+function updateStatus() {
+  const sb = document.getElementById('status-supabase');
+  const cl = document.getElementById('status-claude');
+  sb.innerHTML = `Supabase: <span style="color:${CFG.supabaseUrl ? 'var(--green)' : 'var(--text-3)'}">${CFG.supabaseUrl ? '已設定' : '未設定'}</span>`;
+  cl.innerHTML = `Claude API: <span style="color:${CFG.supabaseUrl ? 'var(--green)' : (CFG.claudeKey ? 'var(--amber)' : 'var(--text-3)')}">${CFG.supabaseUrl ? 'Edge Function ✓' : (CFG.claudeKey ? '直連模式' : '未設定')}</span>`;
+}
+
+// ═══════════════════════════════════════════════
+// TIPTAP INIT — ESM dynamic import（相容 file:// 與 https://）
+// ═══════════════════════════════════════════════
+async function initTipTap() {
+  const editorEl = document.getElementById('tiptap-editor');
+  editorEl.innerHTML = '<div style="color:var(--text-3);padding:20px;font-size:13px;">編輯器載入中…</div>';
+
+  try {
+    // esm.sh 提供穩定的 ESM build，相容所有現代瀏覽器
+    const [
+      { Editor },
+      { StarterKit },
+    ] = await Promise.all([
+      import('https://esm.sh/@tiptap/core@2.11.5'),
+      import('https://esm.sh/@tiptap/starter-kit@2.11.5'),
+    ]);
+
+    editorEl.innerHTML = ''; // 清掉 loading 文字
+
+    tiptapEditor = new Editor({
+      element: editorEl,
+      extensions: [StarterKit],
+      content: '<p></p>',
+      onUpdate:          () => updateToolbarState(),
+      onSelectionUpdate: () => updateToolbarState(),
+    });
+
+  } catch(e) {
+    console.error('TipTap load error:', e);
+    // Fallback：用 textarea 取代，確保使用者還是能輸入
+    editorEl.innerHTML = `
+      <textarea id="tiptap-fallback"
+        style="width:100%;min-height:300px;padding:12px;border:none;outline:none;
+               font-family:var(--font);font-size:14px;line-height:1.75;
+               resize:none;background:transparent;color:var(--text);"
+        placeholder="開始輸入內容（純文字模式，TipTap 載入失敗）…"></textarea>`;
+
+    // 讓 editorToMarkdown 讀 fallback textarea
+    window._tiptapFallback = true;
+  }
+}
+
+function editorCmd(cmd, options) {
+  if (!tiptapEditor) return;
+  const chain = tiptapEditor.chain().focus();
+  if (options) chain[cmd](options).run();
+  else chain[cmd]().run();
+  updateToolbarState();
+}
+
+function updateToolbarState() {
+  if (!tiptapEditor) return;
+  const marks = { 'tb-bold':'bold', 'tb-italic':'italic', 'tb-strike':'strike', 'tb-code':'code' };
+  for (const [id, mark] of Object.entries(marks)) {
+    document.getElementById(id)?.classList.toggle('active', tiptapEditor.isActive(mark));
+  }
+}
+
+function loadTemplate(key) {
+  if (!key || !TEMPLATES[key]) return;
+  const tmpl = TEMPLATES[key];
+  document.getElementById('doc-title').value = tmpl.title;
+
+  if (window._tiptapFallback) {
+    const ta = document.getElementById('tiptap-fallback');
+    if (ta) ta.value = tmpl.body;
+    return;
+  }
+
+  if (tiptapEditor) {
+    // Convert markdown-like content to TipTap HTML
+    const html = tmpl.body
+      .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+      .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+      .replace(/^> (.+)$/gm, '<blockquote><p>$1</p></blockquote>')
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/^- (.+)$/gm, '<li>$1</li>')
+      .replace(/\n\n/g, '</p><p>')
+      .replace(/^(?!<[h|l|b])/gm, '');
+    tiptapEditor.commands.setContent(`<p>${html}</p>`);
+  }
+}
+
+// Simple TipTap → Markdown converter
+function editorToMarkdown() {
+  // Fallback mode：TipTap 載入失敗時用 textarea
+  if (window._tiptapFallback) {
+    return document.getElementById('tiptap-fallback')?.value || '';
+  }
+  if (!tiptapEditor) return '';
+  const json = tiptapEditor.getJSON();
+  return nodeToMarkdown(json);
+}
+
+function nodeToMarkdown(node) {
+  if (!node) return '';
+  if (node.type === 'doc') return (node.content || []).map(nodeToMarkdown).join('\n\n');
+  if (node.type === 'paragraph') {
+    const text = (node.content || []).map(marksToMd).join('');
+    return text || '';
+  }
+  if (node.type === 'heading') {
+    const level = node.attrs?.level || 1;
+    const text = (node.content || []).map(marksToMd).join('');
+    return '#'.repeat(level) + ' ' + text;
+  }
+  if (node.type === 'bulletList') return (node.content || []).map(li => '- ' + (li.content || []).map(nodeToMarkdown).join('')).join('\n');
+  if (node.type === 'orderedList') return (node.content || []).map((li, i) => `${i+1}. ` + (li.content || []).map(nodeToMarkdown).join('')).join('\n');
+  if (node.type === 'listItem') return (node.content || []).map(nodeToMarkdown).join('');
+  if (node.type === 'blockquote') return (node.content || []).map(n => '> ' + nodeToMarkdown(n)).join('\n');
+  if (node.type === 'codeBlock') return '```\n' + (node.content || []).map(n => n.text || '').join('') + '\n```';
+  if (node.type === 'hardBreak') return '\n';
+  if (node.type === 'horizontalRule') return '---';
+  if (node.type === 'text') return marksToMd(node);
+  return '';
+}
+
+function marksToMd(node) {
+  if (!node || node.type !== 'text') return '';
+  let text = node.text || '';
+  const marks = node.marks || [];
+  for (const mark of marks) {
+    if (mark.type === 'bold') text = `**${text}**`;
+    else if (mark.type === 'italic') text = `*${text}*`;
+    else if (mark.type === 'strike') text = `~~${text}~~`;
+    else if (mark.type === 'code') text = '`' + text + '`';
+  }
+  return text;
+}
+
+// ═══════════════════════════════════════════════
+// SUPABASE HELPERS
+// ═══════════════════════════════════════════════
+async function sbFetch(path, options = {}) {
+  if (!CFG.supabaseUrl || !CFG.supabaseKey) throw new Error('Supabase 未設定');
+  const url = CFG.supabaseUrl + path;
+  const headers = {
+    'apikey': CFG.supabaseKey,
+    'Authorization': 'Bearer ' + CFG.supabaseKey,
+    'Content-Type': 'application/json',
+    'Prefer': options.prefer || 'return=representation',
+  };
+  const res = await fetch(url, { ...options, headers: { ...headers, ...(options.headers || {}) } });
+  const text = await res.text();
+  if (!res.ok) throw new Error(`Supabase error ${res.status}: ${text}`);
+  return text ? JSON.parse(text) : null;
+}
+
+// ── kmsWrite：所有寫入操作走 kms-write Edge Function（service_role，可繞過 RLS）──
+async function kmsWrite(action, table, payload = null, id = null, filters = null) {
+  if (!CFG.supabaseUrl || !CFG.supabaseKey) throw new Error('Supabase 未設定');
+  const base = CFG.supabaseUrl.replace(/\/(rest|auth|storage)\/v\d.*$/, '');
+  const url  = `${base}/functions/v1/kms-write`;
+  const res  = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${CFG.supabaseKey}`,
+      'apikey': CFG.supabaseKey,
+    },
+    body: JSON.stringify({ action, table, payload, id, filters }),
+  });
+  const text = await res.text();
+  if (!res.ok) throw new Error(`kms-write error ${res.status}: ${text}`);
+  const data = text ? JSON.parse(text) : null;
+  if (data?.error) throw new Error(data.error);
+  return data?.data || null;
+}
+
+// ═══════════════════════════════════════════════
+// EMBEDDING — 三種模式
+// ═══════════════════════════════════════════════
+async function generateEmbedding(text) {
+  const mode = CFG.embedModel;
+
+  // ── Mock 模式：離線關鍵字雜湊向量 ──
+  if (mode === 'mock') {
+    let hash = 0;
+    for (let i = 0; i < text.length; i++) hash = ((hash << 5) - hash) + text.charCodeAt(i);
+    return Array.from({ length: 1536 }, (_, i) => Math.sin(hash * (i + 1) * 0.001) * 0.5);
+  }
+
+  // ── Edge Function 模式（生產推薦）──
+  // 前端只傳 doc_id，OpenAI key 存在 Supabase Secrets，不暴露
+  // 這個函數在 saveDoc 裡單獨呼叫，不在 retrieveChunks 裡呼叫
+  if (mode === 'edge-fn') {
+    // embedding 由 callEmbedEdgeFn(doc_id) 觸發，這裡回傳 null 表示「交給 Edge Function 處理」
+    return null;
+  }
+
+  // ── 直接呼叫 OpenAI（測試用，注意瀏覽器 CORS）──
+  if (mode === 'direct-openai') {
+    if (!CFG.openAiKey) throw new Error('請設定 OpenAI API Key');
+    const res = await fetch('https://api.openai.com/v1/embeddings', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + CFG.openAiKey,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'text-embedding-3-small',
+        input: text.slice(0, 8000),
+        dimensions: 1536,
+      }),
+    });
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(`OpenAI embedding 錯誤 ${res.status}: ${err}`);
+    }
+    const data = await res.json();
+    return data.data?.[0]?.embedding || null;
+  }
+
+  throw new Error('未知的 embedding 模式：' + mode);
+}
+
+// 呼叫 Supabase Edge Function 觸發 embedding（edge-fn 模式專用）
+async function callEmbedEdgeFn(doc_id) {
+  if (!CFG.supabaseUrl || !CFG.supabaseKey) throw new Error('Supabase 未設定');
+  // Supabase Edge Function URL 格式：https://xxx.supabase.co/functions/v1/fn-name
+  const base = CFG.supabaseUrl.replace(/\/(rest|auth|storage)\/v\d.*$/, '');
+  const url = base + '/functions/v1/embed-document';
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Authorization': 'Bearer ' + CFG.supabaseKey,
+      'apikey': CFG.supabaseKey,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ doc_id }),
+  });
+  const data = await res.json();
+  if (!res.ok || !data.success) {
+    throw new Error(data.error || `Edge Function 錯誤 ${res.status}`);
+  }
+  return data;
+}
+
+// 查詢時的 embedding（支援 edge-fn 模式下的查詢向量）
+async function getQueryEmbedding(queryText) {
+  const mode = CFG.embedModel;
+  if (mode === 'mock') return generateEmbedding(queryText);
+  if (mode === 'direct-openai') return generateEmbedding(queryText);
+  if (mode === 'edge-fn') {
+    if (!CFG.supabaseUrl || !CFG.supabaseKey) return null;
+    try {
+      const base = CFG.supabaseUrl.replace(/\/(rest|auth|storage)\/v\d.*$/, '');
+      const url = base + '/functions/v1/embed-query';
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Bearer ' + CFG.supabaseKey,
+          'apikey': CFG.supabaseKey,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ text: queryText }),
+      });
+      if (!res.ok) {
+        console.warn('[KMS] embed-query Edge Function 失敗:', res.status, '→ 改用關鍵字搜尋');
+        return null; // fallback to keyword search
+      }
+      const data = await res.json();
+      return data.embedding || null;
+    } catch(e) {
+      console.warn('[KMS] embed-query 呼叫錯誤:', e.message, '→ 改用關鍵字搜尋');
+      return null; // 任何錯誤都 fallback，不讓它炸掉 doSearch
+    }
+  }
+  return null;
+}
+
+// Simple cosine similarity for local mock search
+function cosineSim(a, b) {
+  if (!a || !b || a.length !== b.length) return 0;
+  let dot = 0, na = 0, nb = 0;
+  for (let i = 0; i < a.length; i++) {
+    dot += a[i] * b[i];
+    na += a[i] * a[i];
+    nb += b[i] * b[i];
+  }
+  return dot / (Math.sqrt(na) * Math.sqrt(nb) || 1);
+}
+
+// Keyword-based scoring for mock mode (works offline)
+function keywordScore(query, doc) {
+  const q = query.toLowerCase();
+  const text = (doc.title + ' ' + doc.body).toLowerCase();
+  const words = q.split(/[\s,，、？！。]+/).filter(w => w.length > 1);
+  let score = 0;
+  for (const w of words) {
+    const count = (text.match(new RegExp(w, 'g')) || []).length;
+    score += count * (doc.title.toLowerCase().includes(w) ? 2 : 1);
+  }
+  return score / Math.max(words.length, 1);
+}
+
+// ═══════════════════════════════════════════════
+// AI 自動分類
+// ═══════════════════════════════════════════════
+const CAT_IDS = ['product','mfg','quality','sales','supply','compliance','hr','tacit','ai_tech','industry'];
+
+const CAT_NAMES_FOR_PROMPT = {
+  product:    '產品研發（規格書、BOM、DFM、樣品紀錄）',
+  mfg:        '製造工藝（SOP、製程參數、設備操作、良率改善）',
+  quality:    '品質管理（IQC/IPQC/OQC、8D 報告、異常處理）',
+  sales:      '業務客戶（報價範本、展後跟進、客戶需求、合約）',
+  supply:     '供應鏈採購（供應商評估、料號、採購 SOP）',
+  compliance: '法規認證（FCC/CE/RoHS/Qi2 認證、測試報告）',
+  hr:         '人資培訓（教育訓練、新人 onboarding、考核）',
+  tacit:      '內隱知識（專家心得、談判技巧、踩坑紀錄）',
+  ai_tech:    'AI 科技（AI 工具、技術應用、自動化、LLM）',
+  industry:   '產業新知（市場趨勢、競品動態、展覽資訊、法規動向）',
+};
+
+let _classifyTimer = null;
+
+function scheduleAutoClassify() {
+  if (!CFG.claudeKey) return;
+  clearTimeout(_classifyTimer);
+  _classifyTimer = setTimeout(autoClassify, 1500);
+}
+
+async function autoClassify() {
+  const title  = document.getElementById('doc-title')?.value?.trim() || '';
+  const bodyTx = editorToMarkdown?.() || document.getElementById('tiptap-fallback')?.value || '';
+  if (!title && bodyTx.length < 20) return;
+
+  const catEl     = document.getElementById('doc-cat');
+  const indicator = document.getElementById('ai-cat-indicator');
+  if (!catEl) return;
+
+  if (indicator) { indicator.textContent = '🤖 AI 分析中…'; indicator.style.color = 'var(--text-3)'; }
+
+  try {
+    const catList = Object.entries(CAT_NAMES_FOR_PROMPT).map(([k,v]) => `- ${k}: ${v}`).join('\n');
+    const input   = `標題：${title}\n內容：${bodyTx.slice(0, 500)}`;
+
+    const system = `COMART 知識分類助理。從以下十個分類中選出最適合的一個，只回傳分類 key（英文小寫），不要其他文字。\n\n${catList}`;
+    const text = await callClaudeProxy(system, input, 20);
+    const suggested = text.trim().toLowerCase().replace(/[^a-z_]/g, '');
+
+    if (!CAT_IDS.includes(suggested)) { if (indicator) indicator.textContent = ''; return; }
+
+    const currentVal = catEl.value;
+    const isDefault  = currentVal === 'product'; // 使用者還沒手動選過
+
+    if (isDefault) {
+      catEl.value = suggested;
+      if (indicator) {
+        indicator.textContent = `🤖 AI 建議：${CAT_META[suggested]?.name || suggested}（可手動修改）`;
+        indicator.style.color = 'var(--blue)';
+      }
+    } else if (currentVal !== suggested) {
+      if (indicator) {
+        indicator.textContent = `🤖 AI 建議「${CAT_META[suggested]?.name || suggested}」，目前選擇「${CAT_META[currentVal]?.name || currentVal}」`;
+        indicator.style.color = 'var(--text-3)';
+      }
+    } else {
+      if (indicator) { indicator.textContent = `🤖 AI 確認：${CAT_META[suggested]?.name || suggested}`; indicator.style.color = 'var(--green)'; }
+    }
+  } catch(e) {
+    if (indicator) indicator.textContent = '';
+    console.warn('[KMS] AI 分類失敗:', e.message);
+  }
+}
+
+// ═══════════════════════════════════════════════
+// SAVE DOCUMENT
+// ═══════════════════════════════════════════════
+async function saveDoc() {
+  const title = document.getElementById('doc-title').value.trim();
+  const body = editorToMarkdown();
+  const category = document.getElementById('doc-cat').value;
+  const lang = document.getElementById('doc-lang').value;
+  const status = document.getElementById('doc-status').value;
+
+  if (!title) { toast('請輸入文件標題', 'error'); return; }
+  // 有上傳檔案時，body 可以為空（以檔案內容為主）
+  if (!body && !uploadedFile) { toast('請輸入文件內容或上傳檔案', 'error'); return; }
+
+  const btn = document.querySelector('.save-btn');
+  btn.disabled = true;
+
+  try {
+    const mode = CFG.embedModel;
+    const useSupabase = CFG.supabaseUrl && CFG.supabaseKey;
+
+    if (useSupabase) {
+      btn.textContent = '儲存文件…';
+
+      // ── 先上傳原始檔到 Storage（如果有）──
+      let fileUrl = null, fileName = null, fileType = null, fileSize = null;
+      if (uploadedFile) {
+        btn.textContent = '上傳原始檔…';
+        try {
+          fileUrl = await uploadToStorage(uploadedFile);
+          fileName = uploadedFileName;
+          fileType = uploadedFileType;
+          fileSize = uploadedFileSize;
+        } catch(e) {
+          toast('原始檔上傳失敗（文字內容仍會儲存）：' + e.message, '');
+        }
+      }
+
+      const docPayload = {
+        title, body, category, lang, status,
+        author_name: document.getElementById('doc-author').value.trim() || 'Admin',
+        reviewer: document.getElementById('doc-reviewer').value.trim() || null,
+        valid_until: document.getElementById('doc-valid-until').value || null,
+        tags: currentTags,
+        product_line: document.getElementById('doc-product-line').value || null,
+        customer_tag: currentCustomerTags,
+        file_url: fileUrl, file_name: fileName,
+        file_type: fileType, file_size: fileSize,
+        updated_at: new Date().toISOString(),
+      };
+
+      let doc_id;
+
+      if (editingDocId) {
+        // ── 更新既有文件 ──
+        await kmsWrite('update', 'kms_documents', docPayload, editingDocId);
+        doc_id = editingDocId;
+      } else {
+        // ── 新增文件（走 kms-write Edge Function，service_role 繞過 RLS）──
+        const saved = await kmsWrite('insert', 'kms_documents', docPayload);
+        doc_id = saved?.id || saved?.[0]?.id;
+        if (!doc_id) throw new Error('文件儲存後未取得 ID');
+      }
+
+      // ── 步驟 2：觸發 embedding（失敗不擋住文件儲存）──
+      if (mode === 'edge-fn') {
+        btn.textContent = 'Edge Function 向量化…';
+        try {
+          await callEmbedEdgeFn(doc_id);
+          toast(`已儲存並完成向量化 ✓`, 'success');
+        } catch(embedErr) {
+          console.error('[embed-document]', embedErr);
+          toast(`文件已儲存 ✓，向量化失敗（${embedErr.message.slice(0,60)}）— 可稍後重新上傳觸發`, '');
+        }
+
+      } else if (mode === 'direct-openai') {
+        btn.textContent = 'OpenAI 向量化中…';
+        const embedding = await generateEmbedding(title + '\n' + body);
+        await sbFetch(`/rest/v1/kms_documents?id=eq.${doc_id}`, {
+          method: 'PATCH',
+          body: JSON.stringify({ embedding }),
+          prefer: 'return=minimal',
+        });
+        toast('已儲存並完成 OpenAI 向量化 ✓', 'success');
+
+      } else {
+        // mock — 存 mock 向量
+        btn.textContent = 'Mock 向量化…';
+        const embedding = await generateEmbedding(title + '\n' + body);
+        await sbFetch(`/rest/v1/kms_documents?id=eq.${doc_id}`, {
+          method: 'PATCH',
+          body: JSON.stringify({ embedding }),
+          prefer: 'return=minimal',
+        });
+        toast('已儲存至 Supabase（Mock 向量）', 'success');
+      }
+
+    } else {
+      // ── 無 Supabase：存本機 ──
+      btn.textContent = '本機儲存中…';
+      const embedding = await generateEmbedding(title + '\n' + body);
+      const localDoc = { title, body, category, lang, status, embedding,
+        id: 'local-' + Date.now(), created_at: new Date().toISOString() };
+      localDocs.push(localDoc);
+      localStorage.setItem('kms-local-docs', JSON.stringify(localDocs));
+      toast('已儲存至本機（Mock 模式）', 'success');
+    }
+
+    // ── 完成：清空編輯器、存版本快照、跳知識庫 ──
+    autoSnapshot({ title, body, category, lang, status });
+    editingDocId = null;
+    clearUploadedFile(); // 清掉上傳檔案
+
+    // 清空所有欄位
+    document.getElementById('doc-title').value = '';
+    document.getElementById('doc-cat').value = 'product';
+    document.getElementById('doc-lang').value = currentLang;
+    document.getElementById('doc-status').value = 'published';
+    document.getElementById('doc-author').value = '';
+    document.getElementById('doc-reviewer').value = '';
+    document.getElementById('doc-valid-until').value = '';
+    document.getElementById('doc-related').value = '';
+    document.getElementById('doc-product-line').value = '';
+    clearTags();
+    clearCustomerTags();
+    updateEditorModeLabel();
+    if (tiptapEditor) tiptapEditor.commands.clearContent();
+    if (window._tiptapFallback) {
+      const ta = document.getElementById('tiptap-fallback');
+      if (ta) ta.value = '';
+    }
+
+    await loadDocs();
+    switchPanel('docs');
+
+  } catch(e) {
+    toast('儲存失敗：' + e.message, 'error');
+    console.error(e);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '儲存並向量化';
+  }
+}
+
+// 版本快照（本機記錄，Phase C 完整版會存 Supabase）
+function autoSnapshot(doc) {
+  const snaps = JSON.parse(localStorage.getItem('kms-snapshots') || '[]');
+  snaps.unshift({ ...doc, ts: new Date().toISOString() });
+  localStorage.setItem('kms-snapshots', JSON.stringify(snaps.slice(0, 200)));
+}
+
+// 版本快照（本機記錄，Phase C 完整版會存 Supabase）
+function autoSnapshot(doc) {
+  const snaps = JSON.parse(localStorage.getItem('kms-snapshots') || '[]');
+  snaps.unshift({ ...doc, ts: new Date().toISOString() });
+  localStorage.setItem('kms-snapshots', JSON.stringify(snaps.slice(0, 200)));
+}
+
+// ═══════════════════════════════════════════════
+// FILE UPLOAD — 狀態
+// ═══════════════════════════════════════════════
+let uploadedFile = null;      // 單檔（向後相容）
+let uploadedFiles = [];       // 多檔陣列
+let uploadedFileUrl = null;
+let uploadedFileName = null;
+let uploadedFileType = null;
+let uploadedFileSize = null;
+
+const FILE_ICONS = {
+  pdf: '📄', docx: '📝', doc: '📝',
+  xlsx: '📊', xls: '📊', csv: '📊',
+  pptx: '📑', ppt: '📑',
+  jpg: '🖼️', jpeg: '🖼️', png: '🖼️',
+  txt: '📃', md: '📃',
+};
+const FILE_TYPE_LABELS = {
+  pdf: 'PDF', docx: 'DOCX', doc: 'DOC',
+  xlsx: 'XLSX', xls: 'XLS', csv: 'CSV',
+  pptx: 'PPTX', ppt: 'PPT',
+  jpg: 'IMG', jpeg: 'IMG', png: 'IMG',
+  txt: 'TXT', md: 'MD',
+};
+
+function getExt(name) {
+  return (name.split('.').pop() || '').toLowerCase();
+}
+
+function formatBytes(b) {
+  if (b < 1024) return b + ' B';
+  if (b < 1024 * 1024) return (b / 1024).toFixed(1) + ' KB';
+  return (b / 1024 / 1024).toFixed(1) + ' MB';
+}
+
+function handleDragOver(e) {
+  e.preventDefault();
+  document.getElementById('upload-zone').classList.add('dragover');
+}
+function handleDragLeave(e) {
+  document.getElementById('upload-zone').classList.remove('dragover');
+}
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('upload-zone').classList.remove('dragover');
+  const files = [...(e.dataTransfer.files || [])];
+  if (files.length === 1) {
+    processFile(files[0]);
+  } else if (files.length > 1) {
+    processBatchFiles(files);
+  }
+}
+function handleFileSelect(e) {
+  const files = [...(e.target.files || [])];
+  if (files.length === 1) {
+    processFile(files[0]);
+  } else if (files.length > 1) {
+    processBatchFiles(files);
+  }
+}
+
+// ─── 批次上傳：多個檔案批次建立知識條目 ───
+async function processBatchFiles(files) {
+  const allowed = ['pdf','doc','docx','xls','xlsx','csv','pptx','ppt','jpg','jpeg','png','txt','md'];
+  const validFiles = files.filter(f => allowed.includes(getExt(f.name)));
+  if (!validFiles.length) { toast('沒有支援的檔案格式', 'error'); return; }
+
+  const area = document.getElementById('file-preview-area');
+  area.innerHTML = `<div style="font-size:12px;color:var(--text-2);padding:6px 0;">
+    批次上傳 ${validFiles.length} 個檔案，逐一建立知識條目…<br>
+    <span style="color:var(--text-3);">⚠ PDF 和圖片在批次模式下不解析文字（避免卡住），上傳後可個別開啟補充內容。</span>
+  </div>`;
+
+  let success = 0, fail = 0;
+  for (let i = 0; i < validFiles.length; i++) {
+    const f = validFiles[i];
+    const ext = getExt(f.name);
+    area.innerHTML = `<div style="font-size:12px;color:var(--blue);padding:4px 0;">
+      ⏳ 處理中 (${i+1}/${validFiles.length})：${f.name}
+    </div>`;
+    try {
+      // 萃取標題和標籤
+      const baseName = f.name.replace(/\.[^.]+$/, '');
+      const rawParts = baseName.replace(/([a-z])([A-Z])/g,'$1 $2').replace(/[-_\.]/g,' ').split(/\s+/).filter(p=>p.length>1);
+      const tags = [...new Set([ext.toUpperCase(), ...rawParts])].slice(0,6);
+
+      // 解析文字
+      // 批次模式下 PDF / 圖片跳過 Claude API（避免卡住），只存檔名佔位
+      const needsClaude = ['pdf','jpg','jpeg','png'].includes(ext);
+      let body = '';
+      if (!needsClaude) {
+        try { body = await extractText(f, ext) || ''; } catch(e) { console.warn(f.name, e.message); }
+      } else {
+        body = `[${ext.toUpperCase()} 檔案：${f.name}｜批次上傳，文字內容請開啟文件後重新解析]`;
+      }
+
+      // 上傳到 Storage
+      let fileUrl = null, fileName = f.name, fileType = ext, fileSize = f.size;
+      if (CFG.supabaseUrl && CFG.supabaseKey) {
+        try { fileUrl = await uploadToStorage(f); } catch(e) {}
+      }
+
+      // 建立文件
+      const docPayload = {
+        title: baseName,
+        body: body || `[${ext.toUpperCase()} 檔案：${f.name}]`,
+        category: 'product',
+        lang: currentLang,
+        status: 'published',
+        author_name: document.getElementById('doc-author')?.value.trim() || 'Admin',
+        tags,
+        file_url: fileUrl, file_name: fileName, file_type: fileType, file_size: fileSize,
+        updated_at: new Date().toISOString(),
+      };
+
+      if (CFG.supabaseUrl && CFG.supabaseKey) {
+        const saved = await kmsWrite('insert', 'kms_documents', docPayload);
+        const docId = saved?.[0]?.id;
+        if (docId && CFG.embedModel !== 'mock') {
+          try { await callEmbedEdgeFn(docId); } catch(e) {}
+        }
+      } else {
+        localDocs.push({ ...docPayload, id:'local-'+Date.now(), created_at:new Date().toISOString() });
+        localStorage.setItem('kms-local-docs', JSON.stringify(localDocs));
+      }
+      success++;
+    } catch(e) {
+      console.warn('批次上傳失敗：', f.name, e);
+      fail++;
+    }
+  }
+
+  area.innerHTML = `<div style="font-size:12px;padding:6px 0;color:var(--green);">
+    ✓ 批次完成：${success} 筆成功${fail ? `，${fail} 筆失敗` : ''}
+  </div>`;
+  await loadDocs();
+  toast(`批次上傳完成：${success}/${validFiles.length} 筆`, 'success');
+}
+
+// ─── 主流程：選檔 → 解析文字 → 顯示預覽 ───
+async function processFile(file) {
+  const ext = getExt(file.name);
+  const allowed = ['pdf','doc','docx','xls','xlsx','csv','pptx','ppt','jpg','jpeg','png','txt','md'];
+  if (!allowed.includes(ext)) {
+    toast('不支援此格式：' + ext, 'error'); return;
+  }
+
+  uploadedFile = file;
+  uploadedFileName = file.name;
+  uploadedFileType = ext;
+  uploadedFileSize = file.size;
+  uploadedFileUrl = null;
+
+  // ── 立即萃取檔名 → 標題 + 標籤（不等文字解析）──
+  const baseName = file.name.replace(/\.[^.]+$/, '');
+  const titleEl  = document.getElementById('doc-title');
+  if (!titleEl.value) titleEl.value = baseName;
+
+  const extTag  = ext.toUpperCase();
+  const rawParts = baseName
+    .replace(/([a-z])([A-Z])/g, '$1 $2')
+    .replace(/[-_\.]/g, ' ')
+    .split(/\s+/)
+    .map(p => p.trim())
+    .filter(p => p.length > 1);
+  const newTags = [...new Set([extTag, ...rawParts])].filter(t => !currentTags.includes(t));
+  currentTags.push(...newTags.slice(0, 6));
+  renderTags();
+
+  // 上傳後立即觸發 AI 分類
+  scheduleAutoClassify();
+
+  showFilePreview(file, ext);
+
+  // 解析文字並填入編輯器
+  toast('解析檔案內容中…', '');
+  try {
+    const text = await extractText(file, ext);
+    if (text && text.length > 10) {
+      // 填入編輯器（標題和標籤已在選檔時設定）
+      if (tiptapEditor) {
+        const html = text.slice(0, 50000)
+          .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+          .replace(/\n\n+/g, '</p><p>').replace(/\n/g, '<br>');
+        tiptapEditor.commands.setContent(`<p>${html}</p>`);
+      } else if (window._tiptapFallback) {
+        const ta = document.getElementById('tiptap-fallback');
+        if (ta) ta.value = text.slice(0, 50000);
+      }
+      toast(`已解析 ${formatBytes(file.size)} · ${text.length} 字元`, 'success');
+    } else {
+      // 無法抽文字，但仍自動填標題和標籤
+      const titleEl = document.getElementById('doc-title');
+      const baseName = file.name.replace(/\.[^.]+$/, '');
+      if (!titleEl.value) titleEl.value = baseName;
+      const extTag = ext.toUpperCase();
+      if (!currentTags.includes(extTag)) { currentTags.push(extTag); renderTags(); }
+      toast('無法自動萃取文字，已填入檔名作為標題，可直接儲存原始檔', '');
+    }
+  } catch(e) {
+    toast('解析失敗：' + e.message, 'error');
+    console.error(e);
+  }
+}
+
+// ─── 文字抽取：依格式分流 ───
+async function extractText(file, ext) {
+  // TXT / Markdown：直接讀
+  if (ext === 'txt' || ext === 'md') {
+    return await file.text();
+  }
+
+  // Word (.docx)：mammoth.js
+  if (ext === 'docx' || ext === 'doc') {
+    if (!window.mammoth) throw new Error('mammoth.js 尚未載入');
+    const arrayBuffer = await file.arrayBuffer();
+    const result = await mammoth.extractRawText({ arrayBuffer });
+    return result.value;
+  }
+
+  // Excel (.xlsx/.xls)：SheetJS → Markdown 表格格式
+  if (ext === 'xlsx' || ext === 'xls') {
+    if (!window.XLSX) throw new Error('SheetJS 尚未載入');
+    const arrayBuffer = await file.arrayBuffer();
+    const wb = XLSX.read(arrayBuffer, { type: 'array' });
+    const lines = [];
+    for (const sheetName of wb.SheetNames) {
+      lines.push(`## ${sheetName}\n`);
+      const ws = wb.Sheets[sheetName];
+      const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+      if (!rows.length) continue;
+
+      // 取前 500 列避免太長
+      const maxRows = Math.min(rows.length, 500);
+      const header = rows[0];
+
+      // 產生 Markdown 表格
+      if (header && header.length) {
+        // 標題列
+        lines.push('| ' + header.map(h => String(h ?? '').replace(/\|/g, '\\|')).join(' | ') + ' |');
+        // 分隔列
+        lines.push('| ' + header.map(() => '---').join(' | ') + ' |');
+        // 資料列
+        for (let r = 1; r < maxRows; r++) {
+          const row = rows[r];
+          const cells = header.map((_, ci) => String(row[ci] ?? '').replace(/\|/g, '\\|').replace(/\n/g, ' '));
+          lines.push('| ' + cells.join(' | ') + ' |');
+        }
+        if (rows.length > 500) {
+          lines.push(`\n（共 ${rows.length} 列，已截取前 500 列）`);
+        }
+      } else {
+        lines.push('（此工作表無資料）');
+      }
+      lines.push('');
+    }
+    return lines.join('\n');
+  }
+
+  // CSV：PapaParse → Markdown 表格格式
+  if (ext === 'csv') {
+    const text = await file.text();
+    if (!window.Papa) return text; // fallback
+    const result = Papa.parse(text, { header: false, skipEmptyLines: true });
+    const rows = result.data;
+    if (!rows.length) return '（CSV 無資料）';
+
+    const maxRows = Math.min(rows.length, 500);
+    const header = rows[0];
+    const lines = [];
+
+    // 標題列
+    lines.push('| ' + header.map(h => String(h ?? '').replace(/\|/g,'\\|')).join(' | ') + ' |');
+    lines.push('| ' + header.map(() => '---').join(' | ') + ' |');
+    // 資料列
+    for (let r = 1; r < maxRows; r++) {
+      const row = rows[r];
+      const cells = header.map((_, ci) => String(row[ci] ?? '').replace(/\|/g,'\\|').replace(/\n/g,' '));
+      lines.push('| ' + cells.join(' | ') + ' |');
+    }
+    if (rows.length > 500) lines.push(`\n（共 ${rows.length} 列，已截取前 500 列）`);
+    return lines.join('\n');
+  }
+
+  // PowerPoint (.pptx / .ppt)：JSZip 解析 XML
+  if (ext === 'pptx' || ext === 'ppt') {
+    if (!window.JSZip) throw new Error('JSZip 尚未載入');
+    const arrayBuffer = await file.arrayBuffer();
+    let zip;
+    try {
+      zip = await JSZip.loadAsync(arrayBuffer);
+    } catch(e) {
+      throw new Error('PPTX 解析失敗，請確認檔案未損壞（舊版 .ppt 格式不支援，請另存為 .pptx）');
+    }
+
+    // 找所有 slide XML（ppt/slides/slide1.xml, slide2.xml, ...）
+    const slideFiles = Object.keys(zip.files)
+      .filter(name => /^ppt\/slides\/slide\d+\.xml$/.test(name))
+      .sort((a, b) => {
+        const numA = parseInt(a.match(/\d+/)?.[0] || '0');
+        const numB = parseInt(b.match(/\d+/)?.[0] || '0');
+        return numA - numB;
+      });
+
+    if (!slideFiles.length) {
+      throw new Error('找不到投影片內容，請確認這是有效的 .pptx 檔案');
+    }
+
+    const slides = [];
+    for (let i = 0; i < slideFiles.length; i++) {
+      const xmlStr = await zip.files[slideFiles[i]].async('text');
+      // 從 XML 抽出所有 <a:t>（文字節點）
+      const textMatches = xmlStr.match(/<a:t[^>]*>([^<]+)<\/a:t>/g) || [];
+      const texts = textMatches
+        .map(m => m.replace(/<[^>]+>/g, '').trim())
+        .filter(t => t.length > 0);
+      if (texts.length) {
+        slides.push(`### 第 ${i + 1} 張投影片\n${texts.join('\n')}`);
+      }
+    }
+
+    if (!slides.length) return '（此 PPTX 檔案無可抽取的文字內容）';
+    return slides.join('\n\n');
+  }
+
+  // PDF：呼叫 claude-proxy Edge Function 抽文字
+  if (ext === 'pdf') {
+    return await extractPdfWithClaude(file);
+  }
+
+  // 圖片：呼叫 claude-proxy Edge Function OCR
+  if (['jpg','jpeg','png'].includes(ext)) {
+    return await extractImageWithClaude(file, ext);
+  }
+
+  throw new Error('不支援的格式：' + ext);
+}
+
+// ─── 共用：帶 retry 的 claude-proxy 呼叫（處理 429 rate limit）───
+async function callClaudeProxyRaw(body, timeoutMs = 60000) {
+  const base = CFG.supabaseUrl?.replace(/\/(rest|auth|storage)\/v\d.*$/, '') || '';
+  const url  = CFG.supabaseUrl ? `${base}/functions/v1/claude-proxy` : 'https://api.anthropic.com/v1/messages';
+  const headers = CFG.supabaseUrl ? {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${CFG.supabaseKey}`,
+    'apikey': CFG.supabaseKey,
+  } : {
+    'Content-Type': 'application/json',
+    'x-api-key': CFG.claudeKey,
+    'anthropic-version': '2023-06-01',
+    'anthropic-dangerous-direct-browser-access': 'true',
+  };
+
+  const MAX_RETRIES = 3;
+  let lastErr;
+  for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+    if (attempt > 0) {
+      // 指數退避：5s → 15s → 40s，加隨機 jitter
+      const delay = (5000 * Math.pow(3, attempt - 1)) + Math.random() * 2000;
+      toast(`Rate limit，${Math.round(delay/1000)} 秒後重試（第 ${attempt}/${MAX_RETRIES-1} 次）…`, '');
+      await new Promise(r => setTimeout(r, delay));
+    }
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      const res = await fetch(url, { method: 'POST', signal: controller.signal, headers, body: JSON.stringify(body) });
+      clearTimeout(timeoutId);
+      if (res.status === 429) {
+        // 優先讀 Retry-After header
+        const retryAfter = parseInt(res.headers.get('retry-after') || '0') * 1000;
+        lastErr = new Error('rate_limit_429');
+        if (retryAfter > 0 && attempt < MAX_RETRIES - 1) {
+          toast(`Rate limit，${Math.round(retryAfter/1000)} 秒後重試…`, '');
+          await new Promise(r => setTimeout(r, retryAfter));
+        }
+        continue;
+      }
+      if (!res.ok) {
+        const txt = await res.text().catch(() => '');
+        throw new Error(`claude-proxy ${res.status}: ${txt.slice(0, 120)}`);
+      }
+      return await res.json();
+    } catch(e) {
+      clearTimeout(timeoutId);
+      if (e.name === 'AbortError') throw new Error('請求超時，檔案可能太大或網路太慢。原始檔已上傳，文字請手動補充。');
+      if (e.message === 'rate_limit_429') { lastErr = e; continue; }
+      throw e;
+    }
+  }
+  throw new Error(`Claude API 暫時繁忙（rate limit），請稍後再試。原始檔已上傳，文字請手動補充。`);
+}
+
+// ─── PDF → Claude Vision ───
+async function extractPdfWithClaude(file) {
+  try {
+    const base64 = await fileToBase64(file);
+    const data = await callClaudeProxyRaw({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 4096,
+      messages: [{
+        role: 'user',
+        content: [
+          { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: base64 } },
+          { type: 'text', text: '請完整抽取這份 PDF 的所有文字內容，保持原始結構（標題、段落、表格）。只輸出文字內容，不要加任何說明或前言。' },
+        ],
+      }],
+    }, 120000);
+    return data.content?.[0]?.text || '';
+  } catch(e) {
+    throw e;
+  }
+}
+
+// ─── 圖片 → Claude Vision OCR ───
+async function extractImageWithClaude(file, ext) {
+  try {
+    const base64 = await fileToBase64(file);
+    const mediaType = ext === 'png' ? 'image/png' : 'image/jpeg';
+    const data = await callClaudeProxyRaw({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 2048,
+      messages: [{
+        role: 'user',
+        content: [
+          { type: 'image', source: { type: 'base64', media_type: mediaType, data: base64 } },
+          { type: 'text', text: '請完整描述並抽取這張圖片中的所有文字內容。如果是產品圖或規格圖，請詳細描述可見的規格、標示、數值。只輸出內容，不要加說明。' },
+        ],
+      }],
+    }, 40000);
+    return data.content?.[0]?.text || '';
+  } catch(e) {
+    throw e;
+  }
+}
+
+// ─── File → base64 ───
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result.split(',')[1]);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+// ─── 顯示檔案預覽卡 ───
+function showFilePreview(file, ext) {
+  const area = document.getElementById('file-preview-area');
+  const icon = FILE_ICONS[ext] || '📎';
+  const typeLabel = FILE_TYPE_LABELS[ext] || ext.toUpperCase();
+  const badgeClass = ext === 'pdf' ? 'pdf' : ['docx','doc'].includes(ext) ? 'docx' : ['pptx','ppt'].includes(ext) ? 'pptx' : ['csv'].includes(ext) ? 'csv' :
+    ['xlsx','xls'].includes(ext) ? 'xlsx' : ['jpg','jpeg','png'].includes(ext) ? 'img' : 'docx';
+  area.innerHTML = `
+    <div class="file-preview">
+      <span class="file-preview-icon">${icon}</span>
+      <div class="file-preview-info">
+        <div class="file-preview-name">${file.name}</div>
+        <div class="file-preview-size">${formatBytes(file.size)}
+          <span class="file-badge ${badgeClass}" style="margin-left:5px;">${typeLabel}</span>
+        </div>
+      </div>
+      <button class="file-preview-remove" onclick="clearUploadedFile()">✕ 移除</button>
+    </div>`;
+}
+
+function clearUploadedFile() {
+  uploadedFile = null; uploadedFileUrl = null;
+  uploadedFileName = null; uploadedFileType = null; uploadedFileSize = null;
+  document.getElementById('file-preview-area').innerHTML = '';
+  document.getElementById('file-input').value = '';
+}
+
+// ─── 上傳原始檔到 Supabase Storage ───
+async function uploadToStorage(file) {
+  if (!CFG.supabaseUrl || !CFG.supabaseKey) return null;
+
+  const ext = getExt(file.name);
+  const safeName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, '_');
+  const path = `uploads/${Date.now()}_${safeName}`;
+
+  // 顯示進度條
+  const prog = document.getElementById('upload-progress');
+  const bar = document.getElementById('upload-progress-bar');
+  prog.style.display = 'block';
+  bar.style.width = '30%';
+
+  const base = CFG.supabaseUrl.replace(/\/(rest|auth|storage)\/v\d.*$/, '');
+  const url = `${base}/storage/v1/object/kms-files/${path}`;
+
+  bar.style.width = '60%';
+
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Authorization': 'Bearer ' + CFG.supabaseKey,
+      'apikey': CFG.supabaseKey,
+      'Content-Type': file.type || 'application/octet-stream',
+      'x-upsert': 'true',
+    },
+    body: file,
+  });
+
+  bar.style.width = '100%';
+  setTimeout(() => { prog.style.display = 'none'; bar.style.width = '0%'; }, 800);
+
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`Storage 上傳失敗 ${res.status}: ${err}`);
+  }
+
+  // 回傳公開 URL
+  return `${base}/storage/v1/object/public/kms-files/${path}`;
+}
+
+// ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════════
+async function loadDocs() {
+  let docs = [];
+  try {
+    if (CFG.supabaseUrl && CFG.supabaseKey) {
+      docs = await sbFetch('/rest/v1/kms_documents?select=id,title,category,lang,status,product_line,customer_tag,created_at&order=created_at.desc') || [];
+    } else {
+      const saved = localStorage.getItem('kms-local-docs');
+      if (saved) localDocs = JSON.parse(saved);
+      docs = [...DEMO_DOCS, ...localDocs];
+    }
+  } catch(e) {
+    docs = [...DEMO_DOCS, ...localDocs];
+  }
+
+  // ── 套用篩選 ──
+  const searchQ   = (document.getElementById('docs-search')?.value || '').toLowerCase().trim();
+  const filterPL  = document.getElementById('docs-filter-product-line')?.value || '';
+  const filterCat = document.getElementById('docs-filter-cat')?.value || '';
+  const filterCus = (document.getElementById('docs-filter-customer')?.value || '').toLowerCase().trim();
+
+  let filtered = docs;
+  if (searchQ)   filtered = filtered.filter(d => (d.title||'').toLowerCase().includes(searchQ));
+  if (filterPL)  filtered = filtered.filter(d => d.product_line === filterPL);
+  if (filterCat) filtered = filtered.filter(d => d.category === filterCat);
+  if (filterCus) filtered = filtered.filter(d =>
+    (d.customer_tag || []).some(t => t.toLowerCase().includes(filterCus))
+  );
+
+  document.getElementById('doc-count').textContent = filtered.length;
+  document.getElementById('docs-loaded').textContent = filtered.length;
+
+  const list = document.getElementById('doc-list');
+  if (!filtered.length) {
+    const hasFilter = searchQ || filterPL || filterCat || filterCus;
+    list.innerHTML = `<div style="text-align:center;color:var(--text-3);padding:40px 0;font-size:13px;">
+      ${hasFilter ? '沒有符合篩選條件的文件 <button onclick="clearDocsFilters()" style="margin-left:8px;padding:3px 10px;border-radius:6px;border:1px solid var(--border);background:transparent;cursor:pointer;font-size:12px;color:var(--blue);">清除篩選</button>' : '尚無文件'}
+    </div>`;
+    return;
+  }
+
+  const catLabel = { product:'產品研發', mfg:'製造工藝', quality:'品質管理', sales:'業務客戶', supply:'供應鏈採購', compliance:'法規認證', hr:'人資培訓', tacit:'內隱知識', ai_tech:'AI 科技', industry:'產業新知' };
+  const catClass = { product:'product', mfg:'sop', quality:'sop', sales:'sop', supply:'sop', compliance:'sop', hr:'hr', tacit:'tacit', ai_tech:'product', industry:'product' };
+  const statusLabel = { draft:'草稿', published:'已發佈', archived:'已封存' };
+  const statusCls   = { draft:'sb-draft', published:'sb-published', archived:'sb-archived' };
+
+  list.innerHTML = filtered.map(d => {
+    const plBadge = d.product_line
+      ? `<span style="font-size:10px;padding:1px 7px;border-radius:10px;background:#FEF0E8;color:#B5410A;border:1px solid #FAC775;flex-shrink:0;">📦 ${d.product_line}</span>`
+      : '';
+    const cusBadges = (d.customer_tag || []).slice(0,2).map(t =>
+      `<span style="font-size:10px;padding:1px 6px;border-radius:10px;background:#F0EBF8;color:#6B4FA8;border:1px solid #D8C8F0;">🏢 ${t}</span>`
+    ).join('');
+    const safeTitle  = (d.title||'').replace(/'/g,'').replace(/"/g,'');
+    const safeAuthor = (d.author_name||'').replace(/'/g,'').replace(/"/g,'');
+
+    // 權限判斷
+    const showDelete = canDelete(d.author_name);
+    const showEdit   = canEdit(d.author_name);
+
+    return `
+    <div class="doc-item" id="doc-item-${d.id}" style="flex-wrap:wrap;gap:4px;">
+      <div style="display:flex;align-items:center;gap:6px;width:100%;flex-wrap:wrap;">
+        <span class="doc-cat ${catClass[d.category] || 'sop'}">${catLabel[d.category] || d.category}</span>
+        <span class="doc-title" onclick="openReader('${d.id}')" style="cursor:pointer;flex:1;min-width:120px;">${d.title}</span>
+        <span style="font-size:11px;color:var(--text-3);">${d.lang || ''}</span>
+        <span class="status-badge ${statusCls[d.status]||'sb-draft'}">${statusLabel[d.status]||d.status}</span>
+        <button onclick="openReviewPanel('${d.id}','${safeTitle}')"
+          style="padding:3px 7px;border-radius:5px;border:1px solid var(--border);background:var(--bg);font-size:11px;cursor:pointer;flex-shrink:0;" title="審核">📋</button>
+        <button onclick="openCommentsPanel('${d.id}','${safeTitle}')"
+          style="padding:3px 7px;border-radius:5px;border:1px solid var(--border);background:var(--bg);font-size:11px;cursor:pointer;flex-shrink:0;" title="討論">💬</button>
+        ${showEdit ? `<button onclick="openDoc('${d.id}')"
+          style="padding:3px 7px;border-radius:5px;border:1px solid var(--border);background:var(--bg);font-size:11px;cursor:pointer;flex-shrink:0;" title="編輯">✏️</button>` : ''}
+        ${showDelete ? `<button onclick="deleteDoc('${d.id}','${safeTitle}','${safeAuthor}')"
+          style="padding:3px 7px;border-radius:5px;border:1px solid #F5C6C6;background:#FEF2F2;color:#A32D2D;font-size:11px;cursor:pointer;flex-shrink:0;" title="刪除">✕</button>` : ''}
+      </div>
+      ${(plBadge || cusBadges) ? `<div style="display:flex;gap:4px;flex-wrap:wrap;padding-left:2px;">${plBadge}${cusBadges}</div>` : ''}
+    </div>`;
+  }).join('');
+
+  return docs;
+}
+
+function clearDocsFilters() {
+  const ids = ['docs-search','docs-filter-product-line','docs-filter-cat','docs-filter-customer'];
+  ids.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  loadDocs();
+}
+
+// ═══════════════════════════════════════════════
+// EDITOR MODE LABEL（新增 vs 更新）
+// ═══════════════════════════════════════════════
+function updateEditorModeLabel() {
+  const btn = document.querySelector('.save-btn');
+  if (!btn) return;
+  if (editingDocId) {
+    btn.textContent = '更新文件';
+    btn.style.background = 'var(--green)';
+  } else {
+    btn.textContent = '儲存並向量化';
+    btn.style.background = 'var(--blue)';
+  }
+}
+
+function cancelEdit() {
+  if (editingDocId) {
+    if (!confirm('放棄編輯？未儲存的變更將會遺失。')) return;
+  }
+  // 清空所有欄位
+  editingDocId = null;
+  document.getElementById('doc-title').value = '';
+  document.getElementById('doc-cat').value = 'product';
+  document.getElementById('doc-lang').value = currentLang;
+  document.getElementById('doc-status').value = 'published';
+  document.getElementById('doc-author').value = '';
+  document.getElementById('doc-reviewer').value = '';
+  document.getElementById('doc-valid-until').value = '';
+  document.getElementById('doc-related').value = '';
+  clearTags();
+  clearUploadedFile();
+  if (tiptapEditor) tiptapEditor.commands.clearContent();
+  if (window._tiptapFallback) {
+    const ta = document.getElementById('tiptap-fallback');
+    if (ta) ta.value = '';
+  }
+  updateEditorModeLabel();
+  switchPanel('docs');
+}
+
+// ═══════════════════════════════════════════════
+// DELETE DOCUMENT
+// ═══════════════════════════════════════════════
+async function deleteDoc(id, title, authorName) {
+  // 權限檢查：user 角色不能刪除任何文件
+  if (!canDelete(authorName)) {
+    toast('你沒有刪除文件的權限（僅 Admin / DCC 可刪除）', 'error');
+    return;
+  }
+  if (!confirm(`確定刪除「${title}」？\n此動作無法復原，版本歷史也會一併刪除。`)) return;
+
+  try {
+    if (CFG.supabaseUrl && CFG.supabaseKey && !id.startsWith('demo-') && !id.startsWith('local-')) {
+      await kmsWrite('delete', 'kms_doc_versions', null, null, { doc_id: id });
+      await kmsWrite('delete', 'kms_documents', null, id);
+    } else if (id.startsWith('local-')) {
+      localDocs = localDocs.filter(d => d.id !== id);
+      localStorage.setItem('kms-local-docs', JSON.stringify(localDocs));
+    } else {
+      toast('示範文件無法刪除', '');
+      return;
+    }
+
+    document.getElementById('doc-item-' + id)?.remove();
+    const remaining = document.querySelectorAll('.doc-item').length;
+    document.getElementById('doc-count').textContent = remaining;
+    document.getElementById('docs-loaded').textContent = remaining;
+
+    toast(`「${title}」已刪除`, 'success');
+  } catch(e) {
+    toast('刪除失敗：' + e.message, 'error');
+  }
+}
+
+async function openDoc(id) {
+  // Load doc into editor
+  let doc;
+  try {
+    if (CFG.supabaseUrl && CFG.supabaseKey && !id.startsWith('demo-') && !id.startsWith('local-')) {
+      const res = await sbFetch(`/rest/v1/kms_documents?id=eq.${id}&select=*`);
+      doc = res?.[0];
+    } else {
+      const allDocs = [...DEMO_DOCS, ...localDocs];
+      doc = allDocs.find(d => d.id === id);
+    }
+  } catch(e) {}
+
+  if (!doc) { toast('文件載入失敗', 'error'); return; }
+
+  document.getElementById('doc-title').value = doc.title;
+  document.getElementById('doc-cat').value = doc.category || 'product';
+  document.getElementById('doc-lang').value = doc.lang || 'zh-TW';
+  document.getElementById('doc-status').value = doc.status || 'draft';
+  if (tiptapEditor) tiptapEditor.commands.setContent(`<p>${(doc.body || '').replace(/\n/g, '</p><p>')}</p>`);
+  if (window._tiptapFallback) {
+    const ta = document.getElementById('tiptap-fallback');
+    if (ta) ta.value = doc.body || '';
+  }
+
+  // 設定為「更新」模式
+  editingDocId = id.startsWith('demo-') ? null : id; // demo 文件不能更新
+  updateEditorModeLabel();
+  switchPanel('editor');
+}
+
+// ═══════════════════════════════════════════════
+// RAG SEARCH
+// ═══════════════════════════════════════════════
+// 統一的搜尋按鈕復原函式——所有結束路徑都必須呼叫
+function resetSearchBtn() {
+  const btn = document.getElementById('search-btn');
+  if (!btn) return;
+  btn.disabled = false;
+  btn.innerHTML = `<span>${I18N[currentLang]?.['rag.btn'] || '送出問題'}</span>`;
+  window._searchAborted = false;
+}
+
+async function doSearch() {
+  const q = document.getElementById('search-q').value.trim();
+  if (!q) return;
+
+  const btn = document.getElementById('search-btn');
+  if (!btn) return;
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> <span onclick="cancelSearch()" style="cursor:pointer;text-decoration:underline;font-size:11px;">取消</span>';
+
+  const ragBody = document.getElementById('rag-body');
+  if (!ragBody) { btn.disabled = false; return; }
+  const ragEmpty = document.getElementById('rag-empty');
+  if (ragEmpty) ragEmpty.style.display = 'none';
+  ragBody.innerHTML = `<div style="display:flex;align-items:center;gap:8px;color:var(--text-3);font-size:13px;"><span class="spinner"></span>搜尋知識庫中…</div>`;
+  window._searchAborted = false;
+
+  try {
+    if (window._searchAborted) { resetSearchBtn(); return; }
+
+    // Step 1: Retrieve relevant docs
+    const chunks = await retrieveChunks(q);
+    if (window._searchAborted) { resetSearchBtn(); return; }
+
+    if (!chunks.length) {
+      logSearchGap(q);
+    if (!(CFG.supabaseUrl || CFG.claudeKey)) {
+        const noKeyMsg = {
+          'zh-TW': `⚠ 知識庫找不到「${q}」的相關資料。請完成 Supabase 設定以啟用 AI 外部知識搜尋。`,
+          'zh-CN': `⚠ 知识库中未找到「${q}」的相关资料。请完成 Supabase 配置以启用 AI 外部知识搜索。`,
+          'en':    `⚠ No results in Knowledge Base for "${q}". Configure Supabase to enable AI external search.`,
+          'vi':    `⚠ Không tìm thấy "${q}" trong kho kiến thức. Cấu hình Supabase để bật tìm kiếm AI.`,
+          'ja':    `⚠ ナレッジベースに「${q}」の関連情報がありません。Supabase を設定してください。`,
+        }[currentLang] || `⚠ 知識缺口：找不到「${q}」的相關知識條目。`;
+        ragBody.innerHTML = `<div class="gap-banner">${noKeyMsg}</div>`;
+        resetSearchBtn();
+        return;
+      }
+      // AI 外部知識 fallback
+      await searchWithExternalAI(q, ragBody);
+      resetSearchBtn();
+      return;
+    }
+
+    // Step 2: Build RAG prompt
+    const docLabel = currentLang === 'ja' ? 'ドキュメント' : '文件';
+    const context = chunks.map((c, i) =>
+      `[${docLabel}${i+1}] 標題：${c.title}\n內容：${c.snippet.substring(0, 400)}`
+    ).join('\n\n');
+
+    const langInstr = {
+      'zh-TW': '請用繁體中文回答', 'zh-CN': '请用简体中文回答',
+      'en': 'Please answer in English', 'vi': 'Vui lòng trả lời bằng tiếng Việt',
+      'ja': '日本語で回答してください',
+    }[currentLang] || '請用繁體中文回答';
+
+    const systemPrompt = `你是 COMART 公司的知識管理 AI 助理。COMART 是台灣 ODM/OEM 製造商，主要產品是磁吸車架、Qi/Qi2 無線充電器和消費性電子配件，工廠在東莞和越南。${langInstr}。根據提供的知識庫內容回答問題，引用來源時標明「[${docLabel}N]」。若知識庫內容不足以回答，如實說明，不要自行捏造資訊。`;
+    const userMsg = `知識庫內容：\n${context}\n\n問題：${q}`;
+
+    // Step 3: 先渲染 UI 框架，再呼叫 Claude
+    ragBody.innerHTML = `
+      <div class="ai-answer">
+        <div class="ai-label">🤖 AI 彙整回答 — 來源：知識庫</div>
+        <div class="ai-text streaming" id="ai-output"></div>
+      </div>
+      <div class="sources-label">參考文件（${chunks.length} 份）</div>
+      ${chunks.map((c, i) => {
+        const ext = c.file_type || '';
+        const badgeClass = ext === 'pdf' ? 'pdf' : ['docx','doc'].includes(ext) ? 'docx' : ['pptx','ppt'].includes(ext) ? 'pptx' : ['csv'].includes(ext) ? 'csv' :
+          ['xlsx','xls'].includes(ext) ? 'xlsx' : ['jpg','jpeg','png'].includes(ext) ? 'img' : '';
+        const dlBtn = c.file_url
+          ? `<a class="dl-btn" href="${c.file_url}" target="_blank" download="${c.file_name || ''}">
+               ↓ ${c.file_name || '下載原始檔'}
+               ${badgeClass ? `<span class="file-badge ${badgeClass}">${(c.file_type||'').toUpperCase()}</span>` : ''}
+             </a>`
+          : '';
+        return `
+        <div class="source-card">
+          <div class="source-header">
+            <span class="source-title" onclick="openReader('${c.id}')" style="cursor:pointer;">[${docLabel}${i+1}] ${c.title}</span>
+            <span class="source-score">相似度 ${Math.round(c.score * 100)}%</span>
+          </div>
+          <div class="source-snippet">${c.snippet.substring(0, 120)}…</div>
+          <div class="source-meta">${c.category || ''} · ${c.lang || ''}</div>
+          <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;">
+            <button onclick="openReader('${c.id}')"
+              style="font-size:11px;padding:3px 10px;border-radius:5px;border:1px solid var(--blue-border);background:var(--blue-bg);color:var(--blue);cursor:pointer;">
+              📖 閱讀全文
+            </button>
+            ${dlBtn}
+          </div>
+        </div>`;
+      }).join('')}`;
+
+    // 等一個 microtask，確保 DOM 已更新，ai-output 元素存在
+    await new Promise(r => setTimeout(r, 0));
+
+    if (CFG.supabaseUrl || CFG.claudeKey) {
+      await streamClaude(systemPrompt, userMsg);
+    } else {
+      const mockAnswer = generateMockAnswer(q, chunks);
+      const el = document.getElementById('ai-output');
+      if (el) { el.classList.remove('streaming'); el.textContent = mockAnswer; }
+    }
+
+  } catch(e) {
+    if (!window._searchAborted) {
+      ragBody.innerHTML = `<div style="color:var(--red);font-size:13px;">錯誤：${e.message}</div>`;
+    }
+  } finally {
+    // finally 是最後防線，確保按鈕一定恢復
+    resetSearchBtn();
+  }
+}
+
+function cancelSearch() {
+  window._searchAborted = true;
+  resetSearchBtn();
+  document.getElementById('rag-body').innerHTML =
+    '<div style="color:var(--text-3);font-size:13px;padding:20px;">已取消搜尋。</div>';
+}
+
+// Retrieve relevant chunks (Supabase vector or local mock)
+async function retrieveChunks(query) {
+  if (CFG.supabaseUrl && CFG.supabaseKey) {
+    try {
+      const qEmbed = await getQueryEmbedding(query);
+      if (qEmbed) {
+        const results = await sbFetch('/rest/v1/rpc/match_documents', {
+          method: 'POST',
+          body: JSON.stringify({ query_embedding: qEmbed, match_threshold: 0.3, match_count: 5 }),
+        });
+        if (results?.length) {
+          // 補抓 file 欄位（RPC 回傳沒有，另外查）
+          const ids = results.map(r => r.id).join(',');
+          let fileMap = {};
+          try {
+            const fileRows = await sbFetch(
+              `/rest/v1/kms_documents?id=in.(${ids})&select=id,file_url,file_name,file_type,file_size`
+            );
+            for (const f of (fileRows || [])) fileMap[f.id] = f;
+          } catch(e) {}
+
+          return results.map(r => ({
+            id: r.id, title: r.title,
+            snippet: r.body?.substring(0, 300) || '',
+            score: r.similarity || 0.5,
+            category: r.category, lang: r.lang,
+            file_url: fileMap[r.id]?.file_url || null,
+            file_name: fileMap[r.id]?.file_name || null,
+            file_type: fileMap[r.id]?.file_type || null,
+          }));
+        }
+      }
+      // 向量搜尋無結果，fallback 到全文搜尋（含 file 欄位）
+      const ftsResults = await sbFetch(
+        `/rest/v1/kms_documents?select=id,title,body,category,lang,status,file_url,file_name,file_type&status=eq.published&or=(title.ilike.*${encodeURIComponent(query)}*,body.ilike.*${encodeURIComponent(query)}*)&limit=5`
+      );
+      if (ftsResults?.length) {
+        return ftsResults.map(r => ({
+          id: r.id, title: r.title,
+          snippet: r.body?.substring(0, 300) || '',
+          score: 0.6,
+          category: r.category, lang: r.lang,
+          file_url: r.file_url || null,
+          file_name: r.file_name || null,
+          file_type: r.file_type || null,
+        }));
+      }
+    } catch(e) {
+      console.warn('Supabase search failed, falling back to local:', e);
+    }
+  }
+
+  // Local keyword search (mock / offline)
+  const saved = localStorage.getItem('kms-local-docs');
+  const extraDocs = saved ? JSON.parse(saved) : [];
+  const allDocs = [...DEMO_DOCS, ...extraDocs].filter(d => d.status === 'published' || d.status === undefined);
+  return allDocs.map(d => ({
+    ...d,
+    snippet: d.body?.substring(0, 300) || '',
+    score: keywordScore(query, d) / 10,
+    file_url: d.file_url || null,
+    file_name: d.file_name || null,
+    file_type: d.file_type || null,
+  })).filter(d => d.score > 0.01).sort((a, b) => b.score - a.score).slice(0, 5);
+}
+
+// Stream Claude API response
+// ═══════════════════════════════════════════════
+// CLAUDE PROXY — 透過 Supabase Edge Function 呼叫
+// Key 存在 Supabase Secrets，前端不需要知道
+// ═══════════════════════════════════════════════
+async function callClaudeProxy(system, user, maxTokens = 1500) {
+  // 優先用 Edge Function（部署後）
+  // Fallback：直接呼叫（本機測試，需要 Claude Key）
+  const useProxy = CFG.supabaseUrl && CFG.supabaseKey;
+  const base = CFG.supabaseUrl?.replace(/\/(rest|auth|storage)\/v\d.*$/, '') || '';
+  const proxyUrl = `${base}/functions/v1/claude-proxy`;
+
+  const payload = {
+    model: 'claude-sonnet-4-20250514',
+    max_tokens: maxTokens,
+    system,
+    messages: [{ role: 'user', content: user }],
+    stream: false,
+  };
+
+  const MAX_RETRIES = 2;
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      let res;
+      if (useProxy) {
+        // 透過 Supabase Edge Function（不需要 Claude Key 在前端）
+        res = await fetch(proxyUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${CFG.supabaseKey}`,
+            'apikey': CFG.supabaseKey,
+          },
+          body: JSON.stringify(payload),
+        });
+      } else if (CFG.claudeKey) {
+        // 本機 fallback：直接呼叫
+        res = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': CFG.claudeKey,
+            'anthropic-version': '2023-06-01',
+            'anthropic-dangerous-direct-browser-access': 'true',
+          },
+          body: JSON.stringify(payload),
+        });
+      } else {
+        throw new Error('請設定 Supabase 連線或 Claude API Key');
+      }
+
+      if (res.status === 429 && attempt < MAX_RETRIES) {
+        const wait = (attempt + 1) * 10;
+        await new Promise(r => setTimeout(r, wait * 1000));
+        continue;
+      }
+      if (!res.ok) {
+        const err = await res.text();
+        throw new Error(`Claude ${res.status}: ${err}`);
+      }
+      const data = await res.json();
+      return data.content?.[0]?.text || '';
+    } catch(e) {
+      if (attempt >= MAX_RETRIES) throw e;
+      await new Promise(r => setTimeout(r, 3000));
+    }
+  }
+  return '';
+}
+
+async function streamClaude(system, user) {
+  const el = document.getElementById('ai-output');
+  if (!el) return;
+  el.textContent = '連線中…';
+  el.classList.add('streaming');
+
+  try {
+    const text = await callClaudeProxy(system, user, 1500);
+    el.textContent = '';
+    for (let i = 0; i < text.length; i += 3) {
+      el.textContent += text.slice(i, i + 3);
+      if (i % 60 === 0) await new Promise(r => setTimeout(r, 8));
+    }
+  } catch(e) {
+    el.textContent = `⚠ 連線失敗：${e.message}`;
+  } finally {
+    el.classList.remove('streaming');
+  }
+}
+
+function generateMockAnswer(query, chunks) {
+  const lang = currentLang;
+  const docLabel = lang === 'ja' ? 'ドキュメント' : '文件';
+  const intro = {
+    'zh-TW': `根據知識庫中 ${chunks.length} 份相關文件，以下是關於「${query}」的彙整說明：\n\n`,
+    'zh-CN': `根据知识库中 ${chunks.length} 份相关文档，以下是关于「${query}」的汇总说明：\n\n`,
+    'en': `Based on ${chunks.length} relevant documents in the knowledge base, here is a summary for "${query}":\n\n`,
+    'vi': `Dựa trên ${chunks.length} tài liệu liên quan trong kho kiến thức, đây là tóm tắt về "${query}":\n\n`,
+    'ja': `ナレッジベースの ${chunks.length} 件の関連ドキュメントに基づき、「${query}」についての概要は以下の通りです：\n\n`,
+  }[lang] || '';
+  const body = chunks.map((c, i) => `[${docLabel}${i+1}] ${c.title}：${c.snippet.substring(0, 80)}…`).join('\n\n');
+  const footer = {
+    'zh-TW': '',
+    'zh-CN': '',
+    'en': '',
+    'vi': '',
+    'ja': '',
+  }[lang] || '';
+  return intro + body + footer;
+}
+
+// ═══════════════════════════════════════════════
+// PRODUCT LINES
+// ═══════════════════════════════════════════════
+const DEFAULT_PRODUCT_LINES = [
+  'MagSafe Magnetic Car Mount',
+  'Wireless Charger (Qi/Qi2)',
+  'Heavy Duty Mount',
+  'Mobile Phone Accessories',
+  'Consumer Electronics',
+  'Desktop Setup',
+  'Automotive Accessories',
+  'Automotive Parts',
+];
+
+async function loadProductLines() {
+  let lines = DEFAULT_PRODUCT_LINES.slice();
+  try {
+    if (CFG.supabaseUrl && CFG.supabaseKey) {
+      const res = await sbFetch('/rest/v1/kms_product_lines?select=name&order=sort_order.asc&active=eq.true');
+      if (res?.length) lines = res.map(r => r.name);
+    }
+  } catch(e) { console.warn('[KMS] Product lines load failed:', e.message); }
+
+  PRODUCT_LINES = lines;
+
+  // 填入編輯器選單
+  const sel = document.getElementById('doc-product-line');
+  if (sel) {
+    const cur = sel.value;
+    sel.innerHTML = '<option value="">— Select Product Line —</option>' +
+      lines.map(l => `<option value="${l}"${cur===l?' selected':''}>${l}</option>`).join('');
+  }
+
+  // 填入知識庫篩選選單
+  const fsel = document.getElementById('docs-filter-product-line');
+  if (fsel) {
+    const fcur = fsel.value;
+    fsel.innerHTML = '<option value="">All Product Lines</option>' +
+      lines.map(l => `<option value="${l}"${fcur===l?' selected':''}>${l}</option>`).join('');
+  }
+}
+
+function openAddProductLineModal() {
+  document.getElementById('new-product-line-input').value = '';
+  document.getElementById('product-line-modal').classList.add('show');
+  setTimeout(() => document.getElementById('new-product-line-input').focus(), 100);
+}
+function closeAddProductLineModal() {
+  document.getElementById('product-line-modal').classList.remove('show');
+}
+
+async function saveNewProductLine() {
+  const name = document.getElementById('new-product-line-input').value.trim();
+  if (!name) { toast('請輸入產品線名稱', 'error'); return; }
+  if (PRODUCT_LINES.includes(name)) { toast('此產品線已存在', ''); closeAddProductLineModal(); return; }
+
+  try {
+    if (CFG.supabaseUrl && CFG.supabaseKey) {
+      await kmsWrite('insert', 'kms_product_lines', { name, sort_order: PRODUCT_LINES.length + 1, active: true });
+    }
+    PRODUCT_LINES.push(name);
+    await loadProductLines();
+    // 選到新加的
+    const sel = document.getElementById('doc-product-line');
+    if (sel) sel.value = name;
+    closeAddProductLineModal();
+    toast(`已新增：${name}`, 'success');
+  } catch(e) {
+    toast('新增失敗：' + e.message, 'error');
+  }
+}
+
+// ═══════════════════════════════════════════════
+// CUSTOMER TAGS
+// ═══════════════════════════════════════════════
+function handleCustomerTagInput(e) {
+  if (e.key === 'Enter' || e.key === ',') {
+    e.preventDefault();
+    const val = e.target.value.trim().replace(/,/g, '');
+    if (val && !currentCustomerTags.includes(val)) {
+      currentCustomerTags.push(val);
+      renderCustomerTags();
+    }
+    e.target.value = '';
+  } else if (e.key === 'Backspace' && !e.target.value && currentCustomerTags.length) {
+    currentCustomerTags.pop();
+    renderCustomerTags();
+  }
+}
+
+function renderCustomerTags() {
+  const wrap  = document.getElementById('customer-tag-wrap');
+  const input = document.getElementById('customer-tag-input');
+  if (!wrap || !input) return;
+  wrap.querySelectorAll('.tag').forEach(t => t.remove());
+  currentCustomerTags.forEach((t, i) => {
+    const chip = document.createElement('span');
+    chip.className = 'tag';
+    chip.style.background = '#FEF0E8';
+    chip.style.color = '#B5410A';
+    chip.style.borderColor = '#FAC775';
+    chip.innerHTML = `${t}<span class="tag-remove" onclick="removeCustomerTag(${i})">✕</span>`;
+    wrap.insertBefore(chip, input);
+  });
+}
+
+function removeCustomerTag(idx) {
+  currentCustomerTags.splice(idx, 1);
+  renderCustomerTags();
+}
+
+function clearCustomerTags() {
+  currentCustomerTags = [];
+  renderCustomerTags();
+}
+
+// ═══════════════════════════════════════════════
+// READER — 全文閱讀模式
+// ═══════════════════════════════════════════════
+let _readerDoc = null; // 目前閱讀中的文件
+
+async function openReader(id) {
+  // 載入文件
+  let doc = null;
+  try {
+    if (CFG.supabaseUrl && CFG.supabaseKey && !id.startsWith('demo-') && !id.startsWith('local-')) {
+      const res = await sbFetch(`/rest/v1/kms_documents?id=eq.${id}&select=*`);
+      doc = res?.[0];
+    } else {
+      doc = [...DEMO_DOCS, ...localDocs].find(d => d.id === id);
+    }
+  } catch(e) {}
+
+  if (!doc) { toast('文件載入失敗', 'error'); return; }
+  _readerDoc = doc;
+
+  // 標題
+  document.getElementById('reader-title').textContent = doc.title || '—';
+
+  // Meta badges
+  const catLabel = { product:'產品研發', mfg:'製造工藝', quality:'品質管理', sales:'業務客戶',
+    supply:'供應鏈採購', compliance:'法規認證', hr:'人資培訓', tacit:'內隱知識', ai_tech:'AI 科技', industry:'產業新知' };
+  const statusLabel = { draft:'草稿', published:'已發佈', archived:'已封存' };
+  const metaParts = [
+    doc.category ? `<span style="font-size:11px;padding:2px 8px;border-radius:10px;background:var(--blue-bg);color:var(--blue);">${catLabel[doc.category]||doc.category}</span>` : '',
+    doc.product_line ? `<span style="font-size:11px;padding:2px 8px;border-radius:10px;background:#FEF0E8;color:#B5410A;">📦 ${doc.product_line}</span>` : '',
+    doc.lang ? `<span style="font-size:11px;padding:2px 8px;border-radius:10px;background:var(--bg);color:var(--text-3);border:1px solid var(--border);">${doc.lang}</span>` : '',
+    doc.status ? `<span style="font-size:11px;padding:2px 8px;border-radius:10px;background:var(--green-bg);color:var(--green);">${statusLabel[doc.status]||doc.status}</span>` : '',
+    doc.author_name ? `<span style="font-size:11px;color:var(--text-3);">✍ ${doc.author_name}</span>` : '',
+    doc.updated_at ? `<span style="font-size:11px;color:var(--text-3);">${new Date(doc.updated_at).toLocaleDateString('zh-TW')}</span>` : '',
+    ...(doc.customer_tag||[]).map(t => `<span style="font-size:11px;padding:2px 7px;border-radius:10px;background:#F0EBF8;color:#6B4FA8;">🏢 ${t}</span>`),
+    ...(doc.tags||[]).slice(0,5).map(t => `<span style="font-size:11px;padding:2px 7px;border-radius:10px;background:var(--blue-bg);color:var(--blue);">#${t}</span>`),
+  ].filter(Boolean);
+  document.getElementById('reader-meta').innerHTML = metaParts.join('');
+
+  // 內文：Markdown → HTML（用 marked.js）
+  const body = doc.body || '（此文件無文字內容）';
+  const bodyEl = document.getElementById('reader-body-content');
+  if (window.marked) {
+    bodyEl.innerHTML = marked.parse(body);
+  } else {
+    // fallback：純文字，換行轉 <br>
+    bodyEl.innerHTML = `<p>${body.replace(/\n\n+/g,'</p><p>').replace(/\n/g,'<br>')}</p>`;
+  }
+
+  // 下載按鈕
+  const dlBtn = document.getElementById('reader-dl-btn');
+  if (doc.file_url) {
+    dlBtn.style.display = '';
+    dlBtn.textContent = `↓ ${doc.file_name || '下載原始檔'}`;
+  } else {
+    dlBtn.style.display = 'none';
+  }
+
+  // 編輯按鈕：只有能編輯的才顯示
+  const editBtn = document.getElementById('reader-edit-btn');
+  if (editBtn) {
+    if (canEdit(doc.author_name)) {
+      editBtn.style.display = '';
+    } else {
+      editBtn.style.display = 'none';
+    }
+  }
+
+  // 閱覽計數
+  if (CFG.supabaseUrl && CFG.supabaseKey && !id.startsWith('demo-') && !id.startsWith('local-')) {
+    sbFetch('/rest/v1/rpc/increment_view_count', {
+      method:'POST', body:JSON.stringify({doc_id:id}), prefer:'return=minimal',
+    }).catch(()=>{});
+  }
+
+  document.getElementById('reader-modal').classList.add('show');
+}
+
+function closeReader() {
+  document.getElementById('reader-modal').classList.remove('show');
+  _readerDoc = null;
+}
+
+function readerEdit() {
+  if (!_readerDoc) return;
+  closeReader();
+  openDoc(_readerDoc.id);
+}
+
+function readerDownload() {
+  if (!_readerDoc?.file_url) return;
+  const a = document.createElement('a');
+  a.href = _readerDoc.file_url;
+  a.download = _readerDoc.file_name || 'file';
+  a.target = '_blank';
+  a.click();
+}
+
+function logSearchGap(query) {
+  const gaps = JSON.parse(localStorage.getItem('kms-search-gaps') || '[]');
+  gaps.push({ query, ts: new Date().toISOString() });
+  localStorage.setItem('kms-search-gaps', JSON.stringify(gaps.slice(-50)));
+}
+
+// ═══════════════════════════════════════════════
+// EXTERNAL AI FALLBACK SEARCH
+// 知識庫找不到時，用 Claude 一般知識回答，清楚標示來源
+// ═══════════════════════════════════════════════
+async function searchWithExternalAI(query, ragBody) {
+
+  // i18n UI 文字
+  const UI = {
+    label: {
+      'zh-TW':'🌐 AI 外部知識回答', 'zh-CN':'🌐 AI 外部知识回答',
+      'en':'🌐 AI External Knowledge', 'vi':'🌐 Kiến thức AI bên ngoài', 'ja':'🌐 AI 外部知識回答',
+    },
+    gapNote: {
+      'zh-TW':'知識庫中無相關文件，以下回答來自 AI 的一般知識訓練資料。',
+      'zh-CN':'知识库中无相关文档，以下回答来自 AI 的通用知识训练数据。',
+      'en':'No matching documents in the Knowledge Base. The following answer is based on AI general training knowledge.',
+      'vi':'Không có tài liệu liên quan trong kho kiến thức. Câu trả lời dưới đây dựa trên kiến thức huấn luyện AI tổng hợp.',
+      'ja':'ナレッジベースに関連ドキュメントがありません。以下の回答はAIの一般訓練知識に基づいています。',
+    },
+    disclaimer: {
+      'zh-TW':'⚠ 免責聲明：此回答並非來自 COMART 內部知識庫，而是 Claude AI 的一般訓練知識。內容可能不夠精確或不反映公司實際做法，請自行驗證後再使用。建議將正確資訊新增至知識庫以供未來參考。',
+      'zh-CN':'⚠ 免责声明：此回答并非来自 COMART 内部知识库，而是 Claude AI 的通用训练知识。内容可能不够精确或不反映公司实际做法，请自行验证后再使用。建议将正确信息添加至知识库以供未来参考。',
+      'en':'⚠ Disclaimer: This answer is NOT from the COMART internal Knowledge Base. It is based on Claude AI general training data, which may be inaccurate or not reflect company-specific practices. Please verify before acting on this information. Consider adding correct information to the Knowledge Base for future reference.',
+      'vi':'⚠ Tuyên bố từ chối: Câu trả lời này KHÔNG phải từ Kho kiến thức nội bộ COMART. Nó dựa trên dữ liệu huấn luyện chung của AI, có thể không chính xác. Vui lòng xác minh trước khi sử dụng.',
+      'ja':'⚠ 免責事項：この回答はCOMARTの内部ナレッジベースからではなく、Claude AIの一般的なトレーニングデータに基づいています。内容が不正確または社内の実際の慣行と異なる可能性があります。ご使用前に必ず確認してください。',
+    },
+    saveHint: {
+      'zh-TW':'這個回答有幫助？', 'zh-CN':'这个回答有帮助？',
+      'en':'Was this helpful?', 'vi':'Câu trả lời này có hữu ích không?', 'ja':'この回答は役に立ちましたか？',
+    },
+    saveBtn: {
+      'zh-TW':'+ 儲存至知識庫', 'zh-CN':'+ 保存至知识库',
+      'en':'+ Save to Knowledge Base', 'vi':'+ Lưu vào kho kiến thức', 'ja':'+ ナレッジベースに保存',
+    },
+    searching: {
+      'zh-TW':'知識庫無相關資料，正在搜尋 AI 外部知識…',
+      'zh-CN':'知识库无相关资料，正在搜索 AI 外部知识…',
+      'en':'No KB results. Searching AI external knowledge…',
+      'vi':'Không có kết quả KB. Đang tìm kiếm kiến thức AI bên ngoài…',
+      'ja':'KBに結果なし。AI外部知識を検索中…',
+    },
+  };
+  const L = currentLang;
+
+  // 顯示「正在搜尋外部知識」狀態
+  ragBody.innerHTML = `
+    <div class="gap-banner" style="margin-bottom:10px;">
+      ⚠ ${UI.gapNote[L] || UI.gapNote['zh-TW']}
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;color:var(--text-3);font-size:13px;">
+      <span class="spinner"></span>${UI.searching[L] || UI.searching['zh-TW']}
+    </div>`;
+
+  // 建立 external AI answer 容器
+  const answerId = 'ext-ai-output';
+  ragBody.innerHTML = `
+    <div class="gap-banner" style="margin-bottom:12px;font-size:12px;">
+      ⚠ ${UI.gapNote[L] || UI.gapNote['zh-TW']}
+    </div>
+    <div class="ai-answer-ext">
+      <div class="ai-label-ext">
+        ${UI.label[L] || UI.label['zh-TW']}
+        <span style="margin-left:auto;font-size:10px;opacity:.7;font-weight:400;">Claude AI · 非知識庫來源</span>
+      </div>
+      <div class="ai-text streaming" id="${answerId}">連線中…</div>
+      <div class="ai-disclaimer">${UI.disclaimer[L] || UI.disclaimer['zh-TW']}</div>
+      <div class="ai-save-hint">
+        <span style="font-size:12px;color:var(--text-2);">${UI.saveHint[L] || UI.saveHint['zh-TW']}</span>
+        <button class="ai-save-btn" onclick="saveExternalAnswerToKB('${query.replace(/'/g,"\\'")}', '${answerId}')">
+          ${UI.saveBtn[L] || UI.saveBtn['zh-TW']}
+        </button>
+      </div>
+    </div>`;
+
+  // 語言指示
+  const langInstr = {
+    'zh-TW':'請用繁體中文回答', 'zh-CN':'请用简体中文回答',
+    'en':'Please answer in English', 'vi':'Vui lòng trả lời bằng tiếng Việt', 'ja':'日本語で回答してください',
+  }[L] || '請用繁體中文回答';
+
+  const systemPrompt = `你是 COMART 公司的 AI 知識助理。COMART 是台灣 ODM/OEM 製造商，專注於磁吸車架、Qi/Qi2 無線充電器和消費性電子配件。${langInstr}。請根據你的一般知識回答問題，盡量結合消費性電子、製造業、供應鏈的角度。回答要具體且實用。`;
+
+  const userMsg = `問題：${query}\n\n請提供詳細且實用的回答。`;
+
+  // 呼叫 Claude（改用外部知識模式，element id 不同）
+  await streamClaudeToElement(systemPrompt, userMsg, answerId);
+}
+
+// 將外部 AI 回答儲存至知識庫草稿
+function saveExternalAnswerToKB(query, answerId) {
+  const answerEl = document.getElementById(answerId);
+  const answerText = answerEl?.textContent || '';
+  if (!answerText || answerText === '連線中…') {
+    toast('回答尚未完成，請稍候再儲存', '');
+    return;
+  }
+  // 切換到編輯器，預填內容
+  document.getElementById('doc-title').value = `[AI外部知識] ${query}`;
+  if (tiptapEditor) {
+    tiptapEditor.commands.setContent(
+      `<p><strong>原始問題：</strong>${query}</p><p></p><p><strong>AI 回答（來源：Claude 外部知識，請驗證後修改）：</strong></p><p>${answerText.replace(/\n/g,'</p><p>')}</p>`
+    );
+  } else if (window._tiptapFallback) {
+    const ta = document.getElementById('tiptap-fallback');
+    if (ta) ta.value = `原始問題：${query}\n\nAI 回答（來源：Claude 外部知識，請驗證後修改）：\n\n${answerText}`;
+  }
+  document.getElementById('doc-status').value = 'draft'; // AI 外部知識預設草稿，需人工確認後發佈
+  if (!currentTags.includes('AI外部知識')) { currentTags.push('AI外部知識'); renderTags(); }
+  if (!currentTags.includes(currentLang)) { currentTags.push(currentLang); renderTags(); }
+  editingDocId = null;
+  updateEditorModeLabel();
+  switchPanel('editor');
+  toast('已預填至編輯器，請驗證內容後再發佈', '');
+}
+
+// 獨立的 Claude streaming，可指定目標 element id
+async function streamClaudeToElement(system, user, elementId) {
+  const el = document.getElementById(elementId);
+  if (!el) return;
+  el.textContent = '連線中…';
+  el.classList.add('streaming');
+  try {
+    const text = await callClaudeProxy(system, user, 1500);
+    el.textContent = '';
+    for (let i = 0; i < text.length; i += 4) {
+      el.textContent += text.slice(i, i + 4);
+      if (i % 80 === 0) await new Promise(r => setTimeout(r, 8));
+    }
+  } catch(e) {
+    el.textContent = `連線失敗：${e.message}`;
+  } finally {
+    el.classList.remove('streaming');
+  }
+}
+// ═══════════════════════════════════════════════
+function setLang(lang) {
+  currentLang = lang;
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  document.documentElement.lang = lang;
+  applyI18n();
+  // Update editor placeholder lang
+  document.getElementById('doc-lang').value = lang;
+}
+
+function applyI18n() {
+  const s = I18N[currentLang] || I18N['zh-TW'];
+
+  // data-i18n 元素（文字內容）
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.dataset.i18n;
+    if (s[key] !== undefined) el.textContent = s[key];
+  });
+
+  // data-i18n-placeholder 元素
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    const key = el.dataset.i18nPlaceholder;
+    if (s[key] !== undefined) el.placeholder = s[key];
+  });
+
+  // 動態更新 placeholder（不用 data 屬性的欄位）
+  const ph = {
+    'doc-title':     s['editor.title.placeholder'],
+    'doc-author':    s['editor.author.placeholder'],
+    'doc-reviewer':  s['editor.reviewer.placeholder'],
+    'doc-related':   s['editor.related.placeholder'],
+    'tag-input':     s['editor.tag.placeholder'],
+    'search-q':      s['rag.placeholder'],
+    'comment-input': s['comments.input.placeholder'],
+  };
+  for (const [id, text] of Object.entries(ph)) {
+    const el = document.getElementById(id);
+    if (el && text) el.placeholder = text;
+  }
+
+  // 上傳區文字
+  const uploadText = document.querySelector('.upload-zone-text');
+  const uploadHint = document.querySelector('.upload-zone-hint');
+  if (uploadText && s['editor.upload.text']) uploadText.textContent = s['editor.upload.text'];
+  if (uploadHint && s['editor.upload.hint']) uploadHint.textContent = s['editor.upload.hint'];
+
+  // 儲存/取消按鈕
+  const saveBtn = document.querySelector('.save-btn');
+  if (saveBtn) {
+    saveBtn.textContent = editingDocId ? s['editor.update'] : s['editor.save'];
+  }
+  const cancelBtns = document.querySelectorAll('[onclick="cancelEdit()"]');
+  cancelBtns.forEach(b => { if (s['editor.cancel']) b.textContent = s['editor.cancel']; });
+
+  // Sidebar nav 文字（依順序對應）
+  const navKeys = ['nav.search','nav.editor','nav.docs','nav.kmap','nav.analytics','nav.experts','nav.review','nav.comments'];
+  document.querySelectorAll('.nav-item span:not(.nav-badge)').forEach((el, i) => {
+    if (navKeys[i] && s[navKeys[i]]) el.textContent = s[navKeys[i]];
+  });
+
+  // 系統狀態列
+  const sysLabels = document.querySelectorAll('#status-supabase, #status-claude');
+  // （內容動態生成，不在這裡覆蓋）
+
+  // 分類選單
+  const catMap = {
+    product: s['cat.product'], mfg: s['cat.mfg'], quality: s['cat.quality'],
+    sales: s['cat.sales'], supply: s['cat.supply'], compliance: s['cat.compliance'],
+    hr: s['cat.hr'], tacit: s['cat.tacit'], ai_tech: s['cat.ai_tech'], industry: s['cat.industry'],
+  };
+  document.querySelectorAll('#doc-cat option').forEach(opt => {
+    if (catMap[opt.value]) opt.textContent = catMap[opt.value];
+  });
+
+  // 狀態選單
+  const statusMap = {
+    draft: s['status.draft'], review: s['status.review'],
+    published: s['status.published'], archived: s['status.archived'],
+  };
+  document.querySelectorAll('#doc-status option').forEach(opt => {
+    if (statusMap[opt.value]) opt.textContent = statusMap[opt.value];
+  });
+
+  // 留言送出按鈕
+  const commentSubmit = document.querySelector('.comment-submit');
+  if (commentSubmit && s['comments.submit']) commentSubmit.textContent = s['comments.submit'];
+
+  // 系統資訊欄
+  const sysRag = document.querySelector('#status-supabase')?.parentElement?.nextElementSibling;
+  // 低優先，不強制更新已有 inline text
+}
+
+// ═══════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════
+function switchPanel(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-' + id)?.classList.add('active');
+  // Highlight nav
+  const navMap = { rag: 0, editor: 1, docs: 2 };
+  const idx = navMap[id];
+  document.querySelectorAll('.nav-item')[idx]?.classList.add('active');
+  if (id === 'docs') loadDocs();
+}
+
+// ═══════════════════════════════════════════════
+// CONFIG MODAL
+// ═══════════════════════════════════════════════
+function openConfig() {
+  document.getElementById('cfg-supabase-url').value = CFG.supabaseUrl;
+  document.getElementById('cfg-supabase-key').value = CFG.supabaseKey;
+  document.getElementById('cfg-embed-model').value = CFG.embedModel;
+  document.getElementById('config-modal').classList.add('show');
+}
+function closeConfig() { document.getElementById('config-modal').classList.remove('show'); }
+function saveConfig() {
+  CFG.supabaseUrl = document.getElementById('cfg-supabase-url').value.trim().replace(/\/$/, '');
+  CFG.supabaseKey = document.getElementById('cfg-supabase-key').value.trim();
+  CFG.embedModel  = document.getElementById('cfg-embed-model').value;
+  // Claude / OpenAI key 已移至 Supabase Secrets，前端不需要存
+  CFG.claudeKey = '';
+  CFG.openAiKey = '';
+  localStorage.setItem('comart-kms-config', JSON.stringify(CFG));
+  closeConfig();
+  updateStatus();
+  loadDocs();
+  toast('設定已儲存', 'success');
+}
+
+// ── 匯出設定 → 下載 JSON 檔 ──
+function exportConfig() {
+  const exportData = {
+    ...CFG,
+    _exported: new Date().toISOString(),
+    _note: 'COMART KMS Config — 請妥善保管此檔案，不要分享給他人',
+  };
+  const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `comart-kms-config-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('設定已匯出，請妥善保管 JSON 檔案', 'success');
+}
+
+// ── 匯入設定 ← 讀取 JSON 檔 ──
+function importConfig(event) {
+  const file = event.target.files?.[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const data = JSON.parse(e.target.result);
+      // 只取已知欄位，過濾掉 _note / _exported
+      const { supabaseUrl, supabaseKey, claudeKey, openAiKey, embedModel } = data;
+      if (supabaseUrl) CFG.supabaseUrl = supabaseUrl;
+      if (supabaseKey) CFG.supabaseKey = supabaseKey;
+      if (claudeKey)   CFG.claudeKey   = claudeKey;
+      if (openAiKey)   CFG.openAiKey   = openAiKey;
+      if (embedModel)  CFG.embedModel  = embedModel;
+      // 寫入 localStorage
+      localStorage.setItem('comart-kms-config', JSON.stringify(CFG));
+      // 填回設定畫面
+      document.getElementById('cfg-supabase-url').value = CFG.supabaseUrl;
+      document.getElementById('cfg-supabase-key').value = CFG.supabaseKey;
+      document.getElementById('cfg-claude-key').value   = CFG.claudeKey;
+      document.getElementById('cfg-openai-key').value   = CFG.openAiKey;
+      document.getElementById('cfg-embed-model').value  = CFG.embedModel;
+      updateStatus();
+      loadDocs();
+      toast('設定已匯入 ✓', 'success');
+    } catch(err) {
+      toast('匯入失敗：JSON 格式錯誤', 'error');
+    }
+  };
+  reader.readAsText(file);
+  // 清掉 input，讓同一個檔案可以重複匯入
+  event.target.value = '';
+}
+
+// ── 複製為 URL 參數 ──
+// 用途：把設定編碼進 URL，方便在新瀏覽器或新電腦直接打開就載入設定
+// 注意：URL 會包含 API Keys，只在可信任的環境使用
+function copyConfigAsEnv() {
+  const encoded = btoa(JSON.stringify(CFG));
+  const url = `${window.location.origin}${window.location.pathname}?kms_cfg=${encoded}`;
+  navigator.clipboard?.writeText(url).then(() => {
+    toast('URL 已複製！在新電腦或新瀏覽器貼上此 URL 即可自動載入設定', 'success');
+  }).catch(() => {
+    // fallback：顯示在 prompt 讓使用者手動複製
+    prompt('複製此 URL（包含設定）：', url);
+  });
+}
+
+// ═══════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════
+function toast(msg, type = '') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast show' + (type ? ' ' + type : '');
+  setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+// ═══════════════════════════════════════════════
+// VERSION HISTORY
+// ═══════════════════════════════════════════════
+function loadVersionHistory() {
+  const list = document.getElementById('version-list');
+  const countEl = document.getElementById('ver-count');
+
+  // 嘗試從 Supabase 載入（需要 doc_id，目前 POC 從本機快照讀）
+  const snaps = JSON.parse(localStorage.getItem('kms-snapshots') || '[]');
+
+  if (!snaps.length) {
+    list.innerHTML = '<div style="color:var(--text-3);font-size:12px;text-align:center;padding:20px 0;">尚無版本紀錄</div>';
+    countEl.textContent = '0';
+    return;
+  }
+
+  countEl.textContent = snaps.length;
+  list.innerHTML = snaps.map((s, i) => {
+    const dt = new Date(s.ts);
+    const timeStr = dt.toLocaleString('zh-TW', { month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit' });
+    const isLatest = i === 0;
+    return `
+      <div style="border:1px solid var(--border);border-radius:6px;padding:8px 10px;margin-bottom:6px;cursor:pointer;${isLatest?'border-color:var(--blue);':''}"
+        onclick="restoreVersion(${i})">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px;">
+          <span style="font-size:11px;font-weight:500;color:${isLatest?'var(--blue)':'var(--text-2)'}">
+            v${snaps.length - i} ${isLatest ? '（最新）' : ''}
+          </span>
+          <span style="font-size:10px;color:var(--text-3);">${timeStr}</span>
+        </div>
+        <div style="font-size:11px;color:var(--text-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${s.title}</div>
+        <div style="font-size:10px;color:var(--text-3);margin-top:2px;">${s.status === 'published' ? '已發佈' : '草稿'} · ${s.lang}</div>
+      </div>`;
+  }).join('');
+}
+
+async function loadVersionHistoryFromSupabase(doc_id) {
+  if (!CFG.supabaseUrl || !CFG.supabaseKey) return;
+  try {
+    const versions = await sbFetch(
+      `/rest/v1/kms_doc_versions?doc_id=eq.${doc_id}&select=*&order=version_no.desc&limit=20`
+    );
+    if (!versions?.length) return;
+    const list = document.getElementById('version-list');
+    const countEl = document.getElementById('ver-count');
+    countEl.textContent = versions.length;
+    list.innerHTML = versions.map((v, i) => {
+      const dt = new Date(v.created_at);
+      const timeStr = dt.toLocaleString('zh-TW', { month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit' });
+      return `
+        <div style="border:1px solid var(--border);border-radius:6px;padding:8px 10px;margin-bottom:6px;cursor:pointer;"
+          onclick="showVersionDiff('${doc_id}', ${v.version_no})">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px;">
+            <span style="font-size:11px;font-weight:500;color:var(--text-2);">v${v.version_no}</span>
+            <span style="font-size:10px;color:var(--text-3);">${timeStr}</span>
+          </div>
+          <div style="font-size:11px;color:var(--text-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${v.title}</div>
+          <div style="font-size:10px;color:var(--text-3);margin-top:2px;">${v.changed_by}</div>
+        </div>`;
+    }).join('');
+  } catch(e) {
+    console.warn('Version history load failed:', e);
+  }
+}
+
+function restoreVersion(idx) {
+  const snaps = JSON.parse(localStorage.getItem('kms-snapshots') || '[]');
+  const s = snaps[idx];
+  if (!s) return;
+  if (!confirm(`還原至 v${snaps.length - idx}？目前編輯內容將被覆蓋。`)) return;
+  document.getElementById('doc-title').value = s.title;
+  document.getElementById('doc-cat').value = s.category || 'product';
+  document.getElementById('doc-lang').value = s.lang || 'zh-TW';
+  document.getElementById('doc-status').value = s.status || 'draft';
+  if (tiptapEditor) {
+    tiptapEditor.commands.setContent(
+      `<p>${(s.body || '').replace(/\n\n/g,'</p><p>').replace(/\n/g,'<br>')}</p>`
+    );
+  }
+  toast('已還原至 v' + (snaps.length - idx), 'success');
+}
+
+async function showVersionDiff(doc_id, version_no) {
+  if (!CFG.supabaseUrl || !CFG.supabaseKey) return;
+  try {
+    const res = await sbFetch(`/rest/v1/kms_doc_versions?doc_id=eq.${doc_id}&version_no=eq.${version_no}&select=*`);
+    const ver = res?.[0];
+    if (!ver) { toast('版本資料不存在', 'error'); return; }
+    // 簡單 diff：開新視窗顯示舊版內容
+    const w = window.open('', '_blank', 'width=700,height=500');
+    w.document.write(`<html><head><title>v${version_no} — ${ver.title}</title>
+      <style>body{font-family:sans-serif;padding:20px;line-height:1.7;white-space:pre-wrap;font-size:14px;}</style></head>
+      <body><h2>v${version_no} — ${ver.title}</h2><hr><p>${ver.body}</p></body></html>`);
+  } catch(e) {
+    toast('載入版本失敗：' + e.message, 'error');
+  }
+}
+
+// SQL copy helper
+const SETUP_SQL_PREVIEW = `-- 完整 SQL 請見 comart-kms/sql/setup.sql
+-- 主要包含：
+-- 1. create extension vector
+-- 2. create table kms_documents (含 vector(1536) 欄位)
+-- 3. create table kms_doc_versions (版本歷史)
+-- 4. create table kms_search_log (知識缺口偵測)
+-- 5. match_documents() RPC 函數
+-- 6. kms_auto_version() Trigger（自動版本快照）
+-- 7. alter table ... disable row level security（POC 期間）
+-- 
+-- 完整內容已包含在下載的 setup.sql 檔案中`;
+
+function copySql() {
+  navigator.clipboard?.writeText(SETUP_SQL_PREVIEW).then(() => {
+    toast('SQL 概要已複製，完整版見 setup.sql', 'success');
+  }).catch(() => {
+    toast('請從下載的 setup.sql 複製完整 SQL', '');
+  });
+}
+
+// ═══════════════════════════════════════════════
+// TAGS
+// ═══════════════════════════════════════════════
+let currentTags = [];
+
+function handleTagInput(e) {
+  if (e.key === 'Enter' || e.key === ',') {
+    e.preventDefault();
+    const val = e.target.value.trim().replace(/,/g,'');
+    if (val && !currentTags.includes(val)) {
+      currentTags.push(val);
+      renderTags();
+    }
+    e.target.value = '';
+  } else if (e.key === 'Backspace' && !e.target.value && currentTags.length) {
+    currentTags.pop();
+    renderTags();
+  }
+}
+
+function renderTags() {
+  const wrap = document.getElementById('tags-wrap');
+  const input = document.getElementById('tag-input');
+  // 清掉舊 tag chips，保留 input
+  wrap.querySelectorAll('.tag').forEach(t => t.remove());
+  // 插在 input 前面
+  currentTags.forEach((t, i) => {
+    const chip = document.createElement('span');
+    chip.className = 'tag';
+    chip.innerHTML = `${t}<span class="tag-remove" onclick="removeTag(${i})">✕</span>`;
+    wrap.insertBefore(chip, input);
+  });
+}
+
+function removeTag(idx) {
+  currentTags.splice(idx, 1);
+  renderTags();
+}
+
+function clearTags() {
+  currentTags = [];
+  renderTags();
+}
+
+// ═══════════════════════════════════════════════
+// SAVE DOC — 加入 metadata 欄位
+// ═══════════════════════════════════════════════
+// 覆寫 saveDoc 的 docPayload 來源，加入新欄位
+const _origGetDocPayload = () => ({
+  title: document.getElementById('doc-title').value.trim(),
+  body: editorToMarkdown(),
+  category: document.getElementById('doc-cat').value,
+  lang: document.getElementById('doc-lang').value,
+  status: document.getElementById('doc-status').value,
+  author_name: document.getElementById('doc-author').value.trim() || 'Admin',
+  reviewer: document.getElementById('doc-reviewer').value.trim() || null,
+  valid_until: document.getElementById('doc-valid-until').value || null,
+  tags: currentTags,
+  updated_at: new Date().toISOString(),
+});
+
+// OPEN DOC — 載入 metadata 欄位
+const _origOpenDocBase = openDoc;
+async function openDoc(id) {
+  await _origOpenDocBase(id);
+  // 額外載入 metadata 欄位
+  try {
+    let doc;
+    if (CFG.supabaseUrl && CFG.supabaseKey && !id.startsWith('demo-') && !id.startsWith('local-')) {
+      const res = await sbFetch(`/rest/v1/kms_documents?id=eq.${id}&select=author_name,reviewer,valid_until,tags,review_note`);
+      doc = res?.[0];
+    }
+    if (doc) {
+      // doc-author 不預填既有文件的作者名（保持空白讓使用者自行填寫）
+      document.getElementById('doc-reviewer').value = doc.reviewer || '';
+      document.getElementById('doc-valid-until').value = doc.valid_until || '';
+      document.getElementById('doc-product-line').value = doc.product_line || '';
+      currentTags = doc.tags || [];
+      renderTags();
+      currentCustomerTags = doc.customer_tag || [];
+      renderCustomerTags();
+    }
+  } catch(e) {}
+}
+
+// 在 saveDoc 清空時也清 metadata 欄位
+const _origClearEditor = () => {
+  document.getElementById('doc-author').value = '';
+  document.getElementById('doc-reviewer').value = '';
+  document.getElementById('doc-valid-until').value = '';
+  document.getElementById('doc-related').value = '';
+  clearTags();
+};
+
+// ═══════════════════════════════════════════════
+// KNOWLEDGE MAP
+// ═══════════════════════════════════════════════
+const CAT_META = {
+  product:    { name:'產品研發',   icon:'🔬', color:'#185FA5' },
+  mfg:        { name:'製造工藝',   icon:'⚙️', color:'#0D7E6B' },
+  quality:    { name:'品質管理',   icon:'✅', color:'#0F6E56' },
+  sales:      { name:'業務客戶',   icon:'💼', color:'#854F0B' },
+  supply:     { name:'供應鏈採購', icon:'🚚', color:'#993556' },
+  compliance: { name:'法規認證',   icon:'📜', color:'#6B4FA8' },
+  hr:         { name:'人資培訓',   icon:'👥', color:'#534AB7' },
+  tacit:      { name:'內隱知識',   icon:'💡', color:'#D85A30' },
+  ai_tech:    { name:'AI 科技',    icon:'🤖', color:'#0891B2' },
+  industry:   { name:'產業新知',   icon:'🌐', color:'#059669' },
+};
+
+async function loadKmap(filterCat) {
+  const content = document.getElementById('kmap-content');
+  const headerTitle = document.getElementById('kmap-header-title');
+  const headerActions = document.getElementById('kmap-header-actions');
+  content.innerHTML = '<div style="text-align:center;color:var(--text-3);padding:40px 0;font-size:13px;">載入中…</div>';
+
+  let docs = [];
+  try {
+    if (CFG.supabaseUrl && CFG.supabaseKey) {
+      docs = await sbFetch('/rest/v1/kms_documents?select=id,title,category,lang,status,tags,author_name,view_count,updated_at&order=updated_at.desc') || [];
+    } else {
+      docs = [...DEMO_DOCS];
+    }
+  } catch(e) { docs = [...DEMO_DOCS]; }
+
+  if (filterCat) {
+    // 顯示某分類的文件列表
+    const catDocs = docs.filter(d => d.category === filterCat);
+    const meta = CAT_META[filterCat] || { name: filterCat, icon:'📁', color:'#888' };
+    headerTitle.textContent = `${meta.icon} ${meta.name}`;
+    headerActions.innerHTML = '';
+    content.innerHTML = `
+      <div class="kmap-back" onclick="loadKmap(null)">← 回分類總覽</div>
+      <div style="padding:12px 20px;">
+        ${catDocs.length === 0
+          ? '<div style="color:var(--text-3);font-size:13px;padding:20px 0;">此分類尚無文件</div>'
+          : catDocs.map(d => `
+            <div class="doc-item" style="margin-bottom:6px;" id="doc-item-${d.id}">
+              <span class="doc-cat ${d.category === 'quality'?'sop':d.category==='tacit'?'tacit':d.category==='product'?'product':'sop'}">${meta.name}</span>
+              <span class="doc-title" onclick="openReader('${d.id}')" style="cursor:pointer;flex:1;">${d.title}</span>
+              <span style="font-size:11px;color:var(--text-3);margin-right:4px;">👁 ${d.view_count||0}</span>
+              <span class="status-badge sb-${d.status||'draft'}">${{draft:'草稿',review:'審核中',published:'已發佈',archived:'封存'}[d.status]||d.status}</span>
+              <button onclick="deleteDoc('${d.id}','${(d.title||'').replace(/'/g,'')}')"
+                style="margin-left:6px;padding:2px 7px;border-radius:5px;border:1px solid #F5C6C6;background:#FEF2F2;color:#A32D2D;font-size:11px;cursor:pointer;">✕</button>
+            </div>`).join('')}
+      </div>`;
+    return;
+  }
+
+  // 分類總覽
+  headerTitle.textContent = '知識地圖 — 分類總覽';
+  headerActions.innerHTML = '';
+  const counts = {};
+  for (const d of docs) counts[d.category] = (counts[d.category]||0) + 1;
+  const maxCount = Math.max(...Object.values(counts), 1);
+
+  content.innerHTML = `<div class="kmap-grid">
+    ${Object.entries(CAT_META).map(([key, meta]) => `
+      <div class="kmap-card" onclick="loadKmap('${key}')">
+        <div class="kmap-card-icon">${meta.icon}</div>
+        <div class="kmap-card-name">${meta.name}</div>
+        <div class="kmap-card-count">${counts[key]||0} 份文件</div>
+        <div class="kmap-bar" style="background:${meta.color};width:${Math.round(((counts[key]||0)/maxCount)*100)}%;"></div>
+      </div>`).join('')}
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════
+// ANALYTICS
+// ═══════════════════════════════════════════════
+async function loadAnalytics() {
+  const wrap = document.getElementById('analytics-content');
+  wrap.innerHTML = '<div style="text-align:center;color:var(--text-3);padding:40px 0;">載入中…</div>';
+
+  let docs = [], authorStats = [], gaps = [];
+  try {
+    if (CFG.supabaseUrl && CFG.supabaseKey) {
+      [docs, authorStats] = await Promise.all([
+        sbFetch('/rest/v1/kms_documents?select=id,title,category,view_count,status,updated_at&order=view_count.desc&limit=10'),
+        sbFetch('/rest/v1/kms_author_stats'),
+      ]);
+    } else {
+      docs = DEMO_DOCS.map(d => ({ ...d, view_count: Math.floor(Math.random()*80)+5 }));
+    }
+  } catch(e) {
+    docs = DEMO_DOCS.map(d => ({ ...d, view_count: Math.floor(Math.random()*80)+5 }));
+  }
+
+  gaps = JSON.parse(localStorage.getItem('kms-search-gaps') || '[]');
+
+  const totalDocs = docs.length;
+  const published = docs.filter(d => d.status === 'published').length;
+  const totalViews = docs.reduce((s,d) => s + (d.view_count||0), 0);
+  const gapCount = gaps.length;
+  const maxViews = Math.max(...docs.map(d => d.view_count||0), 1);
+
+  wrap.innerHTML = `
+    <div class="section-hd">總覽</div>
+    <div class="stat-grid">
+      <div class="stat-card"><div class="stat-label">知識條目</div><div class="stat-val">${totalDocs}</div></div>
+      <div class="stat-card"><div class="stat-label">已發佈</div><div class="stat-val">${published}</div></div>
+      <div class="stat-card"><div class="stat-label">總閱覽數</div><div class="stat-val">${totalViews}</div></div>
+      <div class="stat-card"><div class="stat-label">知識缺口</div><div class="stat-val" style="color:var(--amber)">${gapCount}</div><div class="stat-sub">未找到結果的查詢</div></div>
+    </div>
+
+    <div class="section-hd">熱門文件（閱覽排行）</div>
+    ${docs.slice(0,8).map(d => `
+      <div class="chart-row">
+        <span class="chart-label" title="${d.title}">${d.title}</span>
+        <div class="chart-track"><div class="chart-fill" style="width:${Math.round(((d.view_count||0)/maxViews)*100)}%;background:var(--blue);"></div></div>
+        <span class="chart-val">${d.view_count||0}</span>
+      </div>`).join('')}
+
+    ${authorStats?.length ? `
+    <div class="section-hd">貢獻度統計（依作者）</div>
+    ${authorStats.slice(0,6).map(a => `
+      <div class="chart-row">
+        <span class="chart-label">${a.author_name||'未知'}</span>
+        <div class="chart-track"><div class="chart-fill" style="width:${Math.round((a.doc_count/Math.max(...authorStats.map(x=>x.doc_count),1))*100)}%;background:var(--green);"></div></div>
+        <span class="chart-val">${a.doc_count}</span>
+      </div>`).join('')}` : ''}
+
+    ${gaps.length ? `
+    <div class="section-hd">知識缺口清單（搜尋無結果）</div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;">
+      ${gaps.slice(-20).reverse().map(g => `
+        <span style="padding:3px 10px;border-radius:20px;background:var(--amber-bg);color:var(--amber);font-size:12px;border:1px solid var(--amber-border);">
+          ${g.query}
+        </span>`).join('')}
+    </div>
+    <button onclick="localStorage.removeItem('kms-search-gaps');loadAnalytics();"
+      style="font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid var(--border);background:transparent;cursor:pointer;color:var(--text-3);">清除缺口紀錄</button>
+    ` : ''}
+  `;
+}
+
+// ═══════════════════════════════════════════════
+// EXPERT DIRECTORY
+// ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════════
+// EXPERT DIRECTORY — Supabase 版本
+// ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════════
+// EXPERT DIRECTORY — 從 Firebase users collection 讀取
+// ═══════════════════════════════════════════════
+
+// Firebase SDK（從 CDN 載入，僅供黃頁使用）
+const FB_CFG = {
+  apiKey: "AIzaSyBW5qQIdX28JnjgymoZxY3MjGnTuIocboQ",
+  authDomain: "comart-quotation.firebaseapp.com",
+  projectId: "comart-quotation",
+  storageBucket: "comart-quotation.firebasestorage.app",
+  messagingSenderId: "1020179116858",
+  appId: "1:1020179116858:web:84646675aaaa753352d603"
+};
+
+let _fbApp = null;
+let _fbDb  = null;
+
+async function getFirebaseDb() {
+  if (_fbDb) return _fbDb;
+  // 動態載入 Firebase SDK（避免與其他頁面衝突）
+  if (!window.__fbLoaded) {
+    await Promise.all([
+      new Promise((res, rej) => {
+        const s = document.createElement('script');
+        s.type = 'module';
+        s.textContent = `
+          import { initializeApp, getApps } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+          import { getFirestore, collection, getDocs, query, where } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+          const cfg = ${JSON.stringify(FB_CFG)};
+          const app = getApps().length ? getApps()[0] : initializeApp(cfg);
+          const db  = getFirestore(app);
+          window.__fbApp = app;
+          window.__fbDb  = db;
+          window.__fbOps = { collection, getDocs, query, where };
+          window.__fbLoaded = true;
+          window.dispatchEvent(new Event('fb-ready'));
+        `;
+        document.head.appendChild(s);
+        window.addEventListener('fb-ready', () => res(), { once: true });
+        setTimeout(() => rej(new Error('Firebase SDK 載入超時')), 10000);
+      })
+    ]);
+  }
+  _fbDb = window.__fbDb;
+  return _fbDb;
+}
+
+async function loadExperts() {
+  const grid = document.getElementById('expert-grid');
+  grid.innerHTML = '<div style="color:var(--text-3);font-size:13px;padding:20px;grid-column:1/-1;">載入中…</div>';
+
+  let users = [];
+  try {
+    const db = await getFirebaseDb();
+    const { collection, getDocs, query, where } = window.__fbOps;
+    const snap = await getDocs(collection(db, 'users'));
+    snap.forEach(doc => {
+      const d = doc.data();
+      if (d.role !== 'inactive') users.push({ id: doc.id, ...d });
+    });
+    // 依 site 排序，同 site 依 nameEn
+    users.sort((a, b) => {
+      const s = (a.site||'').localeCompare(b.site||'');
+      return s !== 0 ? s : (a.nameEn||a.nameZh||'').localeCompare(b.nameEn||b.nameZh||'');
+    });
+  } catch(e) {
+    console.error('[loadExperts]', e);
+    grid.innerHTML = `<div style="color:var(--text-3);font-size:13px;padding:20px;grid-column:1/-1;">無法載入人員資料：${e.message}</div>`;
+    return;
+  }
+
+  if (!users.length) {
+    grid.innerHTML = '<div style="color:var(--text-3);font-size:13px;padding:20px;grid-column:1/-1;">尚無人員資料</div>';
+    return;
+  }
+
+  // 依 site 分組顯示
+  const sites = [...new Set(users.map(u => u.site || '其他'))];
+  grid.innerHTML = sites.map(site => {
+    const group = users.filter(u => (u.site || '其他') === site);
+    return `
+      <div style="grid-column:1/-1;font-size:11px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.05em;padding:4px 0 2px;border-bottom:1px solid var(--border);margin-bottom:2px;">${site}</div>
+      ${group.map(u => {
+        const name    = u.nameZh || u.nameEn || u.email || '—';
+        const nameEn  = u.nameEn || '';
+        const title   = u.titleZh || u.titleEn || '';
+        const initial = name[0]?.toUpperCase() || '?';
+        const avatar  = u.photoURL
+          ? `<img src="${u.photoURL}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;margin-bottom:8px;" onerror="this.style.display='none';this.nextSibling.style.display='flex';" /><div class="expert-avatar" style="display:none;">${initial}</div>`
+          : `<div class="expert-avatar">${initial}</div>`;
+        const contact = [
+          u.email   ? `<span onclick="navigator.clipboard?.writeText('${u.email}');toast('已複製','success')" style="cursor:pointer;">✉ ${u.email}</span>` : '',
+          u.mobile  ? `<span onclick="navigator.clipboard?.writeText('${u.mobile}');toast('已複製','success')" style="cursor:pointer;">📱 ${u.mobile}</span>` : '',
+          u.ext     ? `<span>🔢 分機 ${u.ext}</span>` : '',
+        ].filter(Boolean).join('');
+        return `
+          <div class="expert-card">
+            ${avatar}
+            <div class="expert-name">${name}${nameEn && nameEn !== name ? `<span style="font-size:11px;color:var(--text-3);margin-left:4px;">${nameEn}</span>` : ''}</div>
+            ${title ? `<div class="expert-role">${title}</div>` : ''}
+            ${contact ? `<div class="expert-contact" style="display:flex;flex-direction:column;gap:3px;margin-top:8px;">${contact}</div>` : ''}
+          </div>`;
+      }).join('')}`;
+  }).join('');
+}
+
+// 新增 / 刪除功能已移除，改由 Platform User Management 管理
+function openAddExpertModal() {
+  toast('人員資料請至 Platform → User Management 管理', '');
+}
+
+// ═══════════════════════════════════════════════
+// REVIEW WORKFLOW
+// ═══════════════════════════════════════════════
+let reviewingDocId   = null;
+let reviewingDocTitle = null;
+let reviewingDoc     = null; // 快取目前審核中的文件
+
+async function openReviewPanel(docId, docTitle) {
+  reviewingDocId    = docId;
+  reviewingDocTitle = docTitle;
+  reviewingDoc      = null;
+  switchPanel('review');
+  await loadReviewPanel();
+}
+
+async function loadReviewPanel() {
+  const content = document.getElementById('review-content');
+  if (!reviewingDocId) return;
+
+  // 讀文件目前狀態
+  try {
+    if (CFG.supabaseUrl && CFG.supabaseKey) {
+      const res = await sbFetch(`/rest/v1/kms_documents?id=eq.${reviewingDocId}&select=id,title,status,author_name,reviewer`);
+      reviewingDoc = res?.[0] || null;
+    }
+  } catch(e) {}
+
+  const status = reviewingDoc?.status || 'draft';
+  const steps = ['draft','published','archived'];
+  const stepNames = { draft:'草稿', published:'已發佈', archived:'已封存' };
+  const currentIdx = steps.indexOf(status);
+
+  // 更新流程指示器
+  steps.forEach((s, i) => {
+    const el = document.getElementById(`rs-${s}`);
+    if (!el) return;
+    el.className = 'review-step' + (i < currentIdx ? ' done' : i === currentIdx ? ' active' : '');
+  });
+
+  // 可執行的動作（移除送審流程，改為發佈後撤銷機制）
+  const actions = [];
+  if (status === 'draft')      actions.push({ label:'直接發佈', cls:'review-btn-approve', next:'published' });
+  if (status === 'published')  actions.push({ label:'封存', cls:'review-btn-archive', next:'archived'  });
+  if (status === 'archived')   actions.push({ label:'恢復發佈', cls:'review-btn-approve', next:'published' });
+  // 撤除：任何非草稿狀態都可以強制退回草稿（管理員用）
+  if (status !== 'draft')      actions.push({ label:'⚠ 撤除（退回草稿）', cls:'review-btn-reject', next:'draft' });
+
+  // 讀審核紀錄
+  let logs = [];
+  try {
+    if (CFG.supabaseUrl && CFG.supabaseKey) {
+      logs = await sbFetch(
+        `/rest/v1/kms_review_log?doc_id=eq.${reviewingDocId}&select=*&order=created_at.desc&limit=10`
+      ) || [];
+    }
+  } catch(e) {}
+
+  content.innerHTML = `
+    <div style="margin-bottom:14px;">
+      <div style="font-size:14px;font-weight:500;margin-bottom:4px;">📄 ${reviewingDocTitle}</div>
+      <div style="font-size:12px;color:var(--text-3);">作者：${reviewingDoc?.author_name||'—'} · 審核人：${reviewingDoc?.reviewer||'未指定'}</div>
+    </div>
+
+    <div style="margin-bottom:14px;">
+      <div class="section-hd">執行動作</div>
+      ${actions.length ? `
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          ${actions.map(a => `
+            <button class="review-btn ${a.cls}"
+              onclick="executeReview('${reviewingDocId}','${a.next}','${a.label}')">
+              ${a.label}
+            </button>`).join('')}
+        </div>` : '<div style="font-size:13px;color:var(--text-3);">此狀態無可執行動作</div>'}
+    </div>
+
+    ${logs.length ? `
+      <div class="section-hd">審核紀錄</div>
+      <div style="border:1px solid var(--border);border-radius:var(--radius);padding:8px 12px;">
+        ${logs.map(l => `
+          <div class="review-log-item">
+            <span>${stepNames[l.from_status]||l.from_status} → ${stepNames[l.to_status]||l.to_status}</span>
+            <span style="color:var(--text-3);">${l.actor||'—'}</span>
+            <span style="margin-left:auto;color:var(--text-3);">${new Date(l.created_at).toLocaleString('zh-TW',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'})}</span>
+          </div>`).join('')}
+      </div>` : ''}
+  `;
+}
+
+async function executeReview(docId, newStatus, actionLabel) {
+  const note = (newStatus === 'draft')
+    ? prompt('原因（可選填）：') ?? ''
+    : '';
+
+  // 取得 actor：優先用 doc-author 欄位，fallback 到 'Admin'
+  const actor = document.getElementById('doc-author')?.value.trim() || 'Admin';
+
+  try {
+    if (CFG.supabaseUrl && CFG.supabaseKey) {
+      // 寫入 review_log
+      await kmsWrite('insert', 'kms_review_log', {
+        doc_id: docId,
+        from_status: reviewingDoc?.status || 'draft',
+        to_status: newStatus,
+        actor,
+        note: note || null,
+      });
+      // 更新文件狀態
+      await kmsWrite('update', 'kms_documents',
+        { status: newStatus, review_note: note || null },
+        docId
+      );
+    }
+    if (reviewingDoc) reviewingDoc.status = newStatus;
+    toast(`已執行：${actionLabel}`, 'success');
+    await loadReviewPanel();
+    await loadDocs();
+    updateReviewBadge();
+  } catch(e) {
+    toast('操作失敗：' + e.message, 'error');
+  }
+}
+
+async function updateReviewBadge() {
+  try {
+    if (!CFG.supabaseUrl || !CFG.supabaseKey) return;
+    const res = await sbFetch('/rest/v1/kms_documents?select=id&status=eq.review');
+    const count = res?.length || 0;
+    const badge = document.getElementById('review-count');
+    if (badge) {
+      badge.textContent = count;
+      badge.style.display = count > 0 ? '' : 'none';
+    }
+  } catch(e) {}
+}
+
+// ═══════════════════════════════════════════════
+// COMMENTS / DISCUSSION
+// ═══════════════════════════════════════════════
+let commentsDocId    = null;
+let commentsDocTitle_ = null;
+let replyToId        = null;
+
+async function openCommentsPanel(docId, docTitle) {
+  commentsDocId     = docId;
+  commentsDocTitle_ = docTitle;
+  replyToId         = null;
+  document.getElementById('comments-doc-title').textContent = '— ' + docTitle;
+  switchPanel('comments');
+  await loadComments();
+}
+
+async function loadComments() {
+  if (!commentsDocId) return;
+  const list = document.getElementById('comment-list');
+  list.innerHTML = '<div style="color:var(--text-3);font-size:13px;padding:20px;">載入中…</div>';
+
+  let comments = [];
+  try {
+    if (CFG.supabaseUrl && CFG.supabaseKey) {
+      comments = await sbFetch(
+        `/rest/v1/kms_comments?doc_id=eq.${commentsDocId}&select=*&order=created_at.asc`
+      ) || [];
+    } else {
+      const key = 'kms-comments-' + commentsDocId;
+      comments = JSON.parse(localStorage.getItem(key) || '[]');
+    }
+  } catch(e) {}
+
+  const roots = comments.filter(c => !c.parent_id);
+  const replies = comments.filter(c => c.parent_id);
+
+  if (!comments.length) {
+    list.innerHTML = '<div style="color:var(--text-3);font-size:13px;text-align:center;padding:30px 0;">尚無留言，成為第一個留言的人</div>';
+    return;
+  }
+
+  list.innerHTML = roots.map(c => renderComment(c, replies)).join('');
+}
+
+function renderComment(c, replies) {
+  const childReplies = replies.filter(r => r.parent_id === c.id);
+  const dt = new Date(c.created_at).toLocaleString('zh-TW', { month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit' });
+  return `
+    <div class="comment-item">
+      <div class="comment-header">
+        <div class="comment-avatar">${(c.author||'?')[0]}</div>
+        <span class="comment-author">${c.author}</span>
+        <span class="comment-time">${dt}</span>
+      </div>
+      <div class="comment-body">${c.body.replace(/\n/g,'<br>')}</div>
+      <div class="comment-reply-btn" onclick="setReplyTo('${c.id}','${c.author}')">↩ 回覆</div>
+      ${childReplies.length ? `<div class="reply-indent">${childReplies.map(r => renderComment(r, [])).join('')}</div>` : ''}
+    </div>`;
+}
+
+function setReplyTo(id, author) {
+  replyToId = id;
+  const input = document.getElementById('comment-input');
+  input.placeholder = `回覆 ${author}…`;
+  input.focus();
+}
+
+async function submitComment() {
+  const input = document.getElementById('comment-input');
+  const body = input.value.trim();
+  if (!body || !commentsDocId) return;
+
+  const author = document.getElementById('doc-author')?.value.trim() || 'Admin';
+  const comment = {
+    doc_id: commentsDocId,
+    author,
+    body,
+    parent_id: replyToId || null,
+    created_at: new Date().toISOString(),
+  };
+
+  try {
+    if (CFG.supabaseUrl && CFG.supabaseKey) {
+      await kmsWrite('insert', 'kms_comments', comment);
+    } else {
+      const key = 'kms-comments-' + commentsDocId;
+      const list = JSON.parse(localStorage.getItem(key) || '[]');
+      list.push({ ...comment, id: 'local-' + Date.now() });
+      localStorage.setItem(key, JSON.stringify(list));
+    }
+    input.value = '';
+    input.placeholder = '輸入留言…';
+    replyToId = null;
+    await loadComments();
+  } catch(e) {
+    toast('留言失敗：' + e.message, 'error');
+  }
+}
+
+// ═══════════════════════════════════════════════
+// SWITCH PANEL — 統一入口，含新 panels
+// ═══════════════════════════════════════════════
+const _origSwitchPanel = switchPanel;
+window.switchPanel = function(id) {
+  _origSwitchPanel(id);
+  if (id === 'editor')    setTimeout(loadVersionHistory, 150);
+  if (id === 'kmap')      setTimeout(() => loadKmap(null), 50);
+  if (id === 'analytics') setTimeout(loadAnalytics, 50);
+  if (id === 'experts')   setTimeout(loadExperts, 50);
+  if (id === 'review')    setTimeout(loadReviewPanel, 50);
+};
+
+// 初始化時載入審核 badge
+window.addEventListener('DOMContentLoaded', () => {
+  setTimeout(updateReviewBadge, 2000);
+});
+
+// INCREMENT VIEW COUNT when opening a doc
+const _origOpenDocMeta = openDoc;
+async function openDoc(id) {
+  await _origOpenDocMeta(id);
+  if (CFG.supabaseUrl && CFG.supabaseKey && !id.startsWith('demo-') && !id.startsWith('local-')) {
+    sbFetch('/rest/v1/rpc/increment_view_count', {
+      method: 'POST',
+      body: JSON.stringify({ doc_id: id }),
+      prefer: 'return=minimal',
+    }).catch(()=>{});
+  }
+}
+
+// EXPERT MODAL close on overlay click
+document.getElementById('expert-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeExpertModal();
+});
+
+// Close config modal on overlay click
+document.getElementById('config-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeConfig();
+});
+document.getElementById('product-line-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeAddProductLineModal();
+});
+
+</script>
+</body>
+</html>

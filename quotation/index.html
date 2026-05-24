@@ -384,10 +384,8 @@ img{display:block}
     </div>
   </div>
   <div class="nav-pills" id="navPills">
-    <button class="npill active" data-tab="ai" onclick="switchTab('ai')">🤖 <span id="np-ai">AI</span></button>
     <button class="npill" data-tab="files" onclick="switchTab('files')">📁 <span id="np-files">File</span></button>
     <button class="npill" data-tab="crm" onclick="switchTab('crm')">👥 <span id="np-crm">CRM</span> <span class="badge" id="np-cnt-crm">0</span></button>
-    <button class="npill" data-tab="trip" onclick="switchTab('trip')">✈️ <span id="np-trip">Trip</span></button>
     <button class="npill" data-tab="products" onclick="switchTab('products')"><span id="np-products">Product</span> <span class="badge" id="np-cnt-p">0</span></button>
     <button class="npill" data-tab="quotes" onclick="switchTab('quotes')"><span id="np-quotes">Quote</span> <span class="badge" id="np-cnt-q">0</span></button>
   </div>
@@ -1649,6 +1647,10 @@ async function loadAll() {
   try { const l=localStorage.getItem('qi-lang-v2'); if(l) lang=l; } catch(_){}
   hideSyncing();
 
+  // ── Show back to portal button ──
+  const backBtn = document.getElementById('backToPortal');
+  if (backBtn) backBtn.style.display = 'flex';
+
   // ── Auto-login from Portal Session ──
   if (!currentUser) {
     const portalSess = readPortalSession();
@@ -1675,7 +1677,7 @@ async function loadAll() {
         updateUserBadge();
         await _reloadAfterLogin();
         switchTab('ai');
-        showAITab('translate');
+        
         startListeners();
         return;
       }
@@ -1975,8 +1977,8 @@ function setLang(l){
 function applyLang(){
   const s=(id,k)=>{const el=document.getElementById(id);if(el)el.textContent=t(k);};
   s('np-quotes','quotes');s('np-products','products');s('np-categories','categories');
-  s('np-ai','ai');s('np-files','files');s('np-crm','crm');
-  s('aitab-lbl-translate','translate');s('aitab-lbl-skills','skills');s('aitab-lbl-chat','chat');s('aitab-lbl-tools','tools');
+  s('np-files','files');s('np-crm','crm');
+  
   s('backLbl','back');
   s('fs-client','client');s('fs-moq','moqTiers');s('fs-prods','selectProds');s('fs-prices','prices');
   s('fl-company','company');s('fl-attn','attn');s('fl-email','email');s('fl-tel','tel');
@@ -2006,7 +2008,7 @@ function applyLang(){
   // Quote list filter tabs
   s('qf-all','all');s('qf-draft','draft');s('qf-sent','sent');
   // Nav labels
-  s('np-quotes','quotes');s('np-products','products');s('np-ai','ai');s('np-files','files');s('np-crm','crm');
+  s('np-quotes','quotes');s('np-products','products');s('np-files','files');s('np-crm','crm');
   // Re-render current page to sync language
   if(page==='products') renderProductList();
   if(page==='settings') renderSettingsPage();
@@ -2109,7 +2111,7 @@ function exportVCard() {
 
 function goHome(){
   switchTab('ai');
-  showAITab('translate');
+  
 }
 function goPortal(){
   window.location.href = 'https://platform.comart.com.tw/';
@@ -2126,9 +2128,9 @@ function switchTab(tab){
   document.getElementById('pageCategories').classList.toggle('active',tab==='categories');
   const puEl = document.getElementById('pageUsers'); if(puEl) puEl.classList.toggle('active',tab==='users');
   const pfEl = document.getElementById('pageFiles'); if(pfEl) pfEl.classList.toggle('active',tab==='files');
-  const paEl = document.getElementById('pageAI'); if(paEl) paEl.classList.toggle('active',tab==='ai');
+  
   const pcEl = document.getElementById('pageCRM'); if(pcEl) pcEl.classList.toggle('active',tab==='crm');
-  const ptEl = document.getElementById('pageTrip'); if(ptEl) ptEl.classList.toggle('active',tab==='trip');
+  
   if(tab==='trip') renderTripPage();
   if(tab==='products') renderProductList();
   if(tab==='categories') renderCategoryList();
@@ -2136,7 +2138,7 @@ function switchTab(tab){
   if(tab==='files'){ loadAndRenderFiles(); }
   if(tab==='ai'){
     requestAnimationFrame(()=>{
-      showAITab('translate');
+      
       setTimeout(()=>{ const i=document.getElementById('xlat-input'); if(i) i.focus(); },150);
     });
   }
@@ -2154,7 +2156,7 @@ function goPage(pg){
   if(pg==='settings' && page && !['settings','form','detail'].includes(page)){
     _prevPage = page;
   }
-  ['pageQuotes','pageProducts','pageCategories','pageUsers','pageForm','pageDetail','pageSettings','pageFiles','pageAI','pageCRM','pageTrip'].forEach(id=>{ const el=document.getElementById(id); if(el) el.classList.remove('active'); });
+  ['pageQuotes','pageProducts','pageCategories','pageUsers','pageForm','pageDetail','pageSettings','pageFiles','pageCRM','pageTrip'].forEach(id=>{ const el=document.getElementById(id); if(el) el.classList.remove('active'); });
   document.getElementById('page'+pg.charAt(0).toUpperCase()+pg.slice(1)).classList.add('active');
   const isHome=pg==='quotes'||pg==='products'||pg==='users';
   document.getElementById('logoArea').style.display=isHome?'flex':'none';
@@ -5920,7 +5922,7 @@ async function doLogin() {
   // Reload all data now that user is authenticated (Firestore rules may have blocked pre-login reads)
   await _reloadAfterLogin();
   switchTab('ai');
-  showAITab('translate');
+  
   if (user.mustChangePwd) {
     showChangePwd(true); // force change
   }
@@ -6003,7 +6005,7 @@ async function restoreSession() {
         await _reloadAfterLogin();
         renderUsersPage();
         switchTab('ai');
-        showAITab('translate');
+        
         return true;
       } else {
         // User no longer exists in Firestore — invalidate
@@ -8424,130 +8426,6 @@ init();
 
 
 <!-- ── PAGE: TRIP ──────────────────────────────────── -->
-<div class="page" id="pageTrip">
-
-  <!-- Header -->
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
-    <div style="font-size:18px;font-weight:700;color:var(--tx)">✈️ Business Trips</div>
-    <div style="display:flex;align-items:center;gap:8px">
-      <button onclick="tripMonthNav(-1)" style="padding:5px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);cursor:pointer;font-size:16px">‹</button>
-      <div id="tripMonthLabel" style="font-size:14px;font-weight:700;color:var(--tx);min-width:100px;text-align:center"></div>
-      <button onclick="tripMonthNav(1)" style="padding:5px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);cursor:pointer;font-size:16px">›</button>
-      <button onclick="openTripModal(null)" id="addTripBtn" style="padding:6px 14px;border-radius:8px;background:var(--ac);color:#fff;border:none;cursor:pointer;font-size:13px;font-weight:700">+ Add Trip</button>
-    </div>
-  </div>
-
-  <!-- Calendar -->
-  <div id="tripCalendar" style="margin-bottom:16px"></div>
-
-  <!-- Trip List for selected month -->
-  <div id="tripList" style="display:flex;flex-direction:column;gap:8px"></div>
-
-</div>
-
-
-<!-- ── PRODUCT DETAIL VIEW MODAL ──────────────────── -->
-<div class="overlay" id="prodDetailOverlay" onclick="closeProdDetailModal(event)">
-  <div class="modal" style="max-width:480px;max-height:88vh;overflow-y:auto">
-    <div class="modal-hd" style="position:sticky;top:0;background:var(--s1);z-index:1;padding-bottom:10px;border-bottom:1px solid var(--br)">
-      <div class="modal-title" id="pdv-title">Product Detail</div>
-      <button class="modal-close" onclick="closeProdDetailModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
-    </div>
-    <div id="pdv-body" style="padding-top:14px"></div>
-  </div>
-</div>
-
-<!-- ── TRIP MODAL ──────────────────────────────────── -->
-<div class="overlay" id="tripOverlay" onclick="closeTripModal(event)">
-  <div class="modal" style="max-width:520px;max-height:92vh;overflow-y:auto">
-    <div class="modal-hd" style="position:sticky;top:0;z-index:2;background:var(--s1)">
-      <div class="modal-title" id="trip-modal-title">New Trip</div>
-      <button class="modal-close" onclick="closeTripModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
-    </div>
-
-    <!-- Staff -->
-    <div class="field" style="margin-bottom:8px">
-      <label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px">Staff</label>
-      <select id="trip-staff" style="width:100%;padding:9px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px">
-        <option value="">— Select Staff —</option>
-      </select>
-    </div>
-    <!-- Date From / Date To -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
-      <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px">Date From</label><input id="trip-date-from" type="date" style="width:100%;padding:9px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;box-sizing:border-box"></div>
-      <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px">Date To</label><input id="trip-date-to" type="date" style="width:100%;padding:9px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;box-sizing:border-box"></div>
-    </div>
-    <!-- Destination -->
-    <div class="field" style="margin-bottom:8px">
-      <label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px">Destination</label>
-      <input id="trip-dest" placeholder="e.g. Tokyo, Japan" autocomplete="off" style="width:100%;padding:9px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;box-sizing:border-box">
-    </div>
-    <!-- Notes -->
-    <div class="field" style="margin-bottom:12px">
-      <label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px">Notes <span style="font-weight:400">(purpose, client, etc.)</span></label>
-      <textarea id="trip-notes" rows="2" placeholder="e.g. Visit customer ABC for product demo" style="width:100%;padding:9px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;resize:vertical;box-sizing:border-box;font-family:inherit"></textarea>
-    </div>
-
-    <!-- ── OUTBOUND FLIGHT ── -->
-    <div style="font-size:11px;font-weight:700;color:var(--tx3);letter-spacing:.06em;text-transform:uppercase;margin:12px 0 6px;padding-bottom:4px;border-bottom:1px solid var(--br)">🛫 Outbound Flight</div>
-    <div style="display:grid;grid-template-columns:1fr auto;gap:8px;margin-bottom:6px;align-items:flex-end">
-      <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px">Flight No.</label>
-        <input id="trip-flight" placeholder="e.g. CI101" autocomplete="off" oninput="tripFlightInput('out')" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;box-sizing:border-box;text-transform:uppercase">
-      </div>
-      <button onclick="lookupFlight('out')" style="padding:9px 14px;border-radius:8px;background:var(--s2);border:1px solid var(--br);color:var(--tx2);cursor:pointer;font-size:12px;white-space:nowrap;height:40px">🔍 Lookup</button>
-    </div>
-    <div id="trip-out-flight-info" style="display:none;background:rgba(45,127,249,.08);border:1px solid rgba(45,127,249,.2);border-radius:8px;padding:8px 12px;margin-bottom:8px;font-size:12px;color:var(--tx2)"></div>
-    <!-- Outbound DEP -->
-    <div style="font-size:10px;font-weight:700;color:var(--tx3);text-transform:uppercase;margin-bottom:4px;margin-top:8px">Departure</div>
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:6px">
-      <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px">City</label><input id="trip-out-dep-city" placeholder="Taipei" autocomplete="off" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;box-sizing:border-box"></div>
-      <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px">Airport</label><input id="trip-out-dep-airport" placeholder="Taoyuan" autocomplete="off" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;box-sizing:border-box"></div>
-      <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px">Terminal</label><input id="trip-out-dep-terminal" placeholder="T2" autocomplete="off" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;box-sizing:border-box"></div>
-      <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px">Time</label><input id="trip-out-dep-time" placeholder="08:30" autocomplete="off" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;box-sizing:border-box"></div>
-    </div>
-    <!-- Outbound ARR -->
-    <div style="font-size:10px;font-weight:700;color:var(--tx3);text-transform:uppercase;margin-bottom:4px;margin-top:8px">Arrival</div>
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:6px">
-      <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px">City</label><input id="trip-out-arr-city" placeholder="Tokyo" autocomplete="off" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;box-sizing:border-box"></div>
-      <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px">Airport</label><input id="trip-out-arr-airport" placeholder="Narita" autocomplete="off" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;box-sizing:border-box"></div>
-      <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px">Terminal</label><input id="trip-out-arr-terminal" placeholder="T1" autocomplete="off" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;box-sizing:border-box"></div>
-      <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px">Time (local)</label><input id="trip-out-arr-time" placeholder="12:45" autocomplete="off" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;box-sizing:border-box"></div>
-    </div>
-
-    <!-- ── RETURN FLIGHT ── -->
-    <div style="font-size:11px;font-weight:700;color:var(--tx3);letter-spacing:.06em;text-transform:uppercase;margin:12px 0 6px;padding-bottom:4px;border-bottom:1px solid var(--br)">🛬 Return Flight</div>
-    <div style="display:grid;grid-template-columns:1fr auto;gap:8px;margin-bottom:6px;align-items:flex-end">
-      <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px">Flight No.</label>
-        <input id="trip-return-flight" placeholder="e.g. CI102" autocomplete="off" oninput="tripFlightInput('ret')" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;box-sizing:border-box;text-transform:uppercase">
-      </div>
-      <button onclick="lookupFlight('ret')" style="padding:9px 14px;border-radius:8px;background:var(--s2);border:1px solid var(--br);color:var(--tx2);cursor:pointer;font-size:12px;white-space:nowrap;height:40px">🔍 Lookup</button>
-    </div>
-    <div id="trip-ret-flight-info" style="display:none;background:rgba(61,214,140,.08);border:1px solid rgba(61,214,140,.2);border-radius:8px;padding:8px 12px;margin-bottom:8px;font-size:12px;color:var(--tx2)"></div>
-    <!-- Return DEP -->
-    <div style="font-size:10px;font-weight:700;color:var(--tx3);text-transform:uppercase;margin-bottom:4px;margin-top:8px">Departure</div>
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:6px">
-      <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px">City</label><input id="trip-ret-dep-city" placeholder="Tokyo" autocomplete="off" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;box-sizing:border-box"></div>
-      <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px">Airport</label><input id="trip-ret-dep-airport" placeholder="Narita" autocomplete="off" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;box-sizing:border-box"></div>
-      <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px">Terminal</label><input id="trip-ret-dep-terminal" placeholder="T2" autocomplete="off" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;box-sizing:border-box"></div>
-      <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px">Time</label><input id="trip-ret-dep-time" placeholder="15:30" autocomplete="off" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;box-sizing:border-box"></div>
-    </div>
-    <!-- Return ARR -->
-    <div style="font-size:10px;font-weight:700;color:var(--tx3);text-transform:uppercase;margin-bottom:4px;margin-top:8px">Arrival</div>
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:6px;margin-bottom:16px">
-      <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px">City</label><input id="trip-ret-arr-city" placeholder="Taipei" autocomplete="off" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;box-sizing:border-box"></div>
-      <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px">Airport</label><input id="trip-ret-arr-airport" placeholder="Taoyuan" autocomplete="off" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;box-sizing:border-box"></div>
-      <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px">Terminal</label><input id="trip-ret-arr-terminal" placeholder="T2" autocomplete="off" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;box-sizing:border-box"></div>
-      <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px">Time (local)</label><input id="trip-ret-arr-time" placeholder="18:30" autocomplete="off" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;box-sizing:border-box"></div>
-    </div>
-
-    <div class="btn-row">
-      <button class="btn btn-primary" onclick="saveTrip()">Save</button>
-      <button class="btn btn-ghost" onclick="closeTripModal()">Cancel</button>
-      <button class="btn btn-danger btn-sm" id="trip-del" style="display:none" onclick="deleteTrip()">Delete</button>
-    </div>
-  </div>
-</div>
-
 <div class="page" id="pageFiles">
 
   <!-- Toolbar -->
@@ -8611,223 +8489,7 @@ init();
   </div>
 </div>
 
-<!-- ── PAGE: AI ────────────────────────────────── -->
-<div class="page" id="pageAI" style="padding:0;max-width:900px;margin:0 auto;flex-direction:column;height:calc(100vh - 56px)">
-  <!-- Tab bar -->
-  <div style="display:flex;align-items:center;gap:6px;padding:10px 14px;border-bottom:1px solid var(--br);flex-shrink:0;flex-wrap:wrap">
-    <div style="font-size:14px;font-weight:700;color:#a78bfa;margin-right:6px">🤖 AI</div>
-    <button class="moq-chip on" id="aitab-translate" onclick="showAITab('translate')">🌐 <span id="aitab-lbl-translate">翻譯</span></button>
-    <button class="moq-chip"    id="aitab-skills"    onclick="showAITab('skills')">🛠 <span id="aitab-lbl-skills">Skill</span></button>
-    <button class="moq-chip"    id="aitab-chat"      onclick="showAITab('chat')">✦ <span id="aitab-lbl-chat">Chat</span></button>
-    <button class="moq-chip"    id="aitab-tools"     onclick="showAITab('tools')">🔗 <span id="aitab-lbl-tools">Link</span></button>
-  </div>
 
-  <!-- ── CHAT TAB ── -->
-  <div id="aitab-content-chat" style="display:none;flex-direction:column;min-height:0;overflow:hidden">
-    <div id="aiChatMessages" style="flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:10px">
-      <div style="text-align:center;padding:24px 0 8px">
-        <div style="font-size:26px;margin-bottom:6px">✦</div>
-        <div style="font-size:14px;font-weight:700;color:var(--tx)">Claude · COMART Assistant</div>
-        <div style="font-size:11px;color:var(--tx3);margin-top:4px">Ask anything — quotations, products, market research</div>
-      </div>
-    </div>
-    <div style="padding:10px 14px;border-top:1px solid var(--br);flex-shrink:0">
-      <div style="display:flex;gap:8px;align-items:flex-end">
-        <textarea id="aiChatInput" placeholder="Ask Claude… (Enter to send, Shift+Enter for new line)" rows="2"
-          style="flex:1;padding:10px 12px;border-radius:10px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;resize:none;outline:none;font-family:inherit;line-height:1.5"
-          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendAIChat();}"
-          oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,120)+'px'"></textarea>
-        <button onclick="sendAIChat()" id="aiSendBtn"
-          style="padding:10px 16px;border-radius:10px;background:#7c3aed;color:#fff;border:none;cursor:pointer;font-size:13px;font-weight:700;flex-shrink:0;height:42px">Send</button>
-      </div>
-      <div style="font-size:10px;color:var(--tx3);margin-top:5px;text-align:center">Claude Sonnet · via COMART Worker</div>
-    </div>
-  </div>
-
-  <!-- ── TRANSLATE TAB ── -->
-  <div id="aitab-content-translate" style="display:flex;flex:1;flex-direction:column;overflow:hidden">
-    <div style="flex:1;overflow-y:auto;padding:14px 16px">
-      <!-- Input area -->
-      <div style="margin-bottom:12px">
-        <div style="font-size:11px;font-weight:700;color:var(--tx3);letter-spacing:.06em;margin-bottom:6px">INPUT TEXT / 輸入文字</div>
-        <div style="display:flex;gap:8px;align-items:flex-start">
-          <textarea id="xlat-input" rows="8" placeholder="Paste or type text here… 貼上或輸入文字"
-            style="flex:1;padding:10px 12px;border-radius:10px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;resize:vertical;outline:none;font-family:inherit;min-height:160px"></textarea>
-          <div style="display:flex;flex-direction:column;gap:6px">
-            <button onclick="runTranslate()" id="xlatBtn"
-              style="padding:9px 14px;border-radius:9px;background:#7c3aed;color:#fff;border:none;cursor:pointer;font-size:12px;font-weight:700;white-space:nowrap">
-              Translate ↓
-            </button>
-            <button onclick="copyInputText()" id="xlatCopyBtn" title="Copy input text"
-              style="padding:9px 14px;border-radius:9px;border:1px solid var(--br);background:var(--s2);color:var(--tx2);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;gap:4px;white-space:nowrap">
-              📋
-            </button>
-            <button onclick="startVoiceInput()" id="voiceBtn" title="Record voice"
-              style="padding:9px 14px;border-radius:9px;border:1px solid var(--br);background:var(--s2);color:var(--tx2);cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center">
-              🎙
-            </button>
-          </div>
-        </div>
-        <div id="voiceStatus" style="display:none;font-size:11px;color:var(--ac);margin-top:4px;animation:pulse 1s infinite">● Recording…</div>
-      </div>
-
-      <!-- Results -->
-      <div id="xlatResults" style="display:none">
-        <!-- Direct translation -->
-        <div style="font-size:11px;font-weight:700;color:var(--tx3);letter-spacing:.06em;margin-bottom:8px;margin-top:4px">
-          DIRECT TRANSLATION · 直接翻譯
-        </div>
-        <div id="xlatDirect" style="display:flex;flex-direction:column;gap:6px;margin-bottom:16px"></div>
-        <!-- Business rewrite -->
-        <div style="font-size:11px;font-weight:700;color:var(--ac);letter-spacing:.06em;margin-bottom:8px">
-          BUSINESS VERSION · 商業用語版本
-        </div>
-        <div id="xlatBiz" style="display:flex;flex-direction:column;gap:6px"></div>
-      </div>
-      <div id="xlatLoading" style="display:none;text-align:center;padding:24px;color:var(--tx3);font-size:13px">
-        <div style="font-size:22px;margin-bottom:8px;animation:spin 1s linear infinite">⟳</div>Translating…
-      </div>
-    </div>
-  </div>
-
-  <!-- ── SKILLS TAB ── -->
-  <div id="aitab-content-skills" style="display:none;flex:1;flex-direction:column;overflow:hidden">
-    <div style="flex:1;overflow-y:auto;padding:14px 16px">
-      <div style="font-size:11px;font-weight:700;color:var(--tx3);letter-spacing:.08em;margin-bottom:10px">COMART AI SKILLS</div>
-      <div style="display:flex;flex-direction:column;gap:10px">
-
-        <!-- Company Research -->
-        <div style="background:var(--s2);border:1px solid var(--br);border-radius:12px;padding:14px 16px">
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
-            <div style="width:36px;height:36px;border-radius:8px;background:rgba(16,163,127,.15);color:#10a37f;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🔍</div>
-            <div>
-              <div style="font-size:13px;font-weight:700;color:var(--tx)">公司調查機器人</div>
-              <div style="font-size:11px;color:var(--tx3)">Company Research · /company-research</div>
-            </div>
-          </div>
-          <div style="font-size:12px;color:var(--tx2);margin-bottom:10px;line-height:1.6">
-            輸入公司名稱，自動調查公司背景、聯絡資訊、產品方向、市場動態，輸出完整調查報告與商業開發信。
-          </div>
-          <div style="display:flex;gap:6px;align-items:center;margin-bottom:8px">
-            <input id="skill-company-input" placeholder="Enter company name / 輸入公司名稱" autocomplete="off"
-              style="flex:1;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none"
-              onkeydown="if(event.key==='Enter') runSkillCompany()">
-            <button onclick="runSkillCompany()"
-              style="padding:8px 14px;border-radius:8px;background:#10a37f;color:#fff;border:none;cursor:pointer;font-size:12px;font-weight:700;flex-shrink:0">
-              調查 →
-            </button>
-          </div>
-          <div style="display:flex;align-items:center;gap:8px;margin-top:6px;flex-wrap:wrap">
-            <label style="font-size:11px;color:var(--tx3);flex-shrink:0;white-space:nowrap">📷 上傳名片：</label>
-            <input type="file" id="skill-company-card" accept="image/*" onchange="readCardForCompany(this)"
-              style="font-size:11px;color:var(--tx2);flex:1;min-width:0">
-            <button id="vcard-export-btn" onclick="exportVCard()"
-              style="display:none;padding:5px 10px;border-radius:6px;border:1px solid var(--br);background:var(--s2);color:var(--tx2);font-size:11px;cursor:pointer;flex-shrink:0;align-items:center;gap:4px">
-              📇 Export vCard
-            </button>
-          </div>
-          <div style="display:none">
-          </div>
-        </div>
-
-        <!-- Post-show Followup -->
-        <div style="background:var(--s2);border:1px solid var(--br);border-radius:12px;padding:14px 16px">
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
-            <div style="width:36px;height:36px;border-radius:8px;background:rgba(139,92,246,.15);color:#8b5cf6;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">📧</div>
-            <div>
-              <div style="font-size:13px;font-weight:700;color:var(--tx)">展後跟進機器人</div>
-              <div style="font-size:11px;color:var(--tx3)">Post-Show Followup · /post-show-followup</div>
-            </div>
-          </div>
-          <div style="font-size:12px;color:var(--tx2);margin-bottom:10px;line-height:1.6">
-            輸入展會客戶資訊，自動生成個性化的展後跟進信件，支援中英雙語，整合客戶需求與 COMART 產品亮點。
-          </div>
-          <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px">
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap">
-              <label style="font-size:11px;color:var(--tx3);flex-shrink:0;white-space:nowrap">📷 上傳名片：</label>
-              <input type="file" id="skill-show-card" accept="image/*" onchange="readCardForFollowup(this)"
-                style="font-size:11px;color:var(--tx2);flex:1;min-width:0">
-              <button id="vcard-export-btn-followup" onclick="exportVCard()"
-                style="display:none;padding:5px 10px;border-radius:6px;border:1px solid var(--br);background:var(--s2);color:var(--tx2);font-size:11px;cursor:pointer;flex-shrink:0;white-space:nowrap">
-                📇 Export vCard
-              </button>
-            </div>
-            <input id="skill-show-company" placeholder="客戶公司名稱 / Company name" autocomplete="off"
-              style="padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none">
-            <input id="skill-show-contact" placeholder="聯絡人 / Contact person" autocomplete="off"
-              style="padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none">
-            <input id="skill-show-name" placeholder="展覽名稱 / Show name (e.g. Global Sources)" autocomplete="off"
-              style="padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none">
-            <textarea id="skill-show-notes" placeholder="備注：客戶興趣、產品需求等 / Notes" rows="2"
-              style="padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;resize:none;font-family:inherit"></textarea>
-            <button onclick="runSkillFollowup()"
-              style="padding:9px;border-radius:8px;background:#8b5cf6;color:#fff;border:none;cursor:pointer;font-size:12px;font-weight:700">
-              產生跟進信 →
-            </button>
-          </div>
-        </div>
-
-      </div>
-      <!-- Skill output area -->
-      <div id="skillOutput" style="display:none;margin-top:14px">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
-          <div style="font-size:11px;font-weight:700;color:var(--tx3);letter-spacing:.06em;flex:1">OUTPUT · 輸出結果</div>
-          <button onclick="copySkillOutput()"
-            style="padding:4px 10px;border-radius:6px;border:1px solid var(--br);background:var(--s2);color:var(--tx2);font-size:11px;cursor:pointer">📋 Copy</button>
-          <button onclick="document.getElementById('skillOutput').style.display='none'"
-            style="padding:4px 10px;border-radius:6px;border:1px solid var(--br);background:var(--s2);color:var(--tx2);font-size:11px;cursor:pointer">✕</button>
-        </div>
-        <div id="skillOutputContent"
-          style="background:var(--s2);border:1px solid var(--br);border-radius:10px;padding:14px;font-size:12px;color:var(--tx);line-height:1.7;white-space:pre-wrap;max-height:60vh;overflow-y:auto"></div>
-        <div id="skillLoading" style="display:none;text-align:center;padding:20px;color:var(--tx3);font-size:13px">
-          <div style="font-size:22px;margin-bottom:6px;animation:spin 1s linear infinite">⟳</div>AI is working…
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ── LINKS TAB ── -->
-  <div id="aitab-content-tools" style="display:none;flex:1;overflow-y:auto;padding:14px 16px">
-    <div style="font-size:11px;font-weight:700;color:var(--tx3);letter-spacing:.08em;margin-bottom:10px">COMART AI TOOLS</div>
-    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:18px">
-      <a href="https://chatgpt.com/g/g-68d883bb1a74819197fe3f190920e127-cmt-ke-hu-diao-cha-ji-qi-ren" target="_blank" rel="noopener" class="ai-link">
-        <div class="ai-icon" style="background:rgba(16,163,127,.15);color:#10a37f">🔍</div>
-        <div><div class="ai-title">客戶調查</div><div class="ai-sub">CMT 客戶調查機器人</div></div>
-      </a>
-      <a href="https://chatgpt.com/g/g-692e8cedd9508191b7d37366b48aee8d-comart-translator" target="_blank" rel="noopener" class="ai-link">
-        <div class="ai-icon" style="background:rgba(16,163,127,.15);color:#10a37f">🌐</div>
-        <div><div class="ai-title">語言翻譯</div><div class="ai-sub">COMART Translator</div></div>
-      </a>
-      <a href="https://chatgpt.com/g/g-68e3a7b658d48191b8dac0bbd72b2580-ming-pian-sao-miao-ji-qi-ren" target="_blank" rel="noopener" class="ai-link">
-        <div class="ai-icon" style="background:rgba(16,163,127,.15);color:#10a37f">📇</div>
-        <div><div class="ai-title">名片掃描</div><div class="ai-sub">名片掃描機器人</div></div>
-      </a>
-    </div>
-    <div style="font-size:11px;font-weight:700;color:var(--tx3);letter-spacing:.08em;margin-bottom:10px">AI ASSISTANTS</div>
-    <div style="display:flex;flex-direction:column;gap:8px">
-      <a href="https://chatgpt.com" target="_blank" rel="noopener" class="ai-link">
-        <div class="ai-icon" style="background:rgba(16,163,127,.15);color:#10a37f">💬</div>
-        <div><div class="ai-title">ChatGPT</div><div class="ai-sub">chatgpt.com</div></div>
-      </a>
-      <a href="https://claude.ai" target="_blank" rel="noopener" class="ai-link">
-        <div class="ai-icon" style="background:rgba(217,119,6,.15);color:#d97706">✦</div>
-        <div><div class="ai-title">Claude</div><div class="ai-sub">claude.ai — Anthropic</div></div>
-      </a>
-      <a href="https://gemini.google.com" target="_blank" rel="noopener" class="ai-link">
-        <div class="ai-icon" style="background:rgba(59,130,246,.15);color:#3b82f6">✦</div>
-        <div><div class="ai-title">Gemini</div><div class="ai-sub">gemini.google.com</div></div>
-      </a>
-      <a href="https://chat.deepseek.com" target="_blank" rel="noopener" class="ai-link">
-        <div class="ai-icon" style="background:rgba(99,102,241,.15);color:#6366f1">🐋</div>
-        <div><div class="ai-title">DeepSeek</div><div class="ai-sub">chat.deepseek.com</div></div>
-      </a>
-    </div>
-  </div>
-</div>
-
-<!-- ═══════════════════════════════════════ -->
-<!-- CRM PAGE                                 -->
-<!-- ═══════════════════════════════════════ -->
 <div class="page" id="pageCRM" style="padding:0;max-width:1200px;margin:0 auto;flex-direction:column;height:calc(100vh - 56px)">
   <!-- Sub-tab bar -->
   <div style="display:flex;align-items:center;gap:6px;padding:10px 14px;border-bottom:1px solid var(--br);flex-shrink:0;flex-wrap:wrap">

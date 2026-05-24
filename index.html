@@ -287,7 +287,7 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:
   <div class="topbar">
     <div class="topbar-logo" onclick="switchView('home')">
       <div class="topbar-mark">C</div>
-      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.03</span></div>
+      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.04</span></div>
     </div>
     <div class="topbar-right">
       <div class="lang-switcher">
@@ -536,8 +536,22 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:
               <div id="tripMonthLabel" style="font-size:15px;font-weight:700;color:var(--tx);min-width:130px;text-align:center;"></div>
               <button onclick="tripMonthNav(1)" style="padding:5px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);cursor:pointer;font-size:16px;">›</button>
             </div>
-            <button onclick="openTripModal(null)" id="addTripBtn" style="display:none;"
-              style="padding:7px 16px;border-radius:8px;background:var(--ac);color:#fff;border:none;cursor:pointer;font-size:13px;font-weight:700;">+ Add Trip</button>
+            <div style="position:relative;display:none;" id="addTripBtn">
+              <button onclick="toggleAddMenu()" id="addMenuBtn"
+                style="padding:7px 16px;border-radius:8px;background:var(--ac);color:#fff;border:none;cursor:pointer;font-size:13px;font-weight:700;">＋ Add ▾</button>
+              <div id="addMenuDropdown" style="display:none;position:absolute;top:36px;right:0;background:var(--s1);border:1px solid var(--br);border-radius:10px;min-width:180px;z-index:100;box-shadow:0 4px 20px rgba(0,0,0,.3);overflow:hidden;">
+                <div onclick="closeAddMenu();openCalEventModal('group',null)"
+                  style="padding:10px 16px;cursor:pointer;font-size:13px;color:var(--tx);border-bottom:1px solid var(--br);">🏢 Group Event</div>
+                <div onclick="closeAddMenu();openCalEventModal('tw-cal',null)"
+                  style="padding:10px 16px;cursor:pointer;font-size:13px;color:var(--tx);border-bottom:1px solid var(--br);">🇹🇼 Taiwan Calendar</div>
+                <div onclick="closeAddMenu();openCalEventModal('cn-cal',null)"
+                  style="padding:10px 16px;cursor:pointer;font-size:13px;color:var(--tx);border-bottom:1px solid var(--br);">🇨🇳 China Calendar</div>
+                <div onclick="closeAddMenu();openCalEventModal('vn-cal',null)"
+                  style="padding:10px 16px;cursor:pointer;font-size:13px;color:var(--tx);border-bottom:1px solid var(--br);">🇻🇳 Vietnam Calendar</div>
+                <div onclick="closeAddMenu();openTripModal(null)"
+                  style="padding:10px 16px;cursor:pointer;font-size:13px;color:var(--tx);">✈️ Business Trip</div>
+              </div>
+            </div>
           </div>
           <!-- Calendar grid + list -->
           <div style="flex:1;overflow-y:auto;padding:14px 16px;">
@@ -753,8 +767,7 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:
               <button onclick="tripMonthNav(-1)" style="padding:5px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);cursor:pointer;font-size:16px;">‹</button>
               <div id="tripMonthLabel" style="font-size:14px;font-weight:700;color:var(--tx);min-width:100px;text-align:center;"></div>
               <button onclick="tripMonthNav(1)" style="padding:5px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);cursor:pointer;font-size:16px;">›</button>
-              <button onclick="openTripModal(null)" id="addTripBtn" style="display:none;"
-                style="padding:6px 14px;border-radius:8px;background:var(--ac);color:#fff;border:none;cursor:pointer;font-size:13px;font-weight:700;">+ Add Trip</button>
+
             </div>
           </div>
           <!-- Calendar -->
@@ -2328,34 +2341,66 @@ async function loadHolidays(countryCode, year) {
   renderTripPage();
 }
 
-// Built-in fallback holidays (minimal, covers main dates)
+// Built-in fallback holidays (complete major dates)
 function getBuiltinHolidays(cc, year) {
   var y = year;
   var h = {
     'TW': [
-      { date: y+'-01-01', title: "New Year's Day / 中華民國開國紀念日" },
-      { date: y+'-02-28', title: 'Peace Memorial Day / 和平紀念日' },
-      { date: y+'-04-04', title: "Children's Day / 兒童節" },
-      { date: y+'-04-05', title: 'Tomb Sweeping Day / 清明節' },
-      { date: y+'-06-22', title: 'Dragon Boat Festival / 端午節' },
-      { date: y+'-09-28', title: "Teacher's Day / 教師節" },
-      { date: y+'-10-10', title: 'National Day / 國慶日' },
+      { date: y+'-01-01', title: "New Year's Day 中華民國開國紀念日" },
+      { date: y+'-01-27', title: 'Chinese New Year Eve 除夕' },
+      { date: y+'-01-28', title: 'Chinese New Year 春節初一' },
+      { date: y+'-01-29', title: 'Chinese New Year 春節初二' },
+      { date: y+'-01-30', title: 'Chinese New Year 春節初三' },
+      { date: y+'-02-28', title: 'Peace Memorial Day 和平紀念日' },
+      { date: y+'-04-04', title: "Children's Day 兒童節" },
+      { date: y+'-04-05', title: 'Tomb Sweeping Day 清明節' },
+      { date: y+'-05-01', title: 'Labour Day 勞動節' },
+      { date: y+'-06-22', title: 'Dragon Boat Festival 端午節' },
+      { date: y+'-09-29', title: 'Mid-Autumn Festival 中秋節' },
+      { date: y+'-10-10', title: 'National Day 國慶日' },
     ],
     'CN': [
-      { date: y+'-01-01', title: "New Year's Day / 元旦" },
-      { date: y+'-05-01', title: 'Labour Day / 劳动节' },
-      { date: y+'-10-01', title: 'National Day / 国庆节' },
-      { date: y+'-10-02', title: 'National Day Holiday / 国庆节假日' },
-      { date: y+'-10-03', title: 'National Day Holiday / 国庆节假日' },
+      { date: y+'-01-01', title: "New Year's Day 元旦" },
+      { date: y+'-01-28', title: 'Spring Festival 春節' },
+      { date: y+'-01-29', title: 'Spring Festival 春節' },
+      { date: y+'-01-30', title: 'Spring Festival 春節' },
+      { date: y+'-01-31', title: 'Spring Festival 春節' },
+      { date: y+'-02-01', title: 'Spring Festival 春節' },
+      { date: y+'-02-02', title: 'Spring Festival 春節' },
+      { date: y+'-02-03', title: 'Spring Festival 春節' },
+      { date: y+'-04-05', title: 'Tomb Sweeping Day 清明節' },
+      { date: y+'-05-01', title: 'Labour Day 劳动节' },
+      { date: y+'-05-02', title: 'Labour Day Holiday 劳动节假日' },
+      { date: y+'-05-03', title: 'Labour Day Holiday 劳动节假日' },
+      { date: y+'-06-22', title: 'Dragon Boat Festival 端午节' },
+      { date: y+'-09-29', title: 'Mid-Autumn Festival 中秋节' },
+      { date: y+'-10-01', title: 'National Day 国庆节' },
+      { date: y+'-10-02', title: 'National Day Holiday 国庆节' },
+      { date: y+'-10-03', title: 'National Day Holiday 国庆节' },
+      { date: y+'-10-04', title: 'National Day Holiday 国庆节' },
+      { date: y+'-10-05', title: 'National Day Holiday 国庆节' },
+      { date: y+'-10-06', title: 'National Day Holiday 国庆节' },
+      { date: y+'-10-07', title: 'National Day Holiday 国庆节' },
     ],
     'VN': [
-      { date: y+'-01-01', title: "New Year's Day / Tết Dương lịch" },
-      { date: y+'-04-30', title: 'Reunification Day / Ngày Thống nhất' },
-      { date: y+'-05-01', title: 'Labour Day / Ngày Quốc tế Lao động' },
-      { date: y+'-09-02', title: 'National Day / Ngày Quốc khánh' },
+      { date: y+'-01-01', title: "New Year's Day Tết Dương lịch" },
+      { date: y+'-01-27', title: 'Lunar New Year Eve Tất Niên' },
+      { date: y+'-01-28', title: 'Tết Nguyên Đán 春節' },
+      { date: y+'-01-29', title: 'Tết Nguyên Đán 春節' },
+      { date: y+'-01-30', title: 'Tết Nguyên Đán 春節' },
+      { date: y+'-01-31', title: 'Tết Nguyên Đán 春節' },
+      { date: y+'-02-01', title: 'Tết Nguyên Đán 春節' },
+      { date: y+'-04-07', title: 'Hung Kings Festival Giỗ Tổ Hùng Vương' },
+      { date: y+'-04-30', title: 'Reunification Day Ngày Thống nhất' },
+      { date: y+'-05-01', title: 'Labour Day Ngày Quốc tế Lao động' },
+      { date: y+'-09-02', title: 'National Day Ngày Quốc khánh' },
+      { date: y+'-09-03', title: 'National Day Holiday Ngày Quốc khánh' },
     ],
   };
-  return (h[cc] || []).map(function(x) { return Object.assign({ dateTo: x.date, notes: 'Built-in fallback data' }, x); });
+  var note = 'Built-in data (API unavailable) · For official dates check government sources';
+  return (h[cc] || []).map(function(x) {
+    return { date: x.date, dateTo: x.date, title: x.title, notes: note };
+  });
 }
 
 // ── Get all events for a specific date ──
@@ -2669,6 +2714,23 @@ async function pCleanText() {
   }
 }
 
+
+function toggleAddMenu() {
+  var dd = document.getElementById('addMenuDropdown');
+  if (dd) dd.style.display = dd.style.display === 'none' ? 'block' : 'none';
+}
+function closeAddMenu() {
+  var dd = document.getElementById('addMenuDropdown');
+  if (dd) dd.style.display = 'none';
+}
+// Close dropdown when clicking outside
+document.addEventListener('click', function(e) {
+  var btn = document.getElementById('addMenuBtn');
+  var dd  = document.getElementById('addMenuDropdown');
+  if (dd && btn && !btn.contains(e.target) && !dd.contains(e.target)) {
+    dd.style.display = 'none';
+  }
+});
 </script>
 </body>
 </html>

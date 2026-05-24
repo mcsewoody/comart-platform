@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>COMART Platform v1.08</title>
+<title>COMART Platform v1.09</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -122,7 +122,8 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:
 .dir-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;}
 .dir-card{background:var(--s1);border:1px solid var(--br);border-radius:var(--rl);padding:16px;text-align:center;transition:border-color .15s;cursor:pointer;}
 .dir-card:hover{border-color:var(--ac);transform:translateY(-1px);}
-.dir-avatar{width:56px;height:56px;border-radius:50%;background:var(--ac2);color:var(--ac);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;margin:0 auto 10px;}
+.dir-avatar{width:56px;height:56px;border-radius:50%;background:var(--ac2);color:var(--ac);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;margin:0 auto 10px;overflow:hidden;object-fit:cover;}
+.dir-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
 .dir-name{font-size:14px;font-weight:600;color:var(--tx);margin-bottom:2px;}
 .dir-name-zh{font-size:12px;color:var(--tx3);}
 .dir-title{font-size:12px;color:var(--tx2);margin-top:3px;}
@@ -260,7 +261,7 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:
     <div class="login-logo">
       <div class="login-mark">C</div>
       <div class="login-name">COMART Platform</div>
-      <div class="login-sub">Internal Portal · v1.08</div>
+      <div class="login-sub">Internal Portal · v1.09</div>
     </div>
     <div class="field">
       <label>Employee ID</label>
@@ -286,7 +287,7 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:
   <div class="topbar">
     <div class="topbar-logo" onclick="switchView('home')">
       <div class="topbar-mark">C</div>
-      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.08</span></div>
+      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.09</span></div>
     </div>
     <div class="topbar-right">
       <div class="lang-switcher">
@@ -903,7 +904,11 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:
 <div class="overlay" id="profileOverlay" onclick="if(event.target===this)closeProfile()">
   <div class="modal" style="max-width:520px;max-height:85vh;display:flex;flex-direction:column;">
     <div class="profile-header">
-      <div class="profile-avatar-lg" id="profileAvatar">?</div>
+      <div style="position:relative;flex-shrink:0;">
+        <div class="profile-avatar-lg" id="profileAvatar" style="overflow:hidden;cursor:pointer;" onclick="document.getElementById('avatarFileInput').click()" title="Click to upload photo">?</div>
+        <div style="position:absolute;bottom:0;right:0;width:20px;height:20px;border-radius:50%;background:var(--ac);display:flex;align-items:center;justify-content:center;font-size:10px;cursor:pointer;" onclick="document.getElementById('avatarFileInput').click()">📷</div>
+        <input type="file" id="avatarFileInput" accept="image/*" style="display:none;" onchange="uploadAvatar(event)">
+      </div>
       <div style="flex:1;">
         <div class="profile-name" id="profileName">—</div>
         <div class="profile-title" id="profileTitle"></div>
@@ -1218,10 +1223,8 @@ const SUPABASE_URL = 'https://tcvlnpgpuphdalzvmoyo.supabase.co';
 const SUPABASE_ANON_KEY_PORTAL = ''; // 留空，從 KMS localStorage 讀取
 
 async function getSupabaseKey() {
-  try {
-    const cfg = JSON.parse(localStorage.getItem('comart-kms-config') || '{}');
-    return cfg.supabaseKey || '';
-  } catch(e) { return ''; }
+  // Supabase key is hardcoded (same project as KMS)
+  return 'sb_publishable_rAVwVeUMWD-m_VTFIenMhg_Fcg6ocYJ';
 }
 
 async function loadRanking() {
@@ -1237,7 +1240,7 @@ async function loadRanking() {
   try {
     // 從 kms_documents 抓 author_name + 發文數
     const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/kms_documents?select=author_name,status&status=eq.published`,
+      'https://tcvlnpgpuphdalzvmoyo.supabase.co/rest/v1/kms_documents?select=author_name,status&status=eq.published',
       { headers: { 'apikey': sbKey, 'Authorization': `Bearer ${sbKey}` } }
     );
     if (!res.ok) throw new Error('Supabase error ' + res.status);
@@ -1307,39 +1310,47 @@ async function loadDirectory() {
 }
 
 function renderDirectory() {
-  const q = (document.getElementById('dirSearch')?.value || '').toLowerCase();
-  const grid = document.getElementById('dirGrid');
-  let users = ALL_USERS;
-  if (q) users = users.filter(u =>
-    (u.nameEn||'').toLowerCase().includes(q) ||
-    (u.nameZh||'').toLowerCase().includes(q) ||
-    (u.titleEn||'').toLowerCase().includes(q) ||
-    (u.titleZh||'').toLowerCase().includes(q) ||
-    (u.empId||'').toLowerCase().includes(q)
-  );
-  if (!users.length) { grid.innerHTML = '<div style="color:var(--tx3);font-size:13px;padding:20px;grid-column:1/-1;">No employees found.</div>'; return; }
+  var q = (document.getElementById('dirSearch') ? document.getElementById('dirSearch').value : '').toLowerCase();
+  var grid = document.getElementById('dirGrid');
+  var users = ALL_USERS.slice();
+  if (q) users = users.filter(function(u) {
+    return (u.nameEn||'').toLowerCase().includes(q) ||
+           (u.nameZh||'').toLowerCase().includes(q) ||
+           (u.titleEn||'').toLowerCase().includes(q) ||
+           (u.titleZh||'').toLowerCase().includes(q) ||
+           (u.empId||'').toLowerCase().includes(q);
+  });
+  if (!users.length) {
+    grid.innerHTML = '<div style="color:var(--tx3);font-size:13px;padding:20px;grid-column:1/-1;">No employees found.</div>';
+    return;
+  }
 
-  const siteLabel = { TW:'Taiwan', CN:'Dongguan', VN:'Vietnam', HK:'Hong Kong' };
-  grid.innerHTML = users.map(u => {
-    const init = (u.nameEn || u.nameZh || u.empId || '?')[0].toUpperCase();
-    const contacts = [
-      u.ext    ? `<div class="dir-contact" onclick="event.stopPropagation();navigator.clipboard?.writeText('${u.ext}');toast('分機已複製','ok')">☎ Ext. ${u.ext}</div>` : '',
-      u.mobile ? `<div class="dir-contact" onclick="event.stopPropagation();navigator.clipboard?.writeText('${u.mobile}');toast('手機號碼已複製','ok')">📱 ${u.mobile}</div>` : '',
-      u.email  ? `<div class="dir-contact" onclick="event.stopPropagation();window.location='mailto:${u.email}'">✉ ${u.email}</div>` : '',
+  var siteLabel = { TW:'Taiwan', CN:'China', VN:'Vietnam', Other:'Other' };
+  grid.innerHTML = users.map(function(u) {
+    var init = (u.nameEn || u.nameZh || u.empId || '?')[0].toUpperCase();
+    var contacts = [
+      u.ext    ? '<div class="dir-contact" onclick="event.stopPropagation();navigator.clipboard&&navigator.clipboard.writeText(\'' + u.ext + '\');toast(\'分機已複製\',\'ok\')">☎ Ext. ' + u.ext + '</div>' : '',
+      u.mobile ? '<div class="dir-contact" onclick="event.stopPropagation();navigator.clipboard&&navigator.clipboard.writeText(\'' + u.mobile + '\');toast(\'手機號碼已複製\',\'ok\')">📱 ' + u.mobile + '</div>' : '',
+      u.email  ? '<div class="dir-contact" onclick="event.stopPropagation();window.location=\'mailto:' + u.email + '\'">✉ ' + u.email + '</div>' : '',
     ].filter(Boolean).join('');
-    return `<div class="dir-card" onclick="openProfile('${u.empId}')">
-      <div class="dir-avatar">${init}</div>
-      <div class="dir-name">${u.nameEn || u.empId}</div>
-      ${u.nameZh ? `<div class="dir-name-zh">${u.nameZh}</div>` : ''}
-      <div class="dir-title">${u.titleEn || u.titleZh || ''}</div>
-      <div style="font-size:10px;color:var(--tx3);margin-top:3px;">${siteLabel[u.site]||u.site||''} · ${u.empId}</div>
-      ${contacts ? `<div class="dir-contacts">${contacts}</div>` : ''}
-      <div class="dir-msg-count" id="msgcount-${u.empId}">💬 載入中…</div>
-    </div>`;
+
+    var avatarHtml = u.photoURL
+      ? '<img src="' + u.photoURL + '" style="width:56px;height:56px;border-radius:50%;object-fit:cover;margin:0 auto 10px;display:block;">'
+      : '<div class="dir-avatar">' + init + '</div>';
+
+    return '<div class="dir-card" onclick="openProfile(\'' + u.empId + '\')">'
+      + avatarHtml
+      + '<div class="dir-name">' + escHtml(u.nameEn || u.empId) + '</div>'
+      + (u.nameZh ? '<div class="dir-name-zh">' + escHtml(u.nameZh) + '</div>' : '')
+      + '<div class="dir-title">' + escHtml(u.titleEn || u.titleZh || '') + '</div>'
+      + '<div style="font-size:10px;color:var(--tx3);margin-top:3px;">' + (siteLabel[u.site]||u.site||'') + ' · ' + escHtml(u.empId) + '</div>'
+      + (contacts ? '<div class="dir-contacts">' + contacts + '</div>' : '')
+      + '<div class="dir-msg-count" id="msgcount-' + u.empId + '">💬 載入中…</div>'
+      + '</div>';
   }).join('');
 
   // 非同步載入各員工留言數
-  loadMessageCounts(users.map(u => u.empId));
+  loadMessageCounts(users.map(function(u) { return u.empId; }));
 }
 
 // ═══════════════════════════════════════════════
@@ -2868,6 +2879,39 @@ document.addEventListener('click', function(e) {
     dd.style.display = 'none';
   }
 });
+
+// ── Avatar Upload ──
+async function uploadAvatar(event) {
+  var file = event.target.files[0];
+  if (!file || !_profileUser) return;
+  if (!file.type.startsWith('image/')) { toast('Please select an image file', ''); return; }
+  if (file.size > 2 * 1024 * 1024) { toast('Image must be under 2MB', ''); return; }
+
+  toast('Uploading…');
+  try {
+    var reader = new FileReader();
+    reader.onload = async function(e) {
+      var dataUrl = e.target.result;
+      // Store as base64 in Firebase (for simplicity; for production use Storage)
+      if (db) {
+        await db.collection(COL_U).doc(_profileUser.empId).update({ photoURL: dataUrl });
+        // Update local cache
+        var userInList = ALL_USERS.find(function(u) { return u.empId === _profileUser.empId; });
+        if (userInList) userInList.photoURL = dataUrl;
+        _profileUser.photoURL = dataUrl;
+        // Refresh avatar display
+        var avatarEl = document.getElementById('profileAvatar');
+        if (avatarEl) avatarEl.innerHTML = '<img src="' + dataUrl + '" style="width:64px;height:64px;border-radius:50%;object-fit:cover;">';
+        toast('Photo updated!', 'ok');
+        // Refresh directory grid
+        renderDirectory();
+      }
+    };
+    reader.readAsDataURL(file);
+  } catch(e) {
+    toast('Upload failed: ' + e.message, 'err');
+  }
+}
 </script>
 </body>
 </html>

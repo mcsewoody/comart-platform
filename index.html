@@ -287,7 +287,7 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:
   <div class="topbar">
     <div class="topbar-logo" onclick="switchView('home')">
       <div class="topbar-mark">C</div>
-      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.04</span></div>
+      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.06</span></div>
     </div>
     <div class="topbar-right">
       <div class="lang-switcher">
@@ -2306,14 +2306,23 @@ async function loadCalEvents() {
   return Promise.all(promises);
 }
 
-// ── Load holidays via Supabase Edge Function (avoids CORS) ──
+
+// ── Load holidays ──
+// Nager.Date supports CN, VN but NOT TW — TW uses built-in calculation
 async function loadHolidays(countryCode, year) {
   var key = countryCode + '-' + year;
   if (CAL_HOLIDAYS[key] !== undefined) return;
-  CAL_HOLIDAYS[key] = [];  // mark as in-progress
+
+  // Taiwan: API has no data, use built-in directly
+  if (countryCode === 'TW') {
+    CAL_HOLIDAYS[key] = getBuiltinHolidays('TW', year);
+    renderTripPage();
+    return;
+  }
+
+  CAL_HOLIDAYS[key] = [];  // mark as loading
 
   try {
-    // Use Supabase Edge Function as proxy (avoids CORS on Nager.Date)
     var url = SB_URL + '/functions/v1/holidays-proxy?year=' + year + '&countryCode=' + countryCode;
     var res = await fetch(url, {
       headers: { 'Authorization': 'Bearer ' + SB_ANON, 'apikey': SB_ANON }
@@ -2336,71 +2345,169 @@ async function loadHolidays(countryCode, year) {
     console.warn('Holiday API failed for ' + countryCode + '/' + year + ':', e.message);
   }
 
-  // Fallback: built-in minimal holidays
+  // Fallback for CN/VN if API fails
   CAL_HOLIDAYS[key] = getBuiltinHolidays(countryCode, year);
   renderTripPage();
 }
 
-// Built-in fallback holidays (complete major dates)
+// Built-in fallback holidays — dynamic calculation for any year
+// Uses lunar-javascript library if available, otherwise uses approximate dates
 function getBuiltinHolidays(cc, year) {
   var y = year;
-  var h = {
+  var results = [];
+  var note = 'Estimated dates · verify with official government sources';
+
+  // Fixed solar holidays (same date every year)
+  var fixed = {
     'TW': [
       { date: y+'-01-01', title: "New Year's Day 中華民國開國紀念日" },
-      { date: y+'-01-27', title: 'Chinese New Year Eve 除夕' },
-      { date: y+'-01-28', title: 'Chinese New Year 春節初一' },
-      { date: y+'-01-29', title: 'Chinese New Year 春節初二' },
-      { date: y+'-01-30', title: 'Chinese New Year 春節初三' },
       { date: y+'-02-28', title: 'Peace Memorial Day 和平紀念日' },
       { date: y+'-04-04', title: "Children's Day 兒童節" },
-      { date: y+'-04-05', title: 'Tomb Sweeping Day 清明節' },
       { date: y+'-05-01', title: 'Labour Day 勞動節' },
-      { date: y+'-06-22', title: 'Dragon Boat Festival 端午節' },
-      { date: y+'-09-29', title: 'Mid-Autumn Festival 中秋節' },
       { date: y+'-10-10', title: 'National Day 國慶日' },
     ],
     'CN': [
       { date: y+'-01-01', title: "New Year's Day 元旦" },
-      { date: y+'-01-28', title: 'Spring Festival 春節' },
-      { date: y+'-01-29', title: 'Spring Festival 春節' },
-      { date: y+'-01-30', title: 'Spring Festival 春節' },
-      { date: y+'-01-31', title: 'Spring Festival 春節' },
-      { date: y+'-02-01', title: 'Spring Festival 春節' },
-      { date: y+'-02-02', title: 'Spring Festival 春節' },
-      { date: y+'-02-03', title: 'Spring Festival 春節' },
-      { date: y+'-04-05', title: 'Tomb Sweeping Day 清明節' },
       { date: y+'-05-01', title: 'Labour Day 劳动节' },
-      { date: y+'-05-02', title: 'Labour Day Holiday 劳动节假日' },
-      { date: y+'-05-03', title: 'Labour Day Holiday 劳动节假日' },
-      { date: y+'-06-22', title: 'Dragon Boat Festival 端午节' },
-      { date: y+'-09-29', title: 'Mid-Autumn Festival 中秋节' },
+      { date: y+'-05-02', title: 'Labour Day Holiday' },
+      { date: y+'-05-03', title: 'Labour Day Holiday' },
       { date: y+'-10-01', title: 'National Day 国庆节' },
-      { date: y+'-10-02', title: 'National Day Holiday 国庆节' },
-      { date: y+'-10-03', title: 'National Day Holiday 国庆节' },
-      { date: y+'-10-04', title: 'National Day Holiday 国庆节' },
-      { date: y+'-10-05', title: 'National Day Holiday 国庆节' },
-      { date: y+'-10-06', title: 'National Day Holiday 国庆节' },
-      { date: y+'-10-07', title: 'National Day Holiday 国庆节' },
+      { date: y+'-10-02', title: 'National Day Holiday' },
+      { date: y+'-10-03', title: 'National Day Holiday' },
+      { date: y+'-10-04', title: 'National Day Holiday' },
+      { date: y+'-10-05', title: 'National Day Holiday' },
+      { date: y+'-10-06', title: 'National Day Holiday' },
+      { date: y+'-10-07', title: 'National Day Holiday' },
     ],
     'VN': [
       { date: y+'-01-01', title: "New Year's Day Tết Dương lịch" },
-      { date: y+'-01-27', title: 'Lunar New Year Eve Tất Niên' },
-      { date: y+'-01-28', title: 'Tết Nguyên Đán 春節' },
-      { date: y+'-01-29', title: 'Tết Nguyên Đán 春節' },
-      { date: y+'-01-30', title: 'Tết Nguyên Đán 春節' },
-      { date: y+'-01-31', title: 'Tết Nguyên Đán 春節' },
-      { date: y+'-02-01', title: 'Tết Nguyên Đán 春節' },
-      { date: y+'-04-07', title: 'Hung Kings Festival Giỗ Tổ Hùng Vương' },
       { date: y+'-04-30', title: 'Reunification Day Ngày Thống nhất' },
       { date: y+'-05-01', title: 'Labour Day Ngày Quốc tế Lao động' },
       { date: y+'-09-02', title: 'National Day Ngày Quốc khánh' },
-      { date: y+'-09-03', title: 'National Day Holiday Ngày Quốc khánh' },
+      { date: y+'-09-03', title: 'National Day Holiday' },
     ],
   };
-  var note = 'Built-in data (API unavailable) · For official dates check government sources';
-  return (h[cc] || []).map(function(x) {
-    return { date: x.date, dateTo: x.date, title: x.title, notes: note };
-  });
+  results = (fixed[cc] || []).slice();
+
+  // Lunar-based holidays: use lunar-javascript if available
+  if (window.Lunar && window.LunarYear) {
+    try {
+      function lunarToSolar(lunarYear, lunarMonth, lunarDay) {
+        var lunar = Lunar.fromYmd(lunarYear, lunarMonth, lunarDay);
+        var solar = lunar.getSolar();
+        function p(n) { return n < 10 ? '0'+n : ''+n; }
+        return solar.getYear() + '-' + p(solar.getMonth()) + '-' + p(solar.getDay());
+      }
+
+      if (cc === 'TW' || cc === 'CN') {
+        // Spring Festival (Lunar 1/1)
+        var cny = lunarToSolar(y, 1, 1);
+        var cnyYear = parseInt(cny.slice(0,4));
+        // If CNY falls in Jan, it's for year y; if calculated year differs, adjust
+        var addDays = function(dateStr, days) {
+          var d = new Date(dateStr + 'T00:00:00');
+          d.setDate(d.getDate() + days);
+          function p(n) { return n < 10 ? '0'+n : ''+n; }
+          return d.getFullYear() + '-' + p(d.getMonth()+1) + '-' + p(d.getDate());
+        };
+
+        if (cc === 'TW') {
+          results.push({ date: addDays(cny,-1), title: 'Lunar New Year Eve 除夕' });
+          results.push({ date: cny,             title: 'Lunar New Year 春節初一' });
+          results.push({ date: addDays(cny, 1), title: 'Lunar New Year 春節初二' });
+          results.push({ date: addDays(cny, 2), title: 'Lunar New Year 春節初三' });
+          // Tomb Sweeping: April 4 or 5 depending on year
+          var qm = (y % 4 === 0 && y % 100 !== 0) || y % 400 === 0 ? y+'-04-04' : y+'-04-05';
+          results.push({ date: qm, title: 'Tomb Sweeping Day 清明節' });
+          // Dragon Boat: Lunar 5/5
+          results.push({ date: lunarToSolar(y, 5, 5), title: 'Dragon Boat Festival 端午節' });
+          // Mid-Autumn: Lunar 8/15
+          results.push({ date: lunarToSolar(y, 8, 15), title: 'Mid-Autumn Festival 中秋節' });
+        } else {
+          // CN Spring Festival: 7 days
+          for (var i = -1; i <= 5; i++) {
+            results.push({ date: addDays(cny, i), title: i < 0 ? 'Spring Festival Eve 除夕' : 'Spring Festival 春節第'+(i+1)+'天' });
+          }
+          // Tomb Sweeping
+          results.push({ date: y+'-04-05', title: 'Tomb Sweeping Day 清明节' });
+          // Dragon Boat
+          results.push({ date: lunarToSolar(y, 5, 5), title: 'Dragon Boat Festival 端午节' });
+          // Mid-Autumn
+          results.push({ date: lunarToSolar(y, 8, 15), title: 'Mid-Autumn Festival 中秋节' });
+        }
+      }
+
+      if (cc === 'VN') {
+        // Tết: Lunar 1/1
+        var tet = lunarToSolar(y, 1, 1);
+        var addDays = function(dateStr, days) {
+          var d = new Date(dateStr + 'T00:00:00');
+          d.setDate(d.getDate() + days);
+          function p(n) { return n < 10 ? '0'+n : ''+n; }
+          return d.getFullYear() + '-' + p(d.getMonth()+1) + '-' + p(d.getDate());
+        };
+        for (var i = -1; i <= 4; i++) {
+          results.push({ date: addDays(tet, i), title: i < 0 ? 'Tất Niên (New Year Eve)' : 'Tết Nguyên Đán ngày '+(i+1) });
+        }
+        // Hung Kings: Lunar 3/10
+        results.push({ date: lunarToSolar(y, 3, 10), title: 'Hung Kings Festival Giỗ Tổ Hùng Vương' });
+      }
+
+      note = 'Calculated from lunar calendar · verify with official sources';
+    } catch(e) {
+      console.warn('Lunar calculation failed:', e.message);
+    }
+  } else {
+    // No lunar library — use 2026/2027 lookup table for common years
+    var lunarDates = {
+      // [year]: { cny: 'MM-DD', qm: 'MM-DD', dragon: 'MM-DD', midAutumn: 'MM-DD', tet: 'MM-DD', hung: 'MM-DD' }
+      2025: { cny:'01-29', qm:'04-04', dragon:'05-31', midAutumn:'10-06', tet:'01-29', hung:'04-07' },
+      2026: { cny:'02-17', qm:'04-05', dragon:'06-19', midAutumn:'09-25', tet:'02-17', hung:'04-26' },
+      2027: { cny:'02-06', qm:'04-05', dragon:'06-09', midAutumn:'09-15', tet:'02-06', hung:'04-15' },
+      2028: { cny:'01-26', qm:'04-04', dragon:'05-28', midAutumn:'10-03', tet:'01-26', hung:'04-03' },
+      2029: { cny:'02-13', qm:'04-04', dragon:'06-15', midAutumn:'09-22', tet:'02-13', hung:'04-21' },
+      2030: { cny:'02-03', qm:'04-05', dragon:'06-05', midAutumn:'09-12', tet:'02-03', hung:'04-11' },
+    };
+    var ld = lunarDates[y];
+    var addDays = function(mmdd, days) {
+      var d = new Date(y + '-' + mmdd + 'T00:00:00');
+      d.setDate(d.getDate() + days);
+      function p(n) { return n < 10 ? '0'+n : ''+n; }
+      return d.getFullYear() + '-' + p(d.getMonth()+1) + '-' + p(d.getDate());
+    };
+
+    if (ld) {
+      if (cc === 'TW') {
+        results.push({ date: addDays(ld.cny,-1), title: 'Lunar New Year Eve 除夕' });
+        results.push({ date: y+'-'+ld.cny,       title: 'Lunar New Year 春節初一' });
+        results.push({ date: addDays(ld.cny, 1), title: 'Lunar New Year 春節初二' });
+        results.push({ date: addDays(ld.cny, 2), title: 'Lunar New Year 春節初三' });
+        results.push({ date: y+'-'+ld.qm,        title: 'Tomb Sweeping Day 清明節' });
+        results.push({ date: y+'-'+ld.dragon,    title: 'Dragon Boat Festival 端午節' });
+        results.push({ date: y+'-'+ld.midAutumn, title: 'Mid-Autumn Festival 中秋節' });
+      } else if (cc === 'CN') {
+        for (var i = -1; i <= 5; i++) {
+          results.push({ date: addDays(ld.cny,i), title: i<0?'除夕 Spring Festival Eve':'春節 Spring Festival Day '+(i+1) });
+        }
+        results.push({ date: y+'-'+ld.qm,        title: 'Tomb Sweeping Day 清明节' });
+        results.push({ date: y+'-'+ld.dragon,    title: 'Dragon Boat Festival 端午节' });
+        results.push({ date: y+'-'+ld.midAutumn, title: 'Mid-Autumn Festival 中秋节' });
+      } else if (cc === 'VN') {
+        for (var i = -1; i <= 4; i++) {
+          results.push({ date: addDays(ld.tet,i), title: i<0?'Tất Niên':'Tết Nguyên Đán ngày '+(i+1) });
+        }
+        results.push({ date: y+'-'+ld.hung, title: 'Hung Kings Festival Giỗ Tổ Hùng Vương' });
+      }
+      note = 'Pre-calculated lunar dates · verify with official sources';
+    } else {
+      note = 'Year ' + y + ' lunar dates not in offline table · API data unavailable';
+    }
+  }
+
+  // Sort by date and deduplicate
+  results = results.filter(function(x,i,a) { return a.findIndex(function(b){return b.date===x.date && b.title===x.title;})===i; });
+  results.sort(function(a,b) { return a.date.localeCompare(b.date); });
+  return results.map(function(x) { return { date: x.date, dateTo: x.date, title: x.title, notes: note }; });
 }
 
 // ── Get all events for a specific date ──

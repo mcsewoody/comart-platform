@@ -263,7 +263,7 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:
     <div class="login-logo">
       <div class="login-mark">C</div>
       <div class="login-name">COMART Platform</div>
-      <div class="login-sub">Internal Portal</div>
+      <div class="login-sub">Internal Portal · v1.00</div>
     </div>
     <div class="field">
       <label>Employee ID</label>
@@ -396,7 +396,7 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:
     <button class="moq-chip on" id="aitab-translate" onclick="showAITab('translate')">🌐 <span id="aitab-lbl-translate">翻譯</span></button>
     <button class="moq-chip"    id="aitab-skills"    onclick="showAITab('skills')">🛠 <span id="aitab-lbl-skills">Skill</span></button>
     <button class="moq-chip"    id="aitab-chat"      onclick="showAITab('chat')">✦ <span id="aitab-lbl-chat">Chat</span></button>
-    <button class="moq-chip"    id="aitab-tools"     onclick="showAITab('tools')">🔗 <span id="aitab-lbl-tools">Link</span></button>
+    
   </div>
 
   <!-- ── CHAT TAB ── -->
@@ -564,9 +564,7 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:
   </div>
 
   <!-- ── LINKS TAB ── -->
-  <div id="aitab-content-tools" style="display:none;flex:1;overflow-y:auto;padding:14px 16px">
-    <div style="font-size:11px;font-weight:700;color:var(--tx3);letter-spacing:.08em;margin-bottom:10px">COMART AI TOOLS</div>
-    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:18px">
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:18px">
       <a href="https://chatgpt.com/g/g-68d883bb1a74819197fe3f190920e127-cmt-ke-hu-diao-cha-ji-qi-ren" target="_blank" rel="noopener" class="ai-link">
         <div class="ai-icon" style="background:rgba(16,163,127,.15);color:#10a37f">🔍</div>
         <div><div class="ai-title">客戶調查</div><div class="ai-sub">CMT 客戶調查機器人</div></div>
@@ -742,7 +740,7 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:
       <div class="view" id="view-bulletin">
         <div class="bb-wrap">
           <div class="bb-header">
-            <div style="font-size:18px;font-weight:500;">📢 公佈欄 · Bulletin Board</div>
+            <div style="font-size:18px;font-weight:500;">📢 公告欄 · Bulletin Board</div>
           </div>
           <!-- Compose -->
           <div class="bb-compose" id="bbCompose" style="display:none;">
@@ -1018,14 +1016,14 @@ function enterPortal() {
 // APP GRID
 // ═══════════════════════════════════════════════
 const APPS = [
-  { id:'ai',        label:'AI',         desc:'AI translation, chat & business tools', icon:'🤖', bg:'#130A2A', internal:true,  roles:[], badge:'NEW' },
-  { id:'directory', label:'名人榜',      desc:'Employee directory, contacts & discussions', icon:'👤', bg:'#0A1A2E', internal:true,  roles:[] },
-  { id:'bulletin',  label:'公佈欄',      desc:'Company announcements and notices', icon:'📢', bg:'#1A1A08', internal:true,  roles:[] },
-  { id:'calendar',  label:'Business Trips', desc:'Business trip management & flight tracking', icon:'✈️', bg:'#0A1A1A', internal:true,  roles:[] },
-  { id:'kms',       label:'Knowledge Mgmt', desc:'AI Q&A, document library, 5-language support', icon:'🧠', bg:'#0A2A1A', internal:false, path:'./kms/index.html', badge:'NEW', roles:[] },
-  { id:'quotation', label:'Quotation',   desc:'Product quotations, CRM & AI tools', icon:'💼', bg:'#0F2A4A', internal:false, path:'./quotation/index.html', roles:[] },
-  { id:'admin-sys', label:'Admin System', desc:'Coming soon', icon:'🏛', bg:'#1A0A1A', internal:false, locked:true, badge:'SOON', roles:[] },
-  { id:'product-dev',label:'Product Dev', desc:'Coming soon', icon:'🔬', bg:'#1A1A0A', internal:false, locked:true, badge:'SOON', roles:[] },
+  { id:'ai',         label:'AI',                    labelZh:'AI',          desc:'AI translation, chat & business tools', icon:'🤖', bg:'#130A2A', internal:true,  roles:[] },
+  { id:'directory',  label:'Hall of Fame',           labelZh:'名人榜',      desc:'Employee directory, contacts & discussions', icon:'👤', bg:'#0A1A2E', internal:true,  roles:[] },
+  { id:'kms',        label:'KMS',                   labelZh:'知識管理',     desc:'Knowledge Management — AI Q&A, document library', icon:'🧠', bg:'#0A2A1A', internal:false, path:'./kms/index.html', roles:[] },
+  { id:'bulletin',   label:'Bulletin Board',         labelZh:'公告欄',      desc:'Company announcements and notices', icon:'📢', bg:'#1A1A08', internal:true,  roles:[] },
+  { id:'calendar',   label:'Calendar',               labelZh:'集團行事曆',  desc:'Business trip management & flight tracking', icon:'✈️', bg:'#0A1A1A', internal:true,  roles:[] },
+  { id:'admin-sys',  label:'Admin System',           labelZh:'行政管理系統', desc:'Coming soon', icon:'🏛', bg:'#1A0A1A', internal:false, locked:true, badge:'SOON', roles:[] },
+  { id:'quotation',  label:'Quotation',              labelZh:'報價管理系統', desc:'Product quotations, CRM & AI tools', icon:'💼', bg:'#0F2A4A', internal:false, path:'./quotation/index.html', roles:[] },
+  { id:'product-dev',label:'Product Dev',            labelZh:'產品開發管理', desc:'Coming soon', icon:'🔬', bg:'#1A1A0A', internal:false, locked:true, badge:'SOON', roles:[] },
 ];
 
 function renderAppGrid() {
@@ -1727,7 +1725,6 @@ function applyI18n() {
 // ── Trip Data ──
 const COL_TRIP = 'trips';
 let TRIPS = [];
-let tripCurrentMonth = new Date();
 let _editTrip = null;
 
 async function loadTrips() {
@@ -2106,6 +2103,135 @@ async function sendAIChat() {
     _aiMsgHTML(`<span style="color:var(--ac)">⚠ Error: ${escHtml(e.message)}</span>`);
   } finally {
     if(btn) { btn.disabled=false; btn.textContent='Send'; }
+  }
+}
+
+
+// ── Missing Trip vars ──
+
+let tripViewYear = new Date().getFullYear();
+let tripViewMonth = new Date().getMonth(); // 0-based
+
+const TRIP_COLORS = ['#6366f1','#3DD68C','#f59e0b','#ef4444','#06b6d4','#ec4899','#84cc16'];
+
+function tripMonthNav(delta){
+  tripViewMonth += delta;
+  if(tripViewMonth > 11){ tripViewMonth=0; tripVi
+
+
+function tripMonthNav(delta){
+  tripViewMonth += delta;
+  if(tripViewMonth > 11){ tripViewMonth=0; tripViewYear++; }
+  if(tripViewMonth < 0){ tripViewMonth=11; tripViewYear--; }
+  renderTripPage();
+}
+
+// ── Missing AI/Translation vars ──
+const XLAT_PROXY = 'https://comart.mcsewoody.workers.dev';
+
+const XLAT_LANGS = [
+  { code:'en',    label:'English',       flag:'🇺🇸' },
+  { code:'zh-TW', label:'繁體中文',       flag:'🇹🇼' },
+  { code:'zh-CN', label:'简体中文',       flag:'🇨🇳' },
+  { code:'vi',    label:'Tiếng Việt',    flag:'🇻🇳' },
+  { code:'ja',    label:'日本語',         flag:'🇯🇵' },
+];
+
+function _xlatCard(lang, text, isBiz=false) {
+  const id = 'xlat-'+lang.code+'-'+(isBiz?'biz':'direct');
+  return `<div style="background:var(--bg);border:1px solid var(--br);border-radius:10px;padding:10px 12px;position:relative">
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
+      <span style="font-size:15px">${lang.flag}</span>
+      <span style="font-size:11px;font-weight:700;color:${isBiz?'var(--ac)':'var(--tx3)'}">${lang.label}</span>
+      <button onclick="_xlatCopy('${id}')" title="Copy"
+        style="margin-left:auto;padding:3px 6px;border-radius:5px;border:1px solid var(--br);background:var(--s2);color:var(--tx3);font-size:11px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+    </div>
+    <div id="${id}" style="font-size:13px;color:var(--tx);line-height:1.65;white-space:pre-wrap">${escHtml(text)}</div>
+  </div>`;
+}
+
+function _xlatCopy(id) {
+  const el = document.getElementById(id);
+  if(!el) return;
+  navigator.clipboard.writeText(el.textContent).then(()=>toast('📋 Copied!')).catch(()=>{});
+}
+
+
+async function runTranslate() {
+  const text = document.getElementById('xlat-input')?.value.trim();
+  if(!text) { toast('Please enter text to translate'); return; }
+  const resultsEl = document.getElementById('xlatResults');
+  const loadEl    = document.getElementById('xlatLoading');
+  const directEl  = document.getElementById('xlatDirect');
+  const bizEl     = document.getElementById('xlatBiz');
+  if(resultsEl) resultsEl.style.display='none';
+  if(loadEl)    loadEl.style.display='block';
+  try {
+    // XML format avoids JSON parse errors on long/special-char text
+    const _prompt = `Translate this text to 5 languages and produce a business-polished version. Add proper punctuation everywhere.
+
+Text to translate:
+${text}
+
+Reply with ONLY these 10 XML tags. Do not include any other text. Do not use markdown. Replace each ___ with the actual translation:
+
+<direct_en>___</direct_en>
+<direct_zhtw>___</direct_zhtw>
+<direct_zhcn>___</direct_zhcn>
+<direct_vi>___</direct_vi>
+<direct_ja>___</direct_ja>
+<biz_en>___</biz_en>
+<biz_zhtw>___</biz_zhtw>
+<biz_zhcn>___</biz_zhcn>
+<biz_vi>___</biz_vi>
+<biz_ja>___</biz_ja>`;
+    const res = await fetch(XLAT_PROXY, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model:'claude-haiku-4-5-20251001',
+        max_tokens:8192,
+        messages:[{role:'user', content: _prompt}]
+      })
+    });
+    if(!res.ok){ const t=await res.text(); throw new Error('HTTP '+res.status+': '+t.slice(0,120)); }
+    const data = await res.json();
+    if(data.error) throw new Error(JSON.stringify(data.error).slice(0,120));
+    const raw = (data.content||[]).map(b=>b.text||'').join('') || data.reply || '';
+    console.log('[Translate] Raw response:', raw.slice(0,500));
+
+    function _xt(tag){
+      // Try multiple patterns to extract content
+      const patterns = [
+        new RegExp('<'+tag+'[^>]*>([\\s\\S]*?)<\\/'+tag+'>', 'i'),
+        new RegExp('<'+tag+'>\\s*([\\s\\S]*?)\\s*<\\/'+tag+'>', 'i'),
+      ];
+      for (const p of patterns) {
+        const m = raw.match(p);
+        if (m && m[1]) return m[1].trim();
+      }
+      return '';
+    }
+
+    const parsed = {
+      direct:{'en':_xt('direct_en'),'zh-TW':_xt('direct_zhtw'),'zh-CN':_xt('direct_zhcn'),'vi':_xt('direct_vi'),'ja':_xt('direct_ja')},
+      business:{'en':_xt('biz_en'),'zh-TW':_xt('biz_zhtw'),'zh-CN':_xt('biz_zhcn'),'vi':_xt('biz_vi'),'ja':_xt('biz_ja')},
+    };
+
+    // Check if at least one translation succeeded; else throw with raw
+    const allEmpty = Object.values(parsed.direct).every(v=>!v) && Object.values(parsed.business).every(v=>!v);
+    if (allEmpty) {
+      console.error('[Translate] No XML tags found. Raw was:', raw);
+      throw new Error('Could not parse response. Check console for raw output.');
+    }
+    if(directEl) directEl.innerHTML = XLAT_LANGS.map(l => _xlatCard(l, parsed.direct[l.code]||'', false)).join('');
+    if(bizEl)    bizEl.innerHTML    = XLAT_LANGS.map(l => _xlatCard(l, parsed.business[l.code]||'', true)).join('');
+    if(loadEl)    loadEl.style.display='none';
+    if(resultsEl) resultsEl.style.display='block';
+    // Scroll to results
+    if(resultsEl) resultsEl.scrollIntoView({behavior:'smooth',block:'nearest'});
+  } catch(e) {
+    if(loadEl) loadEl.style.display='none';
+    toast('Translation error: '+e.message);
   }
 }
 

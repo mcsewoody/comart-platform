@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>COMART Platform v1.00</title>
+<title>COMART Platform v1.01</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
@@ -255,7 +255,7 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:
     <div class="login-logo">
       <div class="login-mark">C</div>
       <div class="login-name">COMART Platform</div>
-      <div class="login-sub">Internal Portal · v1.00</div>
+      <div class="login-sub">Internal Portal · v1.01</div>
     </div>
     <div class="field">
       <label>Employee ID</label>
@@ -281,7 +281,7 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:
   <div class="topbar">
     <div class="topbar-logo" onclick="switchView('home')">
       <div class="topbar-mark">C</div>
-      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.00</span></div>
+      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.01</span></div>
     </div>
     <div class="topbar-right">
       <div class="lang-switcher">
@@ -314,7 +314,7 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:
       <button class="sidebar-item" id="sn-bulletin" onclick="switchView('bulletin')">📢 <span>公佈欄</span></button>
       <div class="sidebar-section" style="margin-top:8px;">Admin</div>
       <button class="sidebar-item" id="sn-ai" onclick="switchView('ai')">🤖 <span>AI Tools</span></button>
-      <button class="sidebar-item" id="sn-calendar" onclick="switchView('calendar')">✈️ <span>Calendar</span></button>
+      <button class="sidebar-item" id="sn-calendar" onclick="switchView('calendar')">📅 <span>Calendar</span></button>
       <button class="sidebar-item" id="sn-users" onclick="switchView('users')" style="display:none;">⚙ <span>User Management</span></button>
     </div>
 
@@ -338,6 +338,240 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:
             <div class="cl-item"><div class="cl-dot" style="background:var(--grn)"></div><div><div class="cl-text">公佈欄 (Bulletin Board) — 公司公告、置頂、按讚</div><div class="cl-date">2026-05 · New</div></div></div>
             <div class="cl-item"><div class="cl-dot" style="background:var(--ac)"></div><div><div class="cl-text">Knowledge Management System (KMS) — AI 問答、文件庫、五語言</div><div class="cl-date">2026-05 · New</div></div></div>
             <div class="cl-item"><div class="cl-dot" style="background:var(--tx3)"></div><div><div class="cl-text">Portal launched — 集團統一登入入口，用戶管理集中化</div><div class="cl-date">2026-05 · Platform</div></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── DIRECTORY (名人榜) ── -->
+      <div class="view" id="view-directory">
+        <div class="dir-wrap">
+          <div class="dir-header">
+            <div style="font-size:18px;font-weight:500;">👤 名人榜 · Employee Directory</div>
+            <input class="dir-search" id="dirSearch" placeholder="Search name, title…" oninput="renderDirectory()">
+          </div>
+          <!-- Tab 切換：通訊錄 / 貢獻排行榜 -->
+          <div style="display:flex;gap:6px;margin-bottom:14px;">
+            <button id="dir-tab-contacts" onclick="switchDirTab('contacts')"
+              style="padding:5px 14px;border-radius:20px;border:1px solid var(--ac);background:var(--ac);color:#fff;font-size:12px;font-weight:600;cursor:pointer;">
+              📋 通訊錄
+            </button>
+            <button id="dir-tab-ranking" onclick="switchDirTab('ranking')"
+              style="padding:5px 14px;border-radius:20px;border:1px solid var(--br);background:transparent;color:var(--tx2);font-size:12px;font-weight:600;cursor:pointer;">
+              🏆 知識貢獻排行
+            </button>
+          </div>
+          <!-- 通訊錄 -->
+          <div id="dir-contacts-view">
+            <div class="dir-grid" id="dirGrid"><div style="color:var(--tx3);font-size:13px;padding:20px;">載入中…</div></div>
+          </div>
+          <!-- 排行榜 -->
+          <div id="dir-ranking-view" style="display:none;">
+            <div style="background:var(--s1);border:1px solid var(--br);border-radius:var(--rl);overflow:hidden;">
+              <div style="padding:12px 16px;border-bottom:1px solid var(--br);font-size:12px;color:var(--tx3);">
+                以 KMS 知識庫發文數量計算 · 每月更新
+              </div>
+              <div id="rankingList"><div style="color:var(--tx3);font-size:13px;padding:20px;text-align:center;">載入中…</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- ── AI VIEW ── -->
+      <div class="view" id="view-ai" style="flex-direction:column;padding:0;">
+        <div class="ai-tab-bar">
+          <div style="font-size:14px;font-weight:700;color:#a78bfa;margin-right:6px;">🤖 AI</div>
+          <button class="ai-chip on" id="ptab-translate" onclick="switchAITab('translate')">🌐 翻譯</button>
+          <button class="ai-chip" id="ptab-chat" onclick="switchAITab('chat')">✦ Chat</button>
+          <button class="ai-chip" id="ptab-skills" onclick="switchAITab('skills')">🛠 Skills</button>
+        </div>
+
+        <!-- Translate Tab -->
+        <div class="ai-tab-content on" id="ptab-content-translate">
+          <div style="flex:1;overflow-y:auto;padding:14px 16px;max-width:900px;width:100%;margin:0 auto;">
+            <div style="margin-bottom:12px;">
+              <div style="font-size:11px;font-weight:700;color:var(--tx3);letter-spacing:.06em;margin-bottom:6px;">INPUT TEXT / 輸入文字</div>
+              <div style="display:flex;gap:8px;align-items:flex-start;">
+                <textarea id="p-xlat-input" rows="8" placeholder="Paste or type text hereâ¦ 貼上或輸入文字"
+                  style="flex:1;padding:10px 12px;border-radius:10px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;resize:vertical;outline:none;font-family:inherit;min-height:160px;"></textarea>
+                <div style="display:flex;flex-direction:column;gap:6px;">
+                  <button onclick="pRunTranslate()"
+                    style="padding:9px 14px;border-radius:9px;background:#7c3aed;color:#fff;border:none;cursor:pointer;font-size:12px;font-weight:700;">Translate ↓</button>
+                  <button onclick="navigator.clipboard.readText().then(function(t){document.getElementById('p-xlat-input').value=t;})" title="Paste"
+                    style="padding:9px 14px;border-radius:9px;border:1px solid var(--br);background:var(--s2);color:var(--tx2);cursor:pointer;font-size:14px;">📋</button>
+                  <button onclick="pStartVoice()" id="p-voice-btn" title="Voice input"
+                    style="padding:9px 14px;border-radius:9px;border:1px solid var(--br);background:var(--s2);color:var(--tx2);cursor:pointer;font-size:18px;">🎙</button>
+                  <button onclick="pCleanText()" title="AI 整理：加標點符號、潤稿"
+                    style="padding:9px 14px;border-radius:9px;border:1px solid var(--br);background:var(--s2);color:var(--tx2);cursor:pointer;font-size:16px;">✨</button>
+                </div>
+              </div>
+              <div id="p-voice-status" style="display:none;font-size:11px;color:var(--ac);margin-top:4px;">● Recording… (click 🎙 again to stop)</div>
+            </div>
+            <div id="p-xlat-loading" style="display:none;text-align:center;padding:24px;color:var(--tx3);font-size:13px;">
+              <div style="font-size:22px;margin-bottom:8px;">⟳</div>Translating…
+            </div>
+            <div id="p-xlat-results" style="display:none;">
+              <div style="font-size:11px;font-weight:700;color:var(--tx3);letter-spacing:.06em;margin-bottom:8px;">DIRECT TRANSLATION · 直接翻譯</div>
+              <div id="p-xlat-direct" style="display:flex;flex-direction:column;gap:6px;margin-bottom:16px;"></div>
+              <div style="font-size:11px;font-weight:700;color:#a78bfa;letter-spacing:.06em;margin-bottom:8px;">BUSINESS VERSION · 商業用語版本</div>
+              <div id="p-xlat-biz" style="display:flex;flex-direction:column;gap:6px;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chat Tab -->
+        <div class="ai-tab-content" id="ptab-content-chat" style="flex-direction:column;min-height:0;">
+          <div id="p-chat-messages" style="flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:10px;">
+            <div style="text-align:center;padding:24px 0 8px;">
+              <div style="font-size:26px;margin-bottom:6px;">✦</div>
+              <div style="font-size:14px;font-weight:700;color:var(--tx);">Claude · COMART Assistant</div>
+              <div style="font-size:11px;color:var(--tx3);margin-top:4px;">Ask anything about COMART products, market, or business</div>
+            </div>
+          </div>
+          <div style="padding:10px 14px;border-top:1px solid var(--br);flex-shrink:0;">
+            <div style="display:flex;gap:8px;align-items:flex-end;">
+              <textarea id="p-chat-input" placeholder="Ask Claude… (Enter to send, Shift+Enter for new line)" rows="2"
+                style="flex:1;padding:10px 12px;border-radius:10px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;resize:none;outline:none;font-family:inherit;line-height:1.5;"
+                onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();pSendChat();}"></textarea>
+              <button onclick="pSendChat()" style="padding:10px 16px;border-radius:10px;background:#7c3aed;color:#fff;border:none;cursor:pointer;font-size:13px;font-weight:700;flex-shrink:0;height:42px;">Send</button>
+            </div>
+            <div style="font-size:10px;color:var(--tx3);margin-top:5px;text-align:center;">Claude · via COMART Proxy</div>
+          </div>
+        </div>
+
+        <!-- Skills Tab -->
+        <div class="ai-tab-content" id="ptab-content-skills" style="overflow-y:auto;">
+          <div style="padding:14px 16px;max-width:900px;width:100%;margin:0 auto;">
+            <div style="font-size:11px;font-weight:700;color:var(--tx3);letter-spacing:.08em;margin-bottom:10px;">COMART AI SKILLS</div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <!-- Company Research -->
+              <div style="background:var(--s2);border:1px solid var(--br);border-radius:12px;padding:14px 16px;">
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+                  <div style="width:36px;height:36px;border-radius:8px;background:rgba(16,163,127,.15);color:#10a37f;display:flex;align-items:center;justify-content:center;font-size:18px;">🔍</div>
+                  <div>
+                    <div style="font-size:13px;font-weight:700;color:var(--tx);">公司調查機器人</div>
+                    <div style="font-size:11px;color:var(--tx3);">Company Research</div>
+                  </div>
+                </div>
+                <div style="font-size:12px;color:var(--tx2);margin-bottom:10px;line-height:1.6;">輸入公司名稱，自動調查公司背景、聯絡資訊、產品方向，輸出完整調查報告與商業開發信。</div>
+                <div style="display:flex;gap:6px;align-items:center;">
+                  <input id="p-skill-company" placeholder="Enter company name / 輸入公司名稱" autocomplete="off"
+                    style="flex:1;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;"
+                    onkeydown="if(event.key==='Enter') pRunSkillCompany()">
+                  <button onclick="pRunSkillCompany()"
+                    style="padding:8px 14px;border-radius:8px;background:#10a37f;color:#fff;border:none;cursor:pointer;font-size:12px;font-weight:700;flex-shrink:0;">調查 →</button>
+                </div>
+              </div>
+              <!-- Post-show Followup -->
+              <div style="background:var(--s2);border:1px solid var(--br);border-radius:12px;padding:14px 16px;">
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+                  <div style="width:36px;height:36px;border-radius:8px;background:rgba(139,92,246,.15);color:#8b5cf6;display:flex;align-items:center;justify-content:center;font-size:18px;">📧</div>
+                  <div>
+                    <div style="font-size:13px;font-weight:700;color:var(--tx);">展後跟進機器人</div>
+                    <div style="font-size:11px;color:var(--tx3);">Post-Show Followup</div>
+                  </div>
+                </div>
+                <div style="font-size:12px;color:var(--tx2);margin-bottom:10px;line-height:1.6;">輸入展會客戶資訊，自動生成個性化的展後跟進信件，支援中英雙語。</div>
+                <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px;">
+                  <input id="p-skill-show-company" placeholder="客戶公司名稱 / Company name" autocomplete="off"
+                    style="padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;">
+                  <input id="p-skill-show-contact" placeholder="聯絡人 / Contact person" autocomplete="off"
+                    style="padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;">
+                  <input id="p-skill-show-name" placeholder="展覽名稱 / Show name" autocomplete="off"
+                    style="padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;">
+                  <textarea id="p-skill-show-notes" placeholder="備注：客戶興趣、產品需求等 / Notes" rows="2"
+                    style="padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;resize:none;font-family:inherit;"></textarea>
+                  <button onclick="pRunSkillFollowup()"
+                    style="padding:9px;border-radius:8px;background:#8b5cf6;color:#fff;border:none;cursor:pointer;font-size:12px;font-weight:700;">產生跟進信 →</button>
+                </div>
+              </div>
+            </div>
+            <!-- Output -->
+            <div id="p-skill-output" style="display:none;margin-top:14px;">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+                <div style="font-size:11px;font-weight:700;color:var(--tx3);letter-spacing:.06em;flex:1;">OUTPUT</div>
+                <button onclick="navigator.clipboard.writeText(document.getElementById('p-skill-content').textContent)"
+                  style="padding:4px 10px;border-radius:6px;border:1px solid var(--br);background:var(--s2);color:var(--tx2);font-size:11px;cursor:pointer;">📋 Copy</button>
+                <button onclick="document.getElementById('p-skill-output').style.display='none'"
+                  style="padding:4px 10px;border-radius:6px;border:1px solid var(--br);background:var(--s2);color:var(--tx2);font-size:11px;cursor:pointer;">✕</button>
+              </div>
+              <div id="p-skill-loading" style="display:none;text-align:center;padding:20px;color:var(--tx3);font-size:13px;">
+                <div style="font-size:22px;margin-bottom:6px;">⟳</div>AI is working…
+              </div>
+              <div id="p-skill-content"
+                style="background:var(--s2);border:1px solid var(--br);border-radius:10px;padding:14px;font-size:12px;color:var(--tx);line-height:1.7;white-space:pre-wrap;max-height:60vh;overflow-y:auto;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── CALENDAR / TRIPS VIEW ── -->
+      <div class="view" id="view-calendar" style="flex-direction:row;padding:0;overflow:hidden;">
+
+        <!-- Left sidebar: category toggles -->
+        <div id="cal-sidebar" style="width:200px;flex-shrink:0;background:var(--s1);border-right:1px solid var(--br);overflow-y:auto;padding:14px 12px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;"><div style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;">Calendars</div><button id="cal-add-event-btn" onclick="openCalEventModal('group',null)" style="display:none;padding:2px 8px;border-radius:6px;border:1px solid var(--br);background:transparent;color:var(--ac);font-size:11px;cursor:pointer;">+ Add</button></div>
+          <div id="cal-category-list" style="display:flex;flex-direction:column;gap:6px;"></div>
+          <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--br);font-size:10px;color:var(--tx3);line-height:1.6;">
+            National holidays: Nager.Date API<br>
+            Source: date.nager.at
+          </div>
+        </div>
+
+        <!-- Main calendar area -->
+        <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;">
+          <!-- Month nav -->
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--br);flex-shrink:0;background:var(--s1);">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <button onclick="tripMonthNav(-1)" style="padding:5px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);cursor:pointer;font-size:16px;">‹</button>
+              <div id="tripMonthLabel" style="font-size:15px;font-weight:700;color:var(--tx);min-width:130px;text-align:center;"></div>
+              <button onclick="tripMonthNav(1)" style="padding:5px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);cursor:pointer;font-size:16px;">›</button>
+            </div>
+            <button onclick="openTripModal(null)" id="addTripBtn" style="display:none;"
+              style="padding:7px 16px;border-radius:8px;background:var(--ac);color:#fff;border:none;cursor:pointer;font-size:13px;font-weight:700;">+ Add Trip</button>
+          </div>
+          <!-- Calendar grid + list -->
+          <div style="flex:1;overflow-y:auto;padding:14px 16px;">
+            <div id="tripCalendar" style="margin-bottom:14px;"></div>
+            <div style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;" id="trip-list-label">Events This Month</div>
+            <div id="tripList" style="display:flex;flex-direction:column;gap:6px;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Add/Edit Event Modal (for Group Events + Site Calendars) -->
+      <div class="overlay" id="calEventOverlay" onclick="if(event.target===this)closeCalEventModal()">
+        <div class="modal" style="max-width:440px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+            <div class="modal-title" id="calEventModalTitle">New Event</div>
+            <button onclick="closeCalEventModal()" style="background:transparent;border:none;cursor:pointer;color:var(--tx3);font-size:20px;">✕</button>
+          </div>
+          <div style="margin-bottom:10px;">
+            <label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px;">Calendar</label>
+            <select id="cal-event-cat" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;"></select>
+          </div>
+          <div style="margin-bottom:10px;">
+            <label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px;">Title *</label>
+            <input id="cal-event-title" placeholder="Event title" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;">
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
+            <div>
+              <label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px;">Date From *</label>
+              <input id="cal-event-from" type="date" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;">
+            </div>
+            <div>
+              <label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px;">Date To</label>
+              <input id="cal-event-to" type="date" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;">
+            </div>
+          </div>
+          <div style="margin-bottom:14px;">
+            <label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px;">Notes</label>
+            <textarea id="cal-event-notes" rows="2" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;resize:none;font-family:inherit;"></textarea>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <button onclick="saveCalEvent()" style="padding:9px 20px;border-radius:8px;background:var(--ac);color:#fff;border:none;cursor:pointer;font-size:13px;font-weight:700;">Save</button>
+            <button onclick="closeCalEventModal()" style="padding:9px 16px;border-radius:8px;border:1px solid var(--br);background:transparent;color:var(--tx2);cursor:pointer;font-size:13px;">Cancel</button>
+            <button id="cal-event-del" onclick="deleteCalEvent()" style="display:none;padding:9px 16px;border-radius:8px;background:var(--red);color:#fff;border:none;cursor:pointer;font-size:13px;margin-left:auto;">Delete</button>
           </div>
         </div>
       </div>
@@ -510,7 +744,7 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:
               <button onclick="tripMonthNav(-1)" style="padding:5px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);cursor:pointer;font-size:16px;">‹</button>
               <div id="tripMonthLabel" style="font-size:14px;font-weight:700;color:var(--tx);min-width:100px;text-align:center;"></div>
               <button onclick="tripMonthNav(1)" style="padding:5px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);cursor:pointer;font-size:16px;">›</button>
-              <button onclick="openTripModal(null)" id="addTripBtn"
+              <button onclick="openTripModal(null)" id="addTripBtn" style="display:none;"
                 style="padding:6px 14px;border-radius:8px;background:var(--ac);color:#fff;border:none;cursor:pointer;font-size:13px;font-weight:700;">+ Add Trip</button>
             </div>
           </div>
@@ -858,6 +1092,8 @@ function enterPortal() {
   document.getElementById('bn-users').style.display = isAdmin ? '' : 'none';
   document.getElementById('bbCompose').style.display = isAdmin ? '' : 'none';
   const settBtn = document.getElementById('settingsTopBtn'); if(settBtn) settBtn.style.display = isAdmin ? '' : 'none';
+  var addTripBtn = document.getElementById('addTripBtn'); if(addTripBtn) addTripBtn.style.display = (isAdmin || s.role === 'dcc') ? '' : 'none';
+  var calAddBtn = document.getElementById('cal-add-event-btn'); if(calAddBtn) calAddBtn.style.display = (isAdmin || s.role === 'dcc') ? '' : 'none';
 
   renderAppGrid();
 }
@@ -870,7 +1106,7 @@ const APPS = [
   { id:'directory',  label:'Hall of Fame',   labelZh:'名人榜',       desc:'Employee directory, contacts & discussions', icon:'👤', bg:'#0A1A2E', internal:true, roles:[] },
   { id:'kms',        label:'KMS',            labelZh:'知識管理',     desc:'Knowledge Management — AI Q&A, document library', icon:'🧠', bg:'#0A2A1A', internal:false, path:'./kms/index.html', roles:[] },
   { id:'bulletin',   label:'Bulletin Board', labelZh:'公告欄',       desc:'Company announcements and notices', icon:'📢', bg:'#1A1A08', internal:true, roles:[] },
-  { id:'calendar',   label:'Calendar',       labelZh:'集團行事曆',   desc:'Business trip management & flight tracking', icon:'✈️', bg:'#0A1A1A', internal:true,  roles:[] },
+  { id:'calendar',   label:'Calendar',       labelZh:'集團行事曆',   desc:'Business trip management & flight tracking', icon:'📅', bg:'#0A1A1A', internal:true,  roles:[] },
   { id:'admin-sys',  label:'Admin System',   labelZh:'行政管理系統', desc:'Coming soon', icon:'🏛', bg:'#1A0A1A', internal:false, locked:true, badge:'SOON', roles:[] },
   { id:'quotation',  label:'Quotation',      labelZh:'報價管理系統', desc:'Product quotations, CRM & AI tools', icon:'💼', bg:'#0F2A4A', internal:false, path:'./quotation/index.html', roles:[] },
   { id:'product-dev',label:'Product Dev',    labelZh:'產品開發管理', desc:'Coming soon', icon:'🔬', bg:'#1A1A0A', internal:false, locked:true, badge:'SOON', roles:[] },
@@ -1946,6 +2182,404 @@ async function deleteTrip() {
     toast('Trip deleted', 'ok');
   } catch(e) {
     toast('Delete failed: ' + e.message, 'err');
+  }
+}
+
+
+// ═══════════════════════════════════════════════
+// CALENDAR — Multi-category system
+// ═══════════════════════════════════════════════
+
+// Category definitions
+var CAL_CATEGORIES = [
+  { id:'group',   label:'COMART Group Events', labelZh:'集團活動',   color:'#2D7FF9', icon:'🏢', editable:true,  fbCol:'cal_group'   },
+  { id:'tw-hol',  label:'Taiwan Holidays',     labelZh:'台灣國定假日', color:'#E53E3E', icon:'🇹🇼', editable:false, apiCode:'TW'        },
+  { id:'cn-hol',  label:'China Holidays',      labelZh:'中國國定假日', color:'#E08000', icon:'🇨🇳', editable:false, apiCode:'CN'        },
+  { id:'vn-hol',  label:'Vietnam Holidays',    labelZh:'越南國定假日', color:'#2E8B57', icon:'🇻🇳', editable:false, apiCode:'VN'        },
+  { id:'tw-cal',  label:'Taiwan Calendar',     labelZh:'台灣行事曆',  color:'#6B84C8', icon:'🇹🇼', editable:true,  fbCol:'cal_taiwan'  },
+  { id:'cn-cal',  label:'China Calendar',      labelZh:'中國行事曆',  color:'#C07000', icon:'🇨🇳', editable:true,  fbCol:'cal_china'   },
+  { id:'vn-cal',  label:'Vietnam Calendar',    labelZh:'越南行事曆',  color:'#1A7A4A', icon:'🇻🇳', editable:true,  fbCol:'cal_vietnam' },
+  { id:'trips',   label:'Business Trips',      labelZh:'商務出行',    color:'#805AD5', icon:'✈️', editable:false, isTrips:true        },
+];
+
+// State
+var calActiveCats  = ['group', 'trips', 'tw-hol'];  // default: 3 on
+var CAL_EVENTS     = {};  // { catId: [ {id, title, date, dateTo, notes, creator} ] }
+var CAL_HOLIDAYS   = {};  // { 'TW-2026': [...], 'CN-2026': [...] }
+var calEventEditId = null;
+var calEventEditCat = null;
+
+// ── Init ──
+function initCalendar() {
+  renderCatSidebar();
+  loadTrips().then(function() { renderTripPage(); });
+  loadCalEvents();
+}
+
+function renderCatSidebar() {
+  var list = document.getElementById('cal-category-list');
+  if (!list) return;
+  list.innerHTML = CAL_CATEGORIES.map(function(cat) {
+    var active  = calActiveCats.indexOf(cat.id) >= 0;
+    var border  = active ? cat.color : 'var(--br)';
+    var bg      = active ? (cat.color + '22') : 'transparent';
+    var opacity = active ? '1' : '0.45';
+    return '<div onclick="toggleCatFilter(\'' + cat.id + '\')" '
+      + 'style="display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:8px;border:1px solid ' + border + ';background:' + bg + ';cursor:pointer;opacity:' + opacity + ';transition:all .15s;" '
+      + 'id="cal-cat-row-' + cat.id + '">'
+      + '<div style="width:10px;height:10px;border-radius:50%;background:' + cat.color + ';flex-shrink:0;"></div>'
+      + '<span style="font-size:12px;color:var(--tx);flex:1;">' + cat.icon + ' ' + cat.label + '</span>'
+      + (active ? '<span style="font-size:10px;color:' + cat.color + ';">✓</span>' : '')
+      + '</div>';
+  }).join('');
+}
+
+function toggleCatFilter(catId) {
+  var idx = calActiveCats.indexOf(catId);
+  if (idx >= 0) {
+    calActiveCats.splice(idx, 1);
+  } else {
+    if (calActiveCats.length >= 3) {
+      toast('最多同時顯示 3 個日曆', '');
+      return;
+    }
+    calActiveCats.push(catId);
+    // Load holiday data if needed
+    var cat = CAL_CATEGORIES.find(function(c) { return c.id === catId; });
+    if (cat && cat.apiCode) loadHolidays(cat.apiCode, tripViewYear);
+  }
+  renderCatSidebar();
+  renderTripPage();
+}
+
+// ── Load Firebase events ──
+async function loadCalEvents() {
+  if (!db) return;
+  var editableCats = CAL_CATEGORIES.filter(function(c) { return c.editable && c.fbCol; });
+  for (var i = 0; i < editableCats.length; i++) {
+    var cat = editableCats[i];
+    try {
+      var snap = await db.collection(cat.fbCol).orderBy('dateFrom', 'asc').get();
+      CAL_EVENTS[cat.id] = snap.docs.map(function(d) { return Object.assign({ id: d.id }, d.data()); });
+    } catch(e) {
+      CAL_EVENTS[cat.id] = [];
+    }
+  }
+  renderTripPage();
+}
+
+// ── Load holidays from Nager.Date API ──
+async function loadHolidays(countryCode, year) {
+  var key = countryCode + '-' + year;
+  if (CAL_HOLIDAYS[key]) return;  // already loaded
+  CAL_HOLIDAYS[key] = [];  // mark as loading
+  try {
+    var url = 'https://date.nager.at/api/v3/publicholidays/' + year + '/' + countryCode;
+    var res = await fetch(url);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    var data = await res.json();
+    CAL_HOLIDAYS[key] = data.map(function(h) {
+      return { date: h.date, dateTo: h.date, title: h.name + (h.localName && h.localName !== h.name ? ' (' + h.localName + ')' : ''), notes: 'Source: Nager.Date API (date.nager.at)' };
+    });
+    renderTripPage();
+  } catch(e) {
+    console.warn('Holiday load failed for ' + countryCode, e);
+    CAL_HOLIDAYS[key] = [];
+  }
+}
+
+// ── Get all events for a specific date ──
+function getEventsForDate(dateStr) {
+  var result = [];
+  calActiveCats.forEach(function(catId) {
+    var cat = CAL_CATEGORIES.find(function(c) { return c.id === catId; });
+    if (!cat) return;
+    var events = [];
+    if (cat.isTrips) {
+      events = TRIPS.map(function(t) { return { id: t.id, title: (t.dest || 'Trip') + ' - ' + (t.empId || ''), dateFrom: t.dateFrom, dateTo: t.dateTo || t.dateFrom, catId: catId, color: cat.color }; });
+    } else if (cat.apiCode) {
+      var key = cat.apiCode + '-' + tripViewYear;
+      events = (CAL_HOLIDAYS[key] || []).map(function(h) { return { id: h.date + '-' + cat.id, title: h.title, dateFrom: h.date, dateTo: h.date, catId: catId, color: cat.color }; });
+    } else {
+      events = (CAL_EVENTS[catId] || []).map(function(e) { return Object.assign({ catId: catId, color: cat.color }, e); });
+    }
+    events.forEach(function(e) {
+      var from = e.dateFrom || e.date || '';
+      var to   = e.dateTo   || from;
+      if (dateStr >= from && dateStr <= to) result.push(e);
+    });
+  });
+  return result;
+}
+
+// ── renderTripPage override: now uses multi-category events ──
+// (overrides the Trip-only version added earlier)
+function renderTripPage() {
+  var year  = tripViewYear;
+  var month = tripViewMonth;
+  var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var lbl = document.getElementById('tripMonthLabel');
+  if (lbl) lbl.textContent = monthNames[month] + ' ' + year;
+
+  // Load holidays for active API-based categories
+  calActiveCats.forEach(function(catId) {
+    var cat = CAL_CATEGORIES.find(function(c) { return c.id === catId; });
+    if (cat && cat.apiCode) loadHolidays(cat.apiCode, year);
+  });
+
+  var calEl = document.getElementById('tripCalendar');
+  if (!calEl) return;
+
+  var firstDay    = new Date(year, month, 1).getDay();
+  var daysInMonth = new Date(year, month+1, 0).getDate();
+  var today       = new Date();
+  function isToday(d) { return today.getFullYear()===year && today.getMonth()===month && today.getDate()===d; }
+  function pad(n) { return n < 10 ? '0' + n : '' + n; }
+  function dateStr(d) { return year + '-' + pad(month+1) + '-' + pad(d); }
+
+  var dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  var html = '<div class="trip-cal-wrap"><div class="trip-cal-header">';
+  dayNames.forEach(function(dn) { html += '<div class="trip-cal-dayname">' + dn + '</div>'; });
+  html += '</div><div class="trip-cal-grid">';
+
+  for (var i = 0; i < firstDay; i++) html += '<div class="trip-cal-empty"></div>';
+
+  for (var d = 1; d <= daysInMonth; d++) {
+    var ds      = dateStr(d);
+    var events  = getEventsForDate(ds);
+    var todayBg = isToday(d) ? 'rgba(45,127,249,.08)' : 'transparent';
+    var dayCls  = isToday(d) ? 'color:var(--ac);font-weight:700;' : 'color:var(--tx3);font-weight:500;';
+    html += '<div class="trip-cal-cell" style="background:' + todayBg + ';" onclick="calDayClick(\'' + ds + '\')">';
+    html += '<div style="font-size:11px;' + dayCls + 'margin-bottom:2px;">' + d + '</div>';
+    events.slice(0, 3).forEach(function(ev) {
+      var shortTitle = (ev.title || '').split(' ')[0].slice(0, 8);
+      html += '<div onclick="event.stopPropagation();" style="font-size:9px;background:' + ev.color + '22;color:' + ev.color + ';border-radius:3px;padding:1px 4px;margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600;">' + escHtml(shortTitle) + '</div>';
+    });
+    if (events.length > 3) html += '<div style="font-size:9px;color:var(--tx3);">+' + (events.length-3) + '</div>';
+    html += '</div>';
+  }
+
+  var trailing = (7 - (firstDay + daysInMonth) % 7) % 7;
+  for (var i = 0; i < trailing; i++) html += '<div class="trip-cal-empty"></div>';
+  html += '</div></div>';
+  calEl.innerHTML = html;
+
+  // Event list below calendar
+  var listEl = document.getElementById('tripList');
+  if (!listEl) return;
+
+  // Collect all events for this month
+  var allMonth = [];
+  for (var d = 1; d <= daysInMonth; d++) {
+    var ds = dateStr(d);
+    var evs = getEventsForDate(ds);
+    evs.forEach(function(ev) {
+      if (!allMonth.find(function(x) { return x.id === ev.id; })) allMonth.push(ev);
+    });
+  }
+  allMonth.sort(function(a,b) { return (a.dateFrom||a.date||'').localeCompare(b.dateFrom||b.date||''); });
+
+  if (!allMonth.length) {
+    listEl.innerHTML = '<div style="color:var(--tx3);font-size:13px;padding:12px;text-align:center;">No events this month for selected calendars</div>';
+    return;
+  }
+
+  var canEdit = SESSION && (SESSION.role === 'admin' || SESSION.role === 'dcc');
+  listEl.innerHTML = allMonth.map(function(ev) {
+    var cat = CAL_CATEGORIES.find(function(c) { return c.id === ev.catId; });
+    var dr  = (!ev.dateTo || ev.dateFrom === ev.dateTo) ? ev.dateFrom : (ev.dateFrom + ' → ' + ev.dateTo);
+    var editBtn = (canEdit && cat && cat.editable) ? '<button onclick="openCalEventModal(\'' + (ev.catId||'') + '\',\'' + (ev.id||'') + '\')" style="padding:4px 10px;border-radius:6px;border:1px solid var(--br);background:var(--s2);color:var(--tx2);font-size:11px;cursor:pointer;flex-shrink:0;">Edit</button>' : '';
+    return '<div style="background:var(--s1);border:1px solid var(--br);border-radius:10px;padding:10px 14px;display:flex;gap:10px;align-items:flex-start;">'
+      + '<div style="width:4px;min-height:32px;border-radius:2px;background:' + ev.color + ';flex-shrink:0;"></div>'
+      + '<div style="flex:1;min-width:0;">'
+      + '<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;flex-wrap:wrap;">'
+      + '<span style="font-size:11px;padding:1px 6px;border-radius:8px;background:' + ev.color + '22;color:' + ev.color + ';font-weight:700;">' + escHtml((cat ? cat.icon : '') + ' ' + (cat ? cat.label : '')) + '</span>'
+      + '<span style="font-size:13px;font-weight:600;color:var(--tx);">' + escHtml(ev.title || '') + '</span>'
+      + '</div>'
+      + '<div style="font-size:11px;color:var(--tx3);">📅 ' + escHtml(dr||'') + (ev.creator ? ' · ' + escHtml(ev.creator) : '') + '</div>'
+      + (ev.notes ? '<div style="font-size:11px;color:var(--tx3);margin-top:2px;">' + escHtml(ev.notes) + '</div>' : '')
+      + '</div>'
+      + editBtn
+      + '</div>';
+  }).join('');
+}
+
+function calDayClick(ds) {
+  var listEl = document.getElementById('tripList');
+  if (listEl) listEl.scrollIntoView({ behavior: 'smooth' });
+}
+
+// ── Cal Event Modal ──
+function openCalEventModal(catId, eventId) {
+  var canEdit = SESSION && (SESSION.role === 'admin' || SESSION.role === 'dcc');
+  if (!canEdit) { toast('Only Admin / DCC can manage events', ''); return; }
+
+  calEventEditCat = catId || 'group';
+  calEventEditId  = eventId || null;
+
+  var event = null;
+  if (eventId && CAL_EVENTS[calEventEditCat]) {
+    event = CAL_EVENTS[calEventEditCat].find(function(e) { return e.id === eventId; });
+  }
+
+  document.getElementById('calEventModalTitle').textContent = event ? 'Edit Event' : 'New Event';
+
+  // Populate category dropdown (editable only)
+  var catSel = document.getElementById('cal-event-cat');
+  catSel.innerHTML = CAL_CATEGORIES.filter(function(c) { return c.editable && c.fbCol; })
+    .map(function(c) { return '<option value="' + c.id + '"' + (c.id === calEventEditCat ? ' selected' : '') + '>' + c.icon + ' ' + c.label + '</option>'; }).join('');
+
+  document.getElementById('cal-event-title').value = event ? (event.title || '') : '';
+  document.getElementById('cal-event-from').value  = event ? (event.dateFrom || '') : '';
+  document.getElementById('cal-event-to').value    = event ? (event.dateTo   || '') : '';
+  document.getElementById('cal-event-notes').value = event ? (event.notes    || '') : '';
+  document.getElementById('cal-event-del').style.display = event ? '' : 'none';
+
+  document.getElementById('calEventOverlay').classList.add('show');
+}
+
+function closeCalEventModal() {
+  document.getElementById('calEventOverlay').classList.remove('show');
+  calEventEditId  = null;
+  calEventEditCat = null;
+}
+
+async function saveCalEvent() {
+  var catId  = document.getElementById('cal-event-cat').value;
+  var title  = document.getElementById('cal-event-title').value.trim();
+  var from   = document.getElementById('cal-event-from').value;
+  var to     = document.getElementById('cal-event-to').value;
+  var notes  = document.getElementById('cal-event-notes').value.trim();
+
+  if (!title || !from) { toast('Title and Date From are required', ''); return; }
+
+  var cat = CAL_CATEGORIES.find(function(c) { return c.id === catId; });
+  if (!cat || !cat.fbCol) { toast('Invalid calendar', ''); return; }
+
+  var data = {
+    title: title, dateFrom: from, dateTo: to || from, notes: notes,
+    creator: SESSION ? (SESSION.nameEn || SESSION.empId) : 'Unknown',
+    updatedAt: Date.now()
+  };
+
+  try {
+    if (calEventEditId) {
+      await db.collection(cat.fbCol).doc(calEventEditId).set(data, { merge: true });
+      var idx = (CAL_EVENTS[catId] || []).findIndex(function(e) { return e.id === calEventEditId; });
+      if (idx >= 0) CAL_EVENTS[catId][idx] = Object.assign({ id: calEventEditId }, data);
+    } else {
+      data.createdAt = Date.now();
+      var ref = await db.collection(cat.fbCol).add(data);
+      if (!CAL_EVENTS[catId]) CAL_EVENTS[catId] = [];
+      CAL_EVENTS[catId].push(Object.assign({ id: ref.id }, data));
+    }
+    closeCalEventModal();
+    renderTripPage();
+    toast(calEventEditId ? 'Event updated' : 'Event added', 'ok');
+  } catch(e) {
+    toast('Save failed: ' + e.message, 'err');
+  }
+}
+
+async function deleteCalEvent() {
+  if (!calEventEditId || !calEventEditCat) return;
+  if (!confirm('Delete this event?')) return;
+  var cat = CAL_CATEGORIES.find(function(c) { return c.id === calEventEditCat; });
+  if (!cat || !cat.fbCol) return;
+  try {
+    await db.collection(cat.fbCol).doc(calEventEditId).delete();
+    if (CAL_EVENTS[calEventEditCat]) {
+      CAL_EVENTS[calEventEditCat] = CAL_EVENTS[calEventEditCat].filter(function(e) { return e.id !== calEventEditId; });
+    }
+    closeCalEventModal();
+    renderTripPage();
+    toast('Event deleted', 'ok');
+  } catch(e) {
+    toast('Delete failed: ' + e.message, 'err');
+  }
+}
+
+// ── Override switchView for calendar ──
+// (the original switchView calls loadTrips, now use initCalendar)
+
+// ═══════════════════════════════════════════════
+// VOICE INPUT + AI CLEANUP
+// ═══════════════════════════════════════════════
+var _pVoiceActive = false;
+var _pVoiceSR     = null;
+
+function pStartVoice() {
+  var btn      = document.getElementById('p-voice-btn');
+  var statusEl = document.getElementById('p-voice-status');
+  var input    = document.getElementById('p-xlat-input');
+
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { toast('Voice input not supported on this browser'); return; }
+
+  if (_pVoiceActive && _pVoiceSR) {
+    _pVoiceActive = false;
+    _pVoiceSR.stop();
+    if (btn)      btn.style.background = 'var(--s2)';
+    if (statusEl) statusEl.style.display = 'none';
+    return;
+  }
+
+  var sr = new SR();
+  sr.continuous    = true;
+  sr.interimResults = true;
+  sr.lang = 'zh-TW';  // Primary: Traditional Chinese; user can speak English too
+  _pVoiceSR = sr;
+
+  var finalTranscript = input ? input.value : '';
+
+  sr.onresult = function(e) {
+    var interim = '';
+    for (var i = e.resultIndex; i < e.results.length; i++) {
+      if (e.results[i].isFinal) { finalTranscript += e.results[i][0].transcript; }
+      else { interim += e.results[i][0].transcript; }
+    }
+    if (input) input.value = finalTranscript + interim;
+  };
+
+  sr.onend = function() {
+    _pVoiceActive = false;
+    if (btn)      btn.style.background = 'var(--s2)';
+    if (statusEl) statusEl.style.display = 'none';
+    if (input)    input.value = finalTranscript;
+    // Auto-run AI cleanup after voice
+    if (finalTranscript.trim()) pCleanText();
+  };
+
+  sr.onerror = function(e) {
+    _pVoiceActive = false;
+    if (btn)      btn.style.background = 'var(--s2)';
+    if (statusEl) statusEl.style.display = 'none';
+    toast('Voice error: ' + e.error);
+  };
+
+  sr.start();
+  _pVoiceActive = true;
+  if (btn)      { btn.style.background = '#7c3aed'; btn.style.color = '#fff'; }
+  if (statusEl)   statusEl.style.display = 'block';
+}
+
+async function pCleanText() {
+  var input = document.getElementById('p-xlat-input');
+  var text  = input ? input.value.trim() : '';
+  if (!text) { toast('Please enter text first'); return; }
+
+  var btn = document.getElementById('p-voice-btn');
+  toast('✨ AI 整理中…');
+
+  try {
+    var prompt = '請將以下文字整理好，加上正確的標點符號，修正語句讓它更通順自然，保持原意。只輸出整理後的文字，不要加說明。\n\n' + text;
+    var result = await pCallClaude([{ role: 'user', content: prompt }], null, 1000);
+    if (input && result) {
+      input.value = result.trim();
+      toast('✨ 整理完成');
+    }
+  } catch(e) {
+    toast('Cleanup failed: ' + e.message);
   }
 }
 

@@ -224,6 +224,27 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:
 .lang-switcher{display:flex;gap:3px;margin-right:6px;}
 .lang-btn{padding:3px 8px;border-radius:6px;border:1px solid var(--br);background:transparent;color:var(--tx3);font-size:11px;cursor:pointer;font-family:var(--ff);}
 .lang-btn.active{background:var(--ac2);border-color:var(--ac);color:var(--ac);}
+
+/* ─── AI View ─── */
+.ai-tab-bar { display:flex; align-items:center; gap:6px; padding:10px 14px; border-bottom:1px solid var(--br); flex-shrink:0; flex-wrap:wrap; background:var(--s1); }
+.ai-chip { padding:5px 12px; border-radius:20px; border:1px solid var(--br); background:var(--s2); color:var(--tx2); font-size:12px; cursor:pointer; font-family:var(--ff); transition:all .15s; }
+.ai-chip.on { background:#7c3aed; border-color:#7c3aed; color:#fff; }
+.ai-chip:hover { border-color:#7c3aed; color:#7c3aed; }
+.ai-tab-content { display:none; flex:1; flex-direction:column; overflow:hidden; }
+.ai-tab-content.on { display:flex; }
+.ai-link-item { display:flex; align-items:center; gap:12px; padding:12px 14px; background:var(--s1); border:1px solid var(--br); border-radius:10px; text-decoration:none; transition:border-color .15s; }
+.ai-link-item:hover { border-color:var(--br2); }
+.ai-link-icon { width:36px; height:36px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
+.ai-link-title { font-size:13px; font-weight:600; color:var(--tx); }
+.ai-link-sub { font-size:11px; color:var(--tx3); margin-top:2px; }
+/* ─── Trip Calendar ─── */
+.trip-cal-wrap { background:var(--s1); border:1px solid var(--br); border-radius:12px; overflow:hidden; margin-bottom:16px; }
+.trip-cal-header { display:grid; grid-template-columns:repeat(7,1fr); background:var(--s2); border-bottom:1px solid var(--br); }
+.trip-cal-dayname { padding:7px 4px; text-align:center; font-size:11px; font-weight:700; color:var(--tx3); }
+.trip-cal-grid { display:grid; grid-template-columns:repeat(7,1fr); }
+.trip-cal-cell { min-height:72px; border-right:1px solid var(--br); border-bottom:1px solid var(--br); padding:4px; cursor:pointer; }
+.trip-cal-cell:hover { background:var(--s2); }
+.trip-cal-empty { min-height:72px; border-right:1px solid var(--br); border-bottom:1px solid var(--br); background:var(--bg); }
 </style>
 </head>
 <body>
@@ -356,26 +377,218 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:
       </div>
 
 
-      <!-- ── AI VIEW (opens Quotation AI tab) ── -->
-      <div class="view" id="view-ai">
-        <div style="max-width:600px;margin:60px auto;padding:20px;text-align:center;">
-          <div style="font-size:48px;margin-bottom:16px;">🤖</div>
-          <div style="font-size:20px;font-weight:600;color:var(--tx);margin-bottom:8px;">AI Tools</div>
-          <div style="font-size:14px;color:var(--tx2);margin-bottom:24px;">AI translation, business writing, chat and skill tools are available in the Quotation System.</div>
-          <button onclick="openApp('quotation')" style="padding:10px 24px;background:var(--ac);color:#fff;border:none;border-radius:var(--r);font-size:14px;cursor:pointer;font-family:var(--ff);">Open Quotation System → AI Tab</button>
+      <!-- ── AI VIEW ── -->
+      <div class="view" id="view-ai" style="flex-direction:column;padding:0;">
+        <div class="ai-tab-bar">
+          <div style="font-size:14px;font-weight:700;color:#a78bfa;margin-right:6px;">🤖 AI</div>
+          <button class="ai-chip on" id="ptab-translate" onclick="switchAITab('translate')">🌐 翻譯</button>
+          <button class="ai-chip" id="ptab-chat" onclick="switchAITab('chat')">✦ Chat</button>
+          <button class="ai-chip" id="ptab-skills" onclick="switchAITab('skills')">🛠 Skills</button>
+        </div>
+
+        <!-- Translate Tab -->
+        <div class="ai-tab-content on" id="ptab-content-translate">
+          <div style="flex:1;overflow-y:auto;padding:14px 16px;max-width:900px;width:100%;margin:0 auto;">
+            <div style="margin-bottom:12px;">
+              <div style="font-size:11px;font-weight:700;color:var(--tx3);letter-spacing:.06em;margin-bottom:6px;">INPUT TEXT / 輸入文字</div>
+              <div style="display:flex;gap:8px;align-items:flex-start;">
+                <textarea id="p-xlat-input" rows="8" placeholder="Paste or type text here… 貼上或輸入文字"
+                  style="flex:1;padding:10px 12px;border-radius:10px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;resize:vertical;outline:none;font-family:inherit;min-height:160px;"></textarea>
+                <div style="display:flex;flex-direction:column;gap:6px;">
+                  <button onclick="pRunTranslate()"
+                    style="padding:9px 14px;border-radius:9px;background:#7c3aed;color:#fff;border:none;cursor:pointer;font-size:12px;font-weight:700;">Translate ↓</button>
+                  <button onclick="navigator.clipboard.readText().then(t=>{document.getElementById('p-xlat-input').value=t;})"
+                    style="padding:9px 14px;border-radius:9px;border:1px solid var(--br);background:var(--s2);color:var(--tx2);cursor:pointer;font-size:14px;">📋</button>
+                </div>
+              </div>
+            </div>
+            <div id="p-xlat-loading" style="display:none;text-align:center;padding:24px;color:var(--tx3);font-size:13px;">
+              <div style="font-size:22px;margin-bottom:8px;">⟳</div>Translating…
+            </div>
+            <div id="p-xlat-results" style="display:none;">
+              <div style="font-size:11px;font-weight:700;color:var(--tx3);letter-spacing:.06em;margin-bottom:8px;">DIRECT TRANSLATION · 直接翻譯</div>
+              <div id="p-xlat-direct" style="display:flex;flex-direction:column;gap:6px;margin-bottom:16px;"></div>
+              <div style="font-size:11px;font-weight:700;color:#a78bfa;letter-spacing:.06em;margin-bottom:8px;">BUSINESS VERSION · 商業用語版本</div>
+              <div id="p-xlat-biz" style="display:flex;flex-direction:column;gap:6px;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chat Tab -->
+        <div class="ai-tab-content" id="ptab-content-chat" style="flex-direction:column;min-height:0;">
+          <div id="p-chat-messages" style="flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:10px;">
+            <div style="text-align:center;padding:24px 0 8px;">
+              <div style="font-size:26px;margin-bottom:6px;">✦</div>
+              <div style="font-size:14px;font-weight:700;color:var(--tx);">Claude · COMART Assistant</div>
+              <div style="font-size:11px;color:var(--tx3);margin-top:4px;">Ask anything about COMART products, market, or business</div>
+            </div>
+          </div>
+          <div style="padding:10px 14px;border-top:1px solid var(--br);flex-shrink:0;">
+            <div style="display:flex;gap:8px;align-items:flex-end;">
+              <textarea id="p-chat-input" placeholder="Ask Claude… (Enter to send, Shift+Enter for new line)" rows="2"
+                style="flex:1;padding:10px 12px;border-radius:10px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;resize:none;outline:none;font-family:inherit;line-height:1.5;"
+                onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();pSendChat();}"></textarea>
+              <button onclick="pSendChat()" style="padding:10px 16px;border-radius:10px;background:#7c3aed;color:#fff;border:none;cursor:pointer;font-size:13px;font-weight:700;flex-shrink:0;height:42px;">Send</button>
+            </div>
+            <div style="font-size:10px;color:var(--tx3);margin-top:5px;text-align:center;">Claude · via COMART Proxy</div>
+          </div>
+        </div>
+
+        <!-- Skills Tab -->
+        <div class="ai-tab-content" id="ptab-content-skills" style="overflow-y:auto;">
+          <div style="padding:14px 16px;max-width:900px;width:100%;margin:0 auto;">
+            <div style="font-size:11px;font-weight:700;color:var(--tx3);letter-spacing:.08em;margin-bottom:10px;">COMART AI SKILLS</div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <!-- Company Research -->
+              <div style="background:var(--s2);border:1px solid var(--br);border-radius:12px;padding:14px 16px;">
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+                  <div style="width:36px;height:36px;border-radius:8px;background:rgba(16,163,127,.15);color:#10a37f;display:flex;align-items:center;justify-content:center;font-size:18px;">🔍</div>
+                  <div>
+                    <div style="font-size:13px;font-weight:700;color:var(--tx);">公司調查機器人</div>
+                    <div style="font-size:11px;color:var(--tx3);">Company Research</div>
+                  </div>
+                </div>
+                <div style="font-size:12px;color:var(--tx2);margin-bottom:10px;line-height:1.6;">輸入公司名稱，自動調查公司背景、聯絡資訊、產品方向，輸出完整調查報告與商業開發信。</div>
+                <div style="display:flex;gap:6px;align-items:center;">
+                  <input id="p-skill-company" placeholder="Enter company name / 輸入公司名稱" autocomplete="off"
+                    style="flex:1;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;"
+                    onkeydown="if(event.key==='Enter') pRunSkillCompany()">
+                  <button onclick="pRunSkillCompany()"
+                    style="padding:8px 14px;border-radius:8px;background:#10a37f;color:#fff;border:none;cursor:pointer;font-size:12px;font-weight:700;flex-shrink:0;">調查 →</button>
+                </div>
+              </div>
+              <!-- Post-show Followup -->
+              <div style="background:var(--s2);border:1px solid var(--br);border-radius:12px;padding:14px 16px;">
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+                  <div style="width:36px;height:36px;border-radius:8px;background:rgba(139,92,246,.15);color:#8b5cf6;display:flex;align-items:center;justify-content:center;font-size:18px;">📧</div>
+                  <div>
+                    <div style="font-size:13px;font-weight:700;color:var(--tx);">展後跟進機器人</div>
+                    <div style="font-size:11px;color:var(--tx3);">Post-Show Followup</div>
+                  </div>
+                </div>
+                <div style="font-size:12px;color:var(--tx2);margin-bottom:10px;line-height:1.6;">輸入展會客戶資訊，自動生成個性化的展後跟進信件，支援中英雙語。</div>
+                <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px;">
+                  <input id="p-skill-show-company" placeholder="客戶公司名稱 / Company name" autocomplete="off"
+                    style="padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;">
+                  <input id="p-skill-show-contact" placeholder="聯絡人 / Contact person" autocomplete="off"
+                    style="padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;">
+                  <input id="p-skill-show-name" placeholder="展覽名稱 / Show name" autocomplete="off"
+                    style="padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;">
+                  <textarea id="p-skill-show-notes" placeholder="備注：客戶興趣、產品需求等 / Notes" rows="2"
+                    style="padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;resize:none;font-family:inherit;"></textarea>
+                  <button onclick="pRunSkillFollowup()"
+                    style="padding:9px;border-radius:8px;background:#8b5cf6;color:#fff;border:none;cursor:pointer;font-size:12px;font-weight:700;">產生跟進信 →</button>
+                </div>
+              </div>
+            </div>
+            <!-- Output -->
+            <div id="p-skill-output" style="display:none;margin-top:14px;">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+                <div style="font-size:11px;font-weight:700;color:var(--tx3);letter-spacing:.06em;flex:1;">OUTPUT</div>
+                <button onclick="navigator.clipboard.writeText(document.getElementById('p-skill-content').textContent)"
+                  style="padding:4px 10px;border-radius:6px;border:1px solid var(--br);background:var(--s2);color:var(--tx2);font-size:11px;cursor:pointer;">📋 Copy</button>
+                <button onclick="document.getElementById('p-skill-output').style.display='none'"
+                  style="padding:4px 10px;border-radius:6px;border:1px solid var(--br);background:var(--s2);color:var(--tx2);font-size:11px;cursor:pointer;">✕</button>
+              </div>
+              <div id="p-skill-loading" style="display:none;text-align:center;padding:20px;color:var(--tx3);font-size:13px;">
+                <div style="font-size:22px;margin-bottom:6px;">⟳</div>AI is working…
+              </div>
+              <div id="p-skill-content"
+                style="background:var(--s2);border:1px solid var(--br);border-radius:10px;padding:14px;font-size:12px;color:var(--tx);line-height:1.7;white-space:pre-wrap;max-height:60vh;overflow-y:auto;"></div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- ── CALENDAR VIEW (opens Quotation Trip tab) ── -->
-      <div class="view" id="view-calendar">
-        <div style="max-width:600px;margin:60px auto;padding:20px;text-align:center;">
-          <div style="font-size:48px;margin-bottom:16px;">✈️</div>
-          <div style="font-size:20px;font-weight:600;color:var(--tx);margin-bottom:8px;">Business Trips / 集團行事曆</div>
-          <div style="font-size:14px;color:var(--tx2);margin-bottom:24px;">Business trip management and flight tracking are available in the Quotation System.</div>
-          <button onclick="openApp('quotation')" style="padding:10px 24px;background:var(--ac);color:#fff;border:none;border-radius:var(--r);font-size:14px;cursor:pointer;font-family:var(--ff);">Open Quotation System → Trip Tab</button>
+      <!-- ── CALENDAR / TRIPS VIEW ── -->
+      <div class="view" id="view-calendar" style="flex-direction:column;padding:0;overflow-y:auto;">
+        <div style="max-width:900px;margin:0 auto;width:100%;padding:20px;">
+          <!-- Header -->
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
+            <div style="font-size:18px;font-weight:700;color:var(--tx);">✈️ 集團行事曆 · Business Trips</div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <button onclick="tripMonthNav(-1)" style="padding:5px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);cursor:pointer;font-size:16px;">‹</button>
+              <div id="tripMonthLabel" style="font-size:14px;font-weight:700;color:var(--tx);min-width:100px;text-align:center;"></div>
+              <button onclick="tripMonthNav(1)" style="padding:5px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);cursor:pointer;font-size:16px;">›</button>
+              <button onclick="openTripModal(null)" id="addTripBtn"
+                style="padding:6px 14px;border-radius:8px;background:var(--ac);color:#fff;border:none;cursor:pointer;font-size:13px;font-weight:700;">+ Add Trip</button>
+            </div>
+          </div>
+          <!-- Calendar -->
+          <div id="tripCalendar" style="margin-bottom:16px;"></div>
+          <!-- List -->
+          <div id="tripList" style="display:flex;flex-direction:column;gap:8px;"></div>
         </div>
       </div>
 
+      <!-- Trip Modal -->
+      <div class="overlay" id="tripOverlay" onclick="closeTripModal(event)">
+        <div class="modal" style="max-width:520px;max-height:92vh;overflow-y:auto;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+            <div class="modal-title" id="trip-modal-title">New Trip</div>
+            <button onclick="closeTripModal()" style="background:transparent;border:none;cursor:pointer;color:var(--tx3);font-size:20px;line-height:1;">✕</button>
+          </div>
+          <div class="field">
+            <label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px;">Staff</label>
+            <select id="trip-staff" style="width:100%;padding:9px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;"></select>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px;">Date From</label>
+              <input id="trip-date-from" type="date" style="width:100%;padding:9px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;"></div>
+            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px;">Date To</label>
+              <input id="trip-date-to" type="date" style="width:100%;padding:9px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;"></div>
+          </div>
+          <div class="field" style="margin-bottom:8px;">
+            <label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px;">Destination</label>
+            <input id="trip-dest" placeholder="e.g. Tokyo, Japan" autocomplete="off" style="width:100%;padding:9px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;">
+          </div>
+          <div class="field" style="margin-bottom:12px;">
+            <label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px;">Notes</label>
+            <textarea id="trip-notes" rows="2" placeholder="Purpose, client, etc." style="width:100%;padding:9px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;resize:vertical;font-family:inherit;"></textarea>
+          </div>
+          <!-- Outbound Flight -->
+          <div style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin:10px 0 6px;padding-bottom:4px;border-bottom:1px solid var(--br);">🛫 Outbound Flight</div>
+          <div style="display:grid;grid-template-columns:1fr auto;gap:8px;margin-bottom:6px;align-items:flex-end;">
+            <div class="field">
+              <label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px;">Flight No.</label>
+              <input id="trip-flight" placeholder="e.g. CI101" autocomplete="off" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;text-transform:uppercase;">
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px;">
+            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px;">Dep City</label><input id="trip-out-dep-city" placeholder="Taipei" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
+            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px;">Airport</label><input id="trip-out-dep-airport" placeholder="TPE" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
+            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px;">Terminal</label><input id="trip-out-dep-terminal" placeholder="T2" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
+            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px;">Dep Time</label><input id="trip-out-dep-time" placeholder="08:30" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
+            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px;">Arr City</label><input id="trip-out-arr-city" placeholder="Tokyo" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
+            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px;">Airport</label><input id="trip-out-arr-airport" placeholder="NRT" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
+            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px;">Terminal</label><input id="trip-out-arr-terminal" placeholder="T1" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
+            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px;">Arr Time</label><input id="trip-out-arr-time" placeholder="12:45" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
+          </div>
+          <!-- Return Flight -->
+          <div style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin:10px 0 6px;padding-bottom:4px;border-bottom:1px solid var(--br);">🛬 Return Flight</div>
+          <div style="display:grid;grid-template-columns:1fr;gap:6px;margin-bottom:6px;">
+            <div class="field">
+              <label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px;">Flight No.</label>
+              <input id="trip-return-flight" placeholder="e.g. CI102" autocomplete="off" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;text-transform:uppercase;">
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:16px;">
+            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px;">Dep City</label><input id="trip-ret-dep-city" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
+            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px;">Airport</label><input id="trip-ret-dep-airport" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
+            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px;">Terminal</label><input id="trip-ret-dep-terminal" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
+            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px;">Dep Time</label><input id="trip-ret-dep-time" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
+            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px;">Arr City</label><input id="trip-ret-arr-city" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
+            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px;">Airport</label><input id="trip-ret-arr-airport" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
+            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px;">Terminal</label><input id="trip-ret-arr-terminal" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
+            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px;">Arr Time</label><input id="trip-ret-arr-time" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <button onclick="saveTrip()" style="padding:9px 20px;border-radius:8px;background:var(--ac);color:#fff;border:none;cursor:pointer;font-size:13px;font-weight:700;">Save</button>
+            <button onclick="closeTripModal()" style="padding:9px 16px;border-radius:8px;border:1px solid var(--br);background:transparent;color:var(--tx2);cursor:pointer;font-size:13px;font-family:var(--ff);">Cancel</button>
+            <button id="trip-del" onclick="deleteTrip()" style="display:none;padding:9px 16px;border-radius:8px;background:var(--red);color:#fff;border:none;cursor:pointer;font-size:13px;margin-left:auto;">Delete</button>
+          </div>
+        </div>
+      </div>
       <!-- ── BULLETIN BOARD ── -->
       <div class="view" id="view-bulletin">
         <div class="bb-wrap">
@@ -653,11 +866,11 @@ function enterPortal() {
 // APP GRID
 // ═══════════════════════════════════════════════
 const APPS = [
-  { id:'ai',         label:'AI',             labelZh:'AI',           desc:'AI translation, chat & business tools', icon:'🤖', bg:'#130A2A', internal:true,  roles:[], path:'./quotation/index.html' },
+  { id:'ai',         label:'AI',             labelZh:'AI',           desc:'AI translation, chat & business tools', icon:'🤖', bg:'#130A2A', internal:true,  roles:[] },
   { id:'directory',  label:'Hall of Fame',   labelZh:'名人榜',       desc:'Employee directory, contacts & discussions', icon:'👤', bg:'#0A1A2E', internal:true, roles:[] },
   { id:'kms',        label:'KMS',            labelZh:'知識管理',     desc:'Knowledge Management — AI Q&A, document library', icon:'🧠', bg:'#0A2A1A', internal:false, path:'./kms/index.html', roles:[] },
   { id:'bulletin',   label:'Bulletin Board', labelZh:'公告欄',       desc:'Company announcements and notices', icon:'📢', bg:'#1A1A08', internal:true, roles:[] },
-  { id:'calendar',   label:'Calendar',       labelZh:'集團行事曆',   desc:'Business trip management', icon:'✈️', bg:'#0A1A1A', internal:false, path:'./quotation/index.html', roles:[] },
+  { id:'calendar',   label:'Calendar',       labelZh:'集團行事曆',   desc:'Business trip management & flight tracking', icon:'✈️', bg:'#0A1A1A', internal:true,  roles:[] },
   { id:'admin-sys',  label:'Admin System',   labelZh:'行政管理系統', desc:'Coming soon', icon:'🏛', bg:'#1A0A1A', internal:false, locked:true, badge:'SOON', roles:[] },
   { id:'quotation',  label:'Quotation',      labelZh:'報價管理系統', desc:'Product quotations, CRM & AI tools', icon:'💼', bg:'#0F2A4A', internal:false, path:'./quotation/index.html', roles:[] },
   { id:'product-dev',label:'Product Dev',    labelZh:'產品開發管理', desc:'Coming soon', icon:'🔬', bg:'#1A1A0A', internal:false, locked:true, badge:'SOON', roles:[] },
@@ -1298,6 +1511,444 @@ window.addEventListener('DOMContentLoaded', () => {
     enterPortal();
   }
 });
+
+// ═══════════════════════════════════════════════
+// AI FUNCTIONS
+// ═══════════════════════════════════════════════
+const XLAT_PROXY = 'https://comart.mcsewoody.workers.dev';
+const SB_URL     = 'https://tcvlnpgpuphdalzvmoyo.supabase.co';
+const SB_ANON    = 'sb_publishable_rAVwVeUMWD-m_VTFIenMhg_Fcg6ocYJ';
+
+const XLAT_LANGS = [
+  { code:'en',    label:'English',    flag:'🇺🇸' },
+  { code:'zh-TW', label:'繁體中文',   flag:'🇹🇼' },
+  { code:'zh-CN', label:'简体中文',   flag:'🇨🇳' },
+  { code:'vi',    label:'Tiếng Việt', flag:'🇻🇳' },
+  { code:'ja',    label:'日本語',     flag:'🇯🇵' },
+];
+
+function escHtml(s) {
+  return String(s||'')
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;');
+}
+
+function switchAITab(tab) {
+  ['translate','chat','skills'].forEach(function(t) {
+    var btn = document.getElementById('ptab-' + t);
+    var con = document.getElementById('ptab-content-' + t);
+    if (btn) btn.classList.toggle('on', t === tab);
+    if (con) con.classList.toggle('on', t === tab);
+  });
+}
+
+// ─── Claude API call via proxy ───
+async function pCallClaude(messages, system, maxTokens) {
+  maxTokens = maxTokens || 2000;
+  // Try Supabase Edge Function first
+  var proxyUrl = SB_URL + '/functions/v1/claude-proxy';
+  var headers = {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer ' + SB_ANON,
+    'apikey': SB_ANON
+  };
+  var body = {
+    model: 'claude-haiku-4-5-20251001',
+    max_tokens: maxTokens,
+    messages: messages
+  };
+  if (system) body.system = system;
+  var res = await fetch(proxyUrl, {
+    method: 'POST',
+    headers: headers,
+    body: JSON.stringify(body)
+  });
+  if (!res.ok) {
+    // Fallback: try XLAT_PROXY
+    res = await fetch(XLAT_PROXY, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+  }
+  if (!res.ok) throw new Error('API error ' + res.status);
+  var data = await res.json();
+  if (data.error) throw new Error(JSON.stringify(data.error).slice(0, 120));
+  return (data.content || []).map(function(b) { return b.text || ''; }).join('') || data.reply || '';
+}
+
+// ─── Translate ───
+async function pRunTranslate() {
+  var text = (document.getElementById('p-xlat-input') || {}).value;
+  if (!text || !text.trim()) { toast('Please enter text to translate'); return; }
+  text = text.trim();
+
+  var loadEl    = document.getElementById('p-xlat-loading');
+  var resultsEl = document.getElementById('p-xlat-results');
+  var directEl  = document.getElementById('p-xlat-direct');
+  var bizEl     = document.getElementById('p-xlat-biz');
+
+  if (resultsEl) resultsEl.style.display = 'none';
+  if (loadEl)    loadEl.style.display    = 'block';
+
+  try {
+    var prompt = 'Translate this text to 5 languages and produce a business-polished version.\n\nText:\n' + text + '\n\nReply with ONLY these 10 XML tags:\n<direct_en>___</direct_en>\n<direct_zhtw>___</direct_zhtw>\n<direct_zhcn>___</direct_zhcn>\n<direct_vi>___</direct_vi>\n<direct_ja>___</direct_ja>\n<biz_en>___</biz_en>\n<biz_zhtw>___</biz_zhtw>\n<biz_zhcn>___</biz_zhcn>\n<biz_vi>___</biz_vi>\n<biz_ja>___</biz_ja>';
+
+    var raw = await pCallClaude([{ role: 'user', content: prompt }], null, 4000);
+
+    function xt(tag) {
+      var m = raw.match(new RegExp('<' + tag + '[^>]*>([\\s\\S]*?)<\\/' + tag + '>', 'i'));
+      return (m && m[1]) ? m[1].trim() : '';
+    }
+
+    var direct   = { en: xt('direct_en'), 'zh-TW': xt('direct_zhtw'), 'zh-CN': xt('direct_zhcn'), vi: xt('direct_vi'), ja: xt('direct_ja') };
+    var business = { en: xt('biz_en'),    'zh-TW': xt('biz_zhtw'),    'zh-CN': xt('biz_zhcn'),    vi: xt('biz_vi'),    ja: xt('biz_ja')    };
+
+    function xlatCard(lang, text, isBiz) {
+      var id   = 'pxlat-' + lang.code + '-' + (isBiz ? 'biz' : 'dir');
+      var col  = isBiz ? 'var(--ac)' : 'var(--tx3)';
+      return '<div style="background:var(--bg);border:1px solid var(--br);border-radius:10px;padding:10px 12px;">'
+        + '<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">'
+        + '<span style="font-size:15px;">' + lang.flag + '</span>'
+        + '<span style="font-size:11px;font-weight:700;color:' + col + ';">' + lang.label + '</span>'
+        + '<button onclick="navigator.clipboard.writeText(document.getElementById(\'' + id + '\').textContent).then(function(){toast(\'Copied!\');})" '
+        + 'style="margin-left:auto;padding:3px 8px;border-radius:5px;border:1px solid var(--br);background:var(--s2);color:var(--tx3);font-size:11px;cursor:pointer;">Copy</button>'
+        + '</div>'
+        + '<div id="' + id + '" style="font-size:13px;color:var(--tx);line-height:1.65;white-space:pre-wrap;">' + escHtml(text) + '</div>'
+        + '</div>';
+    }
+
+    if (directEl) directEl.innerHTML = XLAT_LANGS.map(function(l) { return xlatCard(l, direct[l.code] || '', false); }).join('');
+    if (bizEl)    bizEl.innerHTML    = XLAT_LANGS.map(function(l) { return xlatCard(l, business[l.code] || '', true);  }).join('');
+    if (loadEl)    loadEl.style.display    = 'none';
+    if (resultsEl) resultsEl.style.display = 'block';
+    if (resultsEl) resultsEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  } catch(e) {
+    if (loadEl) loadEl.style.display = 'none';
+    toast('Translation error: ' + e.message);
+  }
+}
+
+// ─── Chat ───
+var pChatHistory = [];
+
+async function pSendChat() {
+  var input = document.getElementById('p-chat-input');
+  var msg   = input ? input.value.trim() : '';
+  if (!msg) return;
+  input.value = '';
+  input.style.height = 'auto';
+
+  var messagesEl = document.getElementById('p-chat-messages');
+  function addMsg(role, text) {
+    var isBig = role === 'assistant';
+    var div = document.createElement('div');
+    div.style.cssText = 'display:flex;gap:10px;align-items:flex-start;' + (role === 'user' ? 'flex-direction:row-reverse;' : '');
+    var bubble = document.createElement('div');
+    bubble.style.cssText = 'max-width:80%;padding:10px 14px;border-radius:12px;font-size:13px;line-height:1.65;white-space:pre-wrap;'
+      + (role === 'user' ? 'background:var(--ac);color:#fff;border-radius:12px 12px 3px 12px;' : 'background:var(--s2);color:var(--tx);border-radius:12px 12px 12px 3px;');
+    bubble.textContent = text;
+    div.appendChild(bubble);
+    messagesEl.appendChild(div);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+    return div;
+  }
+
+  addMsg('user', msg);
+  pChatHistory.push({ role: 'user', content: msg });
+
+  var thinkingDiv = addMsg('assistant', '…');
+  try {
+    var reply = await pCallClaude(pChatHistory, 'You are COMART\'s AI assistant. COMART is a Taiwan-based ODM/OEM manufacturer of car mounts, wireless chargers, and consumer electronics accessories. Be helpful, concise, and professional.', 1500);
+    thinkingDiv.querySelector('div').textContent = reply;
+    pChatHistory.push({ role: 'assistant', content: reply });
+  } catch(e) {
+    thinkingDiv.querySelector('div').textContent = 'Error: ' + e.message;
+  }
+}
+
+// ─── Skills: Company Research ───
+async function pRunSkillCompany() {
+  var company = (document.getElementById('p-skill-company') || {}).value;
+  if (!company || !company.trim()) { toast('Please enter a company name'); return; }
+  company = company.trim();
+
+  var outputEl  = document.getElementById('p-skill-output');
+  var contentEl = document.getElementById('p-skill-content');
+  var loadEl    = document.getElementById('p-skill-loading');
+
+  if (outputEl)  { outputEl.style.display  = 'block';  }
+  if (contentEl) { contentEl.style.display = 'none';   }
+  if (loadEl)    { loadEl.style.display    = 'block';   }
+
+  try {
+    var prompt = '請對以下公司進行深度調查，並以繁體中文輸出完整報告。\n\n公司名稱：' + company + '\n\n請包含：\n1. 公司簡介（成立時間、規模、主要業務）\n2. 主要產品與市場\n3. 與 COMART 的合作可能性分析\n4. 聯絡建議\n\n最後附上一封英文商業開發信（200字以內）。';
+    var result = await pCallClaude([{ role: 'user', content: prompt }], null, 3000);
+    if (contentEl) { contentEl.textContent = result; contentEl.style.display = 'block'; }
+    if (loadEl)    loadEl.style.display = 'none';
+  } catch(e) {
+    if (loadEl)    loadEl.style.display    = 'none';
+    if (contentEl) { contentEl.textContent = 'Error: ' + e.message; contentEl.style.display = 'block'; }
+  }
+}
+
+// ─── Skills: Post-show Followup ───
+async function pRunSkillFollowup() {
+  var company = (document.getElementById('p-skill-show-company') || {}).value || '';
+  var contact = (document.getElementById('p-skill-show-contact') || {}).value || '';
+  var showName = (document.getElementById('p-skill-show-name') || {}).value || '';
+  var notes   = (document.getElementById('p-skill-show-notes') || {}).value || '';
+
+  if (!company.trim()) { toast('Please enter company name'); return; }
+
+  var outputEl  = document.getElementById('p-skill-output');
+  var contentEl = document.getElementById('p-skill-content');
+  var loadEl    = document.getElementById('p-skill-loading');
+
+  if (outputEl)  { outputEl.style.display  = 'block';  }
+  if (contentEl) { contentEl.style.display = 'none';   }
+  if (loadEl)    { loadEl.style.display    = 'block';   }
+
+  try {
+    var prompt = 'Write a professional post-exhibition follow-up email for COMART (Taiwan ODM/OEM manufacturer of MagSafe car mounts, wireless chargers, and consumer electronics accessories).\n\nCustomer: ' + company + '\nContact: ' + (contact||'N/A') + '\nExhibition: ' + (showName||'Trade Show') + '\nNotes: ' + (notes||'General interest') + '\n\nWrite in English (primary) with a brief Chinese version below. Keep it warm, professional, and mention COMART\'s key strengths: Taiwan R&D, China/Vietnam manufacturing, Qi2/MagSafe expertise, OEM/ODM flexibility. Max 250 words per version.';
+    var result = await pCallClaude([{ role: 'user', content: prompt }], null, 2000);
+    if (contentEl) { contentEl.textContent = result; contentEl.style.display = 'block'; }
+    if (loadEl)    loadEl.style.display = 'none';
+  } catch(e) {
+    if (loadEl)    loadEl.style.display    = 'none';
+    if (contentEl) { contentEl.textContent = 'Error: ' + e.message; contentEl.style.display = 'block'; }
+  }
+}
+
+// ═══════════════════════════════════════════════
+// TRIP FUNCTIONS
+// ═══════════════════════════════════════════════
+var TRIPS = [];
+var tripViewYear  = new Date().getFullYear();
+var tripViewMonth = new Date().getMonth();
+var editTripId    = null;
+var TRIP_COLORS   = ['#6366f1','#3DD68C','#f59e0b','#ef4444','#06b6d4','#ec4899','#84cc16'];
+var COL_TRIP      = 'trips';
+
+async function loadTrips() {
+  if (!db) return;
+  try {
+    var snap = await db.collection(COL_TRIP).orderBy('dateFrom', 'asc').get();
+    TRIPS = snap.docs.map(function(d) { return Object.assign({ id: d.id }, d.data()); });
+  } catch(e) { console.warn('Trip load:', e); }
+}
+
+function tripMonthNav(delta) {
+  tripViewMonth += delta;
+  if (tripViewMonth > 11) { tripViewMonth = 0;  tripViewYear++; }
+  if (tripViewMonth < 0)  { tripViewMonth = 11; tripViewYear--; }
+  renderTripPage();
+}
+
+function renderTripPage() {
+  var year  = tripViewYear;
+  var month = tripViewMonth;
+  var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var lbl = document.getElementById('tripMonthLabel');
+  if (lbl) lbl.textContent = monthNames[month] + ' ' + year;
+
+  // Staff color map
+  var allStaff = TRIPS.map(function(t) { return t.empId; }).filter(function(v,i,a) { return a.indexOf(v)===i; });
+  var staffColorMap = {};
+  allStaff.forEach(function(s,i) { staffColorMap[s] = TRIP_COLORS[i % TRIP_COLORS.length]; });
+
+  // Calendar
+  var calEl = document.getElementById('tripCalendar');
+  if (!calEl) return;
+  var firstDay    = new Date(year, month, 1).getDay();
+  var daysInMonth = new Date(year, month+1, 0).getDate();
+  var today       = new Date();
+  function isToday(d) { return today.getFullYear()===year && today.getMonth()===month && today.getDate()===d; }
+
+  var monthTrips = TRIPS.filter(function(t) {
+    var from   = new Date(t.dateFrom + 'T00:00:00');
+    var to     = new Date((t.dateTo||t.dateFrom) + 'T23:59:59');
+    var mStart = new Date(year, month, 1);
+    var mEnd   = new Date(year, month+1, 0, 23, 59, 59);
+    return from <= mEnd && to >= mStart;
+  });
+
+  var dayTrips = {};
+  for (var d = 1; d <= daysInMonth; d++) {
+    var dayDate = new Date(year, month, d);
+    dayTrips[d] = monthTrips.filter(function(t) {
+      var from = new Date(t.dateFrom + 'T00:00:00');
+      var to   = new Date((t.dateTo||t.dateFrom) + 'T23:59:59');
+      return from <= dayDate && to >= dayDate;
+    });
+  }
+
+  var dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  var html = '<div class="trip-cal-wrap"><div class="trip-cal-header">';
+  dayNames.forEach(function(dn) { html += '<div class="trip-cal-dayname">' + dn + '</div>'; });
+  html += '</div><div class="trip-cal-grid">';
+
+  for (var i = 0; i < firstDay; i++) html += '<div class="trip-cal-empty"></div>';
+  for (var d = 1; d <= daysInMonth; d++) {
+    var trips     = dayTrips[d];
+    var todayBg   = isToday(d) ? 'rgba(45,127,249,.08)' : 'transparent';
+    var dayColor  = isToday(d) ? 'var(--ac)' : 'var(--tx3)';
+    var dayWeight = isToday(d) ? '700' : '500';
+    html += '<div class="trip-cal-cell" style="background:' + todayBg + ';" onclick="tripDayClick(' + d + ')">';
+    html += '<div style="font-size:11px;font-weight:' + dayWeight + ';color:' + dayColor + ';margin-bottom:2px;">' + d + '</div>';
+    trips.slice(0,3).forEach(function(t) {
+      var u    = ALL_USERS.find(function(x) { return x.empId === t.empId; });
+      var name = (u ? (u.nameEn || u.nameZh || u.empId) : t.empId) || t.empId;
+      var col  = staffColorMap[t.empId] || '#6366f1';
+      html += '<div onclick="event.stopPropagation();openTripModal(\'' + t.id + '\')" '
+        + 'style="font-size:9px;background:' + col + '22;color:' + col + ';border-radius:3px;padding:1px 4px;margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600;">'
+        + escHtml(name.split(' ')[0]) + '</div>';
+    });
+    if (trips.length > 3) html += '<div style="font-size:9px;color:var(--tx3);">+' + (trips.length-3) + '</div>';
+    html += '</div>';
+  }
+  var trailing = (7 - (firstDay + daysInMonth) % 7) % 7;
+  for (var i = 0; i < trailing; i++) html += '<div class="trip-cal-empty"></div>';
+  html += '</div></div>';
+  calEl.innerHTML = html;
+
+  // Trip list
+  var listEl = document.getElementById('tripList');
+  if (!listEl) return;
+  var sorted = monthTrips.slice().sort(function(a,b) { return a.dateFrom.localeCompare(b.dateFrom); });
+  if (!sorted.length) {
+    listEl.innerHTML = '<div style="color:var(--tx3);font-size:13px;padding:12px;text-align:center;">No trips this month</div>';
+    return;
+  }
+  listEl.innerHTML = sorted.map(function(t) {
+    var u    = ALL_USERS.find(function(x) { return x.empId === t.empId; });
+    var name = u ? (u.nameEn || u.nameZh || u.empId) : (t.empId || '');
+    var col  = staffColorMap[t.empId] || '#6366f1';
+    var dr   = (t.dateFrom === t.dateTo || !t.dateTo) ? t.dateFrom : (t.dateFrom + ' → ' + t.dateTo);
+    return '<div style="background:var(--s1);border:1px solid var(--br);border-radius:10px;padding:12px 14px;display:flex;gap:12px;align-items:flex-start;margin-bottom:8px;">'
+      + '<div style="width:6px;min-height:40px;border-radius:3px;background:' + col + ';flex-shrink:0;"></div>'
+      + '<div style="flex:1;min-width:0;">'
+      + '<div style="font-size:13px;font-weight:700;color:var(--tx);">' + escHtml(name) + ' <span style="font-size:11px;color:var(--tx3);">(' + escHtml(t.empId||'') + ')</span>'
+      + ' <span style="font-size:11px;color:var(--ac);font-weight:600;">✈ ' + escHtml(t.dest||'') + '</span></div>'
+      + '<div style="font-size:12px;color:var(--tx2);margin-top:3px;">📅 ' + dr + '</div>'
+      + (t.flight ? '<div style="font-size:11px;color:var(--tx3);">🛫 ' + escHtml(t.flight) + '</div>' : '')
+      + (t.notes  ? '<div style="font-size:11px;color:var(--tx3);margin-top:2px;">' + escHtml(t.notes) + '</div>' : '')
+      + '</div>'
+      + '<button onclick="openTripModal(\'' + t.id + '\')" style="padding:4px 10px;border-radius:6px;border:1px solid var(--br);background:var(--s2);color:var(--tx2);font-size:11px;cursor:pointer;flex-shrink:0;">Edit</button>'
+      + '</div>';
+  }).join('');
+}
+
+function tripDayClick(d) {
+  var listEl = document.getElementById('tripList');
+  if (listEl) listEl.scrollIntoView({ behavior: 'smooth' });
+}
+
+function openTripModal(id) {
+  editTripId = id;
+  var trip   = id ? TRIPS.find(function(x) { return x.id === id; }) : null;
+  document.getElementById('trip-modal-title').textContent = id ? 'Edit Trip' : 'New Trip';
+
+  var staffSel = document.getElementById('trip-staff');
+  if (staffSel) {
+    staffSel.innerHTML = '<option value="">— Select Staff —</option>'
+      + ALL_USERS.slice().sort(function(a,b) {
+          return (a.nameEn||a.nameZh||a.empId||'').localeCompare(b.nameEn||b.nameZh||b.empId||'');
+        }).map(function(u) {
+          return '<option value="' + escHtml(u.empId) + '">' + escHtml(u.nameEn||u.nameZh||u.empId) + ' (' + escHtml(u.empId) + ')</option>';
+        }).join('');
+    staffSel.value = (trip ? trip.empId : SESSION && SESSION.empId) || '';
+  }
+
+  function fld(id, val) { var el = document.getElementById(id); if (el) el.value = val || ''; }
+  fld('trip-date-from',      trip && trip.dateFrom);
+  fld('trip-date-to',        trip && trip.dateTo);
+  fld('trip-dest',           trip && trip.dest);
+  fld('trip-flight',         trip && trip.flight);
+  fld('trip-notes',          trip && trip.notes);
+  fld('trip-out-dep-city',   trip && trip.out && trip.out.depCity);
+  fld('trip-out-dep-airport',trip && trip.out && trip.out.depAirport);
+  fld('trip-out-dep-terminal',trip && trip.out && trip.out.depTerminal);
+  fld('trip-out-dep-time',   trip && trip.out && trip.out.depTime);
+  fld('trip-out-arr-city',   trip && trip.out && trip.out.arrCity);
+  fld('trip-out-arr-airport',trip && trip.out && trip.out.arrAirport);
+  fld('trip-out-arr-terminal',trip && trip.out && trip.out.arrTerminal);
+  fld('trip-out-arr-time',   trip && trip.out && trip.out.arrTime);
+  fld('trip-ret-dep-city',   trip && trip.ret && trip.ret.depCity);
+  fld('trip-ret-dep-airport',trip && trip.ret && trip.ret.depAirport);
+  fld('trip-ret-dep-terminal',trip && trip.ret && trip.ret.depTerminal);
+  fld('trip-ret-dep-time',   trip && trip.ret && trip.ret.depTime);
+  fld('trip-ret-arr-city',   trip && trip.ret && trip.ret.arrCity);
+  fld('trip-ret-arr-airport',trip && trip.ret && trip.ret.arrAirport);
+  fld('trip-ret-arr-terminal',trip && trip.ret && trip.ret.arrTerminal);
+  fld('trip-ret-arr-time',   trip && trip.ret && trip.ret.arrTime);
+
+  var delBtn = document.getElementById('trip-del');
+  if (delBtn) delBtn.style.display = id ? '' : 'none';
+
+  var overlay = document.getElementById('tripOverlay');
+  if (overlay) overlay.classList.add('show');
+}
+
+function closeTripModal(e) {
+  if (e && e.target !== document.getElementById('tripOverlay')) return;
+  var overlay = document.getElementById('tripOverlay');
+  if (overlay) overlay.classList.remove('show');
+  editTripId = null;
+}
+
+async function saveTrip() {
+  var empId    = (document.getElementById('trip-staff') || {}).value || '';
+  var dateFrom = (document.getElementById('trip-date-from') || {}).value || '';
+  var dateTo   = (document.getElementById('trip-date-to') || {}).value || '';
+  var dest     = (document.getElementById('trip-dest') || {}).value || '';
+  var flight   = (document.getElementById('trip-flight') || {}).value || '';
+  var notes    = (document.getElementById('trip-notes') || {}).value || '';
+
+  if (!empId || !dateFrom || !dest) { toast('Staff, Date From, and Destination are required'); return; }
+
+  function gv(id) { var el = document.getElementById(id); return el ? el.value.trim() : ''; }
+  var tripData = {
+    empId: empId, dateFrom: dateFrom, dateTo: dateTo || dateFrom, dest: dest,
+    flight: flight, notes: notes, updatedAt: Date.now(),
+    out: { depCity: gv('trip-out-dep-city'), depAirport: gv('trip-out-dep-airport'), depTerminal: gv('trip-out-dep-terminal'), depTime: gv('trip-out-dep-time'), arrCity: gv('trip-out-arr-city'), arrAirport: gv('trip-out-arr-airport'), arrTerminal: gv('trip-out-arr-terminal'), arrTime: gv('trip-out-arr-time') },
+    ret: { depCity: gv('trip-ret-dep-city'), depAirport: gv('trip-ret-dep-airport'), depTerminal: gv('trip-ret-dep-terminal'), depTime: gv('trip-ret-dep-time'), arrCity: gv('trip-ret-arr-city'), arrAirport: gv('trip-ret-arr-airport'), arrTerminal: gv('trip-ret-arr-terminal'), arrTime: gv('trip-ret-arr-time') }
+  };
+
+  try {
+    if (editTripId) {
+      await db.collection(COL_TRIP).doc(editTripId).set(tripData, { merge: true });
+      var idx = TRIPS.findIndex(function(x) { return x.id === editTripId; });
+      if (idx >= 0) TRIPS[idx] = Object.assign({ id: editTripId }, tripData);
+    } else {
+      tripData.createdAt = Date.now();
+      var ref = await db.collection(COL_TRIP).add(tripData);
+      TRIPS.push(Object.assign({ id: ref.id }, tripData));
+    }
+    closeTripModal();
+    renderTripPage();
+    toast(editTripId ? 'Trip updated' : 'Trip added', 'ok');
+  } catch(e) {
+    toast('Save failed: ' + e.message, 'err');
+  }
+}
+
+async function deleteTrip() {
+  if (!editTripId) return;
+  if (!confirm('Delete this trip?')) return;
+  try {
+    await db.collection(COL_TRIP).doc(editTripId).delete();
+    TRIPS = TRIPS.filter(function(x) { return x.id !== editTripId; });
+    closeTripModal();
+    renderTripPage();
+    toast('Trip deleted', 'ok');
+  } catch(e) {
+    toast('Delete failed: ' + e.message, 'err');
+  }
+}
+
 </script>
 </body>
 </html>

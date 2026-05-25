@@ -360,7 +360,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.15</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.16</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
@@ -802,7 +802,6 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
     <div class="reader-meta" id="reader-meta"></div>
     <div class="reader-body" id="reader-body-content"></div>
     <div class="reader-footer">
-      <button class="reader-btn primary" id="reader-edit-btn" onclick="readerEdit()">✏️ 編輯</button>
       <button class="reader-btn" id="reader-dl-btn" style="display:none;" onclick="readerDownload()">↓ 下載原始檔</button>
       <button class="reader-btn" onclick="closeReader()" style="margin-left:auto;">關閉</button>
     </div>
@@ -2519,7 +2518,8 @@ async function loadDocs() {
 
     // 權限判斷
     const showDelete = canDelete(d.author_name);
-    const showEdit   = canEdit(d.author_name);
+    const kmsR = getKmsRole();
+    const showEdit = (kmsR === 'admin' || kmsR === 'dcc') ? true : canEdit(d.author_name);
 
     return `
     <div class="doc-item" id="doc-item-${d.id}" style="flex-wrap:wrap;gap:4px;">
@@ -3214,15 +3214,6 @@ async function openReader(id) {
     dlBtn.style.display = 'none';
   }
 
-  // 編輯按鈕：只有能編輯的才顯示
-  const editBtn = document.getElementById('reader-edit-btn');
-  if (editBtn) {
-    if (canEdit(doc.author_name)) {
-      editBtn.style.display = '';
-    } else {
-      editBtn.style.display = 'none';
-    }
-  }
 
   // 閱覽計數
   if (CFG.supabaseUrl && CFG.supabaseKey && !id.startsWith('demo-') && !id.startsWith('local-')) {

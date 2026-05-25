@@ -360,7 +360,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.16</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.17</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
@@ -1161,16 +1161,10 @@ function canDelete(docAuthorName) {
 }
 
 // 判斷目前用戶能否編輯某份文件
+// 策略：有 Portal session 登入即可編輯，刪除才限制 admin
 function canEdit(docAuthorName) {
   if (!portalUser) return true; // 沒有 portal session → 全權
-  const role = getKmsRole();
-  if (role === 'admin' || role === 'dcc') return true; // admin/dcc 可編輯所有文件
-  if (!docAuthorName || docAuthorName === 'Admin') return true; // 作者未填或預設值
-  // 比對姓名或工號任一符合即可
-  const nameEn  = portalUser.nameEn  || '';
-  const nameZh  = portalUser.nameZh  || '';
-  const empId   = portalUser.empId   || '';
-  return [nameEn, nameZh, empId].filter(Boolean).some(n => n === docAuthorName);
+  return true; // 有登入皆可編輯，由 saveDoc 的 author 欄位控管身份
 }
 
 async function initPortalSession() {
@@ -2518,8 +2512,7 @@ async function loadDocs() {
 
     // 權限判斷
     const showDelete = canDelete(d.author_name);
-    const kmsR = getKmsRole();
-    const showEdit = (kmsR === 'admin' || kmsR === 'dcc') ? true : canEdit(d.author_name);
+    const showEdit = !!portalUser || true; // 有登入或無 session 皆可編輯
 
     return `
     <div class="doc-item" id="doc-item-${d.id}" style="flex-wrap:wrap;gap:4px;">

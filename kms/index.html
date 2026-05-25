@@ -360,7 +360,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.17</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.18</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
@@ -2384,6 +2384,16 @@ function resetDocAuthor() {
   if (!el) return;
   el.value = portalUser ? (portalUser.nameEn || portalUser.nameZh || '') : '';
 }
+function getFileIcon(fileName) {
+  const ext = (fileName || '').split('.').pop().toLowerCase();
+  const map = {
+    pdf:'📄', doc:'📝', docx:'📝', xls:'📊', xlsx:'📊',
+    ppt:'📊', pptx:'📊', csv:'📊', txt:'📃', md:'📃',
+    jpg:'🖼', jpeg:'🖼', png:'🖼',
+  };
+  return map[ext] || '📎';
+}
+
 function clearUploadedFile() {
   uploadedFile = null; uploadedFileUrl = null;
   uploadedFileName = null; uploadedFileType = null; uploadedFileSize = null;

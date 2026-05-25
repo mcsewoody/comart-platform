@@ -360,7 +360,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.14</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.15</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
@@ -1166,9 +1166,12 @@ function canEdit(docAuthorName) {
   if (!portalUser) return true; // 沒有 portal session → 全權
   const role = getKmsRole();
   if (role === 'admin' || role === 'dcc') return true; // admin/dcc 可編輯所有文件
-  const myName = portalUser.nameEn || portalUser.nameZh || portalUser.empId;
-  if (!docAuthorName || docAuthorName === 'Admin') return true; // 作者欄位空白也允許
-  return docAuthorName === myName;
+  if (!docAuthorName || docAuthorName === 'Admin') return true; // 作者未填或預設值
+  // 比對姓名或工號任一符合即可
+  const nameEn  = portalUser.nameEn  || '';
+  const nameZh  = portalUser.nameZh  || '';
+  const empId   = portalUser.empId   || '';
+  return [nameEn, nameZh, empId].filter(Boolean).some(n => n === docAuthorName);
 }
 
 async function initPortalSession() {
@@ -1761,7 +1764,9 @@ async function saveDoc() {
     document.getElementById('doc-lang').value = currentLang;
     document.getElementById('doc-status').value = 'published';
     document.getElementById('doc-author').value = '';
+    resetDocAuthor();
     document.getElementById('doc-reviewer').value = '';
+    resetDocAuthor();
     document.getElementById('doc-valid-until').value = '';
     document.getElementById('doc-related').value = '';
     document.getElementById('doc-product-line').value = '';
@@ -2379,6 +2384,13 @@ function removeExistingFile() {
   toast('原始檔已標記移除，按「更新文件」後生效', '');
 }
 
+
+// 清空編輯器欄位後，把 doc-author 補回登入者姓名
+function resetDocAuthor() {
+  const el = document.getElementById('doc-author');
+  if (!el) return;
+  el.value = portalUser ? (portalUser.nameEn || portalUser.nameZh || '') : '';
+}
 function clearUploadedFile() {
   uploadedFile = null; uploadedFileUrl = null;
   uploadedFileName = null; uploadedFileType = null; uploadedFileSize = null;
@@ -2582,6 +2594,7 @@ function cancelEdit() {
   document.getElementById('doc-lang').value = currentLang;
   document.getElementById('doc-status').value = 'published';
   document.getElementById('doc-author').value = '';
+  resetDocAuthor();
   document.getElementById('doc-reviewer').value = '';
   document.getElementById('doc-valid-until').value = '';
   document.getElementById('doc-related').value = '';
@@ -2649,7 +2662,13 @@ async function openDoc(id) {
   document.getElementById('doc-cat').value = doc.category || 'product';
   document.getElementById('doc-lang').value = doc.lang || 'zh-TW';
   document.getElementById('doc-status').value = doc.status || 'draft';
-  // doc-author 不預填，保持空白
+  // doc-author 填入文件原作者（或目前登入者）
+  const _docAuthorEl = document.getElementById('doc-author');
+  if (_docAuthorEl) {
+    _docAuthorEl.value = doc.author_name && doc.author_name !== 'Admin'
+      ? doc.author_name
+      : (portalUser ? (portalUser.nameEn || portalUser.nameZh || '') : '');
+  }
   document.getElementById('doc-reviewer').value = doc.reviewer || '';
   document.getElementById('doc-valid-until').value = doc.valid_until || '';
   document.getElementById('doc-related').value = doc.related || '';
@@ -3771,6 +3790,7 @@ const _origGetDocPayload = () => ({
 // 在 saveDoc 清空時也清 metadata 欄位
 const _origClearEditor = () => {
   document.getElementById('doc-author').value = '';
+  resetDocAuthor();
   document.getElementById('doc-reviewer').value = '';
   document.getElementById('doc-valid-until').value = '';
   document.getElementById('doc-related').value = '';

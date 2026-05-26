@@ -361,7 +361,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.31</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.32</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
@@ -587,7 +587,12 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
 
         <!-- Meta row — 第三行：建立者、有效期、關聯文件 -->
         <div style="padding:6px 12px;border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:var(--bg);flex-shrink:0;">
-          <input class="meta-input" id="doc-author" placeholder="建立者姓名" style="width:110px;" autocomplete="off" name="kms-author-nofill" />
+          <div style="position:relative;display:inline-block;">
+            <input class="meta-input" id="doc-author" placeholder="建立者姓名" style="width:130px;"
+              autocomplete="off" name="kms-author-nofill"
+              oninput="filterAuthorList(this.value)" onfocus="showAuthorList()" onblur="setTimeout(()=>hideAuthorList(),200)" />
+            <div id="author-dropdown" style="display:none;position:absolute;top:100%;left:0;z-index:999;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:0 4px 12px rgba(0,0,0,.12);min-width:200px;max-height:160px;overflow-y:auto;font-size:12px;"></div>
+          </div>
           <div style="position:relative;display:inline-block;">
             <input class="meta-input" id="doc-reviewer" placeholder="審核人（工號或姓名）" style="width:150px;"
               autocomplete="off" oninput="filterReviewerList(this.value)" onfocus="showReviewerList()" onblur="setTimeout(()=>hideReviewerList(),200)" />
@@ -794,9 +799,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeConfig()">取消</button>
       <button class="btn-save" onclick="saveConfig()">儲存設定</button>
-      <button onclick="adminUpdateAllAuthors('Woody Liu')"
-        style="margin-left:8px;padding:7px 14px;border-radius:var(--radius);border:1px solid #F5C6C6;background:#FEF2F2;color:#A32D2D;font-size:13px;cursor:pointer;"
-        title="Admin 工具：批次更新所有文件的作者名稱">⚙ 更新所有 author_name</button>
+
     </div>
   </div>
 </div>
@@ -1717,21 +1720,24 @@ async function saveDoc() {
         if (!doc_id) throw new Error('文件儲存後未取得 ID');
       }
 
-      // ── 步驟 2：觸發 embedding（失敗不擋住文件儲存）──
+      // ── 步驟 2：觸發 embedding（只有新檔案或新文件才執行）──
       if (mode === 'edge-fn') {
-        btn.textContent = 'Edge Function 向量化…';
-        try {
-          // 若 body 過長（> 24000字元 ≈ 6000 tokens），先截斷再存一次供 embedding 用
-          if (body && body.length > 24000) {
-            const truncBody = body.slice(0, 24000);
-            await kmsWrite('update', 'kms_documents', { body: truncBody }, doc_id);
-            toast('文件過長，向量化使用前 24000 字元', '');
+        const shouldEmbed = !editingDocId || !!uploadedFile; // 新文件 or 有換附檔
+        if (shouldEmbed) {
+          btn.textContent = 'Edge Function 向量化…';
+          try {
+            if (body && body.length > 24000) {
+              await kmsWrite('update', 'kms_documents', { body: body.slice(0, 24000) }, doc_id);
+              toast('文件過長，向量化使用前 24000 字元', '');
+            }
+            await callEmbedEdgeFn(doc_id);
+            toast(`已儲存並完成向量化 ✓`, 'success');
+          } catch(embedErr) {
+            console.error('[embed-document]', embedErr);
+            toast(`文件已儲存 ✓，向量化失敗（${embedErr.message.slice(0,60)}）`, '');
           }
-          await callEmbedEdgeFn(doc_id);
-          toast(`已儲存並完成向量化 ✓`, 'success');
-        } catch(embedErr) {
-          console.error('[embed-document]', embedErr);
-          toast(`文件已儲存 ✓，向量化失敗（${embedErr.message.slice(0,60)}）— 可稍後重新上傳觸發`, '');
+        } else {
+          toast('文件已更新 ✓', 'success');
         }
 
       } else if (mode === 'direct-openai') {
@@ -2518,46 +2524,48 @@ function removeExistingFile() {
 
 // 組合 author_name：empId + nameEn，讓工號和姓名都可搜尋
 
-// ─── Admin 工具：批次更新所有文件 author_name 為指定名稱 ───
-async function adminUpdateAllAuthors(newName) {
-  if (!CFG.supabaseUrl || !CFG.supabaseKey) { toast('需要 Supabase 設定', 'error'); return; }
-  if (!newName) { newName = prompt('請輸入新的作者名稱（English Name）：', 'Woody Liu'); }
-  if (!newName) return;
-  if (!confirm(`確定將所有文件的 author_name 更新為「${newName}」？此操作無法復原。`)) return;
-  try {
-    toast('更新中…', '');
-    await kmsWrite('update-all', 'kms_documents', { author_name: newName });
-    toast(`✅ 所有文件 author_name 已更新為「${newName}」`, 'success');
-    await loadDocs();
-  } catch(e) {
-    // kmsWrite update-all 可能不支援，改用直接 PATCH 不帶 id filter
-    try {
-      const res = await fetch(CFG.supabaseUrl + '/rest/v1/kms_documents?author_name=neq.NULL_PLACEHOLDER', {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + CFG.supabaseKey,
-          'apikey': CFG.supabaseKey,
-          'Prefer': 'return=minimal',
-        },
-        body: JSON.stringify({ author_name: newName }),
-      });
-      if (res.ok) {
-        toast(`✅ 所有文件 author_name 已更新為「${newName}」`, 'success');
-        await loadDocs();
-      } else {
-        const err = await res.text();
-        toast('更新失敗：' + err.slice(0, 100), 'error');
-      }
-    } catch(e2) {
-      toast('更新失敗：' + e2.message, 'error');
-    }
-  }
-}
 
 function buildAuthorName() {
   if (!portalUser) return document.getElementById('doc-author')?.value.trim() || 'Admin';
   return portalUser.nameEn || portalUser.nameZh || document.getElementById('doc-author')?.value.trim() || 'Admin';
+}
+
+
+// ─── 建立者下拉（複用 Firebase users 快取）───
+function renderAuthorDropdown(users) {
+  const dd = document.getElementById('author-dropdown');
+  if (!dd) return;
+  if (!users.length) { dd.innerHTML = '<div style="padding:8px 12px;color:var(--text-3);">無符合人員</div>'; return; }
+  dd.innerHTML = users.slice(0, 10).map(u => `
+    <div onclick="selectAuthor('${(u.nameEn||u.nameZh||'').replace(/'/g,'')}')"
+      style="padding:7px 12px;cursor:pointer;display:flex;gap:8px;align-items:center;"
+      onmouseover="this.style.background='var(--bg)'" onmouseout="this.style.background=''">
+      <span style="flex:1;">${u.nameEn || u.nameZh}</span>
+      <span style="color:var(--text-3);font-size:11px;">${u.site||''}</span>
+    </div>`).join('');
+}
+function selectAuthor(name) {
+  const el = document.getElementById('doc-author');
+  if (el) el.value = name;
+  hideAuthorList();
+}
+async function showAuthorList() {
+  const users = await loadReviewerUsers();
+  const q = (document.getElementById('doc-author')?.value || '').toLowerCase();
+  renderAuthorDropdown(q ? users.filter(u => (u.nameEn||'').toLowerCase().includes(q) || (u.nameZh||'').includes(q)) : users);
+  const dd = document.getElementById('author-dropdown');
+  if (dd) dd.style.display = 'block';
+}
+async function filterAuthorList(val) {
+  const users = await loadReviewerUsers();
+  const q = val.toLowerCase();
+  renderAuthorDropdown(q ? users.filter(u => (u.nameEn||'').toLowerCase().includes(q) || (u.nameZh||'').includes(q)) : users);
+  const dd = document.getElementById('author-dropdown');
+  if (dd) dd.style.display = 'block';
+}
+function hideAuthorList() {
+  const dd = document.getElementById('author-dropdown');
+  if (dd) dd.style.display = 'none';
 }
 
 function resetDocAuthor() {
@@ -4390,28 +4398,26 @@ async function loadReviewPanel() {
     // 顯示待審核文件列表
     content.innerHTML = '<div style="text-align:center;color:var(--text-3);padding:20px 0;font-size:13px;">載入中…</div>';
     try {
-      let pendingDocs = [];
+      let allRevDocs = [];
       if (CFG.supabaseUrl && CFG.supabaseKey) {
-        pendingDocs = await sbFetch("/rest/v1/kms_documents?status=eq.review&select=id,title,author_name,reviewer,updated_at&order=updated_at.desc") || [];
+        allRevDocs = await sbFetch("/rest/v1/kms_documents?select=id,title,status,author_name,reviewer,category,updated_at&order=updated_at.desc") || [];
       }
-      if (!pendingDocs.length) {
-        content.innerHTML = '<div style="text-align:center;color:var(--text-3);padding:40px 0;font-size:13px;">目前無待審核文件</div>';
+      if (!allRevDocs.length) {
+        content.innerHTML = '<div style="text-align:center;color:var(--text-3);padding:40px 0;font-size:13px;">目前無文件</div>';
         return;
       }
-      // 所有待審文件一律顯示（reviewer 和 admin 皆可審）
-      const myName = portalUser ? (portalUser.nameEn || portalUser.nameZh) : null;
-      content.innerHTML = `
-        <div class="section-hd">待審核文件（${pendingDocs.length}）</div>
-        ${pendingDocs.map(d => {
-          const isMyReview = myName && d.reviewer && d.reviewer.includes(myName);
-          return `
-          <div class="doc-item" style="margin-bottom:6px;cursor:pointer;" onclick="openReviewPanel('${d.id}','${(d.title||'').replace(/'/g,'')}')">
-            <span class="doc-title" style="flex:1;">${d.title}</span>
-            <span style="font-size:11px;color:${isMyReview?'var(--blue)':'var(--text-3)'};">
-              ${d.reviewer ? '審核人：'+d.reviewer : '未指定審核人'}${isMyReview?' ★':''}
-            </span>
-            <span class="status-badge sb-review" style="margin-left:6px;">待審核</span>
-          </div>`;}).join('')}`;
+      const grouped2 = { draft:[], review:[], published:[], archived:[] };
+      allRevDocs.forEach(d => { (grouped2[d.status] || grouped2.draft).push(d); });
+      const stCfg = { draft:{label:'草稿',badge:'sb-draft'}, review:{label:'待審核',badge:'sb-review'}, published:{label:'已發佈',badge:'sb-published'}, archived:{label:'已封存',badge:'sb-archived'} };
+      const renderRevCard = d => {
+        const st = stCfg[d.status]||stCfg.draft;
+        const meta = CAT_META[d.category]||{icon:'📁'};
+        const dt = d.updated_at ? new Date(d.updated_at).toLocaleDateString('zh-TW',{month:'2-digit',day:'2-digit'}) : '';
+        const sid = (d.title||'').replace(/'/g,'');
+        return `<div onclick="openReviewPanel('${d.id}','${sid}')" style="border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px;cursor:pointer;background:var(--surface);" onmouseover="this.style.boxShadow='0 2px 8px rgba(0,0,0,.1)'" onmouseout="this.style.boxShadow=''"><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;"><span class="status-badge ${st.badge}">${st.label}</span><span style="font-size:10px;color:var(--text-3);">${meta.icon} ${dt}</span></div><div style="font-size:13px;font-weight:500;line-height:1.4;margin-bottom:4px;">${d.title}</div><div style="font-size:11px;color:var(--text-3);">${d.author_name||'—'}${d.reviewer?' · 審：'+d.reviewer:''}</div></div>`;
+      };
+      const renderRevGrp = k => grouped2[k].length ? `<div style="margin-bottom:16px;"><div class="section-hd">${stCfg[k].label}（${grouped2[k].length}）</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;margin-top:6px;">${grouped2[k].map(renderRevCard).join('')}</div></div>` : '';
+      content.innerHTML = renderRevGrp('review') + renderRevGrp('draft') + renderRevGrp('published') + renderRevGrp('archived');
     } catch(e) {
       content.innerHTML = `<div style="color:var(--red);padding:20px;">載入失敗：${e.message}</div>`;
     }

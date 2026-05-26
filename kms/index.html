@@ -361,7 +361,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.28</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.29</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
@@ -2139,9 +2139,9 @@ async function extractText(file, ext) {
       if (result.value && result.value.length > 10) return result.value;
       throw new Error('mammoth 抽不到文字');
     } catch(mammothErr) {
-      // .doc 解析失敗時 fallback 到 claude-proxy
-      console.warn('[doc] mammoth 失敗，改用 Claude:', mammothErr.message);
-      return await extractPdfWithClaude(file);
+      console.warn('[doc] mammoth 失敗:', mammothErr.message);
+      // .doc（OLE2）部分格式 mammoth 不支援，請另存為 .docx
+      throw new Error('.doc 格式解析失敗，請在 Word 中另存為 .docx 後再上傳');
     }
   }
 
@@ -4268,7 +4268,36 @@ async function openReviewPanel(docId, docTitle) {
 
 async function loadReviewPanel() {
   const content = document.getElementById('review-content');
-  if (!reviewingDocId) return;
+  if (!reviewingDocId) {
+    // 顯示待審核文件列表
+    content.innerHTML = '<div style="text-align:center;color:var(--text-3);padding:20px 0;font-size:13px;">載入中…</div>';
+    try {
+      let pendingDocs = [];
+      if (CFG.supabaseUrl && CFG.supabaseKey) {
+        pendingDocs = await sbFetch("/rest/v1/kms_documents?status=eq.review&select=id,title,author_name,reviewer,updated_at&order=updated_at.desc") || [];
+      }
+      if (!pendingDocs.length) {
+        content.innerHTML = '<div style="text-align:center;color:var(--text-3);padding:40px 0;font-size:13px;">目前無待審核文件</div>';
+        return;
+      }
+      // 取我的名字用於過濾
+      const myName = portalUser ? (portalUser.nameEn || portalUser.nameZh || portalUser.empId) : null;
+      const myDocs = myName ? pendingDocs.filter(d => !d.reviewer || d.reviewer === myName) : pendingDocs;
+      const otherDocs = myName ? pendingDocs.filter(d => d.reviewer && d.reviewer !== myName) : [];
+      const renderList = (docs, label) => docs.length ? `
+        <div class="section-hd">${label}（${docs.length}）</div>
+        ${docs.map(d => `
+          <div class="doc-item" style="margin-bottom:6px;cursor:pointer;" onclick="openReviewPanel('${d.id}','${(d.title||'').replace(/'/g,'')}')">
+            <span class="doc-title" style="flex:1;">${d.title}</span>
+            <span style="font-size:11px;color:var(--text-3);">${d.reviewer ? '審核人：'+d.reviewer : '未指定審核人'}</span>
+            <span class="status-badge sb-review" style="margin-left:6px;">待審核</span>
+          </div>`).join('')}` : '';
+      content.innerHTML = renderList(myDocs, '指定給我審核') + renderList(otherDocs, '其他待審文件');
+    } catch(e) {
+      content.innerHTML = `<div style="color:var(--red);padding:20px;">載入失敗：${e.message}</div>`;
+    }
+    return;
+  }
 
   // 讀文件目前狀態
   try {

@@ -362,7 +362,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.38</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.39</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
@@ -832,6 +832,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
           <div onclick="restoreReaderOriginal()" style="padding:9px 16px;cursor:pointer;font-size:13px;border-top:1px solid var(--border);color:var(--text-3);" onmouseover="this.style.background='var(--bg)'" onmouseout="this.style.background=''">↩ 恢復原文</div>
         </div>
       </div>
+      <button class="reader-btn" onclick="copyReaderContent()" title="複製全文">📋 複製</button>
       <button class="reader-btn" onclick="closeReader()" style="margin-left:auto;">關閉</button>
     </div>
   </div>
@@ -2836,7 +2837,7 @@ async function loadDocs() {
     return `
     <div class="doc-item" id="doc-item-${d.id}" style="flex-wrap:wrap;gap:4px;">
       <div style="display:flex;align-items:center;gap:6px;width:100%;flex-wrap:wrap;">
-        <span class="doc-cat ${catClass[d.category] || 'sop'}">${catLabel[d.category] || d.category}</span>
+        <span class="doc-cat ${catClass[d.category] || 'sop'}" data-cat="${d.category||''}">${catLabel[d.category] || d.category}</span>
         <span class="doc-title" onclick="openReader('${d.id}')" style="cursor:pointer;flex:1;min-width:120px;">${d.title}</span>
         <span style="font-size:11px;color:var(--text-3);">${d.lang || ''}</span>
 
@@ -2902,10 +2903,11 @@ function hasUnsavedChanges() {
   if (!editingDocId || !window._editSnapshot) return false;
   const s = window._editSnapshot;
   const curTitle  = document.getElementById('doc-title')?.value.trim() || '';
-  const curBody   = editorToMarkdown?.() || '';
+  const curBody   = tiptapEditor?.getText?.() || tiptapEditor?.getHTML?.() || '';
   const curCat    = document.getElementById('doc-cat')?.value || '';
   const curStatus = document.getElementById('doc-status')?.value || '';
-  return curTitle !== s.title || curBody !== s.body || curCat !== s.category || curStatus !== s.status;
+  return curTitle !== s.title || curCat !== s.category || curStatus !== s.status;
+  // body 不比對（TipTap 格式轉換可能產生差異）
 }
 
 function cancelEdit() {
@@ -3565,6 +3567,25 @@ async function openReader(id) {
 
 
 // ─── 閱讀器 AI 翻譯 ───
+
+function copyReaderContent() {
+  const bodyEl = document.getElementById('reader-body-content');
+  if (!bodyEl) return;
+  const text = bodyEl.innerText || bodyEl.textContent || '';
+  navigator.clipboard?.writeText(text)
+    .then(() => toast('✅ 已複製全文', 'success'))
+    .catch(() => {
+      // fallback
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      toast('✅ 已複製全文', 'success');
+    });
+}
+
 function toggleTranslateMenu() {
   const m = document.getElementById('translate-menu');
   if (m) m.style.display = m.style.display === 'none' ? 'block' : 'none';
@@ -3789,8 +3810,13 @@ function setLang(lang) {
   event.target.classList.add('active');
   document.documentElement.lang = lang;
   applyI18n();
-  // Update editor placeholder lang
   document.getElementById('doc-lang').value = lang;
+  // 重新渲染動態內容（列表、地圖、報表）
+  const activePanel = document.querySelector('.panel.active')?.id;
+  if (activePanel === 'panel-docs')      loadDocs();
+  if (activePanel === 'panel-kmap')      loadKmap(null);
+  if (activePanel === 'panel-analytics') loadAnalytics();
+  if (activePanel === 'panel-review')    { window._reviewAllDocs = null; loadReviewPanel(); }
 }
 
 function applyI18n() {
@@ -3873,6 +3899,15 @@ function applyI18n() {
   // 系統資訊欄
   const sysRag = document.querySelector('#status-supabase')?.parentElement?.nextElementSibling;
   // 低優先，不強制更新已有 inline text
+
+  // 更新已渲染的 .doc-cat span 分類標籤
+  const catLookup = Object.fromEntries(
+    Object.entries(CAT_META).map(([k,v]) => [k, (I18N[currentLang]||I18N['zh-TW'])['cat.'+k] || v.name])
+  );
+  document.querySelectorAll('.doc-cat[data-cat]').forEach(el => {
+    const cat = el.dataset.cat;
+    if (catLookup[cat]) el.textContent = catLookup[cat];
+  });
 }
 
 // ═══════════════════════════════════════════════

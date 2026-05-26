@@ -361,7 +361,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.35</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.36</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
@@ -712,10 +712,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         <div style="padding:12px 20px;border-bottom:1px solid var(--border);flex-shrink:0;">
           <div style="font-size:15px;font-weight:500;margin-bottom:10px;">審核流程管理</div>
           <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
-            <span class="review-step" id="rs-all" onclick="filterReviewPanel('all')" style="cursor:pointer;">全部</span>
-            <span class="review-step" id="rs-draft" onclick="filterReviewPanel('draft')" style="cursor:pointer;">草稿</span>
-            <span class="review-arrow">→</span>
-            <span class="review-step" id="rs-review" onclick="filterReviewPanel('review')" style="cursor:pointer;">待審核</span>
+            <span class="review-step active" id="rs-draft" onclick="filterReviewPanel('draft')" style="cursor:pointer;">草稿</span>
             <span class="review-arrow">→</span>
             <span class="review-step" id="rs-published" onclick="filterReviewPanel('published')" style="cursor:pointer;">已發佈</span>
             <span class="review-arrow">→</span>
@@ -2771,7 +2768,7 @@ async function loadDocs() {
   let docs = [];
   try {
     if (CFG.supabaseUrl && CFG.supabaseKey) {
-      docs = await sbFetch('/rest/v1/kms_documents?select=id,title,category,lang,status,product_line,customer_tag,tags,author_name,view_count,file_url,file_name,file_type,file_size,updated_at,created_at&order=updated_at.desc') || [];
+      docs = await sbFetch('/rest/v1/kms_documents?select=id,title,category,lang,status,product_line,customer_tag,tags,author_name,view_count,file_url,file_name,file_type,file_size,updated_at,created_at&status=eq.published&order=updated_at.desc') || [];
     } else {
       const saved = localStorage.getItem('kms-local-docs');
       if (saved) localDocs = JSON.parse(saved);
@@ -2841,7 +2838,7 @@ async function loadDocs() {
         <span class="doc-cat ${catClass[d.category] || 'sop'}">${catLabel[d.category] || d.category}</span>
         <span class="doc-title" onclick="openReader('${d.id}')" style="cursor:pointer;flex:1;min-width:120px;">${d.title}</span>
         <span style="font-size:11px;color:var(--text-3);">${d.lang || ''}</span>
-        <span class="status-badge ${statusCls[d.status]||'sb-draft'}">${statusLabel[d.status]||d.status}</span>
+
         <button onclick="openReviewPanel('${d.id}','${safeTitle}')"
           style="padding:3px 7px;border-radius:5px;border:1px solid var(--border);background:var(--bg);font-size:11px;cursor:pointer;flex-shrink:0;" title="審核">📋</button>
         <button onclick="openCommentsPanel('${d.id}','${safeTitle}')"
@@ -2900,9 +2897,19 @@ function refreshSaveBtnLabel() {
   }
 }
 
+function hasUnsavedChanges() {
+  if (!editingDocId || !window._editSnapshot) return false;
+  const s = window._editSnapshot;
+  const curTitle  = document.getElementById('doc-title')?.value.trim() || '';
+  const curBody   = editorToMarkdown?.() || '';
+  const curCat    = document.getElementById('doc-cat')?.value || '';
+  const curStatus = document.getElementById('doc-status')?.value || '';
+  return curTitle !== s.title || curBody !== s.body || curCat !== s.category || curStatus !== s.status;
+}
+
 function cancelEdit() {
-  if (editingDocId) {
-    if (!confirm('放棄編輯？未儲存的變更將會遺失。')) return;
+  if (editingDocId && hasUnsavedChanges()) {
+    if (!confirm('有未儲存的變更，確定放棄？')) return;
   }
   // 清空所有欄位
   editingDocId = null;
@@ -3030,6 +3037,13 @@ async function openDoc(id) {
 
   // 設定為「更新」模式
   editingDocId = id.startsWith('demo-') ? null : id;
+  // 儲存原始快照，供 cancelEdit 比對
+  window._editSnapshot = {
+    title: doc.title || '',
+    body: doc.body || '',
+    category: doc.category || '',
+    status: doc.status || '',
+  };
   updateEditorModeLabel();
   switchPanel('editor');
 
@@ -4494,7 +4508,7 @@ function filterReviewPanel(status) {
   window._reviewFilter = status;
   window._reviewAllDocs = null; // 強制重新載入
   // 更新 tab 樣式
-  ['all','draft','review','published','archived'].forEach(s => {
+  ['draft','published','archived'].forEach(s => {
     const el = document.getElementById('rs-' + s);
     if (el) el.className = 'review-step' + (s === status ? ' active' : '');
   });
@@ -4577,13 +4591,14 @@ async function loadReviewPanel() {
     el.className = 'review-step' + (i < currentIdx ? ' done' : i === currentIdx ? ' active' : '');
   });
 
-  // 可執行的動作（移除送審流程，改為發佈後撤銷機制）
+  // 審核動作
   const actions = [];
-  if (status === 'draft')      actions.push({ label:'直接發佈', cls:'review-btn-approve', next:'published' });
-  if (status === 'published')  actions.push({ label:'封存', cls:'review-btn-archive', next:'archived'  });
-  if (status === 'archived')   actions.push({ label:'恢復發佈', cls:'review-btn-approve', next:'published' });
-  // 撤除：任何非草稿狀態都可以強制退回草稿（管理員用）
-  if (status !== 'draft')      actions.push({ label:'⚠ 撤除（退回草稿）', cls:'review-btn-reject', next:'draft' });
+  if (status === 'draft') {
+    actions.push({ label:'✅ 發佈', cls:'review-btn-approve', next:'published', needReason: false });
+    actions.push({ label:'↩ 退回', cls:'review-btn-reject',  next:'archived',  needReason: true  });
+  }
+  if (status === 'published') actions.push({ label:'封存', cls:'review-btn-archive', next:'archived', needReason: false });
+  if (status === 'archived')  actions.push({ label:'恢復發佈', cls:'review-btn-approve', next:'published', needReason: false });
 
   // 讀審核紀錄
   let logs = [];
@@ -4607,7 +4622,7 @@ async function loadReviewPanel() {
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
           ${actions.map(a => `
             <button class="review-btn ${a.cls}"
-              onclick="executeReview('${reviewingDocId}','${a.next}','${a.label}')">
+              onclick="executeReview('${reviewingDocId}','${a.next}','${a.label}',${a.needReason})">
               ${a.label}
             </button>`).join('')}
         </div>` : '<div style="font-size:13px;color:var(--text-3);">此狀態無可執行動作</div>'}
@@ -4626,32 +4641,48 @@ async function loadReviewPanel() {
   `;
 }
 
-async function executeReview(docId, newStatus, actionLabel) {
-  const note = (newStatus === 'draft')
-    ? prompt('原因（可選填）：') ?? ''
-    : '';
+async function executeReview(docId, newStatus, actionLabel, needReason = false) {
+  let note = '';
+  if (needReason) {
+    note = prompt(`退回原因（必填）：`);
+    if (note === null) return; // 取消
+    if (!note.trim()) { toast('請填寫退回原因', 'error'); return; }
+  }
 
-  // 取得 actor：優先用 doc-author 欄位，fallback 到 'Admin'
-  const actor = document.getElementById('doc-author')?.value.trim() || 'Admin';
+  const actor = portalUser ? (portalUser.nameEn || portalUser.nameZh || portalUser.empId) : 'Admin';
+  const docAuthor = reviewingDoc?.author_name || '';
 
   try {
     if (CFG.supabaseUrl && CFG.supabaseKey) {
-      // 寫入 review_log
       await kmsWrite('insert', 'kms_review_log', {
         doc_id: docId,
         from_status: reviewingDoc?.status || 'draft',
         to_status: newStatus,
         actor,
-        note: note || null,
+        note: note.trim() || null,
       });
-      // 更新文件狀態
       await kmsWrite('update', 'kms_documents',
-        { status: newStatus, review_note: note || null },
+        { status: newStatus, review_note: note.trim() || null },
         docId
       );
     }
     if (reviewingDoc) reviewingDoc.status = newStatus;
-    toast(`已執行：${actionLabel}`, 'success');
+
+    if (newStatus === 'published') {
+      toast(`✅ 已發佈：${reviewingDoc?.title || ''}`, 'success');
+    } else if (needReason) {
+      // 退回：通知原作者（toast 顯示，實際通知需 email 功能）
+      toast(`↩ 已退回給 ${docAuthor}，原因：${note}`, '');
+      // 若日後有 email Edge Function，可在此呼叫
+    } else {
+      toast(`已執行：${actionLabel}`, 'success');
+    }
+
+    // 回退到草稿列表
+    reviewingDocId = null;
+    reviewingDoc = null;
+    window._reviewAllDocs = null;
+    window._reviewFilter = 'draft';
     await loadReviewPanel();
     await loadDocs();
     updateReviewBadge();
@@ -4824,7 +4855,7 @@ window.switchPanel = function(id) {
   if (id === 'kmap')      setTimeout(() => loadKmap(null), 50);
   if (id === 'analytics') setTimeout(loadAnalytics, 50);
   if (id === 'experts')   setTimeout(loadExperts, 50);
-  if (id === 'review')    { window._reviewAllDocs = null; window._reviewFilter = 'all'; setTimeout(loadReviewPanel, 50); }
+  if (id === 'review')    { window._reviewAllDocs = null; window._reviewFilter = 'draft'; setTimeout(loadReviewPanel, 50); }
 };
 
 // 初始化時載入審核 badge

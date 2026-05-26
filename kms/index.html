@@ -361,7 +361,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.19</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.20</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
@@ -608,7 +608,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         </div><!-- end main editor column -->
 
         <!-- Version History Sidebar -->
-        <div id="version-sidebar" style="width:220px;border-left:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;background:var(--surface);">
+        <div id="version-sidebar" style="width:220px;border-left:1px solid var(--border);display:none;flex-direction:column;flex-shrink:0;background:var(--surface);">
           <div style="padding:10px 12px;border-bottom:1px solid var(--border);font-size:12px;font-weight:500;color:var(--text-2);display:flex;align-items:center;justify-content:space-between;">
             版本歷史
             <span id="ver-count" style="background:var(--bg);border:1px solid var(--border);border-radius:10px;font-size:11px;padding:1px 6px;color:var(--text-3);">0</span>
@@ -2573,6 +2573,9 @@ function updateEditorModeLabel() {
   // 重新解析按鈕：編輯既有文件，或新建但已上傳檔案時顯示
   const reparseBtn = document.getElementById('reparse-btn');
   if (reparseBtn) reparseBtn.style.display = (editingDocId || uploadedFile || uploadedFileUrl) ? 'inline-block' : 'none';
+  // 版本歷史側欄：只在編輯既有文件時顯示
+  const verSidebar = document.getElementById('version-sidebar');
+  if (verSidebar) verSidebar.style.display = editingDocId ? 'flex' : 'none';
 }
 
 // 每次 uploadedFile 狀態改變時呼叫，讓 save-btn 提示更準確
@@ -3823,22 +3826,30 @@ async function loadKmap(filterCat) {
     // 顯示某分類的文件列表
     const catDocs = docs.filter(d => d.category === filterCat);
     const meta = CAT_META[filterCat] || { name: filterCat, icon:'📁', color:'#888' };
-    headerTitle.textContent = `${meta.icon} ${meta.name}`;
+    const catLabel = (I18N[currentLang]||I18N['zh-TW'])['cat.'+filterCat] || meta.name;
+    headerTitle.innerHTML = `<span style="color:var(--text-3);font-weight:400;">知識地圖</span>
+      <span style="color:var(--text-3);margin:0 4px;">›</span>
+      <span>${meta.icon} ${catLabel}</span>`;
     headerActions.innerHTML = '';
     content.innerHTML = `
       <div class="kmap-back" onclick="loadKmap(null)">← 回分類總覽</div>
       <div style="padding:12px 20px;">
         ${catDocs.length === 0
           ? '<div style="color:var(--text-3);font-size:13px;padding:20px 0;">此分類尚無文件</div>'
-          : catDocs.map(d => `
+          : catDocs.map(d => {
+              const safeTitle = (d.title||'').replace(/'/g,'').replace(/"/g,'');
+              const canEditDoc = true; // 登入即可編輯（與知識庫列表一致）
+              return `
             <div class="doc-item" style="margin-bottom:6px;" id="doc-item-${d.id}">
-              <span class="doc-cat ${d.category === 'quality'?'sop':d.category==='tacit'?'tacit':d.category==='product'?'product':'sop'}">${meta.name}</span>
+              <span class="doc-cat ${d.category==='tacit'?'tacit':d.category==='product'?'product':'sop'}">${catLabel}</span>
               <span class="doc-title" onclick="openReader('${d.id}')" style="cursor:pointer;flex:1;">${d.title}</span>
               <span style="font-size:11px;color:var(--text-3);margin-right:4px;">👁 ${d.view_count||0}</span>
               <span class="status-badge sb-${d.status||'draft'}">${{draft:'草稿',review:'審核中',published:'已發佈',archived:'封存'}[d.status]||d.status}</span>
-              <button onclick="deleteDoc('${d.id}','${(d.title||'').replace(/'/g,'')}')"
-                style="margin-left:6px;padding:2px 7px;border-radius:5px;border:1px solid #F5C6C6;background:#FEF2F2;color:#A32D2D;font-size:11px;cursor:pointer;">✕</button>
-            </div>`).join('')}
+              <button onclick="openDoc('${d.id}')"
+                style="padding:2px 7px;border-radius:5px;border:1px solid var(--border);background:var(--bg);font-size:11px;cursor:pointer;flex-shrink:0;" title="編輯">✏️</button>
+              <button onclick="deleteDoc('${d.id}','${safeTitle}','${(d.author_name||'').replace(/'/g,'')}')"
+                style="padding:2px 7px;border-radius:5px;border:1px solid #F5C6C6;background:#FEF2F2;color:#A32D2D;font-size:11px;cursor:pointer;flex-shrink:0;">✕</button>
+            </div>`;}).join('')}
       </div>`;
     return;
   }

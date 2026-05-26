@@ -278,6 +278,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
 .sb-review   { background:var(--amber-bg); color:var(--amber); }
 .sb-published{ background:var(--green-bg); color:var(--green); }
 .sb-archived { background:#F0F0F0; color:#888; }
+.sb-withdrawn { background: #FEF2F2; color: #A32D2D; border: 1px solid #F5C6C6; }
 
 /* ─── Comments ─── */
 .comment-wrap { display:flex;flex-direction:column;gap:10px;padding:16px 20px; }
@@ -361,7 +362,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.36</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.37</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
@@ -552,6 +553,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
           <select class="meta-select" id="doc-status">
             <option value="published">已發佈</option>
             <option value="draft">草稿（暫不公開）</option>
+            <option value="withdrawn">已撤回</option>
             <option value="archived">已封存</option>
           </select>
           <button class="save-btn" onclick="saveDoc()" data-i18n="editor.save">儲存並向量化</button>
@@ -2815,7 +2817,7 @@ async function loadDocs() {
 
   const catLabel = Object.fromEntries(Object.entries(CAT_META).map(([k,v])=>[k, (I18N[currentLang]||I18N['zh-TW'])['cat.'+k] || v.name]));
   const catClass = { product:'product', mfg:'sop', quality:'sop', sales:'sop', supply:'sop', compliance:'sop', hr:'hr', tacit:'tacit', ai_tech:'product', industry:'product' };
-  const statusLabel = { draft:'草稿', published:'已發佈', archived:'已封存' };
+  const statusLabel = { draft:'草稿', published:'已發佈', archived:'已封存', withdrawn:'已撤回' };
   const statusCls   = { draft:'sb-draft', published:'sb-published', archived:'sb-archived' };
 
   list.innerHTML = filtered.map(d => {
@@ -3510,7 +3512,7 @@ async function openReader(id) {
   // Meta badges
   const _cl = Object.fromEntries(Object.entries(CAT_META).map(([k,v])=>[k,(I18N[currentLang]||I18N['zh-TW'])['cat.'+k]||v.name])); const catLabel = { ..._cl,
     supply:'供應鏈採購', compliance:'法規認證', hr:'人資培訓', tacit:'內隱知識', ai_tech:'AI 科技', industry:'產業新知' };
-  const statusLabel = { draft:'草稿', published:'已發佈', archived:'已封存' };
+  const statusLabel = { draft:'草稿', published:'已發佈', archived:'已封存', withdrawn:'已撤回' };
   const metaParts = [
     doc.category ? `<span style="font-size:11px;padding:2px 8px;border-radius:10px;background:var(--blue-bg);color:var(--blue);">${catLabel[doc.category]||doc.category}</span>` : '',
     doc.product_line ? `<span style="font-size:11px;padding:2px 8px;border-radius:10px;background:#FEF0E8;color:#B5410A;">📦 ${doc.product_line}</span>` : '',
@@ -4521,6 +4523,7 @@ function renderReviewList(filterStatus) {
     draft:     { label:'草稿',   badge:'sb-draft'     },
     review:    { label:'待審核',  badge:'sb-review'    },
     published: { label:'已發佈',  badge:'sb-published' },
+    withdrawn: { label:'已撤回',  badge:'sb-withdrawn' },
     archived:  { label:'已封存',  badge:'sb-archived'  },
   };
   let docs = window._reviewAllDocs || [];
@@ -4581,7 +4584,7 @@ async function loadReviewPanel() {
 
   const status = reviewingDoc?.status || 'draft';
   const steps = ['draft','published','archived'];
-  const stepNames = { draft:'草稿', published:'已發佈', archived:'已封存' };
+  const stepNames = { draft:'草稿', published:'已發佈', archived:'已封存', withdrawn:'已撤回' };
   const currentIdx = steps.indexOf(status);
 
   // 更新流程指示器
@@ -4591,14 +4594,13 @@ async function loadReviewPanel() {
     el.className = 'review-step' + (i < currentIdx ? ' done' : i === currentIdx ? ' active' : '');
   });
 
-  // 審核動作
-  const actions = [];
-  if (status === 'draft') {
-    actions.push({ label:'✅ 發佈', cls:'review-btn-approve', next:'published', needReason: false });
-    actions.push({ label:'↩ 退回', cls:'review-btn-reject',  next:'archived',  needReason: true  });
-  }
-  if (status === 'published') actions.push({ label:'封存', cls:'review-btn-archive', next:'archived', needReason: false });
-  if (status === 'archived')  actions.push({ label:'恢復發佈', cls:'review-btn-approve', next:'published', needReason: false });
+  // 審核動作：Admin/DCC 不論現在狀態都可執行四種動作
+  const actions = [
+    { label:'✅ 核准發佈', cls:'review-btn-approve', next:'published',  needReason: false },
+    { label:'↩ 退回草稿', cls:'review-btn-reject',  next:'draft',      needReason: false },
+    { label:'⚠ 撤回',    cls:'review-btn-reject',   next:'withdrawn',  needReason: true  },
+    { label:'📦 封存',    cls:'review-btn-archive',  next:'archived',   needReason: true  },
+  ];
 
   // 讀審核紀錄
   let logs = [];
@@ -4644,50 +4646,63 @@ async function loadReviewPanel() {
 async function executeReview(docId, newStatus, actionLabel, needReason = false) {
   let note = '';
   if (needReason) {
-    note = prompt(`退回原因（必填）：`);
-    if (note === null) return; // 取消
-    if (!note.trim()) { toast('請填寫退回原因', 'error'); return; }
+    note = prompt(actionLabel + ' — 請填寫原因（必填）：');
+    if (note === null) return;
+    if (!note.trim()) { toast('請填寫原因', 'error'); return; }
   }
 
-  const actor = portalUser ? (portalUser.nameEn || portalUser.nameZh || portalUser.empId) : 'Admin';
-  const docAuthor = reviewingDoc?.author_name || '';
+  // 權限檢查：只有 Admin / DCC 可執行
+  const role = getKmsRole();
+  if (role !== 'admin' && role !== 'dcc') {
+    // fallback：若 portalUser.role 含 admin/dcc
+    const pRole = (portalUser?.role || '').toLowerCase();
+    if (!pRole.includes('admin') && !pRole.includes('dcc')) {
+      toast('權限不足：只有 Admin / DCC 可執行此操作', 'error');
+      return;
+    }
+  }
+
+  const actor    = portalUser ? (portalUser.nameEn || portalUser.nameZh || '') : 'Admin';
+  const docTitle = reviewingDoc?.title || '';
+  const docAuthor= reviewingDoc?.author_name || '';
+  const fromStatus = reviewingDoc?.status || 'draft';
+  const btn = document.querySelector('.review-btn-approve, .review-btn-reject, .review-btn-archive');
 
   try {
     if (CFG.supabaseUrl && CFG.supabaseKey) {
-      await kmsWrite('insert', 'kms_review_log', {
-        doc_id: docId,
-        from_status: reviewingDoc?.status || 'draft',
-        to_status: newStatus,
-        actor,
-        note: note.trim() || null,
-      });
+      // 寫入 review_log
+      try {
+        await kmsWrite('insert', 'kms_review_log', {
+          doc_id: docId, from_status: fromStatus, to_status: newStatus,
+          actor, note: note.trim() || null,
+        });
+      } catch(logErr) { console.warn('[review_log]', logErr.message); }
+
+      // 更新文件狀態
       await kmsWrite('update', 'kms_documents',
-        { status: newStatus, review_note: note.trim() || null },
+        { status: newStatus, review_note: note.trim() || null, updated_at: new Date().toISOString() },
         docId
       );
     }
-    if (reviewingDoc) reviewingDoc.status = newStatus;
 
-    if (newStatus === 'published') {
-      toast(`✅ 已發佈：${reviewingDoc?.title || ''}`, 'success');
-    } else if (needReason) {
-      // 退回：通知原作者（toast 顯示，實際通知需 email 功能）
-      toast(`↩ 已退回給 ${docAuthor}，原因：${note}`, '');
-      // 若日後有 email Edge Function，可在此呼叫
-    } else {
-      toast(`已執行：${actionLabel}`, 'success');
-    }
+    const msgs = {
+      published:  `✅ 已核准發佈：${docTitle}`,
+      draft:      `↩ 已退回草稿：${docTitle}`,
+      withdrawn:  `⚠ 已撤回：${docTitle}${note ? '，原因：'+note : ''}`,
+      archived:   `📦 已封存：${docTitle}${note ? '，原因：'+note : ''}`,
+    };
+    toast(msgs[newStatus] || `已執行：${actionLabel}`, newStatus === 'published' ? 'success' : '');
 
-    // 回退到草稿列表
+    // 回到草稿列表
     reviewingDocId = null;
-    reviewingDoc = null;
+    reviewingDoc   = null;
     window._reviewAllDocs = null;
-    window._reviewFilter = 'draft';
-    await loadReviewPanel();
-    await loadDocs();
+    window._reviewFilter  = 'draft';
+    await Promise.all([loadReviewPanel(), loadDocs()]);
     updateReviewBadge();
   } catch(e) {
     toast('操作失敗：' + e.message, 'error');
+    console.error('[executeReview]', e);
   }
 }
 

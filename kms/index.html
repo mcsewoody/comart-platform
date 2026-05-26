@@ -157,7 +157,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
 .ProseMirror p.is-editor-empty:first-child::before { content: attr(data-placeholder); color: var(--text-3); pointer-events: none; float: left; height: 0; }
 
 /* ─── Docs list ─── */
-.docs-wrap { flex: 1; overflow-y: auto; padding: 16px 20px; }
+.docs-wrap { flex: 1; overflow-y: auto; padding: 16px 20px 60px; }
 .docs-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
 .docs-title { font-size: 16px; font-weight: 500; }
 .new-btn { padding: 6px 14px; background: var(--blue); color: #fff; border: none; border-radius: var(--radius); cursor: pointer; font-size: 13px; }
@@ -361,7 +361,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.34</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.35</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
@@ -4262,7 +4262,7 @@ async function loadAnalytics() {
     if (CFG.supabaseUrl && CFG.supabaseKey) {
       [docs, authorStats] = await Promise.all([
         sbFetch('/rest/v1/kms_documents?select=id,title,category,author_name,view_count,status,updated_at&order=view_count.desc'),
-        sbFetch('/rest/v1/kms_author_stats'),
+        sbFetch('/rest/v1/kms_documents?select=author_name&author_name=not.is.null'),
       ]);
     } else {
       docs = DEMO_DOCS.map(d => ({ ...d, view_count: Math.floor(Math.random()*80)+5 }));
@@ -4310,14 +4310,24 @@ async function loadAnalytics() {
         </div>`).join('');
     })()}
 
-    ${authorStats?.length ? `
+    ${authorStats?.length ? (() => {
+      // 從 author_name 陣列計算每人文件數
+      const countMap = {};
+      authorStats.forEach(d => {
+        const name = d.author_name || '未知';
+        countMap[name] = (countMap[name] || 0) + 1;
+      });
+      const sorted = Object.entries(countMap).sort((a,b) => b[1]-a[1]).slice(0,10);
+      const maxCount = sorted[0]?.[1] || 1;
+      return `
     <div class="section-hd">貢獻度統計（依作者）</div>
-    ${authorStats.slice(0,6).map(a => `
+    ${sorted.map(([name, cnt]) => `
       <div class="chart-row">
-        <span class="chart-label" style="cursor:pointer;color:var(--blue);" onclick="viewExpertDocs('${a.author_name||''}')" title="查看此作者文章">${a.author_name||'未知'}</span>
-        <div class="chart-track"><div class="chart-fill" style="width:${Math.round((a.doc_count/Math.max(...authorStats.map(x=>x.doc_count),1))*100)}%;background:var(--green);"></div></div>
-        <span class="chart-val">${a.doc_count}</span>
-      </div>`).join('')}` : ''}
+        <span class="chart-label" style="cursor:pointer;color:var(--blue);" onclick="viewExpertDocs('${name.replace(/'/g,'')}')" title="查看此作者文章">${name}</span>
+        <div class="chart-track"><div class="chart-fill" style="width:${Math.round((cnt/maxCount)*100)}%;background:var(--green);"></div></div>
+        <span class="chart-val">${cnt}</span>
+      </div>`).join('')}`;
+    })() : ''}
 
     ${gaps.length ? `
     <div class="section-hd">知識缺口清單（搜尋無結果）</div>

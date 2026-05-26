@@ -361,7 +361,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.29</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.30</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
@@ -1690,7 +1690,7 @@ async function saveDoc() {
 
       const docPayload = {
         title, body, category, lang, status,
-        author_name: (portalUser?.empId) || document.getElementById('doc-author').value.trim() || 'Admin',
+        author_name: buildAuthorName(),
         reviewer: document.getElementById('doc-reviewer').value.trim() || null,
         valid_until: document.getElementById('doc-valid-until').value || null,
         tags: currentTags,
@@ -1998,7 +1998,7 @@ async function processBatchFiles(files) {
         category: 'product',
         lang: currentLang,
         status: 'published',
-        author_name: document.getElementById('doc-author')?.value.trim() || 'Admin',
+        author_name: buildAuthorName(),
         tags,
         file_url: fileUrl, file_name: fileName, file_type: fileType, file_size: fileSize,
         updated_at: new Date().toISOString(),
@@ -2441,10 +2441,23 @@ function removeExistingFile() {
 
 
 // 清空編輯器欄位後，把 doc-author 補回登入者姓名
+
+// 組合 author_name：empId + nameEn，讓工號和姓名都可搜尋
+function buildAuthorName() {
+  if (!portalUser) return document.getElementById('doc-author')?.value.trim() || 'Admin';
+  const empId  = portalUser.empId  || '';
+  const nameEn = portalUser.nameEn || portalUser.nameZh || '';
+  if (empId && nameEn) return empId + ' ' + nameEn;
+  return empId || nameEn || document.getElementById('doc-author')?.value.trim() || 'Admin';
+}
+
 function resetDocAuthor() {
   const el = document.getElementById('doc-author');
   if (!el) return;
-  el.value = portalUser ? (portalUser.nameEn || portalUser.nameZh || '') : '';
+  if (!portalUser) { el.value = ''; return; }
+  const empId  = portalUser.empId  || '';
+  const nameEn = portalUser.nameEn || portalUser.nameZh || '';
+  el.value = empId && nameEn ? empId + ' ' + nameEn : (nameEn || empId || '');
 }
 function getFileIcon(fileName) {
   const ext = (fileName || '').split('.').pop().toLowerCase();
@@ -2649,7 +2662,7 @@ async function loadDocs() {
       ? window._expertAuthorFilter
       : [window._expertAuthorFilter];
     window._expertAuthorFilter = null;
-    docs = docs.filter(d => af.some(n => n && d.author_name === n));
+    docs = docs.filter(d => af.some(n => n && d.author_name && d.author_name.includes(n)));
   }
 
   let filtered = docs;
@@ -3941,7 +3954,7 @@ const _origGetDocPayload = () => ({
   category: document.getElementById('doc-cat').value,
   lang: document.getElementById('doc-lang').value,
   status: document.getElementById('doc-status').value,
-  author_name: document.getElementById('doc-author').value.trim() || 'Admin',
+  author_name: buildAuthorName(),
   reviewer: document.getElementById('doc-reviewer').value.trim() || null,
   valid_until: document.getElementById('doc-valid-until').value || null,
   tags: currentTags,
@@ -4280,19 +4293,20 @@ async function loadReviewPanel() {
         content.innerHTML = '<div style="text-align:center;color:var(--text-3);padding:40px 0;font-size:13px;">目前無待審核文件</div>';
         return;
       }
-      // 取我的名字用於過濾
+      // 所有待審文件一律顯示（reviewer 和 admin 皆可審）
       const myName = portalUser ? (portalUser.nameEn || portalUser.nameZh || portalUser.empId) : null;
-      const myDocs = myName ? pendingDocs.filter(d => !d.reviewer || d.reviewer === myName) : pendingDocs;
-      const otherDocs = myName ? pendingDocs.filter(d => d.reviewer && d.reviewer !== myName) : [];
-      const renderList = (docs, label) => docs.length ? `
-        <div class="section-hd">${label}（${docs.length}）</div>
-        ${docs.map(d => `
+      content.innerHTML = `
+        <div class="section-hd">待審核文件（${pendingDocs.length}）</div>
+        ${pendingDocs.map(d => {
+          const isMyReview = myName && d.reviewer && d.reviewer.includes(myName);
+          return `
           <div class="doc-item" style="margin-bottom:6px;cursor:pointer;" onclick="openReviewPanel('${d.id}','${(d.title||'').replace(/'/g,'')}')">
             <span class="doc-title" style="flex:1;">${d.title}</span>
-            <span style="font-size:11px;color:var(--text-3);">${d.reviewer ? '審核人：'+d.reviewer : '未指定審核人'}</span>
+            <span style="font-size:11px;color:${isMyReview?'var(--blue)':'var(--text-3)'};">
+              ${d.reviewer ? '審核人：'+d.reviewer : '未指定審核人'}${isMyReview?' ★':''}
+            </span>
             <span class="status-badge sb-review" style="margin-left:6px;">待審核</span>
-          </div>`).join('')}` : '';
-      content.innerHTML = renderList(myDocs, '指定給我審核') + renderList(otherDocs, '其他待審文件');
+          </div>`;}).join('')}`;
     } catch(e) {
       content.innerHTML = `<div style="color:var(--red);padding:20px;">載入失敗：${e.message}</div>`;
     }

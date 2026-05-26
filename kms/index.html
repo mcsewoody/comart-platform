@@ -361,7 +361,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.24</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.25</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
@@ -1864,9 +1864,8 @@ async function reparseCurrentDoc() {
       return;
     }
     toast('下載原始檔中…', '');
-    const res = await fetch(fileUrl, {
-      headers: { 'Authorization': 'Bearer ' + CFG.supabaseKey, 'apikey': CFG.supabaseKey }
-    });
+    // Supabase Storage public URL 不需要帶 auth header
+    const res = await fetch(fileUrl);
     if (!res.ok) throw new Error('下載失敗 ' + res.status);
     const blob = await res.blob();
     const ext = getExt(fileName);
@@ -2534,7 +2533,7 @@ async function loadDocs() {
   let docs = [];
   try {
     if (CFG.supabaseUrl && CFG.supabaseKey) {
-      docs = await sbFetch('/rest/v1/kms_documents?select=id,title,category,lang,status,product_line,customer_tag,created_at&order=created_at.desc') || [];
+      docs = await sbFetch('/rest/v1/kms_documents?select=id,title,category,lang,status,product_line,customer_tag,tags,author_name,view_count,file_url,file_name,file_type,file_size,updated_at,created_at&order=updated_at.desc') || [];
     } else {
       const saved = localStorage.getItem('kms-local-docs');
       if (saved) localDocs = JSON.parse(saved);

@@ -361,7 +361,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.32</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.33</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
@@ -684,6 +684,9 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
 
     <!-- ═══ Analytics Panel ═══ -->
     <div class="panel" id="panel-analytics">
+      <div style="padding:10px 20px;border-bottom:1px solid var(--border);font-size:15px;font-weight:500;flex-shrink:0;display:flex;align-items:center;gap:8px;">
+        📊 分析報表
+      </div>
       <div class="analytics-wrap" id="analytics-content">
         <div style="text-align:center;color:var(--text-3);padding:40px 0;">載入中…</div>
       </div>
@@ -815,6 +818,19 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
     <div class="reader-body" id="reader-body-content"></div>
     <div class="reader-footer">
       <button class="reader-btn" id="reader-dl-btn" style="display:none;" onclick="readerDownload()">↓ 下載原始檔</button>
+      <div style="position:relative;display:inline-block;">
+        <button class="reader-btn" id="reader-translate-btn" onclick="toggleTranslateMenu()" style="gap:4px;">
+          🌐 AI 翻譯 ▾
+        </button>
+        <div id="translate-menu" style="display:none;position:absolute;bottom:100%;left:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:0 4px 12px rgba(0,0,0,.12);min-width:140px;z-index:999;margin-bottom:4px;">
+          <div onclick="translateReader('en')"    style="padding:9px 16px;cursor:pointer;font-size:13px;" onmouseover="this.style.background='var(--bg)'" onmouseout="this.style.background=''">🇺🇸 English</div>
+          <div onclick="translateReader('zh-TW')" style="padding:9px 16px;cursor:pointer;font-size:13px;" onmouseover="this.style.background='var(--bg)'" onmouseout="this.style.background=''">🇹🇼 繁體中文</div>
+          <div onclick="translateReader('zh-CN')" style="padding:9px 16px;cursor:pointer;font-size:13px;" onmouseover="this.style.background='var(--bg)'" onmouseout="this.style.background=''">🇨🇳 简体中文</div>
+          <div onclick="translateReader('vi')"    style="padding:9px 16px;cursor:pointer;font-size:13px;" onmouseover="this.style.background='var(--bg)'" onmouseout="this.style.background=''">🇻🇳 Tiếng Việt</div>
+          <div onclick="translateReader('ja')"    style="padding:9px 16px;cursor:pointer;font-size:13px;" onmouseover="this.style.background='var(--bg)'" onmouseout="this.style.background=''">🇯🇵 日本語</div>
+          <div onclick="restoreReaderOriginal()" style="padding:9px 16px;cursor:pointer;font-size:13px;border-top:1px solid var(--border);color:var(--text-3);" onmouseover="this.style.background='var(--bg)'" onmouseout="this.style.background=''">↩ 恢復原文</div>
+        </div>
+      </div>
       <button class="reader-btn" onclick="closeReader()" style="margin-left:auto;">關閉</button>
     </div>
   </div>
@@ -3511,16 +3527,83 @@ async function openReader(id) {
   }
 
 
-  // 閱覽計數
+  // 閱覽計數（用 Postgres 原子操作，避免競爭條件）
   if (CFG.supabaseUrl && CFG.supabaseKey && !id.startsWith('demo-') && !id.startsWith('local-')) {
-    sbFetch(`/rest/v1/kms_documents?id=eq.${id}`, {
-      method: 'PATCH',
-      body: JSON.stringify({ view_count: (doc.view_count || 0) + 1 }),
-      prefer: 'return=minimal',
-    }).catch(()=>{});
+    fetch(CFG.supabaseUrl + '/rest/v1/rpc/increment_kms_view', {
+      method: 'POST',
+      headers: { 'Content-Type':'application/json', 'Authorization':'Bearer '+CFG.supabaseKey, 'apikey':CFG.supabaseKey },
+      body: JSON.stringify({ doc_id: id }),
+    }).catch(() => {
+      // RPC 不存在時 fallback：直接 PATCH
+      sbFetch(`/rest/v1/kms_documents?id=eq.${id}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ view_count: (doc.view_count || 0) + 1 }),
+        prefer: 'return=minimal',
+      }).catch(()=>{});
+    });
   }
 
   document.getElementById('reader-modal').classList.add('show');
+}
+
+
+// ─── 閱讀器 AI 翻譯 ───
+function toggleTranslateMenu() {
+  const m = document.getElementById('translate-menu');
+  if (m) m.style.display = m.style.display === 'none' ? 'block' : 'none';
+}
+document.addEventListener('click', e => {
+  const btn = document.getElementById('reader-translate-btn');
+  const menu = document.getElementById('translate-menu');
+  if (menu && btn && !btn.contains(e.target) && !menu.contains(e.target)) {
+    menu.style.display = 'none';
+  }
+});
+
+let _readerOriginalBody = null; // 存原始 HTML
+
+async function translateReader(targetLang) {
+  const menu = document.getElementById('translate-menu');
+  if (menu) menu.style.display = 'none';
+  if (!_readerDoc) return;
+  const bodyEl = document.getElementById('reader-body-content');
+  if (!_readerOriginalBody) _readerOriginalBody = bodyEl.innerHTML;
+
+  const langLabel = { en:'英文', 'zh-TW':'繁體中文', 'zh-CN':'簡體中文', vi:'越南文', ja:'日文' }[targetLang] || targetLang;
+  bodyEl.innerHTML = `<p style="color:var(--text-3);font-style:italic;">⏳ AI 翻譯為${langLabel}中，請稍候…</p>`;
+
+  const srcText = _readerDoc.body || '';
+  if (!srcText || srcText.length < 10) { toast('此文件無文字內容可翻譯', ''); bodyEl.innerHTML = _readerOriginalBody; return; }
+
+  try {
+    const truncated = srcText.slice(0, 8000); // 避免超長
+    const data = await callClaudeProxy(
+      `你是專業翻譯員。請將以下文字完整翻譯為${langLabel}，保持原始段落和格式，只輸出翻譯結果，不要加任何說明。`,
+      truncated,
+      2000
+    );
+    const translated = data?.content?.[0]?.text || '';
+    if (!translated) throw new Error('翻譯結果為空');
+    if (window.marked) {
+      bodyEl.innerHTML = marked.parse(translated);
+    } else {
+      bodyEl.innerHTML = '<p>' + translated.replace(/\n\n+/g,'</p><p>').replace(/\n/g,'<br>') + '</p>';
+    }
+    toast(`✅ 已翻譯為${langLabel}`, 'success');
+  } catch(e) {
+    toast('翻譯失敗：' + e.message, 'error');
+    bodyEl.innerHTML = _readerOriginalBody;
+  }
+}
+
+function restoreReaderOriginal() {
+  const menu = document.getElementById('translate-menu');
+  if (menu) menu.style.display = 'none';
+  if (_readerOriginalBody) {
+    document.getElementById('reader-body-content').innerHTML = _readerOriginalBody;
+    _readerOriginalBody = null;
+    toast('已恢復原文', '');
+  }
 }
 
 function closeReader() {
@@ -4177,7 +4260,7 @@ async function loadAnalytics() {
   try {
     if (CFG.supabaseUrl && CFG.supabaseKey) {
       [docs, authorStats] = await Promise.all([
-        sbFetch('/rest/v1/kms_documents?select=id,title,category,view_count,status,updated_at&order=view_count.desc&limit=10'),
+        sbFetch('/rest/v1/kms_documents?select=id,title,category,author_name,view_count,status,updated_at&order=view_count.desc'),
         sbFetch('/rest/v1/kms_author_stats'),
       ]);
     } else {
@@ -4219,7 +4302,7 @@ async function loadAnalytics() {
       docs.forEach(d => { catViews[d.category] = (catViews[d.category]||0) + (d.view_count||0); });
       const maxCat = Math.max(...Object.values(catViews), 1);
       return Object.entries(CAT_META).map(([key, meta]) => `
-        <div class="chart-row">
+        <div class="chart-row" style="cursor:pointer;" onclick="switchPanel('docs');setTimeout(()=>{const el=document.getElementById('docs-filter-cat');if(el){el.value='${key}';el.dispatchEvent(new Event('change'));}loadDocs();},100);" title="點擊查看此分類">
           <span class="chart-label">${meta.icon} ${meta.name}</span>
           <div class="chart-track"><div class="chart-fill" style="width:${Math.round(((catViews[key]||0)/maxCat)*100)}%;background:${meta.color};"></div></div>
           <span class="chart-val">👁 ${catViews[key]||0}</span>
@@ -4230,7 +4313,7 @@ async function loadAnalytics() {
     <div class="section-hd">貢獻度統計（依作者）</div>
     ${authorStats.slice(0,6).map(a => `
       <div class="chart-row">
-        <span class="chart-label">${a.author_name||'未知'}</span>
+        <span class="chart-label" style="cursor:pointer;color:var(--blue);" onclick="viewExpertDocs('${a.author_name||''}')" title="查看此作者文章">${a.author_name||'未知'}</span>
         <div class="chart-track"><div class="chart-fill" style="width:${Math.round((a.doc_count/Math.max(...authorStats.map(x=>x.doc_count),1))*100)}%;background:var(--green);"></div></div>
         <span class="chart-val">${a.doc_count}</span>
       </div>`).join('')}` : ''}

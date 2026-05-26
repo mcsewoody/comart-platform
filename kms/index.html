@@ -361,7 +361,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.30</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.31</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
@@ -794,6 +794,9 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeConfig()">取消</button>
       <button class="btn-save" onclick="saveConfig()">儲存設定</button>
+      <button onclick="adminUpdateAllAuthors('Woody Liu')"
+        style="margin-left:8px;padding:7px 14px;border-radius:var(--radius);border:1px solid #F5C6C6;background:#FEF2F2;color:#A32D2D;font-size:13px;cursor:pointer;"
+        title="Admin 工具：批次更新所有文件的作者名稱">⚙ 更新所有 author_name</button>
     </div>
   </div>
 </div>
@@ -1950,83 +1953,154 @@ function handleFileSelect(e) {
   }
 }
 
-// ─── 批次上傳：多個檔案批次建立知識條目 ───
+// ─── 批次上傳：逐一預覽確認後儲存 ───
+let _batchFiles   = [];
+let _batchIdx     = 0;
+let _batchSuccess = 0;
+let _batchFail    = 0;
+
 async function processBatchFiles(files) {
+  const allowed = ['pdf','doc','docx','xls','xlsx','csv','pptx','ppt','jpg','jpeg','png','txt','md'];
+  const MAX_BYTES = 50 * 1024 * 1024;
+  const validFiles = files.filter(f => {
+    const ext = getExt(f.name);
+    if (!allowed.includes(ext)) { toast(`跳過不支援格式：${f.name}`, ''); return false; }
+    if (f.size > MAX_BYTES) { toast(`跳過過大檔案：${f.name}（${(f.size/1024/1024).toFixed(1)}MB > 50MB）`, ''); return false; }
+    return true;
+  });
+  if (!validFiles.length) { toast('沒有可處理的檔案', 'error'); return; }
+  _batchFiles = validFiles;
+  _batchIdx = 0;
+  _batchSuccess = 0;
+  _batchFail = 0;
+  await processBatchNext();
+}
+
+async function processBatchNext() {
+  if (_batchIdx >= _batchFiles.length) {
+    // 全部完成
+    toast(`批次完成：${_batchSuccess} 筆成功${_batchFail ? `，${_batchFail} 筆失敗` : ''}`, 'success');
+    await loadDocs();
+    switchPanel('docs');
+    return;
+  }
+  const f = _batchFiles[_batchIdx];
+  const ext = getExt(f.name);
+  const total = _batchFiles.length;
+  const current = _batchIdx + 1;
+
+  // 切換到編輯器，顯示進度
+  switchPanel('editor');
+  editingDocId = null;
+  updateEditorModeLabel();
+
+  // 進度 banner
+  const progressHtml = `
+    <div id="batch-progress-bar" style="background:var(--blue-bg);border:1px solid var(--blue);border-radius:var(--radius);padding:8px 14px;margin-bottom:8px;font-size:12px;display:flex;align-items:center;gap:10px;flex-shrink:0;">
+      <span style="color:var(--blue);font-weight:600;">批次上傳 ${current} / ${total}</span>
+      <span style="color:var(--text-2);">${f.name}</span>
+      <span style="margin-left:auto;display:flex;gap:6px;">
+        <button onclick="skipBatchFile()" style="padding:3px 10px;border-radius:5px;border:1px solid var(--border);background:transparent;cursor:pointer;font-size:11px;">跳過</button>
+        <button onclick="skipAllBatch()" style="padding:3px 10px;border-radius:5px;border:1px solid #F5C6C6;background:#FEF2F2;color:#A32D2D;cursor:pointer;font-size:11px;">取消批次</button>
+      </span>
+    </div>`;
+
+  // 插入進度條（在 panel-editor 最頂部）
+  const editorPanel = document.getElementById('panel-editor');
+  let progressEl = document.getElementById('batch-progress-bar');
+  if (!progressEl) {
+    editorPanel.insertAdjacentHTML('afterbegin', progressHtml);
+  } else {
+    progressEl.outerHTML = progressHtml;
+  }
+
+  // 清空所有欄位
+  document.getElementById('doc-title').value = f.name.replace(/\.[^.]+$/, '');
+  document.getElementById('doc-cat').value = 'product';
+  document.getElementById('doc-status').value = 'draft';
+  document.getElementById('doc-reviewer').value = '';
+  document.getElementById('doc-related').value = '';
+  document.getElementById('doc-valid-until').value = new Date().toISOString().split('T')[0];
+  clearTags();
+  resetDocAuthor();
+
+  // 自動加副檔名標籤
+  if (!currentTags.includes(ext.toUpperCase())) { currentTags.push(ext.toUpperCase()); renderTags(); }
+
+  // 設定 uploadedFile
+  uploadedFile = f;
+  uploadedFileName = f.name;
+  uploadedFileType = ext;
+  uploadedFileSize = f.size;
+  uploadedFileUrl = null;
+  window._uploadBlocked = false;
+
+  // 顯示檔案預覽
+  const area = document.getElementById('file-preview-area');
+  if (area) {
+    area.innerHTML = `
+      <div class="file-preview-card">
+        <span style="font-size:16px;">${getFileIcon(f.name)}</span>
+        <span style="font-size:12px;font-weight:500;flex:1;">${f.name}</span>
+        <span style="font-size:11px;color:var(--text-3);">${formatBytes(f.size)}</span>
+      </div>`;
+  }
+
+  // 解析文字
+  if (tiptapEditor) tiptapEditor.commands.setContent('<p style="color:var(--text-3);font-style:italic;">⏳ 解析中，請稍候…</p>');
+  try {
+    const text = await extractText(f, ext);
+    if (text && text.length > 10) {
+      const html = text.slice(0,50000).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n\n+/g,'</p><p>').replace(/\n/g,'<br>');
+      if (tiptapEditor) tiptapEditor.commands.setContent('<p>' + html + '</p>');
+      toast(`✅ 解析完成（${current}/${total}）· ${text.length} 字元 — 確認欄位後按「儲存」`, 'success');
+    } else {
+      if (tiptapEditor) tiptapEditor.commands.clearContent();
+      toast(`⚠ 無法抽取文字（${current}/${total}）— 可手動填寫後按「儲存」`, '');
+    }
+  } catch(e) {
+    if (tiptapEditor) tiptapEditor.commands.clearContent();
+    toast(`解析失敗（${current}/${total}）：${e.message}`, 'error');
+  }
+
+  // 覆寫「儲存」按鈕行為：存完後自動進下一份
+  const saveBtn = document.querySelector('.save-btn');
+  if (saveBtn) {
+    saveBtn.textContent = `儲存並繼續（${current}/${total}）`;
+    saveBtn.onclick = async () => {
+      await saveDoc();
+      _batchIdx++;
+      _batchSuccess++;
+      // 移除進度條（下一份會重建）
+      document.getElementById('batch-progress-bar')?.remove();
+      await processBatchNext();
+    };
+  }
+}
+
+function skipBatchFile() {
+  _batchFail++;
+  _batchIdx++;
+  document.getElementById('batch-progress-bar')?.remove();
+  processBatchNext();
+}
+
+function skipAllBatch() {
+  if (!confirm('確定取消剩餘的批次上傳？')) return;
+  _batchFiles = [];
+  _batchIdx = 0;
+  document.getElementById('batch-progress-bar')?.remove();
+  toast('已取消批次上傳', '');
+  switchPanel('docs');
+}
+
+// 舊的批次上傳迴圈（已由 processBatchNext 取代，保留殼）
+async function _processBatchFiles_legacy(files) {
   const allowed = ['pdf','doc','docx','xls','xlsx','csv','pptx','ppt','jpg','jpeg','png','txt','md'];
   const validFiles = files.filter(f => allowed.includes(getExt(f.name)));
   if (!validFiles.length) { toast('沒有支援的檔案格式', 'error'); return; }
-
-  const area = document.getElementById('file-preview-area');
-  area.innerHTML = `<div style="font-size:12px;color:var(--text-2);padding:6px 0;">
-    批次上傳 ${validFiles.length} 個檔案，逐一建立知識條目…<br>
-    <span style="color:var(--text-3);">⚠ PDF 和圖片在批次模式下不解析文字（避免卡住），上傳後可個別開啟補充內容。</span>
-  </div>`;
-
-  let success = 0, fail = 0;
-  for (let i = 0; i < validFiles.length; i++) {
-    const f = validFiles[i];
-    const ext = getExt(f.name);
-    area.innerHTML = `<div style="font-size:12px;color:var(--blue);padding:4px 0;">
-      ⏳ 處理中 (${i+1}/${validFiles.length})：${f.name}
-    </div>`;
-    try {
-      // 萃取標題和標籤
-      const baseName = f.name.replace(/\.[^.]+$/, '');
-      const rawParts = baseName.replace(/([a-z])([A-Z])/g,'$1 $2').replace(/[-_\.]/g,' ').split(/\s+/).filter(p=>p.length>1);
-      const tags = [...new Set([ext.toUpperCase(), ...rawParts])].slice(0,6);
-
-      // 解析文字
-      // 批次模式下 PDF / 圖片跳過 Claude API（避免卡住），只存檔名佔位
-      const needsClaude = ['pdf','jpg','jpeg','png'].includes(ext);
-      let body = '';
-      if (!needsClaude) {
-        try { body = await extractText(f, ext) || ''; } catch(e) { console.warn(f.name, e.message); }
-      } else {
-        body = `[${ext.toUpperCase()} 檔案：${f.name}｜批次上傳，文字內容請開啟文件後重新解析]`;
-      }
-
-      // 上傳到 Storage
-      let fileUrl = null, fileName = f.name, fileType = ext, fileSize = f.size;
-      if (CFG.supabaseUrl && CFG.supabaseKey) {
-        try { fileUrl = await uploadToStorage(f); } catch(e) {}
-      }
-
-      // 建立文件
-      const docPayload = {
-        title: baseName,
-        body: body || `[${ext.toUpperCase()} 檔案：${f.name}]`,
-        category: 'product',
-        lang: currentLang,
-        status: 'published',
-        author_name: buildAuthorName(),
-        tags,
-        file_url: fileUrl, file_name: fileName, file_type: fileType, file_size: fileSize,
-        updated_at: new Date().toISOString(),
-      };
-
-      if (CFG.supabaseUrl && CFG.supabaseKey) {
-        const saved = await kmsWrite('insert', 'kms_documents', docPayload);
-        const docId = saved?.[0]?.id;
-        if (docId && CFG.embedModel !== 'mock') {
-          try { await callEmbedEdgeFn(docId); } catch(e) {}
-        }
-      } else {
-        localDocs.push({ ...docPayload, id:'local-'+Date.now(), created_at:new Date().toISOString() });
-        localStorage.setItem('kms-local-docs', JSON.stringify(localDocs));
-      }
-      success++;
-    } catch(e) {
-      console.warn('批次上傳失敗：', f.name, e);
-      fail++;
-    }
-  }
-
-  area.innerHTML = `<div style="font-size:12px;padding:6px 0;color:var(--green);">
-    ✓ 批次完成：${success} 筆成功${fail ? `，${fail} 筆失敗` : ''}
-  </div>`;
-  await loadDocs();
-  toast(`批次上傳完成：${success}/${validFiles.length} 筆`, 'success');
 }
+
 
 // ─── 主流程：選檔 → 解析文字 → 顯示預覽 ───
 async function processFile(file) {
@@ -2443,21 +2517,53 @@ function removeExistingFile() {
 // 清空編輯器欄位後，把 doc-author 補回登入者姓名
 
 // 組合 author_name：empId + nameEn，讓工號和姓名都可搜尋
+
+// ─── Admin 工具：批次更新所有文件 author_name 為指定名稱 ───
+async function adminUpdateAllAuthors(newName) {
+  if (!CFG.supabaseUrl || !CFG.supabaseKey) { toast('需要 Supabase 設定', 'error'); return; }
+  if (!newName) { newName = prompt('請輸入新的作者名稱（English Name）：', 'Woody Liu'); }
+  if (!newName) return;
+  if (!confirm(`確定將所有文件的 author_name 更新為「${newName}」？此操作無法復原。`)) return;
+  try {
+    toast('更新中…', '');
+    await kmsWrite('update-all', 'kms_documents', { author_name: newName });
+    toast(`✅ 所有文件 author_name 已更新為「${newName}」`, 'success');
+    await loadDocs();
+  } catch(e) {
+    // kmsWrite update-all 可能不支援，改用直接 PATCH 不帶 id filter
+    try {
+      const res = await fetch(CFG.supabaseUrl + '/rest/v1/kms_documents?author_name=neq.NULL_PLACEHOLDER', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + CFG.supabaseKey,
+          'apikey': CFG.supabaseKey,
+          'Prefer': 'return=minimal',
+        },
+        body: JSON.stringify({ author_name: newName }),
+      });
+      if (res.ok) {
+        toast(`✅ 所有文件 author_name 已更新為「${newName}」`, 'success');
+        await loadDocs();
+      } else {
+        const err = await res.text();
+        toast('更新失敗：' + err.slice(0, 100), 'error');
+      }
+    } catch(e2) {
+      toast('更新失敗：' + e2.message, 'error');
+    }
+  }
+}
+
 function buildAuthorName() {
   if (!portalUser) return document.getElementById('doc-author')?.value.trim() || 'Admin';
-  const empId  = portalUser.empId  || '';
-  const nameEn = portalUser.nameEn || portalUser.nameZh || '';
-  if (empId && nameEn) return empId + ' ' + nameEn;
-  return empId || nameEn || document.getElementById('doc-author')?.value.trim() || 'Admin';
+  return portalUser.nameEn || portalUser.nameZh || document.getElementById('doc-author')?.value.trim() || 'Admin';
 }
 
 function resetDocAuthor() {
   const el = document.getElementById('doc-author');
   if (!el) return;
-  if (!portalUser) { el.value = ''; return; }
-  const empId  = portalUser.empId  || '';
-  const nameEn = portalUser.nameEn || portalUser.nameZh || '';
-  el.value = empId && nameEn ? empId + ' ' + nameEn : (nameEn || empId || '');
+  el.value = portalUser ? (portalUser.nameEn || portalUser.nameZh || '') : '';
 }
 function getFileIcon(fileName) {
   const ext = (fileName || '').split('.').pop().toLowerCase();
@@ -2471,16 +2577,15 @@ function getFileIcon(fileName) {
 
 
 // 點選專家 → 切到知識庫，過濾該作者的文章
-function viewExpertDocs(empId, nameEn, nameZh) {
-  const names = [empId, nameEn, nameZh].filter(Boolean);
-  if (!names.length) return;
+function viewExpertDocs(nameEn) {
+  if (!nameEn) return;
   switchPanel('docs');
   setTimeout(() => {
     const searchEl = document.getElementById('docs-search');
-    if (searchEl) { searchEl.value = nameEn || nameZh || empId || ''; }
-    window._expertAuthorFilter = names;
+    if (searchEl) { searchEl.value = nameEn; }
+    window._expertAuthorFilter = [nameEn];
     loadDocs();
-    toast(`顯示 ${nameEn || nameZh || empId} 的文章`, '');
+    toast(`顯示 ${nameEn} 的文章`, '');
   }, 100);
 }
 
@@ -2662,7 +2767,7 @@ async function loadDocs() {
       ? window._expertAuthorFilter
       : [window._expertAuthorFilter];
     window._expertAuthorFilter = null;
-    docs = docs.filter(d => af.some(n => n && d.author_name && d.author_name.includes(n)));
+    docs = docs.filter(d => af.some(n => n && (d.author_name === n || (d.author_name||'').toLowerCase().includes(n.toLowerCase()))));
   }
 
   let filtered = docs;
@@ -4246,7 +4351,7 @@ async function loadExperts() {
              </div>` : '';
         const empId = u.empId || u.uid || '';
         return `
-          <div class="expert-card" style="cursor:pointer;" onclick="viewExpertDocs('${empId}','${(u.nameEn||'').replace(/'/g,'')}','${(u.nameZh||'').replace(/'/g,'')}')" title="點擊查看 ${name} 的文章">
+          <div class="expert-card" style="cursor:pointer;" onclick="viewExpertDocs('${(u.nameEn||u.nameZh||'').replace(/'/g,'')}')" title="點擊查看 ${name} 的文章">
             ${avatar}
             <div class="expert-name">${name}${nameEn && nameEn !== name ? `<span style="font-size:11px;color:var(--text-3);margin-left:4px;">${nameEn}</span>` : ''}</div>
             ${title ? `<div class="expert-role">${title}</div>` : ''}
@@ -4294,7 +4399,7 @@ async function loadReviewPanel() {
         return;
       }
       // 所有待審文件一律顯示（reviewer 和 admin 皆可審）
-      const myName = portalUser ? (portalUser.nameEn || portalUser.nameZh || portalUser.empId) : null;
+      const myName = portalUser ? (portalUser.nameEn || portalUser.nameZh) : null;
       content.innerHTML = `
         <div class="section-hd">待審核文件（${pendingDocs.length}）</div>
         ${pendingDocs.map(d => {
@@ -4477,7 +4582,7 @@ function renderComment(c, replies) {
   const childReplies = replies.filter(r => r.parent_id === c.id);
   const dt = new Date(c.created_at).toLocaleString('zh-TW', { month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit' });
   // 判斷目前登入者是否為作者（可編輯/刪除）
-  const myName = portalUser ? (portalUser.nameEn || portalUser.nameZh || portalUser.empId) : null;
+  const myName = portalUser ? (portalUser.nameEn || portalUser.nameZh) : null;
   const isOwner = !myName || c.author === myName || getKmsRole() === 'admin';
   const actionBtns = isOwner ? `
     <button onclick="editComment('${c.id}','${c.body.replace(/'/g,"\'").replace(/\n/g,' ')}')"

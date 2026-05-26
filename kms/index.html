@@ -361,7 +361,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.21</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.22</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
@@ -1863,7 +1863,17 @@ async function reparseCurrentDoc() {
     if (!res.ok) throw new Error('下載失敗 ' + res.status);
     const blob = await res.blob();
     const ext = getExt(fileName);
-    const file = new File([blob], fileName, { type: blob.type });
+    // Supabase Storage 回傳的 blob.type 可能為空，補上正確 MIME
+    const MIME_MAP = {
+      pdf:'application/pdf', docx:'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      doc:'application/msword', xlsx:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      pptx:'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+      ppt:'application/vnd.ms-powerpoint', csv:'text/csv', txt:'text/plain',
+      jpg:'image/jpeg', jpeg:'image/jpeg', png:'image/png',
+    };
+    const mimeType = blob.type && blob.type !== 'application/octet-stream'
+      ? blob.type : (MIME_MAP[ext] || 'application/octet-stream');
+    const file = new File([blob], fileName, { type: mimeType });
     if (tiptapEditor) tiptapEditor.commands.setContent('<p style="color:var(--text-3);font-style:italic;">⏳ 重新解析中，請稍候…</p>');
     toast('重新解析內容中…', '');
     const text = await extractText(file, ext);
@@ -2403,19 +2413,16 @@ function getFileIcon(fileName) {
 
 
 // 點選專家 → 切到知識庫，過濾該作者的文章
-function viewExpertDocs(authorName) {
-  if (!authorName) return;
+function viewExpertDocs(nameEn, nameZh, empId) {
+  const names = [nameEn, nameZh, empId].filter(Boolean);
+  if (!names.length) return;
   switchPanel('docs');
   setTimeout(() => {
     const searchEl = document.getElementById('docs-search');
-    if (searchEl) {
-      searchEl.value = authorName;
-      searchEl.dispatchEvent(new Event('input'));
-    }
-    // 也過濾 author_name
-    window._expertAuthorFilter = authorName;
+    if (searchEl) { searchEl.value = ''; }
+    window._expertAuthorFilter = names; // 傳陣列
     loadDocs();
-    toast(`顯示 ${authorName} 的文章`, '');
+    toast(`顯示 ${nameEn || nameZh} 的文章`, '');
   }, 100);
 }
 
@@ -2512,9 +2519,11 @@ async function loadDocs() {
 
   // 專家黃頁跳轉時的 author 過濾
   if (window._expertAuthorFilter) {
-    const af = window._expertAuthorFilter;
+    const af = Array.isArray(window._expertAuthorFilter)
+      ? window._expertAuthorFilter
+      : [window._expertAuthorFilter];
     window._expertAuthorFilter = null;
-    docs = docs.filter(d => d.author_name === af);
+    docs = docs.filter(d => af.some(n => n && d.author_name === n));
   }
 
   let filtered = docs;
@@ -3943,13 +3952,27 @@ async function loadAnalytics() {
       <div class="stat-card"><div class="stat-label">知識缺口</div><div class="stat-val" style="color:var(--amber)">${gapCount}</div><div class="stat-sub">未找到結果的查詢</div></div>
     </div>
 
-    <div class="section-hd">熱門文件（閱覽排行）</div>
-    ${docs.slice(0,8).map(d => `
+    <div class="section-hd">熱門文件 TOP 10（閱讀次數排行）</div>
+    ${docs.slice(0,10).map((d,i) => `
       <div class="chart-row">
-        <span class="chart-label" title="${d.title}">${d.title}</span>
+        <span style="font-size:11px;color:var(--text-3);width:18px;flex-shrink:0;">${i+1}</span>
+        <span class="chart-label" title="${d.title}" onclick="openReader('${d.id}')" style="cursor:pointer;color:var(--blue);">${d.title}</span>
         <div class="chart-track"><div class="chart-fill" style="width:${Math.round(((d.view_count||0)/maxViews)*100)}%;background:var(--blue);"></div></div>
-        <span class="chart-val">${d.view_count||0}</span>
+        <span class="chart-val">👁 ${d.view_count||0}</span>
       </div>`).join('')}
+
+    <div class="section-hd" style="margin-top:16px;">各分類閱讀次數</div>
+    ${(() => {
+      const catViews = {};
+      docs.forEach(d => { catViews[d.category] = (catViews[d.category]||0) + (d.view_count||0); });
+      const maxCat = Math.max(...Object.values(catViews), 1);
+      return Object.entries(CAT_META).map(([key, meta]) => `
+        <div class="chart-row">
+          <span class="chart-label">${meta.icon} ${meta.name}</span>
+          <div class="chart-track"><div class="chart-fill" style="width:${Math.round(((catViews[key]||0)/maxCat)*100)}%;background:${meta.color};"></div></div>
+          <span class="chart-val">👁 ${catViews[key]||0}</span>
+        </div>`).join('');
+    })()}
 
     ${authorStats?.length ? `
     <div class="section-hd">貢獻度統計（依作者）</div>
@@ -4082,9 +4105,9 @@ async function loadExperts() {
           ? `<div class="expert-tags" style="margin-top:6px;display:flex;flex-wrap:wrap;gap:4px;">
                ${expertise.map(t => `<span class="expert-tag">${t}</span>`).join('')}
              </div>` : '';
-        const authorFilter = u.nameZh || u.nameEn || '';
+        const authorFilter = u.nameEn || u.nameZh || u.empId || '';
         return `
-          <div class="expert-card" style="cursor:pointer;" onclick="viewExpertDocs('${authorFilter.replace(/'/g,'')}')" title="點擊查看 ${name} 的文章">
+          <div class="expert-card" style="cursor:pointer;" onclick="viewExpertDocs('${authorFilter.replace(/'/g,'')}','${(u.nameZh||'').replace(/'/g,'')}','${(u.empId||'').replace(/'/g,'')}')" title="點擊查看 ${name} 的文章">
             ${avatar}
             <div class="expert-name">${name}${nameEn && nameEn !== name ? `<span style="font-size:11px;color:var(--text-3);margin-left:4px;">${nameEn}</span>` : ''}</div>
             ${title ? `<div class="expert-role">${title}</div>` : ''}

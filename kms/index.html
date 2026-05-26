@@ -361,7 +361,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.25</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.26</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
@@ -588,7 +588,11 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         <!-- Meta row — 第三行：建立者、有效期、關聯文件 -->
         <div style="padding:6px 12px;border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:var(--bg);flex-shrink:0;">
           <input class="meta-input" id="doc-author" placeholder="建立者姓名" style="width:110px;" autocomplete="off" name="kms-author-nofill" />
-          <input class="meta-input" id="doc-reviewer" placeholder="審核人（選填）" style="width:120px;" />
+          <div style="position:relative;display:inline-block;">
+            <input class="meta-input" id="doc-reviewer" placeholder="審核人（工號或姓名）" style="width:150px;"
+              autocomplete="off" oninput="filterReviewerList(this.value)" onfocus="showReviewerList()" onblur="setTimeout(()=>hideReviewerList(),200)" />
+            <div id="reviewer-dropdown" style="display:none;position:absolute;top:100%;left:0;z-index:999;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:0 4px 12px rgba(0,0,0,.12);min-width:220px;max-height:160px;overflow-y:auto;font-size:12px;"></div>
+          </div>
           <input class="meta-input" id="doc-valid-until" type="date" title="文件有效期限" style="width:130px;" />
           <input class="meta-input" id="doc-related" placeholder="關聯文件標題（逗號分隔）" style="flex:1;min-width:140px;" title="輸入其他知識條目的標題，多筆用逗號分隔。AI 問答時會自動推薦相關文件。" />
         </div>
@@ -2451,11 +2455,92 @@ function viewExpertDocs(empId, nameEn, nameZh) {
   switchPanel('docs');
   setTimeout(() => {
     const searchEl = document.getElementById('docs-search');
-    if (searchEl) { searchEl.value = empId || nameEn || nameZh || ''; }
+    if (searchEl) { searchEl.value = nameEn || nameZh || empId || ''; }
     window._expertAuthorFilter = names;
     loadDocs();
     toast(`顯示 ${nameEn || nameZh || empId} 的文章`, '');
   }, 100);
+}
+
+
+// ─── 審核人自動完成 ───
+let _reviewerUsers = []; // 快取從 Firebase 載入的人員清單
+
+async function loadReviewerUsers() {
+  if (_reviewerUsers.length) return _reviewerUsers;
+  try {
+    const db = await getFirebaseDb();
+    const { collection, getDocs } = window.__fbOps;
+    const snap = await getDocs(collection(db, 'users'));
+    _reviewerUsers = [];
+    snap.forEach(doc => {
+      const d = doc.data();
+      if (d.role !== 'inactive') {
+        _reviewerUsers.push({
+          empId: d.empId || doc.id,
+          nameEn: d.nameEn || '',
+          nameZh: d.nameZh || '',
+          title: d.titleEn || d.titleZh || '',
+          site: d.site || '',
+        });
+      }
+    });
+  } catch(e) { console.warn('[reviewer]', e.message); }
+  return _reviewerUsers;
+}
+
+function renderReviewerDropdown(users) {
+  const dd = document.getElementById('reviewer-dropdown');
+  if (!dd) return;
+  if (!users.length) { dd.innerHTML = '<div style="padding:8px 12px;color:var(--text-3);">無符合人員</div>'; return; }
+  dd.innerHTML = users.slice(0, 8).map(u => `
+    <div onclick="selectReviewer('${u.empId}','${u.nameEn||u.nameZh}')"
+      style="padding:7px 12px;cursor:pointer;display:flex;gap:8px;align-items:center;"
+      onmouseover="this.style.background='var(--bg)'" onmouseout="this.style.background=''">
+      <span style="font-size:13px;flex:1;">${u.nameEn || u.nameZh}</span>
+      <span style="color:var(--text-3);font-size:11px;">${u.empId}</span>
+      ${u.site ? `<span style="color:var(--text-3);font-size:10px;">${u.site}</span>` : ''}
+    </div>`).join('');
+}
+
+function selectReviewer(empId, name) {
+  const input = document.getElementById('doc-reviewer');
+  if (input) input.value = name || empId;
+  hideReviewerList();
+  // 有填審核人 → 自動切為 review 狀態
+  const statusEl = document.getElementById('doc-status');
+  if (statusEl && statusEl.value === 'draft') {
+    statusEl.value = 'review';
+    toast('已設定審核人，狀態切換為「審核中」', '');
+  }
+}
+
+async function showReviewerList() {
+  const dd = document.getElementById('reviewer-dropdown');
+  if (!dd) return;
+  const users = await loadReviewerUsers();
+  const q = (document.getElementById('doc-reviewer')?.value || '').toLowerCase();
+  const matched = q
+    ? users.filter(u => (u.nameEn||'').toLowerCase().includes(q) || (u.nameZh||'').includes(q) || (u.empId||'').toLowerCase().includes(q))
+    : users;
+  renderReviewerDropdown(matched);
+  dd.style.display = 'block';
+}
+
+async function filterReviewerList(val) {
+  const users = await loadReviewerUsers();
+  const q = val.toLowerCase();
+  const matched = q
+    ? users.filter(u => (u.nameEn||'').toLowerCase().includes(q) || (u.nameZh||'').includes(q) || (u.empId||'').toLowerCase().includes(q))
+    : users;
+  renderReviewerDropdown(matched);
+  const dd = document.getElementById('reviewer-dropdown');
+  if (dd) dd.style.display = 'block';
+}
+
+function hideReviewerList() {
+  const dd = document.getElementById('reviewer-dropdown');
+  if (dd) dd.style.display = 'none';
 }
 
 function clearUploadedFile() {
@@ -2749,7 +2834,7 @@ async function openDoc(id) {
       : (portalUser ? (portalUser.nameEn || portalUser.nameZh || '') : '');
   }
   document.getElementById('doc-reviewer').value = doc.reviewer || '';
-  document.getElementById('doc-valid-until').value = doc.valid_until || '';
+  document.getElementById('doc-valid-until').value = new Date().toISOString().split('T')[0]; // 預設今天
   document.getElementById('doc-related').value = doc.related || '';
   const plEl = document.getElementById('doc-product-line');
   if (plEl) plEl.value = doc.product_line || '';

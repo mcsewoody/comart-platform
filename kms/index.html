@@ -2250,6 +2250,133 @@ async function submitComment() {
   }
 }
 
+
+// ═══════════════════════════════════════════════
+// PRODUCT LINES
+// ═══════════════════════════════════════════════
+const DEFAULT_PRODUCT_LINES = [
+  'MagSafe Magnetic Car Mount',
+  'Wireless Charger (Qi/Qi2)',
+  'Heavy Duty Mount',
+  'Mobile Phone Accessories',
+  'Consumer Electronics',
+  'Desktop Setup',
+  'Automotive Accessories',
+  'Automotive Parts',
+];
+
+async function loadProductLines() {
+  let lines = DEFAULT_PRODUCT_LINES.slice();
+  try {
+    if (CFG.supabaseUrl && CFG.supabaseKey) {
+      const res = await sbFetch('/rest/v1/kms_product_lines?select=name&order=sort_order.asc&active=eq.true');
+      if (res?.length) lines = res.map(r => r.name);
+    }
+  } catch(e) { console.warn('[product lines]', e.message); }
+  const sel = document.getElementById('docs-filter-product-line');
+  const edSel = document.getElementById('doc-product-line');
+  [sel, edSel].forEach(el => {
+    if (!el) return;
+    const cur = el.value;
+    while (el.options.length > 1) el.remove(1);
+    lines.forEach(l => {
+      const opt = document.createElement('option');
+      opt.value = l; opt.textContent = l;
+      el.appendChild(opt);
+    });
+    if (cur) el.value = cur;
+  });
+}
+
+// ═══════════════════════════════════════════════
+// DOCS LIST
+// ═══════════════════════════════════════════════
+async function loadDocs() {
+  const wrap = document.getElementById('docs-list');
+  if (!wrap) return;
+
+  // 讀取篩選條件
+  const searchQ   = (document.getElementById('docs-search')?.value || '').toLowerCase().trim();
+  const filterPL  = document.getElementById('docs-filter-product-line')?.value || '';
+  const filterCat = document.getElementById('docs-filter-cat')?.value || '';
+  const filterCus = document.getElementById('docs-filter-customer')?.value || '';
+
+  let docs = [];
+  let localDocs = [];
+  try {
+    if (CFG.supabaseUrl && CFG.supabaseKey) {
+      docs = await sbFetch('/rest/v1/kms_documents?select=id,title,category,lang,status,product_line,customer_tag,tags,author_name,view_count,file_url,file_name,file_type,file_size,summary,updated_at,created_at&status=eq.published&order=updated_at.desc') || [];
+    } else {
+      const saved = localStorage.getItem('kms-local-docs');
+      if (saved) localDocs = JSON.parse(saved);
+      docs = [...DEMO_DOCS, ...localDocs];
+    }
+  } catch(e) {
+    docs = [...DEMO_DOCS, ...localDocs];
+  }
+
+  // 專家黃頁跳轉時的 author 過濾
+  if (window._expertAuthorFilter) {
+    const af = Array.isArray(window._expertAuthorFilter)
+      ? window._expertAuthorFilter
+      : [window._expertAuthorFilter];
+    window._expertAuthorFilter = null;
+    docs = docs.filter(d => af.some(n => n && (d.author_name === n || (d.author_name||'').toLowerCase().includes(n.toLowerCase()))));
+  }
+
+  let filtered = docs;
+  if (searchQ)   filtered = filtered.filter(d => (d.title||'').toLowerCase().includes(searchQ) || (d.author_name||'').toLowerCase().includes(searchQ) || (d.tags||[]).some(t => t.toLowerCase().includes(searchQ)));
+  if (filterPL)  filtered = filtered.filter(d => d.product_line === filterPL);
+  if (filterCat) filtered = filtered.filter(d => d.category === filterCat);
+  if (filterCus) filtered = filtered.filter(d => (d.customer_tag||[]).includes(filterCus));
+
+  const s_ = I18N[currentLang] || I18N['zh-TW'];
+  const catLabel = Object.fromEntries(Object.entries(CAT_META).map(([k,v])=>[k, s_['cat.'+k]||v.name]));
+  const catClass = { product:'product', sales:'sop', industry:'sop', hr:'sop', tacit:'tacit', compliance:'sop', supply:'sop', ai_tech:'ai_tech', template:'template', article:'article' };
+  const s__ = I18N[currentLang]||I18N['zh-TW']; const statusLabel = { draft:s__['status.draft']||'Draft', published:s__['status.published']||'Publish', archived:s__['status.archived']||'Archive', withdrawn:s__['status.withdrawn']||'Withdraw' };
+
+  const hasFilter = searchQ || filterPL || filterCat || filterCus;
+
+  if (!filtered.length) {
+    wrap.innerHTML = `<div style="text-align:center;color:var(--text-3);padding:40px 0;font-size:13px;">${hasFilter ? '無符合條件的文件' : '尚無知識條目'}</div>`;
+    return;
+  }
+
+  wrap.innerHTML = filtered.map(d => {
+    const showEdit = true;
+    const showDelete = canDelete(d.author_name);
+    const safeTitle = (d.title||'').replace(/'/g,'');
+    const plBadge = d.product_line ? `<span style="font-size:10px;background:var(--blue-bg);color:var(--blue);padding:1px 6px;border-radius:8px;">${d.product_line}</span>` : '';
+    const cusBadges = (d.customer_tag||[]).map(c=>`<span style="font-size:10px;background:var(--amber-bg);color:var(--amber);padding:1px 6px;border-radius:8px;">${c}</span>`).join('');
+    return `
+    <div class="doc-item" id="doc-item-${d.id}">
+      <span class="doc-cat ${catClass[d.category] || 'sop'}" data-cat="${d.category||''}">${catLabel[d.category] || d.category}</span>
+      <span class="doc-title" onclick="openReader('${d.id}')" style="cursor:pointer;flex:1;min-width:0;">${d.title}</span>
+      <span style="font-size:11px;color:var(--text-3);white-space:nowrap;">👁 ${d.view_count||0}</span>
+      ${showEdit ? `<button onclick="openDoc('${d.id}')"
+        style="padding:2px 7px;border-radius:5px;border:1px solid var(--border);background:var(--bg);font-size:11px;cursor:pointer;flex-shrink:0;">✏️</button>` : ''}
+      ${showDelete ? `<button onclick="deleteDoc('${d.id}','${safeTitle}','${(d.author_name||'').replace(/'/g,'')}')"
+        style="padding:2px 7px;border-radius:5px;border:1px solid #F5C6C6;background:#FEF2F2;color:#A32D2D;font-size:11px;cursor:pointer;flex-shrink:0;">✕</button>` : ''}
+      ${(plBadge || cusBadges) ? `<div style="display:flex;gap:4px;flex-wrap:wrap;padding-left:2px;">${plBadge}${cusBadges}</div>` : ''}
+      ${d.summary ? `<div id="summary-${d.id}" style="font-size:11px;color:var(--text-2);line-height:1.5;padding:3px 2px 0;width:100%;border-top:1px solid var(--border);margin-top:3px;">${d.summary}</div>` : `<div id="summary-${d.id}" style="display:none;font-size:11px;color:var(--text-2);line-height:1.5;padding:3px 2px 0;width:100%;"></div>`}
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════
+// PANEL SWITCHING
+// ═══════════════════════════════════════════════
+function switchPanel(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  const panel = document.getElementById('panel-' + id);
+  if (panel) panel.classList.add('active');
+  const navBtn = document.querySelector(`.nav-item[onclick*="'${id}'"]`);
+  if (navBtn) navBtn.classList.add('active');
+  if (id === 'docs')   setTimeout(loadDocs, 50);
+  if (id === 'editor') setTimeout(loadProductLines, 100);
+}
+
 // ═══════════════════════════════════════════════
 // SWITCH PANEL — 統一入口，含新 panels
 // ═══════════════════════════════════════════════

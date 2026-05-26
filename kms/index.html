@@ -362,7 +362,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.44</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.45</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
@@ -554,11 +554,11 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
             <option value="ja">日本語</option>
           </select>
           <select class="meta-select" id="doc-status">
-            <option value="published">已發佈</option>
-            <option value="draft">草稿（暫不公開）</option>
-            <option value="withdrawn">已撤回</option>
-            <option value="archived">已封存</option>
-            <option value="template">📋 範本</option>
+            <option value="draft">Draft 草稿</option>
+            <option value="published">Publish 發佈</option>
+            <option value="template">Template 範本</option>
+            <option value="withdrawn" style="display:none;">Withdraw 撤回</option>
+            <option value="archived" style="display:none;">Archive 封存</option>
           </select>
           <button class="save-btn" onclick="saveDoc()" data-i18n="editor.save">儲存並向量化</button>
           <button id="reparse-btn" onclick="reparseCurrentDoc()"
@@ -926,7 +926,7 @@ const I18N = {
     'comments.input.placeholder':'輸入留言…', 'comments.submit':'送出', 'comments.reply':'↩ 回覆',
     'comments.empty':'尚無留言，成為第一個留言的人',
     'config.title':'⚙ API 設定', 'config.save':'儲存設定', 'config.cancel':'取消',
-    'status.draft':'草稿（暫不公開）', 'status.published':'已發佈', 'status.archived':'已封存',
+    'status.draft':'草稿', 'status.published':'發佈', 'status.archived':'封存', 'status.withdrawn':'撤回', 'status.template':'範本',
     'cat.product':'產品開發', 'cat.sales':'客戶資訊', 'cat.industry':'產業新知',
     'cat.hr':'教育訓練', 'cat.tacit':'知識分享', 'cat.compliance':'智財與法規',
     'cat.supply':'科技發展', 'cat.ai_tech':'AI',
@@ -965,7 +965,7 @@ const I18N = {
     'comments.input.placeholder':'输入留言…', 'comments.submit':'发送', 'comments.reply':'↩ 回复',
     'comments.empty':'暂无留言',
     'config.title':'⚙ API 设置', 'config.save':'保存设置', 'config.cancel':'取消',
-    'status.draft':'草稿（暂不公开）', 'status.published':'已发布', 'status.archived':'已归档',
+    'status.draft':'草稿', 'status.published':'发布', 'status.archived':'封存', 'status.withdrawn':'撤回', 'status.template':'模板',
     'cat.product':'产品开发', 'cat.sales':'客户资讯', 'cat.industry':'产业资讯', 'cat.hr':'教育培训', 'cat.tacit':'知识分享', 'cat.compliance':'知产与法规', 'cat.supply':'科技发展', 'cat.ai_tech':'AI',
     'toast.copied':'已复制联系方式', 'toast.saved':'已保存', 'toast.deleted':'已删除',
     'confirm.delete':'确定删除「{title}」？\n此操作不可撤销。',
@@ -1002,7 +1002,7 @@ const I18N = {
     'comments.input.placeholder':'Write a comment…', 'comments.submit':'Send', 'comments.reply':'↩ Reply',
     'comments.empty':'No comments yet. Be the first.',
     'config.title':'⚙ API Settings', 'config.save':'Save Settings', 'config.cancel':'Cancel',
-    'status.draft':'Draft (Hidden)', 'status.published':'Published', 'status.archived':'Archived',
+    'status.draft':'Draft', 'status.published':'Publish', 'status.archived':'Archive', 'status.withdrawn':'Withdraw', 'status.template':'Template',
     'cat.product':'Product', 'cat.sales':'Customer', 'cat.industry':'Industry',
     'cat.hr':'Training', 'cat.tacit':'Sharing', 'cat.compliance':'IPR & Legal',
     'cat.supply':'Technology', 'cat.ai_tech':'AI',
@@ -1041,7 +1041,7 @@ const I18N = {
     'comments.input.placeholder':'Viết bình luận…', 'comments.submit':'Gửi', 'comments.reply':'↩ Trả lời',
     'comments.empty':'Chưa có bình luận. Hãy là người đầu tiên.',
     'config.title':'⚙ Cài đặt API', 'config.save':'Lưu cài đặt', 'config.cancel':'Hủy',
-    'status.draft':'Bản nháp (Ẩn)', 'status.published':'Đã xuất bản', 'status.archived':'Đã lưu trữ',
+    'status.draft':'Nháp', 'status.published':'Xuất bản', 'status.archived':'Lưu trữ', 'status.withdrawn':'Thu hồi', 'status.template':'Mẫu',
     'cat.product':'Phát triển sản phẩm', 'cat.sales':'Thông tin khách hàng', 'cat.industry':'Tin tức ngành',
     'cat.hr':'Đào tạo', 'cat.tacit':'Chia sẻ kiến thức', 'cat.compliance':'Sở hữu trí tuệ & Pháp lý',
     'cat.supply':'Phát triển công nghệ', 'cat.ai_tech':'AI',
@@ -1080,7 +1080,7 @@ const I18N = {
     'comments.input.placeholder':'コメントを入力…', 'comments.submit':'送信', 'comments.reply':'↩ 返信',
     'comments.empty':'まだコメントはありません。最初のコメントを投稿してください。',
     'config.title':'⚙ API 設定', 'config.save':'設定を保存', 'config.cancel':'キャンセル',
-    'status.draft':'下書き（非公開）', 'status.published':'公開済み', 'status.archived':'アーカイブ済み',
+    'status.draft':'下書き', 'status.published':'公開', 'status.archived':'アーカイブ', 'status.withdrawn':'取り下げ', 'status.template':'テンプレート',
     'cat.product':'製品開発', 'cat.sales':'顧客情報', 'cat.industry':'業界情報',
     'cat.hr':'教育・研修', 'cat.tacit':'ナレッジ共有', 'cat.compliance':'知財・法務',
     'cat.supply':'技術動向', 'cat.ai_tech':'AI',
@@ -2968,7 +2968,7 @@ async function loadDocs() {
 
   const catLabel = Object.fromEntries(Object.entries(CAT_META).map(([k,v])=>[k, (I18N[currentLang]||I18N['zh-TW'])['cat.'+k] || v.name]));
   const catClass = { product:'product', mfg:'sop', quality:'sop', sales:'sop', supply:'sop', compliance:'sop', hr:'hr', tacit:'tacit', ai_tech:'product', industry:'product' };
-  const statusLabel = { draft:'草稿', published:'已發佈', archived:'已封存', withdrawn:'已撤回' };
+  const s__ = I18N[currentLang]||I18N['zh-TW']; const statusLabel = { draft:s__['status.draft']||'Draft', published:s__['status.published']||'Publish', archived:s__['status.archived']||'Archive', withdrawn:s__['status.withdrawn']||'Withdraw', template:s__['status.template']||'Template' };
   const statusCls   = { draft:'sb-draft', published:'sb-published', archived:'sb-archived' };
 
   list.innerHTML = filtered.map(d => {
@@ -3666,7 +3666,7 @@ async function openReader(id) {
   // Meta badges
   const _cl = Object.fromEntries(Object.entries(CAT_META).map(([k,v])=>[k,(I18N[currentLang]||I18N['zh-TW'])['cat.'+k]||v.name])); const catLabel = { ..._cl,
     supply:'供應鏈採購', compliance:'法規認證', hr:'人資培訓', tacit:'內隱知識', ai_tech:'AI 科技', industry:'產業新知' };
-  const statusLabel = { draft:'草稿', published:'已發佈', archived:'已封存', withdrawn:'已撤回' };
+  const s__ = I18N[currentLang]||I18N['zh-TW']; const statusLabel = { draft:s__['status.draft']||'Draft', published:s__['status.published']||'Publish', archived:s__['status.archived']||'Archive', withdrawn:s__['status.withdrawn']||'Withdraw', template:s__['status.template']||'Template' };
   const metaParts = [
     doc.category ? `<span style="font-size:11px;padding:2px 8px;border-radius:10px;background:var(--blue-bg);color:var(--blue);">${catLabel[doc.category]||doc.category}</span>` : '',
     doc.product_line ? `<span style="font-size:11px;padding:2px 8px;border-radius:10px;background:#FEF0E8;color:#B5410A;">📦 ${doc.product_line}</span>` : '',
@@ -4038,8 +4038,9 @@ function applyI18n() {
 
   // 狀態選單
   const statusMap = {
-    draft: s['status.draft'], review: s['status.review'],
-    published: s['status.published'], archived: s['status.archived'],
+    draft: s['status.draft'], published: s['status.published'],
+    archived: s['status.archived'], withdrawn: s['status.withdrawn'],
+    template: s['status.template'],
   };
   document.querySelectorAll('#doc-status option').forEach(opt => {
     if (statusMap[opt.value]) opt.textContent = statusMap[opt.value];
@@ -4815,12 +4816,14 @@ function filterReviewPanel(status) {
 
 function renderReviewList(filterStatus) {
   const content = document.getElementById('review-content');
+  const s_ = I18N[currentLang] || I18N['zh-TW'];
   const stCfg = {
-    draft:     { label:'草稿',   badge:'sb-draft'     },
-    review:    { label:'待審核',  badge:'sb-review'    },
-    published: { label:'已發佈',  badge:'sb-published' },
-    withdrawn: { label:'已撤回',  badge:'sb-withdrawn' },
-    archived:  { label:'已封存',  badge:'sb-archived'  },
+    draft:     { label: s_['status.draft']     || 'Draft',    badge:'sb-draft'     },
+    review:    { label: '待審核',                              badge:'sb-review'    },
+    published: { label: s_['status.published'] || 'Publish',  badge:'sb-published' },
+    withdrawn: { label: s_['status.withdrawn'] || 'Withdraw', badge:'sb-withdrawn' },
+    archived:  { label: s_['status.archived']  || 'Archive',  badge:'sb-archived'  },
+    template:  { label: s_['status.template']  || 'Template', badge:'sb-draft'     },
   };
   let docs = window._reviewAllDocs || [];
   if (filterStatus !== 'all') docs = docs.filter(d => d.status === filterStatus);

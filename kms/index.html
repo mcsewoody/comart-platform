@@ -362,7 +362,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.47</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.48</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
@@ -2398,19 +2398,20 @@ async function extractText(file, ext) {
     return await file.text();
   }
 
-  // Word：mammoth.js（docx=OOXML, doc=OLE2 binary）
-  if (ext === 'docx' || ext === 'doc') {
+  // Word：docx 用 mammoth.js，doc 直接走 claude-proxy
+  if (ext === 'docx') {
     if (!window.mammoth) throw new Error('mammoth.js 尚未載入');
     const arrayBuffer = await file.arrayBuffer();
     try {
       const result = await mammoth.extractRawText({ arrayBuffer });
       if (result.value && result.value.length > 10) return result.value;
-      throw new Error('mammoth 抽不到文字');
-    } catch(mammothErr) {
-      console.warn('[doc] mammoth 失敗:', mammothErr.message);
-      // .doc（OLE2）部分格式 mammoth 不支援，請另存為 .docx
-      throw new Error('.doc 格式解析失敗，請在 Word 中另存為 .docx 後再上傳');
-    }
+    } catch(e) { console.warn('[docx] mammoth 失敗，改用 Claude:', e.message); }
+    return await extractPdfWithClaude(file);
+  }
+  if (ext === 'doc') {
+    // OLE2 binary，mammoth 支援不穩定，直接走 claude-proxy
+    toast('⏳ .doc 格式由 AI 解析，請稍候…', '');
+    return await extractPdfWithClaude(file);
   }
 
   // Excel (.xlsx/.xls)：SheetJS → Markdown 表格格式

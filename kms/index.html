@@ -361,7 +361,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.33</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.34</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
@@ -711,17 +711,19 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
       <div style="display:flex;flex-direction:column;height:100%;">
         <div style="padding:12px 20px;border-bottom:1px solid var(--border);flex-shrink:0;">
           <div style="font-size:15px;font-weight:500;margin-bottom:10px;">審核流程管理</div>
-          <div class="review-flow">
-            <span class="review-step" id="rs-draft">草稿</span>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
+            <span class="review-step" id="rs-all" onclick="filterReviewPanel('all')" style="cursor:pointer;">全部</span>
+            <span class="review-step" id="rs-draft" onclick="filterReviewPanel('draft')" style="cursor:pointer;">草稿</span>
             <span class="review-arrow">→</span>
-            <span class="review-step" id="rs-published">已發佈</span>
+            <span class="review-step" id="rs-review" onclick="filterReviewPanel('review')" style="cursor:pointer;">待審核</span>
             <span class="review-arrow">→</span>
-            <span class="review-step" id="rs-archived">已封存</span>
-            <span style="margin-left:12px;font-size:11px;color:var(--text-3);">管理員可隨時撤除任何已發佈文件</span>
+            <span class="review-step" id="rs-published" onclick="filterReviewPanel('published')" style="cursor:pointer;">已發佈</span>
+            <span class="review-arrow">→</span>
+            <span class="review-step" id="rs-archived" onclick="filterReviewPanel('archived')" style="cursor:pointer;">已封存</span>
           </div>
         </div>
         <div style="flex:1;overflow-y:auto;padding:12px 20px;" id="review-content">
-          <div style="color:var(--text-3);font-size:13px;text-align:center;padding:30px 0;">選擇文件後可在此執行審核動作</div>
+          <div style="color:var(--text-3);font-size:13px;text-align:center;padding:30px 0;">載入中…</div>
         </div>
       </div>
     </div>
@@ -3577,12 +3579,11 @@ async function translateReader(targetLang) {
 
   try {
     const truncated = srcText.slice(0, 8000); // 避免超長
-    const data = await callClaudeProxy(
+    const translated = await callClaudeProxy(
       `你是專業翻譯員。請將以下文字完整翻譯為${langLabel}，保持原始段落和格式，只輸出翻譯結果，不要加任何說明。`,
       truncated,
-      2000
+      3000
     );
-    const translated = data?.content?.[0]?.text || '';
     if (!translated) throw new Error('翻譯結果為空');
     if (window.marked) {
       bodyEl.innerHTML = marked.parse(translated);
@@ -4284,7 +4285,7 @@ async function loadAnalytics() {
       <div class="stat-card"><div class="stat-label">知識條目</div><div class="stat-val">${totalDocs}</div></div>
       <div class="stat-card"><div class="stat-label">已發佈</div><div class="stat-val">${published}</div></div>
       <div class="stat-card"><div class="stat-label">總閱覽數</div><div class="stat-val">${totalViews}</div></div>
-      <div class="stat-card"><div class="stat-label">知識缺口</div><div class="stat-val" style="color:var(--amber)">${gapCount}</div><div class="stat-sub">未找到結果的查詢</div></div>
+      <div class="stat-card" onclick="toast('知識缺口紀錄：'+localStorage.getItem('kms-search-gaps')?.slice(0,100),'');" style="cursor:pointer;" title="點擊查看 localStorage 原始值"><div class="stat-label">知識缺口</div><div class="stat-val" style="color:var(--amber)">${gapCount}</div><div class="stat-sub">AI 搜尋無結果的查詢</div></div>
     </div>
 
     <div class="section-hd">熱門文件 TOP 10（閱讀次數排行）</div>
@@ -4475,32 +4476,71 @@ async function openReviewPanel(docId, docTitle) {
   await loadReviewPanel();
 }
 
+
+// ─── 審核流程：篩選和列表渲染 ───
+window._reviewFilter = 'all';
+
+function filterReviewPanel(status) {
+  window._reviewFilter = status;
+  window._reviewAllDocs = null; // 強制重新載入
+  // 更新 tab 樣式
+  ['all','draft','review','published','archived'].forEach(s => {
+    const el = document.getElementById('rs-' + s);
+    if (el) el.className = 'review-step' + (s === status ? ' active' : '');
+  });
+  loadReviewPanel();
+}
+
+function renderReviewList(filterStatus) {
+  const content = document.getElementById('review-content');
+  const stCfg = {
+    draft:     { label:'草稿',   badge:'sb-draft'     },
+    review:    { label:'待審核',  badge:'sb-review'    },
+    published: { label:'已發佈',  badge:'sb-published' },
+    archived:  { label:'已封存',  badge:'sb-archived'  },
+  };
+  let docs = window._reviewAllDocs || [];
+  if (filterStatus !== 'all') docs = docs.filter(d => d.status === filterStatus);
+  if (!docs.length) {
+    content.innerHTML = '<div style="text-align:center;color:var(--text-3);padding:40px 0;font-size:13px;">此分類無文件</div>';
+    return;
+  }
+  const renderRow = d => {
+    const st = stCfg[d.status] || stCfg.draft;
+    const meta = CAT_META[d.category] || { icon:'📁', name:'' };
+    const dt = d.updated_at ? new Date(d.updated_at).toLocaleDateString('zh-TW',{month:'2-digit',day:'2-digit'}) : '';
+    const safeTitle = (d.title||'').replace(/'/g,'');
+    return `
+      <div class="doc-item" style="margin-bottom:4px;">
+        <span class="status-badge ${st.badge}" style="flex-shrink:0;">${st.label}</span>
+        <span style="font-size:10px;color:var(--text-3);flex-shrink:0;">${meta.icon}</span>
+        <span class="doc-title" onclick="openReader('${d.id}')" style="cursor:pointer;flex:1;min-width:0;">${d.title}</span>
+        <span style="font-size:11px;color:var(--text-3);white-space:nowrap;">${d.author_name||'—'}</span>
+        <span style="font-size:11px;color:var(--text-3);white-space:nowrap;">${dt}</span>
+        <button onclick="openDoc('${d.id}')"
+          style="padding:2px 7px;border-radius:5px;border:1px solid var(--border);background:var(--bg);font-size:11px;cursor:pointer;flex-shrink:0;">✏️</button>
+        <button onclick="deleteDoc('${d.id}','${safeTitle}','${(d.author_name||'').replace(/'/g,'')}')"
+          style="padding:2px 7px;border-radius:5px;border:1px solid #F5C6C6;background:#FEF2F2;color:#A32D2D;font-size:11px;cursor:pointer;flex-shrink:0;">✕</button>
+        <button onclick="openReviewPanel('${d.id}','${safeTitle}')"
+          style="padding:2px 7px;border-radius:5px;border:1px solid var(--blue);background:var(--blue-bg);color:var(--blue);font-size:11px;cursor:pointer;flex-shrink:0;">審核</button>
+      </div>`;
+  };
+  content.innerHTML = `<div style="margin-bottom:4px;font-size:12px;color:var(--text-3);">共 ${docs.length} 份文件</div>` + docs.map(renderRow).join('');
+}
+
 async function loadReviewPanel() {
   const content = document.getElementById('review-content');
   if (!reviewingDocId) {
     // 顯示待審核文件列表
     content.innerHTML = '<div style="text-align:center;color:var(--text-3);padding:20px 0;font-size:13px;">載入中…</div>';
     try {
-      let allRevDocs = [];
-      if (CFG.supabaseUrl && CFG.supabaseKey) {
-        allRevDocs = await sbFetch("/rest/v1/kms_documents?select=id,title,status,author_name,reviewer,category,updated_at&order=updated_at.desc") || [];
+      if (!window._reviewAllDocs) {
+        window._reviewAllDocs = [];
+        if (CFG.supabaseUrl && CFG.supabaseKey) {
+          window._reviewAllDocs = await sbFetch("/rest/v1/kms_documents?select=id,title,status,author_name,reviewer,category,updated_at&order=updated_at.desc") || [];
+        }
       }
-      if (!allRevDocs.length) {
-        content.innerHTML = '<div style="text-align:center;color:var(--text-3);padding:40px 0;font-size:13px;">目前無文件</div>';
-        return;
-      }
-      const grouped2 = { draft:[], review:[], published:[], archived:[] };
-      allRevDocs.forEach(d => { (grouped2[d.status] || grouped2.draft).push(d); });
-      const stCfg = { draft:{label:'草稿',badge:'sb-draft'}, review:{label:'待審核',badge:'sb-review'}, published:{label:'已發佈',badge:'sb-published'}, archived:{label:'已封存',badge:'sb-archived'} };
-      const renderRevCard = d => {
-        const st = stCfg[d.status]||stCfg.draft;
-        const meta = CAT_META[d.category]||{icon:'📁'};
-        const dt = d.updated_at ? new Date(d.updated_at).toLocaleDateString('zh-TW',{month:'2-digit',day:'2-digit'}) : '';
-        const sid = (d.title||'').replace(/'/g,'');
-        return `<div onclick="openReviewPanel('${d.id}','${sid}')" style="border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px;cursor:pointer;background:var(--surface);" onmouseover="this.style.boxShadow='0 2px 8px rgba(0,0,0,.1)'" onmouseout="this.style.boxShadow=''"><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;"><span class="status-badge ${st.badge}">${st.label}</span><span style="font-size:10px;color:var(--text-3);">${meta.icon} ${dt}</span></div><div style="font-size:13px;font-weight:500;line-height:1.4;margin-bottom:4px;">${d.title}</div><div style="font-size:11px;color:var(--text-3);">${d.author_name||'—'}${d.reviewer?' · 審：'+d.reviewer:''}</div></div>`;
-      };
-      const renderRevGrp = k => grouped2[k].length ? `<div style="margin-bottom:16px;"><div class="section-hd">${stCfg[k].label}（${grouped2[k].length}）</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;margin-top:6px;">${grouped2[k].map(renderRevCard).join('')}</div></div>` : '';
-      content.innerHTML = renderRevGrp('review') + renderRevGrp('draft') + renderRevGrp('published') + renderRevGrp('archived');
+      renderReviewList(window._reviewFilter || 'all');
     } catch(e) {
       content.innerHTML = `<div style="color:var(--red);padding:20px;">載入失敗：${e.message}</div>`;
     }
@@ -4774,7 +4814,7 @@ window.switchPanel = function(id) {
   if (id === 'kmap')      setTimeout(() => loadKmap(null), 50);
   if (id === 'analytics') setTimeout(loadAnalytics, 50);
   if (id === 'experts')   setTimeout(loadExperts, 50);
-  if (id === 'review')    setTimeout(loadReviewPanel, 50);
+  if (id === 'review')    { window._reviewAllDocs = null; window._reviewFilter = 'all'; setTimeout(loadReviewPanel, 50); }
 };
 
 // 初始化時載入審核 badge

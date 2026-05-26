@@ -203,6 +203,16 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:
 .bnav-btn.active{color:var(--ac);}
 .bnav-icon{font-size:20px;}
 .bnav-label{font-size:9px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;}
+.notif-btn{position:relative;background:none;border:none;cursor:pointer;font-size:20px;padding:4px 8px;color:var(--tx2);}
+.notif-badge{position:absolute;top:0;right:0;background:#E53935;color:#fff;font-size:9px;font-weight:700;padding:1px 4px;border-radius:8px;min-width:14px;text-align:center;display:none;}
+.notif-panel{position:absolute;top:calc(100% + 8px);right:0;width:320px;max-height:420px;background:var(--s1);border:1px solid var(--br);border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.3);z-index:999;display:none;flex-direction:column;overflow:hidden;}
+.notif-panel.open{display:flex;}
+.notif-item{padding:10px 14px;border-bottom:1px solid var(--br);cursor:pointer;transition:background .15s;}
+.notif-item:hover{background:var(--s2);}
+.notif-item.unread{border-left:3px solid var(--ac);}
+.notif-title{font-size:13px;font-weight:500;color:var(--tx1);margin-bottom:2px;}
+.notif-body{font-size:11px;color:var(--tx3);line-height:1.4;}
+.notif-time{font-size:10px;color:var(--tx3);margin-top:3px;}
 
 /* Desktop sidebar */
 .sidebar{display:none;width:220px;border-right:1px solid var(--br);flex-direction:column;flex-shrink:0;background:var(--s1);padding:12px;}
@@ -287,7 +297,7 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:
   <div class="topbar">
     <div class="topbar-logo" onclick="switchView('home')">
       <div class="topbar-mark">C</div>
-      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.12</span></div>
+      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.13</span></div>
     </div>
     <div class="topbar-right">
       <div class="lang-switcher">
@@ -302,6 +312,20 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:
         <div>
           <div class="user-name" id="topName">—</div>
           <div class="user-role" id="topRole">—</div>
+        </div>
+      </div>
+      <div style="position:relative;">
+        <button class="notif-btn" id="notifBtn" onclick="toggleNotifPanel()" title="通知">
+          🔔<span class="notif-badge" id="notifBadge">0</span>
+        </button>
+        <div class="notif-panel" id="notifPanel">
+          <div style="padding:10px 14px;border-bottom:1px solid var(--br);display:flex;align-items:center;justify-content:space-between;">
+            <span style="font-size:13px;font-weight:600;">通知</span>
+            <button onclick="markAllRead()" style="font-size:11px;color:var(--ac);background:none;border:none;cursor:pointer;">全部已讀</button>
+          </div>
+          <div id="notifList" style="flex:1;overflow-y:auto;">
+            <div style="padding:20px;text-align:center;color:var(--tx3);font-size:12px;">載入中…</div>
+          </div>
         </div>
       </div>
       <button class="topbar-btn" id="settingsTopBtn" onclick="switchView('users')" style="display:none;" title="Settings">⚙</button>
@@ -1149,6 +1173,9 @@ function enterPortal() {
 
   renderAppGrid();
   applyI18nAll();
+  // 啟動通知
+  setTimeout(updateNotifBadge, 1000);
+  setInterval(updateNotifBadge, 60000);
 }
 
 // ═══════════════════════════════════════════════
@@ -1251,6 +1278,117 @@ const SUPABASE_ANON_KEY_PORTAL = ''; // 留空，從 KMS localStorage 讀取
 async function getSupabaseKey() {
   // Supabase key is hardcoded (same project as KMS)
   return 'sb_publishable_rAVwVeUMWD-m_VTFIenMhg_Fcg6ocYJ';
+}
+
+
+// ─── 通知系統 ───
+let _notifOpen = false;
+
+function toggleNotifPanel() {
+  _notifOpen = !_notifOpen;
+  const panel = document.getElementById('notifPanel');
+  if (panel) {
+    panel.classList.toggle('open', _notifOpen);
+    if (_notifOpen) loadNotifications();
+  }
+}
+
+// 點其他地方關閉通知面板
+document.addEventListener('click', e => {
+  const btn = document.getElementById('notifBtn');
+  const panel = document.getElementById('notifPanel');
+  if (panel && btn && !btn.contains(e.target) && !panel.contains(e.target)) {
+    panel.classList.remove('open');
+    _notifOpen = false;
+  }
+});
+
+async function loadNotifications() {
+  const sess = readSession();
+  if (!sess?.empId && !sess?.nameEn) return;
+  const sbKey = await getSupabaseKey();
+  if (!sbKey) return;
+
+  const myId = sess.nameEn || sess.empId || '';
+  const list = document.getElementById('notifList');
+  if (!list) return;
+
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/notifications?to_user=eq.${encodeURIComponent(myId)}&order=created_at.desc&limit=30`,
+      { headers: { 'apikey': sbKey, 'Authorization': `Bearer ${sbKey}` } }
+    );
+    if (!res.ok) throw new Error(res.status);
+    const notifs = await res.json();
+
+    const unread = notifs.filter(n => !n.is_read).length;
+    const badge = document.getElementById('notifBadge');
+    if (badge) {
+      badge.textContent = unread;
+      badge.style.display = unread > 0 ? 'block' : 'none';
+    }
+
+    if (!notifs.length) {
+      list.innerHTML = '<div style="padding:24px;text-align:center;color:var(--tx3);font-size:12px;">目前沒有通知</div>';
+      return;
+    }
+
+    list.innerHTML = notifs.map(n => {
+      const dt = new Date(n.created_at).toLocaleString('zh-TW', { month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit' });
+      return `<div class="notif-item ${n.is_read ? '' : 'unread'}" onclick="openNotif('${n.id}','${(n.link||'').replace(/'/g,'')}')">
+        <div class="notif-title">${n.title || '新通知'}</div>
+        <div class="notif-body">${n.body || ''}</div>
+        <div class="notif-time">${dt} · ${n.from_user || 'KMS'}</div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    list.innerHTML = `<div style="padding:16px;color:var(--tx3);font-size:12px;">載入失敗：${e.message}</div>`;
+  }
+}
+
+async function openNotif(notifId, link) {
+  const sbKey = await getSupabaseKey();
+  if (sbKey && notifId) {
+    fetch(`${SUPABASE_URL}/rest/v1/notifications?id=eq.${notifId}`, {
+      method: 'PATCH',
+      headers: { 'apikey': sbKey, 'Authorization': `Bearer ${sbKey}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ is_read: true }),
+    }).catch(()=>{});
+  }
+  if (link) window.open(link, '_blank');
+  document.getElementById('notifPanel')?.classList.remove('open');
+  _notifOpen = false;
+  setTimeout(loadNotifications, 500);
+}
+
+async function markAllRead() {
+  const sess = readSession();
+  const sbKey = await getSupabaseKey();
+  if (!sbKey || !sess) return;
+  const myId = sess.nameEn || sess.empId || '';
+  await fetch(
+    `${SUPABASE_URL}/rest/v1/notifications?to_user=eq.${encodeURIComponent(myId)}&is_read=eq.false`,
+    { method: 'PATCH', headers: { 'apikey': sbKey, 'Authorization': `Bearer ${sbKey}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' }, body: JSON.stringify({ is_read: true }) }
+  ).catch(()=>{});
+  loadNotifications();
+}
+
+async function updateNotifBadge() {
+  const sess = readSession();
+  if (!sess) return;
+  const sbKey = await getSupabaseKey();
+  if (!sbKey) return;
+  const myId = sess.nameEn || sess.empId || '';
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/notifications?to_user=eq.${encodeURIComponent(myId)}&is_read=eq.false&select=id`,
+      { headers: { 'apikey': sbKey, 'Authorization': `Bearer ${sbKey}` } }
+    );
+    const data = await res.json();
+    const cnt = Array.isArray(data) ? data.length : 0;
+    const badge = document.getElementById('notifBadge');
+    if (badge) { badge.textContent = cnt; badge.style.display = cnt > 0 ? 'block' : 'none'; }
+  } catch(e) {}
 }
 
 async function loadRanking() {

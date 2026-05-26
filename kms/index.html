@@ -362,7 +362,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.45</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.47</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
@@ -1888,8 +1888,9 @@ async function saveDoc() {
     // ── 完成：清空編輯器、存版本快照、跳知識庫 ──
     autoSnapshot({ title, body, category, lang, status });
     // 非同步產生 AI 摘要（不擋主流程）
-    if (doc_id && body && body.length > 50) {
-      generateAndSaveSummary(doc_id, title, body).catch(()=>{});
+    const _summaryDocId = (typeof doc_id !== 'undefined' ? doc_id : null) || editingDocId;
+    if (_summaryDocId && body && body.length > 50) {
+      generateAndSaveSummary(_summaryDocId, title, body).catch(()=>{});
     }
     editingDocId = null;
     clearUploadedFile(); // 清掉上傳檔案
@@ -2289,6 +2290,30 @@ async function processFile(file) {
     toast(`檔案過大（${sizeMB} MB），上限為 50 MB`, 'error');
     window._uploadBlocked = true;
     return;
+  }
+
+  // ── 重複檔案檢查（比對 file_name + file_size）──
+  if (CFG.supabaseUrl && CFG.supabaseKey) {
+    try {
+      const dupCheck = await sbFetch(
+        `/rest/v1/kms_documents?file_name=eq.${encodeURIComponent(file.name)}&file_size=eq.${file.size}&select=id,title,status&limit=3`
+      );
+      if (dupCheck && dupCheck.length > 0) {
+        const s_ = I18N[currentLang] || I18N['zh-TW'];
+        const stLabel = { draft: s_['status.draft']||'草稿', published: s_['status.published']||'發佈', template: s_['status.template']||'範本', archived: s_['status.archived']||'封存', withdrawn: s_['status.withdrawn']||'撤回' };
+        const dupList = dupCheck.map(d => `「${d.title}」（${stLabel[d.status]||d.status}）`).join('、');
+        const proceed = confirm(`⚠ 資料庫已有相同檔案：
+${dupList}
+
+確定要繼續上傳並建立新條目嗎？`);
+        if (!proceed) {
+          const fi = document.getElementById('file-input');
+          if (fi) fi.value = '';
+          window._uploadBlocked = true;
+          return;
+        }
+      }
+    } catch(e) { console.warn('[dup-check]', e.message); }
   }
 
   // 每次選檔產生新 token，防止上一個解析的結果覆蓋新檔案（race condition）

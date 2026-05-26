@@ -213,6 +213,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
 .file-preview-info { flex: 1; min-width: 0; }
 .file-preview-name { font-size: 13px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .file-preview-size { font-size: 11px; color: var(--text-3); }
+.file-preview-card { display:flex; align-items:center; gap:8px; padding:5px 10px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); margin-top:4px; }
 .file-preview-remove { padding: 3px 8px; border-radius: 5px; border: 1px solid var(--border); background: transparent; cursor: pointer; font-size: 11px; color: var(--text-3); flex-shrink: 0; }
 .file-preview-remove:hover { border-color: var(--red); color: var(--red); background: var(--red-bg); }
 
@@ -360,7 +361,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.18</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.19</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
@@ -724,7 +725,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         </div>
         <div class="comment-input-wrap">
           <textarea class="comment-input" id="comment-input" placeholder="輸入留言…" rows="2"
-            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();submitComment();}"></textarea>
+            onkeydown="if(event.isComposing)return;if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();submitComment();}"></textarea>
           <button class="comment-submit" onclick="submitComment()">送出</button>
         </div>
       </div>
@@ -2702,16 +2703,12 @@ async function openDoc(id) {
       const _sizeStr = doc.file_size ? ' · ' + formatBytes(doc.file_size) : '';
       _previewArea.innerHTML = `
         <div class="file-preview-card" id="existing-file-card">
-          <div class="file-preview-icon">${getFileIcon(doc.file_name)}</div>
-          <div class="file-preview-info">
-            <div class="file-preview-name">${doc.file_name}</div>
-            <div class="file-preview-size">已上傳${_sizeStr}</div>
-          </div>
+          <span style="font-size:16px;flex-shrink:0;">${getFileIcon(doc.file_name)}</span>
+          <span style="font-size:12px;font-weight:500;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${doc.file_name}">${doc.file_name}</span>
+          <span style="font-size:11px;color:var(--text-3);flex-shrink:0;white-space:nowrap;">已上傳${_sizeStr}</span>
           <a href="${doc.file_url}" target="_blank" download="${doc.file_name}"
-            style="font-size:11px;color:var(--blue);text-decoration:none;padding:3px 8px;border:1px solid var(--blue);border-radius:5px;white-space:nowrap;">
-            ↓ 下載
-          </a>
-          <button class="file-preview-remove" onclick="removeExistingFile()" title="移除此檔案">✕ 刪除</button>
+            style="font-size:11px;color:var(--blue);text-decoration:none;padding:3px 8px;border:1px solid var(--blue);border-radius:5px;white-space:nowrap;flex-shrink:0;">↓ 下載</a>
+          <button class="file-preview-remove" onclick="removeExistingFile()">✕ 刪除</button>
         </div>`;
     } else {
       _previewArea.innerHTML = '';
@@ -3119,6 +3116,7 @@ async function saveNewProductLine() {
 // CUSTOMER TAGS
 // ═══════════════════════════════════════════════
 function handleCustomerTagInput(e) {
+  if (e.isComposing) return; // 中文輸入法組字中，忽略
   if (e.key === 'Enter' || e.key === ',') {
     e.preventDefault();
     const val = e.target.value.trim().replace(/,/g, '');
@@ -3723,6 +3721,7 @@ function copySql() {
 let currentTags = [];
 
 function handleTagInput(e) {
+  if (e.isComposing) return; // 中文輸入法組字中，忽略
   if (e.key === 'Enter' || e.key === ',') {
     e.preventDefault();
     const val = e.target.value.trim().replace(/,/g,'');

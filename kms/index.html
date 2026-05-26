@@ -362,7 +362,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.41</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.44</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
@@ -496,13 +496,16 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
           <button class="tb-btn" title="重做 Ctrl+Y" onclick="editorCmd('redo')">↪</button>
           <div class="tb-sep"></div>
           <!-- Templates -->
-          <select onchange="loadTemplate(this.value);this.value=''" style="font-size:12px;padding:4px 8px;border-radius:6px;border:1px solid var(--border);background:var(--surface);color:var(--text-2);cursor:pointer;outline:none;">
+          <select id="template-select" onchange="loadTemplateFromSelect(this)" style="font-size:12px;padding:4px 8px;border-radius:6px;border:1px solid var(--border);background:var(--surface);color:var(--text-2);cursor:pointer;outline:none;">
             <option value="">套用範本…</option>
-            <option value="sop">SOP 標準作業程序</option>
-            <option value="meeting">會議紀錄</option>
-            <option value="review">專案覆盤</option>
-            <option value="tacit">內隱知識記錄</option>
-            <option value="inspection">IQC/IPQC 檢驗報告</option>
+            <optgroup label="預設範本" id="tmpl-default-group">
+              <option value="__sop">SOP 標準作業程序</option>
+              <option value="__meeting">會議紀錄</option>
+              <option value="__review">專案覆盤</option>
+              <option value="__tacit">內隱知識記錄</option>
+              <option value="__inspection">IQC/IPQC 檢驗報告</option>
+            </optgroup>
+            <optgroup label="自訂範本" id="tmpl-custom-group" style="display:none;"></optgroup>
           </select>
         </div>
 
@@ -555,6 +558,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
             <option value="draft">草稿（暫不公開）</option>
             <option value="withdrawn">已撤回</option>
             <option value="archived">已封存</option>
+            <option value="template">📋 範本</option>
           </select>
           <button class="save-btn" onclick="saveDoc()" data-i18n="editor.save">儲存並向量化</button>
           <button id="reparse-btn" onclick="reparseCurrentDoc()"
@@ -1360,6 +1364,97 @@ function updateToolbarState() {
   }
 }
 
+
+// ─── 範本庫 ───
+async function loadCustomTemplates() {
+  if (!CFG.supabaseUrl || !CFG.supabaseKey) return;
+  try {
+    const templates = await sbFetch("/rest/v1/kms_documents?status=eq.template&select=id,title,file_url,file_name&order=updated_at.desc") || [];
+    const grp = document.getElementById('tmpl-custom-group');
+    if (!grp) return;
+    if (!templates.length) { grp.style.display = 'none'; return; }
+    grp.style.display = '';
+    grp.innerHTML = templates.map(t =>
+      `<option value="db:${t.id}">${t.file_url ? '📎 ' : '📝 '}${t.title}</option>`
+    ).join('');
+  } catch(e) { console.warn('[templates]', e.message); }
+}
+
+async function loadTemplateFromSelect(sel) {
+  const val = sel.value;
+  if (!val) return;
+  sel.value = '';
+
+  if (val.startsWith('__')) {
+    // 預設範本
+    const key = val.slice(2);
+    loadTemplate(key);
+    return;
+  }
+
+  if (val.startsWith('db:')) {
+    const id = val.slice(3);
+    try {
+      const rows = await sbFetch(`/rest/v1/kms_documents?id=eq.${id}&select=title,body,category,lang,file_url,file_name`);
+      const t = rows?.[0];
+      if (!t) { toast('範本載入失敗', 'error'); return; }
+      if (t.file_url && t.file_name) {
+        showTemplateActionModal(t);
+        return;
+      }
+      applyTemplateToEditor(t);
+    } catch(e) { toast('範本載入失敗：' + e.message, 'error'); }
+    return;
+  }}
+
+
+// ─── 套用範本到 editor ───
+function applyTemplateToEditor(t) {
+  document.getElementById('doc-title').value = t.title + '（副本）';
+  document.getElementById('doc-cat').value = t.category || 'product';
+  if (tiptapEditor) {
+    const html = (t.body||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n\n+/g,'</p><p>').replace(/\n/g,'<br>');
+    tiptapEditor.commands.setContent('<p>' + html + '</p>');
+  }
+  toast(`已套用範本：${t.title}`, 'success');
+}
+
+// ─── 範本動作選擇 modal ───
+function showTemplateActionModal(t) {
+  let modal = document.getElementById('tmpl-action-modal');
+  if (modal) modal.remove();
+  modal = document.createElement('div');
+  modal.id = 'tmpl-action-modal';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;display:flex;align-items:center;justify-content:center;';
+  modal.onclick = e => { if (e.target === modal) modal.remove(); };
+  modal.innerHTML = `
+    <div style="background:var(--surface);border-radius:var(--radius-lg);padding:24px;width:min(380px,90vw);box-shadow:0 8px 32px rgba(0,0,0,.2);">
+      <div style="font-size:15px;font-weight:500;margin-bottom:6px;">套用範本</div>
+      <div style="font-size:13px;color:var(--text-2);margin-bottom:18px;">${t.title}</div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <button onclick="applyTemplateToEditor(${JSON.stringify(t).replace(/"/g,'&quot;')});document.getElementById('tmpl-action-modal').remove();"
+          style="padding:10px 16px;border-radius:var(--radius);border:1px solid var(--blue);background:var(--blue);color:#fff;cursor:pointer;font-size:13px;text-align:left;">
+          ✏️ 在 KMS 編輯
+          <div style="font-size:11px;opacity:.8;margin-top:2px;">複製文字內容到編輯器，直接修改後儲存</div>
+        </button>
+        <a href="${t.file_url}" download="${t.file_name}" target="_blank"
+          onclick="document.getElementById('tmpl-action-modal').remove();"
+          style="padding:10px 16px;border-radius:var(--radius);border:1px solid var(--border);background:var(--bg);color:var(--text-2);cursor:pointer;font-size:13px;text-decoration:none;display:block;">
+          ↓ 下載原始檔（${t.file_name}）
+          <div style="font-size:11px;color:var(--text-3);margin-top:2px;">下載到本機用 Word / PPT 開啟編輯</div>
+        </a>
+        <button onclick="applyTemplateToEditor(${JSON.stringify(t).replace(/"/g,'&quot;')});document.getElementById('tmpl-action-modal').remove();setTimeout(()=>document.querySelector('.save-btn')?.click(),300);"
+          style="padding:10px 16px;border-radius:var(--radius);border:1px solid var(--border);background:var(--bg);color:var(--text-2);cursor:pointer;font-size:13px;text-align:left;">
+          📋 兩者都要
+          <div style="font-size:11px;color:var(--text-3);margin-top:2px;">套用到編輯器，同時下載原始檔</div>
+        </button>
+      </div>
+      <button onclick="document.getElementById('tmpl-action-modal').remove()"
+        style="margin-top:14px;width:100%;padding:7px;border-radius:var(--radius);border:1px solid var(--border);background:transparent;cursor:pointer;font-size:13px;color:var(--text-3);">取消</button>
+    </div>`;
+  document.body.appendChild(modal);
+}
+
 function loadTemplate(key) {
   if (!key || !TEMPLATES[key]) return;
   const tmpl = TEMPLATES[key];
@@ -1792,6 +1887,10 @@ async function saveDoc() {
 
     // ── 完成：清空編輯器、存版本快照、跳知識庫 ──
     autoSnapshot({ title, body, category, lang, status });
+    // 非同步產生 AI 摘要（不擋主流程）
+    if (doc_id && body && body.length > 50) {
+      generateAndSaveSummary(doc_id, title, body).catch(()=>{});
+    }
     editingDocId = null;
     clearUploadedFile(); // 清掉上傳檔案
 
@@ -1829,12 +1928,59 @@ async function saveDoc() {
 }
 
 // 版本快照 — 按 doc_id 隔離，新文件用 'new' 暫存
+
+// ─── AI 自動摘要：儲存後非同步產生 2-3 行摘要 ───
+async function generateAndSaveSummary(docId, title, body) {
+  if (!body || body.length < 50) return; // 內容太少不摘要
+  if (!CFG.supabaseUrl || !CFG.supabaseKey) return;
+  try {
+    const truncated = body.slice(0, 6000); // 避免超長
+    const summary = await callClaudeProxy(
+      '你是知識管理系統的摘要助手。請用 2-3 句話（繁體中文）摘要以下文件的核心重點，每句不超過 30 字，直接輸出摘要，不要加任何前言或說明。',
+      `文件標題：${title}\n\n${truncated}`,
+      300
+    );
+    if (!summary || summary.length < 10) return;
+    await sbFetch(`/rest/v1/kms_documents?id=eq.${docId}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + CFG.supabaseKey,
+        'apikey': CFG.supabaseKey,
+        'Prefer': 'return=minimal',
+      },
+      body: JSON.stringify({ summary }),
+    });
+    // 更新列表卡片
+    const summaryEl = document.getElementById('summary-' + docId);
+    if (summaryEl) {
+      summaryEl.textContent = summary;
+      summaryEl.style.display = 'block';
+    }
+  } catch(e) {
+    console.warn('[summary]', e.message);
+  }
+}
+
 function autoSnapshot(doc) {
+  // 本機快照（保留相容）
   const key = 'kms-snaps-' + (doc.id || editingDocId || 'new');
   const snaps = JSON.parse(localStorage.getItem(key) || '[]');
   snaps.unshift({ ...doc, ts: new Date().toISOString() });
   localStorage.setItem(key, JSON.stringify(snaps.slice(0, 30)));
-  // 同步更新 sidebar
+  // 存到 Supabase kms_snapshots（含完整 body）
+  const snapDocId = doc.id || editingDocId;
+  if (snapDocId && CFG.supabaseUrl && CFG.supabaseKey) {
+    kmsWrite('insert', 'kms_snapshots', {
+      doc_id: snapDocId,
+      title: doc.title || '',
+      body: doc.body || '',
+      category: doc.category || '',
+      status: doc.status || '',
+      author_name: doc.author_name || '',
+      saved_by: portalUser ? (portalUser.nameEn || portalUser.nameZh || '') : 'Admin',
+    }).catch(e => console.warn('[snapshot]', e.message));
+  }
   if (document.getElementById('version-list')) loadVersionHistory();
 }
 
@@ -2775,7 +2921,7 @@ async function loadDocs() {
   let docs = [];
   try {
     if (CFG.supabaseUrl && CFG.supabaseKey) {
-      docs = await sbFetch('/rest/v1/kms_documents?select=id,title,category,lang,status,product_line,customer_tag,tags,author_name,view_count,file_url,file_name,file_type,file_size,updated_at,created_at&status=eq.published&order=updated_at.desc') || [];
+      docs = await sbFetch('/rest/v1/kms_documents?select=id,title,category,lang,status,product_line,customer_tag,tags,author_name,view_count,file_url,file_name,file_type,file_size,summary,updated_at,created_at&status=eq.published&order=updated_at.desc') || [];
     } else {
       const saved = localStorage.getItem('kms-local-docs');
       if (saved) localDocs = JSON.parse(saved);
@@ -2856,6 +3002,7 @@ async function loadDocs() {
           style="padding:3px 7px;border-radius:5px;border:1px solid #F5C6C6;background:#FEF2F2;color:#A32D2D;font-size:11px;cursor:pointer;flex-shrink:0;" title="刪除">✕</button>` : ''}
       </div>
       ${(plBadge || cusBadges) ? `<div style="display:flex;gap:4px;flex-wrap:wrap;padding-left:2px;">${plBadge}${cusBadges}</div>` : ''}
+      ${d.summary ? `<div id="summary-${d.id}" style="font-size:11px;color:var(--text-2);line-height:1.5;padding:3px 2px 0;width:100%;border-top:1px solid var(--border);margin-top:3px;">${d.summary}</div>` : `<div id="summary-${d.id}" style="display:none;font-size:11px;color:var(--text-2);line-height:1.5;padding:3px 2px 0;width:100%;"></div>`}
     </div>`;
   }).join('');
 
@@ -4033,39 +4180,61 @@ function toast(msg, type = '') {
 // ═══════════════════════════════════════════════
 // VERSION HISTORY
 // ═══════════════════════════════════════════════
-function loadVersionHistory() {
+async function loadVersionHistory() {
   const list = document.getElementById('version-list');
   const countEl = document.getElementById('ver-count');
   if (!list || !countEl) return;
 
-  // 讀取當前文件的版本快照（按 doc_id 隔離）
-  const key = 'kms-snaps-' + (editingDocId || 'new');
-  const snaps = JSON.parse(localStorage.getItem(key) || '[]');
-
-  if (!snaps.length) {
-    list.innerHTML = '<div style="color:var(--text-3);font-size:12px;text-align:center;padding:20px 0;">尚無版本紀錄</div>';
-    countEl.textContent = '0';
-    return;
+  // 優先從 Supabase 讀（有完整 body 可做 diff）
+  if (editingDocId && CFG.supabaseUrl && CFG.supabaseKey) {
+    try {
+      const snaps = await sbFetch(
+        `/rest/v1/kms_snapshots?doc_id=eq.${editingDocId}&select=id,title,body,category,status,saved_by,created_at&order=created_at.desc&limit=20`
+      ) || [];
+      countEl.textContent = snaps.length;
+      if (!snaps.length) {
+        list.innerHTML = '<div style="color:var(--text-3);font-size:12px;text-align:center;padding:20px 0;">尚無版本紀錄</div>';
+        return;
+      }
+      list.innerHTML = snaps.map((s, i) => {
+        const dt = new Date(s.created_at);
+        const timeStr = dt.toLocaleString('zh-TW', { month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit' });
+        return `
+          <div style="border:1px solid var(--border);border-radius:6px;padding:8px 10px;margin-bottom:6px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px;">
+              <span style="font-size:11px;font-weight:500;color:${i===0?'var(--blue)':'var(--text-2)'}">
+                v${snaps.length - i} ${i===0?'（最新）':''}
+              </span>
+              <span style="font-size:10px;color:var(--text-3);">${timeStr}</span>
+            </div>
+            <div style="font-size:11px;color:var(--text-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${s.title}</div>
+            <div style="font-size:10px;color:var(--text-3);margin-top:2px;">${s.saved_by || ''}</div>
+            <div style="display:flex;gap:4px;margin-top:6px;">
+              <button onclick="restoreSnapshot('${s.id}')"
+                style="flex:1;padding:3px 0;border-radius:5px;border:1px solid var(--border);background:var(--bg);font-size:11px;cursor:pointer;">↩ 還原</button>
+              ${i < snaps.length-1 ? `<button onclick="showVersionDiff('${s.id}','${snaps[i+1].id}')"
+                style="flex:1;padding:3px 0;border-radius:5px;border:1px solid var(--blue);background:var(--blue-bg);color:var(--blue);font-size:11px;cursor:pointer;">🔍 與上版比較</button>` : ''}
+            </div>
+          </div>`;
+      }).join('');
+      return;
+    } catch(e) { console.warn('[version history]', e.message); }
   }
 
+  // Fallback：本機 localStorage
+  const key = 'kms-snaps-' + (editingDocId || 'new');
+  const snaps = JSON.parse(localStorage.getItem(key) || '[]');
   countEl.textContent = snaps.length;
-  list.innerHTML = snaps.map((s, i) => {
-    const dt = new Date(s.ts);
-    const timeStr = dt.toLocaleString('zh-TW', { month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit' });
-    const isLatest = i === 0;
-    return `
-      <div style="border:1px solid var(--border);border-radius:6px;padding:8px 10px;margin-bottom:6px;cursor:pointer;${isLatest?'border-color:var(--blue);':''}"
-        onclick="restoreVersion(${i})">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px;">
-          <span style="font-size:11px;font-weight:500;color:${isLatest?'var(--blue)':'var(--text-2)'}">
-            v${snaps.length - i} ${isLatest ? '（最新）' : ''}
-          </span>
-          <span style="font-size:10px;color:var(--text-3);">${timeStr}</span>
-        </div>
-        <div style="font-size:11px;color:var(--text-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${s.title}</div>
-        <div style="font-size:10px;color:var(--text-3);margin-top:2px;">${s.status === 'published' ? '已發佈' : '草稿'} · ${s.lang}</div>
-      </div>`;
-  }).join('');
+  if (!snaps.length) {
+    list.innerHTML = '<div style="color:var(--text-3);font-size:12px;text-align:center;padding:20px 0;">尚無版本紀錄</div>';
+    return;
+  }
+  list.innerHTML = snaps.map((s, i) => `
+    <div style="border:1px solid var(--border);border-radius:6px;padding:8px 10px;margin-bottom:6px;cursor:pointer;"
+      onclick="restoreVersion(${i})">
+      <div style="font-size:11px;font-weight:500;">${s.title}</div>
+      <div style="font-size:10px;color:var(--text-3);">${new Date(s.ts).toLocaleString('zh-TW',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'})}</div>
+    </div>`).join('');
 }
 
 async function loadVersionHistoryFromSupabase(doc_id) {
@@ -4095,6 +4264,93 @@ async function loadVersionHistoryFromSupabase(doc_id) {
   } catch(e) {
     console.warn('Version history load failed:', e);
   }
+}
+
+
+// ─── 版本快照還原（從 Supabase）───
+async function restoreSnapshot(snapId) {
+  if (!confirm('還原至此版本？目前編輯內容將被覆蓋。')) return;
+  try {
+    const rows = await sbFetch(`/rest/v1/kms_snapshots?id=eq.${snapId}&select=title,body,category,status`);
+    const s = rows?.[0];
+    if (!s) { toast('快照讀取失敗', 'error'); return; }
+    document.getElementById('doc-title').value = s.title || '';
+    document.getElementById('doc-cat').value = s.category || 'product';
+    document.getElementById('doc-status').value = s.status || 'draft';
+    if (tiptapEditor) {
+      const html = (s.body||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n\n+/g,'</p><p>').replace(/\n/g,'<br>');
+      tiptapEditor.commands.setContent('<p>' + html + '</p>');
+    }
+    toast('已還原至選取版本', 'success');
+  } catch(e) { toast('還原失敗：' + e.message, 'error'); }
+}
+
+// ─── 版本 diff：比對兩個快照的差異 ───
+async function showVersionDiff(snapId1, snapId2) {
+  try {
+    const [rows1, rows2] = await Promise.all([
+      sbFetch(`/rest/v1/kms_snapshots?id=eq.${snapId1}&select=title,body,created_at,saved_by`),
+      sbFetch(`/rest/v1/kms_snapshots?id=eq.${snapId2}&select=title,body,created_at,saved_by`),
+    ]);
+    const s1 = rows1?.[0], s2 = rows2?.[0];
+    if (!s1 || !s2) { toast('無法載入版本資料', 'error'); return; }
+
+    // 簡單 diff：逐行比對
+    const lines1 = (s1.body || '').split('\n');
+    const lines2 = (s2.body || '').split('\n');
+    const diffHtml = computeSimpleDiff(lines2, lines1); // 舊 vs 新
+
+    // 顯示 diff modal
+    let modal = document.getElementById('diff-modal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'diff-modal';
+      modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;display:flex;align-items:center;justify-content:center;';
+      modal.onclick = e => { if (e.target === modal) modal.remove(); };
+      document.body.appendChild(modal);
+    }
+    const t1 = new Date(s1.created_at).toLocaleString('zh-TW',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
+    const t2 = new Date(s2.created_at).toLocaleString('zh-TW',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
+    modal.innerHTML = `
+      <div style="background:var(--surface);border-radius:var(--radius-lg);width:min(800px,95vw);max-height:80vh;display:flex;flex-direction:column;overflow:hidden;">
+        <div style="padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+          <div style="font-size:14px;font-weight:500;">版本比較</div>
+          <div style="font-size:12px;color:var(--text-3);">${t2}（舊）→ ${t1}（新）</div>
+          <button onclick="document.getElementById('diff-modal').remove()" style="background:none;border:none;cursor:pointer;font-size:18px;color:var(--text-3);">✕</button>
+        </div>
+        <div style="padding:16px 20px;overflow-y:auto;font-family:monospace;font-size:12px;line-height:1.6;">
+          ${diffHtml || '<div style="color:var(--text-3);text-align:center;padding:20px;">兩版本內容相同</div>'}
+        </div>
+      </div>`;
+  } catch(e) { toast('比較失敗：' + e.message, 'error'); }
+}
+
+function computeSimpleDiff(oldLines, newLines) {
+  const result = [];
+  const maxLen = Math.max(oldLines.length, newLines.length);
+  let hasChange = false;
+  for (let i = 0; i < maxLen; i++) {
+    const o = oldLines[i] ?? null;
+    const n = newLines[i] ?? null;
+    if (o === null) {
+      hasChange = true;
+      result.push(`<div style="background:#d4edda;padding:2px 8px;border-left:3px solid #28a745;">+ ${escHtml(n)}</div>`);
+    } else if (n === null) {
+      hasChange = true;
+      result.push(`<div style="background:#f8d7da;padding:2px 8px;border-left:3px solid #dc3545;">- ${escHtml(o)}</div>`);
+    } else if (o !== n) {
+      hasChange = true;
+      result.push(`<div style="background:#f8d7da;padding:2px 8px;border-left:3px solid #dc3545;">- ${escHtml(o)}</div>`);
+      result.push(`<div style="background:#d4edda;padding:2px 8px;border-left:3px solid #28a745;">+ ${escHtml(n)}</div>`);
+    } else {
+      result.push(`<div style="padding:2px 8px;color:var(--text-3);">  ${escHtml(o)}</div>`);
+    }
+  }
+  return hasChange ? result.join('') : '';
+}
+
+function escHtml(s) {
+  return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
 function restoreVersion(idx) {
@@ -4906,7 +5162,7 @@ async function submitComment() {
 const _origSwitchPanel = switchPanel;
 window.switchPanel = function(id) {
   _origSwitchPanel(id);
-  if (id === 'editor')    setTimeout(loadVersionHistory, 150);
+  if (id === 'editor')    { setTimeout(loadVersionHistory, 150); setTimeout(loadCustomTemplates, 200); }
   if (id === 'kmap')      setTimeout(() => loadKmap(null), 50);
   if (id === 'analytics') setTimeout(loadAnalytics, 50);
   if (id === 'experts')   setTimeout(loadExperts, 50);

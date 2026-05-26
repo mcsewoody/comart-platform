@@ -361,7 +361,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.20</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.21</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
@@ -1707,6 +1707,12 @@ async function saveDoc() {
       if (mode === 'edge-fn') {
         btn.textContent = 'Edge Function 向量化…';
         try {
+          // 若 body 過長（> 24000字元 ≈ 6000 tokens），先截斷再存一次供 embedding 用
+          if (body && body.length > 24000) {
+            const truncBody = body.slice(0, 24000);
+            await kmsWrite('update', 'kms_documents', { body: truncBody }, doc_id);
+            toast('文件過長，向量化使用前 24000 字元', '');
+          }
           await callEmbedEdgeFn(doc_id);
           toast(`已儲存並完成向量化 ✓`, 'success');
         } catch(embedErr) {
@@ -2395,6 +2401,24 @@ function getFileIcon(fileName) {
   return map[ext] || '📎';
 }
 
+
+// 點選專家 → 切到知識庫，過濾該作者的文章
+function viewExpertDocs(authorName) {
+  if (!authorName) return;
+  switchPanel('docs');
+  setTimeout(() => {
+    const searchEl = document.getElementById('docs-search');
+    if (searchEl) {
+      searchEl.value = authorName;
+      searchEl.dispatchEvent(new Event('input'));
+    }
+    // 也過濾 author_name
+    window._expertAuthorFilter = authorName;
+    loadDocs();
+    toast(`顯示 ${authorName} 的文章`, '');
+  }, 100);
+}
+
 function clearUploadedFile() {
   uploadedFile = null; uploadedFileUrl = null;
   uploadedFileName = null; uploadedFileType = null; uploadedFileSize = null;
@@ -2485,6 +2509,13 @@ async function loadDocs() {
   const filterPL  = document.getElementById('docs-filter-product-line')?.value || '';
   const filterCat = document.getElementById('docs-filter-cat')?.value || '';
   const filterCus = (document.getElementById('docs-filter-customer')?.value || '').toLowerCase().trim();
+
+  // 專家黃頁跳轉時的 author 過濾
+  if (window._expertAuthorFilter) {
+    const af = window._expertAuthorFilter;
+    window._expertAuthorFilter = null;
+    docs = docs.filter(d => d.author_name === af);
+  }
 
   let filtered = docs;
   if (searchQ)   filtered = filtered.filter(d => (d.title||'').toLowerCase().includes(searchQ));
@@ -2723,11 +2754,11 @@ async function openDoc(id) {
   updateEditorModeLabel();
   switchPanel('editor');
 
-  // 非同步：增加瀏覽計數（不影響開啟速度）
+  // 非同步：增加瀏覽計數（直接 PATCH，不依賴 RPC）
   if (CFG.supabaseUrl && CFG.supabaseKey && !id.startsWith('demo-') && !id.startsWith('local-')) {
-    sbFetch('/rest/v1/rpc/increment_view_count', {
-      method: 'POST',
-      body: JSON.stringify({ doc_id: id }),
+    sbFetch(`/rest/v1/kms_documents?id=eq.${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ view_count: (doc.view_count || 0) + 1 }),
       prefer: 'return=minimal',
     }).catch(()=>{});
   }
@@ -3221,8 +3252,10 @@ async function openReader(id) {
 
   // 閱覽計數
   if (CFG.supabaseUrl && CFG.supabaseKey && !id.startsWith('demo-') && !id.startsWith('local-')) {
-    sbFetch('/rest/v1/rpc/increment_view_count', {
-      method:'POST', body:JSON.stringify({doc_id:id}), prefer:'return=minimal',
+    sbFetch(`/rest/v1/kms_documents?id=eq.${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ view_count: (doc.view_count || 0) + 1 }),
+      prefer: 'return=minimal',
     }).catch(()=>{});
   }
 
@@ -4049,14 +4082,16 @@ async function loadExperts() {
           ? `<div class="expert-tags" style="margin-top:6px;display:flex;flex-wrap:wrap;gap:4px;">
                ${expertise.map(t => `<span class="expert-tag">${t}</span>`).join('')}
              </div>` : '';
+        const authorFilter = u.nameZh || u.nameEn || '';
         return `
-          <div class="expert-card">
+          <div class="expert-card" style="cursor:pointer;" onclick="viewExpertDocs('${authorFilter.replace(/'/g,'')}')" title="點擊查看 ${name} 的文章">
             ${avatar}
             <div class="expert-name">${name}${nameEn && nameEn !== name ? `<span style="font-size:11px;color:var(--text-3);margin-left:4px;">${nameEn}</span>` : ''}</div>
             ${title ? `<div class="expert-role">${title}</div>` : ''}
             ${bio ? `<div style="font-size:11px;color:var(--text-2);margin-top:5px;line-height:1.5;">${bio}</div>` : ''}
             ${tags}
-            ${contact ? `<div class="expert-contact" style="display:flex;flex-direction:column;gap:4px;margin-top:8px;font-size:11px;">${contact}</div>` : ''}
+            ${contact ? `<div class="expert-contact" style="display:flex;flex-direction:column;gap:4px;margin-top:8px;font-size:11px;" onclick="event.stopPropagation()">${contact}</div>` : ''}
+            <div style="font-size:10px;color:var(--text-3);margin-top:8px;text-align:center;">點擊查看文章 →</div>
           </div>`;
       }).join('')}`;
   }).join('');

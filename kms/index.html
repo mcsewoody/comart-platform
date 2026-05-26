@@ -362,7 +362,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.48</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.49</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
@@ -2159,6 +2159,23 @@ async function processBatchNext() {
   const total = _batchFiles.length;
   const current = _batchIdx + 1;
 
+  // ── 重複檔案檢查 ──
+  if (CFG.supabaseUrl && CFG.supabaseKey) {
+    try {
+      const dupCheck = await sbFetch(
+        `/rest/v1/kms_documents?file_name=eq.${encodeURIComponent(f.name)}&file_size=eq.${f.size}&select=id,title,status&limit=3`
+      );
+      if (dupCheck && dupCheck.length > 0) {
+        const dupList = dupCheck.map(d => `「${d.title}」`).join('、');
+        const proceed = confirm(`⚠ 批次上傳（${current}/${total}）
+「${f.name}」已存在：${dupList}
+
+繼續上傳？`);
+        if (!proceed) { skipBatchFile(); return; }
+      }
+    } catch(e) { console.warn('[dup-check]', e.message); }
+  }
+
   // 切換到編輯器，顯示進度
   switchPanel('editor');
   editingDocId = null;
@@ -2409,9 +2426,9 @@ async function extractText(file, ext) {
     return await extractPdfWithClaude(file);
   }
   if (ext === 'doc') {
-    // OLE2 binary，mammoth 支援不穩定，直接走 claude-proxy
-    toast('⏳ .doc 格式由 AI 解析，請稍候…', '');
-    return await extractPdfWithClaude(file);
+    // OLE2 binary，Claude 不支援非 PDF document type
+    // 建議另存為 .docx 再上傳
+    throw new Error('.doc 格式無法自動解析，請在 Word 中另存為 .docx 後重新上傳');
   }
 
   // Excel (.xlsx/.xls)：SheetJS → Markdown 表格格式

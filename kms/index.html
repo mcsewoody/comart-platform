@@ -361,7 +361,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.22</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.24</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
@@ -516,7 +516,8 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
               multiple onchange="handleFileSelect(event)" />
             <div class="upload-zone-icon">📎</div>
             <div class="upload-zone-text">點擊或拖放檔案上傳（可多選）</div>
-            <div class="upload-zone-hint">PDF · Word · Excel · CSV · PowerPoint · 圖片（JPG/PNG）· TXT · Markdown</div>
+            <div class="upload-zone-hint" data-i18n="upload.formats">PDF · Word · Excel · CSV · PowerPoint · 圖片（JPG/PNG）· TXT · Markdown</div>
+            <div class="upload-zone-hint" style="color:var(--text-3);margin-top:2px;" data-i18n="upload.limits">單檔上限 50 MB · 不支援格式將被拒絕</div>
           </div>
           <div class="upload-progress" id="upload-progress">
             <div class="upload-progress-bar" id="upload-progress-bar"></div>
@@ -879,6 +880,7 @@ const I18N = {
     'editor.upload.text':'點擊或拖放檔案上傳', 'editor.upload.hint':'PDF · Word · Excel · CSV · PowerPoint · 圖片 · TXT · Markdown',
     'docs.title':'知識庫 — 所有文件', 'docs.new':'＋ 新增文件',
     'kmap.title':'知識地圖 — 分類總覽', 'kmap.back':'← 回分類總覽',
+    'upload.formats':'PDF · Word · Excel · CSV · PowerPoint · 圖片（JPG/PNG）· TXT · Markdown', 'upload.limits':'單檔上限 50 MB · 不支援格式將被拒絕',
     'analytics.title':'分析報表', 'analytics.total':'知識條目', 'analytics.published':'已發佈',
     'analytics.views':'總閱覽數', 'analytics.gaps':'知識缺口',
     'experts.title':'專家黃頁', 'experts.add':'＋ 新增專家', 'experts.empty':'尚無專家資料',
@@ -917,6 +919,7 @@ const I18N = {
     'editor.upload.text':'点击或拖放文件上传', 'editor.upload.hint':'PDF · Word · Excel · CSV · PowerPoint · 图片 · TXT · Markdown',
     'docs.title':'知识库 — 所有文档', 'docs.new':'＋ 新建文档',
     'kmap.title':'知识地图 — 分类总览', 'kmap.back':'← 返回分类总览',
+    'upload.formats':'PDF · Word · Excel · CSV · PowerPoint · 图片（JPG/PNG）· TXT · Markdown', 'upload.limits':'单文件上限 50 MB · 不支持的格式将被拒绝',
     'analytics.title':'分析报表', 'analytics.total':'知识条目', 'analytics.published':'已发布',
     'analytics.views':'总阅览数', 'analytics.gaps':'知识缺口',
     'experts.title':'专家黄页', 'experts.add':'＋ 新增专家', 'experts.empty':'暂无专家数据',
@@ -953,6 +956,7 @@ const I18N = {
     'editor.upload.text':'Click or drag files to upload', 'editor.upload.hint':'PDF · Word · Excel · CSV · PowerPoint · Image · TXT · Markdown',
     'docs.title':'Knowledge Base — All Documents', 'docs.new':'＋ New Document',
     'kmap.title':'Knowledge Map — Categories', 'kmap.back':'← Back to Categories',
+    'upload.formats':'PDF · Word · Excel · CSV · PowerPoint · Image（JPG/PNG）· TXT · Markdown', 'upload.limits':'Max 50 MB per file · Unsupported formats will be rejected',
     'analytics.title':'Analytics', 'analytics.total':'Entries', 'analytics.published':'Published',
     'analytics.views':'Total Views', 'analytics.gaps':'Knowledge Gaps',
     'experts.title':'Expert Directory', 'experts.add':'＋ Add Expert', 'experts.empty':'No experts yet',
@@ -991,6 +995,7 @@ const I18N = {
     'editor.upload.text':'Nhấp hoặc kéo tệp để tải lên', 'editor.upload.hint':'PDF · Word · Excel · Hình ảnh · TXT · Markdown',
     'docs.title':'Kho kiến thức — Tất cả tài liệu', 'docs.new':'＋ Tài liệu mới',
     'kmap.title':'Bản đồ kiến thức — Tổng quan', 'kmap.back':'← Quay lại',
+    'upload.formats':'PDF · Word · Excel · CSV · PowerPoint · Ảnh（JPG/PNG）· TXT · Markdown', 'upload.limits':'Tối đa 50 MB mỗi tệp · Định dạng không hỗ trợ sẽ bị từ chối',
     'analytics.title':'Báo cáo', 'analytics.total':'Mục kiến thức', 'analytics.published':'Đã xuất bản',
     'analytics.views':'Tổng lượt xem', 'analytics.gaps':'Khoảng trống kiến thức',
     'experts.title':'Danh bạ chuyên gia', 'experts.add':'＋ Thêm chuyên gia', 'experts.empty':'Chưa có chuyên gia',
@@ -1029,6 +1034,7 @@ const I18N = {
     'editor.upload.text':'クリックまたはドラッグしてアップロード', 'editor.upload.hint':'PDF · Word · Excel · CSV · PowerPoint · 画像 · TXT · Markdown',
     'docs.title':'ナレッジベース — すべてのドキュメント', 'docs.new':'＋ 新規ドキュメント',
     'kmap.title':'ナレッジマップ — カテゴリ一覧', 'kmap.back':'← カテゴリ一覧に戻る',
+    'upload.formats':'PDF · Word · Excel · CSV · PowerPoint · 画像（JPG/PNG）· TXT · Markdown', 'upload.limits':'1ファイル最大 50 MB · 非対応形式は拒否されます',
     'analytics.title':'分析レポート', 'analytics.total':'ナレッジ件数', 'analytics.published':'公開済み',
     'analytics.views':'総閲覧数', 'analytics.gaps':'ナレッジギャップ',
     'experts.title':'専門家名鑑', 'experts.add':'＋ 専門家を追加', 'experts.empty':'専門家データなし',
@@ -1644,8 +1650,9 @@ async function saveDoc() {
   const status = document.getElementById('doc-status').value;
 
   if (!title) { toast('請輸入文件標題', 'error'); return; }
+  if (window._uploadBlocked) { toast('上傳的檔案不符合限制，請移除後重新選擇', 'error'); return; }
   // 有上傳檔案時，body 可以為空（以檔案內容為主）
-  if (!body && !uploadedFile) { toast('請輸入文件內容或上傳檔案', 'error'); return; }
+  if (!body && !uploadedFile && !uploadedFileUrl) { toast('請輸入文件內容或上傳檔案', 'error'); return; }
 
   const btn = document.querySelector('.save-btn');
   btn.disabled = true;
@@ -1679,7 +1686,7 @@ async function saveDoc() {
 
       const docPayload = {
         title, body, category, lang, status,
-        author_name: document.getElementById('doc-author').value.trim() || 'Admin',
+        author_name: (portalUser?.empId) || document.getElementById('doc-author').value.trim() || 'Admin',
         reviewer: document.getElementById('doc-reviewer').value.trim() || null,
         valid_until: document.getElementById('doc-valid-until').value || null,
         tags: currentTags,
@@ -1767,7 +1774,7 @@ async function saveDoc() {
     resetDocAuthor();
     document.getElementById('doc-reviewer').value = '';
     resetDocAuthor();
-    document.getElementById('doc-valid-until').value = '';
+    document.getElementById('doc-valid-until').value = new Date().toISOString().split('T')[0];
     document.getElementById('doc-related').value = '';
     document.getElementById('doc-product-line').value = '';
     clearTags();
@@ -1873,6 +1880,28 @@ async function reparseCurrentDoc() {
     };
     const mimeType = blob.type && blob.type !== 'application/octet-stream'
       ? blob.type : (MIME_MAP[ext] || 'application/octet-stream');
+    // 驗證 blob 是否為有效 zip（docx/pptx 都是 zip，magic bytes: PK\x03\x04）
+    if (['docx','doc','pptx','ppt','xlsx','xls'].includes(ext)) {
+      const header = await blob.slice(0, 4).arrayBuffer();
+      const bytes = new Uint8Array(header);
+      const isPK = bytes[0] === 0x50 && bytes[1] === 0x4B;
+      if (!isPK) {
+        toast('檔案格式錯誤（非有效 Office 檔案），嘗試以 Claude 解析…', '');
+        // fallback: 當作 pdf 用 claude-proxy 處理
+        const fakeFile = new File([blob], fileName, { type: 'application/octet-stream' });
+        if (tiptapEditor) tiptapEditor.commands.setContent('<p style="color:var(--text-3);font-style:italic;">⏳ Claude 解析中…</p>');
+        const fallbackText = await extractPdfWithClaude(fakeFile);
+        if (fallbackText && fallbackText.length > 10) {
+          const escaped = fallbackText.slice(0, 50000).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n\n+/g,'</p><p>').replace(/\n/g,'<br>');
+          if (tiptapEditor) tiptapEditor.commands.setContent('<p>' + escaped + '</p>');
+          toast('✅ Claude 解析完成 · ' + fallbackText.length + ' 字元', 'success');
+        } else {
+          if (tiptapEditor) tiptapEditor.commands.clearContent();
+          toast('無法解析此檔案，請手動貼上內容', '');
+        }
+        return;
+      }
+    }
     const file = new File([blob], fileName, { type: mimeType });
     if (tiptapEditor) tiptapEditor.commands.setContent('<p style="color:var(--text-3);font-style:italic;">⏳ 重新解析中，請稍候…</p>');
     toast('重新解析內容中…', '');
@@ -1999,14 +2028,18 @@ async function processFile(file) {
   const ext = getExt(file.name);
   const allowed = ['pdf','doc','docx','xls','xlsx','csv','pptx','ppt','jpg','jpeg','png','txt','md'];
   if (!allowed.includes(ext)) {
-    toast('不支援此格式：' + ext, 'error'); return;
+    toast('不支援此格式：' + ext, 'error');
+    window._uploadBlocked = true;
+    return;
   }
+  window._uploadBlocked = false;
 
   // ── 檔案大小檢查（Supabase Storage 上限 50MB）──
   const MAX_BYTES = 50 * 1024 * 1024; // 50MB
   if (file.size > MAX_BYTES) {
     const sizeMB = (file.size / 1024 / 1024).toFixed(1);
-    toast(`檔案過大（${sizeMB} MB），Supabase Storage 上限為 50 MB。請壓縮後再上傳，或至 Supabase Dashboard → Storage → kms-files → Edit bucket 調高上限。`, 'error');
+    toast(`檔案過大（${sizeMB} MB），上限為 50 MB`, 'error');
+    window._uploadBlocked = true;
     return;
   }
 
@@ -2413,16 +2446,16 @@ function getFileIcon(fileName) {
 
 
 // 點選專家 → 切到知識庫，過濾該作者的文章
-function viewExpertDocs(nameEn, nameZh, empId) {
-  const names = [nameEn, nameZh, empId].filter(Boolean);
+function viewExpertDocs(empId, nameEn, nameZh) {
+  const names = [empId, nameEn, nameZh].filter(Boolean);
   if (!names.length) return;
   switchPanel('docs');
   setTimeout(() => {
     const searchEl = document.getElementById('docs-search');
-    if (searchEl) { searchEl.value = ''; }
-    window._expertAuthorFilter = names; // 傳陣列
+    if (searchEl) { searchEl.value = empId || nameEn || nameZh || ''; }
+    window._expertAuthorFilter = names;
     loadDocs();
-    toast(`顯示 ${nameEn || nameZh} 的文章`, '');
+    toast(`顯示 ${nameEn || nameZh || empId} 的文章`, '');
   }, 100);
 }
 
@@ -2527,7 +2560,7 @@ async function loadDocs() {
   }
 
   let filtered = docs;
-  if (searchQ)   filtered = filtered.filter(d => (d.title||'').toLowerCase().includes(searchQ));
+  if (searchQ)   filtered = filtered.filter(d => (d.title||'').toLowerCase().includes(searchQ) || (d.author_name||'').toLowerCase().includes(searchQ) || (d.tags||[]).some(t => t.toLowerCase().includes(searchQ)));
   if (filterPL)  filtered = filtered.filter(d => d.product_line === filterPL);
   if (filterCat) filtered = filtered.filter(d => d.category === filterCat);
   if (filterCus) filtered = filtered.filter(d =>
@@ -2643,7 +2676,7 @@ function cancelEdit() {
   document.getElementById('doc-author').value = '';
   resetDocAuthor();
   document.getElementById('doc-reviewer').value = '';
-  document.getElementById('doc-valid-until').value = '';
+  document.getElementById('doc-valid-until').value = new Date().toISOString().split('T')[0];
   document.getElementById('doc-related').value = '';
   clearTags();
   clearUploadedFile();
@@ -3830,7 +3863,7 @@ const _origClearEditor = () => {
   document.getElementById('doc-author').value = '';
   resetDocAuthor();
   document.getElementById('doc-reviewer').value = '';
-  document.getElementById('doc-valid-until').value = '';
+  document.getElementById('doc-valid-until').value = new Date().toISOString().split('T')[0];
   document.getElementById('doc-related').value = '';
   clearTags();
 };
@@ -4105,9 +4138,9 @@ async function loadExperts() {
           ? `<div class="expert-tags" style="margin-top:6px;display:flex;flex-wrap:wrap;gap:4px;">
                ${expertise.map(t => `<span class="expert-tag">${t}</span>`).join('')}
              </div>` : '';
-        const authorFilter = u.nameEn || u.nameZh || u.empId || '';
+        const empId = u.empId || u.uid || '';
         return `
-          <div class="expert-card" style="cursor:pointer;" onclick="viewExpertDocs('${authorFilter.replace(/'/g,'')}','${(u.nameZh||'').replace(/'/g,'')}','${(u.empId||'').replace(/'/g,'')}')" title="點擊查看 ${name} 的文章">
+          <div class="expert-card" style="cursor:pointer;" onclick="viewExpertDocs('${empId}','${(u.nameEn||'').replace(/'/g,'')}','${(u.nameZh||'').replace(/'/g,'')}')" title="點擊查看 ${name} 的文章">
             ${avatar}
             <div class="expert-name">${name}${nameEn && nameEn !== name ? `<span style="font-size:11px;color:var(--text-3);margin-left:4px;">${nameEn}</span>` : ''}</div>
             ${title ? `<div class="expert-role">${title}</div>` : ''}

@@ -362,7 +362,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.39</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.40</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
@@ -2438,16 +2438,21 @@ async function extractPdfWithPdfjs(file) {
     });
   }
   const arrayBuffer = await file.arrayBuffer();
-  const pdf = await window.pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-  const maxPages = Math.min(pdf.numPages, 50); // 最多抽 50 頁
-  const texts = [];
-  for (let i = 1; i <= maxPages; i++) {
+  const pdf = await window.pdfjsLib.getDocument({
+    data: arrayBuffer,
+    useWorkerFetch: false,
+    isEvalSupported: false,
+  }).promise;
+  const maxPages = Math.min(pdf.numPages, 80);
+  // 平行處理所有頁（Promise.all 取代逐頁 await）
+  const pageNums = Array.from({ length: maxPages }, (_, i) => i + 1);
+  const pageTexts = await Promise.all(pageNums.map(async i => {
     const page = await pdf.getPage(i);
     const content = await page.getTextContent();
-    const pageText = content.items.map(item => item.str).join(' ').trim();
-    if (pageText) texts.push(pageText);
-  }
-  if (pdf.numPages > 50) texts.push(`（共 ${pdf.numPages} 頁，已擷取前 50 頁）`);
+    return content.items.map(item => item.str).join(' ').trim();
+  }));
+  const texts = pageTexts.filter(t => t.length > 0);
+  if (pdf.numPages > 80) texts.push(`（共 ${pdf.numPages} 頁，已擷取前 80 頁）`);
   return texts.join('\n\n');
 }
 
@@ -2903,11 +2908,11 @@ function hasUnsavedChanges() {
   if (!editingDocId || !window._editSnapshot) return false;
   const s = window._editSnapshot;
   const curTitle  = document.getElementById('doc-title')?.value.trim() || '';
-  const curBody   = tiptapEditor?.getText?.() || tiptapEditor?.getHTML?.() || '';
+  const curBody   = tiptapEditor?.getText?.()?.trim() || '';
   const curCat    = document.getElementById('doc-cat')?.value || '';
   const curStatus = document.getElementById('doc-status')?.value || '';
-  return curTitle !== s.title || curCat !== s.category || curStatus !== s.status;
-  // body 不比對（TipTap 格式轉換可能產生差異）
+  return curTitle !== s.title || curCat !== s.category || curStatus !== s.status
+    || (s.bodyText && curBody && curBody !== s.bodyText);
 }
 
 function cancelEdit() {
@@ -3042,10 +3047,11 @@ async function openDoc(id) {
   editingDocId = id.startsWith('demo-') ? null : id;
   // 儲存原始快照，供 cancelEdit 比對
   window._editSnapshot = {
-    title: doc.title || '',
-    body: doc.body || '',
+    title:    doc.title    || '',
+    body:     doc.body     || '',
+    bodyText: (doc.body    || '').replace(/<[^>]+>/g,'').trim(), // 純文字供比對
     category: doc.category || '',
-    status: doc.status || '',
+    status:   doc.status   || '',
   };
   updateEditorModeLabel();
   switchPanel('editor');

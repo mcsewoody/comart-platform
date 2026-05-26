@@ -361,7 +361,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.26</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.28</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
@@ -1884,30 +1884,32 @@ async function reparseCurrentDoc() {
     const mimeType = blob.type && blob.type !== 'application/octet-stream'
       ? blob.type : (MIME_MAP[ext] || 'application/octet-stream');
     // 驗證 blob 是否為有效 zip（docx/pptx 都是 zip，magic bytes: PK\x03\x04）
-    if (['docx','doc','pptx','ppt','xlsx','xls'].includes(ext)) {
+    // .doc 是 OLE2 binary 不是 zip，只驗證 docx/pptx/xlsx
+    if (['docx','pptx','ppt','xlsx','xls'].includes(ext)) {
       const header = await blob.slice(0, 4).arrayBuffer();
       const bytes = new Uint8Array(header);
       const isPK = bytes[0] === 0x50 && bytes[1] === 0x4B;
       if (!isPK) {
-        toast('檔案格式錯誤（非有效 Office 檔案），嘗試以 Claude 解析…', '');
-        // fallback: 當作 pdf 用 claude-proxy 處理
-        const fakeFile = new File([blob], fileName, { type: 'application/octet-stream' });
-        if (tiptapEditor) tiptapEditor.commands.setContent('<p style="color:var(--text-3);font-style:italic;">⏳ Claude 解析中…</p>');
-        const fallbackText = await extractPdfWithClaude(fakeFile);
-        if (fallbackText && fallbackText.length > 10) {
-          const escaped = fallbackText.slice(0, 50000).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n\n+/g,'</p><p>').replace(/\n/g,'<br>');
-          if (tiptapEditor) tiptapEditor.commands.setContent('<p>' + escaped + '</p>');
-          toast('✅ Claude 解析完成 · ' + fallbackText.length + ' 字元', 'success');
-        } else {
-          if (tiptapEditor) tiptapEditor.commands.clearContent();
-          toast('無法解析此檔案，請手動貼上內容', '');
-        }
+        toast('下載的檔案不是有效的 Office 格式，Storage 連結可能已失效', 'error');
+        if (tiptapEditor) tiptapEditor.commands.clearContent();
+        return;
+      }
+    }
+    // 驗證 PDF magic bytes（%PDF-）
+    if (ext === 'pdf') {
+      const header = await blob.slice(0, 5).arrayBuffer();
+      const bytes = new Uint8Array(header);
+      const isPdf = bytes[0] === 0x25 && bytes[1] === 0x50 && bytes[2] === 0x44 && bytes[3] === 0x46;
+      if (!isPdf) {
+        toast('下載的檔案不是有效 PDF，可能是 Storage 連結失效', 'error');
+        if (tiptapEditor) tiptapEditor.commands.clearContent();
         return;
       }
     }
     const file = new File([blob], fileName, { type: mimeType });
     if (tiptapEditor) tiptapEditor.commands.setContent('<p style="color:var(--text-3);font-style:italic;">⏳ 重新解析中，請稍候…</p>');
     toast('重新解析內容中…', '');
+    // extractText 已內建 pdfjs 優先 → claude-proxy fallback
     const text = await extractText(file, ext);
     if (text && text.length > 10) {
       const escaped = text.slice(0, 50000)
@@ -2128,12 +2130,19 @@ async function extractText(file, ext) {
     return await file.text();
   }
 
-  // Word (.docx)：mammoth.js
+  // Word：mammoth.js（docx=OOXML, doc=OLE2 binary）
   if (ext === 'docx' || ext === 'doc') {
     if (!window.mammoth) throw new Error('mammoth.js 尚未載入');
     const arrayBuffer = await file.arrayBuffer();
-    const result = await mammoth.extractRawText({ arrayBuffer });
-    return result.value;
+    try {
+      const result = await mammoth.extractRawText({ arrayBuffer });
+      if (result.value && result.value.length > 10) return result.value;
+      throw new Error('mammoth 抽不到文字');
+    } catch(mammothErr) {
+      // .doc 解析失敗時 fallback 到 claude-proxy
+      console.warn('[doc] mammoth 失敗，改用 Claude:', mammothErr.message);
+      return await extractPdfWithClaude(file);
+    }
   }
 
   // Excel (.xlsx/.xls)：SheetJS → Markdown 表格格式

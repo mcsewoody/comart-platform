@@ -364,7 +364,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.62</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.64</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
@@ -612,6 +612,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
           </div>
           <input class="meta-input" id="doc-valid-until" type="date" title="文件有效期限" style="width:130px;" />
           <input class="meta-input" id="doc-related" placeholder="關聯文件標題（逗號分隔）" style="flex:1;min-width:140px;" title="輸入其他知識條目的標題，多筆用逗號分隔。AI 問答時會自動推薦相關文件。" />
+            <input class="meta-input" id="doc-source-url" placeholder="來源網址（選填）" style="flex:1;min-width:140px;" type="url" autocomplete="off" />
         </div>
 
         <!-- Meta row — 第四行：關鍵字標籤 -->
@@ -1188,7 +1189,7 @@ function readPortalSession() {
 // 任何角色都不能修改別人的文章
 const KMS_ROLE_FROM_PORTAL = {
   admin: 'admin',
-  dcc:   'admin',
+  dcc:   'dcc',   // 可審核/封存，不能刪除/修改他人
   user:  'user',
 };
 
@@ -1203,7 +1204,8 @@ function getKmsRole() {
 // 判斷目前用戶能否刪除某份文件
 function canDelete(docAuthorName) {
   const role = getKmsRole();
-  if (role === 'admin') return true; // admin/dcc 可刪任何文件
+  if (role === 'dcc') return false;  // dcc 不能刪除
+  if (role === 'admin') return true; // admin 可刪任何文件
   return false; // user 不能刪除
 }
 
@@ -1211,7 +1213,14 @@ function canDelete(docAuthorName) {
 // 策略：有 Portal session 登入即可編輯，刪除才限制 admin
 function canEdit(docAuthorName) {
   if (!portalUser) return true; // 沒有 portal session → 全權
-  return true; // 有登入皆可編輯，由 saveDoc 的 author 欄位控管身份
+  const role = getKmsRole();
+  if (role === 'admin') return true; // admin 全權
+  if (role === 'dcc') {
+    // dcc 只能修改自己的文件
+    const myName = portalUser.nameEn || portalUser.nameZh || '';
+    return !docAuthorName || docAuthorName === myName;
+  }
+  return true; // user 可修改（author 欄位由 saveDoc 控管）
 }
 
 async function initPortalSession() {
@@ -1253,7 +1262,7 @@ async function initPortalSession() {
 
   const roleEl = document.getElementById('portal-user-role');
   const kmsRole = getKmsRole();
-  const roleLabel = { admin:'KMS Admin', user:'KMS User' }[kmsRole] || kmsRole;
+  const roleLabel = { admin:'KMS Admin', dcc:'KMS DCC', user:'KMS User' }[kmsRole] || kmsRole;
   if (roleEl) roleEl.textContent = roleLabel;
 
   // 預填建立者姓名（帶入登入者姓名）
@@ -1266,6 +1275,8 @@ async function initPortalSession() {
   setTimeout(() => {
     if (kmsRole === 'user') {
       toast(`以 ${roleLabel} 身份登入 — 可新增/修改自己的文章，無法刪除`, '');
+    } else if (kmsRole === 'dcc') {
+      toast(`以 DCC 身份登入 — 可讀取、審核、封存，無法刪除文件`, '');
     }
   }, 1000);
 }
@@ -1734,6 +1745,7 @@ async function saveDoc() {
         customer_tag: currentCustomerTags,
         file_url: finalFileUrl, file_name: finalFileName,
         file_type: finalFileType, file_size: finalFileSize,
+        source_url: document.getElementById('doc-source-url')?.value.trim() || null,
         updated_at: new Date().toISOString(),
       };
 
@@ -2286,8 +2298,11 @@ async function fetchUrlContent() {
       }
     }
 
+    // 保留來源網址到 source_url 欄位
+    const srcEl = document.getElementById('doc-source-url');
+    if (srcEl) srcEl.value = url;
     input.value = '';
-    toast('✅ 內容已擷取並整理完成', 'success');
+    toast('✅ 內容已擷取並整理完成，儲存後將自動產生摘要', 'success');
   } catch(e) {
     toast('擷取失敗：' + e.message, 'error');
   } finally {
@@ -3050,11 +3065,35 @@ async function uploadToStorage(file) {
 
 // ═══════════════════════════════════════════════
 // ═══════════════════════════════════════════════
+
+// ─── 有效日期到期自動封存 ───
+async function checkAndArchiveExpired(docs) {
+  if (!CFG.supabaseUrl || !CFG.supabaseKey || !docs?.length) return;
+  const today = new Date().toISOString().split('T')[0];
+  const expired = docs.filter(d =>
+    d.valid_until && d.valid_until < today && d.status === 'published'
+  );
+  if (!expired.length) return;
+  for (const d of expired) {
+    try {
+      await kmsWrite('update', 'kms_documents',
+        { status: 'archived', review_note: `有效日期 ${d.valid_until} 已到期，自動封存` },
+        d.id
+      );
+      console.log('[expire] 自動封存:', d.title);
+    } catch(e) { console.warn('[expire]', e.message); }
+  }
+  if (expired.length > 0) {
+    toast(`📦 ${expired.length} 份文件已到期自動封存`, '');
+    await loadDocs();
+  }
+}
+
 async function loadDocs() {
   let docs = [];
   try {
     if (CFG.supabaseUrl && CFG.supabaseKey) {
-      docs = await sbFetch('/rest/v1/kms_documents?select=id,title,category,lang,status,product_line,customer_tag,tags,author_name,view_count,file_url,file_name,file_type,file_size,summary,summary_en,summary_zh_cn,summary_vi,summary_ja,updated_at,created_at&status=eq.published&order=updated_at.desc') || [];
+      docs = await sbFetch('/rest/v1/kms_documents?select=id,title,category,lang,status,product_line,customer_tag,tags,author_name,view_count,file_url,file_name,file_type,file_size,summary,summary_en,summary_zh_cn,summary_vi,summary_ja,source_url,valid_until,updated_at,created_at&status=eq.published&order=updated_at.desc') || [];
     } else {
       const saved = localStorage.getItem('kms-local-docs');
       if (saved) localDocs = JSON.parse(saved);
@@ -3080,7 +3119,7 @@ async function loadDocs() {
   }
 
   let filtered = docs;
-  if (searchQ)   filtered = filtered.filter(d => (d.title||'').toLowerCase().includes(searchQ) || (d.author_name||'').toLowerCase().includes(searchQ) || (d.tags||[]).some(t => t.toLowerCase().includes(searchQ)));
+  if (searchQ)   filtered = filtered.filter(d => (d.title||'').toLowerCase().includes(searchQ) || (d.author_name||'').toLowerCase().includes(searchQ) || (d.tags||[]).some(t => t.toLowerCase().includes(searchQ)) || (d.summary||'').toLowerCase().includes(searchQ) || (d.summary_en||'').toLowerCase().includes(searchQ));
   if (filterPL)  filtered = filtered.filter(d => d.product_line === filterPL);
   if (filterCat) filtered = filtered.filter(d => d.category === filterCat);
   if (filterCus) filtered = filtered.filter(d =>
@@ -3103,6 +3142,9 @@ async function loadDocs() {
   const catClass = { product:'product', mfg:'sop', quality:'sop', sales:'sop', supply:'sop', compliance:'sop', hr:'hr', tacit:'tacit', ai_tech:'product', industry:'product' };
   const s__ = I18N[currentLang]||I18N['zh-TW']; const statusLabel = { draft:s__['status.draft']||'Draft', published:s__['status.published']||'Publish', archived:s__['status.archived']||'Archive', withdrawn:s__['status.withdrawn']||'Withdraw' };
   const statusCls   = { draft:'sb-draft', published:'sb-published', archived:'sb-archived' };
+
+  // 到期自動封存（背景執行）
+  checkAndArchiveExpired(docs).catch(()=>{});
 
   list.innerHTML = filtered.map(d => {
     const plBadge = d.product_line
@@ -3135,6 +3177,7 @@ async function loadDocs() {
           style="padding:3px 7px;border-radius:5px;border:1px solid #F5C6C6;background:#FEF2F2;color:#A32D2D;font-size:11px;cursor:pointer;flex-shrink:0;" title="刪除">✕</button>` : ''}
       </div>
       ${(plBadge || cusBadges) ? `<div style="display:flex;gap:4px;flex-wrap:wrap;padding-left:2px;">${plBadge}${cusBadges}</div>` : ''}
+      ${d.source_url ? `<a href="${d.source_url}" target="_blank" rel="noopener" style="font-size:10px;color:var(--blue);text-decoration:none;width:100%;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:2px;" onclick="event.stopPropagation()">🔗 ${d.source_url}</a>` : ''}
       ${(() => {
         const summaryMap = { 'zh-TW': d.summary, 'zh-CN': d.summary_zh_cn, 'en': d.summary_en, 'vi': d.summary_vi, 'ja': d.summary_ja };
         const s = summaryMap[currentLang] || d.summary || '';
@@ -3287,8 +3330,10 @@ async function openDoc(id) {
       : (portalUser ? (portalUser.nameEn || portalUser.nameZh || '') : '');
   }
   document.getElementById('doc-reviewer').value = doc.reviewer || '';
-  document.getElementById('doc-valid-until').value = new Date().toISOString().split('T')[0]; // 預設今天
+  document.getElementById('doc-valid-until').value = doc.valid_until || new Date().toISOString().split('T')[0];
   document.getElementById('doc-related').value = doc.related || '';
+  const _srcUrlEl = document.getElementById('doc-source-url');
+  if (_srcUrlEl) _srcUrlEl.value = doc.source_url || '';
   const plEl = document.getElementById('doc-product-line');
   if (plEl) plEl.value = doc.product_line || '';
   currentTags = doc.tags || [];
@@ -5049,8 +5094,8 @@ function renderReviewList(filterStatus) {
         <span class="doc-title" onclick="openReader('${d.id}')" style="cursor:pointer;flex:1;min-width:0;">${d.title}</span>
         <span style="font-size:11px;color:var(--text-3);white-space:nowrap;">${d.author_name||'—'}</span>
         <span style="font-size:11px;color:var(--text-3);white-space:nowrap;">${dt}</span>
-        <button onclick="openDoc('${d.id}')"
-          style="padding:2px 7px;border-radius:5px;border:1px solid var(--border);background:var(--bg);font-size:11px;cursor:pointer;flex-shrink:0;">✏️</button>
+        ${canEdit(d.author_name) ? `<button onclick="openDoc('${d.id}')"
+          style="padding:2px 7px;border-radius:5px;border:1px solid var(--border);background:var(--bg);font-size:11px;cursor:pointer;flex-shrink:0;">✏️</button>` : ''}
         <button onclick="deleteDoc('${d.id}','${safeTitle}','${(d.author_name||'').replace(/'/g,'')}')"
           style="padding:2px 7px;border-radius:5px;border:1px solid #F5C6C6;background:#FEF2F2;color:#A32D2D;font-size:11px;cursor:pointer;flex-shrink:0;">✕</button>
         <button onclick="openReviewPanel('${d.id}','${safeTitle}')"
@@ -5159,13 +5204,11 @@ async function executeReview(docId, newStatus, actionLabel, needReason = false) 
   // 權限檢查：只有 Admin / DCC 可執行
   const role = getKmsRole();
   if (role !== 'admin' && role !== 'dcc') {
-    // fallback：若 portalUser.role 含 admin/dcc
-    const pRole = (portalUser?.role || '').toLowerCase();
-    if (!pRole.includes('admin') && !pRole.includes('dcc')) {
-      toast('權限不足：只有 Admin / DCC 可執行此操作', 'error');
-      return;
-    }
+    toast('權限不足：只有 Admin / DCC 可執行此操作', 'error');
+    return;
   }
+  // dcc 不能執行「退回草稿」以外的刪除類操作（封存和撤回除外，這些是 dcc 的職責）
+  // dcc 可執行：核准發佈、退回草稿、撤回、封存
 
   const actor    = portalUser ? (portalUser.nameEn || portalUser.nameZh || '') : 'Admin';
   const docTitle = reviewingDoc?.title || '';

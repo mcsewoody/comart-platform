@@ -364,7 +364,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.60</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.61</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
@@ -517,6 +517,20 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
             <div class="upload-progress-bar" id="upload-progress-bar"></div>
           </div>
           <div id="file-preview-area"></div>
+
+          <!-- URL 抓取 -->
+          <div style="display:flex;gap:6px;margin-top:6px;align-items:center;">
+            <span style="font-size:16px;flex-shrink:0;">🔗</span>
+            <input id="url-fetch-input" type="url"
+              placeholder="貼上網址，AI 自動擷取內文…"
+              style="flex:1;font-size:12px;padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg);color:var(--text-1);outline:none;"
+              onkeydown="if(event.key==='Enter'){event.preventDefault();fetchUrlContent();}"
+              autocomplete="off" />
+            <button onclick="fetchUrlContent()"
+              style="padding:5px 12px;border-radius:var(--radius);border:1px solid var(--blue);background:var(--blue-bg);color:var(--blue);font-size:12px;cursor:pointer;white-space:nowrap;flex-shrink:0;">
+              擷取內文
+            </button>
+          </div>
         </div>
 
         <!-- Meta row — 第一行 -->
@@ -2217,6 +2231,69 @@ async function _processBatchFiles_legacy(files) {
 
 
 // ─── 主流程：選檔 → 解析文字 → 顯示預覽 ───
+
+// ─── URL 內文擷取（Jina Reader + Claude 整理）───
+async function fetchUrlContent() {
+  const input = document.getElementById('url-fetch-input');
+  const url = input?.value.trim();
+  if (!url) { toast('請輸入網址', ''); return; }
+  if (!url.startsWith('http')) { toast('請輸入完整網址（含 https://）', 'error'); return; }
+
+  toast('⏳ 擷取中，請稍候…', '');
+  input.disabled = true;
+
+  try {
+    // 用 Jina Reader 抓取網頁內容
+    const jinaUrl = 'https://r.jina.ai/' + url;
+    const res = await fetch(jinaUrl, {
+      headers: { 'Accept': 'text/plain', 'X-Return-Format': 'markdown' }
+    });
+    if (!res.ok) throw new Error('無法擷取此網址（' + res.status + '）');
+    const raw = await res.text();
+    if (!raw || raw.length < 100) throw new Error('擷取到的內容太少，可能是需要登入的頁面');
+
+    toast('⏳ AI 整理內容中…', '');
+
+    // 送給 Claude 整理成知識條目格式
+    const organized = await callClaudeProxy(
+      `你是知識管理系統的內容整理助手。請將以下網頁內容整理成清晰的知識條目，保留重要資訊，去除廣告、導覽選單等無關內容。
+用繁體中文輸出，保持原文重要段落，格式用 Markdown。直接輸出整理後的內容，不要加任何前言。`,
+      raw.slice(0, 8000),
+      2000
+    );
+
+    if (!organized || organized.length < 50) throw new Error('AI 整理結果為空');
+
+    // 填入編輯器
+    if (tiptapEditor) {
+      const html = organized
+        .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+        .replace(/^#{1,6} (.+)$/gm, '<strong>$1</strong>')
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\n\n+/g,'</p><p>')
+        .replace(/\n/g,'<br>');
+      tiptapEditor.commands.setContent('<p>' + html + '</p>');
+    }
+
+    // 自動填入標題（從 Jina 回傳的第一行 Title）
+    const titleMatch = raw.match(/^Title:\s*(.+)$/m);
+    if (titleMatch && titleMatch[1]) {
+      const titleEl = document.getElementById('doc-title');
+      if (titleEl && !titleEl.value) {
+        titleEl.value = titleMatch[1].trim();
+        scheduleAutoClassify();
+      }
+    }
+
+    input.value = '';
+    toast('✅ 內容已擷取並整理完成', 'success');
+  } catch(e) {
+    toast('擷取失敗：' + e.message, 'error');
+  } finally {
+    input.disabled = false;
+  }
+}
+
 async function processFile(file) {
   const ext = getExt(file.name);
   const allowed = ['pdf','doc','docx','xls','xlsx','csv','pptx','ppt','jpg','jpeg','png','txt','md'];

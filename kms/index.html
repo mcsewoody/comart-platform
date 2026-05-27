@@ -364,7 +364,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.54</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.55</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
@@ -1871,17 +1871,9 @@ async function generateAndSaveSummary(docId, title, body) {
     );
     console.log('[summary] Claude 回傳:', summary?.slice(0,50));
     if (!summary || summary.length < 10) { console.warn('[summary] 摘要太短，略過'); return; }
-    const patchRes = await sbFetch(`/rest/v1/kms_documents?id=eq.${docId}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + CFG.supabaseKey,
-        'apikey': CFG.supabaseKey,
-        'Prefer': 'return=minimal',
-      },
-      body: JSON.stringify({ summary }),
-    });
-    console.log('[summary] PATCH 完成, 重新載入列表');
+    // 用 kmsWrite（service_role）寫入，anon key 無 PATCH 權限
+    await kmsWrite('update', 'kms_documents', { summary }, docId);
+    console.log('[summary] 寫入完成, 重新載入列表');
     setTimeout(() => loadDocs(), 500);
   } catch(e) {
     console.error('[summary] 失敗:', e.message);

@@ -364,7 +364,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.64</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.65</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
@@ -581,47 +581,43 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
           <span id="ai-cat-indicator" style="color:var(--blue);"></span>
         </div>
 
-        <!-- Meta row — 第二行：產品線 + 客戶標籤 -->
-        <div style="padding:6px 12px;border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:var(--bg);flex-shrink:0;">
-          <span style="font-size:11px;color:var(--text-3);flex-shrink:0;">📦 Product Line:</span>
-          <select class="meta-select" id="doc-product-line" style="flex:1;min-width:180px;">
-            <option value="">— Select Product Line —</option>
-          </select>
-          <button onclick="openAddProductLineModal()"
-            style="padding:4px 10px;border-radius:6px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:12px;color:var(--text-2);"
-            title="新增產品線">＋</button>
-          <span style="font-size:11px;color:var(--text-3);flex-shrink:0;margin-left:8px;">🏢 Customer:</span>
-          <div class="tags-wrap" id="customer-tag-wrap" style="flex:1;min-width:140px;" onclick="document.getElementById('customer-tag-input').focus()">
-            <input class="tag-input" id="customer-tag-input" placeholder="輸入客戶名後按 Enter"
-              onkeydown="handleCustomerTagInput(event)" />
-          </div>
-        </div>
-
-        <!-- Meta row — 第三行：建立者、有效期、關聯文件 -->
+        <!-- Meta row — 第二行：建立者 + 審核人 + 有效期 + 產品線 -->
         <div style="padding:6px 12px;border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:var(--bg);flex-shrink:0;">
           <div style="position:relative;display:inline-block;">
-            <input class="meta-input" id="doc-author" placeholder="建立者姓名" style="width:130px;"
+            <input class="meta-input" id="doc-author" placeholder="建立者" style="width:110px;"
               autocomplete="off" name="kms-author-nofill"
               oninput="filterAuthorList(this.value)" onfocus="showAuthorList()" onblur="setTimeout(()=>hideAuthorList(),200)" />
             <div id="author-dropdown" style="display:none;position:absolute;top:100%;left:0;z-index:999;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:0 4px 12px rgba(0,0,0,.12);min-width:200px;max-height:160px;overflow-y:auto;font-size:12px;"></div>
           </div>
           <div style="position:relative;display:inline-block;">
-            <input class="meta-input" id="doc-reviewer" placeholder="審核人（工號或姓名）" style="width:150px;"
+            <input class="meta-input" id="doc-reviewer" placeholder="審核人" style="width:110px;"
               autocomplete="off" oninput="filterReviewerList(this.value)" onfocus="showReviewerList()" onblur="setTimeout(()=>hideReviewerList(),200)" />
             <div id="reviewer-dropdown" style="display:none;position:absolute;top:100%;left:0;z-index:999;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:0 4px 12px rgba(0,0,0,.12);min-width:220px;max-height:160px;overflow-y:auto;font-size:12px;"></div>
           </div>
-          <input class="meta-input" id="doc-valid-until" type="date" title="文件有效期限" style="width:130px;" />
-          <input class="meta-input" id="doc-related" placeholder="關聯文件標題（逗號分隔）" style="flex:1;min-width:140px;" title="輸入其他知識條目的標題，多筆用逗號分隔。AI 問答時會自動推薦相關文件。" />
-            <input class="meta-input" id="doc-source-url" placeholder="來源網址（選填）" style="flex:1;min-width:140px;" type="url" autocomplete="off" />
+          <input class="meta-input" id="doc-valid-until" type="date" title="有效期限" style="width:130px;" />
+          <span style="font-size:11px;color:var(--text-3);flex-shrink:0;">📦</span>
+          <select class="meta-select" id="doc-product-line" style="flex:1;min-width:140px;">
+            <option value="">— Product Line —</option>
+          </select>
+          <button onclick="openAddProductLineModal()"
+            style="padding:4px 8px;border-radius:6px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:12px;color:var(--text-2);"
+            title="新增產品線">＋</button>
         </div>
 
-        <!-- Meta row — 第四行：關鍵字標籤 -->
-        <div style="padding:6px 12px;border-bottom:1px solid var(--border);display:flex;gap:6px;align-items:center;flex-shrink:0;background:var(--bg);">
-          <span style="font-size:11px;color:var(--text-3);flex-shrink:0;">🏷 關鍵字：</span>
-          <div class="tags-wrap" id="tags-wrap" style="flex:1;" onclick="document.getElementById('tag-input').focus()">
-            <input class="tag-input" id="tag-input" placeholder="輸入標籤後按 Enter"
+        <!-- Meta row — 第三行：客戶 + 標籤 + 關聯 + 來源 -->
+        <div style="padding:6px 12px;border-bottom:1px solid var(--border);display:flex;gap:6px;align-items:center;flex-wrap:wrap;background:var(--bg);flex-shrink:0;">
+          <span style="font-size:11px;color:var(--text-3);flex-shrink:0;">🏢</span>
+          <div class="tags-wrap" id="customer-tag-wrap" style="flex:1;min-width:110px;" onclick="document.getElementById('customer-tag-input').focus()">
+            <input class="tag-input" id="customer-tag-input" placeholder="客戶名"
+              onkeydown="handleCustomerTagInput(event)" />
+          </div>
+          <span style="font-size:11px;color:var(--text-3);flex-shrink:0;">🏷</span>
+          <div class="tags-wrap" id="tags-wrap" style="flex:1;min-width:110px;" onclick="document.getElementById('tag-input').focus()">
+            <input class="tag-input" id="tag-input" placeholder="關鍵字"
               onkeydown="handleTagInput(event)" />
           </div>
+          <input class="meta-input" id="doc-related" placeholder="關聯文件" style="flex:1;min-width:110px;" title="輸入其他知識條目的標題，多筆用逗號分隔。" />
+          <input class="meta-input" id="doc-source-url" placeholder="來源網址" style="flex:1;min-width:130px;" type="url" autocomplete="off" />
         </div>
 
         <!-- TipTap editor area -->
@@ -1269,6 +1265,11 @@ async function initPortalSession() {
   const _authorEl2 = document.getElementById('doc-author');
   if (_authorEl2 && !_authorEl2.value) {
     _authorEl2.value = displayName || '';
+  }
+  // 預填今天日期
+  const _dateEl = document.getElementById('doc-valid-until');
+  if (_dateEl && !_dateEl.value) {
+    _dateEl.value = new Date().toISOString().split('T')[0];
   }
 
   // 提示目前身份
@@ -3177,7 +3178,7 @@ async function loadDocs() {
           style="padding:3px 7px;border-radius:5px;border:1px solid #F5C6C6;background:#FEF2F2;color:#A32D2D;font-size:11px;cursor:pointer;flex-shrink:0;" title="刪除">✕</button>` : ''}
       </div>
       ${(plBadge || cusBadges) ? `<div style="display:flex;gap:4px;flex-wrap:wrap;padding-left:2px;">${plBadge}${cusBadges}</div>` : ''}
-      ${d.source_url ? `<a href="${d.source_url}" target="_blank" rel="noopener" style="font-size:10px;color:var(--blue);text-decoration:none;width:100%;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:2px;" onclick="event.stopPropagation()">🔗 ${d.source_url}</a>` : ''}
+
       ${(() => {
         const summaryMap = { 'zh-TW': d.summary, 'zh-CN': d.summary_zh_cn, 'en': d.summary_en, 'vi': d.summary_vi, 'ja': d.summary_ja };
         const s = summaryMap[currentLang] || d.summary || '';

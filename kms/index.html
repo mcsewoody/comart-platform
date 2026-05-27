@@ -364,7 +364,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.55</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.57</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
@@ -1863,17 +1863,15 @@ async function generateAndSaveSummary(docId, title, body) {
   if (!CFG.supabaseUrl || !CFG.supabaseKey) return;
   try {
     const truncated = body.slice(0, 6000);
-    console.log('[summary] 開始產生摘要, docId:', docId, 'body長度:', body.length);
     const summary = await callClaudeProxy(
       '你是知識管理系統的摘要助手。請用 2-3 句話（繁體中文）摘要以下文件的核心重點，每句不超過 30 字，直接輸出摘要，不要加任何前言或說明。',
       `文件標題：${title}\n\n${truncated}`,
       300
     );
-    console.log('[summary] Claude 回傳:', summary?.slice(0,50));
-    if (!summary || summary.length < 10) { console.warn('[summary] 摘要太短，略過'); return; }
+    if (!summary || summary.length < 10) return;
     // 用 kmsWrite（service_role）寫入，anon key 無 PATCH 權限
     await kmsWrite('update', 'kms_documents', { summary }, docId);
-    console.log('[summary] 寫入完成, 重新載入列表');
+
     setTimeout(() => loadDocs(), 500);
   } catch(e) {
     console.error('[summary] 失敗:', e.message);
@@ -4615,7 +4613,72 @@ async function loadAnalytics() {
     <button onclick="localStorage.removeItem('kms-search-gaps');loadAnalytics();"
       style="font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid var(--border);background:transparent;cursor:pointer;color:var(--text-3);">清除缺口紀錄</button>
     ` : ''}
+
+  <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border);">
+    <div class="section-hd">批次工具</div>
+    <button id="batch-summary-btn" onclick="batchGenerateSummaries()"
+      style="padding:8px 16px;border-radius:var(--radius);border:1px solid var(--blue);background:var(--blue-bg);color:var(--blue);font-size:13px;cursor:pointer;">
+      🤖 批次產生摘要（補齊無摘要的文件）
+    </button>
+    <div id="batch-summary-progress" style="font-size:12px;color:var(--text-3);margin-top:8px;"></div>
+  </div>
   `;
+}
+
+// ─── 批次產生摘要 ───
+async function batchGenerateSummaries() {
+  const btn = document.getElementById('batch-summary-btn');
+  const prog = document.getElementById('batch-summary-progress');
+  if (!btn || !prog) return;
+
+  btn.disabled = true;
+  btn.textContent = '載入中…';
+
+  try {
+    // 抓所有無摘要的已發佈文件
+    const docs = await sbFetch(
+      '/rest/v1/kms_documents?select=id,title,body,summary&status=eq.published&summary=is.null&order=created_at.desc'
+    ) || [];
+
+    if (!docs.length) {
+      prog.textContent = '✅ 所有文件都已有摘要！';
+      btn.disabled = false;
+      btn.textContent = '🤖 批次產生摘要（補齊無摘要的文件）';
+      return;
+    }
+
+    prog.textContent = `找到 ${docs.length} 份無摘要文件，開始處理…`;
+    let done = 0;
+
+    for (const doc of docs) {
+      if (!doc.body || doc.body.length < 50) { done++; continue; }
+      prog.textContent = `處理中 ${done + 1} / ${docs.length}：${doc.title}`;
+      try {
+        const summary = await callClaudeProxy(
+          '你是知識管理系統的摘要助手。請用 2-3 句話（繁體中文）摘要以下文件的核心重點，每句不超過 30 字，直接輸出摘要，不要加任何前言或說明。',
+          `文件標題：${doc.title}
+
+${doc.body.slice(0, 6000)}`,
+          300
+        );
+        if (summary && summary.length >= 10) {
+          await kmsWrite('update', 'kms_documents', { summary }, doc.id);
+        }
+      } catch(e) { console.warn('[batch-summary]', doc.title, e.message); }
+      done++;
+      // 每筆間隔 1 秒，避免 API rate limit
+      await new Promise(r => setTimeout(r, 1000));
+    }
+
+    prog.textContent = `✅ 完成！已處理 ${done} 份文件`;
+    btn.textContent = '🤖 批次產生摘要（補齊無摘要的文件）';
+    btn.disabled = false;
+    await loadDocs();
+  } catch(e) {
+    prog.textContent = '❌ 失敗：' + e.message;
+    btn.disabled = false;
+    btn.textContent = '🤖 批次產生摘要（補齊無摘要的文件）';
+  }
 }
 
 // ═══════════════════════════════════════════════

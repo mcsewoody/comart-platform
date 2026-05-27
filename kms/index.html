@@ -364,7 +364,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.57</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.58</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
@@ -2451,13 +2451,23 @@ async function extractText(file, ext) {
     return slides.join('\n\n');
   }
 
-  // PDF：優先用 pdfjs 前端解析（快，免 API），失敗才呼叫 claude-proxy
+  // PDF：pdfjs 優先 → 圖片型走 Vision OCR → 最後 claude-proxy
   if (ext === 'pdf') {
     try {
       const pdfjsText = await extractPdfWithPdfjs(file);
       if (pdfjsText && pdfjsText.length > 50) return pdfjsText;
     } catch(e) {
-      console.warn('[PDF] pdfjs 失敗，改用 Claude:', e.message);
+      if (e.message === 'IMAGE_PDF') {
+        // 圖片型 PDF：逐頁 Canvas render + Claude Vision OCR
+        try {
+          const ocrText = await extractImagePdfWithVision(file);
+          if (ocrText && ocrText.length > 50) return ocrText;
+        } catch(ocrErr) {
+          console.warn('[PDF OCR] 失敗:', ocrErr.message);
+        }
+      } else {
+        console.warn('[PDF] pdfjs 失敗，改用 Claude:', e.message);
+      }
     }
     return await extractPdfWithClaude(file);
   }
@@ -2525,39 +2535,114 @@ async function callClaudeProxyRaw(body, timeoutMs = 60000) {
 }
 
 // ─── PDF 前端解析：pdfjs（不走 API，速度快）───
+async function loadPdfjsLib() {
+  if (window.pdfjsLib) return;
+  await new Promise((res, rej) => {
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+    s.onload = () => {
+      window.pdfjsLib.GlobalWorkerOptions.workerSrc =
+        'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+      res();
+    };
+    s.onerror = () => rej(new Error('pdfjs 載入失敗'));
+    document.head.appendChild(s);
+    setTimeout(() => rej(new Error('pdfjs 載入超時')), 15000);
+  });
+}
+
 async function extractPdfWithPdfjs(file) {
-  // 動態載入 pdfjs
-  if (!window.pdfjsLib) {
-    await new Promise((res, rej) => {
-      const s = document.createElement('script');
-      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
-      s.onload = () => {
-        window.pdfjsLib.GlobalWorkerOptions.workerSrc =
-          'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-        res();
-      };
-      s.onerror = () => rej(new Error('pdfjs 載入失敗'));
-      document.head.appendChild(s);
-      setTimeout(() => rej(new Error('pdfjs 載入超時')), 15000);
-    });
-  }
+  await loadPdfjsLib();
   const arrayBuffer = await file.arrayBuffer();
   const pdf = await window.pdfjsLib.getDocument({
     data: arrayBuffer,
     useWorkerFetch: false,
     isEvalSupported: false,
   }).promise;
-  const maxPages = Math.min(pdf.numPages, 80);
-  // 平行處理所有頁（Promise.all 取代逐頁 await）
-  const pageNums = Array.from({ length: maxPages }, (_, i) => i + 1);
-  const pageTexts = await Promise.all(pageNums.map(async i => {
+
+  const totalPages = pdf.numPages;
+  const BATCH = 20; // 每批 20 頁，避免記憶體爆炸
+  const allTexts = [];
+
+  for (let start = 1; start <= totalPages; start += BATCH) {
+    const end = Math.min(start + BATCH - 1, totalPages);
+    const pageNums = Array.from({ length: end - start + 1 }, (_, i) => start + i);
+    const batchTexts = await Promise.all(pageNums.map(async i => {
+      const page = await pdf.getPage(i);
+      const textContent = await page.getTextContent();
+      return textContent.items.map(item => item.str).join(' ').trim();
+    }));
+    allTexts.push(...batchTexts.filter(t => t.length > 0));
+  }
+
+  const result = allTexts.join('\n\n');
+
+  // 圖片型 PDF 偵測：若平均每頁文字量 < 30 字，判定為圖片型
+  const avgCharsPerPage = result.length / totalPages;
+  if (avgCharsPerPage < 30) {
+    throw new Error('IMAGE_PDF'); // 觸發 Vision OCR fallback
+  }
+
+  return result;
+}
+
+// ─── 圖片型 PDF → Canvas render → Claude Vision OCR ───
+async function extractImagePdfWithVision(file) {
+  await loadPdfjsLib();
+  const arrayBuffer = await file.arrayBuffer();
+  const pdf = await window.pdfjsLib.getDocument({
+    data: arrayBuffer,
+    useWorkerFetch: false,
+    isEvalSupported: false,
+  }).promise;
+
+  const totalPages = pdf.numPages;
+  const MAX_OCR_PAGES = 30; // Vision OCR 最多處理 30 頁（每頁需 API 呼叫）
+  const pagesToProcess = Math.min(totalPages, MAX_OCR_PAGES);
+
+  toast(`⏳ 圖片型 PDF，OCR 解析中（共 ${totalPages} 頁，處理前 ${pagesToProcess} 頁）…`, '');
+
+  const results = [];
+  for (let i = 1; i <= pagesToProcess; i++) {
+    toast(`⏳ OCR 第 ${i} / ${pagesToProcess} 頁…`, '');
     const page = await pdf.getPage(i);
-    const content = await page.getTextContent();
-    return content.items.map(item => item.str).join(' ').trim();
-  }));
-  const texts = pageTexts.filter(t => t.length > 0);
-  if (pdf.numPages > 80) texts.push(`（共 ${pdf.numPages} 頁，已擷取前 80 頁）`);
-  return texts.join('\n\n');
+    const viewport = page.getViewport({ scale: 1.5 }); // 1.5x 提高 OCR 精度
+    const canvas = document.createElement('canvas');
+    canvas.width  = viewport.width;
+    canvas.height = viewport.height;
+    const ctx = canvas.getContext('2d');
+    await page.render({ canvasContext: ctx, viewport }).promise;
+
+    // canvas → base64 JPEG（壓縮以減少 API token）
+    const base64 = canvas.toDataURL('image/jpeg', 0.85).split(',')[1];
+
+    try {
+      const text = await callClaudeProxyRaw({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 2000,
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: base64 } },
+            { type: 'text', text: '請完整擷取這頁的所有文字內容，保持段落結構，只輸出文字，不要加任何說明。' }
+          ]
+        }]
+      });
+      const pageText = text?.content?.[0]?.text || '';
+      if (pageText.trim()) results.push(`[第${i}頁]\n${pageText.trim()}`);
+    } catch(e) {
+      console.warn(`[OCR] 第${i}頁失敗:`, e.message);
+    }
+
+    // 每頁間隔 500ms 避免 rate limit
+    if (i < pagesToProcess) await new Promise(r => setTimeout(r, 500));
+  }
+
+  if (totalPages > MAX_OCR_PAGES) {
+    results.push(`\n（共 ${totalPages} 頁，已 OCR 前 ${MAX_OCR_PAGES} 頁）`);
+  }
+
+  return results.join('\n\n');
 }
 
 // ─── PDF → Claude Vision ───

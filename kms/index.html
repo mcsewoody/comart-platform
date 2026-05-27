@@ -364,7 +364,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.58</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.59</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
@@ -1791,7 +1791,7 @@ async function saveDoc() {
     // ── 完成：清空編輯器、存版本快照、跳知識庫 ──
     autoSnapshot({ title, body, category, lang, status });
     // 非同步產生 AI 摘要
-    const _summaryDocId = (typeof doc_id !== 'undefined' ? doc_id : null) || editingDocId;
+    const _summaryDocId = (typeof doc_id !== 'undefined' && doc_id) ? doc_id : editingDocId;
     if (_summaryDocId && body && body.length > 50) {
       generateAndSaveSummary(_summaryDocId, title, body).catch(()=>{});
     }

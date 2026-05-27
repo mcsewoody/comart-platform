@@ -364,7 +364,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.59</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.60</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
@@ -1859,22 +1859,34 @@ async function sendKmsNotification(docId, docTitle, toUser) {
 }
 
 async function generateAndSaveSummary(docId, title, body) {
-  if (!body || body.length < 50) return; // 內容太少不摘要
+  if (!body || body.length < 50) return;
   if (!CFG.supabaseUrl || !CFG.supabaseKey) return;
   try {
     const truncated = body.slice(0, 6000);
-    const summary = await callClaudeProxy(
-      '你是知識管理系統的摘要助手。請用 2-3 句話（繁體中文）摘要以下文件的核心重點，每句不超過 30 字，直接輸出摘要，不要加任何前言或說明。',
-      `文件標題：${title}\n\n${truncated}`,
-      300
+    const input = `文件標題：${title}\n\n${truncated}`;
+    const langPrompts = {
+      summary:      '你是知識管理系統的摘要助手。請用 2-3 句話（繁體中文）摘要以下文件的核心重點，每句不超過 30 字，直接輸出摘要，不要加任何前言或說明。',
+      summary_en:   'You are a KMS assistant. Summarize the following document in 2-3 sentences in English, max 30 words each. Output only the summary.',
+      summary_zh_cn:'你是知识管理系统的摘要助手。请用2-3句话（简体中文）摘要以下文件的核心重点，每句不超过30字，直接输出摘要。',
+      summary_vi:   'Bạn là trợ lý KMS. Hãy tóm tắt tài liệu sau trong 2-3 câu tiếng Việt, mỗi câu không quá 30 từ. Chỉ xuất phần tóm tắt.',
+      summary_ja:   'あなたはKMSのアシスタントです。以下の文書を日本語で2〜3文（各30字以内）に要約し、要約のみを出力してください。',
+    };
+    const entries = Object.entries(langPrompts);
+    const results = await Promise.allSettled(
+      entries.map(([, prompt]) => callClaudeProxy(prompt, input, 300))
     );
-    if (!summary || summary.length < 10) return;
-    // 用 kmsWrite（service_role）寫入，anon key 無 PATCH 權限
-    await kmsWrite('update', 'kms_documents', { summary }, docId);
-
+    const payload = {};
+    entries.forEach(([key], i) => {
+      const r = results[i];
+      if (r.status === 'fulfilled' && r.value && r.value.length >= 10) {
+        payload[key] = r.value;
+      }
+    });
+    if (!Object.keys(payload).length) return;
+    await kmsWrite('update', 'kms_documents', payload, docId);
     setTimeout(() => loadDocs(), 500);
   } catch(e) {
-    console.error('[summary] 失敗:', e.message);
+    console.warn('[summary]', e.message);
   }
 }
 
@@ -2964,7 +2976,7 @@ async function loadDocs() {
   let docs = [];
   try {
     if (CFG.supabaseUrl && CFG.supabaseKey) {
-      docs = await sbFetch('/rest/v1/kms_documents?select=id,title,category,lang,status,product_line,customer_tag,tags,author_name,view_count,file_url,file_name,file_type,file_size,summary,updated_at,created_at&status=eq.published&order=updated_at.desc') || [];
+      docs = await sbFetch('/rest/v1/kms_documents?select=id,title,category,lang,status,product_line,customer_tag,tags,author_name,view_count,file_url,file_name,file_type,file_size,summary,summary_en,summary_zh_cn,summary_vi,summary_ja,updated_at,created_at&status=eq.published&order=updated_at.desc') || [];
     } else {
       const saved = localStorage.getItem('kms-local-docs');
       if (saved) localDocs = JSON.parse(saved);
@@ -3045,7 +3057,12 @@ async function loadDocs() {
           style="padding:3px 7px;border-radius:5px;border:1px solid #F5C6C6;background:#FEF2F2;color:#A32D2D;font-size:11px;cursor:pointer;flex-shrink:0;" title="刪除">✕</button>` : ''}
       </div>
       ${(plBadge || cusBadges) ? `<div style="display:flex;gap:4px;flex-wrap:wrap;padding-left:2px;">${plBadge}${cusBadges}</div>` : ''}
-      ${d.summary ? `<div id="summary-${d.id}" style="font-size:11px;color:var(--text-2);line-height:1.5;padding:3px 2px 0;width:100%;border-top:1px solid var(--border);margin-top:3px;">${d.summary}</div>` : `<div id="summary-${d.id}" style="display:none;font-size:11px;color:var(--text-2);line-height:1.5;padding:3px 2px 0;width:100%;"></div>`}
+      ${(() => {
+        const summaryMap = { 'zh-TW': d.summary, 'zh-CN': d.summary_zh_cn, 'en': d.summary_en, 'vi': d.summary_vi, 'ja': d.summary_ja };
+        const s = summaryMap[currentLang] || d.summary || '';
+        return s ? `<div id="summary-${d.id}" style="font-size:11px;color:var(--text-2);line-height:1.5;padding:3px 2px 0;width:100%;border-top:1px solid var(--border);margin-top:3px;">${s}</div>`
+                 : `<div id="summary-${d.id}" style="display:none;font-size:11px;color:var(--text-2);line-height:1.5;padding:3px 2px 0;width:100%;"></div>`;
+      })()}
     </div>`;
   }).join('');
 
@@ -4722,7 +4739,7 @@ async function batchGenerateSummaries() {
   try {
     // 抓所有無摘要的已發佈文件
     const docs = await sbFetch(
-      '/rest/v1/kms_documents?select=id,title,body,summary&status=eq.published&summary=is.null&order=created_at.desc'
+      '/rest/v1/kms_documents?select=id,title,body,summary,summary_en&status=eq.published&summary=is.null&order=created_at.desc'
     ) || [];
 
     if (!docs.length) {
@@ -4747,7 +4764,9 @@ ${doc.body.slice(0, 6000)}`,
           300
         );
         if (summary && summary.length >= 10) {
+          // 批次：只補繁中，其他語言背景補齊
           await kmsWrite('update', 'kms_documents', { summary }, doc.id);
+          generateAndSaveSummary(doc.id, doc.title, doc.body).catch(()=>{});
         }
       } catch(e) { console.warn('[batch-summary]', doc.title, e.message); }
       done++;

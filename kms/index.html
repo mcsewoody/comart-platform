@@ -364,7 +364,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.53</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.54</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
@@ -1862,14 +1862,16 @@ async function generateAndSaveSummary(docId, title, body) {
   if (!body || body.length < 50) return; // 內容太少不摘要
   if (!CFG.supabaseUrl || !CFG.supabaseKey) return;
   try {
-    const truncated = body.slice(0, 6000); // 避免超長
+    const truncated = body.slice(0, 6000);
+    console.log('[summary] 開始產生摘要, docId:', docId, 'body長度:', body.length);
     const summary = await callClaudeProxy(
       '你是知識管理系統的摘要助手。請用 2-3 句話（繁體中文）摘要以下文件的核心重點，每句不超過 30 字，直接輸出摘要，不要加任何前言或說明。',
       `文件標題：${title}\n\n${truncated}`,
       300
     );
-    if (!summary || summary.length < 10) return;
-    await sbFetch(`/rest/v1/kms_documents?id=eq.${docId}`, {
+    console.log('[summary] Claude 回傳:', summary?.slice(0,50));
+    if (!summary || summary.length < 10) { console.warn('[summary] 摘要太短，略過'); return; }
+    const patchRes = await sbFetch(`/rest/v1/kms_documents?id=eq.${docId}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
@@ -1879,10 +1881,10 @@ async function generateAndSaveSummary(docId, title, body) {
       },
       body: JSON.stringify({ summary }),
     });
-    // 摘要寫入完成後重新渲染列表（確保顯示）
-    setTimeout(() => loadDocs(), 300);
+    console.log('[summary] PATCH 完成, 重新載入列表');
+    setTimeout(() => loadDocs(), 500);
   } catch(e) {
-    console.warn('[summary]', e.message);
+    console.error('[summary] 失敗:', e.message);
   }
 }
 

@@ -364,7 +364,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.65</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.66</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
@@ -394,7 +394,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
       <span data-i18n="nav.search">AI 問答 / 搜尋</span>
     </button>
-    <button class="nav-item" onclick="switchPanel('editor')">
+    <button class="nav-item" onclick="clearEditorFields();switchPanel('editor')">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
       <span data-i18n="nav.editor">建立知識條目</span>
     </button>
@@ -419,6 +419,10 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
       <span>審核流程</span>
       <span class="nav-badge" id="review-count" style="display:none;">0</span>
+    </button>
+    <button class="nav-item" id="nav-setting" onclick="switchPanel('setting')" style="display:none;">
+      <span style="font-size:16px;">⚙️</span>
+      <span>設定</span>
     </button>
     
 
@@ -594,7 +598,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
               autocomplete="off" oninput="filterReviewerList(this.value)" onfocus="showReviewerList()" onblur="setTimeout(()=>hideReviewerList(),200)" />
             <div id="reviewer-dropdown" style="display:none;position:absolute;top:100%;left:0;z-index:999;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:0 4px 12px rgba(0,0,0,.12);min-width:220px;max-height:160px;overflow-y:auto;font-size:12px;"></div>
           </div>
-          <input class="meta-input" id="doc-valid-until" type="date" title="有效期限" style="width:130px;" />
+          <input class="meta-input" id="doc-valid-until" type="date" title="到期封存日期（到期自動封存）" placeholder="到期日" style="width:130px;" />
           <span style="font-size:11px;color:var(--text-3);flex-shrink:0;">📦</span>
           <select class="meta-select" id="doc-product-line" style="flex:1;min-width:140px;">
             <option value="">— Product Line —</option>
@@ -647,7 +651,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
       <div class="docs-wrap">
         <div class="docs-header">
           <div class="docs-title" data-i18n="docs.title">知識庫 — 所有文件</div>
-          <button class="new-btn" onclick="editingDocId=null;updateEditorModeLabel();switchPanel('editor')" data-i18n="docs.new">＋ 新增文件</button>
+          <button class="new-btn" onclick="clearEditorFields();switchPanel('editor')" data-i18n="docs.new">＋ 新增文件</button>
         </div>
         <!-- 篩選列：產品線 + 客戶 + 關鍵字搜尋 -->
         <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center;">
@@ -718,6 +722,26 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
     </div>
 
     <!-- ═══ Review Workflow Panel ═══ -->
+    <div class="panel" id="panel-setting">
+      <div style="display:flex;flex-direction:column;height:100%;">
+        <div style="padding:12px 20px;border-bottom:1px solid var(--border);flex-shrink:0;">
+          <div style="font-size:15px;font-weight:500;margin-bottom:10px;">⚙️ 設定管理</div>
+          <div style="display:flex;gap:6px;">
+            <button id="setting-tab-pl" onclick="switchSettingTab('pl')"
+              style="padding:6px 14px;border-radius:var(--radius);border:1px solid var(--blue);background:var(--blue);color:#fff;font-size:12px;cursor:pointer;">
+              📦 Product Line
+            </button>
+            <button id="setting-tab-cat" onclick="switchSettingTab('cat')"
+              style="padding:6px 14px;border-radius:var(--radius);border:1px solid var(--border);background:transparent;color:var(--text-2);font-size:12px;cursor:pointer;">
+              🗂 分類管理
+            </button>
+          </div>
+        </div>
+        <div style="flex:1;overflow-y:auto;padding:16px 20px;" id="setting-content">
+        </div>
+      </div>
+    </div>
+
     <div class="panel" id="panel-review">
       <div style="display:flex;flex-direction:column;height:100%;">
         <div style="padding:12px 20px;border-bottom:1px solid var(--border);flex-shrink:0;">
@@ -1270,6 +1294,13 @@ async function initPortalSession() {
   const _dateEl = document.getElementById('doc-valid-until');
   if (_dateEl && !_dateEl.value) {
     _dateEl.value = new Date().toISOString().split('T')[0];
+  }
+
+  // Setting nav：只對 admin/dcc 顯示
+  const _navSetting = document.getElementById('nav-setting');
+  if (_navSetting) {
+    const _kmsR = getKmsRole();
+    _navSetting.style.display = (_kmsR === 'admin' || _kmsR === 'dcc') ? '' : 'none';
   }
 
   // 提示目前身份
@@ -3068,6 +3099,102 @@ async function uploadToStorage(file) {
 // ═══════════════════════════════════════════════
 
 // ─── 有效日期到期自動封存 ───
+
+// ═══════════════════════════════════════════════
+// SETTING PANEL
+// ═══════════════════════════════════════════════
+let _settingTab = 'pl';
+
+function switchSettingTab(tab) {
+  _settingTab = tab;
+  ['pl','cat'].forEach(t => {
+    const btn = document.getElementById('setting-tab-' + t);
+    if (!btn) return;
+    if (t === tab) {
+      btn.style.background = 'var(--blue)'; btn.style.color = '#fff';
+      btn.style.borderColor = 'var(--blue)';
+    } else {
+      btn.style.background = 'transparent'; btn.style.color = 'var(--text-2)';
+      btn.style.borderColor = 'var(--border)';
+    }
+  });
+  loadSettingContent();
+}
+
+async function loadSettingContent() {
+  const wrap = document.getElementById('setting-content');
+  if (!wrap) return;
+  if (_settingTab === 'pl') await loadSettingProductLines(wrap);
+  else await loadSettingCategories(wrap);
+}
+
+// ── Product Line 管理 ──
+async function loadSettingProductLines(wrap) {
+  wrap.innerHTML = '<div style="color:var(--text-3);font-size:13px;">載入中…</div>';
+  let lines = [];
+  try {
+    if (CFG.supabaseUrl && CFG.supabaseKey) {
+      lines = await sbFetch('/rest/v1/kms_product_lines?select=id,name,sort_order,active&order=sort_order.asc') || [];
+    }
+  } catch(e) {}
+
+  wrap.innerHTML = `
+    <div style="display:flex;gap:8px;margin-bottom:12px;">
+      <input id="pl-new-input" placeholder="新增 Product Line 名稱"
+        style="flex:1;padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;background:var(--bg);color:var(--text-1);"
+        onkeydown="if(event.key==='Enter')addProductLine()" />
+      <button onclick="addProductLine()"
+        style="padding:7px 14px;border-radius:var(--radius);border:1px solid var(--blue);background:var(--blue);color:#fff;font-size:13px;cursor:pointer;">新增</button>
+    </div>
+    <div id="pl-list">
+      ${lines.map(l => `
+        <div class="doc-item" style="margin-bottom:4px;" id="pl-item-${l.id}">
+          <span style="flex:1;font-size:13px;">${l.name}</span>
+          <span style="font-size:11px;color:var(--text-3);">排序 ${l.sort_order}</span>
+          <button onclick="deleteProductLine('${l.id}','${l.name.replace(/'/g,'')}')"
+            style="padding:2px 8px;border-radius:5px;border:1px solid #F5C6C6;background:#FEF2F2;color:#A32D2D;font-size:11px;cursor:pointer;">刪除</button>
+        </div>`).join('')}
+    </div>`;
+}
+
+async function addProductLine() {
+  const input = document.getElementById('pl-new-input');
+  const name = input?.value.trim();
+  if (!name) return;
+  try {
+    await kmsWrite('insert', 'kms_product_lines', { name, sort_order: 999, active: true });
+    input.value = '';
+    toast('✅ 已新增：' + name, 'success');
+    loadSettingContent();
+    loadProductLines();
+  } catch(e) { toast('新增失敗：' + e.message, 'error'); }
+}
+
+async function deleteProductLine(id, name) {
+  if (!confirm(`確定刪除「${name}」？`)) return;
+  try {
+    await kmsWrite('delete', 'kms_product_lines', null, id);
+    toast('已刪除：' + name, '');
+    loadSettingContent();
+    loadProductLines();
+  } catch(e) { toast('刪除失敗：' + e.message, 'error'); }
+}
+
+// ── 分類管理（CAT_META 為前端定義，這裡顯示說明）──
+async function loadSettingCategories(wrap) {
+  wrap.innerHTML = `
+    <div style="font-size:13px;color:var(--text-3);margin-bottom:12px;">
+      目前 KMS 有 ${Object.keys(CAT_META).length} 個分類。如需新增或修改分類，請聯繫系統管理員更新程式碼。
+    </div>
+    ${Object.entries(CAT_META).map(([key, meta]) => `
+      <div class="doc-item" style="margin-bottom:4px;">
+        <span style="font-size:18px;">${meta.icon}</span>
+        <span style="flex:1;font-size:13px;font-weight:500;">${meta.name}</span>
+        <span style="font-size:11px;color:var(--text-3);font-family:monospace;">${key}</span>
+        <span style="width:16px;height:16px;border-radius:50%;background:${meta.color};display:inline-block;"></span>
+      </div>`).join('')}`;
+}
+
 async function checkAndArchiveExpired(docs) {
   if (!CFG.supabaseUrl || !CFG.supabaseKey || !docs?.length) return;
   const today = new Date().toISOString().split('T')[0];
@@ -3242,6 +3369,44 @@ function hasUnsavedChanges() {
   const curStatus = document.getElementById('doc-status')?.value || '';
   return curTitle !== s.title || curCat !== s.category || curStatus !== s.status
     || (s.bodyText && curBody && curBody !== s.bodyText);
+}
+
+
+// ─── 清空編輯器所有欄位（新建模式）───
+function clearEditorFields() {
+  editingDocId = null;
+  window._editSnapshot = null;
+  window._uploadBlocked = false;
+
+  // 基本欄位
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('doc-title').value = '';
+  document.getElementById('doc-cat').value = 'product';
+  document.getElementById('doc-lang').value = currentLang || 'zh-TW';
+  document.getElementById('doc-status').value = 'published';
+  document.getElementById('doc-valid-until').value = today;   // 問題3：有效期限預設今天
+  document.getElementById('doc-related').value = '';
+  const srcEl = document.getElementById('doc-source-url');
+  if (srcEl) srcEl.value = '';
+  document.getElementById('doc-product-line').value = '';
+
+  // 建立者/審核人
+  resetDocAuthor();
+  document.getElementById('doc-reviewer').value = '';
+
+  // 標籤
+  if (typeof currentTags !== 'undefined') { currentTags = []; renderTags(); }
+  if (typeof currentCustomerTags !== 'undefined') { currentCustomerTags = []; renderCustomerTags(); }
+
+  // 上傳區
+  clearUploadedFile();
+  const urlInput = document.getElementById('url-fetch-input');
+  if (urlInput) urlInput.value = '';
+
+  // 編輯器內容
+  if (tiptapEditor) tiptapEditor.commands.clearContent();
+
+  updateEditorModeLabel();
 }
 
 function cancelEdit() {
@@ -5418,6 +5583,7 @@ window.switchPanel = function(id) {
   if (id === 'editor')    { setTimeout(loadVersionHistory, 150); }
   if (id === 'kmap')      setTimeout(() => loadKmap(null), 50);
   if (id === 'analytics') setTimeout(loadAnalytics, 50);
+  if (id === 'setting')   setTimeout(loadSettingContent, 50);
   if (id === 'experts')   setTimeout(loadExperts, 50);
   if (id === 'review')    { window._reviewAllDocs = null; window._reviewFilter = 'draft'; setTimeout(loadReviewPanel, 50); }
 };

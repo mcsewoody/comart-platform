@@ -389,7 +389,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.75</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.76</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
@@ -570,7 +570,9 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
           <input class="meta-input" id="doc-title" placeholder="文件標題" style="flex:2;min-width:160px;"
             oninput="scheduleAutoClassify()" />
 
-          <select class="meta-select" id="doc-lang">
+          <div style="display:flex;flex-direction:column;gap:1px;">
+            <span style="font-size:9px;color:var(--text-3);letter-spacing:.05em;text-transform:uppercase;" data-i18n="label.language">Language</span>
+            <select class="meta-select" id="doc-lang">
             <option value="zh-TW">繁體中文</option>
             <option value="zh-CN">简体中文</option>
             <option value="en">English</option>
@@ -584,12 +586,12 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
             <option value="withdrawn" style="display:none;">Withdraw 撤回</option>
             <option value="archived" style="display:none;">Archive 封存</option>
           </select>
-          <button class="save-btn" onclick="saveDoc()" data-i18n="editor.save">儲存並向量化</button>
+          <button class="save-btn" onclick="saveDoc()" data-i18n="btn.save">儲存</button>
           <button id="reparse-btn" onclick="reparseCurrentDoc()"
             style="display:none;padding:6px 14px;border-radius:var(--radius);border:1px solid var(--blue);background:transparent;cursor:pointer;font-size:13px;color:var(--blue);white-space:nowrap;">
             🔄 重新解析
           </button>
-          <button onclick="cancelEdit()"
+          <button onclick="cancelEdit()" data-i18n="btn.cancel"
             style="padding:6px 14px;border-radius:var(--radius);border:1px solid var(--border);background:transparent;cursor:pointer;font-size:13px;color:var(--text-2);white-space:nowrap;">
             取消
           </button>
@@ -1081,6 +1083,8 @@ const I18N = {
     'nav.kmap':'Map', 'nav.analytics':'Analytics', 'nav.experts':'Expert', 'nav.review':'Review', 'nav.comments':'Discussion', 'nav.setting':'Settings',
     'label.created':'Created', 'label.modified':'Modified', 'label.valid_until':'Valid Until',
     'label.author':'Author', 'label.reviewer':'Reviewer', 'label.product_line':'Product Line',
+    'label.category':'Category', 'label.stars':'Stars', 'status.indefinitely':'Indefinitely',
+    'btn.save':'儲存', 'btn.cancel':'取消', 'msg.no_content':'尚無內容', 'msg.loading':'載入中…',
     'rag.title':'AI 問答 — 從知識庫取答案',
     'rag.placeholder':'問任何問題，例如：Qi2 充電器良率異常如何處理？',
     'rag.btn':'送出問題', 'rag.empty':'輸入問題，AI 會從知識庫召回相關段落並彙整回答',
@@ -2047,7 +2051,13 @@ async function saveDoc() {
     }
 
     await loadDocs();
-    if (window._openDocFromReview) { window._openDocFromReview=false; switchPanel('review'); setTimeout(loadReviewPanel,100); } else { switchPanel('docs'); }
+    if (window._openDocFromReview) {
+      const _retFilter = window._openDocFromReview;
+      window._openDocFromReview = false;
+      window._reviewFilter = _retFilter;
+      switchPanel('review');
+      setTimeout(() => { filterReviewPanel(_retFilter); }, 100);
+    } else { switchPanel('docs'); }
 
   } catch(e) {
     toast('儲存失敗：' + e.message, 'error');
@@ -2429,9 +2439,11 @@ function skipAllBatch() {
   document.getElementById('batch-progress-bar')?.remove();
   toast('已取消批次上傳', '');
   if (window._openDocFromReview) {
+    const _retFilter = window._openDocFromReview;
     window._openDocFromReview = false;
+    window._reviewFilter = _retFilter;
     switchPanel('review');
-    setTimeout(loadReviewPanel, 100);
+    setTimeout(() => { filterReviewPanel(_retFilter); }, 100);
   } else {
     switchPanel('docs');
   }
@@ -4770,7 +4782,7 @@ function applyI18n() {
   cancelBtns.forEach(b => { if (s['editor.cancel']) b.textContent = s['editor.cancel']; });
 
   // Sidebar nav 文字（依順序對應）
-  const navKeys = ['nav.search','nav.editor','nav.docs','nav.kmap','nav.analytics','nav.experts','nav.review','nav.comments','nav.setting'];
+  const navKeys = ['nav.search','nav.editor','nav.docs','nav.kmap','nav.analytics','nav.experts','nav.review','nav.setting'];
   document.querySelectorAll('.nav-item span:not(.nav-badge)').forEach((el, i) => {
     if (navKeys[i] && s[navKeys[i]]) el.textContent = s[navKeys[i]];
   });
@@ -4859,7 +4871,8 @@ async function loadDiscussModalComments() {
       </div>`;
     }).join('');
   } catch(e) {
-    list.innerHTML = '<div style="color:var(--text-3);font-size:12px;text-align:center;padding:12px;">載入失敗</div>';
+    console.error('[discuss]', e);
+    list.innerHTML = `<div style="color:var(--text-3);font-size:12px;text-align:center;padding:12px;">載入失敗：${e.message}</div>`;
   }
 }
 
@@ -5741,7 +5754,7 @@ function renderReviewList(filterStatus) {
         <span class="doc-title" onclick="openReader('${d.id}')" style="cursor:pointer;flex:1;min-width:0;">${d.title}</span>
         <span style="font-size:11px;color:var(--text-3);white-space:nowrap;">${d.author_name||'—'}</span>
         <span style="font-size:11px;color:var(--text-3);white-space:nowrap;">${dt}</span>
-        ${canEdit(d.author_name) ? `<button onclick="window._openDocFromReview=true;openDoc('${d.id}')"
+        ${canEdit(d.author_name) ? `<button onclick="window._openDocFromReview=window._reviewFilter||'draft';openDoc('${d.id}')"
           style="padding:2px 7px;border-radius:5px;border:1px solid var(--border);background:var(--bg);font-size:11px;cursor:pointer;flex-shrink:0;">✏️</button>` : ''}
         <button onclick="deleteDoc('${d.id}','${safeTitle}','${(d.author_name||'').replace(/'/g,'')}')"
           style="padding:2px 7px;border-radius:5px;border:1px solid #F5C6C6;background:#FEF2F2;color:#A32D2D;font-size:11px;cursor:pointer;flex-shrink:0;">✕</button>
@@ -5755,6 +5768,15 @@ function renderReviewList(filterStatus) {
 async function loadReviewPanel() {
   const content = document.getElementById('review-content');
   if (!reviewingDocId) {
+    // 確保 draft tab 亮燈（第一次進入）
+    if (!window._reviewFilterInitialized) {
+      window._reviewFilterInitialized = true;
+      window._reviewFilter = 'draft';
+      ['draft','published','archived'].forEach(s => {
+        const el = document.getElementById('rs-' + s);
+        if (el) el.className = 'review-step' + (s === 'draft' ? ' active' : '');
+      });
+    }
     // 顯示待審核文件列表
     content.innerHTML = '<div style="text-align:center;color:var(--text-3);padding:20px 0;font-size:13px;">載入中…</div>';
     try {

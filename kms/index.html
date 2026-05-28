@@ -364,7 +364,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.69</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.70</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
@@ -609,16 +609,24 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
               autocomplete="off" oninput="filterReviewerList(this.value)" onfocus="showReviewerList()" onblur="setTimeout(()=>hideReviewerList(),200)" />
             <div id="reviewer-dropdown" style="display:none;position:absolute;top:100%;left:0;z-index:999;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:0 4px 12px rgba(0,0,0,.12);min-width:220px;max-height:160px;overflow-y:auto;font-size:12px;"></div>
           </div>
-          <div style="display:flex;flex-direction:column;gap:1px;">
+          <div style="display:flex;flex-direction:column;gap:2px;">
             <span style="font-size:9px;color:var(--text-3);letter-spacing:.05em;text-transform:uppercase;">Valid Until</span>
-            <input class="meta-input" id="doc-valid-until" type="date" title="到期後自動封存" style="width:120px;" />
+            <div style="display:flex;align-items:center;gap:5px;">
+              <input type="checkbox" id="doc-indefinitely" checked title="永久有效"
+                onchange="document.getElementById('doc-valid-until').style.display=this.checked?'none':'block';if(this.checked)document.getElementById('doc-valid-until').value='';"
+                style="cursor:pointer;width:13px;height:13px;" />
+              <label for="doc-indefinitely" style="font-size:11px;color:var(--text-2);cursor:pointer;white-space:nowrap;">Indefinitely</label>
+              <input class="meta-input" id="doc-valid-until" type="date" title="到期後自動封存" style="width:110px;display:none;" />
+            </div>
           </div>
-          <span style="font-size:11px;color:var(--text-3);flex-shrink:0;">📦</span>
-          <select class="meta-select" id="doc-product-line" style="flex:1;min-width:140px;">
+          <div style="display:flex;flex-direction:column;gap:1px;">
+            <span style="font-size:9px;color:var(--text-3);letter-spacing:.05em;text-transform:uppercase;">Product Line</span>
+            <select class="meta-select" id="doc-product-line" style="flex:1;min-width:140px;">
             <option value="">— Product Line —</option>
           </select>
+          </div>
           <button onclick="openAddProductLineModal()"
-            style="padding:4px 8px;border-radius:6px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:12px;color:var(--text-2);"
+            style="padding:4px 8px;border-radius:6px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:12px;color:var(--text-2);align-self:flex-end;"
             title="新增產品線">＋</button>
         </div>
 
@@ -1869,16 +1877,9 @@ async function saveDoc() {
     // 非同步產生 AI 摘要
     const _summaryDocId = (typeof doc_id !== 'undefined' && doc_id) ? doc_id : editingDocId;
     if (_summaryDocId && body && body.length > 50) {
-      if (window._pendingSummary) {
-        // URL 擷取已預備摘要，直接寫入
-        const pending = window._pendingSummary;
-        window._pendingSummary = null;
-        kmsWrite('update', 'kms_documents', pending, _summaryDocId)
-          .then(() => generateAndSaveSummary(_summaryDocId, title, body))
-          .catch(()=>{});
-      } else {
-        generateAndSaveSummary(_summaryDocId, title, body).catch(()=>{});
-      }
+      // 統一走 generateAndSaveSummary（五語言），_pendingSummary 已廢棄
+      window._pendingSummary = null;
+      generateAndSaveSummary(_summaryDocId, title, body).catch(()=>{});
     }
     const _reviewer = document.getElementById('doc-reviewer')?.value.trim();
     if (_summaryDocId && _reviewer) {
@@ -3182,22 +3183,22 @@ async function loadSettingProductLines(wrap) {
   } catch(e) {}
 
   wrap.innerHTML = `
-    <div style="display:flex;gap:8px;margin-bottom:12px;">
+    <div style="display:flex;gap:8px;margin-bottom:12px;align-items:center;">
       <input id="pl-new-input" placeholder="新增 Product Line 名稱"
-        style="flex:1;padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;background:var(--bg);color:var(--text-1);"
+        style="flex:1;padding:6px 8px;border:1px solid var(--border);border-radius:var(--radius);font-size:12px;background:var(--bg);color:var(--text-1);"
         onkeydown="if(event.key==='Enter')addProductLine()" />
       <button onclick="addProductLine()"
-        style="padding:7px 14px;border-radius:var(--radius);border:1px solid var(--blue);background:var(--blue);color:#fff;font-size:13px;cursor:pointer;">新增</button>
+        style="padding:6px 12px;border-radius:var(--radius);border:1px solid var(--blue);background:var(--blue);color:#fff;font-size:12px;cursor:pointer;">新增</button>
     </div>
-    <div id="pl-list">
-      ${lines.map(l => `
-        <div class="doc-item" style="margin-bottom:4px;" id="pl-item-${l.id}">
-          <span style="flex:1;font-size:13px;">${l.name}</span>
-          <span style="font-size:11px;color:var(--text-3);">排序 ${l.sort_order}</span>
-          <button onclick="deleteProductLine('${l.id}','${l.name.replace(/'/g,'')}')"
-            style="padding:2px 8px;border-radius:5px;border:1px solid #F5C6C6;background:#FEF2F2;color:#A32D2D;font-size:11px;cursor:pointer;">刪除</button>
-        </div>`).join('')}
-    </div>`;
+    ${lines.map(l => `
+      <div class="doc-item" style="margin-bottom:4px;" id="pl-item-${l.id}">
+        <input value="${l.name.replace(/"/g,'&quot;')}"
+          style="flex:1;font-size:13px;border:none;background:transparent;color:var(--text-1);padding:2px 4px;border-radius:4px;"
+          onfocus="this.style.background='var(--bg)';this.style.border='1px solid var(--border)'"
+          onblur="this.style.background='transparent';this.style.border='none';updateProductLine('${l.id}',this.value)" />
+        <button onclick="deleteProductLine('${l.id}','${l.name.replace(/'/g,'')}')"
+          style="padding:2px 8px;border-radius:5px;border:1px solid #F5C6C6;background:#FEF2F2;color:#A32D2D;font-size:11px;cursor:pointer;">刪除</button>
+      </div>`).join('')}`;
 }
 
 async function addProductLine() {
@@ -3211,6 +3212,15 @@ async function addProductLine() {
     loadSettingContent();
     loadProductLines();
   } catch(e) { toast('新增失敗：' + e.message, 'error'); }
+}
+
+async function updateProductLine(id, newName) {
+  if (!newName) return;
+  try {
+    await kmsWrite('update', 'kms_product_lines', { name: newName }, id);
+    loadProductLines();
+    toast('已更新：' + newName, 'success');
+  } catch(e) { toast('更新失敗：' + e.message, 'error'); }
 }
 
 async function deleteProductLine(id, name) {
@@ -3517,7 +3527,11 @@ function clearEditorFields() {
   document.getElementById('doc-cat').value = 'product';
   document.getElementById('doc-lang').value = currentLang || 'zh-TW';
   document.getElementById('doc-status').value = 'published';
-  document.getElementById('doc-valid-until').value = today;
+  // Valid Until 預設 Indefinitely
+  const _indef = document.getElementById('doc-indefinitely');
+  const _vuEl = document.getElementById('doc-valid-until');
+  if (_indef) { _indef.checked = true; }
+  if (_vuEl) { _vuEl.value = ''; _vuEl.style.display = 'none'; }
   // Created/Modified 重置為今天（新建模式）
   const _todayFmt = new Date().toLocaleDateString('zh-TW', {year:'2-digit',month:'2-digit',day:'2-digit'});
   const _ce = document.getElementById('doc-created-display');
@@ -3635,7 +3649,16 @@ async function openDoc(id) {
       : (portalUser ? (portalUser.nameEn || portalUser.nameZh || '') : '');
   }
   document.getElementById('doc-reviewer').value = doc.reviewer || '';
-  document.getElementById('doc-valid-until').value = doc.valid_until || new Date().toISOString().split('T')[0];
+  // Valid Until
+  const _indEl = document.getElementById('doc-indefinitely');
+  const _vuEl2 = document.getElementById('doc-valid-until');
+  if (doc.valid_until) {
+    if (_indEl) _indEl.checked = false;
+    if (_vuEl2) { _vuEl2.value = doc.valid_until; _vuEl2.style.display = 'block'; }
+  } else {
+    if (_indEl) _indEl.checked = true;
+    if (_vuEl2) { _vuEl2.value = ''; _vuEl2.style.display = 'none'; }
+  }
   // Created / Modified 顯示（唯讀）
   const _fmt = d => d ? new Date(d).toLocaleDateString('zh-TW', {year:'2-digit',month:'2-digit',day:'2-digit'}) : '—';
   const _creEl = document.getElementById('doc-created-display');

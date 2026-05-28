@@ -389,7 +389,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.71</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.72</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
@@ -445,10 +445,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
       <span data-i18n="nav.review">Review</span>
       <span class="nav-badge" id="review-count" style="display:none;">0</span>
     </button>
-    <button class="nav-item" id="nav-comments" onclick="switchPanel('comments')">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-      <span data-i18n="nav.comments">Discussion</span>
-    </button>
+
     <button class="nav-item" id="nav-setting" onclick="switchPanel('setting')" style="display:none;">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
       <span data-i18n="nav.setting">Settings</span>
@@ -594,6 +591,11 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
             <option value="vi">Tiếng Việt</option>
             <option value="ja">日本語</option>
           </select>
+          <select class="meta-select" id="doc-stars" style="width:90px;" title="重要性">
+            <option value="1">★ General</option>
+            <option value="2">★★ Important</option>
+            <option value="3">★★★ Must Read</option>
+          </select>
           <select class="meta-select" id="doc-status">
             <option value="draft">Draft 草稿</option>
             <option value="published">Publish 發佈</option>
@@ -707,6 +709,12 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         </div>
         <!-- 篩選列：產品線 + 客戶 + 關鍵字搜尋 -->
         <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center;">
+          <select onchange="_docsOrder=this.value;loadDocs()"
+            style="font-size:12px;padding:4px 8px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);color:var(--text-2);">
+            <option value="updated_at.desc">Latest</option>
+            <option value="stars.desc,updated_at.desc">Stars</option>
+            <option value="view_count.desc">Most Viewed</option>
+          </select>
           <input type="text" id="docs-search" placeholder="🔍 關鍵字搜尋…"
             oninput="loadDocs()"
             style="flex:1;min-width:140px;padding:6px 10px;border-radius:var(--radius);border:1px solid var(--border);font-size:13px;font-family:var(--font);outline:none;background:var(--surface);color:var(--text);" />
@@ -902,6 +910,18 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
     </div>
     <div class="reader-meta" id="reader-meta"></div>
     <div class="reader-body" id="reader-body-content"></div>
+      <!-- Discussion 摺疊區 -->
+      <div id="reader-discussion-wrap" style="display:none;border-top:1px solid var(--border);padding:16px 20px;max-height:40vh;overflow-y:auto;">
+        <div style="font-size:13px;font-weight:500;margin-bottom:10px;">💬 Discussion</div>
+        <div id="reader-comment-list" style="margin-bottom:10px;"></div>
+        <div style="display:flex;gap:8px;">
+          <textarea id="reader-comment-input" placeholder="輸入留言…" rows="2"
+            style="flex:1;padding:8px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;background:var(--bg);color:var(--text-1);resize:none;font-family:var(--font);"
+            onkeydown="if(event.isComposing)return;if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();submitReaderComment();}"></textarea>
+          <button onclick="submitReaderComment()"
+            style="padding:8px 14px;border-radius:var(--radius);border:none;background:var(--blue);color:#fff;font-size:13px;cursor:pointer;align-self:flex-end;">送出</button>
+        </div>
+      </div>
     <div class="reader-footer">
       <button class="reader-btn" id="reader-dl-btn" style="display:none;" onclick="readerDownload()">↓ 下載原始檔</button>
       <div style="position:relative;display:inline-block;">
@@ -918,6 +938,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         </div>
       </div>
       <button class="reader-btn" onclick="copyReaderContent()" title="複製全文">📋 複製</button>
+      <button class="reader-btn" id="reader-discuss-btn" onclick="toggleReaderDiscussion()" style="display:none;">💬 Discussion</button>
       <button class="reader-btn" onclick="closeReader()" style="margin-left:auto;">關閉</button>
     </div>
   </div>
@@ -1315,7 +1336,8 @@ const KMS_ROLE_FROM_PORTAL = {
   user:  'user',
 };
 
-let portalUser = null; // 從 portal 帶進來的使用者
+let portalUser = null;
+let _docsOrder = 'updated_at.desc';
 
 // 取得目前用戶的 KMS 角色
 function getKmsRole() {
@@ -1874,6 +1896,7 @@ async function saveDoc() {
 
       const docPayload = {
         title, body, category, lang, status,
+        stars: parseInt(document.getElementById('doc-stars')?.value || '1'),
         author_name: buildAuthorName(),
         reviewer: document.getElementById('doc-reviewer').value.trim() || null,
         valid_until: document.getElementById('doc-valid-until').value || null,
@@ -1973,6 +1996,7 @@ async function saveDoc() {
     document.getElementById('doc-cat').value = 'product';
     document.getElementById('doc-lang').value = currentLang;
     document.getElementById('doc-status').value = 'published';
+  document.getElementById('doc-stars').value = '1';
     document.getElementById('doc-author').value = '';
     resetDocAuthor();
     document.getElementById('doc-reviewer').value = '';
@@ -3444,7 +3468,7 @@ async function loadDocs() {
   let docs = [];
   try {
     if (CFG.supabaseUrl && CFG.supabaseKey) {
-      docs = await sbFetch('/rest/v1/kms_documents?select=id,title,category,lang,status,product_line,customer_tag,tags,author_name,view_count,file_url,file_name,file_type,file_size,summary,summary_en,summary_zh_cn,summary_vi,summary_ja,source_url,valid_until,updated_at,created_at&status=eq.published&order=updated_at.desc') || [];
+      docs = await sbFetch(`/rest/v1/kms_documents?select=id,title,category,lang,status,stars,product_line,customer_tag,tags,author_name,view_count,file_url,file_name,file_type,file_size,summary,summary_en,summary_zh_cn,summary_vi,summary_ja,source_url,valid_until,updated_at,created_at&status=eq.published&order=${_docsOrder || 'updated_at.desc'}`) || [];
     } else {
       const saved = localStorage.getItem('kms-local-docs');
       if (saved) localDocs = JSON.parse(saved);
@@ -3515,6 +3539,7 @@ async function loadDocs() {
     <div class="doc-item" id="doc-item-${d.id}" style="flex-wrap:wrap;gap:4px;">
       <div style="display:flex;align-items:center;gap:6px;width:100%;flex-wrap:wrap;">
         <span class="doc-cat ${catClass[d.category] || 'sop'}" data-cat="${d.category||''}">${catLabel[d.category] || d.category}</span>
+      ${d.stars >= 3 ? '<span style="color:#F59E0B;font-size:11px;flex-shrink:0;" title="Must Read">★★★</span>' : d.stars === 2 ? '<span style="color:#F59E0B;font-size:11px;flex-shrink:0;" title="Important">★★</span>' : ''}
         <span class="doc-title" onclick="openReader('${d.id}')" style="cursor:pointer;flex:1;min-width:120px;">${d.title}</span>
         <span style="font-size:11px;color:var(--text-3);">${d.lang || ''}</span>
 
@@ -3721,6 +3746,7 @@ async function openDoc(id) {
   document.getElementById('doc-cat').value = doc.category || 'product';
   document.getElementById('doc-lang').value = doc.lang || 'zh-TW';
   document.getElementById('doc-status').value = doc.status || 'draft';
+  document.getElementById('doc-stars').value = String(doc.stars || 1);
   // doc-author 填入文件原作者（或目前登入者）
   const _docAuthorEl = document.getElementById('doc-author');
   if (_docAuthorEl) {
@@ -4312,11 +4338,68 @@ async function openReader(id) {
     });
   }
 
+  window._readerDocId = id;
+  const _rdBtn = document.getElementById('reader-discuss-btn');
+  if (_rdBtn) _rdBtn.style.display = '';
+  const _rdWrap = document.getElementById('reader-discussion-wrap');
+  if (_rdWrap) { _rdWrap.style.display = 'none'; if (_rdBtn) _rdBtn.classList.remove('primary'); }
   document.getElementById('reader-modal').classList.add('show');
 }
 
 
 // ─── 閱讀器 AI 翻譯 ───
+
+
+// ─── Reader 內 Discussion ───
+async function toggleReaderDiscussion() {
+  const wrap = document.getElementById('reader-discussion-wrap');
+  const btn  = document.getElementById('reader-discuss-btn');
+  if (!wrap) return;
+  const showing = wrap.style.display !== 'none';
+  wrap.style.display = showing ? 'none' : 'block';
+  if (btn) btn.classList.toggle('primary', !showing);
+  if (!showing) await loadReaderComments();
+}
+
+async function loadReaderComments() {
+  const docId = window._readerDocId;
+  const list  = document.getElementById('reader-comment-list');
+  if (!docId || !list) return;
+  list.innerHTML = '<div style="color:var(--text-3);font-size:12px;">載入中…</div>';
+  try {
+    const rows = await sbFetch(`/rest/v1/kms_comments?doc_id=eq.${docId}&select=id,content,author_name,created_at&order=created_at.asc`) || [];
+    if (!rows.length) {
+      list.innerHTML = '<div style="color:var(--text-3);font-size:12px;text-align:center;padding:12px 0;">尚無留言</div>';
+      return;
+    }
+    list.innerHTML = rows.map(c => {
+      const dt = new Date(c.created_at).toLocaleString('zh-TW',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
+      return `<div style="margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border);">
+        <div style="display:flex;gap:6px;align-items:baseline;margin-bottom:3px;">
+          <span style="font-size:12px;font-weight:500;color:var(--text);">${c.author_name||'匿名'}</span>
+          <span style="font-size:10px;color:var(--text-3);">${dt}</span>
+        </div>
+        <div style="font-size:13px;color:var(--text);line-height:1.5;">${c.content||''}</div>
+      </div>`;
+    }).join('');
+  } catch(e) { list.innerHTML = '<div style="color:var(--text-3);font-size:12px;">載入失敗</div>'; }
+}
+
+async function submitReaderComment() {
+  const docId = window._readerDocId;
+  const input = document.getElementById('reader-comment-input');
+  const text  = input?.value.trim();
+  if (!docId || !text) return;
+  const author = portalUser ? (portalUser.nameZh || portalUser.nameEn || '') : 'Anonymous';
+  try {
+    await kmsWrite('insert', 'kms_comments', {
+      doc_id: docId, content: text, author_name: author,
+      author_id: portalUser?.empId || null,
+    });
+    input.value = '';
+    await loadReaderComments();
+  } catch(e) { toast('留言失敗：' + e.message, 'error'); }
+}
 
 function copyReaderContent() {
   const bodyEl = document.getElementById('reader-body-content');
@@ -5477,7 +5560,7 @@ async function openReviewPanel(docId, docTitle) {
 
 
 // ─── 審核流程：篩選和列表渲染 ───
-window._reviewFilter = 'all';
+window._reviewFilter = 'draft';
 
 function filterReviewPanel(status) {
   window._reviewFilter = status;

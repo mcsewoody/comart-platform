@@ -364,7 +364,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.67</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.69</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
@@ -588,6 +588,14 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
 
         <!-- Meta row — 第二行：建立者 + 審核人 + 有效期 + 產品線 -->
         <div style="padding:6px 12px;border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:var(--bg);flex-shrink:0;">
+          <div style="display:flex;flex-direction:column;gap:1px;">
+            <span style="font-size:9px;color:var(--text-3);letter-spacing:.05em;text-transform:uppercase;">Created</span>
+            <span id="doc-created-display" style="font-size:11px;color:var(--text-3);padding:4px 2px;min-width:72px;">—</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:1px;">
+            <span style="font-size:9px;color:var(--text-3);letter-spacing:.05em;text-transform:uppercase;">Modified</span>
+            <span id="doc-modified-display" style="font-size:11px;color:var(--text-3);padding:4px 2px;min-width:72px;">—</span>
+          </div>
           <div style="position:relative;display:inline-block;">
             <span style="font-size:9px;color:var(--text-3);letter-spacing:.05em;text-transform:uppercase;display:block;margin-bottom:1px;">Author</span>
             <input class="meta-input" id="doc-author" placeholder="建立者" style="width:110px;"
@@ -1301,6 +1309,9 @@ async function initPortalSession() {
   if (_dateEl && !_dateEl.value) {
     _dateEl.value = new Date().toISOString().split('T')[0];
   }
+
+  // 從 DB 載入分類
+  loadCategoriesFromDB().catch(()=>{});
 
   // Setting nav：只對 admin/dcc 顯示
   const _navSetting = document.getElementById('nav-setting');
@@ -3212,19 +3223,109 @@ async function deleteProductLine(id, name) {
   } catch(e) { toast('刪除失敗：' + e.message, 'error'); }
 }
 
-// ── 分類管理（CAT_META 為前端定義，這裡顯示說明）──
+// ── Categories 管理（從 DB 讀寫）──
 async function loadSettingCategories(wrap) {
+  wrap.innerHTML = '<div style="color:var(--text-3);font-size:13px;">載入中…</div>';
+  let rows = [];
+  try {
+    rows = await sbFetch('/rest/v1/kms_categories?select=id,cat_key,name,name_en,icon,color,sort_order&active=eq.true&order=sort_order.asc') || [];
+  } catch(e) {}
+
   wrap.innerHTML = `
-    <div style="font-size:13px;color:var(--text-3);margin-bottom:12px;">
-      目前 KMS 有 ${Object.keys(CAT_META).length} 個分類。如需新增或修改分類，請聯繫系統管理員更新程式碼。
+    <div style="display:flex;gap:8px;margin-bottom:12px;align-items:center;">
+      <input id="cat-new-key" placeholder="key（英文）" style="width:100px;padding:6px 8px;border:1px solid var(--border);border-radius:var(--radius);font-size:12px;background:var(--bg);color:var(--text-1);" />
+      <input id="cat-new-name" placeholder="英文名稱" style="width:110px;padding:6px 8px;border:1px solid var(--border);border-radius:var(--radius);font-size:12px;background:var(--bg);color:var(--text-1);" />
+      <input id="cat-new-icon" placeholder="icon" style="width:50px;padding:6px 8px;border:1px solid var(--border);border-radius:var(--radius);font-size:12px;background:var(--bg);color:var(--text-1);" />
+      <input id="cat-new-color" type="color" value="#6B7280" style="width:36px;height:30px;border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;padding:2px;" />
+      <button onclick="addCategory()" style="padding:6px 12px;border-radius:var(--radius);border:1px solid var(--blue);background:var(--blue);color:#fff;font-size:12px;cursor:pointer;">新增</button>
     </div>
-    ${Object.entries(CAT_META).map(([key, meta]) => `
-      <div class="doc-item" style="margin-bottom:4px;">
-        <span style="font-size:18px;">${meta.icon}</span>
-        <span style="flex:1;font-size:13px;font-weight:500;">${meta.name}</span>
-        <span style="font-size:11px;color:var(--text-3);font-family:monospace;">${key}</span>
-        <span style="width:16px;height:16px;border-radius:50%;background:${meta.color};display:inline-block;"></span>
+    ${rows.map(r => `
+      <div class="doc-item" style="margin-bottom:4px;" id="cat-row-${r.id}">
+        <span style="font-size:16px;width:24px;text-align:center;">${r.icon||'📁'}</span>
+        <input value="${r.name_en||r.name}"
+          style="flex:1;font-size:13px;border:none;background:transparent;color:var(--text-1);padding:2px 4px;border-radius:4px;"
+          onfocus="this.style.background='var(--bg)';this.style.border='1px solid var(--border)'"
+          onblur="this.style.background='transparent';this.style.border='none';updateCategoryName('${r.id}','${r.cat_key}',this.value)" />
+        <span style="font-size:11px;color:var(--text-3);font-family:monospace;flex-shrink:0;">${r.cat_key}</span>
+        <span style="width:14px;height:14px;border-radius:50%;background:${r.color||'#6B7280'};display:inline-block;flex-shrink:0;"></span>
+        <button onclick="deleteCategory('${r.id}','${r.cat_key}')"
+          style="padding:2px 8px;border-radius:5px;border:1px solid #F5C6C6;background:#FEF2F2;color:#A32D2D;font-size:11px;cursor:pointer;">刪除</button>
       </div>`).join('')}`;
+}
+
+async function addCategory() {
+  const catKey   = document.getElementById('cat-new-key')?.value.trim().replace(/\s/g,'_').toLowerCase();
+  const nameEn   = document.getElementById('cat-new-name')?.value.trim();
+  const icon     = document.getElementById('cat-new-icon')?.value.trim() || '📁';
+  const color    = document.getElementById('cat-new-color')?.value || '#6B7280';
+  if (!catKey || !nameEn) { toast('請填寫 key 和名稱', 'error'); return; }
+  try {
+    await kmsWrite('insert', 'kms_categories', { cat_key: catKey, name: nameEn, name_en: nameEn, icon, color, sort_order: 99, active: true });
+    toast('✅ 已新增分類：' + nameEn, 'success');
+    await loadCategoriesFromDB();
+    loadSettingContent();
+  } catch(e) { toast('新增失敗：' + e.message, 'error'); }
+}
+
+async function updateCategoryName(id, catKey, newName) {
+  if (!newName) return;
+  try {
+    await kmsWrite('update', 'kms_categories', { name: newName, name_en: newName }, id);
+    if (CAT_META[catKey]) CAT_META[catKey].name = newName;
+    const opt = document.querySelector(`#doc-cat option[value="${catKey}"]`);
+    if (opt) opt.textContent = newName;
+    const fopt = document.querySelector(`#docs-filter-cat option[value="${catKey}"]`);
+    if (fopt) fopt.textContent = newName;
+    toast('已更新：' + newName, 'success');
+  } catch(e) { toast('更新失敗：' + e.message, 'error'); }
+}
+
+async function deleteCategory(id, catKey) {
+  if (!confirm(`確定刪除分類「${catKey}」？已使用此分類的文件不受影響。`)) return;
+  try {
+    await kmsWrite('delete', 'kms_categories', null, id);
+    delete CAT_META[catKey];
+    await loadCategoriesFromDB();
+    loadSettingContent();
+    toast('已刪除分類', '');
+  } catch(e) { toast('刪除失敗：' + e.message, 'error'); }
+}
+
+
+// ─── 從 Supabase 載入分類（覆蓋前端 CAT_META）───
+async function loadCategoriesFromDB() {
+  if (!CFG.supabaseUrl || !CFG.supabaseKey) return;
+  try {
+    const rows = await sbFetch('/rest/v1/kms_categories?select=cat_key,name,name_en,name_vi,icon,color,sort_order&active=eq.true&order=sort_order.asc') || [];
+    if (!rows.length) return;
+    // 覆蓋 CAT_META
+    const newMeta = {};
+    rows.forEach(r => {
+      if (!r.cat_key) return;
+      newMeta[r.cat_key] = {
+        name:  r.name_en || r.name || r.cat_key,
+        nameZh: r.name   || r.name_en || r.cat_key,
+        nameVi: r.name_vi || r.name_en || r.cat_key,
+        icon:  r.icon  || '📁',
+        color: r.color || '#6B7280',
+      };
+    });
+    Object.assign(CAT_META, newMeta);
+    // 同步更新 doc-cat 和 filter select
+    ['doc-cat', 'docs-filter-cat'].forEach(selId => {
+      const sel = document.getElementById(selId);
+      if (!sel) return;
+      // 保留第一個 option（全部），其餘重建
+      while (sel.options.length > (selId === 'docs-filter-cat' ? 1 : 0)) sel.remove(selId === 'docs-filter-cat' ? 1 : 0);
+      rows.forEach(r => {
+        if (!r.cat_key) return;
+        const opt = document.createElement('option');
+        opt.value = r.cat_key;
+        opt.textContent = r.name_en || r.name || r.cat_key;
+        sel.appendChild(opt);
+      });
+    });
+  } catch(e) { console.warn('[categories]', e.message); }
 }
 
 async function checkAndArchiveExpired(docs) {
@@ -3416,7 +3517,13 @@ function clearEditorFields() {
   document.getElementById('doc-cat').value = 'product';
   document.getElementById('doc-lang').value = currentLang || 'zh-TW';
   document.getElementById('doc-status').value = 'published';
-  document.getElementById('doc-valid-until').value = today;   // 問題3：有效期限預設今天
+  document.getElementById('doc-valid-until').value = today;
+  // Created/Modified 重置為今天（新建模式）
+  const _todayFmt = new Date().toLocaleDateString('zh-TW', {year:'2-digit',month:'2-digit',day:'2-digit'});
+  const _ce = document.getElementById('doc-created-display');
+  const _me = document.getElementById('doc-modified-display');
+  if (_ce) _ce.textContent = _todayFmt;
+  if (_me) _me.textContent = _todayFmt;
   document.getElementById('doc-related').value = '';
   const srcEl = document.getElementById('doc-source-url');
   if (srcEl) srcEl.value = '';
@@ -3529,6 +3636,12 @@ async function openDoc(id) {
   }
   document.getElementById('doc-reviewer').value = doc.reviewer || '';
   document.getElementById('doc-valid-until').value = doc.valid_until || new Date().toISOString().split('T')[0];
+  // Created / Modified 顯示（唯讀）
+  const _fmt = d => d ? new Date(d).toLocaleDateString('zh-TW', {year:'2-digit',month:'2-digit',day:'2-digit'}) : '—';
+  const _creEl = document.getElementById('doc-created-display');
+  const _modEl = document.getElementById('doc-modified-display');
+  if (_creEl) _creEl.textContent = _fmt(doc.created_at);
+  if (_modEl) _modEl.textContent = _fmt(doc.updated_at);
   document.getElementById('doc-related').value = doc.related || '';
   const _srcUrlEl = document.getElementById('doc-source-url');
   if (_srcUrlEl) _srcUrlEl.value = doc.source_url || '';

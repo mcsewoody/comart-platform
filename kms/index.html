@@ -389,7 +389,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.77</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.78</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
@@ -577,21 +577,23 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
             <option value="vi">Tiếng Việt</option>
             <option value="ja">日本語</option>
           </select>
+
           <select class="meta-select" id="doc-status">
             <option value="draft">Draft 草稿</option>
             <option value="published">Publish 發佈</option>
             <option value="withdrawn" style="display:none;">Withdraw 撤回</option>
             <option value="archived" style="display:none;">Archive 封存</option>
           </select>
-          <button class="save-btn" onclick="saveDoc()" data-i18n="btn.save">儲存</button>
+          <button class="save-btn" onclick="saveDoc()" data-i18n="editor.save">儲存並向量化</button>
           <button id="reparse-btn" onclick="reparseCurrentDoc()"
             style="display:none;padding:6px 14px;border-radius:var(--radius);border:1px solid var(--blue);background:transparent;cursor:pointer;font-size:13px;color:var(--blue);white-space:nowrap;">
             🔄 重新解析
           </button>
-          <button onclick="cancelEdit()" data-i18n="btn.cancel"
+          <button onclick="cancelEdit()"
             style="padding:6px 14px;border-radius:var(--radius);border:1px solid var(--border);background:transparent;cursor:pointer;font-size:13px;color:var(--text-2);white-space:nowrap;">
             取消
           </button>
+        </div>
         <!-- AI 分類建議指示器 -->
         <div style="padding:4px 12px;font-size:11px;min-height:18px;background:var(--bg);flex-shrink:0;">
           <span id="ai-cat-indicator" style="color:var(--blue);"></span>
@@ -1080,7 +1082,7 @@ const I18N = {
     'label.created':'Created', 'label.modified':'Modified', 'label.valid_until':'Valid Until',
     'label.author':'Author', 'label.reviewer':'Reviewer', 'label.product_line':'Product Line',
     'label.category':'Category', 'label.stars':'Stars', 'status.indefinitely':'Indefinitely',
-    'btn.save':'儲存', 'btn.cancel':'取消', 'msg.no_content':'尚無內容', 'msg.loading':'載入中…',
+    'btn.save':'Save', 'btn.cancel':'Cancel',
     'rag.title':'AI 問答 — 從知識庫取答案',
     'rag.placeholder':'問任何問題，例如：Qi2 充電器良率異常如何處理？',
     'rag.btn':'送出問題', 'rag.empty':'輸入問題，AI 會從知識庫召回相關段落並彙整回答',
@@ -2052,7 +2054,7 @@ async function saveDoc() {
       window._openDocFromReview = false;
       window._reviewFilter = _retFilter;
       switchPanel('review');
-      setTimeout(() => { filterReviewPanel(_retFilter); }, 100);
+      setTimeout(() => filterReviewPanel(_retFilter), 100);
     } else { switchPanel('docs'); }
 
   } catch(e) {
@@ -2439,7 +2441,7 @@ function skipAllBatch() {
     window._openDocFromReview = false;
     window._reviewFilter = _retFilter;
     switchPanel('review');
-    setTimeout(() => { filterReviewPanel(_retFilter); }, 100);
+    setTimeout(() => filterReviewPanel(_retFilter), 100);
   } else {
     switchPanel('docs');
   }

@@ -389,7 +389,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.72</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.73</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
@@ -591,11 +591,18 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
             <option value="vi">Tiếng Việt</option>
             <option value="ja">日本語</option>
           </select>
-          <select class="meta-select" id="doc-stars" style="width:90px;" title="重要性">
-            <option value="1">★ General</option>
-            <option value="2">★★ Important</option>
-            <option value="3">★★★ Must Read</option>
-          </select>
+          <div style="display:flex;flex-direction:column;gap:2px;">
+            <span style="font-size:9px;color:var(--text-3);letter-spacing:.05em;text-transform:uppercase;">Stars</span>
+            <div style="display:flex;gap:2px;align-items:center;" id="stars-widget">
+              <span class="star-btn" data-val="1" onclick="setDocStars(1)"
+                style="font-size:20px;cursor:pointer;color:#F59E0B;line-height:1;" title="General">★</span>
+              <span class="star-btn" data-val="2" onclick="setDocStars(2)"
+                style="font-size:20px;cursor:pointer;color:#D1D5DB;line-height:1;" title="Important">★</span>
+              <span class="star-btn" data-val="3" onclick="setDocStars(3)"
+                style="font-size:20px;cursor:pointer;color:#D1D5DB;line-height:1;" title="Must Read">★</span>
+            </div>
+            <input type="hidden" id="doc-stars" value="1" />
+          </div>
           <select class="meta-select" id="doc-status">
             <option value="draft">Draft 草稿</option>
             <option value="published">Publish 發佈</option>
@@ -639,9 +646,8 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
           </div>
           <div style="position:relative;display:inline-block;">
             <span style="font-size:9px;color:var(--text-3);letter-spacing:.05em;text-transform:uppercase;display:block;margin-bottom:1px;" data-i18n="label.author">Author</span>
-            <input class="meta-input" id="doc-author" placeholder="建立者" style="width:110px;"
-              autocomplete="off" name="kms-author-nofill"
-              oninput="filterAuthorList(this.value)" onfocus="showAuthorList()" onblur="setTimeout(()=>hideAuthorList(),200)" />
+            <input class="meta-input" id="doc-author" placeholder="建立者" style="width:110px;background:var(--bg);color:var(--text-3);"
+              autocomplete="off" name="kms-author-nofill" readonly title="建立者為登入使用者，不可修改" />
             <div id="author-dropdown" style="display:none;position:absolute;top:100%;left:0;z-index:999;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:0 4px 12px rgba(0,0,0,.12);min-width:200px;max-height:160px;overflow-y:auto;font-size:12px;"></div>
           </div>
           <div style="position:relative;display:inline-block;">
@@ -1894,8 +1900,14 @@ async function saveDoc() {
       let finalFileType = uploadedFileUrl === '__REMOVE__' ? null : (fileType || (uploadedFile ? null : uploadedFileType));
       let finalFileSize = uploadedFileUrl === '__REMOVE__' ? null : (fileSize || (uploadedFile ? null : uploadedFileSize));
 
+      // 封存文件設為 Indefinitely → 自動重新發佈
+      const isIndefly = document.getElementById('doc-indefinitely')?.checked;
+      const validUntil = document.getElementById('doc-valid-until').value;
+      const origStatus = window._editSnapshot?.status || '';
+      const finalStatus = (origStatus === 'archived' && (isIndefly || !validUntil)) ? 'published' : status;
+
       const docPayload = {
-        title, body, category, lang, status,
+        title, body, category, lang, status: finalStatus,
         stars: parseInt(document.getElementById('doc-stars')?.value || '1'),
         author_name: buildAuthorName(),
         reviewer: document.getElementById('doc-reviewer').value.trim() || null,
@@ -1980,8 +1992,6 @@ async function saveDoc() {
     // 非同步產生 AI 摘要
     const _summaryDocId = (typeof doc_id !== 'undefined' && doc_id) ? doc_id : editingDocId;
     if (_summaryDocId && body && body.length > 50) {
-      // 統一走 generateAndSaveSummary（五語言），_pendingSummary 已廢棄
-      window._pendingSummary = null;
       generateAndSaveSummary(_summaryDocId, title, body).catch(()=>{});
     }
     const _reviewer = document.getElementById('doc-reviewer')?.value.trim();
@@ -1997,6 +2007,7 @@ async function saveDoc() {
     document.getElementById('doc-lang').value = currentLang;
     document.getElementById('doc-status').value = 'published';
   document.getElementById('doc-stars').value = '1';
+  renderStarsWidget(1);
     document.getElementById('doc-author').value = '';
     resetDocAuthor();
     document.getElementById('doc-reviewer').value = '';
@@ -2468,21 +2479,7 @@ async function fetchUrlContent() {
     toast('✅ 內容已擷取完成', 'success');
     // 擷取後立即觸發摘要（非同步）
     const _fetchedTitle = document.getElementById('doc-title')?.value || url;
-    if (organized && organized.length > 50) {
-      setTimeout(async () => {
-        try {
-          const summary = await callClaudeProxy(
-            '你是知識管理系統的摘要助手。請用 2-3 句話（繁體中文）摘要以下文件的核心重點，每句不超過 30 字，直接輸出摘要，不要加任何前言或說明。',
-            `文件標題：${_fetchedTitle}\n\n${organized.slice(0, 6000)}`, 300
-          );
-          if (summary && summary.length >= 10) {
-            // 暫存到 window，儲存時一起寫入
-            window._pendingSummary = { summary };
-            toast('📝 摘要已預備，儲存時自動寫入', '');
-          }
-        } catch(e) {}
-      }, 500);
-    }
+    // 摘要由 saveDoc 儲存後自動觸發 generateAndSaveSummary
   } catch(e) {
     toast('擷取失敗：' + e.message, 'error');
   } finally {
@@ -3520,6 +3517,20 @@ async function loadDocs() {
 
   // 到期自動封存（背景執行）
   checkAndArchiveExpired(docs).catch(()=>{});
+  // 非同步載入留言數
+  if (CFG.supabaseUrl && CFG.supabaseKey && docs.length) {
+    const ids = docs.map(d => d.id).join(',');
+    sbFetch(`/rest/v1/kms_comments?select=doc_id&doc_id=in.(${ids})`)
+      .then(rows => {
+        if (!rows) return;
+        const cnt = {};
+        rows.forEach(r => { cnt[r.doc_id] = (cnt[r.doc_id]||0) + 1; });
+        docs.forEach(d => {
+          const el = document.getElementById('cc-' + d.id);
+          if (el) el.textContent = cnt[d.id] || 0;
+        });
+      }).catch(()=>{});
+  }
 
   list.innerHTML = filtered.map(d => {
     const plBadge = d.product_line
@@ -3542,6 +3553,10 @@ async function loadDocs() {
       ${d.stars >= 3 ? '<span style="color:#F59E0B;font-size:11px;flex-shrink:0;" title="Must Read">★★★</span>' : d.stars === 2 ? '<span style="color:#F59E0B;font-size:11px;flex-shrink:0;" title="Important">★★</span>' : ''}
         <span class="doc-title" onclick="openReader('${d.id}')" style="cursor:pointer;flex:1;min-width:120px;">${d.title}</span>
         <span style="font-size:11px;color:var(--text-3);">${d.lang || ''}</span>
+        <span style="font-size:11px;color:var(--text-3);display:flex;gap:6px;align-items:center;">
+          <span title="觀看次數">👁 ${d.view_count||0}</span>
+          <span title="留言數">💬 <span id="cc-${d.id}">…</span></span>
+        </span>
 
         <button onclick="openReviewPanel('${d.id}','${safeTitle}')"
           style="padding:3px 7px;border-radius:5px;border:1px solid var(--border);background:var(--bg);font-size:11px;cursor:pointer;flex-shrink:0;" title="審核">📋</button>
@@ -3621,6 +3636,19 @@ function hasUnsavedChanges() {
 
 
 // ─── 清空編輯器所有欄位（新建模式）───
+
+function setDocStars(val) {
+  document.getElementById('doc-stars').value = val;
+  renderStarsWidget(val);
+}
+function renderStarsWidget(val) {
+  const v = parseInt(val) || 1;
+  document.querySelectorAll('#stars-widget .star-btn').forEach(btn => {
+    const bv = parseInt(btn.dataset.val);
+    btn.style.color = bv <= v ? '#F59E0B' : '#D1D5DB';
+  });
+}
+
 function clearEditorFields() {
   editingDocId = null;
   window._editSnapshot = null;
@@ -3747,6 +3775,7 @@ async function openDoc(id) {
   document.getElementById('doc-lang').value = doc.lang || 'zh-TW';
   document.getElementById('doc-status').value = doc.status || 'draft';
   document.getElementById('doc-stars').value = String(doc.stars || 1);
+  renderStarsWidget(doc.stars || 1);
   // doc-author 填入文件原作者（或目前登入者）
   const _docAuthorEl = document.getElementById('doc-author');
   if (_docAuthorEl) {

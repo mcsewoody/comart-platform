@@ -389,7 +389,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.78</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.79</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
@@ -4450,7 +4450,7 @@ async function loadReaderComments() {
   if (!docId || !list) return;
   list.innerHTML = '<div style="color:var(--text-3);font-size:12px;">載入中…</div>';
   try {
-    const rows = await sbFetch(`/rest/v1/kms_comments?doc_id=eq.${docId}&select=id,content,author_name,created_at&order=created_at.asc`) || [];
+    const rows = await sbFetch(`/rest/v1/kms_comments?doc_id=eq.${docId}&select=id,body,author,created_at&order=created_at.asc`) || [];
     if (!rows.length) {
       list.innerHTML = '<div style="color:var(--text-3);font-size:12px;text-align:center;padding:12px 0;">尚無留言</div>';
       return;
@@ -4459,10 +4459,10 @@ async function loadReaderComments() {
       const dt = new Date(c.created_at).toLocaleString('zh-TW',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
       return `<div style="margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border);">
         <div style="display:flex;gap:6px;align-items:baseline;margin-bottom:3px;">
-          <span style="font-size:12px;font-weight:500;color:var(--text);">${c.author_name||'匿名'}</span>
+          <span style="font-size:12px;font-weight:500;color:var(--text);">${c.author||'匿名'}</span>
           <span style="font-size:10px;color:var(--text-3);">${dt}</span>
         </div>
-        <div style="font-size:13px;color:var(--text);line-height:1.5;">${c.content||''}</div>
+        <div style="font-size:13px;color:var(--text);line-height:1.5;">${c.body||''}</div>
       </div>`;
     }).join('');
   } catch(e) { list.innerHTML = '<div style="color:var(--text-3);font-size:12px;">載入失敗</div>'; }
@@ -4476,8 +4476,7 @@ async function submitReaderComment() {
   const author = portalUser ? (portalUser.nameZh || portalUser.nameEn || '') : 'Anonymous';
   try {
     await kmsWrite('insert', 'kms_comments', {
-      doc_id: docId, content: text, author_name: author,
-      author_id: portalUser?.empId || null,
+      doc_id: docId, body: text, author: author,
     });
     input.value = '';
     await loadReaderComments();
@@ -4853,7 +4852,7 @@ async function loadDiscussModalComments() {
   if (!list || !_discussDocId) return;
   list.innerHTML = '<div style="color:var(--text-3);font-size:12px;text-align:center;padding:12px;">載入中…</div>';
   try {
-    const rows = await sbFetch(`/rest/v1/kms_comments?doc_id=eq.${_discussDocId}&select=id,content,author_name,created_at&order=created_at.asc`) || [];
+    const rows = await sbFetch(`/rest/v1/kms_comments?doc_id=eq.${_discussDocId}&select=id,body,author,created_at&order=created_at.asc`) || [];
     if (!rows.length) {
       list.innerHTML = '<div style="color:var(--text-3);font-size:12px;text-align:center;padding:20px;">尚無留言，成為第一個留言的人</div>';
       return;
@@ -4862,10 +4861,10 @@ async function loadDiscussModalComments() {
       const dt = new Date(c.created_at).toLocaleString('zh-TW',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
       return `<div style="margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border);">
         <div style="display:flex;gap:8px;align-items:baseline;margin-bottom:4px;">
-          <span style="font-size:12px;font-weight:500;">${c.author_name||'匿名'}</span>
+          <span style="font-size:12px;font-weight:500;">${c.author||'匿名'}</span>
           <span style="font-size:10px;color:var(--text-3);">${dt}</span>
         </div>
-        <div style="font-size:13px;line-height:1.6;">${c.content||''}</div>
+        <div style="font-size:13px;line-height:1.6;">${c.body||''}</div>
       </div>`;
     }).join('');
   } catch(e) {
@@ -4881,8 +4880,8 @@ async function submitDiscussModal() {
   const author = portalUser ? (portalUser.nameZh || portalUser.nameEn || '') : 'Anonymous';
   try {
     await kmsWrite('insert', 'kms_comments', {
-      doc_id: _discussDocId, content: text,
-      author_name: author, author_id: portalUser?.empId || null,
+      doc_id: _discussDocId, body: text,
+      author: author,
     });
     input.value = '';
     // 更新留言數 badge

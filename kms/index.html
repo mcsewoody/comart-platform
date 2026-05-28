@@ -389,7 +389,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.73</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.74</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
@@ -972,6 +972,26 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
 
 <!-- Toast -->
 <div class="toast" id="toast"></div>
+
+<!-- Discussion Modal -->
+<div id="discuss-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;align-items:center;justify-content:center;"
+  onclick="if(event.target===this)closeDiscussModal()">
+  <div style="background:var(--surface);border-radius:var(--radius-lg);width:min(520px,95vw);max-height:80vh;display:flex;flex-direction:column;box-shadow:0 8px 32px rgba(0,0,0,.2);">
+    <div style="padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
+      <div style="font-size:14px;font-weight:500;">💬 Discussion</div>
+      <div id="discuss-modal-title" style="font-size:12px;color:var(--text-3);flex:1;margin:0 12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></div>
+      <button onclick="closeDiscussModal()" style="background:none;border:none;cursor:pointer;font-size:18px;color:var(--text-3);">✕</button>
+    </div>
+    <div id="discuss-modal-list" style="flex:1;overflow-y:auto;padding:14px 20px;min-height:100px;"></div>
+    <div style="padding:12px 20px;border-top:1px solid var(--border);display:flex;gap:8px;flex-shrink:0;">
+      <textarea id="discuss-modal-input" placeholder="輸入留言…" rows="2"
+        style="flex:1;padding:8px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;background:var(--bg);color:var(--text-1);resize:none;font-family:var(--font);"
+        onkeydown="if(event.isComposing)return;if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();submitDiscussModal();}"></textarea>
+      <button onclick="submitDiscussModal()"
+        style="padding:8px 14px;border-radius:var(--radius);border:none;background:var(--blue);color:#fff;font-size:13px;cursor:pointer;align-self:flex-end;">送出</button>
+    </div>
+  </div>
+</div>
 
 <!-- Mobile Bottom Navigation -->
 <nav class="mobile-bottom-nav" id="mobile-bottom-nav">
@@ -1873,6 +1893,7 @@ async function saveDoc() {
   const btn = document.querySelector('.save-btn');
   btn.disabled = true;
 
+  let _savedDocId = null; // 儲存後的文件 ID（解決 scope 問題）
   try {
     const mode = CFG.embedModel;
     const useSupabase = CFG.supabaseUrl && CFG.supabaseKey;
@@ -1924,15 +1945,14 @@ async function saveDoc() {
       let doc_id;
 
       if (editingDocId) {
-        // ── 更新既有文件 ──
         await kmsWrite('update', 'kms_documents', docPayload, editingDocId);
         doc_id = editingDocId;
       } else {
-        // ── 新增文件（走 kms-write Edge Function，service_role 繞過 RLS）──
         const saved = await kmsWrite('insert', 'kms_documents', docPayload);
         doc_id = saved?.id || saved?.[0]?.id;
         if (!doc_id) throw new Error('文件儲存後未取得 ID');
       }
+      _savedDocId = doc_id; // 同步給外層 scope
 
       // ── 步驟 2：觸發 embedding（只有新檔案或新文件才執行）──
       if (mode === 'edge-fn') {
@@ -1990,7 +2010,7 @@ async function saveDoc() {
     // ── 完成：清空編輯器、存版本快照、跳知識庫 ──
     autoSnapshot({ title, body, category, lang, status });
     // 非同步產生 AI 摘要
-    const _summaryDocId = (typeof doc_id !== 'undefined' && doc_id) ? doc_id : editingDocId;
+    const _summaryDocId = _savedDocId || editingDocId;
     if (_summaryDocId && body && body.length > 50) {
       generateAndSaveSummary(_summaryDocId, title, body).catch(()=>{});
     }
@@ -3096,24 +3116,38 @@ let _reviewerUsers = []; // 快取從 Firebase 載入的人員清單
 
 async function loadReviewerUsers() {
   if (_reviewerUsers.length) return _reviewerUsers;
+  _reviewerUsers = [];
+  // 從 Firebase 讀（主要來源）
   try {
     const db = await getFirebaseDb();
     const { collection, getDocs } = window.__fbOps;
     const snap = await getDocs(collection(db, 'users'));
-    _reviewerUsers = [];
     snap.forEach(doc => {
       const d = doc.data();
-      if (d.role !== 'inactive') {
-        _reviewerUsers.push({
-          empId: d.empId || doc.id,
-          nameEn: d.nameEn || '',
-          nameZh: d.nameZh || '',
-          title: d.titleEn || d.titleZh || '',
-          site: d.site || '',
-        });
-      }
+      // 不過濾 inactive，讓所有人都能被選為審核人
+      _reviewerUsers.push({
+        empId: d.empId || doc.id,
+        nameEn: d.nameEn || '',
+        nameZh: d.nameZh || '',
+        title: d.titleEn || d.titleZh || '',
+        site: d.site || '',
+      });
     });
-  } catch(e) { console.warn('[reviewer]', e.message); }
+  } catch(e) { console.warn('[reviewer firebase]', e.message); }
+  // 從 Supabase kms_experts 補充（避免 Firebase 資料不完整）
+  try {
+    if (CFG.supabaseUrl && CFG.supabaseKey) {
+      const experts = await sbFetch('/rest/v1/kms_experts?select=empId,nameEn,nameZh,titleEn,site&active=eq.true') || [];
+      experts.forEach(e => {
+        if (!_reviewerUsers.find(u => u.empId === e.empId)) {
+          _reviewerUsers.push({
+            empId: e.empId, nameEn: e.nameEn||'', nameZh: e.nameZh||'',
+            title: e.titleEn||'', site: e.site||'',
+          });
+        }
+      });
+    }
+  } catch(e) { console.warn('[reviewer supabase]', e.message); }
   return _reviewerUsers;
 }
 
@@ -3560,8 +3594,8 @@ async function loadDocs() {
 
         <button onclick="openReviewPanel('${d.id}','${safeTitle}')"
           style="padding:3px 7px;border-radius:5px;border:1px solid var(--border);background:var(--bg);font-size:11px;cursor:pointer;flex-shrink:0;" title="審核">📋</button>
-        <button onclick="openCommentsPanel('${d.id}','${safeTitle}')"
-          style="padding:3px 7px;border-radius:5px;border:1px solid var(--border);background:var(--bg);font-size:11px;cursor:pointer;flex-shrink:0;" title="討論">💬</button>
+        <button onclick="openDiscussModal('${d.id}','${safeTitle}')"
+          style="padding:3px 7px;border-radius:5px;border:1px solid var(--border);background:var(--bg);font-size:11px;cursor:pointer;flex-shrink:0;" title="Discussion">💬</button>
         ${showEdit ? `<button onclick="openDoc('${d.id}')"
           style="padding:3px 7px;border-radius:5px;border:1px solid var(--border);background:var(--bg);font-size:11px;cursor:pointer;flex-shrink:0;" title="編輯">✏️</button>` : ''}
         ${showDelete ? `<button onclick="deleteDoc('${d.id}','${safeTitle}','${safeAuthor}')"
@@ -4776,6 +4810,66 @@ function applyI18n() {
 // ═══════════════════════════════════════════════
 // NAVIGATION
 // ═══════════════════════════════════════════════
+
+
+// ─── Discussion 浮動視窗 ───
+let _discussDocId = null;
+
+async function openDiscussModal(docId, title) {
+  _discussDocId = docId;
+  document.getElementById('discuss-modal-title').textContent = title;
+  document.getElementById('discuss-modal-input').value = '';
+  document.getElementById('discuss-modal').style.display = 'flex';
+  await loadDiscussModalComments();
+}
+
+function closeDiscussModal() {
+  document.getElementById('discuss-modal').style.display = 'none';
+  _discussDocId = null;
+}
+
+async function loadDiscussModalComments() {
+  const list = document.getElementById('discuss-modal-list');
+  if (!list || !_discussDocId) return;
+  list.innerHTML = '<div style="color:var(--text-3);font-size:12px;text-align:center;padding:12px;">載入中…</div>';
+  try {
+    const rows = await sbFetch(`/rest/v1/kms_comments?doc_id=eq.${_discussDocId}&select=id,content,author_name,created_at&order=created_at.asc`) || [];
+    if (!rows.length) {
+      list.innerHTML = '<div style="color:var(--text-3);font-size:12px;text-align:center;padding:20px;">尚無留言，成為第一個留言的人</div>';
+      return;
+    }
+    list.innerHTML = rows.map(c => {
+      const dt = new Date(c.created_at).toLocaleString('zh-TW',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
+      return `<div style="margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border);">
+        <div style="display:flex;gap:8px;align-items:baseline;margin-bottom:4px;">
+          <span style="font-size:12px;font-weight:500;">${c.author_name||'匿名'}</span>
+          <span style="font-size:10px;color:var(--text-3);">${dt}</span>
+        </div>
+        <div style="font-size:13px;line-height:1.6;">${c.content||''}</div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    list.innerHTML = '<div style="color:var(--text-3);font-size:12px;text-align:center;padding:12px;">載入失敗</div>';
+  }
+}
+
+async function submitDiscussModal() {
+  const input = document.getElementById('discuss-modal-input');
+  const text = input?.value.trim();
+  if (!_discussDocId || !text) return;
+  const author = portalUser ? (portalUser.nameZh || portalUser.nameEn || '') : 'Anonymous';
+  try {
+    await kmsWrite('insert', 'kms_comments', {
+      doc_id: _discussDocId, content: text,
+      author_name: author, author_id: portalUser?.empId || null,
+    });
+    input.value = '';
+    // 更新留言數 badge
+    const ccEl = document.getElementById('cc-' + _discussDocId);
+    if (ccEl) ccEl.textContent = parseInt(ccEl.textContent || '0') + 1;
+    await loadDiscussModalComments();
+  } catch(e) { toast('留言失敗：' + e.message, 'error'); }
+}
 
 function toggleMobileMenu() {
   const m = document.getElementById('mobile-more-menu');

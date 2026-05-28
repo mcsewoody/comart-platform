@@ -364,7 +364,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.66</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.67</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
@@ -509,13 +509,14 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
             onclick="document.getElementById('file-input').click()"
             ondragover="handleDragOver(event)"
             ondragleave="handleDragLeave(event)"
-            ondrop="handleDrop(event)">
+            ondrop="handleDrop(event)"
+            style="padding:10px;margin-bottom:6px;">
             <input type="file" id="file-input" accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.pptx,.ppt,.jpg,.jpeg,.png,.txt,.md"
               multiple onchange="handleFileSelect(event)" />
-            <div class="upload-zone-icon">📎</div>
-            <div class="upload-zone-text">點擊或拖放檔案上傳（可多選）</div>
-            <div class="upload-zone-hint" data-i18n="upload.formats">PDF · Word · Excel · CSV · PowerPoint · 圖片（JPG/PNG）· TXT · Markdown</div>
-            <div class="upload-zone-hint" style="color:var(--text-3);margin-top:2px;" data-i18n="upload.limits">單檔上限 50 MB · 不支援格式將被拒絕</div>
+            <div style="display:flex;align-items:center;gap:8px;justify-content:center;">
+              <span class="upload-zone-icon" style="font-size:18px;margin:0;">📎</span>
+              <span class="upload-zone-text" style="font-size:12px;">點擊或拖放檔案（可多選，上限 50MB）</span>
+            </div>
           </div>
           <div class="upload-progress" id="upload-progress">
             <div class="upload-progress-bar" id="upload-progress-bar"></div>
@@ -554,8 +555,8 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
             <option value="compliance">IPR &amp; Legal</option>
             <option value="supply">Technology</option>
             <option value="ai_tech">AI</option>
-            <option value="template">📋 Template</option>
-            <option value="article">📰 Article</option>
+            <option value="template">Template</option>
+            <option value="article">Article</option>
           </select>
           <select class="meta-select" id="doc-lang">
             <option value="zh-TW">繁體中文</option>
@@ -588,17 +589,22 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         <!-- Meta row — 第二行：建立者 + 審核人 + 有效期 + 產品線 -->
         <div style="padding:6px 12px;border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:var(--bg);flex-shrink:0;">
           <div style="position:relative;display:inline-block;">
+            <span style="font-size:9px;color:var(--text-3);letter-spacing:.05em;text-transform:uppercase;display:block;margin-bottom:1px;">Author</span>
             <input class="meta-input" id="doc-author" placeholder="建立者" style="width:110px;"
               autocomplete="off" name="kms-author-nofill"
               oninput="filterAuthorList(this.value)" onfocus="showAuthorList()" onblur="setTimeout(()=>hideAuthorList(),200)" />
             <div id="author-dropdown" style="display:none;position:absolute;top:100%;left:0;z-index:999;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:0 4px 12px rgba(0,0,0,.12);min-width:200px;max-height:160px;overflow-y:auto;font-size:12px;"></div>
           </div>
           <div style="position:relative;display:inline-block;">
+            <span style="font-size:9px;color:var(--text-3);letter-spacing:.05em;text-transform:uppercase;display:block;margin-bottom:1px;">Reviewer</span>
             <input class="meta-input" id="doc-reviewer" placeholder="審核人" style="width:110px;"
               autocomplete="off" oninput="filterReviewerList(this.value)" onfocus="showReviewerList()" onblur="setTimeout(()=>hideReviewerList(),200)" />
             <div id="reviewer-dropdown" style="display:none;position:absolute;top:100%;left:0;z-index:999;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:0 4px 12px rgba(0,0,0,.12);min-width:220px;max-height:160px;overflow-y:auto;font-size:12px;"></div>
           </div>
-          <input class="meta-input" id="doc-valid-until" type="date" title="到期封存日期（到期自動封存）" placeholder="到期日" style="width:130px;" />
+          <div style="display:flex;flex-direction:column;gap:1px;">
+            <span style="font-size:9px;color:var(--text-3);letter-spacing:.05em;text-transform:uppercase;">Valid Until</span>
+            <input class="meta-input" id="doc-valid-until" type="date" title="到期後自動封存" style="width:120px;" />
+          </div>
           <span style="font-size:11px;color:var(--text-3);flex-shrink:0;">📦</span>
           <select class="meta-select" id="doc-product-line" style="flex:1;min-width:140px;">
             <option value="">— Product Line —</option>
@@ -673,8 +679,8 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
             <option value="compliance">IPR &amp; Legal</option>
             <option value="supply">Technology</option>
             <option value="ai_tech">AI</option>
-            <option value="template">📋 Template</option>
-            <option value="article">📰 Article</option>
+            <option value="template">Template</option>
+            <option value="article">Article</option>
           </select>
           <input type="text" id="docs-filter-customer" placeholder="🏢 Customer…"
             oninput="loadDocs()"
@@ -733,7 +739,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
             </button>
             <button id="setting-tab-cat" onclick="switchSettingTab('cat')"
               style="padding:6px 14px;border-radius:var(--radius);border:1px solid var(--border);background:transparent;color:var(--text-2);font-size:12px;cursor:pointer;">
-              🗂 分類管理
+              Categories
             </button>
           </div>
         </div>
@@ -1852,7 +1858,16 @@ async function saveDoc() {
     // 非同步產生 AI 摘要
     const _summaryDocId = (typeof doc_id !== 'undefined' && doc_id) ? doc_id : editingDocId;
     if (_summaryDocId && body && body.length > 50) {
-      generateAndSaveSummary(_summaryDocId, title, body).catch(()=>{});
+      if (window._pendingSummary) {
+        // URL 擷取已預備摘要，直接寫入
+        const pending = window._pendingSummary;
+        window._pendingSummary = null;
+        kmsWrite('update', 'kms_documents', pending, _summaryDocId)
+          .then(() => generateAndSaveSummary(_summaryDocId, title, body))
+          .catch(()=>{});
+      } else {
+        generateAndSaveSummary(_summaryDocId, title, body).catch(()=>{});
+      }
     }
     const _reviewer = document.getElementById('doc-reviewer')?.value.trim();
     if (_summaryDocId && _reviewer) {
@@ -2334,7 +2349,24 @@ async function fetchUrlContent() {
     const srcEl = document.getElementById('doc-source-url');
     if (srcEl) srcEl.value = url;
     input.value = '';
-    toast('✅ 內容已擷取並整理完成，儲存後將自動產生摘要', 'success');
+    toast('✅ 內容已擷取完成', 'success');
+    // 擷取後立即觸發摘要（非同步）
+    const _fetchedTitle = document.getElementById('doc-title')?.value || url;
+    if (organized && organized.length > 50) {
+      setTimeout(async () => {
+        try {
+          const summary = await callClaudeProxy(
+            '你是知識管理系統的摘要助手。請用 2-3 句話（繁體中文）摘要以下文件的核心重點，每句不超過 30 字，直接輸出摘要，不要加任何前言或說明。',
+            `文件標題：${_fetchedTitle}\n\n${organized.slice(0, 6000)}`, 300
+          );
+          if (summary && summary.length >= 10) {
+            // 暫存到 window，儲存時一起寫入
+            window._pendingSummary = { summary };
+            toast('📝 摘要已預備，儲存時自動寫入', '');
+          }
+        } catch(e) {}
+      }, 500);
+    }
   } catch(e) {
     toast('擷取失敗：' + e.message, 'error');
   } finally {

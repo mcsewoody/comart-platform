@@ -389,7 +389,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.74</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.75</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
@@ -569,21 +569,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         <div class="editor-meta">
           <input class="meta-input" id="doc-title" placeholder="文件標題" style="flex:2;min-width:160px;"
             oninput="scheduleAutoClassify()" />
-          <select class="meta-select" id="doc-cat" onchange="
-            const ind=document.getElementById('ai-cat-indicator');
-            if(ind) ind.textContent='';
-          ">
-            <option value="product">Product</option>
-            <option value="sales">Customer</option>
-            <option value="industry">Industry</option>
-            <option value="hr">Training</option>
-            <option value="tacit">Sharing</option>
-            <option value="compliance">IPR &amp; Legal</option>
-            <option value="supply">Technology</option>
-            <option value="ai_tech">AI</option>
-            <option value="template">Template</option>
-            <option value="article">Article</option>
-          </select>
+
           <select class="meta-select" id="doc-lang">
             <option value="zh-TW">繁體中文</option>
             <option value="zh-CN">简体中文</option>
@@ -591,18 +577,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
             <option value="vi">Tiếng Việt</option>
             <option value="ja">日本語</option>
           </select>
-          <div style="display:flex;flex-direction:column;gap:2px;">
-            <span style="font-size:9px;color:var(--text-3);letter-spacing:.05em;text-transform:uppercase;">Stars</span>
-            <div style="display:flex;gap:2px;align-items:center;" id="stars-widget">
-              <span class="star-btn" data-val="1" onclick="setDocStars(1)"
-                style="font-size:20px;cursor:pointer;color:#F59E0B;line-height:1;" title="General">★</span>
-              <span class="star-btn" data-val="2" onclick="setDocStars(2)"
-                style="font-size:20px;cursor:pointer;color:#D1D5DB;line-height:1;" title="Important">★</span>
-              <span class="star-btn" data-val="3" onclick="setDocStars(3)"
-                style="font-size:20px;cursor:pointer;color:#D1D5DB;line-height:1;" title="Must Read">★</span>
-            </div>
-            <input type="hidden" id="doc-stars" value="1" />
-          </div>
+
           <select class="meta-select" id="doc-status">
             <option value="draft">Draft 草稿</option>
             <option value="published">Publish 發佈</option>
@@ -626,6 +601,18 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
 
         <!-- Meta row — 第二行：建立者 + 審核人 + 有效期 + 產品線 -->
         <div style="padding:6px 12px;border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:var(--bg);flex-shrink:0;">
+          <div style="display:flex;flex-direction:column;gap:2px;">
+            <span style="font-size:9px;color:var(--text-3);letter-spacing:.05em;text-transform:uppercase;">Stars</span>
+            <div style="display:flex;gap:2px;align-items:center;" id="stars-widget">
+              <span class="star-btn" data-val="1" onclick="setDocStars(1)"
+                style="font-size:20px;cursor:pointer;color:#F59E0B;line-height:1;" title="General">★</span>
+              <span class="star-btn" data-val="2" onclick="setDocStars(2)"
+                style="font-size:20px;cursor:pointer;color:#D1D5DB;line-height:1;" title="Important">★</span>
+              <span class="star-btn" data-val="3" onclick="setDocStars(3)"
+                style="font-size:20px;cursor:pointer;color:#D1D5DB;line-height:1;" title="Must Read">★</span>
+            </div>
+            <input type="hidden" id="doc-stars" value="1" />
+          </div>
           <div style="display:flex;flex-direction:column;gap:1px;">
             <span style="font-size:9px;color:var(--text-3);letter-spacing:.05em;text-transform:uppercase;" data-i18n="label.created">Created</span>
             <span id="doc-created-display" style="font-size:11px;color:var(--text-3);padding:4px 2px;min-width:72px;">—</span>
@@ -657,6 +644,21 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
             <div id="reviewer-dropdown" style="display:none;position:absolute;top:100%;left:0;z-index:999;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:0 4px 12px rgba(0,0,0,.12);min-width:220px;max-height:160px;overflow-y:auto;font-size:12px;"></div>
           </div>
 
+          <div style="display:flex;flex-direction:column;gap:1px;">
+            <span style="font-size:9px;color:var(--text-3);letter-spacing:.05em;text-transform:uppercase;" data-i18n="label.category">Category</span>
+            <select class="meta-select" id="doc-cat" onchange="const ind=document.getElementById('ai-cat-indicator');if(ind)ind.textContent='';">
+              <option value="product">Product</option>
+              <option value="sales">Customer</option>
+              <option value="industry">Industry</option>
+              <option value="hr">Training</option>
+              <option value="tacit">Sharing</option>
+              <option value="compliance">IPR &amp; Legal</option>
+              <option value="supply">Technology</option>
+              <option value="ai_tech">AI</option>
+              <option value="template">Template</option>
+              <option value="article">Article</option>
+            </select>
+          </div>
           <div style="display:flex;flex-direction:column;gap:1px;">
             <span style="font-size:9px;color:var(--text-3);letter-spacing:.05em;text-transform:uppercase;">Product Line</span>
             <select class="meta-select" id="doc-product-line" style="flex:1;min-width:140px;">
@@ -2045,7 +2047,7 @@ async function saveDoc() {
     }
 
     await loadDocs();
-    switchPanel('docs');
+    if (window._openDocFromReview) { window._openDocFromReview=false; switchPanel('review'); setTimeout(loadReviewPanel,100); } else { switchPanel('docs'); }
 
   } catch(e) {
     toast('儲存失敗：' + e.message, 'error');
@@ -2426,7 +2428,13 @@ function skipAllBatch() {
   _batchIdx = 0;
   document.getElementById('batch-progress-bar')?.remove();
   toast('已取消批次上傳', '');
-  switchPanel('docs');
+  if (window._openDocFromReview) {
+    window._openDocFromReview = false;
+    switchPanel('review');
+    setTimeout(loadReviewPanel, 100);
+  } else {
+    switchPanel('docs');
+  }
 }
 
 // 舊的批次上傳迴圈（已由 processBatchNext 取代，保留殼）
@@ -2446,7 +2454,7 @@ async function fetchUrlContent() {
   if (!url) { toast('請輸入網址', ''); return; }
   if (!url.startsWith('http')) { toast('請輸入完整網址（含 https://）', 'error'); return; }
 
-  toast('⏳ 擷取中，請稍候…', '');
+  toast('⏳ 擷取中，請稍候…', '', true);
   input.disabled = true;
 
   try {
@@ -2459,7 +2467,7 @@ async function fetchUrlContent() {
     const raw = await res.text();
     if (!raw || raw.length < 100) throw new Error('擷取到的內容太少，可能是需要登入的頁面');
 
-    toast('⏳ AI 整理內容中…', '');
+    toast('⏳ AI 整理內容中…', '', true);
 
     // 送給 Claude 整理成知識條目格式
     const organized = await callClaudeProxy(
@@ -2496,11 +2504,13 @@ async function fetchUrlContent() {
     const srcEl = document.getElementById('doc-source-url');
     if (srcEl) srcEl.value = url;
     input.value = '';
+    toastClear();
     toast('✅ 內容已擷取完成', 'success');
     // 擷取後立即觸發摘要（非同步）
     const _fetchedTitle = document.getElementById('doc-title')?.value || url;
     // 摘要由 saveDoc 儲存後自動觸發 generateAndSaveSummary
   } catch(e) {
+    toastClear();
     toast('擷取失敗：' + e.message, 'error');
   } finally {
     input.disabled = false;
@@ -4984,11 +4994,18 @@ function copyConfigAsEnv() {
 // ═══════════════════════════════════════════════
 // TOAST
 // ═══════════════════════════════════════════════
-function toast(msg, type = '') {
+function toast(msg, type = '', persist = false) {
   const el = document.getElementById('toast');
   el.textContent = msg;
   el.className = 'toast show' + (type ? ' ' + type : '');
-  setTimeout(() => el.classList.remove('show'), 3000);
+  if (window._toastTimer) clearTimeout(window._toastTimer);
+  if (!persist) {
+    window._toastTimer = setTimeout(() => el.classList.remove('show'), 3000);
+  }
+}
+function toastClear() {
+  const el = document.getElementById('toast');
+  if (el) el.classList.remove('show');
 }
 
 // ═══════════════════════════════════════════════
@@ -5724,7 +5741,7 @@ function renderReviewList(filterStatus) {
         <span class="doc-title" onclick="openReader('${d.id}')" style="cursor:pointer;flex:1;min-width:0;">${d.title}</span>
         <span style="font-size:11px;color:var(--text-3);white-space:nowrap;">${d.author_name||'—'}</span>
         <span style="font-size:11px;color:var(--text-3);white-space:nowrap;">${dt}</span>
-        ${canEdit(d.author_name) ? `<button onclick="openDoc('${d.id}')"
+        ${canEdit(d.author_name) ? `<button onclick="window._openDocFromReview=true;openDoc('${d.id}')"
           style="padding:2px 7px;border-radius:5px;border:1px solid var(--border);background:var(--bg);font-size:11px;cursor:pointer;flex-shrink:0;">✏️</button>` : ''}
         <button onclick="deleteDoc('${d.id}','${safeTitle}','${(d.author_name||'').replace(/'/g,'')}')"
           style="padding:2px 7px;border-radius:5px;border:1px solid #F5C6C6;background:#FEF2F2;color:#A32D2D;font-size:11px;cursor:pointer;flex-shrink:0;">✕</button>

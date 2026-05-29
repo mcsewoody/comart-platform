@@ -391,7 +391,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.81</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.82</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
@@ -815,13 +815,13 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
     <div class="panel" id="panel-review">
       <div style="display:flex;flex-direction:column;height:100%;">
         <div style="padding:12px 20px;border-bottom:1px solid var(--border);flex-shrink:0;">
-          <div style="font-size:15px;font-weight:500;margin-bottom:10px;">審核流程管理</div>
+          <div style="font-size:15px;font-weight:500;margin-bottom:10px;" data-i18n="review.title">審核流程管理</div>
           <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
-            <span class="review-step active" id="rs-draft" onclick="filterReviewPanel('draft')" style="cursor:pointer;">草稿</span>
+            <span class="review-step active" id="rs-draft" onclick="filterReviewPanel('draft')" style="cursor:pointer;" data-i18n="status.filter.draft">草稿</span>
             <span class="review-arrow">→</span>
-            <span class="review-step" id="rs-published" onclick="filterReviewPanel('published')" style="cursor:pointer;">已發佈</span>
+            <span class="review-step" id="rs-published" onclick="filterReviewPanel('published')" style="cursor:pointer;" data-i18n="status.filter.published">已發佈</span>
             <span class="review-arrow">→</span>
-            <span class="review-step" id="rs-archived" onclick="filterReviewPanel('archived')" style="cursor:pointer;">已封存</span>
+            <span class="review-step" id="rs-archived" onclick="filterReviewPanel('archived')" style="cursor:pointer;" data-i18n="status.filter.archived">已封存</span>
           </div>
         </div>
         <div style="flex:1;overflow-y:auto;padding:12px 20px;" id="review-content">
@@ -834,7 +834,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
     <div class="panel" id="panel-comments">
       <div style="display:flex;flex-direction:column;height:100%;">
         <div style="padding:12px 20px;border-bottom:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;gap:10px;">
-          <div style="font-size:15px;font-weight:500;">討論 / 留言</div>
+          <div style="font-size:15px;font-weight:500;" data-i18n="label.discuss">討論 / 留言</div>
           <span id="comments-doc-title" style="font-size:12px;color:var(--text-3);">— 請先從知識庫選擇文件</span>
         </div>
         <div class="comment-wrap" id="comment-list" style="flex:1;overflow-y:auto;">
@@ -843,7 +843,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         <div class="comment-input-wrap">
           <textarea class="comment-input" id="comment-input" placeholder="輸入留言…" rows="2"
             onkeydown="if(event.isComposing)return;if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();submitComment();}"></textarea>
-          <button class="comment-submit" onclick="submitComment()">送出</button>
+          <button class="comment-submit" onclick="submitComment()" data-i18n="comments.submit">送出</button>
         </div>
       </div>
     </div>
@@ -888,17 +888,17 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
       <div style="display:flex;gap:6px;flex-wrap:wrap;">
         <button onclick="exportConfig()"
           style="padding:5px 12px;border-radius:6px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:12px;color:var(--text-2);">
-          📤 匯出設定
+          <span data-i18n="btn.export_cfg">📤 匯出設定</span>
         </button>
         <button onclick="document.getElementById('cfg-import-file').click()"
           style="padding:5px 12px;border-radius:6px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:12px;color:var(--text-2);">
-          📥 匯入設定
+          <span data-i18n="btn.import_cfg">📥 匯入設定</span>
         </button>
         <input type="file" id="cfg-import-file" accept=".json" style="display:none"
           onchange="importConfig(event)" />
         <button onclick="copyConfigAsEnv()"
           style="padding:5px 12px;border-radius:6px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:12px;color:var(--text-2);">
-          📋 複製為 URL 參數
+          <span data-i18n="btn.copy_url_param">📋 複製為 URL 參數</span>
         </button>
       </div>
     </div>
@@ -949,7 +949,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
       </div>
       <button class="reader-btn" onclick="copyReaderContent()" title="複製全文">📋 複製</button>
       <button class="reader-btn" id="reader-discuss-btn" onclick="toggleReaderDiscussion()" style="display:none;">💬 Discussion</button>
-      <button class="reader-btn" onclick="closeReader()" style="margin-left:auto;">關閉</button>
+      <button class="reader-btn" onclick="closeReader()" style="margin-left:auto;" data-i18n="btn.close">關閉</button>
     </div>
   </div>
 </div>
@@ -957,7 +957,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
 <!-- Product Line Modal -->
 <div class="modal-overlay" id="product-line-modal">
   <div class="modal" style="max-width:380px;">
-    <div class="modal-title">＋ 新增產品線</div>
+    <div class="modal-title" data-i18n="btn.add_product_line">＋ 新增產品線</div>
     <div class="field">
       <label>Product Line Name（英文）</label>
       <input type="text" id="new-product-line-input" placeholder="e.g. Smart Home Accessories" />
@@ -1053,7 +1053,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
     <button onclick="document.getElementById('sql-helper').style.display='none'"
       style="padding:5px 12px;border-radius:6px;border:1px solid var(--border);background:transparent;cursor:pointer;font-size:12px;">關閉</button>
     <button onclick="copySql()"
-      style="padding:5px 12px;border-radius:6px;border:none;background:var(--blue);color:#fff;cursor:pointer;font-size:12px;">複製 SQL</button>
+      style="padding:5px 12px;border-radius:6px;border:none;background:var(--blue);color:#fff;cursor:pointer;font-size:12px;" data-i18n="btn.copy_sql">複製 SQL</button>
   </div>
 </div>
 
@@ -1078,9 +1078,9 @@ let PRODUCT_LINES = []; // 從 Supabase 或預設值載入的產品線清單
 // i18n strings — 完整五語言
 const I18N = {
   'zh-TW': {
-    'nav.search':'Search', 'nav.editor':'Create', 'nav.docs':'Articles',
+    'nav.search':'AI 問答', 'nav.editor':'新增', 'nav.docs':'知識庫',
     'nav.kmap':'知識地圖', 'nav.analytics':'分析報表', 'nav.experts':'專家黃頁',
-    'nav.kmap':'Map', 'nav.analytics':'Analytics', 'nav.experts':'Expert', 'nav.review':'Review', 'nav.comments':'Discussion', 'nav.setting':'Settings',
+    'nav.review':'審核', 'nav.comments':'討論', 'nav.setting':'設定',
     'label.created':'Created', 'label.modified':'Modified', 'label.valid_until':'Valid Until',
     'label.author':'Author', 'label.reviewer':'Reviewer', 'label.product_line':'Product Line',
     'label.category':'Category', 'label.stars':'Stars', 'status.indefinitely':'Indefinitely',
@@ -1120,6 +1120,12 @@ const I18N = {
     'sys.supabase':'Supabase', 'sys.claude':'Claude API', 'sys.docs':'文件數',
     'sys.rag':'RAG: pgvector + Claude', 'sys.storage':'儲存: Supabase Postgres',
     'cat.all':'所有分類',
+    'review.title':'審核流程管理',
+    'comments.submit':'送出',
+    'btn.export_cfg':'📤 匯出設定',
+    'btn.import_cfg':'📥 匯入設定',
+    'btn.copy_url_param':'📋 複製為 URL 參數',
+    'btn.add_product_line':'＋ 新增產品線',
     'pl.all':'所有產品線',
     'status.filter.draft':'草稿',
     'status.filter.published':'已發佈',
@@ -1160,9 +1166,9 @@ const I18N = {
     'label.cat_views':'各分類閱讀次數',
   },
   'zh-CN': {
-    'nav.search':'Search', 'nav.editor':'创建知识条目', 'nav.docs':'Articles',
+    'nav.search':'AI 问答', 'nav.editor':'新增', 'nav.docs':'知识库',
     'nav.kmap':'知识地图', 'nav.analytics':'分析报表', 'nav.experts':'专家黄页',
-    'nav.kmap':'Map', 'nav.analytics':'Analytics', 'nav.experts':'Expert', 'nav.review':'Review', 'nav.comments':'Discussion', 'nav.setting':'Settings',
+    'nav.review':'审核', 'nav.comments':'讨论', 'nav.setting':'设置',
     'rag.title':'AI 问答 — 从知识库取答案',
     'rag.placeholder':'输入问题，例如：Qi2 充电器良率异常如何处理？',
     'rag.btn':'提交问题', 'rag.empty':'输入问题，AI 会从知识库召回相关段落并汇总回答',
@@ -1196,6 +1202,12 @@ const I18N = {
     'sys.supabase':'Supabase', 'sys.claude':'Claude API', 'sys.docs':'文档数',
     'sys.rag':'RAG: pgvector + Claude', 'sys.storage':'存储: Supabase Postgres',
     'cat.all':'所有分类',
+    'review.title':'审核流程管理',
+    'comments.submit':'发送',
+    'btn.export_cfg':'📤 导出设置',
+    'btn.import_cfg':'📥 导入设置',
+    'btn.copy_url_param':'📋 复制为 URL 参数',
+    'btn.add_product_line':'＋ 新增产品线',
     'pl.all':'所有产品线',
     'status.filter.draft':'草稿',
     'status.filter.published':'已发布',
@@ -1236,9 +1248,9 @@ const I18N = {
     'label.cat_views':'各分类阅读次数',
   },
   'en': {
-    'nav.search':'AI Q&A / Search', 'nav.editor':'Create', 'nav.docs':'Articles',
-    'nav.kmap':'Knowledge Map', 'nav.analytics':'Analytics', 'nav.experts':'Expert Directory',
-    'nav.kmap':'Map', 'nav.analytics':'Analytics', 'nav.experts':'Expert', 'nav.review':'Review', 'nav.comments':'Discussion', 'nav.setting':'Settings',
+    'nav.search':'AI Q&A', 'nav.editor':'Create', 'nav.docs':'Knowledge Base',
+    'nav.kmap':'Knowledge Map', 'nav.analytics':'Analytics', 'nav.experts':'Experts',
+    'nav.review':'Review', 'nav.comments':'Discussion', 'nav.setting':'Settings',
     'rag.title':'AI Q&A — Answers from Knowledge Base',
     'rag.placeholder':'Ask anything, e.g.: How to handle Qi2 charger yield issues?',
     'rag.btn':'Ask', 'rag.empty':'Enter a question. AI will retrieve relevant passages and synthesize an answer.',
@@ -1274,6 +1286,12 @@ const I18N = {
     'sys.supabase':'Supabase', 'sys.claude':'Claude API', 'sys.docs':'Documents',
     'sys.rag':'RAG: pgvector + Claude', 'sys.storage':'Storage: Supabase Postgres',
     'cat.all':'All Categories',
+    'review.title':'Review Management',
+    'comments.submit':'Send',
+    'btn.export_cfg':'📤 Export Settings',
+    'btn.import_cfg':'📥 Import Settings',
+    'btn.copy_url_param':'📋 Copy as URL Params',
+    'btn.add_product_line':'＋ Add Product Line',
     'pl.all':'All Product Lines',
     'status.filter.draft':'Draft',
     'status.filter.published':'Published',
@@ -1314,9 +1332,9 @@ const I18N = {
     'label.cat_views':'Views by Category',
   },
   'vi': {
-    'nav.search':'Hỏi đáp AI', 'nav.editor':'Tạo mục kiến thức', 'nav.docs':'Kho kiến thức',
-    'nav.kmap':'Bản đồ kiến thức', 'nav.analytics':'Báo cáo', 'nav.experts':'Danh bạ chuyên gia',
-    'nav.kmap':'Map', 'nav.analytics':'Analytics', 'nav.experts':'Expert', 'nav.review':'Review', 'nav.comments':'Discussion', 'nav.setting':'Cài đặt',
+    'nav.search':'Hỏi đáp AI', 'nav.editor':'Tạo mới', 'nav.docs':'Kho kiến thức',
+    'nav.kmap':'Bản đồ kiến thức', 'nav.analytics':'Báo cáo', 'nav.experts':'Chuyên gia',
+    'nav.review':'Xem xét', 'nav.comments':'Thảo luận', 'nav.setting':'Cài đặt',
     'rag.title':'Hỏi đáp AI — Từ kho kiến thức',
     'rag.placeholder':'Đặt câu hỏi, ví dụ: Xử lý lỗi tỷ lệ đạt chuẩn Qi2 như thế nào?',
     'rag.btn':'Gửi câu hỏi', 'rag.empty':'Nhập câu hỏi, AI sẽ tìm và tổng hợp câu trả lời từ tài liệu',
@@ -1352,6 +1370,12 @@ const I18N = {
     'sys.supabase':'Supabase', 'sys.claude':'Claude API', 'sys.docs':'Tài liệu',
     'sys.rag':'RAG: pgvector + Claude', 'sys.storage':'Lưu trữ: Supabase Postgres',
     'cat.all':'Tất cả danh mục',
+    'review.title':'Quản lý xem xét',
+    'comments.submit':'Gửi',
+    'btn.export_cfg':'📤 Xuất cài đặt',
+    'btn.import_cfg':'📥 Nhập cài đặt',
+    'btn.copy_url_param':'📋 Sao chép tham số URL',
+    'btn.add_product_line':'＋ Thêm dòng sản phẩm',
     'pl.all':'Tất cả dòng sản phẩm',
     'status.filter.draft':'Nháp',
     'status.filter.published':'Đã xuất bản',
@@ -1392,9 +1416,9 @@ const I18N = {
     'label.cat_views':'Lượt xem theo danh mục',
   },
   'ja': {
-    'nav.search':'AI 質問 / 検索', 'nav.editor':'ナレッジ登録', 'nav.docs':'ナレッジベース',
+    'nav.search':'AI 質問', 'nav.editor':'新規作成', 'nav.docs':'ナレッジベース',
     'nav.kmap':'ナレッジマップ', 'nav.analytics':'分析レポート', 'nav.experts':'専門家名鑑',
-    'nav.kmap':'Map', 'nav.analytics':'Analytics', 'nav.experts':'Expert', 'nav.review':'Review', 'nav.comments':'Discussion', 'nav.setting':'設定',
+    'nav.review':'レビュー', 'nav.comments':'ディスカッション', 'nav.setting':'設定',
     'rag.title':'AI 質問応答 — ナレッジベースから回答',
     'rag.placeholder':'質問を入力してください（例：Qi2充電器の歩留まり異常の対処法は？）',
     'rag.btn':'質問する', 'rag.empty':'質問を入力すると、AIがナレッジベースから関連情報を検索して回答します',
@@ -1430,6 +1454,12 @@ const I18N = {
     'sys.supabase':'Supabase', 'sys.claude':'Claude API', 'sys.docs':'ドキュメント数',
     'sys.rag':'RAG: pgvector + Claude', 'sys.storage':'ストレージ: Supabase Postgres',
     'cat.all':'すべてのカテゴリ',
+    'review.title':'レビュー管理',
+    'comments.submit':'送信',
+    'btn.export_cfg':'📤 設定エクスポート',
+    'btn.import_cfg':'📥 設定インポート',
+    'btn.copy_url_param':'📋 URLパラメータとしてコピー',
+    'btn.add_product_line':'＋ 製品ライン追加',
     'pl.all':'すべての製品ライン',
     'status.filter.draft':'下書き',
     'status.filter.published':'公開済み',
@@ -5948,10 +5978,10 @@ function renderReviewList(filterStatus) {
         <span class="doc-title" onclick="openReader('${d.id}')" style="cursor:pointer;flex:1;min-width:0;">${d.title}</span>
         <span style="font-size:11px;color:var(--text-3);white-space:nowrap;">${d.author_name||'—'}</span>
         <span style="font-size:11px;color:var(--text-3);white-space:nowrap;">${dt}</span>
-        ${canEdit(d.author_name) ? `<button onclick="window._openDocFromReview=window._reviewFilter||'draft';openDoc('${d.id}')"
-          style="padding:2px 7px;border-radius:5px;border:1px solid var(--border);background:var(--bg);font-size:11px;cursor:pointer;flex-shrink:0;">✏️</button>` : ''}
         <button onclick="deleteDoc('${d.id}','${safeTitle}','${(d.author_name||'').replace(/'/g,'')}')"
           style="padding:2px 7px;border-radius:5px;border:1px solid #6a2020;background:#2e1010;color:#f06a6a;font-size:11px;cursor:pointer;flex-shrink:0;">✕</button>
+        ${canEdit(d.author_name) ? `<button onclick="window._openDocFromReview=window._reviewFilter||'draft';openDoc('${d.id}')"
+          style="padding:2px 7px;border-radius:5px;border:1px solid var(--border);background:var(--bg);font-size:11px;cursor:pointer;flex-shrink:0;">✏️ 更新</button>` : ''}
         <button onclick="openReviewPanel('${d.id}','${safeTitle}')"
           style="padding:2px 7px;border-radius:5px;border:1px solid var(--blue);background:var(--blue-bg);color:var(--blue);font-size:11px;cursor:pointer;flex-shrink:0;">審核</button>
       </div>`;

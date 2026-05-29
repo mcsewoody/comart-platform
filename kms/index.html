@@ -391,11 +391,11 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.80</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.81</span>
     </div>
     <div class="lang-selector">
-      <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
-      <button class="lang-btn" onclick="setLang('zh-CN')">简中</button>
+      <button class="lang-btn active" onclick="setLang('zh-TW')" data-i18n="lang.zh-TW">繁中</button>
+      <button class="lang-btn" onclick="setLang('zh-CN')" data-i18n="lang.zh-CN">简中</button>
       <button class="lang-btn" onclick="setLang('en')">EN</button>
       <button class="lang-btn" onclick="setLang('vi')">VI</button>
       <button class="lang-btn" onclick="setLang('ja')">日本語</button>
@@ -454,7 +454,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
     </button>
     
 
-    <div class="nav-section" style="margin-top:8px;" data-i18n-key="nav.section.info">系統資訊</div>
+    <div class="nav-section" style="margin-top:8px;" data-i18n="nav.section.info">系統資訊</div>
     <div style="padding: 8px 10px; font-size: 12px; color: var(--text-3); line-height: 1.6;">
       <div id="status-supabase">Supabase: <span style="color:var(--text-3)">未設定</span></div>
       <div id="status-claude">Claude API: <span style="color:var(--text-3)">未設定</span></div>
@@ -701,10 +701,10 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
             <span id="ver-count" style="background:var(--bg);border:1px solid var(--border);border-radius:10px;font-size:11px;padding:1px 6px;color:var(--text-3);">0</span>
           </div>
           <div id="version-list" style="flex:1;overflow-y:auto;padding:8px;">
-            <div style="color:var(--text-3);font-size:12px;text-align:center;padding:20px 0;">儲存後自動記錄版本</div>
+            <div style="color:var(--text-3);font-size:12px;text-align:center;padding:20px 0;" data-i18n="label.saving_version">儲存後自動記錄版本</div>
           </div>
           <div style="padding:8px;border-top:1px solid var(--border);">
-            <button onclick="loadVersionHistory()" style="width:100%;padding:5px;border-radius:6px;border:1px solid var(--border);background:transparent;cursor:pointer;font-size:12px;color:var(--text-2);">重新整理</button>
+            <button onclick="loadVersionHistory()" style="width:100%;padding:5px;border-radius:6px;border:1px solid var(--border);background:transparent;cursor:pointer;font-size:12px;color:var(--text-2);" data-i18n="btn.refresh">重新整理</button>
           </div>
         </div>
       </div>
@@ -760,7 +760,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
     <div class="panel" id="panel-kmap">
       <div style="display:flex;flex-direction:column;height:100%;">
         <div style="padding:12px 20px;border-bottom:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:space-between;">
-          <div style="font-size:15px;font-weight:500;" id="kmap-header-title">知識地圖 — 分類總覽</div>
+          <div style="font-size:15px;font-weight:500;" id="kmap-header-title" data-i18n="kmap.title">知識地圖 — 分類總覽</div>
           <div id="kmap-header-actions"></div>
         </div>
         <div id="kmap-content" style="flex:1;overflow-y:auto;"></div>
@@ -781,7 +781,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
     <div class="panel" id="panel-experts">
       <div style="display:flex;flex-direction:column;height:100%;">
         <div style="padding:12px 20px;border-bottom:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:space-between;">
-          <div style="font-size:15px;font-weight:500;">專家黃頁</div>
+          <div style="font-size:15px;font-weight:500;" data-i18n="experts.title">專家黃頁</div>
           <a href="/" onclick="event.preventDefault();toast('請至 Platform → User Management 管理人員資料','');"
             style="font-size:11px;color:var(--text-3);text-decoration:none;padding:5px 10px;border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;">
             ⚙ 人員管理請至 Platform
@@ -795,7 +795,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
     <div class="panel" id="panel-setting">
       <div style="display:flex;flex-direction:column;height:100%;">
         <div style="padding:12px 20px;border-bottom:1px solid var(--border);flex-shrink:0;">
-          <div style="font-size:15px;font-weight:500;margin-bottom:10px;">⚙️ 設定管理</div>
+          <div style="font-size:15px;font-weight:500;margin-bottom:10px;" data-i18n="label.setting_mgmt">⚙️ 設定管理</div>
           <div style="display:flex;gap:6px;">
             <button id="setting-tab-pl" onclick="switchSettingTab('pl')"
               style="padding:6px 14px;border-radius:var(--radius);border:1px solid var(--blue);background:var(--blue);color:#fff;font-size:12px;cursor:pointer;">
@@ -815,13 +815,13 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
     <div class="panel" id="panel-review">
       <div style="display:flex;flex-direction:column;height:100%;">
         <div style="padding:12px 20px;border-bottom:1px solid var(--border);flex-shrink:0;">
-          <div style="font-size:15px;font-weight:500;margin-bottom:10px;">審核流程管理</div>
+          <div style="font-size:15px;font-weight:500;margin-bottom:10px;" data-i18n="review.title">審核流程管理</div>
           <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
-            <span class="review-step active" id="rs-draft" onclick="filterReviewPanel('draft')" style="cursor:pointer;">草稿</span>
+            <span class="review-step active" id="rs-draft" onclick="filterReviewPanel('draft')" style="cursor:pointer;" data-i18n="status.filter.draft">草稿</span>
             <span class="review-arrow">→</span>
-            <span class="review-step" id="rs-published" onclick="filterReviewPanel('published')" style="cursor:pointer;">已發佈</span>
+            <span class="review-step" id="rs-published" onclick="filterReviewPanel('published')" style="cursor:pointer;" data-i18n="status.filter.published">已發佈</span>
             <span class="review-arrow">→</span>
-            <span class="review-step" id="rs-archived" onclick="filterReviewPanel('archived')" style="cursor:pointer;">已封存</span>
+            <span class="review-step" id="rs-archived" onclick="filterReviewPanel('archived')" style="cursor:pointer;" data-i18n="status.filter.archived">已封存</span>
           </div>
         </div>
         <div style="flex:1;overflow-y:auto;padding:12px 20px;" id="review-content">
@@ -834,11 +834,11 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
     <div class="panel" id="panel-comments">
       <div style="display:flex;flex-direction:column;height:100%;">
         <div style="padding:12px 20px;border-bottom:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;gap:10px;">
-          <div style="font-size:15px;font-weight:500;">討論 / 留言</div>
-          <span id="comments-doc-title" style="font-size:12px;color:var(--text-3);">— 請先從知識庫選擇文件</span>
+          <div style="font-size:15px;font-weight:500;" data-i18n="label.discuss">討論 / 留言</div>
+          <span id="comments-doc-title" style="font-size:12px;color:var(--text-3);" data-i18n="label.discuss_placeholder">— 請先從知識庫選擇文件</span>
         </div>
         <div class="comment-wrap" id="comment-list" style="flex:1;overflow-y:auto;">
-          <div style="color:var(--text-3);font-size:13px;text-align:center;padding:30px 0;">從知識庫點擊文件標題旁的「💬」進入討論</div>
+          <div style="color:var(--text-3);font-size:13px;text-align:center;padding:30px 0;" data-i18n="label.discuss_hint">從知識庫點擊文件標題旁的「💬」進入討論</div>
         </div>
         <div class="comment-input-wrap">
           <textarea class="comment-input" id="comment-input" placeholder="輸入留言…" rows="2"
@@ -854,7 +854,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
 <!-- Config Modal -->
 <div class="modal-overlay" id="config-modal">
   <div class="modal">
-    <div class="modal-title">⚙ API 設定</div>
+    <div class="modal-title" data-i18n="config.title">⚙ API 設定</div>
 
     <div class="field">
       <label>Supabase Project URL</label>
@@ -867,10 +867,10 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
       <div class="hint">Supabase → Settings → API → anon public key</div>
     </div>
     <div class="field">
-      <label>Embedding 模式</label>
+      <label data-i18n="label.embed_mode">Embedding 模式</label>
       <select id="cfg-embed-model">
-        <option value="edge-fn">Edge Function（推薦，Key 存在 Supabase Secrets）</option>
-        <option value="mock">Mock 模式（離線測試，關鍵字搜尋）</option>
+        <option value="edge-fn" data-i18n="label.embed_edge">Edge Function（推薦，Key 存在 Supabase Secrets）</option>
+        <option value="mock" data-i18n="label.embed_mock">Mock 模式（離線測試，關鍵字搜尋）</option>
       </select>
     </div>
 
@@ -884,7 +884,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
 
     <!-- 匯出 / 匯入設定 -->
     <div style="margin-top:12px;padding:10px 12px;background:var(--bg);border-radius:var(--radius);border:1px solid var(--border);">
-      <div style="font-size:12px;font-weight:500;color:var(--text-2);margin-bottom:8px;">換檔案或換電腦時使用</div>
+      <div style="font-size:12px;font-weight:500;color:var(--text-2);margin-bottom:8px;" data-i18n="label.switch_hint">換檔案或換電腦時使用</div>
       <div style="display:flex;gap:6px;flex-wrap:wrap;">
         <button onclick="exportConfig()"
           style="padding:5px 12px;border-radius:6px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:12px;color:var(--text-2);">
@@ -904,8 +904,8 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
     </div>
 
     <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeConfig()">取消</button>
-      <button class="btn-save" onclick="saveConfig()">儲存設定</button>
+      <button class="btn-cancel" onclick="closeConfig()" data-i18n="btn.cancel" data-i18n="btn.cancel">取消</button>
+      <button class="btn-save" onclick="saveConfig()" data-i18n="config.save">儲存設定</button>
 
     </div>
   </div>
@@ -933,7 +933,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         </div>
       </div>
     <div class="reader-footer">
-      <button class="reader-btn" id="reader-dl-btn" style="display:none;" onclick="readerDownload()">↓ 下載原始檔</button>
+      <button class="reader-btn" id="reader-dl-btn" style="display:none;" onclick="readerDownload()" data-i18n="btn.download">↓ 下載原始檔</button>
       <div style="position:relative;display:inline-block;">
         <button class="reader-btn" id="reader-translate-btn" onclick="toggleTranslateMenu()" style="gap:4px;">
           🌐 AI 翻譯 ▾
@@ -944,12 +944,12 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
           <div onclick="translateReader('zh-CN')" style="padding:9px 16px;cursor:pointer;font-size:13px;" onmouseover="this.style.background='var(--bg)'" onmouseout="this.style.background=''">🇨🇳 简体中文</div>
           <div onclick="translateReader('vi')"    style="padding:9px 16px;cursor:pointer;font-size:13px;" onmouseover="this.style.background='var(--bg)'" onmouseout="this.style.background=''">🇻🇳 Tiếng Việt</div>
           <div onclick="translateReader('ja')"    style="padding:9px 16px;cursor:pointer;font-size:13px;" onmouseover="this.style.background='var(--bg)'" onmouseout="this.style.background=''">🇯🇵 日本語</div>
-          <div onclick="restoreReaderOriginal()" style="padding:9px 16px;cursor:pointer;font-size:13px;border-top:1px solid var(--border);color:var(--text-3);" onmouseover="this.style.background='var(--bg)'" onmouseout="this.style.background=''">↩ 恢復原文</div>
+          <div onclick="restoreReaderOriginal()" style="padding:9px 16px;cursor:pointer;font-size:13px;border-top:1px solid var(--border);color:var(--text-3);" onmouseover="this.style.background='var(--bg)'" onmouseout="this.style.background=''" data-i18n="btn.restore">↩ 恢復原文</div>
         </div>
       </div>
-      <button class="reader-btn" onclick="copyReaderContent()" title="複製全文">📋 複製</button>
+      <button class="reader-btn" onclick="copyReaderContent()" title="複製全文" data-i18n="btn.copy">📋 複製</button>
       <button class="reader-btn" id="reader-discuss-btn" onclick="toggleReaderDiscussion()" style="display:none;">💬 Discussion</button>
-      <button class="reader-btn" onclick="closeReader()" style="margin-left:auto;">關閉</button>
+      <button class="reader-btn" onclick="closeReader()" style="margin-left:auto;" data-i18n="btn.close">關閉</button>
     </div>
   </div>
 </div>
@@ -1047,13 +1047,13 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
 
 <!-- SQL Setup Helper -->
 <div id="sql-helper" style="display:none;position:fixed;bottom:20px;left:20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;max-width:460px;font-size:12px;z-index:50;box-shadow:0 4px 20px rgba(0,0,0,.1);">
-  <div style="font-weight:500;margin-bottom:6px;">🗄 Supabase 初始化 SQL</div>
-  <div style="color:var(--text-2);margin-bottom:8px;">在 Supabase → SQL Editor 執行 <code>setup.sql</code>（已含版本控制 + 全文搜尋 + 向量索引）</div>
+  <div style="font-weight:500;margin-bottom:6px;" data-i18n="label.sql_init">🗄 Supabase 初始化 SQL</div>
+  <div style="color:var(--text-2);margin-bottom:8px;">在 Supabase → SQL Editor 執行 <code>setup.sql</code data-i18n="label.sql_desc">（已含版本控制 + 全文搜尋 + 向量索引）</div>
   <div style="display:flex;gap:6px;">
     <button onclick="document.getElementById('sql-helper').style.display='none'"
       style="padding:5px 12px;border-radius:6px;border:1px solid var(--border);background:transparent;cursor:pointer;font-size:12px;">關閉</button>
     <button onclick="copySql()"
-      style="padding:5px 12px;border-radius:6px;border:none;background:var(--blue);color:#fff;cursor:pointer;font-size:12px;">複製 SQL</button>
+      style="padding:5px 12px;border-radius:6px;border:none;background:var(--blue);color:#fff;cursor:pointer;font-size:12px;" data-i18n="btn.copy_sql">複製 SQL</button>
   </div>
 </div>
 
@@ -1119,6 +1119,78 @@ const I18N = {
     'confirm.cancel_edit':'放棄編輯？未儲存的變更將會遺失。',
     'sys.supabase':'Supabase', 'sys.claude':'Claude API', 'sys.docs':'文件數',
     'sys.rag':'RAG: pgvector + Claude', 'sys.storage':'儲存: Supabase Postgres',
+    'nav.section.info':'系統資訊',
+    'sys.not_set':'未設定',
+    'sys.doc_count':'文件數:',
+    'sys.storage_label':'儲存: Supabase Postgres',
+    'btn.refresh':'重新整理',
+    'btn.close':'關閉',
+    'btn.copy_sql':'複製 SQL',
+    'btn.submit':'送出',
+    'btn.send':'送出',
+    'btn.add':'新增',
+    'btn.delete':'刪除',
+    'btn.skip':'跳過',
+    'btn.cancel_batch':'取消批次',
+    'btn.download':'↓ 下載',
+    'btn.remove_file':'✕ 刪除',
+    'btn.restore':'↩ 還原',
+    'btn.remove':'✕ 移除',
+    'btn.clear_filter':'清除篩選',
+    'btn.back_cat':'← 回分類總覽',
+    'btn.compare':'🔍 與上版比較',
+    'label.loading':'載入中…',
+    'label.no_comments':'尚無留言，成為第一個留言的人',
+    'label.no_versions':'尚無版本紀錄',
+    'label.no_experts':'尚無專家資料',
+    'label.no_results':'無符合人員',
+    'label.saving_version':'儲存後自動記錄版本',
+    'label.version_same':'兩版本內容相同',
+    'label.version_diff_title':'版本比較',
+    'label.knowledge_map':'知識地圖',
+    'label.analytics_title':'總覽',
+    'label.top10':'熱門文件 TOP 10（閱讀次數排行）',
+    'label.cat_views':'各分類閱讀次數',
+    'label.no_cat_docs':'此分類尚無文件',
+    'label.ai_source':'Claude AI · 非知識庫來源',
+    'label.connecting':'連線中…',
+    'label.original_q':'原始問題：',
+    'label.ai_answer_ext':'AI 回答（來源：Claude 外部知識，請驗證後修改）：',
+    'label.ai_summary':'🤖 AI 彙整回答 — 來源：知識庫',
+    'label.ref_docs':'參考文件',
+    'label.similarity':'相似度',
+    'label.searching':'搜尋知識庫中…',
+    'label.cancelled':'已取消搜尋。',
+    'label.upload_progress':'批次上傳',
+    'label.editor_loading':'編輯器載入中…',
+    'label.parsing':'⏳ 解析中，請稍候…',
+    'label.reparsing':'⏳ 重新解析中，請稍候…',
+    'label.parsing_file':'⏳ 解析檔案內容中，請稍候…',
+    'label.translating':'⏳ AI 翻譯中，請稍候…',
+    'label.load_failed':'載入失敗',
+    'label.setting_mgmt':'⚙️ 設定管理',
+    'label.sql_init':'🗄 Supabase 初始化 SQL',
+    'label.sql_hint':'在 Supabase → SQL Editor 執行',
+    'label.sql_desc':'（已含版本控制 + 全文搜尋 + 向量索引）',
+    'label.embed_mode':'Embedding 模式',
+    'label.embed_edge':'Edge Function（推薦，Key 存在 Supabase Secrets）',
+    'label.embed_mock':'Mock 模式（離線測試，關鍵字搜尋）',
+    'label.switch_hint':'換檔案或換電腦時使用',
+    'status.filter.draft':'草稿',
+    'status.filter.published':'已發佈',
+    'status.filter.archived':'已封存',
+    'label.discuss':'討論 / 留言',
+    'label.discuss_hint':'從知識庫點擊文件標題旁的「💬」進入討論',
+    'label.discuss_placeholder':'— 請先從知識庫選擇文件',
+    'label.entry_count':'份文件',
+    'confirm.restore':'確定要還原至此版本？',
+    'cat.all':'所有分類',
+    'pl.all':'所有產品線',
+    'lang.zh-TW':'繁中',
+    'lang.zh-CN':'简中',
+    'lang.en':'EN',
+    'lang.vi':'VI',
+    'lang.ja':'JA',
   },
   'zh-CN': {
     'nav.search':'Search', 'nav.editor':'创建知识条目', 'nav.docs':'Articles',
@@ -1156,6 +1228,80 @@ const I18N = {
     'confirm.cancel_edit':'放弃编辑？未保存的更改将会丢失。',
     'sys.supabase':'Supabase', 'sys.claude':'Claude API', 'sys.docs':'文档数',
     'sys.rag':'RAG: pgvector + Claude', 'sys.storage':'存储: Supabase Postgres',
+    'nav.section.info':'系统信息',
+    'sys.not_set':'未设置',
+    'sys.doc_count':'文档数:',
+    'sys.storage_label':'存储: Supabase Postgres',
+    'btn.refresh':'刷新',
+    'btn.close':'关闭',
+    'btn.copy_sql':'复制 SQL',
+    'btn.submit':'提交',
+    'btn.send':'发送',
+    'btn.add':'新增',
+    'btn.delete':'删除',
+    'btn.skip':'跳过',
+    'btn.cancel_batch':'取消批次',
+    'btn.download':'↓ 下载',
+    'btn.remove_file':'✕ 删除',
+    'btn.restore':'↩ 还原',
+    'btn.remove':'✕ 移除',
+    'btn.clear_filter':'清除筛选',
+    'btn.back_cat':'← 返回分类总览',
+    'btn.compare':'🔍 与上版比较',
+    'label.loading':'加载中…',
+    'label.no_comments':'暂无留言',
+    'label.no_versions':'暂无版本记录',
+    'label.no_experts':'暂无专家数据',
+    'label.no_results':'无符合人员',
+    'label.saving_version':'保存后自动记录版本',
+    'label.version_same':'两版本内容相同',
+    'label.version_diff_title':'版本比较',
+    'label.knowledge_map':'知识地图',
+    'label.analytics_title':'总览',
+    'label.top10':'热门文档 TOP 10（阅读次数排行）',
+    'label.cat_views':'各分类阅读次数',
+    'label.no_cat_docs':'此分类暂无文档',
+    'label.ai_source':'Claude AI · 非知识库来源',
+    'label.connecting':'连接中…',
+    'label.original_q':'原始问题：',
+    'label.ai_answer_ext':'AI 回答（来源：Claude 外部知识，请验证后修改）：',
+    'label.ai_summary':'🤖 AI 汇总回答 — 来源：知识库',
+    'label.ref_docs':'参考文档',
+    'label.similarity':'相似度',
+    'label.searching':'搜索知识库中…',
+    'label.cancelled':'已取消搜索。',
+    'label.upload_progress':'批次上传',
+    'label.editor_loading':'编辑器加载中…',
+    'label.parsing':'⏳ 解析中，请稍候…',
+    'label.reparsing':'⏳ 重新解析中，请稍候…',
+    'label.parsing_file':'⏳ 解析文件内容中，请稍候…',
+    'label.translating':'⏳ AI 翻译中，请稍候…',
+    'label.load_failed':'加载失败',
+    'label.setting_mgmt':'⚙️ 设置管理',
+    'label.sql_init':'🗄 Supabase 初始化 SQL',
+    'label.sql_hint':'在 Supabase → SQL Editor 执行',
+    'label.sql_desc':'（已含版本控制 + 全文搜索 + 向量索引）',
+    'label.embed_mode':'Embedding 模式',
+    'label.embed_edge':'Edge Function（推荐，Key 存于 Supabase Secrets）',
+    'label.embed_mock':'Mock 模式（离线测试，关键字搜索）',
+    'label.switch_hint':'换文件或换电脑时使用',
+    'status.filter.draft':'草稿',
+    'status.filter.published':'已发布',
+    'status.filter.archived':'已归档',
+    'label.discuss':'讨论 / 留言',
+    'label.discuss_hint':'从知识库点击文档标题旁的「💬」进入讨论',
+    'label.discuss_placeholder':'— 请先从知识库选择文档',
+    'label.entry_count':'份文档',
+    'confirm.restore':'确定要还原至此版本？',
+    'label.btn.save':'保存',
+    'label.btn.cancel':'取消',
+    'cat.all':'所有分类',
+    'pl.all':'所有产品线',
+    'lang.zh-TW':'繁中',
+    'lang.zh-CN':'简中',
+    'lang.en':'EN',
+    'lang.vi':'VI',
+    'lang.ja':'JA',
   },
   'en': {
     'nav.search':'AI Q&A / Search', 'nav.editor':'Create', 'nav.docs':'Articles',
@@ -1195,6 +1341,78 @@ const I18N = {
     'confirm.cancel_edit':'Discard changes? Unsaved edits will be lost.',
     'sys.supabase':'Supabase', 'sys.claude':'Claude API', 'sys.docs':'Documents',
     'sys.rag':'RAG: pgvector + Claude', 'sys.storage':'Storage: Supabase Postgres',
+    'nav.section.info':'System Info',
+    'sys.not_set':'Not configured',
+    'sys.doc_count':'Documents:',
+    'sys.storage_label':'Storage: Supabase Postgres',
+    'btn.refresh':'Refresh',
+    'btn.close':'Close',
+    'btn.copy_sql':'Copy SQL',
+    'btn.submit':'Submit',
+    'btn.send':'Send',
+    'btn.add':'Add',
+    'btn.delete':'Delete',
+    'btn.skip':'Skip',
+    'btn.cancel_batch':'Cancel Batch',
+    'btn.download':'↓ Download',
+    'btn.remove_file':'✕ Remove',
+    'btn.restore':'↩ Restore',
+    'btn.remove':'✕ Remove',
+    'btn.clear_filter':'Clear Filter',
+    'btn.back_cat':'← Back to Categories',
+    'btn.compare':'🔍 Compare with Previous',
+    'label.loading':'Loading…',
+    'label.no_comments':'No comments yet. Be the first.',
+    'label.no_versions':'No version history',
+    'label.no_experts':'No experts yet',
+    'label.no_results':'No matching users',
+    'label.saving_version':'Version saved automatically',
+    'label.version_same':'Both versions are identical',
+    'label.version_diff_title':'Version Comparison',
+    'label.knowledge_map':'Knowledge Map',
+    'label.analytics_title':'Overview',
+    'label.top10':'Top 10 Documents (by views)',
+    'label.cat_views':'Views by Category',
+    'label.no_cat_docs':'No documents in this category',
+    'label.ai_source':'Claude AI · External knowledge — verify before use',
+    'label.connecting':'Connecting…',
+    'label.original_q':'Original question:',
+    'label.ai_answer_ext':'AI Answer (source: Claude external knowledge — verify before use):',
+    'label.ai_summary':'🤖 AI Summary — Source: Knowledge Base',
+    'label.ref_docs':'Reference Documents',
+    'label.similarity':'Similarity',
+    'label.searching':'Searching knowledge base…',
+    'label.cancelled':'Search cancelled.',
+    'label.upload_progress':'Batch Upload',
+    'label.editor_loading':'Loading editor…',
+    'label.parsing':'⏳ Parsing, please wait…',
+    'label.reparsing':'⏳ Re-parsing, please wait…',
+    'label.parsing_file':'⏳ Parsing file content, please wait…',
+    'label.translating':'⏳ AI translating, please wait…',
+    'label.load_failed':'Load failed',
+    'label.setting_mgmt':'⚙️ Settings',
+    'label.sql_init':'🗄 Supabase Init SQL',
+    'label.sql_hint':'Run in Supabase → SQL Editor',
+    'label.sql_desc':'(Includes version control + full-text search + vector index)',
+    'label.embed_mode':'Embedding Mode',
+    'label.embed_edge':'Edge Function (recommended — Key stored in Supabase Secrets)',
+    'label.embed_mock':'Mock mode (offline test, keyword search)',
+    'label.switch_hint':'Use when switching files or computers',
+    'status.filter.draft':'Draft',
+    'status.filter.published':'Published',
+    'status.filter.archived':'Archived',
+    'label.discuss':'Discussion',
+    'label.discuss_hint':'Click 💬 next to a document title in the Knowledge Base',
+    'label.discuss_placeholder':'— Select a document from the Knowledge Base',
+    'label.entry_count':'documents',
+    'confirm.restore':'Restore to this version?',
+    'cat.all':'All Categories',
+    'pl.all':'All Product Lines',
+    'lang.zh-TW':'繁中',
+    'lang.zh-CN':'简中',
+    'lang.en':'EN',
+    'lang.vi':'VI',
+    'lang.ja':'JA',
   },
   'vi': {
     'nav.search':'Hỏi đáp AI', 'nav.editor':'Tạo mục kiến thức', 'nav.docs':'Kho kiến thức',
@@ -1234,6 +1452,78 @@ const I18N = {
     'confirm.cancel_edit':'Hủy chỉnh sửa? Các thay đổi chưa lưu sẽ bị mất.',
     'sys.supabase':'Supabase', 'sys.claude':'Claude API', 'sys.docs':'Tài liệu',
     'sys.rag':'RAG: pgvector + Claude', 'sys.storage':'Lưu trữ: Supabase Postgres',
+    'nav.section.info':'Thông tin hệ thống',
+    'sys.not_set':'Chưa cấu hình',
+    'sys.doc_count':'Tài liệu:',
+    'sys.storage_label':'Lưu trữ: Supabase Postgres',
+    'btn.refresh':'Làm mới',
+    'btn.close':'Đóng',
+    'btn.copy_sql':'Sao chép SQL',
+    'btn.submit':'Gửi',
+    'btn.send':'Gửi',
+    'btn.add':'Thêm',
+    'btn.delete':'Xóa',
+    'btn.skip':'Bỏ qua',
+    'btn.cancel_batch':'Hủy hàng loạt',
+    'btn.download':'↓ Tải xuống',
+    'btn.remove_file':'✕ Xóa',
+    'btn.restore':'↩ Khôi phục',
+    'btn.remove':'✕ Xóa',
+    'btn.clear_filter':'Xóa bộ lọc',
+    'btn.back_cat':'← Quay lại danh mục',
+    'btn.compare':'🔍 So sánh với phiên bản trước',
+    'label.loading':'Đang tải…',
+    'label.no_comments':'Chưa có bình luận. Hãy là người đầu tiên.',
+    'label.no_versions':'Chưa có lịch sử phiên bản',
+    'label.no_experts':'Chưa có chuyên gia',
+    'label.no_results':'Không tìm thấy người phù hợp',
+    'label.saving_version':'Tự động lưu phiên bản sau khi lưu',
+    'label.version_same':'Hai phiên bản giống nhau',
+    'label.version_diff_title':'So sánh phiên bản',
+    'label.knowledge_map':'Bản đồ kiến thức',
+    'label.analytics_title':'Tổng quan',
+    'label.top10':'Top 10 tài liệu (theo lượt xem)',
+    'label.cat_views':'Lượt xem theo danh mục',
+    'label.no_cat_docs':'Không có tài liệu trong danh mục này',
+    'label.ai_source':'Claude AI · Nguồn bên ngoài — cần xác minh',
+    'label.connecting':'Đang kết nối…',
+    'label.original_q':'Câu hỏi gốc:',
+    'label.ai_answer_ext':'Câu trả lời AI (nguồn: kiến thức ngoài — cần xác minh):',
+    'label.ai_summary':'🤖 Tóm tắt AI — Nguồn: Kho kiến thức',
+    'label.ref_docs':'Tài liệu tham khảo',
+    'label.similarity':'Độ tương đồng',
+    'label.searching':'Đang tìm kiếm…',
+    'label.cancelled':'Đã hủy tìm kiếm.',
+    'label.upload_progress':'Tải lên hàng loạt',
+    'label.editor_loading':'Đang tải trình soạn thảo…',
+    'label.parsing':'⏳ Đang phân tích, vui lòng đợi…',
+    'label.reparsing':'⏳ Đang phân tích lại, vui lòng đợi…',
+    'label.parsing_file':'⏳ Đang phân tích nội dung tệp, vui lòng đợi…',
+    'label.translating':'⏳ AI đang dịch, vui lòng đợi…',
+    'label.load_failed':'Tải thất bại',
+    'label.setting_mgmt':'⚙️ Quản lý cài đặt',
+    'label.sql_init':'🗄 SQL khởi tạo Supabase',
+    'label.sql_hint':'Chạy trong Supabase → SQL Editor',
+    'label.sql_desc':'(Bao gồm kiểm soát phiên bản + tìm kiếm toàn văn + chỉ mục vector)',
+    'label.embed_mode':'Chế độ Embedding',
+    'label.embed_edge':'Edge Function (khuyến nghị — Key lưu trong Supabase Secrets)',
+    'label.embed_mock':'Chế độ Mock (kiểm tra offline, tìm kiếm từ khóa)',
+    'label.switch_hint':'Dùng khi đổi tệp hoặc đổi máy tính',
+    'status.filter.draft':'Nháp',
+    'status.filter.published':'Đã xuất bản',
+    'status.filter.archived':'Đã lưu trữ',
+    'label.discuss':'Thảo luận / Bình luận',
+    'label.discuss_hint':'Nhấp 💬 bên cạnh tiêu đề tài liệu trong kho kiến thức',
+    'label.discuss_placeholder':'— Chọn tài liệu từ kho kiến thức',
+    'label.entry_count':'tài liệu',
+    'confirm.restore':'Khôi phục về phiên bản này?',
+    'cat.all':'Tất cả danh mục',
+    'pl.all':'Tất cả dòng sản phẩm',
+    'lang.zh-TW':'繁中',
+    'lang.zh-CN':'简中',
+    'lang.en':'EN',
+    'lang.vi':'VI',
+    'lang.ja':'JA',
   },
   'ja': {
     'nav.search':'AI 質問 / 検索', 'nav.editor':'ナレッジ登録', 'nav.docs':'ナレッジベース',
@@ -1273,6 +1563,78 @@ const I18N = {
     'confirm.cancel_edit':'編集を破棄しますか？保存されていない変更は失われます。',
     'sys.supabase':'Supabase', 'sys.claude':'Claude API', 'sys.docs':'ドキュメント数',
     'sys.rag':'RAG: pgvector + Claude', 'sys.storage':'ストレージ: Supabase Postgres',
+    'nav.section.info':'システム情報',
+    'sys.not_set':'未設定',
+    'sys.doc_count':'ドキュメント数:',
+    'sys.storage_label':'ストレージ: Supabase Postgres',
+    'btn.refresh':'更新',
+    'btn.close':'閉じる',
+    'btn.copy_sql':'SQLをコピー',
+    'btn.submit':'送信',
+    'btn.send':'送信',
+    'btn.add':'追加',
+    'btn.delete':'削除',
+    'btn.skip':'スキップ',
+    'btn.cancel_batch':'バッチをキャンセル',
+    'btn.download':'↓ ダウンロード',
+    'btn.remove_file':'✕ 削除',
+    'btn.restore':'↩ 復元',
+    'btn.remove':'✕ 削除',
+    'btn.clear_filter':'フィルターをクリア',
+    'btn.back_cat':'← カテゴリ一覧に戻る',
+    'btn.compare':'🔍 前バージョンと比較',
+    'label.loading':'読み込み中…',
+    'label.no_comments':'コメントはまだありません。最初のコメントを投稿しましょう。',
+    'label.no_versions':'バージョン履歴なし',
+    'label.no_experts':'専門家データなし',
+    'label.no_results':'該当者なし',
+    'label.saving_version':'保存時に自動でバージョンを記録',
+    'label.version_same':'両バージョンの内容は同一です',
+    'label.version_diff_title':'バージョン比較',
+    'label.knowledge_map':'ナレッジマップ',
+    'label.analytics_title':'概要',
+    'label.top10':'人気ドキュメント TOP 10（閲覧数）',
+    'label.cat_views':'カテゴリ別閲覧数',
+    'label.no_cat_docs':'このカテゴリにドキュメントはありません',
+    'label.ai_source':'Claude AI · 外部知識 — 使用前に確認してください',
+    'label.connecting':'接続中…',
+    'label.original_q':'元の質問：',
+    'label.ai_answer_ext':'AI回答（ソース：Claude外部知識 — 使用前に確認してください）：',
+    'label.ai_summary':'🤖 AI要約回答 — ソース：ナレッジベース',
+    'label.ref_docs':'参考ドキュメント',
+    'label.similarity':'類似度',
+    'label.searching':'ナレッジベースを検索中…',
+    'label.cancelled':'検索をキャンセルしました。',
+    'label.upload_progress':'一括アップロード',
+    'label.editor_loading':'エディター読み込み中…',
+    'label.parsing':'⏳ 解析中、しばらくお待ちください…',
+    'label.reparsing':'⏳ 再解析中、しばらくお待ちください…',
+    'label.parsing_file':'⏳ ファイル内容を解析中、しばらくお待ちください…',
+    'label.translating':'⏳ AI翻訳中、しばらくお待ちください…',
+    'label.load_failed':'読み込み失敗',
+    'label.setting_mgmt':'⚙️ 設定管理',
+    'label.sql_init':'🗄 Supabase 初期化 SQL',
+    'label.sql_hint':'Supabase → SQL Editor で実行',
+    'label.sql_desc':'（バージョン管理 + 全文検索 + ベクターインデックス込み）',
+    'label.embed_mode':'Embedding モード',
+    'label.embed_edge':'Edge Function（推奨 — Key は Supabase Secrets に保存）',
+    'label.embed_mock':'Mock モード（オフラインテスト、キーワード検索）',
+    'label.switch_hint':'ファイルまたは端末を変更する際に使用',
+    'status.filter.draft':'下書き',
+    'status.filter.published':'公開済み',
+    'status.filter.archived':'アーカイブ済み',
+    'label.discuss':'ディスカッション / コメント',
+    'label.discuss_hint':'ナレッジベースでドキュメントタイトル横の💬をクリック',
+    'label.discuss_placeholder':'— ナレッジベースからドキュメントを選択してください',
+    'label.entry_count':'件のドキュメント',
+    'confirm.restore':'このバージョンに復元しますか？',
+    'cat.all':'すべてのカテゴリ',
+    'pl.all':'すべての製品ライン',
+    'lang.zh-TW':'繁中',
+    'lang.zh-CN':'简中',
+    'lang.en':'EN',
+    'lang.vi':'VI',
+    'lang.ja':'JA',
   },
 };
 
@@ -4826,6 +5188,47 @@ function applyI18n() {
     const cat = el.dataset.cat;
     if (catLookup[cat]) el.textContent = catLookup[cat];
   });
+
+  // ── 補充：按鈕與動態標籤 ──
+  // 送出/關閉/取消/新增/刪除 通用按鈕（靠 data-i18n 標記處理，下面補沒標記的）
+  const btnMap = {
+    'config-save-btn':    s['config.save'],
+    'config-cancel-btn':  s['btn.cancel'],
+    'docs-new-btn':       s['docs.new'],
+  };
+  for (const [id, text] of Object.entries(btnMap)) {
+    const el = document.getElementById(id);
+    if (el && text) el.textContent = text;
+  }
+
+  // docs panel 標題
+  const docsTitle = document.querySelector('#panel-docs h2, #docs-panel-title');
+  if (docsTitle && s['docs.title']) docsTitle.textContent = s['docs.title'];
+
+  // review filter 按鈕文字（data-i18n 已標記，確保更新）
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.dataset.i18n;
+    if (s[key] !== undefined) el.textContent = s[key];
+  });
+
+  // 系統資訊列
+  const notSetText = s['sys.not_set'] || '未設定';
+  const supaEl = document.getElementById('status-supabase');
+  if (supaEl) {
+    const configured = CFG?.supabaseUrl;
+    supaEl.innerHTML = `Supabase: <span style="color:${configured ? 'var(--green)' : 'var(--text-3)'}">${configured ? 'OK' : notSetText}</span>`;
+  }
+  const claudeEl = document.getElementById('status-claude');
+  if (claudeEl) {
+    const configured = CFG?.claudeKey;
+    claudeEl.innerHTML = `Claude API: <span style="color:${configured ? 'var(--green)' : 'var(--text-3)'}">${configured ? 'OK' : notSetText}</span>`;
+  }
+
+  // filter selects placeholder（All Categories / All Product Lines）
+  const filterCat = document.getElementById('docs-filter-cat');
+  if (filterCat?.options[0]) filterCat.options[0].textContent = s['cat.all'] || 'All Categories';
+  const filterPL = document.getElementById('docs-filter-product-line');
+  if (filterPL?.options[0]) filterPL.options[0].textContent = s['pl.all'] || 'All Product Lines';
 }
 
 // ═══════════════════════════════════════════════
@@ -5367,7 +5770,7 @@ async function loadKmap(filterCat) {
       <span>${meta.icon} ${catLabel}</span>`;
     headerActions.innerHTML = '';
     content.innerHTML = `
-      <div class="kmap-back" onclick="loadKmap(null)">← 回分類總覽</div>
+      <div class="kmap-back" onclick="loadKmap(null)" data-i18n="btn.back_cat">← 回分類總覽</div>
       <div style="padding:12px 20px;">
         ${catDocs.length === 0
           ? '<div style="color:var(--text-3);font-size:13px;padding:20px 0;">此分類尚無文件</div>'
@@ -5437,7 +5840,7 @@ async function loadAnalytics() {
   const maxViews = Math.max(...docs.map(d => d.view_count||0), 1);
 
   wrap.innerHTML = `
-    <div class="section-hd">總覽</div>
+    <div class="section-hd" data-i18n="label.analytics_title">總覽</div>
     <div class="stat-grid">
       <div class="stat-card"><div class="stat-label">知識條目</div><div class="stat-val">${totalDocs}</div></div>
       <div class="stat-card"><div class="stat-label">已發佈</div><div class="stat-val">${published}</div></div>
@@ -5445,7 +5848,7 @@ async function loadAnalytics() {
       <div class="stat-card" onclick="toast('知識缺口紀錄：'+localStorage.getItem('kms-search-gaps')?.slice(0,100),'');" style="cursor:pointer;" title="點擊查看 localStorage 原始值"><div class="stat-label">知識缺口</div><div class="stat-val" style="color:var(--amber)">${gapCount}</div><div class="stat-sub">AI 搜尋無結果的查詢</div></div>
     </div>
 
-    <div class="section-hd">熱門文件 TOP 10（閱讀次數排行）</div>
+    <div class="section-hd" data-i18n="label.top10">熱門文件 TOP 10（閱讀次數排行）</div>
     ${docs.slice(0,10).map((d,i) => `
       <div class="chart-row">
         <span style="font-size:11px;color:var(--text-3);width:18px;flex-shrink:0;">${i+1}</span>
@@ -5454,7 +5857,7 @@ async function loadAnalytics() {
         <span class="chart-val">👁 ${d.view_count||0}</span>
       </div>`).join('')}
 
-    <div class="section-hd" style="margin-top:16px;">各分類閱讀次數</div>
+    <div class="section-hd" style="margin-top:16px;" data-i18n="label.cat_views">各分類閱讀次數</div>
     ${(() => {
       const catViews = {};
       docs.forEach(d => { catViews[d.category] = (catViews[d.category]||0) + (d.view_count||0); });

@@ -391,11 +391,11 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.83</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.81</span>
     </div>
     <div class="lang-selector">
-      <button class="lang-btn active" onclick="setLang('zh-TW')" data-i18n="lang.zh-TW">繁中</button>
-      <button class="lang-btn" onclick="setLang('zh-CN')" data-i18n="lang.zh-CN">简中</button>
+      <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
+      <button class="lang-btn" onclick="setLang('zh-CN')">简中</button>
       <button class="lang-btn" onclick="setLang('en')">EN</button>
       <button class="lang-btn" onclick="setLang('vi')">VI</button>
       <button class="lang-btn" onclick="setLang('ja')">日本語</button>
@@ -560,7 +560,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
               onclick="event.stopPropagation()"
               onkeydown="if(event.isComposing)return;if(event.key==='Enter'){event.preventDefault();event.stopPropagation();fetchUrlContent();}"
               autocomplete="off" autocorrect="off" autocapitalize="off" />
-            <button onclick="event.stopPropagation();fetchUrlContent()" data-i18n="btn.fetch_url"
+            <button onclick="event.stopPropagation();fetchUrlContent()"
               style="padding:5px 12px;border-radius:var(--radius);border:1px solid var(--blue);background:var(--blue-bg);color:var(--blue);font-size:12px;cursor:pointer;white-space:nowrap;flex-shrink:0;">
               擷取內文
             </button>
@@ -589,7 +589,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
           <button class="save-btn" onclick="saveDoc()" data-i18n="editor.save">儲存並向量化</button>
           <button id="reparse-btn" onclick="reparseCurrentDoc()"
             style="display:none;padding:6px 14px;border-radius:var(--radius);border:1px solid var(--blue);background:transparent;cursor:pointer;font-size:13px;color:var(--blue);white-space:nowrap;">
-            <span data-i18n="btn.reparse">🔄 重新解析</span>
+            🔄 重新解析
           </button>
           <button onclick="cancelEdit()"
             style="padding:6px 14px;border-radius:var(--radius);border:1px solid var(--border);background:transparent;cursor:pointer;font-size:13px;color:var(--text-2);white-space:nowrap;">
@@ -697,14 +697,14 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         <!-- Version History Sidebar -->
         <div id="version-sidebar" style="width:220px;border-left:1px solid var(--border);display:none;flex-direction:column;flex-shrink:0;background:var(--surface);">
           <div style="padding:10px 12px;border-bottom:1px solid var(--border);font-size:12px;font-weight:500;color:var(--text-2);display:flex;align-items:center;justify-content:space-between;">
-            <span data-i18n="label.versions">版本歷史</span>
+            版本歷史
             <span id="ver-count" style="background:var(--bg);border:1px solid var(--border);border-radius:10px;font-size:11px;padding:1px 6px;color:var(--text-3);">0</span>
           </div>
           <div id="version-list" style="flex:1;overflow-y:auto;padding:8px;">
-            <div style="color:var(--text-3);font-size:12px;text-align:center;padding:20px 0;" data-i18n="label.saving_version">儲存後自動記錄版本</div>
+            <div style="color:var(--text-3);font-size:12px;text-align:center;padding:20px 0;">儲存後自動記錄版本</div>
           </div>
           <div style="padding:8px;border-top:1px solid var(--border);">
-            <button onclick="loadVersionHistory()" style="width:100%;padding:5px;border-radius:6px;border:1px solid var(--border);background:transparent;cursor:pointer;font-size:12px;color:var(--text-2);" data-i18n="btn.refresh">重新整理</button>
+            <button onclick="loadVersionHistory()" style="width:100%;padding:5px;border-radius:6px;border:1px solid var(--border);background:transparent;cursor:pointer;font-size:12px;color:var(--text-2);">重新整理</button>
           </div>
         </div>
       </div>
@@ -730,7 +730,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
             style="flex:1;min-width:140px;padding:6px 10px;border-radius:var(--radius);border:1px solid var(--border);font-size:13px;font-family:var(--font);outline:none;background:var(--surface);color:var(--text);" />
           <select id="docs-filter-cat" onchange="loadDocs()"
             style="padding:6px 10px;border-radius:var(--radius);border:1px solid var(--border);font-size:12px;font-family:var(--font);background:var(--surface);color:var(--text);outline:none;cursor:pointer;">
-            <option value="">All Categories</option>
+            <option value="" data-i18n="cat.all">All Categories</option>
             <option value="product">Product</option>
             <option value="sales">Customer</option>
             <option value="industry">Industry</option>
@@ -744,7 +744,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
           </select>
           <select id="docs-filter-product-line" onchange="loadDocs()"
             style="padding:6px 10px;border-radius:var(--radius);border:1px solid var(--border);font-size:12px;font-family:var(--font);background:var(--surface);color:var(--text);outline:none;cursor:pointer;">
-            <option value="">All Product Lines</option>
+            <option value="" data-i18n="pl.all">All Product Lines</option>
           </select>
           <input type="text" id="docs-filter-customer" placeholder="🏢 Customer…"
             oninput="loadDocs()"
@@ -760,7 +760,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
     <div class="panel" id="panel-kmap">
       <div style="display:flex;flex-direction:column;height:100%;">
         <div style="padding:12px 20px;border-bottom:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:space-between;">
-          <div style="font-size:15px;font-weight:500;" id="kmap-header-title" data-i18n="kmap.title">知識地圖 — 分類總覽</div>
+          <div style="font-size:15px;font-weight:500;" id="kmap-header-title">知識地圖 — 分類總覽</div>
           <div id="kmap-header-actions"></div>
         </div>
         <div id="kmap-content" style="flex:1;overflow-y:auto;"></div>
@@ -781,7 +781,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
     <div class="panel" id="panel-experts">
       <div style="display:flex;flex-direction:column;height:100%;">
         <div style="padding:12px 20px;border-bottom:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:space-between;">
-          <div style="font-size:15px;font-weight:500;" data-i18n="experts.title">專家黃頁</div>
+          <div style="font-size:15px;font-weight:500;">專家黃頁</div>
           <a href="/" onclick="event.preventDefault();toast('請至 Platform → User Management 管理人員資料','');"
             style="font-size:11px;color:var(--text-3);text-decoration:none;padding:5px 10px;border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;">
             ⚙ 人員管理請至 Platform
@@ -795,7 +795,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
     <div class="panel" id="panel-setting">
       <div style="display:flex;flex-direction:column;height:100%;">
         <div style="padding:12px 20px;border-bottom:1px solid var(--border);flex-shrink:0;">
-          <div style="font-size:15px;font-weight:500;margin-bottom:10px;" data-i18n="label.setting_mgmt">⚙️ 設定管理</div>
+          <div style="font-size:15px;font-weight:500;margin-bottom:10px;">⚙️ 設定管理</div>
           <div style="display:flex;gap:6px;">
             <button id="setting-tab-pl" onclick="switchSettingTab('pl')"
               style="padding:6px 14px;border-radius:var(--radius);border:1px solid var(--blue);background:var(--blue);color:#fff;font-size:12px;cursor:pointer;">
@@ -815,13 +815,13 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
     <div class="panel" id="panel-review">
       <div style="display:flex;flex-direction:column;height:100%;">
         <div style="padding:12px 20px;border-bottom:1px solid var(--border);flex-shrink:0;">
-          <div style="font-size:15px;font-weight:500;margin-bottom:10px;" data-i18n="review.title">審核流程管理</div>
+          <div style="font-size:15px;font-weight:500;margin-bottom:10px;">審核流程管理</div>
           <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
-            <span class="review-step active" id="rs-draft" onclick="filterReviewPanel('draft')" style="cursor:pointer;" data-i18n="status.filter.draft">草稿</span>
+            <span class="review-step active" id="rs-draft" onclick="filterReviewPanel('draft')" style="cursor:pointer;">草稿</span>
             <span class="review-arrow">→</span>
-            <span class="review-step" id="rs-published" onclick="filterReviewPanel('published')" style="cursor:pointer;" data-i18n="status.filter.published">已發佈</span>
+            <span class="review-step" id="rs-published" onclick="filterReviewPanel('published')" style="cursor:pointer;">已發佈</span>
             <span class="review-arrow">→</span>
-            <span class="review-step" id="rs-archived" onclick="filterReviewPanel('archived')" style="cursor:pointer;" data-i18n="status.filter.archived">已封存</span>
+            <span class="review-step" id="rs-archived" onclick="filterReviewPanel('archived')" style="cursor:pointer;">已封存</span>
           </div>
         </div>
         <div style="flex:1;overflow-y:auto;padding:12px 20px;" id="review-content">
@@ -834,11 +834,11 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
     <div class="panel" id="panel-comments">
       <div style="display:flex;flex-direction:column;height:100%;">
         <div style="padding:12px 20px;border-bottom:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;gap:10px;">
-          <div style="font-size:15px;font-weight:500;" data-i18n="label.discuss">討論 / 留言</div>
-          <span id="comments-doc-title" style="font-size:12px;color:var(--text-3);" data-i18n="label.discuss_placeholder">— 請先從知識庫選擇文件</span>
+          <div style="font-size:15px;font-weight:500;">討論 / 留言</div>
+          <span id="comments-doc-title" style="font-size:12px;color:var(--text-3);">— 請先從知識庫選擇文件</span>
         </div>
         <div class="comment-wrap" id="comment-list" style="flex:1;overflow-y:auto;">
-          <div style="color:var(--text-3);font-size:13px;text-align:center;padding:30px 0;" data-i18n="label.discuss_hint">從知識庫點擊文件標題旁的「💬」進入討論</div>
+          <div style="color:var(--text-3);font-size:13px;text-align:center;padding:30px 0;">從知識庫點擊文件標題旁的「💬」進入討論</div>
         </div>
         <div class="comment-input-wrap">
           <textarea class="comment-input" id="comment-input" placeholder="輸入留言…" rows="2"
@@ -854,7 +854,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
 <!-- Config Modal -->
 <div class="modal-overlay" id="config-modal">
   <div class="modal">
-    <div class="modal-title" data-i18n="config.title">⚙ API 設定</div>
+    <div class="modal-title">⚙ API 設定</div>
 
     <div class="field">
       <label>Supabase Project URL</label>
@@ -869,8 +869,8 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
     <div class="field">
       <label data-i18n="label.embed_mode">Embedding 模式</label>
       <select id="cfg-embed-model">
-        <option value="edge-fn" data-i18n="label.embed_edge">Edge Function（推薦，Key 存在 Supabase Secrets）</option>
-        <option value="mock" data-i18n="label.embed_mock">Mock 模式（離線測試，關鍵字搜尋）</option>
+        <option value="edge-fn">Edge Function（推薦，Key 存在 Supabase Secrets）</option>
+        <option value="mock">Mock 模式（離線測試，關鍵字搜尋）</option>
       </select>
     </div>
 
@@ -888,24 +888,24 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
       <div style="display:flex;gap:6px;flex-wrap:wrap;">
         <button onclick="exportConfig()"
           style="padding:5px 12px;border-radius:6px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:12px;color:var(--text-2);">
-          <span data-i18n="btn.export_cfg">📤 匯出設定</span>
+          📤 匯出設定
         </button>
         <button onclick="document.getElementById('cfg-import-file').click()"
           style="padding:5px 12px;border-radius:6px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:12px;color:var(--text-2);">
-          <span data-i18n="btn.import_cfg">📥 匯入設定</span>
+          📥 匯入設定
         </button>
         <input type="file" id="cfg-import-file" accept=".json" style="display:none"
           onchange="importConfig(event)" />
         <button onclick="copyConfigAsEnv()"
           style="padding:5px 12px;border-radius:6px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:12px;color:var(--text-2);">
-          <span data-i18n="btn.copy_url_param">📋 複製為 URL 參數</span>
+          📋 複製為 URL 參數
         </button>
       </div>
     </div>
 
     <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeConfig()" data-i18n="btn.cancel" data-i18n="btn.cancel">取消</button>
-      <button class="btn-save" onclick="saveConfig()" data-i18n="config.save">儲存設定</button>
+      <button class="btn-cancel" onclick="closeConfig()">取消</button>
+      <button class="btn-save" onclick="saveConfig()">儲存設定</button>
 
     </div>
   </div>
@@ -933,10 +933,10 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         </div>
       </div>
     <div class="reader-footer">
-      <button class="reader-btn" id="reader-dl-btn" style="display:none;" onclick="readerDownload()" data-i18n="btn.download">↓ 下載原始檔</button>
+      <button class="reader-btn" id="reader-dl-btn" style="display:none;" onclick="readerDownload()">↓ 下載原始檔</button>
       <div style="position:relative;display:inline-block;">
         <button class="reader-btn" id="reader-translate-btn" onclick="toggleTranslateMenu()" style="gap:4px;">
-          <span data-i18n="btn.ai_translate">🌐 AI 翻譯 ▾</span>
+          🌐 AI 翻譯 ▾
         </button>
         <div id="translate-menu" style="display:none;position:absolute;bottom:100%;left:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:0 4px 12px rgba(0,0,0,.12);min-width:140px;z-index:999;margin-bottom:4px;">
           <div onclick="translateReader('en')"    style="padding:9px 16px;cursor:pointer;font-size:13px;" onmouseover="this.style.background='var(--bg)'" onmouseout="this.style.background=''">🇺🇸 English</div>
@@ -944,12 +944,12 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
           <div onclick="translateReader('zh-CN')" style="padding:9px 16px;cursor:pointer;font-size:13px;" onmouseover="this.style.background='var(--bg)'" onmouseout="this.style.background=''">🇨🇳 简体中文</div>
           <div onclick="translateReader('vi')"    style="padding:9px 16px;cursor:pointer;font-size:13px;" onmouseover="this.style.background='var(--bg)'" onmouseout="this.style.background=''">🇻🇳 Tiếng Việt</div>
           <div onclick="translateReader('ja')"    style="padding:9px 16px;cursor:pointer;font-size:13px;" onmouseover="this.style.background='var(--bg)'" onmouseout="this.style.background=''">🇯🇵 日本語</div>
-          <div onclick="restoreReaderOriginal()" style="padding:9px 16px;cursor:pointer;font-size:13px;border-top:1px solid var(--border);color:var(--text-3);" onmouseover="this.style.background='var(--bg)'" onmouseout="this.style.background=''" data-i18n="btn.restore">↩ 恢復原文</div>
+          <div onclick="restoreReaderOriginal()" style="padding:9px 16px;cursor:pointer;font-size:13px;border-top:1px solid var(--border);color:var(--text-3);" onmouseover="this.style.background='var(--bg)'" onmouseout="this.style.background=''">↩ 恢復原文</div>
         </div>
       </div>
-      <button class="reader-btn" onclick="copyReaderContent()" title="複製全文" data-i18n="btn.copy">📋 複製</button>
+      <button class="reader-btn" onclick="copyReaderContent()" title="複製全文">📋 複製</button>
       <button class="reader-btn" id="reader-discuss-btn" onclick="toggleReaderDiscussion()" style="display:none;">💬 Discussion</button>
-      <button class="reader-btn" onclick="closeReader()" style="margin-left:auto;" data-i18n="btn.close">關閉</button>
+      <button class="reader-btn" onclick="closeReader()" style="margin-left:auto;">關閉</button>
     </div>
   </div>
 </div>
@@ -957,7 +957,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
 <!-- Product Line Modal -->
 <div class="modal-overlay" id="product-line-modal">
   <div class="modal" style="max-width:380px;">
-    <div class="modal-title" data-i18n="btn.add_product_line">＋ 新增產品線</div>
+    <div class="modal-title">＋ 新增產品線</div>
     <div class="field">
       <label>Product Line Name（英文）</label>
       <input type="text" id="new-product-line-input" placeholder="e.g. Smart Home Accessories" />
@@ -1048,12 +1048,12 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
 <!-- SQL Setup Helper -->
 <div id="sql-helper" style="display:none;position:fixed;bottom:20px;left:20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;max-width:460px;font-size:12px;z-index:50;box-shadow:0 4px 20px rgba(0,0,0,.1);">
   <div style="font-weight:500;margin-bottom:6px;" data-i18n="label.sql_init">🗄 Supabase 初始化 SQL</div>
-  <div style="color:var(--text-2);margin-bottom:8px;">在 Supabase → SQL Editor 執行 <code>setup.sql</code data-i18n="label.sql_desc">（已含版本控制 + 全文搜尋 + 向量索引）</div>
+  <div style="color:var(--text-2);margin-bottom:8px;">在 Supabase → SQL Editor 執行 <code>setup.sql</code>（已含版本控制 + 全文搜尋 + 向量索引）</div>
   <div style="display:flex;gap:6px;">
     <button onclick="document.getElementById('sql-helper').style.display='none'"
       style="padding:5px 12px;border-radius:6px;border:1px solid var(--border);background:transparent;cursor:pointer;font-size:12px;">關閉</button>
     <button onclick="copySql()"
-      style="padding:5px 12px;border-radius:6px;border:none;background:var(--blue);color:#fff;cursor:pointer;font-size:12px;" data-i18n="btn.copy_sql">複製 SQL</button>
+      style="padding:5px 12px;border-radius:6px;border:none;background:var(--blue);color:#fff;cursor:pointer;font-size:12px;">複製 SQL</button>
   </div>
 </div>
 
@@ -1070,14 +1070,6 @@ let CFG = {
 };
 let currentLang = 'zh-TW';
 let tiptapEditor = null;
-
-// ── i18n helper ──
-function t(key, vars) {
-  const s = I18N[currentLang] || I18N['zh-TW'];
-  let str = s[key] !== undefined ? s[key] : (I18N['zh-TW'][key] || key);
-  if (vars) Object.entries(vars).forEach(([k,v]) => { str = str.replace('{'+k+'}', v); });
-  return str;
-}
 let localDocs = []; // fallback when Supabase not configured
 let editingDocId = null; // 正在編輯的文件 ID（null = 新增，有值 = 更新）
 let currentCustomerTags = []; // 客戶標籤
@@ -1127,108 +1119,45 @@ const I18N = {
     'confirm.cancel_edit':'放棄編輯？未儲存的變更將會遺失。',
     'sys.supabase':'Supabase', 'sys.claude':'Claude API', 'sys.docs':'文件數',
     'sys.rag':'RAG: pgvector + Claude', 'sys.storage':'儲存: Supabase Postgres',
-    'nav.section.info':'系統資訊',
-    'sys.not_set':'未設定',
-    'sys.doc_count':'文件數:',
-    'sys.storage_label':'儲存: Supabase Postgres',
-    'btn.refresh':'重新整理',
-    'btn.close':'關閉',
-    'btn.copy_sql':'複製 SQL',
-    'btn.submit':'送出',
-    'btn.send':'送出',
-    'btn.add':'新增',
-    'btn.delete':'刪除',
-    'btn.skip':'跳過',
-    'btn.cancel_batch':'取消批次',
-    'btn.download':'↓ 下載',
-    'btn.remove_file':'✕ 刪除',
-    'btn.restore':'↩ 還原',
-    'btn.remove':'✕ 移除',
-    'btn.clear_filter':'清除篩選',
-    'btn.back_cat':'← 回分類總覽',
-    'btn.compare':'🔍 與上版比較',
-    'label.loading':'載入中…',
+    'cat.all':'所有分類',
+    'pl.all':'所有產品線',
+    'status.filter.draft':'草稿',
+    'status.filter.published':'已發佈',
+    'status.filter.archived':'已封存',
     'label.no_comments':'尚無留言，成為第一個留言的人',
     'label.no_versions':'尚無版本紀錄',
     'label.no_experts':'尚無專家資料',
     'label.no_results':'無符合人員',
-    'label.saving_version':'儲存後自動記錄版本',
-    'label.version_same':'兩版本內容相同',
-    'label.version_diff_title':'版本比較',
-    'label.knowledge_map':'知識地圖',
-    'label.analytics_title':'總覽',
-    'label.top10':'熱門文件 TOP 10（閱讀次數排行）',
-    'label.cat_views':'各分類閱讀次數',
     'label.no_cat_docs':'此分類尚無文件',
-    'label.ai_source':'Claude AI · 非知識庫來源',
-    'label.connecting':'連線中…',
-    'label.original_q':'原始問題：',
-    'label.ai_answer_ext':'AI 回答（來源：Claude 外部知識，請驗證後修改）：',
-    'label.ai_summary':'🤖 AI 彙整回答 — 來源：知識庫',
-    'label.ref_docs':'參考文件',
-    'label.similarity':'相似度',
-    'label.searching':t('label.searching'),
-    'label.cancelled':t('label.cancelled'),
-    'label.upload_progress':'批次上傳',
-    'label.editor_loading':'編輯器載入中…',
-    'label.parsing':'⏳ 解析中，請稍候…',
-    'label.reparsing':'⏳ 重新解析中，請稍候…',
-    'label.parsing_file':'⏳ 解析檔案內容中，請稍候…',
-    'label.translating':'⏳ AI 翻譯中，請稍候…',
-    'label.load_failed':'載入失敗',
+    'label.version_same':'兩版本內容相同',
+    'label.saving_version':'儲存後自動記錄版本',
+    'label.discuss':'討論 / 留言',
+    'label.discuss_hint':'從知識庫點擊文件標題旁的「💬」進入討論',
+    'label.discuss_placeholder':'— 請先從知識庫選擇文件',
+    'btn.clear_filter':'清除篩選',
+    'btn.back_cat':'← 回分類總覽',
+    'btn.compare':'🔍 與上版比較',
+    'btn.close':'關閉',
+    'btn.copy_sql':'複製 SQL',
+    'btn.refresh':'重新整理',
+    'btn.fetch_url':'擷取內文',
+    'btn.reparse':'🔄 重新解析',
+    'btn.export_cfg':'📤 匯出設定',
+    'btn.import_cfg':'📥 匯入設定',
+    'btn.add_product_line':'＋ 新增產品線',
+    'nav.section.main':'主功能',
+    'nav.section.info':'系統資訊',
     'label.setting_mgmt':'⚙️ 設定管理',
     'label.sql_init':'🗄 Supabase 初始化 SQL',
     'label.sql_hint':'在 Supabase → SQL Editor 執行',
-    'label.sql_desc':'（已含版本控制 + 全文搜尋 + 向量索引）',
     'label.embed_mode':'Embedding 模式',
     'label.embed_edge':'Edge Function（推薦，Key 存在 Supabase Secrets）',
     'label.embed_mock':'Mock 模式（離線測試，關鍵字搜尋）',
     'label.switch_hint':'換檔案或換電腦時使用',
-    'status.filter.draft':'草稿',
-    'status.filter.published':'已發佈',
-    'status.filter.archived':'已封存',
-    'label.discuss':'討論 / 留言',
-    'label.discuss_hint':'從知識庫點擊文件標題旁的「💬」進入討論',
-    'label.discuss_placeholder':'— 請先從知識庫選擇文件',
-    'label.entry_count':'份文件',
-    'confirm.restore':'確定要還原至此版本？',
-    'cat.all':'所有分類',
-    'pl.all':'所有產品線',
-    'lang.zh-TW':'繁中',
-    'lang.zh-CN':'简中',
-    'lang.en':'EN',
-    'lang.vi':'VI',
-    'lang.ja':'JA',
-    'toast.need_title':'請輸入文件標題',
-    'toast.file_blocked':'上傳的檔案不符合限制，請移除後重新選擇',
-    'toast.need_content':'請輸入文件內容或上傳檔案',
-    'toast.upload_fail':'原始檔上傳失敗（文字內容仍會儲存）',
-    'toast.doc_truncated':'文件過長，向量化使用前 24000 字元',
-    'toast.saved_vectorized':'已儲存並完成向量化 ✓',
-    'toast.saved_embed_fail':'文件已儲存 ✓，向量化失敗',
-    'toast.doc_updated':'文件已更新 ✓',
-    'toast.save_fail':'儲存失敗',
-    'toast.reparse_done':'重新解析完成',
-    'toast.reparse_fail':'無法從原始檔抽取文字，請手動貼上內容',
-    'toast.reparse_error':'重新解析失敗',
-    'toast.no_files':'沒有可處理的檔案',
-    'toast.no_source_file':'此文件無原始檔紀錄，請手動貼上內容後儲存',
-    'toast.downloading':'下載原始檔中…',
-    'label.ai_analyzing':'🤖 AI 分析中…',
-    'label.saving_doc':'儲存文件…',
-    'label.uploading_file':'上傳原始檔…',
-    'label.saving_local':'本機儲存中…',
-    'nav.section.main':'主功能',
     'label.versions':'版本歷史',
-    'btn.fetch_url':'擷取內文',
-    'btn.reparse':'🔄 重新解析',
-    'btn.ai_translate':'🌐 AI 翻譯 ▾',
-    'btn.export_cfg':'📤 匯出設定',
-    'btn.import_cfg':'📥 匯入設定',
-    'btn.copy_url_param':'📋 複製為 URL 參數',
-    'btn.add_product_line':'＋ 新增產品線',
-    'btn.copy':'📋 複製',
-    'btn.down':'↓ 下載原始檔',
+    'label.analytics_title':'分析報表',
+    'label.top10':'熱門文件 TOP 10（閱讀次數排行）',
+    'label.cat_views':'各分類閱讀次數',
   },
   'zh-CN': {
     'nav.search':'Search', 'nav.editor':'创建知识条目', 'nav.docs':'Articles',
@@ -1266,110 +1195,45 @@ const I18N = {
     'confirm.cancel_edit':'放弃编辑？未保存的更改将会丢失。',
     'sys.supabase':'Supabase', 'sys.claude':'Claude API', 'sys.docs':'文档数',
     'sys.rag':'RAG: pgvector + Claude', 'sys.storage':'存储: Supabase Postgres',
-    'nav.section.info':'系统信息',
-    'sys.not_set':'未设置',
-    'sys.doc_count':'文档数:',
-    'sys.storage_label':'存储: Supabase Postgres',
-    'btn.refresh':'刷新',
-    'btn.close':'关闭',
-    'btn.copy_sql':'复制 SQL',
-    'btn.submit':'提交',
-    'btn.send':'发送',
-    'btn.add':'新增',
-    'btn.delete':'删除',
-    'btn.skip':'跳过',
-    'btn.cancel_batch':'取消批次',
-    'btn.download':'↓ 下载',
-    'btn.remove_file':'✕ 删除',
-    'btn.restore':'↩ 还原',
-    'btn.remove':'✕ 移除',
-    'btn.clear_filter':'清除筛选',
-    'btn.back_cat':'← 返回分类总览',
-    'btn.compare':'🔍 与上版比较',
-    'label.loading':'加载中…',
+    'cat.all':'所有分类',
+    'pl.all':'所有产品线',
+    'status.filter.draft':'草稿',
+    'status.filter.published':'已发布',
+    'status.filter.archived':'已归档',
     'label.no_comments':'暂无留言',
     'label.no_versions':'暂无版本记录',
     'label.no_experts':'暂无专家数据',
     'label.no_results':'无符合人员',
-    'label.saving_version':'保存后自动记录版本',
-    'label.version_same':'两版本内容相同',
-    'label.version_diff_title':'版本比较',
-    'label.knowledge_map':'知识地图',
-    'label.analytics_title':'总览',
-    'label.top10':'热门文档 TOP 10（阅读次数排行）',
-    'label.cat_views':'各分类阅读次数',
     'label.no_cat_docs':'此分类暂无文档',
-    'label.ai_source':'Claude AI · 非知识库来源',
-    'label.connecting':'连接中…',
-    'label.original_q':'原始问题：',
-    'label.ai_answer_ext':'AI 回答（来源：Claude 外部知识，请验证后修改）：',
-    'label.ai_summary':'🤖 AI 汇总回答 — 来源：知识库',
-    'label.ref_docs':'参考文档',
-    'label.similarity':'相似度',
-    'label.searching':'搜索知识库中…',
-    'label.cancelled':'已取消搜索。',
-    'label.upload_progress':'批次上传',
-    'label.editor_loading':'编辑器加载中…',
-    'label.parsing':'⏳ 解析中，请稍候…',
-    'label.reparsing':'⏳ 重新解析中，请稍候…',
-    'label.parsing_file':'⏳ 解析文件内容中，请稍候…',
-    'label.translating':'⏳ AI 翻译中，请稍候…',
-    'label.load_failed':'加载失败',
-    'label.setting_mgmt':'⚙️ 设置管理',
-    'label.sql_init':'🗄 Supabase 初始化 SQL',
-    'label.sql_hint':'在 Supabase → SQL Editor 执行',
-    'label.sql_desc':'（已含版本控制 + 全文搜索 + 向量索引）',
-    'label.embed_mode':'Embedding 模式',
-    'label.embed_edge':'Edge Function（推荐，Key 存于 Supabase Secrets）',
-    'label.embed_mock':'Mock 模式（离线测试，关键字搜索）',
-    'label.switch_hint':'换文件或换电脑时使用',
-    'status.filter.draft':'草稿',
-    'status.filter.published':'已发布',
-    'status.filter.archived':'已归档',
+    'label.version_same':'两版本内容相同',
+    'label.saving_version':'保存后自动记录版本',
     'label.discuss':'讨论 / 留言',
     'label.discuss_hint':'从知识库点击文档标题旁的「💬」进入讨论',
     'label.discuss_placeholder':'— 请先从知识库选择文档',
-    'label.entry_count':'份文档',
-    'confirm.restore':'确定要还原至此版本？',
-    'label.btn.save':'保存',
-    'label.btn.cancel':'取消',
-    'cat.all':'所有分类',
-    'pl.all':'所有产品线',
-    'lang.zh-TW':'繁中',
-    'lang.zh-CN':'简中',
-    'lang.en':'EN',
-    'lang.vi':'VI',
-    'lang.ja':'JA',
-    'toast.need_title':'请输入文档标题',
-    'toast.file_blocked':'上传的文件不符合限制，请移除后重新选择',
-    'toast.need_content':'请输入文档内容或上传文件',
-    'toast.upload_fail':'原始文件上传失败（文字内容仍将保存）',
-    'toast.doc_truncated':'文档过长，向量化使用前 24000 字符',
-    'toast.saved_vectorized':'已保存并完成向量化 ✓',
-    'toast.saved_embed_fail':'文档已保存 ✓，向量化失败',
-    'toast.doc_updated':'文档已更新 ✓',
-    'toast.save_fail':'保存失败',
-    'toast.reparse_done':'重新解析完成',
-    'toast.reparse_fail':'无法从原始文件提取文字，请手动粘贴内容',
-    'toast.reparse_error':'重新解析失败',
-    'toast.no_files':'没有可处理的文件',
-    'toast.no_source_file':'此文档无原始文件记录，请手动粘贴内容后保存',
-    'toast.downloading':'下载原始文件中…',
-    'label.ai_analyzing':'🤖 AI 分析中…',
-    'label.saving_doc':'保存文档…',
-    'label.uploading_file':'上传原始文件…',
-    'label.saving_local':'本地保存中…',
-    'nav.section.main':'主功能',
-    'label.versions':'版本历史',
+    'btn.clear_filter':'清除筛选',
+    'btn.back_cat':'← 返回分类总览',
+    'btn.compare':'🔍 与上版比较',
+    'btn.close':'关闭',
+    'btn.copy_sql':'复制 SQL',
+    'btn.refresh':'刷新',
     'btn.fetch_url':'提取内容',
     'btn.reparse':'🔄 重新解析',
-    'btn.ai_translate':'🌐 AI 翻译 ▾',
     'btn.export_cfg':'📤 导出设置',
     'btn.import_cfg':'📥 导入设置',
-    'btn.copy_url_param':'📋 复制为 URL 参数',
     'btn.add_product_line':'＋ 新增产品线',
-    'btn.copy':'📋 复制',
-    'btn.down':'↓ 下载原始文件',
+    'nav.section.main':'主功能',
+    'nav.section.info':'系统信息',
+    'label.setting_mgmt':'⚙️ 设置管理',
+    'label.sql_init':'🗄 Supabase 初始化 SQL',
+    'label.sql_hint':'在 Supabase → SQL Editor 执行',
+    'label.embed_mode':'Embedding 模式',
+    'label.embed_edge':'Edge Function（推荐）',
+    'label.embed_mock':'Mock 模式（离线测试）',
+    'label.switch_hint':'换文件或换电脑时使用',
+    'label.versions':'版本历史',
+    'label.analytics_title':'分析报表',
+    'label.top10':'热门文档 TOP 10',
+    'label.cat_views':'各分类阅读次数',
   },
   'en': {
     'nav.search':'AI Q&A / Search', 'nav.editor':'Create', 'nav.docs':'Articles',
@@ -1409,108 +1273,45 @@ const I18N = {
     'confirm.cancel_edit':'Discard changes? Unsaved edits will be lost.',
     'sys.supabase':'Supabase', 'sys.claude':'Claude API', 'sys.docs':'Documents',
     'sys.rag':'RAG: pgvector + Claude', 'sys.storage':'Storage: Supabase Postgres',
-    'nav.section.info':'System Info',
-    'sys.not_set':'Not configured',
-    'sys.doc_count':'Documents:',
-    'sys.storage_label':'Storage: Supabase Postgres',
-    'btn.refresh':'Refresh',
-    'btn.close':'Close',
-    'btn.copy_sql':'Copy SQL',
-    'btn.submit':'Submit',
-    'btn.send':'Send',
-    'btn.add':'Add',
-    'btn.delete':'Delete',
-    'btn.skip':'Skip',
-    'btn.cancel_batch':'Cancel Batch',
-    'btn.download':'↓ Download',
-    'btn.remove_file':'✕ Remove',
-    'btn.restore':'↩ Restore',
-    'btn.remove':'✕ Remove',
-    'btn.clear_filter':'Clear Filter',
-    'btn.back_cat':'← Back to Categories',
-    'btn.compare':'🔍 Compare with Previous',
-    'label.loading':'Loading…',
+    'cat.all':'All Categories',
+    'pl.all':'All Product Lines',
+    'status.filter.draft':'Draft',
+    'status.filter.published':'Published',
+    'status.filter.archived':'Archived',
     'label.no_comments':'No comments yet. Be the first.',
     'label.no_versions':'No version history',
     'label.no_experts':'No experts yet',
     'label.no_results':'No matching users',
-    'label.saving_version':'Version saved automatically',
-    'label.version_same':'Both versions are identical',
-    'label.version_diff_title':'Version Comparison',
-    'label.knowledge_map':'Knowledge Map',
-    'label.analytics_title':'Overview',
-    'label.top10':'Top 10 Documents (by views)',
-    'label.cat_views':'Views by Category',
     'label.no_cat_docs':'No documents in this category',
-    'label.ai_source':'Claude AI · External knowledge — verify before use',
-    'label.connecting':'Connecting…',
-    'label.original_q':'Original question:',
-    'label.ai_answer_ext':'AI Answer (source: Claude external knowledge — verify before use):',
-    'label.ai_summary':'🤖 AI Summary — Source: Knowledge Base',
-    'label.ref_docs':'Reference Documents',
-    'label.similarity':'Similarity',
-    'label.searching':'Searching knowledge base…',
-    'label.cancelled':'Search cancelled.',
-    'label.upload_progress':'Batch Upload',
-    'label.editor_loading':'Loading editor…',
-    'label.parsing':'⏳ Parsing, please wait…',
-    'label.reparsing':'⏳ Re-parsing, please wait…',
-    'label.parsing_file':'⏳ Parsing file content, please wait…',
-    'label.translating':'⏳ AI translating, please wait…',
-    'label.load_failed':'Load failed',
+    'label.version_same':'Both versions are identical',
+    'label.saving_version':'Version saved automatically on save',
+    'label.discuss':'Discussion',
+    'label.discuss_hint':'Click 💬 next to a document title',
+    'label.discuss_placeholder':'— Select a document from the Knowledge Base',
+    'btn.clear_filter':'Clear Filter',
+    'btn.back_cat':'← Back to Categories',
+    'btn.compare':'🔍 Compare with Previous',
+    'btn.close':'Close',
+    'btn.copy_sql':'Copy SQL',
+    'btn.refresh':'Refresh',
+    'btn.fetch_url':'Fetch Content',
+    'btn.reparse':'🔄 Re-parse',
+    'btn.export_cfg':'📤 Export Settings',
+    'btn.import_cfg':'📥 Import Settings',
+    'btn.add_product_line':'＋ Add Product Line',
+    'nav.section.main':'Main',
+    'nav.section.info':'System Info',
     'label.setting_mgmt':'⚙️ Settings',
     'label.sql_init':'🗄 Supabase Init SQL',
     'label.sql_hint':'Run in Supabase → SQL Editor',
-    'label.sql_desc':'(Includes version control + full-text search + vector index)',
     'label.embed_mode':'Embedding Mode',
-    'label.embed_edge':'Edge Function (recommended — Key stored in Supabase Secrets)',
-    'label.embed_mock':'Mock mode (offline test, keyword search)',
+    'label.embed_edge':'Edge Function (recommended)',
+    'label.embed_mock':'Mock mode (offline test)',
     'label.switch_hint':'Use when switching files or computers',
-    'status.filter.draft':'Draft',
-    'status.filter.published':'Published',
-    'status.filter.archived':'Archived',
-    'label.discuss':'Discussion',
-    'label.discuss_hint':'Click 💬 next to a document title in the Knowledge Base',
-    'label.discuss_placeholder':'— Select a document from the Knowledge Base',
-    'label.entry_count':'documents',
-    'confirm.restore':'Restore to this version?',
-    'cat.all':'All Categories',
-    'pl.all':'All Product Lines',
-    'lang.zh-TW':'繁中',
-    'lang.zh-CN':'简中',
-    'lang.en':'EN',
-    'lang.vi':'VI',
-    'lang.ja':'JA',
-    'toast.need_title':'Please enter a document title',
-    'toast.file_blocked':'File does not meet requirements — remove and retry',
-    'toast.need_content':'Please enter content or upload a file',
-    'toast.upload_fail':'Original file upload failed (text content will still be saved)',
-    'toast.doc_truncated':'Document too long — vectorizing first 24,000 characters',
-    'toast.saved_vectorized':'Saved and vectorized ✓',
-    'toast.saved_embed_fail':'Saved ✓ — vectorization failed',
-    'toast.doc_updated':'Document updated ✓',
-    'toast.save_fail':'Save failed',
-    'toast.reparse_done':'Re-parse complete',
-    'toast.reparse_fail':'Could not extract text from file — please paste content manually',
-    'toast.reparse_error':'Re-parse failed',
-    'toast.no_files':'No processable files',
-    'toast.no_source_file':'No source file on record — please paste content manually',
-    'toast.downloading':'Downloading original file…',
-    'label.ai_analyzing':'🤖 AI analyzing…',
-    'label.saving_doc':'Saving document…',
-    'label.uploading_file':'Uploading file…',
-    'label.saving_local':'Saving locally…',
-    'nav.section.main':'Main',
     'label.versions':'Version History',
-    'btn.fetch_url':'Fetch Content',
-    'btn.reparse':'🔄 Re-parse',
-    'btn.ai_translate':'🌐 AI Translate ▾',
-    'btn.export_cfg':'📤 Export Settings',
-    'btn.import_cfg':'📥 Import Settings',
-    'btn.copy_url_param':'📋 Copy as URL Params',
-    'btn.add_product_line':'＋ Add Product Line',
-    'btn.copy':'📋 Copy',
-    'btn.down':'↓ Download Original',
+    'label.analytics_title':'Analytics',
+    'label.top10':'Top 10 Documents (by views)',
+    'label.cat_views':'Views by Category',
   },
   'vi': {
     'nav.search':'Hỏi đáp AI', 'nav.editor':'Tạo mục kiến thức', 'nav.docs':'Kho kiến thức',
@@ -1550,108 +1351,45 @@ const I18N = {
     'confirm.cancel_edit':'Hủy chỉnh sửa? Các thay đổi chưa lưu sẽ bị mất.',
     'sys.supabase':'Supabase', 'sys.claude':'Claude API', 'sys.docs':'Tài liệu',
     'sys.rag':'RAG: pgvector + Claude', 'sys.storage':'Lưu trữ: Supabase Postgres',
-    'nav.section.info':'Thông tin hệ thống',
-    'sys.not_set':'Chưa cấu hình',
-    'sys.doc_count':'Tài liệu:',
-    'sys.storage_label':'Lưu trữ: Supabase Postgres',
-    'btn.refresh':'Làm mới',
-    'btn.close':'Đóng',
-    'btn.copy_sql':'Sao chép SQL',
-    'btn.submit':'Gửi',
-    'btn.send':'Gửi',
-    'btn.add':'Thêm',
-    'btn.delete':'Xóa',
-    'btn.skip':'Bỏ qua',
-    'btn.cancel_batch':'Hủy hàng loạt',
-    'btn.download':'↓ Tải xuống',
-    'btn.remove_file':'✕ Xóa',
-    'btn.restore':'↩ Khôi phục',
-    'btn.remove':'✕ Xóa',
-    'btn.clear_filter':'Xóa bộ lọc',
-    'btn.back_cat':'← Quay lại danh mục',
-    'btn.compare':'🔍 So sánh với phiên bản trước',
-    'label.loading':'Đang tải…',
-    'label.no_comments':'Chưa có bình luận. Hãy là người đầu tiên.',
-    'label.no_versions':'Chưa có lịch sử phiên bản',
-    'label.no_experts':'Chưa có chuyên gia',
-    'label.no_results':'Không tìm thấy người phù hợp',
-    'label.saving_version':'Tự động lưu phiên bản sau khi lưu',
-    'label.version_same':'Hai phiên bản giống nhau',
-    'label.version_diff_title':'So sánh phiên bản',
-    'label.knowledge_map':'Bản đồ kiến thức',
-    'label.analytics_title':'Tổng quan',
-    'label.top10':'Top 10 tài liệu (theo lượt xem)',
-    'label.cat_views':'Lượt xem theo danh mục',
-    'label.no_cat_docs':'Không có tài liệu trong danh mục này',
-    'label.ai_source':'Claude AI · Nguồn bên ngoài — cần xác minh',
-    'label.connecting':'Đang kết nối…',
-    'label.original_q':'Câu hỏi gốc:',
-    'label.ai_answer_ext':'Câu trả lời AI (nguồn: kiến thức ngoài — cần xác minh):',
-    'label.ai_summary':'🤖 Tóm tắt AI — Nguồn: Kho kiến thức',
-    'label.ref_docs':'Tài liệu tham khảo',
-    'label.similarity':'Độ tương đồng',
-    'label.searching':'Đang tìm kiếm…',
-    'label.cancelled':'Đã hủy tìm kiếm.',
-    'label.upload_progress':'Tải lên hàng loạt',
-    'label.editor_loading':'Đang tải trình soạn thảo…',
-    'label.parsing':'⏳ Đang phân tích, vui lòng đợi…',
-    'label.reparsing':'⏳ Đang phân tích lại, vui lòng đợi…',
-    'label.parsing_file':'⏳ Đang phân tích nội dung tệp, vui lòng đợi…',
-    'label.translating':'⏳ AI đang dịch, vui lòng đợi…',
-    'label.load_failed':'Tải thất bại',
-    'label.setting_mgmt':'⚙️ Quản lý cài đặt',
-    'label.sql_init':'🗄 SQL khởi tạo Supabase',
-    'label.sql_hint':'Chạy trong Supabase → SQL Editor',
-    'label.sql_desc':'(Bao gồm kiểm soát phiên bản + tìm kiếm toàn văn + chỉ mục vector)',
-    'label.embed_mode':'Chế độ Embedding',
-    'label.embed_edge':'Edge Function (khuyến nghị — Key lưu trong Supabase Secrets)',
-    'label.embed_mock':'Chế độ Mock (kiểm tra offline, tìm kiếm từ khóa)',
-    'label.switch_hint':'Dùng khi đổi tệp hoặc đổi máy tính',
+    'cat.all':'Tất cả danh mục',
+    'pl.all':'Tất cả dòng sản phẩm',
     'status.filter.draft':'Nháp',
     'status.filter.published':'Đã xuất bản',
     'status.filter.archived':'Đã lưu trữ',
-    'label.discuss':'Thảo luận / Bình luận',
-    'label.discuss_hint':'Nhấp 💬 bên cạnh tiêu đề tài liệu trong kho kiến thức',
+    'label.no_comments':'Chưa có bình luận.',
+    'label.no_versions':'Chưa có lịch sử phiên bản',
+    'label.no_experts':'Chưa có chuyên gia',
+    'label.no_results':'Không tìm thấy',
+    'label.no_cat_docs':'Không có tài liệu trong danh mục này',
+    'label.version_same':'Hai phiên bản giống nhau',
+    'label.saving_version':'Tự động lưu phiên bản sau khi lưu',
+    'label.discuss':'Thảo luận',
+    'label.discuss_hint':'Nhấp 💬 bên cạnh tiêu đề tài liệu',
     'label.discuss_placeholder':'— Chọn tài liệu từ kho kiến thức',
-    'label.entry_count':'tài liệu',
-    'confirm.restore':'Khôi phục về phiên bản này?',
-    'cat.all':'Tất cả danh mục',
-    'pl.all':'Tất cả dòng sản phẩm',
-    'lang.zh-TW':'繁中',
-    'lang.zh-CN':'简中',
-    'lang.en':'EN',
-    'lang.vi':'VI',
-    'lang.ja':'JA',
-    'toast.need_title':'Vui lòng nhập tiêu đề tài liệu',
-    'toast.file_blocked':'Tệp không đáp ứng yêu cầu — vui lòng xóa và thử lại',
-    'toast.need_content':'Vui lòng nhập nội dung hoặc tải tệp lên',
-    'toast.upload_fail':'Tải tệp gốc thất bại (nội dung văn bản vẫn được lưu)',
-    'toast.doc_truncated':'Tài liệu quá dài — vector hóa 24.000 ký tự đầu tiên',
-    'toast.saved_vectorized':'Đã lưu và vector hóa ✓',
-    'toast.saved_embed_fail':'Đã lưu ✓ — vector hóa thất bại',
-    'toast.doc_updated':'Tài liệu đã được cập nhật ✓',
-    'toast.save_fail':'Lưu thất bại',
-    'toast.reparse_done':'Phân tích lại hoàn tất',
-    'toast.reparse_fail':'Không thể trích xuất văn bản — vui lòng dán nội dung thủ công',
-    'toast.reparse_error':'Phân tích lại thất bại',
-    'toast.no_files':'Không có tệp nào để xử lý',
-    'toast.no_source_file':'Không có hồ sơ tệp gốc — vui lòng dán nội dung thủ công',
-    'toast.downloading':'Đang tải tệp gốc…',
-    'label.ai_analyzing':'🤖 AI đang phân tích…',
-    'label.saving_doc':'Đang lưu tài liệu…',
-    'label.uploading_file':'Đang tải tệp lên…',
-    'label.saving_local':'Đang lưu cục bộ…',
-    'nav.section.main':'Chức năng chính',
-    'label.versions':'Lịch sử phiên bản',
+    'btn.clear_filter':'Xóa bộ lọc',
+    'btn.back_cat':'← Quay lại danh mục',
+    'btn.compare':'🔍 So sánh với phiên bản trước',
+    'btn.close':'Đóng',
+    'btn.copy_sql':'Sao chép SQL',
+    'btn.refresh':'Làm mới',
     'btn.fetch_url':'Lấy nội dung',
     'btn.reparse':'🔄 Phân tích lại',
-    'btn.ai_translate':'🌐 Dịch AI ▾',
     'btn.export_cfg':'📤 Xuất cài đặt',
     'btn.import_cfg':'📥 Nhập cài đặt',
-    'btn.copy_url_param':'📋 Sao chép tham số URL',
     'btn.add_product_line':'＋ Thêm dòng sản phẩm',
-    'btn.copy':'📋 Sao chép',
-    'btn.down':'↓ Tải file gốc',
+    'nav.section.main':'Chức năng chính',
+    'nav.section.info':'Thông tin hệ thống',
+    'label.setting_mgmt':'⚙️ Cài đặt',
+    'label.sql_init':'🗄 SQL khởi tạo Supabase',
+    'label.sql_hint':'Chạy trong Supabase → SQL Editor',
+    'label.embed_mode':'Chế độ Embedding',
+    'label.embed_edge':'Edge Function (khuyến nghị)',
+    'label.embed_mock':'Chế độ Mock (kiểm tra offline)',
+    'label.switch_hint':'Dùng khi đổi tệp hoặc máy tính',
+    'label.versions':'Lịch sử phiên bản',
+    'label.analytics_title':'Phân tích',
+    'label.top10':'Top 10 tài liệu (theo lượt xem)',
+    'label.cat_views':'Lượt xem theo danh mục',
   },
   'ja': {
     'nav.search':'AI 質問 / 検索', 'nav.editor':'ナレッジ登録', 'nav.docs':'ナレッジベース',
@@ -1691,108 +1429,45 @@ const I18N = {
     'confirm.cancel_edit':'編集を破棄しますか？保存されていない変更は失われます。',
     'sys.supabase':'Supabase', 'sys.claude':'Claude API', 'sys.docs':'ドキュメント数',
     'sys.rag':'RAG: pgvector + Claude', 'sys.storage':'ストレージ: Supabase Postgres',
-    'nav.section.info':'システム情報',
-    'sys.not_set':'未設定',
-    'sys.doc_count':'ドキュメント数:',
-    'sys.storage_label':'ストレージ: Supabase Postgres',
-    'btn.refresh':'更新',
-    'btn.close':'閉じる',
-    'btn.copy_sql':'SQLをコピー',
-    'btn.submit':'送信',
-    'btn.send':'送信',
-    'btn.add':'追加',
-    'btn.delete':'削除',
-    'btn.skip':'スキップ',
-    'btn.cancel_batch':'バッチをキャンセル',
-    'btn.download':'↓ ダウンロード',
-    'btn.remove_file':'✕ 削除',
-    'btn.restore':'↩ 復元',
-    'btn.remove':'✕ 削除',
-    'btn.clear_filter':'フィルターをクリア',
-    'btn.back_cat':'← カテゴリ一覧に戻る',
-    'btn.compare':'🔍 前バージョンと比較',
-    'label.loading':'読み込み中…',
-    'label.no_comments':'コメントはまだありません。最初のコメントを投稿しましょう。',
-    'label.no_versions':'バージョン履歴なし',
-    'label.no_experts':'専門家データなし',
-    'label.no_results':'該当者なし',
-    'label.saving_version':'保存時に自動でバージョンを記録',
-    'label.version_same':'両バージョンの内容は同一です',
-    'label.version_diff_title':'バージョン比較',
-    'label.knowledge_map':'ナレッジマップ',
-    'label.analytics_title':'概要',
-    'label.top10':'人気ドキュメント TOP 10（閲覧数）',
-    'label.cat_views':'カテゴリ別閲覧数',
-    'label.no_cat_docs':'このカテゴリにドキュメントはありません',
-    'label.ai_source':'Claude AI · 外部知識 — 使用前に確認してください',
-    'label.connecting':'接続中…',
-    'label.original_q':'元の質問：',
-    'label.ai_answer_ext':'AI回答（ソース：Claude外部知識 — 使用前に確認してください）：',
-    'label.ai_summary':'🤖 AI要約回答 — ソース：ナレッジベース',
-    'label.ref_docs':'参考ドキュメント',
-    'label.similarity':'類似度',
-    'label.searching':'ナレッジベースを検索中…',
-    'label.cancelled':'検索をキャンセルしました。',
-    'label.upload_progress':'一括アップロード',
-    'label.editor_loading':'エディター読み込み中…',
-    'label.parsing':'⏳ 解析中、しばらくお待ちください…',
-    'label.reparsing':'⏳ 再解析中、しばらくお待ちください…',
-    'label.parsing_file':'⏳ ファイル内容を解析中、しばらくお待ちください…',
-    'label.translating':'⏳ AI翻訳中、しばらくお待ちください…',
-    'label.load_failed':'読み込み失敗',
-    'label.setting_mgmt':'⚙️ 設定管理',
-    'label.sql_init':'🗄 Supabase 初期化 SQL',
-    'label.sql_hint':'Supabase → SQL Editor で実行',
-    'label.sql_desc':'（バージョン管理 + 全文検索 + ベクターインデックス込み）',
-    'label.embed_mode':'Embedding モード',
-    'label.embed_edge':'Edge Function（推奨 — Key は Supabase Secrets に保存）',
-    'label.embed_mock':'Mock モード（オフラインテスト、キーワード検索）',
-    'label.switch_hint':'ファイルまたは端末を変更する際に使用',
+    'cat.all':'すべてのカテゴリ',
+    'pl.all':'すべての製品ライン',
     'status.filter.draft':'下書き',
     'status.filter.published':'公開済み',
     'status.filter.archived':'アーカイブ済み',
-    'label.discuss':'ディスカッション / コメント',
-    'label.discuss_hint':'ナレッジベースでドキュメントタイトル横の💬をクリック',
-    'label.discuss_placeholder':'— ナレッジベースからドキュメントを選択してください',
-    'label.entry_count':'件のドキュメント',
-    'confirm.restore':'このバージョンに復元しますか？',
-    'cat.all':'すべてのカテゴリ',
-    'pl.all':'すべての製品ライン',
-    'lang.zh-TW':'繁中',
-    'lang.zh-CN':'简中',
-    'lang.en':'EN',
-    'lang.vi':'VI',
-    'lang.ja':'JA',
-    'toast.need_title':'ドキュメントタイトルを入力してください',
-    'toast.file_blocked':'ファイルが要件を満たしていません — 削除して再選択してください',
-    'toast.need_content':'コンテンツを入力するかファイルをアップロードしてください',
-    'toast.upload_fail':'元ファイルのアップロード失敗（テキスト内容は保存されます）',
-    'toast.doc_truncated':'ドキュメントが長すぎます — 最初の24,000文字をベクトル化します',
-    'toast.saved_vectorized':'保存してベクトル化しました ✓',
-    'toast.saved_embed_fail':'保存済み ✓ — ベクトル化失敗',
-    'toast.doc_updated':'ドキュメントを更新しました ✓',
-    'toast.save_fail':'保存失敗',
-    'toast.reparse_done':'再解析完了',
-    'toast.reparse_fail':'ファイルからテキストを抽出できません — 手動でコンテンツを貼り付けてください',
-    'toast.reparse_error':'再解析失敗',
-    'toast.no_files':'処理できるファイルがありません',
-    'toast.no_source_file':'元ファイルの記録がありません — 手動でコンテンツを貼り付けてください',
-    'toast.downloading':'元ファイルをダウンロード中…',
-    'label.ai_analyzing':'🤖 AI分析中…',
-    'label.saving_doc':'ドキュメント保存中…',
-    'label.uploading_file':'ファイルアップロード中…',
-    'label.saving_local':'ローカル保存中…',
-    'nav.section.main':'メイン機能',
-    'label.versions':'バージョン履歴',
+    'label.no_comments':'コメントはまだありません。',
+    'label.no_versions':'バージョン履歴なし',
+    'label.no_experts':'専門家データなし',
+    'label.no_results':'該当者なし',
+    'label.no_cat_docs':'このカテゴリにドキュメントはありません',
+    'label.version_same':'両バージョンの内容は同一です',
+    'label.saving_version':'保存時に自動でバージョンを記録',
+    'label.discuss':'ディスカッション',
+    'label.discuss_hint':'💬をクリックしてディスカッションに入る',
+    'label.discuss_placeholder':'— ナレッジベースからドキュメントを選択',
+    'btn.clear_filter':'フィルターをクリア',
+    'btn.back_cat':'← カテゴリ一覧に戻る',
+    'btn.compare':'🔍 前バージョンと比較',
+    'btn.close':'閉じる',
+    'btn.copy_sql':'SQLをコピー',
+    'btn.refresh':'更新',
     'btn.fetch_url':'コンテンツ取得',
     'btn.reparse':'🔄 再解析',
-    'btn.ai_translate':'🌐 AI翻訳 ▾',
     'btn.export_cfg':'📤 設定エクスポート',
     'btn.import_cfg':'📥 設定インポート',
-    'btn.copy_url_param':'📋 URLパラメータとしてコピー',
     'btn.add_product_line':'＋ 製品ライン追加',
-    'btn.copy':'📋 コピー',
-    'btn.down':'↓ 元ファイルをダウンロード',
+    'nav.section.main':'メイン機能',
+    'nav.section.info':'システム情報',
+    'label.setting_mgmt':'⚙️ 設定管理',
+    'label.sql_init':'🗄 Supabase 初期化 SQL',
+    'label.sql_hint':'Supabase → SQL Editor で実行',
+    'label.embed_mode':'Embedding モード',
+    'label.embed_edge':'Edge Function（推奨）',
+    'label.embed_mock':'Mock モード（オフラインテスト）',
+    'label.switch_hint':'ファイルまたは端末を変更する際に使用',
+    'label.versions':'バージョン履歴',
+    'label.analytics_title':'分析レポート',
+    'label.top10':'人気ドキュメント TOP 10',
+    'label.cat_views':'カテゴリ別閲覧数',
   },
 };
 
@@ -2032,8 +1707,8 @@ function loadConfig() {
 function updateStatus() {
   const sb = document.getElementById('status-supabase');
   const cl = document.getElementById('status-claude');
-  sb.innerHTML = `Supabase: <span style="color:${CFG.supabaseUrl ? 'var(--green)' : 'var(--text-3)'}">${CFG.supabaseUrl ? 'OK' : t('sys.not_set')}</span>`;
-  cl.innerHTML = `Claude API: <span style="color:${CFG.supabaseUrl ? 'var(--green)' : (CFG.claudeKey ? 'var(--amber)' : 'var(--text-3)')}">${CFG.supabaseUrl ? 'Edge Fn ✓' : (CFG.claudeKey ? 'Direct' : t('sys.not_set'))}</span>`;
+  sb.innerHTML = `Supabase: <span style="color:${CFG.supabaseUrl ? 'var(--green)' : 'var(--text-3)'}">${CFG.supabaseUrl ? '已設定' : '未設定'}</span>`;
+  cl.innerHTML = `Claude API: <span style="color:${CFG.supabaseUrl ? 'var(--green)' : (CFG.claudeKey ? 'var(--amber)' : 'var(--text-3)')}">${CFG.supabaseUrl ? 'Edge Function ✓' : (CFG.claudeKey ? '直連模式' : '未設定')}</span>`;
 }
 
 // ═══════════════════════════════════════════════
@@ -2041,7 +1716,7 @@ function updateStatus() {
 // ═══════════════════════════════════════════════
 async function initTipTap() {
   const editorEl = document.getElementById('tiptap-editor');
-  editorEl.innerHTML = `<div style="color:var(--text-3);padding:20px;font-size:13px;">${t('label.editor_loading')}</div>`;
+  editorEl.innerHTML = '<div style="color:var(--text-3);padding:20px;font-size:13px;">編輯器載入中…</div>';
 
   try {
     // esm.sh 提供穩定的 ESM build，相容所有現代瀏覽器
@@ -2366,7 +2041,7 @@ async function autoClassify() {
   const indicator = document.getElementById('ai-cat-indicator');
   if (!catEl) return;
 
-  if (indicator) { indicator.textContent = t('label.ai_analyzing') || '🤖 AI 分析中…'; indicator.style.color = 'var(--text-3)'; }
+  if (indicator) { indicator.textContent = '🤖 AI 分析中…'; indicator.style.color = 'var(--text-3)'; }
 
   try {
     const catList = Object.entries(CAT_NAMES_FOR_PROMPT).map(([k,v]) => `- ${k}: ${v}`).join('\n');
@@ -2411,10 +2086,10 @@ async function saveDoc() {
   const lang = document.getElementById('doc-lang').value;
   const status = document.getElementById('doc-status').value;
 
-  if (!title) { toast(t('toast.need_title') || '請輸入文件標題', 'error'); return; }
-  if (window._uploadBlocked) { toast(t('toast.file_blocked') || '上傳的檔案不符合限制，請移除後重新選擇', 'error'); return; }
+  if (!title) { toast('請輸入文件標題', 'error'); return; }
+  if (window._uploadBlocked) { toast('上傳的檔案不符合限制，請移除後重新選擇', 'error'); return; }
   // 有上傳檔案時，body 可以為空（以檔案內容為主）
-  if (!body && !uploadedFile && !uploadedFileUrl) { toast(t('toast.need_content') || '請輸入文件內容或上傳檔案', 'error'); return; }
+  if (!body && !uploadedFile && !uploadedFileUrl) { toast('請輸入文件內容或上傳檔案', 'error'); return; }
 
   const btn = document.querySelector('.save-btn');
   btn.disabled = true;
@@ -2425,19 +2100,19 @@ async function saveDoc() {
     const useSupabase = CFG.supabaseUrl && CFG.supabaseKey;
 
     if (useSupabase) {
-      btn.textContent = t('label.saving_doc') || '儲存文件…';
+      btn.textContent = '儲存文件…';
 
       // ── 先上傳原始檔到 Storage（如果有）──
       let fileUrl = null, fileName = null, fileType = null, fileSize = null;
       if (uploadedFile) {
-        btn.textContent = t('label.uploading_file') || '上傳原始檔…';
+        btn.textContent = '上傳原始檔…';
         try {
           fileUrl = await uploadToStorage(uploadedFile);
           fileName = uploadedFileName;
           fileType = uploadedFileType;
           fileSize = uploadedFileSize;
         } catch(e) {
-          toast((t('toast.upload_fail') || '原始檔上傳失敗') + '：' + e.message, '');
+          toast('原始檔上傳失敗（文字內容仍會儲存）：' + e.message, '');
         }
       }
 
@@ -2484,53 +2159,53 @@ async function saveDoc() {
       if (mode === 'edge-fn') {
         const shouldEmbed = !editingDocId || !!uploadedFile; // 新文件 or 有換附檔
         if (shouldEmbed) {
-          btn.textContent = 'Edge Function…';
+          btn.textContent = 'Edge Function 向量化…';
           try {
             if (body && body.length > 24000) {
               await kmsWrite('update', 'kms_documents', { body: body.slice(0, 24000) }, doc_id);
-              toast(t('toast.doc_truncated') || '文件過長，向量化使用前 24000 字元', '');
+              toast('文件過長，向量化使用前 24000 字元', '');
             }
             await callEmbedEdgeFn(doc_id);
-            toast(t('toast.saved_vectorized') || '已儲存並完成向量化 ✓', 'success');
+            toast(`已儲存並完成向量化 ✓`, 'success');
           } catch(embedErr) {
             console.error('[embed-document]', embedErr);
-            toast(`${t('toast.saved_embed_fail') || '文件已儲存 ✓，向量化失敗'}（${embedErr.message.slice(0,60)}）`, '');
+            toast(`文件已儲存 ✓，向量化失敗（${embedErr.message.slice(0,60)}）`, '');
           }
         } else {
-          toast(t('toast.doc_updated') || '文件已更新 ✓', 'success');
+          toast('文件已更新 ✓', 'success');
         }
 
       } else if (mode === 'direct-openai') {
-        btn.textContent = 'OpenAI…';
+        btn.textContent = 'OpenAI 向量化中…';
         const embedding = await generateEmbedding(title + '\n' + body);
         await sbFetch(`/rest/v1/kms_documents?id=eq.${doc_id}`, {
           method: 'PATCH',
           body: JSON.stringify({ embedding }),
           prefer: 'return=minimal',
         });
-        toast(t('toast.saved_vectorized') || '已儲存並完成 OpenAI 向量化 ✓', 'success');
+        toast('已儲存並完成 OpenAI 向量化 ✓', 'success');
 
       } else {
         // mock — 存 mock 向量
-        btn.textContent = 'Mock…';
+        btn.textContent = 'Mock 向量化…';
         const embedding = await generateEmbedding(title + '\n' + body);
         await sbFetch(`/rest/v1/kms_documents?id=eq.${doc_id}`, {
           method: 'PATCH',
           body: JSON.stringify({ embedding }),
           prefer: 'return=minimal',
         });
-        toast(t('toast.saved') || '已儲存至 Supabase（Mock 向量）', 'success');
+        toast('已儲存至 Supabase（Mock 向量）', 'success');
       }
 
     } else {
       // ── 無 Supabase：存本機 ──
-      btn.textContent = t('label.saving_local') || '本機儲存中…';
+      btn.textContent = '本機儲存中…';
       const embedding = await generateEmbedding(title + '\n' + body);
       const localDoc = { title, body, category, lang, status, embedding,
         id: 'local-' + Date.now(), created_at: new Date().toISOString() };
       localDocs.push(localDoc);
       localStorage.setItem('kms-local-docs', JSON.stringify(localDocs));
-      toast(t('toast.saved') || '已儲存至本機（Mock 模式）', 'success');
+      toast('已儲存至本機（Mock 模式）', 'success');
     }
 
     // ── 完成：清空編輯器、存版本快照、跳知識庫 ──
@@ -2580,11 +2255,11 @@ async function saveDoc() {
     } else { switchPanel('docs'); }
 
   } catch(e) {
-    toast((t('toast.save_fail') || '儲存失敗') + '：' + e.message, 'error');
+    toast('儲存失敗：' + e.message, 'error');
     console.error(e);
   } finally {
     btn.disabled = false;
-    btn.textContent = t('editor.save');
+    btn.textContent = '儲存並向量化';
   }
 }
 
@@ -2717,10 +2392,10 @@ async function reparseCurrentDoc() {
     const fileUrl = rows?.[0]?.file_url;
     const fileName = rows?.[0]?.file_name || 'document';
     if (!fileUrl) {
-      toast(t('toast.no_source_file') || '此文件無原始檔紀錄，請手動貼上內容後儲存', '');
+      toast('此文件無原始檔紀錄，請手動貼上內容後儲存', '');
       return;
     }
-    toast(t('toast.downloading') || '下載原始檔中…', '');
+    toast('下載原始檔中…', '');
     // Supabase Storage public URL 不需要帶 auth header
     const res = await fetch(fileUrl);
     if (!res.ok) throw new Error('下載失敗 ' + res.status);
@@ -2761,7 +2436,7 @@ async function reparseCurrentDoc() {
     }
     const file = new File([blob], fileName, { type: mimeType });
     if (tiptapEditor) tiptapEditor.commands.setContent('<p style="color:var(--text-3);font-style:italic;">⏳ 重新解析中，請稍候…</p>');
-    toast(t('label.reparsing') || '重新解析中…', '');
+    toast('重新解析內容中…', '');
     // extractText 已內建 pdfjs 優先 → claude-proxy fallback
     const text = await extractText(file, ext);
     if (text && text.length > 10) {
@@ -2772,16 +2447,16 @@ async function reparseCurrentDoc() {
         .replace(/\n\n+/g, '</p><p>')
         .replace(/\n/g, '<br>');
       if (tiptapEditor) tiptapEditor.commands.setContent('<p>' + escaped + '</p>');
-      toast(`✅ ${t('toast.reparse_done') || '重新解析完成'} · ${text.length} 字元`, 'success');
+      toast('✅ 重新解析完成 · ' + text.length + ' 字元，確認後按「更新文件」儲存', 'success');
     } else {
       if (tiptapEditor) tiptapEditor.commands.clearContent();
-      toast(t('toast.reparse_fail') || '無法從原始檔抽取文字，請手動貼上內容', '');
+      toast('無法從原始檔抽取文字，請手動貼上內容', '');
     }
   } catch(e) {
-    toast((t('toast.reparse_error') || '重新解析失敗') + '：' + e.message, 'error');
+    toast('重新解析失敗：' + e.message, 'error');
     console.error(e);
   } finally {
-    if (btn) { btn.disabled = false; btn.textContent = t('btn.reparse') || '🔄 重新解析'; }
+    if (btn) { btn.disabled = false; btn.textContent = '🔄 重新解析'; }
   }
 }
 function handleDrop(e) {
@@ -2818,7 +2493,7 @@ async function processBatchFiles(files) {
     if (f.size > MAX_BYTES) { toast(`跳過過大檔案：${f.name}（${(f.size/1024/1024).toFixed(1)}MB > 50MB）`, ''); return false; }
     return true;
   });
-  if (!validFiles.length) { toast(t('toast.no_files') || '沒有可處理的檔案', 'error'); return; }
+  if (!validFiles.length) { toast('沒有可處理的檔案', 'error'); return; }
   _batchFiles = validFiles;
   _batchIdx = 0;
   _batchSuccess = 0;
@@ -3590,7 +3265,7 @@ function buildAuthorName() {
 function renderAuthorDropdown(users) {
   const dd = document.getElementById('author-dropdown');
   if (!dd) return;
-  if (!users.length) { dd.innerHTML = `<div style="padding:8px 12px;color:var(--text-3);">${t('label.no_results')}</div>`; return; }
+  if (!users.length) { dd.innerHTML = '<div style="padding:8px 12px;color:var(--text-3);">無符合人員</div>'; return; }
   dd.innerHTML = users.slice(0, 10).map(u => `
     <div onclick="selectAuthor('${(u.nameEn||u.nameZh||'').replace(/'/g,'')}')"
       style="padding:7px 12px;cursor:pointer;display:flex;gap:8px;align-items:center;"
@@ -3696,7 +3371,7 @@ async function loadReviewerUsers() {
 function renderReviewerDropdown(users) {
   const dd = document.getElementById('reviewer-dropdown');
   if (!dd) return;
-  if (!users.length) { dd.innerHTML = `<div style="padding:8px 12px;color:var(--text-3);">${t('label.no_results')}</div>`; return; }
+  if (!users.length) { dd.innerHTML = '<div style="padding:8px 12px;color:var(--text-3);">無符合人員</div>'; return; }
   dd.innerHTML = users.slice(0, 8).map(u => `
     <div onclick="selectReviewer('${u.empId}','${u.nameEn||u.nameZh}')"
       style="padding:7px 12px;cursor:pointer;display:flex;gap:8px;align-items:center;"
@@ -3851,7 +3526,7 @@ async function loadSettingContent() {
 
 // ── Product Line 管理 ──
 async function loadSettingProductLines(wrap) {
-  wrap.innerHTML = `<div style="color:var(--text-3);font-size:13px;">${t('label.loading')}</div>`;
+  wrap.innerHTML = '<div style="color:var(--text-3);font-size:13px;">載入中…</div>';
   let lines = [];
   try {
     if (CFG.supabaseUrl && CFG.supabaseKey) {
@@ -3912,7 +3587,7 @@ async function deleteProductLine(id, name) {
 
 // ── Categories 管理（從 DB 讀寫）──
 async function loadSettingCategories(wrap) {
-  wrap.innerHTML = `<div style="color:var(--text-3);font-size:13px;">${t('label.loading')}</div>`;
+  wrap.innerHTML = '<div style="color:var(--text-3);font-size:13px;">載入中…</div>';
   let rows = [];
   try {
     rows = await sbFetch('/rest/v1/kms_categories?select=id,cat_key,name,name_en,icon,color,sort_order&active=eq.true&order=sort_order.asc') || [];
@@ -4081,7 +3756,7 @@ async function loadDocs() {
   if (!filtered.length) {
     const hasFilter = searchQ || filterPL || filterCat || filterCus;
     list.innerHTML = `<div style="text-align:center;color:var(--text-3);padding:40px 0;font-size:13px;">
-      ${hasFilter ? '沒有符合篩選條件的文件 <button onclick="clearDocsFilters()" style="margin-left:8px;padding:3px 10px;border-radius:6px;border:1px solid var(--border);background:transparent;cursor:pointer;font-size:12px;color:var(--blue);">${t("btn.clear_filter")}</button>' : '尚無文件'}
+      ${hasFilter ? '沒有符合篩選條件的文件 <button onclick="clearDocsFilters()" style="margin-left:8px;padding:3px 10px;border-radius:6px;border:1px solid var(--border);background:transparent;cursor:pointer;font-size:12px;color:var(--blue);">清除篩選</button>' : '尚無文件'}
     </div>`;
     return;
   }
@@ -4306,7 +3981,7 @@ async function deleteDoc(id, title, authorName) {
     toast('你沒有刪除文件的權限（僅 Admin / DCC 可刪除）', 'error');
     return;
   }
-  if (!confirm(t("confirm.delete", {title}))) return;
+  if (!confirm(`確定刪除「${title}」？\n此動作無法復原，版本歷史也會一併刪除。`)) return;
 
   try {
     if (CFG.supabaseUrl && CFG.supabaseKey && !id.startsWith('demo-') && !id.startsWith('local-')) {
@@ -4970,7 +4645,7 @@ async function loadReaderComments() {
   const docId = window._readerDocId;
   const list  = document.getElementById('reader-comment-list');
   if (!docId || !list) return;
-  list.innerHTML = `<div style="color:var(--text-3);font-size:12px;">${t('label.loading')}</div>`;
+  list.innerHTML = '<div style="color:var(--text-3);font-size:12px;">載入中…</div>';
   try {
     const rows = await sbFetch(`/rest/v1/kms_comments?doc_id=eq.${docId}&select=id,body,author,created_at&order=created_at.asc`) || [];
     if (!rows.length) {
@@ -5273,20 +4948,13 @@ function applyI18n() {
 
   // 動態更新 placeholder（不用 data 屬性的欄位）
   const ph = {
-    'doc-title':           s['editor.title.placeholder'],
-    'doc-author':          s['editor.author.placeholder'],
-    'doc-reviewer':        s['editor.reviewer.placeholder'],
-    'doc-related':         s['editor.related.placeholder'],
-    'tag-input':           s['editor.tag.placeholder'],
-    'search-q':            s['rag.placeholder'],
-    'comment-input':       s['comments.input.placeholder'],
-    'discuss-modal-input': s['comments.input.placeholder'],
-    'reader-comment-input':s['comments.input.placeholder'],
-    'docs-search':         s['label.search_placeholder'] || '🔍',
-    'customer-tag-input':  s['editor.customer.placeholder'] || (currentLang==='zh-TW'?'客戶名':'Customer'),
-    'tag-input':           s['editor.tag.placeholder'],
-    'doc-source-url':      s['editor.source_url.placeholder'] || (currentLang==='zh-TW'?'來源網址':'Source URL'),
-    'url-fetch-input':     s['editor.url_fetch.placeholder'] || (currentLang==='zh-TW'?'貼上網址，AI 自動擷取內文…':'Paste URL to fetch content…'),
+    'doc-title':     s['editor.title.placeholder'],
+    'doc-author':    s['editor.author.placeholder'],
+    'doc-reviewer':  s['editor.reviewer.placeholder'],
+    'doc-related':   s['editor.related.placeholder'],
+    'tag-input':     s['editor.tag.placeholder'],
+    'search-q':      s['rag.placeholder'],
+    'comment-input': s['comments.input.placeholder'],
   };
   for (const [id, text] of Object.entries(ph)) {
     const el = document.getElementById(id);
@@ -5353,50 +5021,6 @@ function applyI18n() {
     const cat = el.dataset.cat;
     if (catLookup[cat]) el.textContent = catLookup[cat];
   });
-
-  // ── 補充：按鈕與動態標籤 ──
-  // 送出/關閉/取消/新增/刪除 通用按鈕（靠 data-i18n 標記處理，下面補沒標記的）
-  const btnMap = {
-    'config-save-btn':    s['config.save'],
-    'config-cancel-btn':  s['btn.cancel'],
-    'docs-new-btn':       s['docs.new'],
-  };
-  for (const [id, text] of Object.entries(btnMap)) {
-    const el = document.getElementById(id);
-    if (el && text) el.textContent = text;
-  }
-
-  // docs panel 標題
-  const docsTitle = document.querySelector('#panel-docs h2, #docs-panel-title');
-  if (docsTitle && s['docs.title']) docsTitle.textContent = s['docs.title'];
-
-  // data-i18n 標記元素更新（只處理純文字節點，避免破壞含子元素的容器）
-  document.querySelectorAll('[data-i18n]').forEach(el => {
-    const key = el.dataset.i18n;
-    if (s[key] === undefined) return;
-    // 只有沒有 element children 的節點才直接用 textContent
-    const hasElementChild = [...el.childNodes].some(n => n.nodeType === 1);
-    if (!hasElementChild) el.textContent = s[key];
-  });
-
-  // 系統資訊列
-  const notSetText = s['sys.not_set'] || '未設定';
-  const supaEl = document.getElementById('status-supabase');
-  if (supaEl) {
-    const configured = CFG?.supabaseUrl;
-    supaEl.innerHTML = `Supabase: <span style="color:${configured ? 'var(--green)' : 'var(--text-3)'}">${configured ? 'OK' : notSetText}</span>`;
-  }
-  const claudeEl = document.getElementById('status-claude');
-  if (claudeEl) {
-    const configured = CFG?.claudeKey;
-    claudeEl.innerHTML = `Claude API: <span style="color:${configured ? 'var(--green)' : 'var(--text-3)'}">${configured ? 'OK' : notSetText}</span>`;
-  }
-
-  // filter selects placeholder（All Categories / All Product Lines）
-  const filterCat = document.getElementById('docs-filter-cat');
-  if (filterCat?.options[0]) filterCat.options[0].textContent = s['cat.all'] || 'All Categories';
-  const filterPL = document.getElementById('docs-filter-product-line');
-  if (filterPL?.options[0]) filterPL.options[0].textContent = s['pl.all'] || 'All Product Lines';
 }
 
 // ═══════════════════════════════════════════════
@@ -5423,11 +5047,11 @@ function closeDiscussModal() {
 async function loadDiscussModalComments() {
   const list = document.getElementById('discuss-modal-list');
   if (!list || !_discussDocId) return;
-  list.innerHTML = `<div style="color:var(--text-3);font-size:12px;text-align:center;padding:12px;">${t('label.loading')}</div>`;
+  list.innerHTML = '<div style="color:var(--text-3);font-size:12px;text-align:center;padding:12px;">載入中…</div>';
   try {
     const rows = await sbFetch(`/rest/v1/kms_comments?doc_id=eq.${_discussDocId}&select=id,body,author,created_at&order=created_at.asc`) || [];
     if (!rows.length) {
-      list.innerHTML = `<div style="color:var(--text-3);font-size:12px;text-align:center;padding:20px;">${t('label.no_comments')}</div>`;
+      list.innerHTML = '<div style="color:var(--text-3);font-size:12px;text-align:center;padding:20px;">尚無留言，成為第一個留言的人</div>';
       return;
     }
     list.innerHTML = rows.map(c => {
@@ -5607,7 +5231,7 @@ async function loadVersionHistory() {
       ) || [];
       countEl.textContent = snaps.length;
       if (!snaps.length) {
-        list.innerHTML = `<div style="color:var(--text-3);font-size:12px;text-align:center;padding:20px 0;">${t('label.no_versions')}</div>`;
+        list.innerHTML = '<div style="color:var(--text-3);font-size:12px;text-align:center;padding:20px 0;">尚無版本紀錄</div>';
         return;
       }
       list.innerHTML = snaps.map((s, i) => {
@@ -5640,7 +5264,7 @@ async function loadVersionHistory() {
   const snaps = JSON.parse(localStorage.getItem(key) || '[]');
   countEl.textContent = snaps.length;
   if (!snaps.length) {
-    list.innerHTML = `<div style="color:var(--text-3);font-size:12px;text-align:center;padding:20px 0;">${t('label.no_versions')}</div>`;
+    list.innerHTML = '<div style="color:var(--text-3);font-size:12px;text-align:center;padding:20px 0;">尚無版本紀錄</div>';
     return;
   }
   list.innerHTML = snaps.map((s, i) => `
@@ -5733,7 +5357,7 @@ async function showVersionDiff(snapId1, snapId2) {
           <button onclick="document.getElementById('diff-modal').remove()" style="background:none;border:none;cursor:pointer;font-size:18px;color:var(--text-3);">✕</button>
         </div>
         <div style="padding:16px 20px;overflow-y:auto;font-family:monospace;font-size:12px;line-height:1.6;">
-          ${diffHtml || `<div style="color:var(--text-3);text-align:center;padding:20px;">${t('label.version_same')}</div>`}
+          ${diffHtml || '<div style="color:var(--text-3);text-align:center;padding:20px;">兩版本內容相同</div>'}
         </div>
       </div>`;
   } catch(e) { toast('比較失敗：' + e.message, 'error'); }
@@ -5917,7 +5541,7 @@ async function loadKmap(filterCat) {
   const content = document.getElementById('kmap-content');
   const headerTitle = document.getElementById('kmap-header-title');
   const headerActions = document.getElementById('kmap-header-actions');
-  content.innerHTML = `<div style="text-align:center;color:var(--text-3);padding:40px 0;font-size:13px;">${t('label.loading')}</div>`;
+  content.innerHTML = '<div style="text-align:center;color:var(--text-3);padding:40px 0;font-size:13px;">載入中…</div>';
 
   let docs = [];
   try {
@@ -5938,10 +5562,10 @@ async function loadKmap(filterCat) {
       <span>${meta.icon} ${catLabel}</span>`;
     headerActions.innerHTML = '';
     content.innerHTML = `
-      <div class="kmap-back" onclick="loadKmap(null)" data-i18n="btn.back_cat">← 回分類總覽</div>
+      <div class="kmap-back" onclick="loadKmap(null)">← 回分類總覽</div>
       <div style="padding:12px 20px;">
         ${catDocs.length === 0
-          ? `<div style="color:var(--text-3);font-size:13px;padding:20px 0;">${t('label.no_cat_docs')}</div>`
+          ? '<div style="color:var(--text-3);font-size:13px;padding:20px 0;">此分類尚無文件</div>'
           : catDocs.map(d => {
               const safeTitle = (d.title||'').replace(/'/g,'').replace(/"/g,'');
               const canEditDoc = true; // 登入即可編輯（與知識庫列表一致）
@@ -5983,7 +5607,7 @@ async function loadKmap(filterCat) {
 // ═══════════════════════════════════════════════
 async function loadAnalytics() {
   const wrap = document.getElementById('analytics-content');
-  wrap.innerHTML = `<div style="text-align:center;color:var(--text-3);padding:40px 0;">${t('label.loading')}</div>`;
+  wrap.innerHTML = '<div style="text-align:center;color:var(--text-3);padding:40px 0;">載入中…</div>';
 
   let docs = [], authorStats = [], gaps = [];
   try {
@@ -6008,7 +5632,7 @@ async function loadAnalytics() {
   const maxViews = Math.max(...docs.map(d => d.view_count||0), 1);
 
   wrap.innerHTML = `
-    <div class="section-hd" data-i18n="label.analytics_title">總覽</div>
+    <div class="section-hd">總覽</div>
     <div class="stat-grid">
       <div class="stat-card"><div class="stat-label">知識條目</div><div class="stat-val">${totalDocs}</div></div>
       <div class="stat-card"><div class="stat-label">已發佈</div><div class="stat-val">${published}</div></div>
@@ -6087,7 +5711,7 @@ async function batchGenerateSummaries() {
   if (!btn || !prog) return;
 
   btn.disabled = true;
-  btn.textContent = t('label.loading');
+  btn.textContent = '載入中…';
 
   try {
     // 抓所有無摘要的已發佈文件
@@ -6193,7 +5817,7 @@ async function getFirebaseDb() {
 
 async function loadExperts() {
   const grid = document.getElementById('expert-grid');
-  grid.innerHTML = `<div style="color:var(--text-3);font-size:13px;padding:20px;grid-column:1/-1;">${t('label.loading')}</div>`;
+  grid.innerHTML = '<div style="color:var(--text-3);font-size:13px;padding:20px;grid-column:1/-1;">載入中…</div>';
 
   let users = [];
   try {
@@ -6348,7 +5972,7 @@ async function loadReviewPanel() {
       });
     }
     // 顯示待審核文件列表
-    content.innerHTML = `<div style="text-align:center;color:var(--text-3);padding:20px 0;font-size:13px;">${t('label.loading')}</div>`;
+    content.innerHTML = '<div style="text-align:center;color:var(--text-3);padding:20px 0;font-size:13px;">載入中…</div>';
     try {
       if (!window._reviewAllDocs) {
         window._reviewAllDocs = [];
@@ -6525,7 +6149,7 @@ async function openCommentsPanel(docId, docTitle) {
 async function loadComments() {
   if (!commentsDocId) return;
   const list = document.getElementById('comment-list');
-  list.innerHTML = `<div style="color:var(--text-3);font-size:13px;padding:20px;">${t('label.loading')}</div>`;
+  list.innerHTML = '<div style="color:var(--text-3);font-size:13px;padding:20px;">載入中…</div>';
 
   let comments = [];
   try {
@@ -6543,7 +6167,7 @@ async function loadComments() {
   const replies = comments.filter(c => c.parent_id);
 
   if (!comments.length) {
-    list.innerHTML = `<div style="color:var(--text-3);font-size:13px;text-align:center;padding:30px 0;">${t('label.no_comments')}</div>`;
+    list.innerHTML = '<div style="color:var(--text-3);font-size:13px;text-align:center;padding:30px 0;">尚無留言，成為第一個留言的人</div>';
     return;
   }
 

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>COMART Platform v1.13</title>
+<title>COMART Platform v1.14</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -261,6 +261,15 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:
 .trip-cal-holiday-dot { display:inline-block; width:5px; height:5px; border-radius:50%; margin-right:2px; }
 
 .trip-cal-empty { min-height:72px; border-right:1px solid var(--br); border-bottom:1px solid var(--br); background:var(--bg); }
+/* ─── Date Input calendar icon: 強制亮色 ─── */
+input[type="date"] {
+  color-scheme: dark;
+}
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.7) sepia(1) saturate(3) hue-rotate(175deg) brightness(1.5);
+  cursor: pointer;
+  opacity: 1;
+}
 </style>
 </head>
 <body>
@@ -271,7 +280,7 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:
     <div class="login-logo">
       <div class="login-mark">C</div>
       <div class="login-name">COMART Platform</div>
-      <div class="login-sub">Internal Portal · v1.12</div>
+      <div class="login-sub">Internal Portal · v1.14</div>
     </div>
     <div class="field">
       <label>Employee ID</label>
@@ -297,7 +306,7 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:
   <div class="topbar">
     <div class="topbar-logo" onclick="switchView('home')">
       <div class="topbar-mark">C</div>
-      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.13</span></div>
+      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.14</span></div>
     </div>
     <div class="topbar-right">
       <div class="lang-switcher">
@@ -320,8 +329,8 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:
         </button>
         <div class="notif-panel" id="notifPanel">
           <div style="padding:10px 14px;border-bottom:1px solid var(--br);display:flex;align-items:center;justify-content:space-between;">
-            <span style="font-size:13px;font-weight:600;">通知</span>
-            <button onclick="markAllRead()" style="font-size:11px;color:var(--ac);background:none;border:none;cursor:pointer;">全部已讀</button>
+            <span style="font-size:13px;font-weight:600;" id="notif-title-txt">通知</span>
+            <button id="notif-mark-all-btn" onclick="markAllRead()" style="font-size:11px;color:var(--ac);background:none;border:none;cursor:pointer;">全部已讀</button>
           </div>
           <div id="notifList" style="flex:1;overflow-y:auto;">
             <div style="padding:20px;text-align:center;color:var(--tx3);font-size:12px;">載入中…</div>
@@ -361,14 +370,15 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:
             <div class="home-sub" id="greetSub">Select an application to get started.</div>
           </div>
 
-          <div class="section-title">Applications</div>
+          <div class="section-title" id="sect-apps">Applications</div>
           <div class="app-grid" id="appGrid"></div>
 
-          <div class="section-title">Platform Updates</div>
+          <div class="section-title" id="sect-updates">Platform Updates</div>
           <div class="changelog">
             <div class="cl-item"><div class="cl-dot" style="background:var(--grn)"></div><div><div class="cl-text">名人榜 (Employee Directory) — 公司通訊錄、留言、討論區</div><div class="cl-date">2026-05 · New</div></div></div>
             <div class="cl-item"><div class="cl-dot" style="background:var(--grn)"></div><div><div class="cl-text">公佈欄 (Bulletin Board) — 公司公告、置頂、按讚</div><div class="cl-date">2026-05 · New</div></div></div>
             <div class="cl-item"><div class="cl-dot" style="background:var(--ac)"></div><div><div class="cl-text">Knowledge Management System (KMS) — AI 問答、文件庫、五語言</div><div class="cl-date">2026-05 · New</div></div></div>
+            <div class="cl-item"><div class="cl-dot" style="background:var(--grn)"></div><div><div class="cl-text">v1.14 — i18n 全介面多語擴充（選單/卡片/按鈕/彈窗）；日曆 icon 亮色；通知自動彈窗；User 新增 Department 欄位</div><div class="cl-date">2026-05 · Enhancement</div></div></div>
             <div class="cl-item"><div class="cl-dot" style="background:var(--grn)"></div><div><div class="cl-text">v1.13 — 語音輸入修正（getUserMedia 權限前置）；User 新增專業背景欄位供 KMS 黃頁使用</div><div class="cl-date">2026-05 · Fix + Enhancement</div></div></div>
             <div class="cl-item"><div class="cl-dot" style="background:var(--tx3)"></div><div><div class="cl-text">Portal launched — 集團統一登入入口，用戶管理集中化</div><div class="cl-date">2026-05 · Platform</div></div></div>
           </div>
@@ -379,7 +389,7 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:
       <div class="view" id="view-directory">
         <div class="dir-wrap">
           <div class="dir-header">
-            <div style="font-size:18px;font-weight:500;">👤 名人榜 · Employee Directory</div>
+            <div style="font-size:18px;font-weight:500;" id="dir-title-txt">👤 名人榜 · Employee Directory</div>
             <input class="dir-search" id="dirSearch" placeholder="Search name, title…" oninput="renderDirectory()">
           </div>
           <!-- Tab 切換：通訊錄 / 貢獻排行榜 -->
@@ -897,17 +907,17 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:
       <div class="view" id="view-users">
         <div class="users-wrap">
           <div class="users-header">
-            <div class="users-title">⚙ User Management</div>
-            <button class="add-btn" onclick="openUserModal(null)">＋ Add User</button>
+            <div class="users-title" id="users-title-txt">⚙ User Management</div>
+            <button class="add-btn" id="users-add-btn" onclick="openUserModal(null)">＋ Add User</button>
           </div>
           <table class="user-table">
             <thead>
               <tr>
                 <th>EMP ID</th><th>Name</th><th>Email</th>
-                <th>Role</th><th>Site</th><th></th>
+                <th>Role</th><th>Site</th><th>Dept</th><th></th>
               </tr>
             </thead>
-            <tbody id="userTbody"><tr><td colspan="6" style="text-align:center;color:var(--tx3);padding:20px;">載入中…</td></tr></tbody>
+            <tbody id="userTbody"><tr><td colspan="7" style="text-align:center;color:var(--tx3);padding:20px;">載入中…</td></tr></tbody>
           </table>
         </div>
       </div>
@@ -996,6 +1006,22 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:
         <option value="VN">Vietnam</option>
         <option value="HK">Hong Kong</option>
         <option value="Other">Other</option>
+      </select>
+    </div>
+    <div class="field"><label id="u-dept-label">Department</label>
+      <select id="u-dept">
+        <option value="">— 未指定 / Unassigned —</option>
+        <option value="management">Management / 管理層</option>
+        <option value="sales">Sales / 業務</option>
+        <option value="rd">R&D / 研發</option>
+        <option value="qc">Quality Control / 品管</option>
+        <option value="production">Production / 生產</option>
+        <option value="sourcing">Sourcing / 採購</option>
+        <option value="logistics">Logistics / 物流</option>
+        <option value="finance">Finance / 財務</option>
+        <option value="hr">HR / 人資</option>
+        <option value="it">IT / 資訊</option>
+        <option value="marketing">Marketing / 行銷</option>
       </select>
     </div>
     <!-- ─ 專業背景 ─ -->
@@ -1174,7 +1200,7 @@ function enterPortal() {
   renderAppGrid();
   applyI18nAll();
   // 啟動通知
-  setTimeout(updateNotifBadge, 1000);
+  setTimeout(function() { updateNotifBadge(true); }, 1200);
   setInterval(updateNotifBadge, 60000);
 }
 
@@ -1199,15 +1225,19 @@ function renderAppGrid() {
     if (app.adminOnly && s.role !== 'admin') return '';
     if (app.roles.length && !app.roles.includes(s.role)) return '';
     const locked = app.locked;
-    const badge = app.badge ? `<div class="app-badge ${app.badge==='SOON'?'soon':app.badge==='NEW'?'new_':''}">${app.badge}</div>` : '';
+    const nameKey = 'card_' + app.id.replace('-','_') + '_name';
+    const descKey = 'card_' + app.id.replace('-','_') + '_desc';
+    const displayName = t(nameKey) !== nameKey ? t(nameKey) : app.label;
+    const displayDesc = t(descKey) !== descKey ? t(descKey) : app.desc;
+    const badge = app.badge ? `<div class="app-badge ${app.badge==='SOON'?'soon':app.badge==='NEW'?'new_':''}">${t('soon')||app.badge}</div>` : '';
     const onclick = locked ? 'return false' :
       app.internal ? `switchView('${app.id === 'settings' ? 'users' : app.id}')` :
       `openApp('${app.id}')`;
     return `<div class="app-card${locked?' locked':''}" onclick="${onclick}">
       ${badge}
       <div class="app-icon" style="background:${app.bg}">${app.icon}</div>
-      <div class="app-name">${app.label}</div>
-      <div class="app-desc">${app.desc}</div>
+      <div class="app-name">${displayName}</div>
+      <div class="app-desc">${displayDesc}</div>
     </div>`;
   }).join('');
 }
@@ -1373,7 +1403,7 @@ async function markAllRead() {
   loadNotifications();
 }
 
-async function updateNotifBadge() {
+async function updateNotifBadge(autoOpen) {
   const sess = readSession();
   if (!sess) return;
   const sbKey = await getSupabaseKey();
@@ -1388,6 +1418,12 @@ async function updateNotifBadge() {
     const cnt = Array.isArray(data) ? data.length : 0;
     const badge = document.getElementById('notifBadge');
     if (badge) { badge.textContent = cnt; badge.style.display = cnt > 0 ? 'block' : 'none'; }
+    // 登入後有未讀通知 → 自動開通知面板
+    if (autoOpen && cnt > 0) {
+      _notifOpen = true;
+      const panel = document.getElementById('notifPanel');
+      if (panel) { panel.classList.add('open'); loadNotifications(); }
+    }
   } catch(e) {}
 }
 
@@ -1620,7 +1656,7 @@ async function loadUsers() {
 
 function renderUsersTable() {
   const tbody = document.getElementById('userTbody');
-  if (!ALL_USERS.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--tx3);padding:20px;">No users yet.</td></tr>'; return; }
+  if (!ALL_USERS.length) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--tx3);padding:20px;">No users yet.</td></tr>'; return; }
   const siteLabel = { TW:'Taiwan', CN:'Dongguan', VN:'Vietnam', HK:'Hong Kong' };
   tbody.innerHTML = ALL_USERS.map(u => {
     const roleClass = { admin:'role-admin', dcc:'role-dcc', user:'role-user', inactive:'role-inactive' }[u.role] || 'role-user';
@@ -1630,6 +1666,7 @@ function renderUsersTable() {
       <td style="font-size:11px;color:var(--tx3)">${u.email||u.login||''}</td>
       <td><span class="role-badge ${roleClass}">${u.role.toUpperCase()}</span></td>
       <td style="font-size:11px;color:var(--tx3)">${siteLabel[u.site]||u.site||'—'}</td>
+      <td style="font-size:11px;color:var(--tx3)">${u.dept||'—'}</td>
       <td><button class="edit-btn" onclick="openUserModal('${u.empId}')">Edit</button></td>
     </tr>`;
   }).join('');
@@ -1652,6 +1689,7 @@ function openUserModal(empId) {
   document.getElementById('u-title-en').value = u?.titleEn || '';
   document.getElementById('u-title-zh').value = u?.titleZh || '';
   document.getElementById('u-site').value = u?.site || 'TW';
+  document.getElementById('u-dept').value = u?.dept || '';
   document.getElementById('u-bioZh').value = u?.bioZh || '';
   document.getElementById('u-bioEn').value = u?.bioEn || '';
   document.getElementById('u-expertiseZh').value = (u?.expertiseZh || []).join(', ');
@@ -1675,6 +1713,7 @@ async function saveUser() {
   const titleZh = document.getElementById('u-title-zh').value.trim();
   const site   = document.getElementById('u-site').value;
   const role        = document.getElementById('u-role').value;
+  const dept        = document.getElementById('u-dept').value;
   const bioZh       = document.getElementById('u-bioZh').value.trim();
   const bioEn       = document.getElementById('u-bioEn').value.trim();
   const expertiseZh = document.getElementById('u-expertiseZh').value.split(',').map(s=>s.trim()).filter(Boolean);
@@ -1696,7 +1735,7 @@ async function saveUser() {
 
   const user = {
     empId, nameEn, nameZh, email, login: email,
-    ext, mobile, titleEn, titleZh, site, role,
+    ext, mobile, titleEn, titleZh, site, dept, role,
     bioZh, bioEn, expertiseZh, expertiseEn,
     pwdHash, mustChangePwd,
     createdAt: existing?.createdAt || Date.now(),
@@ -1924,11 +1963,255 @@ function toast(msg, type='') {
 // ── i18n ──
 let LANG = 'en';
 const I18N = {
-  en:    { home:'Home', directory:'Hall of Fame', bulletin:'Bulletin Board', calendar:'Calendar', ai:'AI Tools', users:'User Mgmt', signout:'Sign Out', signout_confirm:'Sign out of COMART Platform?' },
-  'zh-TW':{ home:'首頁', directory:'名人榜', bulletin:'公告欄', calendar:'集團行事曆', ai:'AI 工具', users:'用戶管理', signout:'登出', signout_confirm:'確定登出？' },
-  'zh-CN':{ home:'首页', directory:'员工通讯录', bulletin:'公告栏', calendar:'集团行程', ai:'AI 工具', users:'用户管理', signout:'退出', signout_confirm:'确定退出？' },
-  vi:    { home:'Trang chủ', directory:'Danh bạ', bulletin:'Thông báo', calendar:'Lịch', ai:'Công cụ AI', users:'Quản lý User', signout:'Đăng xuất', signout_confirm:'Đăng xuất?' },
-  ja:    { home:'ホーム', directory:'社員名鑑', bulletin:'掲示板', calendar:'行程管理', ai:'AI ツール', users:'ユーザー管理', signout:'ログアウト', signout_confirm:'ログアウトしますか？' },
+  en: {
+    home:'Home', directory:'Hall of Fame', bulletin:'Bulletin Board', calendar:'Calendar',
+    ai:'AI Tools', users:'User Mgmt', signout:'Sign Out', signout_confirm:'Sign out of COMART Platform?',
+    // cards
+    card_ai_name:'AI Tools', card_ai_desc:'AI translation, chat & business tools',
+    card_directory_name:'Hall of Fame', card_directory_desc:'Employee directory, contacts & discussions',
+    card_kms_name:'KMS', card_kms_desc:'Knowledge Management — AI Q&A, document library',
+    card_bulletin_name:'Bulletin Board', card_bulletin_desc:'Company announcements and notices',
+    card_calendar_name:'Calendar', card_calendar_desc:'Business trip management & flight tracking',
+    card_admin_name:'Admin System', card_admin_desc:'Coming soon',
+    card_quotation_name:'Quotation', card_quotation_desc:'Product quotations, CRM & AI tools',
+    card_product_name:'Product Dev', card_product_desc:'Coming soon',
+    // section titles
+    sect_apps:'Applications', sect_updates:'Platform Updates',
+    // topbar
+    settings:'Settings',
+    // dir
+    dir_title:'Hall of Fame · Employee Directory', dir_search:'Search name, title…',
+    dir_tab_contacts:'Contacts', dir_tab_ranking:'Knowledge Ranking',
+    // bulletin
+    bb_title:'Bulletin Board', bb_pin:'Pin', bb_post:'Post', bb_cancel:'Cancel',
+    bb_placeholder:'Write a company announcement…', bb_empty:'No posts yet.',
+    // calendar
+    cal_title:'Group Calendar', cal_add_trip:'+ Trip', cal_add_event:'+ Event',
+    cal_save:'Save', cal_cancel:'Cancel', cal_delete:'Delete',
+    // trip modal
+    trip_title_new:'New Trip', trip_title_edit:'Edit Trip',
+    trip_staff:'Staff', trip_date_from:'Date From', trip_date_to:'Date To',
+    trip_dest:'Destination', trip_notes:'Notes', trip_outbound:'Outbound Flight',
+    trip_return:'Return Flight', trip_flight_no:'Flight No.',
+    trip_dep_city:'Dep City', trip_arr_city:'Arr City',
+    trip_dep_airport:'Airport', trip_arr_airport:'Airport',
+    trip_terminal:'Terminal', trip_dep_time:'Dep Time', trip_arr_time:'Arr Time',
+    // event modal
+    evt_title_new:'New Event', evt_title_edit:'Edit Event',
+    evt_title_lbl:'Title', evt_all_day:'All Day', evt_date:'Date', evt_color:'Color',
+    // users
+    usr_title:'User Management', usr_add:'+ Add User',
+    usr_col_id:'EMP ID', usr_col_name:'Name', usr_col_title:'Title',
+    usr_col_role:'Role', usr_col_site:'Site', usr_col_dept:'Dept', usr_col_action:'',
+    usr_edit:'Edit',
+    // user modal
+    um_new:'New User', um_edit:'Edit User',
+    um_emp_id:'Employee ID', um_role:'Role', um_name_en:'English Name',
+    um_name_zh:'中文姓名', um_email:'Email', um_ext:'Extension',
+    um_mobile:'Mobile', um_title_en:'Job Title (EN)', um_title_zh:'職稱 (ZH)',
+    um_site:'Site / Location', um_dept:'Department',
+    um_bio_section:'Professional Profile (for KMS)',
+    um_bio_zh:'Bio (ZH)', um_bio_en:'Bio (EN)',
+    um_exp_zh:'Expertise Tags ZH', um_exp_en:'Expertise Tags EN',
+    um_pwd:'Initial Password', um_pwd_reset:'Reset Password (blank = keep)',
+    um_cancel:'Cancel', um_save:'Save', um_delete:'Delete User',
+    // ai tab
+    ai_tab_translate:'Translate', ai_tab_chat:'Chat', ai_tab_skills:'Skills',
+    // notifications
+    notif_title:'Notifications', notif_mark_all:'Mark all read', notif_empty:'No notifications',
+    // profile
+    prof_messages:'Messages', prof_send:'Send', prof_reply:'Reply', prof_placeholder:'Leave a message…',
+    // general
+    loading:'Loading…', save:'Save', cancel:'Cancel', delete:'Delete', edit:'Edit',
+  },
+  'zh-TW': {
+    home:'首頁', directory:'名人榜', bulletin:'公告欄', calendar:'集團行事曆',
+    ai:'AI 工具', users:'用戶管理', signout:'登出', signout_confirm:'確定登出？',
+    card_ai_name:'AI 工具', card_ai_desc:'AI 翻譯、對話與商業工具',
+    card_directory_name:'名人榜', card_directory_desc:'員工通訊錄、聯絡方式與留言',
+    card_kms_name:'知識管理', card_kms_desc:'KMS — AI 問答、文件庫',
+    card_bulletin_name:'公告欄', card_bulletin_desc:'公司公告與通知',
+    card_calendar_name:'集團行事曆', card_calendar_desc:'商務差旅管理與航班追蹤',
+    card_admin_name:'行政管理系統', card_admin_desc:'即將推出',
+    card_quotation_name:'報價管理系統', card_quotation_desc:'產品報價、CRM 與 AI 工具',
+    card_product_name:'產品開發管理', card_product_desc:'即將推出',
+    sect_apps:'應用程式', sect_updates:'平台更新',
+    settings:'設定',
+    dir_title:'名人榜 · 員工通訊錄', dir_search:'搜尋姓名、職稱…',
+    dir_tab_contacts:'通訊錄', dir_tab_ranking:'知識貢獻排行',
+    bb_title:'公告欄', bb_pin:'置頂', bb_post:'發佈', bb_cancel:'取消',
+    bb_placeholder:'撰寫公司公告…', bb_empty:'目前沒有公告。',
+    cal_title:'集團行事曆', cal_add_trip:'+ 差旅', cal_add_event:'+ 事件',
+    cal_save:'儲存', cal_cancel:'取消', cal_delete:'刪除',
+    trip_title_new:'新增差旅', trip_title_edit:'編輯差旅',
+    trip_staff:'員工', trip_date_from:'出發日期', trip_date_to:'返回日期',
+    trip_dest:'目的地', trip_notes:'備註', trip_outbound:'去程班機',
+    trip_return:'回程班機', trip_flight_no:'航班號',
+    trip_dep_city:'出發城市', trip_arr_city:'抵達城市',
+    trip_dep_airport:'機場', trip_arr_airport:'機場',
+    trip_terminal:'航廈', trip_dep_time:'起飛時間', trip_arr_time:'抵達時間',
+    evt_title_new:'新增事件', evt_title_edit:'編輯事件',
+    evt_title_lbl:'標題', evt_all_day:'全天', evt_date:'日期', evt_color:'顏色',
+    usr_title:'用戶管理', usr_add:'+ 新增用戶',
+    usr_col_id:'員工編號', usr_col_name:'姓名', usr_col_title:'職稱',
+    usr_col_role:'角色', usr_col_site:'地點', usr_col_dept:'部門', usr_col_action:'',
+    usr_edit:'編輯',
+    um_new:'新增用戶', um_edit:'編輯用戶',
+    um_emp_id:'員工編號', um_role:'角色', um_name_en:'英文姓名',
+    um_name_zh:'中文姓名', um_email:'電子郵件', um_ext:'分機',
+    um_mobile:'手機', um_title_en:'英文職稱', um_title_zh:'中文職稱',
+    um_site:'地點', um_dept:'部門',
+    um_bio_section:'專業背景（供 KMS 黃頁）',
+    um_bio_zh:'中文專業說明', um_bio_en:'英文 Bio',
+    um_exp_zh:'專業標籤（中文）', um_exp_en:'Expertise Tags (EN)',
+    um_pwd:'初始密碼', um_pwd_reset:'重設密碼（空白=不變）',
+    um_cancel:'取消', um_save:'儲存', um_delete:'刪除用戶',
+    ai_tab_translate:'翻譯', ai_tab_chat:'對話', ai_tab_skills:'技能',
+    notif_title:'通知', notif_mark_all:'全部已讀', notif_empty:'目前沒有通知',
+    prof_messages:'留言', prof_send:'送出', prof_reply:'回覆', prof_placeholder:'留言給這位同事…',
+    loading:'載入中…', save:'儲存', cancel:'取消', delete:'刪除', edit:'編輯',
+  },
+  'zh-CN': {
+    home:'首页', directory:'员工通讯录', bulletin:'公告栏', calendar:'集团行程',
+    ai:'AI 工具', users:'用户管理', signout:'退出', signout_confirm:'确定退出？',
+    card_ai_name:'AI 工具', card_ai_desc:'AI 翻译、对话与商业工具',
+    card_directory_name:'员工通讯录', card_directory_desc:'员工目录、联系方式与留言',
+    card_kms_name:'知识管理', card_kms_desc:'KMS — AI 问答、文件库',
+    card_bulletin_name:'公告栏', card_bulletin_desc:'公司公告与通知',
+    card_calendar_name:'集团行程', card_calendar_desc:'商务差旅管理与航班追踪',
+    card_admin_name:'行政管理系统', card_admin_desc:'即将推出',
+    card_quotation_name:'报价管理系统', card_quotation_desc:'产品报价、CRM 与 AI 工具',
+    card_product_name:'产品开发管理', card_product_desc:'即将推出',
+    sect_apps:'应用程序', sect_updates:'平台更新',
+    settings:'设置',
+    dir_title:'员工通讯录', dir_search:'搜索姓名、职称…',
+    dir_tab_contacts:'通讯录', dir_tab_ranking:'知识贡献排行',
+    bb_title:'公告栏', bb_pin:'置顶', bb_post:'发布', bb_cancel:'取消',
+    bb_placeholder:'撰写公司公告…', bb_empty:'暂无公告。',
+    cal_title:'集团行程', cal_add_trip:'+ 出差', cal_add_event:'+ 事件',
+    cal_save:'保存', cal_cancel:'取消', cal_delete:'删除',
+    trip_title_new:'新建出差', trip_title_edit:'编辑出差',
+    trip_staff:'员工', trip_date_from:'出发日期', trip_date_to:'返回日期',
+    trip_dest:'目的地', trip_notes:'备注', trip_outbound:'去程航班',
+    trip_return:'回程航班', trip_flight_no:'航班号',
+    trip_dep_city:'出发城市', trip_arr_city:'到达城市',
+    trip_dep_airport:'机场', trip_arr_airport:'机场',
+    trip_terminal:'航站楼', trip_dep_time:'起飞时间', trip_arr_time:'到达时间',
+    evt_title_new:'新建事件', evt_title_edit:'编辑事件',
+    evt_title_lbl:'标题', evt_all_day:'全天', evt_date:'日期', evt_color:'颜色',
+    usr_title:'用户管理', usr_add:'+ 新增用户',
+    usr_col_id:'员工编号', usr_col_name:'姓名', usr_col_title:'职称',
+    usr_col_role:'角色', usr_col_site:'地点', usr_col_dept:'部门', usr_col_action:'',
+    usr_edit:'编辑',
+    um_new:'新增用户', um_edit:'编辑用户',
+    um_emp_id:'员工编号', um_role:'角色', um_name_en:'英文姓名',
+    um_name_zh:'中文姓名', um_email:'电子邮件', um_ext:'分机',
+    um_mobile:'手机', um_title_en:'英文职称', um_title_zh:'中文职称',
+    um_site:'地点', um_dept:'部门',
+    um_bio_section:'专业背景（供 KMS）',
+    um_bio_zh:'中文专业说明', um_bio_en:'英文 Bio',
+    um_exp_zh:'专业标签（中文）', um_exp_en:'Expertise Tags (EN)',
+    um_pwd:'初始密码', um_pwd_reset:'重置密码（空白=不变）',
+    um_cancel:'取消', um_save:'保存', um_delete:'删除用户',
+    ai_tab_translate:'翻译', ai_tab_chat:'对话', ai_tab_skills:'技能',
+    notif_title:'通知', notif_mark_all:'全部已读', notif_empty:'暂无通知',
+    prof_messages:'留言', prof_send:'发送', prof_reply:'回复', prof_placeholder:'给这位同事留言…',
+    loading:'加载中…', save:'保存', cancel:'取消', delete:'删除', edit:'编辑',
+  },
+  vi: {
+    home:'Trang chủ', directory:'Danh bạ', bulletin:'Thông báo', calendar:'Lịch',
+    ai:'Công cụ AI', users:'Quản lý User', signout:'Đăng xuất', signout_confirm:'Đăng xuất?',
+    card_ai_name:'Công cụ AI', card_ai_desc:'Dịch thuật AI, trò chuyện & công cụ kinh doanh',
+    card_directory_name:'Danh bạ', card_directory_desc:'Danh bạ nhân viên, liên lạc & thảo luận',
+    card_kms_name:'KMS', card_kms_desc:'Quản lý tri thức — AI Q&A, thư viện tài liệu',
+    card_bulletin_name:'Thông báo', card_bulletin_desc:'Thông báo công ty',
+    card_calendar_name:'Lịch', card_calendar_desc:'Quản lý công tác & theo dõi chuyến bay',
+    card_admin_name:'Hệ thống HC', card_admin_desc:'Sắp ra mắt',
+    card_quotation_name:'Báo giá', card_quotation_desc:'Báo giá sản phẩm, CRM & AI',
+    card_product_name:'Phát triển SP', card_product_desc:'Sắp ra mắt',
+    sect_apps:'Ứng dụng', sect_updates:'Cập nhật nền tảng',
+    settings:'Cài đặt',
+    dir_title:'Danh bạ nhân viên', dir_search:'Tìm tên, chức vụ…',
+    dir_tab_contacts:'Danh bạ', dir_tab_ranking:'Xếp hạng đóng góp',
+    bb_title:'Thông báo', bb_pin:'Ghim', bb_post:'Đăng', bb_cancel:'Hủy',
+    bb_placeholder:'Viết thông báo công ty…', bb_empty:'Chưa có thông báo.',
+    cal_title:'Lịch tập đoàn', cal_add_trip:'+ Công tác', cal_add_event:'+ Sự kiện',
+    cal_save:'Lưu', cal_cancel:'Hủy', cal_delete:'Xóa',
+    trip_title_new:'Thêm công tác', trip_title_edit:'Sửa công tác',
+    trip_staff:'Nhân viên', trip_date_from:'Ngày đi', trip_date_to:'Ngày về',
+    trip_dest:'Điểm đến', trip_notes:'Ghi chú', trip_outbound:'Chuyến bay đi',
+    trip_return:'Chuyến bay về', trip_flight_no:'Số hiệu',
+    trip_dep_city:'TP khởi hành', trip_arr_city:'TP đến',
+    trip_dep_airport:'Sân bay', trip_arr_airport:'Sân bay',
+    trip_terminal:'Nhà ga', trip_dep_time:'Giờ bay', trip_arr_time:'Giờ đến',
+    evt_title_new:'Thêm sự kiện', evt_title_edit:'Sửa sự kiện',
+    evt_title_lbl:'Tiêu đề', evt_all_day:'Cả ngày', evt_date:'Ngày', evt_color:'Màu',
+    usr_title:'Quản lý người dùng', usr_add:'+ Thêm người dùng',
+    usr_col_id:'Mã NV', usr_col_name:'Tên', usr_col_title:'Chức vụ',
+    usr_col_role:'Vai trò', usr_col_site:'Địa điểm', usr_col_dept:'Phòng ban', usr_col_action:'',
+    usr_edit:'Sửa',
+    um_new:'Thêm người dùng', um_edit:'Sửa người dùng',
+    um_emp_id:'Mã NV', um_role:'Vai trò', um_name_en:'Tên tiếng Anh',
+    um_name_zh:'Tên tiếng Trung', um_email:'Email', um_ext:'Máy nhánh',
+    um_mobile:'Di động', um_title_en:'Chức vụ (EN)', um_title_zh:'Chức vụ (ZH)',
+    um_site:'Địa điểm', um_dept:'Phòng ban',
+    um_bio_section:'Hồ sơ chuyên môn (KMS)',
+    um_bio_zh:'Giới thiệu (ZH)', um_bio_en:'Giới thiệu (EN)',
+    um_exp_zh:'Chuyên môn (ZH)', um_exp_en:'Chuyên môn (EN)',
+    um_pwd:'Mật khẩu ban đầu', um_pwd_reset:'Đặt lại MK (để trống = giữ nguyên)',
+    um_cancel:'Hủy', um_save:'Lưu', um_delete:'Xóa người dùng',
+    ai_tab_translate:'Dịch thuật', ai_tab_chat:'Trò chuyện', ai_tab_skills:'Kỹ năng',
+    notif_title:'Thông báo', notif_mark_all:'Đánh dấu đã đọc', notif_empty:'Không có thông báo',
+    prof_messages:'Tin nhắn', prof_send:'Gửi', prof_reply:'Trả lời', prof_placeholder:'Nhắn tin cho đồng nghiệp…',
+    loading:'Đang tải…', save:'Lưu', cancel:'Hủy', delete:'Xóa', edit:'Sửa',
+  },
+  ja: {
+    home:'ホーム', directory:'社員名鑑', bulletin:'掲示板', calendar:'行程管理',
+    ai:'AI ツール', users:'ユーザー管理', signout:'ログアウト', signout_confirm:'ログアウトしますか？',
+    card_ai_name:'AI ツール', card_ai_desc:'AI翻訳・チャット・ビジネスツール',
+    card_directory_name:'社員名鑑', card_directory_desc:'社員ディレクトリ・連絡先・コメント',
+    card_kms_name:'KMS', card_kms_desc:'ナレッジ管理 — AI Q&A・ドキュメント',
+    card_bulletin_name:'掲示板', card_bulletin_desc:'会社のお知らせ',
+    card_calendar_name:'行程管理', card_calendar_desc:'出張管理・フライト追跡',
+    card_admin_name:'総務管理', card_admin_desc:'近日公開',
+    card_quotation_name:'見積', card_quotation_desc:'製品見積・CRM・AIツール',
+    card_product_name:'製品開発', card_product_desc:'近日公開',
+    sect_apps:'アプリケーション', sect_updates:'プラットフォーム更新',
+    settings:'設定',
+    dir_title:'社員名鑑', dir_search:'名前・役職で検索…',
+    dir_tab_contacts:'連絡先', dir_tab_ranking:'知識貢献ランキング',
+    bb_title:'掲示板', bb_pin:'固定', bb_post:'投稿', bb_cancel:'キャンセル',
+    bb_placeholder:'会社のお知らせを入力…', bb_empty:'投稿はありません。',
+    cal_title:'グループカレンダー', cal_add_trip:'+ 出張', cal_add_event:'+ イベント',
+    cal_save:'保存', cal_cancel:'キャンセル', cal_delete:'削除',
+    trip_title_new:'新規出張', trip_title_edit:'出張編集',
+    trip_staff:'担当者', trip_date_from:'出発日', trip_date_to:'帰着日',
+    trip_dest:'目的地', trip_notes:'メモ', trip_outbound:'往路フライト',
+    trip_return:'復路フライト', trip_flight_no:'便名',
+    trip_dep_city:'出発都市', trip_arr_city:'到着都市',
+    trip_dep_airport:'空港', trip_arr_airport:'空港',
+    trip_terminal:'ターミナル', trip_dep_time:'出発時刻', trip_arr_time:'到着時刻',
+    evt_title_new:'新規イベント', evt_title_edit:'イベント編集',
+    evt_title_lbl:'タイトル', evt_all_day:'終日', evt_date:'日付', evt_color:'色',
+    usr_title:'ユーザー管理', usr_add:'+ ユーザー追加',
+    usr_col_id:'社員番号', usr_col_name:'氏名', usr_col_title:'役職',
+    usr_col_role:'ロール', usr_col_site:'拠点', usr_col_dept:'部門', usr_col_action:'',
+    usr_edit:'編集',
+    um_new:'新規ユーザー', um_edit:'ユーザー編集',
+    um_emp_id:'社員番号', um_role:'ロール', um_name_en:'英語氏名',
+    um_name_zh:'中国語氏名', um_email:'メール', um_ext:'内線',
+    um_mobile:'携帯', um_title_en:'役職 (EN)', um_title_zh:'役職 (ZH)',
+    um_site:'拠点', um_dept:'部門',
+    um_bio_section:'専門プロフィール（KMS用）',
+    um_bio_zh:'自己紹介（ZH）', um_bio_en:'自己紹介（EN）',
+    um_exp_zh:'専門タグ（ZH）', um_exp_en:'専門タグ（EN）',
+    um_pwd:'初期パスワード', um_pwd_reset:'パスワードリセット（空白=変更なし）',
+    um_cancel:'キャンセル', um_save:'保存', um_delete:'ユーザー削除',
+    ai_tab_translate:'翻訳', ai_tab_chat:'チャット', ai_tab_skills:'スキル',
+    notif_title:'通知', notif_mark_all:'すべて既読', notif_empty:'通知はありません',
+    prof_messages:'メッセージ', prof_send:'送信', prof_reply:'返信', prof_placeholder:'同僚へのメッセージ…',
+    loading:'読込中…', save:'保存', cancel:'キャンセル', delete:'削除', edit:'編集',
+  },
 };
 
 function t(key) { return (I18N[LANG] || I18N.en)[key] || key; }
@@ -1996,14 +2279,23 @@ function applyI18nAll() {
   if (roleEl) roleEl.textContent = ((roleLabels[LANG]||roleLabels['en'])[SESSION.role]) || '';
 
   // Sign out button
-  var soMap = { en:'Sign Out', 'zh-TW':'登出', 'zh-CN':'退出', vi:'Đăng xuất', ja:'ログアウト' };
   document.querySelectorAll('.topbar-btn').forEach(function(b) {
     if (b.getAttribute('onclick') && b.getAttribute('onclick').includes('doLogout')) {
-      b.textContent = soMap[LANG] || 'Sign Out';
+      b.textContent = t('signout');
     }
   });
 
-  // Section title on home
+  // Settings button
+  var settBtn = document.getElementById('settingsTopBtn');
+  if (settBtn) settBtn.title = t('settings');
+
+  // Section titles on home
+  var sectAppsEl = document.getElementById('sect-apps');
+  if (sectAppsEl) sectAppsEl.textContent = t('sect_apps');
+  var sectUpdatesEl = document.getElementById('sect-updates');
+  if (sectUpdatesEl) sectUpdatesEl.textContent = t('sect_updates');
+
+  // greetSub
   var greetSubEl = document.getElementById('greetSub');
   if (greetSubEl) {
     var roleLabel = ((roleLabels[LANG]||roleLabels['en'])[SESSION.role]) || SESSION.role;
@@ -2016,6 +2308,83 @@ function applyI18nAll() {
     };
     greetSubEl.textContent = subMap[LANG] || subMap['en'];
   }
+
+  // Directory header & tabs
+  var dirTitleEl = document.getElementById('dir-title-txt');
+  if (dirTitleEl) dirTitleEl.textContent = t('dir_title');
+  var dirSearchEl = document.getElementById('dirSearch');
+  if (dirSearchEl) dirSearchEl.placeholder = t('dir_search');
+  var tabContacts = document.getElementById('dir-tab-contacts');
+  if (tabContacts) tabContacts.innerHTML = '📋 ' + t('dir_tab_contacts');
+  var tabRanking = document.getElementById('dir-tab-ranking');
+  if (tabRanking) tabRanking.innerHTML = '🏆 ' + t('dir_tab_ranking');
+
+  // Bulletin
+  var bbTitleEl = document.getElementById('bb-title-txt');
+  if (bbTitleEl) bbTitleEl.textContent = t('bb_title');
+  var bbTextarea = document.getElementById('bbContent');
+  if (bbTextarea) bbTextarea.placeholder = t('bb_placeholder');
+  var bbSubmit = document.getElementById('bb-submit-btn');
+  if (bbSubmit) bbSubmit.textContent = t('bb_post');
+  var bbPinLabel = document.getElementById('bb-pin-label');
+  if (bbPinLabel) bbPinLabel.textContent = t('bb_pin');
+
+  // Calendar
+  var calTitleEl = document.getElementById('cal-title-txt');
+  if (calTitleEl) calTitleEl.textContent = t('cal_title');
+  var calAddTrip = document.getElementById('addTripBtn');
+  if (calAddTrip) calAddTrip.textContent = t('cal_add_trip');
+  var calAddEvt = document.getElementById('cal-add-event-btn');
+  if (calAddEvt) calAddEvt.textContent = t('cal_add_event');
+
+  // Trip modal labels (update on open too)
+  var tfrom = document.querySelector('label[for="trip-date-from-lbl"]');
+  // Labels are set via ID in openTripModal; updateTripModalLabels handles it
+  updateTripModalLabels();
+
+  // AI tabs
+  var tabTr = document.getElementById('ptab-translate');
+  if (tabTr) tabTr.innerHTML = '🌐 ' + t('ai_tab_translate');
+  var tabCh = document.getElementById('ptab-chat');
+  if (tabCh) tabCh.innerHTML = '✦ ' + t('ai_tab_chat');
+  var tabSk = document.getElementById('ptab-skills');
+  if (tabSk) tabSk.innerHTML = '🛠 ' + t('ai_tab_skills');
+
+  // Notification panel header
+  var notifHdr = document.getElementById('notif-title-txt');
+  if (notifHdr) notifHdr.textContent = t('notif_title');
+  var notifMarkAll = document.getElementById('notif-mark-all-btn');
+  if (notifMarkAll) notifMarkAll.textContent = t('notif_mark_all');
+
+  // Users view
+  var usrTitleEl = document.getElementById('users-title-txt');
+  if (usrTitleEl) usrTitleEl.textContent = t('usr_title');
+  var usrAddBtn = document.getElementById('users-add-btn');
+  if (usrAddBtn) usrAddBtn.textContent = t('usr_add');
+
+  // User Modal labels
+  var umTitleEl = document.getElementById('userModalTitle');
+  // handled in openUserModal / closeUserModal
+
+  // App cards
+  renderAppGrid();
+}
+
+function updateTripModalLabels() {
+  var map = {
+    'trip-modal-title-new': t('trip_title_new'),
+    'trip-lbl-staff':   t('trip_staff'),
+    'trip-lbl-from':    t('trip_date_from'),
+    'trip-lbl-to':      t('trip_date_to'),
+    'trip-lbl-dest':    t('trip_dest'),
+    'trip-lbl-notes':   t('trip_notes'),
+    'trip-lbl-out':     '🛫 ' + t('trip_outbound'),
+    'trip-lbl-ret':     '🛬 ' + t('trip_return'),
+  };
+  Object.keys(map).forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.textContent = map[id];
+  });
 }
 
 // ═══════════════════════════════════════════════

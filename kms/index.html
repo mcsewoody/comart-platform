@@ -391,7 +391,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.82</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.83</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('zh-TW')" data-i18n="lang.zh-TW">繁中</button>
@@ -5370,10 +5370,13 @@ function applyI18n() {
   const docsTitle = document.querySelector('#panel-docs h2, #docs-panel-title');
   if (docsTitle && s['docs.title']) docsTitle.textContent = s['docs.title'];
 
-  // review filter 按鈕文字（data-i18n 已標記，確保更新）
+  // data-i18n 標記元素更新（只處理純文字節點，避免破壞含子元素的容器）
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.dataset.i18n;
-    if (s[key] !== undefined) el.textContent = s[key];
+    if (s[key] === undefined) return;
+    // 只有沒有 element children 的節點才直接用 textContent
+    const hasElementChild = [...el.childNodes].some(n => n.nodeType === 1);
+    if (!hasElementChild) el.textContent = s[key];
   });
 
   // 系統資訊列

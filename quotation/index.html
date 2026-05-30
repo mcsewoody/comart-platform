@@ -291,7 +291,7 @@ img{display:block}
       <div class="logo-mark">C</div>
       <div>
         <div class="logo-text">COMART</div>
-        <div id="appVersionDiv" style="font-size:10px;color:var(--ac);font-weight:600;letter-spacing:.04em;line-height:1.3">v3.24</div>
+        <div id="appVersionDiv" style="font-size:10px;color:var(--ac);font-weight:600;letter-spacing:.04em;line-height:1.3">v3.25</div>
       </div>
     </div>
     <div class="topbar-right">
@@ -308,10 +308,12 @@ img{display:block}
     </div>
   </div>
   <div class="nav-pills" id="navPills">
+    <button class="npill" id="np-portal-btn" onclick="goPortal()" title="Back to Portal" style="opacity:.7">◀ Portal</button>
     <button class="npill" data-tab="files" onclick="switchTab('files')">📁 <span id="np-files">File</span></button>
     <button class="npill" data-tab="crm" onclick="switchTab('crm')">👥 <span id="np-crm">CRM</span> <span class="badge" id="np-cnt-crm">0</span></button>
     <button class="npill" data-tab="products" onclick="switchTab('products')"><span id="np-products">Product</span> <span class="badge" id="np-cnt-p">0</span></button>
     <button class="npill" data-tab="quotes" onclick="switchTab('quotes')"><span id="np-quotes">Quote</span> <span class="badge" id="np-cnt-q">0</span></button>
+    <button class="npill" data-tab="settings" onclick="goPage('settings')" id="np-settings-btn">⚙ <span id="np-settings">Settings</span></button>
   </div>
 </div>
 
@@ -1235,7 +1237,6 @@ let tmpImg3 = null; // Photo 3
 let QUOTES = [];
 let PRODUCTS = [];
 let SUPPLIERS = [];
-let TRIPS = [];
 let PRICE_HISTORY = [];
 let INTERFACES = [{"id": "001", "name": "3T Joint", "compatible": ["3T Slot"]}, {"id": "002", "name": "3T Slot", "compatible": ["3T Joint"]}, {"id": "003", "name": "Camera Adapter", "compatible": []}, {"id": "004", "name": "GoPro Adapter", "compatible": []}, {"id": "005", "name": "10mm Ball Socket", "compatible": []}, {"id": "006", "name": "15mm Ball Socket", "compatible": []}, {"id": "007", "name": "17mm Ball Head", "compatible": ["17mm Ball Socket"]}, {"id": "008", "name": "17mm Ball Socket", "compatible": ["17mm Ball Head"]}, {"id": "009", "name": "25mm Ball Head", "compatible": ["25mm Ball Socket"]}, {"id": "010", "name": "25mm Ball Socket", "compatible": ["25mm Ball Head"]}, {"id": "011", "name": "QI", "compatible": []}, {"id": "012", "name": "Ring", "compatible": ["17/25mm Ball Head"]}, {"id": "013", "name": "T Joint", "compatible": ["T Slot", "3T Slot"]}, {"id": "014", "name": "T Slot", "compatible": ["T Joint"]}];
 let SETTINGS = {
@@ -1304,7 +1305,6 @@ const COL_CA = 'crm_accounts';
 const COL_CC = 'crm_contacts';
 const COL_CV = 'crm_activities';
 const COL_CT = 'crm_tasks';
-const COL_TRIP = 'trips';
 const COL_PRICE_HIST = 'price_history';
 
 // CRM in-memory caches
@@ -1396,7 +1396,6 @@ async function _reloadAfterLogin(){
       if(uSnap&&!uSnap.empty){ USERS = uSnap.docs.map(d=>d.data()); lsSet('qi-users-cache',USERS); }
       try{const cSnap=await db.collection(COL_C).orderBy('code','asc').get();CATEGORIES=cSnap.docs.map(d=>d.data());}catch(_){}
       if(sDoc.exists) SETTINGS={...SETTINGS,...sDoc.data()};
-      try{const tSnap=await db.collection(COL_TRIP).orderBy('dateFrom','asc').get();TRIPS=tSnap.docs.map(d=>d.data());lsSet('qi-trips-cache',TRIPS);}catch(_){}
       try{const phSnap=await db.collection(COL_PRICE_HIST).orderBy('ts','asc').get();PRICE_HISTORY=phSnap.docs.map(d=>d.data());}catch(_){}
       lsSet('qi-q-cache',QUOTES);
       lsSet('qi-p-cache',PRODUCTS);
@@ -1446,13 +1445,6 @@ function startListeners() {
       if(page === 'categories') renderCategoryList();
     }, err => console.warn('C listener:', err));
 
-  // TRIPS real-time listener
-  db.collection(COL_TRIP).orderBy('dateFrom','asc')
-    .onSnapshot({ includeMetadataChanges: false }, snap => {
-      TRIPS = snap.docs.map(d => d.data());
-      lsSet('qi-trips-cache', TRIPS);
-      if(page === 'trip') renderTripPage();
-    }, err => console.warn('TRIP listener:', err));
 
   // PRICE_HISTORY real-time listener
   db.collection(COL_PRICE_HIST).orderBy('ts','asc')
@@ -1496,12 +1488,6 @@ async function loadAll() {
       if (sDoc.exists) SETTINGS = { ...SETTINGS, ...sDoc.data() };
       lsSet('qi-q-cache', QUOTES);
       lsSet('qi-p-cache', PRODUCTS);
-      // Load TRIPS from Firestore
-      try {
-        const tripSnap = await db.collection(COL_TRIP).orderBy('dateFrom','asc').get();
-        TRIPS = tripSnap.docs.map(d=>d.data());
-        lsSet('qi-trips-cache', TRIPS);
-      } catch(_) { TRIPS = lsGet('qi-trips-cache', []); }
       // Load PRICE_HISTORY from Firestore
       try {
         const phSnap = await db.collection(COL_PRICE_HIST).orderBy('ts','asc').get();
@@ -1512,7 +1498,6 @@ async function loadAll() {
       console.warn('Firestore load error, using local cache:', e.code||e.message);
       QUOTES   = lsGet('qi-q-cache', []);
       PRODUCTS = lsGet('qi-p-cache', []);
-      TRIPS = lsGet('qi-trips-cache', []);
       PRICE_HISTORY = lsGet('qi-price-history', []);
       USERS = lsGet('qi-users-cache', []);
       window._firestoreLoadFailed = true; // flag: needs reload after login
@@ -1520,7 +1505,6 @@ async function loadAll() {
   } else {
     QUOTES   = lsGet('qi-q-cache', []);
     PRODUCTS = lsGet('qi-p-cache', []);
-    TRIPS = lsGet('qi-trips-cache', []);
     PRICE_HISTORY = lsGet('qi-price-history', []);
     USERS = lsGet('qi-users-cache', []);
     try { const s=localStorage.getItem('qi-s-cache'); if(s) SETTINGS={...SETTINGS,...JSON.parse(s)}; } catch(_){}
@@ -1721,7 +1705,6 @@ async function deleteOneP(id) {
 // ── Save settings ──────────────────────
 async function saveS() {
   lsSet('qi-s-cache', SETTINGS);
-  lsSet('qi-trips-cache', TRIPS);
   if (!USE_FIREBASE) return;
   try { await db.collection(COL_S).doc('main').set(SETTINGS); }
   catch(e) { console.error('saveS:', e); }
@@ -2012,8 +1995,8 @@ function switchTab(tab){
   if(tab==='files'){ loadAndRenderFiles(); }
   if(tab==='crm'){ showCRMTab('accounts'); }
   // Keep nav visible for all home tabs
-  const _la=document.getElementById('logoArea'); if(_la) _la.style.display='flex';
-  const _np=document.getElementById('navPills'); if(_np) _np.style.display='flex';
+  const _la2=document.getElementById('logoArea'); if(_la2) _la2.style.display='flex';
+  const _np2=document.getElementById('navPills'); if(_np2) _np2.style.display='flex';
 }
 let _prevPage = 'files';
 
@@ -2025,21 +2008,24 @@ function goPage(pg){
   }
   ['pageQuotes','pageProducts','pageCategories','pageUsers','pageForm','pageDetail','pageSettings','pageFiles','pageCRM'].forEach(id=>{ const el=document.getElementById(id); if(el) el.classList.remove('active'); });
   document.getElementById('page'+pg.charAt(0).toUpperCase()+pg.slice(1)).classList.add('active');
-  const isHome=pg==='quotes'||pg==='products'||pg==='files'||pg==='crm';
-  document.getElementById('logoArea').style.display=isHome?'flex':'none';
-  document.getElementById('navPills').style.display=isHome?'flex':'none';
-  document.getElementById('backRow').classList.toggle('show',!isHome);
-  const _sb=document.getElementById('settingsBtn'); if(_sb) _sb.style.display=isHome?'flex':'none';
+  const isForm=pg==='form'||pg==='detail';
+  const _la=document.getElementById('logoArea'); if(_la) _la.style.display=isForm?'none':'flex';
+  const _np=document.getElementById('navPills'); if(_np) _np.style.display=isForm?'none':'flex';
+  document.getElementById('backRow').classList.toggle('show',isForm);
+  const _sb=document.getElementById('settingsBtn'); if(_sb) _sb.style.display='none';
   const titles={form:t(editQId?'editQ':'newQ'),detail:t('quoteDetail'),settings:t('settings')};
   document.getElementById('pgTitle').textContent=titles[pg]||'';
+  // Update settings nav pill active state
+  const _sBtn=document.getElementById('np-settings-btn');
+  if(_sBtn) _sBtn.classList.toggle('active', pg==='settings');
   window.scrollTo({top:0,behavior:'instant'});
 }
 function goBack(){
   if(page==='form'||page==='detail') { goPage('quotes'); page='quotes'; }
   else if(page==='settings') {
     // Return to the tab the user was on before entering Settings
-    const dest = _prevPage || 'ai';
-    if(['quotes','products','ai','files','crm'].includes(dest)){
+    const dest = _prevPage || 'files';
+    if(['quotes','products','files','crm'].includes(dest)){
       switchTab(dest);
     } else {
       goPage('quotes'); page='quotes';
@@ -2596,7 +2582,6 @@ function renderProductList(){
   if(_statusF) _disp=_disp.filter(p=>(p.status||'')=== _statusF);
   if(_sq) _disp=_disp.filter(p=>(p.series||'').toLowerCase().includes(_sq)||Object.values(p.name||{}).some(v=>v&&v.toLowerCase().includes(_sq))||Object.values(p.features||{}).some(v=>v&&v.toLowerCase().includes(_sq)));
   if(!_disp.length){el.innerHTML=`<div class="empty-box"><div class="ei">🔍</div><p>No results</p></div>`;return;}
-  const _canEdit = !!currentUser; // All logged-in users can edit trips
   el.innerHTML=_disp.map(p=>`
     <div class="pm-row" style="cursor:default">
       <div class="pm-thumb" ${p.img?`onmouseover="showImgPreview(this,'${p.img}',event)" onmouseout="hideImgPreview(this)" onclick="tapImgPreview('${p.img}',event)"`:``}>${p.img?`<img src="${p.img}" alt="">`:'📦'}</div>

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>COMART Platform v1.16</title>
+<title>COMART Platform v1.17</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -295,7 +295,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     <div class="login-logo">
       <div class="login-mark">C</div>
       <div class="login-name">COMART Platform</div>
-      <div class="login-sub">Internal Portal · v1.16</div>
+      <div class="login-sub">Internal Portal · v1.17</div>
     </div>
     <form id="loginForm" onsubmit="doLogin();return false;" autocomplete="on">
     <div class="field">
@@ -323,7 +323,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   <div class="topbar">
     <div class="topbar-logo" onclick="switchView('home')">
       <div class="topbar-mark">C</div>
-      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.16</span></div>
+      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.17</span></div>
     </div>
     <div class="topbar-right">
       <div class="lang-switcher">
@@ -1064,7 +1064,10 @@ input[type="date"]::-webkit-calendar-picker-indicator {
         <div class="hint">Comma-separated</div>
       </div>
     </div>
-    <div class="field"><label id="u-pwd-label">Initial Password</label><input id="u-pwd" type="password" placeholder="Min 8 characters" autocomplete="off"></div>
+    <div class="field"><label id="u-pwd-label">Initial Password</label><form onsubmit="return false;" style="margin:0;padding:0;display:contents;">
+  <input type="text" name="username" style="display:none;" aria-hidden="true" tabindex="-1">
+  <input id="u-pwd" type="password" name="password" placeholder="Min 8 characters" autocomplete="new-password">
+</form></div>
     <div class="modal-actions">
       <button class="btn-danger" id="u-del-btn" style="display:none;margin-right:auto;" onclick="confirmDeleteUser()">Delete User</button>
       <button class="btn-cancel" onclick="closeUserModal()">Cancel</button>

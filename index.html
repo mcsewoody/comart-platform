@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>COMART Platform v1.18</title>
+<title>COMART Platform v1.17</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -261,25 +261,6 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:
 .trip-cal-holiday-dot { display:inline-block; width:5px; height:5px; border-radius:50%; margin-right:2px; }
 
 .trip-cal-empty { min-height:72px; border-right:1px solid var(--br); border-bottom:1px solid var(--br); background:var(--bg); }
-/* ─── Topbar lang-btn 樣式 ─── */
-#topLangSwitcher .lang-btn {
-  padding: 3px 7px;
-  font-size: 10px;
-  border-radius: 6px;
-  border: 1px solid var(--br);
-  background: var(--s2);
-  color: var(--tx2);
-  cursor: pointer;
-  transition: background .15s, color .15s;
-  white-space: nowrap;
-}
-#topLangSwitcher .lang-btn:hover { background: var(--ac2); color: var(--ac); }
-#topLangSwitcher .lang-btn.active { background: var(--ac); color: #fff; border-color: var(--ac); }
-@media (max-width: 600px) {
-  #topLangSwitcher { gap: 2px; }
-  #topLangSwitcher .lang-btn { padding: 3px 5px; font-size: 9px; }
-}
-
 /* ─── Instant Message Toast Popup ─── */
 .msg-popup{position:fixed;bottom:80px;right:20px;width:320px;background:var(--s1);border:1px solid var(--ac);border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,.4);z-index:9000;overflow:hidden;display:none;animation:slideUp .25s ease;}
 .msg-popup.show{display:block;}
@@ -314,7 +295,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     <div class="login-logo">
       <div class="login-mark">C</div>
       <div class="login-name">COMART Platform</div>
-      <div class="login-sub">Internal Portal · v1.18</div>
+      <div class="login-sub">Internal Portal · v1.17</div>
     </div>
     <form id="loginForm" onsubmit="doLogin();return false;" autocomplete="on">
     <div class="field">
@@ -342,7 +323,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   <div class="topbar">
     <div class="topbar-logo" onclick="switchView('home')">
       <div class="topbar-mark">C</div>
-      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.18</span></div>
+      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.17</span></div>
     </div>
     <div class="topbar-right">
       <div class="lang-switcher">
@@ -374,14 +355,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
         </div>
       </div>
       <button class="topbar-btn" id="settingsTopBtn" onclick="switchView('users')" style="display:none;" title="Settings">⚙</button>
-      <!-- Language switcher in topbar -->
-      <div id="topLangSwitcher" style="display:flex;align-items:center;gap:3px;margin-right:4px;">
-        <button class="lang-btn" onclick="setLang('en')"    title="English">EN</button>
-        <button class="lang-btn" onclick="setLang('zh-TW')" title="繁體中文">繁</button>
-        <button class="lang-btn" onclick="setLang('zh-CN')" title="简体中文">简</button>
-        <button class="lang-btn" onclick="setLang('vi')"    title="Tiếng Việt">VI</button>
-        <button class="lang-btn" onclick="setLang('ja')"    title="日本語">日</button>
-      </div>
       <button class="topbar-btn" onclick="doLogout()">Sign Out</button>
     </div>
   </div>
@@ -422,7 +395,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
             <div class="cl-item"><div class="cl-dot" style="background:var(--grn)"></div><div><div class="cl-text">名人榜 (Employee Directory) — 公司通訊錄、留言、討論區</div><div class="cl-date">2026-05 · New</div></div></div>
             <div class="cl-item"><div class="cl-dot" style="background:var(--grn)"></div><div><div class="cl-text">公佈欄 (Bulletin Board) — 公司公告、置頂、按讚</div><div class="cl-date">2026-05 · New</div></div></div>
             <div class="cl-item"><div class="cl-dot" style="background:var(--ac)"></div><div><div class="cl-text">Knowledge Management System (KMS) — AI 問答、文件庫、五語言</div><div class="cl-date">2026-05 · New</div></div></div>
-            <div class="cl-item"><div class="cl-dot" style="background:var(--grn)"></div><div><div class="cl-text">v1.18 — Topbar 加語言切換器；i18n 覆蓋補完（Users表頭/切換頁重跑）；setLang active判斷修正</div><div class="cl-date">2026-05 · Enhancement</div></div></div>
             <div class="cl-item"><div class="cl-dot" style="background:var(--grn)"></div><div><div class="cl-text">v1.15 — 留言儲存強化（Firestore 權限診斷）；即時訊息彈窗（onSnapshot）支援快速回覆；Calendar + Trip 按鈕修正</div><div class="cl-date">2026-05 · Fix + Feature</div></div></div>
             <div class="cl-item"><div class="cl-dot" style="background:var(--grn)"></div><div><div class="cl-text">v1.14 — i18n 全介面多語擴充（選單/卡片/按鈕/彈窗）；日曆 icon 亮色；通知自動彈窗；User 新增 Department 欄位</div><div class="cl-date">2026-05 · Enhancement</div></div></div>
             <div class="cl-item"><div class="cl-dot" style="background:var(--grn)"></div><div><div class="cl-text">v1.13 — 語音輸入修正（getUserMedia 權限前置）；User 新增專業背景欄位供 KMS 黃頁使用</div><div class="cl-date">2026-05 · Fix + Enhancement</div></div></div>
@@ -959,8 +931,8 @@ input[type="date"]::-webkit-calendar-picker-indicator {
           <table class="user-table">
             <thead>
               <tr>
-                <th id="th-emp-id">EMP ID</th><th id="th-name">Name</th><th>Email</th>
-                <th id="th-role">Role</th><th id="th-site">Site</th><th id="th-dept">Dept</th><th></th>
+                <th>EMP ID</th><th>Name</th><th>Email</th>
+                <th>Role</th><th>Site</th><th>Dept</th><th></th>
               </tr>
             </thead>
             <tbody id="userTbody"><tr><td colspan="7" style="text-align:center;color:var(--tx3);padding:20px;">載入中…</td></tr></tbody>
@@ -1425,8 +1397,6 @@ function switchView(name) {
   if (name === 'bulletin')  loadBulletin();
   if (name === 'users')     loadUsers();
   if (name === 'calendar')  initCalendar();
-  // 切換頁面後重跑 i18n
-  if (SESSION) applyI18nAll();
 }
 
 // ═══════════════════════════════════════════════
@@ -2410,11 +2380,9 @@ function t(key) { return (I18N[LANG] || I18N.en)[key] || key; }
 
 function setLang(lang) {
   LANG = lang;
-  // 所有 lang-btn 用 onclick 屬性判斷 active（與 textContent 無關，更可靠）
   document.querySelectorAll('.lang-btn').forEach(function(b) {
-    var oc = b.getAttribute('onclick') || '';
-    var match = oc.match(/setLang\('([^']+)'\)/);
-    b.classList.toggle('active', !!(match && match[1] === lang));
+    var map = { en:'EN', 'zh-TW':'繁中', 'zh-CN':'简中', vi:'VI', ja:'日' };
+    b.classList.toggle('active', b.textContent.trim() === (map[lang] || lang));
   });
   try { localStorage.setItem('comart-lang', lang); } catch(_) {}
   if (SESSION) {
@@ -2555,26 +2523,9 @@ function applyI18nAll() {
   var usrAddBtn = document.getElementById('users-add-btn');
   if (usrAddBtn) usrAddBtn.textContent = t('usr_add');
 
-  // Users table headers
-  var thMap = {
-    'th-emp-id': t('usr_col_id'), 'th-name': t('usr_col_name'),
-    'th-title':  t('usr_col_title'), 'th-role': t('usr_col_role'),
-    'th-site':   t('usr_col_site'), 'th-dept': t('usr_col_dept'),
-  };
-  Object.keys(thMap).forEach(function(id) {
-    var el = document.getElementById(id); if (el) el.textContent = thMap[id];
-  });
-
-  // User Modal section header
-  var umBioSect = document.getElementById('um-bio-section-lbl');
-  if (umBioSect) umBioSect.textContent = t('um_bio_section');
-
-  // Bulletin empty state
-  var bbEmpty = document.getElementById('bb-empty-txt');
-  if (bbEmpty && !bbEmpty.dataset.hasPost) bbEmpty.textContent = t('bb_empty');
-
-  // Calendar + Trip modal i18n
-  updateTripModalLabels();
+  // User Modal labels
+  var umTitleEl = document.getElementById('userModalTitle');
+  // handled in openUserModal / closeUserModal
 
   // App cards
   renderAppGrid();

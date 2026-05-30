@@ -292,10 +292,17 @@ img{display:block}
       <div class="logo-mark">C</div>
       <div>
         <div class="logo-text">COMART</div>
-        <div id="appVersionDiv" style="font-size:10px;color:var(--ac);font-weight:600;letter-spacing:.04em;line-height:1.3">v3.27</div>
+        <div id="appVersionDiv" style="font-size:10px;color:var(--ac);font-weight:600;letter-spacing:.04em;line-height:1.3">v3.28</div>
       </div>
     </div>
     <div class="topbar-right">
+      <div id="langChips" style="display:flex;gap:3px;align-items:center;flex-shrink:0">
+        <button class="lchip on"  onclick="setLang('en')">EN</button>
+        <button class="lchip"     onclick="setLang('zh-TW')">繁</button>
+        <button class="lchip"     onclick="setLang('zh-CN')">簡</button>
+        <button class="lchip"     onclick="setLang('vi')">VI</button>
+        <button class="lchip"     onclick="setLang('ja')">日</button>
+      </div>
       <div id="userBadge" style="display:none;align-items:center;gap:7px;padding:4px 10px 4px 6px;border-radius:20px;background:var(--s2);border:1px solid var(--br)">
         <div id="userAvatar" style="width:24px;height:24px;border-radius:50%;background:var(--ac2);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--ac)">?</div>
         <div>
@@ -720,7 +727,17 @@ img{display:block}
   <div id="stab-content-iface" style="display:none">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
       <div class="sec-title" style="margin-bottom:0">Interface</div>
-      <button class="btn btn-primary btn-sm" id="ifaceAddBtn" onclick="openIfaceModal(null)" style="display:none">+ Add</button>
+    </div>
+    <!-- UI Language -->
+    <div style="margin-bottom:20px">
+      <div style="font-size:12px;font-weight:600;color:var(--tx2);margin-bottom:8px" id="sg-lang">UI Language</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap" id="langTabsRow">
+        <button class="lchip on"  onclick="setLang('en')">EN</button>
+        <button class="lchip"     onclick="setLang('zh-TW')">繁</button>
+        <button class="lchip"     onclick="setLang('zh-CN')">簡</button>
+        <button class="lchip"     onclick="setLang('vi')">VI</button>
+        <button class="lchip"     onclick="setLang('ja')">日</button>
+      </div>
     </div>
     <div id="ifaceList"></div>
   </div><!-- end iface -->
@@ -1836,11 +1853,13 @@ function setLang(l){
   const _ldd = document.getElementById('langTabsRow');
   if (_ldd && _ldd.tagName === 'SELECT') { _ldd.value = l; }
   document.querySelectorAll('.lchip').forEach(b=>b.classList.toggle('on',b.textContent===LANG_LABELS[l]));
+  // np-settings label
+  const _ns=document.getElementById('np-settings'); if(_ns) _ns.textContent=t('settings');
 }
 function applyLang(){
   const s=(id,k)=>{const el=document.getElementById(id);if(el)el.textContent=t(k);};
   s('np-quotes','quotes');s('np-products','products');s('np-categories','categories');s('np-files','files');s('np-crm','crm');
-  s('aitab-lbl-translate','translate');s('aitab-lbl-skills','skills');s('aitab-lbl-chat','chat');s('aitab-lbl-tools','tools');
+  // AI tab labels removed (AI tab deleted)
   s('backLbl','back');
   s('fs-client','client');s('fs-moq','moqTiers');s('fs-prods','selectProds');s('fs-prices','prices');
   s('fl-company','company');s('fl-attn','attn');s('fl-email','email');s('fl-tel','tel');
@@ -1870,7 +1889,7 @@ function applyLang(){
   // Quote list filter tabs
   s('qf-all','all');s('qf-draft','draft');s('qf-sent','sent');
   // Nav labels
-  s('np-quotes','quotes');s('np-products','products');s('np-files','files');s('np-crm','crm');
+  s('np-quotes','quotes');s('np-products','products');s('np-files','files');s('np-crm','crm');s('np-settings','settings');
   // Re-render current page to sync language
   if(page==='products') renderProductList();
   if(page==='settings') renderSettingsPage();

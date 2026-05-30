@@ -292,7 +292,7 @@ img{display:block}
       <div class="logo-mark">C</div>
       <div>
         <div class="logo-text">COMART</div>
-        <div id="appVersionDiv" style="font-size:10px;color:var(--ac);font-weight:600;letter-spacing:.04em;line-height:1.3">v3.26</div>
+        <div id="appVersionDiv" style="font-size:10px;color:var(--ac);font-weight:600;letter-spacing:.04em;line-height:1.3">v3.27</div>
       </div>
     </div>
     <div class="topbar-right">
@@ -2012,10 +2012,10 @@ function goPage(pg){
   const isForm=pg==='form'||pg==='detail';
   const _la=document.getElementById('logoArea'); if(_la) _la.style.display=isForm?'none':'flex';
   const _np=document.getElementById('navPills'); if(_np) _np.style.display=isForm?'none':'flex';
-  document.getElementById('backRow').classList.toggle('show',isForm);
+  const _br=document.getElementById('backRow'); if(_br) _br.classList.toggle('show',isForm);
   const _sb=document.getElementById('settingsBtn'); if(_sb) _sb.style.display='none';
   const titles={form:t(editQId?'editQ':'newQ'),detail:t('quoteDetail'),settings:t('settings')};
-  document.getElementById('pgTitle').textContent=titles[pg]||'';
+  const _pt=document.getElementById('pgTitle'); if(_pt) _pt.textContent=titles[pg]||'';
   // Update settings nav pill active state
   const _sBtn=document.getElementById('np-settings-btn');
   if(_sBtn) _sBtn.classList.toggle('active', pg==='settings');

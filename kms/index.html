@@ -391,7 +391,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.82</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.84</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
@@ -2330,16 +2330,17 @@ async function generateAndSaveSummary(docId, title, body) {
       summary_ja:   'あなたはKMSのアシスタントです。以下の文書を日本語で2〜3文（各30字以内）に要約し、要約のみを出力してください。',
     };
     const entries = Object.entries(langPrompts);
-    const results = await Promise.allSettled(
-      entries.map(([, prompt]) => callClaudeProxy(prompt, input, 300))
-    );
+    // 循序呼叫（每次間隔 500ms），避免觸發 Edge Function 429 限流
     const payload = {};
-    entries.forEach(([key], i) => {
-      const r = results[i];
-      if (r.status === 'fulfilled' && r.value && r.value.length >= 10) {
-        payload[key] = r.value;
+    for (const [key, prompt] of entries) {
+      try {
+        const result = await callClaudeProxy(prompt, input, 300);
+        if (result && result.length >= 10) payload[key] = result;
+      } catch(e) {
+        console.warn('[summary]', key, e.message);
       }
-    });
+      await new Promise(res => setTimeout(res, 500));
+    }
     if (!Object.keys(payload).length) return;
     await kmsWrite('update', 'kms_documents', payload, docId);
     setTimeout(() => loadDocs(), 500);
@@ -3999,7 +4000,16 @@ function cancelEdit() {
     if (ta) ta.value = '';
   }
   updateEditorModeLabel();
-  switchPanel('docs');
+  // 從 review 開啟編輯的，取消後回 review
+  if (window._openDocFromReview) {
+    const _retFilter = window._openDocFromReview;
+    window._openDocFromReview = false;
+    window._reviewFilter = _retFilter;
+    switchPanel('review');
+    setTimeout(() => filterReviewPanel(_retFilter), 100);
+  } else {
+    switchPanel('docs');
+  }
 }
 
 // ═══════════════════════════════════════════════
@@ -4031,6 +4041,15 @@ async function deleteDoc(id, title, authorName) {
     document.getElementById('docs-loaded').textContent = remaining;
 
     toast(`「${title}」已刪除`, 'success');
+
+    // 若在 review panel，重新載入列表
+    const reviewPanel = document.getElementById('panel-review');
+    if (reviewPanel && reviewPanel.classList.contains('active')) {
+      setTimeout(() => {
+        window._reviewAllDocs = null;
+        loadReviewPanel();
+      }, 300);
+    }
   } catch(e) {
     toast('刪除失敗：' + e.message, 'error');
   }
@@ -5979,11 +5998,11 @@ function renderReviewList(filterStatus) {
         <span style="font-size:11px;color:var(--text-3);white-space:nowrap;">${d.author_name||'—'}</span>
         <span style="font-size:11px;color:var(--text-3);white-space:nowrap;">${dt}</span>
         <button onclick="deleteDoc('${d.id}','${safeTitle}','${(d.author_name||'').replace(/'/g,'')}')"
-          style="padding:2px 7px;border-radius:5px;border:1px solid #6a2020;background:#2e1010;color:#f06a6a;font-size:11px;cursor:pointer;flex-shrink:0;">✕</button>
+          title="刪除" style="width:26px;height:26px;border-radius:5px;border:1px solid var(--border);background:var(--surface);cursor:pointer;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;font-size:13px;padding:0;border-color:#6a2020;background:#2e1010;color:#f06a6a;">🗑</button>
         ${canEdit(d.author_name) ? `<button onclick="window._openDocFromReview=window._reviewFilter||'draft';openDoc('${d.id}')"
-          style="padding:2px 7px;border-radius:5px;border:1px solid var(--border);background:var(--bg);font-size:11px;cursor:pointer;flex-shrink:0;">✏️ 更新</button>` : ''}
+          title="編輯" style="width:26px;height:26px;border-radius:5px;border:1px solid var(--border);background:var(--surface);cursor:pointer;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;font-size:13px;padding:0;">✏️</button>` : ''}
         <button onclick="openReviewPanel('${d.id}','${safeTitle}')"
-          style="padding:2px 7px;border-radius:5px;border:1px solid var(--blue);background:var(--blue-bg);color:var(--blue);font-size:11px;cursor:pointer;flex-shrink:0;">審核</button>
+          title="審核" style="width:26px;height:26px;border-radius:5px;border:1px solid var(--border);background:var(--surface);cursor:pointer;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;font-size:13px;padding:0;border-color:var(--blue-border);background:var(--blue-bg);color:var(--blue);">🔍</button>
       </div>`;
   };
   content.innerHTML = `<div style="margin-bottom:4px;font-size:12px;color:var(--text-3);">共 ${docs.length} 份文件</div>` + docs.map(renderRow).join('');

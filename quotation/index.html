@@ -1409,7 +1409,6 @@ async function _reloadAfterLogin(){
   renderSettingsPage();
   populateSupplierDropdowns();
   const cntEl=document.getElementById('np-cnt-c'); if(cntEl) cntEl.textContent=CATEGORIES.length;
-  await ensureAdminExists();
   setTimeout(batchSetNormalStatus, 1000);
 }
 
@@ -2013,11 +2012,10 @@ function switchTab(tab){
   if(tab==='files'){ loadAndRenderFiles(); }
   if(tab==='crm'){ showCRMTab('accounts'); }
   // Keep nav visible for all home tabs
-  document.getElementById('logoArea').style.display='flex';
-  document.getElementById('navPills').style.display='flex';
-  document.getElementById('settingsBtn').style.display='flex';
+  const _la=document.getElementById('logoArea'); if(_la) _la.style.display='flex';
+  const _np=document.getElementById('navPills'); if(_np) _np.style.display='flex';
 }
-let _prevPage = 'ai';  // remember page before entering settings
+let _prevPage = 'files';
 
 function goPage(pg){
   if(pg==='settings' && currentUser?.role==='user'){toast('No permission');return;}
@@ -2027,11 +2025,11 @@ function goPage(pg){
   }
   ['pageQuotes','pageProducts','pageCategories','pageUsers','pageForm','pageDetail','pageSettings','pageFiles','pageCRM'].forEach(id=>{ const el=document.getElementById(id); if(el) el.classList.remove('active'); });
   document.getElementById('page'+pg.charAt(0).toUpperCase()+pg.slice(1)).classList.add('active');
-  const isHome=pg==='quotes'||pg==='products'||pg==='users';
+  const isHome=pg==='quotes'||pg==='products'||pg==='files'||pg==='crm';
   document.getElementById('logoArea').style.display=isHome?'flex':'none';
   document.getElementById('navPills').style.display=isHome?'flex':'none';
   document.getElementById('backRow').classList.toggle('show',!isHome);
-  document.getElementById('settingsBtn').style.display=isHome?'flex':'none';
+  const _sb=document.getElementById('settingsBtn'); if(_sb) _sb.style.display=isHome?'flex':'none';
   const titles={form:t(editQId?'editQ':'newQ'),detail:t('quoteDetail'),settings:t('settings')};
   document.getElementById('pgTitle').textContent=titles[pg]||'';
   window.scrollTo({top:0,behavior:'instant'});
@@ -6774,8 +6772,7 @@ async function init(){
       window._firestoreLoadFailed = false;
       await _reloadAfterLogin();
     }
-    await ensureAdminExists();
-    setTimeout(batchSetNormalStatus, 2000);
+      setTimeout(batchSetNormalStatus, 2000);
   }
 }
 

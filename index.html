@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>COMART Platform v1.17</title>
+<title>COMART Platform v1.18</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -295,7 +295,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     <div class="login-logo">
       <div class="login-mark">C</div>
       <div class="login-name">COMART Platform</div>
-      <div class="login-sub">Internal Portal · v1.17</div>
+      <div class="login-sub">Internal Portal · v1.18</div>
     </div>
     <form id="loginForm" onsubmit="doLogin();return false;" autocomplete="on">
     <div class="field">
@@ -323,7 +323,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   <div class="topbar">
     <div class="topbar-logo" onclick="switchView('home')">
       <div class="topbar-mark">C</div>
-      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.17</span></div>
+      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.18</span></div>
     </div>
     <div class="topbar-right">
       <div class="lang-switcher">
@@ -355,6 +355,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
         </div>
       </div>
       <button class="topbar-btn" id="settingsTopBtn" onclick="switchView('users')" style="display:none;" title="Settings">⚙</button>
+
       <button class="topbar-btn" onclick="doLogout()">Sign Out</button>
     </div>
   </div>
@@ -931,8 +932,8 @@ input[type="date"]::-webkit-calendar-picker-indicator {
           <table class="user-table">
             <thead>
               <tr>
-                <th>EMP ID</th><th>Name</th><th>Email</th>
-                <th>Role</th><th>Site</th><th>Dept</th><th></th>
+                <th id="th-emp-id">EMP ID</th><th id="th-name">Name</th><th>Email</th>
+                <th id="th-role">Role</th><th id="th-site">Site</th><th id="th-dept">Dept</th><th></th>
               </tr>
             </thead>
             <tbody id="userTbody"><tr><td colspan="7" style="text-align:center;color:var(--tx3);padding:20px;">載入中…</td></tr></tbody>
@@ -1374,7 +1375,13 @@ function renderAppGrid() {
 function openApp(id) {
   const app = APPS.find(a => a.id === id);
   if (!app || !app.path) return;
-  window.location.href = app.path + '?_portal=1';
+  // 把 Portal Session 帶給子系統（跨 domain localStorage 無法共用）
+  var sess = readSession();
+  var token = '';
+  if (sess) {
+    try { token = btoa(unescape(encodeURIComponent(JSON.stringify(sess)))); } catch(_) {}
+  }
+  window.location.href = app.path + '?_portal=1' + (token ? '&_ps=' + encodeURIComponent(token) : '');
 }
 
 // ═══════════════════════════════════════════════
@@ -1397,6 +1404,8 @@ function switchView(name) {
   if (name === 'bulletin')  loadBulletin();
   if (name === 'users')     loadUsers();
   if (name === 'calendar')  initCalendar();
+  // 切換頁面後重跑 i18n
+  if (SESSION) applyI18nAll();
 }
 
 // ═══════════════════════════════════════════════
@@ -2380,9 +2389,11 @@ function t(key) { return (I18N[LANG] || I18N.en)[key] || key; }
 
 function setLang(lang) {
   LANG = lang;
+  // 所有 lang-btn 用 onclick 屬性判斷 active（與 textContent 無關，更可靠）
   document.querySelectorAll('.lang-btn').forEach(function(b) {
-    var map = { en:'EN', 'zh-TW':'繁中', 'zh-CN':'简中', vi:'VI', ja:'日' };
-    b.classList.toggle('active', b.textContent.trim() === (map[lang] || lang));
+    var oc = b.getAttribute('onclick') || '';
+    var match = oc.match(/setLang\('([^']+)'\)/);
+    b.classList.toggle('active', !!(match && match[1] === lang));
   });
   try { localStorage.setItem('comart-lang', lang); } catch(_) {}
   if (SESSION) {
@@ -2523,9 +2534,26 @@ function applyI18nAll() {
   var usrAddBtn = document.getElementById('users-add-btn');
   if (usrAddBtn) usrAddBtn.textContent = t('usr_add');
 
-  // User Modal labels
-  var umTitleEl = document.getElementById('userModalTitle');
-  // handled in openUserModal / closeUserModal
+  // Users table headers
+  var thMap = {
+    'th-emp-id': t('usr_col_id'), 'th-name': t('usr_col_name'),
+    'th-title':  t('usr_col_title'), 'th-role': t('usr_col_role'),
+    'th-site':   t('usr_col_site'), 'th-dept': t('usr_col_dept'),
+  };
+  Object.keys(thMap).forEach(function(id) {
+    var el = document.getElementById(id); if (el) el.textContent = thMap[id];
+  });
+
+  // User Modal section header
+  var umBioSect = document.getElementById('um-bio-section-lbl');
+  if (umBioSect) umBioSect.textContent = t('um_bio_section');
+
+  // Bulletin empty state
+  var bbEmpty = document.getElementById('bb-empty-txt');
+  if (bbEmpty && !bbEmpty.dataset.hasPost) bbEmpty.textContent = t('bb_empty');
+
+  // Calendar + Trip modal i18n
+  updateTripModalLabels();
 
   // App cards
   renderAppGrid();

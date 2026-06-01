@@ -1539,6 +1539,23 @@ async function loadAll() {
   hideSyncing();
 
   // ── Auth: Portal Session Required ──
+  // 若 URL 帶有 _ps（來自 Portal 跨域跳轉），先寫入 localStorage
+  if (!currentUser) {
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const psToken = urlParams.get('_ps');
+      if (psToken) {
+        const decoded = JSON.parse(decodeURIComponent(escape(atob(decodeURIComponent(psToken)))));
+        if (decoded && decoded.empId && decoded.expires && Date.now() < decoded.expires) {
+          localStorage.setItem('comart-portal-session', JSON.stringify(decoded));
+        }
+        // 清除 URL 參數，避免 token 留在網址列
+        const cleanUrl = window.location.pathname + (urlParams.get('_portal') ? '?_portal=1' : '');
+        window.history.replaceState({}, '', cleanUrl);
+      }
+    } catch(e) { console.warn('[Portal session import]', e); }
+  }
+
   if (!currentUser) {
     const portalSess = readPortalSession();
     if (portalSess) {

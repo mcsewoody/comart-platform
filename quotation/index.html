@@ -6757,27 +6757,45 @@ async function batchSetNormalStatus(){
 }
 
 async function init(){
-  // Step 0: 若從 Portal 跨域跳轉過來，URL 帶有 _ps token，立即寫入 localStorage
+  // Step 0: 若從 Portal 跨域跳轉（_ps token 在 URL），直接用 token 登入，不依賴 localStorage
   try {
     const _urlP = new URLSearchParams(window.location.search);
     const _psToken = _urlP.get('_ps');
     if (_psToken) {
       const _decoded = JSON.parse(decodeURIComponent(escape(atob(decodeURIComponent(_psToken)))));
       if (_decoded && _decoded.empId && _decoded.expires && Date.now() < _decoded.expires) {
-        localStorage.setItem('comart-portal-session', JSON.stringify(_decoded));
-        // 同時寫入 qi-user-session-v2，讓 restoreSession() 也能找到
-        localStorage.setItem('qi-user-session-v2', JSON.stringify({
-          empId: _decoded.empId, login: _decoded.email || _decoded.empId,
-          ts: Date.now()
-        }));
+        // 直接查 Firestore 取得最新 user，不依賴任何 localStorage
+        let _freshUser = null;
+        if (USE_FIREBASE && db) {
+          try {
+            const _snap = await db.collection(COL_U).where('empId','==',_decoded.empId).limit(1).get();
+            if (!_snap.empty) _freshUser = _snap.docs[0].data();
+          } catch(_fe) { console.warn('[Portal _ps Firestore]', _fe); }
+        }
+        if (_freshUser && _freshUser.role !== 'inactive') {
+          currentUser = { ..._freshUser };
+          // 清掉 URL token
+          const _clean = window.location.pathname + '?_portal=1';
+          window.history.replaceState({}, '', _clean);
+          // 正常啟動
+          await loadAll();
+          applyLang();
+          hideLoginPage();
+          updateUserBadge();
+          await _reloadAfterLogin();
+          switchTab('files');
+          startListeners();
+          setTimeout(batchSetNormalStatus, 2000);
+          return; // 直接結束，跳過後面的 restoreSession
+        }
       }
-      // 清掉 token，避免留在網址列
-      const _clean = window.location.pathname + (_urlP.get('_portal') ? '?_portal=1' : '');
-      window.history.replaceState({}, '', _clean);
+      // token 無效，清掉
+      const _clean2 = window.location.pathname + '?_portal=1';
+      window.history.replaceState({}, '', _clean2);
     }
   } catch(_e) { console.warn('[Portal _ps import]', _e); }
 
-  // Step 1: try loading with whatever auth state we have (may be empty if Firestore rules block)
+  // Step 1: try loading with whatever auth state we have
   await loadAll();
   applyLang();
   renderQuoteList();
@@ -6793,12 +6811,11 @@ async function init(){
   if (!loggedIn) {
     showLoginPage();
   } else {
-    // If loadAll failed before login, reload now with authenticated context
     if(window._firestoreLoadFailed){
       window._firestoreLoadFailed = false;
       await _reloadAfterLogin();
     }
-      setTimeout(batchSetNormalStatus, 2000);
+    setTimeout(batchSetNormalStatus, 2000);
   }
 }
 

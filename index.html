@@ -3021,101 +3021,86 @@ function closeTripModal(e) {
 }
 
 // ══════════════════════════════════════════
-// FLIGHT AUTO-FILL via Claude API web search
+// FLIGHT AUTO-FILL — Static timetable
 // ══════════════════════════════════════════
+// 常用航班對照表（COMART 常飛航線）
+// 格式：'航班號': { dc, da, dt, dd, ac, aa, at, ad }
+// dc=出發城市, da=出發機場, dt=出發航廈, dd=出發時間
+// ac=抵達城市, aa=抵達機場, at=抵達航廈, ad=抵達時間
+const FLIGHT_TABLE = {
+  // ── China Airlines 華航 ──
+  'CI783': { dc:'Taipei',          da:'TPE', dt:'T1', dd:'10:05', ac:'Ho Chi Minh City', aa:'SGN', at:'T2', ad:'13:30' },
+  'CI782': { dc:'Ho Chi Minh City',da:'SGN', dt:'T2', dd:'14:30', ac:'Taipei',           aa:'TPE', at:'T1', ad:'18:55' },
+  'CI781': { dc:'Taipei',          da:'TPE', dt:'T1', dd:'08:00', ac:'Ho Chi Minh City', aa:'SGN', at:'T2', ad:'11:25' },
+  'CI784': { dc:'Ho Chi Minh City',da:'SGN', dt:'T2', dd:'07:30', ac:'Taipei',           aa:'TPE', at:'T1', ad:'12:00' },
+  'CI785': { dc:'Taipei',          da:'TPE', dt:'T1', dd:'18:30', ac:'Ho Chi Minh City', aa:'SGN', at:'T2', ad:'21:55' },
+  'CI786': { dc:'Ho Chi Minh City',da:'SGN', dt:'T2', dd:'22:55', ac:'Taipei',           aa:'TPE', at:'T1', ad:'03:20+1' },
+  'CI791': { dc:'Taipei',          da:'TPE', dt:'T1', dd:'09:00', ac:'Hanoi',            aa:'HAN', at:'T2', ad:'11:50' },
+  'CI792': { dc:'Hanoi',           da:'HAN', dt:'T2', dd:'12:50', ac:'Taipei',           aa:'TPE', at:'T1', ad:'17:20' },
+  'CI795': { dc:'Taipei',          da:'TPE', dt:'T1', dd:'18:30', ac:'Hanoi',            aa:'HAN', at:'T2', ad:'21:15' },
+  'CI796': { dc:'Hanoi',           da:'HAN', dt:'T2', dd:'22:15', ac:'Taipei',           aa:'TPE', at:'T1', ad:'02:45+1' },
+  'CI621': { dc:'Taipei',          da:'TPE', dt:'T1', dd:'09:00', ac:'Hong Kong',        aa:'HKG', at:'',   ad:'10:40' },
+  'CI622': { dc:'Hong Kong',       da:'HKG', dt:'',   dd:'11:30', ac:'Taipei',           aa:'TPE', at:'T1', ad:'13:15' },
+  // ── Vietnam Airlines ──
+  'VN579': { dc:'Hanoi',           da:'HAN', dt:'T2', dd:'08:00', ac:'Taipei',           aa:'TPE', at:'T1', ad:'12:30' },
+  'VN578': { dc:'Taipei',          da:'TPE', dt:'T2', dd:'13:30', ac:'Hanoi',            aa:'HAN', at:'T2', ad:'16:15' },
+  'VN572': { dc:'Ho Chi Minh City',da:'SGN', dt:'T1', dd:'08:00', ac:'Taipei',           aa:'TPE', at:'T2', ad:'12:20' },
+  'VN571': { dc:'Taipei',          da:'TPE', dt:'T2', dd:'13:15', ac:'Ho Chi Minh City', aa:'SGN', at:'T1', ad:'16:35' },
+  // ── Vietjet / Pacific Airlines ──
+  'VJ832': { dc:'Ho Chi Minh City',da:'SGN', dt:'T1', dd:'06:00', ac:'Taipei',           aa:'TPE', at:'T2', ad:'10:15' },
+  'VJ831': { dc:'Taipei',          da:'TPE', dt:'T2', dd:'11:10', ac:'Ho Chi Minh City', aa:'SGN', at:'T1', ad:'14:25' },
+  '9G868': { dc:'Ho Chi Minh City',da:'SGN', dt:'T1', dd:'07:15', ac:'Hanoi',            aa:'HAN', at:'T2', ad:'09:00' },
+  '9G855': { dc:'Hanoi',           da:'HAN', dt:'T2', dd:'09:50', ac:'Ho Chi Minh City', aa:'SGN', at:'T1', ad:'11:40' },
+  // ── EVA Air 長榮 ──
+  'BR391': { dc:'Taipei',          da:'TPE', dt:'T2', dd:'08:30', ac:'Ho Chi Minh City', aa:'SGN', at:'T2', ad:'11:55' },
+  'BR392': { dc:'Ho Chi Minh City',da:'SGN', dt:'T2', dd:'13:00', ac:'Taipei',           aa:'TPE', at:'T2', ad:'17:25' },
+  'BR393': { dc:'Taipei',          da:'TPE', dt:'T2', dd:'17:00', ac:'Ho Chi Minh City', aa:'SGN', at:'T2', ad:'20:25' },
+  'BR394': { dc:'Ho Chi Minh City',da:'SGN', dt:'T2', dd:'21:25', ac:'Taipei',           aa:'TPE', at:'T2', ad:'01:50+1' },
+  'BR861': { dc:'Taipei',          da:'TPE', dt:'T2', dd:'09:00', ac:'Hanoi',            aa:'HAN', at:'T2', ad:'11:50' },
+  'BR862': { dc:'Hanoi',           da:'HAN', dt:'T2', dd:'12:50', ac:'Taipei',           aa:'TPE', at:'T2', ad:'17:20' },
+  'BR855': { dc:'Taipei',          da:'TPE', dt:'T2', dd:'09:00', ac:'Hong Kong',        aa:'HKG', at:'',   ad:'10:35' },
+  'BR856': { dc:'Hong Kong',       da:'HKG', dt:'',   dd:'11:35', ac:'Taipei',           aa:'TPE', at:'T2', ad:'13:15' },
+  // ── Cathay Pacific 國泰 ──
+  'CX401': { dc:'Taipei',          da:'TPE', dt:'T1', dd:'08:30', ac:'Hong Kong',        aa:'HKG', at:'',   ad:'10:10' },
+  'CX402': { dc:'Hong Kong',       da:'HKG', dt:'',   dd:'11:10', ac:'Taipei',           aa:'TPE', at:'T1', ad:'12:55' },
+  'CX564': { dc:'Hong Kong',       da:'HKG', dt:'',   dd:'08:45', ac:'Ho Chi Minh City', aa:'SGN', at:'T2', ad:'10:20' },
+  'CX565': { dc:'Ho Chi Minh City',da:'SGN', dt:'T2', dd:'11:15', ac:'Hong Kong',        aa:'HKG', at:'',   ad:'13:10' },
+};
 
 function _flightStatus(leg, msg, color) {
   var el = document.getElementById('trip-' + leg + '-status');
   if (!el) return;
-  el.textContent = msg;
+  el.textContent  = msg;
   el.style.color  = color || 'var(--tx3)';
   el.style.display = msg ? 'block' : 'none';
 }
 
-function _fillFlight(leg, dep, arr) {
+function _fillFlight(leg, f) {
   var p = leg === 'out' ? 'trip-out' : 'trip-ret';
-  var m = {
-    'dep-city': dep.city, 'dep-airport': dep.iata,
-    'dep-terminal': dep.terminal, 'dep-time': dep.time,
-    'arr-city': arr.city, 'arr-airport': arr.iata,
-    'arr-terminal': arr.terminal, 'arr-time': arr.time,
+  var map = {
+    'dep-city': f.dc, 'dep-airport': f.da,
+    'dep-terminal': f.dt, 'dep-time': f.dd,
+    'arr-city': f.ac, 'arr-airport': f.aa,
+    'arr-terminal': f.at, 'arr-time': f.ad,
   };
-  Object.keys(m).forEach(function(k) {
+  Object.keys(map).forEach(function(k) {
     var el = document.getElementById(p + '-' + k);
-    if (el && m[k]) el.value = m[k];
+    if (el) el.value = map[k] || '';
   });
 }
 
-async function autoFillFlight(flightNo, leg) {
+function autoFillFlight(flightNo, leg) {
   if (!flightNo || flightNo.length < 3) return;
-  if (!/^[A-Z0-9]{2}\d+$/.test(flightNo)) {
-    _flightStatus(leg, '⚠ 格式錯誤，例：CI101', '#F5A623'); return;
-  }
-
-  _flightStatus(leg, '🔍 查詢中…', 'var(--tx3)');
-
-  var dateEl = document.getElementById('trip-date-from');
-  var dateStr = (dateEl && dateEl.value) ? dateEl.value : new Date().toISOString().slice(0, 10);
-  var prompt = 'Flight ' + flightNo + ' on ' + dateStr + '. '
-    + 'Return ONLY valid JSON, no markdown, no explanation:\n'
-    + '{"dep_iata":"","dep_city":"","dep_terminal":"","dep_time_local":"HH:MM",'
-    + '"arr_iata":"","arr_city":"","arr_terminal":"","arr_time_local":"HH:MM"}\n'
-    + 'Use scheduled departure/arrival local times. '
-    + 'If unknown leave field empty string.';
-
-  try {
-    var resp = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 300,
-        tools: [{ type: 'web_search_20250305', name: 'web_search' }],
-        messages: [{ role: 'user', content: prompt }],
-      }),
-    });
-
-    if (!resp.ok) {
-      _flightStatus(leg, '查詢失敗（' + resp.status + '），請手動填入', '#F5A623');
-      return;
-    }
-
-    var data = await resp.json();
-
-    // 找最後一個 text block
-    var text = '';
-    if (data.content) {
-      for (var i = data.content.length - 1; i >= 0; i--) {
-        if (data.content[i].type === 'text') {
-          text = data.content[i].text.trim();
-          break;
-        }
-      }
-    }
-
-    // 從 text 中擷取 JSON（去掉可能的 markdown fence）
-    var jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      _flightStatus(leg, '查無結果，請手動填入', '#F5A623');
-      return;
-    }
-
-    var f = JSON.parse(jsonMatch[0]);
-
-    _fillFlight(leg,
-      { iata: f.dep_iata, city: f.dep_city, terminal: f.dep_terminal, time: f.dep_time_local },
-      { iata: f.arr_iata, city: f.arr_city, terminal: f.arr_terminal, time: f.arr_time_local }
-    );
-
-    var depStr = (f.dep_iata || '') + (f.dep_time_local ? ' ' + f.dep_time_local : '');
-    var arrStr = (f.arr_iata || '') + (f.arr_time_local ? ' ' + f.arr_time_local : '');
+  var f = FLIGHT_TABLE[flightNo];
+  if (f) {
+    _fillFlight(leg, f);
     _flightStatus(leg,
-      depStr && arrStr ? ('✓ ' + depStr + ' → ' + arrStr) : '✓ 已填入',
+      '✓ ' + f.da + ' ' + f.dd + ' → ' + f.aa + ' ' + f.ad,
       '#2ECC71');
-
-  } catch(e) {
-    console.error('[autoFillFlight]', e);
-    _flightStatus(leg, '網路錯誤，請手動填入', 'var(--red)');
+  } else {
+    _flightStatus(leg,
+      '找不到 ' + flightNo + '，請手動填入（可告知 IT 新增此航班）',
+      '#F5A623');
   }
 }
 

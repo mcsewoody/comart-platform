@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>COMART Platform v1.21</title>
+<title>COMART Platform v1.22</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -295,7 +295,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     <div class="login-logo">
       <div class="login-mark">C</div>
       <div class="login-name">COMART Platform</div>
-      <div class="login-sub">Internal Portal · v1.21</div>
+      <div class="login-sub">Internal Portal · v1.22</div>
     </div>
     <form id="loginForm" onsubmit="doLogin();return false;" autocomplete="on">
     <div class="field">
@@ -323,7 +323,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   <div class="topbar">
     <div class="topbar-logo" onclick="switchView('home')">
       <div class="topbar-mark">C</div>
-      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.21</span></div>
+      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.22</span></div>
     </div>
     <div class="topbar-right">
       <div class="lang-switcher">
@@ -393,6 +393,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
           <div class="section-title" id="sect-updates">Platform Updates</div>
           <div class="changelog">
+            <div class="cl-item"><div class="cl-dot" style="background:var(--grn)"></div><div><div class="cl-text">v1.22 — Trip 航班號自動帶入（AeroDataBox API）：Dep/Arr City、Airport、Terminal、Time</div><div class="cl-date">2026-06 · Feature</div></div></div>
             <div class="cl-item"><div class="cl-dot" style="background:var(--grn)"></div><div><div class="cl-text">名人榜 (Employee Directory) — 公司通訊錄、留言、討論區</div><div class="cl-date">2026-05 · New</div></div></div>
             <div class="cl-item"><div class="cl-dot" style="background:var(--grn)"></div><div><div class="cl-text">公佈欄 (Bulletin Board) — 公司公告、置頂、按讚</div><div class="cl-date">2026-05 · New</div></div></div>
             <div class="cl-item"><div class="cl-dot" style="background:var(--ac)"></div><div><div class="cl-text">Knowledge Management System (KMS) — AI 問答、文件庫、五語言</div><div class="cl-date">2026-05 · New</div></div></div>
@@ -864,8 +865,11 @@ input[type="date"]::-webkit-calendar-picker-indicator {
           <div style="display:grid;grid-template-columns:1fr auto;gap:8px;margin-bottom:6px;align-items:flex-end;">
             <div class="field">
               <label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px;">Flight No.</label>
-              <input id="trip-flight" placeholder="e.g. CI101" autocomplete="off" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;text-transform:uppercase;">
+              <input id="trip-flight" placeholder="e.g. CI101" autocomplete="off"
+                style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;text-transform:uppercase;"
+                onblur="autoFillFlight(this.value.trim().toUpperCase(), 'out')">
             </div>
+            <div id="trip-out-flight-status" style="font-size:11px;color:var(--tx3);padding:2px 0 0;display:none;"></div>
           </div>
           <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px;">
             <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px;">Dep City</label><input id="trip-out-dep-city" placeholder="Taipei" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
@@ -882,8 +886,11 @@ input[type="date"]::-webkit-calendar-picker-indicator {
           <div style="display:grid;grid-template-columns:1fr;gap:6px;margin-bottom:6px;">
             <div class="field">
               <label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px;">Flight No.</label>
-              <input id="trip-return-flight" placeholder="e.g. CI102" autocomplete="off" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;text-transform:uppercase;">
+              <input id="trip-return-flight" placeholder="e.g. CI102" autocomplete="off"
+                style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;text-transform:uppercase;"
+                onblur="autoFillFlight(this.value.trim().toUpperCase(), 'ret')">
             </div>
+            <div id="trip-ret-flight-status" style="font-size:11px;color:var(--tx3);padding:2px 0 0;display:none;"></div>
           </div>
           <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:16px;">
             <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px;">Dep City</label><input id="trip-ret-dep-city" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
@@ -3011,6 +3018,131 @@ function closeTripModal(e) {
   var overlay = document.getElementById('tripOverlay');
   if (overlay) overlay.classList.remove('show');
   editTripId = null;
+}
+
+// ══════════════════════════════════════════════
+// FLIGHT AUTO-FILL via AeroDataBox (RapidAPI)
+// ══════════════════════════════════════════════
+const AERODATABOX_KEY = 'd65db5284cmsh6209ff5aee055eap1aa778jsn2fff41849d15'; // ← 換成你的 RapidAPI Key
+
+// 機場代碼 → 城市名稱對照（常用）
+const AIRPORT_CITY = {
+  TPE:'Taipei', TSA:'Taipei', HAN:'Hanoi', SGN:'Ho Chi Minh City',
+  HKG:'Hong Kong', NRT:'Tokyo', KIX:'Osaka', BKK:'Bangkok',
+  SIN:'Singapore', ICN:'Seoul', PEK:'Beijing', PVG:'Shanghai',
+  CAN:'Guangzhou', SZX:'Shenzhen', KHH:'Kaohsiung', RMQ:'Taichung',
+  DAD:'Da Nang', PQC:'Phu Quoc', HUI:'Hue',
+};
+
+function _setFlightStatus(leg, msg, color) {
+  var id = 'trip-' + leg + '-flight-status';
+  var el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = msg;
+  el.style.color = color || 'var(--tx3)';
+  el.style.display = msg ? 'block' : 'none';
+}
+
+function _fillFlightFields(leg, dep, arr) {
+  // dep / arr: { iata, city, terminal, time }
+  var prefix = leg === 'out' ? 'trip-out' : 'trip-ret';
+  var fields = {
+    dep: ['dep-city', 'dep-airport', 'dep-terminal', 'dep-time'],
+    arr: ['arr-city', 'arr-airport', 'arr-terminal', 'arr-time'],
+  };
+  function setVal(id, val) {
+    var el = document.getElementById(prefix + '-' + id);
+    if (el && val !== undefined && val !== null) el.value = val;
+  }
+  setVal('dep-city',     dep.city     || '');
+  setVal('dep-airport',  dep.iata     || '');
+  setVal('dep-terminal', dep.terminal || '');
+  setVal('dep-time',     dep.time     || '');
+  setVal('arr-city',     arr.city     || '');
+  setVal('arr-airport',  arr.iata     || '');
+  setVal('arr-terminal', arr.terminal || '');
+  setVal('arr-time',     arr.time     || '');
+}
+
+async function autoFillFlight(flightNo, leg) {
+  if (!flightNo || flightNo.length < 3) return;
+
+  // 解析航班號：IATA carrier code (2 char) + flight number
+  var match = flightNo.match(/^([A-Z0-9]{2})(\d+)$/);
+  if (!match) {
+    _setFlightStatus(leg, '⚠ 格式錯誤，例：CI101', 'var(--amb)');
+    return;
+  }
+
+  _setFlightStatus(leg, '🔍 查詢中…', 'var(--tx3)');
+
+  // 用出發日期查詢（若有填 date-from 就用，否則用今天）
+  var dateEl = document.getElementById('trip-date-from');
+  var dateStr = (dateEl && dateEl.value) ? dateEl.value : new Date().toISOString().slice(0, 10);
+
+  var url = 'https://aerodatabox.p.rapidapi.com/flights/number/' +
+    encodeURIComponent(flightNo) + '/' + dateStr +
+    '?withAircraftImage=false&withLocation=false';
+
+  try {
+    var resp = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'X-RapidAPI-Key':  AERODATABOX_KEY,
+        'X-RapidAPI-Host': 'aerodatabox.p.rapidapi.com',
+      },
+    });
+
+    if (!resp.ok) {
+      if (resp.status === 404) {
+        _setFlightStatus(leg, '找不到航班 ' + flightNo + '（確認日期與航班號）', 'var(--amb)');
+      } else if (resp.status === 429) {
+        _setFlightStatus(leg, '查詢次數已達上限，請改手動輸入', 'var(--red)');
+      } else {
+        _setFlightStatus(leg, '查詢失敗（' + resp.status + '），請手動填入', 'var(--amb)');
+      }
+      return;
+    }
+
+    var data = await resp.json();
+    // AeroDataBox 回傳陣列，取第一筆
+    var flight = Array.isArray(data) ? data[0] : data;
+    if (!flight) {
+      _setFlightStatus(leg, '查無結果，請手動填入', 'var(--amb)');
+      return;
+    }
+
+    var dep = flight.departure || {};
+    var arr = flight.arrival   || {};
+
+    var depIata     = (dep.airport && dep.airport.iata) || '';
+    var depCity     = AIRPORT_CITY[depIata] || (dep.airport && dep.airport.municipalityName) || depIata;
+    var depTerminal = dep.terminal || '';
+    var depTime     = dep.scheduledTimeLocal
+      ? dep.scheduledTimeLocal.slice(11, 16)   // "2026-06-01 08:30+08:00" → "08:30"
+      : (dep.scheduledTimeUtc ? dep.scheduledTimeUtc.slice(11, 16) + ' UTC' : '');
+
+    var arrIata     = (arr.airport && arr.airport.iata) || '';
+    var arrCity     = AIRPORT_CITY[arrIata] || (arr.airport && arr.airport.municipalityName) || arrIata;
+    var arrTerminal = arr.terminal || '';
+    var arrTime     = arr.scheduledTimeLocal
+      ? arr.scheduledTimeLocal.slice(11, 16)
+      : (arr.scheduledTimeUtc ? arr.scheduledTimeUtc.slice(11, 16) + ' UTC' : '');
+
+    _fillFlightFields(leg, {
+      iata: depIata, city: depCity, terminal: depTerminal, time: depTime,
+    }, {
+      iata: arrIata, city: arrCity, terminal: arrTerminal, time: arrTime,
+    });
+
+    _setFlightStatus(leg,
+      '✓ ' + depIata + ' ' + (depTime||'') + ' → ' + arrIata + ' ' + (arrTime||''),
+      'var(--grn)');
+
+  } catch(e) {
+    console.error('[autoFillFlight]', e);
+    _setFlightStatus(leg, '網路錯誤，請手動填入', 'var(--red)');
+  }
 }
 
 async function saveTrip() {

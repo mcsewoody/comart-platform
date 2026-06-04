@@ -316,10 +316,10 @@ img{display:block}
     </div>
   </div>
   <div class="nav-pills" id="navPills">
-    <button class="npill" data-tab="files" onclick="switchTab('files')">📁 <span id="np-files">File</span></button>
-    <button class="npill" data-tab="crm" onclick="switchTab('crm')">👥 <span id="np-crm">CRM</span> <span class="badge" id="np-cnt-crm">0</span></button>
     <button class="npill" data-tab="products" onclick="switchTab('products')"><span id="np-products">Product</span> <span class="badge" id="np-cnt-p">0</span></button>
     <button class="npill" data-tab="quotes" onclick="switchTab('quotes')"><span id="np-quotes">Quote</span> <span class="badge" id="np-cnt-q">0</span></button>
+    <button class="npill" data-tab="crm" onclick="switchTab('crm')">👥 <span id="np-crm">CRM</span> <span class="badge" id="np-cnt-crm">0</span></button>
+    <button class="npill" data-tab="files" onclick="switchTab('files')">📁 <span id="np-files">File</span></button>
     <button class="npill" data-tab="settings" onclick="goPage('settings')" id="np-settings-btn">⚙ <span id="np-settings">Settings</span></button>
   </div>
 </div>
@@ -531,6 +531,7 @@ img{display:block}
 </div>
 
 <!-- ── PAGE: USERS ────────────────────────────────────── -->
+<div class="page" id="pageUsers" style="display:none!important"></div>
 
 <!-- ── PAGE: QUOTE FORM ────────────────────────────────── -->
 <div class="page" id="pageForm">
@@ -633,6 +634,7 @@ img{display:block}
     <div class="sec-title" id="fs-prices">Unit Prices</div>
     <div class="price-tbl" id="priceTbl"></div>
   </div>
+
 
   <!-- Products — at the bottom of the form -->
   <div style="margin-top:8px">
@@ -1382,7 +1384,7 @@ function hideSyncing() {
 
 // ── localStorage helpers (fallback) ───
 function lsGet(key, def=[]) { try { const v=localStorage.getItem(key); return v?JSON.parse(v):def; } catch(_){ return def; } }
-function lsSet(key, val)    { try { localStorage.setItem(key, JSON.stringify(val)); } catch(_){ /* silent */ } }
+function lsSet(key, val)    { try { localStorage.setItem(key, JSON.stringify(val)); } catch(_){} }
 
 // ── Real-time listeners (auto-sync across all devices) ──
 let _qUnsub = null;
@@ -1392,8 +1394,8 @@ let _listenersReady = false;
 // ── Reload data after login (clears old listeners, re-fetches everything) ──
 async function _reloadAfterLogin(){
   // Reset listeners so they re-attach with authenticated context
-  if(typeof _qUnsub === 'function'){try{_qUnsub();}catch(_){ /* silent */ }}
-  if(typeof _pUnsub === 'function'){try{_pUnsub();}catch(_){ /* silent */ }}
+  if(typeof _qUnsub === 'function'){try{_qUnsub();}catch(_){}}
+  if(typeof _pUnsub === 'function'){try{_pUnsub();}catch(_){}}
   _listenersReady = false;
   showSyncing();
   try{
@@ -1408,10 +1410,10 @@ async function _reloadAfterLogin(){
       QUOTES   = qSnap.docs.map(d=>d.data());
       PRODUCTS = pSnap.docs.map(d=>d.data());
       if(suppSnap&&!suppSnap.empty) SUPPLIERS = suppSnap.docs.map(d=>d.data());
-      if(uSnap&&!uSnap.empty){ USERS = uSnap.docs.map(d=>{ const u=d.data(); delete u.pwdHash; return u; }); }
-      try{const cSnap=await db.collection(COL_C).orderBy('code','asc').get();CATEGORIES=cSnap.docs.map(d=>d.data());}catch(_){ /* silent */ }
+      if(uSnap&&!uSnap.empty){ USERS = uSnap.docs.map(d=>d.data()); lsSet('qi-users-cache',USERS); }
+      try{const cSnap=await db.collection(COL_C).orderBy('code','asc').get();CATEGORIES=cSnap.docs.map(d=>d.data());}catch(_){}
       if(sDoc.exists) SETTINGS={...SETTINGS,...sDoc.data()};
-      try{const phSnap=await db.collection(COL_PRICE_HIST).orderBy('ts','asc').get();PRICE_HISTORY=phSnap.docs.map(d=>d.data());}catch(_){ /* silent */ }
+      try{const phSnap=await db.collection(COL_PRICE_HIST).orderBy('ts','asc').get();PRICE_HISTORY=phSnap.docs.map(d=>d.data());}catch(_){}
       lsSet('qi-q-cache',QUOTES);
       lsSet('qi-p-cache',PRODUCTS);
     }
@@ -1460,6 +1462,7 @@ function startListeners() {
       if(page === 'categories') renderCategoryList();
     }, err => console.warn('C listener:', err));
 
+
   // PRICE_HISTORY real-time listener
   db.collection(COL_PRICE_HIST).orderBy('ts','asc')
     .onSnapshot({ includeMetadataChanges: false }, snap => {
@@ -1470,7 +1473,8 @@ function startListeners() {
   // USERS real-time listener
   db.collection(COL_U).orderBy('empId','asc')
     .onSnapshot({ includeMetadataChanges: false }, snap => {
-      USERS = snap.docs.map(d=>{ const u=d.data(); delete u.pwdHash; return u; });
+      USERS = snap.docs.map(d => d.data());
+      lsSet('qi-users-cache', USERS);
     }, err => console.warn('USERS listener:', err));
 
   // CRM listeners — accounts/contacts/activities/tasks
@@ -1492,7 +1496,7 @@ async function loadAll() {
       QUOTES   = qSnap.docs.map(d => d.data());
       PRODUCTS = pSnap.docs.map(d => d.data());
       if (suppSnap && !suppSnap.empty) { SUPPLIERS = suppSnap.docs.map(d => d.data()); }
-      if (uSnap && !uSnap.empty) { USERS = uSnap.docs.map(d=>{ const u=d.data(); delete u.pwdHash; return u; }); }
+      if (uSnap && !uSnap.empty) { USERS = uSnap.docs.map(d => d.data()); lsSet('qi-users-cache', USERS); }
     try {
       const cSnap = await db.collection(COL_C).orderBy('code','asc').get();
       CATEGORIES = cSnap.docs.map(d => d.data());
@@ -1520,7 +1524,7 @@ async function loadAll() {
     PRODUCTS = lsGet('qi-p-cache', []);
     PRICE_HISTORY = lsGet('qi-price-history', []);
     USERS = lsGet('qi-users-cache', []);
-    try { const s=localStorage.getItem('qi-s-cache'); if(s) SETTINGS={...SETTINGS,...JSON.parse(s)}; } catch(_){ /* silent */ }
+    try { const s=localStorage.getItem('qi-s-cache'); if(s) SETTINGS={...SETTINGS,...JSON.parse(s)}; } catch(_){}
   }
 
   if (!PRODUCTS.length) {
@@ -1531,7 +1535,7 @@ async function loadAll() {
     }
   }
 
-  try { const l=localStorage.getItem('qi-lang-v2'); if(l) lang=l; } catch(_){ /* silent */ }
+  try { const l=localStorage.getItem('qi-lang-v2'); if(l) lang=l; } catch(_){}
   hideSyncing();
 
   // ── Auth: Portal Session Required ──
@@ -1549,7 +1553,7 @@ async function loadAll() {
       }
       if (freshUser && freshUser.role !== 'inactive') {
         currentUser = { ...freshUser };
-        try { lsSet('qi-user-session-v2', { empId: freshUser.empId, login: freshUser.login, ts: Date.now() }); } catch(_){ /* silent */ }
+        try { lsSet('qi-user-session-v2', { empId: freshUser.empId, login: freshUser.login, ts: Date.now() }); } catch(_) {}
         hideLoginPage();
         updateUserBadge();
         await _reloadAfterLogin();
@@ -1636,7 +1640,7 @@ async function deleteImgFromStorage(prodId) {
   for (const ext of exts) {
     try {
       await storage.ref('products/' + prodId + '.' + ext).delete();
-    } catch(_){ /* silent */ } // ignore if not found
+    } catch(_) {} // ignore if not found
   }
 }
 
@@ -1653,7 +1657,7 @@ async function saveOneP(idOrObj) {
   // If img is base64 (new upload), upload to Firebase Storage
   if (p.img && p.img.startsWith('data:') && USE_FIREBASE) {
     // Cache base64 in localStorage BEFORE uploading (for PDF/XLSX use)
-    try { localStorage.setItem('qi-img-b64-' + p.id, p.img); } catch(_){ /* silent */ }
+    try { localStorage.setItem('qi-img-b64-' + p.id, p.img); } catch(_) {}
     const uploadedUrl = await uploadImgToStorage(p.id, p.img);
     if (uploadedUrl) {
       imgUrl = uploadedUrl;
@@ -1663,7 +1667,7 @@ async function saveOneP(idOrObj) {
     }
   } else if (p.img && p.img.startsWith('data:')) {
     // No Firebase — keep base64 in localStorage too
-    try { localStorage.setItem('qi-img-b64-' + p.id, p.img); } catch(_){ /* silent */ }
+    try { localStorage.setItem('qi-img-b64-' + p.id, p.img); } catch(_) {}
   }
 
   // Strip base64 + sanitize undefined → null before writing to Firestore
@@ -1836,7 +1840,7 @@ function toast(msg,dur=2000){const el=document.getElementById('toast');el.textCo
 // LANG
 // ═══════════════════════════════════════
 function setLang(l){
-  lang=l;try{localStorage.setItem('qi-lang-v2',l);}catch(e){ console.warn("[QS]", e); }
+  lang=l;try{localStorage.setItem('qi-lang-v2',l);}catch(e){}
   applyLang();
   // Re-render ALL pages instantly regardless of current page
   renderQuoteList();
@@ -1855,6 +1859,7 @@ function setLang(l){
 function applyLang(){
   const s=(id,k)=>{const el=document.getElementById(id);if(el)el.textContent=t(k);};
   s('np-quotes','quotes');s('np-products','products');s('np-categories','categories');s('np-files','files');s('np-crm','crm');
+  // AI tab labels removed (AI tab deleted)
   s('backLbl','back');
   s('fs-client','client');s('fs-moq','moqTiers');s('fs-prods','selectProds');s('fs-prices','prices');
   s('fl-company','company');s('fl-attn','attn');s('fl-email','email');s('fl-tel','tel');
@@ -1894,6 +1899,7 @@ function applyLang(){
 // ═══════════════════════════════════════
 // NAV
 // ═══════════════════════════════════════
+
 
 // ── BUSINESS CARD ─────────────────────────────────
 let _lastCardInfo = null;
@@ -1935,6 +1941,58 @@ async function _readCardImage(file, onResult) {
   reader.readAsDataURL(file);
 }
 
+function readCardForCompany(input) {
+  _readCardImage(input.files?.[0], info => {
+    const el = document.getElementById('skill-company-input');
+    if (el && info.company) el.value = info.company;
+    const vb = document.getElementById('vcard-export-btn');
+    if (vb) vb.style.display = 'inline-flex';
+    // Prompt: add to CRM
+    if (typeof promptAddCardToCRM === 'function') {
+      setTimeout(()=>promptAddCardToCRM(info, '客戶調查 / 名片掃描'), 300);
+    }
+  });
+}
+
+function readCardForFollowup(input) {
+  _readCardImage(input.files?.[0], info => {
+    if (info.company) { const e=document.getElementById('skill-show-company'); if(e) e.value=info.company; }
+    if (info.name)    { const e=document.getElementById('skill-show-contact'); if(e) e.value=info.name; }
+    if (info.email||info.phone||info.title) {
+      const e = document.getElementById('skill-show-notes');
+      if (e && !e.value) {
+        e.value = [info.email?'Email: '+info.email:'', info.phone?'Tel: '+info.phone:'', info.title?'Title: '+info.title:''].filter(Boolean).join('\n');
+      }
+    }
+    // Show vCard export button for followup
+    const vb = document.getElementById('vcard-export-btn-followup');
+    if (vb) vb.style.display = 'inline-block';
+    // Prompt: add to CRM (use show name as source if available)
+    if (typeof promptAddCardToCRM === 'function') {
+      const showName = document.getElementById('skill-show-name')?.value.trim() || '展後跟進';
+      setTimeout(()=>promptAddCardToCRM(info, showName), 300);
+    }
+  });
+}
+
+function exportVCard() {
+  if (!_lastCardInfo) { toast('Please upload a business card first'); return; }
+  const i = _lastCardInfo;
+  const lines = ['BEGIN:VCARD','VERSION:3.0',
+    i.name    ?'FN:'+i.name:null, i.company?'ORG:'+i.company:null,
+    i.title   ?'TITLE:'+i.title:null, i.email?'EMAIL:'+i.email:null,
+    i.phone   ?'TEL:'+i.phone:null,  i.website?'URL:'+i.website:null,
+    i.country ?'X-COUNTRY:'+i.country:null, 'END:VCARD'
+  ].filter(Boolean).join('\r\n');
+  const url = URL.createObjectURL(new Blob([lines],{type:'text/vcard'}));
+  const a   = Object.assign(document.createElement('a'),{href:url, download:(i.name||'contact').replace(/\s+/g,'_')+'.vcf'});
+  a.click(); URL.revokeObjectURL(url);
+  toast('✅ vCard downloaded');
+}
+
+function goHome(){
+  switchTab('files');
+}
 function goPortal(){
   window.location.href = 'https://platform.comart.com.tw/';
 }
@@ -1970,10 +2028,15 @@ function goPage(pg){
   ['pageQuotes','pageProducts','pageCategories','pageUsers','pageForm','pageDetail','pageSettings','pageFiles','pageCRM'].forEach(id=>{ const el=document.getElementById(id); if(el) el.classList.remove('active'); });
   const _pgEl=document.getElementById('page'+pg.charAt(0).toUpperCase()+pg.slice(1));
   if(_pgEl) _pgEl.classList.add('active'); else console.warn('goPage: page element not found for', pg);
-  const isForm=pg==='form'||pg==='detail';
-  const _la=document.getElementById('logoArea'); if(_la) _la.style.display=isForm?'none':'flex';
-  const _np=document.getElementById('navPills'); if(_np) _np.style.display=isForm?'none':'flex';
-  const _br=document.getElementById('backRow'); if(_br) _br.classList.toggle('show',isForm);
+  // Keep Quote tab active when in form/detail
+  document.querySelectorAll('.npill[data-tab]').forEach(b=>b.classList.remove('active'));
+  const _activeTab = (pg==='form'||pg==='detail') ? 'quotes' : pg;
+  const _activeBtn = document.querySelector(`.npill[data-tab="${_activeTab}"]`);
+  if(_activeBtn) _activeBtn.classList.add('active');
+  // Nav & topbar always visible (no hiding on form/detail)
+  const _la=document.getElementById('logoArea'); if(_la) _la.style.display='flex';
+  const _np=document.getElementById('navPills'); if(_np) _np.style.display='flex';
+  const _br=document.getElementById('backRow'); if(_br) _br.classList.remove('show');
   const _sb=document.getElementById('settingsBtn'); if(_sb) _sb.style.display='none';
   const titles={form:t(editQId?'editQ':'newQ'),detail:t('quoteDetail'),settings:t('settings')};
   const _pt=document.getElementById('pgTitle'); if(_pt) _pt.textContent=titles[pg]||'';
@@ -2125,6 +2188,7 @@ function filterUncategorized(){
   renderProductList();
 }
 
+
 function removeAllProds(){
   formSelProds=[];
   formPrices={};
@@ -2222,7 +2286,7 @@ async function deleteCat(){
   if(inUse>0){toast('Cannot delete: '+inUse+' product(s) assigned');return;}
   await confirmDelete(c?.code||'category',async()=>{
     CATEGORIES=CATEGORIES.filter(x=>x.id!==editCatId);
-    if(USE_FIREBASE){try{await db.collection(COL_C).doc(editCatId).delete();}catch(e){ console.warn("[QS]", e); }}
+    if(USE_FIREBASE){try{await db.collection(COL_C).doc(editCatId).delete();}catch(e){}}
     closeCatModal();renderCategoryList();toast('Deleted');
   });
 }
@@ -2278,12 +2342,13 @@ function copyProd(){
       const cs=document.getElementById('pm-cat');if(cs&&src.catId)cs.value=src.catId;
       const cs2=document.getElementById('pm-cat2');if(cs2&&src.catId2)cs2.value=src.catId2;
       const b64=localStorage.getItem('qi-img-b64-'+src.id);
-      if(b64)try{localStorage.setItem('qi-img-b64-'+newId,b64);}catch(_){ /* silent */ }
+      if(b64)try{localStorage.setItem('qi-img-b64-'+newId,b64);}catch(_){}
     },120);
   };
   ov.querySelector('#_cpyCx').onclick=()=>document.body.removeChild(ov);
   inp.addEventListener('keydown',e=>{if(e.key==='Enter')ov.querySelector('#_cpyOk').click();});
 }
+
 
 // ── Image hover preview ─────────────────
 // ── Product image hover/tap preview ──
@@ -2302,7 +2367,7 @@ function showImgPreview(el, src, event){
     _imgPreviewEl.style.cssText = 'position:fixed;z-index:8000;background:var(--s1);border:1px solid var(--br);border-radius:10px;padding:6px;box-shadow:0 8px 32px rgba(0,0,0,.6);align-items:center;justify-content:center;display:none;pointer-events:none';
     document.body.appendChild(_imgPreviewEl);
   }
-  _imgPreviewEl.innerHTML = `<img src="${src.startsWith('data:') ? src : encodeURI(src)}" style="max-width:240px;max-height:240px;object-fit:contain;border-radius:6px;display:block">`;
+  _imgPreviewEl.innerHTML = `<img src="${src}" style="max-width:240px;max-height:240px;object-fit:contain;border-radius:6px;display:block">`;
   const rect = el.getBoundingClientRect();
   let left = rect.right + 12;
   let top = rect.top;
@@ -2332,7 +2397,7 @@ function tapImgPreview(src, event){
     _imgPreviewEl.style.display = 'none';
     return;
   }
-  _imgPreviewEl.innerHTML = `<img src="${src.startsWith('data:') ? src : encodeURI(src)}" style="max-width:min(80vw,320px);max-height:min(80vh,320px);object-fit:contain;border-radius:6px;display:block">`;
+  _imgPreviewEl.innerHTML = `<img src="${src}" style="max-width:min(80vw,320px);max-height:min(80vh,320px);object-fit:contain;border-radius:6px;display:block">`;
   // Center on screen for mobile
   _imgPreviewEl.style.left = '50%';
   _imgPreviewEl.style.top = '50%';
@@ -2484,6 +2549,7 @@ async function importProductsXLSX(event) {
     toast('Import done: '+added+' added, '+updated+' updated, '+skipped+' skipped');
   } catch(e) { console.error('importProductsXLSX:',e); toast('Import failed: '+e.message); }
 }
+
 
 function renderProductList(){
   document.getElementById('np-cnt-p').textContent=PRODUCTS.length;
@@ -2912,17 +2978,17 @@ async function saveProd(){
   };
   // Cache base64 to localStorage NOW (before upload changes img to URL)
   if (tmpImg && tmpImg !== '__CLEAR__' && tmpImg.startsWith('data:')) {
-    try { localStorage.setItem('qi-img-b64-' + prodId, tmpImg); } catch(_){ /* silent */ }
+    try { localStorage.setItem('qi-img-b64-' + prodId, tmpImg); } catch(_) {}
   } else if (tmpImg === '__CLEAR__') {
     localStorage.removeItem('qi-img-b64-' + prodId);
   }
   if (tmpImg2 && tmpImg2 !== '__CLEAR__' && tmpImg2.startsWith('data:')) {
-    try { localStorage.setItem('qi-img-b64-' + prodId + '-2', tmpImg2); } catch(_){ /* silent */ }
+    try { localStorage.setItem('qi-img-b64-' + prodId + '-2', tmpImg2); } catch(_) {}
   } else if (tmpImg2 === '__CLEAR__') {
     localStorage.removeItem('qi-img-b64-' + prodId + '-2');
   }
   if (tmpImg3 && tmpImg3 !== '__CLEAR__' && tmpImg3.startsWith('data:')) {
-    try { localStorage.setItem('qi-img-b64-' + prodId + '-3', tmpImg3); } catch(_){ /* silent */ }
+    try { localStorage.setItem('qi-img-b64-' + prodId + '-3', tmpImg3); } catch(_) {}
   } else if (tmpImg3 === '__CLEAR__') {
     localStorage.removeItem('qi-img-b64-' + prodId + '-3');
   }
@@ -3390,6 +3456,22 @@ function toggleProd(id){
   if(navigator.vibrate)navigator.vibrate(8);
 }
 
+function recalcAllPrices(){
+  let changed=0;
+  formSelProds.forEach(id=>{
+    if(!formPrices[id]) return;
+    const base=parseFloat(formPrices[id][1000]);
+    if(!base) return;
+    formMoqs.forEach(m=>{
+      if(m===1000) return;
+      const adj=MOQ_ADJ[m];
+      if(adj!==undefined){ formPrices[id][m]=Math.round(base*adj*100)/100; changed++; }
+    });
+  });
+  renderPriceTbl();
+  toast(changed>0?'Prices recalculated from 1K ✅':'No 1K prices found');
+}
+
 // ── IA/IB Interface Compatible Cycle Filter ────────
 // 追蹤每個 product 的 IA/IB 各自的 cycle index
 const _ifaceCycleIdx = {};
@@ -3466,6 +3548,19 @@ function renderPriceTbl(){
     </div>`;
   }).join('');
   document.getElementById('priceTbl').innerHTML=head+rows;
+}
+function setPr(id,moq,val){
+  if(!formPrices[id]) formPrices[id]={};
+  const v = parseFloat(val);
+  formPrices[id][moq] = v || '';
+  if(moq === 1000 && v > 0){
+    formMoqs.forEach(m => {
+      if(m === 1000) return;
+      const adj = MOQ_ADJ[m];
+      if(adj !== undefined) formPrices[id][m] = Math.round(v * adj * 100) / 100;
+    });
+    renderPriceTbl();
+  }
 }
 // setPrOut: user types in output currency → convert back to USD for storage
 function setPrOut(id,moq,val){
@@ -3549,11 +3644,10 @@ async function saveQuote(){
   syncQuoteToCRM(q).catch(e=>console.warn('CRM sync:',e));
   toast(t('save'));
   renderQuoteList();
-  updateVersionStamp();
-  // Go to detail view after save
-  renderDetail(q.id);
-  page='detail';
-  goPage('detail');
+  // Return to quotes list after save
+  editQId = null;
+  page='quotes';
+  switchTab('quotes');
 }
 async function deleteQuote(){
   if(!editQId)return;
@@ -3758,6 +3852,10 @@ function sendEmailMailto(id){
   toast('📧 Mail client opened — please attach PDF before sending');
 }
 
+
+
+
+
 // ── Sync Latest Prices from Product DB ────────────
 async function syncLatestPrices(id) {
   const q = QUOTES.find(x=>x.id===id);
@@ -3880,13 +3978,31 @@ async function getProdImgB64(pid) {
       rd.onerror = () => rej(new Error('reader fail'));
       rd.readAsDataURL(blob);
     });
-    try { localStorage.setItem('qi-img-b64-' + pid, b64); } catch(_){ /* silent */ }
+    try { localStorage.setItem('qi-img-b64-' + pid, b64); } catch(_) {}
     return b64;
   } catch(e) {
     console.warn('IMG [' + pid + ']: proxy failed:', e.message);
   }
 
   return null;
+}
+
+// ── Pre-cache all product images ──
+async function precacheAllImages() {
+  let ok = 0, skip = 0, fail = 0;
+  toast('⏳ Caching images…');
+  for (const p of PRODUCTS) {
+    if (!p.img) continue;
+    if (p.img.startsWith('data:')) {
+      try { localStorage.setItem('qi-img-b64-' + p.id, p.img); ok++; } catch(_) {}
+      continue;
+    }
+    const cached = localStorage.getItem('qi-img-b64-' + p.id);
+    if (cached && cached.startsWith('data:')) { skip++; continue; }
+    const b64 = await getProdImgB64(p.id);
+    if (b64) ok++; else fail++;
+  }
+  toast('🖼 ' + ok + ' cached, ' + skip + ' already cached' + (fail ? ', ' + fail + ' failed' : '') + ' ✅');
 }
 
 async function downloadXLSX(id) {
@@ -4153,6 +4269,7 @@ async function downloadXLSX(id) {
   }
 }
 
+
 // ════════════════════════════════════════════════
 // PDF (HTML) — for non-Latin languages
 // ════════════════════════════════════════════════
@@ -4165,7 +4282,7 @@ async function downloadPDFasHTML(q) {
   const fname = fComp+'_'+fDate+'_'+fSeq;
   const hdrImgTag = HEADER_IMG_B64
     ? '<img src="data:image/jpeg;base64,'+HEADER_IMG_B64+'" style="width:100%;height:auto;display:block">'
-    : '<div style="background:#C8102E;color:#fff;padding:12px 20px;font-size:20px;font-weight:bold">COMART CORPORATION</div>';
+    : '';
   let prodRows = '';
   for (let pi=0; pi<q.products.length; pi++) {
     const pid=q.products[pi]; const p=prodById(pid); if(!p) continue;
@@ -4227,13 +4344,19 @@ const _PDF_FONT_URLS = {
 // localStorage cache key per language
 const _PDF_CACHE = (ql) => 'qi-pdf-noto-v4-' + ql; // v4 = TTF format
 
+// Returns jsPDF font name for a given output language
+function _pdfFont(ql) {
+  if (ql === 'en') return 'helvetica';
+  return 'NotoLang';
+}
+
 // Fetch font, base64 encode, cache in localStorage
 async function _pdfFetchFont(ql) {
   const ckey = _PDF_CACHE(ql);
   try {
     const cached = localStorage.getItem(ckey);
     if (cached) return cached;
-  } catch(_){ /* silent */ }
+  } catch(_) {}
 
   const url = _PDF_FONT_URLS[ql];
   if (!url) throw new Error('No font URL for language: ' + ql);
@@ -4703,7 +4826,7 @@ async function deleteSupplier() {
   await confirmDelete('Supplier '+s.code+' – '+s.name, async()=>{
     SUPPLIERS=SUPPLIERS.filter(x=>x.id!==s.id);
     if(USE_FIREBASE){
-      try{ await db.collection(COL_SUP).doc(s.id).delete(); } catch(e){ console.warn("[QS]", e); }
+      try{ await db.collection(COL_SUP).doc(s.id).delete(); } catch(e){}
     }
     closeSupModal();
     renderSupplierList();
@@ -4753,6 +4876,20 @@ function supplierTooltipHtml(sup) {
 }
 
 let _supTooltipEl=null;
+function showSupTooltip(el, supCode) {
+  const sup=SUPPLIERS.find(s=>s.code===supCode);
+  if(!sup) return;
+  hideSupTooltip();
+  _supTooltipEl=document.createElement('div');
+  _supTooltipEl.style.cssText='position:fixed;z-index:9999;background:var(--s1);border:1px solid var(--br);border-radius:10px;padding:12px 14px;box-shadow:0 8px 24px rgba(0,0,0,.4);pointer-events:none;max-width:320px';
+  _supTooltipEl.innerHTML=supplierTooltipHtml(sup);
+  document.body.appendChild(_supTooltipEl);
+  const r=el.getBoundingClientRect();
+  let top=r.bottom+8, left=r.left;
+  if(top+200>window.innerHeight) top=r.top-_supTooltipEl.offsetHeight-8;
+  if(left+320>window.innerWidth) left=window.innerWidth-330;
+  _supTooltipEl.style.top=top+'px'; _supTooltipEl.style.left=Math.max(8,left)+'px';
+}
 function hideSupTooltip(){
   if(_supTooltipEl){_supTooltipEl.remove();_supTooltipEl=null;}
 }
@@ -4794,6 +4931,8 @@ function switchProdTab(tab) {
   if(tab==='bom') renderBomTab();
   if(tab==='docs') renderDocsTab();
 }
+
+
 
 // ── Price History Tab ─────────────────────────────
 function renderPriceHistTab() {
@@ -4998,6 +5137,18 @@ function applyWhatIfPrice() {
   toast('1K Price updated to '+wiPrice.toFixed(5));
 }
 
+// ── Copy Input Text (Translate) ────────────────────
+function copyInputText() {
+  const text=document.getElementById('xlat-input')?.value||'';
+  if(!text){ toast('Nothing to copy'); return; }
+  navigator.clipboard.writeText(text).then(()=>toast('Copied!')).catch(()=>{
+    const ta=document.createElement('textarea');
+    ta.value=text; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta); toast('Copied!');
+  });
+}
+
+
 // ── Product Status Management ──────────────────────
 function renderStatusList(){
   const el=document.getElementById('statusList');
@@ -5076,6 +5227,9 @@ function renderSettingsPage(){
   if (_lddS && _lddS.tagName === 'SELECT') { _lddS.value = lang; }
   document.querySelectorAll('.lchip').forEach(b=>b.classList.toggle('on',b.textContent===LANG_LABELS[lang]));
 }
+function updateVersionStamp(){ /* version managed in code */ }
+function initVersionDisplay(){ /* version is fixed in HTML */ }
+
 function markSettingsDirty(){
   const btn=document.getElementById('saveSettingsBtn');
   if(btn) btn.style.cssText='background:var(--ac);color:#000;font-weight:800;';
@@ -5141,6 +5295,26 @@ function importData(e){
   r.readAsText(f);
   e.target.value='';
 }
+async function clearAllQuotes(){
+  if(!confirm('Clear all quotations?'))return;
+  showSyncing();
+  try {
+    // Delete each quote individually from Firestore
+    const ids = QUOTES.map(q => q.id);
+    for (const id of ids) {
+      await deleteOneQ(id);
+    }
+    QUOTES = [];
+    lsSet('qi-q-cache', []);
+    toast('Cleared');
+    renderQuoteList();
+  } catch(e) {
+    toast('⚠️ Error clearing quotes');
+  } finally {
+    hideSyncing();
+  }
+}
+
 // ═══════════════════════════════════════
 // REFRESH (pull latest from Firestore)
 // ═══════════════════════════════════════
@@ -5167,6 +5341,7 @@ window.refreshData = async function refreshData() {
     toast('⚠️ Sync failed — check network');
   } finally { hideSyncing(); }
 }
+
 
 // ═══════════════════════════════════════════════
 // USER MANAGEMENT & AUTH
@@ -5203,13 +5378,14 @@ function hideLoginPage() {
 }
 
 // ── Login ──
+// doLogin removed — authentication handled by Portal Session
 
 // ── Logout ──
 function doLogout() {
   if (!confirm('Logout?')) return;
   currentUser = null;
-  try { localStorage.removeItem(COL_U_SESSION); } catch(_){ /* silent */ }
-  try { localStorage.removeItem(PORTAL_SESSION_KEY); } catch(_){ /* silent */ }
+  try { localStorage.removeItem(COL_U_SESSION); } catch(_) {}
+  try { localStorage.removeItem(PORTAL_SESSION_KEY); } catch(_) {}
   window.location.href = 'https://platform.comart.com.tw/';
 }
 
@@ -5294,14 +5470,21 @@ async function restoreSession() {
 
 // ── Change Password ──
 let _mustChangePwd = false;
+// showChangePwd removed
+// closeChangePwd removed
+// doChangePwd removed — password management handled by Portal
 
 // ── Admin: create default admin if no users exist ──
+// ensureAdminExists removed
 
 // ── User list in Settings ──
 let USERS = [];
 
-function renderUsersPage(){}
-function renderLogTable(){}
+// renderLogTable removed
+function renderUsersPage(){} // stub — users managed in Portal
+function renderLogTable(){} // stub — logs managed in Portal
+
+// showUsersTab removed
 
 async function syncLiveRates(){
   const btn=document.getElementById('syncRateBtn');
@@ -5402,6 +5585,8 @@ function openIfaceModal(id) {
   setTimeout(()=>document.getElementById('iface-name').focus(), 80);
 }
 
+
+
 function closeIfaceModal(e) {
   if(e && e.target !== document.getElementById('ifaceOverlay')) return;
   document.getElementById('ifaceOverlay').style.display = 'none';
@@ -5474,9 +5659,15 @@ function renderSettingsCatList(){
     }).join('')}</tbody>
   </table>`;
 }
+// renderUsersPage removed
 
 // ── User Modal ──
 let editUserId = null;
+// openUserModal removed
+// closeUserModal removed
+// saveUser removed
+// deleteUser removed
+
 
 // ═══════════════════════════════════════
 // ACTIVITY LOG
@@ -5496,6 +5687,7 @@ async function writeLog(action, type, detail) {
     await db.collection(COL_L).add(log);
   } catch(e) { console.warn('writeLog:', e); }
 }
+
 
 // ── FILES MODAL ──────────────────────────────────
 // Admin can manage this list; others just view
@@ -5744,6 +5936,7 @@ async function loadAndRenderFiles(){
   await driveLoadFolder(DRIVE_ROOT_ID);
 }
 
+
 // ════════════════════════════════════════════════
 // CRM MODULE
 // ════════════════════════════════════════════════
@@ -5788,6 +5981,12 @@ function updateCRMBadge(){
   if(el) el.textContent = CRM_ACCOUNTS.length;
 }
 
+// ── Permission check ─────────────────────────
+function canEditCRM(acct){
+  if(!currentUser) return false;
+  if(currentUser.role==='admin' || currentUser.role==='dcc') return true;
+  return acct && acct.owner === currentUser.empId;
+}
 function canViewCRM(acct){
   if(!currentUser) return false;
   if(currentUser.role==='admin' || currentUser.role==='dcc') return true;
@@ -6521,6 +6720,32 @@ function promptAddCardToCRM(info, source){
 
 // ── FILES HOVER PREVIEW ───────────────────────────
 let _driveHoverTimer=null, _driveHoverBubble=null;
+function driveShowHover(el, fileId) {
+  clearTimeout(_driveHoverTimer);
+  if (!fileId) return;
+  _driveHoverTimer = setTimeout(() => {
+    if (!_driveHoverBubble) {
+      _driveHoverBubble = document.createElement('div');
+      _driveHoverBubble.style.cssText = 'position:fixed;z-index:9500;background:#fff;border:1px solid #ddd;border-radius:10px;box-shadow:0 8px 28px rgba(0,0,0,.35);overflow:hidden;pointer-events:none;width:300px;height:200px;display:none';
+      document.body.appendChild(_driveHoverBubble);
+    }
+    _driveHoverBubble.innerHTML = '<iframe src="https://drive.google.com/file/d/' + fileId + '/preview" style="width:300px;height:200px;border:none;display:block" loading="lazy"></iframe>';
+    const r   = el.getBoundingClientRect();
+    let   lft = r.right + 10;
+    let   top = r.top;
+    if (lft + 310 > window.innerWidth)  lft = r.left - 315;
+    if (top + 210 > window.innerHeight) top = window.innerHeight - 215;
+    _driveHoverBubble.style.left    = Math.max(4, lft) + 'px';
+    _driveHoverBubble.style.top     = Math.max(4, top) + 'px';
+    _driveHoverBubble.style.display = 'block';
+  }, 800);
+}
+function driveHideHover(){
+  clearTimeout(_driveHoverTimer);
+  if(_driveHoverBubble){ _driveHoverBubble.style.display='none'; _driveHoverBubble.innerHTML=''; }
+}
+
+
 // ── One-time batch: set status='Normal' for products missing status ──
 async function batchSetNormalStatus(){
   const toUpdate = PRODUCTS.filter(p=>!p.status);
@@ -6658,6 +6883,10 @@ function closeProdQuickView(e){
   if(ov) ov.style.display = 'none';
 }
 
+
+
+
+
 // ── Product Detail Modal ──────────────────────────
 function showProdDetailModal(prodId) {
   const p = prodById(prodId);
@@ -6699,6 +6928,11 @@ function showProdDetailModal(prodId) {
     (lx(p.features)?'<div style="font-size:10px;font-weight:700;color:var(--tx3);letter-spacing:.06em;text-transform:uppercase;margin:10px 0 4px">Description</div><div style="font-size:12px;color:var(--tx2);line-height:1.6;white-space:pre-line">'+escHtml(lx(p.features))+'</div>':'');
   document.getElementById('prodDetailOverlay').style.display='flex';
 }
+function closeProdDetailModal(e){
+  if(e&&e.target!==document.getElementById('prodDetailOverlay')) return;
+  document.getElementById('prodDetailOverlay').style.display='none';
+}
+
 // ── BOM Tab ───────────────────────────────────────
 // ── BOM Tab ───────────────────────────────────────
 const BOM_ICONS={pdf:'📄',doc:'📝',docx:'📝',xls:'📊',xlsx:'📊',ppt:'📑',pptx:'📑',default:'📎'};
@@ -6759,6 +6993,19 @@ function _processBomFile(file){
   r.readAsDataURL(file);
 }
 
+function _openBomBase64(index){
+  const p=PRODUCTS.find(x=>x.id===editProdId);
+  const doc=p?.bomFiles?.[index];
+  if(!doc||!doc.base64)return;
+  const byteChars=atob(doc.base64);
+  const bytes=new Uint8Array(byteChars.length);
+  for(let i=0;i<byteChars.length;i++)bytes[i]=byteChars.charCodeAt(i);
+  const blob=new Blob([bytes],{type:doc.type||'application/octet-stream'});
+  const url=URL.createObjectURL(blob);
+  window.open(url,'_blank');
+  setTimeout(()=>URL.revokeObjectURL(url),10000);
+}
+
 async function deleteBomFile(index){
   const p=PRODUCTS.find(x=>x.id===editProdId);if(!p)return;
   const doc=p.bomFiles?.[index];if(!doc)return;
@@ -6767,7 +7014,7 @@ async function deleteBomFile(index){
     try{
       if(doc.storagePath) await storage.ref(doc.storagePath).delete();
       else if(doc.url) await storage.refFromURL(doc.url).delete();
-    }catch(_){ /* silent */ }
+    }catch(_){}
   }
   const bomFiles=(p.bomFiles||[]).filter((_,i)=>i!==index);
   const updated={...p,bomFiles};
@@ -6832,6 +7079,19 @@ function _processDocFile(file){
   };
   r.readAsDataURL(file);
 }
+function _openDocBase64(index){
+  const p=PRODUCTS.find(x=>x.id===editProdId);
+  const doc=p?.docs?.[index];
+  if(!doc||!doc.base64)return;
+  const mime=doc.type||'application/octet-stream';
+  const byteChars=atob(doc.base64);
+  const bytes=new Uint8Array(byteChars.length);
+  for(let i=0;i<byteChars.length;i++)bytes[i]=byteChars.charCodeAt(i);
+  const blob=new Blob([bytes],{type:mime});
+  const url=URL.createObjectURL(blob);
+  window.open(url,'_blank');
+  setTimeout(()=>URL.revokeObjectURL(url),10000);
+}
 async function deleteDoc(index){
   const p=PRODUCTS.find(x=>x.id===editProdId);if(!p)return;
   const doc=p.docs?.[index];if(!doc)return;
@@ -6840,7 +7100,7 @@ async function deleteDoc(index){
     try{
       if(doc.storagePath) await storage.ref(doc.storagePath).delete();
       else if(doc.url) await storage.refFromURL(doc.url).delete();
-    }catch(_){ /* silent */ }
+    }catch(_){}
   }
   const docs=(p.docs||[]).filter((_,i)=>i!==index);
   const updated={...p,docs};
@@ -6854,6 +7114,7 @@ init();
 </script>
 
 <!-- ── PAGE: FILES ────────────────────────────────── -->
+
 
 <!-- ── PAGE: TRIP ──────────────────────────────────── -->
 
@@ -7262,5 +7523,6 @@ init();
     <div id="pqv-body" style="padding-top:12px"></div>
   </div>
 </div>
+
 
 </body>

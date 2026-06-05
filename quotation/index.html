@@ -292,7 +292,7 @@ img{display:block}
       <div class="logo-mark">C</div>
       <div>
         <div class="logo-text">COMART</div>
-        <div id="appVersionDiv" style="font-size:10px;color:var(--ac);font-weight:600;letter-spacing:.04em;line-height:1.3">v3.33</div>
+        <div id="appVersionDiv" style="font-size:10px;color:var(--ac);font-weight:600;letter-spacing:.04em;line-height:1.3">v3.34</div>
       </div>
     </div>
     <div class="topbar-right">
@@ -535,6 +535,24 @@ img{display:block}
 
 <!-- ── PAGE: QUOTE FORM ────────────────────────────────── -->
 <div class="page" id="pageForm">
+  <!-- Sticky action bar -->
+  <div id="qFormActionBar" style="position:sticky;top:0;z-index:20;background:var(--s1);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;padding:8px 0 10px;margin-bottom:12px;border-bottom:1px solid var(--br);box-shadow:0 2px 8px var(--s1)">
+    <div id="qFormTitle" style="font-size:14px;font-weight:700;color:var(--tx);letter-spacing:.01em">New Quotation</div>
+    <div style="display:flex;gap:6px;align-items:center">
+      <button class="btn btn-primary btn-sm" onclick="saveQuote()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        <span id="saveQlbl">Save</span>
+      </button>
+      <button class="btn btn-danger btn-sm" id="delQBtn" style="display:none" onclick="deleteQuote()" title="Admin only">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6M9 6V4h6v2"/></svg>
+        <span id="delQlbl">Del</span>
+      </button>
+      <button class="btn btn-ghost btn-sm" onclick="switchTab('quotes')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        <span id="cancelQlbl">Quit</span>
+      </button>
+    </div>
+  </div>
   <!-- Client Info -->
   <div class="sec-title" id="fs-client">Client</div>
   <div class="form-card">
@@ -597,22 +615,7 @@ img{display:block}
     </div>
   </div>
 
-  <!-- Products — above action buttons -->
-  <!-- Save/Delete/Back moved up here, before Products -->
-  <div class="btn-row" style="flex-wrap:wrap;gap:8px;margin-top:6px;margin-bottom:16px">
-    <button class="btn btn-primary" onclick="saveQuote()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-      <span id="saveQlbl">Save</span>
-    </button>
-    <button class="btn btn-danger btn-sm" id="delQBtn" style="display:none" onclick="deleteQuote()" title="Admin only">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6M9 6V4h6v2"/></svg>
-      <span id="delQlbl">Del</span>
-    </button>
-    <button class="btn btn-ghost btn-sm" onclick="goBack()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 5l-7 7 7 7"/></svg>
-      <span id="cancelQlbl">Back</span>
-    </button>
-  </div>
+  <!-- action buttons moved to sticky header -->
 
   <!-- f-lang hidden (kept for compatibility) -->
   <select id="f-lang" style="display:none">
@@ -1864,6 +1867,11 @@ function applyLang(){
   s('np-quotes','quotes');s('np-products','products');s('np-categories','categories');s('np-files','files');s('np-crm','crm');
   // AI tab labels removed (AI tab deleted)
   s('backLbl','back');
+  // Update form title on lang change
+  if(page==='form'){
+    const _qt=document.getElementById('qFormTitle');
+    if(_qt) _qt.textContent=editQId?t('editQ'):t('newQ');
+  }
   s('fs-client','client');s('fs-moq','moqTiers');s('fs-prods','selectProds');s('fs-prices','prices');
   s('fl-company','company');s('fl-attn','attn');s('fl-email','email');s('fl-tel','tel');
   s('fl-lang','qlang');s('fl-status','status');s('fl-inco','inco');s('fl-pay','pay');s('fl-notes','notes');
@@ -3177,6 +3185,9 @@ function openQuoteForm(id){
   renderMoqChips();renderProdPicker();renderPriceTbl();
   applyLang();
   page='form';goPage('form');
+  // Update sticky title
+  const _qt=document.getElementById('qFormTitle');
+  if(_qt) _qt.textContent=id?t('editQ'):t('newQ');
 }
 
 // ── Output Currency conversion ────────────────────
@@ -3648,10 +3659,7 @@ async function saveQuote(){
   syncQuoteToCRM(q).catch(e=>console.warn('CRM sync:',e));
   toast(t('save'));
   renderQuoteList();
-  // Return to quotes list after save
-  editQId = null;
-  page='quotes';
-  switchTab('quotes');
+  // Stay on current quote after save
 }
 async function deleteQuote(){
   if(!editQId)return;

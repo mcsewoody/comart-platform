@@ -292,7 +292,7 @@ img{display:block}
       <div class="logo-mark">C</div>
       <div>
         <div class="logo-text">COMART</div>
-        <div id="appVersionDiv" style="font-size:10px;color:var(--ac);font-weight:600;letter-spacing:.04em;line-height:1.3">v3.29</div>
+        <div id="appVersionDiv" style="font-size:10px;color:var(--ac);font-weight:600;letter-spacing:.04em;line-height:1.3">v3.30</div>
       </div>
     </div>
     <div class="topbar-right">
@@ -1557,7 +1557,7 @@ async function loadAll() {
         hideLoginPage();
         updateUserBadge();
         await _reloadAfterLogin();
-        switchTab('files');
+        switchTab('products');
         startListeners();
         return;
       }
@@ -1991,7 +1991,7 @@ function exportVCard() {
 }
 
 function goHome(){
-  switchTab('files');
+  switchTab('products');
 }
 function goPortal(){
   window.location.href = 'https://platform.comart.com.tw/';
@@ -3710,13 +3710,6 @@ function renderDetail(id){
   const termsRows=[[ut('incoterm'),q.inco||SETTINGS.inco],[ut('payment'),q.pay||SETTINGS.pay],[ut('leadTime'),SETTINGS.lead],[ut('validity'),SETTINGS.valid],[ut('currency'),(q.currency||'USD')]].map(([k,v])=>`<div class="terms-row"><div class="terms-k">${k}</div><div>${v||'—'}</div></div>`).join('');
   document.getElementById('pageDetail').innerHTML=`
     <div class="dv-hero">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--br)">
-        <img src="data:image/png;base64,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cWZpL2+stLA1W8KDbU6h63IVmClkZSV5JUng+QZz8TIyMPKpy8S+3HyKHWyq2pyr1up5DKR5BBAIIne39u7J3hqGFl5GmafpqYWIMSmjCNxrCepZZz97Y7clrG/A8f8Aj8eY5JJY4cyl1Mmd5NOh+gnysPUKqNW02o04OfWMjHrJZvSBJDV9mVS/Rw9ZbgBihI8ETxKy2bv67bOiNpSba0LUlbJfI9bMGSLQWVF681XICo6AjkE8lvPmdj4uZH0PtT92f/KkdOzlmeXQuFv4joKlFVU82HPTuTWJCvi5kfQ+1P3Z/wDKj4uZH0PtT92f/KmPB1PQ2+0lp5S+i7k1hWKsGUkMDyCD5EhXxcyPofan7s/+VHxcyPofan7s/wDlT3g6noPaS08pfRdzQ9q+3acO+rcOm00U4Wa/pXY2PS6ri3hRz/VQtvzOoBHBWxQqqikwST3cPtPztX27qGiJtvQtNqz60rutxGy/UKralgH3l7KR2rX8VP8A8PBkCnfTUlHCWpUbyVGdZyoYqL6PoIiJsOUREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREA//2Q==" style="width:26px;height:26px;object-fit:contain;flex-shrink:0">
-        <div>
-          <div style="font-size:12px;font-weight:700;color:var(--tx)">COMART CORPORATION</div>
-          <div style="font-size:9px;color:var(--tx3)">怡業股份有限公司</div>
-        </div>
-      </div>
       <!-- Compact horizontal header row -->
       <div style="display:flex;align-items:flex-start;gap:10px;flex-wrap:wrap">
         <!-- Left: Ref + Company + Contact -->
@@ -5456,7 +5449,7 @@ async function restoreSession() {
         currentUser = freshUser; // Always use freshest role from Firestore
         updateUserBadge();
         await _reloadAfterLogin();
-        switchTab('files');
+        switchTab('products');
         return true;
       } else {
         // User no longer exists in Firestore — invalidate
@@ -6787,7 +6780,7 @@ async function init(){
           hideLoginPage();
           updateUserBadge();
           await _reloadAfterLogin();
-          switchTab('files');
+          switchTab('products');
           startListeners();
           setTimeout(batchSetNormalStatus, 2000);
           return; // 直接結束，跳過後面的 restoreSession

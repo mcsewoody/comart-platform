@@ -794,12 +794,15 @@ img{display:block}
 </div>
 
 <!-- ── PRODUCT MODAL ───────────────────────────────────── -->
-<div class="overlay" id="prodOverlay" onclick="closeProdModal(event)">
-  <div class="modal" style="width:100%;max-width:860px;max-height:96vh;overflow-y:auto">
-    <div class="modal-hd">
-      <div class="modal-title" id="pm-title">New Product</div>
-      <button class="modal-close" onclick="closeProdModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
-    </div>
+<div class="page" id="pageProdForm" style="max-width:900px;margin:0 auto">
+  <!-- Product Form Header -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--br)">
+    <div class="sec-title" style="margin:0" id="pm-title">New Product</div>
+    <button class="btn btn-ghost btn-sm" onclick="closeProdModal()" style="gap:5px">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      Quit
+    </button>
+  </div>
 
     <!-- Image upload -->
     <div style="display:flex;align-items:flex-start;gap:14px;margin-bottom:14px">
@@ -1099,7 +1102,6 @@ img{display:block}
         Copy
       </button>
       <button class="btn btn-danger btn-sm" id="pm-del" style="display:none" onclick="deleteProd()"><span id="pm-del-lbl">Delete</span></button>
-    </div>
   </div>
 </div>
 
@@ -2002,6 +2004,7 @@ function switchTab(tab){
   const psEl=document.getElementById('pageSettings'); if(psEl) psEl.classList.remove('active');
   const pfrEl=document.getElementById('pageForm'); if(pfrEl) pfrEl.classList.remove('active');
   const pdEl=document.getElementById('pageDetail'); if(pdEl) pdEl.classList.remove('active');
+  const ppfEl=document.getElementById('pageProdForm'); if(ppfEl) ppfEl.classList.remove('active');
   document.querySelectorAll('.npill[data-tab]').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));
   document.getElementById('pageQuotes').classList.toggle('active',tab==='quotes');
   document.getElementById('pageProducts').classList.toggle('active',tab==='products');
@@ -2025,12 +2028,12 @@ function goPage(pg){
   if(pg==='settings' && page && !['settings','form','detail'].includes(page)){
     _prevPage = page;
   }
-  ['pageQuotes','pageProducts','pageCategories','pageUsers','pageForm','pageDetail','pageSettings','pageFiles','pageCRM'].forEach(id=>{ const el=document.getElementById(id); if(el) el.classList.remove('active'); });
+  ['pageQuotes','pageProducts','pageCategories','pageUsers','pageForm','pageDetail','pageSettings','pageFiles','pageCRM','pageProdForm'].forEach(id=>{ const el=document.getElementById(id); if(el) el.classList.remove('active'); });
   const _pgEl=document.getElementById('page'+pg.charAt(0).toUpperCase()+pg.slice(1));
   if(_pgEl) _pgEl.classList.add('active'); else console.warn('goPage: page element not found for', pg);
   // Keep Quote tab active when in form/detail
   document.querySelectorAll('.npill[data-tab]').forEach(b=>b.classList.remove('active'));
-  const _activeTab = (pg==='form'||pg==='detail') ? 'quotes' : pg;
+  const _activeTab = (pg==='form'||pg==='detail') ? 'quotes' : (pg==='prodForm' ? 'products' : pg);
   const _activeBtn = document.querySelector(`.npill[data-tab="${_activeTab}"]`);
   if(_activeBtn) _activeBtn.classList.add('active');
   // Nav & topbar always visible (no hiding on form/detail)
@@ -2730,14 +2733,15 @@ function openProdModal(id){
   const catSel2 = document.getElementById('pm-cat2');
   catSel2.innerHTML = _catOpts;
   if(p?.catId2) catSel2.value = p.catId2;
-  document.getElementById('prodOverlay').classList.add('show');
+  goPage('prodForm');
 }
 function closeProdModal(e){
-  if(e&&e.target!==document.getElementById('prodOverlay'))return;
-  document.getElementById('prodOverlay').classList.remove('show');
+  // Clean up image preview
   const zone=document.getElementById('imgZone');
-  const pi=zone.querySelector('.preview-img');if(pi)pi.remove();
-  document.getElementById('imgPh').style.display='';document.getElementById('imgLbl').style.display='';
+  if(zone){const pi=zone.querySelector('.preview-img');if(pi)pi.remove();}
+  const ph=document.getElementById('imgPh');if(ph)ph.style.display='';
+  const lb=document.getElementById('imgLbl');if(lb)lb.style.display='';
+  switchTab('products');
 }
 // ── Unified multilang editor ──────────────────────
 // One language tab controls BOTH name + features
@@ -3021,7 +3025,6 @@ async function saveProd(){
   closeProdModal();
   renderProductList(); // update again after Firestore write (img URL may have changed)
   toast(t('save'));
-  updateVersionStamp();
 }
 
 // ── Delete with password ─────────────────
@@ -3782,6 +3785,9 @@ function renderDetail(id){
           ${_isAdmin?`<button class="btn btn-ghost btn-sm" onclick="deleteQuote()" style="color:#C8102E;border-color:rgba(200,16,46,.3)">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6M9 6V4h6v2"/></svg>
             Delete</button>`:''}
+          <button class="btn btn-ghost btn-sm" onclick="switchTab('quotes')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><path d="M18 6 6 18M6 6l12 12"/></svg>
+            Quit</button>
         `;
       })()}
     </div>

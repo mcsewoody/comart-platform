@@ -292,7 +292,7 @@ img{display:block}
       <div class="logo-mark">C</div>
       <div>
         <div class="logo-text">COMART</div>
-        <div id="appVersionDiv" style="font-size:10px;color:var(--ac);font-weight:600;letter-spacing:.04em;line-height:1.3">v3.34</div>
+        <div id="appVersionDiv" style="font-size:10px;color:var(--ac);font-weight:600;letter-spacing:.04em;line-height:1.3">v3.35</div>
       </div>
     </div>
     <div class="topbar-right">
@@ -547,7 +547,7 @@ img{display:block}
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6M9 6V4h6v2"/></svg>
         <span id="delQlbl">Del</span>
       </button>
-      <button class="btn btn-ghost btn-sm" onclick="switchTab('quotes')">
+      <button class="btn btn-ghost btn-sm" onclick="quitQuoteForm()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><path d="M18 6 6 18M6 6l12 12"/></svg>
         <span id="cancelQlbl">Quit</span>
       </button>
@@ -772,6 +772,17 @@ img{display:block}
     <button class="btn btn-outline btn-sm" onclick="document.getElementById('importFile').click()">Import JSON</button>
   </div>
   <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+  <!-- Translate All Descriptions -->
+  <div style="border-top:1px solid var(--br);padding-top:10px;margin-top:4px;margin-bottom:12px">
+    <div style="font-size:12px;color:var(--tx3);margin-bottom:8px;font-weight:600">🌐 Batch Translation</div>
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <button class="btn btn-outline btn-sm" onclick="translateAllDescriptions()" id="translateAllBtn">
+        🌐 Translate All Descriptions
+      </button>
+      <span id="translateAllStatus" style="font-size:11px;color:var(--tx3)"></span>
+    </div>
+    <div style="font-size:11px;color:var(--tx3);margin-top:4px">把所有產品的英文 Description 翻譯成繁中、簡中、越南文、日文</div>
+  </div>
   <div style="border-top:1px solid var(--br);padding-top:10px;margin-top:4px;margin-bottom:16px">
     <div style="font-size:12px;color:var(--tx3);margin-bottom:8px;font-weight:600">📦 Product Import / Export</div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
@@ -2762,6 +2773,118 @@ const XLAT_PROXY = 'https://comart.mcsewoody.workers.dev';
 // ── Auto-translate helpers ─────────────
 let _translateTimer = null;
 
+
+
+// ── Batch Translate All Product Descriptions ───────
+async function translateAllDescriptions() {
+  const btn = document.getElementById('translateAllBtn');
+  const st  = document.getElementById('translateAllStatus');
+  if (btn) { btn.disabled = true; }
+
+  const prods = PRODUCTS.filter(p => {
+    const enFeat = p.features?.en || '';
+    if (!enFeat.trim()) return false;
+    // Only translate if any non-EN lang is missing
+    return ['zh-TW','zh-CN','vi','ja'].some(c => !(p.features?.[c]||'').trim());
+  });
+
+  if (!prods.length) {
+    toast('✅ All products already have descriptions in all languages');
+    if (btn) btn.disabled = false;
+    return;
+  }
+
+  const langs = ['zh-TW','zh-CN','vi','ja'];
+  const langNames = {'zh-TW':'繁體中文','zh-CN':'简体中文','vi':'tiếng Việt','ja':'日本語'};
+  const langList = langs.map(c => c + ' (' + langNames[c] + ')').join(', ');
+  let done = 0;
+
+  for (const prod of prods) {
+    if (st) st.textContent = `Translating ${done + 1} / ${prods.length}: ${prod.series || prod.id}…`;
+
+    const enFeat = (prod.features?.en || '').trim();
+    const prompt = 'You are a product description translator. Translate the following product description into: ' + langList + '.\n'
+      + 'Reply with ONLY a JSON object. No explanation, no markdown, no code block.\n'
+      + 'Use this exact format: {"zh-TW":"","zh-CN":"","vi":"","ja":""}\n\n'
+      + 'Description (EN): ' + enFeat;
+
+    try {
+      const resp = await fetch(XLAT_PROXY, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-haiku-4-5-20251001',
+          max_tokens: 1000,
+          messages: [{ role: 'user', content: prompt }]
+        })
+      });
+      const data = await resp.json();
+      if (!resp.ok) throw new Error('API ' + resp.status);
+      let raw = (data.content || []).map(b => b.text || '').join('').trim();
+      raw = raw.replace(/^```[a-z]*\n?/,'').replace(/\n?```$/,'').trim();
+      const tr = JSON.parse(raw);
+
+      if (!prod.features) prod.features = {};
+      langs.forEach(c => { if (tr[c]) prod.features[c] = tr[c]; });
+
+      // Save to Firestore / localStorage
+      await saveOneP(prod);
+      done++;
+    } catch(e) {
+      console.warn('[translateAll]', prod.series, e);
+      // Continue with next product
+    }
+
+    // Small delay to avoid rate limits
+    await new Promise(r => setTimeout(r, 400));
+  }
+
+  if (st) st.textContent = `✅ Done — ${done} / ${prods.length} translated`;
+  toast(`✅ Translated ${done} products`);
+  if (btn) btn.disabled = false;
+  renderProductList();
+}
+// ── Auto-translate Description (feat only) ──────────
+async function translateFeatOnly() {
+  const enFeatEl = document.querySelector('[data-field="featFields"][data-lang="en"]');
+  const enFeat = enFeatEl ? enFeatEl.value.trim() : '';
+  if (!enFeat) return; // nothing to translate
+
+  const langs = ['zh-TW','zh-CN','vi','ja'];
+  const langNames = {'zh-TW':'繁體中文','zh-CN':'简体中文','vi':'tiếng Việt','ja':'日本語'};
+  const langList = langs.map(c => c + ' (' + langNames[c] + ')').join(', ');
+
+  const prompt = 'You are a product description translator. Translate the following product description into: ' + langList + '.\n'
+    + 'Reply with ONLY a JSON object. No explanation, no markdown, no code block.\n'
+    + 'Use this exact format: {"zh-TW":"","zh-CN":"","vi":"","ja":""}\n\n'
+    + 'Description (EN): ' + enFeat;
+
+  try {
+    const resp = await fetch(XLAT_PROXY, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await resp.json();
+    if (!resp.ok) throw new Error('API error ' + resp.status);
+    let raw = (data.content || []).map(b => b.text || '').join('').trim();
+    raw = raw.replace(/^```[a-z]*\n?/,'').replace(/\n?```$/,'').trim();
+    const tr = JSON.parse(raw);
+    langs.forEach(code => {
+      if (tr[code]) {
+        const el = document.querySelector('[data-field="featFields"][data-lang="' + code + '"]');
+        if (el) { el.value = tr[code]; flashGreen(el); }
+      }
+    });
+  } catch(e) {
+    console.warn('[translateFeatOnly]', e);
+    // Non-blocking: save continues even if translation fails
+  }
+}
 function scheduleTranslate() {
   clearTimeout(_translateTimer);
   _translateTimer = setTimeout(doTranslate, 1500);
@@ -2949,10 +3072,23 @@ function clearImg3(){
 }
 async function saveProd(){
   const series=document.getElementById('pm-series').value.trim();
-  const name=getMLValues('nameFields');
-  const features=getMLValues('featFields');
   if(!series){toast('Item Code is required');return;}
+  const name=getMLValues('nameFields');
   if(!Object.keys(name).length){toast('Product name required');return;}
+  // Auto-translate Description if EN has content and other langs are empty/missing
+  const _enFeatEl=document.querySelector('[data-field="featFields"][data-lang="en"]');
+  const _enFeat=_enFeatEl?_enFeatEl.value.trim():'';
+  if(_enFeat){
+    const _hasAllFeat=['zh-TW','zh-CN','vi','ja'].every(c=>{
+      const el=document.querySelector('[data-field="featFields"][data-lang="'+c+'"]');
+      return el && el.value.trim();
+    });
+    if(!_hasAllFeat){
+      toast('🌐 Translating description…');
+      await translateFeatOnly();
+    }
+  }
+  const features=getMLValues('featFields');
   const existing=editProdId?PRODUCTS.find(p=>p.id===editProdId):null;
   const imgVal=tmpImg==='__CLEAR__'?null:(tmpImg||existing?.img||null);
   const imgVal2=tmpImg2==='__CLEAR__'?null:(tmpImg2||existing?.img2||null);
@@ -3606,6 +3742,15 @@ function setPrOut(id,moq,val){
   }
 }
 
+function quitQuoteForm(){
+  // Cancel: edit→detail, new→quotes list
+  if (editQId) {
+    renderDetail(editQId);
+    page='detail'; goPage('detail');
+  } else {
+    page='quotes'; switchTab('quotes');
+  }
+}
 async function saveQuote(){
   // Permission check: only Sales/Operator/Admin can edit existing quotes
   if(editQId){
@@ -3659,7 +3804,14 @@ async function saveQuote(){
   syncQuoteToCRM(q).catch(e=>console.warn('CRM sync:',e));
   toast(t('save'));
   renderQuoteList();
-  // Stay on current quote after save
+  // Go back: edit → detail view, new → quotes list
+  if (editQId) {
+    const _savedId = q.id;
+    renderDetail(_savedId);
+    page='detail'; goPage('detail');
+  } else {
+    page='quotes'; switchTab('quotes');
+  }
 }
 async function deleteQuote(){
   if(!editQId)return;

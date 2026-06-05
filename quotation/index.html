@@ -292,7 +292,7 @@ img{display:block}
       <div class="logo-mark">C</div>
       <div>
         <div class="logo-text">COMART</div>
-        <div id="appVersionDiv" style="font-size:10px;color:var(--ac);font-weight:600;letter-spacing:.04em;line-height:1.3">v3.30</div>
+        <div id="appVersionDiv" style="font-size:10px;color:var(--ac);font-weight:600;letter-spacing:.04em;line-height:1.3">v3.31</div>
       </div>
     </div>
     <div class="topbar-right">
@@ -795,13 +795,20 @@ img{display:block}
 
 <!-- ── PRODUCT MODAL ───────────────────────────────────── -->
 <div class="page" id="pageProdForm" style="max-width:900px;margin:0 auto">
-  <!-- Product Form Header -->
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--br)">
-    <div class="sec-title" style="margin:0" id="pm-title">New Product</div>
-    <button class="btn btn-ghost btn-sm" onclick="closeProdModal()" style="gap:5px">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M18 6 6 18M6 6l12 12"/></svg>
-      Quit
-    </button>
+  <!-- Product Form Header: title + action buttons -->
+  <div style="position:sticky;top:0;z-index:20;background:var(--s1);padding:10px 0 10px;margin-bottom:12px;border-bottom:1px solid var(--br);box-shadow:0 2px 8px var(--s1)">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+      <div class="sec-title" style="margin:0" id="pm-title">New Product</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+        <button class="btn btn-primary btn-sm" onclick="saveProd()"><span id="pm-save">Save</span></button>
+        <button class="btn btn-ghost btn-sm" id="pm-copy" style="display:none" onclick="copyProd()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copy
+        </button>
+        <button class="btn btn-danger btn-sm" id="pm-del" style="display:none" onclick="deleteProd()"><span id="pm-del-lbl">Delete</span></button>
+        <button class="btn btn-ghost btn-sm" onclick="closeProdModal()"><span id="pm-cancel">Cancel</span></button>
+      </div>
+    </div>
   </div>
 
     <!-- Image upload -->
@@ -842,16 +849,18 @@ img{display:block}
       </div>
       <div style="flex:1">
         <!-- ── STICKY HEADER: Item Code + Item Name ── -->
-        <div style="position:sticky;top:0;z-index:10;background:var(--s1);padding-bottom:8px;margin-bottom:4px;border-bottom:1px solid var(--br2);box-shadow:0 4px 12px var(--s1)">
+        <div style="position:sticky;top:52px;z-index:10;background:var(--s1);padding-bottom:8px;margin-bottom:4px;border-bottom:1px solid var(--br2);box-shadow:0 4px 12px var(--s1)">
           <div style="font-size:10px;font-weight:700;color:var(--ac);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;padding-bottom:3px;border-bottom:1px solid var(--ac2)">Used on Quotation</div>
-          <!-- Item Code -->
-          <div class="field-grid one" style="margin-bottom:8px">
-            <div class="field"><label id="pm-code-lbl">Item Code</label><input id="pm-series" placeholder="e.g. CQi02" autocomplete="off"></div>
-          </div>
-          <!-- Item Name (sticky with Item Code) -->
-          <div style="margin-bottom:0">
-            <div style="font-size:13px;color:var(--tx2);margin-bottom:5px;font-weight:700;letter-spacing:.02em" id="pm-name-lbl">Item Name</div>
-            <div id="nameFields"></div>
+          <!-- Item Code + Item Name on one line -->
+          <div style="display:grid;grid-template-columns:128px 1fr;gap:10px;align-items:start">
+            <div class="field" style="margin-bottom:0">
+              <label id="pm-code-lbl">Item Code</label>
+              <input id="pm-series" placeholder="e.g. CQi02" autocomplete="off" maxlength="16" style="font-family:var(--fm);letter-spacing:.02em">
+            </div>
+            <div class="field" style="margin-bottom:0">
+              <label id="pm-name-lbl">Item Name</label>
+              <div id="nameFields"></div>
+            </div>
           </div>
         </div>
         <!-- Category 1 + 2 -->
@@ -1094,15 +1103,7 @@ img{display:block}
     <!-- Description label only (language moved to image area) -->
     <div id="pmLangTabs" style="display:none"></div>
 
-    <div class="btn-row">
-      <button class="btn btn-primary" onclick="saveProd()"><span id="pm-save">Save</span></button>
-      <button class="btn btn-ghost" onclick="closeProdModal()"><span id="pm-cancel">Cancel</span></button>
-      <button class="btn btn-ghost btn-sm" id="pm-copy" style="display:none" onclick="copyProd()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-        Copy
-      </button>
-      <button class="btn btn-danger btn-sm" id="pm-del" style="display:none" onclick="deleteProd()"><span id="pm-del-lbl">Delete</span></button>
-  </div>
+
 </div>
 
 <div class="toast" id="toast"></div>

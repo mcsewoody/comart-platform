@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>COMART Platform v1.24</title>
+<title>COMART Platform v1.22</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -11,9 +11,9 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
-  --bg:#111827;--s1:#1A2438;--s2:#213048;--s3:#283A58;
-  --br:#334466;--br2:#4A6080;
-  --tx:#EEF4FF;--tx2:#9DB8D8;--tx3:#6A8FB5;
+  --bg:#080C14;--s1:#0F1520;--s2:#172030;--s3:#1E2B40;
+  --br:#253247;--br2:#3A4E68;
+  --tx:#DCE8F8;--tx2:#7A93B5;--tx3:#3D5472;
   --ac:#2D7FF9;--ac2:rgba(45,127,249,.12);--ac3:rgba(45,127,249,.06);
   --red:#F25C5C;--red2:rgba(242,92,92,.12);
   --grn:#3DD68C;--grn2:rgba(61,214,140,.12);
@@ -33,7 +33,7 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:
 .login-name{font-family:var(--fd);font-style:italic;font-size:22px;}
 .login-sub{font-size:11px;color:var(--tx3);margin-top:3px;letter-spacing:.06em;text-transform:uppercase;}
 .field{margin-bottom:14px;}
-.field label{font-size:12px;font-weight:600;color:var(--tx);display:block;margin-bottom:5px;}
+.field label{font-size:12px;font-weight:600;color:var(--tx2);display:block;margin-bottom:5px;}
 .field input,.field select{width:100%;padding:10px 12px;border-radius:var(--r);border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:14px;font-family:var(--ff);outline:none;transition:border-color .15s;}
 .field input:focus,.field select:focus{border-color:var(--ac);box-shadow:0 0 0 3px var(--ac2);}
 .field input::placeholder{color:var(--tx3);}
@@ -50,7 +50,7 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:
 .shell.show{display:flex;}
 
 /* Topbar */
-.topbar{background:rgba(17,24,39,.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--br);display:flex;align-items:center;padding:0 20px;height:56px;gap:12px;position:sticky;top:0;z-index:100;}
+.topbar{background:rgba(8,12,20,.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--br);display:flex;align-items:center;padding:0 20px;height:56px;gap:12px;position:sticky;top:0;z-index:100;}
 .topbar-logo{display:flex;align-items:center;gap:9px;text-decoration:none;cursor:pointer;}
 .topbar-mark{width:30px;height:30px;background:var(--ac);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-style:italic;font-size:15px;color:#fff;}
 .topbar-name{font-family:var(--fd);font-style:italic;font-size:17px;}
@@ -74,7 +74,7 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:
 .home-greeting{margin-bottom:24px;}
 .home-hello{font-size:22px;font-weight:600;}
 .home-sub{font-size:13px;color:var(--tx2);margin-top:3px;}
-.section-title{font-size:11px;font-weight:600;color:var(--tx2);letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px;}
+.section-title{font-size:11px;font-weight:600;color:var(--tx3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px;}
 .app-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px;margin-bottom:32px;}
 .app-card{background:var(--s1);border:1px solid var(--br);border-radius:var(--rl);padding:18px;cursor:pointer;text-decoration:none;display:block;transition:all .18s;position:relative;overflow:hidden;}
 .app-card::before{content:'';position:absolute;inset:0;background:var(--ac3);opacity:0;transition:opacity .18s;}
@@ -97,12 +97,20 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:
 .cl-date{font-size:11px;color:var(--tx3);margin-top:2px;}
 
 /* ─── Users View ─── */
-.users-wrap{max-width:900px;margin:0 auto;padding:24px 20px;width:100%;}
+.users-wrap{max-width:960px;margin:0 auto;padding:24px 20px;width:100%;}
+.utab{padding:7px 18px;font-size:13px;font-weight:600;border-radius:8px 8px 0 0;border:1px solid var(--br);border-bottom:none;background:var(--s2);color:var(--tx2);cursor:pointer;transition:background .15s,color .15s;font-family:var(--ff);}
+.utab.on{background:var(--s1);color:var(--ac);border-color:var(--ac);}
+.utab:hover:not(.on){background:var(--ac2);color:var(--ac);}
+.usr-filter{display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap;}
+.usr-filter select{padding:6px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;font-family:var(--ff);cursor:pointer;outline:none;}
+.usr-filter select:focus{border-color:var(--ac);}
+.usr-filter-reset{padding:5px 12px;border-radius:8px;border:1px solid var(--br);background:transparent;color:var(--tx2);font-size:12px;cursor:pointer;font-family:var(--ff);}
+.usr-filter-reset:hover{color:var(--tx);border-color:var(--ac);}
 .users-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
 .users-title{font-size:18px;font-weight:500;}
 .add-btn{padding:7px 16px;background:var(--ac);color:#fff;border:none;border-radius:var(--r);cursor:pointer;font-size:13px;font-family:var(--ff);}
 .user-table{width:100%;border-collapse:collapse;font-size:13px;background:var(--s1);border-radius:var(--rl);overflow:hidden;border:1px solid var(--br);}
-.user-table th{padding:10px 14px;text-align:left;color:var(--tx2);font-weight:600;font-size:11px;letter-spacing:.04em;border-bottom:1px solid var(--br);background:var(--s2);}
+.user-table th{padding:10px 14px;text-align:left;color:var(--tx3);font-weight:600;font-size:11px;letter-spacing:.04em;border-bottom:1px solid var(--br);background:var(--s2);}
 .user-table td{padding:10px 14px;border-bottom:1px solid var(--br);color:var(--tx2);}
 .user-table tr:last-child td{border-bottom:none;}
 .user-table tr:hover td{background:var(--s2);}
@@ -295,7 +303,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     <div class="login-logo">
       <div class="login-mark">C</div>
       <div class="login-name">COMART Platform</div>
-      <div class="login-sub">Internal Portal · v1.24</div>
+      <div class="login-sub">Internal Portal · v1.22</div>
     </div>
     <form id="loginForm" onsubmit="doLogin();return false;" autocomplete="on">
     <div class="field">
@@ -323,7 +331,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   <div class="topbar">
     <div class="topbar-logo" onclick="switchView('home')">
       <div class="topbar-mark">C</div>
-      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.24</span></div>
+      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.22</span></div>
     </div>
     <div class="topbar-right">
       <div class="lang-switcher">
@@ -393,7 +401,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
           <div class="section-title" id="sect-updates">Platform Updates</div>
           <div class="changelog">
-            <div class="cl-item"><div class="cl-dot" style="background:var(--grn)"></div><div><div class="cl-text">v1.24 — 整體色調調亮；Event & Trip Modal 欄位標題改亮色</div><div class="cl-date">2026-06 · Enhancement</div></div></div>
+            <div class="cl-item"><div class="cl-dot" style="background:var(--grn)"></div><div><div class="cl-text">v1.25 — Users 三 Tab（Dept/Site 獨立管理）；User Management 新增 Site/Dept/Role 篩選列</div><div class="cl-date">2026-06 · Feature</div></div></div>
             <div class="cl-item"><div class="cl-dot" style="background:var(--grn)"></div><div><div class="cl-text">名人榜 (Employee Directory) — 公司通訊錄、留言、討論區</div><div class="cl-date">2026-05 · New</div></div></div>
             <div class="cl-item"><div class="cl-dot" style="background:var(--grn)"></div><div><div class="cl-text">公佈欄 (Bulletin Board) — 公司公告、置頂、按讚</div><div class="cl-date">2026-05 · New</div></div></div>
             <div class="cl-item"><div class="cl-dot" style="background:var(--ac)"></div><div><div class="cl-text">Knowledge Management System (KMS) — AI 問答、文件庫、五語言</div><div class="cl-date">2026-05 · New</div></div></div>
@@ -628,1530 +636,25 @@ input[type="date"]::-webkit-calendar-picker-indicator {
             <button onclick="closeCalEventModal()" style="background:transparent;border:none;cursor:pointer;color:var(--tx3);font-size:20px;">✕</button>
           </div>
           <div style="margin-bottom:10px;">
-            <label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Calendar</label>
+            <label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px;">Calendar</label>
             <select id="cal-event-cat" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;"></select>
           </div>
           <div style="margin-bottom:10px;">
-            <label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Title *</label>
+            <label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px;">Title *</label>
             <input id="cal-event-title" placeholder="Event title" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;">
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
             <div>
-              <label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Date From *</label>
+              <label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px;">Date From *</label>
               <input id="cal-event-from" type="date" onchange="if(!document.getElementById('cal-event-to').value)document.getElementById('cal-event-to').value=this.value;" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;">
             </div>
             <div>
-              <label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Date To</label>
+              <label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px;">Date To</label>
               <input id="cal-event-to" type="date" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;">
             </div>
           </div>
           <div style="margin-bottom:14px;">
-            <label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Notes</label>
-            <textarea id="cal-event-notes" rows="2" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;resize:none;font-family:inherit;"></textarea>
-          </div>
-          <div style="display:flex;gap:8px;">
-            <button onclick="saveCalEvent()" style="padding:9px 20px;border-radius:8px;background:var(--ac);color:#fff;border:none;cursor:pointer;font-size:13px;font-weight:700;">Save</button>
-            <button onclick="closeCalEventModal()" style="padding:9px 16px;border-radius:8px;border:1px solid var(--br);background:transparent;color:var(--tx2);cursor:pointer;font-size:13px;">Cancel</button>
-            <button id="cal-event-del" onclick="deleteCalEvent()" style="display:none;padding:9px 16px;border-radius:8px;background:var(--red);color:#fff;border:none;cursor:pointer;font-size:13px;margin-left:auto;">Delete</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- ── DIRECTORY (名人榜) ── -->
-      <div class="view" id="view-directory">
-        <div class="dir-wrap">
-          <div class="dir-header">
-            <div style="font-size:18px;font-weight:500;">👤 名人榜 · Employee Directory</div>
-            <input class="dir-search" id="dirSearch" placeholder="Search name, title…" oninput="renderDirectory()">
-          </div>
-          <!-- Tab 切換：通訊錄 / 貢獻排行榜 -->
-          <div style="display:flex;gap:6px;margin-bottom:14px;">
-            <button id="dir-tab-contacts" onclick="switchDirTab('contacts')"
-              style="padding:5px 14px;border-radius:20px;border:1px solid var(--ac);background:var(--ac);color:#fff;font-size:12px;font-weight:600;cursor:pointer;">
-              📋 通訊錄
-            </button>
-            <button id="dir-tab-ranking" onclick="switchDirTab('ranking')"
-              style="padding:5px 14px;border-radius:20px;border:1px solid var(--br);background:transparent;color:var(--tx2);font-size:12px;font-weight:600;cursor:pointer;">
-              🏆 知識貢獻排行
-            </button>
-          </div>
-          <!-- 通訊錄 -->
-          <div id="dir-contacts-view">
-            <div class="dir-grid" id="dirGrid"><div style="color:var(--tx3);font-size:13px;padding:20px;">載入中…</div></div>
-          </div>
-          <!-- 排行榜 -->
-          <div id="dir-ranking-view" style="display:none;">
-            <div style="background:var(--s1);border:1px solid var(--br);border-radius:var(--rl);overflow:hidden;">
-              <div style="padding:12px 16px;border-bottom:1px solid var(--br);font-size:12px;color:var(--tx3);">
-                以 KMS 知識庫發文數量計算 · 每月更新
-              </div>
-              <div id="rankingList"><div style="color:var(--tx3);font-size:13px;padding:20px;text-align:center;">載入中…</div></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-
-      <!-- ── AI VIEW ── -->
-      <div class="view" id="view-ai" style="flex-direction:column;padding:0;">
-        <div class="ai-tab-bar">
-          <div style="font-size:14px;font-weight:700;color:#a78bfa;margin-right:6px;">🤖 AI</div>
-          <button class="ai-chip on" id="ptab-translate" onclick="switchAITab('translate')">🌐 翻譯</button>
-          <button class="ai-chip" id="ptab-chat" onclick="switchAITab('chat')">✦ Chat</button>
-          <button class="ai-chip" id="ptab-skills" onclick="switchAITab('skills')">🛠 Skills</button>
-        </div>
-
-        <!-- Translate Tab -->
-        <div class="ai-tab-content on" id="ptab-content-translate">
-          <div style="flex:1;overflow-y:auto;padding:14px 16px;max-width:900px;width:100%;margin:0 auto;">
-            <div style="margin-bottom:12px;">
-              <div style="font-size:11px;font-weight:700;color:var(--tx3);letter-spacing:.06em;margin-bottom:6px;">INPUT TEXT / 輸入文字</div>
-              <div style="display:flex;gap:8px;align-items:flex-start;">
-                <textarea id="p-xlat-input" rows="8" placeholder="Paste or type text here… 貼上或輸入文字"
-                  style="flex:1;padding:10px 12px;border-radius:10px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;resize:vertical;outline:none;font-family:inherit;min-height:160px;"></textarea>
-                <div style="display:flex;flex-direction:column;gap:6px;">
-                  <button onclick="pRunTranslate()"
-                    style="padding:9px 14px;border-radius:9px;background:#7c3aed;color:#fff;border:none;cursor:pointer;font-size:12px;font-weight:700;">Translate ↓</button>
-                  <button onclick="navigator.clipboard.readText().then(t=>{document.getElementById('p-xlat-input').value=t;})"
-                    style="padding:9px 14px;border-radius:9px;border:1px solid var(--br);background:var(--s2);color:var(--tx2);cursor:pointer;font-size:14px;">📋</button>
-                </div>
-              </div>
-            </div>
-            <div id="p-xlat-loading" style="display:none;text-align:center;padding:24px;color:var(--tx3);font-size:13px;">
-              <div style="font-size:22px;margin-bottom:8px;">⟳</div>Translating…
-            </div>
-            <div id="p-xlat-results" style="display:none;">
-              <div style="font-size:11px;font-weight:700;color:var(--tx3);letter-spacing:.06em;margin-bottom:8px;">DIRECT TRANSLATION · 直接翻譯</div>
-              <div id="p-xlat-direct" style="display:flex;flex-direction:column;gap:6px;margin-bottom:16px;"></div>
-              <div style="font-size:11px;font-weight:700;color:#a78bfa;letter-spacing:.06em;margin-bottom:8px;">BUSINESS VERSION · 商業用語版本</div>
-              <div id="p-xlat-biz" style="display:flex;flex-direction:column;gap:6px;"></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Chat Tab -->
-        <div class="ai-tab-content" id="ptab-content-chat" style="flex-direction:column;min-height:0;">
-          <div id="p-chat-messages" style="flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:10px;">
-            <div style="text-align:center;padding:24px 0 8px;">
-              <div style="font-size:26px;margin-bottom:6px;">✦</div>
-              <div style="font-size:14px;font-weight:700;color:var(--tx);">Claude · COMART Assistant</div>
-              <div style="font-size:11px;color:var(--tx3);margin-top:4px;">Ask anything about COMART products, market, or business</div>
-            </div>
-          </div>
-          <div style="padding:10px 14px;border-top:1px solid var(--br);flex-shrink:0;">
-            <div style="display:flex;gap:8px;align-items:flex-end;">
-              <textarea id="p-chat-input" placeholder="Ask Claude… (Enter to send, Shift+Enter for new line)" rows="2"
-                style="flex:1;padding:10px 12px;border-radius:10px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;resize:none;outline:none;font-family:inherit;line-height:1.5;"
-                onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();pSendChat();}"></textarea>
-              <button onclick="pSendChat()" style="padding:10px 16px;border-radius:10px;background:#7c3aed;color:#fff;border:none;cursor:pointer;font-size:13px;font-weight:700;flex-shrink:0;height:42px;">Send</button>
-            </div>
-            <div style="font-size:10px;color:var(--tx3);margin-top:5px;text-align:center;">Claude · via COMART Proxy</div>
-          </div>
-        </div>
-
-        <!-- Skills Tab -->
-        <div class="ai-tab-content" id="ptab-content-skills" style="overflow-y:auto;">
-          <div style="padding:14px 16px;max-width:900px;width:100%;margin:0 auto;">
-            <div style="font-size:11px;font-weight:700;color:var(--tx3);letter-spacing:.08em;margin-bottom:10px;">COMART AI SKILLS</div>
-            <div style="display:flex;flex-direction:column;gap:10px;">
-              <!-- Company Research -->
-              <div style="background:var(--s2);border:1px solid var(--br);border-radius:12px;padding:14px 16px;">
-                <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
-                  <div style="width:36px;height:36px;border-radius:8px;background:rgba(16,163,127,.15);color:#10a37f;display:flex;align-items:center;justify-content:center;font-size:18px;">🔍</div>
-                  <div>
-                    <div style="font-size:13px;font-weight:700;color:var(--tx);">公司調查機器人</div>
-                    <div style="font-size:11px;color:var(--tx3);">Company Research</div>
-                  </div>
-                </div>
-                <div style="font-size:12px;color:var(--tx2);margin-bottom:10px;line-height:1.6;">輸入公司名稱，自動調查公司背景、聯絡資訊、產品方向，輸出完整調查報告與商業開發信。</div>
-                <div style="display:flex;gap:6px;align-items:center;">
-                  <input id="p-skill-company" placeholder="Enter company name / 輸入公司名稱" autocomplete="off"
-                    style="flex:1;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;"
-                    onkeydown="if(event.key==='Enter') pRunSkillCompany()">
-                  <button onclick="pRunSkillCompany()"
-                    style="padding:8px 14px;border-radius:8px;background:#10a37f;color:#fff;border:none;cursor:pointer;font-size:12px;font-weight:700;flex-shrink:0;">調查 →</button>
-                </div>
-              </div>
-              <!-- Post-show Followup -->
-              <div style="background:var(--s2);border:1px solid var(--br);border-radius:12px;padding:14px 16px;">
-                <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
-                  <div style="width:36px;height:36px;border-radius:8px;background:rgba(139,92,246,.15);color:#8b5cf6;display:flex;align-items:center;justify-content:center;font-size:18px;">📧</div>
-                  <div>
-                    <div style="font-size:13px;font-weight:700;color:var(--tx);">展後跟進機器人</div>
-                    <div style="font-size:11px;color:var(--tx3);">Post-Show Followup</div>
-                  </div>
-                </div>
-                <div style="font-size:12px;color:var(--tx2);margin-bottom:10px;line-height:1.6;">輸入展會客戶資訊，自動生成個性化的展後跟進信件，支援中英雙語。</div>
-                <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px;">
-                  <input id="p-skill-show-company" placeholder="客戶公司名稱 / Company name" autocomplete="off"
-                    style="padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;">
-                  <input id="p-skill-show-contact" placeholder="聯絡人 / Contact person" autocomplete="off"
-                    style="padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;">
-                  <input id="p-skill-show-name" placeholder="展覽名稱 / Show name" autocomplete="off"
-                    style="padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;">
-                  <textarea id="p-skill-show-notes" placeholder="備注：客戶興趣、產品需求等 / Notes" rows="2"
-                    style="padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;resize:none;font-family:inherit;"></textarea>
-                  <button onclick="pRunSkillFollowup()"
-                    style="padding:9px;border-radius:8px;background:#8b5cf6;color:#fff;border:none;cursor:pointer;font-size:12px;font-weight:700;">產生跟進信 →</button>
-                </div>
-              </div>
-            </div>
-            <!-- Output -->
-            <div id="p-skill-output" style="display:none;margin-top:14px;">
-              <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-                <div style="font-size:11px;font-weight:700;color:var(--tx3);letter-spacing:.06em;flex:1;">OUTPUT</div>
-                <button onclick="navigator.clipboard.writeText(document.getElementById('p-skill-content').textContent)"
-                  style="padding:4px 10px;border-radius:6px;border:1px solid var(--br);background:var(--s2);color:var(--tx2);font-size:11px;cursor:pointer;">📋 Copy</button>
-                <button onclick="document.getElementById('p-skill-output').style.display='none'"
-                  style="padding:4px 10px;border-radius:6px;border:1px solid var(--br);background:var(--s2);color:var(--tx2);font-size:11px;cursor:pointer;">✕</button>
-              </div>
-              <div id="p-skill-loading" style="display:none;text-align:center;padding:20px;color:var(--tx3);font-size:13px;">
-                <div style="font-size:22px;margin-bottom:6px;">⟳</div>AI is working…
-              </div>
-              <div id="p-skill-content"
-                style="background:var(--s2);border:1px solid var(--br);border-radius:10px;padding:14px;font-size:12px;color:var(--tx);line-height:1.7;white-space:pre-wrap;max-height:60vh;overflow-y:auto;"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ── CALENDAR / TRIPS VIEW ── -->
-      <div class="view" id="view-calendar" style="flex-direction:column;padding:0;overflow-y:auto;">
-        <div style="max-width:900px;margin:0 auto;width:100%;padding:20px;">
-          <!-- Header -->
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
-            <div style="font-size:18px;font-weight:700;color:var(--tx);">✈️ 集團行事曆 · Business Trips</div>
-            <div style="display:flex;align-items:center;gap:8px;">
-              <button onclick="tripMonthNav(-1)" style="padding:5px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);cursor:pointer;font-size:16px;">‹</button>
-              <div id="tripMonthLabel" style="font-size:14px;font-weight:700;color:var(--tx);min-width:100px;text-align:center;"></div>
-              <button onclick="tripMonthNav(1)" style="padding:5px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);cursor:pointer;font-size:16px;">›</button>
-
-            </div>
-          </div>
-          <!-- Calendar -->
-          <div id="tripCalendar" style="margin-bottom:16px;"></div>
-          <!-- List -->
-          <div id="tripList" style="display:flex;flex-direction:column;gap:8px;"></div>
-        </div>
-      </div>
-
-      <!-- Trip Modal -->
-      <div class="overlay" id="calEventOverlay" onclick="if(event.target===this)closeCalEventModal()">
-        <div class="modal" style="max-width:440px;">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-            <div class="modal-title" id="calEventModalTitle">New Event</div>
-            <button onclick="closeCalEventModal()" style="background:transparent;border:none;cursor:pointer;color:var(--tx3);font-size:20px;">✕</button>
-          </div>
-          <div style="margin-bottom:10px;">
-            <label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Calendar</label>
-            <select id="cal-event-cat" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;"></select>
-          </div>
-          <div style="margin-bottom:10px;">
-            <label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Title *</label>
-            <input id="cal-event-title" placeholder="Event title" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;">
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
-            <div>
-              <label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Date From *</label>
-              <input id="cal-event-from" type="date" onchange="if(!document.getElementById('cal-event-to').value)document.getElementById('cal-event-to').value=this.value;" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;">
-            </div>
-            <div>
-              <label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Date To</label>
-              <input id="cal-event-to" type="date" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;">
-            </div>
-          </div>
-          <div style="margin-bottom:14px;">
-            <label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Notes</label>
-            <textarea id="cal-event-notes" rows="2" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;resize:none;font-family:inherit;"></textarea>
-          </div>
-          <div style="display:flex;gap:8px;">
-            <button onclick="saveCalEvent()" style="padding:9px 20px;border-radius:8px;background:var(--ac);color:#fff;border:none;cursor:pointer;font-size:13px;font-weight:700;">Save</button>
-            <button onclick="closeCalEventModal()" style="padding:9px 16px;border-radius:8px;border:1px solid var(--br);background:transparent;color:var(--tx2);cursor:pointer;font-size:13px;">Cancel</button>
-            <button id="cal-event-del" onclick="deleteCalEvent()" style="display:none;padding:9px 16px;border-radius:8px;background:var(--red);color:#fff;border:none;cursor:pointer;font-size:13px;margin-left:auto;">Delete</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- ── DIRECTORY (名人榜) ── -->
-      <div class="view" id="view-directory">
-        <div class="dir-wrap">
-          <div class="dir-header">
-            <div style="font-size:18px;font-weight:500;">👤 名人榜 · Employee Directory</div>
-            <input class="dir-search" id="dirSearch" placeholder="Search name, title…" oninput="renderDirectory()">
-          </div>
-          <!-- Tab 切換：通訊錄 / 貢獻排行榜 -->
-          <div style="display:flex;gap:6px;margin-bottom:14px;">
-            <button id="dir-tab-contacts" onclick="switchDirTab('contacts')"
-              style="padding:5px 14px;border-radius:20px;border:1px solid var(--ac);background:var(--ac);color:#fff;font-size:12px;font-weight:600;cursor:pointer;">
-              📋 通訊錄
-            </button>
-            <button id="dir-tab-ranking" onclick="switchDirTab('ranking')"
-              style="padding:5px 14px;border-radius:20px;border:1px solid var(--br);background:transparent;color:var(--tx2);font-size:12px;font-weight:600;cursor:pointer;">
-              🏆 知識貢獻排行
-            </button>
-          </div>
-          <!-- 通訊錄 -->
-          <div id="dir-contacts-view">
-            <div class="dir-grid" id="dirGrid"><div style="color:var(--tx3);font-size:13px;padding:20px;">載入中…</div></div>
-          </div>
-          <!-- 排行榜 -->
-          <div id="dir-ranking-view" style="display:none;">
-            <div style="background:var(--s1);border:1px solid var(--br);border-radius:var(--rl);overflow:hidden;">
-              <div style="padding:12px 16px;border-bottom:1px solid var(--br);font-size:12px;color:var(--tx3);">
-                以 KMS 知識庫發文數量計算 · 每月更新
-              </div>
-              <div id="rankingList"><div style="color:var(--tx3);font-size:13px;padding:20px;text-align:center;">載入中…</div></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-
-      <!-- ── AI VIEW ── -->
-      <div class="view" id="view-ai" style="flex-direction:column;padding:0;">
-        <div class="ai-tab-bar">
-          <div style="font-size:14px;font-weight:700;color:#a78bfa;margin-right:6px;">🤖 AI</div>
-          <button class="ai-chip on" id="ptab-translate" onclick="switchAITab('translate')">🌐 翻譯</button>
-          <button class="ai-chip" id="ptab-chat" onclick="switchAITab('chat')">✦ Chat</button>
-          <button class="ai-chip" id="ptab-skills" onclick="switchAITab('skills')">🛠 Skills</button>
-        </div>
-
-        <!-- Translate Tab -->
-        <div class="ai-tab-content on" id="ptab-content-translate">
-          <div style="flex:1;overflow-y:auto;padding:14px 16px;max-width:900px;width:100%;margin:0 auto;">
-            <div style="margin-bottom:12px;">
-              <div style="font-size:11px;font-weight:700;color:var(--tx3);letter-spacing:.06em;margin-bottom:6px;">INPUT TEXT / 輸入文字</div>
-              <div style="display:flex;gap:8px;align-items:flex-start;">
-                <textarea id="p-xlat-input" rows="8" placeholder="Paste or type text here… 貼上或輸入文字"
-                  style="flex:1;padding:10px 12px;border-radius:10px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;resize:vertical;outline:none;font-family:inherit;min-height:160px;"></textarea>
-                <div style="display:flex;flex-direction:column;gap:6px;">
-                  <button onclick="pRunTranslate()"
-                    style="padding:9px 14px;border-radius:9px;background:#7c3aed;color:#fff;border:none;cursor:pointer;font-size:12px;font-weight:700;">Translate ↓</button>
-                  <button onclick="navigator.clipboard.readText().then(t=>{document.getElementById('p-xlat-input').value=t;})"
-                    style="padding:9px 14px;border-radius:9px;border:1px solid var(--br);background:var(--s2);color:var(--tx2);cursor:pointer;font-size:14px;">📋</button>
-                </div>
-              </div>
-            </div>
-            <div id="p-xlat-loading" style="display:none;text-align:center;padding:24px;color:var(--tx3);font-size:13px;">
-              <div style="font-size:22px;margin-bottom:8px;">⟳</div>Translating…
-            </div>
-            <div id="p-xlat-results" style="display:none;">
-              <div style="font-size:11px;font-weight:700;color:var(--tx3);letter-spacing:.06em;margin-bottom:8px;">DIRECT TRANSLATION · 直接翻譯</div>
-              <div id="p-xlat-direct" style="display:flex;flex-direction:column;gap:6px;margin-bottom:16px;"></div>
-              <div style="font-size:11px;font-weight:700;color:#a78bfa;letter-spacing:.06em;margin-bottom:8px;">BUSINESS VERSION · 商業用語版本</div>
-              <div id="p-xlat-biz" style="display:flex;flex-direction:column;gap:6px;"></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Chat Tab -->
-        <div class="ai-tab-content" id="ptab-content-chat" style="flex-direction:column;min-height:0;">
-          <div id="p-chat-messages" style="flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:10px;">
-            <div style="text-align:center;padding:24px 0 8px;">
-              <div style="font-size:26px;margin-bottom:6px;">✦</div>
-              <div style="font-size:14px;font-weight:700;color:var(--tx);">Claude · COMART Assistant</div>
-              <div style="font-size:11px;color:var(--tx3);margin-top:4px;">Ask anything about COMART products, market, or business</div>
-            </div>
-          </div>
-          <div style="padding:10px 14px;border-top:1px solid var(--br);flex-shrink:0;">
-            <div style="display:flex;gap:8px;align-items:flex-end;">
-              <textarea id="p-chat-input" placeholder="Ask Claude… (Enter to send, Shift+Enter for new line)" rows="2"
-                style="flex:1;padding:10px 12px;border-radius:10px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;resize:none;outline:none;font-family:inherit;line-height:1.5;"
-                onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();pSendChat();}"></textarea>
-              <button onclick="pSendChat()" style="padding:10px 16px;border-radius:10px;background:#7c3aed;color:#fff;border:none;cursor:pointer;font-size:13px;font-weight:700;flex-shrink:0;height:42px;">Send</button>
-            </div>
-            <div style="font-size:10px;color:var(--tx3);margin-top:5px;text-align:center;">Claude · via COMART Proxy</div>
-          </div>
-        </div>
-
-        <!-- Skills Tab -->
-        <div class="ai-tab-content" id="ptab-content-skills" style="overflow-y:auto;">
-          <div style="padding:14px 16px;max-width:900px;width:100%;margin:0 auto;">
-            <div style="font-size:11px;font-weight:700;color:var(--tx3);letter-spacing:.08em;margin-bottom:10px;">COMART AI SKILLS</div>
-            <div style="display:flex;flex-direction:column;gap:10px;">
-              <!-- Company Research -->
-              <div style="background:var(--s2);border:1px solid var(--br);border-radius:12px;padding:14px 16px;">
-                <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
-                  <div style="width:36px;height:36px;border-radius:8px;background:rgba(16,163,127,.15);color:#10a37f;display:flex;align-items:center;justify-content:center;font-size:18px;">🔍</div>
-                  <div>
-                    <div style="font-size:13px;font-weight:700;color:var(--tx);">公司調查機器人</div>
-                    <div style="font-size:11px;color:var(--tx3);">Company Research</div>
-                  </div>
-                </div>
-                <div style="font-size:12px;color:var(--tx2);margin-bottom:10px;line-height:1.6;">輸入公司名稱，自動調查公司背景、聯絡資訊、產品方向，輸出完整調查報告與商業開發信。</div>
-                <div style="display:flex;gap:6px;align-items:center;">
-                  <input id="p-skill-company" placeholder="Enter company name / 輸入公司名稱" autocomplete="off"
-                    style="flex:1;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;"
-                    onkeydown="if(event.key==='Enter') pRunSkillCompany()">
-                  <button onclick="pRunSkillCompany()"
-                    style="padding:8px 14px;border-radius:8px;background:#10a37f;color:#fff;border:none;cursor:pointer;font-size:12px;font-weight:700;flex-shrink:0;">調查 →</button>
-                </div>
-              </div>
-              <!-- Post-show Followup -->
-              <div style="background:var(--s2);border:1px solid var(--br);border-radius:12px;padding:14px 16px;">
-                <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
-                  <div style="width:36px;height:36px;border-radius:8px;background:rgba(139,92,246,.15);color:#8b5cf6;display:flex;align-items:center;justify-content:center;font-size:18px;">📧</div>
-                  <div>
-                    <div style="font-size:13px;font-weight:700;color:var(--tx);">展後跟進機器人</div>
-                    <div style="font-size:11px;color:var(--tx3);">Post-Show Followup</div>
-                  </div>
-                </div>
-                <div style="font-size:12px;color:var(--tx2);margin-bottom:10px;line-height:1.6;">輸入展會客戶資訊，自動生成個性化的展後跟進信件，支援中英雙語。</div>
-                <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px;">
-                  <input id="p-skill-show-company" placeholder="客戶公司名稱 / Company name" autocomplete="off"
-                    style="padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;">
-                  <input id="p-skill-show-contact" placeholder="聯絡人 / Contact person" autocomplete="off"
-                    style="padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;">
-                  <input id="p-skill-show-name" placeholder="展覽名稱 / Show name" autocomplete="off"
-                    style="padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;">
-                  <textarea id="p-skill-show-notes" placeholder="備注：客戶興趣、產品需求等 / Notes" rows="2"
-                    style="padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;resize:none;font-family:inherit;"></textarea>
-                  <button onclick="pRunSkillFollowup()"
-                    style="padding:9px;border-radius:8px;background:#8b5cf6;color:#fff;border:none;cursor:pointer;font-size:12px;font-weight:700;">產生跟進信 →</button>
-                </div>
-              </div>
-            </div>
-            <!-- Output -->
-            <div id="p-skill-output" style="display:none;margin-top:14px;">
-              <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-                <div style="font-size:11px;font-weight:700;color:var(--tx3);letter-spacing:.06em;flex:1;">OUTPUT</div>
-                <button onclick="navigator.clipboard.writeText(document.getElementById('p-skill-content').textContent)"
-                  style="padding:4px 10px;border-radius:6px;border:1px solid var(--br);background:var(--s2);color:var(--tx2);font-size:11px;cursor:pointer;">📋 Copy</button>
-                <button onclick="document.getElementById('p-skill-output').style.display='none'"
-                  style="padding:4px 10px;border-radius:6px;border:1px solid var(--br);background:var(--s2);color:var(--tx2);font-size:11px;cursor:pointer;">✕</button>
-              </div>
-              <div id="p-skill-loading" style="display:none;text-align:center;padding:20px;color:var(--tx3);font-size:13px;">
-                <div style="font-size:22px;margin-bottom:6px;">⟳</div>AI is working…
-              </div>
-              <div id="p-skill-content"
-                style="background:var(--s2);border:1px solid var(--br);border-radius:10px;padding:14px;font-size:12px;color:var(--tx);line-height:1.7;white-space:pre-wrap;max-height:60vh;overflow-y:auto;"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ── CALENDAR / TRIPS VIEW ── -->
-      <div class="view" id="view-calendar" style="flex-direction:column;padding:0;overflow-y:auto;">
-        <div style="max-width:900px;margin:0 auto;width:100%;padding:20px;">
-          <!-- Header -->
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
-            <div style="font-size:18px;font-weight:700;color:var(--tx);">✈️ 集團行事曆 · Business Trips</div>
-            <div style="display:flex;align-items:center;gap:8px;">
-              <button onclick="tripMonthNav(-1)" style="padding:5px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);cursor:pointer;font-size:16px;">‹</button>
-              <div id="tripMonthLabel" style="font-size:14px;font-weight:700;color:var(--tx);min-width:100px;text-align:center;"></div>
-              <button onclick="tripMonthNav(1)" style="padding:5px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);cursor:pointer;font-size:16px;">›</button>
-
-            </div>
-          </div>
-          <!-- Calendar -->
-          <div id="tripCalendar" style="margin-bottom:16px;"></div>
-          <!-- List -->
-          <div id="tripList" style="display:flex;flex-direction:column;gap:8px;"></div>
-        </div>
-      </div>
-
-      <!-- Trip Modal -->
-      <div class="overlay" id="calEventOverlay" onclick="if(event.target===this)closeCalEventModal()">
-        <div class="modal" style="max-width:440px;">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-            <div class="modal-title" id="calEventModalTitle">New Event</div>
-            <button onclick="closeCalEventModal()" style="background:transparent;border:none;cursor:pointer;color:var(--tx3);font-size:20px;">✕</button>
-          </div>
-          <div style="margin-bottom:10px;">
-            <label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Calendar</label>
-            <select id="cal-event-cat" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;"></select>
-          </div>
-          <div style="margin-bottom:10px;">
-            <label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Title *</label>
-            <input id="cal-event-title" placeholder="Event title" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;">
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
-            <div>
-              <label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Date From *</label>
-              <input id="cal-event-from" type="date" onchange="if(!document.getElementById('cal-event-to').value)document.getElementById('cal-event-to').value=this.value;" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;">
-            </div>
-            <div>
-              <label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Date To</label>
-              <input id="cal-event-to" type="date" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;">
-            </div>
-          </div>
-          <div style="margin-bottom:14px;">
-            <label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Notes</label>
-            <textarea id="cal-event-notes" rows="2" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;resize:none;font-family:inherit;"></textarea>
-          </div>
-          <div style="display:flex;gap:8px;">
-            <button onclick="saveCalEvent()" style="padding:9px 20px;border-radius:8px;background:var(--ac);color:#fff;border:none;cursor:pointer;font-size:13px;font-weight:700;">Save</button>
-            <button onclick="closeCalEventModal()" style="padding:9px 16px;border-radius:8px;border:1px solid var(--br);background:transparent;color:var(--tx2);cursor:pointer;font-size:13px;">Cancel</button>
-            <button id="cal-event-del" onclick="deleteCalEvent()" style="display:none;padding:9px 16px;border-radius:8px;background:var(--red);color:#fff;border:none;cursor:pointer;font-size:13px;margin-left:auto;">Delete</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- ── DIRECTORY (名人榜) ── -->
-      <div class="view" id="view-directory">
-        <div class="dir-wrap">
-          <div class="dir-header">
-            <div style="font-size:18px;font-weight:500;">👤 名人榜 · Employee Directory</div>
-            <input class="dir-search" id="dirSearch" placeholder="Search name, title…" oninput="renderDirectory()">
-          </div>
-          <!-- Tab 切換：通訊錄 / 貢獻排行榜 -->
-          <div style="display:flex;gap:6px;margin-bottom:14px;">
-            <button id="dir-tab-contacts" onclick="switchDirTab('contacts')"
-              style="padding:5px 14px;border-radius:20px;border:1px solid var(--ac);background:var(--ac);color:#fff;font-size:12px;font-weight:600;cursor:pointer;">
-              📋 通訊錄
-            </button>
-            <button id="dir-tab-ranking" onclick="switchDirTab('ranking')"
-              style="padding:5px 14px;border-radius:20px;border:1px solid var(--br);background:transparent;color:var(--tx2);font-size:12px;font-weight:600;cursor:pointer;">
-              🏆 知識貢獻排行
-            </button>
-          </div>
-          <!-- 通訊錄 -->
-          <div id="dir-contacts-view">
-            <div class="dir-grid" id="dirGrid"><div style="color:var(--tx3);font-size:13px;padding:20px;">載入中…</div></div>
-          </div>
-          <!-- 排行榜 -->
-          <div id="dir-ranking-view" style="display:none;">
-            <div style="background:var(--s1);border:1px solid var(--br);border-radius:var(--rl);overflow:hidden;">
-              <div style="padding:12px 16px;border-bottom:1px solid var(--br);font-size:12px;color:var(--tx3);">
-                以 KMS 知識庫發文數量計算 · 每月更新
-              </div>
-              <div id="rankingList"><div style="color:var(--tx3);font-size:13px;padding:20px;text-align:center;">載入中…</div></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-
-      <!-- ── AI VIEW ── -->
-      <div class="view" id="view-ai" style="flex-direction:column;padding:0;">
-        <div class="ai-tab-bar">
-          <div style="font-size:14px;font-weight:700;color:#a78bfa;margin-right:6px;">🤖 AI</div>
-          <button class="ai-chip on" id="ptab-translate" onclick="switchAITab('translate')">🌐 翻譯</button>
-          <button class="ai-chip" id="ptab-chat" onclick="switchAITab('chat')">✦ Chat</button>
-          <button class="ai-chip" id="ptab-skills" onclick="switchAITab('skills')">🛠 Skills</button>
-        </div>
-
-        <!-- Translate Tab -->
-        <div class="ai-tab-content on" id="ptab-content-translate">
-          <div style="flex:1;overflow-y:auto;padding:14px 16px;max-width:900px;width:100%;margin:0 auto;">
-            <div style="margin-bottom:12px;">
-              <div style="font-size:11px;font-weight:700;color:var(--tx3);letter-spacing:.06em;margin-bottom:6px;">INPUT TEXT / 輸入文字</div>
-              <div style="display:flex;gap:8px;align-items:flex-start;">
-                <textarea id="p-xlat-input" rows="8" placeholder="Paste or type text here… 貼上或輸入文字"
-                  style="flex:1;padding:10px 12px;border-radius:10px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;resize:vertical;outline:none;font-family:inherit;min-height:160px;"></textarea>
-                <div style="display:flex;flex-direction:column;gap:6px;">
-                  <button onclick="pRunTranslate()"
-                    style="padding:9px 14px;border-radius:9px;background:#7c3aed;color:#fff;border:none;cursor:pointer;font-size:12px;font-weight:700;">Translate ↓</button>
-                  <button onclick="navigator.clipboard.readText().then(t=>{document.getElementById('p-xlat-input').value=t;})"
-                    style="padding:9px 14px;border-radius:9px;border:1px solid var(--br);background:var(--s2);color:var(--tx2);cursor:pointer;font-size:14px;">📋</button>
-                </div>
-              </div>
-            </div>
-            <div id="p-xlat-loading" style="display:none;text-align:center;padding:24px;color:var(--tx3);font-size:13px;">
-              <div style="font-size:22px;margin-bottom:8px;">⟳</div>Translating…
-            </div>
-            <div id="p-xlat-results" style="display:none;">
-              <div style="font-size:11px;font-weight:700;color:var(--tx3);letter-spacing:.06em;margin-bottom:8px;">DIRECT TRANSLATION · 直接翻譯</div>
-              <div id="p-xlat-direct" style="display:flex;flex-direction:column;gap:6px;margin-bottom:16px;"></div>
-              <div style="font-size:11px;font-weight:700;color:#a78bfa;letter-spacing:.06em;margin-bottom:8px;">BUSINESS VERSION · 商業用語版本</div>
-              <div id="p-xlat-biz" style="display:flex;flex-direction:column;gap:6px;"></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Chat Tab -->
-        <div class="ai-tab-content" id="ptab-content-chat" style="flex-direction:column;min-height:0;">
-          <div id="p-chat-messages" style="flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:10px;">
-            <div style="text-align:center;padding:24px 0 8px;">
-              <div style="font-size:26px;margin-bottom:6px;">✦</div>
-              <div style="font-size:14px;font-weight:700;color:var(--tx);">Claude · COMART Assistant</div>
-              <div style="font-size:11px;color:var(--tx3);margin-top:4px;">Ask anything about COMART products, market, or business</div>
-            </div>
-          </div>
-          <div style="padding:10px 14px;border-top:1px solid var(--br);flex-shrink:0;">
-            <div style="display:flex;gap:8px;align-items:flex-end;">
-              <textarea id="p-chat-input" placeholder="Ask Claude… (Enter to send, Shift+Enter for new line)" rows="2"
-                style="flex:1;padding:10px 12px;border-radius:10px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;resize:none;outline:none;font-family:inherit;line-height:1.5;"
-                onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();pSendChat();}"></textarea>
-              <button onclick="pSendChat()" style="padding:10px 16px;border-radius:10px;background:#7c3aed;color:#fff;border:none;cursor:pointer;font-size:13px;font-weight:700;flex-shrink:0;height:42px;">Send</button>
-            </div>
-            <div style="font-size:10px;color:var(--tx3);margin-top:5px;text-align:center;">Claude · via COMART Proxy</div>
-          </div>
-        </div>
-
-        <!-- Skills Tab -->
-        <div class="ai-tab-content" id="ptab-content-skills" style="overflow-y:auto;">
-          <div style="padding:14px 16px;max-width:900px;width:100%;margin:0 auto;">
-            <div style="font-size:11px;font-weight:700;color:var(--tx3);letter-spacing:.08em;margin-bottom:10px;">COMART AI SKILLS</div>
-            <div style="display:flex;flex-direction:column;gap:10px;">
-              <!-- Company Research -->
-              <div style="background:var(--s2);border:1px solid var(--br);border-radius:12px;padding:14px 16px;">
-                <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
-                  <div style="width:36px;height:36px;border-radius:8px;background:rgba(16,163,127,.15);color:#10a37f;display:flex;align-items:center;justify-content:center;font-size:18px;">🔍</div>
-                  <div>
-                    <div style="font-size:13px;font-weight:700;color:var(--tx);">公司調查機器人</div>
-                    <div style="font-size:11px;color:var(--tx3);">Company Research</div>
-                  </div>
-                </div>
-                <div style="font-size:12px;color:var(--tx2);margin-bottom:10px;line-height:1.6;">輸入公司名稱，自動調查公司背景、聯絡資訊、產品方向，輸出完整調查報告與商業開發信。</div>
-                <div style="display:flex;gap:6px;align-items:center;">
-                  <input id="p-skill-company" placeholder="Enter company name / 輸入公司名稱" autocomplete="off"
-                    style="flex:1;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;"
-                    onkeydown="if(event.key==='Enter') pRunSkillCompany()">
-                  <button onclick="pRunSkillCompany()"
-                    style="padding:8px 14px;border-radius:8px;background:#10a37f;color:#fff;border:none;cursor:pointer;font-size:12px;font-weight:700;flex-shrink:0;">調查 →</button>
-                </div>
-              </div>
-              <!-- Post-show Followup -->
-              <div style="background:var(--s2);border:1px solid var(--br);border-radius:12px;padding:14px 16px;">
-                <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
-                  <div style="width:36px;height:36px;border-radius:8px;background:rgba(139,92,246,.15);color:#8b5cf6;display:flex;align-items:center;justify-content:center;font-size:18px;">📧</div>
-                  <div>
-                    <div style="font-size:13px;font-weight:700;color:var(--tx);">展後跟進機器人</div>
-                    <div style="font-size:11px;color:var(--tx3);">Post-Show Followup</div>
-                  </div>
-                </div>
-                <div style="font-size:12px;color:var(--tx2);margin-bottom:10px;line-height:1.6;">輸入展會客戶資訊，自動生成個性化的展後跟進信件，支援中英雙語。</div>
-                <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px;">
-                  <input id="p-skill-show-company" placeholder="客戶公司名稱 / Company name" autocomplete="off"
-                    style="padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;">
-                  <input id="p-skill-show-contact" placeholder="聯絡人 / Contact person" autocomplete="off"
-                    style="padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;">
-                  <input id="p-skill-show-name" placeholder="展覽名稱 / Show name" autocomplete="off"
-                    style="padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;">
-                  <textarea id="p-skill-show-notes" placeholder="備注：客戶興趣、產品需求等 / Notes" rows="2"
-                    style="padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;resize:none;font-family:inherit;"></textarea>
-                  <button onclick="pRunSkillFollowup()"
-                    style="padding:9px;border-radius:8px;background:#8b5cf6;color:#fff;border:none;cursor:pointer;font-size:12px;font-weight:700;">產生跟進信 →</button>
-                </div>
-              </div>
-            </div>
-            <!-- Output -->
-            <div id="p-skill-output" style="display:none;margin-top:14px;">
-              <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-                <div style="font-size:11px;font-weight:700;color:var(--tx3);letter-spacing:.06em;flex:1;">OUTPUT</div>
-                <button onclick="navigator.clipboard.writeText(document.getElementById('p-skill-content').textContent)"
-                  style="padding:4px 10px;border-radius:6px;border:1px solid var(--br);background:var(--s2);color:var(--tx2);font-size:11px;cursor:pointer;">📋 Copy</button>
-                <button onclick="document.getElementById('p-skill-output').style.display='none'"
-                  style="padding:4px 10px;border-radius:6px;border:1px solid var(--br);background:var(--s2);color:var(--tx2);font-size:11px;cursor:pointer;">✕</button>
-              </div>
-              <div id="p-skill-loading" style="display:none;text-align:center;padding:20px;color:var(--tx3);font-size:13px;">
-                <div style="font-size:22px;margin-bottom:6px;">⟳</div>AI is working…
-              </div>
-              <div id="p-skill-content"
-                style="background:var(--s2);border:1px solid var(--br);border-radius:10px;padding:14px;font-size:12px;color:var(--tx);line-height:1.7;white-space:pre-wrap;max-height:60vh;overflow-y:auto;"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ── CALENDAR / TRIPS VIEW ── -->
-      <div class="view" id="view-calendar" style="flex-direction:column;padding:0;overflow-y:auto;">
-        <div style="max-width:900px;margin:0 auto;width:100%;padding:20px;">
-          <!-- Header -->
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
-            <div style="font-size:18px;font-weight:700;color:var(--tx);">✈️ 集團行事曆 · Business Trips</div>
-            <div style="display:flex;align-items:center;gap:8px;">
-              <button onclick="tripMonthNav(-1)" style="padding:5px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);cursor:pointer;font-size:16px;">‹</button>
-              <div id="tripMonthLabel" style="font-size:14px;font-weight:700;color:var(--tx);min-width:100px;text-align:center;"></div>
-              <button onclick="tripMonthNav(1)" style="padding:5px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);cursor:pointer;font-size:16px;">›</button>
-
-            </div>
-          </div>
-          <!-- Calendar -->
-          <div id="tripCalendar" style="margin-bottom:16px;"></div>
-          <!-- List -->
-          <div id="tripList" style="display:flex;flex-direction:column;gap:8px;"></div>
-        </div>
-      </div>
-
-      <!-- Trip Modal -->
-      <div class="overlay" id="calEventOverlay" onclick="if(event.target===this)closeCalEventModal()">
-        <div class="modal" style="max-width:440px;">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-            <div class="modal-title" id="calEventModalTitle">New Event</div>
-            <button onclick="closeCalEventModal()" style="background:transparent;border:none;cursor:pointer;color:var(--tx3);font-size:20px;">✕</button>
-          </div>
-          <div style="margin-bottom:10px;">
-            <label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Calendar</label>
-            <select id="cal-event-cat" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;"></select>
-          </div>
-          <div style="margin-bottom:10px;">
-            <label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Title *</label>
-            <input id="cal-event-title" placeholder="Event title" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;">
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
-            <div>
-              <label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Date From *</label>
-              <input id="cal-event-from" type="date" onchange="if(!document.getElementById('cal-event-to').value)document.getElementById('cal-event-to').value=this.value;" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;">
-            </div>
-            <div>
-              <label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Date To</label>
-              <input id="cal-event-to" type="date" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;">
-            </div>
-          </div>
-          <div style="margin-bottom:14px;">
-            <label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Notes</label>
-            <textarea id="cal-event-notes" rows="2" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;resize:none;font-family:inherit;"></textarea>
-          </div>
-          <div style="display:flex;gap:8px;">
-            <button onclick="saveCalEvent()" style="padding:9px 20px;border-radius:8px;background:var(--ac);color:#fff;border:none;cursor:pointer;font-size:13px;font-weight:700;">Save</button>
-            <button onclick="closeCalEventModal()" style="padding:9px 16px;border-radius:8px;border:1px solid var(--br);background:transparent;color:var(--tx2);cursor:pointer;font-size:13px;">Cancel</button>
-            <button id="cal-event-del" onclick="deleteCalEvent()" style="display:none;padding:9px 16px;border-radius:8px;background:var(--red);color:#fff;border:none;cursor:pointer;font-size:13px;margin-left:auto;">Delete</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- ── DIRECTORY (名人榜) ── -->
-      <div class="view" id="view-directory">
-        <div class="dir-wrap">
-          <div class="dir-header">
-            <div style="font-size:18px;font-weight:500;">👤 名人榜 · Employee Directory</div>
-            <input class="dir-search" id="dirSearch" placeholder="Search name, title…" oninput="renderDirectory()">
-          </div>
-          <!-- Tab 切換：通訊錄 / 貢獻排行榜 -->
-          <div style="display:flex;gap:6px;margin-bottom:14px;">
-            <button id="dir-tab-contacts" onclick="switchDirTab('contacts')"
-              style="padding:5px 14px;border-radius:20px;border:1px solid var(--ac);background:var(--ac);color:#fff;font-size:12px;font-weight:600;cursor:pointer;">
-              📋 通訊錄
-            </button>
-            <button id="dir-tab-ranking" onclick="switchDirTab('ranking')"
-              style="padding:5px 14px;border-radius:20px;border:1px solid var(--br);background:transparent;color:var(--tx2);font-size:12px;font-weight:600;cursor:pointer;">
-              🏆 知識貢獻排行
-            </button>
-          </div>
-          <!-- 通訊錄 -->
-          <div id="dir-contacts-view">
-            <div class="dir-grid" id="dirGrid"><div style="color:var(--tx3);font-size:13px;padding:20px;">載入中…</div></div>
-          </div>
-          <!-- 排行榜 -->
-          <div id="dir-ranking-view" style="display:none;">
-            <div style="background:var(--s1);border:1px solid var(--br);border-radius:var(--rl);overflow:hidden;">
-              <div style="padding:12px 16px;border-bottom:1px solid var(--br);font-size:12px;color:var(--tx3);">
-                以 KMS 知識庫發文數量計算 · 每月更新
-              </div>
-              <div id="rankingList"><div style="color:var(--tx3);font-size:13px;padding:20px;text-align:center;">載入中…</div></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-
-      <!-- ── AI VIEW ── -->
-      <div class="view" id="view-ai" style="flex-direction:column;padding:0;">
-        <div class="ai-tab-bar">
-          <div style="font-size:14px;font-weight:700;color:#a78bfa;margin-right:6px;">🤖 AI</div>
-          <button class="ai-chip on" id="ptab-translate" onclick="switchAITab('translate')">🌐 翻譯</button>
-          <button class="ai-chip" id="ptab-chat" onclick="switchAITab('chat')">✦ Chat</button>
-          <button class="ai-chip" id="ptab-skills" onclick="switchAITab('skills')">🛠 Skills</button>
-        </div>
-
-        <!-- Translate Tab -->
-        <div class="ai-tab-content on" id="ptab-content-translate">
-          <div style="flex:1;overflow-y:auto;padding:14px 16px;max-width:900px;width:100%;margin:0 auto;">
-            <div style="margin-bottom:12px;">
-              <div style="font-size:11px;font-weight:700;color:var(--tx3);letter-spacing:.06em;margin-bottom:6px;">INPUT TEXT / 輸入文字</div>
-              <div style="display:flex;gap:8px;align-items:flex-start;">
-                <textarea id="p-xlat-input" rows="8" placeholder="Paste or type text here… 貼上或輸入文字"
-                  style="flex:1;padding:10px 12px;border-radius:10px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;resize:vertical;outline:none;font-family:inherit;min-height:160px;"></textarea>
-                <div style="display:flex;flex-direction:column;gap:6px;">
-                  <button onclick="pRunTranslate()"
-                    style="padding:9px 14px;border-radius:9px;background:#7c3aed;color:#fff;border:none;cursor:pointer;font-size:12px;font-weight:700;">Translate ↓</button>
-                  <button onclick="navigator.clipboard.readText().then(t=>{document.getElementById('p-xlat-input').value=t;})"
-                    style="padding:9px 14px;border-radius:9px;border:1px solid var(--br);background:var(--s2);color:var(--tx2);cursor:pointer;font-size:14px;">📋</button>
-                </div>
-              </div>
-            </div>
-            <div id="p-xlat-loading" style="display:none;text-align:center;padding:24px;color:var(--tx3);font-size:13px;">
-              <div style="font-size:22px;margin-bottom:8px;">⟳</div>Translating…
-            </div>
-            <div id="p-xlat-results" style="display:none;">
-              <div style="font-size:11px;font-weight:700;color:var(--tx3);letter-spacing:.06em;margin-bottom:8px;">DIRECT TRANSLATION · 直接翻譯</div>
-              <div id="p-xlat-direct" style="display:flex;flex-direction:column;gap:6px;margin-bottom:16px;"></div>
-              <div style="font-size:11px;font-weight:700;color:#a78bfa;letter-spacing:.06em;margin-bottom:8px;">BUSINESS VERSION · 商業用語版本</div>
-              <div id="p-xlat-biz" style="display:flex;flex-direction:column;gap:6px;"></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Chat Tab -->
-        <div class="ai-tab-content" id="ptab-content-chat" style="flex-direction:column;min-height:0;">
-          <div id="p-chat-messages" style="flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:10px;">
-            <div style="text-align:center;padding:24px 0 8px;">
-              <div style="font-size:26px;margin-bottom:6px;">✦</div>
-              <div style="font-size:14px;font-weight:700;color:var(--tx);">Claude · COMART Assistant</div>
-              <div style="font-size:11px;color:var(--tx3);margin-top:4px;">Ask anything about COMART products, market, or business</div>
-            </div>
-          </div>
-          <div style="padding:10px 14px;border-top:1px solid var(--br);flex-shrink:0;">
-            <div style="display:flex;gap:8px;align-items:flex-end;">
-              <textarea id="p-chat-input" placeholder="Ask Claude… (Enter to send, Shift+Enter for new line)" rows="2"
-                style="flex:1;padding:10px 12px;border-radius:10px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;resize:none;outline:none;font-family:inherit;line-height:1.5;"
-                onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();pSendChat();}"></textarea>
-              <button onclick="pSendChat()" style="padding:10px 16px;border-radius:10px;background:#7c3aed;color:#fff;border:none;cursor:pointer;font-size:13px;font-weight:700;flex-shrink:0;height:42px;">Send</button>
-            </div>
-            <div style="font-size:10px;color:var(--tx3);margin-top:5px;text-align:center;">Claude · via COMART Proxy</div>
-          </div>
-        </div>
-
-        <!-- Skills Tab -->
-        <div class="ai-tab-content" id="ptab-content-skills" style="overflow-y:auto;">
-          <div style="padding:14px 16px;max-width:900px;width:100%;margin:0 auto;">
-            <div style="font-size:11px;font-weight:700;color:var(--tx3);letter-spacing:.08em;margin-bottom:10px;">COMART AI SKILLS</div>
-            <div style="display:flex;flex-direction:column;gap:10px;">
-              <!-- Company Research -->
-              <div style="background:var(--s2);border:1px solid var(--br);border-radius:12px;padding:14px 16px;">
-                <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
-                  <div style="width:36px;height:36px;border-radius:8px;background:rgba(16,163,127,.15);color:#10a37f;display:flex;align-items:center;justify-content:center;font-size:18px;">🔍</div>
-                  <div>
-                    <div style="font-size:13px;font-weight:700;color:var(--tx);">公司調查機器人</div>
-                    <div style="font-size:11px;color:var(--tx3);">Company Research</div>
-                  </div>
-                </div>
-                <div style="font-size:12px;color:var(--tx2);margin-bottom:10px;line-height:1.6;">輸入公司名稱，自動調查公司背景、聯絡資訊、產品方向，輸出完整調查報告與商業開發信。</div>
-                <div style="display:flex;gap:6px;align-items:center;">
-                  <input id="p-skill-company" placeholder="Enter company name / 輸入公司名稱" autocomplete="off"
-                    style="flex:1;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;"
-                    onkeydown="if(event.key==='Enter') pRunSkillCompany()">
-                  <button onclick="pRunSkillCompany()"
-                    style="padding:8px 14px;border-radius:8px;background:#10a37f;color:#fff;border:none;cursor:pointer;font-size:12px;font-weight:700;flex-shrink:0;">調查 →</button>
-                </div>
-              </div>
-              <!-- Post-show Followup -->
-              <div style="background:var(--s2);border:1px solid var(--br);border-radius:12px;padding:14px 16px;">
-                <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
-                  <div style="width:36px;height:36px;border-radius:8px;background:rgba(139,92,246,.15);color:#8b5cf6;display:flex;align-items:center;justify-content:center;font-size:18px;">📧</div>
-                  <div>
-                    <div style="font-size:13px;font-weight:700;color:var(--tx);">展後跟進機器人</div>
-                    <div style="font-size:11px;color:var(--tx3);">Post-Show Followup</div>
-                  </div>
-                </div>
-                <div style="font-size:12px;color:var(--tx2);margin-bottom:10px;line-height:1.6;">輸入展會客戶資訊，自動生成個性化的展後跟進信件，支援中英雙語。</div>
-                <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px;">
-                  <input id="p-skill-show-company" placeholder="客戶公司名稱 / Company name" autocomplete="off"
-                    style="padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;">
-                  <input id="p-skill-show-contact" placeholder="聯絡人 / Contact person" autocomplete="off"
-                    style="padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;">
-                  <input id="p-skill-show-name" placeholder="展覽名稱 / Show name" autocomplete="off"
-                    style="padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;">
-                  <textarea id="p-skill-show-notes" placeholder="備注：客戶興趣、產品需求等 / Notes" rows="2"
-                    style="padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;resize:none;font-family:inherit;"></textarea>
-                  <button onclick="pRunSkillFollowup()"
-                    style="padding:9px;border-radius:8px;background:#8b5cf6;color:#fff;border:none;cursor:pointer;font-size:12px;font-weight:700;">產生跟進信 →</button>
-                </div>
-              </div>
-            </div>
-            <!-- Output -->
-            <div id="p-skill-output" style="display:none;margin-top:14px;">
-              <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-                <div style="font-size:11px;font-weight:700;color:var(--tx3);letter-spacing:.06em;flex:1;">OUTPUT</div>
-                <button onclick="navigator.clipboard.writeText(document.getElementById('p-skill-content').textContent)"
-                  style="padding:4px 10px;border-radius:6px;border:1px solid var(--br);background:var(--s2);color:var(--tx2);font-size:11px;cursor:pointer;">📋 Copy</button>
-                <button onclick="document.getElementById('p-skill-output').style.display='none'"
-                  style="padding:4px 10px;border-radius:6px;border:1px solid var(--br);background:var(--s2);color:var(--tx2);font-size:11px;cursor:pointer;">✕</button>
-              </div>
-              <div id="p-skill-loading" style="display:none;text-align:center;padding:20px;color:var(--tx3);font-size:13px;">
-                <div style="font-size:22px;margin-bottom:6px;">⟳</div>AI is working…
-              </div>
-              <div id="p-skill-content"
-                style="background:var(--s2);border:1px solid var(--br);border-radius:10px;padding:14px;font-size:12px;color:var(--tx);line-height:1.7;white-space:pre-wrap;max-height:60vh;overflow-y:auto;"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ── CALENDAR / TRIPS VIEW ── -->
-      <div class="view" id="view-calendar" style="flex-direction:column;padding:0;overflow-y:auto;">
-        <div style="max-width:900px;margin:0 auto;width:100%;padding:20px;">
-          <!-- Header -->
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
-            <div style="font-size:18px;font-weight:700;color:var(--tx);">✈️ 集團行事曆 · Business Trips</div>
-            <div style="display:flex;align-items:center;gap:8px;">
-              <button onclick="tripMonthNav(-1)" style="padding:5px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);cursor:pointer;font-size:16px;">‹</button>
-              <div id="tripMonthLabel" style="font-size:14px;font-weight:700;color:var(--tx);min-width:100px;text-align:center;"></div>
-              <button onclick="tripMonthNav(1)" style="padding:5px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);cursor:pointer;font-size:16px;">›</button>
-
-            </div>
-          </div>
-          <!-- Calendar -->
-          <div id="tripCalendar" style="margin-bottom:16px;"></div>
-          <!-- List -->
-          <div id="tripList" style="display:flex;flex-direction:column;gap:8px;"></div>
-        </div>
-      </div>
-
-      <!-- Trip Modal -->
-      <div class="overlay" id="calEventOverlay" onclick="if(event.target===this)closeCalEventModal()">
-        <div class="modal" style="max-width:440px;">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-            <div class="modal-title" id="calEventModalTitle">New Event</div>
-            <button onclick="closeCalEventModal()" style="background:transparent;border:none;cursor:pointer;color:var(--tx3);font-size:20px;">✕</button>
-          </div>
-          <div style="margin-bottom:10px;">
-            <label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Calendar</label>
-            <select id="cal-event-cat" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;"></select>
-          </div>
-          <div style="margin-bottom:10px;">
-            <label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Title *</label>
-            <input id="cal-event-title" placeholder="Event title" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;">
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
-            <div>
-              <label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Date From *</label>
-              <input id="cal-event-from" type="date" onchange="if(!document.getElementById('cal-event-to').value)document.getElementById('cal-event-to').value=this.value;" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;">
-            </div>
-            <div>
-              <label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Date To</label>
-              <input id="cal-event-to" type="date" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;">
-            </div>
-          </div>
-          <div style="margin-bottom:14px;">
-            <label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Notes</label>
-            <textarea id="cal-event-notes" rows="2" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;resize:none;font-family:inherit;"></textarea>
-          </div>
-          <div style="display:flex;gap:8px;">
-            <button onclick="saveCalEvent()" style="padding:9px 20px;border-radius:8px;background:var(--ac);color:#fff;border:none;cursor:pointer;font-size:13px;font-weight:700;">Save</button>
-            <button onclick="closeCalEventModal()" style="padding:9px 16px;border-radius:8px;border:1px solid var(--br);background:transparent;color:var(--tx2);cursor:pointer;font-size:13px;">Cancel</button>
-            <button id="cal-event-del" onclick="deleteCalEvent()" style="display:none;padding:9px 16px;border-radius:8px;background:var(--red);color:#fff;border:none;cursor:pointer;font-size:13px;margin-left:auto;">Delete</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- ── DIRECTORY (名人榜) ── -->
-      <div class="view" id="view-directory">
-        <div class="dir-wrap">
-          <div class="dir-header">
-            <div style="font-size:18px;font-weight:500;">👤 名人榜 · Employee Directory</div>
-            <input class="dir-search" id="dirSearch" placeholder="Search name, title…" oninput="renderDirectory()">
-          </div>
-          <!-- Tab 切換：通訊錄 / 貢獻排行榜 -->
-          <div style="display:flex;gap:6px;margin-bottom:14px;">
-            <button id="dir-tab-contacts" onclick="switchDirTab('contacts')"
-              style="padding:5px 14px;border-radius:20px;border:1px solid var(--ac);background:var(--ac);color:#fff;font-size:12px;font-weight:600;cursor:pointer;">
-              📋 通訊錄
-            </button>
-            <button id="dir-tab-ranking" onclick="switchDirTab('ranking')"
-              style="padding:5px 14px;border-radius:20px;border:1px solid var(--br);background:transparent;color:var(--tx2);font-size:12px;font-weight:600;cursor:pointer;">
-              🏆 知識貢獻排行
-            </button>
-          </div>
-          <!-- 通訊錄 -->
-          <div id="dir-contacts-view">
-            <div class="dir-grid" id="dirGrid"><div style="color:var(--tx3);font-size:13px;padding:20px;">載入中…</div></div>
-          </div>
-          <!-- 排行榜 -->
-          <div id="dir-ranking-view" style="display:none;">
-            <div style="background:var(--s1);border:1px solid var(--br);border-radius:var(--rl);overflow:hidden;">
-              <div style="padding:12px 16px;border-bottom:1px solid var(--br);font-size:12px;color:var(--tx3);">
-                以 KMS 知識庫發文數量計算 · 每月更新
-              </div>
-              <div id="rankingList"><div style="color:var(--tx3);font-size:13px;padding:20px;text-align:center;">載入中…</div></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-
-      <!-- ── AI VIEW ── -->
-      <div class="view" id="view-ai" style="flex-direction:column;padding:0;">
-        <div class="ai-tab-bar">
-          <div style="font-size:14px;font-weight:700;color:#a78bfa;margin-right:6px;">🤖 AI</div>
-          <button class="ai-chip on" id="ptab-translate" onclick="switchAITab('translate')">🌐 翻譯</button>
-          <button class="ai-chip" id="ptab-chat" onclick="switchAITab('chat')">✦ Chat</button>
-          <button class="ai-chip" id="ptab-skills" onclick="switchAITab('skills')">🛠 Skills</button>
-        </div>
-
-        <!-- Translate Tab -->
-        <div class="ai-tab-content on" id="ptab-content-translate">
-          <div style="flex:1;overflow-y:auto;padding:14px 16px;max-width:900px;width:100%;margin:0 auto;">
-            <div style="margin-bottom:12px;">
-              <div style="font-size:11px;font-weight:700;color:var(--tx3);letter-spacing:.06em;margin-bottom:6px;">INPUT TEXT / 輸入文字</div>
-              <div style="display:flex;gap:8px;align-items:flex-start;">
-                <textarea id="p-xlat-input" rows="8" placeholder="Paste or type text here… 貼上或輸入文字"
-                  style="flex:1;padding:10px 12px;border-radius:10px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;resize:vertical;outline:none;font-family:inherit;min-height:160px;"></textarea>
-                <div style="display:flex;flex-direction:column;gap:6px;">
-                  <button onclick="pRunTranslate()"
-                    style="padding:9px 14px;border-radius:9px;background:#7c3aed;color:#fff;border:none;cursor:pointer;font-size:12px;font-weight:700;">Translate ↓</button>
-                  <button onclick="navigator.clipboard.readText().then(t=>{document.getElementById('p-xlat-input').value=t;})"
-                    style="padding:9px 14px;border-radius:9px;border:1px solid var(--br);background:var(--s2);color:var(--tx2);cursor:pointer;font-size:14px;">📋</button>
-                </div>
-              </div>
-            </div>
-            <div id="p-xlat-loading" style="display:none;text-align:center;padding:24px;color:var(--tx3);font-size:13px;">
-              <div style="font-size:22px;margin-bottom:8px;">⟳</div>Translating…
-            </div>
-            <div id="p-xlat-results" style="display:none;">
-              <div style="font-size:11px;font-weight:700;color:var(--tx3);letter-spacing:.06em;margin-bottom:8px;">DIRECT TRANSLATION · 直接翻譯</div>
-              <div id="p-xlat-direct" style="display:flex;flex-direction:column;gap:6px;margin-bottom:16px;"></div>
-              <div style="font-size:11px;font-weight:700;color:#a78bfa;letter-spacing:.06em;margin-bottom:8px;">BUSINESS VERSION · 商業用語版本</div>
-              <div id="p-xlat-biz" style="display:flex;flex-direction:column;gap:6px;"></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Chat Tab -->
-        <div class="ai-tab-content" id="ptab-content-chat" style="flex-direction:column;min-height:0;">
-          <div id="p-chat-messages" style="flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:10px;">
-            <div style="text-align:center;padding:24px 0 8px;">
-              <div style="font-size:26px;margin-bottom:6px;">✦</div>
-              <div style="font-size:14px;font-weight:700;color:var(--tx);">Claude · COMART Assistant</div>
-              <div style="font-size:11px;color:var(--tx3);margin-top:4px;">Ask anything about COMART products, market, or business</div>
-            </div>
-          </div>
-          <div style="padding:10px 14px;border-top:1px solid var(--br);flex-shrink:0;">
-            <div style="display:flex;gap:8px;align-items:flex-end;">
-              <textarea id="p-chat-input" placeholder="Ask Claude… (Enter to send, Shift+Enter for new line)" rows="2"
-                style="flex:1;padding:10px 12px;border-radius:10px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;resize:none;outline:none;font-family:inherit;line-height:1.5;"
-                onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();pSendChat();}"></textarea>
-              <button onclick="pSendChat()" style="padding:10px 16px;border-radius:10px;background:#7c3aed;color:#fff;border:none;cursor:pointer;font-size:13px;font-weight:700;flex-shrink:0;height:42px;">Send</button>
-            </div>
-            <div style="font-size:10px;color:var(--tx3);margin-top:5px;text-align:center;">Claude · via COMART Proxy</div>
-          </div>
-        </div>
-
-        <!-- Skills Tab -->
-        <div class="ai-tab-content" id="ptab-content-skills" style="overflow-y:auto;">
-          <div style="padding:14px 16px;max-width:900px;width:100%;margin:0 auto;">
-            <div style="font-size:11px;font-weight:700;color:var(--tx3);letter-spacing:.08em;margin-bottom:10px;">COMART AI SKILLS</div>
-            <div style="display:flex;flex-direction:column;gap:10px;">
-              <!-- Company Research -->
-              <div style="background:var(--s2);border:1px solid var(--br);border-radius:12px;padding:14px 16px;">
-                <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
-                  <div style="width:36px;height:36px;border-radius:8px;background:rgba(16,163,127,.15);color:#10a37f;display:flex;align-items:center;justify-content:center;font-size:18px;">🔍</div>
-                  <div>
-                    <div style="font-size:13px;font-weight:700;color:var(--tx);">公司調查機器人</div>
-                    <div style="font-size:11px;color:var(--tx3);">Company Research</div>
-                  </div>
-                </div>
-                <div style="font-size:12px;color:var(--tx2);margin-bottom:10px;line-height:1.6;">輸入公司名稱，自動調查公司背景、聯絡資訊、產品方向，輸出完整調查報告與商業開發信。</div>
-                <div style="display:flex;gap:6px;align-items:center;">
-                  <input id="p-skill-company" placeholder="Enter company name / 輸入公司名稱" autocomplete="off"
-                    style="flex:1;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;"
-                    onkeydown="if(event.key==='Enter') pRunSkillCompany()">
-                  <button onclick="pRunSkillCompany()"
-                    style="padding:8px 14px;border-radius:8px;background:#10a37f;color:#fff;border:none;cursor:pointer;font-size:12px;font-weight:700;flex-shrink:0;">調查 →</button>
-                </div>
-              </div>
-              <!-- Post-show Followup -->
-              <div style="background:var(--s2);border:1px solid var(--br);border-radius:12px;padding:14px 16px;">
-                <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
-                  <div style="width:36px;height:36px;border-radius:8px;background:rgba(139,92,246,.15);color:#8b5cf6;display:flex;align-items:center;justify-content:center;font-size:18px;">📧</div>
-                  <div>
-                    <div style="font-size:13px;font-weight:700;color:var(--tx);">展後跟進機器人</div>
-                    <div style="font-size:11px;color:var(--tx3);">Post-Show Followup</div>
-                  </div>
-                </div>
-                <div style="font-size:12px;color:var(--tx2);margin-bottom:10px;line-height:1.6;">輸入展會客戶資訊，自動生成個性化的展後跟進信件，支援中英雙語。</div>
-                <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px;">
-                  <input id="p-skill-show-company" placeholder="客戶公司名稱 / Company name" autocomplete="off"
-                    style="padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;">
-                  <input id="p-skill-show-contact" placeholder="聯絡人 / Contact person" autocomplete="off"
-                    style="padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;">
-                  <input id="p-skill-show-name" placeholder="展覽名稱 / Show name" autocomplete="off"
-                    style="padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;">
-                  <textarea id="p-skill-show-notes" placeholder="備注：客戶興趣、產品需求等 / Notes" rows="2"
-                    style="padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;resize:none;font-family:inherit;"></textarea>
-                  <button onclick="pRunSkillFollowup()"
-                    style="padding:9px;border-radius:8px;background:#8b5cf6;color:#fff;border:none;cursor:pointer;font-size:12px;font-weight:700;">產生跟進信 →</button>
-                </div>
-              </div>
-            </div>
-            <!-- Output -->
-            <div id="p-skill-output" style="display:none;margin-top:14px;">
-              <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-                <div style="font-size:11px;font-weight:700;color:var(--tx3);letter-spacing:.06em;flex:1;">OUTPUT</div>
-                <button onclick="navigator.clipboard.writeText(document.getElementById('p-skill-content').textContent)"
-                  style="padding:4px 10px;border-radius:6px;border:1px solid var(--br);background:var(--s2);color:var(--tx2);font-size:11px;cursor:pointer;">📋 Copy</button>
-                <button onclick="document.getElementById('p-skill-output').style.display='none'"
-                  style="padding:4px 10px;border-radius:6px;border:1px solid var(--br);background:var(--s2);color:var(--tx2);font-size:11px;cursor:pointer;">✕</button>
-              </div>
-              <div id="p-skill-loading" style="display:none;text-align:center;padding:20px;color:var(--tx3);font-size:13px;">
-                <div style="font-size:22px;margin-bottom:6px;">⟳</div>AI is working…
-              </div>
-              <div id="p-skill-content"
-                style="background:var(--s2);border:1px solid var(--br);border-radius:10px;padding:14px;font-size:12px;color:var(--tx);line-height:1.7;white-space:pre-wrap;max-height:60vh;overflow-y:auto;"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ── CALENDAR / TRIPS VIEW ── -->
-      <div class="view" id="view-calendar" style="flex-direction:column;padding:0;overflow-y:auto;">
-        <div style="max-width:900px;margin:0 auto;width:100%;padding:20px;">
-          <!-- Header -->
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
-            <div style="font-size:18px;font-weight:700;color:var(--tx);">✈️ 集團行事曆 · Business Trips</div>
-            <div style="display:flex;align-items:center;gap:8px;">
-              <button onclick="tripMonthNav(-1)" style="padding:5px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);cursor:pointer;font-size:16px;">‹</button>
-              <div id="tripMonthLabel" style="font-size:14px;font-weight:700;color:var(--tx);min-width:100px;text-align:center;"></div>
-              <button onclick="tripMonthNav(1)" style="padding:5px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);cursor:pointer;font-size:16px;">›</button>
-
-            </div>
-          </div>
-          <!-- Calendar -->
-          <div id="tripCalendar" style="margin-bottom:16px;"></div>
-          <!-- List -->
-          <div id="tripList" style="display:flex;flex-direction:column;gap:8px;"></div>
-        </div>
-      </div>
-
-      <!-- Trip Modal -->
-      <div class="overlay" id="calEventOverlay" onclick="if(event.target===this)closeCalEventModal()">
-        <div class="modal" style="max-width:440px;">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-            <div class="modal-title" id="calEventModalTitle">New Event</div>
-            <button onclick="closeCalEventModal()" style="background:transparent;border:none;cursor:pointer;color:var(--tx3);font-size:20px;">✕</button>
-          </div>
-          <div style="margin-bottom:10px;">
-            <label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Calendar</label>
-            <select id="cal-event-cat" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;"></select>
-          </div>
-          <div style="margin-bottom:10px;">
-            <label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Title *</label>
-            <input id="cal-event-title" placeholder="Event title" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;">
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
-            <div>
-              <label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Date From *</label>
-              <input id="cal-event-from" type="date" onchange="if(!document.getElementById('cal-event-to').value)document.getElementById('cal-event-to').value=this.value;" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;">
-            </div>
-            <div>
-              <label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Date To</label>
-              <input id="cal-event-to" type="date" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;">
-            </div>
-          </div>
-          <div style="margin-bottom:14px;">
-            <label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Notes</label>
-            <textarea id="cal-event-notes" rows="2" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;resize:none;font-family:inherit;"></textarea>
-          </div>
-          <div style="display:flex;gap:8px;">
-            <button onclick="saveCalEvent()" style="padding:9px 20px;border-radius:8px;background:var(--ac);color:#fff;border:none;cursor:pointer;font-size:13px;font-weight:700;">Save</button>
-            <button onclick="closeCalEventModal()" style="padding:9px 16px;border-radius:8px;border:1px solid var(--br);background:transparent;color:var(--tx2);cursor:pointer;font-size:13px;">Cancel</button>
-            <button id="cal-event-del" onclick="deleteCalEvent()" style="display:none;padding:9px 16px;border-radius:8px;background:var(--red);color:#fff;border:none;cursor:pointer;font-size:13px;margin-left:auto;">Delete</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- ── DIRECTORY (名人榜) ── -->
-      <div class="view" id="view-directory">
-        <div class="dir-wrap">
-          <div class="dir-header">
-            <div style="font-size:18px;font-weight:500;">👤 名人榜 · Employee Directory</div>
-            <input class="dir-search" id="dirSearch" placeholder="Search name, title…" oninput="renderDirectory()">
-          </div>
-          <!-- Tab 切換：通訊錄 / 貢獻排行榜 -->
-          <div style="display:flex;gap:6px;margin-bottom:14px;">
-            <button id="dir-tab-contacts" onclick="switchDirTab('contacts')"
-              style="padding:5px 14px;border-radius:20px;border:1px solid var(--ac);background:var(--ac);color:#fff;font-size:12px;font-weight:600;cursor:pointer;">
-              📋 通訊錄
-            </button>
-            <button id="dir-tab-ranking" onclick="switchDirTab('ranking')"
-              style="padding:5px 14px;border-radius:20px;border:1px solid var(--br);background:transparent;color:var(--tx2);font-size:12px;font-weight:600;cursor:pointer;">
-              🏆 知識貢獻排行
-            </button>
-          </div>
-          <!-- 通訊錄 -->
-          <div id="dir-contacts-view">
-            <div class="dir-grid" id="dirGrid"><div style="color:var(--tx3);font-size:13px;padding:20px;">載入中…</div></div>
-          </div>
-          <!-- 排行榜 -->
-          <div id="dir-ranking-view" style="display:none;">
-            <div style="background:var(--s1);border:1px solid var(--br);border-radius:var(--rl);overflow:hidden;">
-              <div style="padding:12px 16px;border-bottom:1px solid var(--br);font-size:12px;color:var(--tx3);">
-                以 KMS 知識庫發文數量計算 · 每月更新
-              </div>
-              <div id="rankingList"><div style="color:var(--tx3);font-size:13px;padding:20px;text-align:center;">載入中…</div></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-
-      <!-- ── AI VIEW ── -->
-      <div class="view" id="view-ai" style="flex-direction:column;padding:0;">
-        <div class="ai-tab-bar">
-          <div style="font-size:14px;font-weight:700;color:#a78bfa;margin-right:6px;">🤖 AI</div>
-          <button class="ai-chip on" id="ptab-translate" onclick="switchAITab('translate')">🌐 翻譯</button>
-          <button class="ai-chip" id="ptab-chat" onclick="switchAITab('chat')">✦ Chat</button>
-          <button class="ai-chip" id="ptab-skills" onclick="switchAITab('skills')">🛠 Skills</button>
-        </div>
-
-        <!-- Translate Tab -->
-        <div class="ai-tab-content on" id="ptab-content-translate">
-          <div style="flex:1;overflow-y:auto;padding:14px 16px;max-width:900px;width:100%;margin:0 auto;">
-            <div style="margin-bottom:12px;">
-              <div style="font-size:11px;font-weight:700;color:var(--tx3);letter-spacing:.06em;margin-bottom:6px;">INPUT TEXT / 輸入文字</div>
-              <div style="display:flex;gap:8px;align-items:flex-start;">
-                <textarea id="p-xlat-input" rows="8" placeholder="Paste or type text here… 貼上或輸入文字"
-                  style="flex:1;padding:10px 12px;border-radius:10px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;resize:vertical;outline:none;font-family:inherit;min-height:160px;"></textarea>
-                <div style="display:flex;flex-direction:column;gap:6px;">
-                  <button onclick="pRunTranslate()"
-                    style="padding:9px 14px;border-radius:9px;background:#7c3aed;color:#fff;border:none;cursor:pointer;font-size:12px;font-weight:700;">Translate ↓</button>
-                  <button onclick="navigator.clipboard.readText().then(t=>{document.getElementById('p-xlat-input').value=t;})"
-                    style="padding:9px 14px;border-radius:9px;border:1px solid var(--br);background:var(--s2);color:var(--tx2);cursor:pointer;font-size:14px;">📋</button>
-                </div>
-              </div>
-            </div>
-            <div id="p-xlat-loading" style="display:none;text-align:center;padding:24px;color:var(--tx3);font-size:13px;">
-              <div style="font-size:22px;margin-bottom:8px;">⟳</div>Translating…
-            </div>
-            <div id="p-xlat-results" style="display:none;">
-              <div style="font-size:11px;font-weight:700;color:var(--tx3);letter-spacing:.06em;margin-bottom:8px;">DIRECT TRANSLATION · 直接翻譯</div>
-              <div id="p-xlat-direct" style="display:flex;flex-direction:column;gap:6px;margin-bottom:16px;"></div>
-              <div style="font-size:11px;font-weight:700;color:#a78bfa;letter-spacing:.06em;margin-bottom:8px;">BUSINESS VERSION · 商業用語版本</div>
-              <div id="p-xlat-biz" style="display:flex;flex-direction:column;gap:6px;"></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Chat Tab -->
-        <div class="ai-tab-content" id="ptab-content-chat" style="flex-direction:column;min-height:0;">
-          <div id="p-chat-messages" style="flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:10px;">
-            <div style="text-align:center;padding:24px 0 8px;">
-              <div style="font-size:26px;margin-bottom:6px;">✦</div>
-              <div style="font-size:14px;font-weight:700;color:var(--tx);">Claude · COMART Assistant</div>
-              <div style="font-size:11px;color:var(--tx3);margin-top:4px;">Ask anything about COMART products, market, or business</div>
-            </div>
-          </div>
-          <div style="padding:10px 14px;border-top:1px solid var(--br);flex-shrink:0;">
-            <div style="display:flex;gap:8px;align-items:flex-end;">
-              <textarea id="p-chat-input" placeholder="Ask Claude… (Enter to send, Shift+Enter for new line)" rows="2"
-                style="flex:1;padding:10px 12px;border-radius:10px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;resize:none;outline:none;font-family:inherit;line-height:1.5;"
-                onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();pSendChat();}"></textarea>
-              <button onclick="pSendChat()" style="padding:10px 16px;border-radius:10px;background:#7c3aed;color:#fff;border:none;cursor:pointer;font-size:13px;font-weight:700;flex-shrink:0;height:42px;">Send</button>
-            </div>
-            <div style="font-size:10px;color:var(--tx3);margin-top:5px;text-align:center;">Claude · via COMART Proxy</div>
-          </div>
-        </div>
-
-        <!-- Skills Tab -->
-        <div class="ai-tab-content" id="ptab-content-skills" style="overflow-y:auto;">
-          <div style="padding:14px 16px;max-width:900px;width:100%;margin:0 auto;">
-            <div style="font-size:11px;font-weight:700;color:var(--tx3);letter-spacing:.08em;margin-bottom:10px;">COMART AI SKILLS</div>
-            <div style="display:flex;flex-direction:column;gap:10px;">
-              <!-- Company Research -->
-              <div style="background:var(--s2);border:1px solid var(--br);border-radius:12px;padding:14px 16px;">
-                <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
-                  <div style="width:36px;height:36px;border-radius:8px;background:rgba(16,163,127,.15);color:#10a37f;display:flex;align-items:center;justify-content:center;font-size:18px;">🔍</div>
-                  <div>
-                    <div style="font-size:13px;font-weight:700;color:var(--tx);">公司調查機器人</div>
-                    <div style="font-size:11px;color:var(--tx3);">Company Research</div>
-                  </div>
-                </div>
-                <div style="font-size:12px;color:var(--tx2);margin-bottom:10px;line-height:1.6;">輸入公司名稱，自動調查公司背景、聯絡資訊、產品方向，輸出完整調查報告與商業開發信。</div>
-                <div style="display:flex;gap:6px;align-items:center;">
-                  <input id="p-skill-company" placeholder="Enter company name / 輸入公司名稱" autocomplete="off"
-                    style="flex:1;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;"
-                    onkeydown="if(event.key==='Enter') pRunSkillCompany()">
-                  <button onclick="pRunSkillCompany()"
-                    style="padding:8px 14px;border-radius:8px;background:#10a37f;color:#fff;border:none;cursor:pointer;font-size:12px;font-weight:700;flex-shrink:0;">調查 →</button>
-                </div>
-              </div>
-              <!-- Post-show Followup -->
-              <div style="background:var(--s2);border:1px solid var(--br);border-radius:12px;padding:14px 16px;">
-                <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
-                  <div style="width:36px;height:36px;border-radius:8px;background:rgba(139,92,246,.15);color:#8b5cf6;display:flex;align-items:center;justify-content:center;font-size:18px;">📧</div>
-                  <div>
-                    <div style="font-size:13px;font-weight:700;color:var(--tx);">展後跟進機器人</div>
-                    <div style="font-size:11px;color:var(--tx3);">Post-Show Followup</div>
-                  </div>
-                </div>
-                <div style="font-size:12px;color:var(--tx2);margin-bottom:10px;line-height:1.6;">輸入展會客戶資訊，自動生成個性化的展後跟進信件，支援中英雙語。</div>
-                <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px;">
-                  <input id="p-skill-show-company" placeholder="客戶公司名稱 / Company name" autocomplete="off"
-                    style="padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;">
-                  <input id="p-skill-show-contact" placeholder="聯絡人 / Contact person" autocomplete="off"
-                    style="padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;">
-                  <input id="p-skill-show-name" placeholder="展覽名稱 / Show name" autocomplete="off"
-                    style="padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;">
-                  <textarea id="p-skill-show-notes" placeholder="備注：客戶興趣、產品需求等 / Notes" rows="2"
-                    style="padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;resize:none;font-family:inherit;"></textarea>
-                  <button onclick="pRunSkillFollowup()"
-                    style="padding:9px;border-radius:8px;background:#8b5cf6;color:#fff;border:none;cursor:pointer;font-size:12px;font-weight:700;">產生跟進信 →</button>
-                </div>
-              </div>
-            </div>
-            <!-- Output -->
-            <div id="p-skill-output" style="display:none;margin-top:14px;">
-              <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-                <div style="font-size:11px;font-weight:700;color:var(--tx3);letter-spacing:.06em;flex:1;">OUTPUT</div>
-                <button onclick="navigator.clipboard.writeText(document.getElementById('p-skill-content').textContent)"
-                  style="padding:4px 10px;border-radius:6px;border:1px solid var(--br);background:var(--s2);color:var(--tx2);font-size:11px;cursor:pointer;">📋 Copy</button>
-                <button onclick="document.getElementById('p-skill-output').style.display='none'"
-                  style="padding:4px 10px;border-radius:6px;border:1px solid var(--br);background:var(--s2);color:var(--tx2);font-size:11px;cursor:pointer;">✕</button>
-              </div>
-              <div id="p-skill-loading" style="display:none;text-align:center;padding:20px;color:var(--tx3);font-size:13px;">
-                <div style="font-size:22px;margin-bottom:6px;">⟳</div>AI is working…
-              </div>
-              <div id="p-skill-content"
-                style="background:var(--s2);border:1px solid var(--br);border-radius:10px;padding:14px;font-size:12px;color:var(--tx);line-height:1.7;white-space:pre-wrap;max-height:60vh;overflow-y:auto;"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ── CALENDAR / TRIPS VIEW ── -->
-      <div class="view" id="view-calendar" style="flex-direction:column;padding:0;overflow-y:auto;">
-        <div style="max-width:900px;margin:0 auto;width:100%;padding:20px;">
-          <!-- Header -->
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
-            <div style="font-size:18px;font-weight:700;color:var(--tx);">✈️ 集團行事曆 · Business Trips</div>
-            <div style="display:flex;align-items:center;gap:8px;">
-              <button onclick="tripMonthNav(-1)" style="padding:5px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);cursor:pointer;font-size:16px;">‹</button>
-              <div id="tripMonthLabel" style="font-size:14px;font-weight:700;color:var(--tx);min-width:100px;text-align:center;"></div>
-              <button onclick="tripMonthNav(1)" style="padding:5px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);cursor:pointer;font-size:16px;">›</button>
-
-            </div>
-          </div>
-          <!-- Calendar -->
-          <div id="tripCalendar" style="margin-bottom:16px;"></div>
-          <!-- List -->
-          <div id="tripList" style="display:flex;flex-direction:column;gap:8px;"></div>
-        </div>
-      </div>
-
-      <!-- Trip Modal -->
-      <div class="overlay" id="calEventOverlay" onclick="if(event.target===this)closeCalEventModal()">
-        <div class="modal" style="max-width:440px;">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-            <div class="modal-title" id="calEventModalTitle">New Event</div>
-            <button onclick="closeCalEventModal()" style="background:transparent;border:none;cursor:pointer;color:var(--tx3);font-size:20px;">✕</button>
-          </div>
-          <div style="margin-bottom:10px;">
-            <label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Calendar</label>
-            <select id="cal-event-cat" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;"></select>
-          </div>
-          <div style="margin-bottom:10px;">
-            <label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Title *</label>
-            <input id="cal-event-title" placeholder="Event title" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;">
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
-            <div>
-              <label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Date From *</label>
-              <input id="cal-event-from" type="date" onchange="if(!document.getElementById('cal-event-to').value)document.getElementById('cal-event-to').value=this.value;" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;">
-            </div>
-            <div>
-              <label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Date To</label>
-              <input id="cal-event-to" type="date" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;">
-            </div>
-          </div>
-          <div style="margin-bottom:14px;">
-            <label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Notes</label>
-            <textarea id="cal-event-notes" rows="2" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;resize:none;font-family:inherit;"></textarea>
-          </div>
-          <div style="display:flex;gap:8px;">
-            <button onclick="saveCalEvent()" style="padding:9px 20px;border-radius:8px;background:var(--ac);color:#fff;border:none;cursor:pointer;font-size:13px;font-weight:700;">Save</button>
-            <button onclick="closeCalEventModal()" style="padding:9px 16px;border-radius:8px;border:1px solid var(--br);background:transparent;color:var(--tx2);cursor:pointer;font-size:13px;">Cancel</button>
-            <button id="cal-event-del" onclick="deleteCalEvent()" style="display:none;padding:9px 16px;border-radius:8px;background:var(--red);color:#fff;border:none;cursor:pointer;font-size:13px;margin-left:auto;">Delete</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- ── DIRECTORY (名人榜) ── -->
-      <div class="view" id="view-directory">
-        <div class="dir-wrap">
-          <div class="dir-header">
-            <div style="font-size:18px;font-weight:500;">👤 名人榜 · Employee Directory</div>
-            <input class="dir-search" id="dirSearch" placeholder="Search name, title…" oninput="renderDirectory()">
-          </div>
-          <!-- Tab 切換：通訊錄 / 貢獻排行榜 -->
-          <div style="display:flex;gap:6px;margin-bottom:14px;">
-            <button id="dir-tab-contacts" onclick="switchDirTab('contacts')"
-              style="padding:5px 14px;border-radius:20px;border:1px solid var(--ac);background:var(--ac);color:#fff;font-size:12px;font-weight:600;cursor:pointer;">
-              📋 通訊錄
-            </button>
-            <button id="dir-tab-ranking" onclick="switchDirTab('ranking')"
-              style="padding:5px 14px;border-radius:20px;border:1px solid var(--br);background:transparent;color:var(--tx2);font-size:12px;font-weight:600;cursor:pointer;">
-              🏆 知識貢獻排行
-            </button>
-          </div>
-          <!-- 通訊錄 -->
-          <div id="dir-contacts-view">
-            <div class="dir-grid" id="dirGrid"><div style="color:var(--tx3);font-size:13px;padding:20px;">載入中…</div></div>
-          </div>
-          <!-- 排行榜 -->
-          <div id="dir-ranking-view" style="display:none;">
-            <div style="background:var(--s1);border:1px solid var(--br);border-radius:var(--rl);overflow:hidden;">
-              <div style="padding:12px 16px;border-bottom:1px solid var(--br);font-size:12px;color:var(--tx3);">
-                以 KMS 知識庫發文數量計算 · 每月更新
-              </div>
-              <div id="rankingList"><div style="color:var(--tx3);font-size:13px;padding:20px;text-align:center;">載入中…</div></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-
-      <!-- ── AI VIEW ── -->
-      <div class="view" id="view-ai" style="flex-direction:column;padding:0;">
-        <div class="ai-tab-bar">
-          <div style="font-size:14px;font-weight:700;color:#a78bfa;margin-right:6px;">🤖 AI</div>
-          <button class="ai-chip on" id="ptab-translate" onclick="switchAITab('translate')">🌐 翻譯</button>
-          <button class="ai-chip" id="ptab-chat" onclick="switchAITab('chat')">✦ Chat</button>
-          <button class="ai-chip" id="ptab-skills" onclick="switchAITab('skills')">🛠 Skills</button>
-        </div>
-
-        <!-- Translate Tab -->
-        <div class="ai-tab-content on" id="ptab-content-translate">
-          <div style="flex:1;overflow-y:auto;padding:14px 16px;max-width:900px;width:100%;margin:0 auto;">
-            <div style="margin-bottom:12px;">
-              <div style="font-size:11px;font-weight:700;color:var(--tx3);letter-spacing:.06em;margin-bottom:6px;">INPUT TEXT / 輸入文字</div>
-              <div style="display:flex;gap:8px;align-items:flex-start;">
-                <textarea id="p-xlat-input" rows="8" placeholder="Paste or type text here… 貼上或輸入文字"
-                  style="flex:1;padding:10px 12px;border-radius:10px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;resize:vertical;outline:none;font-family:inherit;min-height:160px;"></textarea>
-                <div style="display:flex;flex-direction:column;gap:6px;">
-                  <button onclick="pRunTranslate()"
-                    style="padding:9px 14px;border-radius:9px;background:#7c3aed;color:#fff;border:none;cursor:pointer;font-size:12px;font-weight:700;">Translate ↓</button>
-                  <button onclick="navigator.clipboard.readText().then(t=>{document.getElementById('p-xlat-input').value=t;})"
-                    style="padding:9px 14px;border-radius:9px;border:1px solid var(--br);background:var(--s2);color:var(--tx2);cursor:pointer;font-size:14px;">📋</button>
-                </div>
-              </div>
-            </div>
-            <div id="p-xlat-loading" style="display:none;text-align:center;padding:24px;color:var(--tx3);font-size:13px;">
-              <div style="font-size:22px;margin-bottom:8px;">⟳</div>Translating…
-            </div>
-            <div id="p-xlat-results" style="display:none;">
-              <div style="font-size:11px;font-weight:700;color:var(--tx3);letter-spacing:.06em;margin-bottom:8px;">DIRECT TRANSLATION · 直接翻譯</div>
-              <div id="p-xlat-direct" style="display:flex;flex-direction:column;gap:6px;margin-bottom:16px;"></div>
-              <div style="font-size:11px;font-weight:700;color:#a78bfa;letter-spacing:.06em;margin-bottom:8px;">BUSINESS VERSION · 商業用語版本</div>
-              <div id="p-xlat-biz" style="display:flex;flex-direction:column;gap:6px;"></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Chat Tab -->
-        <div class="ai-tab-content" id="ptab-content-chat" style="flex-direction:column;min-height:0;">
-          <div id="p-chat-messages" style="flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:10px;">
-            <div style="text-align:center;padding:24px 0 8px;">
-              <div style="font-size:26px;margin-bottom:6px;">✦</div>
-              <div style="font-size:14px;font-weight:700;color:var(--tx);">Claude · COMART Assistant</div>
-              <div style="font-size:11px;color:var(--tx3);margin-top:4px;">Ask anything about COMART products, market, or business</div>
-            </div>
-          </div>
-          <div style="padding:10px 14px;border-top:1px solid var(--br);flex-shrink:0;">
-            <div style="display:flex;gap:8px;align-items:flex-end;">
-              <textarea id="p-chat-input" placeholder="Ask Claude… (Enter to send, Shift+Enter for new line)" rows="2"
-                style="flex:1;padding:10px 12px;border-radius:10px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;resize:none;outline:none;font-family:inherit;line-height:1.5;"
-                onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();pSendChat();}"></textarea>
-              <button onclick="pSendChat()" style="padding:10px 16px;border-radius:10px;background:#7c3aed;color:#fff;border:none;cursor:pointer;font-size:13px;font-weight:700;flex-shrink:0;height:42px;">Send</button>
-            </div>
-            <div style="font-size:10px;color:var(--tx3);margin-top:5px;text-align:center;">Claude · via COMART Proxy</div>
-          </div>
-        </div>
-
-        <!-- Skills Tab -->
-        <div class="ai-tab-content" id="ptab-content-skills" style="overflow-y:auto;">
-          <div style="padding:14px 16px;max-width:900px;width:100%;margin:0 auto;">
-            <div style="font-size:11px;font-weight:700;color:var(--tx3);letter-spacing:.08em;margin-bottom:10px;">COMART AI SKILLS</div>
-            <div style="display:flex;flex-direction:column;gap:10px;">
-              <!-- Company Research -->
-              <div style="background:var(--s2);border:1px solid var(--br);border-radius:12px;padding:14px 16px;">
-                <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
-                  <div style="width:36px;height:36px;border-radius:8px;background:rgba(16,163,127,.15);color:#10a37f;display:flex;align-items:center;justify-content:center;font-size:18px;">🔍</div>
-                  <div>
-                    <div style="font-size:13px;font-weight:700;color:var(--tx);">公司調查機器人</div>
-                    <div style="font-size:11px;color:var(--tx3);">Company Research</div>
-                  </div>
-                </div>
-                <div style="font-size:12px;color:var(--tx2);margin-bottom:10px;line-height:1.6;">輸入公司名稱，自動調查公司背景、聯絡資訊、產品方向，輸出完整調查報告與商業開發信。</div>
-                <div style="display:flex;gap:6px;align-items:center;">
-                  <input id="p-skill-company" placeholder="Enter company name / 輸入公司名稱" autocomplete="off"
-                    style="flex:1;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;"
-                    onkeydown="if(event.key==='Enter') pRunSkillCompany()">
-                  <button onclick="pRunSkillCompany()"
-                    style="padding:8px 14px;border-radius:8px;background:#10a37f;color:#fff;border:none;cursor:pointer;font-size:12px;font-weight:700;flex-shrink:0;">調查 →</button>
-                </div>
-              </div>
-              <!-- Post-show Followup -->
-              <div style="background:var(--s2);border:1px solid var(--br);border-radius:12px;padding:14px 16px;">
-                <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
-                  <div style="width:36px;height:36px;border-radius:8px;background:rgba(139,92,246,.15);color:#8b5cf6;display:flex;align-items:center;justify-content:center;font-size:18px;">📧</div>
-                  <div>
-                    <div style="font-size:13px;font-weight:700;color:var(--tx);">展後跟進機器人</div>
-                    <div style="font-size:11px;color:var(--tx3);">Post-Show Followup</div>
-                  </div>
-                </div>
-                <div style="font-size:12px;color:var(--tx2);margin-bottom:10px;line-height:1.6;">輸入展會客戶資訊，自動生成個性化的展後跟進信件，支援中英雙語。</div>
-                <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px;">
-                  <input id="p-skill-show-company" placeholder="客戶公司名稱 / Company name" autocomplete="off"
-                    style="padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;">
-                  <input id="p-skill-show-contact" placeholder="聯絡人 / Contact person" autocomplete="off"
-                    style="padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;">
-                  <input id="p-skill-show-name" placeholder="展覽名稱 / Show name" autocomplete="off"
-                    style="padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;">
-                  <textarea id="p-skill-show-notes" placeholder="備注：客戶興趣、產品需求等 / Notes" rows="2"
-                    style="padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;resize:none;font-family:inherit;"></textarea>
-                  <button onclick="pRunSkillFollowup()"
-                    style="padding:9px;border-radius:8px;background:#8b5cf6;color:#fff;border:none;cursor:pointer;font-size:12px;font-weight:700;">產生跟進信 →</button>
-                </div>
-              </div>
-            </div>
-            <!-- Output -->
-            <div id="p-skill-output" style="display:none;margin-top:14px;">
-              <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-                <div style="font-size:11px;font-weight:700;color:var(--tx3);letter-spacing:.06em;flex:1;">OUTPUT</div>
-                <button onclick="navigator.clipboard.writeText(document.getElementById('p-skill-content').textContent)"
-                  style="padding:4px 10px;border-radius:6px;border:1px solid var(--br);background:var(--s2);color:var(--tx2);font-size:11px;cursor:pointer;">📋 Copy</button>
-                <button onclick="document.getElementById('p-skill-output').style.display='none'"
-                  style="padding:4px 10px;border-radius:6px;border:1px solid var(--br);background:var(--s2);color:var(--tx2);font-size:11px;cursor:pointer;">✕</button>
-              </div>
-              <div id="p-skill-loading" style="display:none;text-align:center;padding:20px;color:var(--tx3);font-size:13px;">
-                <div style="font-size:22px;margin-bottom:6px;">⟳</div>AI is working…
-              </div>
-              <div id="p-skill-content"
-                style="background:var(--s2);border:1px solid var(--br);border-radius:10px;padding:14px;font-size:12px;color:var(--tx);line-height:1.7;white-space:pre-wrap;max-height:60vh;overflow-y:auto;"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ── CALENDAR / TRIPS VIEW ── -->
-      <div class="view" id="view-calendar" style="flex-direction:column;padding:0;overflow-y:auto;">
-        <div style="max-width:900px;margin:0 auto;width:100%;padding:20px;">
-          <!-- Header -->
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
-            <div style="font-size:18px;font-weight:700;color:var(--tx);">✈️ 集團行事曆 · Business Trips</div>
-            <div style="display:flex;align-items:center;gap:8px;">
-              <button onclick="tripMonthNav(-1)" style="padding:5px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);cursor:pointer;font-size:16px;">‹</button>
-              <div id="tripMonthLabel" style="font-size:14px;font-weight:700;color:var(--tx);min-width:100px;text-align:center;"></div>
-              <button onclick="tripMonthNav(1)" style="padding:5px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);cursor:pointer;font-size:16px;">›</button>
-
-            </div>
-          </div>
-          <!-- Calendar -->
-          <div id="tripCalendar" style="margin-bottom:16px;"></div>
-          <!-- List -->
-          <div id="tripList" style="display:flex;flex-direction:column;gap:8px;"></div>
-        </div>
-      </div>
-
-      <!-- Trip Modal -->
-      <div class="overlay" id="calEventOverlay" onclick="if(event.target===this)closeCalEventModal()">
-        <div class="modal" style="max-width:440px;">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-            <div class="modal-title" id="calEventModalTitle">New Event</div>
-            <button onclick="closeCalEventModal()" style="background:transparent;border:none;cursor:pointer;color:var(--tx3);font-size:20px;">✕</button>
-          </div>
-          <div style="margin-bottom:10px;">
-            <label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Calendar</label>
-            <select id="cal-event-cat" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;"></select>
-          </div>
-          <div style="margin-bottom:10px;">
-            <label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Title *</label>
-            <input id="cal-event-title" placeholder="Event title" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;">
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
-            <div>
-              <label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Date From *</label>
-              <input id="cal-event-from" type="date" onchange="if(!document.getElementById('cal-event-to').value)document.getElementById('cal-event-to').value=this.value;" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;">
-            </div>
-            <div>
-              <label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Date To</label>
-              <input id="cal-event-to" type="date" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;">
-            </div>
-          </div>
-          <div style="margin-bottom:14px;">
-            <label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Notes</label>
+            <label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px;">Notes</label>
             <textarea id="cal-event-notes" rows="2" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;resize:none;font-family:inherit;"></textarea>
           </div>
           <div style="display:flex;gap:8px;">
@@ -2348,58 +851,58 @@ input[type="date"]::-webkit-calendar-picker-indicator {
             <button onclick="closeTripModal()" style="background:transparent;border:none;cursor:pointer;color:var(--tx3);font-size:20px;line-height:1;">✕</button>
           </div>
           <div class="field">
-            <label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Staff</label>
+            <label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px;">Staff</label>
             <select id="trip-staff" style="width:100%;padding:9px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;"></select>
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
-            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Date From</label>
+            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px;">Date From</label>
               <input id="trip-date-from" type="date" onchange="if(!document.getElementById('trip-date-to').value)document.getElementById('trip-date-to').value=this.value;" style="width:100%;padding:9px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;"></div>
-            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Date To</label>
+            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px;">Date To</label>
               <input id="trip-date-to" type="date" style="width:100%;padding:9px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;"></div>
           </div>
           <div class="field" style="margin-bottom:8px;">
-            <label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Destination</label>
+            <label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px;">Destination</label>
             <input id="trip-dest" placeholder="e.g. Tokyo, Japan" autocomplete="off" style="width:100%;padding:9px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;">
           </div>
           <div class="field" style="margin-bottom:12px;">
-            <label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Notes</label>
+            <label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px;">Notes</label>
             <textarea id="trip-notes" rows="2" placeholder="Purpose, client, etc." style="width:100%;padding:9px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;resize:vertical;font-family:inherit;"></textarea>
           </div>
           <!-- Outbound Flight -->
-          <div style="font-size:11px;font-weight:700;color:var(--ac);text-transform:uppercase;letter-spacing:.06em;margin:10px 0 6px;padding-bottom:4px;border-bottom:1px solid var(--br);">🛫 Outbound Flight</div>
+          <div style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin:10px 0 6px;padding-bottom:4px;border-bottom:1px solid var(--br);">🛫 Outbound Flight</div>
           <div style="display:grid;grid-template-columns:1fr auto;gap:8px;margin-bottom:6px;align-items:flex-end;">
             <div class="field">
-              <label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Flight No.</label>
+              <label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px;">Flight No.</label>
               <input id="trip-flight" placeholder="e.g. CI101" autocomplete="off" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;text-transform:uppercase;">
             </div>
           </div>
           <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px;">
-            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Dep City</label><input id="trip-out-dep-city" placeholder="Taipei" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
-            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Airport</label><input id="trip-out-dep-airport" placeholder="TPE" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
-            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Terminal</label><input id="trip-out-dep-terminal" placeholder="T2" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
-            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Dep Time</label><input id="trip-out-dep-time" placeholder="08:30" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
-            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Arr City</label><input id="trip-out-arr-city" placeholder="Tokyo" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
-            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Airport</label><input id="trip-out-arr-airport" placeholder="NRT" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
-            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Terminal</label><input id="trip-out-arr-terminal" placeholder="T1" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
-            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Arr Time</label><input id="trip-out-arr-time" placeholder="12:45" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
+            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px;">Dep City</label><input id="trip-out-dep-city" placeholder="Taipei" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
+            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px;">Airport</label><input id="trip-out-dep-airport" placeholder="TPE" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
+            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px;">Terminal</label><input id="trip-out-dep-terminal" placeholder="T2" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
+            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px;">Dep Time</label><input id="trip-out-dep-time" placeholder="08:30" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
+            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px;">Arr City</label><input id="trip-out-arr-city" placeholder="Tokyo" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
+            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px;">Airport</label><input id="trip-out-arr-airport" placeholder="NRT" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
+            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px;">Terminal</label><input id="trip-out-arr-terminal" placeholder="T1" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
+            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px;">Arr Time</label><input id="trip-out-arr-time" placeholder="12:45" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
           </div>
           <!-- Return Flight -->
-          <div style="font-size:11px;font-weight:700;color:var(--ac);text-transform:uppercase;letter-spacing:.06em;margin:10px 0 6px;padding-bottom:4px;border-bottom:1px solid var(--br);">🛬 Return Flight</div>
+          <div style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin:10px 0 6px;padding-bottom:4px;border-bottom:1px solid var(--br);">🛬 Return Flight</div>
           <div style="display:grid;grid-template-columns:1fr;gap:6px;margin-bottom:6px;">
             <div class="field">
-              <label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Flight No.</label>
+              <label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px;">Flight No.</label>
               <input id="trip-return-flight" placeholder="e.g. CI102" autocomplete="off" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;text-transform:uppercase;">
             </div>
           </div>
           <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:16px;">
-            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Dep City</label><input id="trip-ret-dep-city" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
-            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Airport</label><input id="trip-ret-dep-airport" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
-            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Terminal</label><input id="trip-ret-dep-terminal" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
-            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Dep Time</label><input id="trip-ret-dep-time" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
-            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Arr City</label><input id="trip-ret-arr-city" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
-            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Airport</label><input id="trip-ret-arr-airport" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
-            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Terminal</label><input id="trip-ret-arr-terminal" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
-            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Arr Time</label><input id="trip-ret-arr-time" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
+            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px;">Dep City</label><input id="trip-ret-dep-city" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
+            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px;">Airport</label><input id="trip-ret-dep-airport" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
+            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px;">Terminal</label><input id="trip-ret-dep-terminal" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
+            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px;">Dep Time</label><input id="trip-ret-dep-time" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
+            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px;">Arr City</label><input id="trip-ret-arr-city" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
+            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px;">Airport</label><input id="trip-ret-arr-airport" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
+            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px;">Terminal</label><input id="trip-ret-arr-terminal" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
+            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx3);display:block;margin-bottom:4px;">Arr Time</label><input id="trip-ret-arr-time" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
           </div>
           <div style="display:flex;gap:8px;">
             <button onclick="saveTrip()" style="padding:9px 20px;border-radius:8px;background:var(--ac);color:#fff;border:none;cursor:pointer;font-size:13px;font-weight:700;">Save</button>
@@ -2431,19 +934,74 @@ input[type="date"]::-webkit-calendar-picker-indicator {
       <!-- ── USERS ── -->
       <div class="view" id="view-users">
         <div class="users-wrap">
-          <div class="users-header">
-            <div class="users-title" id="users-title-txt">⚙ User Management</div>
-            <button class="add-btn" id="users-add-btn" onclick="openUserModal(null)">＋ Add User</button>
+
+          <!-- Tab Bar -->
+          <div style="display:flex;gap:0;margin-bottom:0;border-bottom:2px solid var(--br);padding-bottom:0;">
+            <button id="utab-users" class="utab on" onclick="switchUsersTab('users')">👥 Users</button>
+            <button id="utab-dept"  class="utab"    onclick="switchUsersTab('dept')">🏢 Department</button>
+            <button id="utab-site"  class="utab"    onclick="switchUsersTab('site')">📍 Site</button>
           </div>
-          <table class="user-table">
-            <thead>
-              <tr>
-                <th id="th-emp-id">EMP ID</th><th id="th-name">Name</th><th>Email</th>
-                <th id="th-role">Role</th><th id="th-site">Site</th><th id="th-dept">Dept</th><th></th>
-              </tr>
-            </thead>
-            <tbody id="userTbody"><tr><td colspan="7" style="text-align:center;color:var(--tx3);padding:20px;">載入中…</td></tr></tbody>
-          </table>
+
+          <!-- ── Tab 1: User Management ── -->
+          <div id="utab-content-users" style="padding-top:16px;">
+            <div class="users-header">
+              <div class="users-title" id="users-title-txt">⚙ User Management</div>
+              <button class="add-btn" id="users-add-btn" onclick="openUserModal(null)">＋ Add User</button>
+            </div>
+            <!-- Filter Bar -->
+            <div class="usr-filter">
+              <span style="font-size:12px;color:var(--tx2);font-weight:600;">篩選：</span>
+              <select id="usr-filter-site" onchange="renderUsersTable()">
+                <option value="">— All Sites —</option>
+              </select>
+              <select id="usr-filter-dept" onchange="renderUsersTable()">
+                <option value="">— All Depts —</option>
+              </select>
+              <select id="usr-filter-role" onchange="renderUsersTable()">
+                <option value="">— All Roles —</option>
+                <option value="admin">Admin</option>
+                <option value="dcc">DCC</option>
+                <option value="user">User</option>
+                <option value="inactive">Inactive</option>
+              </select>
+              <button class="usr-filter-reset" onclick="resetUsersFilter()">✕ 清除</button>
+              <span id="usr-filter-count" style="font-size:11px;color:var(--tx3);margin-left:4px;"></span>
+            </div>
+            <table class="user-table">
+              <thead>
+                <tr>
+                  <th id="th-emp-id">EMP ID</th><th id="th-name">Name</th><th>Email</th>
+                  <th id="th-role">Role</th><th id="th-site">Site</th><th id="th-dept">Dept</th><th></th>
+                </tr>
+              </thead>
+              <tbody id="userTbody"><tr><td colspan="7" style="text-align:center;color:var(--tx3);padding:20px;">載入中…</td></tr></tbody>
+            </table>
+          </div>
+
+          <!-- ── Tab 2: Department ── -->
+          <div id="utab-content-dept" style="display:none;padding-top:16px;">
+            <div class="users-header">
+              <div class="users-title">🏢 Department 管理</div>
+              <button class="add-btn" onclick="openDeptModal(null)">＋ Add</button>
+            </div>
+            <table class="user-table">
+              <thead><tr><th style="width:100px;">Key</th><th>中文名稱</th><th>英文名稱</th><th style="width:100px;"></th></tr></thead>
+              <tbody id="deptTbody"><tr><td colspan="4" style="text-align:center;color:var(--tx3);padding:20px;">載入中…</td></tr></tbody>
+            </table>
+          </div>
+
+          <!-- ── Tab 3: Site ── -->
+          <div id="utab-content-site" style="display:none;padding-top:16px;">
+            <div class="users-header">
+              <div class="users-title">📍 Site 管理</div>
+              <button class="add-btn" onclick="openSiteModal(null)">＋ Add</button>
+            </div>
+            <table class="user-table">
+              <thead><tr><th style="width:80px;">Key</th><th>中文名稱</th><th>英文名稱</th><th style="width:100px;"></th></tr></thead>
+              <tbody id="siteTbody"><tr><td colspan="4" style="text-align:center;color:var(--tx3);padding:20px;">載入中…</td></tr></tbody>
+            </table>
+          </div>
+
         </div>
       </div>
 
@@ -2585,6 +1143,40 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 <!-- Toast -->
 <div class="toast" id="toast"></div>
+
+<!-- Dept Modal -->
+<div class="overlay" id="deptOverlay" onclick="if(event.target===this)closeDeptModal()">
+  <div class="modal" style="max-width:400px;">
+    <div class="modal-title" id="deptModalTitle">Department</div>
+    <div class="field">
+      <label>Key（英文小寫，唯一識別，建立後不可改）</label>
+      <input id="deptModalKey" placeholder="e.g. rd" autocomplete="off" style="text-transform:lowercase;">
+    </div>
+    <div class="field"><label>中文名稱</label><input id="deptModalZh" placeholder="例：研發" autocomplete="off"></div>
+    <div class="field"><label>英文名稱</label><input id="deptModalEn" placeholder="e.g. R&D" autocomplete="off"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeDeptModal()">Cancel</button>
+      <button class="btn-save" onclick="saveDept()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Site Modal -->
+<div class="overlay" id="siteOverlay" onclick="if(event.target===this)closeSiteModal()">
+  <div class="modal" style="max-width:400px;">
+    <div class="modal-title" id="siteModalTitle">Site / Location</div>
+    <div class="field">
+      <label>Key（2-3 碼大寫，唯一識別，建立後不可改）</label>
+      <input id="siteModalKey" placeholder="e.g. TW" autocomplete="off" style="text-transform:uppercase;">
+    </div>
+    <div class="field"><label>中文名稱</label><input id="siteModalZh" placeholder="例：台灣總部" autocomplete="off"></div>
+    <div class="field"><label>英文名稱</label><input id="siteModalEn" placeholder="e.g. Taiwan HQ" autocomplete="off"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeSiteModal()">Cancel</button>
+      <button class="btn-save" onclick="saveSite()">Save</button>
+    </div>
+  </div>
+</div>
 
 <!-- Instant Message Popup -->
 <div class="msg-popup" id="msgPopup">
@@ -3285,35 +1877,291 @@ async function deletePost(postId) {
 }
 
 // ═══════════════════════════════════════════════
+// USERS TABS
+// ═══════════════════════════════════════════════
+var COL_DEPT = 'departments';
+var COL_SITE = 'sites';
+var ALL_DEPTS = [];
+var ALL_SITES = [];
+
+var DEFAULT_DEPTS = [
+  {key:'management',zh:'管理層',en:'Management'},
+  {key:'sales',zh:'業務',en:'Sales'},
+  {key:'rd',zh:'研發',en:'R&D'},
+  {key:'qc',zh:'品管',en:'Quality Control'},
+  {key:'production',zh:'生產',en:'Production'},
+  {key:'sourcing',zh:'採購',en:'Sourcing'},
+  {key:'logistics',zh:'物流',en:'Logistics'},
+  {key:'finance',zh:'財務',en:'Finance'},
+  {key:'hr',zh:'人資',en:'HR'},
+  {key:'it',zh:'資訊',en:'IT'},
+  {key:'marketing',zh:'行銷',en:'Marketing'},
+];
+var DEFAULT_SITES = [
+  {key:'TW',zh:'台灣總部',en:'Taiwan HQ'},
+  {key:'CN',zh:'東莞廠',en:'Dongguan, China'},
+  {key:'VN',zh:'越南廠',en:'Vietnam'},
+  {key:'HK',zh:'香港辦公室',en:'Hong Kong'},
+];
+
+function switchUsersTab(tab) {
+  ['users','dept','site'].forEach(function(t) {
+    var btn = document.getElementById('utab-' + t);
+    var con = document.getElementById('utab-content-' + t);
+    if (btn) btn.classList.toggle('on', t === tab);
+    if (con) con.style.display = (t === tab) ? '' : 'none';
+  });
+  if (tab === 'dept') loadDepts();
+  if (tab === 'site') loadSites();
+}
+
+// ── Department ──
+async function loadDepts() {
+  if (!db) return;
+  try {
+    var snap = await db.collection(COL_DEPT).orderBy('key').get();
+    if (snap.empty) {
+      var batch = db.batch();
+      DEFAULT_DEPTS.forEach(function(d) { batch.set(db.collection(COL_DEPT).doc(d.key), d); });
+      await batch.commit();
+      snap = await db.collection(COL_DEPT).orderBy('key').get();
+    }
+    ALL_DEPTS = snap.docs.map(function(d) { return Object.assign({id:d.id}, d.data()); });
+    renderDeptTable();
+  } catch(e) { console.warn('loadDepts', e); }
+}
+
+function renderDeptTable() {
+  var tbody = document.getElementById('deptTbody');
+  if (!tbody) return;
+  if (!ALL_DEPTS.length) {
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--tx3);padding:20px;">No departments.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = ALL_DEPTS.map(function(d) {
+    return '<tr>' +
+      '<td style="font-family:monospace;font-size:12px;color:var(--ac);">' + escHtml(d.key) + '</td>' +
+      '<td>' + escHtml(d.zh||'') + '</td>' +
+      '<td>' + escHtml(d.en||'') + '</td>' +
+      '<td style="text-align:right;white-space:nowrap;">' +
+        '<button class="edit-btn" onclick="openDeptModal('' + escHtml(d.id) + '')">Edit</button> ' +
+        '<button class="edit-btn" style="color:var(--red);border-color:var(--red);" ' +
+          'onclick="deleteDept('' + escHtml(d.id) + '','' + escHtml(d.zh||d.key) + '')">Del</button>' +
+      '</td></tr>';
+  }).join('');
+}
+
+var _editDeptId = null;
+function openDeptModal(id) {
+  _editDeptId = id || null;
+  var d = id ? ALL_DEPTS.find(function(x){return x.id===id;}) : null;
+  document.getElementById('deptModalTitle').textContent = d ? 'Edit Department' : 'New Department';
+  document.getElementById('deptModalKey').value = d ? d.key : '';
+  document.getElementById('deptModalKey').disabled = !!d;
+  document.getElementById('deptModalZh').value  = d ? d.zh : '';
+  document.getElementById('deptModalEn').value  = d ? d.en : '';
+  document.getElementById('deptOverlay').classList.add('show');
+}
+function closeDeptModal() { document.getElementById('deptOverlay').classList.remove('show'); }
+
+async function saveDept() {
+  var key = document.getElementById('deptModalKey').value.trim().toLowerCase().replace(/[^a-z0-9_]/g,'_');
+  var zh  = document.getElementById('deptModalZh').value.trim();
+  var en  = document.getElementById('deptModalEn').value.trim();
+  if (!key || !en) { toast('Key 和英文名稱必填'); return; }
+  try {
+    await db.collection(COL_DEPT).doc(key).set({key:key, zh:zh, en:en});
+    toast('已儲存 ✓'); closeDeptModal(); await loadDepts();
+  } catch(e) { toast('儲存失敗：' + e.message, 'err'); }
+}
+
+async function deleteDept(id, name) {
+  if (!confirm('刪除部門「' + name + '」？')) return;
+  try {
+    await db.collection(COL_DEPT).doc(id).delete();
+    toast('已刪除'); await loadDepts();
+  } catch(e) { toast('刪除失敗：' + e.message, 'err'); }
+}
+
+// ── Site ──
+async function loadSites() {
+  if (!db) return;
+  try {
+    var snap = await db.collection(COL_SITE).orderBy('key').get();
+    if (snap.empty) {
+      var batch = db.batch();
+      DEFAULT_SITES.forEach(function(s) { batch.set(db.collection(COL_SITE).doc(s.key), s); });
+      await batch.commit();
+      snap = await db.collection(COL_SITE).orderBy('key').get();
+    }
+    ALL_SITES = snap.docs.map(function(d) { return Object.assign({id:d.id}, d.data()); });
+    renderSiteTable();
+  } catch(e) { console.warn('loadSites', e); }
+}
+
+function renderSiteTable() {
+  var tbody = document.getElementById('siteTbody');
+  if (!tbody) return;
+  if (!ALL_SITES.length) {
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--tx3);padding:20px;">No sites.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = ALL_SITES.map(function(s) {
+    return '<tr>' +
+      '<td style="font-family:monospace;font-size:12px;color:var(--ac);">' + escHtml(s.key) + '</td>' +
+      '<td>' + escHtml(s.zh||'') + '</td>' +
+      '<td>' + escHtml(s.en||'') + '</td>' +
+      '<td style="text-align:right;white-space:nowrap;">' +
+        '<button class="edit-btn" onclick="openSiteModal('' + escHtml(s.id) + '')">Edit</button> ' +
+        '<button class="edit-btn" style="color:var(--red);border-color:var(--red);" ' +
+          'onclick="deleteSite('' + escHtml(s.id) + '','' + escHtml(s.zh||s.key) + '')">Del</button>' +
+      '</td></tr>';
+  }).join('');
+}
+
+var _editSiteId = null;
+function openSiteModal(id) {
+  _editSiteId = id || null;
+  var s = id ? ALL_SITES.find(function(x){return x.id===id;}) : null;
+  document.getElementById('siteModalTitle').textContent = s ? 'Edit Site' : 'New Site';
+  document.getElementById('siteModalKey').value = s ? s.key : '';
+  document.getElementById('siteModalKey').disabled = !!s;
+  document.getElementById('siteModalZh').value  = s ? s.zh : '';
+  document.getElementById('siteModalEn').value  = s ? s.en : '';
+  document.getElementById('siteOverlay').classList.add('show');
+}
+function closeSiteModal() { document.getElementById('siteOverlay').classList.remove('show'); }
+
+async function saveSite() {
+  var key = document.getElementById('siteModalKey').value.trim().toUpperCase().replace(/[^A-Z0-9]/g,'');
+  var zh  = document.getElementById('siteModalZh').value.trim();
+  var en  = document.getElementById('siteModalEn').value.trim();
+  if (!key || !en) { toast('Key 和英文名稱必填'); return; }
+  try {
+    await db.collection(COL_SITE).doc(key).set({key:key, zh:zh, en:en});
+    toast('已儲存 ✓'); closeSiteModal(); await loadSites();
+  } catch(e) { toast('儲存失敗：' + e.message, 'err'); }
+}
+
+async function deleteSite(id, name) {
+  if (!confirm('刪除地點「' + name + '」？')) return;
+  try {
+    await db.collection(COL_SITE).doc(id).delete();
+    toast('已刪除'); await loadSites();
+  } catch(e) { toast('刪除失敗：' + e.message, 'err'); }
+}
+
+// ═══════════════════════════════════════════════
 // USER MANAGEMENT
 // ═══════════════════════════════════════════════
 async function loadUsers() {
   if (SESSION?.role !== 'admin') return;
-  if (db) {
-    try {
-      const snap = await db.collection(COL_U).orderBy('empId','asc').get();
-      ALL_USERS = snap.docs.map(d => d.data());
-    } catch(e) {}
-  }
+  // 同時載入 Dept/Site，讓 filter dropdown 有資料
+  await Promise.allSettled([
+    (async()=>{
+      if (!db) return;
+      try {
+        const snap = await db.collection(COL_U).orderBy('empId','asc').get();
+        ALL_USERS = snap.docs.map(d => d.data());
+      } catch(e) {}
+    })(),
+    (async()=>{
+      if (!db || ALL_DEPTS.length) return;
+      try {
+        const snap = await db.collection(COL_DEPT).orderBy('key').get();
+        if (!snap.empty) ALL_DEPTS = snap.docs.map(d=>Object.assign({id:d.id},d.data()));
+      } catch(e) {}
+    })(),
+    (async()=>{
+      if (!db || ALL_SITES.length) return;
+      try {
+        const snap = await db.collection(COL_SITE).orderBy('key').get();
+        if (!snap.empty) ALL_SITES = snap.docs.map(d=>Object.assign({id:d.id},d.data()));
+      } catch(e) {}
+    })(),
+  ]);
   renderUsersTable();
 }
 
 function renderUsersTable() {
   const tbody = document.getElementById('userTbody');
-  if (!ALL_USERS.length) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--tx3);padding:20px;">No users yet.</td></tr>'; return; }
+  if (!tbody) return;
+
+  // ── 讀取 filter 值 ──
+  const fSite = (document.getElementById('usr-filter-site')?.value || '').trim();
+  const fDept = (document.getElementById('usr-filter-dept')?.value || '').trim();
+  const fRole = (document.getElementById('usr-filter-role')?.value || '').trim();
+
+  // ── 填入 filter dropdown（只在第一次或 ALL_USERS 更新後） ──
+  _populateUserFilterDropdowns();
+
+  let filtered = ALL_USERS.filter(u => {
+    if (fSite && u.site !== fSite) return false;
+    if (fDept && u.dept !== fDept) return false;
+    if (fRole && u.role !== fRole) return false;
+    return true;
+  });
+
+  const countEl = document.getElementById('usr-filter-count');
+  if (countEl) countEl.textContent = (fSite||fDept||fRole)
+    ? `顯示 ${filtered.length} / ${ALL_USERS.length} 人`
+    : `共 ${ALL_USERS.length} 人`;
+
+  if (!filtered.length) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--tx3);padding:20px;">No users found.</td></tr>';
+    return;
+  }
+
+  filtered.sort((a,b) => (a.empId||'').localeCompare(b.empId||''));
   const siteLabel = { TW:'Taiwan', CN:'Dongguan', VN:'Vietnam', HK:'Hong Kong' };
-  tbody.innerHTML = ALL_USERS.map(u => {
+  tbody.innerHTML = filtered.map(u => {
     const roleClass = { admin:'role-admin', dcc:'role-dcc', user:'role-user', inactive:'role-inactive' }[u.role] || 'role-user';
+    const siteDisplay = ALL_SITES.length
+      ? (ALL_SITES.find(s=>s.key===u.site)?.en || siteLabel[u.site] || u.site || '—')
+      : (siteLabel[u.site] || u.site || '—');
+    const deptDisplay = ALL_DEPTS.length
+      ? (ALL_DEPTS.find(d=>d.key===u.dept)?.en || u.dept || '—')
+      : (u.dept || '—');
     return `<tr>
-      <td style="font-weight:700;color:var(--ac);font-family:var(--fm)">${u.empId}</td>
-      <td>${u.nameEn||''}${u.nameZh?' / '+u.nameZh:''}</td>
-      <td style="font-size:11px;color:var(--tx3)">${u.email||u.login||''}</td>
+      <td style="font-weight:700;color:var(--ac);font-family:var(--fm)">${escHtml(u.empId)}</td>
+      <td>${escHtml(u.nameEn||'')}${u.nameZh?' / '+escHtml(u.nameZh):''}</td>
+      <td style="font-size:11px;color:var(--tx2)">${escHtml(u.email||u.login||'')}</td>
       <td><span class="role-badge ${roleClass}">${u.role.toUpperCase()}</span></td>
-      <td style="font-size:11px;color:var(--tx3)">${siteLabel[u.site]||u.site||'—'}</td>
-      <td style="font-size:11px;color:var(--tx3)">${u.dept||'—'}</td>
-      <td><button class="edit-btn" onclick="openUserModal('${u.empId}')">Edit</button></td>
+      <td style="font-size:11px;color:var(--tx2)">${escHtml(siteDisplay)}</td>
+      <td style="font-size:11px;color:var(--tx2)">${escHtml(deptDisplay)}</td>
+      <td><button class="edit-btn" onclick="openUserModal('${escHtml(u.empId)}')">Edit</button></td>
     </tr>`;
   }).join('');
+}
+
+function _populateUserFilterDropdowns() {
+  const siteEl = document.getElementById('usr-filter-site');
+  const deptEl = document.getElementById('usr-filter-dept');
+  if (!siteEl || !deptEl) return;
+
+  // Site dropdown
+  const curSite = siteEl.value;
+  const sites = ALL_SITES.length
+    ? ALL_SITES
+    : [...new Set(ALL_USERS.map(u=>u.site).filter(Boolean))].map(k=>({key:k,en:k}));
+  siteEl.innerHTML = '<option value="">— All Sites —</option>' +
+    sites.map(s=>`<option value="${escHtml(s.key)}">${escHtml(s.en||s.key)}</option>`).join('');
+  siteEl.value = curSite;
+
+  // Dept dropdown
+  const curDept = deptEl.value;
+  const depts = ALL_DEPTS.length
+    ? ALL_DEPTS
+    : [...new Set(ALL_USERS.map(u=>u.dept).filter(Boolean))].map(k=>({key:k,en:k}));
+  deptEl.innerHTML = '<option value="">— All Depts —</option>' +
+    depts.map(d=>`<option value="${escHtml(d.key)}">${escHtml(d.en||d.key)}</option>`).join('');
+  deptEl.value = curDept;
+}
+
+function resetUsersFilter() {
+  const ids = ['usr-filter-site','usr-filter-dept','usr-filter-role'];
+  ids.forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+  renderUsersTable();
 }
 
 // User Modal

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>COMART Platform v1.30</title>
+<title>COMART Platform v1.31</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -320,7 +320,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     <div class="login-logo">
       <div class="login-mark">C</div>
       <div class="login-name">COMART Platform</div>
-      <div class="login-sub">Internal Portal · v1.30</div>
+      <div class="login-sub">Internal Portal · v1.31</div>
     </div>
     <form id="loginForm" onsubmit="doLogin();return false;" autocomplete="on">
     <div class="field">
@@ -348,7 +348,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   <div class="topbar">
     <div class="topbar-logo" onclick="switchView('home')">
       <div class="topbar-mark">C</div>
-      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.30</span></div>
+      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.31</span></div>
     </div>
     <div class="topbar-right">
       <div class="lang-switcher">
@@ -2471,8 +2471,8 @@ input[type="date"]::-webkit-calendar-picker-indicator {
           <!-- Tab 切換列 -->
           <div style="display:flex;gap:6px;margin-bottom:16px;border-bottom:1px solid var(--br);">
             <button id="utab-users" class="utab on" onclick="switchUsersTab('users')">👥 Users</button>
-            <button id="utab-dept"  class="utab"    onclick="switchUsersTab('dept')">🏢 Department</button>
-            <button id="utab-site"  class="utab"    onclick="switchUsersTab('site')">📍 Site</button>
+            <button id="utab-dept"  class="utab"    onclick="switchUsersTab('dept')">🏢 Departments</button>
+            <button id="utab-site"  class="utab"    onclick="switchUsersTab('site')">📍 Sites</button>
           </div>
 
           <!-- Tab 1: User Management -->
@@ -2624,27 +2624,12 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     </div>
     <div class="field"><label>Site / Location</label>
       <select id="u-site">
-        <option value="TW">Taiwan HQ</option>
-        <option value="CN">Dongguan, China</option>
-        <option value="VN">Vietnam</option>
-        <option value="HK">Hong Kong</option>
-        <option value="Other">Other</option>
+        <option value="">— 選擇地點 —</option>
       </select>
     </div>
     <div class="field"><label id="u-dept-label">Department</label>
       <select id="u-dept">
         <option value="">— 未指定 / Unassigned —</option>
-        <option value="management">Management / 管理層</option>
-        <option value="sales">Sales / 業務</option>
-        <option value="rd">R&D / 研發</option>
-        <option value="qc">Quality Control / 品管</option>
-        <option value="production">Production / 生產</option>
-        <option value="sourcing">Sourcing / 採購</option>
-        <option value="logistics">Logistics / 物流</option>
-        <option value="finance">Finance / 財務</option>
-        <option value="hr">HR / 人資</option>
-        <option value="it">IT / 資訊</option>
-        <option value="marketing">Marketing / 行銷</option>
       </select>
     </div>
     <!-- ─ 專業背景 ─ -->
@@ -3661,7 +3646,39 @@ function openUserModal(empId) {
   document.getElementById('u-mobile').value = u?.mobile || '';
   document.getElementById('u-title-en').value = u?.titleEn || '';
   document.getElementById('u-title-zh').value = u?.titleZh || '';
-  document.getElementById('u-site').value = u?.site || 'TW';
+  // 同步 site dropdown 從 ALL_SITES
+  (function() {
+    var sel = document.getElementById('u-site');
+    if (!sel) return;
+    var curVal = u?.site || '';
+    var sites = ALL_SITES.length ? ALL_SITES : [
+      {key:'TW',zh:'台灣總部',en:'Taiwan HQ'},{key:'CN',zh:'東莞廠',en:'Dongguan, China'},
+      {key:'VN',zh:'越南廠',en:'Vietnam'},{key:'HK',zh:'香港辦公室',en:'Hong Kong'},
+    ];
+    sel.innerHTML = '<option value="">— 選擇地點 —</option>'
+      + sites.map(function(s){
+          return '<option value="'+s.key+'">'+(s.en||s.key)+(s.zh?' / '+s.zh:'')+'</option>';
+        }).join('');
+    sel.value = curVal;
+  })();
+  // 同步 dept dropdown 從 ALL_DEPTS
+  (function() {
+    var sel = document.getElementById('u-dept');
+    if (!sel) return;
+    var curVal = u?.dept || '';
+    var depts = ALL_DEPTS.length ? ALL_DEPTS : [
+      {key:'management',zh:'管理層',en:'Management'},{key:'sales',zh:'業務',en:'Sales'},
+      {key:'rd',zh:'研發',en:'R&D'},{key:'qc',zh:'品管',en:'Quality Control'},
+      {key:'production',zh:'生產',en:'Production'},{key:'sourcing',zh:'採購',en:'Sourcing'},
+      {key:'logistics',zh:'物流',en:'Logistics'},{key:'finance',zh:'財務',en:'Finance'},
+      {key:'hr',zh:'人資',en:'HR'},{key:'it',zh:'資訊',en:'IT'},{key:'marketing',zh:'行銷',en:'Marketing'},
+    ];
+    sel.innerHTML = '<option value="">— 未指定 / Unassigned —</option>'
+      + depts.map(function(d){
+          return '<option value="'+d.key+'">'+(d.en||d.key)+(d.zh?' / '+d.zh:'')+'</option>';
+        }).join('');
+    sel.value = curVal;
+  })();
   var avEl = document.getElementById('um-avatar-preview');
   if (avEl) {
     if (u?.photoURL) { avEl.innerHTML = '<img src="' + u.photoURL + '" style="width:100%;height:100%;object-fit:cover;">'; }

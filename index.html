@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>COMART Platform v1.26</title>
+<title>COMART Platform v1.27</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -235,6 +235,16 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:
   .main-content{flex-direction:row;}
 }
 @media(max-width:767px){
+  /* Calendar mobile: sidebar 隱藏，主體全寬 */
+  #view-calendar { flex-direction:column !important; }
+  #cal-sidebar { display:none !important; }
+  #view-calendar > div:last-child { width:100% !important; overflow:auto; }
+  /* Calendar grid cells smaller on mobile */
+  .cal-cell { min-height:44px !important; font-size:10px !important; }
+  .cal-event { font-size:9px !important; padding:1px 3px !important; }
+  /* Trip modal: flight grid 2 col on mobile */
+  #tripOverlay .modal [style*="grid-template-columns:repeat(4"] { grid-template-columns: repeat(2,1fr) !important; }
+
   .bottom-nav{display:block;}
   .app-grid{grid-template-columns:1fr 1fr;}
   .dir-grid{grid-template-columns:1fr 1fr;}
@@ -303,7 +313,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     <div class="login-logo">
       <div class="login-mark">C</div>
       <div class="login-name">COMART Platform</div>
-      <div class="login-sub">Internal Portal · v1.26</div>
+      <div class="login-sub">Internal Portal · v1.27</div>
     </div>
     <form id="loginForm" onsubmit="doLogin();return false;" autocomplete="on">
     <div class="field">
@@ -331,7 +341,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   <div class="topbar">
     <div class="topbar-logo" onclick="switchView('home')">
       <div class="topbar-mark">C</div>
-      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.26</span></div>
+      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.27</span></div>
     </div>
     <div class="topbar-right">
       <div class="lang-switcher">
@@ -401,6 +411,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
           <div class="section-title" id="sect-updates">Platform Updates</div>
           <div class="changelog">
+            <div class="cl-item"><div class="cl-dot" style="background:var(--grn)"></div><div><div class="cl-text">v1.27 — Calendar 手機版修正；User Modal 新增頭像上傳；Hall of Fame 改為 Read-Only（資料集中 Users 管理）</div><div class="cl-date">2026-06 · Feature</div></div></div>
             <div class="cl-item"><div class="cl-dot" style="background:var(--grn)"></div><div><div class="cl-text">v1.26 — 色調再調亮；版本號三處同步修正</div><div class="cl-date">2026-06 · Enhancement</div></div></div>
             <div class="cl-item"><div class="cl-dot" style="background:var(--grn)"></div><div><div class="cl-text">v1.25 — Users 三 Tab（Dept/Site 獨立管理）；User Management 新增 Site/Dept/Role 篩選列</div><div class="cl-date">2026-06 · Feature</div></div></div>
             <div class="cl-item"><div class="cl-dot" style="background:var(--grn)"></div><div><div class="cl-text">名人榜 (Employee Directory) — 公司通訊錄、留言、討論區</div><div class="cl-date">2026-05 · New</div></div></div>
@@ -823,27 +834,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
           </div>
         </div>
       </div>
-
-      <!-- ── CALENDAR / TRIPS VIEW ── -->
-      <div class="view" id="view-calendar" style="flex-direction:column;padding:0;overflow-y:auto;">
-        <div style="max-width:900px;margin:0 auto;width:100%;padding:20px;">
-          <!-- Header -->
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
-            <div style="font-size:18px;font-weight:700;color:var(--tx);">✈️ 集團行事曆 · Business Trips</div>
-            <div style="display:flex;align-items:center;gap:8px;">
-              <button onclick="tripMonthNav(-1)" style="padding:5px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);cursor:pointer;font-size:16px;">‹</button>
-              <div id="tripMonthLabel" style="font-size:14px;font-weight:700;color:var(--tx);min-width:100px;text-align:center;"></div>
-              <button onclick="tripMonthNav(1)" style="padding:5px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);cursor:pointer;font-size:16px;">›</button>
-
-            </div>
-          </div>
-          <!-- Calendar -->
-          <div id="tripCalendar" style="margin-bottom:16px;"></div>
-          <!-- List -->
-          <div id="tripList" style="display:flex;flex-direction:column;gap:8px;"></div>
-        </div>
-      </div>
-
       <!-- Trip Modal -->
       <div class="overlay" id="tripOverlay" onclick="closeTripModal(event)">
         <div class="modal" style="max-width:520px;max-height:92vh;overflow-y:auto;">
@@ -1026,12 +1016,12 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   <div class="modal" style="max-width:520px;max-height:85vh;display:flex;flex-direction:column;">
     <div class="profile-header">
       <div style="position:relative;flex-shrink:0;">
-        <div class="profile-avatar-lg" id="profileAvatar" style="overflow:hidden;cursor:pointer;" onclick="document.getElementById('avatarFileInput').click()" title="Click to upload photo">?</div>
+        <div class="profile-avatar-lg" id="profileAvatar" style="overflow:hidden;">?</div>
         <div style="position:absolute;bottom:0;right:0;width:20px;height:20px;border-radius:50%;background:var(--ac);display:flex;align-items:center;justify-content:center;font-size:10px;cursor:pointer;" onclick="document.getElementById('avatarFileInput').click()">📷</div>
-        <input type="file" id="avatarFileInput" accept="image/*" style="display:none;" onchange="uploadAvatar(event)">
       </div>
       <div style="flex:1;">
         <div class="profile-name" id="profileName">—</div>
+        <div style="font-size:10px;color:var(--tx3);margin-top:3px;">✎ 資料修改請至 <span style="color:var(--ac);cursor:pointer;" onclick="closeProfile();switchView('users')">Users 管理</span></div>
         <div class="profile-title" id="profileTitle"></div>
         <div class="profile-site" id="profileSite"></div>
         <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;" id="profileContacts"></div>
@@ -1061,6 +1051,20 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 <div class="overlay" id="userOverlay" onclick="if(event.target===this)closeUserModal()">
   <div class="modal">
     <div class="modal-title" id="userModalTitle">New User</div>
+    <!-- Avatar 上傳 -->
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px;padding:12px;background:var(--s2);border-radius:10px;">
+      <div id="um-avatar-preview" style="width:64px;height:64px;border-radius:50%;background:var(--ac2);color:var(--ac);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;flex-shrink:0;overflow:hidden;cursor:pointer;"
+        onclick="document.getElementById('um-avatar-input').click()" title="點擊上傳頭像">?</div>
+      <div style="flex:1;">
+        <div style="font-size:12px;color:var(--tx2);margin-bottom:4px;">員工頭像</div>
+        <button type="button" onclick="document.getElementById('um-avatar-input').click()"
+          style="font-size:11px;padding:4px 12px;border-radius:6px;border:1px solid var(--br);background:var(--s3);color:var(--tx2);cursor:pointer;">
+          📷 上傳照片
+        </button>
+        <input type="file" id="um-avatar-input" accept="image/*" style="display:none;" onchange="umPreviewAvatar(event)">
+        <div style="font-size:10px;color:var(--tx3);margin-top:3px;">JPG / PNG，建議 200×200px</div>
+      </div>
+    </div>
     <div class="field"><label>Employee ID</label><input id="u-empId" placeholder="A00001" maxlength="6" oninput="this.value=this.value.toUpperCase()"><div class="hint">Format: 1 letter + 5 digits (A00001)</div></div>
     <div class="field"><label>Role</label>
       <select id="u-role">
@@ -2191,6 +2195,16 @@ function openUserModal(empId) {
   document.getElementById('u-title-en').value = u?.titleEn || '';
   document.getElementById('u-title-zh').value = u?.titleZh || '';
   document.getElementById('u-site').value = u?.site || 'TW';
+  // Avatar preview
+  var avEl = document.getElementById('um-avatar-preview');
+  if (avEl) {
+    if (u?.photoURL) {
+      avEl.innerHTML = '<img src="' + u.photoURL + '" style="width:100%;height:100%;object-fit:cover;">';
+    } else {
+      avEl.textContent = ((u?.nameEn||u?.nameZh||u?.empId||'?')[0]).toUpperCase();
+    }
+  }
+  window._umAvatarDataUrl = null; // reset pending upload
   document.getElementById('u-dept').value = u?.dept || '';
   document.getElementById('u-bioZh').value = u?.bioZh || '';
   document.getElementById('u-bioEn').value = u?.bioEn || '';
@@ -2238,6 +2252,7 @@ async function saveUser() {
   const user = {
     empId, nameEn, nameZh, email, login: email,
     ext, mobile, titleEn, titleZh, site, dept, role,
+    photoURL: window._umAvatarDataUrl || (existing?.photoURL || ''),
     bioZh, bioEn, expertiseZh, expertiseEn,
     pwdHash, mustChangePwd,
     createdAt: existing?.createdAt || Date.now(),
@@ -3546,6 +3561,20 @@ document.addEventListener('click', function(e) {
 });
 
 // ── Avatar Upload ──
+// User Modal avatar preview + base64 encode
+function umPreviewAvatar(event) {
+  var file = event.target.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var dataUrl = e.target.result;
+    window._umAvatarDataUrl = dataUrl;
+    var avEl = document.getElementById('um-avatar-preview');
+    if (avEl) avEl.innerHTML = '<img src="' + dataUrl + '" style="width:100%;height:100%;object-fit:cover;">';
+  };
+  reader.readAsDataURL(file);
+}
+
 async function uploadAvatar(event) {
   var file = event.target.files[0];
   if (!file || !_profileUser) return;

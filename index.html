@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>COMART Platform v1.28</title>
+<title>COMART Platform v1.29</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -229,7 +229,20 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:
 @media(max-width:767px){
   /* Calendar mobile */
   #view-calendar { flex-direction:column !important; }
-  #cal-sidebar { display:none !important; }
+  #cal-sidebar {
+    width:100% !important;
+    border-right:none !important;
+    border-bottom:1px solid var(--br);
+    max-height:0;
+    overflow:hidden;
+    transition:max-height .3s ease;
+    padding:0 12px !important;
+  }
+  #cal-sidebar.mobile-open {
+    max-height:400px;
+    padding:14px 12px !important;
+  }
+  #cal-sidebar-toggle { display:inline-flex !important; align-items:center; gap:4px; }
   .trip-cal-cell { min-height:40px !important; }
   .trip-cal-dayname { font-size:9px !important; }
   /* Trip modal flight grid: 4 col → 2 col on mobile */
@@ -307,7 +320,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     <div class="login-logo">
       <div class="login-mark">C</div>
       <div class="login-name">COMART Platform</div>
-      <div class="login-sub">Internal Portal · v1.28</div>
+      <div class="login-sub">Internal Portal · v1.29</div>
     </div>
     <form id="loginForm" onsubmit="doLogin();return false;" autocomplete="on">
     <div class="field">
@@ -335,7 +348,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   <div class="topbar">
     <div class="topbar-logo" onclick="switchView('home')">
       <div class="topbar-mark">C</div>
-      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.28</span></div>
+      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.29</span></div>
     </div>
     <div class="topbar-right">
       <div class="lang-switcher">
@@ -606,6 +619,11 @@ input[type="date"]::-webkit-calendar-picker-indicator {
               <div id="tripMonthLabel" style="font-size:15px;font-weight:700;color:var(--tx);min-width:130px;text-align:center;"></div>
               <button onclick="tripMonthNav(1)" style="padding:5px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);cursor:pointer;font-size:16px;">›</button>
               <button onclick="goToday()" style="padding:5px 12px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx2);cursor:pointer;font-size:12px;font-weight:600;">Today</button>
+              <!-- 手機版 Calendars 切換按鈕 -->
+              <button id="cal-sidebar-toggle" onclick="toggleCalSidebar()"
+                style="display:none;padding:5px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx2);cursor:pointer;font-size:12px;font-weight:600;">
+                🗓 Cals <span id="cal-active-count-btn"></span>
+              </button>
             </div>
             <div style="position:relative;display:none;" id="addTripBtn">
               <button onclick="toggleAddMenu()" id="addMenuBtn"
@@ -4633,6 +4651,14 @@ async function loadTrips() {
   } catch(e) { console.warn('Trip load:', e); }
 }
 
+function toggleCalSidebar() {
+  var sb = document.getElementById('cal-sidebar');
+  if (!sb) return;
+  sb.classList.toggle('mobile-open');
+  var btn = document.getElementById('cal-sidebar-toggle');
+  if (btn) btn.style.background = sb.classList.contains('mobile-open') ? 'var(--ac2)' : 'var(--s2)';
+}
+
 function goToday() {
   var now = new Date();
   tripViewYear  = now.getFullYear();
@@ -4964,6 +4990,8 @@ function renderCatSidebar() {
   // Count label
   var countEl = document.getElementById('cal-active-count');
   if (countEl) countEl.textContent = calActiveCats.length + '/3';
+  var countBtnEl = document.getElementById('cal-active-count-btn');
+  if (countBtnEl) countBtnEl.textContent = calActiveCats.length + '/3';
 }
 
 function toggleCatFilter(catId) {

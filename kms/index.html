@@ -391,7 +391,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.84</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.85</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
@@ -2350,11 +2350,18 @@ async function generateAndSaveSummary(docId, title, body) {
 }
 
 function autoSnapshot(doc) {
-  // 本機快照（保留相容）
+  // 本機快照（Supabase kms_snapshots 為主，localStorage 僅作短暫 fallback）
   const key = 'kms-snaps-' + (doc.id || editingDocId || 'new');
-  const snaps = JSON.parse(localStorage.getItem(key) || '[]');
-  snaps.unshift({ ...doc, ts: new Date().toISOString() });
-  localStorage.setItem(key, JSON.stringify(snaps.slice(0, 30)));
+  try {
+    const snaps = JSON.parse(localStorage.getItem(key) || '[]');
+    // 只存 5 份、body 截短至 500 字，避免 QuotaExceededError
+    const lite = { ...doc, body: (doc.body||'').slice(0, 500), ts: new Date().toISOString() };
+    snaps.unshift(lite);
+    localStorage.setItem(key, JSON.stringify(snaps.slice(0, 5)));
+  } catch(e) {
+    // localStorage 已滿，靜默跳過（版本已存 Supabase）
+    console.warn('[snapshot] localStorage full, skipped');
+  }
   // 存到 Supabase kms_snapshots（含完整 body）
   const snapDocId = doc.id || editingDocId;
   if (snapDocId && CFG.supabaseUrl && CFG.supabaseKey) {

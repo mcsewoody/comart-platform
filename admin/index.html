@@ -51,6 +51,8 @@ html,body{max-width:100vw;overflow-x:hidden}
 body{font-family:'Segoe UI','PingFang TC','Microsoft JhengHei',sans-serif;background:var(--bg0);color:var(--t1);min-height:100vh;font-size:14px}
 #app{display:flex;flex-direction:column;min-height:100vh}
 #tabs{background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;height:var(--th);position:sticky;top:0;z-index:200;padding:0 16px;gap:4px}
+#portal-back-btn{display:flex;align-items:center;padding:5px 11px;margin-right:4px;border:1px solid var(--border);border-radius:var(--radius);font-size:12px;color:var(--text-2);text-decoration:none;background:transparent;transition:all .15s;white-space:nowrap;flex-shrink:0}
+#portal-back-btn:hover{background:var(--bg);color:var(--text)}
 .logo{display:flex;align-items:center;gap:8px;padding:0 14px 0 4px;border-right:1px solid var(--border);margin-right:8px;font-size:15px;font-weight:600;color:var(--text);letter-spacing:-0.3px;white-space:nowrap}.logo span{color:var(--blue)}
 .mtab{display:flex;align-items:center;gap:7px;padding:0 16px;cursor:pointer;font-size:13px;font-weight:500;color:var(--t2);border-bottom:2px solid transparent;transition:all var(--tr);white-space:nowrap}
 .mtab:hover{color:var(--t1);background:var(--bgh)}
@@ -439,6 +441,7 @@ tr.ovr td{background:rgba(239,68,68,.04)}
 <body>
 <div id="app">
 <div id="tabs">
+  <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
   <div class="logo"><span>🏢</span><span>COMART Admin</span></div>
   <div class="mtab active" data-module="lib" onclick="switchMod('lib')"><span class="tab-icon">📚</span><span>圖書館管理</span><span class="tbadge" id="tb-lib" style="display:none">0</span></div>
   <div class="mtab" data-module="car" onclick="switchMod('car')"><span class="tab-icon">🚗</span><span>公務車管理</span><span class="tbadge" id="tb-car" style="display:none">0</span></div>
@@ -451,9 +454,6 @@ tr.ovr td{background:rgba(239,68,68,.04)}
       <span id="cur-u" style="color:var(--text-2)">載入中…</span>
       <span style="color:var(--text-3);font-size:10px">▾</span>
     </div>
-    <a href="/" style="display:flex;align-items:center;gap:5px;padding:5px 11px;border:1px solid var(--border);border-radius:var(--radius);font-size:12px;color:var(--text-2);text-decoration:none;background:transparent;cursor:pointer;transition:all .15s" onmouseover="this.style.background='var(--bg)'" onmouseout="this.style.background='transparent'">
-      ← Portal
-    </a>
     <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.01</span>
   </div>
 </div>
@@ -1319,24 +1319,58 @@ function applyPortalSession(sess) {
 
 // ── 從 Supabase 同步 users 到 localStorage（快取）──
 async function syncUsersFromSupabase() {
-  const rows = await SB.get('users', '?select=id,emp_id,name_en,name_zh,role,dept,site,email,ext,active&order=emp_id&active=eq.true');
-  if (!rows || !rows.length) return false;
-  // 轉成現有格式（向下相容所有模組）
-  const mapped = rows.map(u => ({
-    id: u.emp_id,          // 現有模組用 id
-    emp_id: u.emp_id,
-    name: u.name_zh || u.name_en,
-    nameZh: u.name_zh,
-    nameEn: u.name_en,
-    role: u.role,
-    dept: u.dept || '',
-    site: u.site || 'TW',
-    email: u.email || '',
-    ext: u.ext || '',
-  }));
-  sv(K.us, mapped);
-  console.log(`✓ users synced from Supabase: ${mapped.length} users`);
-  return true;
+  try {
+    const rows = await SB.get(
+      'users',
+      '?select=id,emp_id,name_en,name_zh,role,dept,site,email,ext,active&order=emp_id&active=eq.true'
+    );
+    if (!rows) { console.warn('syncUsers: SB.get returned null'); return false; }
+    if (!Array.isArray(rows)) { console.warn('syncUsers: unexpected response', rows); return false; }
+    if (!rows.length) { console.warn('syncUsers: 0 rows returned'); return false; }
+
+    const mapped = rows.map(u => ({
+      id:      u.emp_id,
+      emp_id:  u.emp_id,
+      name:    u.name_zh || u.name_en || u.emp_id,
+      nameZh:  u.name_zh  || '',
+      nameEn:  u.name_en  || '',
+      role:    u.role     || 'user',
+      dept:    u.dept     || '',
+      site:    u.site     || 'TW',
+      email:   u.email    || '',
+      ext:     u.ext      || '',
+    }));
+
+    sv(K.us, mapped);
+    console.log(`✓ users synced: ${mapped.length} 筆`);
+
+    // 同步完成後更新所有 select（借書/預約/差旅等）
+    popUsrSel();
+    updUsrDisp();
+    // 更新差旅、會議室、到訪的人員選單
+    const us = mapped;
+    ['bwu','bku','fusr','ft-reporter','vf-owner','vf-comp-sel','tr-person'].forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const cur = el.value;
+      if (id === 'bwu') {
+        el.innerHTML = '<option value="">請選擇員工…</option>' +
+          us.map(u => `<option value="${u.id}">${u.name}（${u.dept||'—'}）</option>`).join('');
+      } else if (id === 'tr-person') {
+        el.innerHTML = '<option value="">請選擇或手動輸入↓</option>' +
+          us.map(u => `<option value="${u.name}||${u.dept||''}">${u.name}（${u.dept||''}）</option>`).join('');
+      } else {
+        el.innerHTML = '<option value="">請選擇…</option>' +
+          us.map(u => `<option value="${u.id}">${u.name}</option>`).join('');
+      }
+      el.value = cur; // 還原選取值
+    });
+
+    return true;
+  } catch(e) {
+    console.error('syncUsers error:', e);
+    return false;
+  }
 }
 const ld=k=>{try{return JSON.parse(localStorage.getItem(k))||[]}catch{return[]}};
 const lo=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))||d}catch{return d}};

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART 行政管理平台 v1.02</title>
+<title>COMART 行政管理平台 v1.03</title>
 <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.js"></script>
 <style>
 :root{
@@ -51,12 +51,38 @@ html,body{max-width:100vw;overflow-x:hidden}
 body{font-family:'Segoe UI','PingFang TC','Microsoft JhengHei',sans-serif;background:var(--bg0);color:var(--t1);min-height:100vh;font-size:14px}
 #app{display:flex;flex-direction:column;min-height:100vh}
 #tabs{background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;height:var(--th);position:sticky;top:0;z-index:200;padding:0 16px;gap:4px}
+/* ── Module Nav（左側直列）── */
+#mod-nav{width:72px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;padding:8px 0;gap:2px;flex-shrink:0;position:sticky;top:var(--th);height:calc(100vh - var(--th));overflow-y:auto}
+.modnav-item{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;width:64px;padding:10px 4px;border-radius:var(--radius);cursor:pointer;transition:all var(--tr);position:relative;text-align:center}
+.modnav-item:hover{background:var(--bg)}
+.modnav-item.active{background:var(--blue-bg)}
+.modnav-item.active .modnav-icon{filter:none}
+.modnav-item.active .modnav-label{color:var(--blue)}
+.modnav-item.active::before{content:'';position:absolute;left:0;top:20%;bottom:20%;width:3px;background:var(--blue);border-radius:0 3px 3px 0}
+.modnav-icon{font-size:22px;line-height:1}
+.modnav-label{font-size:10px;color:var(--text-3);font-weight:500;line-height:1.2;letter-spacing:.01em}
+.modnav-item.active .modnav-icon{transform:scale(1.08)}
+.modnav-item .tbadge{position:absolute;top:4px;right:6px;min-width:16px;height:16px;font-size:9px;padding:0 3px}
+/* 讓 #tabs logo 包含 portal 按鈕 */
+#tabs{padding:0 12px}
+.logo{gap:6px;font-size:14px}
+#portal-back-btn{padding:4px 9px;font-size:12px;border:1px solid var(--border);border-radius:var(--radius);color:var(--text-3);text-decoration:none;transition:all .15s;white-space:nowrap}
+#portal-back-btn:hover{color:var(--text);background:var(--bg)}
+/* mbody 不再需要 flex（layout-wrap 已處理） */
+#mbody{display:block}
+@media(max-width:680px){
+  #mod-nav{width:52px}
+  .modnav-item{width:44px;padding:8px 2px}
+  .modnav-label{display:none}
+  .modnav-icon{font-size:20px}
+}
+
 #portal-back-btn{display:flex;align-items:center;padding:5px 11px;margin-right:4px;border:1px solid var(--border);border-radius:var(--radius);font-size:12px;color:var(--text-2);text-decoration:none;background:transparent;transition:all .15s;white-space:nowrap;flex-shrink:0}
 #portal-back-btn:hover{background:var(--bg);color:var(--text)}
 .logo{display:flex;align-items:center;gap:8px;padding:0 14px 0 4px;border-right:1px solid var(--border);margin-right:8px;font-size:15px;font-weight:600;color:var(--text);letter-spacing:-0.3px;white-space:nowrap}.logo span{color:var(--blue)}
-.mtab{display:flex;align-items:center;gap:7px;padding:0 16px;cursor:pointer;font-size:13px;font-weight:500;color:var(--t2);border-bottom:2px solid transparent;transition:all var(--tr);white-space:nowrap}
-.mtab:hover{color:var(--t1);background:var(--bgh)}
-.mtab.active{color:var(--ac);border-bottom-color:var(--ac);font-weight:600}
+
+
+
 .mtab.active.car{color:var(--tl);border-bottom-color:var(--tl)}
 .tbadge{background:var(--rd);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:10px;min-width:18px;text-align:center}
 .trr{margin-left:auto;display:flex;align-items:center;gap:10px}
@@ -116,7 +142,7 @@ tr.rd td{background:rgba(239,68,68,.04)}
 .fb{display:flex;gap:10px;margin-bottom:13px;align-items:center;flex-wrap:wrap}
 .sw2{position:relative;flex:1;min-width:120px}
 .sw2 .si{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--t3);font-size:13px;pointer-events:none}
-input[type=text],input[type=date],input[type=number],input[type=email],input[type=time],select,textarea{background:var(--bgi);border:1px solid var(--bd);border-radius:var(--rs);color:var(--t1);font-size:13px;padding:7px 12px;outline:none;width:100%;transition:border var(--tr);font-family:inherit}
+input[type=text],input[type=date],input[type=number],input[type=email],input[type=time],select,textarea{background:var(--bgi);border:1px solid var(--border-mid);border-radius:var(--rs);color:var(--text);font-size:13px;padding:7px 12px;outline:none;width:100%;transition:border var(--tr);font-family:inherit}
 input:focus,select:focus,textarea:focus{border-color:var(--blue)}
 .cf input:focus,.cf select:focus,.cf textarea:focus{border-color:var(--tl)}
 .sw2 input{padding-left:32px}
@@ -133,7 +159,7 @@ textarea{resize:vertical;min-height:68px}
 .fg{display:flex;flex-direction:column;gap:5px;margin-bottom:11px}
 .fg2{display:grid;grid-template-columns:1fr 1fr;gap:11px}
 .fg2 .full{grid-column:1/-1}
-.fl{font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.05em}
+.fl{font-size:11px;font-weight:600;color:var(--text-2);text-transform:uppercase;letter-spacing:.05em}
 .fh{font-size:11px;color:var(--t3);margin-top:3px}
 .frow{display:flex;gap:10px}
 #toastc{position:fixed;bottom:20px;right:20px;z-index:999;display:flex;flex-direction:column;gap:8px;pointer-events:none}
@@ -178,6 +204,10 @@ textarea{resize:vertical;min-height:68px}
 #tr-route-tbl td input{padding:3px 5px;font-size:12px;background:var(--bgi);border:1px solid var(--bd);border-radius:3px;color:var(--t1);width:100%}
 #tr-route-tbl td input[type=number]{width:62px}
 #tr-route-tbl td input[type=date]{width:108px}
+input[type=date]{color-scheme:dark}
+input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1) brightness(2);cursor:pointer;opacity:.9}
+input[type=date]::-webkit-calendar-picker-indicator:hover{opacity:1}
+
 #tr-route-tbl td input[type=text]{width:90px}
 .comp-tag{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;background:var(--acd2);border:1px solid rgba(67,97,238,.2);border-radius:14px;font-size:12px;color:var(--ac)}
 .comp-tag button{background:none;border:none;cursor:pointer;color:var(--t3);font-size:12px;line-height:1;padding:0 0 0 2px}
@@ -361,8 +391,8 @@ tr.ovr td{background:rgba(239,68,68,.04)}
   .mc{padding:12px 14px}
   .sg{grid-template-columns:repeat(2,1fr)}
   .fuelsum{grid-template-columns:repeat(2,1fr)}
-  .mtab span:not(.tab-icon){display:none}
-  .logo span:last-child{display:none}
+  .modnav-label{display:none!important}
+  
 
   /* tab bar 更緊湊 */
   #tabs{padding:0 8px;gap:0}
@@ -441,23 +471,50 @@ tr.ovr td{background:rgba(239,68,68,.04)}
 <body>
 <div id="app">
 <div id="tabs">
-  <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
-  <div class="logo"><span>🏢</span><span>COMART Admin</span></div>
-  <div class="mtab active" data-module="lib" onclick="switchMod('lib')"><span class="tab-icon">📚</span><span>圖書館管理</span><span class="tbadge" id="tb-lib" style="display:none">0</span></div>
-  <div class="mtab" data-module="car" onclick="switchMod('car')"><span class="tab-icon">🚗</span><span>公務車管理</span><span class="tbadge" id="tb-car" style="display:none">0</span></div>
-  <div class="mtab" data-module="trip" onclick="switchMod('trip')"><span class="tab-icon">✈️</span><span>差旅報支單</span></div>
-  <div class="mtab" data-module="room" onclick="switchMod('room')"><span class="tab-icon">🏢</span><span>會議室預約</span><span class="tbadge" id="tb-room" style="display:none">0</span></div>
-  <div class="mtab" data-module="visit" onclick="switchMod('visit')"><span class="tab-icon">🤝</span><span>客戶到訪</span><span class="tbadge" id="tb-visit" style="display:none">0</span></div>
+  <div class="logo">
+    <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
+    <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
+    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.03</span>
+  </div>
   <div class="trr">
     <div style="display:flex;align-items:center;gap:6px;padding:4px 12px;background:var(--surface-2);border:1px solid var(--border);border-radius:20px;font-size:12px;cursor:pointer" onclick="showUsw()" id="topbar-user">
       <div style="width:7px;height:7px;border-radius:50%;background:var(--green)" id="user-status-dot"></div>
       <span id="cur-u" style="color:var(--text-2)">載入中…</span>
       <span style="color:var(--text-3);font-size:10px">▾</span>
     </div>
-    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.02</span>
+    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.03</span>
   </div>
 </div>
-<div id="mbody">
+<div id="layout-wrap" style="display:flex;min-height:calc(100vh - var(--th))">
+<!-- ── 左側模塊導覽 ── -->
+<div id="mod-nav">
+  <div class="modnav-item active" data-module="lib" onclick="switchMod('lib')" title="圖書館管理">
+    <span class="modnav-icon">📚</span>
+    <span class="modnav-label">圖書館</span>
+    <span class="tbadge" id="tb-lib" style="display:none">0</span>
+  </div>
+  <div class="modnav-item" data-module="car" onclick="switchMod('car')" title="公務車管理">
+    <span class="modnav-icon">🚗</span>
+    <span class="modnav-label">公務車</span>
+    <span class="tbadge" id="tb-car" style="display:none">0</span>
+  </div>
+  <div class="modnav-item" data-module="trip" onclick="switchMod('trip')" title="差旅報支單">
+    <span class="modnav-icon">✈️</span>
+    <span class="modnav-label">差旅報支</span>
+  </div>
+  <div class="modnav-item" data-module="room" onclick="switchMod('room')" title="會議室預約">
+    <span class="modnav-icon">🏠</span>
+    <span class="modnav-label">會議室</span>
+    <span class="tbadge" id="tb-room" style="display:none">0</span>
+  </div>
+  <div class="modnav-item" data-module="visit" onclick="switchMod('visit')" title="客戶到訪">
+    <span class="modnav-icon">🤝</span>
+    <span class="modnav-label">客戶到訪</span>
+    <span class="tbadge" id="tb-visit" style="display:none">0</span>
+  </div>
+</div>
+<!-- ── 主內容區 ── -->
+<div id="mbody" style="flex:1;min-width:0">
 
 <!-- LIB -->
 <div class="mpanel active" id="panel-lib">
@@ -475,7 +532,7 @@ tr.ovr td{background:rgba(239,68,68,.04)}
       <div class="navi" data-p="lib-cats"><span class="ic">🏷️</span>分類管理</div>
       <div class="navi" data-p="lib-cfg"><span class="ic">⚙️</span>系統設定</div>
     </div>
-    <div class="sbf">v1.02 · Supabase<br><span style="color:var(--ac)">● 本機存儲</span></div>
+    <div class="sbf">v1.03 · Supabase<br><span style="color:var(--ac)">● 本機存儲</span></div>
   </div>
   <div class="mc" id="lc">
     <div class="pg active" id="pg-lib-dash">
@@ -558,7 +615,7 @@ tr.ovr td{background:rgba(239,68,68,.04)}
       <div class="navi cn" data-p="car-park"><span class="ic">🅿️</span>停車格管理</div>
       <div class="navi cn" data-p="car-cfg"><span class="ic">⚙️</span>系統設定</div>
     </div>
-    <div class="sbf">v1.02 · Supabase<br><span style="color:var(--tl)">● 本機存儲</span></div>
+    <div class="sbf">v1.03 · Supabase<br><span style="color:var(--tl)">● 本機存儲</span></div>
   </div>
   <div class="mc cf" id="cc">
     <div class="pg active" id="pg-car-dash">
@@ -647,7 +704,7 @@ tr.ovr td{background:rgba(239,68,68,.04)}
       <div class="navi tna active" data-p="trip-new"><span class="ic">➕</span>新增報支單</div>
       <div class="navi tna" data-p="trip-list"><span class="ic">📋</span>報支單清單</div>
     </div>
-    <div class="sbf">v1.02 · Supabase<br><span style="color:var(--yw)">● 本機存儲</span></div>
+    <div class="sbf">v1.03 · Supabase<br><span style="color:var(--yw)">● 本機存儲</span></div>
   </div>
   <div class="mc" id="tc">
 
@@ -786,7 +843,7 @@ tr.ovr td{background:rgba(239,68,68,.04)}
       <div class="navi rna" data-p="room-report"><span class="ic">📊</span>使用率報表</div>
       <div class="navi rna" data-p="room-fault"><span class="ic">🔧</span>故障回報<span class="nbadge" id="nb-fault" style="display:none">0</span></div>
     </div>
-    <div class="sbf">v1.02 · Supabase<br><span style="color:var(--gn)">● 本機存儲</span></div>
+    <div class="sbf">v1.03 · Supabase<br><span style="color:var(--gn)">● 本機存儲</span></div>
   </div>
   <div class="mc" id="rmc">
 
@@ -953,7 +1010,7 @@ tr.ovr td{background:rgba(239,68,68,.04)}
       <div class="navi vna" data-p="visit-guests"><span class="ic">👥</span>來賓資料庫</div>
       <div class="navi vna" data-p="visit-report"><span class="ic">📊</span>接待報表</div>
     </div>
-    <div class="sbf">v1.02 · Supabase<br><span style="color:#a78bfa">● 本機存儲</span></div>
+    <div class="sbf">v1.03 · Supabase<br><span style="color:#a78bfa">● 本機存儲</span></div>
   </div>
   <div class="mc" id="vmc">
 
@@ -1109,6 +1166,7 @@ tr.ovr td{background:rgba(239,68,68,.04)}
 </div>
 
 </div><!-- /mbody -->
+</div><!-- /layout-wrap -->
 </div><!-- /app -->
 
 <!-- MODALS -->
@@ -1275,7 +1333,7 @@ function readPortalSession() {
     const urlParams = new URLSearchParams(window.location.search);
     const ps = urlParams.get('_ps');
     if (ps) {
-      const s = JSON.parse(atob(ps));
+      const s = JSON.parse(decodeURIComponent(escape(atob(ps))));
       if (s && s.empId && s.expires && Date.now() < s.expires) {
         localStorage.setItem(ADMIN_CFG.portalSessionKey, JSON.stringify(s));
         // 清掉 URL 參數，避免書籤帶走 token
@@ -1456,8 +1514,8 @@ function seedCar(){
 
 function switchMod(m){
   curMod=m;
-  document.querySelectorAll('.mtab').forEach(t=>t.classList.remove('active'));
-  document.querySelector(`.mtab[data-module="${m}"]`).classList.add('active');
+  document.querySelectorAll('.modnav-item').forEach(t=>t.classList.remove('active'));
+  document.querySelector(`.modnav-item[data-module="${m}"]`)?.classList.add('active');
   document.querySelectorAll('.mpanel').forEach(p=>p.classList.remove('active'));
   document.getElementById(`panel-${m}`).classList.add('active');
   if(m==='lib')renderLibPg('lib-dash');

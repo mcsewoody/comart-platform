@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>COMART Platform v1.35</title>
+<title>COMART Platform v1.36</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -323,7 +323,7 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1) brightness(
     <div class="login-logo">
       <div class="login-mark">C</div>
       <div class="login-name">COMART Platform</div>
-      <div class="login-sub">Internal Portal · v1.35</div>
+      <div class="login-sub">Internal Portal · v1.36</div>
     </div>
     <form id="loginForm" onsubmit="doLogin();return false;" autocomplete="on">
     <div class="field">
@@ -351,7 +351,7 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1) brightness(
   <div class="topbar">
     <div class="topbar-logo" onclick="switchView('home')">
       <div class="topbar-mark">C</div>
-      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.35</span></div>
+      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.36</span></div>
     </div>
     <div class="topbar-right">
       <div class="lang-switcher">
@@ -398,7 +398,7 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1) brightness(
       <button class="sidebar-item" id="sn-kms" onclick="openApp('kms')">🧠 <span>KMS</span></button>
       <button class="sidebar-item" id="sn-bulletin" onclick="switchView('bulletin')">📢 <span>Bulletin Board</span></button>
       <button class="sidebar-item" id="sn-calendar" onclick="switchView('calendar')">📅 <span>Calendar</span></button>
-      <button class="sidebar-item" id="sn-admin" style="opacity:.4;cursor:not-allowed;">🏛 <span>Admin System</span></button>
+      <button class="sidebar-item" id="sn-admin" onclick="openApp('admin-sys')">🏛 <span>Admin System</span></button>
       <button class="sidebar-item" id="sn-quotation" onclick="openApp('quotation')">💼 <span>Quotation</span></button>
       <button class="sidebar-item" id="sn-product" style="opacity:.4;cursor:not-allowed;">🔬 <span>Product Dev</span></button>
       <button class="sidebar-item" id="sn-home" onclick="switchView('home')" style="display:none;">🏠</button>
@@ -3003,7 +3003,7 @@ const APPS = [
   { id:'kms',        label:'KMS',            labelZh:'知識管理',     desc:'Knowledge Management — AI Q&A, document library', icon:'🧠', bg:'#0A2A1A', internal:false, path:'./kms/index.html', roles:[] },
   { id:'bulletin',   label:'Bulletin Board', labelZh:'公告欄',       desc:'Company announcements and notices', icon:'📢', bg:'#1A1A08', internal:true, roles:[] },
   { id:'calendar',   label:'Calendar',       labelZh:'集團行事曆',   desc:'Business trip management & flight tracking', icon:'📅', bg:'#0A1A1A', internal:true,  roles:[] },
-  { id:'admin-sys',  label:'Admin System',   labelZh:'行政管理系統', desc:'Coming soon', icon:'🏛', bg:'#1A0A1A', internal:false, locked:true, badge:'SOON', roles:[] },
+  { id:'admin-sys',  label:'Admin System',   labelZh:'行政管理系統', desc:'Library · Fleet · Expense · Meetings · Visits', icon:'🏛', bg:'#1A0A1A', internal:false, path:'./admin/index.html', roles:[] },
   { id:'quotation',  label:'Quotation',      labelZh:'報價管理系統', desc:'Product quotations, CRM & AI tools', icon:'💼', bg:'#0F2A4A', internal:false, path:'https://platform.comart.com.tw/quotation/index.html', roles:[] },
   { id:'product-dev',label:'Product Dev',    labelZh:'產品開發管理', desc:'Coming soon', icon:'🔬', bg:'#1A1A0A', internal:false, locked:true, badge:'SOON', roles:[] },
 ];
@@ -4093,6 +4093,7 @@ const I18N = {
     card_bulletin_name:'Bulletin Board', card_bulletin_desc:'Company announcements and notices',
     card_calendar_name:'Calendar', card_calendar_desc:'Business trip management & flight tracking',
     card_admin_name:'Admin System', card_admin_desc:'Library · Fleet · Expense · Meetings · Visits',
+    card_admin_sys_name:'Admin System', card_admin_sys_desc:'Library · Fleet · Expense · Meetings · Visits',
     card_quotation_name:'Quotation', card_quotation_desc:'Product quotations, CRM & AI tools',
     card_product_name:'Product Dev', card_product_desc:'Coming soon',
     // section titles
@@ -4153,6 +4154,7 @@ const I18N = {
     card_bulletin_name:'公告欄', card_bulletin_desc:'公司公告與通知',
     card_calendar_name:'集團行事曆', card_calendar_desc:'商務差旅管理與航班追蹤',
     card_admin_name:'行政管理系統', card_admin_desc:'圖書館 · 公務車 · 差旅報支 · 會議室 · 客戶到訪',
+    card_admin_sys_name:'行政管理系統', card_admin_sys_desc:'圖書館 · 公務車 · 差旅報支 · 會議室 · 客戶到訪',
     card_quotation_name:'報價管理系統', card_quotation_desc:'產品報價、CRM 與 AI 工具',
     card_product_name:'產品開發管理', card_product_desc:'即將推出',
     sect_apps:'應用程式', sect_updates:'平台更新',
@@ -4200,6 +4202,7 @@ const I18N = {
     card_bulletin_name:'公告栏', card_bulletin_desc:'公司公告与通知',
     card_calendar_name:'集团行程', card_calendar_desc:'商务差旅管理与航班追踪',
     card_admin_name:'行政管理系统', card_admin_desc:'图书馆 · 公务车 · 差旅报销 · 会议室 · 客户来访',
+    card_admin_sys_name:'行政管理系统', card_admin_sys_desc:'图书馆 · 公务车 · 差旅报销 · 会议室 · 客户来访',
     card_quotation_name:'报价管理系统', card_quotation_desc:'产品报价、CRM 与 AI 工具',
     card_product_name:'产品开发管理', card_product_desc:'即将推出',
     sect_apps:'应用程序', sect_updates:'平台更新',
@@ -4247,6 +4250,7 @@ const I18N = {
     card_bulletin_name:'Thông báo', card_bulletin_desc:'Thông báo công ty',
     card_calendar_name:'Lịch', card_calendar_desc:'Quản lý công tác & theo dõi chuyến bay',
     card_admin_name:'Hệ thống HC', card_admin_desc:'Thư viện · Xe công · Chi phí · Phòng họp · Khách thăm',
+    card_admin_sys_name:'Hệ thống HC', card_admin_sys_desc:'Thư viện · Xe công · Chi phí · Phòng họp · Khách thăm',
     card_quotation_name:'Báo giá', card_quotation_desc:'Báo giá sản phẩm, CRM & AI',
     card_product_name:'Phát triển SP', card_product_desc:'Sắp ra mắt',
     sect_apps:'Ứng dụng', sect_updates:'Cập nhật nền tảng',

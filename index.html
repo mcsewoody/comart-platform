@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>COMART Platform v1.32</title>
+<title>COMART Platform v1.34</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -310,6 +310,9 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   cursor: pointer;
   opacity: 1;
 }
+
+input[type=date]{color-scheme:dark}
+input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1) brightness(2);cursor:pointer;opacity:.9}
 </style>
 </head>
 <body>
@@ -320,8 +323,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     <div class="login-logo">
       <div class="login-mark">C</div>
       <div class="login-name">COMART Platform</div>
-      <div class="login-sub">Internal Portal · v1.32 — 解鎖 Admin System（行政管理平台）入口；Admin 子系統加入 Supabase 後端 + Portal session 整合
-v1.31</div>
+      <div class="login-sub">Internal Portal · v1.31</div>
     </div>
     <form id="loginForm" onsubmit="doLogin();return false;" autocomplete="on">
     <div class="field">
@@ -349,7 +351,7 @@ v1.31</div>
   <div class="topbar">
     <div class="topbar-logo" onclick="switchView('home')">
       <div class="topbar-mark">C</div>
-      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.32</span></div>
+      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.34</span></div>
     </div>
     <div class="topbar-right">
       <div class="lang-switcher">
@@ -396,7 +398,7 @@ v1.31</div>
       <button class="sidebar-item" id="sn-kms" onclick="openApp('kms')">🧠 <span>KMS</span></button>
       <button class="sidebar-item" id="sn-bulletin" onclick="switchView('bulletin')">📢 <span>Bulletin Board</span></button>
       <button class="sidebar-item" id="sn-calendar" onclick="switchView('calendar')">📅 <span>Calendar</span></button>
-      <button class="sidebar-item" id="sn-admin" onclick="openApp('admin-sys')">🏛 <span>Admin System</span></button>
+      <button class="sidebar-item" id="sn-admin" style="opacity:.4;cursor:not-allowed;">🏛 <span>Admin System</span></button>
       <button class="sidebar-item" id="sn-quotation" onclick="openApp('quotation')">💼 <span>Quotation</span></button>
       <button class="sidebar-item" id="sn-product" style="opacity:.4;cursor:not-allowed;">🔬 <span>Product Dev</span></button>
       <button class="sidebar-item" id="sn-home" onclick="switchView('home')" style="display:none;">🏠</button>
@@ -2790,22 +2792,62 @@ async function doLogin() {
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span>Signing in…';
 
+  function showErr(msg) { errEl.textContent = msg; errEl.style.display = 'block'; }
+
   try {
     const hash = await sha256(pwd);
     let user = null;
 
-    if (db) {
-      const snap = await db.collection(COL_U).where('empId','==',empId).limit(1).get();
-      if (!snap.empty) user = snap.docs[0].data();
+    // ── 主要：從 Supabase 驗證（透過 Cloudflare Worker）──
+    try {
+      const res = await fetch(
+        `${SB_WORKER}/supabase/rest/v1/users?emp_id=eq.${encodeURIComponent(empId)}&select=emp_id,name_en,name_zh,role,dept,site,email,mobile,ext,title_en,title_zh,pwd_hash,avatar_url,active&limit=1`,
+        { headers: { 'x-admin-token': SB_TOKEN, 'Content-Type': 'application/json' } }
+      );
+      if (res.ok) {
+        const rows = await res.json();
+        if (rows && rows.length > 0) {
+          const row = rows[0];
+          // 轉成 Portal 慣用格式
+          user = {
+            empId:    row.emp_id,
+            nameEn:   row.name_en   || '',
+            nameZh:   row.name_zh   || '',
+            role:     row.active === false ? 'inactive' : (row.role || 'user'),
+            dept:     row.dept      || '',
+            site:     row.site      || 'TW',
+            email:    row.email     || '',
+            mobile:   row.mobile    || '',
+            ext:      row.ext       || '',
+            titleEn:  row.title_en  || '',
+            titleZh:  row.title_zh  || '',
+            pwdHash:  row.pwd_hash  || '',
+            photoURL: row.avatar_url|| '',
+          };
+        }
+      }
+    } catch(e) {
+      console.warn('Supabase login failed, trying Firestore fallback:', e.message);
     }
 
-    if (!user) { showErr('Account not found.'); return; }
-    if (user.pwdHash !== hash) { showErr('Incorrect password.'); return; }
-    if (user.role === 'inactive') { showErr('This account has been deactivated.'); return; }
+    // ── Fallback：Supabase 失敗時從 Firestore 驗證 ──
+    if (!user && db) {
+      try {
+        const snap = await db.collection(COL_U).where('empId','==',empId).limit(1).get();
+        if (!snap.empty) user = snap.docs[0].data();
+      } catch(e) {
+        console.warn('Firestore fallback also failed:', e.message);
+      }
+    }
+
+    if (!user)                        { showErr('Account not found.');              return; }
+    if (user.pwdHash !== hash)         { showErr('Incorrect password.');             return; }
+    if (user.role === 'inactive')      { showErr('This account has been deactivated.'); return; }
 
     writeSession(user);
     enterPortal();
     toast('Welcome, ' + (user.nameEn || user.empId), 'ok');
+
   } catch(e) {
     showErr('Login failed — check your connection and try again.');
     console.error(e);
@@ -2813,8 +2855,6 @@ async function doLogin() {
     btn.disabled = false;
     btn.textContent = 'Sign In';
   }
-
-  function showErr(msg) { errEl.textContent = msg; errEl.style.display = 'block'; }
 }
 
 function doLogout() {
@@ -2963,7 +3003,7 @@ const APPS = [
   { id:'kms',        label:'KMS',            labelZh:'知識管理',     desc:'Knowledge Management — AI Q&A, document library', icon:'🧠', bg:'#0A2A1A', internal:false, path:'./kms/index.html', roles:[] },
   { id:'bulletin',   label:'Bulletin Board', labelZh:'公告欄',       desc:'Company announcements and notices', icon:'📢', bg:'#1A1A08', internal:true, roles:[] },
   { id:'calendar',   label:'Calendar',       labelZh:'集團行事曆',   desc:'Business trip management & flight tracking', icon:'📅', bg:'#0A1A1A', internal:true,  roles:[] },
-  { id:'admin-sys',  label:'Admin System',   labelZh:'行政管理系統', desc:'圖書館 · 公務車 · 差旅報支 · 會議室 · 客戶到訪', icon:'🏛', bg:'#1A0A1A', internal:false, path:'./admin/index.html', roles:[] },
+  { id:'admin-sys',  label:'Admin System',   labelZh:'行政管理系統', desc:'Coming soon', icon:'🏛', bg:'#1A0A1A', internal:false, locked:true, badge:'SOON', roles:[] },
   { id:'quotation',  label:'Quotation',      labelZh:'報價管理系統', desc:'Product quotations, CRM & AI tools', icon:'💼', bg:'#0F2A4A', internal:false, path:'https://platform.comart.com.tw/quotation/index.html', roles:[] },
   { id:'product-dev',label:'Product Dev',    labelZh:'產品開發管理', desc:'Coming soon', icon:'🔬', bg:'#1A1A0A', internal:false, locked:true, badge:'SOON', roles:[] },
 ];
@@ -3699,6 +3739,51 @@ function openUserModal(empId) {
 
 function closeUserModal() { document.getElementById('userOverlay').classList.remove('show'); }
 
+
+// ── Supabase Users Sync (via Cloudflare Worker) ──────────
+const SB_WORKER = 'https://comart.mcsewoody.workers.dev';
+const SB_TOKEN  = 'COMART-ADMIN-2026';
+
+async function sbSyncUser(user, isDelete) {
+  try {
+    if (isDelete) {
+      await fetch(`${SB_WORKER}/supabase/rest/v1/users?emp_id=eq.${encodeURIComponent(user.empId)}`, {
+        method: 'DELETE',
+        headers: { 'x-admin-token': SB_TOKEN, 'Content-Type': 'application/json' },
+      });
+    } else {
+      // Upsert（新增或更新）
+      await fetch(`${SB_WORKER}/supabase/rest/v1/users`, {
+        method: 'POST',
+        headers: {
+          'x-admin-token': SB_TOKEN,
+          'Content-Type': 'application/json',
+          'Prefer': 'resolution=merge-duplicates,return=minimal',
+        },
+        body: JSON.stringify({
+          emp_id:     user.empId,
+          name_en:    user.nameEn    || '',
+          name_zh:    user.nameZh    || '',
+          role:       user.role      || 'user',
+          dept:       user.dept      || '',
+          site:       user.site      || 'TW',
+          email:      user.email     || '',
+          mobile:     user.mobile    || '',
+          ext:        user.ext       || '',
+          title_en:   user.titleEn   || '',
+          title_zh:   user.titleZh   || '',
+          pwd_hash:   user.pwdHash   || '',
+          avatar_url: user.photoURL  || '',
+          active:     true,
+        }),
+      });
+    }
+    console.log(`✓ Supabase sync: ${isDelete ? 'deleted' : 'upserted'} ${user.empId}`);
+  } catch(e) {
+    console.warn('Supabase sync failed (non-fatal):', e.message);
+  }
+}
+
 async function saveUser() {
   const empId  = document.getElementById('u-empId').value.trim().toUpperCase();
   const nameEn = document.getElementById('u-nameEn').value.trim();
@@ -3744,12 +3829,14 @@ async function saveUser() {
     try { await db.collection(COL_U).doc(empId).set(user); }
     catch(e) { toast('Save failed: ' + e.message, 'err'); return; }
   }
+  // 同步到 Supabase（非阻塞）
+  sbSyncUser(user, false);
   closeUserModal();
   await loadUsers();
   toast(existing ? 'User updated' : 'User created', 'ok');
 }
 
-async function confirmDeleteUser() {
+async async function confirmDeleteUser() {
   if (!_editEmpId) return;
   if (_editEmpId === SESSION?.empId) { toast('Cannot delete yourself','err'); return; }
   if (!confirm(`Delete user ${_editEmpId}? This cannot be undone.`)) return;
@@ -3757,6 +3844,8 @@ async function confirmDeleteUser() {
     try { await db.collection(COL_U).doc(_editEmpId).delete(); }
     catch(e) { toast('Delete failed','err'); return; }
   }
+  // 同步刪除到 Supabase（標記 active=false）
+  sbSyncUser({ empId: _editEmpId }, true);
   closeUserModal();
   await loadUsers();
   toast('User deleted','ok');
@@ -4003,7 +4092,7 @@ const I18N = {
     card_kms_name:'KMS', card_kms_desc:'Knowledge Management — AI Q&A, document library',
     card_bulletin_name:'Bulletin Board', card_bulletin_desc:'Company announcements and notices',
     card_calendar_name:'Calendar', card_calendar_desc:'Business trip management & flight tracking',
-    card_admin_name:'Admin System', card_admin_desc:'Coming soon',
+    card_admin_name:'Admin System', card_admin_desc:'Library · Fleet · Expense · Meetings · Visits',
     card_quotation_name:'Quotation', card_quotation_desc:'Product quotations, CRM & AI tools',
     card_product_name:'Product Dev', card_product_desc:'Coming soon',
     // section titles
@@ -4063,7 +4152,7 @@ const I18N = {
     card_kms_name:'知識管理', card_kms_desc:'KMS — AI 問答、文件庫',
     card_bulletin_name:'公告欄', card_bulletin_desc:'公司公告與通知',
     card_calendar_name:'集團行事曆', card_calendar_desc:'商務差旅管理與航班追蹤',
-    card_admin_name:'行政管理系統', card_admin_desc:'即將推出',
+    card_admin_name:'行政管理系統', card_admin_desc:'圖書館 · 公務車 · 差旅報支 · 會議室 · 客戶到訪',
     card_quotation_name:'報價管理系統', card_quotation_desc:'產品報價、CRM 與 AI 工具',
     card_product_name:'產品開發管理', card_product_desc:'即將推出',
     sect_apps:'應用程式', sect_updates:'平台更新',
@@ -4110,7 +4199,7 @@ const I18N = {
     card_kms_name:'知识管理', card_kms_desc:'KMS — AI 问答、文件库',
     card_bulletin_name:'公告栏', card_bulletin_desc:'公司公告与通知',
     card_calendar_name:'集团行程', card_calendar_desc:'商务差旅管理与航班追踪',
-    card_admin_name:'行政管理系统', card_admin_desc:'即将推出',
+    card_admin_name:'行政管理系统', card_admin_desc:'图书馆 · 公务车 · 差旅报销 · 会议室 · 客户来访',
     card_quotation_name:'报价管理系统', card_quotation_desc:'产品报价、CRM 与 AI 工具',
     card_product_name:'产品开发管理', card_product_desc:'即将推出',
     sect_apps:'应用程序', sect_updates:'平台更新',
@@ -4157,7 +4246,7 @@ const I18N = {
     card_kms_name:'KMS', card_kms_desc:'Quản lý tri thức — AI Q&A, thư viện tài liệu',
     card_bulletin_name:'Thông báo', card_bulletin_desc:'Thông báo công ty',
     card_calendar_name:'Lịch', card_calendar_desc:'Quản lý công tác & theo dõi chuyến bay',
-    card_admin_name:'Hệ thống HC', card_admin_desc:'Sắp ra mắt',
+    card_admin_name:'Hệ thống HC', card_admin_desc:'Thư viện · Xe công · Chi phí · Phòng họp · Khách thăm',
     card_quotation_name:'Báo giá', card_quotation_desc:'Báo giá sản phẩm, CRM & AI',
     card_product_name:'Phát triển SP', card_product_desc:'Sắp ra mắt',
     sect_apps:'Ứng dụng', sect_updates:'Cập nhật nền tảng',

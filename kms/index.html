@@ -21,25 +21,25 @@
 /* ─── Reset & Base ─── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
-  /* Dark theme */
-  --bg: #0f1117;
-  --surface: #1a1d27;
-  --surface-2: #22263a;
-  --border: #2e3248;
-  --border-mid: #3d4260;
-  --text: #e8eaf0;
-  --text-2: #a8adc4;
-  --text-3: #6b7090;
-  --blue: #5b9bd5;
-  --blue-bg: #1a2540;
-  --blue-border: #2e4a7a;
-  --green: #3ecf8e;
-  --green-bg: #0d2e20;
-  --amber: #f4c95d;
-  --amber-bg: #2a2010;
-  --amber-border: #7a5a10;
-  --red: #f06a6a;
-  --red-bg: #2e1010;
+  /* Dark theme — 底色純黑，其餘整體調亮 */
+  --bg: #000000;
+  --surface: #141820;
+  --surface-2: #1e2330;
+  --border: #2a3045;
+  --border-mid: #3a4260;
+  --text: #f0f2f8;
+  --text-2: #b8bdd8;
+  --text-3: #7880a0;
+  --blue: #6aaee8;
+  --blue-bg: #1a2a50;
+  --blue-border: #3a5a90;
+  --green: #4edfa0;
+  --green-bg: #0e3828;
+  --amber: #ffd166;
+  --amber-bg: #302518;
+  --amber-border: #8a6a18;
+  --red: #ff7878;
+  --red-bg: #380f0f;
   --radius: 8px;
   --radius-lg: 12px;
   --font: 'Segoe UI', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
@@ -81,7 +81,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
 .search-input { flex: 1; padding: 9px 14px; border-radius: var(--radius); border: 1.5px solid var(--border); font-size: 14px; font-family: var(--font); outline: none; background: var(--surface); color: var(--text); }
 .search-input:focus { border-color: var(--blue); }
 .search-btn { padding: 9px 18px; background: var(--blue); color: #fff; border: none; border-radius: var(--radius); cursor: pointer; font-size: 13px; font-weight: 500; white-space: nowrap; }
-.search-btn:hover { background: #1a4a7a; }
+.search-btn:hover { background: #1e5890; }
 .search-btn:disabled { background: var(--border-mid); cursor: not-allowed; }
 
 .rag-body { flex: 1; overflow-y: auto; padding: 16px 20px; display: flex; flex-direction: column; gap: 12px; }
@@ -135,7 +135,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
 .meta-input:focus { border-color: var(--blue); }
 .meta-select { padding: 5px 10px; border-radius: var(--radius); border: 1px solid var(--border); font-size: 13px; font-family: var(--font); background: var(--surface); color: var(--text); outline: none; cursor: pointer; }
 .save-btn { margin-left: auto; padding: 6px 16px; background: var(--blue); color: #fff; border: none; border-radius: var(--radius); cursor: pointer; font-size: 13px; font-weight: 500; }
-.save-btn:hover { background: #1a4a7a; }
+.save-btn:hover { background: #1e5890; }
 .save-btn:disabled { background: var(--border-mid); cursor: not-allowed; }
 
 .tiptap-wrap { flex: 1; overflow-y: auto; padding: 24px 32px; background: var(--surface); }
@@ -170,13 +170,13 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
 .doc-cat.sop { background: var(--blue-bg); color: var(--blue); }
 .doc-cat.tacit { background: var(--amber-bg); color: var(--amber); }
 .doc-cat.product { background: var(--green-bg); color: var(--green); }
-.doc-cat.hr { background: #2a0f1a; color: #f0a0be; }
-.doc-cat.mfg { background: #0d2a25; color: #3ecf8e; }
-.doc-cat.compliance { background: #1e1030; color: #b494f0; }
-.doc-cat.ai_tech { background: #0a1e30; color: #5b9bd5; }
-.doc-cat.template { background: #1e2030; color: #9098b0; }
-.doc-cat.article { background: #281e08; color: #f4c95d; }
-.doc-cat.industry { background: #0a2818; color: #3ecf8e; }
+.doc-cat.hr { background: #320f20; color: #ffb0cc; }
+.doc-cat.mfg { background: #0e3028; color: #4edfa0; }
+.doc-cat.compliance { background: #241238; color: #c8a8ff; }
+.doc-cat.ai_tech { background: #0a2238; color: #6aaee8; }
+.doc-cat.template { background: #1e2238; color: #a8b0cc; }
+.doc-cat.article { background: #302010; color: #ffd166; }
+.doc-cat.industry { background: #0a3020; color: #4edfa0; }
 .doc-title { font-size: 13px; font-weight: 500; flex: 1; }
 .doc-meta { font-size: 12px; color: var(--text-3); white-space: nowrap; }
 .doc-status { font-size: 11px; padding: 2px 7px; border-radius: 10px; }
@@ -227,11 +227,11 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
 
 /* ─── File type badge ─── */
 .file-badge { font-size: 10px; padding: 1px 6px; border-radius: 4px; font-weight: 600; letter-spacing: .03em; }
-.file-badge.pdf  { background: #2a0f1a; color: #f0a0be; }
+.file-badge.pdf  { background: #320f20; color: #ffb0cc; }
 .file-badge.docx { background: var(--blue-bg); color: var(--blue); }
 .file-badge.xlsx { background: var(--green-bg); color: var(--green); }
 .file-badge.csv  { background: var(--green-bg); color: var(--green); }
-.file-badge.pptx { background: #2a1508; color: #f09060; }
+.file-badge.pptx { background: #301808; color: #ffaa70; }
 .file-badge.img  { background: var(--amber-bg); color: var(--amber); }
 
 /* ─── Tags ─── */
@@ -281,8 +281,8 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
 .sb-draft    { background:var(--bg); color:var(--text-3); border:1px solid var(--border); }
 .sb-review   { background:var(--amber-bg); color:var(--amber); }
 .sb-published{ background:var(--green-bg); color:var(--green); }
-.sb-archived { background:#2a2a2a; color:#888; }
-.sb-withdrawn { background: #2e1010; color: #f06a6a; border: 1px solid #6a2020; }
+.sb-archived { background:#252525; color:#999; }
+.sb-withdrawn { background: #380f0f; color: #ff7878; border: 1px solid #7a2020; }
 
 /* ─── Comments ─── */
 .comment-wrap { display:flex;flex-direction:column;gap:10px;padding:16px 20px; }
@@ -311,7 +311,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
 .review-btn-submit  { background:var(--amber-bg);color:var(--amber); }
 .review-btn-approve { background:var(--green-bg);color:var(--green); }
 .review-btn-reject  { background:var(--red-bg);color:var(--red); }
-.review-btn-archive { background:#2a2a2a;color:#888; }
+.review-btn-archive { background:#252525;color:#999; }
 .review-log-item { font-size:12px;color:var(--text-2);padding:4px 0;border-bottom:1px solid var(--border);display:flex;gap:8px; }
 .review-log-item:last-child { border-bottom:none; }
 
@@ -391,7 +391,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.85</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.86</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
@@ -609,9 +609,9 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
               <span class="star-btn" data-val="1" onclick="setDocStars(1)"
                 style="font-size:20px;cursor:pointer;color:#F59E0B;line-height:1;" title="General">★</span>
               <span class="star-btn" data-val="2" onclick="setDocStars(2)"
-                style="font-size:20px;cursor:pointer;color:#3d4260;line-height:1;" title="Important">★</span>
+                style="font-size:20px;cursor:pointer;color:#444860;line-height:1;" title="Important">★</span>
               <span class="star-btn" data-val="3" onclick="setDocStars(3)"
-                style="font-size:20px;cursor:pointer;color:#3d4260;line-height:1;" title="Must Read">★</span>
+                style="font-size:20px;cursor:pointer;color:#444860;line-height:1;" title="Must Read">★</span>
             </div>
             <input type="hidden" id="doc-stars" value="1" />
           </div>
@@ -2161,7 +2161,10 @@ async function saveDoc() {
       const docPayload = {
         title, body, category, lang, status: finalStatus,
         stars: parseInt(document.getElementById('doc-stars')?.value || '1'),
-        author_name: buildAuthorName(),
+        // update 時保留原始 author（建立者不可變），insert 才用當前登入者
+        author_name: editingDocId
+          ? (window._editSnapshot?.author_name || buildAuthorName())
+          : buildAuthorName(),
         reviewer: document.getElementById('doc-reviewer').value.trim() || null,
         valid_until: document.getElementById('doc-valid-until').value || null,
         tags: currentTags,
@@ -2581,7 +2584,7 @@ async function processBatchNext() {
       <span style="color:var(--text-2);">${f.name}</span>
       <span style="margin-left:auto;display:flex;gap:6px;">
         <button onclick="skipBatchFile()" style="padding:3px 10px;border-radius:5px;border:1px solid var(--border);background:transparent;cursor:pointer;font-size:11px;">跳過</button>
-        <button onclick="skipAllBatch()" style="padding:3px 10px;border-radius:5px;border:1px solid #6a2020;background:#2e1010;color:#f06a6a;cursor:pointer;font-size:11px;">取消批次</button>
+        <button onclick="skipAllBatch()" style="padding:3px 10px;border-radius:5px;border:1px solid #7a2020;background:#380f0f;color:#ff7878;cursor:pointer;font-size:11px;">取消批次</button>
       </span>
     </div>`;
 
@@ -3587,7 +3590,7 @@ async function loadSettingProductLines(wrap) {
           onfocus="this.style.background='var(--bg)';this.style.border='1px solid var(--border)'"
           onblur="this.style.background='transparent';this.style.border='none';updateProductLine('${l.id}',this.value)" />
         <button onclick="deleteProductLine('${l.id}','${l.name.replace(/'/g,'')}')"
-          style="padding:2px 8px;border-radius:5px;border:1px solid #6a2020;background:#2e1010;color:#f06a6a;font-size:11px;cursor:pointer;">刪除</button>
+          style="padding:2px 8px;border-radius:5px;border:1px solid #7a2020;background:#380f0f;color:#ff7878;font-size:11px;cursor:pointer;">刪除</button>
       </div>`).join('')}`;
 }
 
@@ -3649,7 +3652,7 @@ async function loadSettingCategories(wrap) {
         <span style="font-size:11px;color:var(--text-3);font-family:monospace;flex-shrink:0;">${r.cat_key}</span>
         <span style="width:14px;height:14px;border-radius:50%;background:${r.color||'#6B7280'};display:inline-block;flex-shrink:0;"></span>
         <button onclick="deleteCategory('${r.id}','${r.cat_key}')"
-          style="padding:2px 8px;border-radius:5px;border:1px solid #6a2020;background:#2e1010;color:#f06a6a;font-size:11px;cursor:pointer;">刪除</button>
+          style="padding:2px 8px;border-radius:5px;border:1px solid #7a2020;background:#380f0f;color:#ff7878;font-size:11px;cursor:pointer;">刪除</button>
       </div>`).join('')}`;
 }
 
@@ -3854,7 +3857,7 @@ async function loadDocs() {
         ${showEdit ? `<button onclick="openDoc('${d.id}')"
           style="padding:3px 7px;border-radius:5px;border:1px solid var(--border);background:var(--bg);font-size:11px;cursor:pointer;flex-shrink:0;" title="編輯">✏️</button>` : ''}
         ${showDelete ? `<button onclick="deleteDoc('${d.id}','${safeTitle}','${safeAuthor}')"
-          style="padding:3px 7px;border-radius:5px;border:1px solid #6a2020;background:#2e1010;color:#f06a6a;font-size:11px;cursor:pointer;flex-shrink:0;" title="刪除">✕</button>` : ''}
+          style="padding:3px 7px;border-radius:5px;border:1px solid #7a2020;background:#380f0f;color:#ff7878;font-size:11px;cursor:pointer;flex-shrink:0;" title="刪除">✕</button>` : ''}
       </div>
       ${(plBadge || cusBadges) ? `<div style="display:flex;gap:4px;flex-wrap:wrap;padding-left:2px;">${plBadge}${cusBadges}</div>` : ''}
 
@@ -3934,7 +3937,7 @@ function renderStarsWidget(val) {
   const v = parseInt(val) || 1;
   document.querySelectorAll('#stars-widget .star-btn').forEach(btn => {
     const bv = parseInt(btn.dataset.val);
-    btn.style.color = bv <= v ? '#f4c95d' : '#3d4260';
+    btn.style.color = bv <= v ? '#ffd166' : '#444860';
   });
 }
 
@@ -4090,7 +4093,10 @@ async function openDoc(id) {
       ? doc.author_name
       : (portalUser ? (portalUser.nameEn || portalUser.nameZh || '') : '');
   }
-  document.getElementById('doc-reviewer').value = doc.reviewer || '';
+  // Reviewer：若有既有值保留，否則自動填入目前登入者（更新者即本次 reviewer）
+  const _currentUser = portalUser ? (portalUser.nameEn || portalUser.nameZh || '') : '';
+  document.getElementById('doc-reviewer').value =
+    doc.reviewer || _currentUser || '';
   // Valid Until
   const _indEl = document.getElementById('doc-indefinitely');
   const _vuEl2 = document.getElementById('doc-valid-until');
@@ -5428,14 +5434,14 @@ function computeSimpleDiff(oldLines, newLines) {
     const n = newLines[i] ?? null;
     if (o === null) {
       hasChange = true;
-      result.push(`<div style="background:#0d2e20;padding:2px 8px;border-left:3px solid #3ecf8e;">+ ${escHtml(n)}</div>`);
+      result.push(`<div style="background:#0e3828;padding:2px 8px;border-left:3px solid #4edfa0;">+ ${escHtml(n)}</div>`);
     } else if (n === null) {
       hasChange = true;
-      result.push(`<div style="background:#2e1010;padding:2px 8px;border-left:3px solid #f06a6a;">- ${escHtml(o)}</div>`);
+      result.push(`<div style="background:#380f0f;padding:2px 8px;border-left:3px solid #ff7878;">- ${escHtml(o)}</div>`);
     } else if (o !== n) {
       hasChange = true;
-      result.push(`<div style="background:#2e1010;padding:2px 8px;border-left:3px solid #f06a6a;">- ${escHtml(o)}</div>`);
-      result.push(`<div style="background:#0d2e20;padding:2px 8px;border-left:3px solid #3ecf8e;">+ ${escHtml(n)}</div>`);
+      result.push(`<div style="background:#380f0f;padding:2px 8px;border-left:3px solid #ff7878;">- ${escHtml(o)}</div>`);
+      result.push(`<div style="background:#0e3828;padding:2px 8px;border-left:3px solid #4edfa0;">+ ${escHtml(n)}</div>`);
     } else {
       result.push(`<div style="padding:2px 8px;color:var(--text-3);">  ${escHtml(o)}</div>`);
     }
@@ -5634,7 +5640,7 @@ async function loadKmap(filterCat) {
               <button onclick="openDoc('${d.id}')"
                 style="padding:2px 7px;border-radius:5px;border:1px solid var(--border);background:var(--bg);font-size:11px;cursor:pointer;flex-shrink:0;" title="編輯">✏️</button>
               <button onclick="deleteDoc('${d.id}','${safeTitle}','${(d.author_name||'').replace(/'/g,'')}')"
-                style="padding:2px 7px;border-radius:5px;border:1px solid #6a2020;background:#2e1010;color:#f06a6a;font-size:11px;cursor:pointer;flex-shrink:0;">✕</button>
+                style="padding:2px 7px;border-radius:5px;border:1px solid #7a2020;background:#380f0f;color:#ff7878;font-size:11px;cursor:pointer;flex-shrink:0;">✕</button>
             </div>`;}).join('')}
       </div>`;
     return;

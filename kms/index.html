@@ -391,7 +391,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.93</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.94</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
@@ -3324,33 +3324,48 @@ function buildAuthorName() {
 function renderAuthorDropdown(users) {
   const dd = document.getElementById('author-dropdown');
   if (!dd) return;
-  if (!users.length) { dd.innerHTML = '<div style="padding:8px 12px;color:var(--text-3);">無符合人員</div>'; return; }
-  dd.innerHTML = users.slice(0, 10).map(u => `
-    <div onclick="selectAuthor('${(u.nameEn||u.nameZh||'').replace(/'/g,'')}')"
-      style="padding:7px 12px;cursor:pointer;display:flex;gap:8px;align-items:center;"
-      onmouseover="this.style.background='var(--bg)'" onmouseout="this.style.background=''">
-      <span style="flex:1;">${u.nameEn || u.nameZh}</span>
-      <span style="color:var(--text-3);font-size:11px;">${u.site||''}</span>
-    </div>`).join('');
+  if (!users.length) {
+    dd.innerHTML = '<div style="padding:8px 12px;color:var(--text-3);font-size:12px;">無符合人員</div>';
+    dd.style.display = 'block';
+    return;
+  }
+  dd.innerHTML = users.slice(0, 12).map(u => {
+    const name = u.nameEn || u.nameZh || '';
+    const safeName = name.replace(/'/g, '&#39;');
+    const role = u.title || '';
+    return `<div onclick="selectAuthor('${safeName}')"
+      style="padding:7px 12px;cursor:pointer;display:flex;gap:8px;align-items:center;border-bottom:1px solid var(--border);"
+      onmouseover="this.style.background='var(--surface-2)'" onmouseout="this.style.background=''">
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:12px;color:var(--text);">${name}</div>
+        ${role ? `<div style="font-size:10px;color:var(--text-3);">${role}</div>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+  dd.style.display = 'block';
 }
 function selectAuthor(name) {
   const el = document.getElementById('doc-author');
-  if (el) el.value = name;
+  if (el) { el.value = name; el.focus(); }
   hideAuthorList();
 }
 async function showAuthorList() {
+  const input = document.getElementById('doc-author');
+  if (!input || input.readOnly) return;
   const users = await loadReviewerUsers();
-  const q = (document.getElementById('doc-author')?.value || '').toLowerCase();
-  renderAuthorDropdown(q ? users.filter(u => (u.nameEn||'').toLowerCase().includes(q) || (u.nameZh||'').includes(q)) : users);
-  const dd = document.getElementById('author-dropdown');
-  if (dd) dd.style.display = 'block';
+  const q = (input.value || '').toLowerCase();
+  renderAuthorDropdown(q ? users.filter(u =>
+    (u.nameEn||'').toLowerCase().includes(q) || (u.nameZh||'').toLowerCase().includes(q)
+  ) : users);
 }
 async function filterAuthorList(val) {
+  const input = document.getElementById('doc-author');
+  if (!input || input.readOnly) return;
   const users = await loadReviewerUsers();
-  const q = val.toLowerCase();
-  renderAuthorDropdown(q ? users.filter(u => (u.nameEn||'').toLowerCase().includes(q) || (u.nameZh||'').includes(q)) : users);
-  const dd = document.getElementById('author-dropdown');
-  if (dd) dd.style.display = 'block';
+  const q = (val || '').toLowerCase();
+  renderAuthorDropdown(q ? users.filter(u =>
+    (u.nameEn||'').toLowerCase().includes(q) || (u.nameZh||'').toLowerCase().includes(q)
+  ) : users);
 }
 function hideAuthorList() {
   const dd = document.getElementById('author-dropdown');

@@ -391,7 +391,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.86</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.87</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
@@ -3116,6 +3116,8 @@ async function extractPdfWithPdfjs(file) {
   const arrayBuffer = await file.arrayBuffer();
   const pdf = await window.pdfjsLib.getDocument({
     data: arrayBuffer,
+    cMapUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/cmaps/',
+    cMapPacked: true,
     useWorkerFetch: false,
     isEvalSupported: false,
   }).promise;
@@ -3152,6 +3154,8 @@ async function extractImagePdfWithVision(file) {
   const arrayBuffer = await file.arrayBuffer();
   const pdf = await window.pdfjsLib.getDocument({
     data: arrayBuffer,
+    cMapUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/cmaps/',
+    cMapPacked: true,
     useWorkerFetch: false,
     isEvalSupported: false,
   }).promise;

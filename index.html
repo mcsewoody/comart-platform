@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>COMART Platform v1.36</title>
+<title>COMART Platform v1.37</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -323,7 +323,7 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1) brightness(
     <div class="login-logo">
       <div class="login-mark">C</div>
       <div class="login-name">COMART Platform</div>
-      <div class="login-sub">Internal Portal · v1.36</div>
+      <div class="login-sub">Internal Portal · v1.37</div>
     </div>
     <form id="loginForm" onsubmit="doLogin();return false;" autocomplete="on">
     <div class="field">
@@ -351,7 +351,7 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1) brightness(
   <div class="topbar">
     <div class="topbar-logo" onclick="switchView('home')">
       <div class="topbar-mark">C</div>
-      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.36</span></div>
+      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.37</span></div>
     </div>
     <div class="topbar-right">
       <div class="lang-switcher">
@@ -421,6 +421,7 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1) brightness(
 
           <div class="section-title" id="sect-updates">Platform Updates</div>
           <div class="changelog">
+            <div class="cl-item"><div class="cl-dot" style="background:var(--grn)"></div><div><div class="cl-text">v1.37 — i18n 補完（Cards/Users Tab/Calendar dropdown）；HoF Ranking Supabase 失敗時 fallback 顯示員工清單</div><div class="cl-date">2026-06 · Fix</div></div></div>
             <div class="cl-item"><div class="cl-dot" style="background:var(--grn)"></div><div><div class="cl-text">v1.28 — Calendar 手機版修正；Users 三Tab+篩選列；User Modal頭像上傳；HoF Read-Only；色調調亮</div><div class="cl-date">2026-06 · Feature</div></div></div>
             <div class="cl-item"><div class="cl-dot" style="background:var(--grn)"></div><div><div class="cl-text">v1.24 — 整體色調調亮；Event & Trip Modal 欄位標題改亮色</div><div class="cl-date">2026-06 · Enhancement</div></div></div>
             <div class="cl-item"><div class="cl-dot" style="background:var(--grn)"></div><div><div class="cl-text">名人榜 (Employee Directory) — 公司通訊錄、留言、討論區</div><div class="cl-date">2026-05 · New</div></div></div>
@@ -3294,7 +3295,28 @@ async function loadRanking() {
     }).join('');
 
   } catch(e) {
-    listEl.innerHTML = `<div style="color:var(--red);font-size:13px;padding:20px;text-align:center;">載入失敗：${e.message}</div>`;
+    console.warn('loadRanking error:', e.message || e);
+    // Fallback: 從 Firebase users 顯示員工清單
+    if (ALL_USERS && ALL_USERS.length > 0) {
+      const items = ALL_USERS.filter(u => u.role !== 'inactive').slice(0, 20);
+      const medals = ['🥇','🥈','🥉'];
+      listEl.innerHTML = items.map((u, i) => {
+        const av = u.photoURL
+          ? `<img src="${u.photoURL}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;flex-shrink:0;">`
+          : `<div style="width:36px;height:36px;border-radius:50%;background:var(--ac2);color:var(--ac);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0;">${(u.nameEn||u.empId||'?')[0].toUpperCase()}</div>`;
+        const medal = medals[i] || `${i+1}.`;
+        return `<div style="display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--br);">
+          <div style="font-size:18px;width:28px;text-align:center;flex-shrink:0;">${medal}</div>
+          ${av}
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:13px;font-weight:600;color:var(--tx);">${escHtml(u.nameEn||u.nameZh||u.empId)}</div>
+            <div style="font-size:11px;color:var(--tx3);">${escHtml(u.titleEn||u.titleZh||u.dept||'')}</div>
+          </div>
+        </div>`;
+      }).join('') + `<div style="font-size:10px;color:var(--tx3);padding:10px;text-align:center;">KMS 排行需連線 KMS 系統</div>`;
+    } else {
+      listEl.innerHTML = `<div style="color:var(--tx3);font-size:13px;padding:20px;text-align:center;">排行榜暫時無法載入</div>`;
+    }
   }
 }
 
@@ -4297,7 +4319,8 @@ const I18N = {
     card_kms_name:'KMS', card_kms_desc:'ナレッジ管理 — AI Q&A・ドキュメント',
     card_bulletin_name:'掲示板', card_bulletin_desc:'会社のお知らせ',
     card_calendar_name:'行程管理', card_calendar_desc:'出張管理・フライト追跡',
-    card_admin_name:'総務管理', card_admin_desc:'近日公開',
+    card_admin_name:'総務管理', card_admin_desc:'図書・車両・経費・会議室・来客',
+    card_admin_sys_name:'総務管理', card_admin_sys_desc:'図書・車両・経費・会議室・来客',
     card_quotation_name:'見積', card_quotation_desc:'製品見積・CRM・AIツール',
     card_product_name:'製品開発', card_product_desc:'近日公開',
     sect_apps:'アプリケーション', sect_updates:'プラットフォーム更新',
@@ -4461,6 +4484,26 @@ function applyI18nAll() {
   // addTripBtn 是包含 dropdown 的 div，只更新裡面的按鈕文字
   var addMenuBtn = document.getElementById('addMenuBtn');
   if (addMenuBtn) addMenuBtn.textContent = '＋ Add ▾';
+
+  // Calendar dropdown items
+  var calTripItem = document.getElementById('cal-menu-trip');
+  if (calTripItem) calTripItem.textContent = t('trip_title_new');
+  var calEvtItem = document.getElementById('cal-menu-event');
+  if (calEvtItem) calEvtItem.textContent = t('evt_title_new');
+
+  // Users tab buttons
+  var utabUsers = document.getElementById('utab-users');
+  if (utabUsers) utabUsers.innerHTML = '👥 ' + t('users');
+  var utabDept = document.getElementById('utab-dept');
+  if (utabDept) utabDept.innerHTML = '🏢 ' + {en:'Departments','zh-TW':'部門','zh-CN':'部门',vi:'Phòng ban',ja:'部門'}[LANG];
+  var utabSite = document.getElementById('utab-site');
+  if (utabSite) utabSite.innerHTML = '📍 ' + {en:'Sites','zh-TW':'地點','zh-CN':'地点',vi:'Địa điểm',ja:'拠点'}[LANG];
+
+  // User Mgmt add button & title
+  var usrAddBtn2 = document.getElementById('users-add-btn');
+  if (usrAddBtn2) usrAddBtn2.textContent = t('usr_add');
+  var usrTitle2 = document.getElementById('users-title-txt');
+  if (usrTitle2) usrTitle2.textContent = t('usr_title');
 
   // Trip modal labels (update on open too)
   var tfrom = document.querySelector('label[for="trip-date-from-lbl"]');

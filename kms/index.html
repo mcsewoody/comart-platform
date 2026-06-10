@@ -391,7 +391,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.87</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.90</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
@@ -489,6 +489,10 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
               onkeydown="if(event.key==='Enter')doSearch()"/>
             <button class="search-btn" id="search-btn" onclick="doSearch()">
               <span data-i18n="rag.btn">送出問題</span>
+            </button>
+            <button class="search-btn" id="ai-search-btn" onclick="doAiSearch()"
+              style="background:var(--surface);color:var(--blue);border:1px solid var(--blue-border);margin-left:4px;">
+              <span data-i18n="rag.ai_btn">🤖 AI 搜尋</span>
             </button>
           </div>
         </div>
@@ -636,7 +640,8 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
           <div style="position:relative;display:inline-block;">
             <span style="font-size:9px;color:var(--text-3);letter-spacing:.05em;text-transform:uppercase;display:block;margin-bottom:1px;" data-i18n="label.author">Author</span>
             <input class="meta-input" id="doc-author" placeholder="建立者" style="width:110px;background:var(--bg);color:var(--text-3);"
-              autocomplete="off" name="kms-author-nofill" readonly title="建立者為登入使用者，不可修改" />
+              autocomplete="off" name="kms-author-nofill" readonly title="建立者為登入使用者，不可修改"
+              oninput="filterAuthorList(this.value)" onfocus="if(!this.readOnly)showAuthorList()" onblur="setTimeout(()=>hideAuthorList(),200)" />
             <div id="author-dropdown" style="display:none;position:absolute;top:100%;left:0;z-index:999;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:0 4px 12px rgba(0,0,0,.12);min-width:200px;max-height:160px;overflow-y:auto;font-size:12px;"></div>
           </div>
           <div style="position:relative;display:inline-block;">
@@ -1087,7 +1092,7 @@ const I18N = {
     'btn.save':'Save', 'btn.cancel':'Cancel',
     'rag.title':'AI 問答 — 從知識庫取答案',
     'rag.placeholder':'問任何問題，例如：Qi2 充電器良率異常如何處理？',
-    'rag.btn':'送出問題', 'rag.empty':'輸入問題，AI 會從知識庫召回相關段落並彙整回答',
+    'rag.btn':'送出問題', 'rag.ai_btn':'🤖 AI 搜尋', 'rag.empty':'輸入問題，AI 會從知識庫召回相關段落並彙整回答',
     'rag.empty2':'需先設定 API Keys 並新增知識條目',
     'editor.save':'儲存並向量化', 'editor.cancel':'取消', 'editor.update':'更新文件',
     'editor.title.placeholder':'文件標題', 'editor.author.placeholder':'建立者姓名',
@@ -1171,7 +1176,7 @@ const I18N = {
     'nav.review':'审核', 'nav.comments':'讨论', 'nav.setting':'设置',
     'rag.title':'AI 问答 — 从知识库取答案',
     'rag.placeholder':'输入问题，例如：Qi2 充电器良率异常如何处理？',
-    'rag.btn':'提交问题', 'rag.empty':'输入问题，AI 会从知识库召回相关段落并汇总回答',
+    'rag.btn':'提交问题', 'rag.ai_btn':'🤖 AI 搜索', 'rag.empty':'输入问题，AI 会从知识库召回相关段落并汇总回答',
     'rag.empty2':'请先配置 API Keys 并添加知识条目',
     'editor.save':'保存并向量化', 'editor.cancel':'取消', 'editor.update':'更新文档',
     'editor.title.placeholder':'文档标题', 'editor.author.placeholder':'创建者姓名',
@@ -1253,7 +1258,7 @@ const I18N = {
     'nav.review':'Review', 'nav.comments':'Discussion', 'nav.setting':'Settings',
     'rag.title':'AI Q&A — Answers from Knowledge Base',
     'rag.placeholder':'Ask anything, e.g.: How to handle Qi2 charger yield issues?',
-    'rag.btn':'Ask', 'rag.empty':'Enter a question. AI will retrieve relevant passages and synthesize an answer.',
+    'rag.btn':'Ask', 'rag.ai_btn':'🤖 AI Search', 'rag.empty':'Enter a question. AI will retrieve relevant passages and synthesize an answer.',
     'rag.empty2':'Configure API Keys and add documents first.',
     'editor.save':'Save & Vectorize', 'editor.cancel':'Cancel', 'editor.update':'Update Document',
     'editor.title.placeholder':'Document Title', 'editor.author.placeholder':'Author Name',
@@ -1337,7 +1342,7 @@ const I18N = {
     'nav.review':'Xem xét', 'nav.comments':'Thảo luận', 'nav.setting':'Cài đặt',
     'rag.title':'Hỏi đáp AI — Từ kho kiến thức',
     'rag.placeholder':'Đặt câu hỏi, ví dụ: Xử lý lỗi tỷ lệ đạt chuẩn Qi2 như thế nào?',
-    'rag.btn':'Gửi câu hỏi', 'rag.empty':'Nhập câu hỏi, AI sẽ tìm và tổng hợp câu trả lời từ tài liệu',
+    'rag.btn':'Gửi câu hỏi', 'rag.ai_btn':'🤖 Tìm kiếm AI', 'rag.empty':'Nhập câu hỏi, AI sẽ tìm và tổng hợp câu trả lời từ tài liệu',
     'rag.empty2':'Vui lòng cấu hình API Keys và thêm tài liệu trước',
     'editor.save':'Lưu & Vector hóa', 'editor.cancel':'Hủy', 'editor.update':'Cập nhật tài liệu',
     'editor.title.placeholder':'Tiêu đề tài liệu', 'editor.author.placeholder':'Tên tác giả',
@@ -1421,7 +1426,7 @@ const I18N = {
     'nav.review':'レビュー', 'nav.comments':'ディスカッション', 'nav.setting':'設定',
     'rag.title':'AI 質問応答 — ナレッジベースから回答',
     'rag.placeholder':'質問を入力してください（例：Qi2充電器の歩留まり異常の対処法は？）',
-    'rag.btn':'質問する', 'rag.empty':'質問を入力すると、AIがナレッジベースから関連情報を検索して回答します',
+    'rag.btn':'質問する', 'rag.ai_btn':'🤖 AI 検索', 'rag.empty':'質問を入力すると、AIがナレッジベースから関連情報を検索して回答します',
     'rag.empty2':'API Keys を設定し、ドキュメントを追加してください',
     'editor.save':'保存してベクトル化', 'editor.cancel':'キャンセル', 'editor.update':'ドキュメントを更新',
     'editor.title.placeholder':'ドキュメントタイトル', 'editor.author.placeholder':'作成者名',
@@ -2161,9 +2166,9 @@ async function saveDoc() {
       const docPayload = {
         title, body, category, lang, status: finalStatus,
         stars: parseInt(document.getElementById('doc-stars')?.value || '1'),
-        // update 時保留原始 author（建立者不可變），insert 才用當前登入者
+        // author_name：insert 時用登入者，update 時絕對保留原始上傳者
         author_name: editingDocId
-          ? (window._editSnapshot?.author_name || buildAuthorName())
+          ? (window._editSnapshot?.author_name || '')
           : buildAuthorName(),
         reviewer: document.getElementById('doc-reviewer').value.trim() || null,
         valid_until: document.getElementById('doc-valid-until').value || null,
@@ -3399,12 +3404,12 @@ async function loadReviewerUsers() {
   // 從 Supabase kms_experts 補充（避免 Firebase 資料不完整）
   try {
     if (CFG.supabaseUrl && CFG.supabaseKey) {
-      const experts = await sbFetch('/rest/v1/kms_experts?select=emp_id,name_en,name_zh,title_en,site&active=eq.true') || [];
+      const experts = await sbFetch('/rest/v1/kms_experts?select=id,name,role&active=eq.true') || [];
       experts.forEach(e => {
-        if (!_reviewerUsers.find(u => u.empId === e.emp_id)) {
+        if (!_reviewerUsers.find(u => u.empId === e.id)) {
           _reviewerUsers.push({
-            empId: e.emp_id, nameEn: e.name_en||'', nameZh: e.name_zh||'',
-            title: e.title_en||'', site: e.site||'',
+            empId: e.id, nameEn: e.name||'', nameZh: e.name||'',
+            title: e.role||'', site: '',
           });
         }
       });
@@ -3438,6 +3443,7 @@ function selectReviewer(empId, name) {
     toast('已設定審核人，狀態切換為「審核中」', '');
   }
 }
+
 
 async function showReviewerList() {
   const dd = document.getElementById('reviewer-dropdown');
@@ -4093,14 +4099,12 @@ async function openDoc(id) {
   // doc-author 填入文件原作者（或目前登入者）
   const _docAuthorEl = document.getElementById('doc-author');
   if (_docAuthorEl) {
-    _docAuthorEl.value = doc.author_name && doc.author_name !== 'Admin'
-      ? doc.author_name
-      : (portalUser ? (portalUser.nameEn || portalUser.nameZh || '') : '');
+    // Author 永遠顯示原始上傳者，不隨登入者改變
+    _docAuthorEl.value = doc.author_name || '';
   }
-  // Reviewer：若有既有值保留，否則自動填入目前登入者（更新者即本次 reviewer）
+  // Reviewer：修改文件時一律填入目前登入者（修改者即本次 reviewer）
   const _currentUser = portalUser ? (portalUser.nameEn || portalUser.nameZh || '') : '';
-  document.getElementById('doc-reviewer').value =
-    doc.reviewer || _currentUser || '';
+  document.getElementById('doc-reviewer').value = _currentUser || doc.reviewer || '';
   // Valid Until
   const _indEl = document.getElementById('doc-indefinitely');
   const _vuEl2 = document.getElementById('doc-valid-until');
@@ -4194,11 +4198,14 @@ function resetSearchBtn() {
   window._searchAborted = false;
 }
 
+// 純關鍵字搜尋（不呼叫 AI）
 async function doSearch() {
   const q = document.getElementById('search-q').value.trim();
   if (!q) return;
 
   const btn = document.getElementById('search-btn');
+  const aiBtn = document.getElementById('ai-search-btn');
+  if (aiBtn) aiBtn.disabled = true;
   if (!btn) return;
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span> <span onclick="cancelSearch()" style="cursor:pointer;text-decoration:underline;font-size:11px;">取消</span>';
@@ -4213,26 +4220,20 @@ async function doSearch() {
   try {
     if (window._searchAborted) { resetSearchBtn(); return; }
 
-    // Step 1: Retrieve relevant docs
+    // 純關鍵字搜尋：只做向量搜尋，結果直接列出，不呼叫 Claude
     const chunks = await retrieveChunks(q);
     if (window._searchAborted) { resetSearchBtn(); return; }
 
     if (!chunks.length) {
       logSearchGap(q);
-    if (!(CFG.supabaseUrl || CFG.claudeKey)) {
-        const noKeyMsg = {
-          'zh-TW': `⚠ 知識庫找不到「${q}」的相關資料。請完成 Supabase 設定以啟用 AI 外部知識搜尋。`,
-          'zh-CN': `⚠ 知识库中未找到「${q}」的相关资料。请完成 Supabase 配置以启用 AI 外部知识搜索。`,
-          'en':    `⚠ No results in Knowledge Base for "${q}". Configure Supabase to enable AI external search.`,
-          'vi':    `⚠ Không tìm thấy "${q}" trong kho kiến thức. Cấu hình Supabase để bật tìm kiếm AI.`,
-          'ja':    `⚠ ナレッジベースに「${q}」の関連情報がありません。Supabase を設定してください。`,
-        }[currentLang] || `⚠ 知識缺口：找不到「${q}」的相關知識條目。`;
-        ragBody.innerHTML = `<div class="gap-banner">${noKeyMsg}</div>`;
-        resetSearchBtn();
-        return;
-      }
-      // AI 外部知識 fallback
-      await searchWithExternalAI(q, ragBody);
+      const noResultMsg = {
+        'zh-TW': `找不到「${q}」的相關知識條目。可點擊「🤖 AI 搜尋」讓 AI 彙整回答。`,
+        'zh-CN': `未找到「${q}」的相关知识条目。可点击「🤖 AI 搜索」让 AI 汇总回答。`,
+        'en':    `No results found for "${q}". Try "🤖 AI Search" for an AI-generated answer.`,
+        'vi':    `Không tìm thấy kết quả cho "${q}". Thử "🤖 Tìm kiếm AI" để nhận câu trả lời từ AI.`,
+        'ja':    `「${q}」に関する結果が見つかりません。「🤖 AI 検索」でAIによる回答をお試しください。`,
+      }[currentLang] || `找不到「${q}」的相關知識條目。`;
+      ragBody.innerHTML = `<div class="gap-banner">${noResultMsg}</div>`;
       resetSearchBtn();
       return;
     }
@@ -4287,24 +4288,84 @@ async function doSearch() {
         </div>`;
       }).join('')}`;
 
-    // 等一個 microtask，確保 DOM 已更新，ai-output 元素存在
-    await new Promise(r => setTimeout(r, 0));
-
-    if (CFG.supabaseUrl || CFG.claudeKey) {
-      await streamClaude(systemPrompt, userMsg);
-    } else {
-      const mockAnswer = generateMockAnswer(q, chunks);
-      const el = document.getElementById('ai-output');
-      if (el) { el.classList.remove('streaming'); el.textContent = mockAnswer; }
-    }
-
   } catch(e) {
     if (!window._searchAborted) {
       ragBody.innerHTML = `<div style="color:var(--red);font-size:13px;">錯誤：${e.message}</div>`;
     }
   } finally {
-    // finally 是最後防線，確保按鈕一定恢復
+    const aiBtn2 = document.getElementById('ai-search-btn');
+    if (aiBtn2) aiBtn2.disabled = false;
     resetSearchBtn();
+  }
+}
+
+// AI 搜尋（呼叫向量搜尋 + Claude 彙整）
+async function doAiSearch() {
+  const q = document.getElementById('search-q').value.trim();
+  if (!q) return;
+
+  const btn = document.getElementById('search-btn');
+  const aiBtn = document.getElementById('ai-search-btn');
+  if (aiBtn) { aiBtn.disabled = true; aiBtn.innerHTML = '<span class="spinner"></span>'; }
+  if (btn) btn.disabled = true;
+
+  const ragBody = document.getElementById('rag-body');
+  if (!ragBody) { if (aiBtn) { aiBtn.disabled = false; aiBtn.innerHTML = '<span data-i18n="rag.ai_btn">🤖 AI 搜尋</span>'; } return; }
+  const ragEmpty = document.getElementById('rag-empty');
+  if (ragEmpty) ragEmpty.style.display = 'none';
+  ragBody.innerHTML = `<div style="display:flex;align-items:center;gap:8px;color:var(--text-3);font-size:13px;"><span class="spinner"></span> AI 分析中，請稍候…</div>`;
+  window._searchAborted = false;
+
+  try {
+    const chunks = await retrieveChunks(q);
+    if (window._searchAborted) { resetSearchBtn(); return; }
+
+    if (!chunks.length) {
+      logSearchGap(q);
+      await searchWithExternalAI(q, ragBody);
+      resetSearchBtn();
+      return;
+    }
+
+    const docLabel = currentLang === 'ja' ? 'ドキュメント' : '文件';
+    const context = chunks.map((c, i) =>
+      `[${docLabel}${i+1}] 標題：${c.title}\n內容：${c.snippet.substring(0, 400)}`
+    ).join('\n\n');
+
+    const langInstr = {
+      'zh-TW': '請用繁體中文回答', 'zh-CN': '请用简体中文回答',
+      'en': 'Please answer in English', 'vi': 'Vui lòng trả lời bằng tiếng Việt',
+      'ja': '日本語で回答してください',
+    }[currentLang] || '請用繁體中文回答';
+
+    const systemPrompt = `你是 COMART 公司的知識管理 AI 助理。COMART 是台灣 ODM/OEM 製造商，主要產品是磁吸車架、Qi/Qi2 無線充電器和消費性電子配件，工廠在東莞和越南。${langInstr}。只根據以下知識庫內容回答，不要憑空捏造。`;
+    const userMsg = `知識庫內容：\n${context}\n\n問題：${q}`;
+
+    ragBody.innerHTML = `
+      <div class="ai-answer">
+        <div class="ai-label">🤖 AI 彙整回答 — 來源：知識庫</div>
+        <div class="ai-text streaming" id="ai-output"></div>
+      </div>
+      <div class="ref-docs" id="ref-docs-container"></div>`;
+
+    await streamClaudeResponse(systemPrompt, userMsg, 'ai-output');
+
+    // 渲染參考文件
+    const refContainer = document.getElementById('ref-docs-container');
+    if (refContainer && chunks.length) {
+      refContainer.innerHTML = `<div class="ref-docs-title">📎 參考文件</div>` +
+        chunks.map(c => `<div class="ref-doc-item" onclick="openDocById('${c.id}')">
+          <span class="ref-doc-title">${c.title}</span>
+          <span class="ref-doc-sim">${Math.round((c.similarity||0)*100)}%</span>
+        </div>`).join('');
+    }
+  } catch(e) {
+    if (!window._searchAborted) {
+      ragBody.innerHTML = `<div style="color:var(--red);font-size:13px;">錯誤：${e.message}</div>`;
+    }
+  } finally {
+    if (aiBtn) { aiBtn.disabled = false; aiBtn.innerHTML = '<span data-i18n="rag.ai_btn">🤖 AI 搜尋</span>'; }
+    if (btn) btn.disabled = false;
   }
 }
 
@@ -4999,6 +5060,15 @@ function setLang(lang) {
 
 function applyI18n() {
   const s = I18N[currentLang] || I18N['zh-TW'];
+
+  // admin 可修改 author
+  const _authorInput = document.getElementById('doc-author');
+  if (_authorInput) {
+    const _isAdmin = portalUser?.role === 'admin';
+    _authorInput.readOnly = !_isAdmin;
+    _authorInput.style.color = _isAdmin ? 'var(--text)' : 'var(--text-3)';
+    _authorInput.title = _isAdmin ? '管理員可修改建立者' : '建立者為登入使用者，不可修改';
+  }
 
   // data-i18n 元素（文字內容）
   document.querySelectorAll('[data-i18n]').forEach(el => {

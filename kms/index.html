@@ -391,7 +391,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.91</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.93</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
@@ -3865,6 +3865,7 @@ async function loadDocs() {
         <span class="doc-title" onclick="openReader('${d.id}')" style="cursor:pointer;flex:1;min-width:120px;">${d.title}</span>
         <span style="font-size:11px;color:var(--text-3);">${d.lang || ''}</span>
         <span style="font-size:11px;color:var(--text-3);display:flex;gap:6px;align-items:center;">
+          ${d.author_name ? `<span title="Author">✍ ${d.author_name}</span>` : ''}
           <span title="觀看次數">👁 ${d.view_count||0}</span>
           <span title="留言數">💬 <span id="cc-${d.id}">…</span></span>
         </span>
@@ -4247,22 +4248,10 @@ async function doSearch() {
       return;
     }
 
-    // Step 2: Build RAG prompt
-    const docLabel = currentLang === 'ja' ? 'ドキュメント' : '文件';
-    const context = chunks.map((c, i) =>
-      `[${docLabel}${i+1}] 標題：${c.title}\n內容：${c.snippet.substring(0, 400)}`
-    ).join('\n\n');
-
-    const langInstr = {
-      'zh-TW': '請用繁體中文回答', 'zh-CN': '请用简体中文回答',
-      'en': 'Please answer in English', 'vi': 'Vui lòng trả lời bằng tiếng Việt',
-      'ja': '日本語で回答してください',
-    }[currentLang] || '請用繁體中文回答';
-
-    const systemPrompt = `你是 COMART 公司的知識管理 AI 助理。COMART 是台灣 ODM/OEM 製造商，主要產品是磁吸車架、Qi/Qi2 無線充電器和消費性電子配件，工廠在東莞和越南。${langInstr}。根據提供的知識庫內容回答問題，引用來源時標明「[${docLabel}N]」。若知識庫內容不足以回答，如實說明，不要自行捏造資訊。`;
-    const userMsg = `知識庫內容：\n${context}\n\n問題：${q}`;
-
     // 純關鍵字結果：只顯示文件列表，不呼叫 Claude
+    const docLabel = currentLang === 'ja' ? 'ドキュメント' : '文件';
+    const sourcesLabel = { 'zh-TW': `符合文件（${chunks.length} 份）`, 'zh-CN': `符合文档（${chunks.length} 份）`,
+      'en': `Results (${chunks.length})`, 'vi': `Kết quả (${chunks.length})`, 'ja': `結果（${chunks.length} 件）` }[currentLang] || `符合文件（${chunks.length} 份）`;
     ragBody.innerHTML = `
       <div class="sources-label">${sourcesLabel}</div>
       ${chunks.map((c, i) => {

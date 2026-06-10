@@ -391,7 +391,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.90</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.91</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
@@ -1700,6 +1700,15 @@ async function initPortalSession() {
       toast(`以 DCC 身份登入 — 可讀取、審核、封存，無法刪除文件`, '');
     }
   }, 1000);
+
+  // Admin 可修改 author（portalUser 已設定後再執行）
+  const _authorInputInit = document.getElementById('doc-author');
+  if (_authorInputInit) {
+    const _isAdminInit = kmsRole === 'admin';
+    _authorInputInit.readOnly = !_isAdminInit;
+    _authorInputInit.style.color = _isAdminInit ? 'var(--text)' : 'var(--text-3)';
+    _authorInputInit.title = _isAdminInit ? '管理員可修改建立者' : '建立者為登入使用者，不可修改';
+  }
 }
 
 window.addEventListener('DOMContentLoaded', async () => {
@@ -4253,13 +4262,9 @@ async function doSearch() {
     const systemPrompt = `你是 COMART 公司的知識管理 AI 助理。COMART 是台灣 ODM/OEM 製造商，主要產品是磁吸車架、Qi/Qi2 無線充電器和消費性電子配件，工廠在東莞和越南。${langInstr}。根據提供的知識庫內容回答問題，引用來源時標明「[${docLabel}N]」。若知識庫內容不足以回答，如實說明，不要自行捏造資訊。`;
     const userMsg = `知識庫內容：\n${context}\n\n問題：${q}`;
 
-    // Step 3: 先渲染 UI 框架，再呼叫 Claude
+    // 純關鍵字結果：只顯示文件列表，不呼叫 Claude
     ragBody.innerHTML = `
-      <div class="ai-answer">
-        <div class="ai-label">🤖 AI 彙整回答 — 來源：知識庫</div>
-        <div class="ai-text streaming" id="ai-output"></div>
-      </div>
-      <div class="sources-label">參考文件（${chunks.length} 份）</div>
+      <div class="sources-label">${sourcesLabel}</div>
       ${chunks.map((c, i) => {
         const ext = c.file_type || '';
         const badgeClass = ext === 'pdf' ? 'pdf' : ['docx','doc'].includes(ext) ? 'docx' : ['pptx','ppt'].includes(ext) ? 'pptx' : ['csv'].includes(ext) ? 'csv' :
@@ -4348,7 +4353,7 @@ async function doAiSearch() {
       </div>
       <div class="ref-docs" id="ref-docs-container"></div>`;
 
-    await streamClaudeResponse(systemPrompt, userMsg, 'ai-output');
+    await streamClaudeToElement(systemPrompt, userMsg, 'ai-output');
 
     // 渲染參考文件
     const refContainer = document.getElementById('ref-docs-container');

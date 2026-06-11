@@ -391,7 +391,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.94</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.95</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
@@ -1610,9 +1610,12 @@ function getKmsRole() {
 // 判斷目前用戶能否刪除某份文件
 function canDelete(docAuthorName) {
   const role = getKmsRole();
-  if (role === 'dcc') return false;  // dcc 不能刪除
-  if (role === 'admin') return true; // admin 可刪任何文件
-  return false; // user 不能刪除
+  if (role === 'dcc') return false;   // dcc 不能刪除
+  if (role === 'admin') return true;  // admin 無限制
+  // user/dcc 本人：2 天內可刪，由 deleteDoc 判斷時間
+  const myName = portalUser ? (portalUser.nameEn || portalUser.nameZh || '') : '';
+  if (myName && docAuthorName === myName) return true; // 允許，時間限制在 deleteDoc 裡判斷
+  return false;
 }
 
 // 判斷目前用戶能否編輯某份文件
@@ -3352,7 +3355,7 @@ function selectAuthor(name) {
 async function showAuthorList() {
   const input = document.getElementById('doc-author');
   if (!input || input.readOnly) return;
-  const users = await loadReviewerUsers();
+  const users = await loadReviewerUsers(true); // 每次開啟都強制更新
   const q = (input.value || '').toLowerCase();
   renderAuthorDropdown(q ? users.filter(u =>
     (u.nameEn||'').toLowerCase().includes(q) || (u.nameZh||'').toLowerCase().includes(q)
@@ -3405,8 +3408,8 @@ function viewExpertDocs(nameEn) {
 // ─── 審核人自動完成 ───
 let _reviewerUsers = []; // 快取從 Firebase 載入的人員清單
 
-async function loadReviewerUsers() {
-  if (_reviewerUsers.length) return _reviewerUsers;
+async function loadReviewerUsers(forceRefresh = false) {
+  if (_reviewerUsers.length && !forceRefresh) return _reviewerUsers;
   _reviewerUsers = [];
   // 從 Firebase 讀（主要來源）
   try {
@@ -4061,10 +4064,25 @@ function cancelEdit() {
 // DELETE DOCUMENT
 // ═══════════════════════════════════════════════
 async function deleteDoc(id, title, authorName) {
-  // 權限檢查：user 角色不能刪除任何文件
+  // 權限檢查
   if (!canDelete(authorName)) {
-    toast('你沒有刪除文件的權限（僅 Admin / DCC 可刪除）', 'error');
+    toast('你沒有刪除文件的權限（僅 Admin 或文件作者本人可刪除）', 'error');
     return;
+  }
+  // 非 admin：2 天內才可刪（從 created_at 計算）
+  const role = getKmsRole();
+  if (role !== 'admin') {
+    try {
+      const docData = await sbFetch(`/rest/v1/kms_documents?select=created_at&id=eq.${id}`);
+      if (docData && docData[0]?.created_at) {
+        const createdAt = new Date(docData[0].created_at);
+        const diffDays = (Date.now() - createdAt.getTime()) / (1000 * 60 * 60 * 24);
+        if (diffDays > 2) {
+          toast(`⚠ 此文件上傳已超過 2 天，無法刪除。如需刪除請聯繫管理員。`, 'error');
+          return;
+        }
+      }
+    } catch(e) { console.warn('[deleteDoc time check]', e.message); }
   }
   if (!confirm(`確定刪除「${title}」？\n此動作無法復原，版本歷史也會一併刪除。`)) return;
 

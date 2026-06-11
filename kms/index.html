@@ -391,7 +391,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.97</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.98</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
@@ -1654,9 +1654,10 @@ async function initPortalSession() {
         `/rest/v1/kms_users?emp_id=eq.${encodeURIComponent(sess.empId)}&select=name_en,name_zh&limit=1`
       );
       if (rows && rows.length) {
-        displayName = rows[0].name_en || rows[0].name_zh || '';
-        portalUser.nameEn = rows[0].name_en || '';
-        portalUser.nameZh = rows[0].name_zh || '';
+        // 只在 session 沒有姓名時才用 kms_users 補充，不覆蓋已有值
+        if (!portalUser.nameEn && rows[0].name_en) portalUser.nameEn = rows[0].name_en;
+        if (!portalUser.nameZh && rows[0].name_zh) portalUser.nameZh = rows[0].name_zh;
+        displayName = portalUser.nameEn || portalUser.nameZh || displayName;
       }
     } catch(e) { /* 查不到就維持空白，不 fallback 到工號 */ }
   }
@@ -1674,9 +1675,9 @@ async function initPortalSession() {
   const roleLabel = { admin:'KMS Admin', dcc:'KMS DCC', user:'KMS User' }[kmsRole] || kmsRole;
   if (roleEl) roleEl.textContent = roleLabel;
 
-  // 預填建立者姓名（帶入登入者姓名）
+  // 預填建立者姓名（帶入登入者姓名，登入後強制寫入）
   const _authorEl2 = document.getElementById('doc-author');
-  if (_authorEl2 && !_authorEl2.value) {
+  if (_authorEl2 && !editingDocId) {
     _authorEl2.value = displayName || '';
   }
   // 預填今天日期
@@ -3380,7 +3381,11 @@ function hideAuthorList() {
 function resetDocAuthor() {
   const el = document.getElementById('doc-author');
   if (!el) return;
-  el.value = portalUser ? (portalUser.nameEn || portalUser.nameZh || '') : '';
+  if (portalUser) {
+    // 優先用 session 帶來的姓名，避免空字串問題
+    const name = portalUser.nameEn || portalUser.nameZh || '';
+    if (name) el.value = name;
+  }
 }
 function getFileIcon(fileName) {
   const ext = (fileName || '').split('.').pop().toLowerCase();

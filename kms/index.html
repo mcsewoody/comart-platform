@@ -391,7 +391,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.96</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.97</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
@@ -2178,9 +2178,11 @@ async function saveDoc() {
       const docPayload = {
         title, body, category, lang, status: finalStatus,
         stars: parseInt(document.getElementById('doc-stars')?.value || '1'),
-        // author_name：insert 時用登入者，update 時絕對保留原始上傳者
+        // author_name：insert 用登入者；update 時 admin 可改（讀 input），否則保留原始值
         author_name: editingDocId
-          ? (window._editSnapshot?.author_name || '')
+          ? (getKmsRole() === 'admin'
+              ? (document.getElementById('doc-author')?.value.trim() || window._editSnapshot?.author_name || '')
+              : (window._editSnapshot?.author_name || ''))
           : buildAuthorName(),
         reviewer: document.getElementById('doc-reviewer').value.trim() || null,
         valid_until: document.getElementById('doc-valid-until').value || null,

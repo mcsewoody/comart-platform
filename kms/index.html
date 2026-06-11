@@ -391,7 +391,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.95</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.96</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
@@ -3332,7 +3332,7 @@ function renderAuthorDropdown(users) {
     dd.style.display = 'block';
     return;
   }
-  dd.innerHTML = users.slice(0, 12).map(u => {
+  dd.innerHTML = users.slice(0, 50).map(u => {
     const name = u.nameEn || u.nameZh || '';
     const safeName = name.replace(/'/g, '&#39;');
     const role = u.title || '';
@@ -3428,20 +3428,8 @@ async function loadReviewerUsers(forceRefresh = false) {
       });
     });
   } catch(e) { console.warn('[reviewer firebase]', e.message); }
-  // 從 Supabase kms_experts 補充（避免 Firebase 資料不完整）
-  try {
-    if (CFG.supabaseUrl && CFG.supabaseKey) {
-      const experts = await sbFetch('/rest/v1/kms_experts?select=id,name,role&active=eq.true') || [];
-      experts.forEach(e => {
-        if (!_reviewerUsers.find(u => u.empId === e.id)) {
-          _reviewerUsers.push({
-            empId: e.id, nameEn: e.name||'', nameZh: e.name||'',
-            title: e.role||'', site: '',
-          });
-        }
-      });
-    }
-  } catch(e) { console.warn('[reviewer supabase]', e.message); }
+  // kms_experts 不作為人員來源（UUID id 與 Firebase empId 格式不同，會造成重複）
+  // Firebase users collection 已是完整員工名單（30筆）
   return _reviewerUsers;
 }
 
@@ -3449,7 +3437,7 @@ function renderReviewerDropdown(users) {
   const dd = document.getElementById('reviewer-dropdown');
   if (!dd) return;
   if (!users.length) { dd.innerHTML = '<div style="padding:8px 12px;color:var(--text-3);">無符合人員</div>'; return; }
-  dd.innerHTML = users.slice(0, 8).map(u => `
+  dd.innerHTML = users.slice(0, 50).map(u => `
     <div onclick="selectReviewer('${u.empId}','${u.nameEn||u.nameZh}')"
       style="padding:7px 12px;cursor:pointer;display:flex;gap:8px;align-items:center;"
       onmouseover="this.style.background='var(--bg)'" onmouseout="this.style.background=''">

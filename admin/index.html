@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART 行政管理平台 v1.18</title>
+<title>COMART 行政管理平台 v1.19</title>
 <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.js"></script>
 <style>
 :root{
@@ -439,7 +439,7 @@ tr.ovr td{background:rgba(239,68,68,.04)}
   /* 預約表單 grid → 1欄 */
   #pg-car-bk .fg2{grid-template-columns:1fr!important}
 
-  /* 停車格 grid */
+  /* 停車位 grid */
   #pk-grid{grid-template-columns:repeat(2,1fr)!important}
 
   /* 日曆標題 */
@@ -509,7 +509,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="logo">
     <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
     <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
-    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.18</span>
+    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.19</span>
   </div>
   <div class="trr">
     <div style="display:flex;align-items:center;gap:6px;padding:4px 12px;background:var(--surface-2);border:1px solid var(--border);border-radius:20px;font-size:12px;cursor:pointer" onclick="showUsw()" id="topbar-user">
@@ -517,7 +517,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <span id="cur-u" style="color:var(--text-2)">載入中…</span>
       <span style="color:var(--text-3);font-size:10px">▾</span>
     </div>
-    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.18</span>
+    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.19</span>
   </div>
 </div>
 <div id="layout-wrap" style="display:flex;min-height:calc(100vh - var(--th))">
@@ -567,7 +567,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi" data-p="lib-cats"><span class="ic">🏷️</span>分類管理</div>
       <div class="navi" data-p="lib-cfg"><span class="ic">⚙️</span>系統設定</div>
     </div>
-    <div class="sbf">v1.18 · Supabase<br><span style="color:var(--ac)">● 本機存儲</span></div>
+    <div class="sbf">v1.19 · Supabase<br><span style="color:var(--ac)">● 本機存儲</span></div>
   </div>
   <div class="mc" id="lc">
     <div class="pg active" id="pg-lib-dash">
@@ -649,7 +649,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       
       <div class="navi cn" data-p="car-cfg"><span class="ic">⚙️</span>系統設定</div>
     </div>
-    <div class="sbf">v1.18 · Supabase<br><span style="color:var(--tl)">● 本機存儲</span></div>
+    <div class="sbf">v1.19 · Supabase<br><span style="color:var(--tl)">● 本機存儲</span></div>
   </div>
   <div class="mc cf" id="cc">
     <div class="pg active" id="pg-car-dash">
@@ -663,12 +663,12 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
         <div><div class="sth"><div class="stt">📅 今日預約</div><div class="stb" id="cd-dt"></div></div><div class="tw"><table><thead><tr><th>車輛</th><th>使用人</th><th>時間</th><th>目的</th><th>狀態</th></tr></thead><tbody id="cd-td"></tbody></table></div></div>
         <div><div class="sth"><div class="stt">🔔 保養/驗車提醒</div></div><div class="tw"><table><thead><tr><th>車輛</th><th>項目</th><th>到期</th><th>剩餘</th></tr></thead><tbody id="cd-rm"></tbody></table></div></div>
       </div>
-      <div class="sth"><div class="stt">🚙 車輛即時狀態</div><button class="btn btl bsm" style="margin-left:auto" onclick="navCar('car-bk')">＋ 新增預約</button></div>
+      <div class="sth"><div class="stt">🚙 車輛即時狀態</div></div>
       <div class="cgrid" id="cd-cards"></div>
     </div>
     <div class="pg" id="pg-car-veh">
       <div class="fb"><div class="sw2"><span class="si">🔍</span><input type="text" id="vhq" placeholder="車牌、車名…" oninput="renderVeh()"></div><select id="vhtp" style="width:115px" onchange="renderVeh()"><option value="">所有類型</option><option value="sedan">轎車</option><option value="suv">SUV</option><option value="van">廂型車</option><option value="truck">貨車</option></select><button class="btn btl" onclick="requireAdmin(()=>openVehModal())" id="btn-add-veh">＋ 新增車輛</button></div>
-      <div class="tw"><table><thead><tr><th>車輛</th><th>車牌</th><th>類型</th><th>燃料</th><th>停車格</th><th>里程km</th><th>下次保養km</th><th>狀態</th><th>操作</th></tr></thead><tbody id="vh-tb"></tbody></table></div>
+      <div class="tw"><table><thead><tr><th>車輛</th><th>車牌</th><th>類型</th><th>燃料</th><th>停車位</th><th>里程km</th><th>下次保養km</th><th>狀態</th><th>操作</th></tr></thead><tbody id="vh-tb"></tbody></table></div>
     </div>
     <div class="pg" id="pg-car-cal">
       <div class="fb"><select id="cal-vf" style="width:155px" onchange="renderCal()"><option value="">所有車輛</option></select><button class="btn btl bsm" onclick="navCar('car-bk')">＋ 新增預約</button></div>
@@ -717,7 +717,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="tw"><table><thead><tr><th>車輛</th><th>上次驗車</th><th>下次驗車</th><th>剩餘天數</th><th>狀態</th><th>備註</th><th>操作</th></tr></thead><tbody id="insp-tb"></tbody></table></div>
     </div>
     <div class="pg" id="pg-car-park">
-      <div class="fb"><div class="stt">停車格管理</div><div style="margin-left:auto"></div><button class="btn btl" onclick="openParkModal()">＋ 新增停車格</button></div>
+      <div class="fb"><div class="stt">停車位管理</div><div style="margin-left:auto"></div><button class="btn btl" onclick="openParkModal()">＋ 新增停車位</button></div>
       <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(195px,1fr));gap:12px;margin-top:8px" id="pk-grid"></div>
     </div>
     <div class="pg" id="pg-car-cfg">
@@ -741,7 +741,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi tna active" data-p="trip-new"><span class="ic">➕</span>新增報支單</div>
       <div class="navi tna" data-p="trip-list"><span class="ic">📋</span>報支單清單</div>
     </div>
-    <div class="sbf">v1.18 · Supabase<br><span style="color:var(--yw)">● 本機存儲</span></div>
+    <div class="sbf">v1.19 · Supabase<br><span style="color:var(--yw)">● 本機存儲</span></div>
   </div>
   <div class="mc" id="tc">
 
@@ -880,7 +880,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi rna" data-p="room-report"><span class="ic">📊</span>使用率報表</div>
       <div class="navi rna" data-p="room-fault"><span class="ic">🔧</span>故障回報<span class="nbadge" id="nb-fault" style="display:none">0</span></div>
     </div>
-    <div class="sbf">v1.18 · Supabase<br><span style="color:var(--gn)">● 本機存儲</span></div>
+    <div class="sbf">v1.19 · Supabase<br><span style="color:var(--gn)">● 本機存儲</span></div>
   </div>
   <div class="mc" id="rmc">
 
@@ -1047,7 +1047,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi vna" data-p="visit-guests"><span class="ic">👥</span>來賓資料庫</div>
       <div class="navi vna" data-p="visit-report"><span class="ic">📊</span>接待報表</div>
     </div>
-    <div class="sbf">v1.18 · Supabase<br><span style="color:#a78bfa">● 本機存儲</span></div>
+    <div class="sbf">v1.19 · Supabase<br><span style="color:#a78bfa">● 本機存儲</span></div>
   </div>
   <div class="mc" id="vmc">
 
@@ -1211,11 +1211,11 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
 <div class="mo" id="mo-cat"><div class="md" style="max-width:340px"><div class="mh"><div class="mt2">新增分類</div><button class="mc2" onclick="closeMo('mo-cat')">✕</button></div><div class="mb"><div class="fg"><div class="fl">分類名稱 *</div><input type="text" id="catnm" placeholder="管理、設計…"></div></div><div class="mf"><button class="btn bg2" onclick="closeMo('mo-cat')">取消</button><button class="btn bp" onclick="saveCat()">新增</button></div></div></div>
 <div class="mo" id="mo-rsv"><div class="md" style="max-width:430px"><div class="mh"><div class="mt2">新增預約</div><button class="mc2" onclick="closeMo('mo-rsv')">✕</button></div><div class="mb"><div class="fg"><div class="fl">預約人 *</div><select id="rsvu"><option value="">請選擇…</option></select></div><div class="fg"><div class="fl">書籍 *</div><select id="rsvb"><option value="">請選擇…</option></select></div></div><div class="mf"><button class="btn bg2" onclick="closeMo('mo-rsv')">取消</button><button class="btn bp" onclick="saveRsv()">確認</button></div></div></div>
 <div class="mo" id="mo-usw"><div class="md" style="max-width:400px"><div class="mh"><div class="mt2">切換使用者</div><button class="mc2" onclick="closeMo('mo-usw')">✕</button></div><div class="mb"><div class="fh" style="margin-bottom:10px">選擇您的帳號</div><div class="ugrid" id="usw-list"></div></div></div></div>
-<div class="mo" id="mo-veh"><div class="md"><div class="mh"><div class="mt2" id="movht">新增車輛</div><button class="mc2" onclick="closeMo('mo-veh')">✕</button></div><div class="mb cf"><div class="fg2"><div class="fg full"><div class="fl">車輛名稱 *</div><input type="text" id="vnm" placeholder="Toyota Camry 白"></div><div class="fg"><div class="fl">車牌號碼 *</div><input type="text" id="vpl" placeholder="ABC-1234"></div><div class="fg"><div class="fl">類型</div><select id="vtp"><option value="sedan">轎車</option><option value="suv">SUV</option><option value="van">廂型車</option><option value="truck">貨車</option></select></div><div class="fg"><div class="fl">燃料</div><select id="vfl"><option value="gas">汽油</option><option value="diesel">柴油</option><option value="hybrid">油電</option><option value="ev">純電</option></select></div><div class="fg"><div class="fl">目前里程 (km)</div><input type="number" id="vkm" value="0" min="0"></div><div class="fg"><div class="fl">下次保養里程</div><input type="number" id="vnmk" placeholder="50000"></div><div class="fg"><div class="fl">下次驗車日期</div><input type="date" id="vni"></div><div class="fg"><div class="fl">停車格（選填）</div><input type="text" id="vpk" placeholder="例：B1-001"></div><div class="fg"><div class="fl">狀態</div><select id="vstatus"><option value="available">可用</option><option value="maintenance">保養中</option><option value="retired">已除役</option></select></div><div class="fg full"><div class="fl">備註</div><textarea id="vnt" style="min-height:55px"></textarea></div></div></div><div class="mf"><button class="btn bg2" onclick="closeMo('mo-veh')">取消</button><button class="btn btl" onclick="saveVeh()">儲存</button></div></div></div>
+<div class="mo" id="mo-veh"><div class="md"><div class="mh"><div class="mt2" id="movht">新增車輛</div><button class="mc2" onclick="closeMo('mo-veh')">✕</button></div><div class="mb cf"><div class="fg2"><div class="fg full"><div class="fl">車輛名稱 *</div><input type="text" id="vnm" placeholder="Toyota Camry 白"></div><div class="fg"><div class="fl">車牌號碼 *</div><input type="text" id="vpl" placeholder="ABC-1234"></div><div class="fg"><div class="fl">類型</div><select id="vtp"><option value="sedan">轎車</option><option value="suv">SUV</option><option value="van">廂型車</option><option value="truck">貨車</option></select></div><div class="fg"><div class="fl">燃料</div><select id="vfl"><option value="gas">汽油</option><option value="diesel">柴油</option><option value="hybrid">油電</option><option value="ev">純電</option></select></div><div class="fg"><div class="fl">目前里程 (km)</div><input type="number" id="vkm" value="0" min="0"></div><div class="fg"><div class="fl">下次保養里程</div><input type="number" id="vnmk" placeholder="50000"></div><div class="fg"><div class="fl">下次驗車日期</div><input type="date" id="vni"></div><div class="fg"><div class="fl">停車位（選填）</div><input type="text" id="vpk" placeholder="例：B1-001"></div><div class="fg"><div class="fl">狀態</div><select id="vstatus"><option value="available">可用</option><option value="maintenance">保養中</option><option value="retired">已除役</option></select></div><div class="fg full"><div class="fl">備註</div><textarea id="vnt" style="min-height:55px"></textarea></div></div></div><div class="mf"><button class="btn bg2" onclick="closeMo('mo-veh')">取消</button><button class="btn btl" onclick="saveVeh()">儲存</button></div></div></div>
 <div class="mo" id="mo-fuel"><div class="md" style="max-width:480px"><div class="mh"><div class="mt2">記錄加油</div><button class="mc2" onclick="closeMo('mo-fuel')">✕</button></div><div class="mb cf"><div class="fg2"><div class="fg full"><div class="fl">車輛 *</div><select id="fveh"><option value="">請選擇…</option></select></div><div class="fg"><div class="fl">加油日期 *</div><input type="date" id="fdt"></div><div class="fg"><div class="fl">加油人</div><select id="fusr"><option value="">請選擇…</option></select></div><div class="fg"><div class="fl">加油量 (公升) *</div><input type="number" id="flt" placeholder="40" min="0" step="0.1" oninput="calcFuel()"></div><div class="fg"><div class="fl">單價 (元/L)</div><input type="number" id="fpr" placeholder="32" min="0" step="0.1" oninput="calcFuel()"></div><div class="fg"><div class="fl">總金額 (元)</div><input type="number" id="ftot" placeholder="自動計算"></div><div class="fg"><div class="fl">油表里程 (km)</div><input type="number" id="fod" placeholder="0" min="0"></div><div class="fg full"><div class="fl">備註</div><input type="text" id="fnt" placeholder="加油站、油種…"></div></div></div><div class="mf"><button class="btn bg2" onclick="closeMo('mo-fuel')">取消</button><button class="btn btl" onclick="saveFuel()">儲存</button></div></div></div>
 <div class="mo" id="mo-maint"><div class="md"><div class="mh"><div class="mt2" id="momtt">新增保養記錄</div><button class="mc2" onclick="closeMo('mo-maint')">✕</button></div><div class="mb cf"><div class="fg2"><div class="fg full"><div class="fl">車輛 *</div><select id="mtveh"><option value="">請選擇…</option></select></div><div class="fg"><div class="fl">保養日期 *</div><input type="date" id="mtdt"></div><div class="fg"><div class="fl">里程 (km)</div><input type="number" id="mtkm" min="0"></div><div class="fg full"><div class="fl">保養項目 *</div><input type="text" id="mtit" placeholder="機油+機濾、煞車片…"></div><div class="fg"><div class="fl">費用 (元)</div><input type="number" id="mtcs" min="0"></div><div class="fg"><div class="fl">廠商</div><input type="text" id="mtvd"></div><div class="fg"><div class="fl">下次保養里程</div><input type="number" id="mtnk" min="0"></div><div class="fg"><div class="fl">下次保養日期</div><input type="date" id="mtnd"></div><div class="fg full"><div class="fl">備註</div><textarea id="mtnt" style="min-height:52px"></textarea></div></div></div><div class="mf"><button class="btn bg2" onclick="closeMo('mo-maint')">取消</button><button class="btn btl" onclick="saveMaint()">儲存</button></div></div></div>
 <div class="mo" id="mo-insp"><div class="md" style="max-width:450px"><div class="mh"><div class="mt2" id="moispt">登記驗車</div><button class="mc2" onclick="closeMo('mo-insp')">✕</button></div><div class="mb cf"><div class="fg2"><div class="fg full"><div class="fl">車輛 *</div><select id="ispveh"><option value="">請選擇…</option></select></div><div class="fg"><div class="fl">上次驗車日期</div><input type="date" id="ispls"></div><div class="fg"><div class="fl">下次驗車日期 *</div><input type="date" id="ispnx"></div><div class="fg full"><div class="fl">備註</div><input type="text" id="ispnt"></div></div></div><div class="mf"><button class="btn bg2" onclick="closeMo('mo-insp')">取消</button><button class="btn btl" onclick="saveInsp()">儲存</button></div></div></div>
-<div class="mo" id="mo-park"><div class="md" style="max-width:380px"><div class="mh"><div class="mt2">新增停車格</div><button class="mc2" onclick="closeMo('mo-park')">✕</button></div><div class="mb cf"><div class="fg"><div class="fl">格位編號 *</div><input type="text" id="pknm" placeholder="B1-001"></div><div class="fg"><div class="fl">地點說明</div><input type="text" id="pklc" placeholder="地下一層停車場"></div><div class="fg"><div class="fl">備註</div><input type="text" id="pknt"></div></div><div class="mf"><button class="btn bg2" onclick="closeMo('mo-park')">取消</button><button class="btn btl" onclick="savePark()">新增</button></div></div></div>
+<div class="mo" id="mo-park"><div class="md" style="max-width:380px"><div class="mh"><div class="mt2">新增停車位</div><button class="mc2" onclick="closeMo('mo-park')">✕</button></div><div class="mb cf"><div class="fg"><div class="fl">格位編號 *</div><input type="text" id="pknm" placeholder="B1-001"></div><div class="fg"><div class="fl">地點說明</div><input type="text" id="pklc" placeholder="地下一層停車場"></div><div class="fg"><div class="fl">備註</div><input type="text" id="pknt"></div></div><div class="mf"><button class="btn bg2" onclick="closeMo('mo-park')">取消</button><button class="btn btl" onclick="savePark()">新增</button></div></div></div>
 
 
 <div class="mo" id="mo-fault"><div class="md" style="max-width:440px">
@@ -1290,6 +1290,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="mf"><button class="btn bg2" onclick="closeMo('mo-broadcast')">取消</button><button class="broadcast-btn" onclick="sendBroadcast()">🚨 立即廣播</button></div>
 </div></div>
 
+<div class="mo" id="mo-ret"><div class="md" style="max-width:420px"><div class="mh"><div class="mt2">🔑 車輛歸還</div><button class="mcl" onclick="closeMo('mo-ret')">✕</button></div><input type="hidden" id="ret-bk-id"><div class="fg" style="margin-bottom:12px"><div class="fl">歸還里程數（km）*</div><input type="number" id="ret-km" min="0" placeholder="請輸入歸還時里程數"><div style="font-size:11px;color:var(--text-3);margin-top:4px" id="ret-km-hint"></div></div><div class="fg" style="margin-bottom:12px"><div class="fl">停車位</div><input type="text" id="ret-pk" placeholder="例：B1-001（選填）"><div style="font-size:11px;color:var(--text-3);margin-top:4px">歸還後車輛停放位置</div></div><div id="ret-err" style="display:none;color:var(--red);font-size:12px;margin-bottom:8px;padding:8px;background:var(--red-bg);border-radius:var(--radius)"></div><div style="display:flex;gap:10px;margin-top:16px"><button class="btn bg2" style="flex:1" onclick="closeMo('mo-ret')">取消</button><button class="btn btl" style="flex:2" onclick="doReturn()">✓ 確認歸還</button></div></div></div>
 <div id="toastc"></div>
 <script>
 // ── ADMIN CONFIG ──────────────────────────────────
@@ -1924,7 +1925,7 @@ async function seedCar(){
   const fd=d=>{const dt=new Date();dt.setDate(dt.getDate()+d);return dt.toISOString().slice(0,10)};
   const us=ld(K.us);
 
-  // 停車格
+  // 停車位
   const pks=[
     {id:PK1,number:'B1-001',location:'地下一層',note:''},
     {id:PK2,number:'B1-002',location:'地下一層',note:''},
@@ -2230,7 +2231,7 @@ function renderCarDash(){
   document.getElementById('cd-td').innerHTML=tdBks.length?tdBks.map(b=>{const v=gVeh(b.vh_id),u=gUsr(b.u_id);return`<tr><td>${VICO[v?.type]||'🚗'} ${v?.name||'—'}</td><td>${u?.name||'—'}</td><td class="tdm">${b.start.slice(11,16)}–${b.end.slice(11,16)}</td><td class="tdm">${b.purpose||'—'}</td><td>${bkBadge(b)}</td></tr>`}).join(''):'<tr><td colspan="5" class="tdm" style="text-align:center;padding:14px">今日無預約</td></tr>';
   const rems=[];vehs.forEach(v=>{if(v.next_maint_km&&v.km>=(v.next_maint_km-cfg.maint_km))rems.push({v,item:'定期保養',diff:v.next_maint_km-v.km,type:'km'});if(v.next_insp&&dDiff(v.next_insp)<=cfg.insp_days)rems.push({v,item:'定期驗車',diff:dDiff(v.next_insp),date:v.next_insp,type:'dt'});});
   document.getElementById('cd-rm').innerHTML=rems.length?rems.map(r=>`<tr><td>${VICO[r.v.type]||'🚗'} ${r.v.name}</td><td>${r.item}</td><td class="tdm">${r.type==='dt'?fmtD(r.date):`里程${r.v.next_maint_km}km`}</td><td>${r.type==='dt'?`<span class="badge ${r.diff<=7?'br':r.diff<=30?'by':'bo'}">${r.diff}天</span>`:`<span class="badge bo">差${r.diff}km</span>`}</td></tr>`).join(''):'<tr><td colspan="4" class="tdm" style="text-align:center;padding:14px">✓ 無緊急提醒</td></tr>';
-  document.getElementById('cd-cards').innerHTML=vehs.map(v=>{const st=vStBadge(v),pk=gPk(v.pk_id),curBk=bks.find(b=>b.vh_id===v.id&&b.st==='active'&&b.start<=now&&b.end>=now),curU=curBk?gUsr(curBk.u_id):null;return`<div class="ccard"><div class="cch"><div class="ccico">${VICO[v.type]||'🚗'}</div><div><div class="ccn">${v.name}</div><div class="ccp">${v.plate}</div></div><span class="badge ${st.cls}" style="margin-left:auto">${st.lbl}</span></div><div class="ccb"><div class="ccr"><span class="ccl">類型/燃料</span><span class="ccv">${VTLB[v.type]||v.type}·${VFLB[v.fuel]||v.fuel}</span></div><div class="ccr"><span class="ccl">里程</span><span class="ccv">${v.km.toLocaleString()}km</span></div><div class="ccr"><span class="ccl">停車格</span><span class="ccv">${v.pk_id||'—'}</span></div>${curU?`<div class="ccr"><span class="ccl">使用者</span><span class="ccv" style="color:var(--tl)">${curU.name}</span></div>`:''}</div><div class="ccf"><button class="btn btl bsm" onclick="startBk(\'${v.id}\')">＋ 預約</button></div></div>`}).join('');
+  document.getElementById('cd-cards').innerHTML=vehs.map(v=>{const st=vStBadge(v),pk=gPk(v.pk_id),pendBk=bks.find(b=>b.vh_id===v.id&&b.st==='pending'),actBk=bks.find(b=>b.vh_id===v.id&&b.st==='active'),curU=actBk?gUsr(actBk.u_id):null;return`<div class="ccard"><div class="cch"><div class="ccico">${VICO[v.type]||'🚗'}</div><div><div class="ccn">${v.name}</div><div class="ccp">${v.plate}</div></div><span class="badge ${st.cls}" style="margin-left:auto">${st.lbl}</span></div><div class="ccb"><div class="ccr"><span class="ccl">類型/燃料</span><span class="ccv">${VTLB[v.type]||v.type}·${VFLB[v.fuel]||v.fuel}</span></div><div class="ccr"><span class="ccl">里程</span><span class="ccv">${v.km.toLocaleString()}km</span></div><div class="ccr"><span class="ccl">停車位</span><span class="ccv">${v.pk_id||'—'}</span></div>${curU?`<div class="ccr"><span class="ccl">使用者</span><span class="ccv" style="color:var(--tl)">${curU.name}</span></div>`:''}</div><div class="ccf"><button class="btn btl bsm" onclick="startBk(\'${v.id}\')">＋ 預約</button></div></div>`}).join('');
 }
 
 let editVid=null;
@@ -2275,7 +2276,7 @@ function renderMoCal(bks,mts,isps,vf){
   const first=new Date(y,m,1),last=new Date(y,m+1,0),sd=first.getDay();
   const days=[];for(let i=0;i<sd;i++)days.push({d:new Date(y,m,1-sd+i),cur:false});for(let i=1;i<=last.getDate();i++)days.push({d:new Date(y,m,i),cur:true});while(days.length%7)days.push({d:new Date(y,m+1,days.length-last.getDate()-sd+1),cur:false});
   const today=tds();let h='<div class="cg7">';['日','一','二','三','四','五','六'].forEach(w=>h+=`<div class="cwd">${w}</div>`);
-  days.forEach(({d,cur})=>{const ds=d.toISOString().slice(0,10),dbks=bks.filter(b=>b.start.slice(0,10)<=ds&&b.end.slice(0,10)>=ds),dmts=mts.filter(mt=>mt.ndt===ds&&(!vf||mt.vh_id===vf)),disps=isps.filter(isp=>isp.next===ds&&(!vf||isp.vh_id===vf));h+=`<div class="cday ${ds===today?'today':''} ${!cur?'om':''}"><div class="cdn">${d.getDate()}</div>`;let cnt=0;dbks.slice(0,2).forEach(b=>{const v=gVeh(b.vh_id);h+=`<div class="cev ev-${b.st}" onclick="viewBk('${b.id}')" title="${v?.name}: ${b.purpose}">${VICO[v?.type]||'🚗'} ${b.purpose||'預約'}</div>`;cnt++;});dmts.slice(0,1).forEach(mt=>{const v=gVeh(mt.vh_id);h+=`<div class="cev ev-m">🔧 ${v?.name||'保養'}</div>`;cnt++;});disps.slice(0,1).forEach(isp=>{const v=gVeh(isp.vh_id);h+=`<div class="cev ev-m">📋 驗車${v?.plate||''}</div>`;cnt++;});const tot=dbks.length+dmts.length+disps.length;if(tot>cnt)h+=`<div class="cmore">+${tot-cnt}筆</div>`;h+=`</div>`;});
+  days.forEach(({d,cur})=>{const ds=d.toISOString().slice(0,10),dbks=bks.filter(b=>b.start.slice(0,10)<=ds&&b.end.slice(0,10)>=ds),dmts=mts.filter(mt=>mt.ndt===ds&&(!vf||mt.vh_id===vf)),disps=isps.filter(isp=>isp.next===ds&&(!vf||isp.vh_id===vf));h+=`<div class="cday ${ds===today?'today':''} ${!cur?'om':''}"><div class="cdn">${d.getDate()}</div>`;let cnt=0;dbks.slice(0,2).forEach(b=>{const v=gVeh(b.vh_id);h+=`<div class="cev ev-${b.st}" onclick="viewBk('${b.id}')" title="${v?.name}: ${b.purpose}">${VICO[v?.type]||'🚗'} ${v?.plate?.slice(-4)||b.purpose||'預約'}</div>`;cnt++;});dmts.slice(0,1).forEach(mt=>{const v=gVeh(mt.vh_id);h+=`<div class="cev ev-m">🔧 ${v?.name||'保養'}</div>`;cnt++;});disps.slice(0,1).forEach(isp=>{const v=gVeh(isp.vh_id);h+=`<div class="cev ev-m">📋 驗車${v?.plate||''}</div>`;cnt++;});const tot=dbks.length+dmts.length+disps.length;if(tot>cnt)h+=`<div class="cmore">+${tot-cnt}筆</div>`;h+=`</div>`;});
   h+='</div>';document.getElementById('cal-body').innerHTML=h;
 }
 function renderWkCal(bks,mts,isps,vf){
@@ -2361,7 +2362,34 @@ function renderUse(){
   document.getElementById('use-tb').innerHTML=bks.length?bks.map(b=>{const v=gVeh(b.vh_id),u=gUsr(b.u_id);return`<tr><td>${VICO[v?.type]||'🚗'} ${v?.name||'—'}</td><td>${u?.name||'—'}</td><td class="tdm">${b.start.replace('T',' ')}</td><td class="tdm">${b.end.replace('T',' ')}</td><td>${b.purpose||'—'}</td><td class="tdm">${b.km_plan||'—'}</td><td>${bkBadge(b)}</td><td>${b.st==='pending'?`<button class="btn btl bsm" onclick="startUse('${b.id}')">出發</button>`:''} ${b.st==='active'?`<button class="btn bg2 bsm" onclick="endUse('${b.id}')">歸還</button>`:''} ${b.st!=='done'&&b.st!=='active'?`<button class="btn bdr bsm" onclick="cancelBk('${b.id}')">取消</button>`:''}</td></tr>`}).join(''):'<tr><td colspan="8" class="tdm" style="text-align:center;padding:22px">無資料</td></tr>';
 }
 function startUse(id){const bks=ld(K.bks),i=bks.findIndex(b=>b.id===id);if(i>=0){bks[i].st='active';bks[i].actual_start=new Date().toISOString().slice(0,16);}sv(K.bks,bks);if(i>=0)sbSaveCarBk(bks[i]);renderUse();toast('已標記出發','success');}
-function endUse(id){const km=prompt('請輸入歸還里程數（km）：');if(km===null)return;const bks=ld(K.bks),i=bks.findIndex(b=>b.id===id);if(i>=0){bks[i].st='done';bks[i].actual_end=new Date().toISOString().slice(0,16);bks[i].actual_km=parseInt(km)||0;}const vehs=ld(K.vh),vi=vehs.findIndex(v=>v.id===bks[i]?.vh_id);if(vi>=0&&parseInt(km)>vehs[vi].km){vehs[vi].km=parseInt(km);sv(K.vh,vehs);}sv(K.bks,bks);if(bks[bks.findIndex(b=>b.id===id)])sbSaveCarBk(bks[bks.findIndex(b=>b.id===id)]);renderUse();toast('已登記歸還','success');}
+function endUse(id){
+  const bks=ld(K.bks),i=bks.findIndex(b=>b.id===id);if(i<0)return;
+  const bk=bks[i],vehs=ld(K.vh),vi=vehs.findIndex(v=>v.id===bk.vh_id),vh=vehs[vi];
+  const defKm=(vh?.km||0)+(bk.km_plan||0);
+  document.getElementById('ret-bk-id').value=id;
+  document.getElementById('ret-km').value=defKm||'';
+  document.getElementById('ret-km').min=vh?.km||0;
+  document.getElementById('ret-km-hint').textContent='原里程：'+(vh?.km||0).toLocaleString()+' km｜預計：'+defKm.toLocaleString()+' km';
+  document.getElementById('ret-pk').value=vh?.pk_id||'';
+  document.getElementById('ret-err').style.display='none';
+  openMo('mo-ret');
+}
+async function doReturn(){
+  const id=document.getElementById('ret-bk-id').value;
+  const kmVal=parseInt(document.getElementById('ret-km').value);
+  const pkVal=document.getElementById('ret-pk').value.trim();
+  const bks=ld(K.bks),i=bks.findIndex(b=>b.id===id);if(i<0)return;
+  const bk=bks[i],vehs=ld(K.vh),vi=vehs.findIndex(v=>v.id===bk.vh_id),vh=vehs[vi];
+  if(!kmVal||kmVal<(vh?.km||0)){
+    document.getElementById('ret-err').textContent='里程數不可低於原本里程（'+(vh?.km||0).toLocaleString()+' km）';
+    document.getElementById('ret-err').style.display='';
+    return;
+  }
+  bks[i].st='done';bks[i].actual_end=new Date().toISOString().slice(0,16);bks[i].actual_km=kmVal;
+  sv(K.bks,bks);sbSaveCarBk(bks[i]);
+  if(vi>=0){vehs[vi].km=kmVal;vehs[vi].pk_id=pkVal;vehs[vi].parking_id=pkVal||null;vehs[vi].st='available';vehs[vi].status='available';sv(K.vh,vehs);sbSaveVehicle(vehs[vi]);}
+  closeMo('mo-ret');renderCarDash();toast('已登記歸還','success');
+}
 function cancelBk(id){if(!confirm('確定取消？'))return;const bks=ld(K.bks),i=bks.findIndex(b=>b.id===id);if(i>=0){bks[i].st='cancelled';sv(K.bks,bks);sbSaveCarBk(bks[i]);}renderUse();toast('已取消','success');}
 function expUseCSV(){const bks=ld(K.bks);const rows=[['車輛','車牌','使用人','出發','歸還','目的','里程','狀態']];bks.forEach(b=>{const v=gVeh(b.vh_id),u=gUsr(b.u_id);rows.push([v?.name||'',v?.plate||'',u?.name||'',b.start,b.end,b.purpose||'',b.km_plan||'',b.st]);});dl('usage.csv',rows.map(r=>r.map(c=>`"${c}"`).join(',')).join('\n'),'text/csv');toast('已匯出','success');}
 
@@ -2384,7 +2412,7 @@ function openInspModal(id){editIspId=id||null;document.getElementById('moispt').
 function saveInsp(){const vid=document.getElementById('ispveh').value,nxt=document.getElementById('ispnx').value;if(!vid)return toast('請選擇車輛','error');if(!nxt)return toast('請填寫下次驗車日期','error');const data={vh_id:vid,last:document.getElementById('ispls').value||null,next:nxt,note:document.getElementById('ispnt').value.trim()};const isps=ld(K.isp);if(editIspId){const i=isps.findIndex(x=>x.id===editIspId);if(i>=0)isps[i]={...isps[i],...data};}else isps.push({id:uid(),...data});sv(K.isp,isps);const vehs=ld(K.vh),vi=vehs.findIndex(v=>v.id===vid);if(vi>=0){vehs[vi].next_insp=nxt;sv(K.vh,vehs);}closeMo('mo-insp');renderInsp();updBadges();toast('已更新','success');}
 function delInsp(id){if(!confirm('確定刪除？'))return;sv(K.isp,ld(K.isp).filter(i=>i.id!==id));renderInsp();toast('已刪除','success');}
 
-function renderPark(){const pks=ld(K.pk),vehs=ld(K.vh);document.getElementById('pk-grid').innerHTML=pks.length?pks.map(p=>{const car=vehs.find(v=>v.pk_id===p.id);return`<div style="background:var(--bg2);border:1px solid ${car?'rgba(6,182,212,.3)':'var(--bd)'};border-radius:var(--r);padding:13px;text-align:center"><div style="font-size:26px;margin-bottom:5px">${car?'🚗':'🅿️'}</div><div style="font-weight:700;font-size:14px;color:var(--tl)">${p.number}</div><div style="font-size:11px;color:var(--t3);margin:3px 0">${p.location||'—'}</div>${car?`<span class="badge bt" style="margin-top:4px">${car.name}</span>`:`<span class="badge bm" style="margin-top:4px">空位</span>`}<div style="margin-top:10px"><button class="btn bic bdr bsm" onclick="delPark('${p.id}')">✕</button></div></div>`}).join(''):'<div class="es"><div class="ei">🅿️</div><p>尚未設定停車格</p></div>';}
+function renderPark(){const pks=ld(K.pk),vehs=ld(K.vh);document.getElementById('pk-grid').innerHTML=pks.length?pks.map(p=>{const car=vehs.find(v=>v.pk_id===p.id);return`<div style="background:var(--bg2);border:1px solid ${car?'rgba(6,182,212,.3)':'var(--bd)'};border-radius:var(--r);padding:13px;text-align:center"><div style="font-size:26px;margin-bottom:5px">${car?'🚗':'🅿️'}</div><div style="font-weight:700;font-size:14px;color:var(--tl)">${p.number}</div><div style="font-size:11px;color:var(--t3);margin:3px 0">${p.location||'—'}</div>${car?`<span class="badge bt" style="margin-top:4px">${car.name}</span>`:`<span class="badge bm" style="margin-top:4px">空位</span>`}<div style="margin-top:10px"><button class="btn bic bdr bsm" onclick="delPark('${p.id}')">✕</button></div></div>`}).join(''):'<div class="es"><div class="ei">🅿️</div><p>尚未設定停車位</p></div>';}
 function openParkModal(){['pknm','pklc','pknt'].forEach(x=>document.getElementById(x).value='');openMo('mo-park');}
 function savePark(){const nm=document.getElementById('pknm').value.trim();if(!nm)return toast('請輸入格位編號','error');const pks=ld(K.pk);if(pks.find(p=>p.number===nm))return toast('格位編號已存在','error');pks.push({id:uid(),number:nm,location:document.getElementById('pklc').value.trim(),note:document.getElementById('pknt').value.trim()});sv(K.pk,pks);closeMo('mo-park');renderPark();toast('已新增','success');}
 function delPark(id){if(ld(K.vh).find(v=>v.pk_id===id))return toast('此格位有車輛，無法刪除','error');if(!confirm('確定刪除？'))return;sv(K.pk,ld(K.pk).filter(p=>p.id!==id));renderPark();toast('已刪除','success');}

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART 行政管理平台 v1.21</title>
+<title>COMART 行政管理平台 v1.22</title>
 <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.js"></script>
 <style>
 :root{
@@ -509,7 +509,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="logo">
     <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
     <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
-    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.21</span>
+    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.22</span>
   </div>
   <div class="trr">
     <div style="display:flex;align-items:center;gap:6px;padding:4px 12px;background:var(--surface-2);border:1px solid var(--border);border-radius:20px;font-size:12px;cursor:pointer" onclick="showUsw()" id="topbar-user">
@@ -517,7 +517,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <span id="cur-u" style="color:var(--text-2)">載入中…</span>
       <span style="color:var(--text-3);font-size:10px">▾</span>
     </div>
-    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.21</span>
+    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.22</span>
   </div>
 </div>
 <div id="layout-wrap" style="display:flex;min-height:calc(100vh - var(--th))">
@@ -567,7 +567,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi" data-p="lib-cats"><span class="ic">🏷️</span>分類管理</div>
       <div class="navi" data-p="lib-cfg"><span class="ic">⚙️</span>系統設定</div>
     </div>
-    <div class="sbf">v1.21 · Supabase<br><span style="color:var(--ac)">● 本機存儲</span></div>
+    <div class="sbf">v1.22 · Supabase<br><span style="color:var(--ac)">● 本機存儲</span></div>
   </div>
   <div class="mc" id="lc">
     <div class="pg active" id="pg-lib-dash">
@@ -649,7 +649,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       
       <div class="navi cn" data-p="car-cfg"><span class="ic">⚙️</span>系統設定</div>
     </div>
-    <div class="sbf">v1.21 · Supabase<br><span style="color:var(--tl)">● 本機存儲</span></div>
+    <div class="sbf">v1.22 · Supabase<br><span style="color:var(--tl)">● 本機存儲</span></div>
   </div>
   <div class="mc cf" id="cc">
     <div class="pg active" id="pg-car-dash">
@@ -741,7 +741,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi tna active" data-p="trip-new"><span class="ic">➕</span>新增報支單</div>
       <div class="navi tna" data-p="trip-list"><span class="ic">📋</span>報支單清單</div>
     </div>
-    <div class="sbf">v1.21 · Supabase<br><span style="color:var(--yw)">● 本機存儲</span></div>
+    <div class="sbf">v1.22 · Supabase<br><span style="color:var(--yw)">● 本機存儲</span></div>
   </div>
   <div class="mc" id="tc">
 
@@ -880,7 +880,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi rna" data-p="room-report"><span class="ic">📊</span>使用率報表</div>
       <div class="navi rna" data-p="room-fault"><span class="ic">🔧</span>故障回報<span class="nbadge" id="nb-fault" style="display:none">0</span></div>
     </div>
-    <div class="sbf">v1.21 · Supabase<br><span style="color:var(--gn)">● 本機存儲</span></div>
+    <div class="sbf">v1.22 · Supabase<br><span style="color:var(--gn)">● 本機存儲</span></div>
   </div>
   <div class="mc" id="rmc">
 
@@ -1047,7 +1047,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi vna" data-p="visit-guests"><span class="ic">👥</span>來賓資料庫</div>
       <div class="navi vna" data-p="visit-report"><span class="ic">📊</span>接待報表</div>
     </div>
-    <div class="sbf">v1.21 · Supabase<br><span style="color:#a78bfa">● 本機存儲</span></div>
+    <div class="sbf">v1.22 · Supabase<br><span style="color:#a78bfa">● 本機存儲</span></div>
   </div>
   <div class="mc" id="vmc">
 
@@ -1597,6 +1597,7 @@ async function loadCarFromSB() {
     start:   b.start_dt   ? b.start_dt.slice(0,16) : (b.start||''),
     end:     b.end_dt     ? b.end_dt.slice(0,16)   : (b.end||''),
     st:      b.status     || b.st || 'pending',
+    status:  b.status     || b.st || 'pending',
     checkedIn: b.checked_in || b.checkedIn || false,
   })));
 
@@ -2231,7 +2232,7 @@ function renderCarDash(){
   document.getElementById('cd-td').innerHTML=tdBks.length?tdBks.map(b=>{const v=gVeh(b.vh_id),u=gUsr(b.u_id);return`<tr><td>${VICO[v?.type]||'🚗'} ${v?.name||'—'}</td><td>${u?.name||'—'}</td><td class="tdm">${b.start.slice(11,16)}–${b.end.slice(11,16)}</td><td class="tdm">${b.purpose||'—'}</td><td>${bkBadge(b)}</td></tr>`}).join(''):'<tr><td colspan="5" class="tdm" style="text-align:center;padding:14px">今日無預約</td></tr>';
   const rems=[];vehs.forEach(v=>{if(v.next_maint_km&&v.km>=(v.next_maint_km-cfg.maint_km))rems.push({v,item:'定期保養',diff:v.next_maint_km-v.km,type:'km'});if(v.next_insp&&dDiff(v.next_insp)<=cfg.insp_days)rems.push({v,item:'定期驗車',diff:dDiff(v.next_insp),date:v.next_insp,type:'dt'});});
   document.getElementById('cd-rm').innerHTML=rems.length?rems.map(r=>`<tr><td>${VICO[r.v.type]||'🚗'} ${r.v.name}</td><td>${r.item}</td><td class="tdm">${r.type==='dt'?fmtD(r.date):`里程${r.v.next_maint_km}km`}</td><td>${r.type==='dt'?`<span class="badge ${r.diff<=7?'br':r.diff<=30?'by':'bo'}">${r.diff}天</span>`:`<span class="badge bo">差${r.diff}km</span>`}</td></tr>`).join(''):'<tr><td colspan="4" class="tdm" style="text-align:center;padding:14px">✓ 無緊急提醒</td></tr>';
-  document.getElementById('cd-cards').innerHTML=vehs.map(v=>{const st=vStBadge(v),pk=gPk(v.pk_id),pendBk=bks.find(b=>b.vh_id===v.id&&b.st==='pending'),actBk=bks.find(b=>b.vh_id===v.id&&b.st==='active'),curU=actBk?gUsr(actBk.u_id):null;return`<div class="ccard"><div class="cch"><div class="ccico">${VICO[v.type]||'🚗'}</div><div><div class="ccn">${v.name}</div><div class="ccp">${v.plate}</div></div><span class="badge ${st.cls}" style="margin-left:auto">${st.lbl}</span></div><div class="ccb"><div class="ccr"><span class="ccl">類型/燃料</span><span class="ccv">${VTLB[v.type]||v.type}·${VFLB[v.fuel]||v.fuel}</span></div><div class="ccr"><span class="ccl">里程</span><span class="ccv">${v.km.toLocaleString()}km</span></div><div class="ccr"><span class="ccl">停車位</span><span class="ccv">${v.pk_id||'—'}</span></div>${curU?`<div class="ccr"><span class="ccl">使用者</span><span class="ccv" style="color:var(--tl)">${curU.name}</span></div>`:''}</div><div class="ccf" style="flex-wrap:wrap;gap:6px"> ${pendBk?`<button class=\"btn bsm\" style=\"background:var(--acd);color:var(--ac)\" onclick=\"startUse('${pendBk.id}')\">🚗 出發</button> <button class=\"btn bdr bsm\" onclick=\"cancelBk('${pendBk.id}')\">✕ 取消</button>`:''} ${actBk?`<button class=\"btn bg2 bsm\" onclick=\"endUse('${actBk.id}')\">🔑 歸還</button>`:''} ${!actBk&&!pendBk?`<button class=\"btn bsm\" style=\"background:var(--acd);color:var(--ac)\" onclick=\"startBk('${v.id}')\">＋ 預約</button>`:''}</div></div>`}).join('');
+  document.getElementById('cd-cards').innerHTML=vehs.map(v=>{const st=vStBadge(v),pk=gPk(v.pk_id),pendBk=bks.find(b=>b.vh_id===v.id&&(b.st||b.status)==='pending'),actBk=bks.find(b=>b.vh_id===v.id&&(b.st||b.status)==='active'),curU=actBk?gUsr(actBk.u_id):null;return`<div class="ccard"><div class="cch"><div class="ccico">${VICO[v.type]||'🚗'}</div><div><div class="ccn">${v.name}</div><div class="ccp">${v.plate}</div></div><span class="badge ${st.cls}" style="margin-left:auto">${st.lbl}</span></div><div class="ccb"><div class="ccr"><span class="ccl">類型/燃料</span><span class="ccv">${VTLB[v.type]||v.type}·${VFLB[v.fuel]||v.fuel}</span></div><div class="ccr"><span class="ccl">里程</span><span class="ccv">${v.km.toLocaleString()}km</span></div><div class="ccr"><span class="ccl">停車位</span><span class="ccv">${v.pk_id||'—'}</span></div>${curU?`<div class="ccr"><span class="ccl">使用者</span><span class="ccv" style="color:var(--tl)">${curU.name}</span></div>`:''}</div><div class="ccf" style="flex-wrap:wrap;gap:6px"> ${pendBk?`<button class=\"btn bsm\" style=\"background:var(--acd);color:var(--ac)\" onclick=\"startUse('${pendBk.id}')\">🚗 出發</button> <button class=\"btn bdr bsm\" onclick=\"cancelBk('${pendBk.id}')\">✕ 取消</button>`:''} ${actBk?`<button class=\"btn bg2 bsm\" onclick=\"endUse('${actBk.id}')\">🔑 歸還</button>`:''} ${!actBk&&!pendBk?`<button class=\"btn bsm\" style=\"background:var(--acd);color:var(--ac)\" onclick=\"startBk('${v.id}')\">＋ 預約</button>`:''}</div></div>`}).join('');
 }
 
 let editVid=null;
@@ -2285,7 +2286,7 @@ function renderWkCal(bks,mts,isps,vf){
   document.getElementById('cal-tit').textContent=`${ws.getFullYear()}/${ws.getMonth()+1}/${ws.getDate()} — ${days[6].getMonth()+1}/${days[6].getDate()}`;
   const today=tds(),hrs=Array.from({length:13},(_,i)=>i+7);
   let h='<div class="wg"><div><div class="wth"></div>';hrs.forEach(hr=>h+=`<div class="wtl">${String(hr).padStart(2,'0')}:00</div>`);h+='</div>';
-  days.forEach(d=>{const ds=d.toISOString().slice(0,10),isT=ds===today;h+=`<div><div class="wth" style="${isT?'color:var(--tl)':''}">${['日','一','二','三','四','五','六'][d.getDay()]} ${d.getDate()}</div>`;hrs.forEach(hr=>{const ss=`${ds}T${String(hr).padStart(2,'0')}:00`,se=`${ds}T${String(hr+1).padStart(2,'0')}:00`;const hbks=bks.filter(b=>b.start<se&&b.end>ss&&b.start.slice(0,10)<=ds&&b.end.slice(0,10)>=ds);h+=`<div class="wcell">`;hbks.forEach(b=>{const v=gVeh(b.vh_id);h+=`<div class="wev ev-${b.st}" onclick="viewBk('${b.id}')">${b.purpose||'預約'}</div>`;});h+=`</div>`;});h+=`</div>`;});
+  days.forEach(d=>{const ds=d.toISOString().slice(0,10),isT=ds===today;h+=`<div><div class="wth" style="${isT?'color:var(--tl)':''}">${['日','一','二','三','四','五','六'][d.getDay()]} ${d.getDate()}</div>`;hrs.forEach(hr=>{const ss=`${ds}T${String(hr).padStart(2,'0')}:00`,se=`${ds}T${String(hr+1).padStart(2,'0')}:00`;const hbks=bks.filter(b=>b.start<se&&b.end>ss&&b.start.slice(0,10)<=ds&&b.end.slice(0,10)>=ds);h+=`<div class="wcell">`;hbks.forEach(b=>{const v=gVeh(b.vh_id);h+=`<div class="wev ev-${b.st}" onclick="viewBk('${b.id}')" title="${v?.name}: ${b.purpose}">${v?.plate?.slice(-4)||b.purpose||'預約'}</div>`;});h+=`</div>`;});h+=`</div>`;});
   h+='</div>';document.getElementById('cal-body').innerHTML=h;
 }
 function viewBk(id){const b=ld(K.bks).find(x=>x.id===id);if(!b)return;const v=gVeh(b.vh_id),u=gUsr(b.u_id);if(confirm(`車輛：${v?.name||'—'}\n使用人：${u?.name||'—'}\n時間：${b.start.replace('T',' ')} — ${b.end.replace('T',' ')}\n目的：${b.purpose||'—'}\n狀態：${b.st}\n\n點確定標記為已完成（歸還）`)){const bks=ld(K.bks),i=bks.findIndex(x=>x.id===id);if(i>=0){bks[i].st='done';sv(K.bks,bks);}renderCal();renderCarDash();toast('已標記完成','success');}}
@@ -2359,7 +2360,7 @@ function renderUse(){
   if(vf)bks=bks.filter(b=>b.vh_id===vf);if(sf)bks=bks.filter(b=>b.st===sf);
   if(q)bks=bks.filter(b=>{const v=gVeh(b.vh_id),u=gUsr(b.u_id);return v?.name.toLowerCase().includes(q)||v?.plate.toLowerCase().includes(q)||u?.name.toLowerCase().includes(q)||b.purpose?.toLowerCase().includes(q);});
   bks.sort((a,b)=>b.start.localeCompare(a.start));
-  document.getElementById('use-tb').innerHTML=bks.length?bks.map(b=>{const v=gVeh(b.vh_id),u=gUsr(b.u_id);return`<tr><td>${VICO[v?.type]||'🚗'} ${v?.name||'—'}</td><td>${u?.name||'—'}</td><td class="tdm">${b.start.replace('T',' ')}</td><td class="tdm">${b.end.replace('T',' ')}</td><td>${b.purpose||'—'}</td><td class="tdm">${b.km_plan||'—'}</td><td>${bkBadge(b)}</td><td>${b.st==='pending'?`<button class="btn bdr bsm" onclick="cancelBk('${b.id}')">✕ 取消</button>`:''}</td></tr>`}).join(''):'<tr><td colspan="8" class="tdm" style="text-align:center;padding:22px">無資料</td></tr>';
+  document.getElementById('use-tb').innerHTML=bks.length?bks.map(b=>{const v=gVeh(b.vh_id),u=gUsr(b.u_id);return`<tr><td>${VICO[v?.type]||'🚗'} ${v?.name||'—'}</td><td>${u?.name||'—'}</td><td class="tdm">${b.start.replace('T',' ')}</td><td class="tdm">${b.end.replace('T',' ')}</td><td>${b.purpose||'—'}</td><td class="tdm">${b.km_plan||'—'}</td><td>${bkBadge(b)}</td><td>${(b.st||b.status)==='pending'?`<button class="btn bdr bsm" onclick="cancelBk('${b.id}')">✕ 取消</button>`:''}</td></tr>`}).join(''):'<tr><td colspan="8" class="tdm" style="text-align:center;padding:22px">無資料</td></tr>';
 }
 function startUse(id){const bks=ld(K.bks),i=bks.findIndex(b=>b.id===id);if(i>=0){bks[i].st='active';bks[i].actual_start=new Date().toISOString().slice(0,16);}sv(K.bks,bks);if(i>=0)sbSaveCarBk(bks[i]);renderUse();toast('已標記出發','success');}
 function endUse(id){

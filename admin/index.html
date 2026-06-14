@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART 行政管理平台 v1.06</title>
+<title>COMART 行政管理平台 v1.07</title>
 <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.js"></script>
 <style>
 :root{
@@ -474,7 +474,7 @@ tr.ovr td{background:rgba(239,68,68,.04)}
   <div class="logo">
     <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
     <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
-    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.06</span>
+    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.07</span>
   </div>
   <div class="trr">
     <div style="display:flex;align-items:center;gap:6px;padding:4px 12px;background:var(--surface-2);border:1px solid var(--border);border-radius:20px;font-size:12px;cursor:pointer" onclick="showUsw()" id="topbar-user">
@@ -482,7 +482,7 @@ tr.ovr td{background:rgba(239,68,68,.04)}
       <span id="cur-u" style="color:var(--text-2)">載入中…</span>
       <span style="color:var(--text-3);font-size:10px">▾</span>
     </div>
-    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.06</span>
+    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.07</span>
   </div>
 </div>
 <div id="layout-wrap" style="display:flex;min-height:calc(100vh - var(--th))">
@@ -532,7 +532,7 @@ tr.ovr td{background:rgba(239,68,68,.04)}
       <div class="navi" data-p="lib-cats"><span class="ic">🏷️</span>分類管理</div>
       <div class="navi" data-p="lib-cfg"><span class="ic">⚙️</span>系統設定</div>
     </div>
-    <div class="sbf">v1.06 · Supabase<br><span style="color:var(--ac)">● 本機存儲</span></div>
+    <div class="sbf">v1.07 · Supabase<br><span style="color:var(--ac)">● 本機存儲</span></div>
   </div>
   <div class="mc" id="lc">
     <div class="pg active" id="pg-lib-dash">
@@ -615,7 +615,7 @@ tr.ovr td{background:rgba(239,68,68,.04)}
       <div class="navi cn" data-p="car-park"><span class="ic">🅿️</span>停車格管理</div>
       <div class="navi cn" data-p="car-cfg"><span class="ic">⚙️</span>系統設定</div>
     </div>
-    <div class="sbf">v1.06 · Supabase<br><span style="color:var(--tl)">● 本機存儲</span></div>
+    <div class="sbf">v1.07 · Supabase<br><span style="color:var(--tl)">● 本機存儲</span></div>
   </div>
   <div class="mc cf" id="cc">
     <div class="pg active" id="pg-car-dash">
@@ -704,7 +704,7 @@ tr.ovr td{background:rgba(239,68,68,.04)}
       <div class="navi tna active" data-p="trip-new"><span class="ic">➕</span>新增報支單</div>
       <div class="navi tna" data-p="trip-list"><span class="ic">📋</span>報支單清單</div>
     </div>
-    <div class="sbf">v1.06 · Supabase<br><span style="color:var(--yw)">● 本機存儲</span></div>
+    <div class="sbf">v1.07 · Supabase<br><span style="color:var(--yw)">● 本機存儲</span></div>
   </div>
   <div class="mc" id="tc">
 
@@ -843,7 +843,7 @@ tr.ovr td{background:rgba(239,68,68,.04)}
       <div class="navi rna" data-p="room-report"><span class="ic">📊</span>使用率報表</div>
       <div class="navi rna" data-p="room-fault"><span class="ic">🔧</span>故障回報<span class="nbadge" id="nb-fault" style="display:none">0</span></div>
     </div>
-    <div class="sbf">v1.06 · Supabase<br><span style="color:var(--gn)">● 本機存儲</span></div>
+    <div class="sbf">v1.07 · Supabase<br><span style="color:var(--gn)">● 本機存儲</span></div>
   </div>
   <div class="mc" id="rmc">
 
@@ -1010,7 +1010,7 @@ tr.ovr td{background:rgba(239,68,68,.04)}
       <div class="navi vna" data-p="visit-guests"><span class="ic">👥</span>來賓資料庫</div>
       <div class="navi vna" data-p="visit-report"><span class="ic">📊</span>接待報表</div>
     </div>
-    <div class="sbf">v1.06 · Supabase<br><span style="color:#a78bfa">● 本機存儲</span></div>
+    <div class="sbf">v1.07 · Supabase<br><span style="color:#a78bfa">● 本機存儲</span></div>
   </div>
   <div class="mc" id="vmc">
 
@@ -1576,8 +1576,17 @@ async function sbDelCat(id) {
 
 // ── 公務車寫入 SB ────────────────────────────────
 async function sbSaveVehicle(vh) {
-  try { await SB.post('car_vehicles', vh, 'resolution=merge-duplicates,return=minimal'); }
-  catch(e) { console.warn('sbSaveVehicle fail:', e.message); }
+  try {
+    await SB.post('car_vehicles', {
+      id:vh.id, name:vh.name||'', plate:vh.plate||'',
+      type:vh.type||'sedan', fuel:vh.fuel||'gas',
+      km:vh.km||0, next_maint_km:vh.next_maint_km||null,
+      next_insp:vh.next_insp||null,
+      parking_id:vh.pk_id||vh.parking_id||null,
+      pk_id:vh.pk_id||vh.parking_id||null,
+      notes:vh.notes||'', status:vh.st||vh.status||'available',
+    }, 'resolution=merge-duplicates,return=minimal');
+  } catch(e) { console.warn('sbSaveVehicle fail:', e.message); }
 }
 async function sbDelVehicle(id) {
   try { await SB.del('car_vehicles', `id=eq.${id}`); }
@@ -1585,17 +1594,20 @@ async function sbDelVehicle(id) {
 }
 async function sbSaveCarBk(bk) {
   try {
-    // 轉換欄位名稱到資料庫格式
     const row = {
-      id:bk.id, vehicle_id:bk.vId||bk.vehicle_id,
-      user_id:bk.uId||bk.user_id||null,
-      start_dt:bk.startDt||bk.start_dt,
-      end_dt:bk.endDt||bk.end_dt,
-      purpose:bk.purpose||'', km_plan:bk.kmPlan||0,
+      id:bk.id,
+      vehicle_id:bk.vh_id||bk.vId||bk.vehicle_id,
+      user_id:bk.u_id||bk.uId||bk.user_id||null,
+      start_dt:bk.start||bk.startDt||bk.start_dt,
+      end_dt:bk.end||bk.endDt||bk.end_dt,
+      purpose:bk.purpose||'',
+      km_plan:bk.km_plan||bk.kmPlan||0,
       from_loc:bk.from||bk.from_loc||'',
       to_loc:bk.to||bk.to_loc||'',
-      note:bk.note||'', status:bk.status||'pending',
-      actual_km:bk.actualKm||null, checked_in:bk.checkedIn||false,
+      note:bk.note||'',
+      status:bk.st||bk.status||'pending',
+      actual_km:bk.actualKm||null,
+      checked_in:bk.checkedIn||false,
     };
     await SB.post('car_bookings', row, 'resolution=merge-duplicates,return=minimal');
   } catch(e) { console.warn('sbSaveCarBk fail:', e.message); }
@@ -1833,21 +1845,37 @@ async function seedCar(){
   const us=ld(K.us);
   const pks=[{id:uid(),number:'B1-001',location:'地下一層',note:''},{id:uid(),number:'B1-002',location:'地下一層',note:''},{id:uid(),number:'地面-A1',location:'公司門口',note:''}];
   sv(K.pk,pks);
-  for(const pk of pks) await SB.post('car_parkings', pk, 'resolution=merge-duplicates,return=minimal');
+  for(const pk of pks) await SB.post('car_parkings?on_conflict=number', {number:pk.number,location:pk.location||'',note:pk.note||''}, 'resolution=merge-duplicates,return=representation');
   const vehs=[
     {id:uid(),name:'Toyota Camry 白',plate:'ABC-1234',type:'sedan',fuel:'gas',km:42800,next_maint_km:43500,next_insp:fd(45),pk_id:pks[0].id,notes:'',st:'available'},
     {id:uid(),name:'Ford Transit 灰',plate:'XYZ-5678',type:'van',fuel:'diesel',km:88600,next_maint_km:89000,next_insp:fd(120),pk_id:pks[1].id,notes:'7人座',st:'available'},
     {id:uid(),name:'Honda CR-V 黑',plate:'DEF-9012',type:'suv',fuel:'hybrid',km:31200,next_maint_km:35000,next_insp:fd(210),pk_id:'',notes:'',st:'available'},
   ];
   sv(K.vh,vehs);
-  for(const vh of vehs) await SB.post('car_vehicles', vh, 'resolution=merge-duplicates,return=minimal');
+  for(const vh of vehs) await SB.post('car_vehicles', {
+      id:vh.id, name:vh.name, plate:vh.plate, type:vh.type||'sedan',
+      fuel:vh.fuel||'gas', km:vh.km||0,
+      next_maint_km:vh.next_maint_km||null, next_insp:vh.next_insp||null,
+      parking_id:vh.pk_id||null, pk_id:vh.pk_id||null,
+      notes:vh.notes||'', status:vh.st||'available',
+    }, 'resolution=merge-duplicates,return=minimal');
   sv(K.bks,[
     {id:uid(),vh_id:vehs[0].id,u_id:us?.[1]?.id||'',start:tds()+'T09:00',end:tds()+'T17:00',purpose:'客戶拜訪',km_plan:80,from:'公司',to:'台北信義區',note:'',st:'active'},
     {id:uid(),vh_id:vehs[1].id,u_id:us?.[2]?.id||'',start:fd(2)+'T08:00',end:fd(2)+'T18:00',purpose:'展覽物資運送',km_plan:40,from:'公司',to:'南港展覽館',note:'',st:'pending'},
   ]);
   const _seedBks = ld(K.bks);
   for(const bk of _seedBks){
-    await SB.post('car_bookings',{id:bk.id,vehicle_id:bk.vh_id,user_id:bk.u_id||null,start_dt:bk.start_dt||bk.startDt,end_dt:bk.end_dt||bk.endDt,purpose:bk.purpose||'',km_plan:bk.km_plan||0,from_loc:bk.from||'',to_loc:bk.to||'',note:bk.note||'',status:bk.st||'pending',checked_in:false},'resolution=merge-duplicates,return=minimal');
+    await SB.post('car_bookings',{
+        id:bk.id, vehicle_id:bk.vh_id||bk.vehicle_id,
+        user_id:bk.u_id||bk.user_id||null,
+        start_dt:bk.start||bk.start_dt||bk.startDt,
+        end_dt:bk.end||bk.end_dt||bk.endDt,
+        purpose:bk.purpose||'', km_plan:bk.km_plan||0,
+        from_loc:bk.from||bk.from_loc||'',
+        to_loc:bk.to||bk.to_loc||'',
+        note:bk.note||'', status:bk.st||bk.status||'pending',
+        checked_in:bk.checkedIn||false,
+      },'resolution=merge-duplicates,return=minimal');
   }
   sv(K.fl,[
     {id:uid(),vh_id:vehs[0].id,u_id:us?.[1]?.id||'',date:pd(3),liters:45,price:32.5,total:1462.5,odo:42600,note:'中油'},

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART 行政管理平台 v1.15</title>
+<title>COMART 行政管理平台 v1.16</title>
 <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.js"></script>
 <style>
 :root{
@@ -206,9 +206,12 @@ textarea{resize:vertical;min-height:68px}
 #tr-route-tbl td input[type=date]{width:108px}
 input[type=date],input[type=time]{color-scheme:dark}
 input[type=date]::-webkit-calendar-picker-indicator,
-input[type=time]::-webkit-calendar-picker-indicator{filter:invert(1) brightness(2);cursor:pointer;opacity:1}
-input[type=date]::-webkit-calendar-picker-indicator:hover,
-input[type=time]::-webkit-calendar-picker-indicator:hover{opacity:1}
+input[type=time]::-webkit-calendar-picker-indicator{
+  filter:brightness(0) invert(1);
+  cursor:pointer;
+  opacity:1;
+  width:18px;height:18px;
+}
 
 #tr-route-tbl td input[type=text]{width:90px}
 .comp-tag{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;background:var(--acd2);border:1px solid rgba(67,97,238,.2);border-radius:14px;font-size:12px;color:var(--ac)}
@@ -506,7 +509,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="logo">
     <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
     <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
-    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.15</span>
+    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.16</span>
   </div>
   <div class="trr">
     <div style="display:flex;align-items:center;gap:6px;padding:4px 12px;background:var(--surface-2);border:1px solid var(--border);border-radius:20px;font-size:12px;cursor:pointer" onclick="showUsw()" id="topbar-user">
@@ -514,7 +517,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <span id="cur-u" style="color:var(--text-2)">載入中…</span>
       <span style="color:var(--text-3);font-size:10px">▾</span>
     </div>
-    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.15</span>
+    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.16</span>
   </div>
 </div>
 <div id="layout-wrap" style="display:flex;min-height:calc(100vh - var(--th))">
@@ -564,7 +567,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi" data-p="lib-cats"><span class="ic">🏷️</span>分類管理</div>
       <div class="navi" data-p="lib-cfg"><span class="ic">⚙️</span>系統設定</div>
     </div>
-    <div class="sbf">v1.15 · Supabase<br><span style="color:var(--ac)">● 本機存儲</span></div>
+    <div class="sbf">v1.16 · Supabase<br><span style="color:var(--ac)">● 本機存儲</span></div>
   </div>
   <div class="mc" id="lc">
     <div class="pg active" id="pg-lib-dash">
@@ -646,7 +649,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       
       <div class="navi cn" data-p="car-cfg"><span class="ic">⚙️</span>系統設定</div>
     </div>
-    <div class="sbf">v1.15 · Supabase<br><span style="color:var(--tl)">● 本機存儲</span></div>
+    <div class="sbf">v1.16 · Supabase<br><span style="color:var(--tl)">● 本機存儲</span></div>
   </div>
   <div class="mc cf" id="cc">
     <div class="pg active" id="pg-car-dash">
@@ -738,7 +741,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi tna active" data-p="trip-new"><span class="ic">➕</span>新增報支單</div>
       <div class="navi tna" data-p="trip-list"><span class="ic">📋</span>報支單清單</div>
     </div>
-    <div class="sbf">v1.15 · Supabase<br><span style="color:var(--yw)">● 本機存儲</span></div>
+    <div class="sbf">v1.16 · Supabase<br><span style="color:var(--yw)">● 本機存儲</span></div>
   </div>
   <div class="mc" id="tc">
 
@@ -877,7 +880,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi rna" data-p="room-report"><span class="ic">📊</span>使用率報表</div>
       <div class="navi rna" data-p="room-fault"><span class="ic">🔧</span>故障回報<span class="nbadge" id="nb-fault" style="display:none">0</span></div>
     </div>
-    <div class="sbf">v1.15 · Supabase<br><span style="color:var(--gn)">● 本機存儲</span></div>
+    <div class="sbf">v1.16 · Supabase<br><span style="color:var(--gn)">● 本機存儲</span></div>
   </div>
   <div class="mc" id="rmc">
 
@@ -1044,7 +1047,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi vna" data-p="visit-guests"><span class="ic">👥</span>來賓資料庫</div>
       <div class="navi vna" data-p="visit-report"><span class="ic">📊</span>接待報表</div>
     </div>
-    <div class="sbf">v1.15 · Supabase<br><span style="color:#a78bfa">● 本機存儲</span></div>
+    <div class="sbf">v1.16 · Supabase<br><span style="color:#a78bfa">● 本機存儲</span></div>
   </div>
   <div class="mc" id="vmc">
 
@@ -2287,12 +2290,30 @@ function renderWkCal(bks,mts,isps,vf){
 function viewBk(id){const b=ld(K.bks).find(x=>x.id===id);if(!b)return;const v=gVeh(b.vh_id),u=gUsr(b.u_id);if(confirm(`車輛：${v?.name||'—'}\n使用人：${u?.name||'—'}\n時間：${b.start.replace('T',' ')} — ${b.end.replace('T',' ')}\n目的：${b.purpose||'—'}\n狀態：${b.st}\n\n點確定標記為已完成（歸還）`)){const bks=ld(K.bks),i=bks.findIndex(x=>x.id===id);if(i>=0){bks[i].st='done';sv(K.bks,bks);}renderCal();renderCarDash();toast('已標記完成','success');}}
 
 async function initBkForm(){
-  await loadCarFromSB(); // 確保最新車輛資料
-  const vehs=ld(K.vh),us=ld(K.us);
-  document.getElementById('bkveh').innerHTML='<option value="">請選擇…</option>'+vehs.map(v=>`<option value="${v.id}">${VICO[v.type]||'🚗'} ${v.name}（${v.plate}）</option>`).join('');
-  document.getElementById('bku').innerHTML='<option value="">請選擇…</option>'+us.map(u=>`<option value="${u.id}">${u.name}（${u.dept||'—'}）</option>`).join('');
-  if(curUid)document.getElementById('bku').value=curUid;
-  document.getElementById('bksd').value=tds();document.getElementById('bked').value=tds();document.getElementById('bk-conf').style.display='none';
+  // 先填充（用快取），再從 SB 更新後再填一次
+  function _fillBkForm(){
+    const vehs=ld(K.vh), us=ld(K.us);
+    const vSel=document.getElementById('bkveh');
+    const uSel=document.getElementById('bku');
+    if(vSel) vSel.innerHTML='<option value="">請選擇…</option>'+vehs.map(v=>`<option value="${v.id}">${VICO[v.type]||'🚗'} ${v.name}（${v.plate}）</option>`).join('');
+    if(uSel){
+      uSel.innerHTML='<option value="">請選擇…</option>'+us.map(u=>`<option value="${u.id}">${u.name}（${u.dept||'—'}）</option>`).join('');
+      if(curUid) uSel.value=curUid;
+    }
+  }
+  // 立即用快取填一次
+  _fillBkForm();
+  // 從 SB 取最新再填一次
+  await loadCarFromSB();
+  _fillBkForm();
+  // 預設日期時間
+  const _today=tds();
+  const sdEl=document.getElementById('bksd'); if(sdEl)sdEl.value=_today;
+  const edEl=document.getElementById('bked'); if(edEl)edEl.value=_today;
+  const stEl=document.getElementById('bkst2'); if(stEl&&!stEl.value)stEl.value='09:00';
+  const etEl=document.getElementById('bket'); if(etEl&&!etEl.value)etEl.value='18:00';
+  const frEl=document.getElementById('bkfr'); if(frEl&&!frEl.value)frEl.value='公司';
+  const confEl=document.getElementById('bk-conf'); if(confEl)confEl.style.display='none';
 }
 function chkConflict(){
   const vid=document.getElementById('bkv').value,sd=document.getElementById('bksd').value,st=document.getElementById('bkst2').value||'00:00',ed=document.getElementById('bked').value,et=document.getElementById('bket').value||'23:59';

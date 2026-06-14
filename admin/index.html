@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART 行政管理平台 v1.19</title>
+<title>COMART 行政管理平台 v1.20</title>
 <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.js"></script>
 <style>
 :root{
@@ -342,7 +342,7 @@ input[type=time]::-webkit-calendar-picker-indicator{
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--bdl);border-radius:3px}
 .cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(265px,1fr));gap:14px}
-.ccard{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden;transition:all var(--tr)}
+.ccard{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;transition:all var(--tr);min-width:280px;flex:1 1 280px}
 .ccard:hover{border-color:var(--tl);transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,0,0,.3)}
 .cch{padding:12px 15px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:10px}
 .ccico{font-size:26px;flex-shrink:0}
@@ -509,7 +509,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="logo">
     <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
     <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
-    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.19</span>
+    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.20</span>
   </div>
   <div class="trr">
     <div style="display:flex;align-items:center;gap:6px;padding:4px 12px;background:var(--surface-2);border:1px solid var(--border);border-radius:20px;font-size:12px;cursor:pointer" onclick="showUsw()" id="topbar-user">
@@ -517,7 +517,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <span id="cur-u" style="color:var(--text-2)">載入中…</span>
       <span style="color:var(--text-3);font-size:10px">▾</span>
     </div>
-    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.19</span>
+    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.20</span>
   </div>
 </div>
 <div id="layout-wrap" style="display:flex;min-height:calc(100vh - var(--th))">
@@ -567,7 +567,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi" data-p="lib-cats"><span class="ic">🏷️</span>分類管理</div>
       <div class="navi" data-p="lib-cfg"><span class="ic">⚙️</span>系統設定</div>
     </div>
-    <div class="sbf">v1.19 · Supabase<br><span style="color:var(--ac)">● 本機存儲</span></div>
+    <div class="sbf">v1.20 · Supabase<br><span style="color:var(--ac)">● 本機存儲</span></div>
   </div>
   <div class="mc" id="lc">
     <div class="pg active" id="pg-lib-dash">
@@ -579,7 +579,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       </div>
       <div class="dash2col">
         <div><div class="sth"><div class="stt">最新借閱</div><div class="stb" id="ld-dt"></div></div><div class="tw"><table><thead><tr><th>書名</th><th>借閱人</th><th>應還日</th><th>狀態</th></tr></thead><tbody id="ld-rc"></tbody></table></div></div>
-        <div><div class="sth"><div class="stt">⚠️ 逾期清單</div></div><div class="tw"><table><thead><tr><th>書名</th><th>借閱人</th><th>逾期</th><th>操作</th></tr></thead><tbody id="ld-ov"></tbody></table></div></div>
+        <div><div class="sth"><div class="stt">⚠️ 逾期清單</div></div><div class="tw"><table><thead><tr><th>書名</th><th>借閱人</th><th>逾期</th></tr></thead><tbody id="ld-ov"></tbody></table></div></div>
       </div>
       <div class="sth"><div class="stt">📈 借閱排行</div></div>
       <div class="tw"><table><thead><tr><th>#</th><th>書名</th><th>作者</th><th>次數</th><th>分類</th></tr></thead><tbody id="ld-top"></tbody></table></div>
@@ -587,11 +587,11 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
     <div class="pg" id="pg-lib-books">
       <div class="fb"><div class="sw2"><span class="si">🔍</span><input type="text" id="bkq" placeholder="書名、作者、ISBN…" oninput="renderBooks()"></div><select id="bkcat" style="width:135px" onchange="renderBooks()"><option value="">所有分類</option></select><select id="bkst" style="width:108px" onchange="renderBooks()"><option value="">所有狀態</option><option value="av">在館</option><option value="bw">借出中</option></select><div class="vt"><button class="vb active" id="vbg" onclick="setBookV('g')">⊞</button><button class="vb" id="vbl" onclick="setBookV('l')">≡</button></div><button class="btn bp" onclick="openBkModal()">＋ 新增</button></div>
       <div id="bk-gv" class="bkgrid"></div>
-      <div id="bk-lv" style="display:none"><div class="tw"><table><thead><tr><th>書名</th><th>作者</th><th>ISBN</th><th>分類</th><th>館藏</th><th>可借</th><th>狀態</th><th>操作</th></tr></thead><tbody id="bk-lt"></tbody></table></div></div>
+      <div id="bk-lv" style="display:none"><div class="tw"><table><thead><tr><th>書名</th><th>作者</th><th>ISBN</th><th>分類</th><th>館藏</th><th>可借</th><th>狀態</th></tr></thead><tbody id="bk-lt"></tbody></table></div></div>
     </div>
     <div class="pg" id="pg-lib-loans">
       <div class="fb"><div class="sw2"><span class="si">🔍</span><input type="text" id="lnq" placeholder="書名或借閱人…" oninput="renderLoans()"></div><select id="lnst" style="width:115px" onchange="renderLoans()"><option value="active">借閱中</option><option value="overdue">逾期</option><option value="returned">已歸還</option><option value="">全部</option></select><button class="btn bg2 bsm" onclick="exportLoansCSV()">↓ CSV</button></div>
-      <div class="tw"><table><thead><tr><th>書名</th><th>借閱人</th><th>部門</th><th>借出日</th><th>應還日</th><th>歸還日</th><th>狀態</th><th>操作</th></tr></thead><tbody id="ln-tb"></tbody></table></div>
+      <div class="tw"><table><thead><tr><th>書名</th><th>借閱人</th><th>部門</th><th>借出日</th><th>應還日</th><th>歸還日</th><th>狀態</th></tr></thead><tbody id="ln-tb"></tbody></table></div>
     </div>
     <div class="pg" id="pg-lib-borrow">
       <div style="max-width:530px"><div class="sth" style="margin-bottom:14px"><div class="stt">借書登記</div></div>
@@ -604,11 +604,11 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       </div>
     </div>
     <div class="pg" id="pg-lib-return">
-      <div style="max-width:700px"><div class="sth" style="margin-bottom:13px"><div class="stt">還書作業</div></div><div class="fb"><div class="sw2"><span class="si">🔍</span><input type="text" id="rtq" placeholder="借閱人或書名…" oninput="renderReturn()"></div></div><div class="tw"><table><thead><tr><th>書名</th><th>借閱人</th><th>借出日</th><th>應還日</th><th>狀態</th><th>操作</th></tr></thead><tbody id="rt-tb"></tbody></table></div></div>
+      <div style="max-width:700px"><div class="sth" style="margin-bottom:13px"><div class="stt">還書作業</div></div><div class="fb"><div class="sw2"><span class="si">🔍</span><input type="text" id="rtq" placeholder="借閱人或書名…" oninput="renderReturn()"></div></div><div class="tw"><table><thead><tr><th>書名</th><th>借閱人</th><th>借出日</th><th>應還日</th><th>狀態</th></tr></thead><tbody id="rt-tb"></tbody></table></div></div>
     </div>
     <div class="pg" id="pg-lib-rsv">
       <div class="fb"><div class="stt">預約佇列</div><div style="margin-left:auto"></div><button class="btn bp" onclick="openRsvModal()">＋ 新增預約</button></div>
-      <div class="tw"><table><thead><tr><th>書名</th><th>預約人</th><th>預約時間</th><th>狀態</th><th>操作</th></tr></thead><tbody id="rv-tb"></tbody></table></div>
+      <div class="tw"><table><thead><tr><th>書名</th><th>預約人</th><th>預約時間</th><th>狀態</th></tr></thead><tbody id="rv-tb"></tbody></table></div>
     </div>
     <div class="pg" id="pg-lib-cats">
       <div class="fb"><div class="stt">分類管理</div><div style="margin-left:auto"></div><button class="btn bp" onclick="openCatModal()">＋ 新增分類</button></div>
@@ -649,7 +649,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       
       <div class="navi cn" data-p="car-cfg"><span class="ic">⚙️</span>系統設定</div>
     </div>
-    <div class="sbf">v1.19 · Supabase<br><span style="color:var(--tl)">● 本機存儲</span></div>
+    <div class="sbf">v1.20 · Supabase<br><span style="color:var(--tl)">● 本機存儲</span></div>
   </div>
   <div class="mc cf" id="cc">
     <div class="pg active" id="pg-car-dash">
@@ -668,7 +668,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
     </div>
     <div class="pg" id="pg-car-veh">
       <div class="fb"><div class="sw2"><span class="si">🔍</span><input type="text" id="vhq" placeholder="車牌、車名…" oninput="renderVeh()"></div><select id="vhtp" style="width:115px" onchange="renderVeh()"><option value="">所有類型</option><option value="sedan">轎車</option><option value="suv">SUV</option><option value="van">廂型車</option><option value="truck">貨車</option></select><button class="btn btl" onclick="requireAdmin(()=>openVehModal())" id="btn-add-veh">＋ 新增車輛</button></div>
-      <div class="tw"><table><thead><tr><th>車輛</th><th>車牌</th><th>類型</th><th>燃料</th><th>停車位</th><th>里程km</th><th>下次保養km</th><th>狀態</th><th>操作</th></tr></thead><tbody id="vh-tb"></tbody></table></div>
+      <div class="tw"><table><thead><tr><th>車輛</th><th>車牌</th><th>類型</th><th>燃料</th><th>停車位</th><th>里程km</th><th>下次保養km</th><th>狀態</th></tr></thead><tbody id="vh-tb"></tbody></table></div>
     </div>
     <div class="pg" id="pg-car-cal">
       <div class="fb"><select id="cal-vf" style="width:155px" onchange="renderCal()"><option value="">所有車輛</option></select><button class="btn btl bsm" onclick="navCar('car-bk')">＋ 新增預約</button></div>
@@ -701,20 +701,20 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
     </div>
     <div class="pg" id="pg-car-use">
       <div class="fb"><div class="sw2"><span class="si">🔍</span><input type="text" id="usq2" placeholder="車牌、使用人、目的…" oninput="renderUse()"></div><select id="usvf" style="width:145px" onchange="renderUse()"><option value="">所有車輛</option></select><select id="ussf" style="width:108px" onchange="renderUse()"><option value="">全部</option><option value="pending">待出發</option><option value="active">使用中</option><option value="done">已歸還</option><option value="cancelled">已取消</option></select><button class="btn bg2 bsm" onclick="expUseCSV()">↓ CSV</button></div>
-      <div class="tw"><table><thead><tr><th>車輛</th><th>使用人</th><th>出發</th><th>歸還</th><th>目的</th><th>里程</th><th>狀態</th><th>操作</th></tr></thead><tbody id="use-tb"></tbody></table></div>
+      <div class="tw"><table><thead><tr><th>車輛</th><th>使用人</th><th>出發</th><th>歸還</th><th>目的</th><th>里程</th><th>狀態</th></tr></thead><tbody id="use-tb"></tbody></table></div>
     </div>
     <div class="pg" id="pg-car-fuel">
       <div class="fuelsum"><div class="sc ct"><div class="sl">本月油費</div><div class="sv" id="fl-c">$0</div></div><div class="sc"><div class="sl">本月加油量</div><div class="sv" id="fl-l">0</div><div class="ss">公升</div></div><div class="sc ca"><div class="sl">記錄筆數</div><div class="sv" id="fl-n">0</div></div></div>
       <div class="fb"><select id="fvf" style="width:155px" onchange="renderFuel()"><option value="">所有車輛</option></select><button class="btn btl" onclick="openFuelModal()">＋ 記錄加油</button><button class="btn bg2 bsm" onclick="expFuelCSV()">↓ CSV</button></div>
-      <div class="tw"><table><thead><tr><th>車輛</th><th>日期</th><th>油量L</th><th>金額元</th><th>單價</th><th>里程</th><th>加油人</th><th>備註</th><th>操作</th></tr></thead><tbody id="fl-tb"></tbody></table></div>
+      <div class="tw"><table><thead><tr><th>車輛</th><th>日期</th><th>油量L</th><th>金額元</th><th>單價</th><th>里程</th><th>加油人</th><th>備註</th></tr></thead><tbody id="fl-tb"></tbody></table></div>
     </div>
     <div class="pg" id="pg-car-maint">
       <div class="fb"><select id="mtvf" style="width:155px" onchange="renderMaint()"><option value="">所有車輛</option></select><button class="btn btl" onclick="openMaintModal()">＋ 新增保養記錄</button></div>
-      <div class="tw"><table><thead><tr><th>車輛</th><th>保養日期</th><th>項目</th><th>里程</th><th>費用</th><th>下次km</th><th>下次日期</th><th>廠商</th><th>操作</th></tr></thead><tbody id="mt-tb"></tbody></table></div>
+      <div class="tw"><table><thead><tr><th>車輛</th><th>保養日期</th><th>項目</th><th>里程</th><th>費用</th><th>下次km</th><th>下次日期</th><th>廠商</th></tr></thead><tbody id="mt-tb"></tbody></table></div>
     </div>
     <div class="pg" id="pg-car-insp">
       <div class="fb"><div class="stt">驗車管理</div><div style="margin-left:auto"></div><button class="btn btl" onclick="openInspModal()">＋ 登記驗車</button></div>
-      <div class="tw"><table><thead><tr><th>車輛</th><th>上次驗車</th><th>下次驗車</th><th>剩餘天數</th><th>狀態</th><th>備註</th><th>操作</th></tr></thead><tbody id="insp-tb"></tbody></table></div>
+      <div class="tw"><table><thead><tr><th>車輛</th><th>上次驗車</th><th>下次驗車</th><th>剩餘天數</th><th>狀態</th><th>備註</th></tr></thead><tbody id="insp-tb"></tbody></table></div>
     </div>
     <div class="pg" id="pg-car-park">
       <div class="fb"><div class="stt">停車位管理</div><div style="margin-left:auto"></div><button class="btn btl" onclick="openParkModal()">＋ 新增停車位</button></div>
@@ -741,7 +741,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi tna active" data-p="trip-new"><span class="ic">➕</span>新增報支單</div>
       <div class="navi tna" data-p="trip-list"><span class="ic">📋</span>報支單清單</div>
     </div>
-    <div class="sbf">v1.19 · Supabase<br><span style="color:var(--yw)">● 本機存儲</span></div>
+    <div class="sbf">v1.20 · Supabase<br><span style="color:var(--yw)">● 本機存儲</span></div>
   </div>
   <div class="mc" id="tc">
 
@@ -861,7 +861,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
     <div class="pg" id="pg-trip-list">
       <div class="fb"><div class="stt">報支單清單</div></div>
       <div class="tw"><table>
-        <thead><tr><th>申請日期</th><th>出差人員</th><th>地點</th><th>目的</th><th>期間</th><th>台幣合計</th><th>操作</th></tr></thead>
+        <thead><tr><th>申請日期</th><th>出差人員</th><th>地點</th><th>目的</th><th>期間</th><th>台幣合計</th></tr></thead>
         <tbody id="tr-list-body"></tbody>
       </table></div>
     </div>
@@ -880,7 +880,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi rna" data-p="room-report"><span class="ic">📊</span>使用率報表</div>
       <div class="navi rna" data-p="room-fault"><span class="ic">🔧</span>故障回報<span class="nbadge" id="nb-fault" style="display:none">0</span></div>
     </div>
-    <div class="sbf">v1.19 · Supabase<br><span style="color:var(--gn)">● 本機存儲</span></div>
+    <div class="sbf">v1.20 · Supabase<br><span style="color:var(--gn)">● 本機存儲</span></div>
   </div>
   <div class="mc" id="rmc">
 
@@ -1006,7 +1006,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
         <button class="btn bg2 bsm" onclick="navRoom('room-new')" style="margin-left:auto">＋ 新增</button>
       </div>
       <div class="tw"><table>
-        <thead><tr><th>日期時間</th><th>會議室</th><th>標題</th><th>主辦人</th><th>人數</th><th>視訊</th><th>狀態</th><th>操作</th></tr></thead>
+        <thead><tr><th>日期時間</th><th>會議室</th><th>標題</th><th>主辦人</th><th>人數</th><th>視訊</th><th>狀態</th></tr></thead>
         <tbody id="rl-body"></tbody>
       </table></div>
     </div>
@@ -1047,7 +1047,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi vna" data-p="visit-guests"><span class="ic">👥</span>來賓資料庫</div>
       <div class="navi vna" data-p="visit-report"><span class="ic">📊</span>接待報表</div>
     </div>
-    <div class="sbf">v1.19 · Supabase<br><span style="color:#a78bfa">● 本機存儲</span></div>
+    <div class="sbf">v1.20 · Supabase<br><span style="color:#a78bfa">● 本機存儲</span></div>
   </div>
   <div class="mc" id="vmc">
 
@@ -1172,7 +1172,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
         <button class="btn" style="background:#a78bfa;color:#fff;border:none;cursor:pointer;padding:7px 13px;border-radius:var(--rs);font-size:13px;font-weight:500;white-space:nowrap" onclick="navVisit('visit-new')" style="margin-left:auto">＋ 新增</button>
       </div>
       <div class="tw"><table>
-        <thead><tr><th>期間</th><th>公司/單位</th><th>類型</th><th>接待單位</th><th>人數</th><th>負責窗口</th><th>費用預估</th><th>狀態</th><th>操作</th></tr></thead>
+        <thead><tr><th>期間</th><th>公司/單位</th><th>類型</th><th>接待單位</th><th>人數</th><th>負責窗口</th><th>費用預估</th><th>狀態</th></tr></thead>
         <tbody id="vl-body"></tbody>
       </table></div>
     </div>
@@ -2231,7 +2231,7 @@ function renderCarDash(){
   document.getElementById('cd-td').innerHTML=tdBks.length?tdBks.map(b=>{const v=gVeh(b.vh_id),u=gUsr(b.u_id);return`<tr><td>${VICO[v?.type]||'🚗'} ${v?.name||'—'}</td><td>${u?.name||'—'}</td><td class="tdm">${b.start.slice(11,16)}–${b.end.slice(11,16)}</td><td class="tdm">${b.purpose||'—'}</td><td>${bkBadge(b)}</td></tr>`}).join(''):'<tr><td colspan="5" class="tdm" style="text-align:center;padding:14px">今日無預約</td></tr>';
   const rems=[];vehs.forEach(v=>{if(v.next_maint_km&&v.km>=(v.next_maint_km-cfg.maint_km))rems.push({v,item:'定期保養',diff:v.next_maint_km-v.km,type:'km'});if(v.next_insp&&dDiff(v.next_insp)<=cfg.insp_days)rems.push({v,item:'定期驗車',diff:dDiff(v.next_insp),date:v.next_insp,type:'dt'});});
   document.getElementById('cd-rm').innerHTML=rems.length?rems.map(r=>`<tr><td>${VICO[r.v.type]||'🚗'} ${r.v.name}</td><td>${r.item}</td><td class="tdm">${r.type==='dt'?fmtD(r.date):`里程${r.v.next_maint_km}km`}</td><td>${r.type==='dt'?`<span class="badge ${r.diff<=7?'br':r.diff<=30?'by':'bo'}">${r.diff}天</span>`:`<span class="badge bo">差${r.diff}km</span>`}</td></tr>`).join(''):'<tr><td colspan="4" class="tdm" style="text-align:center;padding:14px">✓ 無緊急提醒</td></tr>';
-  document.getElementById('cd-cards').innerHTML=vehs.map(v=>{const st=vStBadge(v),pk=gPk(v.pk_id),pendBk=bks.find(b=>b.vh_id===v.id&&b.st==='pending'),actBk=bks.find(b=>b.vh_id===v.id&&b.st==='active'),curU=actBk?gUsr(actBk.u_id):null;return`<div class="ccard"><div class="cch"><div class="ccico">${VICO[v.type]||'🚗'}</div><div><div class="ccn">${v.name}</div><div class="ccp">${v.plate}</div></div><span class="badge ${st.cls}" style="margin-left:auto">${st.lbl}</span></div><div class="ccb"><div class="ccr"><span class="ccl">類型/燃料</span><span class="ccv">${VTLB[v.type]||v.type}·${VFLB[v.fuel]||v.fuel}</span></div><div class="ccr"><span class="ccl">里程</span><span class="ccv">${v.km.toLocaleString()}km</span></div><div class="ccr"><span class="ccl">停車位</span><span class="ccv">${v.pk_id||'—'}</span></div>${curU?`<div class="ccr"><span class="ccl">使用者</span><span class="ccv" style="color:var(--tl)">${curU.name}</span></div>`:''}</div><div class="ccf"><button class="btn btl bsm" onclick="startBk(\'${v.id}\')">＋ 預約</button></div></div>`}).join('');
+  document.getElementById('cd-cards').innerHTML=vehs.map(v=>{const st=vStBadge(v),pk=gPk(v.pk_id),pendBk=bks.find(b=>b.vh_id===v.id&&b.st==='pending'),actBk=bks.find(b=>b.vh_id===v.id&&b.st==='active'),curU=actBk?gUsr(actBk.u_id):null;return`<div class="ccard"><div class="cch"><div class="ccico">${VICO[v.type]||'🚗'}</div><div><div class="ccn">${v.name}</div><div class="ccp">${v.plate}</div></div><span class="badge ${st.cls}" style="margin-left:auto">${st.lbl}</span></div><div class="ccb"><div class="ccr"><span class="ccl">類型/燃料</span><span class="ccv">${VTLB[v.type]||v.type}·${VFLB[v.fuel]||v.fuel}</span></div><div class="ccr"><span class="ccl">里程</span><span class="ccv">${v.km.toLocaleString()}km</span></div><div class="ccr"><span class="ccl">停車位</span><span class="ccv">${v.pk_id||'—'}</span></div>${curU?`<div class="ccr"><span class="ccl">使用者</span><span class="ccv" style="color:var(--tl)">${curU.name}</span></div>`:''}</div><div class="ccf" style="flex-wrap:wrap;gap:6px"> ${pendBk?`<button class=\"btn bsm\" style=\"background:var(--acd);color:var(--ac)\" onclick=\"startUse('${pendBk.id}')\">🚗 出發</button> <button class=\"btn bdr bsm\" onclick=\"cancelBk('${pendBk.id}')\">✕ 取消</button>`:''} ${actBk?`<button class=\"btn bg2 bsm\" onclick=\"endUse('${actBk.id}')\">🔑 歸還</button>`:''} ${!actBk&&!pendBk?`<button class=\"btn bsm\" style=\"background:var(--acd);color:var(--ac)\" onclick=\"startBk('${v.id}')\">＋ 預約</button>`:''}</div></div>`}).join('');
 }
 
 let editVid=null;
@@ -2359,7 +2359,7 @@ function renderUse(){
   if(vf)bks=bks.filter(b=>b.vh_id===vf);if(sf)bks=bks.filter(b=>b.st===sf);
   if(q)bks=bks.filter(b=>{const v=gVeh(b.vh_id),u=gUsr(b.u_id);return v?.name.toLowerCase().includes(q)||v?.plate.toLowerCase().includes(q)||u?.name.toLowerCase().includes(q)||b.purpose?.toLowerCase().includes(q);});
   bks.sort((a,b)=>b.start.localeCompare(a.start));
-  document.getElementById('use-tb').innerHTML=bks.length?bks.map(b=>{const v=gVeh(b.vh_id),u=gUsr(b.u_id);return`<tr><td>${VICO[v?.type]||'🚗'} ${v?.name||'—'}</td><td>${u?.name||'—'}</td><td class="tdm">${b.start.replace('T',' ')}</td><td class="tdm">${b.end.replace('T',' ')}</td><td>${b.purpose||'—'}</td><td class="tdm">${b.km_plan||'—'}</td><td>${bkBadge(b)}</td><td>${b.st==='pending'?`<button class="btn btl bsm" onclick="startUse('${b.id}')">出發</button>`:''} ${b.st==='active'?`<button class="btn bg2 bsm" onclick="endUse('${b.id}')">歸還</button>`:''} ${b.st!=='done'&&b.st!=='active'?`<button class="btn bdr bsm" onclick="cancelBk('${b.id}')">取消</button>`:''}</td></tr>`}).join(''):'<tr><td colspan="8" class="tdm" style="text-align:center;padding:22px">無資料</td></tr>';
+  document.getElementById('use-tb').innerHTML=bks.length?bks.map(b=>{const v=gVeh(b.vh_id),u=gUsr(b.u_id);return`<tr><td>${VICO[v?.type]||'🚗'} ${v?.name||'—'}</td><td>${u?.name||'—'}</td><td class="tdm">${b.start.replace('T',' ')}</td><td class="tdm">${b.end.replace('T',' ')}</td><td>${b.purpose||'—'}</td><td class="tdm">${b.km_plan||'—'}</td><td>${bkBadge(b)}</td><td></td></tr>`}).join(''):'<tr><td colspan="8" class="tdm" style="text-align:center;padding:22px">無資料</td></tr>';
 }
 function startUse(id){const bks=ld(K.bks),i=bks.findIndex(b=>b.id===id);if(i>=0){bks[i].st='active';bks[i].actual_start=new Date().toISOString().slice(0,16);}sv(K.bks,bks);if(i>=0)sbSaveCarBk(bks[i]);renderUse();toast('已標記出發','success');}
 function endUse(id){

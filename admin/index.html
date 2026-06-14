@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART 行政管理平台 v1.26</title>
+<title>COMART 行政管理平台 v1.27</title>
 <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.js"></script>
 <style>
 :root{
@@ -509,7 +509,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="logo">
     <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
     <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
-    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.26</span>
+    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.27</span>
   </div>
   <div class="trr">
     <div style="display:flex;align-items:center;gap:6px;padding:4px 12px;background:var(--surface-2);border:1px solid var(--border);border-radius:20px;font-size:12px;cursor:pointer" onclick="showUsw()" id="topbar-user">
@@ -517,7 +517,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <span id="cur-u" style="color:var(--text-2)">載入中…</span>
       <span style="color:var(--text-3);font-size:10px">▾</span>
     </div>
-    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.26</span>
+    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.27</span>
   </div>
 </div>
 <div id="layout-wrap" style="display:flex;min-height:calc(100vh - var(--th))">
@@ -567,7 +567,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi" data-p="lib-cats"><span class="ic">🏷️</span>分類管理</div>
       <div class="navi" data-p="lib-cfg"><span class="ic">⚙️</span>系統設定</div>
     </div>
-    <div class="sbf">v1.26 · Supabase<br><span style="color:var(--ac)">● 本機存儲</span></div>
+    <div class="sbf">v1.27 · Supabase<br><span style="color:var(--ac)">● 本機存儲</span></div>
   </div>
   <div class="mc" id="lc">
     <div class="pg active" id="pg-lib-dash">
@@ -649,7 +649,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       
       <div class="navi cn" data-p="car-cfg"><span class="ic">⚙️</span>系統設定</div>
     </div>
-    <div class="sbf">v1.26 · Supabase<br><span style="color:var(--tl)">● 本機存儲</span></div>
+    <div class="sbf">v1.27 · Supabase<br><span style="color:var(--tl)">● 本機存儲</span></div>
   </div>
   <div class="mc cf" id="cc">
     <div class="pg active" id="pg-car-dash">
@@ -741,7 +741,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi tna active" data-p="trip-new"><span class="ic">➕</span>新增報支單</div>
       <div class="navi tna" data-p="trip-list"><span class="ic">📋</span>報支單清單</div>
     </div>
-    <div class="sbf">v1.26 · Supabase<br><span style="color:var(--yw)">● 本機存儲</span></div>
+    <div class="sbf">v1.27 · Supabase<br><span style="color:var(--yw)">● 本機存儲</span></div>
   </div>
   <div class="mc" id="tc">
 
@@ -880,7 +880,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi rna" data-p="room-report"><span class="ic">📊</span>使用率報表</div>
       <div class="navi rna" data-p="room-fault"><span class="ic">🔧</span>故障回報<span class="nbadge" id="nb-fault" style="display:none">0</span></div>
     </div>
-    <div class="sbf">v1.26 · Supabase<br><span style="color:var(--gn)">● 本機存儲</span></div>
+    <div class="sbf">v1.27 · Supabase<br><span style="color:var(--gn)">● 本機存儲</span></div>
   </div>
   <div class="mc" id="rmc">
 
@@ -1047,7 +1047,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi vna" data-p="visit-guests"><span class="ic">👥</span>來賓資料庫</div>
       <div class="navi vna" data-p="visit-report"><span class="ic">📊</span>接待報表</div>
     </div>
-    <div class="sbf">v1.26 · Supabase<br><span style="color:#a78bfa">● 本機存儲</span></div>
+    <div class="sbf">v1.27 · Supabase<br><span style="color:#a78bfa">● 本機存儲</span></div>
   </div>
   <div class="mc" id="vmc">
 
@@ -2033,7 +2033,7 @@ async function renderCarPg(p){
   if(p==='car-veh'){loadCarFromSB().then(()=>renderVeh());}
   if(p==='car-cal'){popCarSels();renderCal();}
   if(p==='car-bk')setTimeout(()=>initCarBkForm().catch(e=>console.warn(e)),50);
-  if(p==='car-use'){popCarSels();renderUse().catch(()=>{});}
+  if(p==='car-use'){popCarSels();loadCarFromSB().then(()=>renderUse());}
   if(p==='car-fuel'){popCarSels();renderFuel();renderFuelSum();}
   if(p==='car-maint'){popCarSels();renderMaint();}
   if(p==='car-insp')renderInsp();
@@ -2356,8 +2356,7 @@ function doBooking(){
   ['bkpur','bkkm','bkfr','bkto','bknt'].forEach(x=>document.getElementById(x).value='');document.getElementById('bk-conf').style.display='none';navCar('car-cal');
 }
 
-async function renderUse(){
-  await loadCarFromSB();
+function renderUse(){
   let bks=ld(K.bks);const q=document.getElementById('usq2')?.value.toLowerCase()||'',vf=document.getElementById('usvf')?.value||'',sf=document.getElementById('ussf')?.value||'';
   if(vf)bks=bks.filter(b=>b.vh_id===vf);if(sf)bks=bks.filter(b=>b.st===sf);
   if(q)bks=bks.filter(b=>{const v=gVeh(b.vh_id),u=gUsr(b.u_id);return v?.name.toLowerCase().includes(q)||v?.plate.toLowerCase().includes(q)||u?.name.toLowerCase().includes(q)||b.purpose?.toLowerCase().includes(q);});
@@ -2407,7 +2406,7 @@ async function cancelBk(id){
   // 重新從 SB 載入確保資料一致
   await loadCarFromSB();
   // 更新畫面
-  await renderUse();
+  renderUse();
   await renderCarDash();
   toast('✓ 已取消預約','success');
 }

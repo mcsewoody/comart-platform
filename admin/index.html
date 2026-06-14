@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART 行政管理平台 v1.11</title>
+<title>COMART 行政管理平台 v1.12</title>
 <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.js"></script>
 <style>
 :root{
@@ -474,7 +474,7 @@ tr.ovr td{background:rgba(239,68,68,.04)}
   <div class="logo">
     <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
     <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
-    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.11</span>
+    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.12</span>
   </div>
   <div class="trr">
     <div style="display:flex;align-items:center;gap:6px;padding:4px 12px;background:var(--surface-2);border:1px solid var(--border);border-radius:20px;font-size:12px;cursor:pointer" onclick="showUsw()" id="topbar-user">
@@ -482,7 +482,7 @@ tr.ovr td{background:rgba(239,68,68,.04)}
       <span id="cur-u" style="color:var(--text-2)">載入中…</span>
       <span style="color:var(--text-3);font-size:10px">▾</span>
     </div>
-    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.11</span>
+    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.12</span>
   </div>
 </div>
 <div id="layout-wrap" style="display:flex;min-height:calc(100vh - var(--th))">
@@ -532,7 +532,7 @@ tr.ovr td{background:rgba(239,68,68,.04)}
       <div class="navi" data-p="lib-cats"><span class="ic">🏷️</span>分類管理</div>
       <div class="navi" data-p="lib-cfg"><span class="ic">⚙️</span>系統設定</div>
     </div>
-    <div class="sbf">v1.11 · Supabase<br><span style="color:var(--ac)">● 本機存儲</span></div>
+    <div class="sbf">v1.12 · Supabase<br><span style="color:var(--ac)">● 本機存儲</span></div>
   </div>
   <div class="mc" id="lc">
     <div class="pg active" id="pg-lib-dash">
@@ -614,7 +614,7 @@ tr.ovr td{background:rgba(239,68,68,.04)}
       
       <div class="navi cn" data-p="car-cfg"><span class="ic">⚙️</span>系統設定</div>
     </div>
-    <div class="sbf">v1.11 · Supabase<br><span style="color:var(--tl)">● 本機存儲</span></div>
+    <div class="sbf">v1.12 · Supabase<br><span style="color:var(--tl)">● 本機存儲</span></div>
   </div>
   <div class="mc cf" id="cc">
     <div class="pg active" id="pg-car-dash">
@@ -706,7 +706,7 @@ tr.ovr td{background:rgba(239,68,68,.04)}
       <div class="navi tna active" data-p="trip-new"><span class="ic">➕</span>新增報支單</div>
       <div class="navi tna" data-p="trip-list"><span class="ic">📋</span>報支單清單</div>
     </div>
-    <div class="sbf">v1.11 · Supabase<br><span style="color:var(--yw)">● 本機存儲</span></div>
+    <div class="sbf">v1.12 · Supabase<br><span style="color:var(--yw)">● 本機存儲</span></div>
   </div>
   <div class="mc" id="tc">
 
@@ -845,7 +845,7 @@ tr.ovr td{background:rgba(239,68,68,.04)}
       <div class="navi rna" data-p="room-report"><span class="ic">📊</span>使用率報表</div>
       <div class="navi rna" data-p="room-fault"><span class="ic">🔧</span>故障回報<span class="nbadge" id="nb-fault" style="display:none">0</span></div>
     </div>
-    <div class="sbf">v1.11 · Supabase<br><span style="color:var(--gn)">● 本機存儲</span></div>
+    <div class="sbf">v1.12 · Supabase<br><span style="color:var(--gn)">● 本機存儲</span></div>
   </div>
   <div class="mc" id="rmc">
 
@@ -1012,7 +1012,7 @@ tr.ovr td{background:rgba(239,68,68,.04)}
       <div class="navi vna" data-p="visit-guests"><span class="ic">👥</span>來賓資料庫</div>
       <div class="navi vna" data-p="visit-report"><span class="ic">📊</span>接待報表</div>
     </div>
-    <div class="sbf">v1.11 · Supabase<br><span style="color:#a78bfa">● 本機存儲</span></div>
+    <div class="sbf">v1.12 · Supabase<br><span style="color:#a78bfa">● 本機存儲</span></div>
   </div>
   <div class="mc" id="vmc">
 
@@ -1545,16 +1545,43 @@ async function loadCarFromSB() {
     SB.get('car_parkings','?order=number'),
   ]);
   const [vhs,bks,fl,mt,isp,pk] = results.map(r=>r.status==='fulfilled'&&Array.isArray(r.value)?r.value:null);
-  if(vhs) sv(K.vh, vhs);
-  if(bks) sv(K.bks, bks);
-  if(fl)  sv(K.fl, fl);
-  if(mt)  sv(K.mt, mt);
-  if(isp) sv(K.isp, isp);
-  if(pk)  sv(K.pk, pk);
+
+  // 車輛：DB status → 前端 st
+  if(vhs) sv(K.vh, vhs.map(v=>({
+    ...v,
+    st: v.status||'available',
+    pk_id: v.pk_id||v.parking_id||'',
+  })));
+
+  // 預約：DB start_dt/end_dt → 前端 start/end，vehicle_id → vh_id
+  if(bks) sv(K.bks, bks.map(b=>({
+    ...b,
+    vh_id:   b.vehicle_id || b.vh_id,
+    u_id:    b.user_id    || b.u_id || '',
+    start:   b.start_dt   ? b.start_dt.slice(0,16) : (b.start||''),
+    end:     b.end_dt     ? b.end_dt.slice(0,16)   : (b.end||''),
+    st:      b.status     || b.st || 'pending',
+    checkedIn: b.checked_in || b.checkedIn || false,
+  })));
+
+  // 油資：DB vehicle_id → vh_id, log_date → date
+  if(fl) sv(K.fl, fl.map(f=>({
+    ...f,
+    vh_id:  f.vehicle_id || f.vh_id,
+    u_id:   f.user_id    || f.u_id || '',
+    date:   f.log_date   || f.date,
+    price:  f.price_per_l|| f.price,
+    total:  f.total,
+    odo:    f.odometer   || f.odo,
+  })));
+
+  if(mt)  sv(K.mt,  mt.map(m=>({...m, vh_id:m.vehicle_id||m.vh_id})));
+  if(isp) sv(K.isp, isp.map(i=>({...i, vh_id:i.vehicle_id||i.vh_id})));
+  if(pk)  sv(K.pk,  pk);
+
   console.log(`✓ car synced: ${vhs?.length||0} vehicles, ${bks?.length||0} bookings`);
 }
 
-// ── 圖書館寫入 SB ────────────────────────────────
 async function sbSaveBook(book) {
   if(!book.id){console.warn('sbSaveBook: missing id');return;}
   try { await SB.post('lib_books', book, 'resolution=merge-duplicates,return=minimal'); }
@@ -1601,8 +1628,8 @@ async function sbSaveCarBk(bk) {
       id:bk.id,
       vehicle_id:bk.vh_id||bk.vId||bk.vehicle_id,
       user_id:bk.u_id||bk.uId||bk.user_id||null,
-      start_dt:bk.start||bk.startDt||bk.start_dt,
-      end_dt:bk.end||bk.endDt||bk.end_dt,
+      start_dt:(bk.start||bk.startDt||bk.start_dt||'').replace('T',' '),
+      end_dt:(bk.end||bk.endDt||bk.end_dt||'').replace('T',' '),
       purpose:bk.purpose||'',
       km_plan:bk.km_plan||bk.kmPlan||0,
       from_loc:bk.from||bk.from_loc||'',

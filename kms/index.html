@@ -27,9 +27,9 @@
   --surface-2: #1e2330;
   --border: #2a3045;
   --border-mid: #3a4260;
-  --text: #f0f2f8;
-  --text-2: #b8bdd8;
-  --text-3: #7880a0;
+  --text: #f5f7ff;
+  --text-2: #cdd3f0;
+  --text-3: #9098c0;
   --blue: #6aaee8;
   --blue-bg: #1a2a50;
   --blue-border: #3a5a90;
@@ -391,7 +391,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.98</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.99</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
@@ -634,7 +634,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
                 onchange="document.getElementById('doc-valid-until').style.display=this.checked?'none':'block';if(this.checked)document.getElementById('doc-valid-until').value='';"
                 style="cursor:pointer;width:13px;height:13px;" />
               <label for="doc-indefinitely" style="font-size:11px;color:var(--text-2);cursor:pointer;white-space:nowrap;">Indefinitely</label>
-              <input class="meta-input" id="doc-valid-until" type="date" title="到期後自動封存" style="width:110px;display:none;" />
+              <input class="meta-input" id="doc-valid-until" type="date" title="到期後自動封存" style="width:138px;display:none;" />
             </div>
           </div>
           <div style="position:relative;display:inline-block;">
@@ -2186,7 +2186,7 @@ async function saveDoc() {
               : (window._editSnapshot?.author_name || ''))
           : buildAuthorName(),
         reviewer: document.getElementById('doc-reviewer').value.trim() || null,
-        valid_until: document.getElementById('doc-valid-until').value || null,
+        valid_until: document.getElementById('doc-indefinitely')?.checked ? null : (document.getElementById('doc-valid-until').value || null),
         tags: currentTags,
         product_line: document.getElementById('doc-product-line').value || null,
         customer_tag: currentCustomerTags,
@@ -6094,41 +6094,83 @@ function renderReviewList(filterStatus) {
     content.innerHTML = '<div style="text-align:center;color:var(--text-3);padding:40px 0;font-size:13px;">此分類無文件</div>';
     return;
   }
+  const isArchived = filterStatus === 'archived';
   const renderRow = d => {
     const st = stCfg[d.status] || stCfg.draft;
     const meta = CAT_META[d.category] || { icon:'📁', name:'' };
     const dt = d.updated_at ? new Date(d.updated_at).toLocaleDateString('zh-TW',{month:'2-digit',day:'2-digit'}) : '';
     const safeTitle = (d.title||'').replace(/'/g,'');
+    const safeAuthor = (d.author_name||'').replace(/'/g,'');
+    const cbHtml = isArchived
+      ? `<input type="checkbox" class="rv-cb" data-id="${d.id}" style="width:14px;height:14px;cursor:pointer;accent-color:var(--blue);flex-shrink:0;" onclick="event.stopPropagation()">`
+      : '';
     return `
       <div class="doc-item" style="margin-bottom:4px;">
+        ${cbHtml}
         <span class="status-badge ${st.badge}" style="flex-shrink:0;">${st.label}</span>
         <span style="font-size:10px;color:var(--text-3);flex-shrink:0;">${meta.icon}</span>
         <span class="doc-title" onclick="openReader('${d.id}')" style="cursor:pointer;flex:1;min-width:0;">${d.title}</span>
         <span style="font-size:11px;color:var(--text-3);white-space:nowrap;">${d.author_name||'—'}</span>
         <span style="font-size:11px;color:var(--text-3);white-space:nowrap;">${dt}</span>
-        <button onclick="deleteDoc('${d.id}','${safeTitle}','${(d.author_name||'').replace(/'/g,'')}')"
-          title="刪除" style="width:26px;height:26px;border-radius:5px;border:1px solid var(--border);background:var(--surface);cursor:pointer;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;font-size:13px;padding:0;border-color:#6a2020;background:#2e1010;color:#f06a6a;">🗑</button>
+        <button onclick="deleteDoc('${d.id}','${safeTitle}','${safeAuthor}')"
+          title="刪除" style="width:26px;height:26px;border-radius:5px;border:1px solid #7a2020;background:#380f0f;color:var(--red);cursor:pointer;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;font-size:13px;padding:0;">🗑</button>
         ${canEdit(d.author_name) ? `<button onclick="window._openDocFromReview=window._reviewFilter||'draft';openDoc('${d.id}')"
-          title="編輯" style="width:26px;height:26px;border-radius:5px;border:1px solid var(--border);background:var(--surface);cursor:pointer;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;font-size:13px;padding:0;">✏️</button>` : ''}
+          title="編輯" style="width:26px;height:26px;border-radius:5px;border:1px solid var(--border);background:var(--surface);font-size:13px;cursor:pointer;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;padding:0;">✏️</button>` : ''}
         <button onclick="openReviewPanel('${d.id}','${safeTitle}')"
-          title="審核" style="width:26px;height:26px;border-radius:5px;border:1px solid var(--border);background:var(--surface);cursor:pointer;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;font-size:13px;padding:0;border-color:var(--blue-border);background:var(--blue-bg);color:var(--blue);">🔍</button>
+          title="審核" style="width:26px;height:26px;border-radius:5px;border:1px solid var(--blue-border);background:var(--blue-bg);color:var(--blue);font-size:13px;cursor:pointer;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;padding:0;">🔍</button>
       </div>`;
   };
-  content.innerHTML = `<div style="margin-bottom:4px;font-size:12px;color:var(--text-3);">共 ${docs.length} 份文件</div>` + docs.map(renderRow).join('');
+  const toolbarHtml = isArchived ? `
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;padding:8px 10px;background:var(--surface-2);border-radius:var(--radius);border:1px solid var(--border);">
+      <input type="checkbox" id="rv-select-all" style="width:14px;height:14px;cursor:pointer;accent-color:var(--blue);"
+        onchange="document.querySelectorAll('.rv-cb').forEach(cb=>cb.checked=this.checked)">
+      <label for="rv-select-all" style="font-size:12px;color:var(--text-2);cursor:pointer;user-select:none;">全選</label>
+      <span style="flex:1;font-size:12px;color:var(--text-3);">共 ${docs.length} 份封存文件</span>
+      <button onclick="batchRepublish()"
+        style="padding:4px 12px;border-radius:var(--radius);border:1px solid var(--green);background:var(--green-bg);color:var(--green);font-size:12px;cursor:pointer;font-weight:500;">
+        ✅ 重新發佈
+      </button>
+    </div>` : `<div style="margin-bottom:4px;font-size:12px;color:var(--text-3);">共 ${docs.length} 份文件</div>`;
+  content.innerHTML = toolbarHtml + docs.map(renderRow).join('');
+}
+
+async function batchRepublish() {
+  const cbs = [...document.querySelectorAll('.rv-cb:checked')];
+  if (!cbs.length) { toast('請先勾選要重新發佈的文件', 'error'); return; }
+  if (!confirm(`確定將選取的 ${cbs.length} 份封存文件重新發佈，並設為 Indefinitely？`)) return;
+
+  const ids = cbs.map(cb => cb.dataset.id);
+  let ok = 0, fail = 0;
+
+  for (const id of ids) {
+    try {
+      await kmsWrite('update', 'kms_documents', {
+        status: 'published',
+        valid_until: null,
+      }, id);
+      ok++;
+    } catch(e) {
+      console.warn('[batchRepublish]', id, e.message);
+      fail++;
+    }
+    await new Promise(r => setTimeout(r, 200)); // 間隔避免 429
+  }
+
+  toast(`重新發佈完成：${ok} 份成功${fail ? `，${fail} 份失敗` : ''}`, ok ? 'success' : 'error');
+  window._reviewAllDocs = null;
+  loadReviewPanel();
 }
 
 async function loadReviewPanel() {
   const content = document.getElementById('review-content');
   if (!reviewingDocId) {
     // 確保 draft tab 亮燈（第一次進入）
-    if (!window._reviewFilterInitialized) {
-      window._reviewFilterInitialized = true;
-      window._reviewFilter = 'draft';
-      ['draft','published','archived'].forEach(s => {
-        const el = document.getElementById('rs-' + s);
-        if (el) el.className = 'review-step' + (s === 'draft' ? ' active' : '');
-      });
-    }
+    // 每次進入都重置 tab 亮燈到 draft
+    window._reviewFilter = window._reviewFilter || 'draft';
+    ['draft','published','archived'].forEach(s => {
+      const el = document.getElementById('rs-' + s);
+      if (el) el.className = 'review-step' + (s === window._reviewFilter ? ' active' : '');
+    });
     // 顯示待審核文件列表
     content.innerHTML = '<div style="text-align:center;color:var(--text-3);padding:20px 0;font-size:13px;">載入中…</div>';
     try {

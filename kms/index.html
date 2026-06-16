@@ -391,7 +391,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v1.99</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v2.00</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
@@ -3841,19 +3841,25 @@ async function loadDocs() {
 
   // 到期自動封存（背景執行）
   checkAndArchiveExpired(docs).catch(()=>{});
-  // 非同步載入留言數
+  // 非同步載入留言數（分批查詢避免 URL 過長 400 錯誤）
   if (CFG.supabaseUrl && CFG.supabaseKey && docs.length) {
-    const ids = docs.map(d => d.id).join(',');
-    sbFetch(`/rest/v1/kms_comments?select=doc_id&doc_id=in.(${ids})`)
-      .then(rows => {
-        if (!rows) return;
-        const cnt = {};
-        rows.forEach(r => { cnt[r.doc_id] = (cnt[r.doc_id]||0) + 1; });
-        docs.forEach(d => {
-          const el = document.getElementById('cc-' + d.id);
-          if (el) el.textContent = cnt[d.id] || 0;
-        });
-      }).catch(()=>{});
+    const BATCH = 50;
+    const cnt = {};
+    const allIds = docs.map(d => d.id);
+    const fetchBatch = async () => {
+      for (let i = 0; i < allIds.length; i += BATCH) {
+        const batchIds = allIds.slice(i, i + BATCH).join(',');
+        try {
+          const rows = await sbFetch(`/rest/v1/kms_comments?select=doc_id&doc_id=in.(${batchIds})`);
+          if (rows) rows.forEach(r => { cnt[r.doc_id] = (cnt[r.doc_id]||0) + 1; });
+        } catch(e) {}
+      }
+      docs.forEach(d => {
+        const el = document.getElementById('cc-' + d.id);
+        if (el) el.textContent = cnt[d.id] || 0;
+      });
+    };
+    fetchBatch();
   }
 
   list.innerHTML = filtered.map(d => {

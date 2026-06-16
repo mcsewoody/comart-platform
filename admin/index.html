@@ -603,43 +603,76 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
 @keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
 #panel-lottery .confetti-canvas{position:fixed;inset:0;pointer-events:none;z-index:10000;}
 
-/* ── MODE 1：吃角子老虎機 ── */
-#panel-lottery .slot-machine{
-  background:linear-gradient(135deg,#1e1035,#2d1b5e);
-  border:2px solid rgba(167,139,250,.3);border-radius:20px;
-  padding:30px 24px;box-shadow:0 0 60px rgba(124,58,237,.3),inset 0 0 30px rgba(0,0,0,.5);
+
+/* ── 老虎機 v2 ── */
+#panel-lottery .slot-machine-v2{
+  background:linear-gradient(160deg,#1a0533,#0d0220);
+  border:3px solid rgba(167,139,250,.4);
+  border-radius:24px;padding:20px 24px 24px;
+  box-shadow:0 0 60px rgba(124,58,237,.3),0 0 120px rgba(124,58,237,.1);
+  position:relative;min-width:320px;
+}
+#panel-lottery .sm-top-light{
+  position:absolute;top:-6px;left:50%;transform:translateX(-50%);
+  width:80px;height:12px;border-radius:6px;
+  background:linear-gradient(90deg,#7c3aed,#4f46e5,#7c3aed);
+  box-shadow:0 0 20px rgba(124,58,237,.8);
+  animation:smTopPulse 1.5s ease-in-out infinite;
+}
+@keyframes smTopPulse{0%,100%{opacity:.6;box-shadow:0 0 15px rgba(124,58,237,.6);}50%{opacity:1;box-shadow:0 0 30px rgba(124,58,237,1);}}
+#panel-lottery .sm-title{
+  text-align:center;font-size:12px;letter-spacing:6px;color:rgba(167,139,250,.7);
+  margin-bottom:14px;
+}
+#panel-lottery .sm-screen{
+  background:#050212;border:2px solid rgba(99,102,241,.3);border-radius:14px;
+  padding:8px;position:relative;overflow:hidden;
+  box-shadow:inset 0 0 30px rgba(0,0,0,.8);
+}
+#panel-lottery .sm-scanline{
+  position:absolute;inset:0;pointer-events:none;z-index:3;
+  background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.08) 3px,rgba(0,0,0,.08) 4px);
+}
+#panel-lottery .sm-highlight-bar{
+  position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);
+  height:56px;pointer-events:none;z-index:2;
+  border-top:1px solid rgba(251,191,36,.5);border-bottom:1px solid rgba(251,191,36,.5);
+  background:rgba(251,191,36,.04);
+}
+#panel-lottery .sm-reel-wrap{
+  display:flex;gap:8px;justify-content:center;
+}
+#panel-lottery .sm-reel{
+  width:100px;height:168px;overflow:hidden;border-radius:8px;
+  background:linear-gradient(180deg,#0a0118,#120a2e,#0a0118);
   position:relative;
 }
-#panel-lottery .slot-machine::before{
-  content:'🎰 LUCKY DRAW';position:absolute;top:-14px;left:50%;transform:translateX(-50%);
-  background:linear-gradient(90deg,#7c3aed,#4f46e5);padding:4px 20px;border-radius:999px;
-  font-size:12px;letter-spacing:3px;color:#fff;
+#panel-lottery .sm-reel-inner{
+  display:flex;flex-direction:column;will-change:transform;
 }
-#panel-lottery .reels{display:flex;gap:12px;}
-#panel-lottery .reel{
-  width:110px;height:150px;overflow:hidden;border-radius:12px;
-  background:#0d0618;border:2px solid rgba(139,92,246,.4);
-  position:relative;box-shadow:inset 0 0 20px rgba(0,0,0,.8);
+#panel-lottery .sm-reel-item{
+  height:56px;display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:700;color:#c4b5fd;
+  text-align:center;padding:0 6px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  width:100px;
 }
-#panel-lottery .reel::before,#panel-lottery .reel::after{
-  content:'';position:absolute;left:0;right:0;height:45px;z-index:2;pointer-events:none;
+#panel-lottery .sm-reel-item.highlight{color:#fbbf24;text-shadow:0 0 12px rgba(251,191,36,.8);}
+#panel-lottery .sm-reel::before,#panel-lottery .sm-reel::after{
+  content:'';position:absolute;left:0;right:0;height:56px;z-index:4;pointer-events:none;
 }
-#panel-lottery .reel::before{top:0;background:linear-gradient(to bottom,#0d0618,transparent);}
-#panel-lottery .reel::after{bottom:0;background:linear-gradient(to top,#0d0618,transparent);}
-#panel-lottery .reel-inner{
-  display:flex;flex-direction:column;align-items:center;
-  transition:none;
+#panel-lottery .sm-reel::before{top:0;background:linear-gradient(to bottom,#0a0118 30%,transparent);}
+#panel-lottery .sm-reel::after{bottom:0;background:linear-gradient(to top,#0a0118 30%,transparent);}
+#panel-lottery .sm-bottom{
+  margin-top:14px;display:flex;justify-content:center;
 }
-#panel-lottery .reel-item{
-  height:50px;display:flex;align-items:center;justify-content:center;
-  font-size:15px;font-weight:700;color:#e2d9f3;letter-spacing:1px;
-  width:100%;text-align:center;padding:0 4px;
+#panel-lottery .sm-led{
+  font-family:monospace;font-size:13px;letter-spacing:3px;
+  color:#4ade80;text-shadow:0 0 8px rgba(74,222,128,.7);
+  background:rgba(0,0,0,.6);border:1px solid rgba(74,222,128,.2);
+  border-radius:6px;padding:6px 20px;
 }
-#panel-lottery .reel-highlight{
-  position:absolute;top:50%;left:0;right:0;height:50px;transform:translateY(-50%);
-  border-top:2px solid rgba(167,139,250,.6);border-bottom:2px solid rgba(167,139,250,.6);
-  background:rgba(124,58,237,.1);pointer-events:none;z-index:1;
-}
+@keyframes smSpin{0%{color:#c4b5fd;}50%{color:#fbbf24;text-shadow:0 0 10px rgba(251,191,36,.5);}100%{color:#c4b5fd;}}
 
 /* ── MODE 2：俄羅斯輪盤 ── */
 #panel-lottery .revolver-wrap{position:relative;display:flex;flex-direction:column;align-items:center;gap:16px;}
@@ -1464,9 +1497,23 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
 
         <!-- MODE 1：老虎機 -->
         <div id="lotto-slot" class="lotto-mode">
-          <div class="slot-machine">
-            <div class="reels">
-              <div class="reel" id="reel0"><div class="reel-inner" id="ri0"></div><div class="reel-highlight"></div></div>
+          <div class="slot-machine-v2">
+            <div class="sm-top-light"></div>
+            <div class="sm-title">🎰 LUCKY DRAW</div>
+            <div class="sm-screen">
+              <div class="sm-reel-wrap">
+                <div class="sm-reel" id="smr0"><div class="sm-reel-inner" id="smri0"></div></div>
+                <div class="sm-reel" id="smr1"><div class="sm-reel-inner" id="smri1"></div></div>
+                <div class="sm-reel" id="smr2"><div class="sm-reel-inner" id="smri2"></div></div>
+              </div>
+              <div class="sm-scanline"></div>
+              <div class="sm-highlight-bar"></div>
+            </div>
+            <div class="sm-bottom">
+              <div class="sm-led" id="sm-led-msg">INSERT COIN</div>
+            </div>
+          </div>
+        </div>
               <div class="reel" id="reel1"><div class="reel-inner" id="ri1"></div><div class="reel-highlight"></div></div>
               <div class="reel" id="reel2"><div class="reel-inner" id="ri2"></div><div class="reel-highlight"></div></div>
             </div>
@@ -2716,18 +2763,22 @@ async function doReturn(){
 async function cancelBk(id){
   if(!confirm('確定取消此預約？'))return;
   const bks=ld(K.bks),i=bks.findIndex(b=>b.id===id);
-  if(i<0)return;
-  // 先更新本地快取（讓 UI 立即響應）
+  if(i<0){toast('找不到預約','error');return;}
+  // 1. 先同步到 Supabase（最重要）
+  const patchResult = await SB.patch('car_bookings','id=eq.'+encodeURIComponent(id),{status:'cancelled'});
+  if(!patchResult){
+    toast('取消失敗，請重試','error');
+    return;
+  }
+  // 2. 更新本地快取
   bks[i].st='cancelled';
   bks[i].status='cancelled';
   sv(K.bks,bks);
-  // 立即更新畫面（讀本地快取）
+  // 3. 重新從 SB 載入
+  await loadCarFromSB();
+  // 4. 更新畫面（不管在哪個頁面都更新）
   renderUse();
   await renderCarDash();
-  // 再同步到 Supabase
-  try{
-    await SB.patch('car_bookings','id=eq.'+id,{status:'cancelled'});
-  }catch(e){console.warn('cancel SB fail:',e);}
   toast('✓ 已取消預約','success');
 }
 function expUseCSV(){const bks=ld(K.bks);const rows=[['車輛','車牌','使用人','出發','歸還','目的','里程','狀態']];bks.forEach(b=>{const v=gVeh(b.vh_id),u=gUsr(b.u_id);rows.push([v?.name||'',v?.plate||'',u?.name||'',b.start,b.end,b.purpose||'',b.km_plan||'',b.st]);});dl('usage.csv',rows.map(r=>r.map(c=>`"${c}"`).join(',')).join('\n'),'text/csv');toast('已匯出','success');}
@@ -4731,7 +4782,7 @@ function lottoInit(){
   // 星星
   lottoMakeStars();
   // 初始化各模式
-  lottoInitSlot();
+  lottoInitSlotV2();
   lottoInitRevolver();
   lottoInitVortex();
   lottoInitTarot();
@@ -4762,6 +4813,7 @@ function lottoSetMode(mode){
     if(el) el.style.display=(m===mode?'':'none');
   });
   if(mode==='tarot') lottoInitTarot();
+  if(mode==='slot') lottoInitSlotV2();
   if(mode==='vortex') lottoVortexIdle();
   var hint=document.getElementById('lotto-hint');
   if(hint) hint.textContent='點擊開始，5秒後揭曉命運';
@@ -4831,67 +4883,116 @@ function lottoInitSlot(){
   }
 }
 
-var slotTimers=[];
-function lottoSlot(winner){
-  slotTimers.forEach(function(t){clearTimeout(t);clearInterval(t);});
-  slotTimers=[];
 
-  var itemH=52, reelH=156;
-  var stops=[3200,3800,4500];
+// ══ 老虎機 v2 ══
+var smTimers=[], smITEMH=56, smREEL_H=168, smRunning=false;
 
-  for(var r=0;r<3;r++){
-    (function(reel){
-      var ri=document.getElementById('ri'+reel); if(!ri)return;
-      var items=LPOOL.length?LPOOL.slice():['???'];
-      if(items.indexOf(winner)<0) items.push(winner);
-
-      ri.innerHTML='';
-      var list=[];
-      // 重複 8 次讓滾動夠長，最後加 winner
-      for(var rep=0;rep<8;rep++){
-        for(var k=0;k<items.length;k++) list.push(items[k]);
-      }
-      list.push(winner);
-
-      list.forEach(function(n){
-        var d=document.createElement('div');
-        d.style.cssText='height:'+itemH+'px;display:flex;align-items:center;justify-content:center;'
-          +'font-size:14px;font-weight:700;color:#e2d9f3;width:100%;text-align:center;'
-          +'padding:0 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';
-        d.textContent=n;
-        ri.appendChild(d);
-      });
-
-      // 從名單第二輪開始（讓人名從一開始就可見）
-      var startY=-(items.length*itemH);
-      ri.style.transition='none';
-      ri.style.transform='translateY('+startY+'px)';
-
-      // winner 最終位置（顯示在中央）
-      var targetY=-((list.length-1)*itemH)+(reelH/2-itemH/2);
-
-      var pos=startY, spd=0;
-      var myIv=setInterval(function(){
-        spd=Math.min(spd+8,100);
-        pos-=spd;
-        ri.style.transform='translateY('+pos+'px)';
-      },30);
-      slotTimers.push(myIv);
-
-      var myStop=setTimeout(function(){
-        clearInterval(myIv);
-        ri.style.transition='transform 1.2s cubic-bezier(0.25,0.46,0.45,0.94)';
-        ri.style.transform='translateY('+targetY+'px)';
-        if(reel===2){
-          slotTimers.push(setTimeout(function(){
-            lottoShowResult(winner);
-          },1300));
-        }
-      },stops[reel]);
-      slotTimers.push(myStop);
-    })(r);
+function smFill(reelId, winner, isLast){
+  var ri = document.getElementById(reelId);
+  if(!ri) return;
+  ri.innerHTML='';
+  var pool = LPOOL.length ? LPOOL.slice() : ['???'];
+  if(pool.indexOf(winner)<0) pool.push(winner);
+  // 建立循環串列：隨機 * 6 輪 + winner 在最後
+  var list=[];
+  for(var rep=0;rep<6;rep++){
+    var shuffled=pool.slice().sort(()=>Math.random()-.5);
+    shuffled.forEach(function(n){list.push(n);});
   }
+  list.push(winner);
+  list.forEach(function(n,idx){
+    var d=document.createElement('div');
+    d.className='sm-reel-item'+(n===winner&&idx===list.length-1?' highlight':'');
+    d.textContent=n;
+    ri.appendChild(d);
+  });
+  // 從第 pool.length 個開始（讓人名一開始就可見）
+  var startY = -(pool.length * smITEMH);
+  ri.style.transition='none';
+  ri.style.transform='translateY('+startY+'px)';
+  return {list:list, startY:startY};
 }
+
+function smLedMsg(msg, color){
+  var el=document.getElementById('sm-led-msg');
+  if(!el)return;
+  el.textContent=msg;
+  el.style.color=color||'#4ade80';
+  el.style.textShadow='0 0 8px '+(color||'rgba(74,222,128,.7)');
+}
+
+function lottoSlotV2(winner){
+  if(smRunning)return;
+  smRunning=true;
+  smTimers.forEach(function(t){clearTimeout(t);clearInterval(t);});
+  smTimers=[];
+
+  var stops=[2800, 3500, 4300]; // 各 reel 停止時間 ms
+  var reels=['smri0','smri1','smri2'];
+
+  smLedMsg('SPINNING...','#f59e0b');
+
+  reels.forEach(function(reelId, r){
+    var info = smFill(reelId, winner, r===2);
+    var list = info.list;
+    var totalH = list.length * smITEMH;
+    // 目標：winner（最後一個）顯示在中央
+    var targetY = -((list.length-1)*smITEMH) + (smREEL_H/2 - smITEMH/2);
+
+    var pos = info.startY;
+    var spd = 0;
+    var myIv = setInterval(function(){
+      spd = Math.min(spd+10, 120);
+      pos -= spd;
+      // 防止滾過頭（限制在 targetY - 3*totalH）
+      if(pos < targetY - totalH*2) pos += totalH;
+      document.getElementById(reelId).style.transform='translateY('+pos+'px)';
+    }, 25);
+    smTimers.push(myIv);
+
+    var myStop = setTimeout(function(){
+      clearInterval(myIv);
+      var ri = document.getElementById(reelId);
+      if(!ri)return;
+      ri.style.transition='transform 0.9s cubic-bezier(0.22,1,0.36,1)';
+      ri.style.transform='translateY('+targetY+'px)';
+      // 停止時 LED 更新
+      if(r===0) smLedMsg('LOCK  1','#a78bfa');
+      if(r===1) smLedMsg('LOCK  2','#818cf8');
+      if(r===2){
+        smTimers.push(setTimeout(function(){
+          smLedMsg('✦ '+winner+' ✦','#fbbf24');
+          smRunning=false;
+          lottoShowResult(winner);
+        },1000));
+      }
+    }, stops[r]);
+    smTimers.push(myStop);
+  });
+}
+
+function lottoInitSlotV2(){
+  smRunning=false;
+  smTimers.forEach(function(t){clearTimeout(t);clearInterval(t);});
+  smTimers=[];
+  ['smri0','smri1','smri2'].forEach(function(id,i){
+    var ri=document.getElementById(id);
+    if(!ri)return;
+    ri.innerHTML='';
+    var pool=LPOOL.length?LPOOL.slice():['???'];
+    pool.forEach(function(n){
+      var d=document.createElement('div');
+      d.className='sm-reel-item';
+      d.textContent=n;
+      ri.appendChild(d);
+    });
+    ri.style.transition='none';
+    var mid=Math.floor(pool.length/2)*smITEMH-(smREEL_H/2-smITEMH/2);
+    ri.style.transform='translateY(-'+mid+'px)';
+  });
+  smLedMsg('INSERT COIN','#4ade80');
+}
+
 
 
 function lottoDrawRoulette(wheelAngle){
@@ -5291,8 +5392,8 @@ function lottoDraw(){
   lottoAudio('tension');
 
   if(LMODE==='slot'){
-    lottoInitSlot();
-    setTimeout(function(){lottoSlot(winner);},100);
+    lottoInitSlotV2();
+    setTimeout(function(){lottoSlotV2(winner);},200);
   }else if(LMODE==='revolver'){
     var box=document.getElementById('rev-name-box');
     if(box){box.textContent='?';box.style.color='#fca5a5';box.style.boxShadow='';}

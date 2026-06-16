@@ -502,137 +502,256 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
 .trip-sec-title{opacity:1!important}
 .sbf{color:var(--text-3)!important}
 
-/* == LOTTERY == */
-#panel-lottery .lotto-wrap{height:100%;background:radial-gradient(circle at 50% 30%,#1a2050 0%,#0b0e22 70%);overflow:hidden;position:relative;}
-#panel-lottery .lotto-wrap #app{height:100%;display:flex;flex-direction:column;color:#fff;user-select:none;}
+/* ══ LOTTERY SYSTEM ══ */
+#panel-lottery .mc{padding:0!important;overflow:hidden;}
+#panel-lottery .mc>.lotto-root{
+  height:100%;
+  background:radial-gradient(ellipse at 50% 0%,#1a0a2e 0%,#0d0618 55%,#050210 100%);
+  display:flex;flex-direction:column;align-items:center;
+  overflow:hidden;position:relative;color:#fff;
+  font-family:"PingFang TC","Microsoft JhengHei",sans-serif;
+  user-select:none;
+}
+/* 星星背景 */
+#panel-lottery .stars{position:absolute;inset:0;pointer-events:none;overflow:hidden;}
+#panel-lottery .star{position:absolute;border-radius:50%;background:#fff;animation:twinkle var(--d,3s) ease-in-out infinite var(--delay,0s);}
+@keyframes twinkle{0%,100%{opacity:.2;transform:scale(1);}50%{opacity:1;transform:scale(1.5);}}
 
-  
-  
-  
-  
-  #app{height:100vh;display:flex;flex-direction:column;}
-  #menu{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;}
-  #menu h1{font-size:clamp(28px,6vw,52px);letter-spacing:4px;background:linear-gradient(90deg,#fff,#CADCFC,#4361EE);-webkit-background-clip:text;background-clip:text;color:transparent;margin-bottom:8px;}
-  #menu .sub{color:#9aa6d6;margin-bottom:34px;font-size:15px;letter-spacing:2px;}
-  .cards{display:flex;gap:20px;flex-wrap:wrap;justify-content:center;max-width:1080px;}
-  .mode-card{
-    width:248px;background:rgba(255,255,255,.04);border:1px solid rgba(202,220,252,.18);
-    border-radius:20px;padding:26px 22px;cursor:pointer;transition:.25s;backdrop-filter:blur(6px);
-    display:flex;flex-direction:column;align-items:center;text-align:center;
-  }
-  .mode-card:hover{transform:translateY(-8px);border-color:var(--accent);box-shadow:0 18px 50px rgba(67,97,238,.35);background:rgba(67,97,238,.08);}
-  .mode-card .emoji-ico{font-size:50px;margin-bottom:12px;}
-  .mode-card h2{font-size:21px;margin-bottom:9px;letter-spacing:2px;}
-  .mode-card p{font-size:13px;color:#9aa6d6;line-height:1.7;}
-  .badge{margin-top:14px;font-size:12px;color:var(--gold);border:1px solid var(--gold);padding:4px 12px;border-radius:999px;}
+/* 頂部 */
+#panel-lottery .lotto-header{
+  text-align:center;padding:18px 0 8px;z-index:2;
+}
+#panel-lottery .lotto-title{
+  font-size:22px;font-weight:700;letter-spacing:4px;
+  background:linear-gradient(135deg,#c084fc,#818cf8,#38bdf8);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+#panel-lottery .lotto-pool{font-size:12px;color:#a78bfa;letter-spacing:2px;margin-top:4px;}
 
-  .stage{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;}
-  .stage.active{display:flex;}
-  .back-btn{position:absolute;top:18px;left:18px;z-index:50;background:rgba(255,255,255,.08);border:1px solid rgba(202,220,252,.25);color:#fff;padding:8px 18px;border-radius:999px;cursor:pointer;font-size:14px;letter-spacing:1px;}
-  .back-btn:hover{background:rgba(255,255,255,.18);}
-  .count-tag{position:absolute;top:20px;right:20px;z-index:50;font-size:13px;color:#9aa6d6;letter-spacing:1px;}
-  .draw-btn{
-    margin-top:34px;padding:16px 56px;font-size:20px;letter-spacing:6px;font-weight:bold;color:#fff;
-    border:none;border-radius:999px;cursor:pointer;
-    background:linear-gradient(90deg,#4361EE,#C8941A);box-shadow:0 10px 36px rgba(67,97,238,.5);transition:.2s;
-  }
-  .draw-btn:hover:not(:disabled){transform:scale(1.05);}
-  .draw-btn:disabled{opacity:.4;cursor:not-allowed;}
-  .stage-title{font-size:22px;letter-spacing:3px;color:#CADCFC;margin-bottom:24px;text-shadow:0 0 18px rgba(67,97,238,.6);}
+/* 模式選擇 */
+#panel-lottery .mode-bar{
+  display:flex;gap:10px;padding:0 20px 12px;z-index:2;flex-wrap:wrap;justify-content:center;
+}
+#panel-lottery .mode-btn{
+  padding:8px 18px;border-radius:999px;border:1px solid rgba(139,92,246,.4);
+  background:rgba(139,92,246,.1);color:#c4b5fd;font-size:13px;letter-spacing:1px;
+  cursor:pointer;transition:.2s;
+}
+#panel-lottery .mode-btn.active{
+  background:linear-gradient(135deg,#7c3aed,#4f46e5);
+  border-color:transparent;color:#fff;
+  box-shadow:0 4px 20px rgba(124,58,237,.5);
+}
+#panel-lottery .mode-btn:hover:not(.active){background:rgba(139,92,246,.2);}
 
-  /* 老虎機 */
-  .slot-wrap{display:flex;gap:14px;}
-  .reel{
-    width:clamp(150px,40vw,280px);height:170px;overflow:hidden;border-radius:18px;
-    background:linear-gradient(180deg,#0d1130,#1a2050);border:3px solid var(--accent);
-    box-shadow:inset 0 0 50px rgba(0,0,0,.7),0 0 40px rgba(67,97,238,.4);position:relative;
-  }
-  .reel::before,.reel::after{content:"";position:absolute;left:0;right:0;height:55px;z-index:3;pointer-events:none;}
-  .reel::before{top:0;background:linear-gradient(180deg,#0d1130,transparent);}
-  .reel::after{bottom:0;background:linear-gradient(0deg,#0d1130,transparent);}
-  .reel .line{position:absolute;top:50%;left:0;right:0;height:60px;transform:translateY(-50%);border-top:2px solid var(--gold);border-bottom:2px solid var(--gold);z-index:2;background:rgba(200,148,26,.06);}
-  .reel-track{position:absolute;left:0;right:0;display:flex;flex-direction:column;align-items:center;will-change:transform;}
-  .reel-track div{height:60px;line-height:60px;font-size:34px;font-weight:bold;color:#fff;width:100%;text-align:center;}
+/* 舞台 */
+#panel-lottery .lotto-stage{
+  flex:1;display:flex;align-items:center;justify-content:center;
+  position:relative;z-index:2;width:100%;
+}
 
-  /* 黑洞 */
-  #vortexCanvas{position:absolute;inset:0;width:100%;height:100%;}
+/* 抽籤按鈕 */
+#panel-lottery .draw-area{
+  padding:16px 0 20px;z-index:2;display:flex;flex-direction:column;align-items:center;gap:10px;
+}
+#panel-lottery .draw-btn{
+  padding:14px 60px;font-size:18px;font-weight:700;letter-spacing:4px;
+  border:none;border-radius:999px;cursor:pointer;
+  background:linear-gradient(135deg,#7c3aed,#2563eb);
+  color:#fff;box-shadow:0 8px 30px rgba(124,58,237,.6);
+  transition:.15s;position:relative;overflow:hidden;
+}
+#panel-lottery .draw-btn::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.2),transparent);
+  transform:translateX(-100%);transition:.5s;
+}
+#panel-lottery .draw-btn:hover::before{transform:translateX(100%);}
+#panel-lottery .draw-btn:hover:not(:disabled){transform:scale(1.04);}
+#panel-lottery .draw-btn:disabled{opacity:.4;cursor:not-allowed;transform:none;}
+#panel-lottery .draw-hint{font-size:11px;color:#6d5ea6;letter-spacing:2px;}
 
-  /* 翻牌（名牌掃描）*/
-  .card-field{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;max-width:820px;max-height:62vh;overflow:auto;padding:6px;}
-  .name-tile{min-width:90px;height:60px;display:flex;align-items:center;justify-content:center;
-    border-radius:10px;font-size:20px;font-weight:bold;color:#CADCFC;flex:0 0 auto;padding:0 14px;
-    background:linear-gradient(145deg,#1E2761,#2c3e8f);border:2px solid rgba(202,220,252,.25);
-    transition:transform .12s,box-shadow .12s,background .12s;}
-  .name-tile.lit{background:linear-gradient(145deg,#4361EE,#5a73d8);color:#fff;
-    box-shadow:0 0 22px 4px var(--accent);border-color:#CADCFC;transform:scale(1.08);}
-  .name-tile.win{background:linear-gradient(145deg,#fff,#CADCFC);color:#1E2761;
-    box-shadow:0 0 34px 8px var(--gold);border-color:var(--gold);transform:scale(1.35);z-index:2;}
+/* 結果彈出 */
+#panel-lottery .result-overlay{
+  position:fixed;inset:0;z-index:9999;display:none;
+  background:radial-gradient(circle,rgba(20,10,40,.97) 0%,rgba(5,2,16,.99) 100%);
+  align-items:center;justify-content:center;flex-direction:column;
+}
+#panel-lottery .result-overlay.show{display:flex;}
+#panel-lottery .result-winner{
+  font-size:clamp(40px,8vw,80px);font-weight:900;letter-spacing:6px;
+  background:linear-gradient(135deg,#fbbf24,#f59e0b,#fde68a,#fbbf24);
+  background-size:200%;
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  animation:goldShine 1.5s linear infinite, winPop .6s cubic-bezier(.34,1.56,.64,1) both;
+  text-shadow:none;
+}
+@keyframes goldShine{0%{background-position:0%}100%{background-position:200%}}
+@keyframes winPop{0%{transform:scale(0) rotate(-10deg);opacity:0;}100%{transform:scale(1) rotate(0);opacity:1;}}
+#panel-lottery .result-label{
+  font-size:14px;letter-spacing:6px;color:#a78bfa;margin-bottom:16px;
+  animation:fadeUp .5s .3s both;
+}
+#panel-lottery .result-close{
+  margin-top:32px;padding:12px 40px;border-radius:999px;
+  background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);
+  color:#fff;font-size:14px;cursor:pointer;letter-spacing:2px;
+  animation:fadeUp .5s .8s both;
+}
+#panel-lottery .result-close:hover{background:rgba(255,255,255,.2);}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+#panel-lottery .confetti-canvas{position:fixed;inset:0;pointer-events:none;z-index:10000;}
 
-  /* 輪盤 */
-  .wheel-stage{position:relative;width:min(78vw,440px);height:min(78vw,440px);}
-  #wheelCanvas{width:100%;height:100%;display:block;filter:drop-shadow(0 0 30px rgba(67,97,238,.45));}
-  .wheel-pointer{position:absolute;top:-6px;left:50%;transform:translateX(-50%);z-index:6;
-    width:0;height:0;border-left:18px solid transparent;border-right:18px solid transparent;border-top:32px solid var(--gold);
-    filter:drop-shadow(0 2px 6px rgba(0,0,0,.6));}
-  .wheel-hub{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:5;
-    width:54px;height:54px;border-radius:50%;background:radial-gradient(circle,#fff,#CADCFC 60%,#4361EE);
-    box-shadow:0 0 18px rgba(67,97,238,.8);display:flex;align-items:center;justify-content:center;font-size:24px;}
+/* ── MODE 1：吃角子老虎機 ── */
+#panel-lottery .slot-machine{
+  background:linear-gradient(135deg,#1e1035,#2d1b5e);
+  border:2px solid rgba(167,139,250,.3);border-radius:20px;
+  padding:30px 24px;box-shadow:0 0 60px rgba(124,58,237,.3),inset 0 0 30px rgba(0,0,0,.5);
+  position:relative;
+}
+#panel-lottery .slot-machine::before{
+  content:'🎰 LUCKY DRAW';position:absolute;top:-14px;left:50%;transform:translateX(-50%);
+  background:linear-gradient(90deg,#7c3aed,#4f46e5);padding:4px 20px;border-radius:999px;
+  font-size:12px;letter-spacing:3px;color:#fff;
+}
+#panel-lottery .reels{display:flex;gap:12px;}
+#panel-lottery .reel{
+  width:110px;height:150px;overflow:hidden;border-radius:12px;
+  background:#0d0618;border:2px solid rgba(139,92,246,.4);
+  position:relative;box-shadow:inset 0 0 20px rgba(0,0,0,.8);
+}
+#panel-lottery .reel::before,#panel-lottery .reel::after{
+  content:'';position:absolute;left:0;right:0;height:45px;z-index:2;pointer-events:none;
+}
+#panel-lottery .reel::before{top:0;background:linear-gradient(to bottom,#0d0618,transparent);}
+#panel-lottery .reel::after{bottom:0;background:linear-gradient(to top,#0d0618,transparent);}
+#panel-lottery .reel-inner{
+  display:flex;flex-direction:column;align-items:center;
+  transition:none;
+}
+#panel-lottery .reel-item{
+  height:50px;display:flex;align-items:center;justify-content:center;
+  font-size:15px;font-weight:700;color:#e2d9f3;letter-spacing:1px;
+  width:100%;text-align:center;padding:0 4px;
+}
+#panel-lottery .reel-highlight{
+  position:absolute;top:50%;left:0;right:0;height:50px;transform:translateY(-50%);
+  border-top:2px solid rgba(167,139,250,.6);border-bottom:2px solid rgba(167,139,250,.6);
+  background:rgba(124,58,237,.1);pointer-events:none;z-index:1;
+}
 
-  /* 中獎 */
-  #winOverlay{position:fixed;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;z-index:100;background:rgba(5,7,20,.78);backdrop-filter:blur(8px);}
-  #winOverlay.show{display:flex;animation:fadeIn .3s;}
-  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
-  .win-label{font-size:22px;letter-spacing:10px;color:var(--gold);margin-bottom:10px;animation:pulse 1s infinite;}
-  @keyframes pulse{0%,100%{opacity:.6}50%{opacity:1}}
-  .win-name{font-size:clamp(60px,16vw,150px);font-weight:900;letter-spacing:6px;
-    background:linear-gradient(90deg,#C8941A,#fff,#CADCFC,#4361EE,#C8941A);background-size:300% 100%;
-    -webkit-background-clip:text;background-clip:text;color:transparent;animation:shine 2s linear infinite,popIn .6s cubic-bezier(.2,1.5,.4,1);
-    text-align:center;line-height:1.1;}
-  @keyframes shine{to{background-position:300% 0}}
-  @keyframes popIn{0%{transform:scale(0) rotate(-15deg)}70%{transform:scale(1.15)}100%{transform:scale(1)}}
-  .win-again{margin-top:36px;display:flex;gap:16px;}
-  .win-again button{padding:12px 32px;border-radius:999px;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff;cursor:pointer;font-size:15px;letter-spacing:2px;}
-  .win-again button:hover{background:rgba(255,255,255,.22);}
-  .win-again .primary{background:linear-gradient(90deg,#4361EE,#C8941A);border:none;}
-  canvas#confetti{position:fixed;inset:0;pointer-events:none;z-index:99;display:none;}
-  .muted-tag{position:fixed;bottom:14px;right:16px;font-size:12px;color:#6b76a8;z-index:60;cursor:pointer;}
+/* ── MODE 2：俄羅斯輪盤 ── */
+#panel-lottery .revolver-wrap{position:relative;display:flex;flex-direction:column;align-items:center;gap:20px;}
+#panel-lottery .revolver{position:relative;width:220px;height:220px;}
+#panel-lottery .revolver-barrel{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:220px;height:220px;border-radius:50%;
+  background:radial-gradient(circle,#2d1f4e 30%,#1a1035 70%);
+  border:3px solid rgba(239,68,68,.4);
+  box-shadow:0 0 40px rgba(239,68,68,.2),inset 0 0 30px rgba(0,0,0,.5);
+}
+#panel-lottery .cylinder{
+  position:absolute;top:50%;left:50%;
+  width:140px;height:140px;transform:translate(-50%,-50%);
+  border-radius:50%;
+  background:conic-gradient(
+    #3b1a6e 0deg 60deg, #1a0a2e 60deg 120deg,
+    #3b1a6e 120deg 180deg, #1a0a2e 180deg 240deg,
+    #3b1a6e 240deg 300deg, #1a0a2e 300deg 360deg
+  );
+  border:2px solid rgba(139,92,246,.5);
+  transition:transform .1s linear;
+}
+#panel-lottery .chamber{
+  position:absolute;width:24px;height:24px;border-radius:50%;
+  background:radial-gradient(circle,#ef4444 0%,#7f1d1d 100%);
+  border:2px solid rgba(239,68,68,.6);
+  box-shadow:0 0 10px rgba(239,68,68,.5);
+}
+#panel-lottery .crosshair{
+  position:absolute;top:50%;right:-30px;transform:translateY(-50%);
+  width:30px;height:2px;background:rgba(239,68,68,.8);
+}
+#panel-lottery .crosshair::before{
+  content:'▶';position:absolute;right:-8px;top:-9px;color:rgba(239,68,68,.9);font-size:18px;
+}
+#panel-lottery .revolver-name-ring{
+  position:absolute;inset:0;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+}
+#panel-lottery .ring-name{
+  position:absolute;font-size:11px;color:rgba(196,181,253,.7);letter-spacing:1px;
+  white-space:nowrap;font-weight:600;
+}
+#panel-lottery .selected-name-box{
+  background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);
+  border-radius:12px;padding:10px 32px;font-size:18px;font-weight:700;
+  color:#fca5a5;letter-spacing:3px;min-width:200px;text-align:center;min-height:44px;
+}
 
-  /* ===== 人員管理 ===== */
-  #manageBtn{position:fixed;top:16px;right:16px;z-index:80;background:rgba(255,255,255,.08);
-    border:1px solid rgba(202,220,252,.3);color:#fff;padding:9px 18px;border-radius:999px;cursor:pointer;
-    font-size:14px;letter-spacing:1px;transition:.2s;}
-  #manageBtn:hover{background:rgba(67,97,238,.25);border-color:var(--accent);}
-  #mgrOverlay{position:fixed;inset:0;z-index:90;display:none;align-items:center;justify-content:center;
-    background:rgba(5,7,20,.7);backdrop-filter:blur(6px);}
-  #mgrOverlay.show{display:flex;}
-  .mgr-panel{width:min(92vw,460px);max-height:86vh;background:linear-gradient(180deg,#141a3c,#0d1130);
-    border:1px solid rgba(202,220,252,.25);border-radius:20px;padding:22px;display:flex;flex-direction:column;
-    box-shadow:0 24px 70px rgba(0,0,0,.6);}
-  .mgr-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
-  .mgr-head h2{font-size:20px;letter-spacing:2px;color:#CADCFC;}
-  .mgr-close{background:none;border:none;color:#9aa6d6;font-size:26px;cursor:pointer;line-height:1;}
-  .mgr-status{font-size:12px;color:#9aa6d6;margin-bottom:14px;min-height:16px;letter-spacing:.5px;}
-  .mgr-status.err{color:#ff8585;} .mgr-status.ok{color:#7ee0a0;}
-  .mgr-add{display:flex;gap:8px;margin-bottom:14px;}
-  .mgr-add input{flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(202,220,252,.25);
-    color:#fff;padding:11px 14px;border-radius:10px;font-size:15px;outline:none;}
-  .mgr-add input:focus{border-color:var(--accent);}
-  .mgr-add button{background:linear-gradient(90deg,#4361EE,#C8941A);border:none;color:#fff;
-    padding:0 20px;border-radius:10px;cursor:pointer;font-size:15px;font-weight:bold;}
-  .mgr-add button:disabled{opacity:.4;cursor:not-allowed;}
-  .mgr-list{overflow:auto;flex:1;border-top:1px solid rgba(202,220,252,.12);padding-top:8px;}
-  .mgr-row{display:flex;align-items:center;gap:8px;padding:8px 4px;border-bottom:1px solid rgba(202,220,252,.08);}
-  .mgr-row .nm{flex:1;font-size:16px;}
-  .mgr-row input.edit{flex:1;background:rgba(255,255,255,.06);border:1px solid var(--accent);
-    color:#fff;padding:7px 10px;border-radius:8px;font-size:15px;outline:none;}
-  .mgr-row .idx{width:26px;color:#6b76a8;font-size:13px;text-align:center;}
-  .mgr-row button{background:rgba(255,255,255,.08);border:1px solid rgba(202,220,252,.2);color:#cdd6f4;
-    width:34px;height:34px;border-radius:8px;cursor:pointer;font-size:15px;}
-  .mgr-row button:hover{background:rgba(67,97,238,.3);}
-  .mgr-row button.del:hover{background:rgba(255,90,90,.35);border-color:#ff6b6b;}
-  .mgr-foot{margin-top:14px;font-size:12px;color:#6b76a8;text-align:center;letter-spacing:.5px;}
-  .spin{display:inline-block;width:13px;height:13px;border:2px solid #4361EE;border-top-color:transparent;border-radius:50%;animation:rot .7s linear infinite;vertical-align:-2px;margin-right:6px;}
-  @keyframes rot{to{transform:rotate(360deg)}}
+/* ── MODE 3：命運漩渦 ── */
+#panel-lottery .vortex-wrap{position:relative;width:300px;height:300px;}
+#panel-lottery .vortex-canvas{border-radius:50%;display:block;}
+#panel-lottery .vortex-center{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:70px;height:70px;border-radius:50%;
+  background:radial-gradient(circle,#000 40%,#3b0764 100%);
+  display:flex;align-items:center;justify-content:center;
+  font-size:28px;z-index:3;
+  box-shadow:0 0 30px rgba(0,0,0,.9),0 0 60px rgba(88,28,135,.5);
+}
+#panel-lottery .floating-name{
+  position:absolute;font-size:13px;font-weight:700;
+  color:rgba(216,180,254,.9);pointer-events:none;
+  transition:none;white-space:nowrap;
+}
+
+/* ── MODE 4：神秘牌陣 ── */
+#panel-lottery .tarot-wrap{display:flex;flex-direction:column;align-items:center;gap:20px;}
+#panel-lottery .tarot-deck{display:flex;gap:14px;perspective:800px;}
+#panel-lottery .tarot-card{
+  width:90px;height:140px;border-radius:10px;cursor:pointer;
+  position:relative;transform-style:preserve-3d;transition:transform .6s cubic-bezier(.4,0,.2,1);
+}
+#panel-lottery .tarot-card.flipped{transform:rotateY(180deg);}
+#panel-lottery .card-face,.card-back{
+  position:absolute;inset:0;border-radius:10px;backface-visibility:hidden;
+  display:flex;align-items:center;justify-content:center;overflow:hidden;
+}
+#panel-lottery .card-back{
+  background:linear-gradient(135deg,#1e1b4b,#312e81);
+  border:2px solid rgba(99,102,241,.4);
+  box-shadow:0 4px 20px rgba(0,0,0,.5);
+}
+#panel-lottery .card-back-inner{
+  width:70%;height:80%;
+  border:1px solid rgba(99,102,241,.3);border-radius:6px;
+  background:repeating-linear-gradient(45deg,rgba(99,102,241,.08) 0px,rgba(99,102,241,.08) 2px,transparent 2px,transparent 10px);
+  display:flex;align-items:center;justify-content:center;font-size:28px;
+}
+#panel-lottery .card-face{
+  background:linear-gradient(135deg,#0f172a,#1e1b4b);
+  border:2px solid rgba(251,191,36,.5);transform:rotateY(180deg);
+  box-shadow:0 0 20px rgba(251,191,36,.2);flex-direction:column;
+}
+#panel-lottery .card-symbol{font-size:36px;margin-bottom:6px;}
+#panel-lottery .card-name{font-size:12px;font-weight:700;color:#fde68a;letter-spacing:2px;text-align:center;padding:0 6px;}
+#panel-lottery .tarot-glow{
+  position:absolute;inset:-4px;border-radius:14px;
+  background:linear-gradient(135deg,#fbbf24,#a855f7,#3b82f6);
+  opacity:0;z-index:-1;filter:blur(8px);
+  transition:opacity .4s;
+}
+#panel-lottery .tarot-card.chosen .tarot-glow{opacity:.8;}
+#panel-lottery .tarot-card.chosen .card-face{border-color:rgba(251,191,36,.9);}
+#panel-lottery .tarot-hint{font-size:13px;color:#818cf8;letter-spacing:2px;}
+
+/* 震動動畫 */
+@keyframes lShake{0%,100%{transform:translateX(0);}15%{transform:translateX(-8px) rotate(-2deg);}30%{transform:translateX(8px) rotate(2deg);}45%{transform:translateX(-6px);}60%{transform:translateX(6px);}75%{transform:translateX(-3px);}90%{transform:translateX(3px);}}
+@keyframes lPulse{0%,100%{box-shadow:0 0 20px rgba(239,68,68,.3);}50%{box-shadow:0 0 60px rgba(239,68,68,.9),0 0 100px rgba(239,68,68,.5);}}
+@keyframes lFloat{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
+.lotto-shake{animation:lShake .4s ease-in-out;}
+.lotto-pulse{animation:lPulse 1s ease-in-out infinite;}
 
 </style>
 </head>
@@ -679,12 +798,13 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="modnav-item" data-module="trip" onclick="switchMod('trip')" title="差旅報支單">
     <span class="modnav-icon">✈️</span>
     <span class="modnav-label">差旅報支</span>
-  </div>
-  <div class="modnav-item" data-module="lottery" onclick="switchMod('lottery')" title="抽籤系統">
+    <div class="modnav-item" data-module="lottery" onclick="switchMod('lottery')" title="抽籤系統">
     <span class="modnav-icon">🎰</span>
     <span class="modnav-label">抽籤</span>
   </div>
 </div>
+</div>
+  <!-- inject: lottery nav -->
 <!-- ── 主內容區 ── -->
 <div id="mbody" style="flex:1;min-width:0">
 
@@ -1343,107 +1463,96 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
 <!-- LOTTERY -->
 <div class="mpanel" id="panel-lottery">
   <div class="msb"></div>
-  <div class="mc" style="padding:0;height:calc(100vh - var(--th));overflow:hidden;">
-    <div class="lotto-wrap">
-<div id="app">
+  <div class="mc">
+    <div class="lotto-root">
+      <!-- 星星背景 -->
+      <div class="stars" id="lotto-stars"></div>
 
-  <div id="menu">
-    <h1>COMART 抽籤系統</h1>
-    <div class="sub">名單共 <span id="poolCount">0</span> 位 · 選擇一種抽籤方式</div>
-    <div class="cards">
-      <div class="mode-card" onclick="openStage('slot')">
-        <div class="emoji-ico">🎰</div><h2>幸運老虎機</h2>
-        <p>三軸滾動、急停定格<br>賭城式高速翻轉懸念</p><div class="badge">經典刺激</div>
+      <!-- 頂部 -->
+      <div class="lotto-header">
+        <div class="lotto-title">✦ COMART 命運抽籤 ✦</div>
+        <div class="lotto-pool">名單共 <span id="lotto-count">0</span> 位同事</div>
       </div>
-      <div class="mode-card" onclick="openStage('vortex')">
-        <div class="emoji-ico">🌀</div><h2>能量黑洞</h2>
-        <p>名字粒子捲入漩渦<br>最後一刻爆射而出</p><div class="badge">科幻懸疑</div>
+
+      <!-- 模式選擇 -->
+      <div class="mode-bar">
+        <button class="mode-btn active" onclick="lottoSetMode('slot')">🎰 老虎機</button>
+        <button class="mode-btn" onclick="lottoSetMode('revolver')">🔫 俄羅斯輪盤</button>
+        <button class="mode-btn" onclick="lottoSetMode('vortex')">🌀 命運漩渦</button>
+        <button class="mode-btn" onclick="lottoSetMode('tarot')">🃏 神秘牌陣</button>
       </div>
-      <div class="mode-card" onclick="openStage('cards')">
-        <div class="emoji-ico">🃏</div><h2>命運翻牌</h2>
-        <p>掃描跳動的卡牌矩陣<br>鎖定唯一一張命運之牌</p><div class="badge">趣味驚喜</div>
+
+      <!-- 舞台 -->
+      <div class="lotto-stage" id="lotto-stage">
+
+        <!-- MODE 1：老虎機 -->
+        <div id="lotto-slot" class="lotto-mode">
+          <div class="slot-machine">
+            <div class="reels">
+              <div class="reel" id="reel0"><div class="reel-inner" id="ri0"></div><div class="reel-highlight"></div></div>
+              <div class="reel" id="reel1"><div class="reel-inner" id="ri1"></div><div class="reel-highlight"></div></div>
+              <div class="reel" id="reel2"><div class="reel-inner" id="ri2"></div><div class="reel-highlight"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MODE 2：俄羅斯輪盤 -->
+        <div id="lotto-revolver" class="lotto-mode" style="display:none">
+          <div class="revolver-wrap">
+            <div class="revolver">
+              <div class="revolver-barrel"></div>
+              <div class="cylinder" id="lotto-cylinder">
+                <div class="chamber" style="top:8px;left:50%;transform:translateX(-50%)"></div>
+                <div class="chamber" style="top:35%;right:8px;transform:translateY(-50%)"></div>
+                <div class="chamber" style="bottom:35%;right:8px;transform:translateY(50%)"></div>
+                <div class="chamber" style="bottom:8px;left:50%;transform:translateX(-50%)"></div>
+                <div class="chamber" style="top:35%;left:8px;transform:translateY(-50%)"></div>
+                <div class="chamber" style="bottom:35%;left:8px;transform:translateY(50%)"></div>
+              </div>
+              <div class="revolver-name-ring" id="lotto-name-ring"></div>
+              <div class="crosshair"></div>
+            </div>
+            <div class="selected-name-box" id="rev-name-box">?</div>
+          </div>
+        </div>
+
+        <!-- MODE 3：命運漩渦 -->
+        <div id="lotto-vortex" class="lotto-mode" style="display:none">
+          <div class="vortex-wrap" id="vortex-wrap">
+            <canvas class="vortex-canvas" id="vortex-canvas" width="300" height="300"></canvas>
+            <div class="vortex-center" id="vortex-center">🌀</div>
+          </div>
+        </div>
+
+        <!-- MODE 4：神秘牌陣 -->
+        <div id="lotto-tarot" class="lotto-mode" style="display:none">
+          <div class="tarot-wrap">
+            <div class="tarot-deck" id="tarot-deck"></div>
+            <div class="tarot-hint" id="tarot-hint">選擇任意一張牌</div>
+          </div>
+        </div>
+
+      </div><!-- /lotto-stage -->
+
+      <!-- 抽籤按鈕 -->
+      <div class="draw-area">
+        <button class="draw-btn" id="lotto-draw-btn" onclick="lottoDraw()">
+          ⚡ 開始抽籤
+        </button>
+        <div class="draw-hint" id="lotto-hint">點擊開始，5秒後揭曉命運</div>
       </div>
-      <div class="mode-card" onclick="openStage('wheel')">
-        <div class="emoji-ico">🎡</div><h2>俄羅斯輪盤</h2>
-        <p>名字均分扇形轉盤<br>急速旋轉、指針定生死</p><div class="badge">命運轉盤</div>
-      </div>
+
+    </div><!-- /lotto-root -->
+
+    <!-- 結果彈出 -->
+    <div class="result-overlay" id="lotto-result">
+      <div style="font-size:13px;letter-spacing:8px;color:#a78bfa;margin-bottom:8px;animation:fadeUp .4s both;">✦ 命運選擇了 ✦</div>
+      <div class="result-label">恭喜獲選的同事是</div>
+      <div class="result-winner" id="lotto-winner-name">—</div>
+      <canvas class="confetti-canvas" id="lotto-confetti"></canvas>
+      <button class="result-close" onclick="lottoCloseResult()">✕ 關閉</button>
     </div>
-  </div>
 
-  <div class="stage" id="stage-slot">
-    <button class="back-btn" onclick="goMenu()">← 返回</button>
-    <div class="count-tag">幸運老虎機</div>
-    <div class="stage-title">🎰 拉下拉桿，決定今日幸運兒</div>
-    <div class="slot-wrap">
-      <div class="reel"><div class="line"></div><div class="reel-track" id="reel0"></div></div>
-      <div class="reel"><div class="line"></div><div class="reel-track" id="reel1"></div></div>
-      <div class="reel"><div class="line"></div><div class="reel-track" id="reel2"></div></div>
-    </div>
-    <button class="draw-btn" id="btn-slot" onclick="runSlot()">開始抽籤</button>
-  </div>
-
-  <div class="stage" id="stage-vortex">
-    <button class="back-btn" onclick="goMenu()">← 返回</button>
-    <div class="count-tag">能量黑洞</div>
-    <div class="stage-title">🌀 啟動黑洞，吞噬所有名字</div>
-    <canvas id="vortexCanvas"></canvas>
-    <button class="draw-btn" id="btn-vortex" onclick="runVortex()" style="z-index:20;">啟動黑洞</button>
-  </div>
-
-  <div class="stage" id="stage-cards">
-    <button class="back-btn" onclick="goMenu()">← 返回</button>
-    <div class="count-tag">命運翻牌</div>
-    <div class="stage-title">🃏 22 位全員到齊，光點掃描鎖定得主</div>
-    <div class="card-field" id="cardField"></div>
-    <button class="draw-btn" id="btn-cards" onclick="runCards()">開始掃描</button>
-  </div>
-
-  <div class="stage" id="stage-wheel">
-    <button class="back-btn" onclick="goMenu()">← 返回</button>
-    <div class="count-tag">俄羅斯輪盤</div>
-    <div class="stage-title">🎡 轉動命運之輪，指針鎖定得主</div>
-    <div class="wheel-stage">
-      <div class="wheel-pointer"></div>
-      <canvas id="wheelCanvas" width="440" height="440"></canvas>
-      <div class="wheel-hub">🎯</div>
-    </div>
-    <button class="draw-btn" id="btn-wheel" onclick="runWheel()">轉動輪盤</button>
-  </div>
-
-</div>
-
-<!-- 人員管理按鈕 -->
-<button id="manageBtn" onclick="openMgr()">⚙ 人員管理</button>
-
-<!-- 人員管理面板 -->
-<div id="mgrOverlay">
-  <div class="mgr-panel">
-    <div class="mgr-head">
-      <h2>⚙ 人員管理</h2>
-      <button class="mgr-close" onclick="closeMgr()">×</button>
-    </div>
-    <div class="mgr-status" id="mgrStatus"></div>
-    <div class="mgr-add">
-      <input type="text" id="addInput" placeholder="輸入姓名後按新增" maxlength="20"
-             onkeydown="if(event.key==='Enter')addName()">
-      <button id="addBtn" onclick="addName()">＋ 新增</button>
-    </div>
-    <div class="mgr-list" id="mgrList"></div>
-    <div class="mgr-foot">資料即時同步至 Google Sheet · 共 <span id="mgrCount">0</span> 位</div>
-  </div>
-</div>
-
-<div id="winOverlay">
-  <div class="win-label">🎉 幸 運 得 主 🎉</div>
-  <div class="win-name" id="winName">—</div>
-  <div class="win-again">
-    <button class="primary" onclick="closeWin(true)">再抽一次</button>
-    <button onclick="closeWin(false)">回主選單</button>
-  </div>
-</div>
-<canvas id="confetti"></canvas>
-<div class="muted-tag" id="muteTag" onclick="toggleMute()">🔊 音效開</div>
-    </div>
   </div>
 </div>
 <!-- /LOTTERY -->
@@ -2240,11 +2349,11 @@ function switchMod(m){
   document.getElementById(`panel-${m}`).classList.add('active');
   if(m==='lib')renderLibPg('lib-dash');
   if(m==='car')renderCarPg('car-dash');
-  if(m==='lottery'){loadLotteryPool();}
+  if(m==='lottery'){lottoInit();}
   if(m==='trip'){navTrip('trip-new');}
   if(m==='room'){seedRoomDemo().then(()=>navRoom('room-dash'));;}
   if(m==='visit'){seedVisitDemo().then(()=>navVisit('visit-dash'));}
-  if(m==='lottery'){loadLotteryPool();}
+  if(m==='lottery'){lottoInit();}
   if(m==='trip'){navTrip('trip-new');}
   if(m==='room'){seedRoomDemo().then(()=>navRoom('room-dash'));;}
   if(m==='visit'){seedVisitDemo().then(()=>navVisit('visit-dash'));}
@@ -4637,245 +4746,545 @@ async function seedVisitDemo(){
 }
 
 // == LOTTERY JS ==
-var POOL = [];  // 抽籤名單
-function loadLotteryPool(){
-  var us = ld(K.us);
-  POOL = us && us.length > 0
-    ? us.filter(function(u){return u.active!==false;}).map(function(u){return u.nameZh||u.nameEn||u.name||u.id;}).filter(Boolean)
-    : ['員工A','員工B','員工C'];
-  if(typeof refreshCounts==='function') refreshCounts();
-  console.log('抽籤名單:', POOL.length, '位');
+// ══════════════════════════════════════════
+// LOTTERY SYSTEM
+// ══════════════════════════════════════════
+var LPOOL = [];      // 抽籤名單
+var LMODE = 'slot';  // 當前模式
+var LDRAWING = false;// 抽籤中標記
+var LAUDIO = null;   // AudioContext
+
+// 初始化名單
+function lottoInit(){
+  var us = ld(K.us)||[];
+  LPOOL = us.filter(function(u){return u.active!==false;})
+             .map(function(u){return u.nameZh||u.nameEn||u.name||u.id;})
+             .filter(Boolean);
+  var el = document.getElementById('lotto-count');
+  if(el) el.textContent = LPOOL.length;
+  // 星星
+  lottoMakeStars();
+  // 初始化各模式
+  lottoInitSlot();
+  lottoInitRevolver();
+  lottoInitVortex();
+  lottoInitTarot();
 }
 
-
-
-const rand = n => Math.floor(Math.random()*n);
-const pickIdx = () => rand(POOL.length);
-const pick = () => POOL[pickIdx()];
-const DURATION = 5000;
-
-function refreshCounts(){
-  document.getElementById('poolCount').textContent = POOL.length;
-  document.getElementById('mgrCount').textContent = POOL.length;
+function lottoMakeStars(){
+  var c = document.getElementById('lotto-stars'); if(!c)return;
+  c.innerHTML='';
+  for(var i=0;i<60;i++){
+    var s=document.createElement('div');
+    s.className='star';
+    var size=(Math.random()*3+1)+'px';
+    s.style.cssText='width:'+size+';height:'+size
+      +';left:'+(Math.random()*100)+'%;top:'+(Math.random()*100)+'%'
+      +';--d:'+(Math.random()*4+2)+'s;--delay:'+(-Math.random()*4)+'s';
+    c.appendChild(s);
+  }
 }
 
-
-// 寫入：fetch no-cors 送出（沙箱可送，但讀不到回應），送完再 JSONP 拉一次確認
-
-
-function toggleMute(){muted=!muted;document.getElementById('muteTag').textContent=muted?'🔇 音效關':'🔊 音效開';if(muted)stopBgm();}
-function note(freq,dur,t0,gain=0.16,type='triangle'){
-  if(muted)return; const c=AC(); const t=c.currentTime+t0;
-  const o=c.createOscillator(),g=c.createGain();
-  o.type=type;o.frequency.setValueAtTime(freq,t);
-  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(gain,t+0.015);
-  g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
-  o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+dur);
-}
-const NF={C5:523.25,D5:587.33,E5:659.25,F5:698.46,G5:783.99,A5:880,B5:987.77,C6:1046.5,D6:1174.66,E6:1318.51,G6:1567.98};
-function playMelody(speed){
-  if(muted)return 0;
-  const seq=[NF.C5,NF.E5,NF.G5,NF.E5, NF.F5,NF.A5,NF.G5,NF.E5, NF.D5,NF.F5,NF.A5,NF.G5, NF.C6,NF.G5,NF.E5,NF.C5];
-  const step=0.16/speed;
-  seq.forEach((f,i)=>note(f,step*1.4,i*step,0.12,'triangle'));
-  const bass=[NF.C5/2,NF.G5/2,NF.F5/2,NF.G5/2];
-  bass.forEach((f,i)=>note(f,step*3.6,i*step*4,0.10,'sine'));
-  return seq.length*step;
-}
-function startBgm(){ bgmStop=false; let speed=1;
-  const loop=()=>{ if(bgmStop||muted)return; const len=playMelody(speed);
-    speed=Math.min(speed+0.12,1.9); bgmTimer=setTimeout(loop,len*1000); }; loop();
-}
-function stopBgm(){ bgmStop=true; if(bgmTimer)clearTimeout(bgmTimer); }
-function blip(){ if(muted)return; note(NF.C6+rand(3)*120,0.05,0,0.05,'triangle'); }
-function winFanfare(){
-  const arp=[NF.C5,NF.E5,NF.G5,NF.C6,NF.E6,NF.G6];
-  arp.forEach((f,i)=>note(f,0.45,i*0.09,0.2,'triangle'));
-  note(NF.C6,1.0,0.6,0.18,'triangle'); note(NF.E6,1.0,0.6,0.15,'triangle'); note(NF.G6,1.0,0.6,0.13,'triangle');
+// 切換模式
+function lottoSetMode(mode){
+  LMODE=mode;
+  document.querySelectorAll('#panel-lottery .mode-btn').forEach(function(b,i){
+    b.classList.toggle('active', ['slot','revolver','vortex','tarot'][i]===mode);
+  });
+  ['slot','revolver','vortex','tarot'].forEach(function(m){
+    var el=document.getElementById('lotto-'+m);
+    if(el) el.style.display=(m===mode?'':'none');
+  });
+  if(mode==='tarot') lottoInitTarot();
+  if(mode==='vortex') lottoVortexIdle();
+  var hint=document.getElementById('lotto-hint');
+  if(hint) hint.textContent='點擊開始，5秒後揭曉命運';
+  var btn=document.getElementById('lotto-draw-btn');
+  if(btn){btn.disabled=false;btn.textContent='⚡ 開始抽籤';}
+  LDRAWING=false;
 }
 
-/* ===================== 導覽 ===================== */
-let current=null, busy=false;
-function openStage(m){ AC(); current=m; document.getElementById('menu').style.display='none';
-  document.querySelectorAll('.stage').forEach(s=>s.classList.remove('active'));
-  document.getElementById('stage-'+m).classList.add('active');
-  if(m==='slot')initSlot(); if(m==='vortex')initVortex(); if(m==='cards')initCards(); if(m==='wheel')initWheel();
-}
-function goMenu(){ if(busy)return; current=null; stopBgm();
-  document.querySelectorAll('.stage').forEach(s=>s.classList.remove('active'));
-  document.getElementById('menu').style.display='flex';
+// 亂數選人
+function lottoPick(){
+  if(!LPOOL.length)return'（名單空白）';
+  return LPOOL[Math.floor(Math.random()*LPOOL.length)];
 }
 
-/* ===================== 模式一：老虎機 ===================== */
-function fillReel(id){
-  const el=document.getElementById(id); el.innerHTML='';
-  const seq=[]; for(let i=0;i<40;i++) seq.push(pick());
-  seq.forEach(n=>{const d=document.createElement('div');d.textContent=n;el.appendChild(d);});
-  el.style.transform='translateY(0)'; return seq;
-}
-function initSlot(){ ['reel0','reel1','reel2'].forEach(fillReel); }
-function runSlot(){
-  if(busy)return; busy=true; document.getElementById('btn-slot').disabled=true;
-  const winner=pick();
-  const reels=['reel0','reel1','reel2'].map(id=>({el:document.getElementById(id),seq:fillReel(id)}));
-  reels.forEach(r=>{ r.el.children[36].textContent=winner; });
-  const ROW=60; const stops=[DURATION-1400,DURATION-700,DURATION];
-  startBgm(); let tickTimer=setInterval(blip,90);
-  const start=performance.now();
-  reels.forEach((r,idx)=>{
-    const target=36*ROW-(170/2-30); const stopAt=stops[idx];
-    function anim(now){
-      const t=now-start;
-      if(t>=stopAt){ r.el.style.transform=`translateY(${-target}px)`; note(NF.G5-idx*40,0.2,0,0.16,'triangle');
-        if(idx===2){clearInterval(tickTimer);finishGeneric('btn-slot',winner);} return;}
-      const p=t/stopAt; const ease=1-Math.pow(1-p,2.4);
-      const total=target+(3*r.el.children.length*ROW);
-      const y=(ease*total)%(r.el.children.length*ROW);
-      r.el.style.transform=`translateY(${-y}px)`; requestAnimationFrame(anim);
+// 音效
+function lottoAudio(type){
+  try{
+    if(!LAUDIO) LAUDIO=new (window.AudioContext||window.webkitAudioContext)();
+    var ctx=LAUDIO;
+    function beep(freq,dur,vol,wave,delay){
+      var o=ctx.createOscillator(),g=ctx.createGain();
+      o.connect(g);g.connect(ctx.destination);
+      o.type=wave||'sine';o.frequency.value=freq;
+      g.gain.setValueAtTime(0,ctx.currentTime+(delay||0));
+      g.gain.linearRampToValueAtTime(vol||.3,ctx.currentTime+(delay||0)+.01);
+      g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+(delay||0)+dur);
+      o.start(ctx.currentTime+(delay||0));
+      o.stop(ctx.currentTime+(delay||0)+dur+.1);
     }
-    requestAnimationFrame(anim);
+    if(type==='tick'){beep(800,.05,.15,'square');}
+    if(type==='spin'){beep(220,.3,.2,'sawtooth');beep(330,.3,.15,'sawtooth',.05);}
+    if(type==='tension'){
+      [1,1.2,1.5,2,2.5,3].forEach(function(m,i){beep(110*m,.15,.2,'sawtooth',i*.08);});
+    }
+    if(type==='win'){
+      [523,659,784,1047].forEach(function(f,i){beep(f,.4,.4,'sine',i*.12);});
+      beep(1319,.8,.5,'sine',.5);
+    }
+    if(type==='shot'){beep(80,.5,.5,'sawtooth');beep(40,.8,.3,'sawtooth',.1);}
+    if(type==='whoosh'){
+      var o=ctx.createOscillator(),g=ctx.createGain();
+      o.connect(g);g.connect(ctx.destination);
+      o.type='sawtooth';o.frequency.setValueAtTime(2000,ctx.currentTime);
+      o.frequency.exponentialRampToValueAtTime(100,ctx.currentTime+.5);
+      g.gain.setValueAtTime(.3,ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.5);
+      o.start();o.stop(ctx.currentTime+.6);
+    }
+  }catch(e){}
+}
+
+// ──────────────────────────────────────────
+// MODE 1：吃角子老虎機
+// ──────────────────────────────────────────
+function lottoInitSlot(){
+  for(var r=0;r<3;r++){
+    var ri=document.getElementById('ri'+r); if(!ri)continue;
+    ri.innerHTML='';
+    var items=LPOOL.length?LPOOL:['???'];
+    // 多排
+    var list=[];
+    for(var i=0;i<20;i++) list.push(items[Math.floor(Math.random()*items.length)]);
+    list.forEach(function(n){
+      var d=document.createElement('div');d.className='reel-item';d.textContent=n;ri.appendChild(d);
+    });
+    ri.style.transform='translateY(0px)';
+  }
+}
+
+var slotTimers=[];
+function lottoSlot(winner){
+  // 清除舊 timer
+  slotTimers.forEach(clearTimeout);slotTimers=[];
+  var stops=[3800,4200,4600]; // 各滾輪停止時間
+  for(var r=0;r<3;r++){
+    (function(reel){
+      var ri=document.getElementById('ri'+reel); if(!ri)return;
+      var items=LPOOL.length?LPOOL:['???'];
+      // 重新填充：最後一格固定為 winner
+      ri.innerHTML='';
+      var list=[];
+      for(var i=0;i<25;i++){
+        list.push(items[Math.floor(Math.random()*items.length)]);
+      }
+      list.push(winner);
+      list.forEach(function(n){
+        var d=document.createElement('div');d.className='reel-item';d.textContent=n;ri.appendChild(d);
+      });
+      var total=list.length,itemH=50,targetY=-(total-1)*itemH+50;
+
+      // 高速滾動
+      var startTime=null,duration=stops[reel],startY=0;
+      // 先快速移動
+      ri.style.transition='none';
+      ri.style.transform='translateY('+startY+'px)';
+
+      var spd=0,pos=0,tickInterval=setInterval(function(){
+        spd=Math.min(spd+15,80);
+        pos-=spd;
+        // 循環
+        if(Math.abs(pos)>total*itemH) pos+=total*itemH;
+        ri.style.transform='translateY('+pos+'px)';
+        lottoAudio('tick');
+      },40);
+
+      slotTimers.push(setTimeout(function(){
+        clearInterval(tickInterval);
+        // 緩速停到 winner
+        ri.style.transition='transform 0.8s cubic-bezier(.2,.8,.4,1.2)';
+        ri.style.transform='translateY('+targetY+'px)';
+        if(reel===2){
+          slotTimers.push(setTimeout(function(){
+            lottoShowResult(winner);
+          },900));
+        }
+      },stops[reel]));
+    })(r);
+  }
+}
+
+// ──────────────────────────────────────────
+// MODE 2：俄羅斯輪盤
+// ──────────────────────────────────────────
+var revolverAngle=0, revolverRAF=null;
+
+function lottoInitRevolver(){
+  var ring=document.getElementById('lotto-name-ring'); if(!ring)return;
+  ring.innerHTML='';
+  var names=LPOOL.slice(0,12);
+  var n=names.length||1,R=90;
+  names.forEach(function(name,i){
+    var angle=(360/n)*i;
+    var rad=angle*Math.PI/180;
+    var x=R*Math.sin(rad),y=-R*Math.cos(rad);
+    var d=document.createElement('div');
+    d.className='ring-name';
+    d.style.cssText='transform:translate(-50%,-50%) translate('+x+'px,'+y+'px) rotate('+angle+'deg)';
+    d.textContent=name.slice(0,3);
+    ring.appendChild(d);
   });
 }
 
-/* ===================== 模式二：能量黑洞 ===================== */
-let vCanvas,vCtx,vParticles=[],vAnim=null,vW,vH;
-function initVortex(){
-  vCanvas=document.getElementById('vortexCanvas');vCtx=vCanvas.getContext('2d');
-  resizeV(); window.addEventListener('resize',resizeV); buildParticles(); drawVortexIdle();
-}
-function resizeV(){ if(!vCanvas)return; vW=vCanvas.width=vCanvas.clientWidth; vH=vCanvas.height=vCanvas.clientHeight; }
-function buildParticles(){
-  vParticles=POOL.map(name=>{const ang=Math.random()*Math.PI*2,r=Math.min(vW,vH)*0.38;
-    return {name,ang,r,baseR:r,size:14+Math.random()*8};});
-}
-function drawVortexIdle(){
-  vCtx.clearRect(0,0,vW,vH); vCtx.save();vCtx.translate(vW/2,vH/2);
-  vParticles.forEach(p=>{const x=Math.cos(p.ang)*p.r,y=Math.sin(p.ang)*p.r;
-    vCtx.globalAlpha=.85;vCtx.fillStyle='#CADCFC';vCtx.font=`${p.size}px sans-serif`;
-    vCtx.textAlign='center';vCtx.fillText(p.name,x,y);p.ang+=0.002;});
-  vCtx.restore(); if(!busy)vAnim=requestAnimationFrame(drawVortexIdle);
-}
-function runVortex(){
-  if(busy)return; busy=true; document.getElementById('btn-vortex').disabled=true;
-  cancelAnimationFrame(vAnim); const winner=pick();
-  startBgm(); let tickTimer=setInterval(blip,90); const start=performance.now();
-  function anim(now){
-    const t=now-start; const p=Math.min(t/DURATION,1); vCtx.clearRect(0,0,vW,vH);
-    vCtx.save();vCtx.translate(vW/2,vH/2);
-    const coreR=20+Math.sin(t/120)*8+p*40;
-    const grd=vCtx.createRadialGradient(0,0,2,0,0,coreR*2.4);
-    grd.addColorStop(0,'#fff');grd.addColorStop(.3,'#4361EE');grd.addColorStop(1,'rgba(30,39,97,0)');
-    vCtx.fillStyle=grd;vCtx.beginPath();vCtx.arc(0,0,coreR*2.4,0,Math.PI*2);vCtx.fill();
-    vParticles.forEach(pt=>{
-      pt.r=pt.baseR*(1-p)+8*p; pt.ang+=0.04+p*0.5;
-      const x=Math.cos(pt.ang)*pt.r,y=Math.sin(pt.ang)*pt.r;
-      vCtx.globalAlpha=Math.max(0,1-p*0.9);
-      vCtx.fillStyle=`hsl(${(pt.r+t/5)%360},80%,75%)`;
-      vCtx.font=`${pt.size*(1-p*0.5)}px sans-serif`;vCtx.textAlign='center';vCtx.fillText(pt.name,x,y);});
-    vCtx.restore();
-    if(t<DURATION)requestAnimationFrame(anim);
-    else{clearInterval(tickTimer);vCtx.fillStyle='#fff';vCtx.fillRect(0,0,vW,vH);
-      finishGeneric('btn-vortex',winner); buildParticles();drawVortexIdle();}
+function lottoRevolver(winner){
+  var cyl=document.getElementById('lotto-cylinder');
+  var box=document.getElementById('rev-name-box');
+  if(!box)return;
+  box.textContent='?';
+
+  var startTime=null,totalDuration=4500;
+  var startAngle=revolverAngle;
+  var spinRevs=8+Math.random()*4;
+  var targetAngle=startAngle+spinRevs*360;
+
+  // 槍聲效果
+  setTimeout(function(){lottoAudio('shot');},300);
+  setTimeout(function(){lottoAudio('shot');},900);
+  setTimeout(function(){lottoAudio('shot');},1800);
+
+  function animate(ts){
+    if(!startTime) startTime=ts;
+    var elapsed=ts-startTime;
+    var t=Math.min(elapsed/totalDuration,1);
+    // easeOutQuart
+    var ease=1-Math.pow(1-t,4);
+    var angle=startAngle+ease*(targetAngle-startAngle);
+    revolverAngle=angle;
+    if(cyl) cyl.style.transform='rotate('+angle+'deg)';
+
+    // 名字閃爍
+    if(elapsed>1000 && elapsed<totalDuration-500){
+      var idx=Math.floor(Math.random()*LPOOL.length);
+      box.textContent=LPOOL[idx]||'???';
+      if(elapsed%200<50) lottoAudio('tick');
+    }
+
+    if(t<1){
+      revolverRAF=requestAnimationFrame(animate);
+    }else{
+      box.textContent=winner;
+      box.style.color='#f87171';
+      box.style.boxShadow='0 0 20px rgba(239,68,68,.5)';
+      setTimeout(function(){lottoShowResult(winner);},600);
+    }
   }
-  requestAnimationFrame(anim);
+  revolverRAF=requestAnimationFrame(animate);
 }
 
-/* ===================== 模式三：命運翻牌（名牌掃描）===================== */
-let cardEls=[];
-function initCards(){
-  const field=document.getElementById('cardField');field.innerHTML='';cardEls=[];
-  POOL.forEach(name=>{const c=document.createElement('div');c.className='name-tile';
-    c.textContent=name; c.dataset.name=name; field.appendChild(c);cardEls.push(c);});
-}
-function runCards(){
-  if(busy)return; busy=true; document.getElementById('btn-cards').disabled=true;
-  initCards(); const winner=pick(); startBgm(); const start=performance.now(); let lastIdx=-1;
-  function scan(now){
-    const t=now-start; const p=Math.min(t/DURATION,1);
-    const interval=40+p*p*260; const idx=Math.floor(t/interval)%cardEls.length;
-    if(idx!==lastIdx){cardEls.forEach(c=>c.classList.remove('lit'));cardEls[idx].classList.add('lit');blip();lastIdx=idx;}
-    if(t<DURATION)requestAnimationFrame(scan);
-    else{cardEls.forEach(c=>c.classList.remove('lit'));
-      const winEl=cardEls.find(c=>c.dataset.name===winner)||cardEls[0];
-      winEl.classList.add('win');
-      note(NF.A5,0.4,0,0.2,'triangle');
-      setTimeout(()=>finishGeneric('btn-cards',winner),700);}
+// ──────────────────────────────────────────
+// MODE 3：命運漩渦
+// ──────────────────────────────────────────
+var vortexRAF=null, vortexParticles=[], vortexRunning=false;
+
+function lottoInitVortex(){
+  var canvas=document.getElementById('vortex-canvas'); if(!canvas)return;
+  var ctx=canvas.getContext('2d');
+  vortexParticles=[];
+  var names=LPOOL.slice(0,16);
+  var n=Math.max(names.length,1);
+  for(var i=0;i<n;i++){
+    var angle=(Math.PI*2/n)*i;
+    var r=120+Math.random()*10;
+    vortexParticles.push({
+      name:names[i]||'?',
+      x:150+r*Math.cos(angle),
+      y:150+r*Math.sin(angle),
+      r:r,angle:angle,
+      speed:.008+Math.random()*.004,
+      alpha:1,scale:1,absorbed:false
+    });
   }
-  requestAnimationFrame(scan);
+  lottoVortexIdle();
 }
 
-/* ===================== 模式四：俄羅斯輪盤 ===================== */
-let wCanvas,wCtx,wRot=0,wSize=440;
-const WHEEL_COLORS=['#1E2761','#4361EE','#2c3e8f','#5a73d8','#1b2a6b','#3550c4'];
-function initWheel(){ wCanvas=document.getElementById('wheelCanvas'); wCtx=wCanvas.getContext('2d'); wRot=0; drawWheel(0); }
-function drawWheel(rot){
-  const n=POOL.length, R=wSize/2, cx=R, cy=R, seg=(Math.PI*2)/n;
-  wCtx.clearRect(0,0,wSize,wSize); wCtx.save(); wCtx.translate(cx,cy); wCtx.rotate(rot);
-  const fontSize = n>30?11 : n>22?13 : 15;
-  for(let i=0;i<n;i++){
-    const a0=i*seg, a1=a0+seg;
-    wCtx.beginPath();wCtx.moveTo(0,0);wCtx.arc(0,0,R-6,a0,a1);wCtx.closePath();
-    wCtx.fillStyle=WHEEL_COLORS[i%WHEEL_COLORS.length];wCtx.fill();
-    wCtx.strokeStyle='rgba(202,220,252,.35)';wCtx.lineWidth=1;wCtx.stroke();
-    wCtx.save();wCtx.rotate(a0+seg/2);wCtx.textAlign='right';wCtx.fillStyle='#fff';
-    wCtx.font=`bold ${fontSize}px "PingFang TC",sans-serif`;wCtx.fillText(POOL[i],R-16,5);wCtx.restore();
+function lottoVortexIdle(){
+  cancelAnimationFrame(vortexRAF);
+  var canvas=document.getElementById('vortex-canvas'); if(!canvas)return;
+  var ctx=canvas.getContext('2d');
+  function draw(){
+    ctx.clearRect(0,0,300,300);
+    // 漩渦光環
+    for(var i=3;i>0;i--){
+      ctx.beginPath();
+      ctx.arc(150,150,i*24,0,Math.PI*2);
+      ctx.strokeStyle='rgba(139,92,246,'+(0.05*i)+')';
+      ctx.lineWidth=i*3;
+      ctx.stroke();
+    }
+    vortexParticles.forEach(function(p){
+      if(p.absorbed)return;
+      p.angle+=p.speed;
+      p.x=150+p.r*Math.cos(p.angle);
+      p.y=150+p.r*Math.sin(p.angle);
+      ctx.save();
+      ctx.globalAlpha=p.alpha;
+      ctx.fillStyle='rgba(196,181,253,0.85)';
+      ctx.font='bold 12px "PingFang TC",sans-serif';
+      ctx.textAlign='center';
+      ctx.fillText(p.name,p.x,p.y);
+      ctx.restore();
+    });
+    vortexRAF=requestAnimationFrame(draw);
   }
-  wCtx.beginPath();wCtx.arc(0,0,R-4,0,Math.PI*2);wCtx.lineWidth=6;wCtx.strokeStyle='#C8941A';wCtx.stroke();
-  wCtx.restore();
+  draw();
 }
-function runWheel(){
-  if(busy)return; busy=true; document.getElementById('btn-wheel').disabled=true;
-  const n=POOL.length, seg=(Math.PI*2)/n, winIdx=pickIdx(), winner=POOL[winIdx];
-  const centerAngle=winIdx*seg+seg/2; const target=(-Math.PI/2-centerAngle); const finalRot=target+6*Math.PI*2;
-  startBgm(); let tickTimer=setInterval(blip,80);
-  const start=performance.now(); const startRot=wRot%(Math.PI*2);
-  function anim(now){
-    const t=now-start; const p=Math.min(t/DURATION,1); const ease=1-Math.pow(1-p,3);
-    wRot=startRot+(finalRot-startRot)*ease; drawWheel(wRot);
-    if(t<DURATION)requestAnimationFrame(anim);
-    else{ wRot=finalRot; drawWheel(wRot); clearInterval(tickTimer);
-      note(NF.A5,0.35,0,0.2,'triangle'); finishGeneric('btn-wheel',winner); }
+
+function lottoVortex(winner){
+  cancelAnimationFrame(vortexRAF);
+  var canvas=document.getElementById('vortex-canvas'); if(!canvas)return;
+  var ctx=canvas.getContext('2d');
+  var center=document.getElementById('vortex-center');
+  var startTime=null,totalDuration=4500;
+
+  // 重置名單
+  var names=LPOOL.slice(0,16);
+  var n=Math.max(names.length,1);
+  vortexParticles=[];
+  for(var i=0;i<n;i++){
+    var angle=(Math.PI*2/n)*i;
+    var r=120;
+    vortexParticles.push({name:names[i]||'?',x:150+r*Math.cos(angle),y:150+r*Math.sin(angle),
+      r:r,angle:angle,speed:.01+Math.random()*.005,alpha:1,scale:1,absorbed:false});
   }
-  requestAnimationFrame(anim);
+
+  function draw(ts){
+    if(!startTime)startTime=ts;
+    var elapsed=ts-startTime;
+    var t=Math.min(elapsed/totalDuration,1);
+
+    ctx.clearRect(0,0,300,300);
+    // 漩渦核心發光
+    var grd=ctx.createRadialGradient(150,150,0,150,150,80*(1-t*.5)+20);
+    grd.addColorStop(0,'rgba(88,28,135,'+(0.4+t*.5)+')');
+    grd.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=grd;ctx.fillRect(0,0,300,300);
+
+    vortexParticles.forEach(function(p){
+      if(p.absorbed)return;
+      // 名字是 winner 則減速，其他加速吸入
+      var isWinner=(p.name===winner);
+      if(t>.6&&!isWinner){
+        p.r=Math.max(p.r-(5*t),0);
+        p.alpha=Math.max(p.alpha-.02,0);
+        if(p.r<5){p.absorbed=true;if(center)lottoAudio('whoosh');}
+      }else{
+        p.speed=.01+t*.05;
+      }
+      p.angle+=p.speed*(1+t*4);
+      p.x=150+p.r*Math.cos(p.angle);
+      p.y=150+p.r*Math.sin(p.angle);
+
+      ctx.save();
+      ctx.globalAlpha=p.alpha;
+      var s=isWinner&&t>.6?1+t*.5:1;
+      ctx.scale(s,s);
+      ctx.fillStyle=isWinner&&t>.6?'rgba(251,191,36,1)':'rgba(196,181,253,0.85)';
+      ctx.font=(isWinner&&t>.6?'bold 16px':'bold 12px')+' "PingFang TC",sans-serif';
+      ctx.textAlign='center';
+      ctx.fillText(p.name,p.x/s,p.y/s);
+      ctx.restore();
+
+      if(t<.4) lottoAudio&&elapsed%300<16&&lottoAudio('tick');
+    });
+
+    if(center) center.textContent=t>.8?'⚡':'🌀';
+
+    if(t<1){vortexRAF=requestAnimationFrame(draw);}
+    else{
+      ctx.clearRect(0,0,300,300);
+      setTimeout(function(){lottoShowResult(winner);lottoVortexIdle();},300);
+    }
+  }
+  vortexRAF=requestAnimationFrame(draw);
 }
 
-/* ===================== 收尾 + 中獎 ===================== */
-function finishGeneric(btnId,winner){ stopBgm(); document.getElementById(btnId).disabled=false; busy=false; showWin(winner); }
-function showWin(name){
-  document.getElementById('winName').textContent=name;
-  document.getElementById('winOverlay').classList.add('show'); winFanfare(); launchConfetti();
-}
-function closeWin(again){
-  document.getElementById('winOverlay').classList.remove('show'); stopConfetti();
-  if(again){ if(current==='slot')initSlot(); if(current==='vortex'){buildParticles();drawVortexIdle();}
-    if(current==='cards')initCards(); if(current==='wheel')initWheel(); }
-  else goMenu();
+// ──────────────────────────────────────────
+// MODE 4：神秘牌陣
+// ──────────────────────────────────────────
+var tarotReady=false, tarotWinner='';
+
+function lottoInitTarot(){
+  var deck=document.getElementById('tarot-deck'); if(!deck)return;
+  deck.innerHTML='';
+  tarotReady=false;
+  var hint=document.getElementById('tarot-hint');
+  if(hint)hint.textContent='按下「開始抽籤」洗牌';
+
+  var emojis=['🌟','💫','⚡','🔮','🎭','🌙','🔥','💎'];
+  for(var i=0;i<6;i++){
+    var card=document.createElement('div');
+    card.className='tarot-card';
+    var glow=document.createElement('div');glow.className='tarot-glow';
+    var back=document.createElement('div');back.className='card-back';
+    back.innerHTML='<div class="card-back-inner">'+emojis[i%emojis.length]+'</div>';
+    var face=document.createElement('div');face.className='card-face';
+    face.innerHTML='<div class="card-symbol">'+emojis[Math.floor(Math.random()*emojis.length)]+'</div>'
+                  +'<div class="card-name" id="card-name-'+i+'">?</div>';
+    card.appendChild(glow);card.appendChild(back);card.appendChild(face);
+    (function(idx){
+      card.onclick=function(){
+        if(!tarotReady||card.classList.contains('chosen'))return;
+        // 翻牌選擇
+        deck.querySelectorAll('.tarot-card').forEach(function(c){
+          if(c!==card){c.style.opacity='.3';}
+        });
+        card.classList.add('chosen','flipped');
+        lottoAudio('win');
+        var hint=document.getElementById('tarot-hint');
+        if(hint)hint.textContent='命運已定…';
+        setTimeout(function(){lottoShowResult(tarotWinner);},1200);
+      };
+    })(i);
+    deck.appendChild(card);
+  }
 }
 
-/* ---------- 撒花 ---------- */
-let confCanvas,confCtx,confPieces=[],confAnim=null;
-function launchConfetti(){
-  confCanvas=document.getElementById('confetti');confCtx=confCanvas.getContext('2d');
-  confCanvas.style.display='block';confCanvas.width=innerWidth;confCanvas.height=innerHeight;
-  const colors=['#C8941A','#4361EE','#CADCFC','#fff','#ff6b6b','#ffd93d'];confPieces=[];
-  for(let i=0;i<180;i++){confPieces.push({x:innerWidth/2,y:innerHeight/2,
-    vx:(Math.random()-0.5)*18,vy:(Math.random()-0.9)*18,g:0.25+Math.random()*0.2,
-    size:6+Math.random()*8,color:colors[rand(colors.length)],rot:Math.random()*6,vr:(Math.random()-0.5)*0.4,life:1});}
-  cancelAnimationFrame(confAnim);confLoop();
-}
-function confLoop(){
-  confCtx.clearRect(0,0,confCanvas.width,confCanvas.height);let alive=false;
-  confPieces.forEach(p=>{p.vy+=p.g;p.x+=p.vx;p.y+=p.vy;p.rot+=p.vr;p.life-=0.006;
-    if(p.life>0&&p.y<confCanvas.height+40){alive=true;confCtx.save();confCtx.globalAlpha=Math.max(0,p.life);
-      confCtx.translate(p.x,p.y);confCtx.rotate(p.rot);confCtx.fillStyle=p.color;
-      confCtx.fillRect(-p.size/2,-p.size/2,p.size,p.size*0.6);confCtx.restore();}});
-  if(alive)confAnim=requestAnimationFrame(confLoop);else confCanvas.style.display='none';
-}
-function stopConfetti(){cancelAnimationFrame(confAnim);if(confCanvas)confCanvas.style.display='none';}
+function lottoTarot(winner){
+  tarotWinner=winner;
+  var deck=document.getElementById('tarot-deck'); if(!deck)return;
+  var cards=deck.querySelectorAll('.tarot-card');
+  var hint=document.getElementById('tarot-hint');
+  // 洗牌動畫
+  var delays=[200,400,300,500,250,350];
+  var winnerCardIdx=Math.floor(Math.random()*6);
+  cards.forEach(function(card,i){
+    card.style.transition='transform '+(0.3+Math.random()*.2)+'s';
+    setTimeout(function(){
+      // 設定每張牌的名字
+      var nameEl=card.querySelector('.card-name');
+      if(i===winnerCardIdx){
+        if(nameEl)nameEl.textContent=winner;
+      }else{
+        var others=LPOOL.filter(function(n){return n!==winner;});
+        if(nameEl)nameEl.textContent=others[Math.floor(Math.random()*others.length)]||'?';
+      }
+      // 洗牌晃動
+      card.style.transform='translateY(-'+(10+Math.random()*20)+'px) rotate('+(Math.random()*10-5)+'deg)';
+      setTimeout(function(){card.style.transform='';},250);
+      lottoAudio('tick');
+    },delays[i]||300);
+  });
 
-/* ===================== 啟動 ===================== */
-refreshCounts();
-loadNames();  // 從 Google Sheet 載入最新名單
+  setTimeout(function(){
+    if(hint)hint.textContent='✦ 選一張牌，揭示你的命運 ✦';
+    tarotReady=true;
+  },1500);
+}
+
+// ──────────────────────────────────────────
+// 主要抽籤邏輯
+// ──────────────────────────────────────────
+function lottoDraw(){
+  if(LDRAWING)return;
+  if(!LPOOL.length){
+    var btn=document.getElementById('lotto-draw-btn');
+    if(btn){btn.textContent='⚠️ 名單空白';setTimeout(function(){btn.textContent='⚡ 開始抽籤';},1500);}
+    return;
+  }
+  LDRAWING=true;
+  var btn=document.getElementById('lotto-draw-btn');
+  if(btn){btn.disabled=true;btn.textContent='🎲 命運轉動中…';}
+  var hint=document.getElementById('lotto-hint');
+  if(hint)hint.textContent='✦ 命運之輪正在轉動，5秒後揭曉 ✦';
+
+  var winner=lottoPick();
+  lottoAudio('tension');
+
+  if(LMODE==='slot'){
+    lottoInitSlot();
+    setTimeout(function(){lottoSlot(winner);},100);
+  }else if(LMODE==='revolver'){
+    var box=document.getElementById('rev-name-box');
+    if(box){box.textContent='?';box.style.color='#fca5a5';box.style.boxShadow='';}
+    lottoRevolver(winner);
+  }else if(LMODE==='vortex'){
+    lottoVortex(winner);
+  }else if(LMODE==='tarot'){
+    LDRAWING=false;// tarot 由玩家點選觸發，先解鎖 draw
+    lottoTarot(winner);
+    return;
+  }
+}
+
+// 顯示結果
+function lottoShowResult(winner){
+  LDRAWING=false;
+  var el=document.getElementById('lotto-result');
+  var nameEl=document.getElementById('lotto-winner-name');
+  if(!el||!nameEl)return;
+  nameEl.textContent=winner;
+  el.classList.add('show');
+  lottoAudio('win');
+  lottoConfetti();
+}
+
+function lottoCloseResult(){
+  var el=document.getElementById('lotto-result');
+  if(el)el.classList.remove('show');
+  var btn=document.getElementById('lotto-draw-btn');
+  if(btn){btn.disabled=false;btn.textContent='⚡ 開始抽籤';}
+  var hint=document.getElementById('lotto-hint');
+  if(hint)hint.textContent='點擊開始，5秒後揭曉命運';
+  // 重置各模式
+  if(LMODE==='tarot')lottoInitTarot();
+  if(LMODE==='vortex')lottoVortexIdle();
+  if(LMODE==='revolver'){
+    var box=document.getElementById('rev-name-box');
+    if(box){box.textContent='?';box.style.color='';box.style.boxShadow='';}
+  }
+  var confCanvas=document.getElementById('lotto-confetti');
+  if(confCanvas){var ctx=confCanvas.getContext('2d');ctx.clearRect(0,0,confCanvas.width,confCanvas.height);}
+}
+
+// 彩帶
+var confParticles=[], confRAF2=null;
+function lottoConfetti(){
+  var canvas=document.getElementById('lotto-confetti'); if(!canvas)return;
+  canvas.width=window.innerWidth;canvas.height=window.innerHeight;
+  var ctx=canvas.getContext('2d');
+  confParticles=[];
+  var colors=['#fbbf24','#a78bfa','#38bdf8','#f472b6','#4ade80','#fb923c'];
+  for(var i=0;i<150;i++){
+    confParticles.push({
+      x:Math.random()*canvas.width,y:-10-Math.random()*200,
+      w:6+Math.random()*8,h:10+Math.random()*8,
+      color:colors[Math.floor(Math.random()*colors.length)],
+      vx:(Math.random()-.5)*6,vy:3+Math.random()*5,
+      rot:Math.random()*360,vr:(Math.random()-.5)*10,
+      alpha:1
+    });
+  }
+  cancelAnimationFrame(confRAF2);
+  (function loop(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    var alive=false;
+    confParticles.forEach(function(p){
+      if(p.alpha<=0)return;
+      alive=true;
+      p.x+=p.vx;p.y+=p.vy;p.rot+=p.vr;
+      if(p.y>canvas.height*.7)p.alpha=Math.max(0,p.alpha-.02);
+      ctx.save();ctx.globalAlpha=p.alpha;
+      ctx.translate(p.x+p.w/2,p.y+p.h/2);
+      ctx.rotate(p.rot*Math.PI/180);
+      ctx.fillStyle=p.color;
+      ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);
+      ctx.restore();
+    });
+    if(alive)confRAF2=requestAnimationFrame(loop);
+  })();
+}
 
 init();
 </script>

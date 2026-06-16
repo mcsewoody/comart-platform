@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART 行政管理平台 v1.28</title>
+<title>COMART 行政管理平台 v1.29</title>
 <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.js"></script>
 <style>
 :root{
@@ -641,52 +641,29 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
 }
 
 /* ── MODE 2：俄羅斯輪盤 ── */
-#panel-lottery .revolver-wrap{position:relative;display:flex;flex-direction:column;align-items:center;gap:20px;}
-#panel-lottery .revolver{position:relative;width:220px;height:220px;}
-#panel-lottery .revolver-barrel{
-  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-  width:220px;height:220px;border-radius:50%;
-  background:radial-gradient(circle,#2d1f4e 30%,#1a1035 70%);
-  border:3px solid rgba(239,68,68,.4);
-  box-shadow:0 0 40px rgba(239,68,68,.2),inset 0 0 30px rgba(0,0,0,.5);
+#panel-lottery .revolver-wrap{position:relative;display:flex;flex-direction:column;align-items:center;gap:16px;}
+#panel-lottery .roulette-container{position:relative;width:320px;height:320px;}
+#panel-lottery .roulette-canvas{border-radius:50%;display:block;}
+#panel-lottery .roulette-ball{
+  position:absolute;width:18px;height:18px;border-radius:50%;
+  background:radial-gradient(circle at 35% 35%,#fff,#e0e0e0,#aaa);
+  box-shadow:0 2px 8px rgba(0,0,0,.8),inset 0 1px 2px rgba(255,255,255,.9);
+  top:50%;left:50%;transform:translate(-50%,-50%);
+  pointer-events:none;z-index:10;
 }
-#panel-lottery .cylinder{
-  position:absolute;top:50%;left:50%;
-  width:140px;height:140px;transform:translate(-50%,-50%);
-  border-radius:50%;
-  background:conic-gradient(
-    #3b1a6e 0deg 60deg, #1a0a2e 60deg 120deg,
-    #3b1a6e 120deg 180deg, #1a0a2e 180deg 240deg,
-    #3b1a6e 240deg 300deg, #1a0a2e 300deg 360deg
-  );
-  border:2px solid rgba(139,92,246,.5);
-  transition:transform .1s linear;
-}
-#panel-lottery .chamber{
-  position:absolute;width:24px;height:24px;border-radius:50%;
-  background:radial-gradient(circle,#ef4444 0%,#7f1d1d 100%);
-  border:2px solid rgba(239,68,68,.6);
-  box-shadow:0 0 10px rgba(239,68,68,.5);
-}
-#panel-lottery .crosshair{
-  position:absolute;top:50%;right:-30px;transform:translateY(-50%);
-  width:30px;height:2px;background:rgba(239,68,68,.8);
-}
-#panel-lottery .crosshair::before{
-  content:'▶';position:absolute;right:-8px;top:-9px;color:rgba(239,68,68,.9);font-size:18px;
-}
-#panel-lottery .revolver-name-ring{
-  position:absolute;inset:0;border-radius:50%;
-  display:flex;align-items:center;justify-content:center;
-}
-#panel-lottery .ring-name{
-  position:absolute;font-size:11px;color:rgba(196,181,253,.7);letter-spacing:1px;
-  white-space:nowrap;font-weight:600;
+#panel-lottery .roulette-pointer{
+  position:absolute;top:-12px;left:50%;transform:translateX(-50%);
+  width:0;height:0;
+  border-left:10px solid transparent;border-right:10px solid transparent;
+  border-top:24px solid #ef4444;
+  filter:drop-shadow(0 2px 4px rgba(239,68,68,.6));
+  z-index:5;
 }
 #panel-lottery .selected-name-box{
   background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);
-  border-radius:12px;padding:10px 32px;font-size:18px;font-weight:700;
-  color:#fca5a5;letter-spacing:3px;min-width:200px;text-align:center;min-height:44px;
+  border-radius:12px;padding:10px 32px;font-size:20px;font-weight:700;
+  color:#fca5a5;letter-spacing:3px;min-width:240px;text-align:center;min-height:50px;
+  box-shadow:0 0 20px rgba(239,68,68,.1);
 }
 
 /* ── MODE 3：命運漩渦 ── */
@@ -761,7 +738,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="logo">
     <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
     <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
-    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.28</span>
+    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.29</span>
   </div>
   <div class="trr">
     <div style="display:flex;align-items:center;gap:6px;padding:4px 12px;background:var(--surface-2);border:1px solid var(--border);border-radius:20px;font-size:12px;cursor:pointer" onclick="showUsw()" id="topbar-user">
@@ -769,7 +746,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <span id="cur-u" style="color:var(--text-2)">載入中…</span>
       <span style="color:var(--text-3);font-size:10px">▾</span>
     </div>
-    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.28</span>
+    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.29</span>
   </div>
 </div>
 <div id="layout-wrap" style="display:flex;min-height:calc(100vh - var(--th))">
@@ -824,7 +801,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi" data-p="lib-cats"><span class="ic">🏷️</span>分類管理</div>
       <div class="navi" data-p="lib-cfg"><span class="ic">⚙️</span>系統設定</div>
     </div>
-    <div class="sbf">v1.28 · Supabase<br><span style="color:var(--ac)">● 本機存儲</span></div>
+    <div class="sbf">v1.29 · Supabase<br><span style="color:var(--ac)">● 本機存儲</span></div>
   </div>
   <div class="mc" id="lc">
     <div class="pg active" id="pg-lib-dash">
@@ -906,7 +883,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       
       <div class="navi cn" data-p="car-cfg"><span class="ic">⚙️</span>系統設定</div>
     </div>
-    <div class="sbf">v1.28 · Supabase<br><span style="color:var(--tl)">● 本機存儲</span></div>
+    <div class="sbf">v1.29 · Supabase<br><span style="color:var(--tl)">● 本機存儲</span></div>
   </div>
   <div class="mc cf" id="cc">
     <div class="pg active" id="pg-car-dash">
@@ -998,7 +975,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi tna active" data-p="trip-new"><span class="ic">➕</span>新增報支單</div>
       <div class="navi tna" data-p="trip-list"><span class="ic">📋</span>報支單清單</div>
     </div>
-    <div class="sbf">v1.28 · Supabase<br><span style="color:var(--yw)">● 本機存儲</span></div>
+    <div class="sbf">v1.29 · Supabase<br><span style="color:var(--yw)">● 本機存儲</span></div>
   </div>
   <div class="mc" id="tc">
 
@@ -1137,7 +1114,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi rna" data-p="room-report"><span class="ic">📊</span>使用率報表</div>
       <div class="navi rna" data-p="room-fault"><span class="ic">🔧</span>故障回報<span class="nbadge" id="nb-fault" style="display:none">0</span></div>
     </div>
-    <div class="sbf">v1.28 · Supabase<br><span style="color:var(--gn)">● 本機存儲</span></div>
+    <div class="sbf">v1.29 · Supabase<br><span style="color:var(--gn)">● 本機存儲</span></div>
   </div>
   <div class="mc" id="rmc">
 
@@ -1304,7 +1281,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi vna" data-p="visit-guests"><span class="ic">👥</span>來賓資料庫</div>
       <div class="navi vna" data-p="visit-report"><span class="ic">📊</span>接待報表</div>
     </div>
-    <div class="sbf">v1.28 · Supabase<br><span style="color:#a78bfa">● 本機存儲</span></div>
+    <div class="sbf">v1.29 · Supabase<br><span style="color:#a78bfa">● 本機存儲</span></div>
   </div>
   <div class="mc" id="vmc">
 
@@ -1499,20 +1476,12 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
         <!-- MODE 2：俄羅斯輪盤 -->
         <div id="lotto-revolver" class="lotto-mode" style="display:none">
           <div class="revolver-wrap">
-            <div class="revolver">
-              <div class="revolver-barrel"></div>
-              <div class="cylinder" id="lotto-cylinder">
-                <div class="chamber" style="top:8px;left:50%;transform:translateX(-50%)"></div>
-                <div class="chamber" style="top:35%;right:8px;transform:translateY(-50%)"></div>
-                <div class="chamber" style="bottom:35%;right:8px;transform:translateY(50%)"></div>
-                <div class="chamber" style="bottom:8px;left:50%;transform:translateX(-50%)"></div>
-                <div class="chamber" style="top:35%;left:8px;transform:translateY(-50%)"></div>
-                <div class="chamber" style="bottom:35%;left:8px;transform:translateY(50%)"></div>
-              </div>
-              <div class="revolver-name-ring" id="lotto-name-ring"></div>
-              <div class="crosshair"></div>
+            <div class="roulette-container">
+              <canvas class="roulette-canvas" id="roulette-canvas" width="320" height="320"></canvas>
+              <div class="roulette-ball" id="roulette-ball"></div>
+              <div class="roulette-pointer"></div>
             </div>
-            <div class="selected-name-box" id="rev-name-box">?</div>
+            <div class="selected-name-box" id="rev-name-box">— 等待抽籤 —</div>
           </div>
         </div>
 
@@ -2349,11 +2318,10 @@ function switchMod(m){
   document.getElementById(`panel-${m}`).classList.add('active');
   if(m==='lib')renderLibPg('lib-dash');
   if(m==='car')renderCarPg('car-dash');
-  if(m==='lottery'){lottoInit();}
+  if(m==='lottery'){setTimeout(()=>{try{lottoInit();}catch(e){console.warn(e);}},50);}
   if(m==='trip'){navTrip('trip-new');}
   if(m==='room'){seedRoomDemo().then(()=>navRoom('room-dash'));;}
   if(m==='visit'){seedVisitDemo().then(()=>navVisit('visit-dash'));}
-  if(m==='lottery'){lottoInit();}
   if(m==='trip'){navTrip('trip-new');}
   if(m==='room'){seedRoomDemo().then(()=>navRoom('room-dash'));;}
   if(m==='visit'){seedVisitDemo().then(()=>navVisit('visit-dash'));}
@@ -4917,70 +4885,158 @@ function lottoSlot(winner){
 }
 
 // ──────────────────────────────────────────
-// MODE 2：俄羅斯輪盤
+// MODE 2：俄羅斯輪盤（大轉盤+球珠）
 // ──────────────────────────────────────────
-var revolverAngle=0, revolverRAF=null;
+var rouletteAngle=0, rouletteRAF=null, rouletteBallAngle=0;
+
+// 轉盤顏色
+var ROULETTE_COLORS=['#b91c1c','#1d4ed8','#b91c1c','#1d4ed8','#b91c1c','#1d4ed8',
+  '#b91c1c','#1d4ed8','#b91c1c','#1d4ed8','#047857','#b91c1c','#1d4ed8','#b91c1c',
+  '#1d4ed8','#b91c1c','#1d4ed8','#b91c1c','#1d4ed8','#b91c1c','#1d4ed8','#b91c1c','#1d4ed8'];
+
+function lottoDrawRoulette(wheelAngle){
+  var canvas=document.getElementById('roulette-canvas'); if(!canvas)return;
+  var ctx=canvas.getContext('2d');
+  var W=320,H=320,cx=160,cy=160,R=148,iR=55;
+  ctx.clearRect(0,0,W,H);
+
+  var names=LPOOL.length?LPOOL:['?'];
+  var n=names.length;
+  var arc=Math.PI*2/n;
+
+  // 外框光環
+  ctx.save();
+  ctx.beginPath();ctx.arc(cx,cy,R+4,0,Math.PI*2);
+  ctx.strokeStyle='rgba(239,68,68,0.4)';ctx.lineWidth=3;ctx.stroke();
+  ctx.restore();
+
+  // 扇形
+  names.forEach(function(name,i){
+    var startA=wheelAngle+i*arc-Math.PI/2;
+    var endA=startA+arc;
+    var color=ROULETTE_COLORS[i%ROULETTE_COLORS.length];
+
+    ctx.beginPath();
+    ctx.moveTo(cx,cy);
+    ctx.arc(cx,cy,R,startA,endA);
+    ctx.closePath();
+    ctx.fillStyle=color;
+    ctx.fill();
+    ctx.strokeStyle='rgba(0,0,0,0.3)';ctx.lineWidth=1;ctx.stroke();
+
+    // 文字
+    ctx.save();
+    ctx.translate(cx,cy);
+    ctx.rotate(startA+arc/2);
+    ctx.textAlign='right';
+    ctx.fillStyle='#fff';
+    ctx.font='bold '+(n>16?10:n>10?12:14)+'px "PingFang TC",sans-serif';
+    ctx.shadowColor='rgba(0,0,0,0.5)';ctx.shadowBlur=3;
+    ctx.fillText(name.slice(0,4),R-8,4);
+    ctx.restore();
+  });
+
+  // 內圓
+  var grd=ctx.createRadialGradient(cx,cy,0,cx,cy,iR);
+  grd.addColorStop(0,'#1a0a2e');grd.addColorStop(1,'#2d1b5e');
+  ctx.beginPath();ctx.arc(cx,cy,iR,0,Math.PI*2);
+  ctx.fillStyle=grd;ctx.fill();
+  ctx.strokeStyle='rgba(139,92,246,0.5)';ctx.lineWidth=2;ctx.stroke();
+
+  // 中心圖示
+  ctx.font='bold 22px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillStyle='#e2d9f3';ctx.fillText('🎰',cx,cy);
+}
+
+function lottoUpdateBall(ballAngle, ballR){
+  var ball=document.getElementById('roulette-ball'); if(!ball)return;
+  var cx=160,cy=160;
+  var x=cx+ballR*Math.cos(ballAngle);
+  var y=cy+ballR*Math.sin(ballAngle);
+  ball.style.left=(x-9)+'px';
+  ball.style.top=(y-9)+'px';
+}
 
 function lottoInitRevolver(){
-  var ring=document.getElementById('lotto-name-ring'); if(!ring)return;
-  ring.innerHTML='';
-  var names=LPOOL.slice(0,12);
-  var n=names.length||1,R=90;
-  names.forEach(function(name,i){
-    var angle=(360/n)*i;
-    var rad=angle*Math.PI/180;
-    var x=R*Math.sin(rad),y=-R*Math.cos(rad);
-    var d=document.createElement('div');
-    d.className='ring-name';
-    d.style.cssText='transform:translate(-50%,-50%) translate('+x+'px,'+y+'px) rotate('+angle+'deg)';
-    d.textContent=name.slice(0,3);
-    ring.appendChild(d);
-  });
+  rouletteAngle=0;
+  rouletteBallAngle=0;
+  lottoDrawRoulette(0);
+  lottoUpdateBall(0,120);
+  var box=document.getElementById('rev-name-box');
+  if(box){box.textContent='— 等待抽籤 —';box.style.color='#fca5a5';box.style.boxShadow='';}
 }
 
 function lottoRevolver(winner){
-  var cyl=document.getElementById('lotto-cylinder');
   var box=document.getElementById('rev-name-box');
   if(!box)return;
-  box.textContent='?';
+  box.textContent='轉動中…';
 
-  var startTime=null,totalDuration=4500;
-  var startAngle=revolverAngle;
-  var spinRevs=8+Math.random()*4;
-  var targetAngle=startAngle+spinRevs*360;
+  // 計算 winner 扇形角度
+  var names=LPOOL.length?LPOOL:['?'];
+  var n=names.length;
+  var winIdx=names.indexOf(winner);
+  if(winIdx<0)winIdx=0;
+  var arc=Math.PI*2/n;
+  // winner 扇形中心對準 top（-π/2）
+  var targetWheelAngle=(-Math.PI/2)-(winIdx*arc+arc/2);
+  // 加上多圈
+  var totalSpins=8+Math.random()*4;
+  var startWheelAngle=rouletteAngle;
+  var deltaAngle=totalSpins*Math.PI*2+(targetWheelAngle-startWheelAngle%(Math.PI*2));
 
-  // 槍聲效果
-  setTimeout(function(){lottoAudio('shot');},300);
-  setTimeout(function(){lottoAudio('shot');},900);
-  setTimeout(function(){lottoAudio('shot');},1800);
+  var startTime=null,totalDuration=5000;
+  var ballStartR=130,ballEndR=130;
+  var ballStartAngle=rouletteBallAngle;
+  // 球反向旋轉（更快）
+  var ballDelta=-(totalSpins*2)*Math.PI*2;
 
+  cancelAnimationFrame(rouletteRAF);
+
+  // 音效節奏
+  var lastTick=0;
   function animate(ts){
-    if(!startTime) startTime=ts;
+    if(!startTime)startTime=ts;
     var elapsed=ts-startTime;
     var t=Math.min(elapsed/totalDuration,1);
-    // easeOutQuart
-    var ease=1-Math.pow(1-t,4);
-    var angle=startAngle+ease*(targetAngle-startAngle);
-    revolverAngle=angle;
-    if(cyl) cyl.style.transform='rotate('+angle+'deg)';
+    // 緩速曲線
+    var ease=t<1?1-Math.pow(1-t,3):1;
 
-    // 名字閃爍
-    if(elapsed>1000 && elapsed<totalDuration-500){
-      var idx=Math.floor(Math.random()*LPOOL.length);
-      box.textContent=LPOOL[idx]||'???';
-      if(elapsed%200<50) lottoAudio('tick');
+    // 輪盤旋轉
+    var wAngle=startWheelAngle+ease*deltaAngle;
+    rouletteAngle=wAngle;
+    lottoDrawRoulette(wAngle);
+
+    // 球：先快後慢，半徑略微變化
+    var ballEase=t<.7?t/.7:1-(t-.7)/.3*.1;
+    var ballAngle=ballStartAngle+ease*ballDelta;
+    rouletteBallAngle=ballAngle;
+    // 球半徑：高速時外圈，減速後往內
+    var bR=130-ease*20;
+    lottoUpdateBall(ballAngle, bR);
+
+    // 點擊音效（越來越慢）
+    var tickInterval=Math.max(50,50+ease*400);
+    if(elapsed-lastTick>tickInterval){
+      lottoAudio('tick');lastTick=elapsed;
     }
 
     if(t<1){
-      revolverRAF=requestAnimationFrame(animate);
+      rouletteRAF=requestAnimationFrame(animate);
     }else{
+      // 球落入 winner 槽
+      lottoAudio('win');
+      var winArc=arc,winStart=rouletteAngle+winIdx*winArc-Math.PI/2;
+      var finalBallAngle=-(Math.PI/2);
+      var finalBallR=100;
+      lottoUpdateBall(finalBallAngle,finalBallR);
+
       box.textContent=winner;
-      box.style.color='#f87171';
-      box.style.boxShadow='0 0 20px rgba(239,68,68,.5)';
-      setTimeout(function(){lottoShowResult(winner);},600);
+      box.style.color='#fbbf24';
+      box.style.boxShadow='0 0 30px rgba(251,191,36,.6)';
+      setTimeout(function(){lottoShowResult(winner);},800);
     }
   }
-  revolverRAF=requestAnimationFrame(animate);
+  rouletteRAF=requestAnimationFrame(animate);
 }
 
 // ──────────────────────────────────────────

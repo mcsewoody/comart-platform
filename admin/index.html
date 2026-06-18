@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" href="data:,">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART 行政管理平台 v1.38</title>
+<title>COMART 行政管理平台 v1.39</title>
 <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.js"></script>
 <style>
 :root{
@@ -829,7 +829,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   /* 輪盤 */
   .#panel-lottery .wheel-stage{position:relative;width:min(78vw,440px);height:min(78vw,440px);overflow:visible;}
 #panel-lottery #wheelCanvas{width:100%;height:100%;display:block;filter:drop-shadow(0 0 30px rgba(67,97,238,.45));}
-#panel-lottery .wheel-pointer{position:absolute;top:-8px;left:50%;transform:translateX(-50%);z-index:10;width:0;height:0;border-left:13px solid transparent;border-right:13px solid transparent;border-top:34px solid #ef4444;filter:drop-shadow(0 2px 8px rgba(239,68,68,.9));}
+#panel-lottery .wheel-pointer{display:none;}
 #panel-lottery .wheel-hub{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:5;
     width:54px;height:54px;border-radius:50%;background:radial-gradient(circle,#fff,#CADCFC 60%,#4361EE);
     box-shadow:0 0 18px rgba(67,97,238,.8);display:flex;align-items:center;justify-content:center;font-size:24px;}
@@ -865,7 +865,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="logo">
     <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
     <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
-    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.38</span>
+    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.39</span>
   </div>
   <div class="trr">
     <div style="display:flex;align-items:center;gap:6px;padding:4px 12px;background:var(--surface-2);border:1px solid var(--border);border-radius:20px;font-size:12px;cursor:pointer" onclick="showUsw()" id="topbar-user">
@@ -873,7 +873,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <span id="cur-u" style="color:var(--text-2)">載入中…</span>
       <span style="color:var(--text-3);font-size:10px">▾</span>
     </div>
-    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.38</span>
+    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.39</span>
   </div>
 </div>
 <div id="layout-wrap" style="display:flex;min-height:calc(100vh - var(--th))">
@@ -927,7 +927,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi" data-p="lib-cats"><span class="ic">🏷️</span>分類管理</div>
       <div class="navi" data-p="lib-cfg"><span class="ic">⚙️</span>系統設定</div>
     </div>
-    <div class="sbf">v1.38 · Supabase<br><span style="color:var(--ac)">● 本機存儲</span></div>
+    <div class="sbf">v1.39 · Supabase<br><span style="color:var(--ac)">● 本機存儲</span></div>
   </div>
   <div class="mc" id="lc">
     <div class="pg active" id="pg-lib-dash">
@@ -1009,7 +1009,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       
       <div class="navi cn" data-p="car-cfg"><span class="ic">⚙️</span>系統設定</div>
     </div>
-    <div class="sbf">v1.38 · Supabase<br><span style="color:var(--tl)">● 本機存儲</span></div>
+    <div class="sbf">v1.39 · Supabase<br><span style="color:var(--tl)">● 本機存儲</span></div>
   </div>
   <div class="mc cf" id="cc">
     <div class="pg active" id="pg-car-dash">
@@ -1101,7 +1101,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi tna active" data-p="trip-new"><span class="ic">➕</span>新增報支單</div>
       <div class="navi tna" data-p="trip-list"><span class="ic">📋</span>報支單清單</div>
     </div>
-    <div class="sbf">v1.38 · Supabase<br><span style="color:var(--yw)">● 本機存儲</span></div>
+    <div class="sbf">v1.39 · Supabase<br><span style="color:var(--yw)">● 本機存儲</span></div>
   </div>
   <div class="mc" id="tc">
 
@@ -1240,7 +1240,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi rna" data-p="room-report"><span class="ic">📊</span>使用率報表</div>
       <div class="navi rna" data-p="room-fault"><span class="ic">🔧</span>故障回報<span class="nbadge" id="nb-fault" style="display:none">0</span></div>
     </div>
-    <div class="sbf">v1.38 · Supabase<br><span style="color:var(--gn)">● 本機存儲</span></div>
+    <div class="sbf">v1.39 · Supabase<br><span style="color:var(--gn)">● 本機存儲</span></div>
   </div>
   <div class="mc" id="rmc">
 
@@ -1407,7 +1407,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi vna" data-p="visit-guests"><span class="ic">👥</span>來賓資料庫</div>
       <div class="navi vna" data-p="visit-report"><span class="ic">📊</span>接待報表</div>
     </div>
-    <div class="sbf">v1.38 · Supabase<br><span style="color:#a78bfa">● 本機存儲</span></div>
+    <div class="sbf">v1.39 · Supabase<br><span style="color:#a78bfa">● 本機存儲</span></div>
   </div>
   <div class="mc" id="vmc">
 
@@ -5004,16 +5004,24 @@ function initCards(){
 function runCards(){
   if(L_busy)return; L_busy=true; document.getElementById('btn-cards').disabled=true;
   initCards(); const winner=L_pick(); startBgm(); const start=performance.now(); let lastIdx=-1;
+  const LIT_STYLE='background:linear-gradient(145deg,#4361EE,#5a73d8);color:#fff;box-shadow:0 0 22px 6px rgba(67,97,238,.8);border:2px solid #CADCFC;transform:scale(1.12);transition:all .08s;';
+  const NORMAL_STYLE='min-width:80px;max-width:130px;height:48px;display:flex;align-items:center;justify-content:center;border-radius:10px;font-size:15px;font-weight:bold;color:#CADCFC;flex:0 0 auto;padding:0 10px;background:linear-gradient(145deg,#1E2761,#2a3580);border:1.5px solid rgba(202,220,252,.25);cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';
+  const WIN_STYLE='background:linear-gradient(145deg,#fff,#CADCFC);color:#1E2761;box-shadow:0 0 34px 10px rgba(200,148,26,.9);border:2px solid #C8941A;transform:scale(1.35);z-index:2;font-size:16px;';
   function scan(now){
     const t=now-start; const p=Math.min(t/L_DURATION,1);
     const interval=40+p*p*260; const idx=Math.floor(t/interval)%L_cardEls.length;
-    if(idx!==lastIdx){L_cardEls.forEach(c=>c.classList.remove('lit'));L_cardEls[idx].classList.add('lit');blip();lastIdx=idx;}
+    if(idx!==lastIdx){
+      L_cardEls.forEach((c,i)=>{c.style.cssText=NORMAL_STYLE+(i===idx?LIT_STYLE:'');});
+      blip();lastIdx=idx;
+    }
     if(t<L_DURATION)requestAnimationFrame(scan);
-    else{L_cardEls.forEach(c=>c.classList.remove('lit'));
+    else{
+      L_cardEls.forEach(c=>{c.style.cssText=NORMAL_STYLE;});
       const winEl=L_cardEls.find(c=>c.dataset.name===winner)||L_cardEls[0];
-      winEl.classList.add('win');
+      winEl.style.cssText=NORMAL_STYLE+WIN_STYLE;
       note(L_NF.A5,0.4,0,0.2,'triangle');
-      setTimeout(()=>finishGeneric('btn-cards',winner),700);}
+      setTimeout(()=>finishGeneric('btn-cards',winner),700);
+    }
   }
   requestAnimationFrame(scan);
 }
@@ -5035,6 +5043,30 @@ function drawWheel(rot){
     wCtx.font=`bold ${fontSize}px "PingFang TC",sans-serif`;wCtx.fillText(POOL[i],R-16,5);wCtx.restore();
   }
   wCtx.beginPath();wCtx.arc(0,0,R-4,0,Math.PI*2);wCtx.lineWidth=6;wCtx.strokeStyle='#C8941A';wCtx.stroke();
+  wCtx.restore();
+  // 畫指針（canvas 絕對座標，不受 rotate 影響）
+  const cx2=wSize/2;
+  wCtx.save();
+  wCtx.shadowColor='rgba(239,68,68,.9)';
+  wCtx.shadowBlur=14;
+  wCtx.beginPath();
+  wCtx.moveTo(cx2, 23);      // 尖端（上移19px）
+  wCtx.lineTo(cx2-14, -15);  // 左上
+  wCtx.lineTo(cx2+14, -15);  // 右上
+  wCtx.closePath();
+  wCtx.fillStyle='#ef4444';
+  wCtx.fill();
+  wCtx.strokeStyle='rgba(255,255,255,0.9)';
+  wCtx.lineWidth=2;
+  wCtx.stroke();
+  // 指針底部小圓點
+  wCtx.beginPath();
+  wCtx.arc(cx2, -15, 6, 0, Math.PI*2);
+  wCtx.fillStyle='#ef4444';
+  wCtx.fill();
+  wCtx.strokeStyle='#fff';
+  wCtx.lineWidth=2;
+  wCtx.stroke();
   wCtx.restore();
 }
 function runWheel(){

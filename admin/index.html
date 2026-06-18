@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" href="data:,">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART 行政管理平台 v1.37</title>
+<title>COMART 行政管理平台 v1.38</title>
 <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.js"></script>
 <style>
 :root{
@@ -816,7 +816,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   #vortexCanvas{position:absolute;inset:0;width:100%;height:100%;}
 
   /* 翻牌（名牌掃描）*/
-  .#panel-lottery .#panel-lottery .card-field{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;align-content:flex-start;width:100%;max-height:55vh;overflow-y:auto;padding:8px 16px;box-sizing:border-box;align-self:stretch;}
+  .#panel-lottery .#panel-lottery .#panel-lottery #cardField{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;align-content:flex-start;width:100%;max-height:55vh;overflow-y:auto;padding:8px 16px;box-sizing:border-box;}
 #panel-lottery .name-tile{min-width:80px;max-width:140px;height:52px;display:flex;align-items:center;justify-content:center;
     border-radius:10px;font-size:16px;font-weight:bold;color:#CADCFC;flex:0 0 auto;padding:0 12px;
     background:linear-gradient(145deg,#1E2761,#2c3e8f);border:2px solid rgba(202,220,252,.25);
@@ -827,9 +827,9 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
     box-shadow:0 0 34px 8px var(--gold);border-color:var(--gold);transform:scale(1.35);z-index:2;}
 
   /* 輪盤 */
-  .#panel-lottery .wheel-stage{position:relative;width:min(78vw,440px);height:min(78vw,440px);}
+  .#panel-lottery .wheel-stage{position:relative;width:min(78vw,440px);height:min(78vw,440px);overflow:visible;}
 #panel-lottery #wheelCanvas{width:100%;height:100%;display:block;filter:drop-shadow(0 0 30px rgba(67,97,238,.45));}
-#panel-lottery .wheel-pointer{position:absolute;top:0;left:50%;transform:translateX(-50%);z-index:10;width:0;height:0;border-left:14px solid transparent;border-right:14px solid transparent;border-top:36px solid #ef4444;filter:drop-shadow(0 0 8px rgba(239,68,68,1));}
+#panel-lottery .wheel-pointer{position:absolute;top:-8px;left:50%;transform:translateX(-50%);z-index:10;width:0;height:0;border-left:13px solid transparent;border-right:13px solid transparent;border-top:34px solid #ef4444;filter:drop-shadow(0 2px 8px rgba(239,68,68,.9));}
 #panel-lottery .wheel-hub{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:5;
     width:54px;height:54px;border-radius:50%;background:radial-gradient(circle,#fff,#CADCFC 60%,#4361EE);
     box-shadow:0 0 18px rgba(67,97,238,.8);display:flex;align-items:center;justify-content:center;font-size:24px;}
@@ -865,7 +865,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="logo">
     <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
     <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
-    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.37</span>
+    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.38</span>
   </div>
   <div class="trr">
     <div style="display:flex;align-items:center;gap:6px;padding:4px 12px;background:var(--surface-2);border:1px solid var(--border);border-radius:20px;font-size:12px;cursor:pointer" onclick="showUsw()" id="topbar-user">
@@ -873,7 +873,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <span id="cur-u" style="color:var(--text-2)">載入中…</span>
       <span style="color:var(--text-3);font-size:10px">▾</span>
     </div>
-    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.37</span>
+    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.38</span>
   </div>
 </div>
 <div id="layout-wrap" style="display:flex;min-height:calc(100vh - var(--th))">
@@ -927,7 +927,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi" data-p="lib-cats"><span class="ic">🏷️</span>分類管理</div>
       <div class="navi" data-p="lib-cfg"><span class="ic">⚙️</span>系統設定</div>
     </div>
-    <div class="sbf">v1.37 · Supabase<br><span style="color:var(--ac)">● 本機存儲</span></div>
+    <div class="sbf">v1.38 · Supabase<br><span style="color:var(--ac)">● 本機存儲</span></div>
   </div>
   <div class="mc" id="lc">
     <div class="pg active" id="pg-lib-dash">
@@ -1009,7 +1009,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       
       <div class="navi cn" data-p="car-cfg"><span class="ic">⚙️</span>系統設定</div>
     </div>
-    <div class="sbf">v1.37 · Supabase<br><span style="color:var(--tl)">● 本機存儲</span></div>
+    <div class="sbf">v1.38 · Supabase<br><span style="color:var(--tl)">● 本機存儲</span></div>
   </div>
   <div class="mc cf" id="cc">
     <div class="pg active" id="pg-car-dash">
@@ -1101,7 +1101,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi tna active" data-p="trip-new"><span class="ic">➕</span>新增報支單</div>
       <div class="navi tna" data-p="trip-list"><span class="ic">📋</span>報支單清單</div>
     </div>
-    <div class="sbf">v1.37 · Supabase<br><span style="color:var(--yw)">● 本機存儲</span></div>
+    <div class="sbf">v1.38 · Supabase<br><span style="color:var(--yw)">● 本機存儲</span></div>
   </div>
   <div class="mc" id="tc">
 
@@ -1240,7 +1240,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi rna" data-p="room-report"><span class="ic">📊</span>使用率報表</div>
       <div class="navi rna" data-p="room-fault"><span class="ic">🔧</span>故障回報<span class="nbadge" id="nb-fault" style="display:none">0</span></div>
     </div>
-    <div class="sbf">v1.37 · Supabase<br><span style="color:var(--gn)">● 本機存儲</span></div>
+    <div class="sbf">v1.38 · Supabase<br><span style="color:var(--gn)">● 本機存儲</span></div>
   </div>
   <div class="mc" id="rmc">
 
@@ -1407,7 +1407,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi vna" data-p="visit-guests"><span class="ic">👥</span>來賓資料庫</div>
       <div class="navi vna" data-p="visit-report"><span class="ic">📊</span>接待報表</div>
     </div>
-    <div class="sbf">v1.37 · Supabase<br><span style="color:#a78bfa">● 本機存儲</span></div>
+    <div class="sbf">v1.38 · Supabase<br><span style="color:#a78bfa">● 本機存儲</span></div>
   </div>
   <div class="mc" id="vmc">
 
@@ -4992,8 +4992,14 @@ function runVortex(){
 let L_cardEls=[];
 function initCards(){
   const field=document.getElementById('cardField');field.innerHTML='';L_cardEls=[];
-  POOL.forEach(name=>{const c=document.createElement('div');c.className='name-tile';
-    c.textContent=name; c.dataset.name=name; field.appendChild(c);L_cardEls.push(c);});
+  // 讓 cardField 正確換行
+  field.style.cssText='display:flex;flex-wrap:wrap;gap:8px;justify-content:center;align-content:flex-start;width:100%;max-height:50vh;overflow-y:auto;padding:8px;box-sizing:border-box;';
+  POOL.forEach(name=>{
+    const c=document.createElement('div');
+    c.className='name-tile';
+    c.style.cssText='min-width:80px;max-width:130px;height:48px;display:flex;align-items:center;justify-content:center;border-radius:10px;font-size:15px;font-weight:bold;color:#CADCFC;flex:0 0 auto;padding:0 10px;background:linear-gradient(145deg,#1E2761,#2a3580);border:1.5px solid rgba(202,220,252,.25);cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';
+    c.textContent=name; c.dataset.name=name; field.appendChild(c);L_cardEls.push(c);
+  });
 }
 function runCards(){
   if(L_busy)return; L_busy=true; document.getElementById('btn-cards').disabled=true;

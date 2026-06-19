@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" href="data:,">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART 行政管理平台 v1.42</title>
+<title>COMART 行政管理平台 v1.44</title>
 <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.js"></script>
 <style>
 :root{
@@ -865,7 +865,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="logo">
     <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
     <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
-    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.42</span>
+    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.44</span>
   </div>
   <div class="trr">
     <div style="display:flex;align-items:center;gap:6px;padding:4px 12px;background:var(--surface-2);border:1px solid var(--border);border-radius:20px;font-size:12px;cursor:pointer" onclick="showUsw()" id="topbar-user">
@@ -873,7 +873,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <span id="cur-u" style="color:var(--text-2)">載入中…</span>
       <span style="color:var(--text-3);font-size:10px">▾</span>
     </div>
-    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.42</span>
+    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.44</span>
   </div>
 </div>
 <div id="layout-wrap" style="display:flex;min-height:calc(100vh - var(--th))">
@@ -927,7 +927,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi" data-p="lib-cats"><span class="ic">🏷️</span>分類管理</div>
       <div class="navi" data-p="lib-cfg"><span class="ic">⚙️</span>系統設定</div>
     </div>
-    <div class="sbf">v1.42 · Supabase<br><span style="color:var(--ac)">● 本機存儲</span></div>
+    <div class="sbf">v1.44 · Supabase<br><span style="color:var(--ac)">● 本機存儲</span></div>
   </div>
   <div class="mc" id="lc">
     <div class="pg active" id="pg-lib-dash">
@@ -1009,7 +1009,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       
       <div class="navi cn" data-p="car-cfg"><span class="ic">⚙️</span>系統設定</div>
     </div>
-    <div class="sbf">v1.42 · Supabase<br><span style="color:var(--tl)">● 本機存儲</span></div>
+    <div class="sbf">v1.44 · Supabase<br><span style="color:var(--tl)">● 本機存儲</span></div>
   </div>
   <div class="mc cf" id="cc">
     <div class="pg active" id="pg-car-dash">
@@ -1101,7 +1101,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi tna active" data-p="trip-new"><span class="ic">➕</span>新增報支單</div>
       <div class="navi tna" data-p="trip-list"><span class="ic">📋</span>報支單清單</div>
     </div>
-    <div class="sbf">v1.42 · Supabase<br><span style="color:var(--yw)">● 本機存儲</span></div>
+    <div class="sbf">v1.44 · Supabase<br><span style="color:var(--yw)">● 本機存儲</span></div>
   </div>
   <div class="mc" id="tc">
 
@@ -1240,7 +1240,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi rna" data-p="room-report"><span class="ic">📊</span>使用率報表</div>
       <div class="navi rna" data-p="room-fault"><span class="ic">🔧</span>故障回報<span class="nbadge" id="nb-fault" style="display:none">0</span></div>
     </div>
-    <div class="sbf">v1.42 · Supabase<br><span style="color:var(--gn)">● 本機存儲</span></div>
+    <div class="sbf">v1.44 · Supabase<br><span style="color:var(--gn)">● 本機存儲</span></div>
   </div>
   <div class="mc" id="rmc">
 
@@ -1474,7 +1474,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi vna" data-p="visit-guests"><span class="ic">👥</span>來賓資料庫</div>
       <div class="navi vna" data-p="visit-report"><span class="ic">📊</span>接待報表</div>
     </div>
-    <div class="sbf">v1.42 · Supabase<br><span style="color:#a78bfa">● 本機存儲</span></div>
+    <div class="sbf">v1.44 · Supabase<br><span style="color:#a78bfa">● 本機存儲</span></div>
   </div>
   <div class="mc" id="vmc">
 
@@ -2088,7 +2088,7 @@ async function loadLibFromSB() {
   if(books)  sv(K.bk, books);
   if(loans)  sv(K.ln, loans);
   if(rvs)    sv(K.rv, rvs);
-  console.log(`✓ lib synced: ${cats?.length||0} cats, ${books?.length||0} books, ${loans?.length||0} loans`);
+  if(cats?.length||books?.length)console.log(`✓ lib synced: ${cats?.length||0} cats, ${books?.length||0} books, ${loans?.length||0} loans`);
 }
 
 // ── 公務車：從 Supabase 載入 ────────────────────────
@@ -3727,9 +3727,11 @@ function navRoom(p){
 }
 
 // ── Storage helpers ──
-function getBookings(){return ld(RK);}
+// 讀寫一律以 SB 快取（RK/FK）為準，快取由 getRoomBookings()/getRoomFaults() 在進模組時填入
+// saveBookings 只更新快取；SB 同步由各呼叫端的 saveRoomBooking() 負責
+function getBookings(){return ld(RK)||[];}
 function saveBookings(arr){sv(RK,arr);}
-function getFaults(){return ld(FK);}
+function getFaults(){return ld(FK)||[];}
 function saveFaults(arr){sv(FK,arr);}
 
 // ── Time helpers ──
@@ -3782,7 +3784,7 @@ function roomLiveStatus(roomId,bks){
 
 // ── Dashboard ──
 async function renderRoomDash(){
-  const bks=await getRoomBookings();
+  const [bks]=await Promise.all([getRoomBookings(),getRoomFaults()]);
   updateRoomClock();
   if(roomClockTimer)clearInterval(roomClockTimer);
   roomClockTimer=setInterval(()=>{updateRoomClock();renderDashCards(bks);renderDashGantt(bks);},30000);
@@ -4077,7 +4079,8 @@ async function iBkSave(){
     toast('⚠ 時段衝突，請重新選擇','error');iBkGoStep(2);iRenderRoomRecommend();return;
   }
   const arr=getBookings();arr.push(bk);saveBookings(arr);
-  saveRoomBooking(bk);
+  await saveRoomBooking(bk);
+  await getRoomBookings(); // 從 SB 重新拉取確保快取一致
   const roomName=ROOMS.find(r=>r.id===iBkSelectedRoom)?.name||'—';
   toast(`✓ 已預約${roomName} ${bk.start}–${bk.end}「${title}」`,'success');
   updRoomBadge();
@@ -4219,7 +4222,7 @@ function renderBkSummary(){
 }
 
 // Step 3: save
-function bkSave(){
+async function bkSave(){
   const title=document.getElementById('bk-title')?.value.trim();
   if(!title){toast('請填寫會議標題','error');return;}
   if(!bkSelectedRoom){toast('請先選擇會議室','error');return;}
@@ -4245,8 +4248,11 @@ function bkSave(){
   if(existing.some(b=>timeToMin(b.start)<timeToMin(bk.end)&&timeToMin(b.end)>timeToMin(bk.start))){
     toast('⚠ 時段衝突，請重新選擇','error');bkGoStep(2);renderRoomRecommend();return;
   }
+  // 先更新快取，再寫 SB
   const arr=getBookings();arr.push(bk);saveBookings(arr);
-  saveRoomBooking(bk); // 同步到 SB
+  await saveRoomBooking(bk);
+  // 從 SB 重新拉取確保快取一致
+  await getRoomBookings();
   const roomName=ROOMS.find(r=>r.id===bkSelectedRoom)?.name||'—';
   toast(`✓ 已預約${roomName} ${bk.start}–${bk.end}「${title}」`,'success');
   updRoomBadge();
@@ -4308,9 +4314,10 @@ async function renderRoomList(){
 async function cancelBk(id){
   if(!confirm('確定取消此預約？'))return;
   const arr=getBookings();const i=arr.findIndex(b=>b.id===id);
-  if(i>=0)arr[i].status='cancelled';
+  if(i<0){toast('找不到該預約','error');return;}
+  arr[i].status='cancelled';
   saveBookings(arr);
-  if(i>=0) saveRoomBooking(arr[i]); // 同步 cancelled 狀態到 SB
+  await saveRoomBooking(arr[i]); // 同步到 SB
   renderRoomList();renderRoomDash();toast('已取消預約','success');updRoomBadge();
 }
 
@@ -4323,28 +4330,27 @@ function openCheckin(id){
   if(el)el.textContent=`會議室：${room?.name}  ${bk.date} ${bk.start}–${bk.end}\n「${bk.title||'（無標題）'}」\n已開始了嗎？若 15 分鐘內未確認，系統將自動釋出會議室。`;
   openMo('mo-checkin');
 }
-function checkinAction(started){
+async function checkinAction(started){
   if(!checkinBkId){closeMo('mo-checkin');return;}
   const arr=getBookings();const i=arr.findIndex(b=>b.id===checkinBkId);
   if(i>=0){
     if(started){arr[i].checkedIn=true;arr[i].status='inprogress';}
     else{arr[i].status='cancelled';}
     saveBookings(arr);
+    await saveRoomBooking(arr[i]); // 同步到 SB
   }
   closeMo('mo-checkin');
-  // 同步到 SB
-  if(checkinBkId){const bk=arr[arr.findIndex(b=>b.id===checkinBkId)];if(bk)saveRoomBooking(bk);}
   checkinBkId=null;
   toast(started?'已確認報到，會議進行中':'已取消預約，會議室已釋出','success');
   renderRoomDash();renderRoomList();updRoomBadge();
 }
-let _autoReleaseLastRun=0; // ms timestamp，避免同一秒內重複執行
+let _autoReleaseLastRun=0;
 function checkAutoReleaseWithToast(bksOverride){
   const now=Date.now();
-  // 2秒內重複呼叫直接跳過（switchMod + renderRoomDash 同時觸發的防護）
   if(now-_autoReleaseLastRun<2000)return;
   _autoReleaseLastRun=now;
-  const nowDate=new Date();const bks=bksOverride||getBookings();let released=[];
+  const nowDate=new Date();const bks=bksOverride||getBookings();
+  const released=[];const toSync=[];
   bks.forEach((b,i)=>{
     if(b.status!=='confirmed')return;
     const startDT=new Date(b.date+'T'+b.start+':00');
@@ -4352,10 +4358,13 @@ function checkAutoReleaseWithToast(bksOverride){
     if(minsAfterStart>=15&&!b.checkedIn){
       bks[i].status='cancelled';bks[i].autoReleased=true;
       released.push(b.title||'會議');
+      toSync.push(bks[i]);
     }
   });
   if(released.length){
-    saveBookings(bks);updRoomBadge();
+    saveBookings(bks);
+    toSync.forEach(bk=>saveRoomBooking(bk)); // 同步到 SB
+    updRoomBadge();
     released.forEach(t=>toast(`🔓 auto released: ${t}`,'warn'));
   }
 }
@@ -4494,19 +4503,8 @@ function updRoomBadge(){
 }
 
 // ── Seed demo data ──
-async function seedRoomDemo(){
-  if(getBookings().length>0)return;
-  const us=ld(K.us);
-  const uid1=us[0]?.id||'demo';const uid2=us[1]?.id||'demo2';
-  const today=todayStr2();
-  const nowH=new Date().getHours();
-  const bks=[
-    {id:uid(),roomId:'big',date:today,start:`${String(nowH).padStart(2,'0')}:00`,end:`${String(nowH+1).padStart(2,'0')}:00`,title:'產品週會',headcount:10,hostId:uid1,emails:'',vc:true,note:'',status:'inprogress',checkedIn:true,createdAt:new Date().toISOString()},
-    {id:uid(),roomId:'small',date:today,start:`${String(Math.min(nowH+2,17)).padStart(2,'0')}:00`,end:`${String(Math.min(nowH+3,18)).padStart(2,'0')}:00`,title:'設計評審',headcount:4,hostId:uid2,emails:'',vc:false,note:'',status:'confirmed',checkedIn:false,createdAt:new Date().toISOString()},
-  ];
-  saveBookings(bks);
-  for(const bk of bks) saveRoomBooking(bk);
-}
+// seedRoomDemo 已移除：資料正本在 Supabase，不自動塞假資料
+async function seedRoomDemo(){}
 
 
 

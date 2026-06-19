@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" href="data:,">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART 行政管理平台 v1.39</title>
+<title>COMART 行政管理平台 v1.40</title>
 <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.js"></script>
 <style>
 :root{
@@ -865,7 +865,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="logo">
     <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
     <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
-    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.39</span>
+    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.40</span>
   </div>
   <div class="trr">
     <div style="display:flex;align-items:center;gap:6px;padding:4px 12px;background:var(--surface-2);border:1px solid var(--border);border-radius:20px;font-size:12px;cursor:pointer" onclick="showUsw()" id="topbar-user">
@@ -873,7 +873,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <span id="cur-u" style="color:var(--text-2)">載入中…</span>
       <span style="color:var(--text-3);font-size:10px">▾</span>
     </div>
-    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.39</span>
+    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.40</span>
   </div>
 </div>
 <div id="layout-wrap" style="display:flex;min-height:calc(100vh - var(--th))">
@@ -927,7 +927,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi" data-p="lib-cats"><span class="ic">🏷️</span>分類管理</div>
       <div class="navi" data-p="lib-cfg"><span class="ic">⚙️</span>系統設定</div>
     </div>
-    <div class="sbf">v1.39 · Supabase<br><span style="color:var(--ac)">● 本機存儲</span></div>
+    <div class="sbf">v1.40 · Supabase<br><span style="color:var(--ac)">● 本機存儲</span></div>
   </div>
   <div class="mc" id="lc">
     <div class="pg active" id="pg-lib-dash">
@@ -1009,7 +1009,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       
       <div class="navi cn" data-p="car-cfg"><span class="ic">⚙️</span>系統設定</div>
     </div>
-    <div class="sbf">v1.39 · Supabase<br><span style="color:var(--tl)">● 本機存儲</span></div>
+    <div class="sbf">v1.40 · Supabase<br><span style="color:var(--tl)">● 本機存儲</span></div>
   </div>
   <div class="mc cf" id="cc">
     <div class="pg active" id="pg-car-dash">
@@ -1101,7 +1101,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi tna active" data-p="trip-new"><span class="ic">➕</span>新增報支單</div>
       <div class="navi tna" data-p="trip-list"><span class="ic">📋</span>報支單清單</div>
     </div>
-    <div class="sbf">v1.39 · Supabase<br><span style="color:var(--yw)">● 本機存儲</span></div>
+    <div class="sbf">v1.40 · Supabase<br><span style="color:var(--yw)">● 本機存儲</span></div>
   </div>
   <div class="mc" id="tc">
 
@@ -1240,7 +1240,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi rna" data-p="room-report"><span class="ic">📊</span>使用率報表</div>
       <div class="navi rna" data-p="room-fault"><span class="ic">🔧</span>故障回報<span class="nbadge" id="nb-fault" style="display:none">0</span></div>
     </div>
-    <div class="sbf">v1.39 · Supabase<br><span style="color:var(--gn)">● 本機存儲</span></div>
+    <div class="sbf">v1.40 · Supabase<br><span style="color:var(--gn)">● 本機存儲</span></div>
   </div>
   <div class="mc" id="rmc">
 
@@ -1252,6 +1252,12 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
         <span id="room-clock" style="font-size:12px;color:var(--t3);margin-left:12px"></span>
       </div>
       <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;margin-bottom:20px" id="room-dash-cards"></div>
+      <!-- 快速新增預約按鈕 -->
+      <div style="margin-bottom:20px">
+        <button class="btn" style="background:var(--gn);color:#0f1117;border:none;cursor:pointer;padding:9px 20px;border-radius:var(--r);font-size:14px;font-weight:600;width:100%;display:flex;align-items:center;justify-content:center;gap:8px" onclick="navRoom('room-new')">
+          ➕ 新增會議室預約
+        </button>
+      </div>
       <!-- 今日時間軸快覽 -->
       <div class="sth" style="margin-bottom:10px"><div class="stt">今日時間軸</div><div class="ssub" id="room-today-label"></div></div>
       <div class="gantt-wrap" id="room-dash-gantt"></div>
@@ -1407,7 +1413,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi vna" data-p="visit-guests"><span class="ic">👥</span>來賓資料庫</div>
       <div class="navi vna" data-p="visit-report"><span class="ic">📊</span>接待報表</div>
     </div>
-    <div class="sbf">v1.39 · Supabase<br><span style="color:#a78bfa">● 本機存儲</span></div>
+    <div class="sbf">v1.40 · Supabase<br><span style="color:#a78bfa">● 本機存儲</span></div>
   </div>
   <div class="mc" id="vmc">
 
@@ -2451,7 +2457,10 @@ function switchMod(m){
   if(m==='car')renderCarPg('car-dash');
   if(m==='trip'){navTrip('trip-new');}
   if(m==='lottery'){lottoInit();}
-  if(m==='room'){seedRoomDemo().then(()=>navRoom('room-dash'));;}
+  if(m==='room'){getRoomBookings().then(bks=>{
+    checkAutoReleaseWithToast(bks);
+    navRoom('room-dash');
+  });}
   if(m==='visit'){seedVisitDemo().then(()=>navVisit('visit-dash'));}
 }
 
@@ -3650,7 +3659,7 @@ function navRoom(p){
   document.getElementById(`pg-${p}`)?.classList.add('active');
   if(p==='room-dash') renderRoomDash();
   if(p==='room-cal') renderRoomCal();
-  if(p==='room-new') initBkForm();
+  if(p==='room-new') getRoomBookings().then(()=>initBkForm());
   if(p==='room-list') renderRoomList();
   if(p==='room-report') renderReport('week');
   if(p==='room-fault') renderFaults();
@@ -3780,10 +3789,11 @@ function renderDashGantt(bks){
 }
 
 // ── Full Calendar (day view) ──
-function renderRoomCal(){
+async function renderRoomCal(){
   const d=calRoomDate.toISOString().slice(0,10);
   document.getElementById('cal-room-title').textContent=fmtD(d);
-  const bks=getBookings().filter(b=>b.date===d&&b.status!=='cancelled');
+  const allBks=await getRoomBookings();
+  const bks=allBks.filter(b=>b.date===d&&b.status!=='cancelled');
   document.getElementById('room-full-gantt').innerHTML=buildGantt(bks);
   requestAnimationFrame(drawNowLine);
 }
@@ -3929,25 +3939,38 @@ function bkStep1Next(){
 
 // Step 2: recommend
 function renderRoomRecommend(){
-  const date=document.getElementById('bk-date').value;
-  const headcount=parseInt(document.getElementById('bk-headcount').value)||1;
+  if(!bkSelectedSlot){return;} // guard: slot not yet selected
+  const date=document.getElementById('bk-date')?.value||todayStr2();
+  const headcount=parseInt(document.getElementById('bk-headcount')?.value)||1;
   const{start,end}=bkSelectedSlot;
   const bks=getBookings().filter(b=>b.date===date&&b.status!=='cancelled');
   const el=document.getElementById('bk-room-cards');if(!el)return;
+  // 推薦邏輯：≤6人 → 優先小會議室；>6人 → 優先大會議室
+  const preferSmall=headcount<=6;
+  const sortedRooms=[...ROOMS].sort((a,b2)=>{
+    const aSmall=a.cap<=8;const bSmall=b2.cap<=8;
+    if(preferSmall&&aSmall&&!bSmall)return -1;
+    if(preferSmall&&!aSmall&&bSmall)return 1;
+    if(!preferSmall&&!aSmall&&bSmall)return -1;
+    if(!preferSmall&&aSmall&&!bSmall)return 1;
+    return 0;
+  });
   let html='';let hasAny=false;
-  ROOMS.forEach(room=>{
+  sortedRooms.forEach(room=>{
     const conflict=bks.find(b=>b.roomId===room.id&&timeToMin(b.start)<timeToMin(end)&&timeToMin(b.end)>timeToMin(start));
     const suitable=headcount<=room.cap;
-    const recommended=!conflict&&suitable;
+    const isPreferred=preferSmall?(room.cap<=8):(room.cap>8);
+    const recommended=!conflict&&suitable&&isPreferred;
     if(!conflict)hasAny=true;
     const sel=bkSelectedRoom===room.id;
-    html+=`<div style="border:2px solid ${sel?'var(--gn)':conflict?'var(--rd)':'var(--bd)'};border-radius:var(--r);padding:13px;cursor:${conflict?'not-allowed':'pointer'};background:${sel?'rgba(34,197,94,.08)':'var(--bg0)'}" onclick="${conflict?'':` bkSelectRoom('${room.id}')`}">
+    html+=`<div data-room-id="${room.id}" style="border:2px solid ${sel?'var(--gn)':conflict?'var(--rd)':'var(--bd)'};border-radius:var(--r);padding:13px;cursor:${conflict?'not-allowed':'pointer'};background:${sel?'rgba(34,197,94,.08)':'var(--bg0)'};transition:all .15s" onclick="${conflict?'':` bkSelectRoom('${room.id}')`}">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
         <span style="font-size:14px;font-weight:700">${room.icon} ${room.name}</span>
-        <span class="badge ${conflict?'br':recommended?'bg':'by'}">${conflict?'時段衝突':recommended?'✓ 推薦':'可預約'}</span>
+        <span class="badge ${conflict?'br':recommended?'bg':suitable?'ba':'by'}">${conflict?'時段衝突':recommended?'✓ 推薦':suitable?'可預約':'容量不足'}</span>
       </div>
       <div style="font-size:12px;color:var(--t3)">容量：最多 ${room.cap} 人${headcount>room.cap?' ⚠ 超出人數':''} · ${room.equip.join('、')}</div>
       ${conflict?`<div style="font-size:11px;color:var(--rd);margin-top:4px">⚠ 已有預約：${conflict.title||'—'} (${conflict.start}–${conflict.end})</div>`:''}
+      ${recommended?`<div style="font-size:11px;color:var(--gn);margin-top:4px">👍 ${headcount}人會議推薦使用${room.name}</div>`:''}
     </div>`;
   });
   el.innerHTML=html;
@@ -3955,10 +3978,8 @@ function renderRoomRecommend(){
   const altEl=document.getElementById('bk-alt-slots');const altList=document.getElementById('bk-alt-list');
   if(!hasAny&&altEl&&altList){
     altEl.style.display='';
-    const date=document.getElementById('bk-date').value;
     const dur=timeToMin(end)-timeToMin(start);
-    const altBks=bks;
-    const alts=[];
+    const altBks=bks;const alts=[];
     for(let m=ROOM_HOURS.start*60;m+dur<=ROOM_HOURS.end*60;m+=30){
       const as=minToTime(m);const ae=minToTime(m+dur);
       const fr=ROOMS.filter(r=>!altBks.some(b=>b.roomId===r.id&&timeToMin(b.start)<m+dur&&timeToMin(b.end)>m));
@@ -4024,7 +4045,18 @@ function quickBook(roomId){
   setTimeout(()=>{
     document.getElementById('bk-date').value=todayStr2();
     updateSlots();
-    setTimeout(()=>bkSelectRoom(roomId),80);
+    // 只預選會議室，不強制跳 Step2（slot 尚未選擇）
+    bkSelectedRoom=roomId;
+    // 在 Step2 的 room cards 裡預選該房間（等 DOM ready）
+    setTimeout(()=>{
+      if(bkSelectedSlot){bkSelectRoom(roomId);}
+      else{
+        // 直接標記預選，讓使用者選完 slot 再跳
+        document.querySelectorAll('#bk-room-cards [data-room-id]').forEach(el=>{
+          el.style.outline=el.dataset.roomId===roomId?'2px solid var(--gn)':'';
+        });
+      }
+    },120);
   },80);
 }
 
@@ -4092,19 +4124,24 @@ function checkinAction(started){
   toast(started?'已確認報到，會議進行中':'已取消預約，會議室已釋出','success');
   renderRoomDash();renderRoomList();updRoomBadge();
 }
-function checkAutoRelease(){
-  const now=new Date();const bks=getBookings();let changed=false;
+function checkAutoReleaseWithToast(bksOverride){
+  const now=new Date();const bks=bksOverride||getBookings();let released=[];
   bks.forEach((b,i)=>{
     if(b.status!=='confirmed')return;
     const startDT=new Date(b.date+'T'+b.start+':00');
     const minsAfterStart=(now-startDT)/60000;
     if(minsAfterStart>=15&&!b.checkedIn){
-      bks[i].status='cancelled';bks[i].autoReleased=true;changed=true;
+      bks[i].status='cancelled';bks[i].autoReleased=true;
+      released.push(b.title||'會議');
       console.warn('auto released:', b.title||'會議');
     }
   });
-  if(changed){saveBookings(bks);updRoomBadge();}
+  if(released.length){
+    saveBookings(bks);updRoomBadge();
+    released.forEach(t=>toast(`🔓 auto released: ${t}`,'warn'));
+  }
 }
+function checkAutoRelease(){checkAutoReleaseWithToast();}
 
 // ── Report ──
 let curReportPeriod='week';

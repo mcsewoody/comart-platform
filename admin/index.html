@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" href="data:,">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART 行政管理平台 v1.40</title>
+<title>COMART 行政管理平台 v1.41</title>
 <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.js"></script>
 <style>
 :root{
@@ -865,7 +865,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="logo">
     <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
     <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
-    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.40</span>
+    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.41</span>
   </div>
   <div class="trr">
     <div style="display:flex;align-items:center;gap:6px;padding:4px 12px;background:var(--surface-2);border:1px solid var(--border);border-radius:20px;font-size:12px;cursor:pointer" onclick="showUsw()" id="topbar-user">
@@ -873,7 +873,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <span id="cur-u" style="color:var(--text-2)">載入中…</span>
       <span style="color:var(--text-3);font-size:10px">▾</span>
     </div>
-    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.40</span>
+    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.41</span>
   </div>
 </div>
 <div id="layout-wrap" style="display:flex;min-height:calc(100vh - var(--th))">
@@ -927,7 +927,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi" data-p="lib-cats"><span class="ic">🏷️</span>分類管理</div>
       <div class="navi" data-p="lib-cfg"><span class="ic">⚙️</span>系統設定</div>
     </div>
-    <div class="sbf">v1.40 · Supabase<br><span style="color:var(--ac)">● 本機存儲</span></div>
+    <div class="sbf">v1.41 · Supabase<br><span style="color:var(--ac)">● 本機存儲</span></div>
   </div>
   <div class="mc" id="lc">
     <div class="pg active" id="pg-lib-dash">
@@ -1009,7 +1009,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       
       <div class="navi cn" data-p="car-cfg"><span class="ic">⚙️</span>系統設定</div>
     </div>
-    <div class="sbf">v1.40 · Supabase<br><span style="color:var(--tl)">● 本機存儲</span></div>
+    <div class="sbf">v1.41 · Supabase<br><span style="color:var(--tl)">● 本機存儲</span></div>
   </div>
   <div class="mc cf" id="cc">
     <div class="pg active" id="pg-car-dash">
@@ -1101,7 +1101,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi tna active" data-p="trip-new"><span class="ic">➕</span>新增報支單</div>
       <div class="navi tna" data-p="trip-list"><span class="ic">📋</span>報支單清單</div>
     </div>
-    <div class="sbf">v1.40 · Supabase<br><span style="color:var(--yw)">● 本機存儲</span></div>
+    <div class="sbf">v1.41 · Supabase<br><span style="color:var(--yw)">● 本機存儲</span></div>
   </div>
   <div class="mc" id="tc">
 
@@ -1240,7 +1240,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi rna" data-p="room-report"><span class="ic">📊</span>使用率報表</div>
       <div class="navi rna" data-p="room-fault"><span class="ic">🔧</span>故障回報<span class="nbadge" id="nb-fault" style="display:none">0</span></div>
     </div>
-    <div class="sbf">v1.40 · Supabase<br><span style="color:var(--gn)">● 本機存儲</span></div>
+    <div class="sbf">v1.41 · Supabase<br><span style="color:var(--gn)">● 本機存儲</span></div>
   </div>
   <div class="mc" id="rmc">
 
@@ -1252,11 +1252,72 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
         <span id="room-clock" style="font-size:12px;color:var(--t3);margin-left:12px"></span>
       </div>
       <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;margin-bottom:20px" id="room-dash-cards"></div>
-      <!-- 快速新增預約按鈕 -->
-      <div style="margin-bottom:20px">
-        <button class="btn" style="background:var(--gn);color:#0f1117;border:none;cursor:pointer;padding:9px 20px;border-radius:var(--r);font-size:14px;font-weight:600;width:100%;display:flex;align-items:center;justify-content:center;gap:8px" onclick="navRoom('room-new')">
-          ➕ 新增會議室預約
-        </button>
+      <!-- 新增預約（嵌入狀態看板下方） -->
+      <div style="margin-bottom:20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;cursor:pointer" onclick="toggleInlineBkForm()" id="inline-bk-header">
+          <div style="font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px">➕ 新增會議室預約</div>
+          <span id="inline-bk-toggle" style="font-size:12px;color:var(--text-3)">展開 ▾</span>
+        </div>
+        <div id="inline-bk-body" style="display:none">
+          <!-- Step bar -->
+          <div class="step-bar" style="margin-bottom:16px">
+            <div class="step-item active" id="istep-1"><div class="step-num">1</div><div class="step-lbl">選時段</div></div>
+            <div class="step-item" id="istep-2"><div class="step-num">2</div><div class="step-lbl">選會議室</div></div>
+            <div class="step-item" id="istep-3"><div class="step-num">3</div><div class="step-lbl">填資料</div></div>
+          </div>
+          <!-- Step 1 -->
+          <div id="isc-1" class="step-content active">
+            <div class="fg2" style="margin-bottom:14px">
+              <div class="fg"><div class="fl">預約日期 *</div><input type="date" id="ibk-date" onchange="iUpdateSlots()"></div>
+              <div class="fg"><div class="fl">與會人數 *</div>
+                <select id="ibk-headcount" onchange="iUpdateSlots()">
+                  <option value="2">2人</option><option value="4">4人</option><option value="6">6人</option>
+                  <option value="8">8人</option><option value="10">10人</option><option value="12">12人</option>
+                  <option value="15">15人以上</option>
+                </select>
+              </div>
+            </div>
+            <div style="display:flex;gap:8px;margin-bottom:8px;align-items:center;flex-wrap:wrap">
+              <select id="ibk-dur" onchange="iUpdateSlots()">
+                <option value="30">30分鐘</option><option value="60" selected>1小時</option>
+                <option value="90">1.5小時</option><option value="120">2小時</option>
+                <option value="180">3小時</option><option value="240">4小時</option>
+              </select>
+              <span style="font-size:12px;color:var(--t3)">或手動：</span>
+              <input type="time" id="ibk-start" value="09:00" style="width:100px" onchange="iUpdateSlots()">
+              <span style="font-size:12px;color:var(--t3)">~</span>
+              <input type="time" id="ibk-end" value="10:00" style="width:100px" onchange="iUpdateSlots()">
+            </div>
+            <div id="ibk-slots" class="slot-grid" style="margin-bottom:12px"></div>
+            <button class="btn" style="background:var(--gn);color:#0f1117;padding:7px 16px;border-radius:var(--rs);font-size:13px;font-weight:600;border:none;cursor:pointer;width:100%" onclick="iBkStep1Next()">下一步：查看推薦會議室 →</button>
+          </div>
+          <!-- Step 2 -->
+          <div id="isc-2" class="step-content">
+            <div id="ibk-room-cards" style="display:flex;flex-direction:column;gap:12px;margin-bottom:14px"></div>
+            <div id="ibk-alt-slots" style="display:none">
+              <div class="fl" style="margin-bottom:8px;color:var(--yw)">⚠️ 所選時段已滿，其他可用時段：</div>
+              <div id="ibk-alt-list" class="slot-grid"></div>
+            </div>
+            <div style="display:flex;gap:10px;margin-top:4px">
+              <button class="btn bg2" onclick="iBkGoStep(1)">← 返回</button>
+              <button class="btn" style="background:var(--gn);color:#0f1117;padding:7px 16px;border-radius:var(--rs);font-size:13px;font-weight:600;border:none;cursor:pointer;flex:1" onclick="iBkStep2Next()">下一步：填寫資料 →</button>
+            </div>
+          </div>
+          <!-- Step 3 -->
+          <div id="isc-3" class="step-content">
+            <div style="background:var(--bg0);border-radius:var(--rs);padding:10px 14px;margin-bottom:14px;font-size:13px;line-height:1.7" id="ibk-summary-box"></div>
+            <div class="fg2">
+              <div class="fg full"><div class="fl">會議標題 *</div><input type="text" id="ibk-title" placeholder="例：Q3產品評審會議"></div>
+              <div class="fg full"><div class="fl">主辦人</div><select id="ibk-host"><option value="">請選擇…</option></select></div>
+              <div class="fg"><div class="fl">是否需要視訊</div><select id="ibk-vc"><option value="0">否</option><option value="1">是</option></select></div>
+              <div class="fg"><div class="fl">備註</div><input type="text" id="ibk-note" placeholder="其他需求"></div>
+            </div>
+            <div style="display:flex;gap:10px;margin-top:14px">
+              <button class="btn bg2" onclick="iBkGoStep(2)">← 返回</button>
+              <button class="btn" style="background:var(--gn);color:#0f1117;padding:7px 16px;border-radius:var(--rs);font-size:13px;font-weight:600;border:none;cursor:pointer;flex:1" onclick="iBkSave()">✓ 確認預約</button>
+            </div>
+          </div>
+        </div>
       </div>
       <!-- 今日時間軸快覽 -->
       <div class="sth" style="margin-bottom:10px"><div class="stt">今日時間軸</div><div class="ssub" id="room-today-label"></div></div>
@@ -1413,7 +1474,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi vna" data-p="visit-guests"><span class="ic">👥</span>來賓資料庫</div>
       <div class="navi vna" data-p="visit-report"><span class="ic">📊</span>接待報表</div>
     </div>
-    <div class="sbf">v1.40 · Supabase<br><span style="color:#a78bfa">● 本機存儲</span></div>
+    <div class="sbf">v1.41 · Supabase<br><span style="color:#a78bfa">● 本機存儲</span></div>
   </div>
   <div class="mc" id="vmc">
 
@@ -3728,7 +3789,6 @@ async function renderRoomDash(){
   renderDashCards(bks);
   renderDashGantt(bks);
   document.getElementById('room-today-label').textContent=todayStr2();
-  checkAutoRelease();
   updRoomBadge();
 }
 
@@ -3873,6 +3933,160 @@ function initBkForm(){
   const hs=document.getElementById('bk-host');
   if(hs)hs.innerHTML='<option value="">請選擇…</option>'+us.map(u=>`<option value="${u.id}">${u.name}（${u.dept||''}）</option>`).join('');
   updateSlots();
+}
+
+// ── Inline Booking Form (embedded in dash) ──
+let iBkStep=1,iBkSelectedSlot=null,iBkSelectedRoom=null;
+function toggleInlineBkForm(){
+  const body=document.getElementById('inline-bk-body');
+  const tog=document.getElementById('inline-bk-toggle');
+  if(!body)return;
+  const open=body.style.display==='none'||body.style.display==='';
+  body.style.display=open?'block':'none';
+  if(tog)tog.textContent=open?'收起 ▴':'展開 ▾';
+  if(open)iInitBkForm();
+}
+function iInitBkForm(){
+  iBkStep=1;iBkSelectedSlot=null;iBkSelectedRoom=null;
+  iBkGoStep(1);
+  const dateEl=document.getElementById('ibk-date');
+  if(dateEl&&!dateEl.value)dateEl.value=todayStr2();
+  const us=ld(K.us);
+  const hs=document.getElementById('ibk-host');
+  if(hs)hs.innerHTML='<option value="">請選擇…</option>'+us.map(u=>`<option value="${u.id}">${u.name}（${u.dept||''}）</option>`).join('');
+  iUpdateSlots();
+}
+function iBkGoStep(n){
+  iBkStep=n;
+  [1,2,3].forEach(i=>{
+    const si=document.getElementById(`istep-${i}`);
+    const sc=document.getElementById(`isc-${i}`);
+    if(si){si.classList.toggle('active',i===n);si.classList.toggle('done',i<n);}
+    if(sc)sc.classList.toggle('active',i===n);
+  });
+}
+function iUpdateSlots(){
+  const dateEl=document.getElementById('ibk-date');
+  const sEl=document.getElementById('ibk-start');const eEl=document.getElementById('ibk-end');
+  const durEl=document.getElementById('ibk-dur');
+  if(!dateEl?.value)return;
+  const date=dateEl.value;const dur=parseInt(durEl?.value||60);
+  if(sEl?.value){const sm=timeToMin(sEl.value);const em=sm+dur;if(em<=ROOM_HOURS.end*60){eEl.value=minToTime(em);}}
+  const bks=getBookings().filter(b=>b.date===date&&b.status!=='cancelled');
+  const slots=[];
+  for(let m=ROOM_HOURS.start*60;m+dur<=ROOM_HOURS.end*60;m+=30){
+    const start=minToTime(m);const end=minToTime(m+dur);
+    const freeRooms=ROOMS.filter(room=>!bks.some(b=>b.roomId===room.id&&timeToMin(b.start)<m+dur&&timeToMin(b.end)>m));
+    const now=new Date();const slotDT=new Date(date+'T'+start+':00');const past=slotDT<now;
+    slots.push({start,end,freeRooms,past});
+  }
+  const el=document.getElementById('ibk-slots');if(!el)return;
+  el.innerHTML=slots.map(s=>{
+    const sel=iBkSelectedSlot&&iBkSelectedSlot.start===s.start&&iBkSelectedSlot.end===s.end;
+    const cls=s.past?'slot-busy':s.freeRooms.length===0?'slot-busy':sel?'slot-sel':'';
+    const label=s.past?'過去':s.freeRooms.length===0?'全滿':(s.freeRooms.length===2?'2間可用':'1間可用');
+    return `<div class="slot ${cls}" onclick="${s.past||s.freeRooms.length===0?'':'iSelectSlot(this,\"'+s.start+'\",\"'+s.end+'\")'}">${s.start}<br><span style="font-size:9px;opacity:.8">${label}</span></div>`;
+  }).join('');
+  if(sEl&&eEl&&iBkSelectedSlot){sEl.value=iBkSelectedSlot.start;eEl.value=iBkSelectedSlot.end;}
+}
+function iSelectSlot(el,start,end){
+  document.querySelectorAll('#ibk-slots .slot').forEach(s=>s.classList.remove('slot-sel'));
+  el.classList.add('slot-sel');
+  iBkSelectedSlot={start,end};
+  const sEl=document.getElementById('ibk-start');const eEl=document.getElementById('ibk-end');
+  if(sEl)sEl.value=start;if(eEl)eEl.value=end;
+}
+function iBkStep1Next(){
+  const dateEl=document.getElementById('ibk-date');
+  const sEl=document.getElementById('ibk-start');const eEl=document.getElementById('ibk-end');
+  if(!dateEl?.value){toast('請選擇日期','error');return;}
+  if(!iBkSelectedSlot&&sEl?.value&&eEl?.value)iBkSelectedSlot={start:sEl.value,end:eEl.value};
+  if(!iBkSelectedSlot){toast('請選擇時段','error');return;}
+  if(timeToMin(iBkSelectedSlot.end)<=timeToMin(iBkSelectedSlot.start)){toast('結束時間必須晚於開始','error');return;}
+  iBkGoStep(2);iRenderRoomRecommend();
+}
+function iRenderRoomRecommend(){
+  if(!iBkSelectedSlot)return;
+  const date=document.getElementById('ibk-date')?.value||todayStr2();
+  const headcount=parseInt(document.getElementById('ibk-headcount')?.value)||1;
+  const{start,end}=iBkSelectedSlot;
+  const bks=getBookings().filter(b=>b.date===date&&b.status!=='cancelled');
+  const el=document.getElementById('ibk-room-cards');if(!el)return;
+  const preferSmall=headcount<=6;
+  const sortedRooms=[...ROOMS].sort((a,b2)=>{
+    const aSmall=a.cap<=8;const bSmall=b2.cap<=8;
+    if(preferSmall&&aSmall&&!bSmall)return -1;if(preferSmall&&!aSmall&&bSmall)return 1;
+    if(!preferSmall&&!aSmall&&bSmall)return -1;if(!preferSmall&&aSmall&&!bSmall)return 1;return 0;
+  });
+  let html='';let hasAny=false;
+  sortedRooms.forEach(room=>{
+    const conflict=bks.find(b=>b.roomId===room.id&&timeToMin(b.start)<timeToMin(end)&&timeToMin(b.end)>timeToMin(start));
+    const suitable=headcount<=room.cap;
+    const isPreferred=preferSmall?(room.cap<=8):(room.cap>8);
+    const recommended=!conflict&&suitable&&isPreferred;
+    if(!conflict)hasAny=true;
+    const sel=iBkSelectedRoom===room.id;
+    html+=`<div data-room-id="${room.id}" style="border:2px solid ${sel?'var(--gn)':conflict?'var(--rd)':'var(--bd)'};border-radius:var(--r);padding:13px;cursor:${conflict?'not-allowed':'pointer'};background:${sel?'rgba(34,197,94,.08)':'var(--bg0)'};" onclick="${conflict?'':` iBkSelectRoom('${room.id}')`}">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <span style="font-size:14px;font-weight:700">${room.icon} ${room.name}</span>
+        <span class="badge ${conflict?'br':recommended?'bg':suitable?'ba':'by'}">${conflict?'時段衝突':recommended?'✓ 推薦':suitable?'可預約':'容量不足'}</span>
+      </div>
+      <div style="font-size:12px;color:var(--t3)">容量 ${room.cap} 人${headcount>room.cap?' ⚠ 超出':''} · ${room.equip.join('、')}</div>
+      ${conflict?`<div style="font-size:11px;color:var(--rd);margin-top:4px">⚠ ${conflict.title||'—'} (${conflict.start}–${conflict.end})</div>`:''}
+      ${recommended?`<div style="font-size:11px;color:var(--gn);margin-top:4px">👍 ${headcount}人推薦</div>`:''}
+    </div>`;
+  });
+  el.innerHTML=html;
+  const altEl=document.getElementById('ibk-alt-slots');const altList=document.getElementById('ibk-alt-list');
+  if(!hasAny&&altEl&&altList){
+    altEl.style.display='';const dur=timeToMin(end)-timeToMin(start);const alts=[];
+    for(let m=ROOM_HOURS.start*60;m+dur<=ROOM_HOURS.end*60;m+=30){
+      const as=minToTime(m);const ae=minToTime(m+dur);
+      const fr=ROOMS.filter(r=>!bks.some(b=>b.roomId===r.id&&timeToMin(b.start)<m+dur&&timeToMin(b.end)>m));
+      if(fr.length)alts.push({start:as,end:ae,rooms:fr});
+    }
+    altList.innerHTML=alts.slice(0,8).map(a=>`<div class="slot" onclick="iSelectAltSlot('${a.start}','${a.end}')">${a.start}<br><span style="font-size:9px">${a.rooms.length}間可用</span></div>`).join('');
+  }else if(altEl)altEl.style.display='none';
+}
+function iBkSelectRoom(id){iBkSelectedRoom=id;iRenderRoomRecommend();}
+function iSelectAltSlot(s,e){iBkSelectedSlot={start:s,end:e};iBkSelectedRoom=null;iRenderRoomRecommend();}
+function iBkStep2Next(){
+  if(!iBkSelectedRoom){toast('請選擇會議室','error');return;}
+  iBkGoStep(3);
+  const date=document.getElementById('ibk-date').value;
+  const room=ROOMS.find(r=>r.id===iBkSelectedRoom);
+  const el=document.getElementById('ibk-summary-box');
+  if(el)el.innerHTML=`<b>${room?.name||'—'}</b> · <b>${date}</b> · <b>${iBkSelectedSlot.start}–${iBkSelectedSlot.end}</b><br>與會人數：${document.getElementById('ibk-headcount').value} 人`;
+}
+async function iBkSave(){
+  const title=document.getElementById('ibk-title')?.value.trim();
+  if(!title){toast('請填寫會議標題','error');return;}
+  if(!iBkSelectedRoom){toast('請先選擇會議室','error');return;}
+  const date=document.getElementById('ibk-date').value;
+  const bk={
+    id:uid(),roomId:iBkSelectedRoom,date,
+    start:iBkSelectedSlot.start,end:iBkSelectedSlot.end,
+    title,headcount:parseInt(document.getElementById('ibk-headcount').value)||1,
+    hostId:document.getElementById('ibk-host').value,
+    vc:document.getElementById('ibk-vc').value==='1',
+    note:document.getElementById('ibk-note').value.trim(),
+    emails:'',status:'confirmed',createdAt:new Date().toISOString(),checkedIn:false,
+  };
+  const existing=getBookings().filter(b=>b.roomId===iBkSelectedRoom&&b.date===date&&b.status!=='cancelled');
+  if(existing.some(b=>timeToMin(b.start)<timeToMin(bk.end)&&timeToMin(b.end)>timeToMin(bk.start))){
+    toast('⚠ 時段衝突，請重新選擇','error');iBkGoStep(2);iRenderRoomRecommend();return;
+  }
+  const arr=getBookings();arr.push(bk);saveBookings(arr);
+  saveRoomBooking(bk);
+  const roomName=ROOMS.find(r=>r.id===iBkSelectedRoom)?.name||'—';
+  toast(`✓ 已預約${roomName} ${bk.start}–${bk.end}「${title}」`,'success');
+  updRoomBadge();
+  // 收起表單並刷新看板
+  const body=document.getElementById('inline-bk-body');
+  const tog=document.getElementById('inline-bk-toggle');
+  if(body)body.style.display='none';
+  if(tog)tog.textContent='展開 ▾';
+  renderRoomDash();
 }
 function bkGoStep(n){
   bkStep=n;
@@ -4124,16 +4338,20 @@ function checkinAction(started){
   toast(started?'已確認報到，會議進行中':'已取消預約，會議室已釋出','success');
   renderRoomDash();renderRoomList();updRoomBadge();
 }
+let _autoReleaseLastRun=0; // ms timestamp，避免同一秒內重複執行
 function checkAutoReleaseWithToast(bksOverride){
-  const now=new Date();const bks=bksOverride||getBookings();let released=[];
+  const now=Date.now();
+  // 2秒內重複呼叫直接跳過（switchMod + renderRoomDash 同時觸發的防護）
+  if(now-_autoReleaseLastRun<2000)return;
+  _autoReleaseLastRun=now;
+  const nowDate=new Date();const bks=bksOverride||getBookings();let released=[];
   bks.forEach((b,i)=>{
     if(b.status!=='confirmed')return;
     const startDT=new Date(b.date+'T'+b.start+':00');
-    const minsAfterStart=(now-startDT)/60000;
+    const minsAfterStart=(nowDate-startDT)/60000;
     if(minsAfterStart>=15&&!b.checkedIn){
       bks[i].status='cancelled';bks[i].autoReleased=true;
       released.push(b.title||'會議');
-      console.warn('auto released:', b.title||'會議');
     }
   });
   if(released.length){

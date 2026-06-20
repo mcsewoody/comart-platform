@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" href="data:,">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART 行政管理平台 v1.51</title>
+<title>COMART 行政管理平台 v1.52</title>
 <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.js"></script>
 <style>
 :root{
@@ -151,7 +151,7 @@ body{font-family:'Segoe UI','PingFang TC','Microsoft JhengHei',sans-serif;backgr
 .navi .ic{font-size:15px;width:18px;text-align:center}
 .nbadge{margin-left:auto;background:var(--rd);color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;min-width:18px;text-align:center}
 .sbf{margin-top:auto;padding:10px 8px;border-top:1px solid var(--border);font-size:11px;color:var(--text-3)}
-.mc{flex:1;padding:20px 24px;overflow-y:auto}
+.mc{flex:1;padding:20px 24px;overflow-y:auto;overflow-x:hidden;min-width:0;}
 .pg{display:none}.pg.active{display:block}
 .sg{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin-bottom:20px}
 .sc{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius);padding:15px 17px}
@@ -296,10 +296,10 @@ input[type=time]::-webkit-calendar-picker-indicator{
 .room-equip{display:flex;gap:6px;flex-wrap:wrap}
 .equip-tag{font-size:11px;padding:2px 7px;border-radius:4px;background:var(--acd2);color:var(--ac)}
 /* Gantt */
-.gantt-wrap{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;cursor:grab;user-select:none;}
+.gantt-wrap{display:block;width:100%;box-sizing:border-box;background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);overflow-x:scroll;overflow-y:hidden;-webkit-overflow-scrolling:touch;cursor:grab;user-select:none;}
 .gantt-wrap.dragging{cursor:grabbing;}
 .gantt-head{display:flex;background:var(--bg1);border-bottom:1px solid var(--bd);}
-.gantt-inner{display:block;/* width set by JS */}
+.gantt-inner{display:block;}
 .gantt-label-col{width:110px;flex-shrink:0;padding:8px 12px;font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;border-right:1px solid var(--bd)}
 .gantt-time-row{flex:1;display:flex;position:relative;overflow:hidden}
 .gantt-hour{flex:1;border-right:1px solid var(--bd);text-align:center;font-size:10px;color:var(--t3);padding:4px 2px;white-space:nowrap}
@@ -981,7 +981,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="logo">
     <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
     <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
-    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.51</span>
+    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.52</span>
   </div>
   <div class="trr">
     <div style="display:flex;align-items:center;gap:6px;padding:4px 12px;background:var(--surface-2);border:1px solid var(--border);border-radius:20px;font-size:12px;cursor:pointer" onclick="showUsw()" id="topbar-user">
@@ -989,7 +989,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <span id="cur-u" style="color:var(--text-2)">載入中…</span>
       <span style="color:var(--text-3);font-size:10px">▾</span>
     </div>
-    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.51</span>
+    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.52</span>
   </div>
 </div>
 <!-- ══ 手機版：模塊 tab bar（桌面隱藏）══ -->
@@ -1072,7 +1072,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi" data-p="lib-cats"><span class="ic">🏷️</span>分類管理</div>
       <div class="navi" data-p="lib-cfg"><span class="ic">⚙️</span>系統設定</div>
     </div>
-    <div class="sbf">v1.51 · Supabase<br><span style="color:var(--ac)">● 本機存儲</span></div>
+    <div class="sbf">v1.52 · Supabase<br><span style="color:var(--ac)">● 本機存儲</span></div>
   </div>
   <div class="mc" id="lc">
     <div class="pg active" id="pg-lib-dash">
@@ -1154,7 +1154,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       
       <div class="navi cn" data-p="car-cfg"><span class="ic">⚙️</span>系統設定</div>
     </div>
-    <div class="sbf">v1.51 · Supabase<br><span style="color:var(--tl)">● 本機存儲</span></div>
+    <div class="sbf">v1.52 · Supabase<br><span style="color:var(--tl)">● 本機存儲</span></div>
   </div>
   <div class="mc cf" id="cc">
     <div class="pg active" id="pg-car-dash">
@@ -1246,7 +1246,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi tna active" data-p="trip-new"><span class="ic">➕</span>新增報支單</div>
       <div class="navi tna" data-p="trip-list"><span class="ic">📋</span>報支單清單</div>
     </div>
-    <div class="sbf">v1.51 · Supabase<br><span style="color:var(--yw)">● 本機存儲</span></div>
+    <div class="sbf">v1.52 · Supabase<br><span style="color:var(--yw)">● 本機存儲</span></div>
   </div>
   <div class="mc" id="tc">
 
@@ -1385,7 +1385,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi rna" data-p="room-report"><span class="ic">📊</span>使用率報表</div>
       <div class="navi rna" data-p="room-fault"><span class="ic">🔧</span>故障回報<span class="nbadge" id="nb-fault" style="display:none">0</span></div>
     </div>
-    <div class="sbf">v1.51 · Supabase<br><span style="color:var(--gn)">● 本機存儲</span></div>
+    <div class="sbf">v1.52 · Supabase<br><span style="color:var(--gn)">● 本機存儲</span></div>
   </div>
   <div class="mc" id="rmc">
 
@@ -1619,7 +1619,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi vna" data-p="visit-guests"><span class="ic">👥</span>來賓資料庫</div>
       <div class="navi vna" data-p="visit-report"><span class="ic">📊</span>接待報表</div>
     </div>
-    <div class="sbf">v1.51 · Supabase<br><span style="color:#a78bfa">● 本機存儲</span></div>
+    <div class="sbf">v1.52 · Supabase<br><span style="color:#a78bfa">● 本機存儲</span></div>
   </div>
   <div class="mc" id="vmc">
 
@@ -2700,17 +2700,17 @@ function switchMod(m){
 // ══ 手機版導覽 JS ══
 const MOBILE_SUBNAV = {
   room:[
-    {p:'room-dash',ic:'🏠',lb:'看板'},
+    {p:'room-dash',ic:'📊',lb:'看板'},
     {p:'room-new',ic:'➕',lb:'新增預約'},
     {p:'room-cal',ic:'📅',lb:'日曆'},
     {p:'room-list',ic:'📋',lb:'預約清單'},
     {p:'room-checkin',ic:'✅',lb:'報到'},
     {p:'room-fault',ic:'🔧',lb:'故障回報'},
-    {p:'room-report',ic:'📊',lb:'報表'},
+    {p:'room-report',ic:'📈',lb:'報表'},
     {p:'room-cfg',ic:'⚙️',lb:'設定'},
   ],
   car:[
-    {p:'car-dash',ic:'🏠',lb:'看板'},
+    {p:'car-dash',ic:'📊',lb:'看板'},
     {p:'car-use',ic:'🚗',lb:'用車申請'},
     {p:'car-cal',ic:'📅',lb:'行程表'},
     {p:'car-fuel',ic:'⛽',lb:'加油'},
@@ -2720,7 +2720,7 @@ const MOBILE_SUBNAV = {
     {p:'car-cfg',ic:'⚙️',lb:'設定'},
   ],
   lib:[
-    {p:'lib-dash',ic:'🏠',lb:'總覽'},
+    {p:'lib-dash',ic:'📊',lb:'總覽'},
     {p:'lib-books',ic:'📖',lb:'書目'},
     {p:'lib-loans',ic:'📋',lb:'借閱'},
     {p:'lib-borrow',ic:'➕',lb:'借書'},
@@ -2730,10 +2730,10 @@ const MOBILE_SUBNAV = {
     {p:'lib-cfg',ic:'⚙️',lb:'設定'},
   ],
   visit:[
-    {p:'visit-dash',ic:'🏠',lb:'總覽'},
+    {p:'visit-dash',ic:'📊',lb:'總覽'},
     {p:'visit-new',ic:'➕',lb:'新增'},
     {p:'visit-list',ic:'📋',lb:'清單'},
-    {p:'visit-report',ic:'📊',lb:'報表'},
+    {p:'visit-report',ic:'📈',lb:'報表'},
   ],
   trip:[
     {p:'trip-new',ic:'➕',lb:'新增'},
@@ -5539,11 +5539,14 @@ function AC(){
   return L_actx;
 }
 async function ensureAudio(){
-  AC();
-  if(L_actx.state!=='running'){
-    try{ await L_actx.resume(); }catch(e){}
-    // 等 AudioContext 真正 running 後才播音（currentTime 開始走）
-    await new Promise(r=>setTimeout(r,80));
+  if(!L_actx) L_actx=new (window.AudioContext||window.webkitAudioContext)();
+  if(L_actx.state==='running') return;
+  try{ await L_actx.resume(); }catch(e){}
+  // iOS 有時 resume() resolve 了但 state 還不是 running，輪詢等待
+  let tries=0;
+  while(L_actx.state!=='running'&&tries<20){
+    await new Promise(r=>setTimeout(r,50));
+    tries++;
   }
 }
 function ensureAudioSync(){
@@ -5552,12 +5555,18 @@ function ensureAudioSync(){
 }
 function toggleMute(){L_muted=!L_muted;document.getElementById('muteTag').textContent=L_muted?'🔇 音效關':'🔊 音效開';if(L_muted)stopBgm();}
 function note(freq,dur,t0,gain=0.16,type='triangle'){
-  if(L_muted)return; const c=AC(); const t=c.currentTime+t0;
+  if(L_muted||!L_actx)return;
+  if(L_actx.state!=='running')return; // 未 running 不排程
+  const c=L_actx;
+  const now=c.currentTime;
+  const t=now + Math.max(t0, 0.005); // 確保排程在未來
   const o=c.createOscillator(),g=c.createGain();
   o.type=type;o.frequency.setValueAtTime(freq,t);
-  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(gain,t+0.015);
+  g.gain.setValueAtTime(0,t);
+  g.gain.linearRampToValueAtTime(gain,t+0.015);
   g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
-  o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+dur);
+  o.connect(g);g.connect(c.destination);
+  o.start(t);o.stop(t+dur+0.05);
 }
 const L_NF={C5:523.25,D5:587.33,E5:659.25,F5:698.46,G5:783.99,A5:880,B5:987.77,C6:1046.5,D6:1174.66,E6:1318.51,G6:1567.98};
 function playMelody(speed){

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" href="data:,">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART 行政管理平台 v1.47</title>
+<title>COMART 行政管理平台 v1.48</title>
 <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.js"></script>
 <style>
 :root{
@@ -248,8 +248,10 @@ input[type=time]::-webkit-calendar-picker-indicator{
 .room-equip{display:flex;gap:6px;flex-wrap:wrap}
 .equip-tag{font-size:11px;padding:2px 7px;border-radius:4px;background:var(--acd2);color:var(--ac)}
 /* Gantt */
-.gantt-wrap{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden}
-.gantt-head{display:flex;background:var(--bg1);border-bottom:1px solid var(--bd);position:sticky;top:0;z-index:10}
+.gantt-wrap{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;cursor:grab;user-select:none;}
+.gantt-wrap.dragging{cursor:grabbing;}
+.gantt-head{display:flex;background:var(--bg1);border-bottom:1px solid var(--bd);}
+.gantt-inner{min-width:max-content;}
 .gantt-label-col{width:110px;flex-shrink:0;padding:8px 12px;font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;border-right:1px solid var(--bd)}
 .gantt-time-row{flex:1;display:flex;position:relative;overflow:hidden}
 .gantt-hour{flex:1;border-right:1px solid var(--bd);text-align:center;font-size:10px;color:var(--t3);padding:4px 2px;white-space:nowrap}
@@ -435,7 +437,8 @@ tr.ovr td{background:rgba(239,68,68,.04)}
     border-bottom:2px solid transparent;margin-bottom:-2px;
     cursor:pointer;transition:all .15s;min-width:50px;position:relative;
   }
-  .mm-item.active{color:var(--blue);border-bottom-color:var(--blue)}
+  .mm-item.active{color:#4361EE;border-bottom-color:#4361EE;background:rgba(67,97,238,.12);}
+  .mm-item.active .mm-ico{filter:drop-shadow(0 0 4px rgba(67,97,238,.8));}
   .mm-item .mm-ico{font-size:20px;line-height:1}
   .mm-item .mm-lbl{font-size:9px;font-weight:500}
   .mm-item .tbadge{position:absolute;top:3px;right:4px;min-width:13px;height:13px;font-size:8px;padding:0 2px}
@@ -917,7 +920,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="logo">
     <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
     <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
-    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.47</span>
+    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.48</span>
   </div>
   <div class="trr">
     <div style="display:flex;align-items:center;gap:6px;padding:4px 12px;background:var(--surface-2);border:1px solid var(--border);border-radius:20px;font-size:12px;cursor:pointer" onclick="showUsw()" id="topbar-user">
@@ -925,7 +928,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <span id="cur-u" style="color:var(--text-2)">載入中…</span>
       <span style="color:var(--text-3);font-size:10px">▾</span>
     </div>
-    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.47</span>
+    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.48</span>
   </div>
 </div>
 <!-- ══ 手機版：模塊 tab bar（桌面隱藏）══ -->
@@ -1006,7 +1009,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi" data-p="lib-cats"><span class="ic">🏷️</span>分類管理</div>
       <div class="navi" data-p="lib-cfg"><span class="ic">⚙️</span>系統設定</div>
     </div>
-    <div class="sbf">v1.47 · Supabase<br><span style="color:var(--ac)">● 本機存儲</span></div>
+    <div class="sbf">v1.48 · Supabase<br><span style="color:var(--ac)">● 本機存儲</span></div>
   </div>
   <div class="mc" id="lc">
     <div class="pg active" id="pg-lib-dash">
@@ -1088,7 +1091,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       
       <div class="navi cn" data-p="car-cfg"><span class="ic">⚙️</span>系統設定</div>
     </div>
-    <div class="sbf">v1.47 · Supabase<br><span style="color:var(--tl)">● 本機存儲</span></div>
+    <div class="sbf">v1.48 · Supabase<br><span style="color:var(--tl)">● 本機存儲</span></div>
   </div>
   <div class="mc cf" id="cc">
     <div class="pg active" id="pg-car-dash">
@@ -1180,7 +1183,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi tna active" data-p="trip-new"><span class="ic">➕</span>新增報支單</div>
       <div class="navi tna" data-p="trip-list"><span class="ic">📋</span>報支單清單</div>
     </div>
-    <div class="sbf">v1.47 · Supabase<br><span style="color:var(--yw)">● 本機存儲</span></div>
+    <div class="sbf">v1.48 · Supabase<br><span style="color:var(--yw)">● 本機存儲</span></div>
   </div>
   <div class="mc" id="tc">
 
@@ -1319,7 +1322,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi rna" data-p="room-report"><span class="ic">📊</span>使用率報表</div>
       <div class="navi rna" data-p="room-fault"><span class="ic">🔧</span>故障回報<span class="nbadge" id="nb-fault" style="display:none">0</span></div>
     </div>
-    <div class="sbf">v1.47 · Supabase<br><span style="color:var(--gn)">● 本機存儲</span></div>
+    <div class="sbf">v1.48 · Supabase<br><span style="color:var(--gn)">● 本機存儲</span></div>
   </div>
   <div class="mc" id="rmc">
 
@@ -1553,7 +1556,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi vna" data-p="visit-guests"><span class="ic">👥</span>來賓資料庫</div>
       <div class="navi vna" data-p="visit-report"><span class="ic">📊</span>接待報表</div>
     </div>
-    <div class="sbf">v1.47 · Supabase<br><span style="color:#a78bfa">● 本機存儲</span></div>
+    <div class="sbf">v1.48 · Supabase<br><span style="color:#a78bfa">● 本機存儲</span></div>
   </div>
   <div class="mc" id="vmc">
 
@@ -1726,6 +1729,20 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
         <option value="all">全部人員</option>
       </select>
       <span id="lotto-site-count" style="font-size:12px;color:#a78bfa;letter-spacing:1px;"></span>
+    </div>
+    <!-- 不重複開關 -->
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;background:rgba(255,255,255,.04);border:1px solid rgba(202,220,252,.15);border-radius:12px;padding:10px 16px;flex-wrap:wrap;gap:10px">
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;color:#CADCFC">
+        <input type="checkbox" id="noRepeatToggle" onchange="toggleNoRepeat()" style="width:16px;height:16px;cursor:pointer;accent-color:#4361EE">
+        不重複抽選
+      </label>
+      <span id="drawn-remain" style="font-size:12px;color:#9aa6d6;flex:1;text-align:right"></span>
+      <button id="reset-drawn-btn" onclick="resetDrawn()" style="display:none;font-size:11px;padding:4px 10px;border-radius:999px;border:1px solid rgba(202,220,252,.25);background:rgba(255,255,255,.06);color:#9aa6d6;cursor:pointer">重置已抽</button>
+    </div>
+    <!-- 已抽名單 -->
+    <div id="drawn-list-wrap" style="display:none;width:100%;max-width:800px;background:rgba(255,255,255,.03);border:1px solid rgba(202,220,252,.12);border-radius:12px;padding:12px 14px;margin-bottom:16px">
+      <div style="font-size:11px;color:#6b76a8;letter-spacing:1px;margin-bottom:8px">已抽中名單（最新在前）</div>
+      <div id="drawn-list" style="display:flex;flex-wrap:wrap;gap:6px"></div>
     </div>
     <div class="cards">
       <div class="mode-card" onclick="openStage('slot')">
@@ -3979,6 +3996,7 @@ async function renderRoomDash(){
   renderDashGantt(bks);
   document.getElementById('room-today-label').textContent=todayStr2();
   updRoomBadge();
+  setTimeout(initGanttDrag,100);
 }
 
 function updateRoomClock(){
@@ -4045,6 +4063,7 @@ async function renderRoomCal(){
   const bks=allBks.filter(b=>b.date===d&&b.status!=='cancelled');
   document.getElementById('room-full-gantt').innerHTML=buildGantt(bks);
   requestAnimationFrame(drawNowLine);
+  setTimeout(initGanttDrag,100);
 }
 function calRoomMov(dir){calRoomDate.setDate(calRoomDate.getDate()+dir);renderRoomCal();}
 function calRoomToday(){calRoomDate=new Date();renderRoomCal();}
@@ -4052,14 +4071,16 @@ function calRoomToday(){calRoomDate=new Date();renderRoomCal();}
 // ── Gantt builder ──
 function buildGantt(bks){
   const hours=Array.from({length:ROOM_HOURS.end-ROOM_HOURS.start},(_,i)=>ROOM_HOURS.start+i);
-  const hourW=100/(ROOM_HOURS.end-ROOM_HOURS.start);
-  let h=`<div class="gantt-head"><div class="gantt-label-col">會議室</div><div class="gantt-time-row">`;
-  hours.forEach(hr=>h+=`<div class="gantt-hour" style="width:${hourW}%">${String(hr).padStart(2,'0')}:00</div>`);
+  const hourW=64; // px per hour — 固定寬度，讓手機可橫滑
+  const totalW=hours.length*hourW;
+  let h=`<div class="gantt-inner" style="min-width:${totalW+100}px">`;
+  h+=`<div class="gantt-head"><div class="gantt-label-col">會議室</div><div class="gantt-time-row" style="width:${totalW}px;flex-shrink:0">`;
+  hours.forEach(hr=>h+=`<div class="gantt-hour" style="width:${hourW}px;flex-shrink:0">${String(hr).padStart(2,'0')}:00</div>`);
   h+=`</div></div>`;
   ROOMS.forEach(room=>{
     const roomBks=bks.filter(b=>b.roomId===room.id);
     h+=`<div class="gantt-row"><div class="gantt-room-label">${room.icon} ${room.name}</div>
-    <div class="gantt-timeline" onclick="ganttClick(event,'${room.id}',this)" id="gtl-${room.id}">
+    <div class="gantt-timeline" style="width:${totalW}px;flex-shrink:0;position:relative" onclick="ganttClick(event,'${room.id}',this)" id="gtl-${room.id}">
       <div class="gantt-now-line" id="gnl-${room.id}"></div>`;
     roomBks.forEach(bk=>{
       const st=bkStatus(bk);
@@ -4070,7 +4091,20 @@ function buildGantt(bks){
     });
     h+=`</div></div>`;
   });
+  h+=`</div>`;
   return h;
+}
+function initGanttDrag(){
+  document.querySelectorAll('.gantt-wrap').forEach(wrap=>{
+    let isDown=false,startX=0,scrollL=0;
+    wrap.addEventListener('mousedown',e=>{isDown=true;wrap.classList.add('dragging');startX=e.pageX-wrap.offsetLeft;scrollL=wrap.scrollLeft;});
+    wrap.addEventListener('mouseleave',()=>{isDown=false;wrap.classList.remove('dragging');});
+    wrap.addEventListener('mouseup',()=>{isDown=false;wrap.classList.remove('dragging');});
+    wrap.addEventListener('mousemove',e=>{if(!isDown)return;e.preventDefault();const x=e.pageX-wrap.offsetLeft;wrap.scrollLeft=scrollL-(x-startX);});
+    // touch
+    wrap.addEventListener('touchstart',e=>{startX=e.touches[0].pageX;scrollL=wrap.scrollLeft;},{passive:true});
+    wrap.addEventListener('touchmove',e=>{const x=e.touches[0].pageX;wrap.scrollLeft=scrollL-(x-startX);},{passive:true});
+  });
 }
 function drawNowLine(){
   const now=new Date();
@@ -5289,6 +5323,18 @@ async function seedVisitDemo(){
 // ══ LOTTERY INIT（Admin 整合）══
 let _lottoAllUsers = []; // 全部使用者快取
 
+function toggleNoRepeat(){
+  L_noRepeat=document.getElementById('noRepeatToggle')?.checked||false;
+  const btn=document.getElementById('reset-drawn-btn');
+  if(btn)btn.style.display=L_noRepeat?'':'none';
+  if(!L_noRepeat){L_drawn=[];}
+  renderDrawnList();
+}
+function resetDrawn(){
+  L_drawn=[];renderDrawnList();
+  toast && toast('已重置抽選紀錄','success');
+}
+
 function lottoInit(){
   const us = ld(K.us)||[];
   _lottoAllUsers = us.filter(u=>u.active!==false);
@@ -5331,9 +5377,36 @@ function lottoFilterSite(){
 
 /* ===================== 名單 ===================== */
 let POOL = [];
+let L_noRepeat = false;
+let L_drawn = [];
 const L_rand = n => Math.floor(Math.random()*n);
 const L_pickIdx = () => L_rand(POOL.length);
-const L_pick = () => POOL[L_pickIdx()];
+function L_pickSafe(){
+  const avail = L_noRepeat ? POOL.filter(n=>!L_drawn.includes(n)) : POOL;
+  if(!avail.length){
+    if(L_noRepeat){ L_drawn=[]; renderDrawnList(); toast && toast('全員已抽完，重新開始','warn'); }
+    return POOL[L_rand(POOL.length)];
+  }
+  return avail[L_rand(avail.length)];
+}
+const L_pick = () => L_pickSafe();
+function addDrawn(name){
+  if(!L_drawn.includes(name)) L_drawn.push(name);
+  renderDrawnList();
+}
+function renderDrawnList(){
+  const el=document.getElementById('drawn-list-wrap');
+  if(!el)return;
+  if(!L_noRepeat||!L_drawn.length){el.style.display='none';return;}
+  el.style.display='block';
+  const list=document.getElementById('drawn-list');
+  if(list) list.innerHTML=[...L_drawn].reverse().map((n,i)=>
+    `<span style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:rgba(67,97,238,.15);border:1px solid rgba(67,97,238,.3);border-radius:999px;font-size:12px;color:#CADCFC">
+      <span style="opacity:.6;font-size:10px">#${L_drawn.length-i}</span>${n}
+    </span>`).join('');
+  const rem=document.getElementById('drawn-remain');
+  if(rem) rem.textContent=`剩 ${POOL.filter(n=>!L_drawn.includes(n)).length}/${POOL.length}`;
+}
 const L_DURATION = 5000;
 document.getElementById('poolCount').textContent = POOL.length;
 function escapeHtml(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
@@ -5384,6 +5457,7 @@ function openStage(m){ AC(); L_current=m; document.getElementById('menu').style.
 function goMenu(){ if(L_busy)return; L_current=null; stopBgm();
   document.querySelectorAll('.stage').forEach(s=>s.classList.remove('active'));
   document.getElementById('menu').style.display='flex';
+  renderDrawnList();
 }
 
 /* ===================== 模式一：老虎機 ===================== */
@@ -5397,17 +5471,26 @@ function initSlot(){ ['reel0','reel1','reel2'].forEach(fillReel); }
 function runSlot(){
   if(L_busy)return; L_busy=true; document.getElementById('btn-slot').disabled=true;
   const winner=L_pick();
+  const ROW=50; // 必須與 CSS .reel-track div{height:50px} 一致
+  const reelH=document.querySelector('#panel-lottery .reel')?.offsetHeight||120;
+  const centerOffset=Math.floor(reelH/2)-Math.floor(ROW/2); // 使得 row 垂直置中於 reel
   const reels=['reel0','reel1','reel2'].map(id=>({el:document.getElementById(id),seq:fillReel(id)}));
+  // 把 winner 放在第 36 個 slot
   reels.forEach(r=>{ r.el.children[36].textContent=winner; });
-  const ROW=60; const stops=[L_DURATION-1400,L_DURATION-700,L_DURATION];
+  const stops=[L_DURATION-1400,L_DURATION-700,L_DURATION];
   startBgm(); let tickTimer=setInterval(blip,90);
   const start=performance.now();
   reels.forEach((r,idx)=>{
-    const target=36*ROW-(170/2-30); const stopAt=stops[idx];
+    const target=36*ROW - centerOffset;
+    const stopAt=stops[idx];
     function anim(now){
       const t=now-start;
-      if(t>=stopAt){ r.el.style.transform=`translateY(${-target}px)`; note(L_NF.G5-idx*40,0.2,0,0.16,'triangle');
-        if(idx===2){clearInterval(tickTimer);finishGeneric('btn-slot',winner);} return;}
+      if(t>=stopAt){
+        r.el.style.transform=`translateY(${-target}px)`;
+        note(L_NF.G5-idx*40,0.2,0,0.16,'triangle');
+        if(idx===2){clearInterval(tickTimer);finishGeneric('btn-slot',winner);}
+        return;
+      }
       const p=t/stopAt; const ease=1-Math.pow(1-p,2.4);
       const total=target+(3*r.el.children.length*ROW);
       const y=(ease*total)%(r.el.children.length*ROW);
@@ -5558,7 +5641,7 @@ function runWheel(){
 }
 
 /* ===================== 收尾 + 中獎 ===================== */
-function finishGeneric(btnId,winner){ stopBgm(); document.getElementById(btnId).disabled=false; L_busy=false; showWin(winner); }
+function finishGeneric(btnId,winner){ stopBgm(); document.getElementById(btnId).disabled=false; L_busy=false; if(L_noRepeat)addDrawn(winner); showWin(winner); }
 function showWin(name){
   // Admin overlay
   const wo=document.getElementById('lotto-result-overlay');

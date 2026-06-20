@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" href="data:,">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART 行政管理平台 v1.56</title>
+<title>COMART 行政管理平台 v1.57</title>
 <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.js"></script>
 <style>
 :root{
@@ -120,8 +120,7 @@ body{font-family:'Segoe UI','PingFang TC','Microsoft JhengHei',sans-serif;backgr
 /* 桌面版 .msb 隱藏，改用頂部 #desktop-subnav */
 .msb{display:none!important}
 @media(max-width:680px){
-  #mod-nav{width:52px}
-  .modnav-item{width:44px;padding:8px 2px}
+  #mod-nav{width:100%}
   .modnav-label{display:none}
   .modnav-icon{font-size:20px}
 }
@@ -505,7 +504,7 @@ tr.ovr td{background:rgba(239,68,68,.04)}
   #layout-wrap{flex-direction:column!important;min-height:0}
   .mpanel{flex-direction:column!important;min-height:0}
   #mbody{min-height:0;flex:1;overflow:hidden}
-  .mc{padding:12px 12px 20px!important;overflow-y:auto;-webkit-overflow-scrolling:touch}
+  .mc{padding:12px 12px 20px!important;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch}
 
   /* ── 其他 UI ── */
   .sg{grid-template-columns:repeat(2,1fr)}
@@ -963,7 +962,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="logo">
     <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
     <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
-    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.56</span>
+    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.57</span>
   </div>
   <div class="trr">
     <div style="display:flex;align-items:center;gap:6px;padding:4px 12px;background:var(--surface-2);border:1px solid var(--border);border-radius:20px;font-size:12px;cursor:pointer" onclick="showUsw()" id="topbar-user">
@@ -971,7 +970,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <span id="cur-u" style="color:var(--text-2)">載入中…</span>
       <span style="color:var(--text-3);font-size:10px">▾</span>
     </div>
-    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.56</span>
+    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.57</span>
   </div>
 </div>
 
@@ -5516,7 +5515,7 @@ function note(freq,dur,t0,gain=0.16,type='triangle'){
   if(L_actx.state!=='running')return; // 未 running 不排程
   const c=L_actx;
   const now=c.currentTime;
-  const t=now + Math.max(t0, 0.005); // 確保排程在未來
+  const t=now + Math.max(t0, 0.05); // 確保排程在未來（iOS 需至少 50ms buffer）
   const o=c.createOscillator(),g=c.createGain();
   o.type=type;o.frequency.setValueAtTime(freq,t);
   g.gain.setValueAtTime(0,t);
@@ -5553,6 +5552,8 @@ function openStage(m){
   // iOS: AudioContext 必須在 user gesture 的同步 callstack 裡建立/resume
   if(!L_actx) L_actx=new (window.AudioContext||window.webkitAudioContext)();
   if(L_actx.state==='suspended') L_actx.resume();
+  // iOS warm-up：播一個 0 增益靜音聲，喚醒音訊硬體並避免 session 被收回
+  try{const o=L_actx.createOscillator(),g=L_actx.createGain();g.gain.value=0;o.connect(g);g.connect(L_actx.destination);o.start();o.stop(L_actx.currentTime+0.001);}catch(e){}
   L_current=m;
   if(L_noRepeat){ L_drawn=[]; renderDrawnList(); }
   document.getElementById('menu').style.display='none';
@@ -5577,6 +5578,7 @@ function fillReel(id){
 function initSlot(){ ['reel0','reel1','reel2'].forEach(fillReel); }
 function runSlot(){
   if(L_busy)return; L_busy=true; document.getElementById('btn-slot').disabled=true;
+  ensureAudioSync();
   const winner=L_pick();
   const ROW=50; // 必須與 CSS .reel-track div{height:50px} 一致
   const reelH=document.querySelector('#panel-lottery .reel')?.offsetHeight||120;
@@ -5627,6 +5629,7 @@ function drawVortexIdle(){
 }
 function runVortex(){
   if(L_busy)return; L_busy=true; document.getElementById('btn-vortex').disabled=true;
+  ensureAudioSync();
   cancelAnimationFrame(vAnim); const winner=L_pick();
   startBgm(); let tickTimer=setInterval(blip,90); const start=performance.now();
   function anim(now){
@@ -5665,6 +5668,7 @@ function initCards(){
 }
 function runCards(){
   if(L_busy)return; L_busy=true; document.getElementById('btn-cards').disabled=true;
+  ensureAudioSync();
   initCards(); const winner=L_pick(); startBgm(); const start=performance.now(); let lastIdx=-1;
   const LIT_STYLE='background:linear-gradient(145deg,#4361EE,#5a73d8);color:#fff;box-shadow:0 0 22px 6px rgba(67,97,238,.8);border:2px solid #CADCFC;transform:scale(1.12);transition:all .08s;';
   const NORMAL_STYLE='min-width:80px;max-width:130px;height:48px;display:flex;align-items:center;justify-content:center;border-radius:10px;font-size:15px;font-weight:bold;color:#CADCFC;flex:0 0 auto;padding:0 10px;background:linear-gradient(145deg,#1E2761,#2a3580);border:1.5px solid rgba(202,220,252,.25);cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';
@@ -5733,6 +5737,7 @@ function drawWheel(rot){
 }
 function runWheel(){
   if(L_busy)return; L_busy=true; document.getElementById('btn-wheel').disabled=true;
+  ensureAudioSync();
   const n=POOL.length, seg=(Math.PI*2)/n, winIdx=L_pickIdx(), winner=POOL[winIdx];
   const centerAngle=winIdx*seg+seg/2; const target=(-Math.PI/2-centerAngle); const finalRot=target+6*Math.PI*2;
   startBgm(); let tickTimer=setInterval(blip,80);

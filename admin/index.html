@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" href="data:,">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART 行政管理平台 v1.53</title>
+<title>COMART 行政管理平台 v1.54</title>
 <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.js"></script>
 <style>
 :root{
@@ -151,7 +151,7 @@ body{font-family:'Segoe UI','PingFang TC','Microsoft JhengHei',sans-serif;backgr
 .navi .ic{font-size:15px;width:18px;text-align:center}
 .nbadge{margin-left:auto;background:var(--rd);color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;min-width:18px;text-align:center}
 .sbf{margin-top:auto;padding:10px 8px;border-top:1px solid var(--border);font-size:11px;color:var(--text-3)}
-.mc{flex:1;padding:20px 24px;overflow-y:auto;overflow-x:hidden;min-width:0;}
+.mc{flex:1;padding:20px 24px;overflow-y:auto;min-width:0;}
 .pg{display:none}.pg.active{display:block}
 .sg{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin-bottom:20px}
 .sc{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius);padding:15px 17px}
@@ -472,32 +472,7 @@ tr.ovr td{background:rgba(239,68,68,.04)}
   #mbody{min-height:0;flex:1;overflow:hidden}
 
   /* 模塊 tab bar（緊接 #tabs 下方）*/
-  #mobile-modnav{
-    display:flex!important;
-    position:sticky;top:44px;z-index:190;
-    background:var(--surface);
-    border-bottom:2px solid var(--border);
-    overflow-x:auto;overflow-y:hidden;
-    -webkit-overflow-scrolling:touch;
-    scrollbar-width:none;
-    padding:0 4px;gap:0;flex-shrink:0;
-  }
-  #mobile-modnav::-webkit-scrollbar{display:none}
-  .mm-item{
-    display:flex;flex-direction:column;align-items:center;justify-content:center;
-    gap:1px;padding:7px 14px;
-    font-size:9px;color:var(--text-3);
-    white-space:nowrap;flex-shrink:0;
-    border-bottom:2px solid transparent;margin-bottom:-2px;
-    cursor:pointer;transition:all .15s;min-width:50px;position:relative;
-  }
-  .mm-item.active{color:#4361EE;border-bottom-color:#4361EE;background:rgba(67,97,238,.12);}
-  .mm-item.active .mm-ico{filter:drop-shadow(0 0 4px rgba(67,97,238,.8));}
-  .mm-item .mm-ico{font-size:20px;line-height:1}
-  .mm-item .mm-lbl{font-size:9px;font-weight:500}
-  .mm-item .tbadge{position:absolute;top:3px;right:4px;min-width:13px;height:13px;font-size:8px;padding:0 2px}
-
-  /* 子功能 pill bar */
+/* 子功能 pill bar */
   #mobile-subnav{
     display:flex!important;
     position:sticky;top:92px;z-index:180;
@@ -982,7 +957,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="logo">
     <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
     <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
-    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.53</span>
+    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.54</span>
   </div>
   <div class="trr">
     <div style="display:flex;align-items:center;gap:6px;padding:4px 12px;background:var(--surface-2);border:1px solid var(--border);border-radius:20px;font-size:12px;cursor:pointer" onclick="showUsw()" id="topbar-user">
@@ -990,34 +965,10 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <span id="cur-u" style="color:var(--text-2)">載入中…</span>
       <span style="color:var(--text-3);font-size:10px">▾</span>
     </div>
-    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.53</span>
+    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.54</span>
   </div>
 </div>
-<!-- ══ 手機版：模塊 tab bar（桌面隱藏）══ -->
-<div id="mobile-modnav" style="display:none">
-  <div class="mm-item active" data-module="room" onclick="switchMod('room')">
-    <span class="mm-ico">🏠</span><span class="mm-lbl">會議室</span>
-    <span class="tbadge" id="mm-tb-room" style="display:none">0</span>
-  </div>
-  <div class="mm-item" data-module="car" onclick="switchMod('car')">
-    <span class="mm-ico">🚗</span><span class="mm-lbl">公務車</span>
-    <span class="tbadge" id="mm-tb-car" style="display:none">0</span>
-  </div>
-  <div class="mm-item" data-module="visit" onclick="switchMod('visit')">
-    <span class="mm-ico">🤝</span><span class="mm-lbl">到訪</span>
-    <span class="tbadge" id="mm-tb-visit" style="display:none">0</span>
-  </div>
-  <div class="mm-item" data-module="lib" onclick="switchMod('lib')">
-    <span class="mm-ico">📚</span><span class="mm-lbl">圖書館</span>
-    <span class="tbadge" id="mm-tb-lib" style="display:none">0</span>
-  </div>
-  <div class="mm-item" data-module="trip" onclick="switchMod('trip')">
-    <span class="mm-ico">✈️</span><span class="mm-lbl">差旅</span>
-  </div>
-  <div class="mm-item" data-module="lottery" onclick="switchMod('lottery')">
-    <span class="mm-ico">🎰</span><span class="mm-lbl">抽籤</span>
-  </div>
-</div>
+
 <!-- ══ 手機版：子功能 pill bar（桌面隱藏，由 JS 動態填入）══ -->
 <div id="mobile-subnav" style="display:none"></div>
 <!-- ══ 桌面版：子功能列（手機隱藏）══ -->
@@ -1073,7 +1024,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi" data-p="lib-cats"><span class="ic">🏷️</span>分類管理</div>
       <div class="navi" data-p="lib-cfg"><span class="ic">⚙️</span>系統設定</div>
     </div>
-    <div class="sbf">v1.53 · Supabase<br><span style="color:var(--ac)">● 本機存儲</span></div>
+    <div class="sbf">v1.54 · Supabase<br><span style="color:var(--ac)">● 本機存儲</span></div>
   </div>
   <div class="mc" id="lc">
     <div class="pg active" id="pg-lib-dash">
@@ -1155,7 +1106,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       
       <div class="navi cn" data-p="car-cfg"><span class="ic">⚙️</span>系統設定</div>
     </div>
-    <div class="sbf">v1.53 · Supabase<br><span style="color:var(--tl)">● 本機存儲</span></div>
+    <div class="sbf">v1.54 · Supabase<br><span style="color:var(--tl)">● 本機存儲</span></div>
   </div>
   <div class="mc cf" id="cc">
     <div class="pg active" id="pg-car-dash">
@@ -1247,7 +1198,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi tna active" data-p="trip-new"><span class="ic">➕</span>新增報支單</div>
       <div class="navi tna" data-p="trip-list"><span class="ic">📋</span>報支單清單</div>
     </div>
-    <div class="sbf">v1.53 · Supabase<br><span style="color:var(--yw)">● 本機存儲</span></div>
+    <div class="sbf">v1.54 · Supabase<br><span style="color:var(--yw)">● 本機存儲</span></div>
   </div>
   <div class="mc" id="tc">
 
@@ -1386,7 +1337,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi rna" data-p="room-report"><span class="ic">📊</span>使用率報表</div>
       <div class="navi rna" data-p="room-fault"><span class="ic">🔧</span>故障回報<span class="nbadge" id="nb-fault" style="display:none">0</span></div>
     </div>
-    <div class="sbf">v1.53 · Supabase<br><span style="color:var(--gn)">● 本機存儲</span></div>
+    <div class="sbf">v1.54 · Supabase<br><span style="color:var(--gn)">● 本機存儲</span></div>
   </div>
   <div class="mc" id="rmc">
 
@@ -1620,7 +1571,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi vna" data-p="visit-guests"><span class="ic">👥</span>來賓資料庫</div>
       <div class="navi vna" data-p="visit-report"><span class="ic">📊</span>接待報表</div>
     </div>
-    <div class="sbf">v1.53 · Supabase<br><span style="color:#a78bfa">● 本機存儲</span></div>
+    <div class="sbf">v1.54 · Supabase<br><span style="color:#a78bfa">● 本機存儲</span></div>
   </div>
   <div class="mc" id="vmc">
 
@@ -2744,9 +2695,7 @@ const MOBILE_SUBNAV = {
 };
 
 function mobileModSwitch(m){
-  document.querySelectorAll('.mm-item').forEach(el=>{
-    el.classList.toggle('active', el.dataset.module===m);
-  });
+  // mm-item removed
   mobileSubNav(m, null);
   desktopSubNav(m, null);
 }
@@ -5540,14 +5489,15 @@ function AC(){
   return L_actx;
 }
 async function ensureAudio(){
-  if(!L_actx) L_actx=new (window.AudioContext||window.webkitAudioContext)();
+  if(!L_actx){
+    L_actx = new (window.AudioContext||window.webkitAudioContext)();
+  }
   if(L_actx.state==='running') return;
   try{ await L_actx.resume(); }catch(e){}
-  // iOS 有時 resume() resolve 了但 state 還不是 running，輪詢等待
-  let tries=0;
-  while(L_actx.state!=='running'&&tries<20){
+  // 輪詢最多 1 秒
+  for(let i=0;i<20;i++){
+    if(L_actx.state==='running') break;
     await new Promise(r=>setTimeout(r,50));
-    tries++;
   }
 }
 function ensureAudioSync(){
@@ -5594,8 +5544,10 @@ function winFanfare(){
 /* ===================== 導覽 ===================== */
 let L_current=null, L_busy=false;
 function openStage(m){
-  ensureAudioSync(); L_current=m;
-  // 切換遊戲時清除本輪已抽名單
+  // iOS: AudioContext 必須在 user gesture 的同步 callstack 裡建立/resume
+  if(!L_actx) L_actx=new (window.AudioContext||window.webkitAudioContext)();
+  if(L_actx.state==='suspended') L_actx.resume();
+  L_current=m;
   if(L_noRepeat){ L_drawn=[]; renderDrawnList(); }
   document.getElementById('menu').style.display='none';
   document.querySelectorAll('.stage').forEach(s=>s.classList.remove('active'));
@@ -5617,8 +5569,8 @@ function fillReel(id){
   el.style.transform='translateY(0)'; return seq;
 }
 function initSlot(){ ['reel0','reel1','reel2'].forEach(fillReel); }
-async function runSlot(){
-  if(L_busy)return; L_busy=true; await ensureAudio(); document.getElementById('btn-slot').disabled=true;
+function runSlot(){
+  if(L_busy)return; L_busy=true; document.getElementById('btn-slot').disabled=true;
   const winner=L_pick();
   const ROW=50; // 必須與 CSS .reel-track div{height:50px} 一致
   const reelH=document.querySelector('#panel-lottery .reel')?.offsetHeight||120;
@@ -5667,8 +5619,8 @@ function drawVortexIdle(){
     vCtx.textAlign='center';vCtx.fillText(p.name,x,y);p.ang+=0.002;});
   vCtx.restore(); if(!L_busy)vAnim=requestAnimationFrame(drawVortexIdle);
 }
-async function runVortex(){
-  if(L_busy)return; L_busy=true; await ensureAudio(); document.getElementById('btn-vortex').disabled=true;
+function runVortex(){
+  if(L_busy)return; L_busy=true; document.getElementById('btn-vortex').disabled=true;
   cancelAnimationFrame(vAnim); const winner=L_pick();
   startBgm(); let tickTimer=setInterval(blip,90); const start=performance.now();
   function anim(now){
@@ -5705,8 +5657,8 @@ function initCards(){
     c.textContent=name; c.dataset.name=name; field.appendChild(c);L_cardEls.push(c);
   });
 }
-async function runCards(){
-  if(L_busy)return; L_busy=true; await ensureAudio(); document.getElementById('btn-cards').disabled=true;
+function runCards(){
+  if(L_busy)return; L_busy=true; document.getElementById('btn-cards').disabled=true;
   initCards(); const winner=L_pick(); startBgm(); const start=performance.now(); let lastIdx=-1;
   const LIT_STYLE='background:linear-gradient(145deg,#4361EE,#5a73d8);color:#fff;box-shadow:0 0 22px 6px rgba(67,97,238,.8);border:2px solid #CADCFC;transform:scale(1.12);transition:all .08s;';
   const NORMAL_STYLE='min-width:80px;max-width:130px;height:48px;display:flex;align-items:center;justify-content:center;border-radius:10px;font-size:15px;font-weight:bold;color:#CADCFC;flex:0 0 auto;padding:0 10px;background:linear-gradient(145deg,#1E2761,#2a3580);border:1.5px solid rgba(202,220,252,.25);cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';
@@ -5773,8 +5725,8 @@ function drawWheel(rot){
   wCtx.stroke();
   wCtx.restore();
 }
-async function runWheel(){
-  if(L_busy)return; L_busy=true; await ensureAudio(); document.getElementById('btn-wheel').disabled=true;
+function runWheel(){
+  if(L_busy)return; L_busy=true; document.getElementById('btn-wheel').disabled=true;
   const n=POOL.length, seg=(Math.PI*2)/n, winIdx=L_pickIdx(), winner=POOL[winIdx];
   const centerAngle=winIdx*seg+seg/2; const target=(-Math.PI/2-centerAngle); const finalRot=target+6*Math.PI*2;
   startBgm(); let tickTimer=setInterval(blip,80);

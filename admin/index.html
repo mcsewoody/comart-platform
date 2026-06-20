@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" href="data:,">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART 行政管理平台 v1.45</title>
+<title>COMART 行政管理平台 v1.47</title>
 <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.js"></script>
 <style>
 :root{
@@ -399,101 +399,111 @@ tr.ovr td{background:rgba(239,68,68,.04)}
 .dash2col{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}
 @media(max-width:900px){.sg,.fuelsum{grid-template-columns:repeat(2,1fr)}.cgrid{grid-template-columns:1fr}}
 @media(max-width:680px){
-  /* ── Sidebar → bottom sheet nav ── */
-  .msb{
-    display:flex!important;
-    position:fixed;bottom:0;left:0;right:0;
-    width:100%!important;height:auto!important;
-    flex-direction:row;flex-wrap:nowrap;
-    overflow-x:auto;overflow-y:hidden;
-    -webkit-overflow-scrolling:touch;
-    padding:6px 8px env(safe-area-inset-bottom);
-    background:var(--surface);
-    border-right:none;border-top:1px solid var(--border);
-    z-index:200;gap:2px;
-    box-shadow:0 -4px 20px rgba(0,0,0,.25);
-  }
-  /* 隱藏 sidebar 裡的非 navi 元素（標題、版本資訊） */
-  .msb .sbh,.msb .navl,.msb .sbf,.msb .navs{display:none!important}
-  .navi{
-    flex-direction:column;align-items:center;justify-content:center;
-    gap:2px;padding:5px 8px;min-width:54px;flex-shrink:0;
-    font-size:9px;border-radius:8px;
-  }
-  .navi .ic{font-size:18px;width:auto}
-  /* 主內容區底部留出 tab bar 高度 */
-  .mc{padding:12px 14px 80px!important}
-  #mbody{padding-bottom:0}
-
-  .sg{grid-template-columns:repeat(2,1fr)}
-  .fuelsum{grid-template-columns:repeat(2,1fr)}
+  /* 隱藏桌面元素 */
+  #mod-nav{display:none!important}
+  .msb{display:none!important}
   .modnav-label{display:none!important}
 
-  /* tab bar 更緊湊 */
-  #tabs{padding:0 8px;gap:0}
-  .mtab{padding:0 10px}
+  /* 頂部緊湊 */
+  #tabs{padding:0 8px;height:44px;gap:4px}
+  .logo{font-size:12px;gap:3px;padding:0 6px 0 0}
+  #portal-back-btn{padding:3px 7px;font-size:11px}
+  #cur-u{max-width:58px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
-  /* dashboard 雙欄 → 單欄 */
+  /* layout 改直向堆疊 */
+  #layout-wrap{flex-direction:column!important;min-height:0}
+  .mpanel{flex-direction:column!important;min-height:0}
+  #mbody{min-height:0;flex:1;overflow:hidden}
+
+  /* 模塊 tab bar（緊接 #tabs 下方）*/
+  #mobile-modnav{
+    display:flex!important;
+    position:sticky;top:44px;z-index:190;
+    background:var(--surface);
+    border-bottom:2px solid var(--border);
+    overflow-x:auto;overflow-y:hidden;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+    padding:0 4px;gap:0;flex-shrink:0;
+  }
+  #mobile-modnav::-webkit-scrollbar{display:none}
+  .mm-item{
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:1px;padding:7px 14px;
+    font-size:9px;color:var(--text-3);
+    white-space:nowrap;flex-shrink:0;
+    border-bottom:2px solid transparent;margin-bottom:-2px;
+    cursor:pointer;transition:all .15s;min-width:50px;position:relative;
+  }
+  .mm-item.active{color:var(--blue);border-bottom-color:var(--blue)}
+  .mm-item .mm-ico{font-size:20px;line-height:1}
+  .mm-item .mm-lbl{font-size:9px;font-weight:500}
+  .mm-item .tbadge{position:absolute;top:3px;right:4px;min-width:13px;height:13px;font-size:8px;padding:0 2px}
+
+  /* 子功能 pill bar */
+  #mobile-subnav{
+    display:flex!important;
+    position:sticky;top:92px;z-index:180;
+    background:var(--bg);
+    border-bottom:1px solid var(--border);
+    overflow-x:auto;overflow-y:hidden;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+    padding:7px 8px;gap:6px;flex-shrink:0;
+  }
+  #mobile-subnav::-webkit-scrollbar{display:none}
+  .msn-btn{
+    display:inline-flex;align-items:center;gap:4px;
+    padding:5px 12px;border-radius:999px;
+    font-size:12px;font-weight:500;
+    white-space:nowrap;flex-shrink:0;
+    border:1px solid var(--border);
+    background:var(--surface);color:var(--text-2);
+    cursor:pointer;transition:all .15s;
+  }
+  .msn-btn.active{
+    background:var(--blue-bg);color:var(--blue);
+    border-color:rgba(67,97,238,.4);
+  }
+
+  /* 內容區 */
+  .mc{padding:12px 12px 20px!important;overflow-y:auto;-webkit-overflow-scrolling:touch}
+
+  /* 其他 layout */
+  .sg{grid-template-columns:repeat(2,1fr)}
+  .fuelsum{grid-template-columns:repeat(2,1fr)}
   div[style*="grid-template-columns:1fr 1fr"]{grid-template-columns:1fr!important}
-
-  /* filter bar 換行，select 不固定寬 */
   .fb{flex-wrap:wrap;gap:8px}
   .fb select{width:100%!important;flex:1 1 100%}
   .fb .sw2{flex:1 1 100%}
-
-  /* 表格：所有欄可橫向滾動，重要欄才顯示 */
   .tw{overflow-x:auto;-webkit-overflow-scrolling:touch}
   table{min-width:0;font-size:12px}
   thead th{padding:7px 8px;font-size:10px}
   tbody td{padding:7px 8px}
-
-  /* 書目 grid → 2欄 */
   .bkgrid{grid-template-columns:repeat(2,1fr);gap:10px}
-
-  /* 車輛 card grid → 1欄 */
   .cgrid{grid-template-columns:1fr}
   .dash2col{grid-template-columns:1fr}
-
-  /* modal 全螢幕 */
   .mo{padding:0;align-items:flex-end}
   .md{max-width:100%!important;border-radius:var(--r) var(--r) 0 0;max-height:92vh}
-
-  /* form grid → 1欄 */
   .fg2{grid-template-columns:1fr!important}
   .fg2 .full{grid-column:1/-1}
   .frow{flex-direction:column}
-
-  /* borrow 日期 row → 堆疊 */
   .frow>div{flex:1 1 100%}
-
-  /* 預約表單 grid → 1欄 */
   #pg-car-bk .fg2{grid-template-columns:1fr!important}
-
-  /* 停車位 grid */
   #pk-grid{grid-template-columns:repeat(2,1fr)!important}
-
-  /* 日曆標題 */
   .caltit{min-width:80px;font-size:13px}
   .calnav{padding:3px 8px;font-size:12px}
-
-  /* 月曆格子縮小 */
   .cday{min-height:52px;padding:2px}
   .cdn{font-size:10px}
   .cev{font-size:9px;padding:1px 3px}
-
-  /* week 欄寬 */
   .wg{grid-template-columns:40px repeat(7,1fr)}
   .wtl{font-size:9px;padding:1px 2px}
   .wth{font-size:9px;padding:4px 2px}
-
-  /* toast 靠左 */
-  #toastc{right:8px;bottom:70px;left:8px}
+  #toastc{right:8px;bottom:12px;left:8px}
   .toast{min-width:0;width:100%}
-
-  /* user-select grid → 2欄 */
   .ugrid{grid-template-columns:repeat(2,1fr)}
-
-  /* 隱藏部分不重要的表格欄（透過 JS 控制或只用 overflow） */
+  .visit-cards-grid{grid-template-columns:1fr!important}
+  .visit-form-grid{grid-template-columns:1fr!important}
 }
 
 @media(max-width:400px){
@@ -799,10 +809,10 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
 #panel-lottery .lotto-root{height:100%;overflow:auto;}
 @media(max-width:680px){
   #panel-lottery .mc{padding-bottom:0!important;}
-  #panel-lottery .lotto-root{height:calc(100vh - var(--th) - 64px);padding-bottom:env(safe-area-inset-bottom);}
+  #panel-lottery .lotto-root{height:calc(100vh - 44px - 48px - 40px);padding-bottom:0;}
   #panel-lottery #app{height:100%;min-height:0;}
-  #panel-lottery #menu{padding:16px 12px;overflow-y:auto;}
-  #panel-lottery .muted-tag{bottom:76px;}
+  #panel-lottery #menu{padding:12px 10px;overflow-y:auto;}
+  #panel-lottery .muted-tag{bottom:12px;}
 }
 
 #panel-lottery #app{height:100vh;display:flex;flex-direction:column;}
@@ -907,7 +917,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="logo">
     <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
     <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
-    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.45</span>
+    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.47</span>
   </div>
   <div class="trr">
     <div style="display:flex;align-items:center;gap:6px;padding:4px 12px;background:var(--surface-2);border:1px solid var(--border);border-radius:20px;font-size:12px;cursor:pointer" onclick="showUsw()" id="topbar-user">
@@ -915,9 +925,36 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <span id="cur-u" style="color:var(--text-2)">載入中…</span>
       <span style="color:var(--text-3);font-size:10px">▾</span>
     </div>
-    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.45</span>
+    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.47</span>
   </div>
 </div>
+<!-- ══ 手機版：模塊 tab bar（桌面隱藏）══ -->
+<div id="mobile-modnav" style="display:none">
+  <div class="mm-item active" data-module="room" onclick="switchMod('room')">
+    <span class="mm-ico">🏠</span><span class="mm-lbl">會議室</span>
+    <span class="tbadge" id="mm-tb-room" style="display:none">0</span>
+  </div>
+  <div class="mm-item" data-module="car" onclick="switchMod('car')">
+    <span class="mm-ico">🚗</span><span class="mm-lbl">公務車</span>
+    <span class="tbadge" id="mm-tb-car" style="display:none">0</span>
+  </div>
+  <div class="mm-item" data-module="visit" onclick="switchMod('visit')">
+    <span class="mm-ico">🤝</span><span class="mm-lbl">到訪</span>
+    <span class="tbadge" id="mm-tb-visit" style="display:none">0</span>
+  </div>
+  <div class="mm-item" data-module="lib" onclick="switchMod('lib')">
+    <span class="mm-ico">📚</span><span class="mm-lbl">圖書館</span>
+    <span class="tbadge" id="mm-tb-lib" style="display:none">0</span>
+  </div>
+  <div class="mm-item" data-module="trip" onclick="switchMod('trip')">
+    <span class="mm-ico">✈️</span><span class="mm-lbl">差旅</span>
+  </div>
+  <div class="mm-item" data-module="lottery" onclick="switchMod('lottery')">
+    <span class="mm-ico">🎰</span><span class="mm-lbl">抽籤</span>
+  </div>
+</div>
+<!-- ══ 手機版：子功能 pill bar（桌面隱藏，由 JS 動態填入）══ -->
+<div id="mobile-subnav" style="display:none"></div>
 <div id="layout-wrap" style="display:flex;min-height:calc(100vh - var(--th))">
 <!-- ── 左側模塊導覽 ── -->
 <div id="mod-nav">
@@ -969,7 +1006,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi" data-p="lib-cats"><span class="ic">🏷️</span>分類管理</div>
       <div class="navi" data-p="lib-cfg"><span class="ic">⚙️</span>系統設定</div>
     </div>
-    <div class="sbf">v1.45 · Supabase<br><span style="color:var(--ac)">● 本機存儲</span></div>
+    <div class="sbf">v1.47 · Supabase<br><span style="color:var(--ac)">● 本機存儲</span></div>
   </div>
   <div class="mc" id="lc">
     <div class="pg active" id="pg-lib-dash">
@@ -1051,7 +1088,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       
       <div class="navi cn" data-p="car-cfg"><span class="ic">⚙️</span>系統設定</div>
     </div>
-    <div class="sbf">v1.45 · Supabase<br><span style="color:var(--tl)">● 本機存儲</span></div>
+    <div class="sbf">v1.47 · Supabase<br><span style="color:var(--tl)">● 本機存儲</span></div>
   </div>
   <div class="mc cf" id="cc">
     <div class="pg active" id="pg-car-dash">
@@ -1143,7 +1180,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi tna active" data-p="trip-new"><span class="ic">➕</span>新增報支單</div>
       <div class="navi tna" data-p="trip-list"><span class="ic">📋</span>報支單清單</div>
     </div>
-    <div class="sbf">v1.45 · Supabase<br><span style="color:var(--yw)">● 本機存儲</span></div>
+    <div class="sbf">v1.47 · Supabase<br><span style="color:var(--yw)">● 本機存儲</span></div>
   </div>
   <div class="mc" id="tc">
 
@@ -1282,7 +1319,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi rna" data-p="room-report"><span class="ic">📊</span>使用率報表</div>
       <div class="navi rna" data-p="room-fault"><span class="ic">🔧</span>故障回報<span class="nbadge" id="nb-fault" style="display:none">0</span></div>
     </div>
-    <div class="sbf">v1.45 · Supabase<br><span style="color:var(--gn)">● 本機存儲</span></div>
+    <div class="sbf">v1.47 · Supabase<br><span style="color:var(--gn)">● 本機存儲</span></div>
   </div>
   <div class="mc" id="rmc">
 
@@ -1516,7 +1553,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi vna" data-p="visit-guests"><span class="ic">👥</span>來賓資料庫</div>
       <div class="navi vna" data-p="visit-report"><span class="ic">📊</span>接待報表</div>
     </div>
-    <div class="sbf">v1.45 · Supabase<br><span style="color:#a78bfa">● 本機存儲</span></div>
+    <div class="sbf">v1.47 · Supabase<br><span style="color:#a78bfa">● 本機存儲</span></div>
   </div>
   <div class="mc" id="vmc">
 
@@ -2563,6 +2600,8 @@ function switchMod(m){
   document.querySelector(`.modnav-item[data-module="${m}"]`)?.classList.add('active');
   document.querySelectorAll('.mpanel').forEach(p=>p.classList.remove('active'));
   document.getElementById(`panel-${m}`).classList.add('active');
+  // 手機版模塊 tab bar
+  mobileModSwitch(m);
   if(m==='lib')renderLibPg('lib-dash');
   if(m==='car')renderCarPg('car-dash');
   if(m==='trip'){navTrip('trip-new');}
@@ -2574,9 +2613,105 @@ function switchMod(m){
   if(m==='visit'){seedVisitDemo().then(()=>navVisit('visit-dash'));}
 }
 
+// ══ 手機版導覽 JS ══
+const MOBILE_SUBNAV = {
+  room:[
+    {p:'room-dash',ic:'🏠',lb:'看板'},
+    {p:'room-new',ic:'➕',lb:'新增預約'},
+    {p:'room-cal',ic:'📅',lb:'日曆'},
+    {p:'room-list',ic:'📋',lb:'預約清單'},
+    {p:'room-checkin',ic:'✅',lb:'報到'},
+    {p:'room-fault',ic:'🔧',lb:'故障回報'},
+    {p:'room-report',ic:'📊',lb:'報表'},
+    {p:'room-cfg',ic:'⚙️',lb:'設定'},
+  ],
+  car:[
+    {p:'car-dash',ic:'🏠',lb:'看板'},
+    {p:'car-use',ic:'🚗',lb:'用車申請'},
+    {p:'car-cal',ic:'📅',lb:'行程表'},
+    {p:'car-fuel',ic:'⛽',lb:'加油'},
+    {p:'car-veh',ic:'🔑',lb:'車輛'},
+    {p:'car-maint',ic:'🔧',lb:'保養'},
+    {p:'car-insp',ic:'📋',lb:'驗車'},
+    {p:'car-cfg',ic:'⚙️',lb:'設定'},
+  ],
+  lib:[
+    {p:'lib-dash',ic:'🏠',lb:'總覽'},
+    {p:'lib-books',ic:'📖',lb:'書目'},
+    {p:'lib-loans',ic:'📋',lb:'借閱'},
+    {p:'lib-borrow',ic:'➕',lb:'借書'},
+    {p:'lib-return',ic:'↩️',lb:'還書'},
+    {p:'lib-rsv',ic:'🔖',lb:'預約'},
+    {p:'lib-cats',ic:'🏷️',lb:'分類'},
+    {p:'lib-cfg',ic:'⚙️',lb:'設定'},
+  ],
+  visit:[
+    {p:'visit-dash',ic:'🏠',lb:'總覽'},
+    {p:'visit-new',ic:'➕',lb:'新增'},
+    {p:'visit-list',ic:'📋',lb:'清單'},
+    {p:'visit-report',ic:'📊',lb:'報表'},
+  ],
+  trip:[
+    {p:'trip-new',ic:'➕',lb:'新增'},
+    {p:'trip-list',ic:'📋',lb:'清單'},
+  ],
+  lottery:[],
+};
+
+function mobileModSwitch(m){
+  // 更新模塊 tab 狀態
+  document.querySelectorAll('.mm-item').forEach(el=>{
+    el.classList.toggle('active', el.dataset.module===m);
+  });
+  // 填入子功能 pill bar
+  mobileSubNav(m, null);
+}
+
+function mobileSubNav(mod, activeP){
+  const bar = document.getElementById('mobile-subnav');
+  if(!bar) return;
+  // 桌面版不操作（靠 CSS media query 控制顯示）
+  if(window.innerWidth > 680) return;
+  const items = MOBILE_SUBNAV[mod]||[];
+  if(!items.length){bar.style.display='none';return;}
+  bar.style.display='flex';
+  bar.innerHTML = items.map(it=>`
+    <button class="msn-btn${activeP===it.p?' active':''}" onclick="mobileNavTo('${mod}','${it.p}')">
+      ${it.ic} ${it.lb}
+    </button>`).join('');
+}
+
+function mobileNavTo(mod, p){
+  if(mod==='room') navRoom(p);
+  else if(mod==='car') navCar(p);
+  else if(mod==='lib') navLib(p);
+  else if(mod==='visit') navVisit(p);
+  else if(mod==='trip') navTrip(p);
+  // 更新 active 狀態
+  document.querySelectorAll('#mobile-subnav .msn-btn').forEach(btn=>{
+    btn.classList.toggle('active', btn.textContent.trim().endsWith(
+      (MOBILE_SUBNAV[mod]||[]).find(it=>it.p===p)?.lb||'__'
+    ));
+  });
+  mobileSubNav(mod, p);
+}
+
+// 同步 badge 到手機版模塊 tab
+function syncMobileBadges(){
+  ['room','car','lib','visit'].forEach(m=>{
+    const src = document.getElementById(`tb-${m}`);
+    const dst = document.getElementById(`mm-tb-${m}`);
+    if(src && dst){
+      dst.textContent = src.textContent;
+      dst.style.display = src.style.display;
+    }
+  });
+}
+
 function navLib(p){
   document.querySelectorAll('#panel-lib .navi').forEach(el=>el.classList.remove('active'));
   document.querySelector(`#panel-lib .navi[data-p="${p}"]`)?.classList.add('active');
+  mobileSubNav('lib',p);
   renderLibPg(p);
 }
 function renderLibPg(p){
@@ -2595,6 +2730,7 @@ function renderLibPg(p){
 function navCar(p){
   document.querySelectorAll('#panel-car .navi').forEach(el=>el.classList.remove('active'));
   document.querySelector(`#panel-car .navi[data-p="${p}"]`)?.classList.add('active');
+  mobileSubNav('car',p);
   renderCarPg(p);
 }
 async function renderCarPg(p){
@@ -3085,6 +3221,7 @@ function navTrip(p){
   document.querySelector(`#panel-trip .navi[data-p="${p}"]`)?.classList.add('active');
   document.querySelectorAll('#tc .pg').forEach(el=>el.classList.remove('active'));
   document.getElementById(`pg-${p}`)?.classList.add('active');
+  mobileSubNav('trip',p);
   if(p==='trip-new') initTripForm();
   if(p==='trip-list') renderTripList();
 }
@@ -3767,6 +3904,7 @@ function navRoom(p){
   document.querySelector(`#panel-room .navi[data-p="${p}"]`)?.classList.add('active');
   document.querySelectorAll('#rmc .pg').forEach(el=>el.classList.remove('active'));
   document.getElementById(`pg-${p}`)?.classList.add('active');
+  mobileSubNav('room',p);
   if(p==='room-dash') renderRoomDash();
   if(p==='room-cal') renderRoomCal();
   if(p==='room-new') getRoomBookings().then(()=>initBkForm());
@@ -4577,6 +4715,7 @@ function navVisit(p){
   document.querySelector(`#panel-visit .navi[data-p="${p}"]`)?.classList.add('active');
   document.querySelectorAll('#vmc .pg').forEach(el=>el.classList.remove('active'));
   document.getElementById(`pg-${p}`)?.classList.add('active');
+  mobileSubNav('visit',p);
   if(p==='visit-dash')renderVisitDash();
   if(p==='visit-new')initVisitForm();
   if(p==='visit-list')renderVisitList();

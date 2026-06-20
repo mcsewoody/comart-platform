@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" href="data:,">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART 行政管理平台 v1.50</title>
+<title>COMART 行政管理平台 v1.51</title>
 <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.js"></script>
 <style>
 :root{
@@ -299,7 +299,7 @@ input[type=time]::-webkit-calendar-picker-indicator{
 .gantt-wrap{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;cursor:grab;user-select:none;}
 .gantt-wrap.dragging{cursor:grabbing;}
 .gantt-head{display:flex;background:var(--bg1);border-bottom:1px solid var(--bd);}
-.gantt-inner{min-width:max-content;}
+.gantt-inner{display:block;/* width set by JS */}
 .gantt-label-col{width:110px;flex-shrink:0;padding:8px 12px;font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;border-right:1px solid var(--bd)}
 .gantt-time-row{flex:1;display:flex;position:relative;overflow:hidden}
 .gantt-hour{flex:1;border-right:1px solid var(--bd);text-align:center;font-size:10px;color:var(--t3);padding:4px 2px;white-space:nowrap}
@@ -981,7 +981,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="logo">
     <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
     <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
-    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.50</span>
+    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.51</span>
   </div>
   <div class="trr">
     <div style="display:flex;align-items:center;gap:6px;padding:4px 12px;background:var(--surface-2);border:1px solid var(--border);border-radius:20px;font-size:12px;cursor:pointer" onclick="showUsw()" id="topbar-user">
@@ -989,7 +989,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <span id="cur-u" style="color:var(--text-2)">載入中…</span>
       <span style="color:var(--text-3);font-size:10px">▾</span>
     </div>
-    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.50</span>
+    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.51</span>
   </div>
 </div>
 <!-- ══ 手機版：模塊 tab bar（桌面隱藏）══ -->
@@ -1072,7 +1072,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi" data-p="lib-cats"><span class="ic">🏷️</span>分類管理</div>
       <div class="navi" data-p="lib-cfg"><span class="ic">⚙️</span>系統設定</div>
     </div>
-    <div class="sbf">v1.50 · Supabase<br><span style="color:var(--ac)">● 本機存儲</span></div>
+    <div class="sbf">v1.51 · Supabase<br><span style="color:var(--ac)">● 本機存儲</span></div>
   </div>
   <div class="mc" id="lc">
     <div class="pg active" id="pg-lib-dash">
@@ -1154,7 +1154,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       
       <div class="navi cn" data-p="car-cfg"><span class="ic">⚙️</span>系統設定</div>
     </div>
-    <div class="sbf">v1.50 · Supabase<br><span style="color:var(--tl)">● 本機存儲</span></div>
+    <div class="sbf">v1.51 · Supabase<br><span style="color:var(--tl)">● 本機存儲</span></div>
   </div>
   <div class="mc cf" id="cc">
     <div class="pg active" id="pg-car-dash">
@@ -1246,7 +1246,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi tna active" data-p="trip-new"><span class="ic">➕</span>新增報支單</div>
       <div class="navi tna" data-p="trip-list"><span class="ic">📋</span>報支單清單</div>
     </div>
-    <div class="sbf">v1.50 · Supabase<br><span style="color:var(--yw)">● 本機存儲</span></div>
+    <div class="sbf">v1.51 · Supabase<br><span style="color:var(--yw)">● 本機存儲</span></div>
   </div>
   <div class="mc" id="tc">
 
@@ -1385,7 +1385,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi rna" data-p="room-report"><span class="ic">📊</span>使用率報表</div>
       <div class="navi rna" data-p="room-fault"><span class="ic">🔧</span>故障回報<span class="nbadge" id="nb-fault" style="display:none">0</span></div>
     </div>
-    <div class="sbf">v1.50 · Supabase<br><span style="color:var(--gn)">● 本機存儲</span></div>
+    <div class="sbf">v1.51 · Supabase<br><span style="color:var(--gn)">● 本機存儲</span></div>
   </div>
   <div class="mc" id="rmc">
 
@@ -1619,7 +1619,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi vna" data-p="visit-guests"><span class="ic">👥</span>來賓資料庫</div>
       <div class="navi vna" data-p="visit-report"><span class="ic">📊</span>接待報表</div>
     </div>
-    <div class="sbf">v1.50 · Supabase<br><span style="color:#a78bfa">● 本機存儲</span></div>
+    <div class="sbf">v1.51 · Supabase<br><span style="color:#a78bfa">● 本機存儲</span></div>
   </div>
   <div class="mc" id="vmc">
 
@@ -2765,14 +2765,22 @@ function desktopSubNav(mod, activeP){
 function mobileSubNav(mod, activeP){
   const bar = document.getElementById('mobile-subnav');
   if(!bar) return;
-  if(window.innerWidth > 680) return;
   const items = MOBILE_SUBNAV[mod]||[];
-  if(!items.length){bar.innerHTML='';bar.style.display='none';return;}
-  bar.style.display='flex';
+  // 不論桌面/手機都清空，CSS media query 控制 #mobile-subnav 是否顯示
+  if(!items.length){
+    bar.innerHTML='';
+    bar.style.display='none';
+    return;
+  }
+  // 只在手機實際顯示時才設 display
   bar.innerHTML = items.map(it=>`
     <button class="msn-btn${activeP===it.p?' active':''}" onclick="mobileNavTo('${mod}','${it.p}')">
       ${it.ic} ${it.lb}
     </button>`).join('');
+  // display 由 CSS @media 控制，這裡不強設（除非確定要顯示）
+  if(window.matchMedia('(max-width:680px)').matches){
+    bar.style.display='flex';
+  }
 }
 
 function mobileNavTo(mod, p){
@@ -4147,23 +4155,31 @@ function calRoomToday(){calRoomDate=new Date();renderRoomCal();}
 // ── Gantt builder ──
 function buildGantt(bks){
   const hours=Array.from({length:ROOM_HOURS.end-ROOM_HOURS.start},(_,i)=>ROOM_HOURS.start+i);
-  const hourW=64; // px per hour — 固定寬度，讓手機可橫滑
-  const totalW=hours.length*hourW;
-  let h=`<div class="gantt-inner" style="min-width:${totalW+100}px">`;
-  h+=`<div class="gantt-head"><div class="gantt-label-col">會議室</div><div class="gantt-time-row" style="width:${totalW}px;flex-shrink:0">`;
+  const labelW=100; // px for room label col
+  const hourW=70;   // px per hour
+  const timelineW=hours.length*hourW;
+  const totalW=labelW+timelineW;
+  // gantt-inner 設 width 撐開 gantt-wrap 讓 overflow scroll 生效
+  let h=`<div class="gantt-inner" style="width:${totalW}px">`;
+  // header row
+  h+=`<div class="gantt-head" style="width:${totalW}px">`;
+  h+=`<div class="gantt-label-col" style="width:${labelW}px;flex-shrink:0">會議室</div>`;
+  h+=`<div style="display:flex;width:${timelineW}px;flex-shrink:0">`;
   hours.forEach(hr=>h+=`<div class="gantt-hour" style="width:${hourW}px;flex-shrink:0">${String(hr).padStart(2,'0')}:00</div>`);
   h+=`</div></div>`;
+  // room rows
   ROOMS.forEach(room=>{
     const roomBks=bks.filter(b=>b.roomId===room.id);
-    h+=`<div class="gantt-row"><div class="gantt-room-label">${room.icon} ${room.name}</div>
-    <div class="gantt-timeline" style="width:${totalW}px;flex-shrink:0;position:relative" id="gtl-${room.id}">
-      <div class="gantt-now-line" id="gnl-${room.id}"></div>`;
+    h+=`<div class="gantt-row" style="width:${totalW}px">`;
+    h+=`<div class="gantt-room-label" style="width:${labelW}px;flex-shrink:0">${room.icon} ${room.name}</div>`;
+    h+=`<div class="gantt-timeline" style="width:${timelineW}px;flex-shrink:0;position:relative;height:44px" id="gtl-${room.id}">`;
+    h+=`<div class="gantt-now-line" id="gnl-${room.id}"></div>`;
     roomBks.forEach(bk=>{
       const st=bkStatus(bk);
       const left=pct(timeToMin(bk.start));
       const width=widthPct(bk);
       const cls=st==='inprogress'?'gb-inprogress':st==='done'?'gb-cancelled':st==='confirmed'?'gb-confirmed':'gb-pending';
-      h+=`<div class="gantt-block ${cls}" style="left:${left};width:${width}" title="${bk.title||'會議'}  ${bk.start}-${bk.end}" onclick="showBkPopup('${bk.id}',event)">${bk.start} ${bk.title||room.name}</div>`;
+      h+=`<div class="gantt-block ${cls}" style="left:${left};width:${width}" title="${bk.title||'會議'} ${bk.start}-${bk.end}" onclick="showBkPopup('${bk.id}',event)">${bk.start} ${bk.title||room.name}</div>`;
     });
     h+=`</div></div>`;
   });
@@ -5524,11 +5540,15 @@ function AC(){
 }
 async function ensureAudio(){
   AC();
-  if(L_actx.state==='suspended') await L_actx.resume();
+  if(L_actx.state!=='running'){
+    try{ await L_actx.resume(); }catch(e){}
+    // 等 AudioContext 真正 running 後才播音（currentTime 開始走）
+    await new Promise(r=>setTimeout(r,80));
+  }
 }
 function ensureAudioSync(){
   AC();
-  if(L_actx.state==='suspended') L_actx.resume();
+  if(L_actx.state==='suspended') L_actx.resume().catch(()=>{});
 }
 function toggleMute(){L_muted=!L_muted;document.getElementById('muteTag').textContent=L_muted?'🔇 音效關':'🔊 音效開';if(L_muted)stopBgm();}
 function note(freq,dur,t0,gain=0.16,type='triangle'){

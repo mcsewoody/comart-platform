@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" href="data:,">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART 行政管理平台 v1.48</title>
+<title>COMART 行政管理平台 v1.49</title>
 <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.js"></script>
 <style>
 :root{
@@ -52,25 +52,73 @@ html,body{max-width:100vw;overflow-x:hidden}
 body{font-family:'Segoe UI','PingFang TC','Microsoft JhengHei',sans-serif;background:var(--bg0);color:var(--t1);min-height:100vh;font-size:14px}
 #app{display:flex;flex-direction:column;min-height:100vh}
 #tabs{background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;height:var(--th);position:sticky;top:0;z-index:200;padding:0 16px;gap:4px}
-/* ── Module Nav（左側直列）── */
-#mod-nav{width:72px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;padding:8px 0;gap:2px;flex-shrink:0;position:sticky;top:var(--th);height:calc(100vh - var(--th));overflow-y:auto}
-.modnav-item{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;width:64px;padding:10px 4px;border-radius:var(--radius);cursor:pointer;transition:all var(--tr);position:relative;text-align:center}
+/* ── 頂部主功能列（桌面 & 手機共用結構，手機用 #mobile-modnav）── */
+#mod-nav{
+  width:100%;background:var(--surface);
+  border-bottom:1px solid var(--border);
+  border-right:none;
+  display:flex;flex-direction:row;align-items:center;
+  padding:0 8px;gap:0;
+  flex-shrink:0;
+  position:sticky;top:var(--th);z-index:190;
+  height:48px;overflow-x:auto;overflow-y:hidden;
+  scrollbar-width:none;
+}
+#mod-nav::-webkit-scrollbar{display:none}
+.modnav-item{
+  display:flex;flex-direction:row;align-items:center;justify-content:center;
+  gap:6px;padding:0 16px;
+  border-radius:0;cursor:pointer;
+  transition:all var(--tr);position:relative;
+  text-align:center;height:48px;
+  border-bottom:2px solid transparent;
+  flex-shrink:0;white-space:nowrap;
+}
 .modnav-item:hover{background:var(--bg)}
-.modnav-item.active{background:var(--blue-bg)}
-.modnav-item.active .modnav-icon{filter:none}
-.modnav-item.active .modnav-label{color:var(--blue)}
-.modnav-item.active::before{content:'';position:absolute;left:0;top:20%;bottom:20%;width:3px;background:var(--blue);border-radius:0 3px 3px 0}
-.modnav-icon{font-size:22px;line-height:1}
-.modnav-label{font-size:10px;color:var(--text-3);font-weight:500;line-height:1.2;letter-spacing:.01em}
-.modnav-item.active .modnav-icon{transform:scale(1.08)}
-.modnav-item .tbadge{position:absolute;top:4px;right:6px;min-width:16px;height:16px;font-size:9px;padding:0 3px}
+.modnav-item.active{background:transparent;border-bottom-color:#4361EE;}
+.modnav-item.active .modnav-label{color:#4361EE;}
+.modnav-item.active::before{display:none}
+.modnav-item.active .modnav-icon{transform:scale(1.08);filter:drop-shadow(0 0 4px rgba(67,97,238,.6))}
+.modnav-icon{font-size:18px;line-height:1}
+.modnav-label{font-size:12px;color:var(--text-2);font-weight:500;line-height:1.2;letter-spacing:.01em}
+.modnav-item .tbadge{position:absolute;top:6px;right:6px;min-width:16px;height:16px;font-size:9px;padding:0 3px}
+/* 子功能列（桌面 second row）*/
+#desktop-subnav{
+  width:100%;
+  background:var(--bg);
+  border-bottom:1px solid var(--border);
+  display:flex;flex-direction:row;align-items:center;
+  padding:6px 12px;gap:6px;
+  flex-shrink:0;
+  position:sticky;top:calc(var(--th) + 48px);z-index:180;
+  overflow-x:auto;overflow-y:hidden;
+  scrollbar-width:none;
+  min-height:40px;
+}
+#desktop-subnav::-webkit-scrollbar{display:none}
+.dsn-btn{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:5px 14px;border-radius:999px;
+  font-size:12px;font-weight:500;
+  white-space:nowrap;flex-shrink:0;
+  border:1px solid var(--border);
+  background:var(--surface);color:var(--text-2);
+  cursor:pointer;transition:all .15s;
+}
+.dsn-btn:hover{background:var(--bg2);color:var(--text)}
+.dsn-btn.active{
+  background:rgba(67,97,238,.12);color:#4361EE;
+  border-color:rgba(67,97,238,.4);
+}
 /* 讓 #tabs logo 包含 portal 按鈕 */
 #tabs{padding:0 12px}
 .logo{gap:6px;font-size:14px}
 #portal-back-btn{padding:4px 9px;font-size:12px;border:1px solid var(--border);border-radius:var(--radius);color:var(--text-3);text-decoration:none;transition:all .15s;white-space:nowrap}
 #portal-back-btn:hover{color:var(--text);background:var(--bg)}
-/* mbody 不再需要 flex（layout-wrap 已處理） */
+/* mbody 不再需要 flex sidebar 空間 */
 #mbody{display:block}
+/* 桌面版 .msb 隱藏，改用頂部 #desktop-subnav */
+.msb{display:none!important}
 @media(max-width:680px){
   #mod-nav{width:52px}
   .modnav-item{width:44px;padding:8px 2px}
@@ -89,8 +137,8 @@ body{font-family:'Segoe UI','PingFang TC','Microsoft JhengHei',sans-serif;backgr
 .trr{margin-left:auto;display:flex;align-items:center;gap:10px}
 .usw{display:flex;align-items:center;gap:8px;background:var(--bg2);border:1px solid var(--bd);border-radius:var(--rs);padding:5px 10px;cursor:pointer;font-size:12px;color:var(--t2)}
 .udot{width:8px;height:8px;border-radius:50%;background:var(--gn)}
-#mbody{display:flex;flex:1;min-height:calc(100vh - var(--th))}
-.mpanel{display:none;flex:1}.mpanel.active{display:flex}
+#mbody{display:flex;flex:1;min-height:calc(100vh - var(--th) - 48px - 40px)}
+.mpanel{display:none;flex:1;flex-direction:column}.mpanel.active{display:flex}
 .msb{width:var(--sw);background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:var(--th);height:calc(100vh - var(--th));overflow-y:auto;flex-shrink:0;padding:12px}
 .sbh{padding:6px 8px 10px;border-bottom:1px solid var(--border);font-size:11px;font-weight:500;letter-spacing:.06em;color:var(--text-3);text-transform:uppercase;margin-bottom:4px}
 .navs{padding:7px 0}
@@ -401,10 +449,17 @@ tr.ovr td{background:rgba(239,68,68,.04)}
 .dash2col{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}
 @media(max-width:900px){.sg,.fuelsum{grid-template-columns:repeat(2,1fr)}.cgrid{grid-template-columns:1fr}}
 @media(max-width:680px){
-  /* 隱藏桌面元素 */
-  #mod-nav{display:none!important}
-  .msb{display:none!important}
-  .modnav-label{display:none!important}
+  /* 隱藏桌面專用元素 */
+  #desktop-subnav{display:none!important}
+  /* mod-nav 手機版：字體小一點，高度壓縮 */
+  #mod-nav{height:40px;top:44px;padding:0 4px;z-index:190;}
+  .modnav-item{padding:0 10px;height:40px;gap:4px;}
+  .modnav-label{font-size:9px;}
+  .modnav-icon{font-size:16px;}
+  /* 子功能 pill bar */
+  #mobile-subnav{top:84px!important;z-index:180;}
+  /* 內容區 top offset */
+  .mc{padding-top:8px!important;}
 
   /* 頂部緊湊 */
   #tabs{padding:0 8px;height:44px;gap:4px}
@@ -911,7 +966,14 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
 
 
 @keyframes winPop{0%{transform:scale(0) rotate(-10deg);opacity:0;}100%{transform:scale(1) rotate(0);opacity:1;}}
-#lotto-result-overlay.show{display:flex!important;}
+#panel-lottery .stage-drawn-list{
+  position:absolute;bottom:8px;left:0;right:0;
+  max-height:80px;overflow-y:auto;
+  padding:6px 16px;
+  display:flex;flex-wrap:wrap;gap:5px;justify-content:center;
+  scrollbar-width:thin;
+}
+#panel-lottery .stage-drawn-list:empty{display:none;}
 </style>
 </head>
 <body>
@@ -920,7 +982,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="logo">
     <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
     <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
-    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.48</span>
+    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.49</span>
   </div>
   <div class="trr">
     <div style="display:flex;align-items:center;gap:6px;padding:4px 12px;background:var(--surface-2);border:1px solid var(--border);border-radius:20px;font-size:12px;cursor:pointer" onclick="showUsw()" id="topbar-user">
@@ -928,7 +990,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <span id="cur-u" style="color:var(--text-2)">載入中…</span>
       <span style="color:var(--text-3);font-size:10px">▾</span>
     </div>
-    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.48</span>
+    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.49</span>
   </div>
 </div>
 <!-- ══ 手機版：模塊 tab bar（桌面隱藏）══ -->
@@ -958,6 +1020,8 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
 </div>
 <!-- ══ 手機版：子功能 pill bar（桌面隱藏，由 JS 動態填入）══ -->
 <div id="mobile-subnav" style="display:none"></div>
+<!-- ══ 桌面版：子功能列（手機隱藏）══ -->
+<div id="desktop-subnav"></div>
 <div id="layout-wrap" style="display:flex;min-height:calc(100vh - var(--th))">
 <!-- ── 左側模塊導覽 ── -->
 <div id="mod-nav">
@@ -1009,7 +1073,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi" data-p="lib-cats"><span class="ic">🏷️</span>分類管理</div>
       <div class="navi" data-p="lib-cfg"><span class="ic">⚙️</span>系統設定</div>
     </div>
-    <div class="sbf">v1.48 · Supabase<br><span style="color:var(--ac)">● 本機存儲</span></div>
+    <div class="sbf">v1.49 · Supabase<br><span style="color:var(--ac)">● 本機存儲</span></div>
   </div>
   <div class="mc" id="lc">
     <div class="pg active" id="pg-lib-dash">
@@ -1091,7 +1155,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       
       <div class="navi cn" data-p="car-cfg"><span class="ic">⚙️</span>系統設定</div>
     </div>
-    <div class="sbf">v1.48 · Supabase<br><span style="color:var(--tl)">● 本機存儲</span></div>
+    <div class="sbf">v1.49 · Supabase<br><span style="color:var(--tl)">● 本機存儲</span></div>
   </div>
   <div class="mc cf" id="cc">
     <div class="pg active" id="pg-car-dash">
@@ -1183,7 +1247,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi tna active" data-p="trip-new"><span class="ic">➕</span>新增報支單</div>
       <div class="navi tna" data-p="trip-list"><span class="ic">📋</span>報支單清單</div>
     </div>
-    <div class="sbf">v1.48 · Supabase<br><span style="color:var(--yw)">● 本機存儲</span></div>
+    <div class="sbf">v1.49 · Supabase<br><span style="color:var(--yw)">● 本機存儲</span></div>
   </div>
   <div class="mc" id="tc">
 
@@ -1322,7 +1386,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi rna" data-p="room-report"><span class="ic">📊</span>使用率報表</div>
       <div class="navi rna" data-p="room-fault"><span class="ic">🔧</span>故障回報<span class="nbadge" id="nb-fault" style="display:none">0</span></div>
     </div>
-    <div class="sbf">v1.48 · Supabase<br><span style="color:var(--gn)">● 本機存儲</span></div>
+    <div class="sbf">v1.49 · Supabase<br><span style="color:var(--gn)">● 本機存儲</span></div>
   </div>
   <div class="mc" id="rmc">
 
@@ -1556,7 +1620,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi vna" data-p="visit-guests"><span class="ic">👥</span>來賓資料庫</div>
       <div class="navi vna" data-p="visit-report"><span class="ic">📊</span>接待報表</div>
     </div>
-    <div class="sbf">v1.48 · Supabase<br><span style="color:#a78bfa">● 本機存儲</span></div>
+    <div class="sbf">v1.49 · Supabase<br><span style="color:#a78bfa">● 本機存儲</span></div>
   </div>
   <div class="mc" id="vmc">
 
@@ -1774,6 +1838,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="reel"><div class="line"></div><div class="reel-track" id="reel2"></div></div>
     </div>
     <button class="draw-btn" id="btn-slot" onclick="runSlot()">開始抽籤</button>
+    <div id="stage-drawn-slot" class="stage-drawn-list"></div>
   </div>
 
   <div class="stage" id="stage-vortex">
@@ -1782,6 +1847,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
     <div class="stage-title">🌀 啟動黑洞，吞噬所有名字</div>
     <canvas id="vortexCanvas"></canvas>
     <button class="draw-btn" id="btn-vortex" onclick="runVortex()" style="z-index:20;">啟動黑洞</button>
+    <div id="stage-drawn-vortex" class="stage-drawn-list"></div>
   </div>
 
   <div class="stage" id="stage-cards">
@@ -1790,6 +1856,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
     <div class="stage-title">🃏 <span id="cards-pool-count">0</span> 位全員到齊，光點掃描鎖定得主</div>
     <div class="card-field" id="cardField"></div>
     <button class="draw-btn" id="btn-cards" onclick="runCards()">開始掃描</button>
+    <div id="stage-drawn-cards" class="stage-drawn-list"></div>
   </div>
 
   <div class="stage" id="stage-wheel">
@@ -1802,6 +1869,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="wheel-hub">🎯</div>
     </div>
     <button class="draw-btn" id="btn-wheel" onclick="runWheel()">轉動輪盤</button>
+    <div id="stage-drawn-wheel" class="stage-drawn-list"></div>
   </div>
 
 </div>
@@ -2676,12 +2744,23 @@ const MOBILE_SUBNAV = {
 };
 
 function mobileModSwitch(m){
-  // 更新模塊 tab 狀態
   document.querySelectorAll('.mm-item').forEach(el=>{
     el.classList.toggle('active', el.dataset.module===m);
   });
-  // 填入子功能 pill bar
   mobileSubNav(m, null);
+  desktopSubNav(m, null);
+}
+
+function desktopSubNav(mod, activeP){
+  const bar = document.getElementById('desktop-subnav');
+  if(!bar) return;
+  if(window.innerWidth <= 680) return; // 手機版交給 mobile-subnav
+  const items = MOBILE_SUBNAV[mod]||[];
+  if(!items.length){bar.innerHTML='';return;}
+  bar.innerHTML = items.map(it=>`
+    <button class="dsn-btn${activeP===it.p?' active':''}" onclick="mobileNavTo('${mod}','${it.p}')">
+      ${it.ic} ${it.lb}
+    </button>`).join('');
 }
 
 function mobileSubNav(mod, activeP){
@@ -2704,13 +2783,8 @@ function mobileNavTo(mod, p){
   else if(mod==='lib') navLib(p);
   else if(mod==='visit') navVisit(p);
   else if(mod==='trip') navTrip(p);
-  // 更新 active 狀態
-  document.querySelectorAll('#mobile-subnav .msn-btn').forEach(btn=>{
-    btn.classList.toggle('active', btn.textContent.trim().endsWith(
-      (MOBILE_SUBNAV[mod]||[]).find(it=>it.p===p)?.lb||'__'
-    ));
-  });
   mobileSubNav(mod, p);
+  desktopSubNav(mod, p);
 }
 
 // 同步 badge 到手機版模塊 tab
@@ -2729,6 +2803,7 @@ function navLib(p){
   document.querySelectorAll('#panel-lib .navi').forEach(el=>el.classList.remove('active'));
   document.querySelector(`#panel-lib .navi[data-p="${p}"]`)?.classList.add('active');
   mobileSubNav('lib',p);
+  desktopSubNav('lib',p);
   renderLibPg(p);
 }
 function renderLibPg(p){
@@ -2748,6 +2823,7 @@ function navCar(p){
   document.querySelectorAll('#panel-car .navi').forEach(el=>el.classList.remove('active'));
   document.querySelector(`#panel-car .navi[data-p="${p}"]`)?.classList.add('active');
   mobileSubNav('car',p);
+  desktopSubNav('car',p);
   renderCarPg(p);
 }
 async function renderCarPg(p){
@@ -3239,6 +3315,7 @@ function navTrip(p){
   document.querySelectorAll('#tc .pg').forEach(el=>el.classList.remove('active'));
   document.getElementById(`pg-${p}`)?.classList.add('active');
   mobileSubNav('trip',p);
+  desktopSubNav('trip',p);
   if(p==='trip-new') initTripForm();
   if(p==='trip-list') renderTripList();
 }
@@ -3922,6 +3999,7 @@ function navRoom(p){
   document.querySelectorAll('#rmc .pg').forEach(el=>el.classList.remove('active'));
   document.getElementById(`pg-${p}`)?.classList.add('active');
   mobileSubNav('room',p);
+  desktopSubNav('room',p);
   if(p==='room-dash') renderRoomDash();
   if(p==='room-cal') renderRoomCal();
   if(p==='room-new') getRoomBookings().then(()=>initBkForm());
@@ -4096,14 +4174,29 @@ function buildGantt(bks){
 }
 function initGanttDrag(){
   document.querySelectorAll('.gantt-wrap').forEach(wrap=>{
-    let isDown=false,startX=0,scrollL=0;
-    wrap.addEventListener('mousedown',e=>{isDown=true;wrap.classList.add('dragging');startX=e.pageX-wrap.offsetLeft;scrollL=wrap.scrollLeft;});
+    let isDown=false,startX=0,scrollL=0,moved=false;
+    wrap.addEventListener('mousedown',e=>{
+      isDown=true;moved=false;
+      wrap.classList.add('dragging');
+      startX=e.pageX;scrollL=wrap.scrollLeft;
+    });
     wrap.addEventListener('mouseleave',()=>{isDown=false;wrap.classList.remove('dragging');});
     wrap.addEventListener('mouseup',()=>{isDown=false;wrap.classList.remove('dragging');});
-    wrap.addEventListener('mousemove',e=>{if(!isDown)return;e.preventDefault();const x=e.pageX-wrap.offsetLeft;wrap.scrollLeft=scrollL-(x-startX);});
-    // touch
-    wrap.addEventListener('touchstart',e=>{startX=e.touches[0].pageX;scrollL=wrap.scrollLeft;},{passive:true});
-    wrap.addEventListener('touchmove',e=>{const x=e.touches[0].pageX;wrap.scrollLeft=scrollL-(x-startX);},{passive:true});
+    wrap.addEventListener('mousemove',e=>{
+      if(!isDown)return;
+      const dx=e.pageX-startX;
+      if(Math.abs(dx)>4){moved=true;e.preventDefault();}
+      wrap.scrollLeft=scrollL-dx;
+    });
+    // touch — passive:true 讓瀏覽器正常捲動，不阻止
+    let tStartX=0,tScrollL=0;
+    wrap.addEventListener('touchstart',e=>{
+      tStartX=e.touches[0].pageX;tScrollL=wrap.scrollLeft;
+    },{passive:true});
+    wrap.addEventListener('touchmove',e=>{
+      const dx=e.touches[0].pageX-tStartX;
+      wrap.scrollLeft=tScrollL-dx;
+    },{passive:true});
   });
 }
 function drawNowLine(){
@@ -4750,6 +4843,7 @@ function navVisit(p){
   document.querySelectorAll('#vmc .pg').forEach(el=>el.classList.remove('active'));
   document.getElementById(`pg-${p}`)?.classList.add('active');
   mobileSubNav('visit',p);
+  desktopSubNav('visit',p);
   if(p==='visit-dash')renderVisitDash();
   if(p==='visit-new')initVisitForm();
   if(p==='visit-list')renderVisitList();
@@ -5395,17 +5489,31 @@ function addDrawn(name){
   renderDrawnList();
 }
 function renderDrawnList(){
+  // menu 頁面的已抽清單
   const el=document.getElementById('drawn-list-wrap');
-  if(!el)return;
-  if(!L_noRepeat||!L_drawn.length){el.style.display='none';return;}
-  el.style.display='block';
-  const list=document.getElementById('drawn-list');
-  if(list) list.innerHTML=[...L_drawn].reverse().map((n,i)=>
-    `<span style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:rgba(67,97,238,.15);border:1px solid rgba(67,97,238,.3);border-radius:999px;font-size:12px;color:#CADCFC">
-      <span style="opacity:.6;font-size:10px">#${L_drawn.length-i}</span>${n}
-    </span>`).join('');
-  const rem=document.getElementById('drawn-remain');
-  if(rem) rem.textContent=`剩 ${POOL.filter(n=>!L_drawn.includes(n)).length}/${POOL.length}`;
+  if(el){
+    if(!L_noRepeat||!L_drawn.length){el.style.display='none';}
+    else{
+      el.style.display='block';
+      const list=document.getElementById('drawn-list');
+      if(list) list.innerHTML=[...L_drawn].reverse().map((n,i)=>
+        `<span style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:rgba(67,97,238,.15);border:1px solid rgba(67,97,238,.3);border-radius:999px;font-size:12px;color:#CADCFC">
+          <span style="opacity:.6;font-size:10px">#${L_drawn.length-i}</span>${n}
+        </span>`).join('');
+      const rem=document.getElementById('drawn-remain');
+      if(rem) rem.textContent=`剩 ${POOL.filter(n=>!L_drawn.includes(n)).length}/${POOL.length}`;
+    }
+  }
+  // 四個 stage 裡的已抽清單
+  ['slot','vortex','cards','wheel'].forEach(mode=>{
+    const sel=document.getElementById(`stage-drawn-${mode}`);
+    if(!sel)return;
+    if(!L_noRepeat||!L_drawn.length){sel.innerHTML='';return;}
+    sel.innerHTML=[...L_drawn].reverse().map((n,i)=>
+      `<span style="display:inline-flex;align-items:center;gap:3px;padding:2px 8px;background:rgba(67,97,238,.2);border:1px solid rgba(202,220,252,.3);border-radius:999px;font-size:11px;color:#CADCFC;white-space:nowrap;">
+        <span style="opacity:.5;font-size:9px">#${L_drawn.length-i}</span>${n}
+      </span>`).join('');
+  });
 }
 const L_DURATION = 5000;
 document.getElementById('poolCount').textContent = POOL.length;
@@ -5413,7 +5521,16 @@ function escapeHtml(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'
 
 /* ===================== 音效：輕快音樂 ===================== */
 let L_actx=null, L_muted=false, bgmTimer=null, bgmStop=false;
-function AC(){ if(!L_actx) L_actx=new (window.AudioContext||window.webkitAudioContext)(); if(L_actx.state==='suspended')L_actx.resume(); return L_actx; }
+function AC(){
+  if(!L_actx) L_actx=new (window.AudioContext||window.webkitAudioContext)();
+  // iOS 需要在 user gesture 裡 resume
+  if(L_actx.state==='suspended') L_actx.resume();
+  return L_actx;
+}
+function ensureAudio(){
+  // 每次 user gesture 都呼叫，確保 context running
+  AC();
+}
 function toggleMute(){L_muted=!L_muted;document.getElementById('muteTag').textContent=L_muted?'🔇 音效關':'🔊 音效開';if(L_muted)stopBgm();}
 function note(freq,dur,t0,gain=0.16,type='triangle'){
   if(L_muted)return; const c=AC(); const t=c.currentTime+t0;
@@ -5469,7 +5586,7 @@ function fillReel(id){
 }
 function initSlot(){ ['reel0','reel1','reel2'].forEach(fillReel); }
 function runSlot(){
-  if(L_busy)return; L_busy=true; document.getElementById('btn-slot').disabled=true;
+  if(L_busy)return; L_busy=true; AC(); document.getElementById('btn-slot').disabled=true;
   const winner=L_pick();
   const ROW=50; // 必須與 CSS .reel-track div{height:50px} 一致
   const reelH=document.querySelector('#panel-lottery .reel')?.offsetHeight||120;
@@ -5519,7 +5636,7 @@ function drawVortexIdle(){
   vCtx.restore(); if(!L_busy)vAnim=requestAnimationFrame(drawVortexIdle);
 }
 function runVortex(){
-  if(L_busy)return; L_busy=true; document.getElementById('btn-vortex').disabled=true;
+  if(L_busy)return; L_busy=true; AC(); document.getElementById('btn-vortex').disabled=true;
   cancelAnimationFrame(vAnim); const winner=L_pick();
   startBgm(); let tickTimer=setInterval(blip,90); const start=performance.now();
   function anim(now){
@@ -5557,7 +5674,7 @@ function initCards(){
   });
 }
 function runCards(){
-  if(L_busy)return; L_busy=true; document.getElementById('btn-cards').disabled=true;
+  if(L_busy)return; L_busy=true; AC(); document.getElementById('btn-cards').disabled=true;
   initCards(); const winner=L_pick(); startBgm(); const start=performance.now(); let lastIdx=-1;
   const LIT_STYLE='background:linear-gradient(145deg,#4361EE,#5a73d8);color:#fff;box-shadow:0 0 22px 6px rgba(67,97,238,.8);border:2px solid #CADCFC;transform:scale(1.12);transition:all .08s;';
   const NORMAL_STYLE='min-width:80px;max-width:130px;height:48px;display:flex;align-items:center;justify-content:center;border-radius:10px;font-size:15px;font-weight:bold;color:#CADCFC;flex:0 0 auto;padding:0 10px;background:linear-gradient(145deg,#1E2761,#2a3580);border:1.5px solid rgba(202,220,252,.25);cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';
@@ -5625,7 +5742,7 @@ function drawWheel(rot){
   wCtx.restore();
 }
 function runWheel(){
-  if(L_busy)return; L_busy=true; document.getElementById('btn-wheel').disabled=true;
+  if(L_busy)return; L_busy=true; AC(); document.getElementById('btn-wheel').disabled=true;
   const n=POOL.length, seg=(Math.PI*2)/n, winIdx=L_pickIdx(), winner=POOL[winIdx];
   const centerAngle=winIdx*seg+seg/2; const target=(-Math.PI/2-centerAngle); const finalRot=target+6*Math.PI*2;
   startBgm(); let tickTimer=setInterval(blip,80);

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" href="data:,">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART 行政管理平台 v1.44</title>
+<title>COMART 行政管理平台 v1.45</title>
 <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.js"></script>
 <style>
 :root{
@@ -291,7 +291,13 @@ input[type=time]::-webkit-calendar-picker-indicator{
 .slot:hover:not(.slot-busy):not(.slot-sel){background:var(--bgh);border-color:var(--gn)}
 .slot-busy{opacity:.4;cursor:not-allowed;background:var(--red-d);border-color:rgba(239,68,68,.3);color:var(--rd)}
 .slot-sel{background:rgba(34,197,94,.15);border-color:var(--gn);color:var(--gn);font-weight:700}
-@media(max-width:680px){.gantt-label-col,.gantt-room-label{width:80px}.step-lbl{display:none}}
+@media(max-width:680px){
+  .gantt-label-col,.gantt-room-label{width:68px;font-size:10px;padding:6px 6px}
+  .step-lbl{display:none}
+  .gantt-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  .gantt-head,.gantt-row{min-width:480px;}
+  .gantt-block{font-size:9px;}
+}
 
 /* VISIT */
 .vna.active{color:#a78bfa!important;background:rgba(167,139,250,.08)!important;font-weight:600}
@@ -393,12 +399,35 @@ tr.ovr td{background:rgba(239,68,68,.04)}
 .dash2col{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}
 @media(max-width:900px){.sg,.fuelsum{grid-template-columns:repeat(2,1fr)}.cgrid{grid-template-columns:1fr}}
 @media(max-width:680px){
-  .msb{display:none}
-  .mc{padding:12px 14px}
+  /* ── Sidebar → bottom sheet nav ── */
+  .msb{
+    display:flex!important;
+    position:fixed;bottom:0;left:0;right:0;
+    width:100%!important;height:auto!important;
+    flex-direction:row;flex-wrap:nowrap;
+    overflow-x:auto;overflow-y:hidden;
+    -webkit-overflow-scrolling:touch;
+    padding:6px 8px env(safe-area-inset-bottom);
+    background:var(--surface);
+    border-right:none;border-top:1px solid var(--border);
+    z-index:200;gap:2px;
+    box-shadow:0 -4px 20px rgba(0,0,0,.25);
+  }
+  /* 隱藏 sidebar 裡的非 navi 元素（標題、版本資訊） */
+  .msb .sbh,.msb .navl,.msb .sbf,.msb .navs{display:none!important}
+  .navi{
+    flex-direction:column;align-items:center;justify-content:center;
+    gap:2px;padding:5px 8px;min-width:54px;flex-shrink:0;
+    font-size:9px;border-radius:8px;
+  }
+  .navi .ic{font-size:18px;width:auto}
+  /* 主內容區底部留出 tab bar 高度 */
+  .mc{padding:12px 14px 80px!important}
+  #mbody{padding-bottom:0}
+
   .sg{grid-template-columns:repeat(2,1fr)}
   .fuelsum{grid-template-columns:repeat(2,1fr)}
   .modnav-label{display:none!important}
-  
 
   /* tab bar 更緊湊 */
   #tabs{padding:0 8px;gap:0}
@@ -458,7 +487,7 @@ tr.ovr td{background:rgba(239,68,68,.04)}
   .wth{font-size:9px;padding:4px 2px}
 
   /* toast 靠左 */
-  #toastc{right:8px;bottom:12px;left:8px}
+  #toastc{right:8px;bottom:70px;left:8px}
   .toast{min-width:0;width:100%}
 
   /* user-select grid → 2欄 */
@@ -768,49 +797,61 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
 /* ══ LOTTERY ══ */
 #panel-lottery .mc{padding:0!important;overflow:hidden;}
 #panel-lottery .lotto-root{height:100%;overflow:auto;}
+@media(max-width:680px){
+  #panel-lottery .mc{padding-bottom:0!important;}
+  #panel-lottery .lotto-root{height:calc(100vh - var(--th) - 64px);padding-bottom:env(safe-area-inset-bottom);}
+  #panel-lottery #app{height:100%;min-height:0;}
+  #panel-lottery #menu{padding:16px 12px;overflow-y:auto;}
+  #panel-lottery .muted-tag{bottom:76px;}
+}
 
 #panel-lottery #app{height:100vh;display:flex;flex-direction:column;}
 #panel-lottery #menu{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;}
 #panel-lottery #menu h1{font-size:clamp(28px,6vw,52px);letter-spacing:4px;background:linear-gradient(90deg,#fff,#CADCFC,#4361EE);-webkit-background-clip:text;background-clip:text;color:transparent;margin-bottom:8px;}
-#panel-lottery #menu .sub{color:#9aa6d6;margin-bottom:34px;font-size:15px;letter-spacing:2px;}
-#panel-lottery .cards{display:flex;gap:20px;flex-wrap:wrap;justify-content:center;max-width:1080px;}
+#panel-lottery #menu .sub{color:#9aa6d6;margin-bottom:20px;font-size:15px;letter-spacing:2px;text-align:center;}
+/* site filter bar */
+#panel-lottery #menu .site-bar{margin-bottom:20px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center;}
+#panel-lottery #menu .site-bar label{font-size:12px;color:#9aa6d6;letter-spacing:1px;}
+#panel-lottery #menu .site-bar select{background:rgba(255,255,255,.08);border:1px solid rgba(202,220,252,.25);color:#fff;border-radius:8px;padding:6px 12px;font-size:13px;cursor:pointer;}
+#panel-lottery #menu .site-bar select option{background:#1a1a2e;color:#fff;}
+#panel-lottery .cards{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;justify-content:center;max-width:1080px;width:100%;}
 #panel-lottery .mode-card{
-    width:248px;background:rgba(255,255,255,.04);border:1px solid rgba(202,220,252,.18);
-    border-radius:20px;padding:26px 22px;cursor:pointer;transition:.25s;backdrop-filter:blur(6px);
+    background:rgba(255,255,255,.04);border:1px solid rgba(202,220,252,.18);
+    border-radius:20px;padding:22px 16px;cursor:pointer;transition:.25s;backdrop-filter:blur(6px);
     display:flex;flex-direction:column;align-items:center;text-align:center;
   }
 #panel-lottery .mode-card:hover{transform:translateY(-8px);border-color:var(--accent);box-shadow:0 18px 50px rgba(67,97,238,.35);background:rgba(67,97,238,.08);}
-#panel-lottery .mode-card .emoji-ico{font-size:50px;margin-bottom:12px;}
-#panel-lottery .mode-card h2{font-size:21px;margin-bottom:9px;letter-spacing:2px;}
-#panel-lottery .mode-card p{font-size:13px;color:#9aa6d6;line-height:1.7;}
-#panel-lottery .badge{margin-top:14px;font-size:12px;color:var(--gold);border:1px solid var(--gold);padding:4px 12px;border-radius:999px;}
+#panel-lottery .mode-card .emoji-ico{font-size:40px;margin-bottom:10px;}
+#panel-lottery .mode-card h2{font-size:18px;margin-bottom:7px;letter-spacing:2px;}
+#panel-lottery .mode-card p{font-size:12px;color:#9aa6d6;line-height:1.6;}
+#panel-lottery .badge{margin-top:12px;font-size:11px;color:var(--gold);border:1px solid var(--gold);padding:3px 10px;border-radius:999px;}
 #panel-lottery .stage{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;}
 #panel-lottery .stage.active{display:flex;}
 #panel-lottery .back-btn{position:absolute;top:18px;left:18px;z-index:50;background:rgba(255,255,255,.08);border:1px solid rgba(202,220,252,.25);color:#fff;padding:8px 18px;border-radius:999px;cursor:pointer;font-size:14px;letter-spacing:1px;}
 #panel-lottery .back-btn:hover{background:rgba(255,255,255,.18);}
 #panel-lottery .count-tag{position:absolute;top:20px;right:20px;z-index:50;font-size:13px;color:#9aa6d6;letter-spacing:1px;}
 #panel-lottery .draw-btn{
-    margin-top:34px;padding:16px 56px;font-size:20px;letter-spacing:6px;font-weight:bold;color:#fff;
+    margin-top:24px;padding:14px 44px;font-size:18px;letter-spacing:5px;font-weight:bold;color:#fff;
     border:none;border-radius:999px;cursor:pointer;
     background:linear-gradient(90deg,#4361EE,#C8941A);box-shadow:0 10px 36px rgba(67,97,238,.5);transition:.2s;
   }
 #panel-lottery .draw-btn:hover:not(:disabled){transform:scale(1.05);}
 #panel-lottery .draw-btn:disabled{opacity:.4;cursor:not-allowed;}
-#panel-lottery .stage-title{font-size:22px;letter-spacing:3px;color:#CADCFC;margin-bottom:24px;text-shadow:0 0 18px rgba(67,97,238,.6);}
+#panel-lottery .stage-title{font-size:clamp(14px,3.5vw,22px);letter-spacing:2px;color:#CADCFC;margin-bottom:16px;text-shadow:0 0 18px rgba(67,97,238,.6);text-align:center;padding:0 20px;}
 
   /* 老虎機 */
-  .slot-wrap{display:flex;gap:14px;}
+  .slot-wrap{display:flex;gap:8px;justify-content:center;}
 #panel-lottery .reel{
-    width:clamp(150px,40vw,280px);height:170px;overflow:hidden;border-radius:18px;
+    width:clamp(80px,26vw,200px);height:clamp(120px,22vh,170px);overflow:hidden;border-radius:14px;
     background:linear-gradient(180deg,#0d1130,#1a2050);border:3px solid var(--accent);
     box-shadow:inset 0 0 50px rgba(0,0,0,.7),0 0 40px rgba(67,97,238,.4);position:relative;
   }
-#panel-lottery .reel::before,.reel::after{content:"";position:absolute;left:0;right:0;height:55px;z-index:3;pointer-events:none;}
+#panel-lottery .reel::before,.reel::after{content:"";position:absolute;left:0;right:0;height:40px;z-index:3;pointer-events:none;}
 #panel-lottery .reel::before{top:0;background:linear-gradient(180deg,#0d1130,transparent);}
 #panel-lottery .reel::after{bottom:0;background:linear-gradient(0deg,#0d1130,transparent);}
-#panel-lottery .reel .line{position:absolute;top:50%;left:0;right:0;height:60px;transform:translateY(-50%);border-top:2px solid var(--gold);border-bottom:2px solid var(--gold);z-index:2;background:rgba(200,148,26,.06);}
+#panel-lottery .reel .line{position:absolute;top:50%;left:0;right:0;height:50px;transform:translateY(-50%);border-top:2px solid var(--gold);border-bottom:2px solid var(--gold);z-index:2;background:rgba(200,148,26,.06);}
 #panel-lottery .reel-track{position:absolute;left:0;right:0;display:flex;flex-direction:column;align-items:center;will-change:transform;}
-#panel-lottery .reel-track div{height:60px;line-height:60px;font-size:34px;font-weight:bold;color:#fff;width:100%;text-align:center;}
+#panel-lottery .reel-track div{height:50px;line-height:50px;font-size:clamp(20px,5vw,34px);font-weight:bold;color:#fff;width:100%;text-align:center;}
 
   /* 黑洞 */
   #vortexCanvas{position:absolute;inset:0;width:100%;height:100%;}
@@ -828,6 +869,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
 
   /* 輪盤 */
   .#panel-lottery .wheel-stage{position:relative;width:min(78vw,440px);height:min(78vw,440px);overflow:visible;}
+#panel-lottery .wheel-stage{position:relative;width:min(78vw,440px);height:min(78vw,440px);overflow:visible;}
 #panel-lottery #wheelCanvas{width:100%;height:100%;display:block;filter:drop-shadow(0 0 30px rgba(67,97,238,.45));}
 #panel-lottery .wheel-pointer{display:none;}
 #panel-lottery .wheel-hub{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:5;
@@ -865,7 +907,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="logo">
     <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
     <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
-    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.44</span>
+    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.45</span>
   </div>
   <div class="trr">
     <div style="display:flex;align-items:center;gap:6px;padding:4px 12px;background:var(--surface-2);border:1px solid var(--border);border-radius:20px;font-size:12px;cursor:pointer" onclick="showUsw()" id="topbar-user">
@@ -873,7 +915,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <span id="cur-u" style="color:var(--text-2)">載入中…</span>
       <span style="color:var(--text-3);font-size:10px">▾</span>
     </div>
-    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.44</span>
+    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.45</span>
   </div>
 </div>
 <div id="layout-wrap" style="display:flex;min-height:calc(100vh - var(--th))">
@@ -927,7 +969,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi" data-p="lib-cats"><span class="ic">🏷️</span>分類管理</div>
       <div class="navi" data-p="lib-cfg"><span class="ic">⚙️</span>系統設定</div>
     </div>
-    <div class="sbf">v1.44 · Supabase<br><span style="color:var(--ac)">● 本機存儲</span></div>
+    <div class="sbf">v1.45 · Supabase<br><span style="color:var(--ac)">● 本機存儲</span></div>
   </div>
   <div class="mc" id="lc">
     <div class="pg active" id="pg-lib-dash">
@@ -1009,7 +1051,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       
       <div class="navi cn" data-p="car-cfg"><span class="ic">⚙️</span>系統設定</div>
     </div>
-    <div class="sbf">v1.44 · Supabase<br><span style="color:var(--tl)">● 本機存儲</span></div>
+    <div class="sbf">v1.45 · Supabase<br><span style="color:var(--tl)">● 本機存儲</span></div>
   </div>
   <div class="mc cf" id="cc">
     <div class="pg active" id="pg-car-dash">
@@ -1101,7 +1143,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi tna active" data-p="trip-new"><span class="ic">➕</span>新增報支單</div>
       <div class="navi tna" data-p="trip-list"><span class="ic">📋</span>報支單清單</div>
     </div>
-    <div class="sbf">v1.44 · Supabase<br><span style="color:var(--yw)">● 本機存儲</span></div>
+    <div class="sbf">v1.45 · Supabase<br><span style="color:var(--yw)">● 本機存儲</span></div>
   </div>
   <div class="mc" id="tc">
 
@@ -1240,7 +1282,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi rna" data-p="room-report"><span class="ic">📊</span>使用率報表</div>
       <div class="navi rna" data-p="room-fault"><span class="ic">🔧</span>故障回報<span class="nbadge" id="nb-fault" style="display:none">0</span></div>
     </div>
-    <div class="sbf">v1.44 · Supabase<br><span style="color:var(--gn)">● 本機存儲</span></div>
+    <div class="sbf">v1.45 · Supabase<br><span style="color:var(--gn)">● 本機存儲</span></div>
   </div>
   <div class="mc" id="rmc">
 
@@ -1474,7 +1516,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi vna" data-p="visit-guests"><span class="ic">👥</span>來賓資料庫</div>
       <div class="navi vna" data-p="visit-report"><span class="ic">📊</span>接待報表</div>
     </div>
-    <div class="sbf">v1.44 · Supabase<br><span style="color:#a78bfa">● 本機存儲</span></div>
+    <div class="sbf">v1.45 · Supabase<br><span style="color:#a78bfa">● 本機存儲</span></div>
   </div>
   <div class="mc" id="vmc">
 
@@ -1641,6 +1683,13 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div id="menu">
     <h1>COMART 抽籤系統</h1>
     <div class="sub">名單共 <span id="poolCount">0</span> 位 · 選擇一種抽籤方式</div>
+    <div class="site-bar">
+      <label>參與單位：</label>
+      <select id="lottoSiteFilter" onchange="lottoFilterSite()">
+        <option value="all">全部人員</option>
+      </select>
+      <span id="lotto-site-count" style="font-size:12px;color:#a78bfa;letter-spacing:1px;"></span>
+    </div>
     <div class="cards">
       <div class="mode-card" onclick="openStage('slot')">
         <div class="emoji-ico">🎰</div><h2>幸運老虎機</h2>
@@ -1684,7 +1733,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="stage" id="stage-cards">
     <button class="back-btn" onclick="goMenu()">← 返回</button>
     <div class="count-tag">命運翻牌</div>
-    <div class="stage-title">🃏 22 位全員到齊，光點掃描鎖定得主</div>
+    <div class="stage-title">🃏 <span id="cards-pool-count">0</span> 位全員到齊，光點掃描鎖定得主</div>
     <div class="card-field" id="cardField"></div>
     <button class="draw-btn" id="btn-cards" onclick="runCards()">開始掃描</button>
   </div>
@@ -5099,17 +5148,46 @@ async function seedVisitDemo(){
 
 // ══ LOTTERY JS ══
 // ══ LOTTERY INIT（Admin 整合）══
+let _lottoAllUsers = []; // 全部使用者快取
+
 function lottoInit(){
-  // 從 Admin users 載入抽籤名單
   const us = ld(K.us)||[];
-  POOL = us.filter(u=>u.active!==false)
-           .map(u=>u.nameZh||u.nameEn||u.name||u.id)
-           .filter(Boolean);
+  _lottoAllUsers = us.filter(u=>u.active!==false);
+
+  // 建立 site 選單（TW/DG/VN/等，去重）
+  const sites = [...new Set(_lottoAllUsers.map(u=>u.site||'TW').filter(Boolean))].sort();
+  const sel = document.getElementById('lottoSiteFilter');
+  if(sel){
+    sel.innerHTML = `<option value="all">全部人員（${_lottoAllUsers.length}位）</option>`
+      + sites.map(s=>{
+          const cnt = _lottoAllUsers.filter(u=>(u.site||'TW')===s).length;
+          return `<option value="${s}">${siteName(s)}（${cnt}位）</option>`;
+        }).join('');
+  }
+  lottoFilterSite(); // 套用目前選擇
+}
+
+function siteName(s){
+  const map={TW:'台灣總部',DG:'東莞工廠',VN:'越南工廠'};
+  return map[s]||s;
+}
+
+function lottoFilterSite(){
+  const sel = document.getElementById('lottoSiteFilter');
+  const val = sel?.value||'all';
+  const filtered = val==='all'
+    ? _lottoAllUsers
+    : _lottoAllUsers.filter(u=>(u.site||'TW')===val);
+  POOL = filtered.map(u=>u.nameZh||u.nameEn||u.name||u.id).filter(Boolean);
   if(!POOL.length) POOL = ['請先建立人員名單'];
-  // 更新人數顯示
+  // 更新顯示
   const pc = document.getElementById('poolCount');
   if(pc) pc.textContent = POOL.length;
-  console.log('✓ 抽籤人員載入：', POOL.length, '位');
+  const cpc = document.getElementById('cards-pool-count');
+  if(cpc) cpc.textContent = POOL.length;
+  const sc = document.getElementById('lotto-site-count');
+  if(sc) sc.textContent = val==='all'?'':`· ${siteName(val)} ${POOL.length} 位`;
+  console.log('✓ 抽籤名單：', POOL.length, '位', val==='all'?'(全部)':`(${val})`);
 }
 
 /* ===================== 名單 ===================== */
@@ -5160,6 +5238,8 @@ let L_current=null, L_busy=false;
 function openStage(m){ AC(); L_current=m; document.getElementById('menu').style.display='none';
   document.querySelectorAll('.stage').forEach(s=>s.classList.remove('active'));
   document.getElementById('stage-'+m).classList.add('active');
+  // 同步人數到各 stage 標題
+  const cpc=document.getElementById('cards-pool-count');if(cpc)cpc.textContent=POOL.length;
   if(m==='slot')initSlot(); if(m==='vortex')initVortex(); if(m==='cards')initCards(); if(m==='wheel')initWheel();
 }
 function goMenu(){ if(L_busy)return; L_current=null; stopBgm();

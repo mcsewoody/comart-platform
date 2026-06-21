@@ -827,6 +827,8 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
             <span class="review-step" id="rs-published" onclick="filterReviewPanel('published')" style="cursor:pointer;" data-i18n="status.filter.published">已發佈</span>
             <span class="review-arrow">→</span>
             <span class="review-step" id="rs-archived" onclick="filterReviewPanel('archived')" style="cursor:pointer;" data-i18n="status.filter.archived">已封存</span>
+            <span style="color:var(--border);margin:0 2px;">|</span>
+            <span id="rs-noauthor" onclick="filterReviewPanel('noauthor')" style="cursor:pointer;padding:5px 12px;border-radius:var(--radius);font-size:12px;font-weight:500;border:1px solid var(--amber);color:var(--amber);background:transparent;">⚠ 未署名</span>
           </div>
         </div>
         <div style="flex:1;overflow-y:auto;padding:12px 20px;" id="review-content">
@@ -6081,6 +6083,8 @@ function filterReviewPanel(status) {
     const el = document.getElementById('rs-' + s);
     if (el) el.className = 'review-step' + (s === status ? ' active' : '');
   });
+  const naEl = document.getElementById('rs-noauthor');
+  if (naEl) naEl.style.background = status === 'noauthor' ? 'var(--amber-bg)' : 'transparent';
   loadReviewPanel();
 }
 
@@ -6095,12 +6099,18 @@ function renderReviewList(filterStatus) {
     archived:  { label: s_['status.archived']  || 'Archive',  badge:'sb-archived'  },
   };
   let docs = window._reviewAllDocs || [];
-  if (filterStatus !== 'all') docs = docs.filter(d => d.status === filterStatus);
+  if (filterStatus === 'noauthor') {
+    docs = docs.filter(d => !d.author_name || !d.author_name.trim());
+  } else if (filterStatus !== 'all') {
+    docs = docs.filter(d => d.status === filterStatus);
+  }
   if (!docs.length) {
-    content.innerHTML = '<div style="text-align:center;color:var(--text-3);padding:40px 0;font-size:13px;">此分類無文件</div>';
+    const emptyMsg = filterStatus === 'noauthor' ? '所有文件均已署名 ✅' : '此分類無文件';
+    content.innerHTML = `<div style="text-align:center;color:var(--text-3);padding:40px 0;font-size:13px;">${emptyMsg}</div>`;
     return;
   }
   const isArchived = filterStatus === 'archived';
+  const isNoAuthor = filterStatus === 'noauthor';
   const renderRow = d => {
     const st = stCfg[d.status] || stCfg.draft;
     const meta = CAT_META[d.category] || { icon:'📁', name:'' };
@@ -6136,6 +6146,9 @@ function renderReviewList(filterStatus) {
         style="padding:4px 12px;border-radius:var(--radius);border:1px solid var(--green);background:var(--green-bg);color:var(--green);font-size:12px;cursor:pointer;font-weight:500;">
         ✅ 重新發佈
       </button>
+    </div>` : isNoAuthor ? `
+    <div style="margin-bottom:10px;padding:8px 12px;background:var(--amber-bg);border:1px solid var(--amber-border);border-radius:var(--radius);font-size:12px;color:var(--amber);">
+      ⚠ 共 ${docs.length} 份文件未署名，點擊 ✏️ 開啟文件後補上作者姓名再儲存
     </div>` : `<div style="margin-bottom:4px;font-size:12px;color:var(--text-3);">共 ${docs.length} 份文件</div>`;
   content.innerHTML = toolbarHtml + docs.map(renderRow).join('');
 }
@@ -6177,6 +6190,8 @@ async function loadReviewPanel() {
       const el = document.getElementById('rs-' + s);
       if (el) el.className = 'review-step' + (s === window._reviewFilter ? ' active' : '');
     });
+    const naEl = document.getElementById('rs-noauthor');
+    if (naEl) naEl.style.background = window._reviewFilter === 'noauthor' ? 'var(--amber-bg)' : 'transparent';
     // 顯示待審核文件列表
     content.innerHTML = '<div style="text-align:center;color:var(--text-3);padding:20px 0;font-size:13px;">載入中…</div>';
     try {

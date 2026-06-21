@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>COMART Platform v1.38</title>
+<title>COMART Platform v1.39</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -323,7 +323,7 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1) brightness(
     <div class="login-logo">
       <div class="login-mark">C</div>
       <div class="login-name">COMART Platform</div>
-      <div class="login-sub">Internal Portal · v1.38</div>
+      <div class="login-sub">Internal Portal · v1.39</div>
     </div>
     <form id="loginForm" onsubmit="doLogin();return false;" autocomplete="on">
     <div class="field">
@@ -351,7 +351,7 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1) brightness(
   <div class="topbar">
     <div class="topbar-logo" onclick="switchView('home')">
       <div class="topbar-mark">C</div>
-      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.38</span></div>
+      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.39</span></div>
     </div>
     <div class="topbar-right">
       <div class="lang-switcher">
@@ -3323,11 +3323,35 @@ async function loadRanking() {
 }
 
 async function loadDirectory() {
-  if (!db) { renderDirectory(); return; }
+  // 主要：Supabase
+  let sbLoaded = false;
   try {
-    const snap = await db.collection(COL_U).orderBy('empId','asc').get();
-    ALL_USERS = snap.docs.map(d => d.data()).filter(u => u.role !== 'inactive');
-  } catch(e) { ALL_USERS = []; }
+    const res = await fetch(
+      `${SB_WORKER}/supabase/rest/v1/users?select=emp_id,name_en,name_zh,role,dept,site,email,mobile,ext,title_en,title_zh,avatar_url,active&order=emp_id&active=eq.true`,
+      { headers: { 'x-admin-token': SB_TOKEN } }
+    );
+    if (res.ok) {
+      const rows = await res.json();
+      if (Array.isArray(rows) && rows.length) {
+        ALL_USERS = rows.map(u => ({
+          empId:   u.emp_id,   nameEn: u.name_en  || '', nameZh: u.name_zh  || '',
+          role:    u.role      || 'user',          dept:   u.dept     || '',
+          site:    u.site      || 'TW',            email:  u.email    || '',
+          mobile:  u.mobile    || '',              ext:    u.ext      || '',
+          titleEn: u.title_en  || '',              titleZh:u.title_zh || '',
+          photoURL:u.avatar_url|| '',
+        }));
+        sbLoaded = true;
+      }
+    }
+  } catch(e) { console.warn('loadDirectory Supabase failed:', e.message); }
+  // Firebase 備援
+  if (!sbLoaded && db) {
+    try {
+      const snap = await db.collection(COL_U).orderBy('empId','asc').get();
+      ALL_USERS = snap.docs.map(d => d.data()).filter(u => u.role !== 'inactive');
+    } catch(e) { ALL_USERS = []; }
+  }
   renderDirectory();
 }
 
@@ -3654,8 +3678,63 @@ function _populateUserFilterDropdowns() {
 // ═══════════════════════════════════════════════
 async function loadUsers() {
   if (SESSION?.role !== 'admin') return;
+  // 主要：Supabase
+  let sbLoaded = false;
+  try {
+    const res = await fetch(
+      `${SB_WORKER}/supabase/rest/v1/users?select=emp_id,name_en,name_zh,role,dept,site,email,mobile,ext,title_en,title_zh,avatar_url,pwd_hash,active&order=emp_id`,
+      { headers: { 'x-admin-token': SB_TOKEN } }
+    );
+    if (res.ok) {
+      const rows = await res.json();
+      if (Array.isArray(rows) && rows.length) {
+        ALL_USERS = rows.map(u => ({
+          empId:       u.emp_id,
+          nameEn:      u.name_en    || '',
+          nameZh:      u.name_zh    || '',
+          email:       u.email      || '',
+          login:       u.email      || '',
+          ext:         u.ext        || '',
+          mobile:      u.mobile     || '',
+          titleEn:     u.title_en   || '',
+          titleZh:     u.title_zh   || '',
+          site:        u.site       || 'TW',
+          dept:        u.dept       || '',
+          role:        u.active === false ? 'inactive' : (u.role || 'user'),
+          photoURL:    u.avatar_url || '',
+          pwdHash:     u.pwd_hash   || '',
+          active:      u.active !== false,
+          bioZh: '', bioEn: '', expertiseZh: [], expertiseEn: [],
+        }));
+        sbLoaded = true;
+      }
+    }
+  } catch(e) { console.warn('loadUsers Supabase failed, falling back to Firebase:', e.message); }
+
+  // Firebase：備援（若 Supabase 失敗）＋ 補 bio/expertise 擴充欄位
   await Promise.allSettled([
-    (async()=>{ if(!db)return; try{const s=await db.collection(COL_U).orderBy('empId','asc').get();ALL_USERS=s.docs.map(d=>d.data());}catch(e){} })(),
+    (async() => {
+      if (!db) return;
+      try {
+        const s = await db.collection(COL_U).orderBy('empId','asc').get();
+        const fbUsers = s.docs.map(d => d.data());
+        if (!sbLoaded) {
+          ALL_USERS = fbUsers;
+        } else {
+          fbUsers.forEach(fu => {
+            const u = ALL_USERS.find(x => x.empId === fu.empId);
+            if (!u) return;
+            if (fu.bioZh)       u.bioZh       = fu.bioZh;
+            if (fu.bioEn)       u.bioEn        = fu.bioEn;
+            if (fu.expertiseZh) u.expertiseZh  = fu.expertiseZh;
+            if (fu.expertiseEn) u.expertiseEn  = fu.expertiseEn;
+            if (fu.mustChangePwd !== undefined) u.mustChangePwd = fu.mustChangePwd;
+            if (fu.createdAt)   u.createdAt    = fu.createdAt;
+            if (!u.photoURL && fu.photoURL) u.photoURL = fu.photoURL;
+          });
+        }
+      } catch(e) { console.warn('loadUsers Firebase fallback failed:', e.message); }
+    })(),
     (async()=>{ if(!db||ALL_DEPTS.length)return; try{const s=await db.collection(COL_DEPT).orderBy('key').get();if(!s.empty)ALL_DEPTS=s.docs.map(d=>Object.assign({id:d.id},d.data()));}catch(e){} })(),
     (async()=>{ if(!db||ALL_SITES.length)return; try{const s=await db.collection(COL_SITE).orderBy('key').get();if(!s.empty)ALL_SITES=s.docs.map(d=>Object.assign({id:d.id},d.data()));}catch(e){} })(),
   ]);
@@ -3769,43 +3848,38 @@ const SB_WORKER = 'https://comart.mcsewoody.workers.dev';
 const SB_TOKEN  = 'COMART-ADMIN-2026';
 
 async function sbSyncUser(user, isDelete) {
-  try {
-    if (isDelete) {
-      await fetch(`${SB_WORKER}/supabase/rest/v1/users?emp_id=eq.${encodeURIComponent(user.empId)}`, {
-        method: 'DELETE',
-        headers: { 'x-admin-token': SB_TOKEN, 'Content-Type': 'application/json' },
-      });
-    } else {
-      // Upsert（新增或更新）
-      await fetch(`${SB_WORKER}/supabase/rest/v1/users`, {
-        method: 'POST',
-        headers: {
-          'x-admin-token': SB_TOKEN,
-          'Content-Type': 'application/json',
-          'Prefer': 'resolution=merge-duplicates,return=minimal',
-        },
-        body: JSON.stringify({
-          emp_id:     user.empId,
-          name_en:    user.nameEn    || '',
-          name_zh:    user.nameZh    || '',
-          role:       user.role      || 'user',
-          dept:       user.dept      || '',
-          site:       user.site      || 'TW',
-          email:      user.email     || '',
-          mobile:     user.mobile    || '',
-          ext:        user.ext       || '',
-          title_en:   user.titleEn   || '',
-          title_zh:   user.titleZh   || '',
-          pwd_hash:   user.pwdHash   || '',
-          avatar_url: user.photoURL  || '',
-          active:     true,
-        }),
-      });
-    }
-    console.log(`✓ Supabase sync: ${isDelete ? 'deleted' : 'upserted'} ${user.empId}`);
-  } catch(e) {
-    console.warn('Supabase sync failed (non-fatal):', e.message);
+  if (isDelete) {
+    await fetch(`${SB_WORKER}/supabase/rest/v1/users?emp_id=eq.${encodeURIComponent(user.empId)}`, {
+      method: 'DELETE',
+      headers: { 'x-admin-token': SB_TOKEN, 'Content-Type': 'application/json' },
+    });
+  } else {
+    await fetch(`${SB_WORKER}/supabase/rest/v1/users`, {
+      method: 'POST',
+      headers: {
+        'x-admin-token': SB_TOKEN,
+        'Content-Type': 'application/json',
+        'Prefer': 'resolution=merge-duplicates,return=minimal',
+      },
+      body: JSON.stringify({
+        emp_id:     user.empId,
+        name_en:    user.nameEn    || '',
+        name_zh:    user.nameZh    || '',
+        role:       user.role      || 'user',
+        dept:       user.dept      || '',
+        site:       user.site      || 'TW',
+        email:      user.email     || '',
+        mobile:     user.mobile    || '',
+        ext:        user.ext       || '',
+        title_en:   user.titleEn   || '',
+        title_zh:   user.titleZh   || '',
+        pwd_hash:   user.pwdHash   || '',
+        avatar_url: user.photoURL  || '',
+        active:     true,
+      }),
+    });
   }
+  console.log(`✓ Supabase sync: ${isDelete ? 'deleted' : 'upserted'} ${user.empId}`);
 }
 
 async function saveUser() {
@@ -3849,12 +3923,11 @@ async function saveUser() {
     updatedAt: Date.now(),
   };
 
-  if (db) {
-    try { await db.collection(COL_U).doc(empId).set(user); }
-    catch(e) { toast('Save failed: ' + e.message, 'err'); return; }
-  }
-  // 同步到 Supabase（非阻塞）
-  sbSyncUser(user, false);
+  // 主要寫入：Supabase（確保 admin lottery 等取得最新名單）
+  try { await sbSyncUser(user, false); }
+  catch(e) { toast('Save failed: ' + e.message, 'err'); return; }
+  // 備援寫入：Firebase（非阻塞）
+  if (db) { db.collection(COL_U).doc(empId).set(user).catch(e => console.warn('Firebase backup failed:', e.message)); }
   closeUserModal();
   await loadUsers();
   toast(existing ? 'User updated' : 'User created', 'ok');
@@ -3864,12 +3937,11 @@ async function confirmDeleteUser() {
   if (!_editEmpId) return;
   if (_editEmpId === SESSION?.empId) { toast('Cannot delete yourself','err'); return; }
   if (!confirm(`Delete user ${_editEmpId}? This cannot be undone.`)) return;
-  if (db) {
-    try { await db.collection(COL_U).doc(_editEmpId).delete(); }
-    catch(e) { toast('Delete failed','err'); return; }
-  }
-  // 同步刪除到 Supabase（標記 active=false）
-  sbSyncUser({ empId: _editEmpId }, true);
+  // 主要刪除：Supabase
+  try { await sbSyncUser({ empId: _editEmpId }, true); }
+  catch(e) { toast('Delete failed: ' + e.message, 'err'); return; }
+  // 備援刪除：Firebase（非阻塞）
+  if (db) { db.collection(COL_U).doc(_editEmpId).delete().catch(e => console.warn('Firebase delete failed:', e.message)); }
   closeUserModal();
   await loadUsers();
   toast('User deleted','ok');
@@ -5002,13 +5074,22 @@ function openTripModal(id) {
 
   if (ALL_USERS.length > 0) {
     _doOpen();
-  } else if (db) {
-    db.collection(COL_U).orderBy('empId','asc').get().then(function(snap) {
-      ALL_USERS = snap.docs.map(function(d){ return d.data(); });
-      _doOpen();
-    }).catch(function(e) { toast('載入員工失敗：' + e.message, 'err'); });
   } else {
-    _doOpen();
+    fetch(`${SB_WORKER}/supabase/rest/v1/users?select=emp_id,name_en,name_zh,role,dept,site,email,ext,active&order=emp_id&active=eq.true`,
+      { headers: { 'x-admin-token': SB_TOKEN } })
+      .then(function(r){ return r.json(); })
+      .then(function(rows){
+        if (Array.isArray(rows) && rows.length) {
+          ALL_USERS = rows.map(function(u){ return { empId:u.emp_id, nameEn:u.name_en||'', nameZh:u.name_zh||'', role:u.role||'user', dept:u.dept||'', site:u.site||'TW', email:u.email||'', ext:u.ext||'' }; });
+        }
+      }).catch(function(){})
+      .finally(function(){
+        if (ALL_USERS.length === 0 && db) {
+          db.collection(COL_U).orderBy('empId','asc').get().then(function(snap){
+            ALL_USERS = snap.docs.map(function(d){ return d.data(); });
+          }).catch(function(){}).finally(_doOpen);
+        } else { _doOpen(); }
+      });
   }
 }
 
@@ -5203,9 +5284,20 @@ function initCalendar() {
   // Load users first (needed for Trip staff dropdown), then events + trips
   var userLoadPromise = (ALL_USERS.length > 0)
     ? Promise.resolve()
-    : (db ? db.collection(COL_U).orderBy('empId','asc').get().then(function(snap) {
-        ALL_USERS = snap.docs.map(function(d){ return d.data(); });
-      }).catch(function(){}) : Promise.resolve());
+    : fetch(`${SB_WORKER}/supabase/rest/v1/users?select=emp_id,name_en,name_zh,role,dept,site,email,ext,active&order=emp_id&active=eq.true`,
+        { headers: { 'x-admin-token': SB_TOKEN } })
+      .then(function(r){ return r.json(); })
+      .then(function(rows){
+        if (Array.isArray(rows) && rows.length) {
+          ALL_USERS = rows.map(function(u){ return { empId:u.emp_id, nameEn:u.name_en||'', nameZh:u.name_zh||'', role:u.role||'user', dept:u.dept||'', site:u.site||'TW', email:u.email||'', ext:u.ext||'' }; });
+        }
+      })
+      .catch(function() {
+        if (!db) return;
+        return db.collection(COL_U).orderBy('empId','asc').get().then(function(snap){
+          ALL_USERS = snap.docs.map(function(d){ return d.data(); });
+        }).catch(function(){});
+      });
 
   userLoadPromise.then(function() {
     return Promise.all([loadCalEvents(), loadTrips()]);

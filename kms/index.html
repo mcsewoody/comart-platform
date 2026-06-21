@@ -391,7 +391,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v2.00</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v2.01</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
@@ -3328,7 +3328,7 @@ function buildAuthorName() {
 }
 
 
-// ─── 建立者下拉（複用 Firebase users 快取）───
+// ─── 建立者下拉（複用 Supabase users 快取）───
 function renderAuthorDropdown(users) {
   const dd = document.getElementById('author-dropdown');
   if (!dd) return;
@@ -3415,30 +3415,29 @@ function viewExpertDocs(nameEn) {
 
 
 // ─── 審核人自動完成 ───
-let _reviewerUsers = []; // 快取從 Firebase 載入的人員清單
+const KMS_SB_WORKER = 'https://comart.mcsewoody.workers.dev';
+const KMS_SB_TOKEN  = 'COMART-ADMIN-2026';
+let _reviewerUsers = []; // 快取從 Supabase 載入的人員清單
 
 async function loadReviewerUsers(forceRefresh = false) {
   if (_reviewerUsers.length && !forceRefresh) return _reviewerUsers;
   _reviewerUsers = [];
-  // 從 Firebase 讀（主要來源）
   try {
-    const db = await getFirebaseDb();
-    const { collection, getDocs } = window.__fbOps;
-    const snap = await getDocs(collection(db, 'users'));
-    snap.forEach(doc => {
-      const d = doc.data();
-      // 不過濾 inactive，讓所有人都能被選為審核人
-      _reviewerUsers.push({
-        empId: d.empId || doc.id,
-        nameEn: d.nameEn || '',
-        nameZh: d.nameZh || '',
-        title: d.titleEn || d.titleZh || '',
-        site: d.site || '',
-      });
-    });
-  } catch(e) { console.warn('[reviewer firebase]', e.message); }
-  // kms_experts 不作為人員來源（UUID id 與 Firebase empId 格式不同，會造成重複）
-  // Firebase users collection 已是完整員工名單（30筆）
+    const res = await fetch(
+      `${KMS_SB_WORKER}/supabase/rest/v1/users?select=emp_id,name_en,name_zh,title_en,title_zh,site&order=emp_id&active=eq.true`,
+      { headers: { 'x-admin-token': KMS_SB_TOKEN } }
+    );
+    const rows = await res.json();
+    if (Array.isArray(rows)) {
+      _reviewerUsers = rows.map(u => ({
+        empId:  u.emp_id,
+        nameEn: u.name_en || '',
+        nameZh: u.name_zh || '',
+        title:  u.title_en || u.title_zh || '',
+        site:   u.site     || '',
+      }));
+    }
+  } catch(e) { console.warn('[reviewer supabase]', e.message); }
   return _reviewerUsers;
 }
 
@@ -5935,51 +5934,8 @@ ${doc.body.slice(0, 6000)}`,
 // EXPERT DIRECTORY — Supabase 版本
 // ═══════════════════════════════════════════════
 // ═══════════════════════════════════════════════
-// EXPERT DIRECTORY — 從 Firebase users collection 讀取
+// EXPERT DIRECTORY — 從 Supabase users 讀取
 // ═══════════════════════════════════════════════
-
-// Firebase SDK（從 CDN 載入，僅供黃頁使用）
-const FB_CFG = {
-  apiKey: "AIzaSyBW5qQIdX28JnjgymoZxY3MjGnTuIocboQ",
-  authDomain: "comart-quotation.firebaseapp.com",
-  projectId: "comart-quotation",
-  storageBucket: "comart-quotation.firebasestorage.app",
-  messagingSenderId: "1020179116858",
-  appId: "1:1020179116858:web:84646675aaaa753352d603"
-};
-
-let _fbApp = null;
-let _fbDb  = null;
-
-async function getFirebaseDb() {
-  if (_fbDb) return _fbDb;
-  // 動態載入 Firebase SDK（避免與其他頁面衝突）
-  if (!window.__fbLoaded) {
-    await Promise.all([
-      new Promise((res, rej) => {
-        const s = document.createElement('script');
-        s.type = 'module';
-        s.textContent = `
-          import { initializeApp, getApps } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-          import { getFirestore, collection, getDocs, query, where } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
-          const cfg = ${JSON.stringify(FB_CFG)};
-          const app = getApps().length ? getApps()[0] : initializeApp(cfg);
-          const db  = getFirestore(app);
-          window.__fbApp = app;
-          window.__fbDb  = db;
-          window.__fbOps = { collection, getDocs, query, where };
-          window.__fbLoaded = true;
-          window.dispatchEvent(new Event('fb-ready'));
-        `;
-        document.head.appendChild(s);
-        window.addEventListener('fb-ready', () => res(), { once: true });
-        setTimeout(() => rej(new Error('Firebase SDK 載入超時')), 10000);
-      })
-    ]);
-  }
-  _fbDb = window.__fbDb;
-  return _fbDb;
-}
 
 async function loadExperts() {
   const grid = document.getElementById('expert-grid');
@@ -5987,18 +5943,28 @@ async function loadExperts() {
 
   let users = [];
   try {
-    const db = await getFirebaseDb();
-    const { collection, getDocs, query, where } = window.__fbOps;
-    const snap = await getDocs(collection(db, 'users'));
-    snap.forEach(doc => {
-      const d = doc.data();
-      if (d.role !== 'inactive') users.push({ id: doc.id, ...d });
-    });
-    // 依 site 排序，同 site 依 nameEn
-    users.sort((a, b) => {
-      const s = (a.site||'').localeCompare(b.site||'');
-      return s !== 0 ? s : (a.nameEn||a.nameZh||'').localeCompare(b.nameEn||b.nameZh||'');
-    });
+    const res = await fetch(
+      `${KMS_SB_WORKER}/supabase/rest/v1/users?select=emp_id,name_en,name_zh,role,dept,site,email,mobile,ext,title_en,title_zh,avatar_url&order=site,name_en&active=eq.true`,
+      { headers: { 'x-admin-token': KMS_SB_TOKEN } }
+    );
+    const rows = await res.json();
+    if (Array.isArray(rows)) {
+      users = rows.map(u => ({
+        id:      u.emp_id,
+        empId:   u.emp_id,
+        nameEn:  u.name_en   || '',
+        nameZh:  u.name_zh   || '',
+        role:    u.role      || 'user',
+        dept:    u.dept      || '',
+        site:    u.site      || 'TW',
+        email:   u.email     || '',
+        mobile:  u.mobile    || '',
+        ext:     u.ext       || '',
+        titleEn: u.title_en  || '',
+        titleZh: u.title_zh  || '',
+        photoURL:u.avatar_url|| '',
+      }));
+    }
   } catch(e) {
     console.error('[loadExperts]', e);
     grid.innerHTML = `<div style="color:var(--text-3);font-size:13px;padding:20px;grid-column:1/-1;">無法載入人員資料：${e.message}</div>`;

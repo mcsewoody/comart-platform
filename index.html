@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>COMART Platform v1.40</title>
+<title>COMART Platform v1.41</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -323,7 +323,7 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1) brightness(
     <div class="login-logo">
       <div class="login-mark">C</div>
       <div class="login-name">COMART Platform</div>
-      <div class="login-sub">Internal Portal · v1.40</div>
+      <div class="login-sub">Internal Portal · v1.41</div>
     </div>
     <form id="loginForm" onsubmit="doLogin();return false;" autocomplete="on">
     <div class="field">
@@ -351,7 +351,7 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1) brightness(
   <div class="topbar">
     <div class="topbar-logo" onclick="switchView('home')">
       <div class="topbar-mark">C</div>
-      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.40</span></div>
+      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.41</span></div>
     </div>
     <div class="topbar-right">
       <div class="lang-switcher">
@@ -3851,13 +3851,14 @@ const SB_WORKER = 'https://comart.mcsewoody.workers.dev';
 const SB_TOKEN  = 'COMART-ADMIN-2026';
 
 async function sbSyncUser(user, isDelete) {
+  let res;
   if (isDelete) {
-    await fetch(`${SB_WORKER}/supabase/rest/v1/users?emp_id=eq.${encodeURIComponent(user.empId)}`, {
+    res = await fetch(`${SB_WORKER}/supabase/rest/v1/users?emp_id=eq.${encodeURIComponent(user.empId)}`, {
       method: 'DELETE',
       headers: { 'x-admin-token': SB_TOKEN, 'Content-Type': 'application/json' },
     });
   } else {
-    await fetch(`${SB_WORKER}/supabase/rest/v1/users`, {
+    res = await fetch(`${SB_WORKER}/supabase/rest/v1/users`, {
       method: 'POST',
       headers: {
         'x-admin-token': SB_TOKEN,
@@ -3885,6 +3886,10 @@ async function sbSyncUser(user, isDelete) {
         active:        true,
       }),
     });
+  }
+  if (!res.ok) {
+    const errText = await res.text().catch(() => String(res.status));
+    throw new Error(`Supabase ${res.status}: ${errText}`);
   }
   console.log(`✓ Supabase sync: ${isDelete ? 'deleted' : 'upserted'} ${user.empId}`);
 }
@@ -3930,11 +3935,28 @@ async function saveUser() {
     updatedAt: Date.now(),
   };
 
-  // 主要寫入：Supabase（確保 admin lottery 等取得最新名單）
-  try { await sbSyncUser(user, false); }
-  catch(e) { toast('Save failed: ' + e.message, 'err'); return; }
-  // 備援寫入：Firebase（非阻塞）
-  if (db) { db.collection(COL_U).doc(empId).set(user).catch(e => console.warn('Firebase backup failed:', e.message)); }
+  // 主要寫入：Supabase
+  let sbOk = false;
+  try { await sbSyncUser(user, false); sbOk = true; }
+  catch(e) { console.warn('Supabase write failed:', e.message); }
+
+  if (!sbOk) {
+    // Supabase 失敗 → Firebase 接手（blocking），更新本機快取，不重新讀 Supabase
+    if (db) {
+      try { await db.collection(COL_U).doc(empId).set(user); }
+      catch(e2) { toast('Save failed: ' + e2.message, 'err'); return; }
+    } else { toast('Save failed: no database available', 'err'); return; }
+    const idx = ALL_USERS.findIndex(u => u.empId === empId);
+    if (idx >= 0) Object.assign(ALL_USERS[idx], user);
+    else ALL_USERS.push(user);
+    closeUserModal();
+    renderUsersTable();
+    toast(existing ? 'User updated' : 'User created', 'ok');
+    return;
+  }
+
+  // Supabase 成功 → Firebase 非阻塞備援
+  if (db) { db.collection(COL_U).doc(empId).set(user).catch(()=>{}); }
   closeUserModal();
   await loadUsers();
   toast(existing ? 'User updated' : 'User created', 'ok');
@@ -3945,10 +3967,25 @@ async function confirmDeleteUser() {
   if (_editEmpId === SESSION?.empId) { toast('Cannot delete yourself','err'); return; }
   if (!confirm(`Delete user ${_editEmpId}? This cannot be undone.`)) return;
   // 主要刪除：Supabase
-  try { await sbSyncUser({ empId: _editEmpId }, true); }
-  catch(e) { toast('Delete failed: ' + e.message, 'err'); return; }
-  // 備援刪除：Firebase（非阻塞）
-  if (db) { db.collection(COL_U).doc(_editEmpId).delete().catch(e => console.warn('Firebase delete failed:', e.message)); }
+  let sbDelOk = false;
+  try { await sbSyncUser({ empId: _editEmpId }, true); sbDelOk = true; }
+  catch(e) { console.warn('Supabase delete failed:', e.message); }
+
+  if (!sbDelOk) {
+    // Supabase 失敗 → Firebase 接手
+    if (db) {
+      try { await db.collection(COL_U).doc(_editEmpId).delete(); }
+      catch(e2) { toast('Delete failed: ' + e2.message, 'err'); return; }
+    } else { toast('Delete failed: no database available', 'err'); return; }
+    ALL_USERS = ALL_USERS.filter(u => u.empId !== _editEmpId);
+    closeUserModal();
+    renderUsersTable();
+    toast('User deleted', 'ok');
+    return;
+  }
+
+  // Supabase 成功 → Firebase 非阻塞備援
+  if (db) { db.collection(COL_U).doc(_editEmpId).delete().catch(()=>{}); }
   closeUserModal();
   await loadUsers();
   toast('User deleted','ok');

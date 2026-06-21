@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>COMART Platform v1.42</title>
+<title>COMART Platform v1.43</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -3798,10 +3798,11 @@ function openUserModal(empId) {
     var sel = document.getElementById('u-site');
     if (!sel) return;
     var curVal = u?.site || '';
-    var sites = ALL_SITES.length ? ALL_SITES : [
-      {key:'TW',zh:'台灣總部',en:'Taiwan HQ'},{key:'CN',zh:'東莞廠',en:'Dongguan, China'},
-      {key:'VN',zh:'越南廠',en:'Vietnam'},{key:'HK',zh:'香港辦公室',en:'Hong Kong'},
-    ];
+    var siteBase = ALL_SITES.length ? ALL_SITES
+      : [...new Set(ALL_USERS.map(function(u){return u.site;}).filter(Boolean))].map(function(k){return {key:k,en:k,zh:k};});
+    var sites = siteBase.some(function(s){return s.key==='N/A';})
+      ? siteBase
+      : siteBase.concat([{key:'N/A',zh:'不適用',en:'N/A'}]);
     sel.innerHTML = '<option value="">— 選擇地點 —</option>'
       + sites.map(function(s){
           return '<option value="'+s.key+'">'+(s.en||s.key)+(s.zh?' / '+s.zh:'')+'</option>';

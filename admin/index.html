@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" href="data:,">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART 行政管理平台 v1.60</title>
+<title>COMART 行政管理平台 v1.61</title>
 <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.js"></script>
 <style>
 :root{
@@ -970,7 +970,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="logo">
     <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
     <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
-    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.60</span>
+    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.61</span>
   </div>
   <div class="trr">
     <div style="display:flex;align-items:center;gap:6px;padding:4px 12px;background:var(--surface-2);border:1px solid var(--border);border-radius:20px;font-size:12px;cursor:pointer" onclick="showUsw()" id="topbar-user">
@@ -978,7 +978,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <span id="cur-u" style="color:var(--text-2)">載入中…</span>
       <span style="color:var(--text-3);font-size:10px">▾</span>
     </div>
-    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.60</span>
+    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.61</span>
   </div>
 </div>
 
@@ -2002,6 +2002,14 @@ const SB = {
       return null;
     }
   },
+  // UPSERT: PATCH existing row, POST if none matched (Worker strips Prefer header)
+  async upsert(table, data, pkField = 'id') {
+    const pkVal = data[pkField];
+    if (!pkVal) return this.post(table, data);
+    const patched = await this.patch(table, `${pkField}=eq.${encodeURIComponent(pkVal)}`, data);
+    if (patched && patched.length > 0) return patched;
+    return this.post(table, data);
+  },
   // DELETE
   async del(table, filter) {
     try {
@@ -2277,7 +2285,7 @@ async function loadCarFromSB() {
 
 async function sbSaveBook(book) {
   if(!book.id){console.warn('sbSaveBook: missing id');return;}
-  try { await SB.post('lib_books', book, 'resolution=merge-duplicates,return=minimal'); }
+  try { await SB.upsert('lib_books', book); }
   catch(e) { console.warn('sbSaveBook fail:', e.message); }
 }
 async function sbDelBook(id) {
@@ -2285,11 +2293,11 @@ async function sbDelBook(id) {
   catch(e) { console.warn('sbDelBook fail:', e.message); }
 }
 async function sbSaveLoan(loan) {
-  try { await SB.post('lib_loans', loan, 'resolution=merge-duplicates,return=minimal'); }
+  try { await SB.upsert('lib_loans', loan); }
   catch(e) { console.warn('sbSaveLoan fail:', e.message); }
 }
 async function sbSaveCat(cat) {
-  try { await SB.post('lib_categories', cat, 'resolution=merge-duplicates,return=minimal'); }
+  try { await SB.upsert('lib_categories', cat); }
   catch(e) { console.warn('sbSaveCat fail:', e.message); }
 }
 async function sbDelCat(id) {
@@ -2300,7 +2308,7 @@ async function sbDelCat(id) {
 // ── 公務車寫入 SB ────────────────────────────────
 async function sbSaveVehicle(vh) {
   try {
-    await SB.post('car_vehicles', {
+    await SB.upsert('car_vehicles', {
       id:vh.id, name:vh.name||'', plate:vh.plate||'',
       type:vh.type||'sedan', fuel:vh.fuel||'gas',
       km:vh.km||0, next_maint_km:vh.next_maint_km||null,
@@ -2308,7 +2316,7 @@ async function sbSaveVehicle(vh) {
       parking_id:vh.pk_id||vh.parking_id||null,
       pk_id:vh.pk_id||vh.parking_id||null,
       notes:vh.notes||'', status:vh.st||vh.status||'available',
-    }, 'resolution=merge-duplicates,return=minimal');
+    });
   } catch(e) { console.warn('sbSaveVehicle fail:', e.message); }
 }
 async function sbDelVehicle(id) {
@@ -2332,7 +2340,7 @@ async function sbSaveCarBk(bk) {
       actual_km:bk.actualKm||null,
       checked_in:bk.checkedIn||false,
     };
-    await SB.post('car_bookings', row, 'resolution=merge-duplicates,return=minimal');
+    await SB.upsert('car_bookings', row);
   } catch(e) { console.warn('sbSaveCarBk fail:', e.message); }
 }
 async function sbDelCarBk(id) {
@@ -2340,11 +2348,11 @@ async function sbDelCarBk(id) {
   catch(e) { console.warn('sbDelCarBk fail:', e.message); }
 }
 async function sbSaveFuelLog(log) {
-  try { await SB.post('car_fuel_logs', log, 'resolution=merge-duplicates,return=minimal'); }
+  try { await SB.upsert('car_fuel_logs', log); }
   catch(e) { console.warn('sbSaveFuelLog fail:', e.message); }
 }
 async function sbSaveMaintLog(log) {
-  try { await SB.post('car_maint_logs', log, 'resolution=merge-duplicates,return=minimal'); }
+  try { await SB.upsert('car_maint_logs', log); }
   catch(e) { console.warn('sbSaveMaintLog fail:', e.message); }
 }
 

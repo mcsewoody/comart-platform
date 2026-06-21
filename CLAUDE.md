@@ -12,12 +12,14 @@ COMART Platform is an internal corporate portal for COMART Corporation, deployed
 
 Each sub-application is one self-contained HTML file with all CSS, JS, and HTML inlined. Files grow large (~5,000–8,000 lines). There is no bundler, no module system, and no package.json.
 
-| File | Purpose | ~Lines |
-|------|---------|--------|
-| `index.html` | Main portal — login, home, directory, bulletin, calendar, AI tools | 5,889 |
-| `admin/index.html` | Admin System — room booking, fleet, visitor, library, trip reimbursement, lottery | 5,835 |
-| `kms/index.html` | Knowledge Management System — RAG, document editor, AI Q&A | 6,520 |
-| `quotation/index.html` | Quotation & CRM system | 7,699 |
+| File | Version | Purpose | ~Lines |
+|------|---------|---------|--------|
+| `index.html` | v1.37 | Main portal — login, home, directory, bulletin, calendar, AI tools | 5,889 |
+| `admin/index.html` | v1.57 | Admin System — room booking, fleet, visitor, library, trip reimbursement, lottery | 5,840 |
+| `kms/index.html` | — | Knowledge Management System — RAG, document editor, AI Q&A | 6,520 |
+| `quotation/index.html` | — | Quotation & CRM system | 7,699 |
+
+`admin/lottery.html` is a standalone lottery page (separate from the lottery module inside `admin/index.html`).
 
 Numbered backup files (`index112.html`, `index328.html`, etc.) are iteration snapshots. They are untracked by git (`.gitignore` excludes nothing — these are just leftover drafts).
 
@@ -48,7 +50,7 @@ Numbered backup files (`index112.html`, `index328.html`, etc.) are iteration sna
 **Supabase Edge Functions** (Deno, in `supabase/functions/`):
 - `claude-proxy` — forwards requests to Anthropic API; reads `CLAUDE_API_KEY` from Supabase Secrets (never exposed to frontend)
 - `kms-write` — service-role writes to KMS tables, bypassing RLS; allowed tables: `kms_documents`, `kms_doc_versions`, `kms_comments`, `kms_review_log`, `kms_experts`, `kms_product_lines`, `kms_search_log`
-- `embed-document` / `embed-query` — generate pgvector embeddings for RAG
+- `embed-document` / `embed-query` — generate pgvector embeddings for RAG (**not** in `supabase/config.toml`; must be deployed with `--no-verify-jwt` flag)
 - `holidays-proxy` — holiday calendar API proxy
 
 ### Authentication & Session
@@ -82,7 +84,7 @@ The portal supports EN, 繁中, 简中, VI, 日 via `setLang(lang)`. Each langua
 ## 系統架構
 
 - **Platform** (`/`) — 入口門戶，`index.html`
-- **Admin** (`/admin`) — 行政管理平台，目前 v1.56，5835 行
+- **Admin** (`/admin`) — 行政管理平台，目前 v1.57，5840 行
 - **KMS** (`/kms`) — 知識管理系統
 - **Quotation** (`/quotation`) — 報價系統
 

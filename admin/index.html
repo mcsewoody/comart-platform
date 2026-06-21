@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" href="data:,">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART 行政管理平台 v1.59</title>
+<title>COMART 行政管理平台 v1.60</title>
 <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.js"></script>
 <style>
 :root{
@@ -970,7 +970,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="logo">
     <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
     <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
-    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.59</span>
+    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.60</span>
   </div>
   <div class="trr">
     <div style="display:flex;align-items:center;gap:6px;padding:4px 12px;background:var(--surface-2);border:1px solid var(--border);border-radius:20px;font-size:12px;cursor:pointer" onclick="showUsw()" id="topbar-user">
@@ -978,7 +978,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <span id="cur-u" style="color:var(--text-2)">載入中…</span>
       <span style="color:var(--text-3);font-size:10px">▾</span>
     </div>
-    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.59</span>
+    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.60</span>
   </div>
 </div>
 
@@ -2654,7 +2654,7 @@ function switchMod(m){
   if(m==='lib')renderLibPg('lib-dash');
   if(m==='car')renderCarPg('car-dash');
   if(m==='trip'){navTrip('trip-new');}
-  if(m==='lottery'){lottoInit();}
+  if(m==='lottery'){syncUsersFromSupabase().catch(()=>{}).then(()=>lottoInit());}
   if(m==='room'){getRoomBookings().then(bks=>{
     checkAutoReleaseWithToast(bks);
     navRoom('room-dash');

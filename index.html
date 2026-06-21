@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>COMART Platform v1.37</title>
+<title>COMART Platform v1.38</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -323,7 +323,7 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1) brightness(
     <div class="login-logo">
       <div class="login-mark">C</div>
       <div class="login-name">COMART Platform</div>
-      <div class="login-sub">Internal Portal · v1.37</div>
+      <div class="login-sub">Internal Portal · v1.38</div>
     </div>
     <form id="loginForm" onsubmit="doLogin();return false;" autocomplete="on">
     <div class="field">
@@ -351,7 +351,7 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1) brightness(
   <div class="topbar">
     <div class="topbar-logo" onclick="switchView('home')">
       <div class="topbar-mark">C</div>
-      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.37</span></div>
+      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.38</span></div>
     </div>
     <div class="topbar-right">
       <div class="lang-switcher">
@@ -3199,7 +3199,9 @@ async function markAllRead() {
     `${SUPABASE_URL}/rest/v1/notifications?to_user=eq.${encodeURIComponent(myId)}&is_read=eq.false`,
     { method: 'PATCH', headers: { 'apikey': sbKey, 'Authorization': `Bearer ${sbKey}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' }, body: JSON.stringify({ is_read: true }) }
   ).catch(()=>{});
-  loadNotifications();
+  document.getElementById('notifPanel')?.classList.remove('open');
+  _notifOpen = false;
+  updateNotifBadge(false);
 }
 
 async function updateNotifBadge(autoOpen) {

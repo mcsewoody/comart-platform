@@ -101,7 +101,7 @@ The portal supports EN, 繁中, 简中, VI, 日 via `setLang(lang)`. Each langua
 
 - 每次修改版本號 +0.01
 - 版本號同步更新三處：`<title>`、`.login-sub`、topbar `<span>`
-- 每次修改後用 `node --check /tmp/check.js` 驗證 JS 語法
+- 每次修改後自動 commit 並 `git push`，不需等候使用者指示
 
 ## Admin 重要細節
 

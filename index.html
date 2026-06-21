@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>COMART Platform v1.41</title>
+<title>COMART Platform v1.42</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -323,7 +323,7 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1) brightness(
     <div class="login-logo">
       <div class="login-mark">C</div>
       <div class="login-name">COMART Platform</div>
-      <div class="login-sub">Internal Portal · v1.41</div>
+      <div class="login-sub">Internal Portal · v1.42</div>
     </div>
     <form id="loginForm" onsubmit="doLogin();return false;" autocomplete="on">
     <div class="field">
@@ -351,7 +351,7 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1) brightness(
   <div class="topbar">
     <div class="topbar-logo" onclick="switchView('home')">
       <div class="topbar-mark">C</div>
-      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.41</span></div>
+      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.42</span></div>
     </div>
     <div class="topbar-right">
       <div class="lang-switcher">
@@ -3850,7 +3850,7 @@ function closeUserModal() { document.getElementById('userOverlay').classList.rem
 const SB_WORKER = 'https://comart.mcsewoody.workers.dev';
 const SB_TOKEN  = 'COMART-ADMIN-2026';
 
-async function sbSyncUser(user, isDelete) {
+async function sbSyncUser(user, isDelete, isNew) {
   let res;
   if (isDelete) {
     res = await fetch(`${SB_WORKER}/supabase/rest/v1/users?emp_id=eq.${encodeURIComponent(user.empId)}`, {
@@ -3858,12 +3858,14 @@ async function sbSyncUser(user, isDelete) {
       headers: { 'x-admin-token': SB_TOKEN, 'Content-Type': 'application/json' },
     });
   } else {
-    res = await fetch(`${SB_WORKER}/supabase/rest/v1/users`, {
-      method: 'POST',
+    const url = isNew
+      ? `${SB_WORKER}/supabase/rest/v1/users`
+      : `${SB_WORKER}/supabase/rest/v1/users?emp_id=eq.${encodeURIComponent(user.empId)}`;
+    res = await fetch(url, {
+      method: isNew ? 'POST' : 'PATCH',
       headers: {
         'x-admin-token': SB_TOKEN,
         'Content-Type': 'application/json',
-        'Prefer': 'resolution=merge-duplicates,return=minimal',
       },
       body: JSON.stringify({
         emp_id:        user.empId,
@@ -3937,7 +3939,7 @@ async function saveUser() {
 
   // 主要寫入：Supabase
   let sbOk = false;
-  try { await sbSyncUser(user, false); sbOk = true; }
+  try { await sbSyncUser(user, false, !existing); sbOk = true; }
   catch(e) { console.warn('Supabase write failed:', e.message); }
 
   if (!sbOk) {

@@ -960,7 +960,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   min-width:60px;
 }
 #panel-lottery .drawn-chip .chip-no{font-size:11px;opacity:.55;color:#CADCFC;letter-spacing:1px;line-height:1;}
-#panel-lottery .drawn-chip .chip-name{font-size:32px;font-weight:700;color:#fff;line-height:1.1;white-space:nowrap;}
+#panel-lottery .drawn-chip .chip-name{font-size:16px;font-weight:700;color:#fff;line-height:1.1;white-space:nowrap;}
 </style>
 </head>
 <body>
@@ -1852,7 +1852,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div id="lotto-result-overlay" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(10,5,20,.95);align-items:center;justify-content:center;flex-direction:column;">
         <div style="font-size:clamp(40px,8vw,80px);font-weight:900;color:#fbbf24;animation:winPop .6s cubic-bezier(.34,1.56,.64,1) both" id="lotto-result-name"></div>
         <div style="font-size:13px;letter-spacing:6px;color:#a78bfa;margin:12px 0 0">🎉 幸 運 得 主 🎉</div>
-        <button onclick="document.getElementById('lotto-result-overlay').classList.remove('show');stopConfetti();" style="margin-top:28px;padding:10px 36px;border-radius:999px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);color:#fff;font-size:14px;cursor:pointer;letter-spacing:2px">✕ 關閉</button>
+        <button onclick="document.getElementById('lotto-result-overlay').style.display='none';stopConfetti();" style="margin-top:28px;padding:10px 36px;border-radius:999px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);color:#fff;font-size:14px;cursor:pointer;letter-spacing:2px">✕ 關閉</button>
       </div>
     </div>
   </div>
@@ -5768,7 +5768,7 @@ function showWin(name){
   // Admin overlay
   const wo=document.getElementById('lotto-result-overlay');
   const wn=document.getElementById('lotto-result-name');
-  if(wo&&wn){wn.textContent=name;wo.classList.add('show');winFanfare();launchConfetti();return;}
+  if(wo&&wn){wn.textContent=name;wo.style.display='flex';winFanfare();launchConfetti();return;}
   document.getElementById('winName').textContent=name;
   document.getElementById('winOverlay').classList.add('show'); winFanfare(); launchConfetti();
 }

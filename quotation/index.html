@@ -292,7 +292,7 @@ img{display:block}
       <div class="logo-mark">C</div>
       <div>
         <div class="logo-text">COMART</div>
-        <div id="appVersionDiv" style="font-size:10px;color:var(--ac);font-weight:600;letter-spacing:.04em;line-height:1.3">v3.36</div>
+        <div id="appVersionDiv" style="font-size:10px;color:var(--ac);font-weight:600;letter-spacing:.04em;line-height:1.3">v3.37</div>
       </div>
     </div>
     <div class="topbar-right">
@@ -1417,22 +1417,22 @@ async function _reloadAfterLogin(){
   showSyncing();
   try{
     if(USE_FIREBASE){
-      const [qSnap, pSnap, sDoc, suppSnap, uSnap] = await Promise.all([
+      const [qSnap, pSnap, sDoc, suppSnap] = await Promise.all([
         db.collection(COL_Q).orderBy('date','asc').get(),
         db.collection(COL_P).orderBy('createdAt','asc').get(),
         db.collection(COL_S).doc('main').get(),
         db.collection(COL_SUP).orderBy('code','asc').get(),
-        db.collection(COL_U).orderBy('empId','asc').get(),
       ]);
       QUOTES   = qSnap.docs.map(d=>d.data());
       PRODUCTS = pSnap.docs.map(d=>d.data());
       if(suppSnap&&!suppSnap.empty) SUPPLIERS = suppSnap.docs.map(d=>d.data());
-      if(uSnap&&!uSnap.empty){ USERS = uSnap.docs.map(d=>d.data()); lsSet('qi-users-cache',USERS); }
       try{const cSnap=await db.collection(COL_C).orderBy('code','asc').get();CATEGORIES=cSnap.docs.map(d=>d.data());}catch(_){}
       if(sDoc.exists) SETTINGS={...SETTINGS,...sDoc.data()};
       try{const phSnap=await db.collection(COL_PRICE_HIST).orderBy('ts','asc').get();PRICE_HISTORY=phSnap.docs.map(d=>d.data());}catch(_){}
       lsSet('qi-q-cache',QUOTES);
       lsSet('qi-p-cache',PRODUCTS);
+      // Users — from Supabase
+      _loadUsersFromSB().then(rows=>{ if(rows){ USERS=rows; lsSet('qi-users-cache',USERS); } }).catch(()=>{});
     }
   }catch(e){ console.warn('_reloadAfterLogin error:',e); }
   hideSyncing();
@@ -1487,12 +1487,10 @@ function startListeners() {
       lsSet('qi-price-history', PRICE_HISTORY);
     }, err => console.warn('PRICE_HIST listener:', err));
 
-  // USERS real-time listener
-  db.collection(COL_U).orderBy('empId','asc')
-    .onSnapshot({ includeMetadataChanges: false }, snap => {
-      USERS = snap.docs.map(d => d.data());
-      lsSet('qi-users-cache', USERS);
-    }, err => console.warn('USERS listener:', err));
+  // USERS — 從 Supabase 一次性載入（非即時，人員異動頻率低）
+  _loadUsersFromSB().then(rows => {
+    if (rows) { USERS = rows; lsSet('qi-users-cache', USERS); }
+  }).catch(() => {});
 
   // CRM listeners — accounts/contacts/activities/tasks
   if(typeof subscribeCRM === 'function') subscribeCRM();
@@ -1503,17 +1501,15 @@ async function loadAll() {
   showSyncing();
   if (USE_FIREBASE) {
     try {
-      const [qSnap, pSnap, sDoc, suppSnap, uSnap] = await Promise.all([
+      const [qSnap, pSnap, sDoc, suppSnap] = await Promise.all([
         db.collection(COL_Q).orderBy('date','asc').get(),
         db.collection(COL_P).orderBy('createdAt','asc').get(),
         db.collection(COL_S).doc('main').get(),
         db.collection(COL_SUP).orderBy('code','asc').get(),
-        db.collection(COL_U).orderBy('empId','asc').get(),
       ]);
       QUOTES   = qSnap.docs.map(d => d.data());
       PRODUCTS = pSnap.docs.map(d => d.data());
       if (suppSnap && !suppSnap.empty) { SUPPLIERS = suppSnap.docs.map(d => d.data()); }
-      if (uSnap && !uSnap.empty) { USERS = uSnap.docs.map(d => d.data()); lsSet('qi-users-cache', USERS); }
     try {
       const cSnap = await db.collection(COL_C).orderBy('code','asc').get();
       CATEGORIES = cSnap.docs.map(d => d.data());
@@ -1533,16 +1529,18 @@ async function loadAll() {
       QUOTES   = lsGet('qi-q-cache', []);
       PRODUCTS = lsGet('qi-p-cache', []);
       PRICE_HISTORY = lsGet('qi-price-history', []);
-      USERS = lsGet('qi-users-cache', []);
       window._firestoreLoadFailed = true; // flag: needs reload after login
     }
   } else {
     QUOTES   = lsGet('qi-q-cache', []);
     PRODUCTS = lsGet('qi-p-cache', []);
     PRICE_HISTORY = lsGet('qi-price-history', []);
-    USERS = lsGet('qi-users-cache', []);
     try { const s=localStorage.getItem('qi-s-cache'); if(s) SETTINGS={...SETTINGS,...JSON.parse(s)}; } catch(_){}
   }
+  // Users — 主要從 Supabase 載入（Firebase users collection 已停用）
+  const sbUsers = await _loadUsersFromSB().catch(() => null);
+  if (sbUsers) { USERS = sbUsers; lsSet('qi-users-cache', USERS); }
+  else { USERS = lsGet('qi-users-cache', []); }
 
   if (!PRODUCTS.length) {
     seedDefaultProducts();
@@ -1560,14 +1558,23 @@ async function loadAll() {
     const portalSess = readPortalSession();
     if (portalSess) {
       let freshUser = null;
-      if (USE_FIREBASE && db) {
-        try {
-          const snap = await db.collection(COL_U)
-            .where('empId', '==', portalSess.empId)
-            .limit(1).get();
-          if (!snap.empty) freshUser = snap.docs[0].data();
-        } catch(e) { console.warn('[Portal auth]', e); }
-      }
+      try {
+        const res = await fetch(
+          `${SB_WORKER}/supabase/rest/v1/users?select=emp_id,name_en,name_zh,role,dept,site,email,mobile,ext,title_en,title_zh,avatar_url,pwd_hash,active&emp_id=eq.${encodeURIComponent(portalSess.empId)}&limit=1`,
+          { headers: { 'x-admin-token': SB_TOKEN } }
+        );
+        const rows = await res.json();
+        if (Array.isArray(rows) && rows.length) {
+          const u = rows[0];
+          freshUser = {
+            empId:   u.emp_id,   nameEn: u.name_en || '', nameZh: u.name_zh || '',
+            email:   u.email||'', login: u.email||'', ext: u.ext||'', mobile: u.mobile||'',
+            titleEn: u.title_en||'', titleZh: u.title_zh||'',
+            role:    u.active === false ? 'inactive' : (u.role || 'user'),
+            photoURL:u.avatar_url||'', pwdHash: u.pwd_hash||'',
+          };
+        }
+      } catch(e) { console.warn('[Portal auth SB]', e); }
       if (freshUser && freshUser.role !== 'inactive') {
         currentUser = { ...freshUser };
         try { lsSet('qi-user-session-v2', { empId: freshUser.empId, login: freshUser.login, ts: Date.now() }); } catch(_) {}
@@ -2769,6 +2776,57 @@ let _pmLang = LANGS[0];
 
 // Translation proxy URL — replace with your Cloudflare Worker URL
 const XLAT_PROXY = 'https://comart.mcsewoody.workers.dev';
+const SB_WORKER  = 'https://comart.mcsewoody.workers.dev';
+const SB_TOKEN   = 'COMART-ADMIN-2026';
+
+async function _loadUsersFromSB() {
+  try {
+    const res = await fetch(
+      `${SB_WORKER}/supabase/rest/v1/users?select=emp_id,name_en,name_zh,role,dept,site,email,mobile,ext,title_en,title_zh,avatar_url,pwd_hash,active&order=emp_id&active=eq.true`,
+      { headers: { 'x-admin-token': SB_TOKEN } }
+    );
+    const rows = await res.json();
+    if (Array.isArray(rows) && rows.length) {
+      return rows.map(u => ({
+        empId:   u.emp_id,
+        nameEn:  u.name_en   || '',
+        nameZh:  u.name_zh   || '',
+        email:   u.email     || '',
+        login:   u.email     || '',
+        ext:     u.ext       || '',
+        mobile:  u.mobile    || '',
+        titleEn: u.title_en  || '',
+        titleZh: u.title_zh  || '',
+        role:    u.active === false ? 'inactive' : (u.role || 'user'),
+        photoURL:u.avatar_url|| '',
+        pwdHash: u.pwd_hash  || '',
+      }));
+    }
+  } catch(e) { console.warn('[quotation users SB]', e.message); }
+  return null;
+}
+
+async function _fetchUserFromSB(empId) {
+  try {
+    const res = await fetch(
+      `${SB_WORKER}/supabase/rest/v1/users?emp_id=eq.${encodeURIComponent(empId)}&select=emp_id,name_en,name_zh,role,dept,site,email,mobile,ext,title_en,title_zh,avatar_url,pwd_hash,active&limit=1`,
+      { headers: { 'x-admin-token': SB_TOKEN } }
+    );
+    const rows = await res.json();
+    if (Array.isArray(rows) && rows.length) {
+      const u = rows[0];
+      return {
+        empId:   u.emp_id,   nameEn:  u.name_en  || '', nameZh: u.name_zh || '',
+        email:   u.email  || '',      login:   u.email  || '',
+        ext:     u.ext    || '',      mobile:  u.mobile || '',
+        titleEn: u.title_en || '',    titleZh: u.title_zh || '',
+        role:    u.active===false ? 'inactive' : (u.role || 'user'),
+        photoURL:u.avatar_url || '',  pwdHash: u.pwd_hash || '',
+      };
+    }
+  } catch(e) { console.warn('[quotation SB fetchUser]', e.message); }
+  return null;
+}
 
 // ── Auto-translate helpers ─────────────
 let _translateTimer = null;
@@ -5616,25 +5674,27 @@ async function restoreSession() {
     const sess = JSON.parse(s);
     // Session valid for 30 days
     if (Date.now() - sess.ts > 30 * 86400000) { localStorage.removeItem(COL_U_SESSION); return false; }
-    if (USE_FIREBASE) {
-      const snap = await db.collection(COL_U).where('empId','==',sess.empId).limit(1).get();
-      if (!snap.empty) {
-        const freshUser = snap.docs[0].data();
-        // If user was deleted from Firestore or empId mismatch, invalidate session
-        if (!freshUser || freshUser.empId !== sess.empId) {
-          localStorage.removeItem(COL_U_SESSION);
-          return false;
-        }
-        currentUser = freshUser; // Always use freshest role from Firestore
-        updateUserBadge();
-        await _reloadAfterLogin();
-        switchTab('products');
-        return true;
-      } else {
-        // User no longer exists in Firestore — invalidate
-        localStorage.removeItem(COL_U_SESSION);
-        return false;
-      }
+    const _res = await fetch(
+      `${SB_WORKER}/supabase/rest/v1/users?select=emp_id,name_en,name_zh,role,dept,site,email,mobile,ext,title_en,title_zh,avatar_url,pwd_hash,active&emp_id=eq.${encodeURIComponent(sess.empId)}&limit=1`,
+      { headers: { 'x-admin-token': SB_TOKEN } }
+    );
+    const _rows = await _res.json();
+    if (Array.isArray(_rows) && _rows.length) {
+      const u = _rows[0];
+      if (u.active === false) { localStorage.removeItem(COL_U_SESSION); return false; }
+      currentUser = {
+        empId: u.emp_id, nameEn: u.name_en||'', nameZh: u.name_zh||'',
+        email: u.email||'', login: u.email||'', ext: u.ext||'', mobile: u.mobile||'',
+        titleEn: u.title_en||'', titleZh: u.title_zh||'',
+        role: u.role||'user', photoURL: u.avatar_url||'', pwdHash: u.pwd_hash||'',
+      };
+      updateUserBadge();
+      await _reloadAfterLogin();
+      switchTab('products');
+      return true;
+    } else {
+      localStorage.removeItem(COL_U_SESSION);
+      return false;
     }
   } catch(e) { console.warn('restoreSession:', e); }
   return false;
@@ -6940,14 +7000,25 @@ async function init(){
     if (_psToken) {
       const _decoded = JSON.parse(decodeURIComponent(escape(atob(decodeURIComponent(_psToken)))));
       if (_decoded && _decoded.empId && _decoded.expires && Date.now() < _decoded.expires) {
-        // 直接查 Firestore 取得最新 user，不依賴任何 localStorage
+        // 直接查 Supabase 取得最新 user，不依賴任何 localStorage
         let _freshUser = null;
-        if (USE_FIREBASE && db) {
-          try {
-            const _snap = await db.collection(COL_U).where('empId','==',_decoded.empId).limit(1).get();
-            if (!_snap.empty) _freshUser = _snap.docs[0].data();
-          } catch(_fe) { console.warn('[Portal _ps Firestore]', _fe); }
-        }
+        try {
+          const _r = await fetch(
+            `${SB_WORKER}/supabase/rest/v1/users?select=emp_id,name_en,name_zh,role,dept,site,email,mobile,ext,title_en,title_zh,avatar_url,pwd_hash,active&emp_id=eq.${encodeURIComponent(_decoded.empId)}&limit=1`,
+            { headers: { 'x-admin-token': SB_TOKEN } }
+          );
+          const _rr = await _r.json();
+          if (Array.isArray(_rr) && _rr.length) {
+            const u = _rr[0];
+            _freshUser = {
+              empId: u.emp_id, nameEn: u.name_en||'', nameZh: u.name_zh||'',
+              email: u.email||'', login: u.email||'', ext: u.ext||'', mobile: u.mobile||'',
+              titleEn: u.title_en||'', titleZh: u.title_zh||'',
+              role: u.active===false ? 'inactive' : (u.role||'user'),
+              photoURL: u.avatar_url||'', pwdHash: u.pwd_hash||'',
+            };
+          }
+        } catch(_fe) { console.warn('[Portal _ps SB]', _fe); }
         if (_freshUser && _freshUser.role !== 'inactive') {
           currentUser = { ..._freshUser };
           // 清掉 URL token

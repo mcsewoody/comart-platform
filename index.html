@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>COMART Platform v1.39</title>
+<title>COMART Platform v1.40</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -323,7 +323,7 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1) brightness(
     <div class="login-logo">
       <div class="login-mark">C</div>
       <div class="login-name">COMART Platform</div>
-      <div class="login-sub">Internal Portal · v1.39</div>
+      <div class="login-sub">Internal Portal · v1.40</div>
     </div>
     <form id="loginForm" onsubmit="doLogin();return false;" autocomplete="on">
     <div class="field">
@@ -351,7 +351,7 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1) brightness(
   <div class="topbar">
     <div class="topbar-logo" onclick="switchView('home')">
       <div class="topbar-mark">C</div>
-      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.39</span></div>
+      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.40</span></div>
     </div>
     <div class="topbar-right">
       <div class="lang-switcher">
@@ -3682,7 +3682,7 @@ async function loadUsers() {
   let sbLoaded = false;
   try {
     const res = await fetch(
-      `${SB_WORKER}/supabase/rest/v1/users?select=emp_id,name_en,name_zh,role,dept,site,email,mobile,ext,title_en,title_zh,avatar_url,pwd_hash,active&order=emp_id`,
+      `${SB_WORKER}/supabase/rest/v1/users?select=emp_id,name_en,name_zh,role,dept,site,email,mobile,ext,title_en,title_zh,avatar_url,pwd_hash,active,bio_zh,bio_en,expertise_zh,expertise_en&order=emp_id`,
       { headers: { 'x-admin-token': SB_TOKEN } }
     );
     if (res.ok) {
@@ -3701,10 +3701,13 @@ async function loadUsers() {
           site:        u.site       || 'TW',
           dept:        u.dept       || '',
           role:        u.active === false ? 'inactive' : (u.role || 'user'),
-          photoURL:    u.avatar_url || '',
-          pwdHash:     u.pwd_hash   || '',
-          active:      u.active !== false,
-          bioZh: '', bioEn: '', expertiseZh: [], expertiseEn: [],
+          photoURL:     u.avatar_url   || '',
+          pwdHash:      u.pwd_hash    || '',
+          active:       u.active !== false,
+          bioZh:        u.bio_zh      || '',
+          bioEn:        u.bio_en      || '',
+          expertiseZh:  u.expertise_zh || [],
+          expertiseEn:  u.expertise_en || [],
         }));
         sbLoaded = true;
       }
@@ -3862,20 +3865,24 @@ async function sbSyncUser(user, isDelete) {
         'Prefer': 'resolution=merge-duplicates,return=minimal',
       },
       body: JSON.stringify({
-        emp_id:     user.empId,
-        name_en:    user.nameEn    || '',
-        name_zh:    user.nameZh    || '',
-        role:       user.role      || 'user',
-        dept:       user.dept      || '',
-        site:       user.site      || 'TW',
-        email:      user.email     || '',
-        mobile:     user.mobile    || '',
-        ext:        user.ext       || '',
-        title_en:   user.titleEn   || '',
-        title_zh:   user.titleZh   || '',
-        pwd_hash:   user.pwdHash   || '',
-        avatar_url: user.photoURL  || '',
-        active:     true,
+        emp_id:        user.empId,
+        name_en:       user.nameEn       || '',
+        name_zh:       user.nameZh       || '',
+        role:          user.role         || 'user',
+        dept:          user.dept         || '',
+        site:          user.site         || 'TW',
+        email:         user.email        || '',
+        mobile:        user.mobile       || '',
+        ext:           user.ext          || '',
+        title_en:      user.titleEn      || '',
+        title_zh:      user.titleZh      || '',
+        pwd_hash:      user.pwdHash      || '',
+        avatar_url:    user.photoURL     || '',
+        bio_zh:        user.bioZh        || '',
+        bio_en:        user.bioEn        || '',
+        expertise_zh:  user.expertiseZh  || [],
+        expertise_en:  user.expertiseEn  || [],
+        active:        true,
       }),
     });
   }
@@ -5958,20 +5965,26 @@ async function uploadAvatar(event) {
     var reader = new FileReader();
     reader.onload = async function(e) {
       var dataUrl = e.target.result;
-      // Store as base64 in Firebase (for simplicity; for production use Storage)
-      if (db) {
-        await db.collection(COL_U).doc(_profileUser.empId).update({ photoURL: dataUrl });
-        // Update local cache
-        var userInList = ALL_USERS.find(function(u) { return u.empId === _profileUser.empId; });
-        if (userInList) userInList.photoURL = dataUrl;
-        _profileUser.photoURL = dataUrl;
-        // Refresh avatar display
-        var avatarEl = document.getElementById('profileAvatar');
-        if (avatarEl) avatarEl.innerHTML = '<img src="' + dataUrl + '" style="width:64px;height:64px;border-radius:50%;object-fit:cover;">';
-        toast('Photo updated!', 'ok');
-        // Refresh directory grid
-        renderDirectory();
-      }
+      // Primary: Supabase
+      try {
+        await fetch(`${SB_WORKER}/supabase/rest/v1/users?emp_id=eq.${encodeURIComponent(_profileUser.empId)}`, {
+          method: 'PATCH',
+          headers: { 'x-admin-token': SB_TOKEN, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+          body: JSON.stringify({ avatar_url: dataUrl }),
+        });
+      } catch(e) { console.warn('Photo Supabase sync failed:', e.message); }
+      // Backup: Firebase
+      if (db) { db.collection(COL_U).doc(_profileUser.empId).update({ photoURL: dataUrl }).catch(()=>{}); }
+      // Update local cache
+      var userInList = ALL_USERS.find(function(u) { return u.empId === _profileUser.empId; });
+      if (userInList) userInList.photoURL = dataUrl;
+      _profileUser.photoURL = dataUrl;
+      // Refresh avatar display
+      var avatarEl = document.getElementById('profileAvatar');
+      if (avatarEl) avatarEl.innerHTML = '<img src="' + dataUrl + '" style="width:64px;height:64px;border-radius:50%;object-fit:cover;">';
+      toast('Photo updated!', 'ok');
+      // Refresh directory grid
+      renderDirectory();
     };
     reader.readAsDataURL(file);
   } catch(e) {

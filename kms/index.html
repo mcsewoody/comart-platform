@@ -394,9 +394,9 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
       <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v2.06</span>
     </div>
     <div class="lang-selector">
-      <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
-      <button class="lang-btn" onclick="setLang('zh-CN')">简中</button>
-      <button class="lang-btn" onclick="setLang('en')">EN</button>
+      <button class="lang-btn active" onclick="setLang('en')">EN</button>
+      <button class="lang-btn" onclick="setLang('zh-TW')">繁中</button>
+      <button class="lang-btn" onclick="setLang('zh-CN')">簡中</button>
       <button class="lang-btn" onclick="setLang('vi')">VI</button>
       <button class="lang-btn" onclick="setLang('ja')">日本語</button>
     </div>
@@ -1077,7 +1077,7 @@ let CFG = {
   openAiKey: '',
   embedModel: 'edge-fn',
 };
-let currentLang = 'zh-TW';
+let currentLang = 'en';
 let tiptapEditor = null;
 let localDocs = []; // fallback when Supabase not configured
 let editingDocId = null; // 正在編輯的文件 ID（null = 新增，有值 = 更新）
@@ -1720,6 +1720,8 @@ async function initPortalSession() {
 }
 
 window.addEventListener('DOMContentLoaded', async () => {
+  try { const l = localStorage.getItem('kms-lang'); if (l) { currentLang = l; } } catch(_) {}
+  setLang(currentLang);
   loadConfig();
   await initPortalSession();
   // doc-author 由 initPortalSession 填入登入者姓名（若已查到）
@@ -5130,8 +5132,11 @@ async function streamClaudeToElement(system, user, elementId) {
 // ═══════════════════════════════════════════════
 function setLang(lang) {
   currentLang = lang;
-  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
-  event.target.classList.add('active');
+  document.querySelectorAll('.lang-btn').forEach(b => {
+    const oc = b.getAttribute('onclick') || '';
+    b.classList.toggle('active', oc.includes(`'${lang}'`));
+  });
+  try { localStorage.setItem('kms-lang', lang); } catch(_) {}
   document.documentElement.lang = lang;
   applyI18n();
   document.getElementById('doc-lang').value = lang;

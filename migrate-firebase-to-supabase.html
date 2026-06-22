@@ -163,11 +163,23 @@ async function sbTruncate(table) {
   });
 }
 
+// 讓同批所有物件有相同的 key（缺的補 null），解決 PGRST102
+function normalizeRows(rows) {
+  const allKeys = new Set();
+  rows.forEach(r => Object.keys(r).forEach(k => allKeys.add(k)));
+  return rows.map(r => {
+    const out = {};
+    allKeys.forEach(k => { out[k] = r[k] !== undefined ? r[k] : null; });
+    return out;
+  });
+}
+
 // 批次 POST（50 筆一批，速度快）
 async function sbBatchPost(table, rows) {
   if (!rows.length) return;
-  for (let i = 0; i < rows.length; i += BATCH_SIZE) {
-    const batch = rows.slice(i, i + BATCH_SIZE);
+  const normalized = normalizeRows(rows);
+  for (let i = 0; i < normalized.length; i += BATCH_SIZE) {
+    const batch = normalized.slice(i, i + BATCH_SIZE);
     const res = await fetch(`${WORKER}/supabase/rest/v1/${table}`, {
       method: 'POST',
       headers: { 'x-admin-token': SB_TOKEN, 'Content-Type': 'application/json' },

@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<title>Firebase → Supabase 資料遷移</title>
+<style>
+body { font-family: monospace; background: #0f1117; color: #e2e8f0; padding: 24px; max-width: 900px; margin: 0 auto; }
+h1 { color: #5b9bd5; font-size: 18px; margin-bottom: 4px; }
+.sub { color: #64748b; font-size: 12px; margin-bottom: 24px; }
+.card { background: #1a1f2e; border: 1px solid #2d3748; border-radius: 10px; padding: 16px; margin-bottom: 16px; }
+.card h2 { font-size: 13px; color: #94a3b8; margin: 0 0 12px; letter-spacing: 1px; text-transform: uppercase; }
+.log { background: #0a0e1a; border-radius: 6px; padding: 12px; font-size: 11px; max-height: 300px; overflow-y: auto; }
+.ok  { color: #10b981; } .err { color: #ef4444; } .warn { color: #f59e0b; } .info { color: #60a5fa; }
+button { background: #5b9bd5; color: #fff; border: none; border-radius: 8px; padding: 10px 20px; font-size: 13px; font-weight: 600; cursor: pointer; margin-right: 8px; margin-bottom: 8px; }
+button:disabled { opacity: .4; cursor: not-allowed; }
+button.danger { background: #ef4444; }
+.progress { margin-top: 8px; font-size: 12px; color: #94a3b8; }
+.badge { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 10px; font-weight: 700; }
+.badge.ok  { background: rgba(16,185,129,.2); color: #10b981; }
+.badge.err { background: rgba(239,68,68,.2); color: #ef4444; }
+.badge.pending { background: rgba(91,155,213,.2); color: #5b9bd5; }
+table { width: 100%; border-collapse: collapse; font-size: 12px; }
+td, th { padding: 6px 8px; border-bottom: 1px solid #2d3748; text-align: left; }
+th { color: #64748b; font-weight: 600; }
+</style>
+</head>
+<body>
+<h1>Firebase → Supabase 資料遷移工具</h1>
+<p class="sub">請先在 Supabase 執行 001_quotation_tables.sql 和 002_platform_tables.sql，再執行遷移</p>
+
+<div class="card">
+  <h2>設定</h2>
+  <table>
+    <tr><th>Supabase Worker</th><td id="cfg-worker">https://comart.mcsewoody.workers.dev</td></tr>
+    <tr><th>Admin Token</th><td>COMART-ADMIN-2026</td></tr>
+    <tr><th>Firebase Project</th><td>comart-quotation</td></tr>
+  </table>
+</div>
+
+<div class="card">
+  <h2>遷移進度</h2>
+  <table id="progress-table">
+    <thead><tr><th>Collection</th><th>狀態</th><th>筆數</th><th>說明</th></tr></thead>
+    <tbody id="progress-body"></tbody>
+  </table>
+</div>
+
+<div class="card">
+  <h2>操作</h2>
+  <button id="btn-start" onclick="startMigration()">▶ 開始全部遷移</button>
+  <button onclick="testConnection()">🔌 測試連線</button>
+  <div class="progress" id="overall-status"></div>
+</div>
+
+<div class="card">
+  <h2>Log</h2>
+  <div class="log" id="log"></div>
+</div>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+<script>
+// ── 設定 ─────────────────────────────────────────────────────
+const WORKER    = 'https://comart.mcsewoody.workers.dev';
+const SB_TOKEN  = 'COMART-ADMIN-2026';
+const BATCH_SIZE = 50; // 每批最多幾筆
+
+const FB_CONFIG = {
+  apiKey: "AIzaSyBW5qQIdX28JnjgymoZxY3MjGnTuIocboQ",
+  authDomain: "comart-quotation.firebaseapp.com",
+  projectId: "comart-quotation",
+  storageBucket: "comart-quotation.firebasestorage.app",
+  messagingSenderId: "1020179116858",
+  appId: "1:1020179116858:web:84646675aaaa753352d603"
+};
+
+// ── Collections 遷移清單 [fb_collection, sb_table, order_by] ─
+const COLLECTIONS = [
+  // Quotation
+  ['categories',     'categories',          'createdAt'],
+  ['suppliers',      'suppliers',           'code'],
+  ['products',       'products',            'createdAt'],
+  ['quotes',         'quotes',              'date'],
+  ['price_history',  'price_history',       'ts'],
+  ['crm_accounts',   'crm_accounts',        'createdAt'],
+  ['crm_contacts',   'crm_contacts',        'createdAt'],
+  ['crm_activities', 'crm_activities',      'createdAt'],
+  ['crm_tasks',      'crm_tasks',           'createdAt'],
+  ['logs',           'logs',                'ts'],
+  // Settings (special: single doc 'main')
+  ['settings_main',  'quotation_settings',  null],
+  // Platform
+  ['portal_bulletin','portal_bulletin',     'ts'],
+  ['portal_messages','portal_messages',     'ts'],
+  ['departments',    'departments',         'key'],
+  ['sites',          'sites',              'key'],
+  ['trips',          'trips',              'dateFrom'],
+];
+
+// ── UI helpers ────────────────────────────────────────────────
+const logEl = document.getElementById('log');
+function log(msg, cls='info') {
+  const t = new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  logEl.innerHTML += `<div class="${cls}">[${t}] ${msg}</div>`;
+  logEl.scrollTop = logEl.scrollHeight;
+}
+
+const rows = {};
+function initTable() {
+  const tbody = document.getElementById('progress-body');
+  tbody.innerHTML = '';
+  for (const [fb] of COLLECTIONS) {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${fb}</td><td id="st-${fb}"><span class="badge pending">等待中</span></td><td id="ct-${fb}">—</td><td id="msg-${fb}"></td>`;
+    tbody.appendChild(tr);
+    rows[fb] = { st: document.getElementById('st-'+fb), ct: document.getElementById('ct-'+fb), msg: document.getElementById('msg-'+fb) };
+  }
+}
+
+function setRow(fb, status, count, msg='') {
+  if (!rows[fb]) return;
+  const cls = status==='ok'?'ok':status==='err'?'err':'pending';
+  const label = status==='ok'?'完成':status==='err'?'失敗':'處理中…';
+  rows[fb].st.innerHTML = `<span class="badge ${cls}">${label}</span>`;
+  rows[fb].ct.textContent = count != null ? count : '—';
+  rows[fb].msg.textContent = msg;
+}
+
+// ── Supabase helpers ─────────────────────────────────────────
+async function sbUpsert(table, rows) {
+  if (!rows.length) return;
+  // 分批發送
+  for (let i = 0; i < rows.length; i += BATCH_SIZE) {
+    const batch = rows.slice(i, i + BATCH_SIZE);
+    const res = await fetch(`${WORKER}/supabase/rest/v1/${table}`, {
+      method: 'POST',
+      headers: {
+        'x-admin-token': SB_TOKEN,
+        'Content-Type': 'application/json',
+        'Prefer': 'resolution=merge-duplicates,return=minimal',
+      },
+      body: JSON.stringify(batch),
+    });
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(`Supabase ${table} ${res.status}: ${err}`);
+    }
+  }
+}
+
+// Worker 過濾 Prefer header → fallback to PATCH for individual rows
+async function sbUpsertSafe(table, rows, pkField) {
+  for (const row of rows) {
+    const pk = row[pkField];
+    if (!pk) { await sbUpsert(table, [row]); continue; }
+    // try PATCH first
+    const patchRes = await fetch(`${WORKER}/supabase/rest/v1/${table}?${pkField}=eq.${encodeURIComponent(pk)}`, {
+      method: 'PATCH',
+      headers: { 'x-admin-token': SB_TOKEN, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
+      body: JSON.stringify(row),
+    });
+    if (patchRes.ok) {
+      const patched = await patchRes.json();
+      if (patched && patched.length > 0) continue; // updated
+    }
+    // no match → POST
+    const postRes = await fetch(`${WORKER}/supabase/rest/v1/${table}`, {
+      method: 'POST',
+      headers: { 'x-admin-token': SB_TOKEN, 'Content-Type': 'application/json' },
+      body: JSON.stringify(row),
+    });
+    if (!postRes.ok) {
+      const err = await postRes.text();
+      throw new Error(`POST ${table}: ${postRes.status} ${err}`);
+    }
+  }
+}
+
+// ── Firebase helpers ─────────────────────────────────────────
+let db = null;
+function ensureFirebase() {
+  if (db) return db;
+  if (!firebase.apps.length) firebase.initializeApp(FB_CONFIG);
+  db = firebase.firestore();
+  return db;
+}
+
+async function fbGetAll(collection, orderBy) {
+  const ref = orderBy ? db.collection(collection).orderBy(orderBy, 'asc') : db.collection(collection);
+  const snap = await ref.get();
+  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+}
+
+// ── Migration functions ──────────────────────────────────────
+async function migrateCollection(fbCol, sbTable, _pkField, orderBy) {
+  setRow(fbCol, 'pending', null, '讀取 Firebase…');
+  log(`讀取 Firebase [${fbCol}]…`);
+  const docs = await fbGetAll(fbCol, orderBy);
+  log(`  Firebase [${fbCol}]: ${docs.length} 筆`, 'info');
+  setRow(fbCol, 'pending', docs.length, '寫入 Supabase…');
+
+  if (!docs.length) { setRow(fbCol, 'ok', 0, '無資料'); return 0; }
+
+  // All Firebase docs have an id (either predefined or auto-generated).
+  // fbGetAll always maps doc.id into the 'id' field, so we always upsert by 'id'.
+  await sbUpsertSafe(sbTable, docs, 'id');
+
+  log(`  ✓ ${sbTable}: ${docs.length} 筆寫入完成`, 'ok');
+  setRow(fbCol, 'ok', docs.length);
+  return docs.length;
+}
+
+async function migrateSettings() {
+  setRow('settings_main', 'pending', null, '讀取 Firebase…');
+  log('讀取 Firebase [settings/main]…');
+  const snap = await db.collection('settings').doc('main').get();
+  if (!snap.exists) { setRow('settings_main', 'ok', 0, '無資料'); return; }
+  const data = { id: 'main', ...snap.data() };
+  await sbUpsertSafe('quotation_settings', [data], 'id');
+  log('  ✓ quotation_settings: 1 筆寫入完成', 'ok');
+  setRow('settings_main', 'ok', 1);
+}
+
+async function startMigration() {
+  document.getElementById('btn-start').disabled = true;
+  document.getElementById('overall-status').textContent = '遷移中…';
+  initTable();
+
+  try {
+    ensureFirebase();
+    let total = 0;
+
+    // Quotation collections
+    for (const [fb, sb, ord] of COLLECTIONS) {
+      try {
+        if (fb === 'settings_main') {
+          await migrateSettings();
+        } else {
+          const n = await migrateCollection(fb, sb, null, ord);
+          total += n;
+        }
+      } catch(e) {
+        log(`✗ [${fb}] 失敗: ${e.message}`, 'err');
+        setRow(fb, 'err', null, e.message.slice(0,60));
+      }
+    }
+
+    log(`\n✅ 遷移完成！共 ${total} 筆資料`, 'ok');
+    document.getElementById('overall-status').textContent = `✅ 完成，共 ${total} 筆`;
+  } catch(e) {
+    log('❌ 嚴重錯誤：' + e.message, 'err');
+    document.getElementById('overall-status').textContent = '❌ 失敗：' + e.message;
+  }
+
+  document.getElementById('btn-start').disabled = false;
+}
+
+async function testConnection() {
+  log('測試 Supabase 連線…');
+  try {
+    const res = await fetch(`${WORKER}/supabase/rest/v1/users?limit=1`, {
+      headers: { 'x-admin-token': SB_TOKEN }
+    });
+    if (res.ok) log('✓ Supabase Worker 連線正常', 'ok');
+    else log('✗ Supabase 回傳 ' + res.status, 'err');
+  } catch(e) { log('✗ 連線失敗: ' + e.message, 'err'); }
+
+  log('測試 Firebase 連線…');
+  try {
+    ensureFirebase();
+    await db.collection('quotes').limit(1).get();
+    log('✓ Firebase 連線正常', 'ok');
+  } catch(e) { log('✗ Firebase 失敗: ' + e.message, 'err'); }
+}
+
+// Init
+initTable();
+</script>
+</body>
+</html>

@@ -292,7 +292,7 @@ img{display:block}
       <div class="logo-mark">C</div>
       <div>
         <div class="logo-text">COMART</div>
-        <div id="appVersionDiv" style="font-size:10px;color:var(--ac);font-weight:600;letter-spacing:.04em;line-height:1.3">v3.39</div>
+        <div id="appVersionDiv" style="font-size:10px;color:var(--ac);font-weight:600;letter-spacing:.04em;line-height:1.3">v3.40</div>
       </div>
     </div>
     <div class="topbar-right">
@@ -1677,11 +1677,20 @@ async function saveOneP(idOrObj) {
       return out;
     }).filter(Boolean);
   }
+  // Explicit column whitelist — prevents JS-only fields from causing PGRST204
   const data = {
-    ...p,
+    id: p.id, series: p.series, name: p.name, features: p.features,
+    catId: p.catId, catId2: p.catId2, defaultPrice: p.defaultPrice,
+    supplier1: p.supplier1, curr1: p.curr1, cost1: p.cost1,
+    supplier2: p.supplier2, curr2: p.curr2, cost2: p.cost2,
+    material: p.material, interfaceA: p.interfaceA, interfaceB: p.interfaceB,
+    tooling: p.tooling, coo: p.coo, dim: p.dim, weight: p.weight,
+    pkgdim: p.pkgdim, pkgweight: p.pkgweight, remark: p.remark,
+    status: p.status || null,
     img: imgUrl,
     docs: _stripB64(p.docs),
     bomFiles: _stripB64(p.bomFiles),
+    createdAt: p.createdAt,
     updatedAt: Date.now()
   };
   lsSet('qi-p-cache', PRODUCTS);

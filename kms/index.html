@@ -391,7 +391,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v2.05</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v2.06</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
@@ -3206,7 +3206,7 @@ async function extractImagePdfWithVision(file) {
 
     try {
       const text = await callClaudeProxyRaw({
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-sonnet-4-6',
         max_tokens: 2000,
         messages: [{
           role: 'user',
@@ -3238,7 +3238,7 @@ async function extractPdfWithClaude(file) {
   try {
     const base64 = await fileToBase64(file);
     const data = await callClaudeProxyRaw({
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-sonnet-4-6',
       max_tokens: 4096,
       messages: [{
         role: 'user',
@@ -3260,7 +3260,7 @@ async function extractImageWithClaude(file, ext) {
     const base64 = await fileToBase64(file);
     const mediaType = ext === 'png' ? 'image/png' : 'image/jpeg';
     const data = await callClaudeProxyRaw({
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-sonnet-4-6',
       max_tokens: 2048,
       messages: [{
         role: 'user',
@@ -4540,7 +4540,7 @@ async function callClaudeProxy(system, user, maxTokens = 1500) {
   const proxyUrl = `${base}/functions/v1/claude-proxy`;
 
   const payload = {
-    model: 'claude-sonnet-4-20250514',
+    model: 'claude-sonnet-4-6',
     max_tokens: maxTokens,
     system,
     messages: [{ role: 'user', content: user }],

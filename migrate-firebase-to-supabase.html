@@ -48,6 +48,8 @@ th { color: #64748b; font-weight: 600; }
 <div class="card">
   <h2>操作</h2>
   <button id="btn-start" onclick="startMigration()">▶ 開始全部遷移</button>
+  <button onclick="migrateProductsOnly()">▶ 只遷移 products</button>
+  <button onclick="scanProducts()">🔍 掃描 products 欄位</button>
   <button onclick="testConnection()">🔌 測試連線</button>
   <div class="progress" id="overall-status"></div>
 </div>
@@ -317,6 +319,42 @@ async function startMigration() {
     document.getElementById('overall-status').textContent = '❌ 失敗：' + e.message;
   }
 
+  document.getElementById('btn-start').disabled = false;
+}
+
+async function scanProducts() {
+  log('掃描 Firebase products 所有欄位…');
+  ensureFirebase();
+  const snap = await db.collection('products').get();
+  const allKeys = new Set();
+  snap.docs.forEach(d => Object.keys(d.data()).forEach(k => allKeys.add(k)));
+  allKeys.add('id');
+  const schemaKeys = new Set(['id','series','name','features','catId','catId2','defaultPrice',
+    'supplier1','curr1','cost1','supplier2','curr2','cost2','material','interfaceA','interfaceB',
+    'tooling','coo','dim','weight','pkgdim','pkgweight','remark','img','img2','docs','bomFiles',
+    'bom','createdAt','updatedAt']);
+  const missing = [...allKeys].filter(k => !schemaKeys.has(k));
+  log(`Firebase 欄位 (${allKeys.size}): ${[...allKeys].sort().join(', ')}`, 'ok');
+  if (missing.length) {
+    log(`⚠️ Schema 缺少欄位: ${missing.join(', ')}`, 'warn');
+    const sql = missing.map(c => `ALTER TABLE products ADD COLUMN IF NOT EXISTS "${c}" TEXT;`).join('\n');
+    log('請在 Supabase SQL Editor 執行：\n' + sql, 'warn');
+  } else {
+    log('✓ 所有欄位都在 schema 中', 'ok');
+  }
+}
+
+async function migrateProductsOnly() {
+  document.getElementById('btn-start').disabled = true;
+  ensureFirebase();
+  try {
+    log('--- 只遷移 products ---');
+    const n = await migrateCollection('products', 'products', null, 'createdAt');
+    log(`完成，共 ${n} 筆`, 'ok');
+    reportSkipped();
+  } catch(e) {
+    log('❌ ' + e.message, 'err');
+  }
   document.getElementById('btn-start').disabled = false;
 }
 

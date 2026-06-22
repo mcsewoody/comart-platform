@@ -292,7 +292,7 @@ img{display:block}
       <div class="logo-mark">C</div>
       <div>
         <div class="logo-text">COMART</div>
-        <div id="appVersionDiv" style="font-size:10px;color:var(--ac);font-weight:600;letter-spacing:.04em;line-height:1.3">v3.37</div>
+        <div id="appVersionDiv" style="font-size:10px;color:var(--ac);font-weight:600;letter-spacing:.04em;line-height:1.3">v3.38</div>
       </div>
     </div>
     <div class="topbar-right">
@@ -1126,7 +1126,6 @@ img{display:block}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
 <script>
 // ═══════════════════════════════════════
@@ -1282,7 +1281,7 @@ let SETTINGS = {
 const PRESET_MOQS = [1,500,1000,3000,5000,10000];
 
 // ═══════════════════════════════════════
-// FIREBASE CONFIG & INIT
+// FIREBASE STORAGE INIT (for file uploads only; data → Supabase)
 // ═══════════════════════════════════════
 const firebaseConfig = {
   apiKey: "AIzaSyBW5qQIdX28JnjgymoZxY3MjGnTuIocboQ",
@@ -1292,23 +1291,14 @@ const firebaseConfig = {
   messagingSenderId: "1020179116858",
   appId: "1:1020179116858:web:84646675aaaa753352d603"
 };
-// ── Firebase init (safe — scripts loaded before this runs) ──
-let db = null;
 let storage = null;
-let USE_FIREBASE = false;
 let CATEGORIES = [];
 
 if (typeof firebase !== 'undefined') {
   try {
-    firebase.initializeApp(firebaseConfig);
-    db = firebase.firestore();
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     storage = firebase.storage();
-    USE_FIREBASE = true;
-  } catch(e) {
-    console.warn('Firebase init error:', e);
-  }
-} else {
-  console.warn('Firebase SDK not loaded — using localStorage only');
+  } catch(e) { console.warn('Firebase Storage init error:', e); }
 }
 
 const COL_Q = 'quotes';
@@ -1346,6 +1336,7 @@ let CRM_ACCOUNTS = [];
 let CRM_CONTACTS = [];
 let CRM_ACTIVITIES = [];
 let CRM_TASKS = [];
+let _crmPollTimer = null;
 
 // CRM constants
 const CRM_STAGES = [
@@ -1408,32 +1399,29 @@ let _qUnsub = null;
 let _pUnsub = null;
 let _listenersReady = false;
 
-// ── Reload data after login (clears old listeners, re-fetches everything) ──
+// ── Reload data after login ──
 async function _reloadAfterLogin(){
-  // Reset listeners so they re-attach with authenticated context
-  if(typeof _qUnsub === 'function'){try{_qUnsub();}catch(_){}}
-  if(typeof _pUnsub === 'function'){try{_pUnsub();}catch(_){}}
+  _stopPolling();
   _listenersReady = false;
   showSyncing();
   try{
-    if(USE_FIREBASE){
-      const [qSnap, pSnap, sDoc, suppSnap] = await Promise.all([
-        db.collection(COL_Q).orderBy('date','asc').get(),
-        db.collection(COL_P).orderBy('createdAt','asc').get(),
-        db.collection(COL_S).doc('main').get(),
-        db.collection(COL_SUP).orderBy('code','asc').get(),
-      ]);
-      QUOTES   = qSnap.docs.map(d=>d.data());
-      PRODUCTS = pSnap.docs.map(d=>d.data());
-      if(suppSnap&&!suppSnap.empty) SUPPLIERS = suppSnap.docs.map(d=>d.data());
-      try{const cSnap=await db.collection(COL_C).orderBy('code','asc').get();CATEGORIES=cSnap.docs.map(d=>d.data());}catch(_){}
-      if(sDoc.exists) SETTINGS={...SETTINGS,...sDoc.data()};
-      try{const phSnap=await db.collection(COL_PRICE_HIST).orderBy('ts','asc').get();PRICE_HISTORY=phSnap.docs.map(d=>d.data());}catch(_){}
-      lsSet('qi-q-cache',QUOTES);
-      lsSet('qi-p-cache',PRODUCTS);
-      // Users — from Supabase
-      _loadUsersFromSB().then(rows=>{ if(rows){ USERS=rows; lsSet('qi-users-cache',USERS); } }).catch(()=>{});
-    }
+    const [qData, pData, sData, suppData, cData, phData] = await Promise.all([
+      SB.get('quotes', 'order=date'),
+      SB.get('products', 'order=createdAt'),
+      SB.get('quotation_settings', 'id=eq.main&limit=1'),
+      SB.get('suppliers', 'order=code'),
+      SB.get('categories', 'order=code'),
+      SB.get('price_history', 'order=ts'),
+    ]);
+    QUOTES        = qData    || [];
+    PRODUCTS      = pData    || [];
+    SUPPLIERS     = suppData || [];
+    CATEGORIES    = cData    || [];
+    PRICE_HISTORY = phData   || [];
+    if(sData?.[0]?.data) SETTINGS = {...SETTINGS, ...sData[0].data};
+    lsSet('qi-q-cache', QUOTES);
+    lsSet('qi-p-cache', PRODUCTS);
+    _loadUsersFromSB().then(rows=>{ if(rows){ USERS=rows; lsSet('qi-users-cache',USERS); } }).catch(()=>{});
   }catch(e){ console.warn('_reloadAfterLogin error:',e); }
   hideSyncing();
   startListeners();
@@ -1445,99 +1433,83 @@ async function _reloadAfterLogin(){
   setTimeout(batchSetNormalStatus, 1000);
 }
 
+let _pollTimer = null;
+
+function _stopPolling() {
+  if (_pollTimer) { clearInterval(_pollTimer); _pollTimer = null; }
+  _listenersReady = false;
+}
+
 function startListeners() {
-  if (!USE_FIREBASE || _listenersReady) return;
+  if (_listenersReady) return;
   _listenersReady = true;
 
-  // Real-time quotes listener — safe for multi-user editing
-  _qUnsub = db.collection(COL_Q).orderBy('date','asc')
-    .onSnapshot({ includeMetadataChanges: false }, snap => {
-      QUOTES = snap.docs.map(d => d.data());
-      lsSet('qi-q-cache', QUOTES);
-      // Only re-render list; don't interrupt active form editing
-      if (page === 'quotes' || page === 'detail') renderQuoteList();
-      else renderQuoteList(); // still update counts in background
-    }, err => console.warn('Q listener:', err));
-
-  // Real-time products listener
-  _pUnsub = db.collection(COL_P).orderBy('createdAt','asc')
-    .onSnapshot({ includeMetadataChanges: false }, snap => {
-      // img is now a Firebase Storage URL — no localStorage needed
-      PRODUCTS = snap.docs.map(d => d.data());
-      lsSet('qi-p-cache', PRODUCTS);
-      if (!document.getElementById('prodOverlay')?.classList.contains('show')) {
-        renderProductList();
+  // Poll Supabase every 20 seconds for multi-user sync
+  _pollTimer = setInterval(async () => {
+    try {
+      const [qData, pData, cData, phData] = await Promise.all([
+        SB.get('quotes', 'order=date'),
+        SB.get('products', 'order=createdAt'),
+        SB.get('categories', 'order=code'),
+        SB.get('price_history', 'order=ts'),
+      ]);
+      if (qData) {
+        QUOTES = qData; lsSet('qi-q-cache', QUOTES);
+        if (page === 'quotes' || page === 'detail') renderQuoteList();
+        else renderQuoteList();
       }
-    }, err => console.warn('P listener:', err));
+      if (pData) {
+        PRODUCTS = pData; lsSet('qi-p-cache', PRODUCTS);
+        if (!document.getElementById('prodOverlay')?.classList.contains('show')) renderProductList();
+      }
+      if (cData) {
+        CATEGORIES = cData;
+        const cntEl = document.getElementById('np-cnt-c');
+        if(cntEl) cntEl.textContent = CATEGORIES.length;
+        if (page === 'categories') renderCategoryList();
+      }
+      if (phData) { PRICE_HISTORY = phData; lsSet('qi-price-history', PRICE_HISTORY); }
+    } catch(e) { console.warn('poll error:', e); }
+  }, 20000);
 
-  // Categories real-time listener
-  db.collection(COL_C).orderBy('code','asc')
-    .onSnapshot({ includeMetadataChanges: false }, snap => {
-      CATEGORIES = snap.docs.map(d => d.data());
-      const cntEl = document.getElementById('np-cnt-c');
-      if(cntEl) cntEl.textContent = CATEGORIES.length;
-      if(page === 'categories') renderCategoryList();
-    }, err => console.warn('C listener:', err));
-
-
-  // PRICE_HISTORY real-time listener
-  db.collection(COL_PRICE_HIST).orderBy('ts','asc')
-    .onSnapshot({ includeMetadataChanges: false }, snap => {
-      PRICE_HISTORY = snap.docs.map(d => d.data());
-      lsSet('qi-price-history', PRICE_HISTORY);
-    }, err => console.warn('PRICE_HIST listener:', err));
-
-  // USERS — 從 Supabase 一次性載入（非即時，人員異動頻率低）
+  // Users — low change rate, load once
   _loadUsersFromSB().then(rows => {
     if (rows) { USERS = rows; lsSet('qi-users-cache', USERS); }
   }).catch(() => {});
 
-  // CRM listeners — accounts/contacts/activities/tasks
+  // CRM polling
   if(typeof subscribeCRM === 'function') subscribeCRM();
 }
 
 // ── Load all data ──────────────────────
 async function loadAll() {
   showSyncing();
-  if (USE_FIREBASE) {
-    try {
-      const [qSnap, pSnap, sDoc, suppSnap] = await Promise.all([
-        db.collection(COL_Q).orderBy('date','asc').get(),
-        db.collection(COL_P).orderBy('createdAt','asc').get(),
-        db.collection(COL_S).doc('main').get(),
-        db.collection(COL_SUP).orderBy('code','asc').get(),
-      ]);
-      QUOTES   = qSnap.docs.map(d => d.data());
-      PRODUCTS = pSnap.docs.map(d => d.data());
-      if (suppSnap && !suppSnap.empty) { SUPPLIERS = suppSnap.docs.map(d => d.data()); }
-    try {
-      const cSnap = await db.collection(COL_C).orderBy('code','asc').get();
-      CATEGORIES = cSnap.docs.map(d => d.data());
-    } catch(_) { CATEGORIES = []; }
+  try {
+    const [qData, pData, sData, suppData, cData, phData] = await Promise.all([
+      SB.get('quotes', 'order=date'),
+      SB.get('products', 'order=createdAt'),
+      SB.get('quotation_settings', 'id=eq.main&limit=1'),
+      SB.get('suppliers', 'order=code'),
+      SB.get('categories', 'order=code'),
+      SB.get('price_history', 'order=ts'),
+    ]);
+    QUOTES        = qData    || [];
+    PRODUCTS      = pData    || [];
+    SUPPLIERS     = suppData || [];
+    CATEGORIES    = cData    || [];
+    PRICE_HISTORY = phData   || [];
+    if (sData?.[0]?.data) SETTINGS = {...SETTINGS, ...sData[0].data};
+    lsSet('qi-q-cache', QUOTES);
+    lsSet('qi-p-cache', PRODUCTS);
+    lsSet('qi-price-history', PRICE_HISTORY);
     { const _e=document.getElementById('np-cnt-c'); if(_e) _e.textContent=CATEGORIES.length; }
-      if (sDoc.exists) SETTINGS = { ...SETTINGS, ...sDoc.data() };
-      lsSet('qi-q-cache', QUOTES);
-      lsSet('qi-p-cache', PRODUCTS);
-      // Load PRICE_HISTORY from Firestore
-      try {
-        const phSnap = await db.collection(COL_PRICE_HIST).orderBy('ts','asc').get();
-        PRICE_HISTORY = phSnap.docs.map(d=>d.data());
-        lsSet('qi-price-history', PRICE_HISTORY);
-      } catch(_) { PRICE_HISTORY = lsGet('qi-price-history', []); }
-    } catch(e) {
-      console.warn('Firestore load error, using local cache:', e.code||e.message);
-      QUOTES   = lsGet('qi-q-cache', []);
-      PRODUCTS = lsGet('qi-p-cache', []);
-      PRICE_HISTORY = lsGet('qi-price-history', []);
-      window._firestoreLoadFailed = true; // flag: needs reload after login
-    }
-  } else {
-    QUOTES   = lsGet('qi-q-cache', []);
-    PRODUCTS = lsGet('qi-p-cache', []);
+  } catch(e) {
+    console.warn('SB load error, using local cache:', e.message);
+    QUOTES        = lsGet('qi-q-cache', []);
+    PRODUCTS      = lsGet('qi-p-cache', []);
     PRICE_HISTORY = lsGet('qi-price-history', []);
     try { const s=localStorage.getItem('qi-s-cache'); if(s) SETTINGS={...SETTINGS,...JSON.parse(s)}; } catch(_){}
   }
-  // Users — 主要從 Supabase 載入（Firebase users collection 已停用）
   const sbUsers = await _loadUsersFromSB().catch(() => null);
   if (sbUsers) { USERS = sbUsers; lsSet('qi-users-cache', USERS); }
   else { USERS = lsGet('qi-users-cache', []); }
@@ -1598,12 +1570,10 @@ async function loadAll() {
 async function saveOneQ(idOrObj) {
   const q = (typeof idOrObj === 'object') ? idOrObj : QUOTES.find(x => x.id === idOrObj);
   if (!q) return;
-  // Always stamp updatedAt for conflict detection
   const data = { ...q, updatedAt: Date.now() };
   lsSet('qi-q-cache', QUOTES);
-  if (!USE_FIREBASE) return;
   try {
-    await db.collection(COL_Q).doc(q.id).set(data);
+    await SB.upsert('quotes', data);
   } catch(e) {
     console.error('saveOneQ:', e);
     toast('⚠️ Cloud sync error — please retry');
@@ -1612,10 +1582,9 @@ async function saveOneQ(idOrObj) {
 
 // ── Delete one quote ───────────────────
 async function deleteOneQ(id) {
-  if (!USE_FIREBASE) { lsSet('qi-q-cache', QUOTES); return; }
+  lsSet('qi-q-cache', QUOTES);
   try {
-    await db.collection(COL_Q).doc(id).delete();
-    lsSet('qi-q-cache', QUOTES);
+    await SB.delete('quotes', 'id=eq.' + encodeURIComponent(id));
   } catch(e) { console.error('deleteOneQ:', e); toast('⚠️ Delete failed — please retry'); }
 }
 
@@ -1641,7 +1610,7 @@ async function uploadImgToStorage(prodId, base64DataUrl) {
 // Always throws on failure — no base64 fallback
 async function _uploadFileToStorage(path, b64, mimeType){
   console.log('[Storage] Upload start:', path, 'mime:', mimeType, 'b64 length:', b64?.length);
-  if(!USE_FIREBASE) throw new Error('USE_FIREBASE is false');
+  if(!storage) throw new Error('Firebase Storage not initialized');
   if(!storage) throw new Error('storage object is null — Firebase Storage not initialized');
   const ref=storage.ref(path);
   console.log('[Storage] ref created, calling put()...');
@@ -1679,7 +1648,7 @@ async function saveOneP(idOrObj) {
   let imgUrl = p.img || null;
 
   // If img is base64 (new upload), upload to Firebase Storage
-  if (p.img && p.img.startsWith('data:') && USE_FIREBASE) {
+  if (p.img && p.img.startsWith('data:') && storage) {
     // Cache base64 in localStorage BEFORE uploading (for PDF/XLSX use)
     try { localStorage.setItem('qi-img-b64-' + p.id, p.img); } catch(_) {}
     const uploadedUrl = await uploadImgToStorage(p.id, p.img);
@@ -1716,13 +1685,10 @@ async function saveOneP(idOrObj) {
     updatedAt: Date.now()
   };
   lsSet('qi-p-cache', PRODUCTS);
-  if (!USE_FIREBASE) return;
   try {
-    console.log('[Firestore] saveOneP:', p.id, '| docs:', (data.docs||[]).length, '| bomFiles:', (data.bomFiles||[]).length);
-    await db.collection(COL_P).doc(p.id).set(data);
-    console.log('[Firestore] saveOneP success');
+    await SB.upsert('products', data);
   } catch(e) {
-    console.error('[Firestore] saveOneP FAILED:', e.code, e.message);
+    console.error('saveOneP FAILED:', e.message);
     toast('⚠️ Product sync error: '+e.message);
   }
 }
@@ -1731,11 +1697,9 @@ async function saveOneP(idOrObj) {
 async function deleteOneP(id) {
   localStorage.removeItem('qi-img-' + id);
   localStorage.removeItem('qi-img-b64-' + id);
-  if (!USE_FIREBASE) { lsSet('qi-p-cache', PRODUCTS); return; }
+  lsSet('qi-p-cache', PRODUCTS);
   try {
-    await db.collection(COL_P).doc(id).delete();
-    lsSet('qi-p-cache', PRODUCTS);
-    // Also delete image from Storage (async, non-blocking)
+    await SB.delete('products', 'id=eq.' + encodeURIComponent(id));
     deleteImgFromStorage(id);
   } catch(e) {
     console.error('deleteOneP:', e);
@@ -1746,31 +1710,22 @@ async function deleteOneP(id) {
 // ── Save settings ──────────────────────
 async function saveS() {
   lsSet('qi-s-cache', SETTINGS);
-  if (!USE_FIREBASE) return;
-  try { await db.collection(COL_S).doc('main').set(SETTINGS); }
+  try { await SB.upsert('quotation_settings', {id:'main', data: SETTINGS}); }
   catch(e) { console.error('saveS:', e); }
 }
 
 // ── Batch save all quotes ──────────────
 async function saveQ() {
   lsSet('qi-q-cache', QUOTES);
-  if (!USE_FIREBASE) return;
-  try {
-    const batch = db.batch();
-    QUOTES.forEach(q => batch.set(db.collection(COL_Q).doc(q.id), q));
-    await batch.commit();
-  } catch(e) { console.error('saveQ:', e); toast('⚠️ Cloud sync error'); }
+  try { await Promise.all(QUOTES.map(q => SB.upsert('quotes', q))); }
+  catch(e) { console.error('saveQ:', e); toast('⚠️ Cloud sync error'); }
 }
 
 // ── Batch save all products ────────────
 async function saveP() {
   lsSet('qi-p-cache', PRODUCTS);
-  if (!USE_FIREBASE) return;
-  try {
-    const batch = db.batch();
-    PRODUCTS.forEach(p => batch.set(db.collection(COL_P).doc(p.id), p));
-    await batch.commit();
-  } catch(e) { console.error('saveP:', e); }
+  try { await Promise.all(PRODUCTS.map(p => SB.upsert('products', p))); }
+  catch(e) { console.error('saveP:', e); }
 }
 
 // ═══════════════════════════════════════
@@ -2306,7 +2261,7 @@ async function saveCat(){
   const cat={id:existing?.id||uid(),code,desc,createdAt:existing?.createdAt||Date.now(),updatedAt:Date.now()};
   if(existing) CATEGORIES=CATEGORIES.map(c=>c.id===editCatId?cat:c);
   else CATEGORIES.push(cat);
-  if(USE_FIREBASE){try{await db.collection(COL_C).doc(cat.id).set(cat);}catch(e){console.error('saveCat',e);}}
+  try { await SB.upsert('categories', cat); } catch(e){ console.error('saveCat',e); }
   closeCatModal();renderCategoryList();renderSettingsCatList();updateVersionStamp();toast('Saved');
 }
 async function deleteCat(){
@@ -2316,7 +2271,7 @@ async function deleteCat(){
   if(inUse>0){toast('Cannot delete: '+inUse+' product(s) assigned');return;}
   await confirmDelete(c?.code||'category',async()=>{
     CATEGORIES=CATEGORIES.filter(x=>x.id!==editCatId);
-    if(USE_FIREBASE){try{await db.collection(COL_C).doc(editCatId).delete();}catch(e){}}
+    try { await SB.delete('categories', 'id=eq.' + encodeURIComponent(editCatId)); } catch(e){}
     closeCatModal();renderCategoryList();toast('Deleted');
   });
 }
@@ -2779,6 +2734,39 @@ const XLAT_PROXY = 'https://comart.mcsewoody.workers.dev';
 const SB_WORKER  = 'https://comart.mcsewoody.workers.dev';
 const SB_TOKEN   = 'COMART-ADMIN-2026';
 
+const SB = {
+  _h: { 'x-admin-token': SB_TOKEN, 'Content-Type': 'application/json' },
+  _url: t => `${SB_WORKER}/supabase/rest/v1/${t}`,
+  async get(table, qs='') {
+    const res = await fetch(`${this._url(table)}${qs?'?'+qs:''}`, { headers: this._h });
+    if (!res.ok) { console.warn('SB.get', table, res.status); return null; }
+    return res.json();
+  },
+  async post(table, data) {
+    const res = await fetch(this._url(table), { method:'POST', headers: this._h, body: JSON.stringify(data) });
+    if (!res.ok) { const e=await res.text(); throw new Error(`SB.post ${table}: ${e}`); }
+  },
+  async patch(table, qs, data) {
+    const res = await fetch(`${this._url(table)}?${qs}`, {
+      method:'PATCH', headers: {...this._h, Prefer:'return=representation'}, body: JSON.stringify(data)
+    });
+    if (!res.ok) { const e=await res.text(); throw new Error(`SB.patch ${table}: ${e}`); }
+    return res.json();
+  },
+  async delete(table, qs) {
+    await fetch(`${this._url(table)}?${qs}`, { method:'DELETE', headers: this._h });
+  },
+  async upsert(table, data, pk='id') {
+    const pkVal = data[pk];
+    if (!pkVal) return this.post(table, data);
+    const patched = await this.patch(table, `${pk}=eq.${encodeURIComponent(pkVal)}`, data).catch(()=>[]);
+    if (patched && patched.length > 0) return;
+    return this.post(table, data);
+  }
+};
+
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,8); }
+
 async function _loadUsersFromSB() {
   try {
     const res = await fetch(
@@ -3215,10 +3203,7 @@ async function saveProd(){
     };
     PRICE_HISTORY.push(_phEntry);
     lsSet('qi-price-history', PRICE_HISTORY);
-    if(USE_FIREBASE){
-      db.collection(COL_PRICE_HIST).doc(_phEntry.id).set(_phEntry)
-        .catch(e=>console.error('price_history write:', e));
-    }
+    SB.upsert('price_history', _phEntry).catch(e=>console.error('price_history write:', e));
   }
   if(existing) PRODUCTS = PRODUCTS.map(p => p.id===editProdId ? prod : p);
   else PRODUCTS.push(prod);
@@ -5040,10 +5025,7 @@ async function saveSupplier() {
   };
   const idx = SUPPLIERS.findIndex(s=>s.id===sup.id);
   if(idx>-1) SUPPLIERS.splice(idx,1,sup); else SUPPLIERS.push(sup);
-  if(USE_FIREBASE){
-    try{ await db.collection(COL_SUP).doc(sup.id).set(sup); }
-    catch(e){ console.error(e); }
-  }
+  try { await SB.upsert('suppliers', sup); } catch(e){ console.error(e); }
   closeSupModal();
   renderSupplierList();
   populateSupplierDropdowns();
@@ -5055,9 +5037,7 @@ async function deleteSupplier() {
   if(!s) return;
   await confirmDelete('Supplier '+s.code+' – '+s.name, async()=>{
     SUPPLIERS=SUPPLIERS.filter(x=>x.id!==s.id);
-    if(USE_FIREBASE){
-      try{ await db.collection(COL_SUP).doc(s.id).delete(); } catch(e){}
-    }
+    try { await SB.delete('suppliers', 'id=eq.'+encodeURIComponent(s.id)); } catch(e){}
     closeSupModal();
     renderSupplierList();
     populateSupplierDropdowns();
@@ -5171,21 +5151,10 @@ function renderPriceHistTab() {
   const prodId = editProdId;
   if(!prodId){ el.innerHTML='<div style="color:var(--tx3);font-size:12px;padding:8px">Save product first</div>'; return; }
   // Also try to pull fresh from Firestore for this product
-  if(USE_FIREBASE){
-    el.innerHTML='<div style="color:var(--tx3);font-size:12px;padding:8px">Loading...</div>';
-    db.collection(COL_PRICE_HIST).where('prodId','==',prodId).orderBy('ts','desc').get()
-      .then(snap=>{
-        const freshHist = snap.docs.map(d=>d.data());
-        // Merge with local (deduplicate by id)
-        const ids = new Set(freshHist.map(h=>h.id));
-        const merged = [...freshHist, ...(PRICE_HISTORY||[]).filter(h=>h.prodId===prodId&&!ids.has(h.id))];
-        _renderHistTable(el, merged);
-      })
-      .catch(()=> _renderHistTable(el, (PRICE_HISTORY||[]).filter(h=>h.prodId===prodId)));
-    return;
-  }
-  const hist = [...(PRICE_HISTORY||[])].filter(h=>h.prodId===prodId).sort((a,b)=>b.ts-a.ts);
-  _renderHistTable(el, hist);
+  el.innerHTML='<div style="color:var(--tx3);font-size:12px;padding:8px">Loading...</div>';
+  SB.get('price_history', `prodId=eq.${encodeURIComponent(prodId)}&order=ts.desc`)
+    .then(rows=>{ _renderHistTable(el, rows||[]); })
+    .catch(()=> _renderHistTable(el, (PRICE_HISTORY||[]).filter(h=>h.prodId===prodId)));
 }
 
 function _renderHistTable(el, hist) {
@@ -5549,19 +5518,16 @@ async function clearAllQuotes(){
 // REFRESH (pull latest from Firestore)
 // ═══════════════════════════════════════
 window.refreshData = async function refreshData() {
-  if (!USE_FIREBASE) { toast('⚡ Local mode — no cloud sync'); return; }
   showSyncing();
   try {
-    const [qSnap, pSnap] = await Promise.all([
-      db.collection(COL_Q).orderBy('date','asc').get(),
-      db.collection(COL_P).orderBy('createdAt','asc').get()
+    const [qData, pData, cData] = await Promise.all([
+      SB.get('quotes', 'order=date'),
+      SB.get('products', 'order=createdAt'),
+      SB.get('categories', 'order=code'),
     ]);
-    QUOTES   = qSnap.docs.map(d => d.data());
-    PRODUCTS = pSnap.docs.map(d => d.data());
-    try {
-      const cSnap = await db.collection(COL_C).orderBy('code','asc').get();
-      CATEGORIES = cSnap.docs.map(d => d.data());
-    } catch(_) { CATEGORIES = []; }
+    QUOTES     = qData || [];
+    PRODUCTS   = pData || [];
+    CATEGORIES = cData || [];
     { const _e=document.getElementById('np-cnt-c'); if(_e) _e.textContent=CATEGORIES.length; }
     lsSet('qi-q-cache', QUOTES);
     lsSet('qi-p-cache', PRODUCTS);
@@ -5905,7 +5871,7 @@ let editUserId = null;
 // ACTIVITY LOG
 // ═══════════════════════════════════════
 async function writeLog(action, type, detail) {
-  if (!USE_FIREBASE || !currentUser) return;
+  if (!currentUser) return;
   try {
     const log = {
       ts: Date.now(),
@@ -5916,7 +5882,7 @@ async function writeLog(action, type, detail) {
       type,     // 'quote' | 'product' | 'category' | 'user' | 'settings'
       detail,   // human-readable description
     };
-    await db.collection(COL_L).add(log);
+    await SB.post('logs', {...log, id: uid()});
   } catch(e) { console.warn('writeLog:', e); }
 }
 
@@ -6182,30 +6148,26 @@ let _crmTab       = 'accounts';
 // ── Firestore subscription ───────────────────
 let _crmAUnsub=null,_crmCUnsub=null,_crmVUnsub=null,_crmTUnsub=null;
 function subscribeCRM(){
-  if(!USE_FIREBASE || !db) return;
-  if(_crmAUnsub) _crmAUnsub();
-  if(_crmCUnsub) _crmCUnsub();
-  if(_crmVUnsub) _crmVUnsub();
-  if(_crmTUnsub) _crmTUnsub();
-  _crmAUnsub = db.collection(COL_CA).onSnapshot(s=>{
-    CRM_ACCOUNTS = s.docs.map(d=>({...d.data(),id:d.id}));
-    if(page==='crm' && _crmTab==='accounts') renderCRMAccounts();
+  async function _loadCRM() {
+    const [accts, contacts, activities, tasks] = await Promise.all([
+      SB.get('crm_accounts', 'order=createdAt'),
+      SB.get('crm_contacts', 'order=createdAt'),
+      SB.get('crm_activities', 'order=createdAt'),
+      SB.get('crm_tasks', 'order=createdAt'),
+    ]);
+    CRM_ACCOUNTS   = accts      || [];
+    CRM_CONTACTS   = contacts   || [];
+    CRM_ACTIVITIES = activities || [];
+    CRM_TASKS      = tasks      || [];
     updateCRMBadge();
-  });
-  _crmCUnsub = db.collection(COL_CC).onSnapshot(s=>{
-    CRM_CONTACTS = s.docs.map(d=>({...d.data(),id:d.id}));
-    if(_editAcctId) renderAcctContacts();
-  });
-  _crmVUnsub = db.collection(COL_CV).onSnapshot(s=>{
-    CRM_ACTIVITIES = s.docs.map(d=>({...d.data(),id:d.id}));
-    if(_editAcctId) renderAcctActivities();
+    if(page==='crm' && _crmTab==='accounts') renderCRMAccounts();
     if(page==='crm' && _crmTab==='activities') renderCRMActivities();
-  });
-  _crmTUnsub = db.collection(COL_CT).onSnapshot(s=>{
-    CRM_TASKS = s.docs.map(d=>({...d.data(),id:d.id}));
-    if(_editAcctId) renderAcctTasks();
     if(page==='crm' && _crmTab==='tasks') renderCRMTasks();
-  });
+    if(_editAcctId){ renderAcctContacts(); renderAcctActivities(); renderAcctTasks(); }
+  }
+  _loadCRM();
+  if (_crmPollTimer) clearInterval(_crmPollTimer);
+  _crmPollTimer = setInterval(_loadCRM, 20000);
 }
 
 function updateCRMBadge(){
@@ -6374,13 +6336,13 @@ async function saveAccount(){
   };
   try {
     if(_editAcctId){
-      await db.collection(COL_CA).doc(_editAcctId).set({...a, id:_editAcctId}, {merge:true});
+      await SB.upsert('crm_accounts', {...a, id:_editAcctId});
     } else {
       a.createdAt = Date.now();
       a.createdBy = currentUser?.empId || null;
-      const docRef = await db.collection(COL_CA).add(a);
-      _editAcctId = docRef.id;
-      await db.collection(COL_CA).doc(docRef.id).set({id:docRef.id}, {merge:true});
+      a.id = uid();
+      _editAcctId = a.id;
+      await SB.post('crm_accounts', a);
     }
     toast('✅ 已儲存');
     closeAccountModal();
@@ -6391,15 +6353,12 @@ async function deleteAccount(){
   if(currentUser?.role!=='admin'){ toast('只有 Admin 可以刪除'); return; }
   if(!confirm('確定刪除此客戶？所有聯絡人/互動紀錄/任務也會被刪除。')) return;
   try {
-    await db.collection(COL_CA).doc(_editAcctId).delete();
-    // Cascade delete
-    const sub = ['crm_contacts','crm_activities','crm_tasks'];
-    for(const col of sub){
-      const docs = await db.collection(col).where('accountId','==',_editAcctId).get();
-      const batch = db.batch();
-      docs.forEach(d => batch.delete(d.ref));
-      await batch.commit();
-    }
+    await SB.delete('crm_accounts', 'id=eq.'+encodeURIComponent(_editAcctId));
+    await Promise.all([
+      SB.delete('crm_contacts',   'accountId=eq.'+encodeURIComponent(_editAcctId)),
+      SB.delete('crm_activities', 'accountId=eq.'+encodeURIComponent(_editAcctId)),
+      SB.delete('crm_tasks',      'accountId=eq.'+encodeURIComponent(_editAcctId)),
+    ]);
     toast('已刪除');
     closeAccountModal();
   } catch(e){ toast('刪除失敗: '+e.message); }
@@ -6529,11 +6488,10 @@ async function saveContact(){
   };
   try {
     if(_editContactId){
-      await db.collection(COL_CC).doc(_editContactId).set(c, {merge:true});
+      await SB.upsert('crm_contacts', {...c, id:_editContactId});
     } else {
-      c.createdAt=Date.now();
-      const ref=await db.collection(COL_CC).add(c);
-      await db.collection(COL_CC).doc(ref.id).set({id:ref.id},{merge:true});
+      c.createdAt=Date.now(); c.id=uid();
+      await SB.post('crm_contacts', c);
     }
     toast('✅ 已儲存');
     closeContactModal();
@@ -6542,7 +6500,7 @@ async function saveContact(){
 async function deleteContact(){
   if(!_editContactId) return;
   if(!confirm('刪除此聯絡人？')) return;
-  await db.collection(COL_CC).doc(_editContactId).delete();
+  await SB.delete('crm_contacts', 'id=eq.'+encodeURIComponent(_editContactId));
   toast('已刪除');
   closeContactModal();
 }
@@ -6588,11 +6546,10 @@ async function saveActivity(){
   };
   try {
     if(_editActivityId){
-      await db.collection(COL_CV).doc(_editActivityId).set(v,{merge:true});
+      await SB.upsert('crm_activities', {...v, id:_editActivityId});
     } else {
-      v.createdAt=Date.now(); v.createdBy=currentUser?.empId||null;
-      const r = await db.collection(COL_CV).add(v);
-      await db.collection(COL_CV).doc(r.id).set({id:r.id},{merge:true});
+      v.createdAt=Date.now(); v.createdBy=currentUser?.empId||null; v.id=uid();
+      await SB.post('crm_activities', v);
     }
     toast('✅ 已儲存');
     closeActivityModal();
@@ -6601,7 +6558,7 @@ async function saveActivity(){
 async function deleteActivity(){
   if(!_editActivityId) return;
   if(!confirm('刪除此互動紀錄？')) return;
-  await db.collection(COL_CV).doc(_editActivityId).delete();
+  await SB.delete('crm_activities', 'id=eq.'+encodeURIComponent(_editActivityId));
   toast('已刪除');
   closeActivityModal();
 }
@@ -6654,11 +6611,10 @@ async function saveTask(){
   };
   try {
     if(_editTaskId){
-      await db.collection(COL_CT).doc(_editTaskId).set(tk,{merge:true});
+      await SB.upsert('crm_tasks', {...tk, id:_editTaskId});
     } else {
-      tk.createdAt=Date.now(); tk.createdBy=currentUser?.empId||null;
-      const r = await db.collection(COL_CT).add(tk);
-      await db.collection(COL_CT).doc(r.id).set({id:r.id},{merge:true});
+      tk.createdAt=Date.now(); tk.createdBy=currentUser?.empId||null; tk.id=uid();
+      await SB.post('crm_tasks', tk);
     }
     toast('✅ 已儲存');
     closeTaskModal();
@@ -6667,7 +6623,7 @@ async function saveTask(){
 async function deleteTask(){
   if(!_editTaskId) return;
   if(!confirm('刪除此任務？')) return;
-  await db.collection(COL_CT).doc(_editTaskId).delete();
+  await SB.delete('crm_tasks', 'id=eq.'+encodeURIComponent(_editTaskId));
   toast('已刪除');
   closeTaskModal();
 }
@@ -6675,7 +6631,7 @@ async function toggleTaskDone(id, e){
   if(e) e.stopPropagation();
   const tk = CRM_TASKS.find(x=>x.id===id);
   if(!tk) return;
-  await db.collection(COL_CT).doc(id).set({done:!tk.done, updatedAt:Date.now()},{merge:true});
+  await SB.upsert('crm_tasks', {id, done:!tk.done, updatedAt:Date.now()});
 }
 
 // ── PIPELINE BOARD ───────────────────────────
@@ -6827,16 +6783,16 @@ async function syncQuoteToCRM(quote){
       createdBy: currentUser?.empId || null,
     };
     try {
-      const r = await db.collection(COL_CA).add(newAcct);
-      await db.collection(COL_CA).doc(r.id).set({id:r.id},{merge:true});
-      acct = {...newAcct, id:r.id};
+      newAcct.id = uid();
+      await SB.post('crm_accounts', newAcct);
+      acct = newAcct;
       toast('👥 已自動建立客戶: '+quote.company);
     } catch(e){ console.warn('CRM auto-create failed:',e); return; }
   }
   // Link quote → account
   if(quote.id && acct.id && quote.accountId !== acct.id){
     try {
-      await db.collection(COL_Q).doc(quote.id).set({accountId:acct.id},{merge:true});
+      await SB.upsert('quotes', {...quote, accountId:acct.id});
     } catch(e){ console.warn('Quote-CRM link failed:',e); }
   }
   // Auto-create contact if email is new
@@ -6847,22 +6803,18 @@ async function syncQuoteToCRM(quote){
     if(!exists && (quote.attn || quote.email)){
       try {
         const c = {
-          accountId: acct.id,
-          name: quote.attn||'',
-          email: quote.email||'',
-          phone: quote.tel||'',
+          id: uid(), accountId: acct.id,
+          name: quote.attn||'', email: quote.email||'', phone: quote.tel||'',
           createdAt: Date.now(), updatedAt: Date.now(),
         };
-        const r = await db.collection(COL_CC).add(c);
-        await db.collection(COL_CC).doc(r.id).set({id:r.id},{merge:true});
+        await SB.post('crm_contacts', c);
       } catch(e){ console.warn('CRM auto-contact failed:',e); }
     }
   }
   // Auto-create activity for the quote
   try {
-    await db.collection(COL_CV).add({
-      accountId: acct.id,
-      type: 'quote',
+    await SB.post('crm_activities', {
+      id: uid(), accountId: acct.id, type: 'quote',
       title: 'Quote: ' + (quote.ref||''),
       date: quote.date || new Date().toISOString().slice(0,10),
       detail: `${quote.products?.length||0} products`,
@@ -6892,8 +6844,8 @@ async function addCardInfoToCRM(info, source){
             phone: info.phone||'',
             createdAt: Date.now(), updatedAt: Date.now(),
           };
-          const r = await db.collection(COL_CC).add(c);
-          await db.collection(COL_CC).doc(r.id).set({id:r.id},{merge:true});
+          c.id = uid();
+          await SB.post('crm_contacts', c);
           toast('✅ 已新增聯絡人到 '+info.company);
         } catch(e){ toast('失敗: '+e.message); return; }
       } else {
@@ -6904,6 +6856,7 @@ async function addCardInfoToCRM(info, source){
     // Create new account + contact
     try {
       const newAcct = {
+        id: uid(),
         company: info.company,
         country: '', status: 'lead',
         source: source || '名片掃描',
@@ -6912,17 +6865,14 @@ async function addCardInfoToCRM(info, source){
         createdAt: Date.now(), updatedAt: Date.now(),
         createdBy: currentUser?.empId || null,
       };
-      const r = await db.collection(COL_CA).add(newAcct);
-      await db.collection(COL_CA).doc(r.id).set({id:r.id},{merge:true});
+      await SB.post('crm_accounts', newAcct);
       if(info.name || info.email){
-        const c = {
-          accountId: r.id,
+        await SB.post('crm_contacts', {
+          id: uid(), accountId: newAcct.id,
           name: info.name||'', title: info.title||'',
           email: info.email||'', phone: info.phone||'',
           createdAt: Date.now(), updatedAt: Date.now(),
-        };
-        const cr = await db.collection(COL_CC).add(c);
-        await db.collection(COL_CC).doc(cr.id).set({id:cr.id},{merge:true});
+        });
       }
       toast('✅ 已加入 CRM: '+info.company);
     } catch(e){ toast('失敗: '+e.message); }
@@ -7253,7 +7203,7 @@ async function deleteBomFile(index){
   const p=PRODUCTS.find(x=>x.id===editProdId);if(!p)return;
   const doc=p.bomFiles?.[index];if(!doc)return;
   if(!confirm('Delete "'+doc.name+'"?'))return;
-  if(USE_FIREBASE&&storage){
+  if(storage){
     try{
       if(doc.storagePath) await storage.ref(doc.storagePath).delete();
       else if(doc.url) await storage.refFromURL(doc.url).delete();
@@ -7339,7 +7289,7 @@ async function deleteDoc(index){
   const p=PRODUCTS.find(x=>x.id===editProdId);if(!p)return;
   const doc=p.docs?.[index];if(!doc)return;
   if(!confirm('Delete "'+doc.name+'"?'))return;
-  if(USE_FIREBASE&&storage){
+  if(storage){
     try{
       if(doc.storagePath) await storage.ref(doc.storagePath).delete();
       else if(doc.url) await storage.refFromURL(doc.url).delete();

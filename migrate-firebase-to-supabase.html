@@ -177,40 +177,51 @@ function normalizeRows(rows) {
 // 略過的欄位記錄
 const skippedCols = {}; // { table: Set<colName> }
 
-// 批次 POST（50 筆一批）；遇到 PGRST204 未知欄位自動略過並記錄
+function extractUnknownCol(errText) {
+  if (!errText.includes('PGRST204')) return null;
+  try {
+    const j = JSON.parse(errText);
+    if (j.message) {
+      const m = j.message.match(/find the \W(\w+)\W column/) ||
+                j.message.match(/column \W(\w+)\W/);
+      if (m) return m[1];
+    }
+  } catch(e) {}
+  const m = errText.match(/find the \W(\w+)\W column/);
+  return m ? m[1] : null;
+}
+
+// 批次 POST（每批自己 retry，遇到未知欄位自動略過）
 async function sbBatchPost(table, rows) {
   if (!rows.length) return;
-  let data = normalizeRows(rows);
+  const data = normalizeRows(rows);
   const skipped = skippedCols[table] = skippedCols[table] || new Set();
 
-  let retry = true;
-  let attempts = 0;
-  while (retry && attempts < 20) {
-    attempts++;
-    retry = false;
-    for (let i = 0; i < data.length; i += BATCH_SIZE) {
-      const batch = data.slice(i, i + BATCH_SIZE);
+  for (let i = 0; i < data.length; i += BATCH_SIZE) {
+    // 每批次先套用已知略過欄位
+    let batch = data.slice(i, i + BATCH_SIZE).map(r => {
+      const n = Object.assign({}, r);
+      skipped.forEach(c => delete n[c]);
+      return n;
+    });
+
+    let ok = false, attempts = 0;
+    while (!ok && attempts < 20) {
+      attempts++;
       const res = await fetch(`${WORKER}/supabase/rest/v1/${table}`, {
         method: 'POST',
         headers: { 'x-admin-token': SB_TOKEN, 'Content-Type': 'application/json' },
         body: JSON.stringify(batch),
       });
-      if (!res.ok) {
-        const errText = await res.text();
-        let errJson; try { errJson = JSON.parse(errText); } catch(e) {}
-        // PGRST204 = unknown column — strip it and retry
-        if (errJson && errJson.code === 'PGRST204') {
-          const msg = errJson.message || errText;
-          const m = msg.match(/find the .(.+?). column/) || msg.match(/'(.+?)'/);
-          if (m) {
-            const col = m[1];
-            skipped.add(col);
-            log(`  ⚠️ [${table}] 略過未知欄位: ${col}`, 'warn');
-            data.forEach(r => delete r[col]);
-            retry = true;
-            break;
-          }
-        }
+      if (res.ok) { ok = true; continue; }
+
+      const errText = await res.text();
+      const col = extractUnknownCol(errText);
+      if (col) {
+        skipped.add(col);
+        log(`  ⚠️ [${table}] 略過未知欄位: ${col}`, 'warn');
+        batch = batch.map(r => { const n = Object.assign({}, r); delete n[col]; return n; });
+      } else {
         throw new Error(`POST ${table}: ${res.status} ${errText}`);
       }
     }

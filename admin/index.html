@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" href="data:,">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART 行政管理平台 v1.64</title>
+<title>COMART 行政管理平台 v1.65</title>
 <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.js"></script>
 <style>
 :root{
@@ -961,6 +961,11 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
 }
 #panel-lottery .drawn-chip .chip-no{font-size:11px;opacity:.55;color:#CADCFC;letter-spacing:1px;line-height:1;}
 #panel-lottery .drawn-chip .chip-name{font-size:16px;font-weight:700;color:#fff;line-height:1.1;white-space:nowrap;}
+/* i18n lang buttons */
+.admin-lang-sw{display:flex;gap:2px;align-items:center;margin-right:6px}
+.admin-lang-btn{background:transparent;border:1px solid var(--border);color:var(--text-3);border-radius:5px;padding:2px 7px;font-size:11px;cursor:pointer;transition:all .15s;white-space:nowrap}
+.admin-lang-btn:hover{border-color:var(--blue);color:var(--blue)}
+.admin-lang-btn.active{background:var(--blue);border-color:var(--blue);color:#fff;font-weight:600}
 </style>
 </head>
 <body>
@@ -970,15 +975,22 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="logo">
     <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
     <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
-    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.64</span>
+    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.65</span>
   </div>
   <div class="trr">
+    <div class="admin-lang-sw">
+      <button class="admin-lang-btn active" onclick="setLang('en')">EN</button>
+      <button class="admin-lang-btn" onclick="setLang('zh-TW')">繁中</button>
+      <button class="admin-lang-btn" onclick="setLang('zh-CN')">簡中</button>
+      <button class="admin-lang-btn" onclick="setLang('vi')">VI</button>
+      <button class="admin-lang-btn" onclick="setLang('ja')">日本語</button>
+    </div>
     <div style="display:flex;align-items:center;gap:6px;padding:4px 12px;background:var(--surface-2);border:1px solid var(--border);border-radius:20px;font-size:12px;cursor:pointer" onclick="showUsw()" id="topbar-user">
       <div style="width:7px;height:7px;border-radius:50%;background:var(--green)" id="user-status-dot"></div>
       <span id="cur-u" style="color:var(--text-2)">載入中…</span>
       <span style="color:var(--text-3);font-size:10px">▾</span>
     </div>
-    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.64</span>
+    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.65</span>
   </div>
 </div>
 
@@ -986,31 +998,31 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
 <div id="mod-nav">
   <div class="modnav-item active" data-module="room" onclick="switchMod('room')" title="會議室預約">
     <span class="modnav-icon">🏠</span>
-    <span class="modnav-label">會議室</span>
+    <span class="modnav-label" data-i18n="mod.room">會議室</span>
     <span class="tbadge" id="tb-room" style="display:none">0</span>
   </div>
   <div class="modnav-item" data-module="car" onclick="switchMod('car')" title="公務車管理">
     <span class="modnav-icon">🚗</span>
-    <span class="modnav-label">公務車</span>
+    <span class="modnav-label" data-i18n="mod.car">公務車</span>
     <span class="tbadge" id="tb-car" style="display:none">0</span>
   </div>
   <div class="modnav-item" data-module="visit" onclick="switchMod('visit')" title="客戶到訪">
     <span class="modnav-icon">🤝</span>
-    <span class="modnav-label">客戶到訪</span>
+    <span class="modnav-label" data-i18n="mod.visit">客戶到訪</span>
     <span class="tbadge" id="tb-visit" style="display:none">0</span>
   </div>
   <div class="modnav-item" data-module="lib" onclick="switchMod('lib')" title="圖書館管理">
     <span class="modnav-icon">📚</span>
-    <span class="modnav-label">圖書館</span>
+    <span class="modnav-label" data-i18n="mod.lib">圖書館</span>
     <span class="tbadge" id="tb-lib" style="display:none">0</span>
   </div>
   <div class="modnav-item" data-module="trip" onclick="switchMod('trip')" title="差旅報支單">
     <span class="modnav-icon">✈️</span>
-    <span class="modnav-label">差旅報支</span>
+    <span class="modnav-label" data-i18n="mod.trip">差旅報支</span>
   </div>
   <div class="modnav-item" data-module="lottery" onclick="switchMod('lottery')" title="抽籤系統">
     <span class="modnav-icon">🎰</span>
-    <span class="modnav-label">抽籤</span>
+    <span class="modnav-label" data-i18n="mod.lottery">抽籤</span>
   </div>
 </div>
 <!-- ══ 次選單：手機版 pill bar（JS 動態填入）══ -->
@@ -1024,28 +1036,28 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
 <!-- LIB -->
 <div class="mpanel active" id="panel-lib">
   <div class="msb">
-    <div class="sbh">📚 圖書館</div>
-    <div class="navs"><div class="navl">主選單</div>
-      <div class="navi active" data-p="lib-dash"><span class="ic">🏠</span>總覽</div>
-      <div class="navi" data-p="lib-books"><span class="ic">📖</span>書目管理</div>
-      <div class="navi" data-p="lib-loans"><span class="ic">📋</span>借閱管理<span class="nbadge" id="nb-ov" style="display:none">0</span></div>
-      <div class="navi" data-p="lib-borrow"><span class="ic">➕</span>借書登記</div>
-      <div class="navi" data-p="lib-return"><span class="ic">↩️</span>還書作業</div>
-      <div class="navi" data-p="lib-rsv"><span class="ic">🔖</span>預約管理</div>
+    <div class="sbh" data-i18n="lib.title">📚 圖書館</div>
+    <div class="navs"><div class="navl" data-i18n="g.nav.main">主選單</div>
+      <div class="navi active" data-p="lib-dash"><span class="ic">🏠</span><span data-i18n="lib.nav.dash">總覽</span></div>
+      <div class="navi" data-p="lib-books"><span class="ic">📖</span><span data-i18n="lib.nav.books">書目管理</span></div>
+      <div class="navi" data-p="lib-loans"><span class="ic">📋</span><span data-i18n="lib.nav.loans">借閱管理</span><span class="nbadge" id="nb-ov" style="display:none">0</span></div>
+      <div class="navi" data-p="lib-borrow"><span class="ic">➕</span><span data-i18n="lib.nav.borrow">借書登記</span></div>
+      <div class="navi" data-p="lib-return"><span class="ic">↩️</span><span data-i18n="lib.nav.return">還書作業</span></div>
+      <div class="navi" data-p="lib-rsv"><span class="ic">🔖</span><span data-i18n="lib.nav.rsv">預約管理</span></div>
     </div>
-    <div class="navs"><div class="navl">設定</div>
-      <div class="navi" data-p="lib-cats"><span class="ic">🏷️</span>分類管理</div>
-      <div class="navi" data-p="lib-cfg"><span class="ic">⚙️</span>系統設定</div>
+    <div class="navs"><div class="navl" data-i18n="g.nav.settings">設定</div>
+      <div class="navi" data-p="lib-cats"><span class="ic">🏷️</span><span data-i18n="lib.nav.cats">分類管理</span></div>
+      <div class="navi" data-p="lib-cfg"><span class="ic">⚙️</span><span data-i18n="lib.nav.cfg">系統設定</span></div>
     </div>
     <div class="sbf">v1.56 · Supabase<br><span style="color:var(--ac)">● 本機存儲</span></div>
   </div>
   <div class="mc" id="lc">
     <div class="pg active" id="pg-lib-dash">
       <div class="sg">
-        <div class="sc ca"><div class="sl">館藏總數</div><div class="sv" id="sl-tot">0</div><div class="ss">冊</div></div>
-        <div class="sc"><div class="sl">借閱中</div><div class="sv" id="sl-act">0</div><div class="ss">冊</div></div>
-        <div class="sc cd"><div class="sl">逾期未還</div><div class="sv" id="sl-ov">0</div><div class="ss">冊</div></div>
-        <div class="sc cw"><div class="sl">即將到期</div><div class="sv" id="sl-sn">0</div><div class="ss">3天內</div></div>
+        <div class="sc ca"><div class="sl" data-i18n="lib.stat.total">館藏總數</div><div class="sv" id="sl-tot">0</div><div class="ss" data-i18n="lib.stat.unit">冊</div></div>
+        <div class="sc"><div class="sl" data-i18n="lib.stat.loaned">借閱中</div><div class="sv" id="sl-act">0</div><div class="ss" data-i18n="lib.stat.unit">冊</div></div>
+        <div class="sc cd"><div class="sl" data-i18n="lib.stat.overdue">逾期未還</div><div class="sv" id="sl-ov">0</div><div class="ss" data-i18n="lib.stat.unit">冊</div></div>
+        <div class="sc cw"><div class="sl" data-i18n="lib.stat.soon">即將到期</div><div class="sv" id="sl-sn">0</div><div class="ss" data-i18n="lib.stat.soon_unit">3天內</div></div>
       </div>
       <div class="dash2col">
         <div><div class="sth"><div class="stt">最新借閱</div><div class="stb" id="ld-dt"></div></div><div class="tw"><table><thead><tr><th>書名</th><th>借閱人</th><th>應還日</th><th>狀態</th></tr></thead><tbody id="ld-rc"></tbody></table></div></div>
@@ -1103,31 +1115,31 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
 <!-- CAR -->
 <div class="mpanel" id="panel-car">
   <div class="msb cf">
-    <div class="sbh">🚗 公務車</div>
-    <div class="navs"><div class="navl">主選單</div>
-      <div class="navi cn active" data-p="car-dash"><span class="ic">🏠</span>車輛看板</div>
-      <div class="navi cn" data-p="car-use"><span class="ic">📋</span>使用記錄</div>
-      <div class="navi cn" data-p="car-cal"><span class="ic">📅</span>預約日曆</div>
-      <div class="navi cn" data-p="car-fuel"><span class="ic">⛽</span>油資記錄</div>
-    <div class="navi cn" data-p="car-veh"><span class="ic">🚙</span>車輛清單</div>
+    <div class="sbh" data-i18n="car.title">🚗 公務車</div>
+    <div class="navs"><div class="navl" data-i18n="g.nav.main">主選單</div>
+      <div class="navi cn active" data-p="car-dash"><span class="ic">🏠</span><span data-i18n="car.nav.dash">車輛看板</span></div>
+      <div class="navi cn" data-p="car-use"><span class="ic">📋</span><span data-i18n="car.nav.use">使用記錄</span></div>
+      <div class="navi cn" data-p="car-cal"><span class="ic">📅</span><span data-i18n="car.nav.cal">預約日曆</span></div>
+      <div class="navi cn" data-p="car-fuel"><span class="ic">⛽</span><span data-i18n="car.nav.fuel">油資記錄</span></div>
+    <div class="navi cn" data-p="car-veh"><span class="ic">🚙</span><span data-i18n="car.nav.veh">車輛清單</span></div>
       </div>
-    <div class="navs"><div class="navl">保養維修</div>
-      <div class="navi cn" data-p="car-maint"><span class="ic">🔧</span>保養記錄<span class="nbadge" id="nb-mt" style="display:none">0</span></div>
-      <div class="navi cn" data-p="car-insp"><span class="ic">📋</span>驗車管理</div>
+    <div class="navs"><div class="navl" data-i18n="car.nav.maint_grp">保養維修</div>
+      <div class="navi cn" data-p="car-maint"><span class="ic">🔧</span><span data-i18n="car.nav.maint">保養記錄</span><span class="nbadge" id="nb-mt" style="display:none">0</span></div>
+      <div class="navi cn" data-p="car-insp"><span class="ic">📋</span><span data-i18n="car.nav.insp">驗車管理</span></div>
     </div>
-    <div class="navs"><div class="navl">設定</div>
-      
-      <div class="navi cn" data-p="car-cfg"><span class="ic">⚙️</span>系統設定</div>
+    <div class="navs"><div class="navl" data-i18n="g.nav.settings">設定</div>
+
+      <div class="navi cn" data-p="car-cfg"><span class="ic">⚙️</span><span data-i18n="g.nav.cfg">系統設定</span></div>
     </div>
     <div class="sbf">v1.56 · Supabase<br><span style="color:var(--tl)">● 本機存儲</span></div>
   </div>
   <div class="mc cf" id="cc">
     <div class="pg active" id="pg-car-dash">
       <div class="sg">
-        <div class="sc ct"><div class="sl">車輛總數</div><div class="sv" id="sc-tot">0</div><div class="ss">輛</div></div>
-        <div class="sc cs"><div class="sl">可預約</div><div class="sv" id="sc-av">0</div><div class="ss">輛空閒</div></div>
-        <div class="sc ca"><div class="sl">使用中</div><div class="sv" id="sc-in">0</div><div class="ss">輛</div></div>
-        <div class="sc cw"><div class="sl">保養提醒</div><div class="sv" id="sc-mt">0</div><div class="ss">需注意</div></div>
+        <div class="sc ct"><div class="sl" data-i18n="car.stat.total">車輛總數</div><div class="sv" id="sc-tot">0</div><div class="ss" data-i18n="car.stat.unit">輛</div></div>
+        <div class="sc cs"><div class="sl" data-i18n="car.stat.avail">可預約</div><div class="sv" id="sc-av">0</div><div class="ss" data-i18n="car.stat.idle">輛空閒</div></div>
+        <div class="sc ca"><div class="sl" data-i18n="car.stat.inuse">使用中</div><div class="sv" id="sc-in">0</div><div class="ss" data-i18n="car.stat.unit">輛</div></div>
+        <div class="sc cw"><div class="sl" data-i18n="car.stat.maint">保養提醒</div><div class="sv" id="sc-mt">0</div><div class="ss" data-i18n="car.stat.maint_unit">需注意</div></div>
       </div>
       <div class="dash2col">
         <div><div class="sth"><div class="stt">📅 今日預約</div><div class="stb" id="cd-dt"></div></div><div class="tw"><table><thead><tr><th>車輛</th><th>使用人</th><th>時間</th><th>目的</th><th>狀態</th></tr></thead><tbody id="cd-td"></tbody></table></div></div>
@@ -1206,10 +1218,10 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
 <!-- TRIP PANEL -->
 <div class="mpanel" id="panel-trip">
   <div class="msb">
-    <div class="sbh" style="color:var(--yw)">✈️ 差旅報支單</div>
-    <div class="navs"><div class="navl">功能</div>
-      <div class="navi tna active" data-p="trip-new"><span class="ic">➕</span>新增報支單</div>
-      <div class="navi tna" data-p="trip-list"><span class="ic">📋</span>報支單清單</div>
+    <div class="sbh" style="color:var(--yw)" data-i18n="trip.title">✈️ 差旅報支單</div>
+    <div class="navs"><div class="navl" data-i18n="g.nav.func">功能</div>
+      <div class="navi tna active" data-p="trip-new"><span class="ic">➕</span><span data-i18n="trip.nav.new">新增報支單</span></div>
+      <div class="navi tna" data-p="trip-list"><span class="ic">📋</span><span data-i18n="trip.nav.list">報支單清單</span></div>
     </div>
     <div class="sbf">v1.56 · Supabase<br><span style="color:var(--yw)">● 本機存儲</span></div>
   </div>
@@ -1341,14 +1353,14 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
 <!-- ROOM PANEL -->
 <div class="mpanel" id="panel-room">
   <div class="msb">
-    <div class="sbh" style="color:var(--gn)">🏢 會議室預約</div>
-    <div class="navs"><div class="navl">功能</div>
-      <div class="navi rna active" data-p="room-dash"><span class="ic">🏠</span>狀態看板</div>
-      <div class="navi rna" data-p="room-new"><span class="ic">➕</span>新增預約</div>
-      <div class="navi rna" data-p="room-cal"><span class="ic">📅</span>預約日曆</div>
-      <div class="navi rna" data-p="room-list"><span class="ic">📋</span>預約清單</div>
-      <div class="navi rna" data-p="room-report"><span class="ic">📊</span>使用率報表</div>
-      <div class="navi rna" data-p="room-fault"><span class="ic">🔧</span>故障回報<span class="nbadge" id="nb-fault" style="display:none">0</span></div>
+    <div class="sbh" style="color:var(--gn)" data-i18n="room.title">🏢 會議室預約</div>
+    <div class="navs"><div class="navl" data-i18n="g.nav.func">功能</div>
+      <div class="navi rna active" data-p="room-dash"><span class="ic">🏠</span><span data-i18n="room.nav.dash">狀態看板</span></div>
+      <div class="navi rna" data-p="room-new"><span class="ic">➕</span><span data-i18n="room.nav.new">新增預約</span></div>
+      <div class="navi rna" data-p="room-cal"><span class="ic">📅</span><span data-i18n="room.nav.cal">預約日曆</span></div>
+      <div class="navi rna" data-p="room-list"><span class="ic">📋</span><span data-i18n="room.nav.list">預約清單</span></div>
+      <div class="navi rna" data-p="room-report"><span class="ic">📊</span><span data-i18n="room.nav.report">使用率報表</span></div>
+      <div class="navi rna" data-p="room-fault"><span class="ic">🔧</span><span data-i18n="room.nav.fault">故障回報</span><span class="nbadge" id="nb-fault" style="display:none">0</span></div>
     </div>
     <div class="sbf">v1.56 · Supabase<br><span style="color:var(--gn)">● 本機存儲</span></div>
   </div>
@@ -1576,13 +1588,13 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
 <!-- VISIT PANEL -->
 <div class="mpanel" id="panel-visit">
   <div class="msb">
-    <div class="sbh" style="color:#a78bfa">🤝 客戶到訪派車</div>
-    <div class="navs"><div class="navl">功能</div>
-      <div class="navi vna active" data-p="visit-dash"><span class="ic">🏠</span>到訪看板</div>
-      <div class="navi vna" data-p="visit-new"><span class="ic">➕</span>新增到訪</div>
-      <div class="navi vna" data-p="visit-list"><span class="ic">📋</span>到訪清單</div>
-      <div class="navi vna" data-p="visit-guests"><span class="ic">👥</span>來賓資料庫</div>
-      <div class="navi vna" data-p="visit-report"><span class="ic">📊</span>接待報表</div>
+    <div class="sbh" style="color:#a78bfa" data-i18n="visit.title">🤝 客戶到訪派車</div>
+    <div class="navs"><div class="navl" data-i18n="g.nav.func">功能</div>
+      <div class="navi vna active" data-p="visit-dash"><span class="ic">🏠</span><span data-i18n="visit.nav.dash">到訪看板</span></div>
+      <div class="navi vna" data-p="visit-new"><span class="ic">➕</span><span data-i18n="visit.nav.new">新增到訪</span></div>
+      <div class="navi vna" data-p="visit-list"><span class="ic">📋</span><span data-i18n="visit.nav.list">到訪清單</span></div>
+      <div class="navi vna" data-p="visit-guests"><span class="ic">👥</span><span data-i18n="visit.nav.guests">來賓資料庫</span></div>
+      <div class="navi vna" data-p="visit-report"><span class="ic">📊</span><span data-i18n="visit.nav.report">接待報表</span></div>
     </div>
     <div class="sbf">v1.56 · Supabase<br><span style="color:#a78bfa">● 本機存儲</span></div>
   </div>
@@ -2523,6 +2535,159 @@ async function delVisitGuest(id) {
   catch(e) { console.warn('delVisitGuest SB fail:', e.message); }
 }
 
+// ── I18N ──────────────────────────────────────────────
+let currentAdminLang = 'en';
+const ADMIN_I18N = {
+  en: {
+    'mod.room':'Meeting Rooms','mod.car':'Fleet','mod.visit':'Visitors',
+    'mod.lib':'Library','mod.trip':'Travel Expense','mod.lottery':'Lottery',
+    'g.nav.main':'Main Menu','g.nav.settings':'Settings','g.nav.func':'Functions','g.nav.cfg':'Config',
+    'lib.title':'📚 Library',
+    'lib.nav.dash':'Overview','lib.nav.books':'Book Catalog','lib.nav.loans':'Loan Mgmt',
+    'lib.nav.borrow':'Check Out','lib.nav.return':'Return','lib.nav.rsv':'Reservations',
+    'lib.nav.cats':'Categories','lib.nav.cfg':'Config',
+    'lib.stat.total':'Total Books','lib.stat.loaned':'Loaned','lib.stat.overdue':'Overdue',
+    'lib.stat.soon':'Due Soon','lib.stat.unit':'vols','lib.stat.soon_unit':'within 3d',
+    'car.title':'🚗 Fleet',
+    'car.nav.dash':'Dashboard','car.nav.use':'Usage Log','car.nav.cal':'Calendar',
+    'car.nav.fuel':'Fuel Log','car.nav.veh':'Vehicles',
+    'car.nav.maint_grp':'Maintenance','car.nav.maint':'Maint. Log','car.nav.insp':'Inspection',
+    'car.stat.total':'Total Vehicles','car.stat.avail':'Available','car.stat.inuse':'In Use',
+    'car.stat.maint':'Maint. Alert','car.stat.unit':'units','car.stat.idle':'idle',
+    'car.stat.maint_unit':'attention',
+    'room.title':'🏢 Meeting Rooms',
+    'room.nav.dash':'Status Board','room.nav.new':'New Booking','room.nav.cal':'Calendar',
+    'room.nav.list':'Booking List','room.nav.report':'Usage Report','room.nav.fault':'Report Fault',
+    'visit.title':'🤝 Visitor Mgmt',
+    'visit.nav.dash':'Visitor Board','visit.nav.new':'New Visit','visit.nav.list':'Visit List',
+    'visit.nav.guests':'Guest DB','visit.nav.report':'Reports',
+    'trip.title':'✈️ Travel Expense',
+    'trip.nav.new':'New Report','trip.nav.list':'Report List',
+  },
+  'zh-TW': {
+    'mod.room':'會議室','mod.car':'公務車','mod.visit':'客戶到訪',
+    'mod.lib':'圖書館','mod.trip':'差旅報支','mod.lottery':'抽籤',
+    'g.nav.main':'主選單','g.nav.settings':'設定','g.nav.func':'功能','g.nav.cfg':'系統設定',
+    'lib.title':'📚 圖書館',
+    'lib.nav.dash':'總覽','lib.nav.books':'書目管理','lib.nav.loans':'借閱管理',
+    'lib.nav.borrow':'借書登記','lib.nav.return':'還書作業','lib.nav.rsv':'預約管理',
+    'lib.nav.cats':'分類管理','lib.nav.cfg':'系統設定',
+    'lib.stat.total':'館藏總數','lib.stat.loaned':'借閱中','lib.stat.overdue':'逾期未還',
+    'lib.stat.soon':'即將到期','lib.stat.unit':'冊','lib.stat.soon_unit':'3天內',
+    'car.title':'🚗 公務車',
+    'car.nav.dash':'車輛看板','car.nav.use':'使用記錄','car.nav.cal':'預約日曆',
+    'car.nav.fuel':'油資記錄','car.nav.veh':'車輛清單',
+    'car.nav.maint_grp':'保養維修','car.nav.maint':'保養記錄','car.nav.insp':'驗車管理',
+    'car.stat.total':'車輛總數','car.stat.avail':'可預約','car.stat.inuse':'使用中',
+    'car.stat.maint':'保養提醒','car.stat.unit':'輛','car.stat.idle':'輛空閒',
+    'car.stat.maint_unit':'需注意',
+    'room.title':'🏢 會議室預約',
+    'room.nav.dash':'狀態看板','room.nav.new':'新增預約','room.nav.cal':'預約日曆',
+    'room.nav.list':'預約清單','room.nav.report':'使用率報表','room.nav.fault':'故障回報',
+    'visit.title':'🤝 客戶到訪派車',
+    'visit.nav.dash':'到訪看板','visit.nav.new':'新增到訪','visit.nav.list':'到訪清單',
+    'visit.nav.guests':'來賓資料庫','visit.nav.report':'接待報表',
+    'trip.title':'✈️ 差旅報支單',
+    'trip.nav.new':'新增報支單','trip.nav.list':'報支單清單',
+  },
+  'zh-CN': {
+    'mod.room':'会议室','mod.car':'公务车','mod.visit':'客户到访',
+    'mod.lib':'图书馆','mod.trip':'差旅报销','mod.lottery':'抽签',
+    'g.nav.main':'主菜单','g.nav.settings':'设置','g.nav.func':'功能','g.nav.cfg':'系统设置',
+    'lib.title':'📚 图书馆',
+    'lib.nav.dash':'总览','lib.nav.books':'书目管理','lib.nav.loans':'借阅管理',
+    'lib.nav.borrow':'借书登记','lib.nav.return':'还书作业','lib.nav.rsv':'预约管理',
+    'lib.nav.cats':'分类管理','lib.nav.cfg':'系统设置',
+    'lib.stat.total':'馆藏总数','lib.stat.loaned':'借阅中','lib.stat.overdue':'逾期未还',
+    'lib.stat.soon':'即将到期','lib.stat.unit':'册','lib.stat.soon_unit':'3天内',
+    'car.title':'🚗 公务车',
+    'car.nav.dash':'车辆看板','car.nav.use':'使用记录','car.nav.cal':'预约日历',
+    'car.nav.fuel':'油费记录','car.nav.veh':'车辆清单',
+    'car.nav.maint_grp':'保养维修','car.nav.maint':'保养记录','car.nav.insp':'验车管理',
+    'car.stat.total':'车辆总数','car.stat.avail':'可预约','car.stat.inuse':'使用中',
+    'car.stat.maint':'保养提醒','car.stat.unit':'辆','car.stat.idle':'辆空闲',
+    'car.stat.maint_unit':'需注意',
+    'room.title':'🏢 会议室预约',
+    'room.nav.dash':'状态看板','room.nav.new':'新增预约','room.nav.cal':'预约日历',
+    'room.nav.list':'预约清单','room.nav.report':'使用率报表','room.nav.fault':'故障报告',
+    'visit.title':'🤝 客户到访管理',
+    'visit.nav.dash':'到访看板','visit.nav.new':'新增到访','visit.nav.list':'到访清单',
+    'visit.nav.guests':'来宾数据库','visit.nav.report':'接待报表',
+    'trip.title':'✈️ 差旅报销单',
+    'trip.nav.new':'新增报销单','trip.nav.list':'报销单清单',
+  },
+  vi: {
+    'mod.room':'Phòng họp','mod.car':'Xe công vụ','mod.visit':'Khách thăm',
+    'mod.lib':'Thư viện','mod.trip':'Chi phí công tác','mod.lottery':'Rút thăm',
+    'g.nav.main':'Menu chính','g.nav.settings':'Cài đặt','g.nav.func':'Chức năng','g.nav.cfg':'Cấu hình',
+    'lib.title':'📚 Thư viện',
+    'lib.nav.dash':'Tổng quan','lib.nav.books':'Danh mục sách','lib.nav.loans':'Quản lý mượn',
+    'lib.nav.borrow':'Mượn sách','lib.nav.return':'Trả sách','lib.nav.rsv':'Đặt trước',
+    'lib.nav.cats':'Danh mục','lib.nav.cfg':'Cấu hình',
+    'lib.stat.total':'Tổng sách','lib.stat.loaned':'Đang mượn','lib.stat.overdue':'Quá hạn',
+    'lib.stat.soon':'Sắp đến hạn','lib.stat.unit':'cuốn','lib.stat.soon_unit':'trong 3 ngày',
+    'car.title':'🚗 Xe công vụ',
+    'car.nav.dash':'Bảng điều khiển','car.nav.use':'Lịch sử sử dụng','car.nav.cal':'Lịch đặt xe',
+    'car.nav.fuel':'Ghi nhiên liệu','car.nav.veh':'Danh sách xe',
+    'car.nav.maint_grp':'Bảo dưỡng','car.nav.maint':'Lịch sử bảo dưỡng','car.nav.insp':'Kiểm định',
+    'car.stat.total':'Tổng xe','car.stat.avail':'Sẵn sàng','car.stat.inuse':'Đang sử dụng',
+    'car.stat.maint':'Cảnh báo BD','car.stat.unit':'xe','car.stat.idle':'xe rảnh',
+    'car.stat.maint_unit':'cần chú ý',
+    'room.title':'🏢 Đặt phòng họp',
+    'room.nav.dash':'Bảng trạng thái','room.nav.new':'Đặt phòng mới','room.nav.cal':'Lịch đặt',
+    'room.nav.list':'Danh sách đặt','room.nav.report':'Báo cáo','room.nav.fault':'Báo lỗi',
+    'visit.title':'🤝 Quản lý khách',
+    'visit.nav.dash':'Bảng khách','visit.nav.new':'Thêm lịch thăm','visit.nav.list':'Danh sách thăm',
+    'visit.nav.guests':'CSDL khách','visit.nav.report':'Báo cáo tiếp đón',
+    'trip.title':'✈️ Chi phí công tác',
+    'trip.nav.new':'Tạo phiếu mới','trip.nav.list':'Danh sách phiếu',
+  },
+  ja: {
+    'mod.room':'会議室','mod.car':'社用車','mod.visit':'来訪管理',
+    'mod.lib':'図書館','mod.trip':'出張経費','mod.lottery':'抽選',
+    'g.nav.main':'メインメニュー','g.nav.settings':'設定','g.nav.func':'機能','g.nav.cfg':'システム設定',
+    'lib.title':'📚 図書館',
+    'lib.nav.dash':'概要','lib.nav.books':'蔵書管理','lib.nav.loans':'貸出管理',
+    'lib.nav.borrow':'貸出登録','lib.nav.return':'返却処理','lib.nav.rsv':'予約管理',
+    'lib.nav.cats':'カテゴリ管理','lib.nav.cfg':'システム設定',
+    'lib.stat.total':'総蔵書数','lib.stat.loaned':'貸出中','lib.stat.overdue':'延滞',
+    'lib.stat.soon':'返却期限間近','lib.stat.unit':'冊','lib.stat.soon_unit':'3日以内',
+    'car.title':'🚗 社用車',
+    'car.nav.dash':'ダッシュボード','car.nav.use':'利用記録','car.nav.cal':'予約カレンダー',
+    'car.nav.fuel':'給油記録','car.nav.veh':'車両一覧',
+    'car.nav.maint_grp':'整備・点検','car.nav.maint':'整備記録','car.nav.insp':'車検管理',
+    'car.stat.total':'車両総数','car.stat.avail':'予約可能','car.stat.inuse':'使用中',
+    'car.stat.maint':'整備アラート','car.stat.unit':'台','car.stat.idle':'台空き',
+    'car.stat.maint_unit':'要注意',
+    'room.title':'🏢 会議室予約',
+    'room.nav.dash':'ステータス','room.nav.new':'新規予約','room.nav.cal':'予約カレンダー',
+    'room.nav.list':'予約一覧','room.nav.report':'利用レポート','room.nav.fault':'故障報告',
+    'visit.title':'🤝 来訪管理',
+    'visit.nav.dash':'来訪ボード','visit.nav.new':'来訪登録','visit.nav.list':'来訪一覧',
+    'visit.nav.guests':'ゲストDB','visit.nav.report':'接客レポート',
+    'trip.title':'✈️ 出張経費申請',
+    'trip.nav.new':'新規申請','trip.nav.list':'申請一覧',
+  },
+};
+function t(key) {
+  return (ADMIN_I18N[currentAdminLang] || ADMIN_I18N['zh-TW'])[key] || (ADMIN_I18N['zh-TW'][key] || key);
+}
+function applyI18n() {
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const val = t(el.dataset.i18n);
+    if (val) el.textContent = val;
+  });
+}
+function setLang(lang) {
+  currentAdminLang = lang;
+  localStorage.setItem('admin-lang', lang);
+  document.querySelectorAll('.admin-lang-btn').forEach(b => {
+    const oc = b.getAttribute('onclick') || '';
+    b.classList.toggle('active', oc.includes(`'${lang}'`));
+  });
+  applyI18n();
+}
+
 async function init(){
   // 1. 讀取 Portal session
   const sess = readPortalSession();
@@ -2541,6 +2706,8 @@ async function init(){
   // seed 只在 SB 也空的時候執行（兜底）
   setTimeout(async()=>{ if(!ld(K.bk).length) await seedLib(); if(!ld(K.vh).length) await seedCar(); },2000);
   chkOv();popCatSel();popUsrSel();
+  const savedLang = localStorage.getItem('admin-lang') || 'en';
+  setLang(savedLang);
   seedRoomDemo().then(()=>{}); seedVisitDemo().then(()=>{}); switchMod('room');updUsrDisp();updBadges();
   document.querySelectorAll('#panel-lib .navi').forEach(el=>el.addEventListener('click',()=>{const p=el.dataset.p;if(p)navLib(p);}));
   document.querySelectorAll('#panel-car .navi').forEach(el=>el.addEventListener('click',()=>{const p=el.dataset.p;if(p)navCar(p);}));

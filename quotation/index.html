@@ -4167,7 +4167,7 @@ async function getProdImgB64(pid) {
     return 'data:image/jpeg;base64,' + PROD_IMG_B64[pid].b64;
   }
 
-  // 3. Firebase Storage URL — fetch via Cloudflare Worker proxy (avoids CORS)
+  // 3. Remote image URL — fetch via Cloudflare Worker proxy (avoids CORS)
   const prod = PRODUCTS.find(x => x.id === pid);
   if (!prod?.img) { return null; }
 
@@ -5151,7 +5151,7 @@ function renderPriceHistTab() {
   if(!el) return;
   const prodId = editProdId;
   if(!prodId){ el.innerHTML='<div style="color:var(--tx3);font-size:12px;padding:8px">Save product first</div>'; return; }
-  // Also try to pull fresh from Firestore for this product
+  // Pull fresh from Supabase for this product
   el.innerHTML='<div style="color:var(--tx3);font-size:12px;padding:8px">Loading...</div>';
   SB.get('price_history', `prodId=eq.${encodeURIComponent(prodId)}&order=ts.desc`)
     .then(rows=>{ _renderHistTable(el, rows||[]); })
@@ -5464,7 +5464,7 @@ function importData(e){
     try{
       const d=JSON.parse(ev.target.result);
       showSyncing();
-      // Import quotes — only add new ones not already in Firebase
+      // Import quotes — only add new ones not already in local
       if(d.quotes){
         const newQ=d.quotes.filter(q=>!QUOTES.find(x=>x.id===q.id));
         for(const q of newQ){
@@ -5499,7 +5499,7 @@ async function clearAllQuotes(){
   if(!confirm('Clear all quotations?'))return;
   showSyncing();
   try {
-    // Delete each quote individually from Firestore
+    // Delete each quote individually from Supabase
     const ids = QUOTES.map(q => q.id);
     for (const id of ids) {
       await deleteOneQ(id);

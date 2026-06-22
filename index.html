@@ -3269,7 +3269,7 @@ async function loadRanking() {
 
   } catch(e) {
     console.warn('loadRanking error:', e.message || e);
-    // Fallback: 從 Firebase users 顯示員工清單
+    // Fallback: show from cached ALL_USERS
     if (ALL_USERS && ALL_USERS.length > 0) {
       const items = ALL_USERS.filter(u => u.role !== 'inactive').slice(0, 20);
       const medals = ['🥇','🥈','🥉'];
@@ -4035,7 +4035,7 @@ async function sendMessage() {
       const roots = _profileMsgs.filter(m => !m.parentId);
       countEl.textContent = `💬 ${roots.length} 則留言`;
     }
-    // 寫入成功後通知對方（Firebase portal_notifications）
+    // 通知對方（寫入 Supabase notifications）
     _notifyMsgReceived(msg);
   } catch(e) {
     toast('留言失敗：' + e.message, 'err');

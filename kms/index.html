@@ -391,7 +391,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v2.01</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v2.02</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
@@ -829,6 +829,8 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
             <span class="review-step" id="rs-archived" onclick="filterReviewPanel('archived')" style="cursor:pointer;" data-i18n="status.filter.archived">已封存</span>
             <span style="color:var(--border);margin:0 2px;">|</span>
             <span id="rs-noauthor" onclick="filterReviewPanel('noauthor')" style="cursor:pointer;padding:5px 12px;border-radius:var(--radius);font-size:12px;font-weight:500;border:1px solid var(--amber);color:var(--amber);background:transparent;">⚠ 未署名</span>
+            <span style="color:var(--border);margin:0 2px;">|</span>
+            <span id="rs-duplicate" onclick="filterReviewPanel('duplicate')" style="cursor:pointer;padding:5px 12px;border-radius:var(--radius);font-size:12px;font-weight:500;border:1px solid var(--red);color:var(--red);background:transparent;">🔁 重複文件</span>
           </div>
         </div>
         <div style="flex:1;overflow-y:auto;padding:12px 20px;" id="review-content">
@@ -6051,6 +6053,8 @@ function filterReviewPanel(status) {
   });
   const naEl = document.getElementById('rs-noauthor');
   if (naEl) naEl.style.background = status === 'noauthor' ? 'var(--amber-bg)' : 'transparent';
+  const dupEl = document.getElementById('rs-duplicate');
+  if (dupEl) dupEl.style.background = status === 'duplicate' ? 'var(--red-bg)' : 'transparent';
   loadReviewPanel();
 }
 
@@ -6146,6 +6150,130 @@ async function batchRepublish() {
   loadReviewPanel();
 }
 
+function _dupNormName(filename) {
+  if (!filename) return '';
+  let base = filename.replace(/\.[^.]+$/, '').toLowerCase().trim();
+  // 去除常見複本後綴：(1) (2) copy 副本 拷貝 _v2 -copy 等
+  base = base.replace(/[\s_-]*(copy|\(copy\)|\(\d+\)|副本|拷貝|v\d+)[\s_-]*/gi, '').trim();
+  base = base.replace(/[\s_-]+/g, ' ');
+  return base;
+}
+
+async function findAndRenderDuplicates() {
+  const content = document.getElementById('review-content');
+  const role = getKmsRole();
+  const canDel = (role === 'admin' || role === 'dcc');
+  try {
+    const docs = await sbFetch(
+      '/rest/v1/kms_documents?select=id,title,status,author_name,file_name,file_size,updated_at&file_size=not.is.null&file_name=not.is.null&order=file_size.desc,file_name.asc'
+    ) || [];
+
+    // 分組：相同 file_size + 相似 file_name
+    const groups = {};
+    for (const doc of docs) {
+      const key = _dupNormName(doc.file_name) + '|||' + doc.file_size;
+      if (!groups[key]) groups[key] = [];
+      groups[key].push(doc);
+    }
+    const dupGroups = Object.values(groups).filter(g => g.length >= 2);
+
+    if (!dupGroups.length) {
+      content.innerHTML = `<div style="text-align:center;color:var(--text-3);padding:40px 0;font-size:13px;">✅ 未發現重複文件</div>`;
+      return;
+    }
+
+    const totalDups = dupGroups.reduce((s, g) => s + g.length, 0);
+    const stCfg = { draft:'sb-draft', review:'sb-review', published:'sb-published', withdrawn:'sb-withdrawn', archived:'sb-archived' };
+    const stLabel = { draft:'草稿', review:'待審核', published:'已發佈', withdrawn:'已撤回', archived:'已封存' };
+
+    let html = `<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;padding:8px 12px;background:var(--red-bg);border:1px solid var(--red);border-radius:var(--radius);font-size:12px;color:var(--red);">
+      ⚠ 發現 ${dupGroups.length} 組重複文件，共 ${totalDups} 份`;
+    if (canDel) {
+      html += `<span style="flex:1;"></span>
+        <input type="checkbox" id="dup-select-all" style="width:14px;height:14px;cursor:pointer;accent-color:var(--blue);"
+          onchange="document.querySelectorAll('.dup-cb').forEach(cb=>cb.checked=this.checked)">
+        <label for="dup-select-all" style="cursor:pointer;user-select:none;color:var(--text-2);">全選</label>
+        <button onclick="batchDeleteDuplicates()"
+          style="padding:4px 12px;border-radius:var(--radius);border:1px solid var(--red);background:var(--red-bg);color:var(--red);font-size:12px;cursor:pointer;font-weight:500;">🗑 批次刪除</button>`;
+    }
+    html += `</div>`;
+
+    dupGroups.forEach((group, gi) => {
+      const repDoc = group[0];
+      const sizeStr = formatBytes(repDoc.file_size);
+      html += `<div style="margin-bottom:12px;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;">
+        <div style="padding:6px 12px;background:var(--surface-2);font-size:11px;color:var(--text-3);display:flex;gap:8px;align-items:center;">
+          <span style="font-weight:600;color:var(--text-2);">第 ${gi+1} 組</span>
+          <span title="${repDoc.file_name}">📄 ${repDoc.file_name}</span>
+          <span>· ${sizeStr}</span>
+          <span>· ${group.length} 份</span>
+        </div>`;
+      group.forEach(doc => {
+        const dt = doc.updated_at ? new Date(doc.updated_at).toLocaleDateString('zh-TW',{month:'2-digit',day:'2-digit'}) : '';
+        const badge = stCfg[doc.status] || 'sb-draft';
+        const label = stLabel[doc.status] || doc.status;
+        const safeTitle = (doc.title||'').replace(/'/g,'');
+        const safeAuthor = (doc.author_name||'').replace(/'/g,'');
+        html += `<div class="doc-item" style="margin:0;border-radius:0;border-top:1px solid var(--border);">
+          ${canDel ? `<input type="checkbox" class="dup-cb" data-id="${doc.id}" style="width:14px;height:14px;cursor:pointer;accent-color:var(--blue);flex-shrink:0;" onclick="event.stopPropagation()">` : ''}
+          <span class="status-badge ${badge}" style="flex-shrink:0;">${label}</span>
+          <span class="doc-title" onclick="openReader('${doc.id}')" style="cursor:pointer;flex:1;min-width:0;">${doc.title}</span>
+          <span style="font-size:11px;color:var(--text-3);white-space:nowrap;">${doc.author_name||'—'}</span>
+          <span style="font-size:11px;color:var(--text-3);white-space:nowrap;">${dt}</span>
+          ${canDel ? `<button onclick="deleteDupDoc('${doc.id}','${safeTitle}','${safeAuthor}')"
+            title="刪除" style="width:26px;height:26px;border-radius:5px;border:1px solid #7a2020;background:#380f0f;color:var(--red);cursor:pointer;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;font-size:13px;padding:0;">🗑</button>` : ''}
+        </div>`;
+      });
+      html += `</div>`;
+    });
+
+    content.innerHTML = html;
+  } catch(e) {
+    content.innerHTML = `<div style="color:var(--red);padding:20px;">載入失敗：${e.message}</div>`;
+  }
+}
+
+async function deleteDupDoc(id, title, authorName) {
+  const role = getKmsRole();
+  if (role !== 'admin' && role !== 'dcc') {
+    toast('僅 Admin 或 DCC 可刪除重複文件', 'error'); return;
+  }
+  if (!confirm(`確定刪除「${title}」？\n此動作無法復原，版本歷史也會一併刪除。`)) return;
+  try {
+    await kmsWrite('delete', 'kms_doc_versions', null, null, { doc_id: id });
+    await kmsWrite('delete', 'kms_documents', null, id);
+    toast('已刪除', 'success');
+    await findAndRenderDuplicates();
+  } catch(e) {
+    toast('刪除失敗：' + e.message, 'error');
+  }
+}
+
+async function batchDeleteDuplicates() {
+  const role = getKmsRole();
+  if (role !== 'admin' && role !== 'dcc') {
+    toast('僅 Admin 或 DCC 可批次刪除', 'error'); return;
+  }
+  const cbs = [...document.querySelectorAll('.dup-cb:checked')];
+  if (!cbs.length) { toast('請先勾選要刪除的文件', 'error'); return; }
+  if (!confirm(`確定刪除選取的 ${cbs.length} 份文件？\n此動作無法復原。`)) return;
+  const ids = cbs.map(cb => cb.dataset.id);
+  let ok = 0, fail = 0;
+  for (const id of ids) {
+    try {
+      await kmsWrite('delete', 'kms_doc_versions', null, null, { doc_id: id });
+      await kmsWrite('delete', 'kms_documents', null, id);
+      ok++;
+    } catch(e) {
+      console.warn('[batchDeleteDuplicates]', id, e.message);
+      fail++;
+    }
+    await new Promise(r => setTimeout(r, 200));
+  }
+  toast(`批次刪除完成：${ok} 份成功${fail ? `，${fail} 份失敗` : ''}`, ok ? 'success' : 'error');
+  await findAndRenderDuplicates();
+}
+
 async function loadReviewPanel() {
   const content = document.getElementById('review-content');
   if (!reviewingDocId) {
@@ -6158,8 +6286,14 @@ async function loadReviewPanel() {
     });
     const naEl = document.getElementById('rs-noauthor');
     if (naEl) naEl.style.background = window._reviewFilter === 'noauthor' ? 'var(--amber-bg)' : 'transparent';
+    const dupEl = document.getElementById('rs-duplicate');
+    if (dupEl) dupEl.style.background = window._reviewFilter === 'duplicate' ? 'var(--red-bg)' : 'transparent';
     // 顯示待審核文件列表
     content.innerHTML = '<div style="text-align:center;color:var(--text-3);padding:20px 0;font-size:13px;">載入中…</div>';
+    if (window._reviewFilter === 'duplicate') {
+      await findAndRenderDuplicates();
+      return;
+    }
     try {
       if (!window._reviewAllDocs) {
         window._reviewAllDocs = [];

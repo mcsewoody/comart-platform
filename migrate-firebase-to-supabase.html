@@ -174,22 +174,52 @@ function normalizeRows(rows) {
   });
 }
 
-// 批次 POST（50 筆一批，速度快）
+// 略過的欄位記錄
+const skippedCols = {}; // { table: Set<colName> }
+
+// 批次 POST（50 筆一批）；遇到 PGRST204 未知欄位自動略過並記錄
 async function sbBatchPost(table, rows) {
   if (!rows.length) return;
-  const normalized = normalizeRows(rows);
-  for (let i = 0; i < normalized.length; i += BATCH_SIZE) {
-    const batch = normalized.slice(i, i + BATCH_SIZE);
-    const res = await fetch(`${WORKER}/supabase/rest/v1/${table}`, {
-      method: 'POST',
-      headers: { 'x-admin-token': SB_TOKEN, 'Content-Type': 'application/json' },
-      body: JSON.stringify(batch),
-    });
-    if (!res.ok) {
-      const err = await res.text();
-      throw new Error(`POST ${table}: ${res.status} ${err}`);
+  let data = normalizeRows(rows);
+  const skipped = skippedCols[table] = skippedCols[table] || new Set();
+
+  let retry = true;
+  let attempts = 0;
+  while (retry && attempts < 20) {
+    attempts++;
+    retry = false;
+    for (let i = 0; i < data.length; i += BATCH_SIZE) {
+      const batch = data.slice(i, i + BATCH_SIZE);
+      const res = await fetch(`${WORKER}/supabase/rest/v1/${table}`, {
+        method: 'POST',
+        headers: { 'x-admin-token': SB_TOKEN, 'Content-Type': 'application/json' },
+        body: JSON.stringify(batch),
+      });
+      if (!res.ok) {
+        const errText = await res.text();
+        const m = errText.match(/Could not find the '(.+?)' column/);
+        if (m) {
+          const col = m[1];
+          skipped.add(col);
+          log(`  ⚠️ [${table}] 略過未知欄位: ${col}`, 'warn');
+          data.forEach(r => delete r[col]);
+          retry = true; // restart with cleaned data
+          break;
+        }
+        throw new Error(`POST ${table}: ${res.status} ${errText}`);
+      }
     }
   }
+}
+
+function reportSkipped() {
+  const entries = Object.entries(skippedCols).filter(([,s]) => s.size > 0);
+  if (!entries.length) return;
+  log('\n⚠️  以下欄位因不在 schema 中被略過（資料未寫入）：', 'warn');
+  entries.forEach(([table, cols]) => {
+    log(`   ${table}: ${[...cols].join(', ')}`, 'warn');
+  });
+  log('如需保留這些欄位，請在 Supabase SQL Editor 執行 ALTER TABLE 後重跑遷移。', 'warn');
 }
 
 // ── Firebase helpers ─────────────────────────────────────────
@@ -263,6 +293,7 @@ async function startMigration() {
       }
     }
 
+    reportSkipped();
     log(`\n✅ 遷移完成！共 ${total} 筆資料`, 'ok');
     document.getElementById('overall-status').textContent = `✅ 完成，共 ${total} 筆`;
   } catch(e) {

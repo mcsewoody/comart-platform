@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" href="data:,">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART 行政管理平台 v1.63</title>
+<title>COMART 行政管理平台 v1.64</title>
 <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.js"></script>
 <style>
 :root{
@@ -970,7 +970,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="logo">
     <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
     <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
-    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.63</span>
+    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.64</span>
   </div>
   <div class="trr">
     <div style="display:flex;align-items:center;gap:6px;padding:4px 12px;background:var(--surface-2);border:1px solid var(--border);border-radius:20px;font-size:12px;cursor:pointer" onclick="showUsw()" id="topbar-user">
@@ -978,7 +978,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <span id="cur-u" style="color:var(--text-2)">載入中…</span>
       <span style="color:var(--text-3);font-size:10px">▾</span>
     </div>
-    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.63</span>
+    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.64</span>
   </div>
 </div>
 
@@ -2132,6 +2132,7 @@ const lo=(k,d)=>{if(_mem[k]!==undefined)return _mem[k];try{return JSON.parse(loc
 const sv=(k,v)=>{_mem[k]=v;try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}};
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 const tds=()=>new Date().toISOString().slice(0,10);
+const dtStr=d=>[d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');
 const fmtD=s=>{if(!s)return'—';const d=new Date(s+'T00:00:00');return`${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}`};
 const dDiff=s=>{const d=new Date(s+'T00:00:00');const n=new Date();n.setHours(0,0,0,0);return Math.round((d-n)/86400000)};
 let curUid=localStorage.getItem(K.cu)||null,curMod='lib';
@@ -3056,7 +3057,7 @@ function renderMoCal(bks,mts,isps,vf){
   const first=new Date(y,m,1),last=new Date(y,m+1,0),sd=first.getDay();
   const days=[];for(let i=0;i<sd;i++)days.push({d:new Date(y,m,1-sd+i),cur:false});for(let i=1;i<=last.getDate();i++)days.push({d:new Date(y,m,i),cur:true});while(days.length%7)days.push({d:new Date(y,m+1,days.length-last.getDate()-sd+1),cur:false});
   const today=tds();let h='<div class="cg7">';['日','一','二','三','四','五','六'].forEach(w=>h+=`<div class="cwd">${w}</div>`);
-  days.forEach(({d,cur})=>{const ds=d.toISOString().slice(0,10),dbks=bks.filter(b=>b.start.slice(0,10)<=ds&&b.end.slice(0,10)>=ds),dmts=mts.filter(mt=>mt.ndt===ds&&(!vf||mt.vh_id===vf)),disps=isps.filter(isp=>isp.next===ds&&(!vf||isp.vh_id===vf));h+=`<div class="cday ${ds===today?'today':''} ${!cur?'om':''}"><div class="cdn">${d.getDate()}</div>`;let cnt=0;dbks.slice(0,2).forEach(b=>{const v=gVeh(b.vh_id);h+=`<div class="cev ev-${b.st}" onclick="viewBk('${b.id}')" title="${v?.name}: ${b.purpose}">${VICO[v?.type]||'🚗'} ${v?.plate?.slice(-4)||b.purpose||'預約'}</div>`;cnt++;});dmts.slice(0,1).forEach(mt=>{const v=gVeh(mt.vh_id);h+=`<div class="cev ev-m">🔧 ${v?.name||'保養'}</div>`;cnt++;});disps.slice(0,1).forEach(isp=>{const v=gVeh(isp.vh_id);h+=`<div class="cev ev-m">📋 驗車${v?.plate||''}</div>`;cnt++;});const tot=dbks.length+dmts.length+disps.length;if(tot>cnt)h+=`<div class="cmore">+${tot-cnt}筆</div>`;h+=`</div>`;});
+  days.forEach(({d,cur})=>{const ds=dtStr(d),dbks=bks.filter(b=>b.start.slice(0,10)<=ds&&b.end.slice(0,10)>=ds),dmts=mts.filter(mt=>mt.ndt===ds&&(!vf||mt.vh_id===vf)),disps=isps.filter(isp=>isp.next===ds&&(!vf||isp.vh_id===vf));h+=`<div class="cday ${ds===today?'today':''} ${!cur?'om':''}"><div class="cdn">${d.getDate()}</div>`;let cnt=0;dbks.slice(0,2).forEach(b=>{const v=gVeh(b.vh_id);h+=`<div class="cev ev-${b.st}" onclick="viewBk('${b.id}')" title="${v?.name}: ${b.purpose}">${VICO[v?.type]||'🚗'} ${v?.plate?.slice(-4)||b.purpose||'預約'}</div>`;cnt++;});dmts.slice(0,1).forEach(mt=>{const v=gVeh(mt.vh_id);h+=`<div class="cev ev-m">🔧 ${v?.name||'保養'}</div>`;cnt++;});disps.slice(0,1).forEach(isp=>{const v=gVeh(isp.vh_id);h+=`<div class="cev ev-m">📋 驗車${v?.plate||''}</div>`;cnt++;});const tot=dbks.length+dmts.length+disps.length;if(tot>cnt)h+=`<div class="cmore">+${tot-cnt}筆</div>`;h+=`</div>`;});
   h+='</div>';document.getElementById('cal-body').innerHTML=h;
 }
 function renderWkCal(bks,mts,isps,vf){

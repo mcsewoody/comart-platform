@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>COMART Platform v1.46</title>
+<title>COMART Platform v1.47</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.js"></script>
 <style>
@@ -321,7 +321,7 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1) brightness(
     <div class="login-logo">
       <div class="login-mark">C</div>
       <div class="login-name">COMART Platform</div>
-      <div class="login-sub">Internal Portal · v1.46</div>
+      <div class="login-sub">Internal Portal · v1.47</div>
     </div>
     <form id="loginForm" onsubmit="doLogin();return false;" autocomplete="on">
     <div class="field">
@@ -349,7 +349,7 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1) brightness(
   <div class="topbar">
     <div class="topbar-logo" onclick="switchView('home')">
       <div class="topbar-mark">C</div>
-      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.46</span></div>
+      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.47</span></div>
     </div>
     <div class="topbar-right">
       <div class="lang-switcher">
@@ -419,6 +419,7 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1) brightness(
 
           <div class="section-title" id="sect-updates">Platform Updates</div>
           <div class="changelog">
+            <div class="cl-item"><div class="cl-dot" style="background:var(--grn)"></div><div><div class="cl-text">v1.47 — i18n 全面補完：AI Skills tab（公司調查、展後跟進）、排行榜說明、Calendar Add 按鈕全部支援 5 語言</div><div class="cl-date">2026-06 · Enhancement</div></div></div>
             <div class="cl-item"><div class="cl-dot" style="background:var(--grn)"></div><div><div class="cl-text">v1.37 — i18n 補完（Cards/Users Tab/Calendar dropdown）；HoF Ranking Supabase 失敗時 fallback 顯示員工清單</div><div class="cl-date">2026-06 · Fix</div></div></div>
             <div class="cl-item"><div class="cl-dot" style="background:var(--grn)"></div><div><div class="cl-text">v1.28 — Calendar 手機版修正；Users 三Tab+篩選列；User Modal頭像上傳；HoF Read-Only；色調調亮</div><div class="cl-date">2026-06 · Feature</div></div></div>
             <div class="cl-item"><div class="cl-dot" style="background:var(--grn)"></div><div><div class="cl-text">v1.24 — 整體色調調亮；Event & Trip Modal 欄位標題改亮色</div><div class="cl-date">2026-06 · Enhancement</div></div></div>
@@ -458,7 +459,7 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1) brightness(
           <!-- 排行榜 -->
           <div id="dir-ranking-view" style="display:none;">
             <div style="background:var(--s1);border:1px solid var(--br);border-radius:var(--rl);overflow:hidden;">
-              <div style="padding:12px 16px;border-bottom:1px solid var(--br);font-size:12px;color:var(--tx3);">
+              <div id="dir-ranking-desc-txt" style="padding:12px 16px;border-bottom:1px solid var(--br);font-size:12px;color:var(--tx3);">
                 以 KMS 知識庫發文數量計算 · 每月更新
               </div>
               <div id="rankingList"><div style="color:var(--tx3);font-size:13px;padding:20px;text-align:center;">載入中…</div></div>
@@ -540,16 +541,16 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1) brightness(
                 <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
                   <div style="width:36px;height:36px;border-radius:8px;background:rgba(16,163,127,.15);color:#10a37f;display:flex;align-items:center;justify-content:center;font-size:18px;">🔍</div>
                   <div>
-                    <div style="font-size:13px;font-weight:700;color:var(--tx);">公司調查機器人</div>
+                    <div id="skill-company-title-txt" style="font-size:13px;font-weight:700;color:var(--tx);">公司調查機器人</div>
                     <div style="font-size:11px;color:var(--tx3);">Company Research</div>
                   </div>
                 </div>
-                <div style="font-size:12px;color:var(--tx2);margin-bottom:10px;line-height:1.6;">輸入公司名稱，自動調查公司背景、聯絡資訊、產品方向，輸出完整調查報告與商業開發信。</div>
+                <div id="skill-company-desc-txt" style="font-size:12px;color:var(--tx2);margin-bottom:10px;line-height:1.6;">輸入公司名稱，自動調查公司背景、聯絡資訊、產品方向，輸出完整調查報告與商業開發信。</div>
                 <div style="display:flex;gap:6px;align-items:center;">
                   <input id="p-skill-company" placeholder="Enter company name / 輸入公司名稱" autocomplete="off"
                     style="flex:1;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;"
                     onkeydown="if(event.key==='Enter') pRunSkillCompany()">
-                  <button onclick="pRunSkillCompany()"
+                  <button id="skill-company-btn" onclick="pRunSkillCompany()"
                     style="padding:8px 14px;border-radius:8px;background:#10a37f;color:#fff;border:none;cursor:pointer;font-size:12px;font-weight:700;flex-shrink:0;">調查 →</button>
                 </div>
               </div>
@@ -558,11 +559,11 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1) brightness(
                 <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
                   <div style="width:36px;height:36px;border-radius:8px;background:rgba(139,92,246,.15);color:#8b5cf6;display:flex;align-items:center;justify-content:center;font-size:18px;">📧</div>
                   <div>
-                    <div style="font-size:13px;font-weight:700;color:var(--tx);">展後跟進機器人</div>
+                    <div id="skill-followup-title-txt" style="font-size:13px;font-weight:700;color:var(--tx);">展後跟進機器人</div>
                     <div style="font-size:11px;color:var(--tx3);">Post-Show Followup</div>
                   </div>
                 </div>
-                <div style="font-size:12px;color:var(--tx2);margin-bottom:10px;line-height:1.6;">輸入展會客戶資訊，自動生成個性化的展後跟進信件，支援中英雙語。</div>
+                <div id="skill-followup-desc-txt" style="font-size:12px;color:var(--tx2);margin-bottom:10px;line-height:1.6;">輸入展會客戶資訊，自動生成個性化的展後跟進信件，支援中英雙語。</div>
                 <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px;">
                   <input id="p-skill-show-company" placeholder="客戶公司名稱 / Company name" autocomplete="off"
                     style="padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;">
@@ -572,7 +573,7 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1) brightness(
                     style="padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;">
                   <textarea id="p-skill-show-notes" placeholder="備注：客戶興趣、產品需求等 / Notes" rows="2"
                     style="padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;resize:none;font-family:inherit;"></textarea>
-                  <button onclick="pRunSkillFollowup()"
+                  <button id="skill-followup-btn" onclick="pRunSkillFollowup()"
                     style="padding:9px;border-radius:8px;background:#8b5cf6;color:#fff;border:none;cursor:pointer;font-size:12px;font-weight:700;">產生跟進信 →</button>
                 </div>
               </div>
@@ -715,7 +716,7 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1) brightness(
           <!-- 排行榜 -->
           <div id="dir-ranking-view" style="display:none;">
             <div style="background:var(--s1);border:1px solid var(--br);border-radius:var(--rl);overflow:hidden;">
-              <div style="padding:12px 16px;border-bottom:1px solid var(--br);font-size:12px;color:var(--tx3);">
+              <div id="dir-ranking-desc-txt" style="padding:12px 16px;border-bottom:1px solid var(--br);font-size:12px;color:var(--tx3);">
                 以 KMS 知識庫發文數量計算 · 每月更新
               </div>
               <div id="rankingList"><div style="color:var(--tx3);font-size:13px;padding:20px;text-align:center;">載入中…</div></div>
@@ -792,16 +793,16 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1) brightness(
                 <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
                   <div style="width:36px;height:36px;border-radius:8px;background:rgba(16,163,127,.15);color:#10a37f;display:flex;align-items:center;justify-content:center;font-size:18px;">🔍</div>
                   <div>
-                    <div style="font-size:13px;font-weight:700;color:var(--tx);">公司調查機器人</div>
+                    <div id="skill-company-title-txt" style="font-size:13px;font-weight:700;color:var(--tx);">公司調查機器人</div>
                     <div style="font-size:11px;color:var(--tx3);">Company Research</div>
                   </div>
                 </div>
-                <div style="font-size:12px;color:var(--tx2);margin-bottom:10px;line-height:1.6;">輸入公司名稱，自動調查公司背景、聯絡資訊、產品方向，輸出完整調查報告與商業開發信。</div>
+                <div id="skill-company-desc-txt" style="font-size:12px;color:var(--tx2);margin-bottom:10px;line-height:1.6;">輸入公司名稱，自動調查公司背景、聯絡資訊、產品方向，輸出完整調查報告與商業開發信。</div>
                 <div style="display:flex;gap:6px;align-items:center;">
                   <input id="p-skill-company" placeholder="Enter company name / 輸入公司名稱" autocomplete="off"
                     style="flex:1;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;"
                     onkeydown="if(event.key==='Enter') pRunSkillCompany()">
-                  <button onclick="pRunSkillCompany()"
+                  <button id="skill-company-btn" onclick="pRunSkillCompany()"
                     style="padding:8px 14px;border-radius:8px;background:#10a37f;color:#fff;border:none;cursor:pointer;font-size:12px;font-weight:700;flex-shrink:0;">調查 →</button>
                 </div>
               </div>
@@ -810,11 +811,11 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1) brightness(
                 <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
                   <div style="width:36px;height:36px;border-radius:8px;background:rgba(139,92,246,.15);color:#8b5cf6;display:flex;align-items:center;justify-content:center;font-size:18px;">📧</div>
                   <div>
-                    <div style="font-size:13px;font-weight:700;color:var(--tx);">展後跟進機器人</div>
+                    <div id="skill-followup-title-txt" style="font-size:13px;font-weight:700;color:var(--tx);">展後跟進機器人</div>
                     <div style="font-size:11px;color:var(--tx3);">Post-Show Followup</div>
                   </div>
                 </div>
-                <div style="font-size:12px;color:var(--tx2);margin-bottom:10px;line-height:1.6;">輸入展會客戶資訊，自動生成個性化的展後跟進信件，支援中英雙語。</div>
+                <div id="skill-followup-desc-txt" style="font-size:12px;color:var(--tx2);margin-bottom:10px;line-height:1.6;">輸入展會客戶資訊，自動生成個性化的展後跟進信件，支援中英雙語。</div>
                 <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px;">
                   <input id="p-skill-show-company" placeholder="客戶公司名稱 / Company name" autocomplete="off"
                     style="padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;">
@@ -824,7 +825,7 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1) brightness(
                     style="padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;">
                   <textarea id="p-skill-show-notes" placeholder="備注：客戶興趣、產品需求等 / Notes" rows="2"
                     style="padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;resize:none;font-family:inherit;"></textarea>
-                  <button onclick="pRunSkillFollowup()"
+                  <button id="skill-followup-btn" onclick="pRunSkillFollowup()"
                     style="padding:9px;border-radius:8px;background:#8b5cf6;color:#fff;border:none;cursor:pointer;font-size:12px;font-weight:700;">產生跟進信 →</button>
                 </div>
               </div>
@@ -930,7 +931,7 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1) brightness(
           <!-- 排行榜 -->
           <div id="dir-ranking-view" style="display:none;">
             <div style="background:var(--s1);border:1px solid var(--br);border-radius:var(--rl);overflow:hidden;">
-              <div style="padding:12px 16px;border-bottom:1px solid var(--br);font-size:12px;color:var(--tx3);">
+              <div id="dir-ranking-desc-txt" style="padding:12px 16px;border-bottom:1px solid var(--br);font-size:12px;color:var(--tx3);">
                 以 KMS 知識庫發文數量計算 · 每月更新
               </div>
               <div id="rankingList"><div style="color:var(--tx3);font-size:13px;padding:20px;text-align:center;">載入中…</div></div>
@@ -1007,16 +1008,16 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1) brightness(
                 <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
                   <div style="width:36px;height:36px;border-radius:8px;background:rgba(16,163,127,.15);color:#10a37f;display:flex;align-items:center;justify-content:center;font-size:18px;">🔍</div>
                   <div>
-                    <div style="font-size:13px;font-weight:700;color:var(--tx);">公司調查機器人</div>
+                    <div id="skill-company-title-txt" style="font-size:13px;font-weight:700;color:var(--tx);">公司調查機器人</div>
                     <div style="font-size:11px;color:var(--tx3);">Company Research</div>
                   </div>
                 </div>
-                <div style="font-size:12px;color:var(--tx2);margin-bottom:10px;line-height:1.6;">輸入公司名稱，自動調查公司背景、聯絡資訊、產品方向，輸出完整調查報告與商業開發信。</div>
+                <div id="skill-company-desc-txt" style="font-size:12px;color:var(--tx2);margin-bottom:10px;line-height:1.6;">輸入公司名稱，自動調查公司背景、聯絡資訊、產品方向，輸出完整調查報告與商業開發信。</div>
                 <div style="display:flex;gap:6px;align-items:center;">
                   <input id="p-skill-company" placeholder="Enter company name / 輸入公司名稱" autocomplete="off"
                     style="flex:1;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;"
                     onkeydown="if(event.key==='Enter') pRunSkillCompany()">
-                  <button onclick="pRunSkillCompany()"
+                  <button id="skill-company-btn" onclick="pRunSkillCompany()"
                     style="padding:8px 14px;border-radius:8px;background:#10a37f;color:#fff;border:none;cursor:pointer;font-size:12px;font-weight:700;flex-shrink:0;">調查 →</button>
                 </div>
               </div>
@@ -1025,11 +1026,11 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1) brightness(
                 <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
                   <div style="width:36px;height:36px;border-radius:8px;background:rgba(139,92,246,.15);color:#8b5cf6;display:flex;align-items:center;justify-content:center;font-size:18px;">📧</div>
                   <div>
-                    <div style="font-size:13px;font-weight:700;color:var(--tx);">展後跟進機器人</div>
+                    <div id="skill-followup-title-txt" style="font-size:13px;font-weight:700;color:var(--tx);">展後跟進機器人</div>
                     <div style="font-size:11px;color:var(--tx3);">Post-Show Followup</div>
                   </div>
                 </div>
-                <div style="font-size:12px;color:var(--tx2);margin-bottom:10px;line-height:1.6;">輸入展會客戶資訊，自動生成個性化的展後跟進信件，支援中英雙語。</div>
+                <div id="skill-followup-desc-txt" style="font-size:12px;color:var(--tx2);margin-bottom:10px;line-height:1.6;">輸入展會客戶資訊，自動生成個性化的展後跟進信件，支援中英雙語。</div>
                 <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px;">
                   <input id="p-skill-show-company" placeholder="客戶公司名稱 / Company name" autocomplete="off"
                     style="padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;">
@@ -1039,7 +1040,7 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1) brightness(
                     style="padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;">
                   <textarea id="p-skill-show-notes" placeholder="備注：客戶興趣、產品需求等 / Notes" rows="2"
                     style="padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;resize:none;font-family:inherit;"></textarea>
-                  <button onclick="pRunSkillFollowup()"
+                  <button id="skill-followup-btn" onclick="pRunSkillFollowup()"
                     style="padding:9px;border-radius:8px;background:#8b5cf6;color:#fff;border:none;cursor:pointer;font-size:12px;font-weight:700;">產生跟進信 →</button>
                 </div>
               </div>
@@ -1145,7 +1146,7 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1) brightness(
           <!-- 排行榜 -->
           <div id="dir-ranking-view" style="display:none;">
             <div style="background:var(--s1);border:1px solid var(--br);border-radius:var(--rl);overflow:hidden;">
-              <div style="padding:12px 16px;border-bottom:1px solid var(--br);font-size:12px;color:var(--tx3);">
+              <div id="dir-ranking-desc-txt" style="padding:12px 16px;border-bottom:1px solid var(--br);font-size:12px;color:var(--tx3);">
                 以 KMS 知識庫發文數量計算 · 每月更新
               </div>
               <div id="rankingList"><div style="color:var(--tx3);font-size:13px;padding:20px;text-align:center;">載入中…</div></div>
@@ -1222,16 +1223,16 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1) brightness(
                 <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
                   <div style="width:36px;height:36px;border-radius:8px;background:rgba(16,163,127,.15);color:#10a37f;display:flex;align-items:center;justify-content:center;font-size:18px;">🔍</div>
                   <div>
-                    <div style="font-size:13px;font-weight:700;color:var(--tx);">公司調查機器人</div>
+                    <div id="skill-company-title-txt" style="font-size:13px;font-weight:700;color:var(--tx);">公司調查機器人</div>
                     <div style="font-size:11px;color:var(--tx3);">Company Research</div>
                   </div>
                 </div>
-                <div style="font-size:12px;color:var(--tx2);margin-bottom:10px;line-height:1.6;">輸入公司名稱，自動調查公司背景、聯絡資訊、產品方向，輸出完整調查報告與商業開發信。</div>
+                <div id="skill-company-desc-txt" style="font-size:12px;color:var(--tx2);margin-bottom:10px;line-height:1.6;">輸入公司名稱，自動調查公司背景、聯絡資訊、產品方向，輸出完整調查報告與商業開發信。</div>
                 <div style="display:flex;gap:6px;align-items:center;">
                   <input id="p-skill-company" placeholder="Enter company name / 輸入公司名稱" autocomplete="off"
                     style="flex:1;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;"
                     onkeydown="if(event.key==='Enter') pRunSkillCompany()">
-                  <button onclick="pRunSkillCompany()"
+                  <button id="skill-company-btn" onclick="pRunSkillCompany()"
                     style="padding:8px 14px;border-radius:8px;background:#10a37f;color:#fff;border:none;cursor:pointer;font-size:12px;font-weight:700;flex-shrink:0;">調查 →</button>
                 </div>
               </div>
@@ -1240,11 +1241,11 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1) brightness(
                 <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
                   <div style="width:36px;height:36px;border-radius:8px;background:rgba(139,92,246,.15);color:#8b5cf6;display:flex;align-items:center;justify-content:center;font-size:18px;">📧</div>
                   <div>
-                    <div style="font-size:13px;font-weight:700;color:var(--tx);">展後跟進機器人</div>
+                    <div id="skill-followup-title-txt" style="font-size:13px;font-weight:700;color:var(--tx);">展後跟進機器人</div>
                     <div style="font-size:11px;color:var(--tx3);">Post-Show Followup</div>
                   </div>
                 </div>
-                <div style="font-size:12px;color:var(--tx2);margin-bottom:10px;line-height:1.6;">輸入展會客戶資訊，自動生成個性化的展後跟進信件，支援中英雙語。</div>
+                <div id="skill-followup-desc-txt" style="font-size:12px;color:var(--tx2);margin-bottom:10px;line-height:1.6;">輸入展會客戶資訊，自動生成個性化的展後跟進信件，支援中英雙語。</div>
                 <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px;">
                   <input id="p-skill-show-company" placeholder="客戶公司名稱 / Company name" autocomplete="off"
                     style="padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;">
@@ -1254,7 +1255,7 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1) brightness(
                     style="padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;">
                   <textarea id="p-skill-show-notes" placeholder="備注：客戶興趣、產品需求等 / Notes" rows="2"
                     style="padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;resize:none;font-family:inherit;"></textarea>
-                  <button onclick="pRunSkillFollowup()"
+                  <button id="skill-followup-btn" onclick="pRunSkillFollowup()"
                     style="padding:9px;border-radius:8px;background:#8b5cf6;color:#fff;border:none;cursor:pointer;font-size:12px;font-weight:700;">產生跟進信 →</button>
                 </div>
               </div>
@@ -1360,7 +1361,7 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1) brightness(
           <!-- 排行榜 -->
           <div id="dir-ranking-view" style="display:none;">
             <div style="background:var(--s1);border:1px solid var(--br);border-radius:var(--rl);overflow:hidden;">
-              <div style="padding:12px 16px;border-bottom:1px solid var(--br);font-size:12px;color:var(--tx3);">
+              <div id="dir-ranking-desc-txt" style="padding:12px 16px;border-bottom:1px solid var(--br);font-size:12px;color:var(--tx3);">
                 以 KMS 知識庫發文數量計算 · 每月更新
               </div>
               <div id="rankingList"><div style="color:var(--tx3);font-size:13px;padding:20px;text-align:center;">載入中…</div></div>
@@ -1437,16 +1438,16 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1) brightness(
                 <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
                   <div style="width:36px;height:36px;border-radius:8px;background:rgba(16,163,127,.15);color:#10a37f;display:flex;align-items:center;justify-content:center;font-size:18px;">🔍</div>
                   <div>
-                    <div style="font-size:13px;font-weight:700;color:var(--tx);">公司調查機器人</div>
+                    <div id="skill-company-title-txt" style="font-size:13px;font-weight:700;color:var(--tx);">公司調查機器人</div>
                     <div style="font-size:11px;color:var(--tx3);">Company Research</div>
                   </div>
                 </div>
-                <div style="font-size:12px;color:var(--tx2);margin-bottom:10px;line-height:1.6;">輸入公司名稱，自動調查公司背景、聯絡資訊、產品方向，輸出完整調查報告與商業開發信。</div>
+                <div id="skill-company-desc-txt" style="font-size:12px;color:var(--tx2);margin-bottom:10px;line-height:1.6;">輸入公司名稱，自動調查公司背景、聯絡資訊、產品方向，輸出完整調查報告與商業開發信。</div>
                 <div style="display:flex;gap:6px;align-items:center;">
                   <input id="p-skill-company" placeholder="Enter company name / 輸入公司名稱" autocomplete="off"
                     style="flex:1;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;"
                     onkeydown="if(event.key==='Enter') pRunSkillCompany()">
-                  <button onclick="pRunSkillCompany()"
+                  <button id="skill-company-btn" onclick="pRunSkillCompany()"
                     style="padding:8px 14px;border-radius:8px;background:#10a37f;color:#fff;border:none;cursor:pointer;font-size:12px;font-weight:700;flex-shrink:0;">調查 →</button>
                 </div>
               </div>
@@ -1455,11 +1456,11 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1) brightness(
                 <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
                   <div style="width:36px;height:36px;border-radius:8px;background:rgba(139,92,246,.15);color:#8b5cf6;display:flex;align-items:center;justify-content:center;font-size:18px;">📧</div>
                   <div>
-                    <div style="font-size:13px;font-weight:700;color:var(--tx);">展後跟進機器人</div>
+                    <div id="skill-followup-title-txt" style="font-size:13px;font-weight:700;color:var(--tx);">展後跟進機器人</div>
                     <div style="font-size:11px;color:var(--tx3);">Post-Show Followup</div>
                   </div>
                 </div>
-                <div style="font-size:12px;color:var(--tx2);margin-bottom:10px;line-height:1.6;">輸入展會客戶資訊，自動生成個性化的展後跟進信件，支援中英雙語。</div>
+                <div id="skill-followup-desc-txt" style="font-size:12px;color:var(--tx2);margin-bottom:10px;line-height:1.6;">輸入展會客戶資訊，自動生成個性化的展後跟進信件，支援中英雙語。</div>
                 <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px;">
                   <input id="p-skill-show-company" placeholder="客戶公司名稱 / Company name" autocomplete="off"
                     style="padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;">
@@ -1469,7 +1470,7 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1) brightness(
                     style="padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;">
                   <textarea id="p-skill-show-notes" placeholder="備注：客戶興趣、產品需求等 / Notes" rows="2"
                     style="padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;resize:none;font-family:inherit;"></textarea>
-                  <button onclick="pRunSkillFollowup()"
+                  <button id="skill-followup-btn" onclick="pRunSkillFollowup()"
                     style="padding:9px;border-radius:8px;background:#8b5cf6;color:#fff;border:none;cursor:pointer;font-size:12px;font-weight:700;">產生跟進信 →</button>
                 </div>
               </div>
@@ -1575,7 +1576,7 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1) brightness(
           <!-- 排行榜 -->
           <div id="dir-ranking-view" style="display:none;">
             <div style="background:var(--s1);border:1px solid var(--br);border-radius:var(--rl);overflow:hidden;">
-              <div style="padding:12px 16px;border-bottom:1px solid var(--br);font-size:12px;color:var(--tx3);">
+              <div id="dir-ranking-desc-txt" style="padding:12px 16px;border-bottom:1px solid var(--br);font-size:12px;color:var(--tx3);">
                 以 KMS 知識庫發文數量計算 · 每月更新
               </div>
               <div id="rankingList"><div style="color:var(--tx3);font-size:13px;padding:20px;text-align:center;">載入中…</div></div>
@@ -1652,16 +1653,16 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1) brightness(
                 <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
                   <div style="width:36px;height:36px;border-radius:8px;background:rgba(16,163,127,.15);color:#10a37f;display:flex;align-items:center;justify-content:center;font-size:18px;">🔍</div>
                   <div>
-                    <div style="font-size:13px;font-weight:700;color:var(--tx);">公司調查機器人</div>
+                    <div id="skill-company-title-txt" style="font-size:13px;font-weight:700;color:var(--tx);">公司調查機器人</div>
                     <div style="font-size:11px;color:var(--tx3);">Company Research</div>
                   </div>
                 </div>
-                <div style="font-size:12px;color:var(--tx2);margin-bottom:10px;line-height:1.6;">輸入公司名稱，自動調查公司背景、聯絡資訊、產品方向，輸出完整調查報告與商業開發信。</div>
+                <div id="skill-company-desc-txt" style="font-size:12px;color:var(--tx2);margin-bottom:10px;line-height:1.6;">輸入公司名稱，自動調查公司背景、聯絡資訊、產品方向，輸出完整調查報告與商業開發信。</div>
                 <div style="display:flex;gap:6px;align-items:center;">
                   <input id="p-skill-company" placeholder="Enter company name / 輸入公司名稱" autocomplete="off"
                     style="flex:1;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;"
                     onkeydown="if(event.key==='Enter') pRunSkillCompany()">
-                  <button onclick="pRunSkillCompany()"
+                  <button id="skill-company-btn" onclick="pRunSkillCompany()"
                     style="padding:8px 14px;border-radius:8px;background:#10a37f;color:#fff;border:none;cursor:pointer;font-size:12px;font-weight:700;flex-shrink:0;">調查 →</button>
                 </div>
               </div>
@@ -1670,11 +1671,11 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1) brightness(
                 <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
                   <div style="width:36px;height:36px;border-radius:8px;background:rgba(139,92,246,.15);color:#8b5cf6;display:flex;align-items:center;justify-content:center;font-size:18px;">📧</div>
                   <div>
-                    <div style="font-size:13px;font-weight:700;color:var(--tx);">展後跟進機器人</div>
+                    <div id="skill-followup-title-txt" style="font-size:13px;font-weight:700;color:var(--tx);">展後跟進機器人</div>
                     <div style="font-size:11px;color:var(--tx3);">Post-Show Followup</div>
                   </div>
                 </div>
-                <div style="font-size:12px;color:var(--tx2);margin-bottom:10px;line-height:1.6;">輸入展會客戶資訊，自動生成個性化的展後跟進信件，支援中英雙語。</div>
+                <div id="skill-followup-desc-txt" style="font-size:12px;color:var(--tx2);margin-bottom:10px;line-height:1.6;">輸入展會客戶資訊，自動生成個性化的展後跟進信件，支援中英雙語。</div>
                 <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px;">
                   <input id="p-skill-show-company" placeholder="客戶公司名稱 / Company name" autocomplete="off"
                     style="padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;">
@@ -1684,7 +1685,7 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1) brightness(
                     style="padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;">
                   <textarea id="p-skill-show-notes" placeholder="備注：客戶興趣、產品需求等 / Notes" rows="2"
                     style="padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;resize:none;font-family:inherit;"></textarea>
-                  <button onclick="pRunSkillFollowup()"
+                  <button id="skill-followup-btn" onclick="pRunSkillFollowup()"
                     style="padding:9px;border-radius:8px;background:#8b5cf6;color:#fff;border:none;cursor:pointer;font-size:12px;font-weight:700;">產生跟進信 →</button>
                 </div>
               </div>
@@ -1790,7 +1791,7 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1) brightness(
           <!-- 排行榜 -->
           <div id="dir-ranking-view" style="display:none;">
             <div style="background:var(--s1);border:1px solid var(--br);border-radius:var(--rl);overflow:hidden;">
-              <div style="padding:12px 16px;border-bottom:1px solid var(--br);font-size:12px;color:var(--tx3);">
+              <div id="dir-ranking-desc-txt" style="padding:12px 16px;border-bottom:1px solid var(--br);font-size:12px;color:var(--tx3);">
                 以 KMS 知識庫發文數量計算 · 每月更新
               </div>
               <div id="rankingList"><div style="color:var(--tx3);font-size:13px;padding:20px;text-align:center;">載入中…</div></div>
@@ -1867,16 +1868,16 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1) brightness(
                 <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
                   <div style="width:36px;height:36px;border-radius:8px;background:rgba(16,163,127,.15);color:#10a37f;display:flex;align-items:center;justify-content:center;font-size:18px;">🔍</div>
                   <div>
-                    <div style="font-size:13px;font-weight:700;color:var(--tx);">公司調查機器人</div>
+                    <div id="skill-company-title-txt" style="font-size:13px;font-weight:700;color:var(--tx);">公司調查機器人</div>
                     <div style="font-size:11px;color:var(--tx3);">Company Research</div>
                   </div>
                 </div>
-                <div style="font-size:12px;color:var(--tx2);margin-bottom:10px;line-height:1.6;">輸入公司名稱，自動調查公司背景、聯絡資訊、產品方向，輸出完整調查報告與商業開發信。</div>
+                <div id="skill-company-desc-txt" style="font-size:12px;color:var(--tx2);margin-bottom:10px;line-height:1.6;">輸入公司名稱，自動調查公司背景、聯絡資訊、產品方向，輸出完整調查報告與商業開發信。</div>
                 <div style="display:flex;gap:6px;align-items:center;">
                   <input id="p-skill-company" placeholder="Enter company name / 輸入公司名稱" autocomplete="off"
                     style="flex:1;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;"
                     onkeydown="if(event.key==='Enter') pRunSkillCompany()">
-                  <button onclick="pRunSkillCompany()"
+                  <button id="skill-company-btn" onclick="pRunSkillCompany()"
                     style="padding:8px 14px;border-radius:8px;background:#10a37f;color:#fff;border:none;cursor:pointer;font-size:12px;font-weight:700;flex-shrink:0;">調查 →</button>
                 </div>
               </div>
@@ -1885,11 +1886,11 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1) brightness(
                 <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
                   <div style="width:36px;height:36px;border-radius:8px;background:rgba(139,92,246,.15);color:#8b5cf6;display:flex;align-items:center;justify-content:center;font-size:18px;">📧</div>
                   <div>
-                    <div style="font-size:13px;font-weight:700;color:var(--tx);">展後跟進機器人</div>
+                    <div id="skill-followup-title-txt" style="font-size:13px;font-weight:700;color:var(--tx);">展後跟進機器人</div>
                     <div style="font-size:11px;color:var(--tx3);">Post-Show Followup</div>
                   </div>
                 </div>
-                <div style="font-size:12px;color:var(--tx2);margin-bottom:10px;line-height:1.6;">輸入展會客戶資訊，自動生成個性化的展後跟進信件，支援中英雙語。</div>
+                <div id="skill-followup-desc-txt" style="font-size:12px;color:var(--tx2);margin-bottom:10px;line-height:1.6;">輸入展會客戶資訊，自動生成個性化的展後跟進信件，支援中英雙語。</div>
                 <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px;">
                   <input id="p-skill-show-company" placeholder="客戶公司名稱 / Company name" autocomplete="off"
                     style="padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;">
@@ -1899,7 +1900,7 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1) brightness(
                     style="padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;">
                   <textarea id="p-skill-show-notes" placeholder="備注：客戶興趣、產品需求等 / Notes" rows="2"
                     style="padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;resize:none;font-family:inherit;"></textarea>
-                  <button onclick="pRunSkillFollowup()"
+                  <button id="skill-followup-btn" onclick="pRunSkillFollowup()"
                     style="padding:9px;border-radius:8px;background:#8b5cf6;color:#fff;border:none;cursor:pointer;font-size:12px;font-weight:700;">產生跟進信 →</button>
                 </div>
               </div>
@@ -2005,7 +2006,7 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1) brightness(
           <!-- 排行榜 -->
           <div id="dir-ranking-view" style="display:none;">
             <div style="background:var(--s1);border:1px solid var(--br);border-radius:var(--rl);overflow:hidden;">
-              <div style="padding:12px 16px;border-bottom:1px solid var(--br);font-size:12px;color:var(--tx3);">
+              <div id="dir-ranking-desc-txt" style="padding:12px 16px;border-bottom:1px solid var(--br);font-size:12px;color:var(--tx3);">
                 以 KMS 知識庫發文數量計算 · 每月更新
               </div>
               <div id="rankingList"><div style="color:var(--tx3);font-size:13px;padding:20px;text-align:center;">載入中…</div></div>
@@ -2082,16 +2083,16 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1) brightness(
                 <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
                   <div style="width:36px;height:36px;border-radius:8px;background:rgba(16,163,127,.15);color:#10a37f;display:flex;align-items:center;justify-content:center;font-size:18px;">🔍</div>
                   <div>
-                    <div style="font-size:13px;font-weight:700;color:var(--tx);">公司調查機器人</div>
+                    <div id="skill-company-title-txt" style="font-size:13px;font-weight:700;color:var(--tx);">公司調查機器人</div>
                     <div style="font-size:11px;color:var(--tx3);">Company Research</div>
                   </div>
                 </div>
-                <div style="font-size:12px;color:var(--tx2);margin-bottom:10px;line-height:1.6;">輸入公司名稱，自動調查公司背景、聯絡資訊、產品方向，輸出完整調查報告與商業開發信。</div>
+                <div id="skill-company-desc-txt" style="font-size:12px;color:var(--tx2);margin-bottom:10px;line-height:1.6;">輸入公司名稱，自動調查公司背景、聯絡資訊、產品方向，輸出完整調查報告與商業開發信。</div>
                 <div style="display:flex;gap:6px;align-items:center;">
                   <input id="p-skill-company" placeholder="Enter company name / 輸入公司名稱" autocomplete="off"
                     style="flex:1;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;"
                     onkeydown="if(event.key==='Enter') pRunSkillCompany()">
-                  <button onclick="pRunSkillCompany()"
+                  <button id="skill-company-btn" onclick="pRunSkillCompany()"
                     style="padding:8px 14px;border-radius:8px;background:#10a37f;color:#fff;border:none;cursor:pointer;font-size:12px;font-weight:700;flex-shrink:0;">調查 →</button>
                 </div>
               </div>
@@ -2100,11 +2101,11 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1) brightness(
                 <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
                   <div style="width:36px;height:36px;border-radius:8px;background:rgba(139,92,246,.15);color:#8b5cf6;display:flex;align-items:center;justify-content:center;font-size:18px;">📧</div>
                   <div>
-                    <div style="font-size:13px;font-weight:700;color:var(--tx);">展後跟進機器人</div>
+                    <div id="skill-followup-title-txt" style="font-size:13px;font-weight:700;color:var(--tx);">展後跟進機器人</div>
                     <div style="font-size:11px;color:var(--tx3);">Post-Show Followup</div>
                   </div>
                 </div>
-                <div style="font-size:12px;color:var(--tx2);margin-bottom:10px;line-height:1.6;">輸入展會客戶資訊，自動生成個性化的展後跟進信件，支援中英雙語。</div>
+                <div id="skill-followup-desc-txt" style="font-size:12px;color:var(--tx2);margin-bottom:10px;line-height:1.6;">輸入展會客戶資訊，自動生成個性化的展後跟進信件，支援中英雙語。</div>
                 <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px;">
                   <input id="p-skill-show-company" placeholder="客戶公司名稱 / Company name" autocomplete="off"
                     style="padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;">
@@ -2114,7 +2115,7 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1) brightness(
                     style="padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;">
                   <textarea id="p-skill-show-notes" placeholder="備注：客戶興趣、產品需求等 / Notes" rows="2"
                     style="padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;resize:none;font-family:inherit;"></textarea>
-                  <button onclick="pRunSkillFollowup()"
+                  <button id="skill-followup-btn" onclick="pRunSkillFollowup()"
                     style="padding:9px;border-radius:8px;background:#8b5cf6;color:#fff;border:none;cursor:pointer;font-size:12px;font-weight:700;">產生跟進信 →</button>
                 </div>
               </div>
@@ -2220,7 +2221,7 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1) brightness(
           <!-- 排行榜 -->
           <div id="dir-ranking-view" style="display:none;">
             <div style="background:var(--s1);border:1px solid var(--br);border-radius:var(--rl);overflow:hidden;">
-              <div style="padding:12px 16px;border-bottom:1px solid var(--br);font-size:12px;color:var(--tx3);">
+              <div id="dir-ranking-desc-txt" style="padding:12px 16px;border-bottom:1px solid var(--br);font-size:12px;color:var(--tx3);">
                 以 KMS 知識庫發文數量計算 · 每月更新
               </div>
               <div id="rankingList"><div style="color:var(--tx3);font-size:13px;padding:20px;text-align:center;">載入中…</div></div>
@@ -2297,16 +2298,16 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1) brightness(
                 <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
                   <div style="width:36px;height:36px;border-radius:8px;background:rgba(16,163,127,.15);color:#10a37f;display:flex;align-items:center;justify-content:center;font-size:18px;">🔍</div>
                   <div>
-                    <div style="font-size:13px;font-weight:700;color:var(--tx);">公司調查機器人</div>
+                    <div id="skill-company-title-txt" style="font-size:13px;font-weight:700;color:var(--tx);">公司調查機器人</div>
                     <div style="font-size:11px;color:var(--tx3);">Company Research</div>
                   </div>
                 </div>
-                <div style="font-size:12px;color:var(--tx2);margin-bottom:10px;line-height:1.6;">輸入公司名稱，自動調查公司背景、聯絡資訊、產品方向，輸出完整調查報告與商業開發信。</div>
+                <div id="skill-company-desc-txt" style="font-size:12px;color:var(--tx2);margin-bottom:10px;line-height:1.6;">輸入公司名稱，自動調查公司背景、聯絡資訊、產品方向，輸出完整調查報告與商業開發信。</div>
                 <div style="display:flex;gap:6px;align-items:center;">
                   <input id="p-skill-company" placeholder="Enter company name / 輸入公司名稱" autocomplete="off"
                     style="flex:1;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;"
                     onkeydown="if(event.key==='Enter') pRunSkillCompany()">
-                  <button onclick="pRunSkillCompany()"
+                  <button id="skill-company-btn" onclick="pRunSkillCompany()"
                     style="padding:8px 14px;border-radius:8px;background:#10a37f;color:#fff;border:none;cursor:pointer;font-size:12px;font-weight:700;flex-shrink:0;">調查 →</button>
                 </div>
               </div>
@@ -2315,11 +2316,11 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1) brightness(
                 <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
                   <div style="width:36px;height:36px;border-radius:8px;background:rgba(139,92,246,.15);color:#8b5cf6;display:flex;align-items:center;justify-content:center;font-size:18px;">📧</div>
                   <div>
-                    <div style="font-size:13px;font-weight:700;color:var(--tx);">展後跟進機器人</div>
+                    <div id="skill-followup-title-txt" style="font-size:13px;font-weight:700;color:var(--tx);">展後跟進機器人</div>
                     <div style="font-size:11px;color:var(--tx3);">Post-Show Followup</div>
                   </div>
                 </div>
-                <div style="font-size:12px;color:var(--tx2);margin-bottom:10px;line-height:1.6;">輸入展會客戶資訊，自動生成個性化的展後跟進信件，支援中英雙語。</div>
+                <div id="skill-followup-desc-txt" style="font-size:12px;color:var(--tx2);margin-bottom:10px;line-height:1.6;">輸入展會客戶資訊，自動生成個性化的展後跟進信件，支援中英雙語。</div>
                 <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px;">
                   <input id="p-skill-show-company" placeholder="客戶公司名稱 / Company name" autocomplete="off"
                     style="padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;">
@@ -2329,7 +2330,7 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1) brightness(
                     style="padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;">
                   <textarea id="p-skill-show-notes" placeholder="備注：客戶興趣、產品需求等 / Notes" rows="2"
                     style="padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;resize:none;font-family:inherit;"></textarea>
-                  <button onclick="pRunSkillFollowup()"
+                  <button id="skill-followup-btn" onclick="pRunSkillFollowup()"
                     style="padding:9px;border-radius:8px;background:#8b5cf6;color:#fff;border:none;cursor:pointer;font-size:12px;font-weight:700;">產生跟進信 →</button>
                 </div>
               </div>
@@ -4155,6 +4156,17 @@ const I18N = {
     notif_title:'Notifications', notif_mark_all:'Mark all read', notif_empty:'No notifications',
     // profile
     prof_messages:'Messages', prof_send:'Send', prof_reply:'Reply', prof_placeholder:'Leave a message…',
+    // skills tab
+    skill_company_title:'Company Research Bot',
+    skill_company_desc:'Enter a company name to automatically research its background, contacts, and products. Outputs a full investigation report and business development letter.',
+    skill_company_btn:'Research →',
+    skill_followup_title:'Post-Show Followup Bot',
+    skill_followup_desc:'Enter trade show customer info to automatically generate personalized follow-up emails in Chinese and English.',
+    skill_followup_btn:'Generate Email →',
+    // directory
+    dir_ranking_desc:'Ranked by KMS knowledge base contribution count · Updated monthly',
+    // calendar add btn
+    cal_add_btn:'＋ Add ▾',
     // general
     loading:'Loading…', save:'Save', cancel:'Cancel', delete:'Delete', edit:'Edit',
   },
@@ -4204,6 +4216,14 @@ const I18N = {
     ai_tab_translate:'翻譯', ai_tab_chat:'對話', ai_tab_skills:'技能',
     notif_title:'通知', notif_mark_all:'全部已讀', notif_empty:'目前沒有通知',
     prof_messages:'留言', prof_send:'送出', prof_reply:'回覆', prof_placeholder:'留言給這位同事…',
+    skill_company_title:'公司調查機器人',
+    skill_company_desc:'輸入公司名稱，自動調查公司背景、聯絡資訊、產品方向，輸出完整調查報告與商業開發信。',
+    skill_company_btn:'調查 →',
+    skill_followup_title:'展後跟進機器人',
+    skill_followup_desc:'輸入展會客戶資訊，自動生成個性化的展後跟進信件，支援中英雙語。',
+    skill_followup_btn:'產生跟進信 →',
+    dir_ranking_desc:'以 KMS 知識庫發文數量計算 · 每月更新',
+    cal_add_btn:'＋ 新增 ▾',
     loading:'載入中…', save:'儲存', cancel:'取消', delete:'刪除', edit:'編輯',
   },
   'zh-CN': {
@@ -4252,6 +4272,14 @@ const I18N = {
     ai_tab_translate:'翻译', ai_tab_chat:'对话', ai_tab_skills:'技能',
     notif_title:'通知', notif_mark_all:'全部已读', notif_empty:'暂无通知',
     prof_messages:'留言', prof_send:'发送', prof_reply:'回复', prof_placeholder:'给这位同事留言…',
+    skill_company_title:'公司调查机器人',
+    skill_company_desc:'输入公司名称，自动调查公司背景、联系信息、产品方向，输出完整调查报告与商业开发信。',
+    skill_company_btn:'调查 →',
+    skill_followup_title:'展后跟进机器人',
+    skill_followup_desc:'输入展会客户信息，自动生成个性化的展后跟进信件，支持中英双语。',
+    skill_followup_btn:'生成跟进信 →',
+    dir_ranking_desc:'以 KMS 知识库发文数量计算 · 每月更新',
+    cal_add_btn:'＋ 新增 ▾',
     loading:'加载中…', save:'保存', cancel:'取消', delete:'删除', edit:'编辑',
   },
   vi: {
@@ -4300,6 +4328,14 @@ const I18N = {
     ai_tab_translate:'Dịch thuật', ai_tab_chat:'Trò chuyện', ai_tab_skills:'Kỹ năng',
     notif_title:'Thông báo', notif_mark_all:'Đánh dấu đã đọc', notif_empty:'Không có thông báo',
     prof_messages:'Tin nhắn', prof_send:'Gửi', prof_reply:'Trả lời', prof_placeholder:'Nhắn tin cho đồng nghiệp…',
+    skill_company_title:'Bot Nghiên cứu Công ty',
+    skill_company_desc:'Nhập tên công ty để tự động tra cứu thông tin nền tảng, liên lạc và hướng sản phẩm. Xuất báo cáo điều tra đầy đủ và thư phát triển kinh doanh.',
+    skill_company_btn:'Tra cứu →',
+    skill_followup_title:'Bot Theo dõi Sau Triển lãm',
+    skill_followup_desc:'Nhập thông tin khách hàng triển lãm để tự động tạo email theo dõi cá nhân hóa bằng cả tiếng Trung và tiếng Anh.',
+    skill_followup_btn:'Tạo Email →',
+    dir_ranking_desc:'Xếp hạng theo số bài đóng góp vào KMS · Cập nhật hàng tháng',
+    cal_add_btn:'＋ Thêm ▾',
     loading:'Đang tải…', save:'Lưu', cancel:'Hủy', delete:'Xóa', edit:'Sửa',
   },
   ja: {
@@ -4348,6 +4384,14 @@ const I18N = {
     ai_tab_translate:'翻訳', ai_tab_chat:'チャット', ai_tab_skills:'スキル',
     notif_title:'通知', notif_mark_all:'すべて既読', notif_empty:'通知はありません',
     prof_messages:'メッセージ', prof_send:'送信', prof_reply:'返信', prof_placeholder:'同僚へのメッセージ…',
+    skill_company_title:'会社調査ボット',
+    skill_company_desc:'会社名を入力すると、会社概要・連絡先・製品方向を自動調査し、詳細報告書とビジネス開発レターを出力します。',
+    skill_company_btn:'調査 →',
+    skill_followup_title:'展示会フォローアップボット',
+    skill_followup_desc:'展示会の顧客情報を入力して、中国語と英語のパーソナライズされたフォローアップメールを自動生成します。',
+    skill_followup_btn:'メール生成 →',
+    dir_ranking_desc:'KMSへの投稿数でランキング · 毎月更新',
+    cal_add_btn:'＋ 追加 ▾',
     loading:'読込中…', save:'保存', cancel:'キャンセル', delete:'削除', edit:'編集',
   },
 };
@@ -4474,7 +4518,7 @@ function applyI18nAll() {
   if (calTitleEl) calTitleEl.textContent = t('cal_title');
   // addTripBtn 是包含 dropdown 的 div，只更新裡面的按鈕文字
   var addMenuBtn = document.getElementById('addMenuBtn');
-  if (addMenuBtn) addMenuBtn.textContent = '＋ Add ▾';
+  if (addMenuBtn) addMenuBtn.textContent = t('cal_add_btn');
 
   // Calendar dropdown items
   var calTripItem = document.getElementById('cal-menu-trip');
@@ -4508,6 +4552,25 @@ function applyI18nAll() {
   if (tabCh) tabCh.innerHTML = '✦ ' + t('ai_tab_chat');
   var tabSk = document.getElementById('ptab-skills');
   if (tabSk) tabSk.innerHTML = '🛠 ' + t('ai_tab_skills');
+
+  // Skills tab content
+  var el;
+  el = document.getElementById('skill-company-title-txt');
+  if (el) el.textContent = t('skill_company_title');
+  el = document.getElementById('skill-company-desc-txt');
+  if (el) el.textContent = t('skill_company_desc');
+  el = document.getElementById('skill-company-btn');
+  if (el) el.textContent = t('skill_company_btn');
+  el = document.getElementById('skill-followup-title-txt');
+  if (el) el.textContent = t('skill_followup_title');
+  el = document.getElementById('skill-followup-desc-txt');
+  if (el) el.textContent = t('skill_followup_desc');
+  el = document.getElementById('skill-followup-btn');
+  if (el) el.textContent = t('skill_followup_btn');
+
+  // Directory ranking description
+  var rankingDescEl = document.getElementById('dir-ranking-desc-txt');
+  if (rankingDescEl) rankingDescEl.textContent = t('dir_ranking_desc');
 
   // Notification panel header
   var notifHdr = document.getElementById('notif-title-txt');

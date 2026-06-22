@@ -391,7 +391,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v2.04</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v2.05</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
@@ -4304,10 +4304,10 @@ async function doSearch() {
         return `
         <div class="source-card">
           <div class="source-header">
-            <span class="source-title" onclick="openReader('${c.id}')" style="cursor:pointer;">[${docLabel}${i+1}] ${c.title}</span>
+            <span class="source-title" data-chunk-id="${c.id}" onclick="openReader('${c.id}')" style="cursor:pointer;">[${docLabel}${i+1}] ${c.title}</span>
             <span class="source-score">相似度 ${Math.round(c.score * 100)}%</span>
           </div>
-          <div class="source-snippet">${c.snippet.substring(0, 120)}…</div>
+          <div class="source-snippet">${getSnippetForLang(c, currentLang) || c.snippet.substring(0, 120)}…</div>
           <div class="source-meta">${c.category || ''} · ${c.lang || ''}${c.author_name ? ' · ' + c.author_name : ''}${c.created_at ? ' · ' + new Date(c.created_at).toLocaleDateString('zh-TW',{year:'numeric',month:'2-digit',day:'2-digit'}) : ''}</div>
           <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;">
             <button onclick="openReader('${c.id}')"
@@ -4318,6 +4318,8 @@ async function doSearch() {
           </div>
         </div>`;
       }).join('')}`;
+
+    if (currentLang !== 'zh-TW') translateSearchTitles(chunks, currentLang).catch(() => {});
 
   } catch(e) {
     if (!window._searchAborted) {
@@ -4360,7 +4362,7 @@ async function doAiSearch() {
 
     const docLabel = currentLang === 'ja' ? 'ドキュメント' : '文件';
     const context = chunks.map((c, i) =>
-      `[${docLabel}${i+1}] 標題：${c.title}\n內容：${c.snippet.substring(0, 600)}`
+      `[${docLabel}${i+1}] 標題：${c.title}\n內容：${getSnippetForLang(c, currentLang) || c.snippet.substring(0, 600)}`
     ).join('\n\n');
 
     const langInstr = {
@@ -4386,9 +4388,10 @@ async function doAiSearch() {
     if (refContainer && chunks.length) {
       refContainer.innerHTML = `<div class="ref-docs-title">📎 參考文件</div>` +
         chunks.map(c => `<div class="ref-doc-item" onclick="openDocById('${c.id}')">
-          <span class="ref-doc-title">${c.title}</span>
+          <span class="ref-doc-title source-title" data-chunk-id="${c.id}">${c.title}</span>
           <span class="ref-doc-sim">${Math.round((c.similarity||0)*100)}%</span>
         </div>`).join('');
+      if (currentLang !== 'zh-TW') translateSearchTitles(chunks, currentLang).catch(() => {});
     }
   } catch(e) {
     if (!window._searchAborted) {
@@ -4407,6 +4410,43 @@ function cancelSearch() {
     '<div style="color:var(--text-3);font-size:13px;padding:20px;">已取消搜尋。</div>';
 }
 
+function getSnippetForLang(chunk, lang) {
+  const map = {
+    'zh-TW': chunk.summary_zhtw,
+    'zh-CN': chunk.summary_zhcn,
+    'en':    chunk.summary_en,
+    'vi':    chunk.summary_vi,
+    'ja':    chunk.summary_ja,
+  };
+  const s = map[lang] || chunk.summary_zhtw || chunk.snippet || '';
+  return s.substring(0, 150);
+}
+
+async function translateSearchTitles(chunks, targetLang) {
+  if (!chunks.length || targetLang === 'zh-TW') return;
+  const langMap = { 'zh-CN': '简体中文', 'en': 'English', 'vi': 'Tiếng Việt', 'ja': '日本語' };
+  const langName = langMap[targetLang];
+  if (!langName) return;
+  try {
+    const titleList = chunks.map(c => c.title).join('\n');
+    const translated = await callClaudeProxy(
+      '你是翻譯助手，直接翻譯，不解釋，不加編號，不加標點。',
+      `將以下標題逐行翻譯為${langName}，每行一個，保持原順序，只輸出翻譯後的標題：\n${titleList}`,
+      Math.min(1000, chunks.length * 30 + 100)
+    );
+    if (!translated) return;
+    const lines = translated.split('\n').map(l => l.trim()).filter(Boolean);
+    chunks.forEach((c, i) => {
+      if (!lines[i]) return;
+      document.querySelectorAll(`.source-title[data-chunk-id="${c.id}"]`).forEach(el => {
+        el.textContent = el.textContent.replace(c.title, lines[i]);
+      });
+    });
+  } catch(e) {
+    console.warn('[translateSearchTitles]', e.message);
+  }
+}
+
 // Retrieve relevant chunks (Supabase vector or local mock)
 async function retrieveChunks(query) {
   if (CFG.supabaseUrl && CFG.supabaseKey) {
@@ -4423,7 +4463,7 @@ async function retrieveChunks(query) {
           let fileMap = {};
           try {
             const fileRows = await sbFetch(
-              `/rest/v1/kms_documents?id=in.(${ids})&select=id,file_url,file_name,file_type,file_size,author_name,created_at`
+              `/rest/v1/kms_documents?id=in.(${ids})&select=id,file_url,file_name,file_type,file_size,author_name,created_at,summary,summary_en,summary_zh_cn,summary_vi,summary_ja`
             );
             for (const f of (fileRows || [])) fileMap[f.id] = f;
           } catch(e) {}
@@ -4436,14 +4476,19 @@ async function retrieveChunks(query) {
             file_url: fileMap[r.id]?.file_url || null,
             file_name: fileMap[r.id]?.file_name || null,
             file_type: fileMap[r.id]?.file_type || null,
-            author_name: fileMap[r.id]?.author_name || null,
-            created_at: fileMap[r.id]?.created_at || null,
+            author_name:   fileMap[r.id]?.author_name    || null,
+            created_at:    fileMap[r.id]?.created_at     || null,
+            summary_zhtw:  fileMap[r.id]?.summary        || null,
+            summary_zhcn:  fileMap[r.id]?.summary_zh_cn  || null,
+            summary_en:    fileMap[r.id]?.summary_en     || null,
+            summary_vi:    fileMap[r.id]?.summary_vi     || null,
+            summary_ja:    fileMap[r.id]?.summary_ja     || null,
           }));
         }
       }
       // 向量搜尋無結果，fallback 到全文搜尋（含 file 欄位）
       const ftsResults = await sbFetch(
-        `/rest/v1/kms_documents?select=id,title,body,category,lang,status,file_url,file_name,file_type,author_name,created_at&status=eq.published&or=(title.ilike.*${encodeURIComponent(query)}*,body.ilike.*${encodeURIComponent(query)}*)&limit=100`
+        `/rest/v1/kms_documents?select=id,title,body,category,lang,status,file_url,file_name,file_type,author_name,created_at,summary,summary_en,summary_zh_cn,summary_vi,summary_ja&status=eq.published&or=(title.ilike.*${encodeURIComponent(query)}*,body.ilike.*${encodeURIComponent(query)}*)&limit=100`
       );
       if (ftsResults?.length) {
         return ftsResults.map(r => ({
@@ -4454,8 +4499,13 @@ async function retrieveChunks(query) {
           file_url: r.file_url || null,
           file_name: r.file_name || null,
           file_type: r.file_type || null,
-          author_name: r.author_name || null,
-          created_at: r.created_at || null,
+          author_name:  r.author_name   || null,
+          created_at:   r.created_at    || null,
+          summary_zhtw: r.summary       || null,
+          summary_zhcn: r.summary_zh_cn || null,
+          summary_en:   r.summary_en    || null,
+          summary_vi:   r.summary_vi    || null,
+          summary_ja:   r.summary_ja    || null,
         }));
       }
     } catch(e) {

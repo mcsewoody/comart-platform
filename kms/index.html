@@ -391,7 +391,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v2.03</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v2.04</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
@@ -4308,7 +4308,7 @@ async function doSearch() {
             <span class="source-score">相似度 ${Math.round(c.score * 100)}%</span>
           </div>
           <div class="source-snippet">${c.snippet.substring(0, 120)}…</div>
-          <div class="source-meta">${c.category || ''} · ${c.lang || ''}</div>
+          <div class="source-meta">${c.category || ''} · ${c.lang || ''}${c.author_name ? ' · ' + c.author_name : ''}${c.created_at ? ' · ' + new Date(c.created_at).toLocaleDateString('zh-TW',{year:'numeric',month:'2-digit',day:'2-digit'}) : ''}</div>
           <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;">
             <button onclick="openReader('${c.id}')"
               style="font-size:11px;padding:3px 10px;border-radius:5px;border:1px solid var(--blue-border);background:var(--blue-bg);color:var(--blue);cursor:pointer;">
@@ -4415,7 +4415,7 @@ async function retrieveChunks(query) {
       if (qEmbed) {
         const results = await sbFetch('/rest/v1/rpc/match_documents', {
           method: 'POST',
-          body: JSON.stringify({ query_embedding: qEmbed, match_threshold: 0.3, match_count: 15 }),
+          body: JSON.stringify({ query_embedding: qEmbed, match_threshold: 0.3, match_count: 100 }),
         });
         if (results?.length) {
           // 補抓 file 欄位（RPC 回傳沒有，另外查）
@@ -4423,7 +4423,7 @@ async function retrieveChunks(query) {
           let fileMap = {};
           try {
             const fileRows = await sbFetch(
-              `/rest/v1/kms_documents?id=in.(${ids})&select=id,file_url,file_name,file_type,file_size`
+              `/rest/v1/kms_documents?id=in.(${ids})&select=id,file_url,file_name,file_type,file_size,author_name,created_at`
             );
             for (const f of (fileRows || [])) fileMap[f.id] = f;
           } catch(e) {}
@@ -4436,12 +4436,14 @@ async function retrieveChunks(query) {
             file_url: fileMap[r.id]?.file_url || null,
             file_name: fileMap[r.id]?.file_name || null,
             file_type: fileMap[r.id]?.file_type || null,
+            author_name: fileMap[r.id]?.author_name || null,
+            created_at: fileMap[r.id]?.created_at || null,
           }));
         }
       }
       // 向量搜尋無結果，fallback 到全文搜尋（含 file 欄位）
       const ftsResults = await sbFetch(
-        `/rest/v1/kms_documents?select=id,title,body,category,lang,status,file_url,file_name,file_type&status=eq.published&or=(title.ilike.*${encodeURIComponent(query)}*,body.ilike.*${encodeURIComponent(query)}*)&limit=15`
+        `/rest/v1/kms_documents?select=id,title,body,category,lang,status,file_url,file_name,file_type,author_name,created_at&status=eq.published&or=(title.ilike.*${encodeURIComponent(query)}*,body.ilike.*${encodeURIComponent(query)}*)&limit=100`
       );
       if (ftsResults?.length) {
         return ftsResults.map(r => ({
@@ -4452,6 +4454,8 @@ async function retrieveChunks(query) {
           file_url: r.file_url || null,
           file_name: r.file_name || null,
           file_type: r.file_type || null,
+          author_name: r.author_name || null,
+          created_at: r.created_at || null,
         }));
       }
     } catch(e) {
@@ -4470,7 +4474,7 @@ async function retrieveChunks(query) {
     file_url: d.file_url || null,
     file_name: d.file_name || null,
     file_type: d.file_type || null,
-  })).filter(d => d.score > 0.01).sort((a, b) => b.score - a.score).slice(0, 15);
+  })).filter(d => d.score > 0.01).sort((a, b) => b.score - a.score).slice(0, 100);
 }
 
 // Stream Claude API response

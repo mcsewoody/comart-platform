@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" href="data:,">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART 行政管理平台 v1.62</title>
+<title>COMART 行政管理平台 v1.63</title>
 <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.js"></script>
 <style>
 :root{
@@ -970,7 +970,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="logo">
     <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
     <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
-    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.62</span>
+    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.63</span>
   </div>
   <div class="trr">
     <div style="display:flex;align-items:center;gap:6px;padding:4px 12px;background:var(--surface-2);border:1px solid var(--border);border-radius:20px;font-size:12px;cursor:pointer" onclick="showUsw()" id="topbar-user">
@@ -978,7 +978,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <span id="cur-u" style="color:var(--text-2)">載入中…</span>
       <span style="color:var(--text-3);font-size:10px">▾</span>
     </div>
-    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.62</span>
+    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.63</span>
   </div>
 </div>
 
@@ -2126,9 +2126,10 @@ async function syncUsersFromSupabase() {
     return false;
   }
 }
-const ld=k=>{try{return JSON.parse(localStorage.getItem(k))||[]}catch{return[]}};
-const lo=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))||d}catch{return d}};
-const sv=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
+const _mem={};
+const ld=k=>{if(_mem[k]!==undefined)return _mem[k];try{return JSON.parse(localStorage.getItem(k))||[]}catch{return[]}};
+const lo=(k,d)=>{if(_mem[k]!==undefined)return _mem[k];try{return JSON.parse(localStorage.getItem(k))||d}catch{return d}};
+const sv=(k,v)=>{_mem[k]=v;try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}};
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 const tds=()=>new Date().toISOString().slice(0,10);
 const fmtD=s=>{if(!s)return'—';const d=new Date(s+'T00:00:00');return`${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}`};

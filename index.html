@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>COMART Platform v1.43</title>
+<title>COMART Platform v1.44</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -323,7 +323,7 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1) brightness(
     <div class="login-logo">
       <div class="login-mark">C</div>
       <div class="login-name">COMART Platform</div>
-      <div class="login-sub">Internal Portal · v1.42</div>
+      <div class="login-sub">Internal Portal · v1.44</div>
     </div>
     <form id="loginForm" onsubmit="doLogin();return false;" autocomplete="on">
     <div class="field">
@@ -351,7 +351,7 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1) brightness(
   <div class="topbar">
     <div class="topbar-logo" onclick="switchView('home')">
       <div class="topbar-mark">C</div>
-      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.42</span></div>
+      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.44</span></div>
     </div>
     <div class="topbar-right">
       <div class="lang-switcher">
@@ -2986,7 +2986,7 @@ async function sendPopupReply() {
     parentId:    null,
   };
   try {
-    if (db) await db.collection(COL_MSG).add(msg);
+    await SB.post('portal_messages', { ...msg, id: uid() });
     _notifyMsgReceived(msg);
     toast('回覆已送出 ✓', 'ok');
     closeMsgPopup();
@@ -3405,10 +3405,9 @@ function renderDirectory() {
 let BB_POSTS = [];
 
 async function loadBulletin() {
-  if (!db) { renderBulletin(); return; }
   try {
-    const snap = await db.collection(COL_BB).orderBy('ts','desc').limit(50).get();
-    BB_POSTS = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    const rows = await SB.get('portal_bulletin', 'order=ts.desc&limit=50');
+    BB_POSTS = rows || [];
   } catch(e) { BB_POSTS = []; }
   renderBulletin();
 }
@@ -3457,10 +3456,8 @@ async function submitPost() {
     ts: Date.now(), likes: [],
   };
 
-  if (db) {
-    try { await db.collection(COL_BB).add(post); }
-    catch(e) { toast('發佈失敗：' + e.message, 'err'); return; }
-  }
+  try { await SB.post('portal_bulletin', { ...post, id: uid() }); }
+  catch(e) { toast('發佈失敗：' + e.message, 'err'); return; }
   document.getElementById('bbText').value = '';
   document.getElementById('bbPin').checked = false;
   await loadBulletin();
@@ -3474,13 +3471,14 @@ async function toggleLike(postId) {
   const likes = post.likes || [];
   const newLikes = likes.includes(empId) ? likes.filter(l=>l!==empId) : [...likes, empId];
   post.likes = newLikes;
-  if (db) { try { await db.collection(COL_BB).doc(postId).update({ likes: newLikes }); } catch(e){} }
+  SB.patch('portal_bulletin', 'id=eq.'+encodeURIComponent(postId), { likes: newLikes }).catch(()=>{});
   renderBulletin();
 }
 
 async function deletePost(postId) {
   if (!confirm('刪除此公告？')) return;
-  if (db) { try { await db.collection(COL_BB).doc(postId).delete(); } catch(e) { toast('刪除失敗','err'); return; } }
+  try { await SB.delete('portal_bulletin', 'id=eq.'+encodeURIComponent(postId)); }
+  catch(e) { toast('刪除失敗','err'); return; }
   BB_POSTS = BB_POSTS.filter(p => p.id !== postId);
   renderBulletin();
   toast('已刪除','ok');
@@ -3531,16 +3529,9 @@ function umPreviewAvatar(event) {
 
 // ── Dept ──
 async function loadDepts() {
-  if (!db) return;
   try {
-    var snap = await db.collection(COL_DEPT).orderBy('key').get();
-    if (snap.empty) {
-      var batch = db.batch();
-      DEFAULT_DEPTS.forEach(function(d) { batch.set(db.collection(COL_DEPT).doc(d.key), d); });
-      await batch.commit();
-      snap = await db.collection(COL_DEPT).orderBy('key').get();
-    }
-    ALL_DEPTS = snap.docs.map(function(d) { return Object.assign({id:d.id}, d.data()); });
+    var rows = await SB.get('departments', 'order=key');
+    ALL_DEPTS = rows || [];
     renderDeptTable();
   } catch(e) { console.warn('loadDepts', e); }
 }
@@ -3580,27 +3571,20 @@ async function saveDept() {
   var zh  = document.getElementById('deptModalZh').value.trim();
   var en  = document.getElementById('deptModalEn').value.trim();
   if (!key||!en) { toast('Key 和英文名稱必填'); return; }
-  try { await db.collection(COL_DEPT).doc(key).set({key:key,zh:zh,en:en}); toast('已儲存 ✓'); closeDeptModal(); await loadDepts(); }
+  try { await SB.upsert('departments', {id:key, key:key, zh:zh, en:en}); toast('已儲存 ✓'); closeDeptModal(); await loadDepts(); }
   catch(e) { toast('儲存失敗：'+e.message,'err'); }
 }
 async function deleteDept(id, name) {
   if (!confirm('刪除「'+name+'」？')) return;
-  try { await db.collection(COL_DEPT).doc(id).delete(); toast('已刪除'); await loadDepts(); }
+  try { await SB.delete('departments', 'id=eq.'+encodeURIComponent(id)); toast('已刪除'); await loadDepts(); }
   catch(e) { toast('刪除失敗：'+e.message,'err'); }
 }
 
 // ── Site ──
 async function loadSites() {
-  if (!db) return;
   try {
-    var snap = await db.collection(COL_SITE).orderBy('key').get();
-    if (snap.empty) {
-      var batch = db.batch();
-      DEFAULT_SITES.forEach(function(s) { batch.set(db.collection(COL_SITE).doc(s.key), s); });
-      await batch.commit();
-      snap = await db.collection(COL_SITE).orderBy('key').get();
-    }
-    ALL_SITES = snap.docs.map(function(d) { return Object.assign({id:d.id}, d.data()); });
+    var rows = await SB.get('sites', 'order=key');
+    ALL_SITES = rows || [];
     renderSiteTable();
   } catch(e) { console.warn('loadSites', e); }
 }
@@ -3640,12 +3624,12 @@ async function saveSite() {
   var zh  = document.getElementById('siteModalZh').value.trim();
   var en  = document.getElementById('siteModalEn').value.trim();
   if (!key||!en) { toast('Key 和英文名稱必填'); return; }
-  try { await db.collection(COL_SITE).doc(key).set({key:key,zh:zh,en:en}); toast('已儲存 ✓'); closeSiteModal(); await loadSites(); }
+  try { await SB.upsert('sites', {id:key, key:key, zh:zh, en:en}); toast('已儲存 ✓'); closeSiteModal(); await loadSites(); }
   catch(e) { toast('儲存失敗：'+e.message,'err'); }
 }
 async function deleteSite(id, name) {
   if (!confirm('刪除「'+name+'」？')) return;
-  try { await db.collection(COL_SITE).doc(id).delete(); toast('已刪除'); await loadSites(); }
+  try { await SB.delete('sites', 'id=eq.'+encodeURIComponent(id)); toast('已刪除'); await loadSites(); }
   catch(e) { toast('刪除失敗：'+e.message,'err'); }
 }
 
@@ -3738,8 +3722,8 @@ async function loadUsers() {
         }
       } catch(e) { console.warn('loadUsers Firebase fallback failed:', e.message); }
     })(),
-    (async()=>{ if(!db||ALL_DEPTS.length)return; try{const s=await db.collection(COL_DEPT).orderBy('key').get();if(!s.empty)ALL_DEPTS=s.docs.map(d=>Object.assign({id:d.id},d.data()));}catch(e){} })(),
-    (async()=>{ if(!db||ALL_SITES.length)return; try{const s=await db.collection(COL_SITE).orderBy('key').get();if(!s.empty)ALL_SITES=s.docs.map(d=>Object.assign({id:d.id},d.data()));}catch(e){} })(),
+    (async()=>{ if(ALL_DEPTS.length)return; try{const r=await SB.get('departments','order=key');if(r&&r.length)ALL_DEPTS=r;}catch(e){} })(),
+    (async()=>{ if(ALL_SITES.length)return; try{const r=await SB.get('sites','order=key');if(r&&r.length)ALL_SITES=r;}catch(e){} })(),
   ]);
   renderUsersTable();
 }
@@ -3851,6 +3835,17 @@ function closeUserModal() { document.getElementById('userOverlay').classList.rem
 const SB_WORKER = 'https://comart.mcsewoody.workers.dev';
 const SB_TOKEN  = 'COMART-ADMIN-2026';
 
+const SB = {
+  _h: { 'x-admin-token': SB_TOKEN, 'Content-Type': 'application/json' },
+  _url: t => `${SB_WORKER}/supabase/rest/v1/${t}`,
+  async get(table, qs='') { const res = await fetch(`${this._url(table)}${qs?'?'+qs:''}`, {headers:this._h}); if(!res.ok){console.warn('SB.get',table,res.status);return null;} return res.json(); },
+  async post(table, data) { const res = await fetch(this._url(table),{method:'POST',headers:this._h,body:JSON.stringify(data)}); if(!res.ok){const e=await res.text();throw new Error(`SB.post ${table}: ${e}`);} },
+  async patch(table, qs, data) { const res = await fetch(`${this._url(table)}?${qs}`,{method:'PATCH',headers:{...this._h,Prefer:'return=representation'},body:JSON.stringify(data)}); if(!res.ok){const e=await res.text();throw new Error(`SB.patch ${table}: ${e}`);} return res.json(); },
+  async delete(table, qs) { await fetch(`${this._url(table)}?${qs}`,{method:'DELETE',headers:this._h}); },
+  async upsert(table, data, pk='id') { const pkVal=data[pk]; if(!pkVal) return this.post(table,data); const patched=await this.patch(table,`${pk}=eq.${encodeURIComponent(pkVal)}`,data).catch(()=>[]); if(patched&&patched.length>0) return; return this.post(table,data); }
+};
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,8); }
+
 async function sbSyncUser(user, isDelete, isNew) {
   let res;
   if (isDelete) {
@@ -3938,28 +3933,8 @@ async function saveUser() {
     updatedAt: Date.now(),
   };
 
-  // 主要寫入：Supabase
-  let sbOk = false;
-  try { await sbSyncUser(user, false, !existing); sbOk = true; }
-  catch(e) { console.warn('Supabase write failed:', e.message); }
-
-  if (!sbOk) {
-    // Supabase 失敗 → Firebase 接手（blocking），更新本機快取，不重新讀 Supabase
-    if (db) {
-      try { await db.collection(COL_U).doc(empId).set(user); }
-      catch(e2) { toast('Save failed: ' + e2.message, 'err'); return; }
-    } else { toast('Save failed: no database available', 'err'); return; }
-    const idx = ALL_USERS.findIndex(u => u.empId === empId);
-    if (idx >= 0) Object.assign(ALL_USERS[idx], user);
-    else ALL_USERS.push(user);
-    closeUserModal();
-    renderUsersTable();
-    toast(existing ? 'User updated' : 'User created', 'ok');
-    return;
-  }
-
-  // Supabase 成功 → Firebase 非阻塞備援
-  if (db) { db.collection(COL_U).doc(empId).set(user).catch(()=>{}); }
+  try { await sbSyncUser(user, false, !existing); }
+  catch(e) { toast('Save failed: ' + e.message, 'err'); return; }
   closeUserModal();
   await loadUsers();
   toast(existing ? 'User updated' : 'User created', 'ok');
@@ -3969,26 +3944,8 @@ async function confirmDeleteUser() {
   if (!_editEmpId) return;
   if (_editEmpId === SESSION?.empId) { toast('Cannot delete yourself','err'); return; }
   if (!confirm(`Delete user ${_editEmpId}? This cannot be undone.`)) return;
-  // 主要刪除：Supabase
-  let sbDelOk = false;
-  try { await sbSyncUser({ empId: _editEmpId }, true); sbDelOk = true; }
-  catch(e) { console.warn('Supabase delete failed:', e.message); }
-
-  if (!sbDelOk) {
-    // Supabase 失敗 → Firebase 接手
-    if (db) {
-      try { await db.collection(COL_U).doc(_editEmpId).delete(); }
-      catch(e2) { toast('Delete failed: ' + e2.message, 'err'); return; }
-    } else { toast('Delete failed: no database available', 'err'); return; }
-    ALL_USERS = ALL_USERS.filter(u => u.empId !== _editEmpId);
-    closeUserModal();
-    renderUsersTable();
-    toast('User deleted', 'ok');
-    return;
-  }
-
-  // Supabase 成功 → Firebase 非阻塞備援
-  if (db) { db.collection(COL_U).doc(_editEmpId).delete().catch(()=>{}); }
+  try { await sbSyncUser({ empId: _editEmpId }, true); }
+  catch(e) { toast('Delete failed: ' + e.message, 'err'); return; }
   closeUserModal();
   await loadUsers();
   toast('User deleted','ok');
@@ -4003,21 +3960,11 @@ let _replyToId   = null;
 let _profileMsgs = [];
 
 async function loadMessageCounts(empIds) {
-  if (!db) {
-    empIds.forEach(id => {
-      const el = document.getElementById('msgcount-' + id);
-      if (el) el.textContent = '';
-    });
-    return;
-  }
   for (const empId of empIds) {
     try {
-      const snap = await db.collection(COL_MSG)
-        .where('targetEmpId','==',empId)
-        .where('parentId','==',null)
-        .get();
+      const rows = await SB.get('portal_messages', 'targetEmpId=eq.'+encodeURIComponent(empId)+'&parentId=is.null&select=id');
       const el = document.getElementById('msgcount-' + empId);
-      if (el) el.textContent = snap.size ? `💬 ${snap.size} 則留言` : '💬 留言';
+      if (el) el.textContent = (rows&&rows.length) ? `💬 ${rows.length} 則留言` : '💬 留言';
     } catch(e) {
       const el = document.getElementById('msgcount-' + empId);
       if (el) el.textContent = '💬 留言';
@@ -4067,14 +4014,9 @@ async function loadMessages(empId) {
   const countEl  = document.getElementById('profileMsgCount');
   listEl.innerHTML = '<div class="msg-empty">載入中…</div>';
 
-  if (!db) { listEl.innerHTML = '<div class="msg-empty">需要網路連線</div>'; return; }
-
   try {
-    const snap = await db.collection(COL_MSG)
-      .where('targetEmpId','==',empId)
-      .orderBy('ts','asc')
-      .get();
-    _profileMsgs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    const rows = await SB.get('portal_messages', 'targetEmpId=eq.'+encodeURIComponent(empId)+'&order=ts');
+    _profileMsgs = rows || [];
   } catch(e) { _profileMsgs = []; }
 
   const roots   = _profileMsgs.filter(m => !m.parentId);
@@ -4140,9 +4082,8 @@ async function sendMessage() {
     parentId: _replyToId || null,
   };
 
-  if (!db) { toast('⚠️ 資料庫未連線', 'err'); return; }
   try {
-    await db.collection(COL_MSG).add(msg);
+    await SB.post('portal_messages', { ...msg, id: uid() });
     document.getElementById('msgInput').value = '';
     _replyToId = null;
     document.getElementById('msgReplyHint').textContent = '';
@@ -4153,15 +4094,10 @@ async function sendMessage() {
       const roots = _profileMsgs.filter(m => !m.parentId);
       countEl.textContent = `💬 ${roots.length} 則留言`;
     }
-    // 寫入成功後通知對方
+    // 寫入成功後通知對方（Firebase portal_notifications）
     _notifyMsgReceived(msg);
   } catch(e) {
-    console.error('[sendMessage]', e);
-    if (e.code === 'permission-denied') {
-      toast('⚠️ 權限不足：請確認 Firestore Rules 允許 portal_messages 寫入', 'err');
-    } else {
-      toast('留言失敗：' + e.message, 'err');
-    }
+    toast('留言失敗：' + e.message, 'err');
   }
 }
 
@@ -4195,7 +4131,7 @@ async function likeMsg(msgId) {
   const likes    = msg.likes || [];
   const newLikes = likes.includes(empId) ? likes.filter(l => l !== empId) : [...likes, empId];
   msg.likes = newLikes;
-  if (db) { try { await db.collection(COL_MSG).doc(msgId).update({ likes: newLikes }); } catch(e){} }
+  SB.patch('portal_messages', 'id=eq.'+encodeURIComponent(msgId), { likes: newLikes }).catch(()=>{});
   const replies = _profileMsgs.filter(m => m.parentId);
   document.getElementById('msgList').innerHTML =
     _profileMsgs.filter(m => !m.parentId).map(m => renderMsg(m, replies)).join('');
@@ -4203,7 +4139,8 @@ async function likeMsg(msgId) {
 
 async function deleteMsg(msgId) {
   if (!confirm('刪除此留言？')) return;
-  if (db) { try { await db.collection(COL_MSG).doc(msgId).delete(); } catch(e) { toast('刪除失敗','err'); return; } }
+  try { await SB.delete('portal_messages', 'id=eq.'+encodeURIComponent(msgId)); }
+  catch(e) { toast('刪除失敗','err'); return; }
   _profileMsgs = _profileMsgs.filter(m => m.id !== msgId);
   const replies = _profileMsgs.filter(m => m.parentId);
   document.getElementById('msgList').innerHTML =
@@ -4925,10 +4862,9 @@ var TRIP_COLORS   = ['#6366f1','#3DD68C','#f59e0b','#ef4444','#06b6d4','#ec4899'
 var COL_TRIP      = 'trips';
 
 async function loadTrips() {
-  if (!db) return;
   try {
-    var snap = await db.collection(COL_TRIP).orderBy('dateFrom', 'asc').get();
-    TRIPS = snap.docs.map(function(d) { return Object.assign({ id: d.id }, d.data()); });
+    var rows = await SB.get('trips', 'order=dateFrom');
+    TRIPS = rows || [];
   } catch(e) { console.warn('Trip load:', e); }
 }
 
@@ -5130,13 +5066,7 @@ function openTripModal(id) {
           ALL_USERS = rows.map(function(u){ return { empId:u.emp_id, nameEn:u.name_en||'', nameZh:u.name_zh||'', role:u.role||'user', dept:u.dept||'', site:u.site||'TW', email:u.email||'', ext:u.ext||'' }; });
         }
       }).catch(function(){})
-      .finally(function(){
-        if (ALL_USERS.length === 0 && db) {
-          db.collection(COL_U).orderBy('empId','asc').get().then(function(snap){
-            ALL_USERS = snap.docs.map(function(d){ return d.data(); });
-          }).catch(function(){}).finally(_doOpen);
-        } else { _doOpen(); }
-      });
+      .finally(function(){ _doOpen(); });
   }
 }
 
@@ -5248,13 +5178,14 @@ async function saveTrip() {
 
   try {
     if (editTripId) {
-      await db.collection(COL_TRIP).doc(editTripId).set(tripData, { merge: true });
+      await SB.upsert('trips', Object.assign({ id: editTripId }, tripData));
       var idx = TRIPS.findIndex(function(x) { return x.id === editTripId; });
       if (idx >= 0) TRIPS[idx] = Object.assign({ id: editTripId }, tripData);
     } else {
       tripData.createdAt = Date.now();
-      var ref = await db.collection(COL_TRIP).add(tripData);
-      TRIPS.push(Object.assign({ id: ref.id }, tripData));
+      var newId = uid();
+      await SB.post('trips', Object.assign({ id: newId }, tripData));
+      TRIPS.push(Object.assign({ id: newId }, tripData));
     }
     closeTripModal();
     renderTripPage();
@@ -5268,7 +5199,7 @@ async function deleteTrip() {
   if (!editTripId) return;
   if (!confirm('Delete this trip?')) return;
   try {
-    await db.collection(COL_TRIP).doc(editTripId).delete();
+    await SB.delete('trips', 'id=eq.'+encodeURIComponent(editTripId));
     TRIPS = TRIPS.filter(function(x) { return x.id !== editTripId; });
     closeTripModal();
     renderTripPage();
@@ -6013,8 +5944,6 @@ async function uploadAvatar(event) {
           body: JSON.stringify({ avatar_url: dataUrl }),
         });
       } catch(e) { console.warn('Photo Supabase sync failed:', e.message); }
-      // Backup: Firebase
-      if (db) { db.collection(COL_U).doc(_profileUser.empId).update({ photoURL: dataUrl }).catch(()=>{}); }
       // Update local cache
       var userInList = ALL_USERS.find(function(u) { return u.empId === _profileUser.empId; });
       if (userInList) userInList.photoURL = dataUrl;

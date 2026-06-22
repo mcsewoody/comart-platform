@@ -391,7 +391,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v2.02</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v2.03</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('zh-TW')">繁中</button>
@@ -4360,7 +4360,7 @@ async function doAiSearch() {
 
     const docLabel = currentLang === 'ja' ? 'ドキュメント' : '文件';
     const context = chunks.map((c, i) =>
-      `[${docLabel}${i+1}] 標題：${c.title}\n內容：${c.snippet.substring(0, 400)}`
+      `[${docLabel}${i+1}] 標題：${c.title}\n內容：${c.snippet.substring(0, 600)}`
     ).join('\n\n');
 
     const langInstr = {
@@ -4415,7 +4415,7 @@ async function retrieveChunks(query) {
       if (qEmbed) {
         const results = await sbFetch('/rest/v1/rpc/match_documents', {
           method: 'POST',
-          body: JSON.stringify({ query_embedding: qEmbed, match_threshold: 0.3, match_count: 5 }),
+          body: JSON.stringify({ query_embedding: qEmbed, match_threshold: 0.3, match_count: 15 }),
         });
         if (results?.length) {
           // 補抓 file 欄位（RPC 回傳沒有，另外查）
@@ -4430,7 +4430,7 @@ async function retrieveChunks(query) {
 
           return results.map(r => ({
             id: r.id, title: r.title,
-            snippet: r.body?.substring(0, 300) || '',
+            snippet: r.body?.substring(0, 600) || '',
             score: r.similarity || 0.5,
             category: r.category, lang: r.lang,
             file_url: fileMap[r.id]?.file_url || null,
@@ -4441,12 +4441,12 @@ async function retrieveChunks(query) {
       }
       // 向量搜尋無結果，fallback 到全文搜尋（含 file 欄位）
       const ftsResults = await sbFetch(
-        `/rest/v1/kms_documents?select=id,title,body,category,lang,status,file_url,file_name,file_type&status=eq.published&or=(title.ilike.*${encodeURIComponent(query)}*,body.ilike.*${encodeURIComponent(query)}*)&limit=5`
+        `/rest/v1/kms_documents?select=id,title,body,category,lang,status,file_url,file_name,file_type&status=eq.published&or=(title.ilike.*${encodeURIComponent(query)}*,body.ilike.*${encodeURIComponent(query)}*)&limit=15`
       );
       if (ftsResults?.length) {
         return ftsResults.map(r => ({
           id: r.id, title: r.title,
-          snippet: r.body?.substring(0, 300) || '',
+          snippet: r.body?.substring(0, 600) || '',
           score: 0.6,
           category: r.category, lang: r.lang,
           file_url: r.file_url || null,
@@ -4470,7 +4470,7 @@ async function retrieveChunks(query) {
     file_url: d.file_url || null,
     file_name: d.file_name || null,
     file_type: d.file_type || null,
-  })).filter(d => d.score > 0.01).sort((a, b) => b.score - a.score).slice(0, 5);
+  })).filter(d => d.score > 0.01).sort((a, b) => b.score - a.score).slice(0, 15);
 }
 
 // Stream Claude API response

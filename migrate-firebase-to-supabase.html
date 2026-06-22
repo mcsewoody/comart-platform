@@ -49,6 +49,7 @@ th { color: #64748b; font-weight: 600; }
   <h2>操作</h2>
   <button id="btn-start" onclick="startMigration()">▶ 開始全部遷移</button>
   <button onclick="migrateProductsOnly()">▶ 只遷移 products</button>
+  <button onclick="migrateCalEvents()">▶ 只遷移行事曆</button>
   <button onclick="scanProducts()">🔍 掃描 products 欄位</button>
   <button onclick="testConnection()">🔌 測試連線</button>
   <div class="progress" id="overall-status"></div>
@@ -351,6 +352,41 @@ async function migrateProductsOnly() {
     log('--- 只遷移 products ---');
     const n = await migrateCollection('products', 'products', null, 'createdAt');
     log(`完成，共 ${n} 筆`, 'ok');
+    reportSkipped();
+  } catch(e) {
+    log('❌ ' + e.message, 'err');
+  }
+  document.getElementById('btn-start').disabled = false;
+}
+
+// 行事曆遷移：四個 Firebase collections → 一張 cal_events 表（加 category 欄位）
+const CAL_MAP = [
+  { fbCol: 'cal_group',   category: 'group'  },
+  { fbCol: 'cal_taiwan',  category: 'tw-cal' },
+  { fbCol: 'cal_china',   category: 'cn-cal' },
+  { fbCol: 'cal_vietnam', category: 'vn-cal' },
+];
+
+async function migrateCalEvents() {
+  document.getElementById('btn-start').disabled = true;
+  ensureFirebase();
+  log('--- 遷移行事曆事件 ---');
+  let total = 0;
+  try {
+    // 清空現有 cal_events
+    await fetch(`${WORKER}/supabase/rest/v1/cal_events?id=not.is.null`, {
+      method: 'DELETE', headers: { 'x-admin-token': SB_TOKEN }
+    });
+    for (const { fbCol, category } of CAL_MAP) {
+      const snap = await db.collection(fbCol).get();
+      const docs = snap.docs.map(d => ({ id: d.id, ...d.data(), category }));
+      log(`  Firebase [${fbCol}]: ${docs.length} 筆`);
+      if (docs.length) {
+        await sbBatchPost('cal_events', docs);
+        total += docs.length;
+      }
+    }
+    log(`✓ cal_events: ${total} 筆寫入完成`, 'ok');
     reportSkipped();
   } catch(e) {
     log('❌ ' + e.message, 'err');

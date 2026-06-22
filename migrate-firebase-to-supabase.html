@@ -197,14 +197,19 @@ async function sbBatchPost(table, rows) {
       });
       if (!res.ok) {
         const errText = await res.text();
-        const m = errText.match(/Could not find the '(.+?)' column/);
-        if (m) {
-          const col = m[1];
-          skipped.add(col);
-          log(`  ⚠️ [${table}] 略過未知欄位: ${col}`, 'warn');
-          data.forEach(r => delete r[col]);
-          retry = true; // restart with cleaned data
-          break;
+        let errJson; try { errJson = JSON.parse(errText); } catch(e) {}
+        // PGRST204 = unknown column — strip it and retry
+        if (errJson && errJson.code === 'PGRST204') {
+          const msg = errJson.message || errText;
+          const m = msg.match(/find the .(.+?). column/) || msg.match(/'(.+?)'/);
+          if (m) {
+            const col = m[1];
+            skipped.add(col);
+            log(`  ⚠️ [${table}] 略過未知欄位: ${col}`, 'warn');
+            data.forEach(r => delete r[col]);
+            retry = true;
+            break;
+          }
         }
         throw new Error(`POST ${table}: ${res.status} ${errText}`);
       }

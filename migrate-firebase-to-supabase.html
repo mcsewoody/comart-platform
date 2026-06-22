@@ -150,30 +150,32 @@ async function sbUpsert(table, rows) {
   }
 }
 
-// Worker 過濾 Prefer header → fallback to PATCH for individual rows
-async function sbUpsertSafe(table, rows, pkField) {
-  for (const row of rows) {
-    const pk = row[pkField];
-    if (!pk) { await sbUpsert(table, [row]); continue; }
-    // try PATCH first
-    const patchRes = await fetch(`${WORKER}/supabase/rest/v1/${table}?${pkField}=eq.${encodeURIComponent(pk)}`, {
-      method: 'PATCH',
-      headers: { 'x-admin-token': SB_TOKEN, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
-      body: JSON.stringify(row),
-    });
-    if (patchRes.ok) {
-      const patched = await patchRes.json();
-      if (patched && patched.length > 0) continue; // updated
-    }
-    // no match → POST
-    const postRes = await fetch(`${WORKER}/supabase/rest/v1/${table}`, {
+// 清空 table（支援重跑）
+async function sbTruncate(table) {
+  await fetch(`${WORKER}/supabase/rest/v1/${table}?id=not.is.null`, {
+    method: 'DELETE',
+    headers: { 'x-admin-token': SB_TOKEN },
+  });
+  // logs / bulletin / messages 用 ts 欄位
+  await fetch(`${WORKER}/supabase/rest/v1/${table}?ts=not.is.null`, {
+    method: 'DELETE',
+    headers: { 'x-admin-token': SB_TOKEN },
+  });
+}
+
+// 批次 POST（50 筆一批，速度快）
+async function sbBatchPost(table, rows) {
+  if (!rows.length) return;
+  for (let i = 0; i < rows.length; i += BATCH_SIZE) {
+    const batch = rows.slice(i, i + BATCH_SIZE);
+    const res = await fetch(`${WORKER}/supabase/rest/v1/${table}`, {
       method: 'POST',
       headers: { 'x-admin-token': SB_TOKEN, 'Content-Type': 'application/json' },
-      body: JSON.stringify(row),
+      body: JSON.stringify(batch),
     });
-    if (!postRes.ok) {
-      const err = await postRes.text();
-      throw new Error(`POST ${table}: ${postRes.status} ${err}`);
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(`POST ${table}: ${res.status} ${err}`);
     }
   }
 }
@@ -203,9 +205,9 @@ async function migrateCollection(fbCol, sbTable, _pkField, orderBy) {
 
   if (!docs.length) { setRow(fbCol, 'ok', 0, '無資料'); return 0; }
 
-  // All Firebase docs have an id (either predefined or auto-generated).
-  // fbGetAll always maps doc.id into the 'id' field, so we always upsert by 'id'.
-  await sbUpsertSafe(sbTable, docs, 'id');
+  // Clear table first (safe for re-runs), then batch POST
+  await sbTruncate(sbTable);
+  await sbBatchPost(sbTable, docs);
 
   log(`  ✓ ${sbTable}: ${docs.length} 筆寫入完成`, 'ok');
   setRow(fbCol, 'ok', docs.length);
@@ -219,7 +221,8 @@ async function migrateSettings() {
   if (!snap.exists) { setRow('settings_main', 'ok', 0, '無資料'); return; }
   // Store entire settings object in the 'data' JSONB column
   const row = { id: 'main', data: snap.data() };
-  await sbUpsertSafe('quotation_settings', [row], 'id');
+  await sbTruncate('quotation_settings');
+  await sbBatchPost('quotation_settings', [row]);
   log('  ✓ quotation_settings: 1 筆寫入完成', 'ok');
   setRow('settings_main', 'ok', 1);
 }

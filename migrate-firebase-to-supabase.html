@@ -217,8 +217,9 @@ async function migrateSettings() {
   log('讀取 Firebase [settings/main]…');
   const snap = await db.collection('settings').doc('main').get();
   if (!snap.exists) { setRow('settings_main', 'ok', 0, '無資料'); return; }
-  const data = { id: 'main', ...snap.data() };
-  await sbUpsertSafe('quotation_settings', [data], 'id');
+  // Store entire settings object in the 'data' JSONB column
+  const row = { id: 'main', data: snap.data() };
+  await sbUpsertSafe('quotation_settings', [row], 'id');
   log('  ✓ quotation_settings: 1 筆寫入完成', 'ok');
   setRow('settings_main', 'ok', 1);
 }

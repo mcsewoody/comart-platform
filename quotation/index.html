@@ -292,7 +292,7 @@ img{display:block}
       <div class="logo-mark">C</div>
       <div>
         <div class="logo-text">COMART</div>
-        <div id="appVersionDiv" style="font-size:10px;color:var(--ac);font-weight:600;letter-spacing:.04em;line-height:1.3">v3.43</div>
+        <div id="appVersionDiv" style="font-size:10px;color:var(--ac);font-weight:600;letter-spacing:.04em;line-height:1.3">v3.44</div>
       </div>
     </div>
     <div class="topbar-right">
@@ -1125,8 +1125,6 @@ img{display:block}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
 <script>
 // ═══════════════════════════════════════
 // DEFAULT PRODUCT IMAGES (from Qi xlsx)
@@ -1280,26 +1278,11 @@ let SETTINGS = {
 
 const PRESET_MOQS = [1,500,1000,3000,5000,10000];
 
-// ═══════════════════════════════════════
-// FIREBASE STORAGE INIT (for file uploads only; data → Supabase)
-// ═══════════════════════════════════════
-const firebaseConfig = {
-  apiKey: "AIzaSyBW5qQIdX28JnjgymoZxY3MjGnTuIocboQ",
-  authDomain: "comart-quotation.firebaseapp.com",
-  projectId: "comart-quotation",
-  storageBucket: "comart-quotation.firebasestorage.app",
-  messagingSenderId: "1020179116858",
-  appId: "1:1020179116858:web:84646675aaaa753352d603"
-};
-let storage = null;
-let CATEGORIES = [];
+// ── Supabase Storage ──
+const SB_STORAGE_BUCKET = 'product-assets';
+const SB_STORAGE_BASE   = 'https://tcvlnpgpuphdalzvmoyo.supabase.co/storage/v1/object/public/' + SB_STORAGE_BUCKET;
 
-if (typeof firebase !== 'undefined') {
-  try {
-    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-    storage = firebase.storage();
-  } catch(e) { console.warn('Firebase Storage init error:', e); }
-}
+let CATEGORIES = [];
 
 const COL_Q = 'quotes';
 const COL_P = 'products';
@@ -1588,57 +1571,65 @@ async function deleteOneQ(id) {
   } catch(e) { console.error('deleteOneQ:', e); toast('⚠️ Delete failed — please retry'); }
 }
 
-// ── Upload image to Firebase Storage ──
+// ── Upload image to Supabase Storage ──
 async function uploadImgToStorage(prodId, base64DataUrl) {
-  if (!storage || !base64DataUrl) return null;
+  if (!base64DataUrl) return null;
   try {
-    // Convert base64 data URL to Blob
     const res = await fetch(base64DataUrl);
     const blob = await res.blob();
     const ext = blob.type.includes('png') ? 'png' : blob.type.includes('webp') ? 'webp' : 'jpg';
-    const ref = storage.ref('products/' + prodId + '.' + ext);
-    await ref.put(blob, { contentType: blob.type });
-    const url = await ref.getDownloadURL();
-    return url;
+    const path = 'products/' + prodId + '.' + ext;
+    const up = await fetch(
+      SB_WORKER + '/supabase/storage/v1/object/' + SB_STORAGE_BUCKET + '/' + path,
+      { method: 'POST', headers: { 'x-admin-token': SB_TOKEN, 'Content-Type': blob.type, 'x-upsert': 'true' }, body: blob }
+    );
+    if (!up.ok) throw new Error(await up.text());
+    return SB_STORAGE_BASE + '/' + path;
   } catch(e) {
     console.error('uploadImgToStorage:', e);
     return null;
   }
 }
 
-// ── Upload file to Firebase Storage, return download URL ──
-// Always throws on failure — no base64 fallback
-async function _uploadFileToStorage(path, b64, mimeType){
-  console.log('[Storage] Upload start:', path, 'mime:', mimeType, 'b64 length:', b64?.length);
-  if(!storage) throw new Error('Firebase Storage not initialized');
-  if(!storage) throw new Error('storage object is null — Firebase Storage not initialized');
-  const ref=storage.ref(path);
-  console.log('[Storage] ref created, calling put()...');
-  // Use Blob + put() instead of putString — more reliable for large files
-  const byteChars=atob(b64);
-  const bytes=new Uint8Array(byteChars.length);
-  for(let i=0;i<byteChars.length;i++) bytes[i]=byteChars.charCodeAt(i);
-  const blob=new Blob([bytes],{type:mimeType});
-  await ref.put(blob,{contentType:mimeType});
-  console.log('[Storage] put() done, getting download URL...');
-  const url=await ref.getDownloadURL();
-  console.log('[Storage] Upload success, URL:', url);
-  return url;
+// ── Upload file to Supabase Storage, return download URL ──
+async function _uploadFileToStorage(path, b64, mimeType) {
+  const byteChars = atob(b64);
+  const bytes = new Uint8Array(byteChars.length);
+  for (let i = 0; i < byteChars.length; i++) bytes[i] = byteChars.charCodeAt(i);
+  const blob = new Blob([bytes], { type: mimeType });
+  const up = await fetch(
+    SB_WORKER + '/supabase/storage/v1/object/' + SB_STORAGE_BUCKET + '/' + path,
+    { method: 'POST', headers: { 'x-admin-token': SB_TOKEN, 'Content-Type': mimeType, 'x-upsert': 'true' }, body: blob }
+  );
+  if (!up.ok) throw new Error(await up.text());
+  return SB_STORAGE_BASE + '/' + path;
 }
 
-// ── Delete image from Firebase Storage ──
+// ── Delete image from Supabase Storage ──
 async function deleteImgFromStorage(prodId) {
-  if (!storage) return;
-  const exts = ['jpg', 'png', 'webp'];
-  for (const ext of exts) {
-    try {
-      await storage.ref('products/' + prodId + '.' + ext).delete();
-    } catch(_) {} // ignore if not found
-  }
+  const prefixes = ['jpg', 'png', 'webp'].map(e => 'products/' + prodId + '.' + e);
+  try {
+    await fetch(
+      SB_WORKER + '/supabase/storage/v1/object/' + SB_STORAGE_BUCKET,
+      { method: 'DELETE', headers: { 'x-admin-token': SB_TOKEN, 'Content-Type': 'application/json' }, body: JSON.stringify({ prefixes }) }
+    );
+  } catch(_) {}
+}
+
+// ── Delete a single file from Supabase Storage ──
+async function _deleteStorageFile(storagePath) {
+  if (!storagePath) return;
+  // Skip old Firebase Storage URLs (orphaned — let them expire naturally)
+  if (storagePath.startsWith('http') && storagePath.includes('firebasestorage')) return;
+  try {
+    await fetch(
+      SB_WORKER + '/supabase/storage/v1/object/' + SB_STORAGE_BUCKET,
+      { method: 'DELETE', headers: { 'x-admin-token': SB_TOKEN, 'Content-Type': 'application/json' }, body: JSON.stringify({ prefixes: [storagePath] }) }
+    );
+  } catch(_) {}
 }
 
 // ── Save one product (accepts object directly) ──
-// Images uploaded to Firebase Storage → URL saved in Firestore
 async function saveOneP(idOrObj) {
   const p = (typeof idOrObj === 'object') ? idOrObj : PRODUCTS.find(x => x.id === idOrObj);
   if (!p) return;
@@ -1647,7 +1638,7 @@ async function saveOneP(idOrObj) {
 
   let imgUrl = p.img || null;
 
-  // If img is base64 (new upload), upload to Firebase Storage
+  // If img is base64 (new upload), upload to Supabase Storage
   if (p.img && p.img.startsWith('data:') && storage) {
     // Cache base64 in localStorage BEFORE uploading (for PDF/XLSX use)
     try { localStorage.setItem('qi-img-b64-' + p.id, p.img); } catch(_) {}
@@ -1663,7 +1654,7 @@ async function saveOneP(idOrObj) {
     try { localStorage.setItem('qi-img-b64-' + p.id, p.img); } catch(_) {}
   }
 
-  // Strip base64 + sanitize undefined → null before writing to Firestore
+  // Strip base64 + sanitize undefined → null before writing to Supabase
   function _stripB64(arr){
     if(!arr) return [];            // null / undefined → empty array
     if(!Array.isArray(arr)) return [];
@@ -1672,7 +1663,7 @@ async function saveOneP(idOrObj) {
       const out={};
       for(const [k,v] of Object.entries(item)){
         if(k==='base64') continue;           // drop base64 entirely
-        out[k] = (v===undefined||v===null) ? null : v; // Firestore rejects undefined
+        out[k] = (v===undefined||v===null) ? null : v;
       }
       return out;
     }).filter(Boolean);
@@ -3221,7 +3212,7 @@ async function saveProd(){
   // Pass object directly — avoids stale array reads
   await saveOneP(prod);
   closeProdModal();
-  renderProductList(); // update again after Firestore write (img URL may have changed)
+  renderProductList(); // update again after img URL may have changed
   toast(t('save'));
 }
 
@@ -5525,7 +5516,7 @@ async function clearAllQuotes(){
 }
 
 // ═══════════════════════════════════════
-// REFRESH (pull latest from Firestore)
+// REFRESH
 // ═══════════════════════════════════════
 window.refreshData = async function refreshData() {
   showSyncing();
@@ -6155,7 +6146,7 @@ let _editActivityId=null;
 let _editTaskId   = null;
 let _crmTab       = 'accounts';
 
-// ── Firestore subscription ───────────────────
+// ── CRM data loader ──────────────────────────
 let _crmAUnsub=null,_crmCUnsub=null,_crmVUnsub=null,_crmTUnsub=null;
 function subscribeCRM(){
   async function _loadCRM() {
@@ -7018,10 +7009,6 @@ async function init(){
   if (!loggedIn) {
     showLoginPage();
   } else {
-    if(window._firestoreLoadFailed){
-      window._firestoreLoadFailed = false;
-      await _reloadAfterLogin();
-    }
     setTimeout(batchSetNormalStatus, 2000);
   }
 }
@@ -7213,12 +7200,7 @@ async function deleteBomFile(index){
   const p=PRODUCTS.find(x=>x.id===editProdId);if(!p)return;
   const doc=p.bomFiles?.[index];if(!doc)return;
   if(!confirm('Delete "'+doc.name+'"?'))return;
-  if(storage){
-    try{
-      if(doc.storagePath) await storage.ref(doc.storagePath).delete();
-      else if(doc.url) await storage.refFromURL(doc.url).delete();
-    }catch(_){}
-  }
+  await _deleteStorageFile(doc.storagePath);
   const bomFiles=(p.bomFiles||[]).filter((_,i)=>i!==index);
   const updated={...p,bomFiles};
   const idx=PRODUCTS.findIndex(x=>x.id===editProdId);
@@ -7299,12 +7281,7 @@ async function deleteDoc(index){
   const p=PRODUCTS.find(x=>x.id===editProdId);if(!p)return;
   const doc=p.docs?.[index];if(!doc)return;
   if(!confirm('Delete "'+doc.name+'"?'))return;
-  if(storage){
-    try{
-      if(doc.storagePath) await storage.ref(doc.storagePath).delete();
-      else if(doc.url) await storage.refFromURL(doc.url).delete();
-    }catch(_){}
-  }
+  await _deleteStorageFile(doc.storagePath);
   const docs=(p.docs||[]).filter((_,i)=>i!==index);
   const updated={...p,docs};
   const idx=PRODUCTS.findIndex(x=>x.id===editProdId);

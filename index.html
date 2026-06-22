@@ -3,11 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>COMART Platform v1.44</title>
+<title>COMART Platform v1.45</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
@@ -323,7 +321,7 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1) brightness(
     <div class="login-logo">
       <div class="login-mark">C</div>
       <div class="login-name">COMART Platform</div>
-      <div class="login-sub">Internal Portal · v1.44</div>
+      <div class="login-sub">Internal Portal · v1.45</div>
     </div>
     <form id="loginForm" onsubmit="doLogin();return false;" autocomplete="on">
     <div class="field">
@@ -351,7 +349,7 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1) brightness(
   <div class="topbar">
     <div class="topbar-logo" onclick="switchView('home')">
       <div class="topbar-mark">C</div>
-      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.44</span></div>
+      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.45</span></div>
     </div>
     <div class="topbar-right">
       <div class="lang-switcher">
@@ -2719,21 +2717,6 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1) brightness(
 </div>
 
 <script>
-// ═══════════════════════════════════════════════
-// FIREBASE
-// ═══════════════════════════════════════════════
-const FB_CFG = {
-  apiKey: "AIzaSyBW5qQIdX28JnjgymoZxY3MjGnTuIocboQ",
-  authDomain: "comart-quotation.firebaseapp.com",
-  projectId: "comart-quotation",
-  storageBucket: "comart-quotation.firebasestorage.app",
-  messagingSenderId: "1020179116858",
-  appId: "1:1020179116858:web:84646675aaaa753352d603"
-};
-
-let db = null;
-try { firebase.initializeApp(FB_CFG); db = firebase.firestore(); } catch(e) {}
-
 const COL_U   = 'users';
 const COL_BB  = 'portal_bulletin';   // 公佈欄
 const SESSION_KEY = 'comart-portal-session';
@@ -2828,17 +2811,7 @@ async function doLogin() {
         }
       }
     } catch(e) {
-      console.warn('Supabase login failed, trying Firestore fallback:', e.message);
-    }
-
-    // ── Fallback：Supabase 失敗時從 Firestore 驗證 ──
-    if (!user && db) {
-      try {
-        const snap = await db.collection(COL_U).where('empId','==',empId).limit(1).get();
-        if (!snap.empty) user = snap.docs[0].data();
-      } catch(e) {
-        console.warn('Firestore fallback also failed:', e.message);
-      }
+      console.warn('Supabase login failed:', e.message);
     }
 
     if (!user)                        { showErr('Account not found.');              return; }
@@ -2904,36 +2877,41 @@ function enterPortal() {
 }
 
 // ═══════════════════════════════════════════════
-// INSTANT MESSAGE NOTIFICATION (onSnapshot)
+// INSTANT MESSAGE NOTIFICATION (polling portal_messages)
 // ═══════════════════════════════════════════════
-var _msgPopupEmpId    = null;  // 誰留言給我
-var _msgPopupNotifId  = null;  // Firestore notif doc id
-var _msgUnsubscribe   = null;  // onSnapshot unsubscribe handle
-var _msgPopupQueue    = [];    // 多條訊息排隊顯示
-var _msgPopupShowing  = false;
+var _msgPopupEmpId   = null;  // 誰留言給我
+var _msgPopupQueue   = [];    // 多條訊息排隊顯示
+var _msgPopupShowing = false;
+var _msgPollTimer    = null;
+var _lastMsgTs       = 0;
 
 function startMsgListener() {
-  if (!db || !SESSION) return;
-  if (_msgUnsubscribe) { try { _msgUnsubscribe(); } catch(_) {} }
+  if (!SESSION) return;
+  if (_msgPollTimer) clearInterval(_msgPollTimer);
+  _lastMsgTs = Date.now() - 3000;
+  _msgPollTimer = setInterval(_pollNewMessages, 10000);
+}
 
-  _msgUnsubscribe = db.collection('portal_notifications')
-    .where('toEmpId', '==', SESSION.empId)
-    .where('isRead',  '==', false)
-    .onSnapshot(function(snap) {
-      snap.docChanges().forEach(function(change) {
-        if (change.type === 'added') {
-          var n = Object.assign({ _id: change.doc.id }, change.doc.data());
-          if (n.type === 'message') {
-            _msgPopupQueue.push(n);
-            _showNextMsgPopup();
-          }
-          // 更新鈴鐺 badge
-          updateNotifBadge(false);
-        }
+async function _pollNewMessages() {
+  if (!SESSION) return;
+  try {
+    const rows = await SB.get('portal_messages',
+      'targetEmpId=eq.' + encodeURIComponent(SESSION.empId) +
+      '&ts=gt.' + _lastMsgTs + '&order=ts.asc'
+    );
+    if (!rows || !rows.length) return;
+    _lastMsgTs = rows[rows.length - 1].ts + 1;
+    rows.forEach(function(msg) {
+      if (msg.authorId === SESSION.empId) return;
+      _msgPopupQueue.push({
+        fromEmpId: msg.authorId || null,
+        fromName:  msg.authorName || '',
+        body:      msg.body || '',
       });
-    }, function(err) {
-      console.warn('[msgListener]', err);
     });
+    _showNextMsgPopup();
+    updateNotifBadge(false);
+  } catch(e) { console.warn('[msgPoll]', e); }
 }
 
 function _showNextMsgPopup() {
@@ -2963,13 +2941,6 @@ function closeMsgPopup() {
   var popup = document.getElementById('msgPopup');
   if (popup) popup.classList.remove('show');
   _msgPopupShowing = false;
-  // 標記已讀
-  if (db && _msgPopupNotifId) {
-    db.collection('portal_notifications').doc(_msgPopupNotifId)
-      .update({ isRead: true }).catch(function(){});
-    _msgPopupNotifId = null;
-  }
-  // 顯示下一條
   setTimeout(_showNextMsgPopup, 400);
 }
 
@@ -3345,13 +3316,6 @@ async function loadDirectory() {
       }
     }
   } catch(e) { console.warn('loadDirectory Supabase failed:', e.message); }
-  // Firebase 備援
-  if (!sbLoaded && db) {
-    try {
-      const snap = await db.collection(COL_U).orderBy('empId','asc').get();
-      ALL_USERS = snap.docs.map(d => d.data()).filter(u => u.role !== 'inactive');
-    } catch(e) { ALL_USERS = []; }
-  }
   renderDirectory();
 }
 
@@ -3696,32 +3660,9 @@ async function loadUsers() {
         sbLoaded = true;
       }
     }
-  } catch(e) { console.warn('loadUsers Supabase failed, falling back to Firebase:', e.message); }
+  } catch(e) { console.warn('loadUsers Supabase failed:', e.message); }
 
-  // Firebase：備援（若 Supabase 失敗）＋ 補 bio/expertise 擴充欄位
   await Promise.allSettled([
-    (async() => {
-      if (!db) return;
-      try {
-        const s = await db.collection(COL_U).orderBy('empId','asc').get();
-        const fbUsers = s.docs.map(d => d.data());
-        if (!sbLoaded) {
-          ALL_USERS = fbUsers;
-        } else {
-          fbUsers.forEach(fu => {
-            const u = ALL_USERS.find(x => x.empId === fu.empId);
-            if (!u) return;
-            if (fu.bioZh)       u.bioZh       = fu.bioZh;
-            if (fu.bioEn)       u.bioEn        = fu.bioEn;
-            if (fu.expertiseZh) u.expertiseZh  = fu.expertiseZh;
-            if (fu.expertiseEn) u.expertiseEn  = fu.expertiseEn;
-            if (fu.mustChangePwd !== undefined) u.mustChangePwd = fu.mustChangePwd;
-            if (fu.createdAt)   u.createdAt    = fu.createdAt;
-            if (!u.photoURL && fu.photoURL) u.photoURL = fu.photoURL;
-          });
-        }
-      } catch(e) { console.warn('loadUsers Firebase fallback failed:', e.message); }
-    })(),
     (async()=>{ if(ALL_DEPTS.length)return; try{const r=await SB.get('departments','order=key');if(r&&r.length)ALL_DEPTS=r;}catch(e){} })(),
     (async()=>{ if(ALL_SITES.length)return; try{const r=await SB.get('sites','order=key');if(r&&r.length)ALL_SITES=r;}catch(e){} })(),
   ]);
@@ -4101,25 +4042,17 @@ async function sendMessage() {
   }
 }
 
-// 留言通知：寫入 Firestore notifications，讓收件人即時看到
+// 留言通知：寫入 Supabase notifications，讓收件人鈴鐺顯示
 async function _notifyMsgReceived(msg) {
-  if (!db) return;
   try {
     const targetUser = ALL_USERS.find(function(u) { return u.empId === msg.targetEmpId; });
     if (!targetUser) return;
-    const toName = targetUser.nameEn || targetUser.nameZh || targetUser.empId;
-    await db.collection('portal_notifications').add({
-      toEmpId:   msg.targetEmpId,
-      toName:    toName,
-      fromEmpId: msg.authorId,
-      fromName:  msg.authorName,
-      type:      'message',
-      title:     msg.authorName + ' 留言給你',
+    await SB.post('notifications', {
+      to_user:   targetUser.nameEn || targetUser.nameZh || targetUser.empId,
+      from_user: msg.authorName || SESSION.empId,
+      title:     (msg.authorName || SESSION.empId) + ' 留言給你',
       body:      msg.body.length > 80 ? msg.body.slice(0, 80) + '…' : msg.body,
-      parentId:  msg.parentId || null,
-      msgId:     null,  // will be updated if needed
-      isRead:    false,
-      createdAt: Date.now(),
+      is_read:   false,
     });
   } catch(e) { console.warn('[_notifyMsgReceived]', e); }
 }
@@ -5216,14 +5149,14 @@ async function deleteTrip() {
 
 // Category definitions
 var CAL_CATEGORIES = [
-  { id:'group',   label:'COMART Group Events', labelZh:'集團活動',   color:'#2D7FF9', icon:'🏢', editable:true,  fbCol:'cal_group'   },
-  { id:'tw-hol',  label:'Taiwan Holidays',     labelZh:'台灣國定假日', color:'#E53E3E', icon:'TW', editable:false, apiCode:'TW'        },
-  { id:'cn-hol',  label:'China Holidays',      labelZh:'中國國定假日', color:'#E08000', icon:'CN', editable:false, apiCode:'CN'        },
-  { id:'vn-hol',  label:'Vietnam Holidays',    labelZh:'越南國定假日', color:'#2E8B57', icon:'VN', editable:false, apiCode:'VN'        },
-  { id:'tw-cal',  label:'Taiwan Calendar',     labelZh:'台灣行事曆',  color:'#6B84C8', icon:'TW', editable:true,  fbCol:'cal_taiwan'  },
-  { id:'cn-cal',  label:'China Calendar',      labelZh:'中國行事曆',  color:'#C07000', icon:'CN', editable:true,  fbCol:'cal_china'   },
-  { id:'vn-cal',  label:'Vietnam Calendar',    labelZh:'越南行事曆',  color:'#1A7A4A', icon:'VN', editable:true,  fbCol:'cal_vietnam' },
-  { id:'trips',   label:'Business Trips',      labelZh:'商務出行',    color:'#805AD5', icon:'✈️', editable:false, isTrips:true        },
+  { id:'group',   label:'COMART Group Events', labelZh:'集團活動',   color:'#2D7FF9', icon:'🏢', editable:true  },
+  { id:'tw-hol',  label:'Taiwan Holidays',     labelZh:'台灣國定假日', color:'#E53E3E', icon:'TW', editable:false, apiCode:'TW' },
+  { id:'cn-hol',  label:'China Holidays',      labelZh:'中國國定假日', color:'#E08000', icon:'CN', editable:false, apiCode:'CN' },
+  { id:'vn-hol',  label:'Vietnam Holidays',    labelZh:'越南國定假日', color:'#2E8B57', icon:'VN', editable:false, apiCode:'VN' },
+  { id:'tw-cal',  label:'Taiwan Calendar',     labelZh:'台灣行事曆',  color:'#6B84C8', icon:'TW', editable:true  },
+  { id:'cn-cal',  label:'China Calendar',      labelZh:'中國行事曆',  color:'#C07000', icon:'CN', editable:true  },
+  { id:'vn-cal',  label:'Vietnam Calendar',    labelZh:'越南行事曆',  color:'#1A7A4A', icon:'VN', editable:true  },
+  { id:'trips',   label:'Business Trips',      labelZh:'商務出行',    color:'#805AD5', icon:'✈️', editable:false, isTrips:true },
 ];
 
 // State
@@ -5270,12 +5203,7 @@ function initCalendar() {
           ALL_USERS = rows.map(function(u){ return { empId:u.emp_id, nameEn:u.name_en||'', nameZh:u.name_zh||'', role:u.role||'user', dept:u.dept||'', site:u.site||'TW', email:u.email||'', ext:u.ext||'' }; });
         }
       })
-      .catch(function() {
-        if (!db) return;
-        return db.collection(COL_U).orderBy('empId','asc').get().then(function(snap){
-          ALL_USERS = snap.docs.map(function(d){ return d.data(); });
-        }).catch(function(){});
-      });
+      .catch(function() {});
 
   userLoadPromise.then(function() {
     return Promise.all([loadCalEvents(), loadTrips()]);
@@ -5326,19 +5254,17 @@ function toggleCatFilter(catId) {
   renderTripPage();
 }
 
-// ── Load Firebase events ──
+// ── Load cal events from Supabase ──
 async function loadCalEvents() {
-  if (!db) return Promise.resolve();
-  var editableCats = CAL_CATEGORIES.filter(function(c) { return c.editable && c.fbCol; });
-  var promises = editableCats.map(async function(cat) {
-    try {
-      var snap = await db.collection(cat.fbCol).orderBy('dateFrom', 'asc').get();
-      CAL_EVENTS[cat.id] = snap.docs.map(function(d) { return Object.assign({ id: d.id }, d.data()); });
-    } catch(e) {
-      CAL_EVENTS[cat.id] = [];
-    }
-  });
-  return Promise.all(promises);
+  try {
+    var rows = await SB.get('cal_events', 'order=dateFrom.asc');
+    if (!rows) return;
+    CAL_CATEGORIES.filter(function(c){ return c.editable; }).forEach(function(c){ CAL_EVENTS[c.id] = []; });
+    rows.forEach(function(e) {
+      if (!CAL_EVENTS[e.category]) CAL_EVENTS[e.category] = [];
+      CAL_EVENTS[e.category].push(e);
+    });
+  } catch(e) { console.warn('[loadCalEvents]', e); }
 }
 
 
@@ -5706,7 +5632,7 @@ function openCalEventModal(catId, eventId) {
 
   // Populate category dropdown (editable only)
   var catSel = document.getElementById('cal-event-cat');
-  catSel.innerHTML = CAL_CATEGORIES.filter(function(c) { return c.editable && c.fbCol; })
+  catSel.innerHTML = CAL_CATEGORIES.filter(function(c) { return c.editable; })
     .map(function(c) { return '<option value="' + c.id + '"' + (c.id === calEventEditCat ? ' selected' : '') + '>' + c.icon + ' ' + c.label + '</option>'; }).join('');
 
   // Default dates: +7 days from today for new events
@@ -5742,9 +5668,10 @@ async function saveCalEvent() {
   if (to && to < from) { toast('Date To cannot be earlier than Date From', ''); return; }
 
   var cat = CAL_CATEGORIES.find(function(c) { return c.id === catId; });
-  if (!cat || !cat.fbCol) { toast('Invalid calendar', ''); return; }
+  if (!cat || !cat.editable) { toast('Invalid calendar', ''); return; }
 
   var data = {
+    category: catId,
     title: title, dateFrom: from, dateTo: to || from, notes: notes,
     creator: SESSION ? (SESSION.nameEn || SESSION.empId) : 'Unknown',
     updatedAt: Date.now()
@@ -5752,14 +5679,15 @@ async function saveCalEvent() {
 
   try {
     if (calEventEditId) {
-      await db.collection(cat.fbCol).doc(calEventEditId).set(data, { merge: true });
+      await SB.patch('cal_events', 'id=eq.' + encodeURIComponent(calEventEditId), data);
       var idx = (CAL_EVENTS[catId] || []).findIndex(function(e) { return e.id === calEventEditId; });
       if (idx >= 0) CAL_EVENTS[catId][idx] = Object.assign({ id: calEventEditId }, data);
     } else {
       data.createdAt = Date.now();
-      var ref = await db.collection(cat.fbCol).add(data);
+      data.id = uid();
+      await SB.post('cal_events', data);
       if (!CAL_EVENTS[catId]) CAL_EVENTS[catId] = [];
-      CAL_EVENTS[catId].push(Object.assign({ id: ref.id }, data));
+      CAL_EVENTS[catId].push(Object.assign({}, data));
     }
     closeCalEventModal();
     renderTripPage();
@@ -5772,10 +5700,8 @@ async function saveCalEvent() {
 async function deleteCalEvent() {
   if (!calEventEditId || !calEventEditCat) return;
   if (!confirm('Delete this event?')) return;
-  var cat = CAL_CATEGORIES.find(function(c) { return c.id === calEventEditCat; });
-  if (!cat || !cat.fbCol) return;
   try {
-    await db.collection(cat.fbCol).doc(calEventEditId).delete();
+    await SB.delete('cal_events', 'id=eq.' + encodeURIComponent(calEventEditId));
     if (CAL_EVENTS[calEventEditCat]) {
       CAL_EVENTS[calEventEditCat] = CAL_EVENTS[calEventEditCat].filter(function(e) { return e.id !== calEventEditId; });
     }

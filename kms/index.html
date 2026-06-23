@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART KMS v2.08</title>
+<title>COMART KMS v2.09</title>
 
 <!-- Marked for Markdown → HTML preview (classic script, no module needed) -->
 <script src="https://cdn.jsdelivr.net/npm/marked@9.1.6/marked.min.js"></script>
@@ -391,7 +391,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v2.08</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v2.09</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('en')">EN</button>
@@ -1106,6 +1106,7 @@ const I18N = {
     'docs.title':'知識庫 — 所有文件', 'docs.new':'＋ 新增文件',
     'kmap.title':'知識地圖 — 分類總覽', 'kmap.back':'← 回分類總覽',
     'upload.formats':'PDF · Word · Excel · CSV · PowerPoint · 圖片（JPG/PNG）· TXT · Markdown', 'upload.limits':'單檔上限 50 MB · 不支援格式將被拒絕',
+    'batch.skip':'跳過','batch.cancel':'取消批次',
     'analytics.title':'分析報表', 'analytics.total':'知識條目', 'analytics.published':'已發佈',
     'analytics.views':'總閱覽數', 'analytics.gaps':'知識缺口',
     'experts.title':'專家黃頁', 'experts.add':'＋ 新增專家', 'experts.empty':'尚無專家資料',
@@ -1205,6 +1206,7 @@ const I18N = {
     'docs.title':'知识库 — 所有文档', 'docs.new':'＋ 新建文档',
     'kmap.title':'知识地图 — 分类总览', 'kmap.back':'← 返回分类总览',
     'upload.formats':'PDF · Word · Excel · CSV · PowerPoint · 图片（JPG/PNG）· TXT · Markdown', 'upload.limits':'单文件上限 50 MB · 不支持的格式将被拒绝',
+    'batch.skip':'跳过','batch.cancel':'取消批次',
     'analytics.title':'分析报表', 'analytics.total':'知识条目', 'analytics.published':'已发布',
     'analytics.views':'总阅览数', 'analytics.gaps':'知识缺口',
     'experts.title':'专家黄页', 'experts.add':'＋ 新增专家', 'experts.empty':'暂无专家数据',
@@ -1302,6 +1304,7 @@ const I18N = {
     'docs.title':'Knowledge Base — All Documents', 'docs.new':'＋ New Document',
     'kmap.title':'Knowledge Map — Categories', 'kmap.back':'← Back to Categories',
     'upload.formats':'PDF · Word · Excel · CSV · PowerPoint · Image（JPG/PNG）· TXT · Markdown', 'upload.limits':'Max 50 MB per file · Unsupported formats will be rejected',
+    'batch.skip':'Skip','batch.cancel':'Cancel Batch',
     'analytics.title':'Analytics', 'analytics.total':'Entries', 'analytics.published':'Published',
     'analytics.views':'Total Views', 'analytics.gaps':'Knowledge Gaps',
     'experts.title':'Expert Directory', 'experts.add':'＋ Add Expert', 'experts.empty':'No experts yet',
@@ -1401,6 +1404,7 @@ const I18N = {
     'docs.title':'Kho kiến thức — Tất cả tài liệu', 'docs.new':'＋ Tài liệu mới',
     'kmap.title':'Bản đồ kiến thức — Tổng quan', 'kmap.back':'← Quay lại',
     'upload.formats':'PDF · Word · Excel · CSV · PowerPoint · Ảnh（JPG/PNG）· TXT · Markdown', 'upload.limits':'Tối đa 50 MB mỗi tệp · Định dạng không hỗ trợ sẽ bị từ chối',
+    'batch.skip':'Bỏ qua','batch.cancel':'Hủy hàng loạt',
     'analytics.title':'Báo cáo', 'analytics.total':'Mục kiến thức', 'analytics.published':'Đã xuất bản',
     'analytics.views':'Tổng lượt xem', 'analytics.gaps':'Khoảng trống kiến thức',
     'experts.title':'Danh bạ chuyên gia', 'experts.add':'＋ Thêm chuyên gia', 'experts.empty':'Chưa có chuyên gia',
@@ -1500,6 +1504,7 @@ const I18N = {
     'docs.title':'ナレッジベース — すべてのドキュメント', 'docs.new':'＋ 新規ドキュメント',
     'kmap.title':'ナレッジマップ — カテゴリ一覧', 'kmap.back':'← カテゴリ一覧に戻る',
     'upload.formats':'PDF · Word · Excel · CSV · PowerPoint · 画像（JPG/PNG）· TXT · Markdown', 'upload.limits':'1ファイル最大 50 MB · 非対応形式は拒否されます',
+    'batch.skip':'スキップ','batch.cancel':'一括キャンセル',
     'analytics.title':'分析レポート', 'analytics.total':'ナレッジ件数', 'analytics.published':'公開済み',
     'analytics.views':'総閲覧数', 'analytics.gaps':'ナレッジギャップ',
     'experts.title':'専門家名鑑', 'experts.add':'＋ 専門家を追加', 'experts.empty':'専門家データなし',
@@ -2710,8 +2715,8 @@ async function processBatchNext() {
       <span style="color:var(--blue);font-weight:600;">批次上傳 ${current} / ${total}</span>
       <span style="color:var(--text-2);">${f.name}</span>
       <span style="margin-left:auto;display:flex;gap:6px;">
-        <button onclick="skipBatchFile()" style="padding:3px 10px;border-radius:5px;border:1px solid var(--border);background:transparent;cursor:pointer;font-size:11px;">跳過</button>
-        <button onclick="skipAllBatch()" style="padding:3px 10px;border-radius:5px;border:1px solid #7a2020;background:#380f0f;color:#ff7878;cursor:pointer;font-size:11px;">取消批次</button>
+        <button onclick="skipBatchFile()" style="padding:3px 10px;border-radius:5px;border:1px solid var(--border);background:transparent;cursor:pointer;font-size:11px;">${(I18N[currentLang]||I18N['zh-TW'])['batch.skip']||'跳過'}</button>
+        <button onclick="skipAllBatch()" style="padding:3px 10px;border-radius:5px;border:1px solid #7a2020;background:#380f0f;color:#ff7878;cursor:pointer;font-size:11px;">${(I18N[currentLang]||I18N['zh-TW'])['batch.cancel']||'取消批次'}</button>
       </span>
     </div>`;
 

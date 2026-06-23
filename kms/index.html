@@ -2124,17 +2124,43 @@ function cosineSim(a, b) {
   return dot / (Math.sqrt(na) * Math.sqrt(nb) || 1);
 }
 
-// Keyword-based scoring for mock mode (works offline)
+// Keyword-based scoring — checks title(×3), summary(×2), body(×1), category(×2)
 function keywordScore(query, doc) {
-  const q = query.toLowerCase();
-  const text = (doc.title + ' ' + doc.body).toLowerCase();
-  const words = q.split(/[\s,，、？！。]+/).filter(w => w.length > 1);
+  const words = query.toLowerCase().split(/[\s,，、？！。・]+/).filter(w => w.length > 0);
+  if (!words.length) return 0;
+  const title    = (doc.title    || '').toLowerCase();
+  const body     = (doc.body     || '').toLowerCase();
+  const summary  = (doc.summary  || doc.summary_zhtw || doc.snippet || '').toLowerCase();
+  const category = (doc.category || '').toLowerCase();
   let score = 0;
   for (const w of words) {
-    const count = (text.match(new RegExp(w, 'g')) || []).length;
-    score += count * (doc.title.toLowerCase().includes(w) ? 2 : 1);
+    if (title.includes(w))    score += 3 * (title.split(w).length - 1);
+    if (summary.includes(w))  score += 2 * (summary.split(w).length - 1);
+    if (body.includes(w))     score += 1 * Math.min((body.split(w).length - 1), 10);
+    if (category.includes(w)) score += 2;
   }
-  return score / Math.max(words.length, 1);
+  return score / words.length;
+}
+
+// Hybrid reranking: combine vector similarity + keyword boost
+// vectorWeight: 0.65, keywordWeight: 0.35
+function hybridRerank(chunks, query) {
+  const words = query.toLowerCase().split(/[\s,，、？！。・]+/).filter(w => w.length > 0);
+  return chunks.map(c => {
+    const vecScore  = c.score || 0;
+    const title     = (c.title   || '').toLowerCase();
+    const snippet   = (c.snippet || '').toLowerCase();
+    const summary   = (c.summary_zhtw || c.summary_en || '').toLowerCase();
+    let kwRaw = 0;
+    for (const w of words) {
+      if (title.includes(w))   kwRaw += 3;
+      if (summary.includes(w)) kwRaw += 2;
+      if (snippet.includes(w)) kwRaw += 1;
+    }
+    const kwScore = words.length ? Math.min(kwRaw / words.length / 5, 1) : 0;
+    const hybrid  = vecScore * 0.65 + kwScore * 0.35;
+    return { ...c, hybridScore: hybrid, kwScore };
+  }).sort((a, b) => b.hybridScore - a.hybridScore);
 }
 
 // ═══════════════════════════════════════════════
@@ -4427,20 +4453,31 @@ async function doAiSearch() {
   window._searchAborted = false;
 
   try {
-    const chunks = await retrieveChunks(q);
+    const allChunks = await retrieveChunks(q);
     if (window._searchAborted) { resetSearchBtn(); return; }
 
-    if (!chunks.length) {
+    if (!allChunks.length) {
       logSearchGap(q);
       await searchWithExternalAI(q, ragBody);
       resetSearchBtn();
       return;
     }
 
+    // 只取 hybridScore ≥ 0.35 的文件給 Claude，最多 15 篇，保底至少 3 篇
+    const threshold = 0.35;
+    let topChunks = allChunks.filter(c => (c.hybridScore || c.score) >= threshold);
+    if (topChunks.length < 3) topChunks = allChunks.slice(0, 3);
+    if (topChunks.length > 15) topChunks = topChunks.slice(0, 15);
+
+    // 所有搜尋結果（含低分）顯示在參考清單，但只有高分的送給 Claude
+    const displayChunks = allChunks.slice(0, 30);
+
     const docLabel = currentLang === 'ja' ? 'ドキュメント' : '文件';
-    const context = chunks.map((c, i) =>
-      `[${docLabel}${i+1}] 標題：${c.title}\n內容：${getSnippetForLang(c, currentLang) || c.snippet.substring(0, 600)}`
-    ).join('\n\n');
+    const context = topChunks.map((c, i) => {
+      const snippet = getSnippetForLang(c, currentLang) || c.snippet.substring(0, 800);
+      const meta = [c.category, c.author_name, c.created_at?.substring(0,10)].filter(Boolean).join(' · ');
+      return `[${docLabel}${i+1}] 標題：${c.title}${meta ? ` (${meta})` : ''}\n內容：${snippet}`;
+    }).join('\n\n');
 
     const langInstr = {
       'zh-TW': '請用繁體中文回答', 'zh-CN': '请用简体中文回答',
@@ -4448,27 +4485,32 @@ async function doAiSearch() {
       'ja': '日本語で回答してください',
     }[currentLang] || '請用繁體中文回答';
 
-    const systemPrompt = `你是 COMART 公司的知識管理 AI 助理。COMART 是台灣 ODM/OEM 製造商，主要產品是磁吸車架、Qi/Qi2 無線充電器和消費性電子配件，工廠在東莞和越南。${langInstr}。只根據以下知識庫內容回答，不要憑空捏造。`;
-    const userMsg = `知識庫內容：\n${context}\n\n問題：${q}`;
+    const systemPrompt = `你是 COMART 公司的知識管理 AI 助理。COMART 是台灣 ODM/OEM 製造商，主要產品是磁吸車架、Qi/Qi2 無線充電器和消費性電子配件，工廠在東莞和越南。${langInstr}。只根據以下知識庫內容回答，若知識庫內容不足以回答請如實說明，不要憑空捏造。`;
+    const userMsg = `知識庫內容（共 ${topChunks.length} 份文件）：\n${context}\n\n問題：${q}`;
 
     ragBody.innerHTML = `
       <div class="ai-answer">
-        <div class="ai-label">🤖 AI 彙整回答 — 來源：知識庫</div>
+        <div class="ai-label">🤖 AI 彙整回答 — 來源：知識庫（${topChunks.length} 份相關文件）</div>
         <div class="ai-text streaming" id="ai-output"></div>
       </div>
       <div class="ref-docs" id="ref-docs-container"></div>`;
 
     await streamClaudeToElement(systemPrompt, userMsg, 'ai-output');
 
-    // 渲染參考文件
+    // 渲染參考文件（顯示 hybrid score）
     const refContainer = document.getElementById('ref-docs-container');
-    if (refContainer && chunks.length) {
-      refContainer.innerHTML = `<div class="ref-docs-title">📎 參考文件</div>` +
-        chunks.map(c => `<div class="ref-doc-item" onclick="openDocById('${c.id}')">
-          <span class="ref-doc-title source-title" data-chunk-id="${c.id}">${c.title}</span>
-          <span class="ref-doc-sim">${Math.round((c.similarity||0)*100)}%</span>
-        </div>`).join('');
-      if (currentLang !== 'zh-TW') translateSearchTitles(chunks, currentLang).catch(() => {});
+    if (refContainer && displayChunks.length) {
+      refContainer.innerHTML = `<div class="ref-docs-title">📎 參考文件（${displayChunks.length} 筆，依相關度排序）</div>` +
+        displayChunks.map(c => {
+          const pct = Math.round((c.hybridScore || c.score || 0) * 100);
+          const inContext = topChunks.some(t => t.id === c.id);
+          const badge = inContext ? `<span style="font-size:10px;background:var(--ac);color:#fff;border-radius:3px;padding:1px 5px;margin-right:4px">AI用</span>` : '';
+          return `<div class="ref-doc-item" onclick="openDocById('${c.id}')">
+            <span class="ref-doc-title source-title" data-chunk-id="${c.id}">${badge}${c.title}</span>
+            <span class="ref-doc-sim">${pct}%</span>
+          </div>`;
+        }).join('');
+      if (currentLang !== 'zh-TW') translateSearchTitles(displayChunks, currentLang).catch(() => {});
     }
   } catch(e) {
     if (!window._searchAborted) {
@@ -4524,84 +4566,92 @@ async function translateSearchTitles(chunks, targetLang) {
   }
 }
 
-// Retrieve relevant chunks (Supabase vector or local mock)
+// Retrieve relevant chunks (Supabase vector + keyword hybrid, or local mock)
 async function retrieveChunks(query) {
+  const SELECT_FIELDS = 'id,title,body,category,lang,status,file_url,file_name,file_type,author_name,created_at,summary,summary_en,summary_zh_cn,summary_vi,summary_ja,tags';
+
   if (CFG.supabaseUrl && CFG.supabaseKey) {
     try {
+      // ── 1. 向量搜尋（主要）──
+      let vecResults = [];
       const qEmbed = await getQueryEmbedding(query);
       if (qEmbed) {
-        const results = await sbFetch('/rest/v1/rpc/match_documents', {
+        const raw = await sbFetch('/rest/v1/rpc/match_documents', {
           method: 'POST',
-          body: JSON.stringify({ query_embedding: qEmbed, match_threshold: 0.3, match_count: 100 }),
+          body: JSON.stringify({ query_embedding: qEmbed, match_threshold: 0.25, match_count: 60 }),
         });
-        if (results?.length) {
-          // 補抓 file 欄位（RPC 回傳沒有，另外查）
-          const ids = results.map(r => r.id).join(',');
-          let fileMap = {};
+        if (raw?.length) {
+          // 補抓完整欄位（RPC 只回傳 id/title/body/similarity）
+          const ids = raw.map(r => r.id).join(',');
+          let metaMap = {};
           try {
-            const fileRows = await sbFetch(
-              `/rest/v1/kms_documents?id=in.(${ids})&select=id,file_url,file_name,file_type,file_size,author_name,created_at,summary,summary_en,summary_zh_cn,summary_vi,summary_ja`
-            );
-            for (const f of (fileRows || [])) fileMap[f.id] = f;
+            const rows = await sbFetch(`/rest/v1/kms_documents?id=in.(${ids})&select=${SELECT_FIELDS}`);
+            for (const r of (rows || [])) metaMap[r.id] = r;
           } catch(e) {}
 
-          return results.map(r => ({
-            id: r.id, title: r.title,
-            snippet: r.body?.substring(0, 600) || '',
-            score: r.similarity || 0.5,
-            category: r.category, lang: r.lang,
-            file_url: fileMap[r.id]?.file_url || null,
-            file_name: fileMap[r.id]?.file_name || null,
-            file_type: fileMap[r.id]?.file_type || null,
-            author_name:   fileMap[r.id]?.author_name    || null,
-            created_at:    fileMap[r.id]?.created_at     || null,
-            summary_zhtw:  fileMap[r.id]?.summary        || null,
-            summary_zhcn:  fileMap[r.id]?.summary_zh_cn  || null,
-            summary_en:    fileMap[r.id]?.summary_en     || null,
-            summary_vi:    fileMap[r.id]?.summary_vi     || null,
-            summary_ja:    fileMap[r.id]?.summary_ja     || null,
-          }));
+          vecResults = raw.map(r => {
+            const m = metaMap[r.id] || {};
+            return {
+              id: r.id, title: r.title,
+              snippet: r.body?.substring(0, 800) || '',
+              score: r.similarity || 0,
+              category: r.category || m.category, lang: r.lang || m.lang,
+              tags: m.tags || null,
+              file_url:  m.file_url  || null, file_name: m.file_name || null, file_type: m.file_type || null,
+              author_name:  m.author_name   || null, created_at:   m.created_at    || null,
+              summary_zhtw: m.summary       || null, summary_zhcn: m.summary_zh_cn || null,
+              summary_en:   m.summary_en    || null, summary_vi:   m.summary_vi    || null,
+              summary_ja:   m.summary_ja    || null,
+            };
+          });
         }
       }
-      // 向量搜尋無結果，fallback 到全文搜尋（含 file 欄位）
-      const ftsResults = await sbFetch(
-        `/rest/v1/kms_documents?select=id,title,body,category,lang,status,file_url,file_name,file_type,author_name,created_at,summary,summary_en,summary_zh_cn,summary_vi,summary_ja&status=eq.published&or=(title.ilike.*${encodeURIComponent(query)}*,body.ilike.*${encodeURIComponent(query)}*)&limit=100`
-      );
-      if (ftsResults?.length) {
-        return ftsResults.map(r => ({
-          id: r.id, title: r.title,
-          snippet: r.body?.substring(0, 600) || '',
-          score: 0.6,
-          category: r.category, lang: r.lang,
-          file_url: r.file_url || null,
-          file_name: r.file_name || null,
-          file_type: r.file_type || null,
-          author_name:  r.author_name   || null,
-          created_at:   r.created_at    || null,
-          summary_zhtw: r.summary       || null,
-          summary_zhcn: r.summary_zh_cn || null,
-          summary_en:   r.summary_en    || null,
-          summary_vi:   r.summary_vi    || null,
-          summary_ja:   r.summary_ja    || null,
-        }));
-      }
+
+      // ── 2. 全文搜尋（title + summary + body ilike），結果與向量結果合併去重 ──
+      const enc = encodeURIComponent(query);
+      let kwResults = [];
+      try {
+        const kwRaw = await sbFetch(
+          `/rest/v1/kms_documents?select=${SELECT_FIELDS}&status=eq.published&or=(title.ilike.*${enc}*,summary.ilike.*${enc}*,body.ilike.*${enc}*)&limit=40`
+        );
+        if (kwRaw?.length) {
+          const existIds = new Set(vecResults.map(r => r.id));
+          kwResults = kwRaw
+            .filter(r => !existIds.has(r.id))
+            .map(r => ({
+              id: r.id, title: r.title,
+              snippet: r.body?.substring(0, 800) || '',
+              score: 0.45,  // 關鍵字命中基礎分
+              category: r.category, lang: r.lang, tags: r.tags || null,
+              file_url:  r.file_url  || null, file_name: r.file_name || null, file_type: r.file_type || null,
+              author_name:  r.author_name   || null, created_at:   r.created_at    || null,
+              summary_zhtw: r.summary       || null, summary_zhcn: r.summary_zh_cn || null,
+              summary_en:   r.summary_en    || null, summary_vi:   r.summary_vi    || null,
+              summary_ja:   r.summary_ja    || null,
+            }));
+        }
+      } catch(e) {}
+
+      const merged = [...vecResults, ...kwResults];
+      if (merged.length) return hybridRerank(merged, query);
+
     } catch(e) {
       console.warn('Supabase search failed, falling back to local:', e);
     }
   }
 
-  // Local keyword search (mock / offline)
+  // ── Local keyword search (offline fallback) ──
   const saved = localStorage.getItem('kms-local-docs');
   const extraDocs = saved ? JSON.parse(saved) : [];
   const allDocs = [...DEMO_DOCS, ...extraDocs].filter(d => d.status === 'published' || d.status === undefined);
-  return allDocs.map(d => ({
+  const scored = allDocs.map(d => ({
     ...d,
     snippet: d.body?.substring(0, 300) || '',
-    score: keywordScore(query, d) / 10,
-    file_url: d.file_url || null,
-    file_name: d.file_name || null,
-    file_type: d.file_type || null,
-  })).filter(d => d.score > 0.01).sort((a, b) => b.score - a.score).slice(0, 100);
+    score: keywordScore(query, d) / 15,
+    hybridScore: keywordScore(query, d) / 15,
+    file_url: d.file_url || null, file_name: d.file_name || null, file_type: d.file_type || null,
+  })).filter(d => d.score > 0.01).sort((a, b) => b.score - a.score);
+  return hybridRerank(scored, query);
 }
 
 // Stream Claude API response

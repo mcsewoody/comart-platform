@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART KMS v2.09</title>
+<title>COMART KMS v2.10</title>
 
 <!-- Marked for Markdown → HTML preview (classic script, no module needed) -->
 <script src="https://cdn.jsdelivr.net/npm/marked@9.1.6/marked.min.js"></script>
@@ -391,7 +391,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v2.09</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v2.10</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('en')">EN</button>
@@ -479,7 +479,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
             <input type="text" style="display:none;" aria-hidden="true" tabindex="-1" />
             <input type="password" style="display:none;" aria-hidden="true" tabindex="-1" />
             <input class="search-input" id="search-q" data-i18n-placeholder="rag.placeholder"
-              placeholder="問任何問題，例如：Qi2 充電器良率異常如何處理？"
+              placeholder="問任何問題，例如：Qi2 充電器良率異常如何處理？" data-i18n-placeholder="rag.placeholder"
               type="search"
               autocomplete="new-password"
               autocorrect="off"
@@ -560,7 +560,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
             <span style="font-size:16px;flex-shrink:0;">🔗</span>
             <input id="url-fetch-input" type="url"
               data-i18n-placeholder="editor.url.placeholder"
-              placeholder="貼上網址，AI 自動擷取內文…"
+              placeholder="貼上網址，AI 自動擷取內文…" data-i18n-placeholder="editor.url.placeholder"
               style="flex:1;font-size:12px;padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg);color:var(--text-1);outline:none;"
               onclick="event.stopPropagation()"
               onkeydown="if(event.isComposing)return;if(event.key==='Enter'){event.preventDefault();event.stopPropagation();fetchUrlContent();}"
@@ -573,7 +573,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
 
         <!-- Meta row — 第一行 -->
         <div class="editor-meta">
-          <input class="meta-input" id="doc-title" placeholder="文件標題" style="flex:2;min-width:160px;"
+          <input class="meta-input" id="doc-title" placeholder="文件標題" data-i18n-placeholder="editor.title.placeholder" style="flex:2;min-width:160px;"
             oninput="scheduleAutoClassify()" />
 
           <select class="meta-select" id="doc-lang">
@@ -608,7 +608,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         <!-- Meta row — 第二行：建立者 + 審核人 + 有效期 + 產品線 -->
         <div style="padding:6px 12px;border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:var(--bg);flex-shrink:0;">
           <div style="display:flex;flex-direction:column;gap:2px;">
-            <span style="font-size:9px;color:var(--text-3);letter-spacing:.05em;text-transform:uppercase;">Stars</span>
+            <span style="font-size:9px;color:var(--text-3);letter-spacing:.05em;text-transform:uppercase;" data-i18n="label.stars">Stars</span>
             <div style="display:flex;gap:2px;align-items:center;" id="stars-widget">
               <span class="star-btn" data-val="1" onclick="setDocStars(1)"
                 style="font-size:20px;cursor:pointer;color:#F59E0B;line-height:1;" title="General">★</span>
@@ -618,6 +618,18 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
                 style="font-size:20px;cursor:pointer;color:#444860;line-height:1;" title="Must Read">★</span>
             </div>
             <input type="hidden" id="doc-stars" value="1" />
+          </div>
+          <div style="display:flex;flex-direction:column;gap:2px;">
+            <span style="font-size:9px;color:var(--text-3);letter-spacing:.05em;text-transform:uppercase;" data-i18n="label.confidential">Confidential</span>
+            <div style="display:flex;gap:2px;align-items:center;" id="conf-widget">
+              <span class="conf-btn" data-val="1" onclick="setDocConf(1)"
+                style="font-size:20px;cursor:pointer;color:#e74c3c;line-height:1;" title="Public — everyone">★</span>
+              <span class="conf-btn" data-val="2" onclick="setDocConf(2)"
+                style="font-size:20px;cursor:pointer;color:#444860;line-height:1;" title="Internal — DCC &amp; Admin">★</span>
+              <span class="conf-btn" data-val="3" onclick="setDocConf(3)"
+                style="font-size:20px;cursor:pointer;color:#444860;line-height:1;" title="Confidential — Admin only">★</span>
+            </div>
+            <input type="hidden" id="doc-conf-level" value="1" />
           </div>
           <div style="display:flex;flex-direction:column;gap:1px;">
             <span style="font-size:9px;color:var(--text-3);letter-spacing:.05em;text-transform:uppercase;" data-i18n="label.created">Created</span>
@@ -639,14 +651,14 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
           </div>
           <div style="position:relative;display:inline-block;">
             <span style="font-size:9px;color:var(--text-3);letter-spacing:.05em;text-transform:uppercase;display:block;margin-bottom:1px;" data-i18n="label.author">Author</span>
-            <input class="meta-input" id="doc-author" placeholder="建立者" style="width:110px;background:var(--bg);color:var(--text-3);"
+            <input class="meta-input" id="doc-author" placeholder="建立者" data-i18n-placeholder="label.author" style="width:110px;background:var(--bg);color:var(--text-3);"
               autocomplete="off" name="kms-author-nofill" readonly title="建立者為登入使用者，不可修改"
               oninput="filterAuthorList(this.value)" onfocus="if(!this.readOnly)showAuthorList()" onblur="setTimeout(()=>hideAuthorList(),200)" />
             <div id="author-dropdown" style="display:none;position:absolute;top:100%;left:0;z-index:999;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:0 4px 12px rgba(0,0,0,.12);min-width:200px;max-height:160px;overflow-y:auto;font-size:12px;"></div>
           </div>
           <div style="position:relative;display:inline-block;">
             <span style="font-size:9px;color:var(--text-3);letter-spacing:.05em;text-transform:uppercase;display:block;margin-bottom:1px;" data-i18n="label.reviewer">Reviewer</span>
-            <input class="meta-input" id="doc-reviewer" placeholder="審核人" style="width:110px;"
+            <input class="meta-input" id="doc-reviewer" placeholder="審核人" data-i18n-placeholder="label.reviewer" style="width:110px;"
               autocomplete="off" oninput="filterReviewerList(this.value)" onfocus="showReviewerList()" onblur="setTimeout(()=>hideReviewerList(),200)" />
             <div id="reviewer-dropdown" style="display:none;position:absolute;top:100%;left:0;z-index:999;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:0 4px 12px rgba(0,0,0,.12);min-width:220px;max-height:160px;overflow-y:auto;font-size:12px;"></div>
           </div>
@@ -1093,6 +1105,8 @@ const I18N = {
     'label.created':'Created', 'label.modified':'Modified', 'label.valid_until':'Valid Until',
     'label.author':'Author', 'label.reviewer':'Reviewer', 'label.product_line':'Product Line',
     'label.category':'Category', 'label.stars':'Stars', 'status.indefinitely':'Indefinitely',
+    'label.confidential':'Confidential',
+    'conf.level.1':'Public — everyone','conf.level.2':'Internal — DCC & Admin','conf.level.3':'Confidential — Admin only',
     'btn.save':'Save', 'btn.cancel':'Cancel',
     'rag.title':'AI 問答 — 從知識庫取答案',
     'rag.placeholder':'問任何問題，例如：Qi2 充電器良率異常如何處理？',
@@ -1189,6 +1203,8 @@ const I18N = {
     'pl.add_hint':'新增後會出現在所有文件的產品線選單中',
     'label.indefinitely':'永久有效',
     'label.docs_count':'文件數',
+    'label.confidential':'機密等級',
+    'conf.level.1':'公開 — 所有人可見','conf.level.2':'內部 — DCC 及管理員','conf.level.3':'機密 — 僅管理員',
   },
   'zh-CN': {
     'nav.search':'AI 问答', 'nav.editor':'新增', 'nav.docs':'知识库',
@@ -1287,6 +1303,8 @@ const I18N = {
     'pl.add_hint':'添加后将出现在所有文档的产品线选项中',
     'label.indefinitely':'永久有效',
     'label.docs_count':'文档数',
+    'label.confidential':'机密等级',
+    'conf.level.1':'公开 — 所有人可见','conf.level.2':'内部 — DCC 及管理员','conf.level.3':'机密 — 仅管理员',
   },
   'en': {
     'nav.search':'AI Q&A', 'nav.editor':'Create', 'nav.docs':'Knowledge Base',
@@ -1487,6 +1505,8 @@ const I18N = {
     'pl.add_hint':'Sẽ hiển thị trong menu dòng sản phẩm của tất cả tài liệu',
     'label.indefinitely':'Vĩnh viễn',
     'label.docs_count':'Tài liệu',
+    'label.confidential':'Mức độ bảo mật',
+    'conf.level.1':'Công khai — mọi người','conf.level.2':'Nội bộ — DCC & Admin','conf.level.3':'Bảo mật — chỉ Admin',
   },
   'ja': {
     'nav.search':'AI 質問', 'nav.editor':'新規作成', 'nav.docs':'ナレッジベース',
@@ -1587,6 +1607,8 @@ const I18N = {
     'pl.add_hint':'追加後、すべての文書の製品ライン選択肢に表示されます',
     'label.indefinitely':'永続的に有効',
     'label.docs_count':'ドキュメント数',
+    'label.confidential':'機密レベル',
+    'conf.level.1':'公開 — 全員閲覧可','conf.level.2':'内部 — DCC・管理者のみ','conf.level.3':'機密 — 管理者のみ',
   },
 };
 
@@ -2291,6 +2313,7 @@ async function saveDoc() {
       const docPayload = {
         title, body, category, lang, status: finalStatus,
         stars: parseInt(document.getElementById('doc-stars')?.value || '1'),
+        conf_level: parseInt(document.getElementById('doc-conf-level')?.value || '1'),
         // author_name：insert 用登入者；update 時 admin 可改（讀 input），否則保留原始值
         author_name: editingDocId
           ? (getKmsRole() === 'admin'
@@ -2394,6 +2417,8 @@ async function saveDoc() {
     document.getElementById('doc-status').value = 'published';
   document.getElementById('doc-stars').value = '1';
   renderStarsWidget(1);
+  document.getElementById('doc-conf-level').value = '1';
+  renderConfWidget(1);
     document.getElementById('doc-author').value = '';
     resetDocAuthor();
     document.getElementById('doc-reviewer').value = '';
@@ -3900,7 +3925,8 @@ async function loadDocs() {
   let docs = [];
   try {
     if (CFG.supabaseUrl && CFG.supabaseKey) {
-      docs = await sbFetch(`/rest/v1/kms_documents?select=id,title,category,lang,status,stars,product_line,customer_tag,tags,author_name,view_count,file_url,file_name,file_type,file_size,summary,summary_en,summary_zh_cn,summary_vi,summary_ja,source_url,valid_until,updated_at,created_at&status=eq.published&order=${_docsOrder || 'updated_at.desc'}`) || [];
+      const _confFilter = getKmsRole() === 'admin' ? '' : getKmsRole() === 'dcc' ? '&conf_level=lte.2' : '&conf_level=lte.1';
+      docs = await sbFetch(`/rest/v1/kms_documents?select=id,title,category,lang,status,stars,conf_level,product_line,customer_tag,tags,author_name,view_count,file_url,file_name,file_type,file_size,summary,summary_en,summary_zh_cn,summary_vi,summary_ja,source_url,valid_until,updated_at,created_at&status=eq.published${_confFilter}&order=${_docsOrder || 'updated_at.desc'}`) || [];
     } else {
       const saved = localStorage.getItem('kms-local-docs');
       if (saved) localDocs = JSON.parse(saved);
@@ -3992,6 +4018,7 @@ async function loadDocs() {
       <div style="display:flex;align-items:center;gap:6px;width:100%;flex-wrap:wrap;">
         <span class="doc-cat ${catClass[d.category] || 'sop'}" data-cat="${d.category||''}">${catLabel[d.category] || d.category}</span>
       ${d.stars >= 3 ? '<span style="color:#F59E0B;font-size:11px;flex-shrink:0;" title="Must Read">★★★</span>' : d.stars === 2 ? '<span style="color:#F59E0B;font-size:11px;flex-shrink:0;" title="Important">★★</span>' : ''}
+      ${(d.conf_level||1) >= 3 ? `<span style="color:#e74c3c;font-size:10px;font-weight:700;flex-shrink:0;background:rgba(231,76,60,.12);padding:1px 5px;border-radius:4px;" title="${(I18N[currentLang]||I18N['zh-TW'])['conf.level.3']||'Admin Only'}">🔒×3</span>` : (d.conf_level||1) === 2 ? `<span style="color:#e74c3c;font-size:10px;font-weight:700;flex-shrink:0;background:rgba(231,76,60,.08);padding:1px 5px;border-radius:4px;" title="${(I18N[currentLang]||I18N['zh-TW'])['conf.level.2']||'DCC+Admin'}">🔒×2</span>` : ''}
         <span class="doc-title" onclick="openReader('${d.id}')" style="cursor:pointer;flex:1;min-width:120px;">${d.title}</span>
         <span style="font-size:11px;color:var(--text-3);">${d.lang || ''}</span>
         <span style="font-size:11px;color:var(--text-3);display:flex;gap:6px;align-items:center;">
@@ -4088,6 +4115,17 @@ function renderStarsWidget(val) {
   document.querySelectorAll('#stars-widget .star-btn').forEach(btn => {
     const bv = parseInt(btn.dataset.val);
     btn.style.color = bv <= v ? '#ffd166' : '#444860';
+  });
+}
+function setDocConf(val) {
+  document.getElementById('doc-conf-level').value = val;
+  renderConfWidget(val);
+}
+function renderConfWidget(val) {
+  const v = parseInt(val) || 1;
+  document.querySelectorAll('#conf-widget .conf-btn').forEach(btn => {
+    const bv = parseInt(btn.dataset.val);
+    btn.style.color = bv <= v ? '#e74c3c' : '#444860';
   });
 }
 
@@ -4251,6 +4289,8 @@ async function openDoc(id) {
   document.getElementById('doc-status').value = doc.status || 'draft';
   document.getElementById('doc-stars').value = String(doc.stars || 1);
   renderStarsWidget(doc.stars || 1);
+  document.getElementById('doc-conf-level').value = String(doc.conf_level || 1);
+  renderConfWidget(doc.conf_level || 1);
   // doc-author 填入文件原作者（或目前登入者）
   const _docAuthorEl = document.getElementById('doc-author');
   if (_docAuthorEl) {
@@ -4573,7 +4613,9 @@ async function translateSearchTitles(chunks, targetLang) {
 
 // Retrieve relevant chunks (Supabase vector + keyword hybrid, or local mock)
 async function retrieveChunks(query) {
-  const SELECT_FIELDS = 'id,title,body,category,lang,status,file_url,file_name,file_type,author_name,created_at,summary,summary_en,summary_zh_cn,summary_vi,summary_ja,tags';
+  const SELECT_FIELDS = 'id,title,body,category,lang,status,conf_level,file_url,file_name,file_type,author_name,created_at,summary,summary_en,summary_zh_cn,summary_vi,summary_ja,tags';
+  const _role = getKmsRole();
+  const _confFilter = _role === 'admin' ? '' : _role === 'dcc' ? '&conf_level=lte.2' : '&conf_level=lte.1';
 
   if (CFG.supabaseUrl && CFG.supabaseKey) {
     try {
@@ -4590,7 +4632,7 @@ async function retrieveChunks(query) {
           const ids = raw.map(r => r.id).join(',');
           let metaMap = {};
           try {
-            const rows = await sbFetch(`/rest/v1/kms_documents?id=in.(${ids})&select=${SELECT_FIELDS}`);
+            const rows = await sbFetch(`/rest/v1/kms_documents?id=in.(${ids})&select=${SELECT_FIELDS}${_confFilter}`);
             for (const r of (rows || [])) metaMap[r.id] = r;
           } catch(e) {}
 
@@ -4617,7 +4659,7 @@ async function retrieveChunks(query) {
       let kwResults = [];
       try {
         const kwRaw = await sbFetch(
-          `/rest/v1/kms_documents?select=${SELECT_FIELDS}&status=eq.published&or=(title.ilike.*${enc}*,summary.ilike.*${enc}*,body.ilike.*${enc}*)&limit=40`
+          `/rest/v1/kms_documents?select=${SELECT_FIELDS}&status=eq.published${_confFilter}&or=(title.ilike.*${enc}*,summary.ilike.*${enc}*,body.ilike.*${enc}*)&limit=40`
         );
         if (kwRaw?.length) {
           const existIds = new Set(vecResults.map(r => r.id));

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART KMS v2.10</title>
+<title>COMART KMS v2.11</title>
 
 <!-- Marked for Markdown → HTML preview (classic script, no module needed) -->
 <script src="https://cdn.jsdelivr.net/npm/marked@9.1.6/marked.min.js"></script>
@@ -391,7 +391,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v2.10</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v2.11</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('en')">EN</button>
@@ -1711,6 +1711,20 @@ let _docsOrder = 'updated_at.desc';
 function getKmsRole() {
   if (!portalUser) return 'admin'; // 沒有 portal session 時預設全權（本機直接開）
   return KMS_ROLE_FROM_PORTAL[portalUser.role] || 'user';
+}
+
+// 回傳 conf_level 存取條件：url = Supabase query param, fn = JS post-filter
+// 規則：admin 全看；dcc 看 lte.2；user 看 lte.1；任何角色都可看自己的文件
+function confAccess() {
+  const role = getKmsRole();
+  if (role === 'admin') return { url: '', fn: () => true };
+  const myName = portalUser?.nameEn || portalUser?.nameZh || '';
+  const maxLevel = role === 'dcc' ? 2 : 1;
+  const url = myName
+    ? `&or=(conf_level.lte.${maxLevel},author_name.eq.${encodeURIComponent(myName)})`
+    : `&conf_level=lte.${maxLevel}`;
+  const fn = doc => (doc.conf_level || 1) <= maxLevel || (myName && doc.author_name === myName);
+  return { url, fn };
 }
 
 // 判斷目前用戶能否刪除某份文件
@@ -3925,8 +3939,8 @@ async function loadDocs() {
   let docs = [];
   try {
     if (CFG.supabaseUrl && CFG.supabaseKey) {
-      const _confFilter = getKmsRole() === 'admin' ? '' : getKmsRole() === 'dcc' ? '&conf_level=lte.2' : '&conf_level=lte.1';
-      docs = await sbFetch(`/rest/v1/kms_documents?select=id,title,category,lang,status,stars,conf_level,product_line,customer_tag,tags,author_name,view_count,file_url,file_name,file_type,file_size,summary,summary_en,summary_zh_cn,summary_vi,summary_ja,source_url,valid_until,updated_at,created_at&status=eq.published${_confFilter}&order=${_docsOrder || 'updated_at.desc'}`) || [];
+      const cf = confAccess();
+      docs = await sbFetch(`/rest/v1/kms_documents?select=id,title,category,lang,status,stars,conf_level,product_line,customer_tag,tags,author_name,view_count,file_url,file_name,file_type,file_size,summary,summary_en,summary_zh_cn,summary_vi,summary_ja,source_url,valid_until,updated_at,created_at&status=eq.published${cf.url}&order=${_docsOrder || 'updated_at.desc'}`) || [];
     } else {
       const saved = localStorage.getItem('kms-local-docs');
       if (saved) localDocs = JSON.parse(saved);
@@ -4614,8 +4628,7 @@ async function translateSearchTitles(chunks, targetLang) {
 // Retrieve relevant chunks (Supabase vector + keyword hybrid, or local mock)
 async function retrieveChunks(query) {
   const SELECT_FIELDS = 'id,title,body,category,lang,status,conf_level,file_url,file_name,file_type,author_name,created_at,summary,summary_en,summary_zh_cn,summary_vi,summary_ja,tags';
-  const _role = getKmsRole();
-  const _confFilter = _role === 'admin' ? '' : _role === 'dcc' ? '&conf_level=lte.2' : '&conf_level=lte.1';
+  const cf = confAccess();
 
   if (CFG.supabaseUrl && CFG.supabaseKey) {
     try {
@@ -4632,11 +4645,11 @@ async function retrieveChunks(query) {
           const ids = raw.map(r => r.id).join(',');
           let metaMap = {};
           try {
-            const rows = await sbFetch(`/rest/v1/kms_documents?id=in.(${ids})&select=${SELECT_FIELDS}${_confFilter}`);
+            const rows = await sbFetch(`/rest/v1/kms_documents?id=in.(${ids})&select=${SELECT_FIELDS}${cf.url}`);
             for (const r of (rows || [])) metaMap[r.id] = r;
           } catch(e) {}
 
-          vecResults = raw.map(r => {
+          vecResults = raw.filter(r => metaMap[r.id]).map(r => {
             const m = metaMap[r.id] || {};
             return {
               id: r.id, title: r.title,
@@ -4659,12 +4672,12 @@ async function retrieveChunks(query) {
       let kwResults = [];
       try {
         const kwRaw = await sbFetch(
-          `/rest/v1/kms_documents?select=${SELECT_FIELDS}&status=eq.published${_confFilter}&or=(title.ilike.*${enc}*,summary.ilike.*${enc}*,body.ilike.*${enc}*)&limit=40`
+          `/rest/v1/kms_documents?select=${SELECT_FIELDS}&status=eq.published&or=(title.ilike.*${enc}*,summary.ilike.*${enc}*,body.ilike.*${enc}*)&limit=40`
         );
         if (kwRaw?.length) {
           const existIds = new Set(vecResults.map(r => r.id));
           kwResults = kwRaw
-            .filter(r => !existIds.has(r.id))
+            .filter(r => !existIds.has(r.id) && cf.fn(r))
             .map(r => ({
               id: r.id, title: r.title,
               snippet: r.body?.substring(0, 800) || '',

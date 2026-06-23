@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" href="data:,">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART 行政管理平台 v1.66</title>
+<title>COMART 行政管理平台 v1.67</title>
 <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.js"></script>
 <style>
 :root{
@@ -975,7 +975,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="logo">
     <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
     <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
-    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.66</span>
+    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.67</span>
   </div>
   <div class="trr">
     <div class="admin-lang-sw">
@@ -990,7 +990,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <span id="cur-u" style="color:var(--text-2)">載入中…</span>
       <span style="color:var(--text-3);font-size:10px">▾</span>
     </div>
-    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.66</span>
+    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.67</span>
   </div>
 </div>
 
@@ -1761,7 +1761,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
 <div id="app">
 
   <div id="menu">
-    <h1>COMART 抽籤系統</h1>
+    <h1 data-i18n="lot.title">COMART 抽籤系統</h1>
     <div class="sub">名單共 <span id="poolCount">0</span> 位 · 選擇一種抽籤方式</div>
     <div class="site-bar">
       <label data-i18n="lot.unit_label">參與單位：</label>
@@ -2659,11 +2659,16 @@ const ADMIN_I18N = {
     'room.ph.title':'e.g. Q3 Product Review','room.ph.emails':'a@comart.com.tw, b@…','room.ph.notes':'Other requirements','room.ph.notes2':'Other requirements or notes',
     'trip.ph.name_manual':'Enter name manually','trip.ph.dept':'Department name','trip.ph.dest_txt':'Enter destination','trip.ph.purpose_txt':'Enter purpose','trip.ph.companion':'Enter name, press Enter to add',
     'visit.ph.company':'Company/unit name','visit.ph.notes':'Special requirements, notes…','visit.ph.search':'Company, contact…','visit.ph.guest_search':'Name, company…',
+    'trip.lbl.amount':'Amount:','trip.lbl.subtotal':'Subtotal:','trip.lbl.day':'Day',
     'lot.title':'COMART Lottery','lot.pool':'Pool','lot.no_repeat':'No repeat draw','lot.reset':'Reset drawn','lot.drawn_list':'Drawn list (latest first)',
     'lot.slot_title':'Lucky Slots','lot.vortex_title':'Energy Vortex','lot.cards_title':'Fate Cards','lot.wheel_title':'Fortune Wheel',
     'lot.start':'Start','lot.spin':'Spin','lot.winner_label':'🎉 Lucky Winner 🎉','lot.draw_again':'Draw Again','lot.back_menu':'Back to Menu','lot.close':'✕ Close',
     'lot.all_staff':'All Staff','lot.unit_label':'Unit:',
     'g.save_cfg':'Save Config',
+    'g.toast.csv_done':'CSV exported','g.toast.no_data':'Data not found',
+    'g.lbl.day_n':'Day %d','visit.lbl.period':'Period:','visit.lbl.headcount':'Attendees:','visit.lbl.owner':'Contact:','visit.lbl.tasks':'Tasks:',
+    'visit.lbl.guests':'Guest List','visit.lbl.itinerary':'Itinerary','visit.lbl.no_task':'No tasks',
+    'car.type.company':'Company Car','car.type.taxi':'Taxi','car.type.none':'No Car',
     'g.cal.today':'Today','g.cal.month':'Month','g.cal.week':'Week',
     'car.st.inuse':'In Use','car.st.need_maint':'Needs Service','car.st.insp_alert':'Inspection Due','car.st.avail':'Available',
     'car.fuel.gas':'Gasoline','car.fuel.diesel':'Diesel','car.fuel.hybrid':'Hybrid','car.fuel.ev':'Electric',
@@ -2808,11 +2813,16 @@ const ADMIN_I18N = {
     'room.ph.title':'例：Q3產品評審會議','room.ph.emails':'a@comart.com.tw, b@comart.com.tw','room.ph.notes':'其他需求','room.ph.notes2':'其他需求或說明',
     'trip.ph.name_manual':'手動輸入姓名','trip.ph.dept':'部門名稱','trip.ph.dest_txt':'輸入出差地點','trip.ph.purpose_txt':'輸入出差目的','trip.ph.companion':'手動輸入姓名，按 Enter 加入',
     'visit.ph.company':'公司/單位名稱','visit.ph.notes':'特殊需求、注意事項…','visit.ph.search':'公司、負責人…','visit.ph.guest_search':'姓名、公司…',
+    'trip.lbl.amount':'金額:','trip.lbl.subtotal':'小計:','trip.lbl.day':'天',
     'lot.title':'COMART 抽籤系統','lot.pool':'名單共','lot.no_repeat':'不重複抽選','lot.reset':'重置已抽','lot.drawn_list':'已抽中名單（最新在前）',
     'lot.slot_title':'幸運老虎機','lot.vortex_title':'能量黑洞','lot.cards_title':'命運翻牌','lot.wheel_title':'俄羅斯輪盤',
     'lot.start':'開始抽籤','lot.spin':'轉動輪盤','lot.winner_label':'🎉 幸 運 得 主 🎉','lot.draw_again':'再抽一次','lot.back_menu':'回主選單','lot.close':'✕ 關閉',
     'lot.all_staff':'全部人員','lot.unit_label':'參與單位：',
     'g.save_cfg':'儲存設定',
+    'g.toast.csv_done':'已匯出 CSV','g.toast.no_data':'找不到資料',
+    'g.lbl.day_n':'第 %d 天','visit.lbl.period':'期間：','visit.lbl.headcount':'人數：','visit.lbl.owner':'負責窗口：','visit.lbl.tasks':'任務進度：',
+    'visit.lbl.guests':'來賓名單','visit.lbl.itinerary':'行程任務','visit.lbl.no_task':'無任務',
+    'car.type.company':'公務車','car.type.taxi':'計程車','car.type.none':'無派車',
     'g.cal.today':'今天','g.cal.month':'月','g.cal.week':'週',
     'car.st.inuse':'使用中','car.st.need_maint':'需保養','car.st.insp_alert':'驗車提醒','car.st.avail':'可預約',
     'car.fuel.gas':'汽油','car.fuel.diesel':'柴油','car.fuel.hybrid':'油電','car.fuel.ev':'純電',
@@ -2957,11 +2967,16 @@ const ADMIN_I18N = {
     'room.ph.title':'例：Q3产品评审会议','room.ph.emails':'a@comart.com.tw, b@comart.com.tw','room.ph.notes':'其他需求','room.ph.notes2':'其他需求或说明',
     'trip.ph.name_manual':'手动输入姓名','trip.ph.dept':'部门名称','trip.ph.dest_txt':'输入出差地点','trip.ph.purpose_txt':'输入出差目的','trip.ph.companion':'手动输入姓名，按 Enter 加入',
     'visit.ph.company':'公司/单位名称','visit.ph.notes':'特殊需求、注意事项…','visit.ph.search':'公司、负责人…','visit.ph.guest_search':'姓名、公司…',
+    'trip.lbl.amount':'金额:','trip.lbl.subtotal':'小计:','trip.lbl.day':'天',
     'lot.title':'COMART 抽签系统','lot.pool':'名单共','lot.no_repeat':'不重复抽选','lot.reset':'重置已抽','lot.drawn_list':'已抽中名单（最新在前）',
     'lot.slot_title':'幸运老虎机','lot.vortex_title':'能量黑洞','lot.cards_title':'命运翻牌','lot.wheel_title':'俄罗斯轮盘',
     'lot.start':'开始抽签','lot.spin':'转动轮盘','lot.winner_label':'🎉 幸 运 得 主 🎉','lot.draw_again':'再抽一次','lot.back_menu':'回主选单','lot.close':'✕ 关闭',
     'lot.all_staff':'全部人员','lot.unit_label':'参与单位：',
     'g.save_cfg':'保存设置',
+    'g.toast.csv_done':'已导出 CSV','g.toast.no_data':'找不到数据',
+    'g.lbl.day_n':'第 %d 天','visit.lbl.period':'期间：','visit.lbl.headcount':'人数：','visit.lbl.owner':'负责窗口：','visit.lbl.tasks':'任务进度：',
+    'visit.lbl.guests':'来宾名单','visit.lbl.itinerary':'行程任务','visit.lbl.no_task':'无任务',
+    'car.type.company':'公务车','car.type.taxi':'出租车','car.type.none':'无派车',
     'g.cal.today':'今天','g.cal.month':'月','g.cal.week':'周',
     'car.st.inuse':'使用中','car.st.need_maint':'需保养','car.st.insp_alert':'验车提醒','car.st.avail':'可预约',
     'car.fuel.gas':'汽油','car.fuel.diesel':'柴油','car.fuel.hybrid':'油电','car.fuel.ev':'纯电',
@@ -3106,11 +3121,16 @@ const ADMIN_I18N = {
     'room.ph.title':'VD: Họp đánh giá Q3','room.ph.emails':'a@comart.com.tw, b@…','room.ph.notes':'Yêu cầu khác','room.ph.notes2':'Yêu cầu hoặc ghi chú khác',
     'trip.ph.name_manual':'Nhập tên thủ công','trip.ph.dept':'Tên phòng ban','trip.ph.dest_txt':'Nhập điểm đến','trip.ph.purpose_txt':'Nhập mục đích','trip.ph.companion':'Nhập tên, bấm Enter để thêm',
     'visit.ph.company':'Tên công ty/đơn vị','visit.ph.notes':'Yêu cầu đặc biệt, lưu ý…','visit.ph.search':'Công ty, người phụ trách…','visit.ph.guest_search':'Tên, công ty…',
+    'trip.lbl.amount':'Số tiền:','trip.lbl.subtotal':'Tổng phụ:','trip.lbl.day':'Ngày',
     'lot.title':'COMART Rút thăm','lot.pool':'Danh sách','lot.no_repeat':'Không lặp lại','lot.reset':'Đặt lại đã rút','lot.drawn_list':'Đã rút (mới nhất đầu)',
     'lot.slot_title':'Máy đánh bạc may mắn','lot.vortex_title':'Hố đen năng lượng','lot.cards_title':'Lật bài vận mệnh','lot.wheel_title':'Vòng quay số phận',
     'lot.start':'Bắt đầu quay','lot.spin':'Quay vòng','lot.winner_label':'🎉 Người may mắn 🎉','lot.draw_again':'Rút thêm','lot.back_menu':'Về menu','lot.close':'✕ Đóng',
     'lot.all_staff':'Tất cả','lot.unit_label':'Đơn vị:',
     'g.save_cfg':'Lưu cài đặt',
+    'g.toast.csv_done':'Đã xuất CSV','g.toast.no_data':'Không tìm thấy dữ liệu',
+    'g.lbl.day_n':'Ngày %d','visit.lbl.period':'Thời gian:','visit.lbl.headcount':'Số người:','visit.lbl.owner':'Người phụ trách:','visit.lbl.tasks':'Tiến độ:',
+    'visit.lbl.guests':'Danh sách khách','visit.lbl.itinerary':'Lịch trình','visit.lbl.no_task':'Không có nhiệm vụ',
+    'car.type.company':'Xe công ty','car.type.taxi':'Taxi','car.type.none':'Không có xe',
     'g.cal.today':'Hôm nay','g.cal.month':'Tháng','g.cal.week':'Tuần',
     'car.st.inuse':'Đang dùng','car.st.need_maint':'Cần BD','car.st.insp_alert':'Đến hạn KĐ','car.st.avail':'Sẵn sàng',
     'car.fuel.gas':'Xăng','car.fuel.diesel':'Dầu diesel','car.fuel.hybrid':'Hybrid','car.fuel.ev':'Điện',
@@ -3255,11 +3275,16 @@ const ADMIN_I18N = {
     'room.ph.title':'例：Q3製品レビュー会議','room.ph.emails':'a@comart.com.tw, b@…','room.ph.notes':'その他の要望','room.ph.notes2':'その他の要望や説明',
     'trip.ph.name_manual':'名前を手動入力','trip.ph.dept':'部署名','trip.ph.dest_txt':'出張先を入力','trip.ph.purpose_txt':'目的を入力','trip.ph.companion':'名前を入力してEnterキーで追加',
     'visit.ph.company':'会社名/組織名','visit.ph.notes':'特別な要件、注意事項…','visit.ph.search':'会社、担当者…','visit.ph.guest_search':'名前、会社…',
+    'trip.lbl.amount':'金額:','trip.lbl.subtotal':'小計:','trip.lbl.day':'日',
     'lot.title':'COMART 抽選','lot.pool':'名簿','lot.no_repeat':'重複なし抽選','lot.reset':'抽選リセット','lot.drawn_list':'抽選済（最新順）',
     'lot.slot_title':'ラッキースロット','lot.vortex_title':'エネルギーブラックホール','lot.cards_title':'運命のカード','lot.wheel_title':'運命のルーレット',
     'lot.start':'抽選開始','lot.spin':'ルーレット回す','lot.winner_label':'🎉 ラッキー当選者 🎉','lot.draw_again':'もう一度','lot.back_menu':'メインに戻る','lot.close':'✕ 閉じる',
     'lot.all_staff':'全員','lot.unit_label':'参加部門：',
     'g.save_cfg':'設定保存',
+    'g.toast.csv_done':'CSVをエクスポートしました','g.toast.no_data':'データが見つかりません',
+    'g.lbl.day_n':'第 %d 日','visit.lbl.period':'期間：','visit.lbl.headcount':'人数：','visit.lbl.owner':'担当者：','visit.lbl.tasks':'タスク進捗：',
+    'visit.lbl.guests':'来訪者リスト','visit.lbl.itinerary':'行程タスク','visit.lbl.no_task':'タスクなし',
+    'car.type.company':'社用車','car.type.taxi':'タクシー','car.type.none':'配車なし',
     'g.cal.today':'今日','g.cal.month':'月','g.cal.week':'週',
     'car.st.inuse':'使用中','car.st.need_maint':'整備要','car.st.insp_alert':'車検注意','car.st.avail':'予約可能',
     'car.fuel.gas':'ガソリン','car.fuel.diesel':'ディーゼル','car.fuel.hybrid':'ハイブリッド','car.fuel.ev':'EV',
@@ -4215,10 +4240,10 @@ function renderCurrCards(){
       <span>TWD</span>
     </div>
     <div class="curr-amt-row">
-      <span>金額：</span>
+      <span>${t('trip.lbl.amount')}</span>
       <input type="number" id="amt-${c.code}" value="0" min="0" step="0.01" onchange="calcTripTotal()">
     </div>
-    <div class="curr-sub">小計：<span id="sub-${c.code}">NT$0</span></div>
+    <div class="curr-sub">${t('trip.lbl.subtotal')}<span id="sub-${c.code}">NT$0</span></div>
   </div>`).join('');
 }
 function getRate(code){
@@ -5776,7 +5801,7 @@ function renderVfDays(){
   document.getElementById('vf-days-list').innerHTML=vfDays.map((day,di)=>`
   <div class="day-block">
     <div class="day-block-head">
-      <span>第 ${di+1} 天</span>
+      <span>${t('g.lbl.day_n').replace('%d',di+1)}</span>
       <input type="date" value="${day.date}" onchange="vfDays[${di}].date=this.value" style="font-size:12px;padding:2px 6px;width:120px;margin-left:8px">
       <button class="btn bg2 bsm" style="margin-left:auto" onclick="vfAddTask(${di})">＋ 任務</button>
       ${vfDays.length>1?`<button class="btn bdr bsm bic" onclick="vfDays.splice(${di},1);renderVfDays()">✕</button>`:''}
@@ -5937,26 +5962,26 @@ function openVisitDetail(id){
     <span class="badge bm">${UNIT_LABEL[v.unit]||'—'}</span>
   </div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;font-size:13px">
-    <div><span style="color:var(--t3)">期間：</span>${v.dateStart}${v.dateEnd!==v.dateStart?' — '+v.dateEnd:''}</div>
-    <div><span style="color:var(--t3)">人數：</span>${v.headcount||'—'}</div>
-    <div><span style="color:var(--t3)">負責窗口：</span>${owner?.name||v.ownerId||'—'}</div>
-    <div><span style="color:var(--t3)">任務進度：</span>${doneTasks}/${allTasks.length}</div>
+    <div><span style="color:var(--t3)">${t('visit.lbl.period')}</span>${v.dateStart}${v.dateEnd!==v.dateStart?' — '+v.dateEnd:''}</div>
+    <div><span style="color:var(--t3)">${t('visit.lbl.headcount')}</span>${v.headcount||'—'}</div>
+    <div><span style="color:var(--t3)">${t('visit.lbl.owner')}</span>${owner?.name||v.ownerId||'—'}</div>
+    <div><span style="color:var(--t3)">${t('visit.lbl.tasks')}</span>${doneTasks}/${allTasks.length}</div>
   </div>`;
-  if(v.guests?.length){html+=`<div style="font-weight:600;margin-bottom:7px;font-size:13px">來賓名單</div>
+  if(v.guests?.length){html+=`<div style="font-weight:600;margin-bottom:7px;font-size:13px">${t('visit.lbl.guests')}</div>
   <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:14px">
   ${v.guests.map(g=>{const db=getGuests().find(x=>x.id===g.guestId);return`<div class="guest-card"><div class="guest-avatar">${COUNTRIES[db?.country||'other']||'🌏'}</div><div><div style="font-size:13px;font-weight:600">${g.name||db?.name||'—'} <span style="color:var(--t3);font-weight:400">${g.title||db?.title||''}</span></div>${g.note||db?.pref?`<div style="font-size:11px;color:var(--t3)">${g.note||''} ${db?.pref?'· '+db.pref:''}</div>`:''}</div></div>`;}).join('')}
   </div>`;}
-  if(v.days?.length){html+=`<div style="font-weight:600;margin-bottom:7px;font-size:13px">行程任務</div>`;
+  if(v.days?.length){html+=`<div style="font-weight:600;margin-bottom:7px;font-size:13px">${t('visit.lbl.itinerary')}</div>`;
   v.days.forEach((day,di)=>{
-    html+=`<div class="day-block"><div class="day-block-head">📅 ${day.date}（第${di+1}天）</div><div class="day-block-body">`;
-    if(!day.tasks?.length){html+='<div style="font-size:12px;color:var(--t3)">無任務</div>';}
+    html+=`<div class="day-block"><div class="day-block-head">📅 ${day.date}（${t('g.lbl.day_n').replace('%d',di+1)}）</div><div class="day-block-body">`;
+    if(!day.tasks?.length){html+=`<div style="font-size:12px;color:var(--t3)">${t('visit.lbl.no_task')}</div>`;}
     day.tasks.forEach((t,ti)=>{
       const assignee=gUsr(t.assigneeId);
       html+=`<div class="task-item">
         <div class="task-check ${t.done?'done':''}" onclick="toggleVisitTask('${id}',${di},${ti})">${t.done?'✓':''}</div>
         <div style="flex:1"><span style="font-weight:600">${t.type}</span> ${t.startTime||''} ${t.from?t.from+'→':''}${t.to||''}</div>
         ${assignee?`<span class="assign-pill ${t.confirmed?'confirmed':''}">${assignee.name}</span>`:''}
-        <span class="badge ${t.carType==='company'?'bt':t.carType==='taxi'?'by':'bm'}">${t.carType==='company'?'公務車':t.carType==='taxi'?'計程車':'無派車'}</span>
+        <span class="badge ${t.carType==='company'?'bt':t.carType==='taxi'?'by':'bm'}">${t.carType==='company'?t('car.type.company'):t.carType==='taxi'?t('car.type.taxi'):t('car.type.none')}</span>
       </div>`;
     });
     html+='</div></div>';
@@ -6138,12 +6163,12 @@ function exportVisitCSV(){
   const rows=[['日期','公司','類型','接待單位','人數','負責窗口','目的','費用合計','狀態']];
   visits.forEach(v=>{const owner=gUsr(v.ownerId);const total=(v.costs||[]).reduce((s,c)=>s+(+c.amount||0),0);rows.push([v.dateStart,v.company||'',TYPE_LABEL[v.type]||v.type,UNIT_LABEL[v.unit]||v.unit,v.headcount||'',owner?.name||v.ownerId||'',v.purpose||'',total,V_ST_LABEL[visitStatus(v)]||'']);});
   dl('visit_report.csv',rows.map(r=>r.map(c=>`"${c}"`).join(',')).join('\n'),'text/csv');
-  toast('已匯出 CSV','success');
+  toast(t('g.toast.csv_done'),'success');
 }
 
 // ── Generate Doc ──
 function genVisitDoc(v){
-  if(!v){toast('找不到資料','error');return;}
+  if(!v){toast(t('g.toast.no_data'),'error');return;}
   const owner=gUsr(v.ownerId);const totalCost=(v.costs||[]).reduce((s,c)=>s+(+c.amount||0),0);
   const w=window.open('','_blank');
   w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">

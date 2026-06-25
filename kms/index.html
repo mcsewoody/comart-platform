@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART KMS v2.11</title>
+<title>COMART KMS v2.12</title>
 
 <!-- Marked for Markdown → HTML preview (classic script, no module needed) -->
 <script src="https://cdn.jsdelivr.net/npm/marked@9.1.6/marked.min.js"></script>
@@ -28,8 +28,8 @@
   --border: #2a3045;
   --border-mid: #3a4260;
   --text: #f5f7ff;
-  --text-2: #cdd3f0;
-  --text-3: #9098c0;
+  --text-2: #D8DEFF;
+  --text-3: #AEB5D5;
   --blue: #6aaee8;
   --blue-bg: #1a2a50;
   --blue-border: #3a5a90;
@@ -391,7 +391,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v2.11</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v2.12</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('en')">EN</button>
@@ -1767,11 +1767,11 @@ async function initPortalSession() {
   if (chip) chip.style.display = 'flex';
 
   // ── 補齊真實姓名：若 session 沒帶 nameEn/nameZh，去 kms_users 查 ──
-  let displayName = sess.nameEn || sess.nameZh || '';
+  let displayName = sess.nameEn || sess.nameZh || sess.empId || '';
   if (!displayName && sess.empId && CFG.supabaseUrl && CFG.supabaseKey) {
     try {
       const rows = await sbFetch(
-        `/rest/v1/kms_users?emp_id=eq.${encodeURIComponent(sess.empId)}&select=name_en,name_zh&limit=1`
+        `/rest/v1/users?emp_id=eq.${encodeURIComponent(sess.empId)}&select=name_en,name_zh&limit=1`
       );
       if (rows && rows.length) {
         // 只在 session 沒有姓名時才用 kms_users 補充，不覆蓋已有值
@@ -3473,7 +3473,7 @@ function removeExistingFile() {
 
 function buildAuthorName() {
   if (!portalUser) return document.getElementById('doc-author')?.value.trim() || 'Admin';
-  return portalUser.nameEn || portalUser.nameZh || document.getElementById('doc-author')?.value.trim() || 'Admin';
+  return portalUser.nameEn || portalUser.nameZh || document.getElementById('doc-author')?.value.trim() || portalUser.empId || 'Admin';
 }
 
 
@@ -3533,8 +3533,8 @@ function resetDocAuthor() {
   const el = document.getElementById('doc-author');
   if (!el) return;
   if (portalUser) {
-    // 優先用 session 帶來的姓名，避免空字串問題
-    const name = portalUser.nameEn || portalUser.nameZh || '';
+    // 優先用 session 帶來的姓名，沒有則用工號，確保 author 不為空
+    const name = portalUser.nameEn || portalUser.nameZh || portalUser.empId || '';
     if (name) el.value = name;
   }
 }

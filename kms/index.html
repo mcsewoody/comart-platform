@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART KMS v2.12</title>
+<title>COMART KMS v2.13</title>
 
 <!-- Marked for Markdown → HTML preview (classic script, no module needed) -->
 <script src="https://cdn.jsdelivr.net/npm/marked@9.1.6/marked.min.js"></script>
@@ -391,7 +391,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v2.12</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v2.13</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('en')">EN</button>
@@ -1732,9 +1732,10 @@ function canDelete(docAuthorName) {
   const role = getKmsRole();
   if (role === 'dcc') return false;   // dcc 不能刪除
   if (role === 'admin') return true;  // admin 無限制
-  // user/dcc 本人：2 天內可刪，由 deleteDoc 判斷時間
-  const myName = portalUser ? (portalUser.nameEn || portalUser.nameZh || '') : '';
-  if (myName && docAuthorName === myName) return true; // 允許，時間限制在 deleteDoc 裡判斷
+  // user 本人：48 小時內可刪，由 deleteDoc 判斷時間
+  const myName  = portalUser ? (portalUser.nameEn || portalUser.nameZh || '') : '';
+  const myEmpId = portalUser ? (portalUser.empId || '') : '';
+  if ((myName && docAuthorName === myName) || (myEmpId && docAuthorName === myEmpId)) return true;
   return false;
 }
 
@@ -1819,7 +1820,7 @@ async function initPortalSession() {
   // 提示目前身份
   setTimeout(() => {
     if (kmsRole === 'user') {
-      toast(`以 ${roleLabel} 身份登入 — 可新增/修改自己的文章，無法刪除`, '');
+      toast(`以 ${roleLabel} 身份登入 — 可新增/修改自己的文章，建立後 48 小時內可刪除`, '');
     } else if (kmsRole === 'dcc') {
       toast(`以 DCC 身份登入 — 可讀取、審核、封存，無法刪除文件`, '');
     }
@@ -2331,8 +2332,8 @@ async function saveDoc() {
         // author_name：insert 用登入者；update 時 admin 可改（讀 input），否則保留原始值
         author_name: editingDocId
           ? (getKmsRole() === 'admin'
-              ? (document.getElementById('doc-author')?.value.trim() || window._editSnapshot?.author_name || '')
-              : (window._editSnapshot?.author_name || ''))
+              ? (document.getElementById('doc-author')?.value.trim() || window._editSnapshot?.author_name || buildAuthorName())
+              : (window._editSnapshot?.author_name || buildAuthorName()))
           : buildAuthorName(),
         reviewer: document.getElementById('doc-reviewer').value.trim() || null,
         valid_until: document.getElementById('doc-indefinitely')?.checked ? null : (document.getElementById('doc-valid-until').value || null),
@@ -4376,11 +4377,12 @@ async function openDoc(id) {
   editingDocId = id.startsWith('demo-') ? null : id;
   // 儲存原始快照，供 cancelEdit 比對
   window._editSnapshot = {
-    title:    doc.title    || '',
-    body:     doc.body     || '',
-    bodyText: (doc.body    || '').replace(/<[^>]+>/g,'').trim(), // 純文字供比對
-    category: doc.category || '',
-    status:   doc.status   || '',
+    title:       doc.title       || '',
+    body:        doc.body        || '',
+    bodyText:    (doc.body       || '').replace(/<[^>]+>/g,'').trim(),
+    category:    doc.category    || '',
+    status:      doc.status      || '',
+    author_name: doc.author_name || '',
   };
   updateEditorModeLabel();
   switchPanel('editor');

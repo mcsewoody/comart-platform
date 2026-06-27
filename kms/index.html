@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART KMS v2.15</title>
+<title>COMART KMS v2.16</title>
 
 <!-- Marked for Markdown → HTML preview (classic script, no module needed) -->
 <script src="https://cdn.jsdelivr.net/npm/marked@9.1.6/marked.min.js"></script>
@@ -391,7 +391,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v2.15</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v2.16</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('en')">EN</button>
@@ -798,12 +798,13 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
     <div class="panel" id="panel-experts">
       <div style="display:flex;flex-direction:column;height:100%;">
         <div style="padding:12px 20px;border-bottom:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:space-between;">
-          <div style="font-size:15px;font-weight:500;" data-i18n="experts.title">專家黃頁</div>
+          <div style="font-size:15px;font-weight:500;" data-i18n="experts.title">通訊錄</div>
           <a href="/" onclick="event.preventDefault();toast('請至 Platform → User Management 管理人員資料','');"
             style="font-size:11px;color:var(--text-3);text-decoration:none;padding:5px 10px;border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;">
             ⚙ 人員管理請至 Platform
           </a>
         </div>
+        <div id="expert-site-filter" style="padding:8px 20px;border-bottom:1px solid var(--border);flex-shrink:0;display:flex;gap:6px;flex-wrap:wrap;align-items:center;"></div>
         <div class="expert-grid" id="expert-grid"></div>
       </div>
     </div>
@@ -1100,7 +1101,7 @@ let PRODUCT_LINES = []; // 從 Supabase 或預設值載入的產品線清單
 const I18N = {
   'zh-TW': {
     'nav.search':'AI 問答', 'nav.editor':'新增', 'nav.docs':'知識庫',
-    'nav.kmap':'知識地圖', 'nav.analytics':'分析報表', 'nav.experts':'專家黃頁',
+    'nav.kmap':'知識地圖', 'nav.analytics':'分析報表', 'nav.experts':'通訊錄',
     'nav.review':'審核', 'nav.comments':'討論', 'nav.setting':'設定',
     'label.created':'Created', 'label.modified':'Modified', 'label.valid_until':'Valid Until',
     'label.author':'Author', 'label.reviewer':'Reviewer', 'label.product_line':'Product Line',
@@ -1123,7 +1124,7 @@ const I18N = {
     'batch.skip':'跳過','batch.cancel':'取消批次',
     'analytics.title':'分析報表', 'analytics.total':'知識條目', 'analytics.published':'已發佈',
     'analytics.views':'總閱覽數', 'analytics.gaps':'知識缺口',
-    'experts.title':'專家黃頁', 'experts.add':'＋ 新增專家', 'experts.empty':'尚無專家資料',
+    'experts.title':'通訊錄', 'experts.add':'＋ 新增專家', 'experts.empty':'尚無人員資料',
     'experts.copy':'已複製聯絡方式', 'experts.remove':'移除',
     'review.title':'審核流程管理', 'review.empty':'選擇文件後可在此執行審核動作',
     'review.actions':'執行動作', 'review.log':'審核紀錄',
@@ -1208,7 +1209,7 @@ const I18N = {
   },
   'zh-CN': {
     'nav.search':'AI 问答', 'nav.editor':'新增', 'nav.docs':'知识库',
-    'nav.kmap':'知识地图', 'nav.analytics':'分析报表', 'nav.experts':'专家黄页',
+    'nav.kmap':'知识地图', 'nav.analytics':'分析报表', 'nav.experts':'通讯录',
     'nav.review':'审核', 'nav.comments':'讨论', 'nav.setting':'设置',
     'rag.title':'AI 问答 — 从知识库取答案',
     'rag.placeholder':'输入问题，例如：Qi2 充电器良率异常如何处理？',
@@ -1225,7 +1226,7 @@ const I18N = {
     'batch.skip':'跳过','batch.cancel':'取消批次',
     'analytics.title':'分析报表', 'analytics.total':'知识条目', 'analytics.published':'已发布',
     'analytics.views':'总阅览数', 'analytics.gaps':'知识缺口',
-    'experts.title':'专家黄页', 'experts.add':'＋ 新增专家', 'experts.empty':'暂无专家数据',
+    'experts.title':'通讯录', 'experts.add':'＋ 新增专家', 'experts.empty':'暂无人员数据',
     'experts.copy':'已复制联系方式', 'experts.remove':'移除',
     'review.title':'审核流程管理', 'review.empty':'选择文档后可在此执行审核操作',
     'review.actions':'执行操作', 'review.log':'审核记录',
@@ -1308,7 +1309,7 @@ const I18N = {
   },
   'en': {
     'nav.search':'AI Q&A', 'nav.editor':'Create', 'nav.docs':'Knowledge Base',
-    'nav.kmap':'Knowledge Map', 'nav.analytics':'Analytics', 'nav.experts':'Experts',
+    'nav.kmap':'Knowledge Map', 'nav.analytics':'Analytics', 'nav.experts':'Directory',
     'nav.review':'Review', 'nav.comments':'Discussion', 'nav.setting':'Settings',
     'rag.title':'AI Q&A — Answers from Knowledge Base',
     'rag.placeholder':'Ask anything, e.g.: How to handle Qi2 charger yield issues?',
@@ -1325,7 +1326,7 @@ const I18N = {
     'batch.skip':'Skip','batch.cancel':'Cancel Batch',
     'analytics.title':'Analytics', 'analytics.total':'Entries', 'analytics.published':'Published',
     'analytics.views':'Total Views', 'analytics.gaps':'Knowledge Gaps',
-    'experts.title':'Expert Directory', 'experts.add':'＋ Add Expert', 'experts.empty':'No experts yet',
+    'experts.title':'Directory', 'experts.add':'＋ Add Expert', 'experts.empty':'No users yet',
     'experts.copy':'Contact info copied', 'experts.remove':'Remove',
     'review.title':'Review Workflow', 'review.empty':'Select a document to manage its review',
     'review.actions':'Actions', 'review.log':'Review History',
@@ -1408,7 +1409,7 @@ const I18N = {
   },
   'vi': {
     'nav.search':'Hỏi đáp AI', 'nav.editor':'Tạo mới', 'nav.docs':'Kho kiến thức',
-    'nav.kmap':'Bản đồ kiến thức', 'nav.analytics':'Báo cáo', 'nav.experts':'Chuyên gia',
+    'nav.kmap':'Bản đồ kiến thức', 'nav.analytics':'Báo cáo', 'nav.experts':'Danh bạ',
     'nav.review':'Xem xét', 'nav.comments':'Thảo luận', 'nav.setting':'Cài đặt',
     'rag.title':'Hỏi đáp AI — Từ kho kiến thức',
     'rag.placeholder':'Đặt câu hỏi, ví dụ: Xử lý lỗi tỷ lệ đạt chuẩn Qi2 như thế nào?',
@@ -1425,7 +1426,7 @@ const I18N = {
     'batch.skip':'Bỏ qua','batch.cancel':'Hủy hàng loạt',
     'analytics.title':'Báo cáo', 'analytics.total':'Mục kiến thức', 'analytics.published':'Đã xuất bản',
     'analytics.views':'Tổng lượt xem', 'analytics.gaps':'Khoảng trống kiến thức',
-    'experts.title':'Danh bạ chuyên gia', 'experts.add':'＋ Thêm chuyên gia', 'experts.empty':'Chưa có chuyên gia',
+    'experts.title':'Danh bạ', 'experts.add':'＋ Thêm người dùng', 'experts.empty':'Chưa có dữ liệu',
     'experts.copy':'Đã sao chép thông tin liên hệ', 'experts.remove':'Xóa',
     'review.title':'Quy trình duyệt', 'review.empty':'Chọn tài liệu để quản lý quy trình duyệt',
     'review.actions':'Hành động', 'review.log':'Lịch sử duyệt',
@@ -1510,7 +1511,7 @@ const I18N = {
   },
   'ja': {
     'nav.search':'AI 質問', 'nav.editor':'新規作成', 'nav.docs':'ナレッジベース',
-    'nav.kmap':'ナレッジマップ', 'nav.analytics':'分析レポート', 'nav.experts':'専門家名鑑',
+    'nav.kmap':'ナレッジマップ', 'nav.analytics':'分析レポート', 'nav.experts':'連絡先',
     'nav.review':'レビュー', 'nav.comments':'ディスカッション', 'nav.setting':'設定',
     'rag.title':'AI 質問応答 — ナレッジベースから回答',
     'rag.placeholder':'質問を入力してください（例：Qi2充電器の歩留まり異常の対処法は？）',
@@ -1527,7 +1528,7 @@ const I18N = {
     'batch.skip':'スキップ','batch.cancel':'一括キャンセル',
     'analytics.title':'分析レポート', 'analytics.total':'ナレッジ件数', 'analytics.published':'公開済み',
     'analytics.views':'総閲覧数', 'analytics.gaps':'ナレッジギャップ',
-    'experts.title':'専門家名鑑', 'experts.add':'＋ 専門家を追加', 'experts.empty':'専門家データなし',
+    'experts.title':'連絡先', 'experts.add':'＋ ユーザーを追加', 'experts.empty':'データなし',
     'experts.copy':'連絡先をコピーしました', 'experts.remove':'削除',
     'review.title':'審査ワークフロー', 'review.empty':'ドキュメントを選択して審査を開始',
     'review.actions':'操作', 'review.log':'審査履歴',
@@ -5335,7 +5336,7 @@ function setLang(lang) {
   const activePanel = document.querySelector('.panel.active')?.id;
   if (activePanel === 'panel-docs')      loadDocs();
   if (activePanel === 'panel-kmap')      loadKmap(null);
-  if (activePanel === 'panel-analytics') loadAnalytics();
+  if (activePanel === 'panel-analytics') loadAnalytics(portalUser?.site || '');
   if (activePanel === 'panel-review')    { window._reviewAllDocs = null; loadReviewPanel(); }
 }
 
@@ -6234,11 +6235,18 @@ ${doc.body.slice(0, 6000)}`,
 // EXPERT DIRECTORY — 從 Supabase users 讀取
 // ═══════════════════════════════════════════════
 
+let _expertAllUsers = [];
+let _expertSiteFilter = '';
+
 async function loadExperts() {
   const grid = document.getElementById('expert-grid');
   grid.innerHTML = '<div style="color:var(--text-3);font-size:13px;padding:20px;grid-column:1/-1;">載入中…</div>';
 
-  let users = [];
+  // 首次載入時，預設篩選登入使用者的 site
+  if (!_expertAllUsers.length) {
+    _expertSiteFilter = portalUser?.site || '';
+  }
+
   try {
     const res = await fetch(
       `${KMS_SB_WORKER}/supabase/rest/v1/users?select=emp_id,name_en,name_zh,role,dept,site,email,mobile,ext,title_en,title_zh,avatar_url&order=site,name_en&active=eq.true`,
@@ -6246,7 +6254,7 @@ async function loadExperts() {
     );
     const rows = await res.json();
     if (Array.isArray(rows)) {
-      users = rows.map(u => ({
+      _expertAllUsers = rows.map(u => ({
         id:      u.emp_id,
         empId:   u.emp_id,
         nameEn:  u.name_en   || '',
@@ -6268,49 +6276,83 @@ async function loadExperts() {
     return;
   }
 
-  if (!users.length) {
-    grid.innerHTML = '<div style="color:var(--text-3);font-size:13px;padding:20px;grid-column:1/-1;">尚無人員資料</div>';
+  _renderExpertContent();
+}
+
+function _setExpertFilter(site) {
+  _expertSiteFilter = site;
+  _renderExpertContent();
+}
+
+function _renderExpertContent() {
+  const grid = document.getElementById('expert-grid');
+  const filterBar = document.getElementById('expert-site-filter');
+  const SITE_FLAG = { TW:'🇹🇼', CN:'🇨🇳', VN:'🇻🇳' };
+
+  if (!_expertAllUsers.length) {
+    if (grid) grid.innerHTML = '<div style="color:var(--text-3);font-size:13px;padding:20px;grid-column:1/-1;">尚無人員資料</div>';
     return;
   }
 
-  // 依 site 分組顯示
-  const sites = [...new Set(users.map(u => u.site || '其他'))];
-  grid.innerHTML = sites.map(site => {
-    const group = users.filter(u => (u.site || '其他') === site);
-    return `
-      <div style="grid-column:1/-1;font-size:11px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.05em;padding:4px 0 2px;border-bottom:1px solid var(--border);margin-bottom:2px;">${site}</div>
-      ${group.map(u => {
-        const lang    = currentLang;
-        const name    = u.nameZh || u.nameEn || u.email || '—';
-        const nameEn  = u.nameEn || '';
-        const title   = (['zh-TW','zh-CN'].includes(lang) ? u.titleZh : u.titleEn) || u.titleZh || u.titleEn || '';
-        const bio     = (['zh-TW','zh-CN'].includes(lang) ? u.bioZh : u.bioEn) || u.bioZh || u.bioEn || '';
-        const expertise = (['zh-TW','zh-CN'].includes(lang) ? u.expertiseZh : u.expertiseEn) || u.expertiseZh || u.expertiseEn || [];
-        const initial = name[0]?.toUpperCase() || '?';
-        const avatar  = u.photoURL
-          ? `<img src="${u.photoURL}" style="width:44px;height:44px;border-radius:50%;object-fit:cover;margin-bottom:8px;flex-shrink:0;" onerror="this.style.display='none';this.nextSibling.style.display='flex';" /><div class="expert-avatar" style="display:none;">${initial}</div>`
-          : `<div class="expert-avatar">${initial}</div>`;
-        const contact = [
-          u.email  ? `<span onclick="navigator.clipboard?.writeText('${u.email}');toast('已複製','success')" style="cursor:pointer;color:var(--blue);">✉ ${u.email}</span>` : '',
-          u.mobile ? `<span onclick="navigator.clipboard?.writeText('${u.mobile}');toast('已複製','success')" style="cursor:pointer;">📱 ${u.mobile}</span>` : '',
-          u.ext    ? `<span>🔢 分機 ${u.ext}</span>` : '',
-        ].filter(Boolean).join('');
-        const tags = Array.isArray(expertise) && expertise.length
-          ? `<div class="expert-tags" style="margin-top:6px;display:flex;flex-wrap:wrap;gap:4px;">
-               ${expertise.map(t => `<span class="expert-tag">${t}</span>`).join('')}
-             </div>` : '';
-        const empId = u.empId || u.uid || '';
-        return `
-          <div class="expert-card" style="cursor:pointer;" onclick="viewExpertDocs('${(u.nameEn||u.nameZh||'').replace(/'/g,'')}')" title="點擊查看 ${name} 的文章">
-            ${avatar}
-            <div class="expert-name">${name}${nameEn && nameEn !== name ? `<span style="font-size:11px;color:var(--text-3);margin-left:4px;">${nameEn}</span>` : ''}</div>
-            ${title ? `<div class="expert-role">${title}</div>` : ''}
-            ${bio ? `<div style="font-size:11px;color:var(--text-2);margin-top:5px;line-height:1.5;">${bio}</div>` : ''}
-            ${tags}
-            ${contact ? `<div class="expert-contact" style="display:flex;flex-direction:column;gap:4px;margin-top:8px;font-size:11px;" onclick="event.stopPropagation()">${contact}</div>` : ''}
-            <div style="font-size:10px;color:var(--text-3);margin-top:8px;text-align:center;">點擊查看文章 →</div>
-          </div>`;
-      }).join('')}`;
+  // 渲染 site 篩選按鈕
+  const allSites = [...new Set(_expertAllUsers.map(u => u.site || 'TW'))].sort();
+  if (filterBar) {
+    filterBar.innerHTML = ['', ...allSites].map(s =>
+      `<button onclick="_setExpertFilter('${s}')" style="padding:4px 12px;border-radius:12px;border:1px solid ${s===_expertSiteFilter ? 'var(--blue)' : 'var(--border)'};background:${s===_expertSiteFilter ? 'rgba(91,155,213,.15)' : 'transparent'};color:${s===_expertSiteFilter ? 'var(--blue)' : 'var(--text-3)'};font-size:12px;cursor:pointer;font-family:inherit;">${s ? (SITE_FLAG[s]||'') + ' ' + s : 'All'}</button>`
+    ).join('');
+  }
+
+  // 依篩選過濾使用者
+  const users = _expertSiteFilter
+    ? _expertAllUsers.filter(u => (u.site || 'TW') === _expertSiteFilter)
+    : _expertAllUsers;
+
+  if (!users.length) {
+    grid.innerHTML = '<div style="color:var(--text-3);font-size:13px;padding:20px;grid-column:1/-1;">此 site 尚無人員資料</div>';
+    return;
+  }
+
+  // 選 All 時依 site 分組顯示；選特定 site 時直接列出
+  const sitesToShow = _expertSiteFilter
+    ? [_expertSiteFilter]
+    : [...new Set(users.map(u => u.site || 'TW'))];
+
+  grid.innerHTML = sitesToShow.map(site => {
+    const group = _expertSiteFilter ? users : users.filter(u => (u.site || 'TW') === site);
+    const groupHeader = !_expertSiteFilter
+      ? `<div style="grid-column:1/-1;font-size:11px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.05em;padding:4px 0 2px;border-bottom:1px solid var(--border);margin-bottom:2px;">${(SITE_FLAG[site]||'')} ${site}</div>`
+      : '';
+    return groupHeader + group.map(u => {
+      const lang    = currentLang;
+      const name    = u.nameZh || u.nameEn || u.email || '—';
+      const nameEn  = u.nameEn || '';
+      const title   = (['zh-TW','zh-CN'].includes(lang) ? u.titleZh : u.titleEn) || u.titleZh || u.titleEn || '';
+      const bio     = (['zh-TW','zh-CN'].includes(lang) ? u.bioZh : u.bioEn) || u.bioZh || u.bioEn || '';
+      const expertise = (['zh-TW','zh-CN'].includes(lang) ? u.expertiseZh : u.expertiseEn) || u.expertiseZh || u.expertiseEn || [];
+      const initial = name[0]?.toUpperCase() || '?';
+      const avatar  = u.photoURL
+        ? `<img src="${u.photoURL}" style="width:44px;height:44px;border-radius:50%;object-fit:cover;margin-bottom:8px;flex-shrink:0;" onerror="this.style.display='none';this.nextSibling.style.display='flex';" /><div class="expert-avatar" style="display:none;">${initial}</div>`
+        : `<div class="expert-avatar">${initial}</div>`;
+      const contact = [
+        u.email  ? `<span onclick="navigator.clipboard?.writeText('${u.email}');toast('已複製','success')" style="cursor:pointer;color:var(--blue);">✉ ${u.email}</span>` : '',
+        u.mobile ? `<span onclick="navigator.clipboard?.writeText('${u.mobile}');toast('已複製','success')" style="cursor:pointer;">📱 ${u.mobile}</span>` : '',
+        u.ext    ? `<span>🔢 分機 ${u.ext}</span>` : '',
+      ].filter(Boolean).join('');
+      const tags = Array.isArray(expertise) && expertise.length
+        ? `<div class="expert-tags" style="margin-top:6px;display:flex;flex-wrap:wrap;gap:4px;">
+             ${expertise.map(t => `<span class="expert-tag">${t}</span>`).join('')}
+           </div>` : '';
+      return `
+        <div class="expert-card" style="cursor:pointer;" onclick="viewExpertDocs('${(u.nameEn||u.nameZh||'').replace(/'/g,'')}')" title="點擊查看 ${name} 的文章">
+          ${avatar}
+          <div class="expert-name">${name}${nameEn && nameEn !== name ? `<span style="font-size:11px;color:var(--text-3);margin-left:4px;">${nameEn}</span>` : ''}</div>
+          ${title ? `<div class="expert-role">${title}</div>` : ''}
+          ${bio ? `<div style="font-size:11px;color:var(--text-2);margin-top:5px;line-height:1.5;">${bio}</div>` : ''}
+          ${tags}
+          ${contact ? `<div class="expert-contact" style="display:flex;flex-direction:column;gap:4px;margin-top:8px;font-size:11px;" onclick="event.stopPropagation()">${contact}</div>` : ''}
+          <div style="font-size:10px;color:var(--text-3);margin-top:8px;text-align:center;">點擊查看文章 →</div>
+        </div>`;
+    }).join('');
   }).join('');
 }
 
@@ -6895,7 +6937,7 @@ window.switchPanel = function(id) {
   _origSwitchPanel(id);
   if (id === 'editor')    { setTimeout(loadVersionHistory, 150); }
   if (id === 'kmap')      setTimeout(() => loadKmap(null), 50);
-  if (id === 'analytics') setTimeout(loadAnalytics, 50);
+  if (id === 'analytics') setTimeout(() => loadAnalytics(portalUser?.site || ''), 50);
   if (id === 'setting')   setTimeout(loadSettingContent, 50);
   if (id === 'experts')   setTimeout(loadExperts, 50);
   if (id === 'review')    { window._reviewAllDocs = null; window._reviewFilter = 'draft'; setTimeout(loadReviewPanel, 50); }

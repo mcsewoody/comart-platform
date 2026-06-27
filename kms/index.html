@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART KMS v2.14</title>
+<title>COMART KMS v2.15</title>
 
 <!-- Marked for Markdown → HTML preview (classic script, no module needed) -->
 <script src="https://cdn.jsdelivr.net/npm/marked@9.1.6/marked.min.js"></script>
@@ -391,7 +391,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v2.14</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v2.15</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('en')">EN</button>
@@ -6040,23 +6040,38 @@ async function loadKmap(filterCat) {
 // ═══════════════════════════════════════════════
 // ANALYTICS
 // ═══════════════════════════════════════════════
-async function loadAnalytics() {
+async function loadAnalytics(siteFilter = '') {
   const wrap = document.getElementById('analytics-content');
   wrap.innerHTML = '<div style="text-align:center;color:var(--text-3);padding:40px 0;">載入中…</div>';
 
-  let docs = [], authorStats = [], gaps = [];
+  let docs = [], authorStats = [], gaps = [], usersData = [];
   try {
     if (CFG.supabaseUrl && CFG.supabaseKey) {
       [docs, authorStats] = await Promise.all([
         sbFetch('/rest/v1/kms_documents?select=id,title,category,author_name,view_count,status,updated_at&order=view_count.desc'),
         sbFetch('/rest/v1/kms_documents?select=author_name&author_name=not.is.null'),
       ]);
+      try {
+        const r = await fetch(`${KMS_SB_WORKER}/supabase/rest/v1/users?select=name_en,name_zh,site&active=eq.true`, { headers:{'x-admin-token':KMS_SB_TOKEN} });
+        if (r.ok) usersData = await r.json();
+      } catch(_) {}
     } else {
       docs = DEMO_DOCS.map(d => ({ ...d, view_count: Math.floor(Math.random()*80)+5 }));
     }
   } catch(e) {
     docs = DEMO_DOCS.map(d => ({ ...d, view_count: Math.floor(Math.random()*80)+5 }));
   }
+
+  // Build author name → site mapping
+  const nameSiteMap = {};
+  if (Array.isArray(usersData)) {
+    usersData.forEach(u => {
+      if (u.name_en) nameSiteMap[u.name_en.trim()] = u.site || '';
+      if (u.name_zh) nameSiteMap[u.name_zh.trim()] = u.site || '';
+    });
+  }
+  const allSites = [...new Set(Object.values(nameSiteMap).filter(Boolean))].sort();
+  const SITE_FLAG = { TW:'🇹🇼', CN:'🇨🇳', VN:'🇻🇳' };
 
   gaps = JSON.parse(localStorage.getItem('kms-search-gaps') || '[]');
 
@@ -6065,6 +6080,20 @@ async function loadAnalytics() {
   const totalViews = docs.reduce((s,d) => s + (d.view_count||0), 0);
   const gapCount = gaps.length;
   const maxViews = Math.max(...docs.map(d => d.view_count||0), 1);
+
+  // Build knowledge ranking with site info
+  const countMap = {};
+  (authorStats || []).forEach(d => {
+    const name = (d.author_name || '').trim() || '未知';
+    if (!countMap[name]) countMap[name] = { count: 0, site: nameSiteMap[name] || '' };
+    countMap[name].count++;
+  });
+  const rankAll = Object.entries(countMap).sort((a,b) => b[1].count - a[1].count);
+  const rankFiltered = siteFilter ? rankAll.filter(([,v]) => v.site === siteFilter) : rankAll;
+  const maxRankCount = rankFiltered[0]?.[1].count || 1;
+  const siteFilterBtns = ['', ...allSites].map(s =>
+    `<button onclick="loadAnalytics('${s}')" style="padding:3px 10px;border-radius:12px;border:1px solid ${s===siteFilter ? 'var(--blue)' : 'var(--border)'};background:${s===siteFilter ? 'rgba(91,155,213,.15)' : 'transparent'};color:${s===siteFilter ? 'var(--blue)' : 'var(--text-3)'};font-size:11px;cursor:pointer;font-family:inherit;">${s ? (SITE_FLAG[s]||'') + ' ' + s : 'All'}</button>`
+  ).join('');
 
   wrap.innerHTML = `
     <div class="section-hd">總覽</div>
@@ -6097,24 +6126,22 @@ async function loadAnalytics() {
         </div>`).join('');
     })()}
 
-    ${authorStats?.length ? (() => {
-      // 從 author_name 陣列計算每人文件數
-      const countMap = {};
-      authorStats.forEach(d => {
-        const name = d.author_name || '未知';
-        countMap[name] = (countMap[name] || 0) + 1;
-      });
-      const sorted = Object.entries(countMap).sort((a,b) => b[1]-a[1]).slice(0,10);
-      const maxCount = sorted[0]?.[1] || 1;
-      return `
-    <div class="section-hd">貢獻度統計（依作者）</div>
-    ${sorted.map(([name, cnt]) => `
-      <div class="chart-row">
-        <span class="chart-label" style="cursor:pointer;color:var(--blue);" onclick="viewExpertDocs('${name.replace(/'/g,'')}')" title="查看此作者文章">${name}</span>
-        <div class="chart-track"><div class="chart-fill" style="width:${Math.round((cnt/maxCount)*100)}%;background:var(--green);"></div></div>
-        <span class="chart-val">${cnt}</span>
-      </div>`).join('')}`;
-    })() : ''}
+    ${rankAll.length ? `
+    <div class="section-hd" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:16px;">
+      <span>🏆 Knowledge Ranking</span>
+      <div style="display:flex;gap:4px;flex-wrap:wrap;">${siteFilterBtns}</div>
+    </div>
+    ${rankFiltered.map(([name, {count, site}], i) => {
+      const siteTag = site ? `<span style="font-size:10px;padding:1px 6px;border-radius:8px;background:rgba(255,255,255,.06);color:var(--text-3);flex-shrink:0;">${SITE_FLAG[site]||''} ${site}</span>` : '';
+      return `<div class="chart-row">
+        <span style="font-size:11px;color:var(--text-3);width:22px;flex-shrink:0;text-align:right;">${i+1}</span>
+        <span class="chart-label" style="cursor:pointer;color:var(--blue);" onclick="viewExpertDocs('${name.replace(/'/g,'&#39;')}')" title="查看此作者文章">${name}</span>
+        ${siteTag}
+        <div class="chart-track"><div class="chart-fill" style="width:${Math.round((count/maxRankCount)*100)}%;background:var(--green);"></div></div>
+        <span class="chart-val">${count}</span>
+      </div>`;
+    }).join('')}
+    ` : ''}
 
     ${gaps.length ? `
     <div class="section-hd">知識缺口清單（搜尋無結果）</div>

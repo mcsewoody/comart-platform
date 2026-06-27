@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>COMART Platform v1.48</title>
+<title>COMART Platform v1.49</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.js"></script>
 <style>
@@ -321,7 +321,7 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1) brightness(
     <div class="login-logo">
       <div class="login-mark">C</div>
       <div class="login-name">COMART Platform</div>
-      <div class="login-sub">Internal Portal · v1.48</div>
+      <div class="login-sub">Internal Portal · v1.49</div>
     </div>
     <form id="loginForm" onsubmit="doLogin();return false;" autocomplete="on">
     <div class="field">
@@ -349,7 +349,7 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1) brightness(
   <div class="topbar">
     <div class="topbar-logo" onclick="switchView('home')">
       <div class="topbar-mark">C</div>
-      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.48</span></div>
+      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.49</span></div>
     </div>
     <div class="topbar-right">
       <div class="lang-switcher">
@@ -419,7 +419,7 @@ input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1) brightness(
 
           <div class="section-title" id="sect-updates">Platform Updates</div>
           <div class="changelog">
-            <div class="cl-item"><div class="cl-dot" style="background:var(--grn)"></div><div><div class="cl-text">v1.48 — 全系統文字顯示調亮（tx2/tx3 提高對比度），背景維持純黑</div><div class="cl-date">2026-06 · UI</div></div></div>
+            <div class="cl-item"><div class="cl-dot" style="background:var(--grn)"></div><div><div class="cl-text">v1.49 — 全系統文字顯示調亮（tx2/tx3 提高對比度），背景維持純黑</div><div class="cl-date">2026-06 · UI</div></div></div>
             <div class="cl-item"><div class="cl-dot" style="background:var(--grn)"></div><div><div class="cl-text">v1.47 — i18n 全面補完：AI Skills tab（公司調查、展後跟進）、排行榜說明、Calendar Add 按鈕全部支援 5 語言</div><div class="cl-date">2026-06 · Enhancement</div></div></div>
             <div class="cl-item"><div class="cl-dot" style="background:var(--grn)"></div><div><div class="cl-text">v1.37 — i18n 補完（Cards/Users Tab/Calendar dropdown）；HoF Ranking Supabase 失敗時 fallback 顯示員工清單</div><div class="cl-date">2026-06 · Fix</div></div></div>
             <div class="cl-item"><div class="cl-dot" style="background:var(--grn)"></div><div><div class="cl-text">v1.28 — Calendar 手機版修正；Users 三Tab+篩選列；User Modal頭像上傳；HoF Read-Only；色調調亮</div><div class="cl-date">2026-06 · Feature</div></div></div>
@@ -2871,6 +2871,10 @@ function enterPortal() {
   var calAddBtn = document.getElementById('cal-add-event-btn'); if(calAddBtn) calAddBtn.style.display = (isAdmin || s.role === 'dcc') ? '' : 'none';
 
   renderAppGrid();
+  if (!localStorage.getItem('comart-lang')) {
+    const _sl = { TW:'zh-TW', CN:'zh-CN', VN:'vi' }[SESSION.site];
+    if (_sl) setLang(_sl);
+  }
   applyI18nAll();
   // 啟動通知
   setTimeout(function() { updateNotifBadge(true); }, 1200);

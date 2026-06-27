@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" href="data:,">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART 行政管理平台 v1.68</title>
+<title>COMART 行政管理平台 v1.69</title>
 <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.js"></script>
 <style>
 :root{
@@ -975,7 +975,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="logo">
     <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
     <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
-    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.68</span>
+    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.69</span>
   </div>
   <div class="trr">
     <div class="admin-lang-sw">
@@ -990,7 +990,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <span id="cur-u" style="color:var(--text-2)">載入中…</span>
       <span style="color:var(--text-3);font-size:10px">▾</span>
     </div>
-    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.68</span>
+    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.69</span>
   </div>
 </div>
 
@@ -3365,7 +3365,8 @@ async function init(){
   // seed 只在 SB 也空的時候執行（兜底）
   setTimeout(async()=>{ if(!ld(K.bk).length) await seedLib(); if(!ld(K.vh).length) await seedCar(); },2000);
   chkOv();popCatSel();popUsrSel();
-  const savedLang = localStorage.getItem('admin-lang') || 'en';
+  const _siteLang = { TW:'zh-TW', CN:'zh-CN', VN:'vi' }[PORTAL_SESSION?.site];
+  const savedLang = localStorage.getItem('admin-lang') || _siteLang || 'en';
   setLang(savedLang);
   seedRoomDemo().then(()=>{}); seedVisitDemo().then(()=>{}); switchMod('room');updUsrDisp();updBadges();
   document.querySelectorAll('#panel-lib .navi').forEach(el=>el.addEventListener('click',()=>{const p=el.dataset.p;if(p)navLib(p);}));

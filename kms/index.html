@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART KMS v2.13</title>
+<title>COMART KMS v2.14</title>
 
 <!-- Marked for Markdown → HTML preview (classic script, no module needed) -->
 <script src="https://cdn.jsdelivr.net/npm/marked@9.1.6/marked.min.js"></script>
@@ -391,7 +391,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v2.13</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v2.14</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('en')">EN</button>
@@ -1841,6 +1841,10 @@ window.addEventListener('DOMContentLoaded', async () => {
   setLang(currentLang);
   loadConfig();
   await initPortalSession();
+  if (!localStorage.getItem('kms-lang')) {
+    const _sl = { TW:'zh-TW', CN:'zh-CN', VN:'vi' }[portalUser?.site];
+    if (_sl) setLang(_sl);
+  }
   // doc-author 由 initPortalSession 填入登入者姓名（若已查到）
   // 此處不再強制清空，讓 initPortalSession 的 displayName 生效
   await initTipTap();

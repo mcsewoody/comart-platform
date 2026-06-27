@@ -292,7 +292,7 @@ img{display:block}
       <div class="logo-mark">C</div>
       <div>
         <div class="logo-text">COMART</div>
-        <div id="appVersionDiv" style="font-size:10px;color:var(--ac);font-weight:600;letter-spacing:.04em;line-height:1.3">v3.48</div>
+        <div id="appVersionDiv" style="font-size:10px;color:var(--ac);font-weight:600;letter-spacing:.04em;line-height:1.3">v3.49</div>
       </div>
     </div>
     <div class="topbar-right">
@@ -1739,11 +1739,16 @@ async function loadAll() {
             titleEn: u.title_en||'', titleZh: u.title_zh||'',
             role:    u.active === false ? 'inactive' : (u.role || 'user'),
             photoURL:u.avatar_url||'', pwdHash: u.pwd_hash||'',
+            site:    u.site || 'TW',
           };
         }
       } catch(e) { console.warn('[Portal auth SB]', e); }
       if (freshUser && freshUser.role !== 'inactive') {
         currentUser = { ...freshUser };
+        if (!localStorage.getItem('qi-lang-v2')) {
+          const _sl = { TW:'zh-TW', CN:'zh-CN', VN:'vi' }[freshUser.site];
+          if (_sl) setLang(_sl);
+        }
         try { lsSet('qi-user-session-v2', { empId: freshUser.empId, login: freshUser.login, ts: Date.now() }); } catch(_) {}
         hideLoginPage();
         updateUserBadge();

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" href="data:,">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART 行政管理平台 v1.69</title>
+<title>COMART 行政管理平台 v1.70</title>
 <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.js"></script>
 <style>
 :root{
@@ -975,7 +975,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="logo">
     <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
     <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
-    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.69</span>
+    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.70</span>
   </div>
   <div class="trr">
     <div class="admin-lang-sw">
@@ -990,7 +990,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <span id="cur-u" style="color:var(--text-2)">載入中…</span>
       <span style="color:var(--text-3);font-size:10px">▾</span>
     </div>
-    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.69</span>
+    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.70</span>
   </div>
 </div>
 
@@ -1006,15 +1006,15 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
     <span class="modnav-label" data-i18n="mod.car">公務車</span>
     <span class="tbadge" id="tb-car" style="display:none">0</span>
   </div>
-  <div class="modnav-item" data-module="visit" onclick="switchMod('visit')" title="客戶到訪">
-    <span class="modnav-icon">🤝</span>
-    <span class="modnav-label" data-i18n="mod.visit">客戶到訪</span>
-    <span class="tbadge" id="tb-visit" style="display:none">0</span>
-  </div>
   <div class="modnav-item" data-module="lib" onclick="switchMod('lib')" title="圖書館管理">
     <span class="modnav-icon">📚</span>
     <span class="modnav-label" data-i18n="mod.lib">圖書館</span>
     <span class="tbadge" id="tb-lib" style="display:none">0</span>
+  </div>
+  <div class="modnav-item" data-module="visit" onclick="switchMod('visit')" title="客戶到訪">
+    <span class="modnav-icon">🤝</span>
+    <span class="modnav-label" data-i18n="mod.visit">客戶到訪</span>
+    <span class="tbadge" id="tb-visit" style="display:none">0</span>
   </div>
   <div class="modnav-item" data-module="trip" onclick="switchMod('trip')" title="差旅報支單">
     <span class="modnav-icon">✈️</span>
@@ -1053,6 +1053,13 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   </div>
   <div class="mc" id="lc">
     <div class="pg active" id="pg-lib-dash">
+      <div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;align-items:center">
+        <span style="font-size:12px;color:var(--t3)">Site:</span>
+        <button class="calvb" data-smod="lib" data-site="" onclick="setSiteFilter('lib','')">全部</button>
+        <button class="calvb" data-smod="lib" data-site="TW" onclick="setSiteFilter('lib','TW')">🇹🇼 TW</button>
+        <button class="calvb" data-smod="lib" data-site="CN" onclick="setSiteFilter('lib','CN')">🇨🇳 CN</button>
+        <button class="calvb" data-smod="lib" data-site="VN" onclick="setSiteFilter('lib','VN')">🇻🇳 VN</button>
+      </div>
       <div class="sg">
         <div class="sc ca"><div class="sl" data-i18n="lib.stat.total">館藏總數</div><div class="sv" id="sl-tot">0</div><div class="ss" data-i18n="lib.stat.unit">冊</div></div>
         <div class="sc"><div class="sl" data-i18n="lib.stat.loaned">借閱中</div><div class="sv" id="sl-act">0</div><div class="ss" data-i18n="lib.stat.unit">冊</div></div>
@@ -1135,6 +1142,13 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   </div>
   <div class="mc cf" id="cc">
     <div class="pg active" id="pg-car-dash">
+      <div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;align-items:center">
+        <span style="font-size:12px;color:var(--t3)">Site:</span>
+        <button class="calvb" data-smod="car" data-site="" onclick="setSiteFilter('car','')">全部</button>
+        <button class="calvb" data-smod="car" data-site="TW" onclick="setSiteFilter('car','TW')">🇹🇼 TW</button>
+        <button class="calvb" data-smod="car" data-site="CN" onclick="setSiteFilter('car','CN')">🇨🇳 CN</button>
+        <button class="calvb" data-smod="car" data-site="VN" onclick="setSiteFilter('car','VN')">🇻🇳 VN</button>
+      </div>
       <div class="sg">
         <div class="sc ct"><div class="sl" data-i18n="car.stat.total">車輛總數</div><div class="sv" id="sc-tot">0</div><div class="ss" data-i18n="car.stat.unit">輛</div></div>
         <div class="sc cs"><div class="sl" data-i18n="car.stat.avail">可預約</div><div class="sv" id="sc-av">0</div><div class="ss" data-i18n="car.stat.idle">輛空閒</div></div>
@@ -1368,10 +1382,17 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
 
     <!-- DASH -->
     <div class="pg active" id="pg-room-dash">
-      <div class="sth" style="margin-bottom:16px">
+      <div class="sth" style="margin-bottom:10px">
         <div class="stt" data-i18n="room.dash.title2">🏢 會議室即時狀態</div>
         <button class="btn bg2 bsm" onclick="navRoom('room-new')" style="margin-left:auto" data-i18n="room.dash.add">＋ 新增預約</button>
         <span id="room-clock" style="font-size:12px;color:var(--t3);margin-left:12px"></span>
+      </div>
+      <div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;align-items:center">
+        <span style="font-size:12px;color:var(--t3)">Site:</span>
+        <button class="calvb" data-smod="room" data-site="" onclick="setSiteFilter('room','')">全部</button>
+        <button class="calvb" data-smod="room" data-site="TW" onclick="setSiteFilter('room','TW')">🇹🇼 TW</button>
+        <button class="calvb" data-smod="room" data-site="CN" onclick="setSiteFilter('room','CN')">🇨🇳 CN</button>
+        <button class="calvb" data-smod="room" data-site="VN" onclick="setSiteFilter('room','VN')">🇻🇳 VN</button>
       </div>
       <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;margin-bottom:20px" id="room-dash-cards"></div>
       <!-- 新增預約（嵌入狀態看板下方） -->
@@ -1890,7 +1911,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="mh"><div class="mt2" data-i18n="room.mo.fault">回報設備故障</div><button class="mc2" onclick="closeMo('mo-fault')">✕</button></div>
   <div class="mb">
     <div class="fg"><div class="fl" data-i18n="room.tbl.room">會議室</div>
-      <select id="ft-room"><option value="big">大會議室</option><option value="small">小會議室</option></select></div>
+      <select id="ft-room"></select></div>
     <div class="fg"><div class="fl">故障設備</div>
       <select id="ft-equip"><option value="投影機">投影機</option><option value="視訊系統">視訊系統</option><option value="白板">白板/白板筆</option><option value="冷氣">冷氣</option><option value="燈光">燈光</option><option value="音響">音響</option><option value="其他">其他</option></select></div>
     <div class="fg"><div class="fl">問題描述 *</div><textarea id="ft-desc" placeholder="詳細描述故障狀況…" style="min-height:80px"></textarea></div>
@@ -2330,6 +2351,7 @@ async function sbSaveVehicle(vh) {
       parking_id:vh.pk_id||vh.parking_id||null,
       pk_id:vh.pk_id||vh.parking_id||null,
       notes:vh.notes||'', status:vh.st||vh.status||'available',
+      site:vh.site||'TW',
     });
   } catch(e) { console.warn('sbSaveVehicle fail:', e.message); }
 }
@@ -3368,6 +3390,21 @@ async function init(){
   const _siteLang = { TW:'zh-TW', CN:'zh-CN', VN:'vi' }[PORTAL_SESSION?.site];
   const savedLang = localStorage.getItem('admin-lang') || _siteLang || 'en';
   setLang(savedLang);
+  // 依登入 site 設定預設過濾
+  _roomSite = PORTAL_SESSION?.site || '';
+  _carSite  = PORTAL_SESSION?.site || '';
+  _libSite  = PORTAL_SESSION?.site || '';
+  // 同步 site filter 按鈕視覺狀態（DOM 尚未完全渲染，用 setTimeout 確保）
+  setTimeout(()=>{
+    ['room','car','lib'].forEach(mod=>{
+      const site = mod==='room'?_roomSite:mod==='car'?_carSite:_libSite;
+      document.querySelectorAll(`[data-smod="${mod}"]`).forEach(b=>{
+        const act=b.dataset.site===site;
+        b.style.background=act?'var(--ac)':'';b.style.color=act?'#fff':'';
+        b.style.borderColor=act?'var(--ac)':'';
+      });
+    });
+  },0);
   seedRoomDemo().then(()=>{}); seedVisitDemo().then(()=>{}); switchMod('room');updUsrDisp();updBadges();
   document.querySelectorAll('#panel-lib .navi').forEach(el=>el.addEventListener('click',()=>{const p=el.dataset.p;if(p)navLib(p);}));
   document.querySelectorAll('#panel-car .navi').forEach(el=>el.addEventListener('click',()=>{const p=el.dataset.p;if(p)navCar(p);}));
@@ -3391,11 +3428,11 @@ async function seedLib(){
   }
   const cid = n => defCats.find(x=>x.name===n)?.id||'';
   const bks=[
-    {id:uid(),title:'從A到A+',author:'詹姆‧柯林斯',isbn:'9789573258674',cat_id:cid('管理'),lang:'繁中',year:2002,copies:2,cover:'',notes:''},
-    {id:uid(),title:'Hooked 鉤癮效應',author:'尼爾‧艾歐',isbn:'9789863213307',cat_id:cid('設計'),lang:'繁中',year:2014,copies:1,cover:'',notes:''},
-    {id:uid(),title:'精實創業',author:'艾瑞克‧萊斯',isbn:'',cat_id:cid('管理'),lang:'繁中',year:2012,copies:1,cover:'',notes:''},
-    {id:uid(),title:'Steve Jobs',author:'Walter Isaacson',isbn:'9781451648539',cat_id:cid('傳記'),lang:'EN',year:2011,copies:1,cover:'',notes:''},
-    {id:uid(),title:'原則',author:'瑞‧達利歐',isbn:'',cat_id:cid('管理'),lang:'繁中',year:2018,copies:2,cover:'',notes:''},
+    {id:uid(),title:'從A到A+',author:'詹姆‧柯林斯',isbn:'9789573258674',cat_id:cid('管理'),lang:'繁中',year:2002,copies:2,cover:'',notes:'',site:'TW'},
+    {id:uid(),title:'Hooked 鉤癮效應',author:'尼爾‧艾歐',isbn:'9789863213307',cat_id:cid('設計'),lang:'繁中',year:2014,copies:1,cover:'',notes:'',site:'TW'},
+    {id:uid(),title:'精實創業',author:'艾瑞克‧萊斯',isbn:'',cat_id:cid('管理'),lang:'繁中',year:2012,copies:1,cover:'',notes:'',site:'TW'},
+    {id:uid(),title:'Steve Jobs',author:'Walter Isaacson',isbn:'9781451648539',cat_id:cid('傳記'),lang:'EN',year:2011,copies:1,cover:'',notes:'',site:'TW'},
+    {id:uid(),title:'原則',author:'瑞‧達利歐',isbn:'',cat_id:cid('管理'),lang:'繁中',year:2018,copies:2,cover:'',notes:'',site:'TW'},
   ];
   sv(K.bk, bks);
   // 寫書目到 Supabase
@@ -3432,9 +3469,9 @@ async function seedCar(){
 
   // 車輛
   const vehs=[
-    {id:VH1,name:'Toyota Camry 白',plate:'ABC-1234',type:'sedan',fuel:'gas',km:42800,next_maint_km:43500,next_insp:fd(45),pk_id:PK1,parking_id:PK1,notes:'',st:'available',status:'available'},
-    {id:VH2,name:'Ford Transit 灰',plate:'XYZ-5678',type:'van',fuel:'diesel',km:88600,next_maint_km:89000,next_insp:fd(120),pk_id:PK2,parking_id:PK2,notes:'7人座',st:'available',status:'available'},
-    {id:VH3,name:'Honda CR-V 黑',plate:'DEF-9012',type:'suv',fuel:'hybrid',km:31200,next_maint_km:35000,next_insp:fd(210),pk_id:'',parking_id:null,notes:'',st:'available',status:'available'},
+    {id:VH1,name:'Toyota Camry 白',plate:'ABC-1234',type:'sedan',fuel:'gas',km:42800,next_maint_km:43500,next_insp:fd(45),pk_id:PK1,parking_id:PK1,notes:'',st:'available',status:'available',site:'TW'},
+    {id:VH2,name:'Ford Transit 灰',plate:'XYZ-5678',type:'van',fuel:'diesel',km:88600,next_maint_km:89000,next_insp:fd(120),pk_id:PK2,parking_id:PK2,notes:'7人座',st:'available',status:'available',site:'TW'},
+    {id:VH3,name:'Honda CR-V 黑',plate:'DEF-9012',type:'suv',fuel:'hybrid',km:31200,next_maint_km:35000,next_insp:fd(210),pk_id:'',parking_id:null,notes:'',st:'available',status:'available',site:'TW'},
   ];
   sv(K.vh,vehs);
   for(const vh of vehs){
@@ -3442,7 +3479,7 @@ async function seedCar(){
       id:vh.id, name:vh.name, plate:vh.plate, type:vh.type,
       fuel:vh.fuel, km:vh.km, next_maint_km:vh.next_maint_km||null,
       next_insp:vh.next_insp||null, parking_id:vh.parking_id||null,
-      pk_id:vh.pk_id||null, notes:vh.notes||'', status:vh.status,
+      pk_id:vh.pk_id||null, notes:vh.notes||'', status:vh.status, site:vh.site,
     }, 'resolution=merge-duplicates,return=minimal');
   }
 
@@ -3688,7 +3725,7 @@ function bkBadge(b){
 
 function renderLibDash(){
   chkOv();
-  const ln=ld(K.ln),bk=ld(K.bk);
+  const ln=ld(K.ln),bk=(_libSite?ld(K.bk).filter(b=>b.site===_libSite):ld(K.bk));
   const ov=ln.filter(l=>l.st==='overdue');
   const sn=ln.filter(l=>l.st==='active'&&dDiff(l.due)<=3&&dDiff(l.due)>=0);
   document.getElementById('sl-tot').textContent=bk.reduce((s,b)=>s+b.copies,0);
@@ -3708,7 +3745,7 @@ function renderLibDash(){
 let bkV='grid',editBkId=null;
 function setBookV(v){bkV=v;document.getElementById('bk-gv').style.display=v==='g'?'':'none';document.getElementById('bk-lv').style.display=v==='l'?'':'none';document.getElementById('vbg').classList.toggle('active',v==='g');document.getElementById('vbl').classList.toggle('active',v==='l');renderBooks();}
 function renderBooks(){
-  let bks=ld(K.bk);
+  let bks=_libSite?ld(K.bk).filter(b=>b.site===_libSite):ld(K.bk);
   const q=document.getElementById('bkq')?.value.toLowerCase()||'',cat=document.getElementById('bkcat')?.value||'',st=document.getElementById('bkst')?.value||'';
   if(q)bks=bks.filter(b=>b.title?.toLowerCase().includes(q)||b.author?.toLowerCase().includes(q)||b.isbn?.includes(q));
   if(cat)bks=bks.filter(b=>b.cat_id===cat);
@@ -3729,7 +3766,7 @@ function openBkModal(id){
 }
 function saveBook(){
   const tit=document.getElementById('bktit').value.trim();if(!tit){toast('請輸入書名','error');return;}
-  const data={isbn:document.getElementById('bkisbn').value.trim(),title:tit,author:document.getElementById('bkaut').value.trim(),year:parseInt(document.getElementById('bkyr').value)||null,cat_id:document.getElementById('bkcatsel').value,lang:document.getElementById('bklng').value,copies:parseInt(document.getElementById('bkcp').value)||1,cover:document.getElementById('bkcov').value.trim(),notes:document.getElementById('bknt2').value.trim()};
+  const data={isbn:document.getElementById('bkisbn').value.trim(),title:tit,author:document.getElementById('bkaut').value.trim(),year:parseInt(document.getElementById('bkyr').value)||null,cat_id:document.getElementById('bkcatsel').value,lang:document.getElementById('bklng').value,copies:parseInt(document.getElementById('bkcp').value)||1,cover:document.getElementById('bkcov').value.trim(),notes:document.getElementById('bknt2').value.trim(),site:_libSite||'TW'};
   const newId=editBkId||uid();
   const fullData={id:newId,...data};
   const bks=ld(K.bk);
@@ -3830,7 +3867,7 @@ function popCarSels(){const vehs=ld(K.vh),vOpts='<option value="">所有車輛</
 
 async function renderCarDash(){
   await loadCarFromSB();
-  const vehs=ld(K.vh),bks=ld(K.bks),now=new Date().toISOString().slice(0,16),today=tds(),cfg=lo(K.ccfg,DCCFG);
+  const vehs=(_carSite?ld(K.vh).filter(v=>v.site===_carSite):ld(K.vh)),bks=ld(K.bks),now=new Date().toISOString().slice(0,16),today=tds(),cfg=lo(K.ccfg,DCCFG);
   const inU=vehs.filter(v=>bks.find(b=>b.vh_id===v.id&&b.st==='active'&&b.start<=now&&b.end>=now)).length;
   const needM=vehs.filter(v=>(v.next_maint_km&&v.km>=(v.next_maint_km-cfg.maint_km))||(v.next_insp&&dDiff(v.next_insp)<=cfg.insp_days)).length;
   document.getElementById('sc-tot').textContent=vehs.length;document.getElementById('sc-av').textContent=vehs.length-inU;document.getElementById('sc-in').textContent=inU;document.getElementById('sc-mt').textContent=needM;
@@ -3844,7 +3881,7 @@ async function renderCarDash(){
 
 let editVid=null;
 async function renderVeh(){ await loadCarFromSB();
-  let vehs=ld(K.vh);const q=document.getElementById('vhq')?.value.toLowerCase()||'',tp=document.getElementById('vhtp')?.value||'';
+  let vehs=_carSite?ld(K.vh).filter(v=>v.site===_carSite):ld(K.vh);const q=document.getElementById('vhq')?.value.toLowerCase()||'',tp=document.getElementById('vhtp')?.value||'';
   if(q)vehs=vehs.filter(v=>v.name.toLowerCase().includes(q)||v.plate.toLowerCase().includes(q));if(tp)vehs=vehs.filter(v=>v.type===tp);
   const cfg=lo(K.ccfg,DCCFG);
   document.getElementById('vh-tb').innerHTML=vehs.length?vehs.map(v=>{const st=vStBadge(v),pk=gPk(v.pk_id),mw=v.next_maint_km&&v.km>=(v.next_maint_km-cfg.maint_km);return`<tr class="${mw?'rw':''}"><td>${VICO[v.type]} <b>${v.name}</b></td><td class="tdm" style="font-family:monospace">${v.plate}</td><td>${t('car.veh.type.'+v.type)||v.type}</td><td>${t('car.fuel.'+v.fuel)||v.fuel}</td><td>${v.pk_id||'—'}</td><td>${v.km.toLocaleString()}</td><td style="color:${mw?'var(--or)':'var(--t1)'}">${v.next_maint_km?v.next_maint_km.toLocaleString():'—'}</td><td><span class="badge ${st.cls}">${st.lbl}</span></td><td>${isAdmin()?`<button class="btn bg2 bsm" onclick="openVehModal('${v.id}')">${t('g.btn.edit')}</button> <button class="btn bdr bsm" onclick="delVeh('${v.id}')">${t('g.btn.delete')}</button>`:''}</td></tr>`}).join(''):`<tr><td colspan="9" class="tdm" style="text-align:center;padding:22px">${t('car.no_veh')}</td></tr>`;
@@ -3864,7 +3901,7 @@ async function openVehModal(id){
 function saveVeh(){
   const nm=document.getElementById('vnm').value.trim(),pl=document.getElementById('vpl').value.trim();
   if(!nm||!pl)return toast('請輸入名稱和車牌','error');
-  const data={name:nm,plate:pl,type:document.getElementById('vtp').value,fuel:document.getElementById('vfl').value,km:parseInt(document.getElementById('vkm').value)||0,next_maint_km:parseInt(document.getElementById('vnmk').value)||null,next_insp:document.getElementById('vni').value||null,pk_id:document.getElementById('vpk').value,parking_id:document.getElementById('vpk').value||null,notes:document.getElementById('vnt').value.trim(),st:document.getElementById('vstatus')?.value||'available',status:document.getElementById('vstatus')?.value||'available'};
+  const data={name:nm,plate:pl,type:document.getElementById('vtp').value,fuel:document.getElementById('vfl').value,km:parseInt(document.getElementById('vkm').value)||0,next_maint_km:parseInt(document.getElementById('vnmk').value)||null,next_insp:document.getElementById('vni').value||null,pk_id:document.getElementById('vpk').value,parking_id:document.getElementById('vpk').value||null,notes:document.getElementById('vnt').value.trim(),st:document.getElementById('vstatus')?.value||'available',status:document.getElementById('vstatus')?.value||'available',site:_carSite||'TW'};
   const newVid = editVid || uid();
   const fullVeh = {id:newVid, ...data};
   const vehs=ld(K.vh);
@@ -4787,9 +4824,26 @@ ${(data.advances||[]).map(a=>{const r=+(data.currencies?.[a.currency]?.rate)||1;
 // ══════════════════════════════
 const RK='room_v1';const FK='fault_v1';
 const ROOMS=[
-  {id:'big',name:'大會議室',cap:20,equip:['視訊系統','白板','投影機'],icon:'🏛️'},
-  {id:'small',name:'小會議室',cap:8,equip:['視訊系統','白板','投影機'],icon:'🚪'},
+  {id:'TW-big',  name:'大會議室',cap:20,equip:['視訊系統','白板','投影機'],icon:'🏛️',site:'TW'},
+  {id:'TW-small',name:'小會議室',cap:8, equip:['視訊系統','白板','投影機'],icon:'🚪',site:'TW'},
+  {id:'CN-big',  name:'大會議室',cap:20,equip:['視訊系統','白板','投影機'],icon:'🏛️',site:'CN'},
+  {id:'CN-small',name:'小會議室',cap:8, equip:['視訊系統','白板','投影機'],icon:'🚪',site:'CN'},
+  {id:'VN-big',  name:'大會議室',cap:20,equip:['視訊系統','白板','投影機'],icon:'🏛️',site:'VN'},
+  {id:'VN-small',name:'小會議室',cap:8, equip:['視訊系統','白板','投影機'],icon:'🚪',site:'VN'},
 ];
+const SITEFLAGS={TW:'🇹🇼',CN:'🇨🇳',VN:'🇻🇳'};
+let _roomSite='',_carSite='',_libSite='';
+function visRooms(){return _roomSite?ROOMS.filter(r=>r.site===_roomSite):ROOMS;}
+function setSiteFilter(mod,site){
+  if(mod==='room'){_roomSite=site;renderRoomDash();}
+  else if(mod==='car'){_carSite=site;renderCarDash();}
+  else if(mod==='lib'){_libSite=site;renderLibDash();}
+  document.querySelectorAll(`[data-smod="${mod}"]`).forEach(b=>{
+    const act=b.dataset.site===site;
+    b.style.background=act?'var(--ac)':'';b.style.color=act?'#fff':'';
+    b.style.borderColor=act?'var(--ac)':'';
+  });
+}
 const ROOM_HOURS={start:8,end:18};
 let calRoomDate=new Date();
 let bkStep=1,bkSelectedSlot=null,bkSelectedRoom=null,checkinBkId=null;
@@ -4891,7 +4945,7 @@ function updateRoomClock(){
 function renderDashCards(bks){
   const el=document.getElementById('room-dash-cards');
   if(!el)return;
-  el.innerHTML=ROOMS.map(room=>{
+  el.innerHTML=visRooms().map(room=>{
     const st=roomLiveStatus(room.id,bks);
     const faults=getFaults().filter(f=>f.roomId===room.id&&f.status==='open');
     return `<div class="room-card" style="border-top:3px solid ${st.type==='busy'?'var(--rd)':st.type==='soon'?'var(--yw)':'var(--gn)'}">
@@ -4919,7 +4973,7 @@ function renderDashCards(bks){
     </div>`;
   }).join('');
   // today remaining slots
-  ROOMS.forEach(room=>{
+  visRooms().forEach(room=>{
     const el2=document.getElementById(`today-slots-${room.id}`);
     if(!el2)return;
     const today=todayStr2();
@@ -4968,7 +5022,7 @@ function buildGantt(bks){
   hours.forEach(hr=>h+=`<div class="gantt-hour" style="width:${hourW}px;flex-shrink:0">${String(hr).padStart(2,'0')}:00</div>`);
   h+=`</div></div>`;
   // room rows
-  ROOMS.forEach(room=>{
+  visRooms().forEach(room=>{
     const roomBks=bks.filter(b=>b.roomId===room.id);
     h+=`<div class="gantt-row" style="width:${totalW}px">`;
     h+=`<div class="gantt-room-label" style="width:${labelW}px;flex-shrink:0">${room.icon} ${room.name}</div>`;
@@ -5019,7 +5073,7 @@ function drawNowLine(){
   const curMin=now.getHours()*60+now.getMinutes();
   const pct2=((curMin-startMin)/totalMin*100);
   if(pct2<0||pct2>100)return;
-  ROOMS.forEach(room=>{
+  visRooms().forEach(room=>{
     const line=document.getElementById(`gnl-${room.id}`);
     if(line)line.style.left=pct2+'%';
   });
@@ -5105,7 +5159,7 @@ function iUpdateSlots(){
   const slots=[];
   for(let m=ROOM_HOURS.start*60;m+dur<=ROOM_HOURS.end*60;m+=30){
     const start=minToTime(m);const end=minToTime(m+dur);
-    const freeRooms=ROOMS.filter(room=>!bks.some(b=>b.roomId===room.id&&timeToMin(b.start)<m+dur&&timeToMin(b.end)>m));
+    const freeRooms=visRooms().filter(room=>!bks.some(b=>b.roomId===room.id&&timeToMin(b.start)<m+dur&&timeToMin(b.end)>m));
     const now=new Date();const slotDT=new Date(date+'T'+start+':00');const past=slotDT<now;
     slots.push({start,end,freeRooms,past});
   }
@@ -5113,7 +5167,7 @@ function iUpdateSlots(){
   el.innerHTML=slots.map(s=>{
     const sel=iBkSelectedSlot&&iBkSelectedSlot.start===s.start&&iBkSelectedSlot.end===s.end;
     const cls=s.past?'slot-busy':s.freeRooms.length===0?'slot-busy':sel?'slot-sel':'';
-    const label=s.past?'過去':s.freeRooms.length===0?'全滿':(s.freeRooms.length===2?'2間可用':'1間可用');
+    const label=s.past?'過去':s.freeRooms.length===0?'全滿':`${s.freeRooms.length}間可用`;
     return `<div class="slot ${cls}" onclick="${s.past||s.freeRooms.length===0?'':'iSelectSlot(this,\"'+s.start+'\",\"'+s.end+'\")'}">${s.start}<br><span style="font-size:9px;opacity:.8">${label}</span></div>`;
   }).join('');
   if(sEl&&eEl&&iBkSelectedSlot){sEl.value=iBkSelectedSlot.start;eEl.value=iBkSelectedSlot.end;}
@@ -5142,7 +5196,7 @@ function iRenderRoomRecommend(){
   const bks=getBookings().filter(b=>b.date===date&&b.status!=='cancelled');
   const el=document.getElementById('ibk-room-cards');if(!el)return;
   const preferSmall=headcount<=6;
-  const sortedRooms=[...ROOMS].sort((a,b2)=>{
+  const sortedRooms=[...visRooms()].sort((a,b2)=>{
     const aSmall=a.cap<=8;const bSmall=b2.cap<=8;
     if(preferSmall&&aSmall&&!bSmall)return -1;if(preferSmall&&!aSmall&&bSmall)return 1;
     if(!preferSmall&&!aSmall&&bSmall)return -1;if(!preferSmall&&aSmall&&!bSmall)return 1;return 0;
@@ -5171,7 +5225,7 @@ function iRenderRoomRecommend(){
     altEl.style.display='';const dur=timeToMin(end)-timeToMin(start);const alts=[];
     for(let m=ROOM_HOURS.start*60;m+dur<=ROOM_HOURS.end*60;m+=30){
       const as=minToTime(m);const ae=minToTime(m+dur);
-      const fr=ROOMS.filter(r=>!bks.some(b=>b.roomId===r.id&&timeToMin(b.start)<m+dur&&timeToMin(b.end)>m));
+      const fr=visRooms().filter(r=>!bks.some(b=>b.roomId===r.id&&timeToMin(b.start)<m+dur&&timeToMin(b.end)>m));
       if(fr.length)alts.push({start:as,end:ae,rooms:fr});
     }
     altList.innerHTML=alts.slice(0,8).map(a=>`<div class="slot" onclick="iSelectAltSlot('${a.start}','${a.end}')">${a.start}<br><span style="font-size:9px">${a.rooms.length}間可用</span></div>`).join('');
@@ -5248,7 +5302,7 @@ function renderSlotGrid(date,dur){
   for(let m=ROOM_HOURS.start*60;m+dur<=ROOM_HOURS.end*60;m+=30){
     const start=minToTime(m);const end=minToTime(m+dur);
     // check if any room free
-    const freeRooms=ROOMS.filter(room=>!bks.some(b=>b.roomId===room.id&&timeToMin(b.start)<m+dur&&timeToMin(b.end)>m));
+    const freeRooms=visRooms().filter(room=>!bks.some(b=>b.roomId===room.id&&timeToMin(b.start)<m+dur&&timeToMin(b.end)>m));
     const now=new Date();const slotDT=new Date(date+'T'+start+':00');
     const past=slotDT<now;
     slots.push({start,end,freeRooms,past});
@@ -5256,7 +5310,7 @@ function renderSlotGrid(date,dur){
   el.innerHTML=slots.map(s=>{
     const sel=bkSelectedSlot&&bkSelectedSlot.start===s.start&&bkSelectedSlot.end===s.end;
     const cls=s.past?'slot-busy':s.freeRooms.length===0?'slot-busy':sel?'slot-sel':'';
-    const label=s.past?'過去':s.freeRooms.length===0?'全滿':(s.freeRooms.length===2?'2間可用':'1間可用');
+    const label=s.past?'過去':s.freeRooms.length===0?'全滿':`${s.freeRooms.length}間可用`;
     return `<div class="slot ${cls}" onclick="${s.past||s.freeRooms.length===0?'':'selectSlot(this,\"'+s.start+'\",\"'+s.end+'\")'}">${s.start}<br><span style="font-size:9px;opacity:.8">${label}</span></div>`;
   }).join('');
   // sync manual time fields
@@ -5291,7 +5345,7 @@ function renderRoomRecommend(){
   const el=document.getElementById('bk-room-cards');if(!el)return;
   // 推薦邏輯：≤6人 → 優先小會議室；>6人 → 優先大會議室
   const preferSmall=headcount<=6;
-  const sortedRooms=[...ROOMS].sort((a,b2)=>{
+  const sortedRooms=[...visRooms()].sort((a,b2)=>{
     const aSmall=a.cap<=8;const bSmall=b2.cap<=8;
     if(preferSmall&&aSmall&&!bSmall)return -1;
     if(preferSmall&&!aSmall&&bSmall)return 1;
@@ -5326,7 +5380,7 @@ function renderRoomRecommend(){
     const altBks=bks;const alts=[];
     for(let m=ROOM_HOURS.start*60;m+dur<=ROOM_HOURS.end*60;m+=30){
       const as=minToTime(m);const ae=minToTime(m+dur);
-      const fr=ROOMS.filter(r=>!altBks.some(b=>b.roomId===r.id&&timeToMin(b.start)<m+dur&&timeToMin(b.end)>m));
+      const fr=visRooms().filter(r=>!altBks.some(b=>b.roomId===r.id&&timeToMin(b.start)<m+dur&&timeToMin(b.end)>m));
       if(fr.length)alts.push({start:as,end:ae,rooms:fr});
     }
     altList.innerHTML=alts.slice(0,8).map(a=>`<div class="slot" onclick="selectAltSlot('${a.start}','${a.end}')">${a.start}<br><span style="font-size:9px">${a.rooms.length}間可用</span></div>`).join('');
@@ -5411,7 +5465,7 @@ function quickBook(roomId){
 async function renderRoomList(){
   const rf=document.getElementById('rl-room-f');
   const sf=document.getElementById('rl-status-f');
-  if(rf){const cur=rf.value;rf.innerHTML='<option value="">所有會議室</option>'+ROOMS.map(r=>`<option value="${r.id}" ${cur===r.id?'selected':''}>${r.name}</option>`).join('');rf.value=cur||'';}
+  if(rf){const cur=rf.value;rf.innerHTML='<option value="">所有會議室</option>'+visRooms().map(r=>`<option value="${r.id}" ${cur===r.id?'selected':''}>${SITEFLAGS[r.site]||''} ${r.name}</option>`).join('');rf.value=cur||'';}
   let bks=(await getRoomBookings()).sort((a,b)=>bkKey(b).localeCompare(bkKey(a)));
   const rFilt=rf?.value||'';const sFilt=sf?.value||'';
   if(rFilt)bks=bks.filter(b=>b.roomId===rFilt);
@@ -5531,7 +5585,7 @@ function renderReport(period){
   const totalSlotMin=totalHours*60*days;
   const el=document.getElementById('rpt-content');if(!el)return;
   let html='<div class="report-grid">';
-  ROOMS.forEach(room=>{
+  visRooms().forEach(room=>{
     const roomBks=bks.filter(b=>b.roomId===room.id);
     const usedMin=roomBks.reduce((s,b)=>s+durMin(b),0);
     const pct2=Math.min(100,(usedMin/totalSlotMin*100)).toFixed(1);
@@ -5593,7 +5647,8 @@ async function renderFaults(){
 }
 function openFaultModal(roomId){
   const us=ld(K.us);
-  const rSel=document.getElementById('ft-room');if(rSel&&roomId)rSel.value=roomId;
+  const rSel=document.getElementById('ft-room');
+  if(rSel){rSel.innerHTML=visRooms().map(r=>`<option value="${r.id}">${SITEFLAGS[r.site]||''} ${r.name}</option>`).join('');if(roomId)rSel.value=roomId;}
   const rep=document.getElementById('ft-reporter');
   if(rep)rep.innerHTML='<option value="">請選擇…</option>'+us.map(u=>`<option value="${u.id}">${u.name}</option>`).join('');
   document.getElementById('ft-desc').value='';
@@ -5604,7 +5659,7 @@ function submitFault(){
   if(!desc){toast('請填寫問題描述','error');return;}
   const f={
     id:uid(),
-    roomId:document.getElementById('ft-room')?.value||'big',
+    roomId:document.getElementById('ft-room')?.value||visRooms()[0]?.id||'',
     equip:document.getElementById('ft-equip')?.value||'其他',
     desc,
     reporterId:document.getElementById('ft-reporter')?.value||'',

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" href="data:,">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART 行政管理平台 v1.70</title>
+<title>COMART 行政管理平台 v1.71</title>
 <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.js"></script>
 <style>
 :root{
@@ -975,7 +975,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="logo">
     <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
     <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
-    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.70</span>
+    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.71</span>
   </div>
   <div class="trr">
     <div class="admin-lang-sw">
@@ -990,7 +990,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <span id="cur-u" style="color:var(--text-2)">載入中…</span>
       <span style="color:var(--text-3);font-size:10px">▾</span>
     </div>
-    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.70</span>
+    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.71</span>
   </div>
 </div>
 
@@ -1376,6 +1376,9 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="navi rna" data-p="room-report"><span class="ic">📊</span><span data-i18n="room.nav.report">使用率報表</span></div>
       <div class="navi rna" data-p="room-fault"><span class="ic">🔧</span><span data-i18n="room.nav.fault">故障回報</span><span class="nbadge" id="nb-fault" style="display:none">0</span></div>
     </div>
+    <div class="navs"><div class="navl" data-i18n="g.nav.settings">設定</div>
+      <div class="navi rna" data-p="room-cfg"><span class="ic">⚙️</span><span data-i18n="room.nav.cfg">系統設定</span></div>
+    </div>
     <div class="sbf">v1.56 · Supabase<br><span style="color:var(--gn)">● 本機存儲</span></div>
   </div>
   <div class="mc" id="rmc">
@@ -1600,6 +1603,19 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
         <button class="btn" style="margin-left:auto;background:var(--rd);color:#fff;padding:6px 12px;border-radius:var(--rs);font-size:12px;font-weight:600;border:none;cursor:pointer" onclick="openFaultModal()" data-i18n="room.fault.add">＋ 新增回報</button>
       </div>
       <div class="fault-list" id="fault-list"></div>
+    </div>
+
+    <!-- CFG -->
+    <div class="pg" id="pg-room-cfg">
+      <div style="max-width:440px"><div class="stt" style="margin-bottom:15px" data-i18n="room.nav.cfg">會議室系統設定</div>
+        <div style="background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);padding:20px;display:flex;flex-direction:column;gap:13px">
+          <div class="fg" style="margin-bottom:0"><div class="fl" data-i18n="room.cfg.hours_start">營業開始時間（整點）</div><input type="number" id="rc-hs" min="0" max="12" value="8"></div>
+          <div class="fg" style="margin-bottom:0"><div class="fl" data-i18n="room.cfg.hours_end">營業結束時間（整點）</div><input type="number" id="rc-he" min="12" max="24" value="18"></div>
+          <div class="fg" style="margin-bottom:0"><div class="fl" data-i18n="room.cfg.max_days">最多可提前預約天數</div><input type="number" id="rc-md" min="1" max="90" value="14"></div>
+          <div class="fg" style="margin-bottom:0"><div class="fl" data-i18n="room.cfg.autorelease">未報到自動釋出（分鐘）</div><input type="number" id="rc-ar" min="5" max="60" value="15"></div>
+          <button class="btn" style="background:var(--gn);color:#0f1117;border:none;cursor:pointer;padding:7px 14px;border-radius:var(--rs);font-size:13px;font-weight:600" onclick="saveRoomCfg()" data-i18n="lib.btn.save_cfg">儲存設定</button>
+        </div>
+      </div>
     </div>
 
   </div>
@@ -1988,7 +2004,7 @@ const ADMIN_CFG = {
   adminToken: 'COMART-ADMIN-2026',
   portalSessionKey: 'comart-portal-session',
 };
-const K={bk:'lib_bk',ln:'lib_ln',us:'lib_us',ct:'lib_ct',rv:'lib_rv',lcfg:'lib_cfg',vh:'car_vh',bks:'car_bks',fl:'car_fl',mt:'car_mt',isp:'car_isp',pk:'car_pk',ccfg:'car_cfg',cu:'cur_u'};
+const K={bk:'lib_bk',ln:'lib_ln',us:'lib_us',ct:'lib_ct',rv:'lib_rv',lcfg:'lib_cfg',vh:'car_vh',bks:'car_bks',fl:'car_fl',mt:'car_mt',isp:'car_isp',pk:'car_pk',ccfg:'car_cfg',rcfg:'room_cfg',cu:'cur_u'};
 
 // ── SUPABASE ADAPTER ───────────────────────────────
 // 所有 CRUD 透過 Cloudflare Worker（service_role），前端只存快取
@@ -2171,6 +2187,7 @@ const dDiff=s=>{const d=new Date(s+'T00:00:00');const n=new Date();n.setHours(0,
 let curUid=localStorage.getItem(K.cu)||null,curMod='lib';
 const DLCFG={max_loans:3,loan_days:30,remind_days:3};
 const DCCFG={maint_km:500,insp_days:30,max_days:7};
+const DRCFG={hours_start:8,hours_end:18,max_days:14,autorelease_min:15};
 const DCATS=['管理','行銷','設計','科技','財務','語言','傳記','文學','其他'];
 const VTLB={sedan:'轎車',suv:'SUV',van:'廂型車',truck:'貨車'};
 const VFLB={gas:'汽油',diesel:'柴油',hybrid:'油電',ev:'純電'};
@@ -3384,6 +3401,8 @@ async function init(){
   // 4. 初始化本機設定
   if(!lo(K.lcfg,null))sv(K.lcfg,DLCFG);
   if(!lo(K.ccfg,null))sv(K.ccfg,DCCFG);
+  if(!lo(K.rcfg,null))sv(K.rcfg,DRCFG);
+  const _rcfg=lo(K.rcfg,DRCFG);ROOM_HOURS={start:_rcfg.hours_start??8,end:_rcfg.hours_end??18};
   // seed 只在 SB 也空的時候執行（兜底）
   setTimeout(async()=>{ if(!ld(K.bk).length) await seedLib(); if(!ld(K.vh).length) await seedCar(); },2000);
   chkOv();popCatSel();popUsrSel();
@@ -3852,6 +3871,8 @@ function delCat(id){if(ld(K.bk).find(b=>b.cat_id===id))return toast('此分類�
 
 function loadLibCfg(){const cfg=lo(K.lcfg,DLCFG);document.getElementById('cfml').value=cfg.max_loans||3;document.getElementById('cfld').value=cfg.loan_days||30;document.getElementById('cfrd').value=cfg.remind_days||3;}
 function saveLibCfg(){sv(K.lcfg,{max_loans:parseInt(document.getElementById('cfml').value)||3,loan_days:parseInt(document.getElementById('cfld').value)||30,remind_days:parseInt(document.getElementById('cfrd').value)||3});toast('已儲存','success');}
+function loadRoomCfg(){const cfg=lo(K.rcfg,DRCFG);document.getElementById('rc-hs').value=cfg.hours_start??8;document.getElementById('rc-he').value=cfg.hours_end??18;document.getElementById('rc-md').value=cfg.max_days??14;document.getElementById('rc-ar').value=cfg.autorelease_min??15;}
+function saveRoomCfg(){const cfg={hours_start:parseInt(document.getElementById('rc-hs').value)||8,hours_end:parseInt(document.getElementById('rc-he').value)||18,max_days:parseInt(document.getElementById('rc-md').value)||14,autorelease_min:parseInt(document.getElementById('rc-ar').value)||15};sv(K.rcfg,cfg);ROOM_HOURS={start:cfg.hours_start,end:cfg.hours_end};toast('已儲存','success');}
 function expData(){const data={};Object.entries(K).forEach(([k,sk])=>{data[k]=JSON.parse(localStorage.getItem(sk)||'null');});dl('comart_backup.json',JSON.stringify(data,null,2),'application/json');toast('已匯出','success');}
 function impTrig(){document.getElementById('impf').click();}
 function impData(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{try{const d=JSON.parse(ev.target.result);Object.entries(K).forEach(([k,sk])=>{if(d[k]!==undefined)localStorage.setItem(sk,JSON.stringify(d[k]));});toast('已匯入，重整中…','success');setTimeout(()=>location.reload(),1000);}catch{toast('格式錯誤','error');}};r.readAsText(f);}
@@ -4844,7 +4865,7 @@ function setSiteFilter(mod,site){
     b.style.borderColor=act?'var(--ac)':'';
   });
 }
-const ROOM_HOURS={start:8,end:18};
+let ROOM_HOURS={start:8,end:18};
 let calRoomDate=new Date();
 let bkStep=1,bkSelectedSlot=null,bkSelectedRoom=null,checkinBkId=null;
 let roomClockTimer=null,autoReleaseTimer=null;
@@ -4866,6 +4887,7 @@ function navRoom(p){
   if(p==='room-list') renderRoomList();
   if(p==='room-report') renderReport('week');
   if(p==='room-fault') renderFaults();
+  if(p==='room-cfg') loadRoomCfg();
 }
 
 // ── Storage helpers ──

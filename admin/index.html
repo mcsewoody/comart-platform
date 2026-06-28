@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" href="data:,">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART 行政管理平台 v1.71</title>
+<title>COMART 行政管理平台 v1.72</title>
 <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.js"></script>
 <style>
 :root{
@@ -975,7 +975,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="logo">
     <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
     <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
-    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.71</span>
+    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.72</span>
   </div>
   <div class="trr">
     <div class="admin-lang-sw">
@@ -990,7 +990,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <span id="cur-u" style="color:var(--text-2)">載入中…</span>
       <span style="color:var(--text-3);font-size:10px">▾</span>
     </div>
-    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.71</span>
+    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.72</span>
   </div>
 </div>
 
@@ -1896,7 +1896,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   </div>
 </div>
 <canvas id="confetti"></canvas>
-<div class="muted-tag" id="muteTag" onclick="toggleMute()">🔊 音效開</div>
+<div class="muted-tag" id="muteTag" onclick="toggleMute()" data-i18n="lot.sound_on">🔊 音效開</div>
       <!-- Admin 結果 overlay -->
       <div id="lotto-result-overlay" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(10,5,20,.95);align-items:center;justify-content:center;flex-direction:column;">
         <div style="font-size:clamp(40px,8vw,80px);font-weight:900;color:#fbbf24;animation:winPop .6s cubic-bezier(.34,1.56,.64,1) both" id="lotto-result-name"></div>
@@ -1913,14 +1913,14 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
 
 <!-- MODALS -->
 <div class="mo" id="mo-book"><div class="md"><div class="mh"><div class="mt2" id="mobkt" data-i18n="lib.mo.add_book">新增書籍</div><button class="mc2" onclick="closeMo('mo-book')">✕</button></div><div class="mb"><div class="fg"><div class="fl" data-i18n="lib.mo.isbn_auto">ISBN（可自動帶入）</div><div style="display:flex;gap:8px"><input type="text" id="bkisbn" placeholder="978-…" style="flex:1"><button class="btn bg2 bsm" onclick="lookupISBN()" data-i18n="lib.mo.lookup">查詢</button></div><div class="isbnld" id="isbnld">🔄 查詢中…</div></div><div class="fg2"><div class="fg full"><div class="fl" data-i18n="lib.tbl.title">書名 *</div><input type="text" id="bktit"></div><div class="fg"><div class="fl" data-i18n="lib.tbl.author">作者</div><input type="text" id="bkaut"></div><div class="fg"><div class="fl">出版年</div><input type="number" id="bkyr" min="1900" max="2099"></div><div class="fg"><div class="fl" data-i18n="lib.tbl.cat">分類</div><select id="bkcatsel"><option value="">未分類</option></select></div><div class="fg"><div class="fl" data-i18n="lib.tbl.status">語言</div><select id="bklng"><option value="繁中">繁體中文</option><option value="简中">簡體中文</option><option value="EN">英文</option><option value="日文">日文</option><option value="其他">其他</option></select></div><div class="fg"><div class="fl" data-i18n="lib.tbl.copies">館藏數量</div><input type="number" id="bkcp" value="1" min="1"></div><div class="fg full"><div class="fl">封面圖片 URL</div><input type="text" id="bkcov" placeholder="https://…"></div><div class="fg full"><div class="fl" data-i18n="lib.tbl.notes">備註</div><textarea id="bknt2" style="min-height:58px"></textarea></div></div></div><div class="mf"><button class="btn bg2" onclick="closeMo('mo-book')" data-i18n="g.btn.cancel">取消</button><button class="btn bp" onclick="saveBook()" data-i18n="g.btn.save">儲存</button></div></div></div>
-<div class="mo" id="mo-cat"><div class="md" style="max-width:340px"><div class="mh"><div class="mt2" data-i18n="lib.mo.add_cat">新增分類</div><button class="mc2" onclick="closeMo('mo-cat')">✕</button></div><div class="mb"><div class="fg"><div class="fl">分類名稱 *</div><input type="text" id="catnm" placeholder="管理、設計…"></div></div><div class="mf"><button class="btn bg2" onclick="closeMo('mo-cat')" data-i18n="g.btn.cancel">取消</button><button class="btn bp" onclick="saveCat()" data-i18n="lib.btn.add">＋ 新增</button></div></div></div>
+<div class="mo" id="mo-cat"><div class="md" style="max-width:340px"><div class="mh"><div class="mt2" data-i18n="lib.mo.add_cat">新增分類</div><button class="mc2" onclick="closeMo('mo-cat')">✕</button></div><div class="mb"><div class="fg"><div class="fl" data-i18n="cat.name.label">分類名稱 *</div><input type="text" id="catnm" placeholder="管理、設計…"></div></div><div class="mf"><button class="btn bg2" onclick="closeMo('mo-cat')" data-i18n="g.btn.cancel">取消</button><button class="btn bp" onclick="saveCat()" data-i18n="lib.btn.add">＋ 新增</button></div></div></div>
 <div class="mo" id="mo-rsv"><div class="md" style="max-width:430px"><div class="mh"><div class="mt2" data-i18n="lib.mo.add_rsv">新增預約</div><button class="mc2" onclick="closeMo('mo-rsv')">✕</button></div><div class="mb"><div class="fg"><div class="fl" data-i18n="lib.lbl.borrower">預約人 *</div><select id="rsvu"><option value="">請選擇…</option></select></div><div class="fg"><div class="fl" data-i18n="lib.lbl.book">書籍 *</div><select id="rsvb"><option value="">請選擇…</option></select></div></div><div class="mf"><button class="btn bg2" onclick="closeMo('mo-rsv')" data-i18n="g.btn.cancel">取消</button><button class="btn bp" onclick="saveRsv()" data-i18n="g.btn.confirm">確認</button></div></div></div>
 <div class="mo" id="mo-usw"><div class="md" style="max-width:400px"><div class="mh"><div class="mt2" data-i18n="lib.mo.switch_user">切換使用者</div><button class="mc2" onclick="closeMo('mo-usw')">✕</button></div><div class="mb"><div class="fh" data-i18n="lib.mo.select_account" style="margin-bottom:10px">選擇您的帳號</div><div class="ugrid" id="usw-list"></div></div></div></div>
 <div class="mo" id="mo-veh"><div class="md"><div class="mh"><div class="mt2" id="movht" data-i18n="car.mo.add_veh">新增車輛</div><button class="mc2" onclick="closeMo('mo-veh')">✕</button></div><div class="mb cf"><div class="fg2"><div class="fg full"><div class="fl" data-i18n="car.tbl.vehicle">車輛名稱 *</div><input type="text" id="vnm" placeholder="Toyota Camry 白"></div><div class="fg"><div class="fl" data-i18n="car.tbl.plate">車牌號碼 *</div><input type="text" id="vpl" placeholder="ABC-1234"></div><div class="fg"><div class="fl" data-i18n="car.tbl.type">類型</div><select id="vtp"><option value="sedan" data-i18n="car.veh.type.sedan">轎車</option><option value="suv">SUV</option><option value="van" data-i18n="car.veh.type.van">廂型車</option><option value="truck" data-i18n="car.veh.type.truck">貨車</option></select></div><div class="fg"><div class="fl" data-i18n="car.tbl.fuel">燃料</div><select id="vfl"><option value="gas" data-i18n="car.fuel.gas">汽油</option><option value="diesel" data-i18n="car.fuel.diesel">柴油</option><option value="hybrid" data-i18n="car.fuel.hybrid">油電</option><option value="ev" data-i18n="car.fuel.ev">純電</option></select></div><div class="fg"><div class="fl" data-i18n="car.tbl.km">目前里程 (km)</div><input type="number" id="vkm" value="0" min="0"></div><div class="fg"><div class="fl" data-i18n="car.tbl.next_km">下次保養里程</div><input type="number" id="vnmk" placeholder="50000"></div><div class="fg"><div class="fl" data-i18n="car.tbl.next_insp">下次驗車日期</div><input type="date" id="vni"></div><div class="fg"><div class="fl" data-i18n="car.tbl.park">停車位（選填）</div><input type="text" id="vpk" placeholder="例：B1-001"></div><div class="fg"><div class="fl" data-i18n="car.tbl.status">狀態</div><select id="vstatus"><option value="available" data-i18n="car.st.avail">可用</option><option value="maintenance" data-i18n="car.st.need_maint">保養中</option><option value="retired">已除役</option></select></div><div class="fg full"><div class="fl" data-i18n="car.tbl.notes">備註</div><textarea id="vnt" style="min-height:55px"></textarea></div></div></div><div class="mf"><button class="btn bg2" onclick="closeMo('mo-veh')" data-i18n="g.btn.cancel">取消</button><button class="btn btl" onclick="saveVeh()" data-i18n="g.btn.save">儲存</button></div></div></div>
-<div class="mo" id="mo-fuel"><div class="md" style="max-width:480px"><div class="mh"><div class="mt2" data-i18n="car.mo.fuel_log">記錄加油</div><button class="mc2" onclick="closeMo('mo-fuel')">✕</button></div><div class="mb cf"><div class="fg2"><div class="fg full"><div class="fl" data-i18n="car.lbl.vehicle">車輛 *</div><select id="fveh"><option value="">請選擇…</option></select></div><div class="fg"><div class="fl">加油日期 *</div><input type="date" id="fdt"></div><div class="fg"><div class="fl" data-i18n="car.tbl.fueler">加油人</div><select id="fusr"><option value="">請選擇…</option></select></div><div class="fg"><div class="fl" data-i18n="car.tbl.km_vol">加油量 (公升) *</div><input type="number" id="flt" placeholder="40" min="0" step="0.1" oninput="calcFuel()"></div><div class="fg"><div class="fl" data-i18n="car.tbl.price">單價 (元/L)</div><input type="number" id="fpr" placeholder="32" min="0" step="0.1" oninput="calcFuel()"></div><div class="fg"><div class="fl" data-i18n="car.tbl.amount">總金額 (元)</div><input type="number" id="ftot" placeholder="自動計算"></div><div class="fg"><div class="fl" data-i18n="car.tbl.km">油表里程 (km)</div><input type="number" id="fod" placeholder="0" min="0"></div><div class="fg full"><div class="fl" data-i18n="car.tbl.notes">備註</div><input type="text" id="fnt" placeholder="加油站、油種…"></div></div></div><div class="mf"><button class="btn bg2" onclick="closeMo('mo-fuel')" data-i18n="g.btn.cancel">取消</button><button class="btn btl" onclick="saveFuel()" data-i18n="g.btn.save">儲存</button></div></div></div>
+<div class="mo" id="mo-fuel"><div class="md" style="max-width:480px"><div class="mh"><div class="mt2" data-i18n="car.mo.fuel_log">記錄加油</div><button class="mc2" onclick="closeMo('mo-fuel')">✕</button></div><div class="mb cf"><div class="fg2"><div class="fg full"><div class="fl" data-i18n="car.lbl.vehicle">車輛 *</div><select id="fveh"><option value="">請選擇…</option></select></div><div class="fg"><div class="fl" data-i18n="fuel.date.label">加油日期 *</div><input type="date" id="fdt"></div><div class="fg"><div class="fl" data-i18n="car.tbl.fueler">加油人</div><select id="fusr"><option value="">請選擇…</option></select></div><div class="fg"><div class="fl" data-i18n="car.tbl.km_vol">加油量 (公升) *</div><input type="number" id="flt" placeholder="40" min="0" step="0.1" oninput="calcFuel()"></div><div class="fg"><div class="fl" data-i18n="car.tbl.price">單價 (元/L)</div><input type="number" id="fpr" placeholder="32" min="0" step="0.1" oninput="calcFuel()"></div><div class="fg"><div class="fl" data-i18n="car.tbl.amount">總金額 (元)</div><input type="number" id="ftot" placeholder="自動計算"></div><div class="fg"><div class="fl" data-i18n="car.tbl.km">油表里程 (km)</div><input type="number" id="fod" placeholder="0" min="0"></div><div class="fg full"><div class="fl" data-i18n="car.tbl.notes">備註</div><input type="text" id="fnt" placeholder="加油站、油種…"></div></div></div><div class="mf"><button class="btn bg2" onclick="closeMo('mo-fuel')" data-i18n="g.btn.cancel">取消</button><button class="btn btl" onclick="saveFuel()" data-i18n="g.btn.save">儲存</button></div></div></div>
 <div class="mo" id="mo-maint"><div class="md"><div class="mh"><div class="mt2" id="momtt" data-i18n="car.mo.add_maint">新增保養記錄</div><button class="mc2" onclick="closeMo('mo-maint')">✕</button></div><div class="mb cf"><div class="fg2"><div class="fg full"><div class="fl" data-i18n="car.lbl.vehicle">車輛 *</div><select id="mtveh"><option value="">請選擇…</option></select></div><div class="fg"><div class="fl" data-i18n="car.tbl.maint_date">保養日期 *</div><input type="date" id="mtdt"></div><div class="fg"><div class="fl" data-i18n="car.tbl.km">里程 (km)</div><input type="number" id="mtkm" min="0"></div><div class="fg full"><div class="fl" data-i18n="car.tbl.item">保養項目 *</div><input type="text" id="mtit" placeholder="機油+機濾、煞車片…"></div><div class="fg"><div class="fl" data-i18n="car.tbl.cost">費用 (元)</div><input type="number" id="mtcs" min="0"></div><div class="fg"><div class="fl" data-i18n="car.tbl.vendor">廠商</div><input type="text" id="mtvd"></div><div class="fg"><div class="fl" data-i18n="car.tbl.next_km2">下次保養里程</div><input type="number" id="mtnk" min="0"></div><div class="fg"><div class="fl" data-i18n="car.tbl.next_date">下次保養日期</div><input type="date" id="mtnd"></div><div class="fg full"><div class="fl" data-i18n="car.tbl.notes">備註</div><textarea id="mtnt" style="min-height:52px"></textarea></div></div></div><div class="mf"><button class="btn bg2" onclick="closeMo('mo-maint')" data-i18n="g.btn.cancel">取消</button><button class="btn btl" onclick="saveMaint()" data-i18n="g.btn.save">儲存</button></div></div></div>
 <div class="mo" id="mo-insp"><div class="md" style="max-width:450px"><div class="mh"><div class="mt2" id="moispt" data-i18n="car.mo.add_insp">登記驗車</div><button class="mc2" onclick="closeMo('mo-insp')">✕</button></div><div class="mb cf"><div class="fg2"><div class="fg full"><div class="fl" data-i18n="car.lbl.vehicle">車輛 *</div><select id="ispveh"><option value="">請選擇…</option></select></div><div class="fg"><div class="fl" data-i18n="car.tbl.last_insp">上次驗車日期</div><input type="date" id="ispls"></div><div class="fg"><div class="fl" data-i18n="car.tbl.next_insp">下次驗車日期 *</div><input type="date" id="ispnx"></div><div class="fg full"><div class="fl" data-i18n="car.tbl.notes">備註</div><input type="text" id="ispnt"></div></div></div><div class="mf"><button class="btn bg2" onclick="closeMo('mo-insp')" data-i18n="g.btn.cancel">取消</button><button class="btn btl" onclick="saveInsp()" data-i18n="g.btn.save">儲存</button></div></div></div>
-<div class="mo" id="mo-park"><div class="md" style="max-width:380px"><div class="mh"><div class="mt2" data-i18n="car.mo.add_park">新增停車位</div><button class="mc2" onclick="closeMo('mo-park')">✕</button></div><div class="mb cf"><div class="fg"><div class="fl" data-i18n="car.tbl.park">格位編號 *</div><input type="text" id="pknm" placeholder="B1-001"></div><div class="fg"><div class="fl">地點說明</div><input type="text" id="pklc" placeholder="地下一層停車場"></div><div class="fg"><div class="fl" data-i18n="car.tbl.notes">備註</div><input type="text" id="pknt"></div></div><div class="mf"><button class="btn bg2" onclick="closeMo('mo-park')" data-i18n="g.btn.cancel">取消</button><button class="btn btl" onclick="savePark()" data-i18n="lib.btn.add">新增</button></div></div></div>
+<div class="mo" id="mo-park"><div class="md" style="max-width:380px"><div class="mh"><div class="mt2" data-i18n="car.mo.add_park">新增停車位</div><button class="mc2" onclick="closeMo('mo-park')">✕</button></div><div class="mb cf"><div class="fg"><div class="fl" data-i18n="car.tbl.park">格位編號 *</div><input type="text" id="pknm" placeholder="B1-001"></div><div class="fg"><div class="fl" data-i18n="park.desc.label">地點說明</div><input type="text" id="pklc" placeholder="地下一層停車場"></div><div class="fg"><div class="fl" data-i18n="car.tbl.notes">備註</div><input type="text" id="pknt"></div></div><div class="mf"><button class="btn bg2" onclick="closeMo('mo-park')" data-i18n="g.btn.cancel">取消</button><button class="btn btl" onclick="savePark()" data-i18n="lib.btn.add">新增</button></div></div></div>
 
 
 <div class="mo" id="mo-fault"><div class="md" style="max-width:440px">
@@ -1928,10 +1928,18 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="mb">
     <div class="fg"><div class="fl" data-i18n="room.tbl.room">會議室</div>
       <select id="ft-room"></select></div>
-    <div class="fg"><div class="fl">故障設備</div>
-      <select id="ft-equip"><option value="投影機">投影機</option><option value="視訊系統">視訊系統</option><option value="白板">白板/白板筆</option><option value="冷氣">冷氣</option><option value="燈光">燈光</option><option value="音響">音響</option><option value="其他">其他</option></select></div>
-    <div class="fg"><div class="fl">問題描述 *</div><textarea id="ft-desc" placeholder="詳細描述故障狀況…" style="min-height:80px"></textarea></div>
-    <div class="fg"><div class="fl">回報人</div><select id="ft-reporter"><option value="">請選擇…</option></select></div>
+    <div class="fg"><div class="fl" data-i18n="fault.device.label">故障設備</div>
+      <select id="ft-equip">
+        <option value="投影機" data-i18n="fault.dev.projector">投影機</option>
+        <option value="視訊系統" data-i18n="fault.dev.video">視訊系統</option>
+        <option value="白板" data-i18n="fault.dev.whiteboard">白板/白板筆</option>
+        <option value="冷氣" data-i18n="fault.dev.ac">冷氣</option>
+        <option value="燈光" data-i18n="fault.dev.lights">燈光</option>
+        <option value="音響" data-i18n="fault.dev.audio">音響</option>
+        <option value="其他" data-i18n="fault.dev.other">其他</option>
+      </select></div>
+    <div class="fg"><div class="fl" data-i18n="fault.desc.label">問題描述 *</div><textarea id="ft-desc" data-i18n-ph="fault.desc.ph" placeholder="詳細描述故障狀況…" style="min-height:80px"></textarea></div>
+    <div class="fg"><div class="fl" data-i18n="fault.reporter.label">回報人</div><select id="ft-reporter"><option value="">請選擇…</option></select></div>
   </div>
   <div class="mf"><button class="btn bg2" onclick="closeMo('mo-fault')" data-i18n="g.btn.cancel">取消</button><button class="btn" style="background:var(--rd);color:#fff;border:none;cursor:pointer;padding:7px 14px;border-radius:var(--rs);font-size:13px;font-weight:500" onclick="submitFault()" data-i18n="room.mo.submit_fault">送出回報</button></div>
 </div></div>
@@ -1952,26 +1960,26 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="mh"><div class="mt2" id="mo-guest-title" data-i18n="visit.mo.add_guest">新增來賓</div><button class="mc2" onclick="closeMo('mo-guest')">✕</button></div>
   <div class="mb">
     <div class="fg2">
-      <div class="fg"><div class="fl">姓名 *</div><input type="text" id="mg-name" placeholder="姓名"></div>
-      <div class="fg"><div class="fl">職稱</div><input type="text" id="mg-title" placeholder="採購經理"></div>
-      <div class="fg full"><div class="fl">公司/單位 *</div><input type="text" id="mg-company" placeholder="公司名稱"></div>
+      <div class="fg"><div class="fl" data-i18n="guest.name.label">姓名 *</div><input type="text" id="mg-name" data-i18n-ph="guest.name.ph" placeholder="姓名"></div>
+      <div class="fg"><div class="fl" data-i18n="guest.title.label">職稱</div><input type="text" id="mg-title" data-i18n-ph="guest.title.ph" placeholder="採購經理"></div>
+      <div class="fg full"><div class="fl" data-i18n="guest.company.label">公司/單位 *</div><input type="text" id="mg-company" data-i18n-ph="guest.company.ph" placeholder="公司名稱"></div>
       <div class="fg"><div class="fl">Email</div><input type="email" id="mg-email" placeholder="name@company.com"></div>
-      <div class="fg"><div class="fl">電話</div><input type="text" id="mg-phone" placeholder="+886…"></div>
-      <div class="fg"><div class="fl">國籍/地區</div>
+      <div class="fg"><div class="fl" data-i18n="guest.phone.label">電話</div><input type="text" id="mg-phone" placeholder="+886…"></div>
+      <div class="fg"><div class="fl" data-i18n="guest.nationality.label">國籍/地區</div>
         <select id="mg-country">
-          <option value="TW">台灣</option><option value="CN">中國</option><option value="VN">越南</option>
-          <option value="HK">香港</option><option value="JP">日本</option><option value="US">美國</option>
-          <option value="EU">歐洲</option><option value="other">其他</option>
+          <option value="TW" data-i18n="guest.nat.tw">台灣</option><option value="CN" data-i18n="guest.nat.cn">中國</option><option value="VN" data-i18n="guest.nat.vn">越南</option>
+          <option value="HK" data-i18n="guest.nat.hk">香港</option><option value="JP" data-i18n="guest.nat.jp">日本</option><option value="US" data-i18n="guest.nat.us">美國</option>
+          <option value="EU" data-i18n="guest.nat.eu">歐洲</option><option value="other" data-i18n="guest.nat.other">其他</option>
         </select>
       </div>
-      <div class="fg"><div class="fl">來訪類型</div>
+      <div class="fg"><div class="fl" data-i18n="guest.type.label">來訪類型</div>
         <select id="mg-type">
-          <option value="client">現有客戶</option><option value="potential">潛在客戶</option>
-          <option value="supplier">供應商</option><option value="partner">合作夥伴</option>
-          <option value="gov">政府/媒體</option><option value="other">其他</option>
+          <option value="client" data-i18n="guest.type.existing">現有客戶</option><option value="potential" data-i18n="guest.type.potential">潛在客戶</option>
+          <option value="supplier" data-i18n="guest.type.supplier">供應商</option><option value="partner" data-i18n="guest.type.partner">合作夥伴</option>
+          <option value="gov" data-i18n="guest.type.gov">政府/媒體</option><option value="other" data-i18n="guest.type.other">其他</option>
         </select>
       </div>
-      <div class="fg full"><div class="fl">備註偏好（飲食、語言等）</div><input type="text" id="mg-pref" placeholder="不吃豬肉、需要英語翻譯…"></div>
+      <div class="fg full"><div class="fl" data-i18n="guest.prefs.label">備註偏好（飲食、語言等）</div><input type="text" id="mg-pref" placeholder="不吃豬肉、需要英語翻譯…"></div>
     </div>
   </div>
   <div class="mf"><button class="btn bg2" onclick="closeMo('mo-guest')" data-i18n="g.btn.cancel">取消</button><button class="btn" style="background:#a78bfa;color:#fff;border:none;cursor:pointer;padding:7px 14px;border-radius:var(--rs);font-size:13px" onclick="saveGuest()" data-i18n="g.btn.save">儲存</button></div>
@@ -1986,10 +1994,14 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
 <div class="mo" id="mo-broadcast"><div class="md" style="max-width:480px">
   <div class="mh"><div class="mt2" data-i18n="room.mo.broadcast">🚨 緊急廣播</div><button class="mc2" onclick="closeMo('mo-broadcast')">✕</button></div>
   <div class="mb">
-    <div class="alert-banner">⚠ 此訊息將通知所有相關人員（系統通知 + Email）</div>
-    <div class="fg"><div class="fl">訊息內容 *</div><textarea id="bc-msg" style="min-height:80px" placeholder="例：客戶班機延誤2小時，接機時間調整為 16:00，請相關人員注意…"></textarea></div>
-    <div class="fg"><div class="fl">緊急程度</div>
-      <select id="bc-level"><option value="info">一般通知</option><option value="urgent">緊急</option><option value="cancel">行程取消/中止</option></select>
+    <div class="alert-banner" data-i18n="broadcast.banner">⚠ 此訊息將通知所有相關人員（系統通知 + Email）</div>
+    <div class="fg"><div class="fl" data-i18n="broadcast.content.label">訊息內容 *</div><textarea id="bc-msg" style="min-height:80px" data-i18n-ph="broadcast.content.ph" placeholder="例：客戶班機延誤2小時，接機時間調整為 16:00，請相關人員注意…"></textarea></div>
+    <div class="fg"><div class="fl" data-i18n="broadcast.level.label">緊急程度</div>
+      <select id="bc-level">
+        <option value="info" data-i18n="broadcast.lvl.normal">一般通知</option>
+        <option value="urgent" data-i18n="broadcast.lvl.urgent">緊急</option>
+        <option value="cancel" data-i18n="broadcast.lvl.cancel">行程取消/中止</option>
+      </select>
     </div>
   </div>
   <div class="mf"><button class="btn bg2" onclick="closeMo('mo-broadcast')" data-i18n="g.btn.cancel">取消</button><button class="broadcast-btn" onclick="sendBroadcast()" data-i18n="room.mo.broadcast_btn">🚨 立即廣播</button></div>
@@ -2658,7 +2670,7 @@ const ADMIN_I18N = {
     'visit.nav.guests':'Guest DB','visit.nav.report':'Reports',
     'visit.dash.title2':'🤝 Visitor Board','visit.dash.add':'＋ New Visit',
     'visit.dash.week':'This Week\'s Visits','visit.dash.week_sub':'Sorted by date',
-    'visit.form.title_new':'New Visit Schedule','visit.form.clear':'Clear',
+    'visit.form.title_new':'New Visit Schedule','visit.form.title_edit':'Edit Visit Schedule','visit.form.clear':'Clear',
     'visit.form.sec_basic':'▌ Basic Info','visit.form.sec_guests':'▌ Guest List',
     'visit.form.sec_days':'▌ Schedule','visit.form.sec_escorts':'▌ Escort Staff','visit.form.sec_costs':'▌ Cost Estimate',
     'visit.lbl.company':'Company *','visit.lbl.db':'Select from DB…','visit.lbl.manage':'Manage',
@@ -2730,6 +2742,38 @@ const ADMIN_I18N = {
     'lib.no_overdue':'✓ No overdue','lib.no_books':'No books','lib.no_loans':'No loan records',
     'lib.no_rsv':'No reservations','car.no_veh':'No vehicles','lib.book_instock':'In Stock','lib.book_loaned':'Loaned',
     'car.veh.fuel.label':'Type/Fuel','car.veh.km_label':'Mileage','car.veh.park_label':'Parking','car.veh.user_label':'Driver',
+    'err.time_order':'End time must be after start time','err.no_copies':'No copies available',
+    'room.nav.cfg':'Room Config','room.cfg.hours_start':'Opening Hours Start','room.cfg.hours_end':'Opening Hours End',
+    'room.cfg.max_days':'Max Advance Booking Days','room.cfg.autorelease':'Auto-release if No Check-in (min)','car.filter.all':'All',
+    'fault.device.label':'Equipment','fault.desc.label':'Description *','fault.reporter.label':'Reporter',
+    'fault.dev.projector':'Projector','fault.dev.video':'Video System','fault.dev.whiteboard':'Whiteboard/Markers',
+    'fault.dev.ac':'Air Con','fault.dev.lights':'Lighting','fault.dev.audio':'Audio','fault.dev.other':'Other',
+    'fault.desc.ph':'Describe the fault in detail…',
+    'guest.name.label':'Name *','guest.title.label':'Title','guest.company.label':'Company *',
+    'guest.phone.label':'Phone','guest.nationality.label':'Nationality/Region',
+    'guest.nat.tw':'Taiwan','guest.nat.cn':'China','guest.nat.vn':'Vietnam','guest.nat.hk':'Hong Kong',
+    'guest.nat.jp':'Japan','guest.nat.us':'USA','guest.nat.eu':'Europe','guest.nat.other':'Other',
+    'guest.type.label':'Visit Type',
+    'guest.type.existing':'Existing Customer','guest.type.potential':'Potential Customer','guest.type.supplier':'Supplier',
+    'guest.type.partner':'Partner','guest.type.gov':'Government/Media','guest.type.other':'Other',
+    'guest.prefs.label':'Preferences (diet, language, etc.)',
+    'guest.name.ph':'Full name','guest.title.ph':'Purchase Manager','guest.company.ph':'Company name',
+    'broadcast.banner':'⚠ This message will notify all relevant staff (system + email)',
+    'broadcast.content.label':'Message *','broadcast.content.ph':'Enter message content…','broadcast.level.label':'Urgency',
+    'broadcast.lvl.normal':'General Notice','broadcast.lvl.urgent':'Urgent','broadcast.lvl.cancel':'Trip Cancelled/Suspended',
+    'cat.name.label':'Category Name *','fuel.date.label':'Fuel Date *','park.desc.label':'Location Description',
+    'lib.grid.instock':'In Stock: %d','lib.grid.loaned':'Loaned','lib.grid.no_data':'No data','lib.grid.uncat':'Uncategorized',
+    'lib.no_books_in':'No books available','lib.book_count':'%d vol(s)','lib.loan_status':'Currently loaning %d / max %d vol(s)',
+    'cal.month_fmt':'%Y-%m','cal.collapse':'Collapse ▴','cal.expand':'Expand ▾',
+    'room.headcount_fmt':'%d attendees','room.checkin_confirm':'Check in now? The room will be marked as in use.',
+    'visit.no_week':'No visits scheduled this week','visit.all_staff':'All Staff (%d)',
+    'visit.stat.company':'Company:','visit.stat.type':'Type:','visit.stat.date':'Date:',
+    'car.mileage_hint':'Original: %d km | Estimated: %d km','car.mileage_low':'Mileage cannot be lower than original (%d km)',
+    'g.querying':'Querying…','g.updated':'Updated %s','g.update_fail':'Update failed',
+    'car.today_bk':'Today\'s bookings: %s','car.no_bk_today2':'No bookings today',
+    'lot.sound_off':'🔇 Sound Off','lot.sound_on':'🔊 Sound On',
+    'g.select_staff':'— Select Staff —','g.select_or_type':'— Select or type below ↓','g.select':'— Select —',
+    'car.all_veh2':'All Vehicles','lib.all_cats2':'All Categories',
   },
   'zh-TW': {
     'mod.room':'會議室','mod.car':'公務車','mod.visit':'客戶到訪',
@@ -2812,7 +2856,7 @@ const ADMIN_I18N = {
     'visit.nav.guests':'來賓資料庫','visit.nav.report':'接待報表',
     'visit.dash.title2':'🤝 到訪看板','visit.dash.add':'＋ 新增到訪',
     'visit.dash.week':'本週到訪行程','visit.dash.week_sub':'依日期排列',
-    'visit.form.title_new':'新增到訪行程','visit.form.clear':'清除',
+    'visit.form.title_new':'新增到訪行程','visit.form.title_edit':'編輯到訪行程','visit.form.clear':'清除',
     'visit.form.sec_basic':'▌ 到訪基本資料','visit.form.sec_guests':'▌ 來賓名單',
     'visit.form.sec_days':'▌ 行程任務安排','visit.form.sec_escorts':'▌ 公司陪同人員與分工','visit.form.sec_costs':'▌ 費用預估',
     'visit.lbl.company':'來訪單位/公司 *','visit.lbl.db':'從資料庫選…','visit.lbl.manage':'管理',
@@ -2884,6 +2928,38 @@ const ADMIN_I18N = {
     'lib.no_overdue':'✓ 無逾期','lib.no_books':'無書籍資料','lib.no_loans':'無借閱記錄',
     'lib.no_rsv':'無預約記錄','car.no_veh':'無車輛資料','lib.book_instock':'在館','lib.book_loaned':'借出',
     'car.veh.fuel.label':'類型/燃料','car.veh.km_label':'里程','car.veh.park_label':'停車位','car.veh.user_label':'使用者',
+    'err.time_order':'結束時間必須晚於開始','err.no_copies':'無可借冊數',
+    'room.nav.cfg':'系統設定','room.cfg.hours_start':'營業開始時間（整點）','room.cfg.hours_end':'營業結束時間（整點）',
+    'room.cfg.max_days':'最多可提前預約天數','room.cfg.autorelease':'未報到自動釋出（分鐘）','car.filter.all':'全部',
+    'fault.device.label':'故障設備','fault.desc.label':'問題描述 *','fault.reporter.label':'回報人',
+    'fault.dev.projector':'投影機','fault.dev.video':'視訊系統','fault.dev.whiteboard':'白板/白板筆',
+    'fault.dev.ac':'冷氣','fault.dev.lights':'燈光','fault.dev.audio':'音響','fault.dev.other':'其他',
+    'fault.desc.ph':'詳細描述故障狀況…',
+    'guest.name.label':'姓名 *','guest.title.label':'職稱','guest.company.label':'公司/單位 *',
+    'guest.phone.label':'電話','guest.nationality.label':'國籍/地區',
+    'guest.nat.tw':'台灣','guest.nat.cn':'中國','guest.nat.vn':'越南','guest.nat.hk':'香港',
+    'guest.nat.jp':'日本','guest.nat.us':'美國','guest.nat.eu':'歐洲','guest.nat.other':'其他',
+    'guest.type.label':'來訪類型',
+    'guest.type.existing':'現有客戶','guest.type.potential':'潛在客戶','guest.type.supplier':'供應商',
+    'guest.type.partner':'合作夥伴','guest.type.gov':'政府/媒體','guest.type.other':'其他',
+    'guest.prefs.label':'備註偏好（飲食、語言等）',
+    'guest.name.ph':'姓名','guest.title.ph':'採購經理','guest.company.ph':'公司名稱',
+    'broadcast.banner':'⚠ 此訊息將通知所有相關人員（系統通知 + Email）',
+    'broadcast.content.label':'訊息內容 *','broadcast.content.ph':'輸入廣播訊息…','broadcast.level.label':'緊急程度',
+    'broadcast.lvl.normal':'一般通知','broadcast.lvl.urgent':'緊急','broadcast.lvl.cancel':'行程取消/中止',
+    'cat.name.label':'分類名稱 *','fuel.date.label':'加油日期 *','park.desc.label':'地點說明',
+    'lib.grid.instock':'可借 %d','lib.grid.loaned':'借出中','lib.grid.no_data':'尚無資料','lib.grid.uncat':'未分類',
+    'lib.no_books_in':'無在館書籍','lib.book_count':'%d 本','lib.loan_status':'目前借閱 %d 冊，上限 %d 冊',
+    'cal.month_fmt':'%Y年%m月','cal.collapse':'收起 ▴','cal.expand':'展開 ▾',
+    'room.headcount_fmt':'與會人數：%d 人','room.checkin_confirm':'確認開始使用？將標記會議室為使用中。',
+    'visit.no_week':'本週無排定到訪行程','visit.all_staff':'全部人員（%d 位）',
+    'visit.stat.company':'公司：','visit.stat.type':'類型：','visit.stat.date':'日期：',
+    'car.mileage_hint':'原里程：%d km｜預計：%d km','car.mileage_low':'里程數不可低於原本里程（%d km）',
+    'g.querying':'查詢中…','g.updated':'已更新 %s','g.update_fail':'更新失敗',
+    'car.today_bk':'今日預約：%s','car.no_bk_today2':'今日無預約',
+    'lot.sound_off':'🔇 音效關','lot.sound_on':'🔊 音效開',
+    'g.select_staff':'— 請選擇員工 —','g.select_or_type':'— 請選擇或手動輸入↓','g.select':'— 請選擇… —',
+    'car.all_veh2':'所有車輛','lib.all_cats2':'所有分類',
   },
   'zh-CN': {
     'mod.room':'会议室','mod.car':'公务车','mod.visit':'客户到访',
@@ -2966,7 +3042,7 @@ const ADMIN_I18N = {
     'visit.nav.guests':'来宾数据库','visit.nav.report':'接待报表',
     'visit.dash.title2':'🤝 到访看板','visit.dash.add':'＋ 新增到访',
     'visit.dash.week':'本周到访行程','visit.dash.week_sub':'依日期排列',
-    'visit.form.title_new':'新增到访行程','visit.form.clear':'清除',
+    'visit.form.title_new':'新增到访行程','visit.form.title_edit':'编辑到访行程','visit.form.clear':'清除',
     'visit.form.sec_basic':'▌ 到访基本资料','visit.form.sec_guests':'▌ 来宾名单',
     'visit.form.sec_days':'▌ 行程任务安排','visit.form.sec_escorts':'▌ 公司陪同人员与分工','visit.form.sec_costs':'▌ 费用预估',
     'visit.lbl.company':'来访单位/公司 *','visit.lbl.db':'从数据库选…','visit.lbl.manage':'管理',
@@ -3038,6 +3114,38 @@ const ADMIN_I18N = {
     'lib.no_overdue':'✓ 无逾期','lib.no_books':'无书籍资料','lib.no_loans':'无借阅记录',
     'lib.no_rsv':'无预约记录','car.no_veh':'无车辆资料','lib.book_instock':'在馆','lib.book_loaned':'借出',
     'car.veh.fuel.label':'类型/燃料','car.veh.km_label':'里程','car.veh.park_label':'停车位','car.veh.user_label':'使用者',
+    'err.time_order':'结束时间必须晚于开始','err.no_copies':'无可借册数',
+    'room.nav.cfg':'系统设置','room.cfg.hours_start':'营业开始时间（整点）','room.cfg.hours_end':'营业结束时间（整点）',
+    'room.cfg.max_days':'最多可提前预约天数','room.cfg.autorelease':'未报到自动释出（分钟）','car.filter.all':'全部',
+    'fault.device.label':'故障设备','fault.desc.label':'问题描述 *','fault.reporter.label':'回报人',
+    'fault.dev.projector':'投影机','fault.dev.video':'视讯系统','fault.dev.whiteboard':'白板/白板笔',
+    'fault.dev.ac':'冷气','fault.dev.lights':'灯光','fault.dev.audio':'音响','fault.dev.other':'其他',
+    'fault.desc.ph':'详细描述故障状况…',
+    'guest.name.label':'姓名 *','guest.title.label':'职称','guest.company.label':'公司/单位 *',
+    'guest.phone.label':'电话','guest.nationality.label':'国籍/地区',
+    'guest.nat.tw':'台湾','guest.nat.cn':'中国','guest.nat.vn':'越南','guest.nat.hk':'香港',
+    'guest.nat.jp':'日本','guest.nat.us':'美国','guest.nat.eu':'欧洲','guest.nat.other':'其他',
+    'guest.type.label':'来访类型',
+    'guest.type.existing':'现有客户','guest.type.potential':'潜在客户','guest.type.supplier':'供应商',
+    'guest.type.partner':'合作伙伴','guest.type.gov':'政府/媒体','guest.type.other':'其他',
+    'guest.prefs.label':'备注偏好（饮食、语言等）',
+    'guest.name.ph':'姓名','guest.title.ph':'采购经理','guest.company.ph':'公司名称',
+    'broadcast.banner':'⚠ 此消息将通知所有相关人员（系统通知 + Email）',
+    'broadcast.content.label':'消息内容 *','broadcast.content.ph':'输入广播消息…','broadcast.level.label':'紧急程度',
+    'broadcast.lvl.normal':'一般通知','broadcast.lvl.urgent':'紧急','broadcast.lvl.cancel':'行程取消/中止',
+    'cat.name.label':'分类名称 *','fuel.date.label':'加油日期 *','park.desc.label':'地点说明',
+    'lib.grid.instock':'可借 %d','lib.grid.loaned':'借出中','lib.grid.no_data':'暂无资料','lib.grid.uncat':'未分类',
+    'lib.no_books_in':'无在馆书籍','lib.book_count':'%d 本','lib.loan_status':'目前借阅 %d 册，上限 %d 册',
+    'cal.month_fmt':'%Y年%m月','cal.collapse':'收起 ▴','cal.expand':'展开 ▾',
+    'room.headcount_fmt':'与会人数：%d 人','room.checkin_confirm':'确认开始使用？将标记会议室为使用中。',
+    'visit.no_week':'本周无排定到访行程','visit.all_staff':'全部人员（%d 位）',
+    'visit.stat.company':'公司：','visit.stat.type':'类型：','visit.stat.date':'日期：',
+    'car.mileage_hint':'原里程：%d km｜预计：%d km','car.mileage_low':'里程数不可低于原本里程（%d km）',
+    'g.querying':'查询中…','g.updated':'已更新 %s','g.update_fail':'更新失败',
+    'car.today_bk':'今日预约：%s','car.no_bk_today2':'今日无预约',
+    'lot.sound_off':'🔇 音效关','lot.sound_on':'🔊 音效开',
+    'g.select_staff':'— 请选择员工 —','g.select_or_type':'— 请选择或手动输入↓','g.select':'— 请选择… —',
+    'car.all_veh2':'所有车辆','lib.all_cats2':'所有分类',
   },
   vi: {
     'mod.room':'Phòng họp','mod.car':'Xe công vụ','mod.visit':'Khách thăm',
@@ -3120,7 +3228,7 @@ const ADMIN_I18N = {
     'visit.nav.guests':'CSDL khách','visit.nav.report':'Báo cáo tiếp đón',
     'visit.dash.title2':'🤝 Bảng lịch thăm','visit.dash.add':'＋ Thêm lịch thăm',
     'visit.dash.week':'Lịch thăm tuần này','visit.dash.week_sub':'Sắp xếp theo ngày',
-    'visit.form.title_new':'Lịch thăm mới','visit.form.clear':'Xóa',
+    'visit.form.title_new':'Lịch thăm mới','visit.form.title_edit':'Sửa lịch thăm','visit.form.clear':'Xóa',
     'visit.form.sec_basic':'▌ Thông tin cơ bản','visit.form.sec_guests':'▌ Danh sách khách',
     'visit.form.sec_days':'▌ Lịch trình','visit.form.sec_escorts':'▌ Nhân viên hộ tống','visit.form.sec_costs':'▌ Chi phí dự kiến',
     'visit.lbl.company':'Công ty *','visit.lbl.db':'Chọn từ CSDL…','visit.lbl.manage':'Quản lý',
@@ -3192,6 +3300,38 @@ const ADMIN_I18N = {
     'lib.no_overdue':'✓ Không quá hạn','lib.no_books':'Không có sách','lib.no_loans':'Không có ghi mượn',
     'lib.no_rsv':'Không có đặt trước','car.no_veh':'Không có xe','lib.book_instock':'Còn sách','lib.book_loaned':'Đã mượn',
     'car.veh.fuel.label':'Loại/Nhiên liệu','car.veh.km_label':'Số km','car.veh.park_label':'Bãi đỗ','car.veh.user_label':'Người dùng',
+    'err.time_order':'Giờ kết thúc phải sau giờ bắt đầu','err.no_copies':'Không còn sách để mượn',
+    'room.nav.cfg':'Cấu hình phòng họp','room.cfg.hours_start':'Giờ mở cửa (bắt đầu)','room.cfg.hours_end':'Giờ đóng cửa (kết thúc)',
+    'room.cfg.max_days':'Ngày đặt trước tối đa','room.cfg.autorelease':'Tự động giải phóng nếu không check-in (phút)','car.filter.all':'Tất cả',
+    'fault.device.label':'Thiết bị','fault.desc.label':'Mô tả *','fault.reporter.label':'Người báo cáo',
+    'fault.dev.projector':'Máy chiếu','fault.dev.video':'Hệ thống hội nghị','fault.dev.whiteboard':'Bảng/Bút bảng',
+    'fault.dev.ac':'Điều hòa','fault.dev.lights':'Đèn','fault.dev.audio':'Âm thanh','fault.dev.other':'Khác',
+    'fault.desc.ph':'Mô tả chi tiết sự cố…',
+    'guest.name.label':'Tên *','guest.title.label':'Chức danh','guest.company.label':'Công ty *',
+    'guest.phone.label':'Điện thoại','guest.nationality.label':'Quốc tịch/Vùng',
+    'guest.nat.tw':'Đài Loan','guest.nat.cn':'Trung Quốc','guest.nat.vn':'Việt Nam','guest.nat.hk':'Hồng Kông',
+    'guest.nat.jp':'Nhật Bản','guest.nat.us':'Mỹ','guest.nat.eu':'Châu Âu','guest.nat.other':'Khác',
+    'guest.type.label':'Loại khách',
+    'guest.type.existing':'Khách hàng hiện tại','guest.type.potential':'Khách hàng tiềm năng','guest.type.supplier':'Nhà cung cấp',
+    'guest.type.partner':'Đối tác','guest.type.gov':'Chính phủ/Truyền thông','guest.type.other':'Khác',
+    'guest.prefs.label':'Ghi chú (ăn uống, ngôn ngữ…)',
+    'guest.name.ph':'Họ và tên','guest.title.ph':'Trưởng phòng mua hàng','guest.company.ph':'Tên công ty',
+    'broadcast.banner':'⚠ Tin nhắn này sẽ thông báo tất cả nhân viên liên quan (hệ thống + email)',
+    'broadcast.content.label':'Nội dung *','broadcast.content.ph':'Nhập nội dung thông báo…','broadcast.level.label':'Mức độ khẩn cấp',
+    'broadcast.lvl.normal':'Thông báo thông thường','broadcast.lvl.urgent':'Khẩn cấp','broadcast.lvl.cancel':'Hủy/Hoãn chuyến',
+    'cat.name.label':'Tên danh mục *','fuel.date.label':'Ngày đổ xăng *','park.desc.label':'Mô tả vị trí',
+    'lib.grid.instock':'Còn %d cuốn','lib.grid.loaned':'Đã mượn','lib.grid.no_data':'Không có dữ liệu','lib.grid.uncat':'Chưa phân loại',
+    'lib.no_books_in':'Không có sách trong thư viện','lib.book_count':'%d cuốn','lib.loan_status':'Đang mượn %d / tối đa %d cuốn',
+    'cal.month_fmt':'Tháng %m/%Y','cal.collapse':'Thu gọn ▴','cal.expand':'Mở rộng ▾',
+    'room.headcount_fmt':'%d người tham dự','room.checkin_confirm':'Xác nhận bắt đầu sử dụng? Phòng sẽ được đánh dấu là đang dùng.',
+    'visit.no_week':'Không có lịch khách thăm tuần này','visit.all_staff':'Tất cả nhân viên (%d)',
+    'visit.stat.company':'Công ty:','visit.stat.type':'Loại:','visit.stat.date':'Ngày:',
+    'car.mileage_hint':'Km gốc: %d | Dự kiến: %d km','car.mileage_low':'Số km không thể thấp hơn km gốc (%d km)',
+    'g.querying':'Đang truy vấn…','g.updated':'Đã cập nhật %s','g.update_fail':'Cập nhật thất bại',
+    'car.today_bk':'Đặt xe hôm nay: %s','car.no_bk_today2':'Không có đặt xe hôm nay',
+    'lot.sound_off':'🔇 Tắt âm thanh','lot.sound_on':'🔊 Bật âm thanh',
+    'g.select_staff':'— Chọn nhân viên —','g.select_or_type':'— Chọn hoặc nhập bên dưới ↓','g.select':'— Chọn… —',
+    'car.all_veh2':'Tất cả xe','lib.all_cats2':'Tất cả danh mục',
   },
   ja: {
     'mod.room':'会議室','mod.car':'社用車','mod.visit':'来訪管理',
@@ -3274,7 +3414,7 @@ const ADMIN_I18N = {
     'visit.nav.guests':'ゲストDB','visit.nav.report':'接客レポート',
     'visit.dash.title2':'🤝 来訪ボード','visit.dash.add':'＋ 来訪登録',
     'visit.dash.week':'今週の来訪','visit.dash.week_sub':'日付順',
-    'visit.form.title_new':'新規来訪登録','visit.form.clear':'クリア',
+    'visit.form.title_new':'新規来訪登録','visit.form.title_edit':'来訪登録編集','visit.form.clear':'クリア',
     'visit.form.sec_basic':'▌ 基本情報','visit.form.sec_guests':'▌ ゲスト一覧',
     'visit.form.sec_days':'▌ スケジュール','visit.form.sec_escorts':'▌ 担当スタッフ','visit.form.sec_costs':'▌ 費用見積',
     'visit.lbl.company':'会社名 *','visit.lbl.db':'DBから選択…','visit.lbl.manage':'管理',
@@ -3346,6 +3486,38 @@ const ADMIN_I18N = {
     'lib.no_overdue':'✓ 延滞なし','lib.no_books':'蔵書なし','lib.no_loans':'貸出記録なし',
     'lib.no_rsv':'予約記録なし','car.no_veh':'車両データなし','lib.book_instock':'館内','lib.book_loaned':'貸出中',
     'car.veh.fuel.label':'タイプ/燃料','car.veh.km_label':'走行距離','car.veh.park_label':'駐車場','car.veh.user_label':'利用者',
+    'err.time_order':'終了時刻は開始時刻より後にしてください','err.no_copies':'貸出可能な冊数なし',
+    'room.nav.cfg':'会議室設定','room.cfg.hours_start':'営業開始時間（整時）','room.cfg.hours_end':'営業終了時間（整時）',
+    'room.cfg.max_days':'最大事前予約日数','room.cfg.autorelease':'未チェックインで自動開放（分）','car.filter.all':'すべて',
+    'fault.device.label':'故障設備','fault.desc.label':'問題説明 *','fault.reporter.label':'報告者',
+    'fault.dev.projector':'プロジェクター','fault.dev.video':'ビデオシステム','fault.dev.whiteboard':'ホワイトボード/マーカー',
+    'fault.dev.ac':'エアコン','fault.dev.lights':'照明','fault.dev.audio':'音響','fault.dev.other':'その他',
+    'fault.desc.ph':'故障の詳細を説明してください…',
+    'guest.name.label':'氏名 *','guest.title.label':'役職','guest.company.label':'会社/組織 *',
+    'guest.phone.label':'電話','guest.nationality.label':'国籍/地域',
+    'guest.nat.tw':'台湾','guest.nat.cn':'中国','guest.nat.vn':'ベトナム','guest.nat.hk':'香港',
+    'guest.nat.jp':'日本','guest.nat.us':'アメリカ','guest.nat.eu':'ヨーロッパ','guest.nat.other':'その他',
+    'guest.type.label':'来訪タイプ',
+    'guest.type.existing':'既存顧客','guest.type.potential':'潜在顧客','guest.type.supplier':'サプライヤー',
+    'guest.type.partner':'パートナー','guest.type.gov':'政府/メディア','guest.type.other':'その他',
+    'guest.prefs.label':'備考（食事・言語など）',
+    'guest.name.ph':'氏名','guest.title.ph':'購買マネージャー','guest.company.ph':'会社名',
+    'broadcast.banner':'⚠ このメッセージは関係者全員に通知されます（システム通知 + メール）',
+    'broadcast.content.label':'メッセージ内容 *','broadcast.content.ph':'放送メッセージを入力…','broadcast.level.label':'緊急度',
+    'broadcast.lvl.normal':'一般通知','broadcast.lvl.urgent':'緊急','broadcast.lvl.cancel':'行程キャンセル/中止',
+    'cat.name.label':'カテゴリ名 *','fuel.date.label':'給油日 *','park.desc.label':'場所の説明',
+    'lib.grid.instock':'貸出可 %d','lib.grid.loaned':'貸出中','lib.grid.no_data':'データなし','lib.grid.uncat':'未分類',
+    'lib.no_books_in':'館内に蔵書なし','lib.book_count':'%d 冊','lib.loan_status':'現在 %d 冊借用中（上限 %d 冊）',
+    'cal.month_fmt':'%Y年%m月','cal.collapse':'折りたたむ ▴','cal.expand':'展開 ▾',
+    'room.headcount_fmt':'出席者：%d 名','room.checkin_confirm':'会議を開始しますか？会議室が使用中になります。',
+    'visit.no_week':'今週の来訪予定はありません','visit.all_staff':'全スタッフ（%d 名）',
+    'visit.stat.company':'会社：','visit.stat.type':'タイプ：','visit.stat.date':'日付：',
+    'car.mileage_hint':'元の走行距離：%d km｜予想：%d km','car.mileage_low':'走行距離は元の距離（%d km）を下回ることはできません',
+    'g.querying':'照会中…','g.updated':'%s 更新済','g.update_fail':'更新失敗',
+    'car.today_bk':'本日の予約：%s','car.no_bk_today2':'本日の予約なし',
+    'lot.sound_off':'🔇 サウンドオフ','lot.sound_on':'🔊 サウンドオン',
+    'g.select_staff':'— スタッフを選択 —','g.select_or_type':'— 選択または入力↓','g.select':'— 選択… —',
+    'car.all_veh2':'全車両','lib.all_cats2':'全カテゴリ',
   },
 };
 function t(key) {
@@ -3757,7 +3929,7 @@ function renderLibDash(){
   document.getElementById('ld-ov').innerHTML=ov.length?ov.map(l=>{const b=gBk(l.bk_id),u=gUsr(l.u_id);return`<tr class="rd"><td>${b?.title||'—'}</td><td>${u?.name||'—'}</td><td><span class="badge br">${-dDiff(l.due)}d</span></td><td><button class="btn bg2 bsm" onclick="qReturn('${l.id}')">${t('lib.btn.return')}</button></td></tr>`}).join(''):`<tr><td colspan="4" class="tdm" style="text-align:center;padding:14px">${t('lib.no_overdue')}</td></tr>`;
   const lc={};ln.forEach(l=>{lc[l.bk_id]=(lc[l.bk_id]||0)+1;});
   const top=Object.entries(lc).sort((a,b)=>b[1]-a[1]).slice(0,5);
-  document.getElementById('ld-top').innerHTML=top.length?top.map(([bid,cnt],i)=>{const b=gBk(bid),cat=gCat(b?.cat_id);return`<tr><td><b>${i+1}</b></td><td>${b?.title||'—'}</td><td class="tdm">${b?.author||'—'}</td><td><span class="badge ba">${cnt}次</span></td><td>${cat?`<span class="ctag">${cat.name}</span>`:'—'}</td></tr>`}).join(''):'<tr><td colspan="5" class="tdm" style="text-align:center;padding:14px">尚無資料</td></tr>';
+  document.getElementById('ld-top').innerHTML=top.length?top.map(([bid,cnt],i)=>{const b=gBk(bid),cat=gCat(b?.cat_id);return`<tr><td><b>${i+1}</b></td><td>${b?.title||'—'}</td><td class="tdm">${b?.author||'—'}</td><td><span class="badge ba">${cnt}次</span></td><td>${cat?`<span class="ctag">${cat.name}</span>`:'—'}</td></tr>`}).join(''):`<tr><td colspan="5" class="tdm" style="text-align:center;padding:14px">${t('lib.grid.no_data')}</td></tr>`;
   document.getElementById('ld-dt').textContent=`截至 ${fmtD(tds())}`;
 }
 
@@ -3771,14 +3943,14 @@ function renderBooks(){
   if(st==='av')bks=bks.filter(b=>bkAvail(b)>0);
   if(st==='bw')bks=bks.filter(b=>bkAvail(b)===0);
   if(bkV==='g'){
-    document.getElementById('bk-gv').innerHTML=bks.length?bks.map(b=>{const av=bkAvail(b),cat=gCat(b.cat_id);return`<div class="bkcard" onclick="openBkModal('${b.id}')"><div class="bkcov">${b.cover?`<img src="${b.cover}" onerror="this.style.display='none'">`:''}<div class="bkph" style="${b.cover?'display:none':''}">📗</div></div><div class="bki"><div class="bktt">${b.title}</div><div class="bkau">${b.author||'—'}</div><div class="bkft">${cat?`<span class="ctag">${cat.name}</span>`:'<span></span>'}<span class="badge ${av>0?'bg':'br'}">${av>0?`可借${av}`:'借出中'}</span></div></div></div>`}).join(''):'<div class="es" style="grid-column:1/-1"><div class="ei">📚</div><p>找不到書籍</p></div>';
+    document.getElementById('bk-gv').innerHTML=bks.length?bks.map(b=>{const av=bkAvail(b),cat=gCat(b.cat_id);return`<div class="bkcard" onclick="openBkModal('${b.id}')"><div class="bkcov">${b.cover?`<img src="${b.cover}" onerror="this.style.display='none'">`:''}<div class="bkph" style="${b.cover?'display:none':''}">📗</div></div><div class="bki"><div class="bktt">${b.title}</div><div class="bkau">${b.author||'—'}</div><div class="bkft">${cat?`<span class="ctag">${cat.name}</span>`:'<span></span>'}<span class="badge ${av>0?'bg':'br'}">${av>0?t('lib.grid.instock').replace('%d',av):t('lib.grid.loaned')}</span></div></div></div>`}).join(''):'<div class="es" style="grid-column:1/-1"><div class="ei">📚</div><p>找不到書籍</p></div>';
   }else{
     document.getElementById('bk-lt').innerHTML=bks.length?bks.map(b=>{const av=bkAvail(b),cat=gCat(b.cat_id);return`<tr><td><b>${b.title}</b>${b.lang?` <span class="badge bm">${b.lang}</span>`:''}</td><td class="tdm">${b.author||'—'}</td><td class="tdm">${b.isbn||'—'}</td><td>${cat?`<span class="ctag">${cat.name}</span>`:'—'}</td><td>${b.copies}</td><td>${av}</td><td><span class="badge ${av>0?'bg':'br'}">${av>0?t('lib.book_instock'):t('lib.book_loaned')}</span></td><td><button class="btn bg2 bsm" onclick="openBkModal('${b.id}')">${t('g.btn.edit')}</button> <button class="btn bdr bsm" onclick="delBk('${b.id}')">${t('g.btn.delete')}</button></td></tr>`}).join(''):`<tr><td colspan="8" class="tdm" style="text-align:center;padding:22px">${t('lib.no_books')}</td></tr>`;
   }
 }
 function openBkModal(id){
   editBkId=id||null;document.getElementById('mobkt').textContent=id?'編輯書籍':'新增書籍';
-  const cats=ld(K.ct);document.getElementById('bkcatsel').innerHTML='<option value="">未分類</option>'+cats.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+  const cats=ld(K.ct);document.getElementById('bkcatsel').innerHTML=`<option value="">${t('lib.grid.uncat')}</option>`+cats.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
   if(id){const b=gBk(id);if(!b)return;['bkisbn','bktit','bkaut','bkyr','bkcov','bknt2'].forEach(x=>document.getElementById(x).value=b[{bkisbn:'isbn',bktit:'title',bkaut:'author',bkyr:'year',bkcov:'cover',bknt2:'notes'}[x]]||'');document.getElementById('bklng').value=b.lang||'繁中';document.getElementById('bkcp').value=b.copies||1;document.getElementById('bkcatsel').value=b.cat_id||'';}
   else{['bkisbn','bktit','bkaut','bkyr','bkcov','bknt2'].forEach(x=>document.getElementById(x).value='');document.getElementById('bkcp').value=1;document.getElementById('bklng').value='繁中';}
   openMo('mo-book');
@@ -3825,7 +3997,7 @@ function renderBwBooks(){
   const q=document.getElementById('bwbq')?.value.toLowerCase()||'';
   let bks=ld(K.bk).filter(b=>bkAvail(b)>0);
   if(q)bks=bks.filter(b=>b.title.toLowerCase().includes(q)||b.author?.toLowerCase().includes(q));
-  document.getElementById('bwbl').innerHTML=bks.length?bks.map(b=>{const av=bkAvail(b),s=selBwBk===b.id;return`<div onclick="selBw('${b.id}')" style="padding:8px 12px;cursor:pointer;border-bottom:1px solid var(--bd);font-size:13px;background:${s?'var(--acd)':'transparent'};color:${s?'var(--ac)':'var(--t1)'}"><b>${b.title}</b><span style="color:var(--t3);font-size:11px;margin-left:6px">${b.author||''}</span><span class="badge bg" style="float:right">可借${av}</span></div>`}).join(''):'<div style="padding:14px;text-align:center;color:var(--t3);font-size:13px">無在館書籍</div>';
+  document.getElementById('bwbl').innerHTML=bks.length?bks.map(b=>{const av=bkAvail(b),s=selBwBk===b.id;return`<div onclick="selBw('${b.id}')" style="padding:8px 12px;cursor:pointer;border-bottom:1px solid var(--bd);font-size:13px;background:${s?'var(--acd)':'transparent'};color:${s?'var(--ac)':'var(--t1)'}"><b>${b.title}</b><span style="color:var(--t3);font-size:11px;margin-left:6px">${b.author||''}</span><span class="badge bg" style="float:right">${t('lib.grid.instock').replace('%d',av)}</span></div>`}).join(''):`<div style="padding:14px;text-align:center;color:var(--t3);font-size:13px">${t('lib.no_books_in')}</div>`;
 }
 function selBw(id){selBwBk=id;const b=gBk(id);const el=document.getElementById('bwsel');el.style.display='';el.textContent=`✓ 已選擇：${b.title}`;renderBwBooks();}
 function updBwDue(){
@@ -3839,7 +4011,7 @@ function doLoan(){
   if(!selBwBk)return toast('請選擇書籍','error');
   const cfg=lo(K.lcfg,DLCFG),ln=ld(K.ln);
   if(ln.filter(l=>l.u_id===uid2&&l.st!=='returned').length>=cfg.max_loans)return toast(`已達借閱上限（${cfg.max_loans}冊）`,'error');
-  const bk=gBk(selBwBk);if(!bk||bkAvail(bk)===0)return toast('無可借冊數','error');
+  const bk=gBk(selBwBk);if(!bk||bkAvail(bk)===0)return toast(t('err.no_copies'),'error');
   const bw=document.getElementById('bwdt').value||tds(),due=document.getElementById('bwdu').value;if(!due)return toast('請設定應還日期','error');
   const _newLoan={id:uid(),bk_id:selBwBk,u_id:uid2,bw,due,ret:null,st:'active'};ln.push(_newLoan);sv(K.ln,ln);sbSaveLoan(_newLoan);
   selBwBk=null;document.getElementById('bwsel').style.display='none';document.getElementById('bwbq').value='';document.getElementById('bwu').value='';
@@ -3878,11 +4050,11 @@ function impTrig(){document.getElementById('impf').click();}
 function impData(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{try{const d=JSON.parse(ev.target.result);Object.entries(K).forEach(([k,sk])=>{if(d[k]!==undefined)localStorage.setItem(sk,JSON.stringify(d[k]));});toast('已匯入，重整中…','success');setTimeout(()=>location.reload(),1000);}catch{toast('格式錯誤','error');}};r.readAsText(f);}
 function resetData(){if(!confirm('⚠️ 確定清除所有資料？'))return;Object.values(K).forEach(k=>localStorage.removeItem(k));toast('已清除，重整中…','warn');setTimeout(()=>location.reload(),1000);}
 
-function popCatSel(){const cats=ld(K.ct),opts='<option value="">所有分類</option>'+cats.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');const el=document.getElementById('bkcat');if(el)el.innerHTML=opts;}
+function popCatSel(){const cats=ld(K.ct),opts=`<option value="">${t('lib.all_cats2')}</option>`+cats.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');const el=document.getElementById('bkcat');if(el)el.innerHTML=opts;}
 function popUsrSel(){
   const us=ld(K.us),opts='<option value="">請選擇員工…</option>'+us.map(u=>`<option value="${u.id}">${u.name}（${u.dept||'—'}）</option>`).join('');
   const el=document.getElementById('bwu');if(el){el.innerHTML=opts;if(curUid)el.value=curUid;}
-  const h=document.getElementById('bwh');if(h&&el){el.onchange=()=>{const u2=el.value;if(!u2){h.textContent='';return;}const cfg=lo(K.lcfg,DLCFG);const a=ld(K.ln).filter(l=>l.u_id===u2&&l.st!=='returned').length;h.textContent=`目前借閱${a}冊，上限${cfg.max_loans}冊`;};}
+  const h=document.getElementById('bwh');if(h&&el){el.onchange=()=>{const u2=el.value;if(!u2){h.textContent='';return;}const cfg=lo(K.lcfg,DLCFG);const a=ld(K.ln).filter(l=>l.u_id===u2&&l.st!=='returned').length;h.textContent=t('lib.loan_status').replace('%d',a).replace('%d',cfg.max_loans);};}
 }
 function popCarSels(){const vehs=ld(K.vh),vOpts='<option value="">所有車輛</option>'+vehs.map(v=>`<option value="${v.id}">${v.name}(${v.plate})</option>`).join('');['cal-vf','usvf','fvf','mtvf'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=vOpts;});}
 
@@ -3938,7 +4110,7 @@ function calMov(d){if(calV==='month')calDt.setMonth(calDt.getMonth()+d);else cal
 function calToday(){calDt=new Date();renderCal();}
 function renderCal(){const vf=document.getElementById('cal-vf')?.value||'';let bks=ld(K.bks);if(vf)bks=bks.filter(b=>b.vh_id===vf);const mts=ld(K.mt),isps=ld(K.isp);if(calV==='month')renderMoCal(bks,mts,isps,vf);else renderWkCal(bks,mts,isps,vf);}
 function renderMoCal(bks,mts,isps,vf){
-  const y=calDt.getFullYear(),m=calDt.getMonth();document.getElementById('cal-tit').textContent=`${y}年${m+1}月`;
+  const y=calDt.getFullYear(),m=calDt.getMonth();document.getElementById('cal-tit').textContent=t('cal.month_fmt').replace('%Y',y).replace('%m',String(m+1).padStart(2,'0'));
   const first=new Date(y,m,1),last=new Date(y,m+1,0),sd=first.getDay();
   const days=[];for(let i=0;i<sd;i++)days.push({d:new Date(y,m,1-sd+i),cur:false});for(let i=1;i<=last.getDate();i++)days.push({d:new Date(y,m,i),cur:true});while(days.length%7)days.push({d:new Date(y,m+1,days.length-last.getDate()-sd+1),cur:false});
   const today=tds();let h='<div class="cg7">';['日','一','二','三','四','五','六'].forEach(w=>h+=`<div class="cwd">${w}</div>`);
@@ -3986,7 +4158,7 @@ function chkConflict(){
   const vid=document.getElementById('bkv').value,sd=document.getElementById('bksd').value,st=document.getElementById('bkst2').value||'00:00',ed=document.getElementById('bked').value,et=document.getElementById('bket').value||'23:59';
   const el=document.getElementById('bk-conf');if(!vid||!sd||!ed){el.style.display='none';return;}
   const ns=`${sd}T${st}`,ne=`${ed}T${et}`;
-  if(ne<=ns){el.style.display='';el.textContent='⚠️ 結束時間必須晚於開始';return;}
+  if(ne<=ns){el.style.display='';el.textContent='⚠️ '+t('err.time_order');return;}
   const cf=ld(K.bks).find(b=>b.vh_id===vid&&b.st!=='done'&&b.st!=='cancelled'&&b.start<ne&&b.end>ns);
   if(cf){const u=gUsr(cf.u_id);el.style.display='';el.textContent=`⚠️ 與${u?.name||'其他人'}衝突（${cf.start.replace('T',' ')} — ${cf.end.replace('T',' ')}）`;}else el.style.display='none';
 }
@@ -4013,7 +4185,7 @@ function startBk(vid){
 function doBooking(){
   const vid=document.getElementById('bkv').value,uid2=document.getElementById('bku').value,sd=document.getElementById('bksd').value,st=document.getElementById('bkst2').value||'08:00',ed=document.getElementById('bked').value,et=document.getElementById('bket').value||'18:00',pur=document.getElementById('bkpur').value.trim();
   if(!vid)return toast('請選擇車輛','error');if(!uid2)return toast('請選擇使用人','error');if(!sd||!ed)return toast('請選擇日期','error');if(!pur)return toast('請填寫出行目的','error');
-  const ns=`${sd}T${st}`,ne=`${ed}T${et}`;if(ne<=ns)return toast('結束時間必須晚於開始','error');
+  const ns=`${sd}T${st}`,ne=`${ed}T${et}`;if(ne<=ns)return toast(t('err.time_order'),'error');
   if(ld(K.bks).find(b=>b.vh_id===vid&&b.st!=='done'&&b.st!=='cancelled'&&b.start<ne&&b.end>ns))return toast('此車時段已有預約','error');
   const bks=ld(K.bks);bks.push({id:uid(),vh_id:vid,u_id:uid2,start:ns,end:ne,purpose:pur,km_plan:parseInt(document.getElementById('bkkm').value)||0,from:document.getElementById('bkfr').value.trim(),to:document.getElementById('bkto').value.trim(),note:document.getElementById('bknt').value.trim(),st:'pending'});
   sv(K.bks,bks);sbSaveCarBk(bks[bks.length-1]);const v=gVeh(vid),u=gUsr(uid2);toast(`已預約：${u?.name}使用${v?.name}（${sd}）`,'success');
@@ -4035,7 +4207,7 @@ function endUse(id){
   document.getElementById('ret-bk-id').value=id;
   document.getElementById('ret-km').value=defKm||'';
   document.getElementById('ret-km').min=vh?.km||0;
-  document.getElementById('ret-km-hint').textContent='原里程：'+(vh?.km||0).toLocaleString()+' km｜預計：'+defKm.toLocaleString()+' km';
+  document.getElementById('ret-km-hint').textContent=t('car.mileage_hint').replace('%d',(vh?.km||0).toLocaleString()).replace('%d',defKm.toLocaleString());
   document.getElementById('ret-pk').value=vh?.pk_id||'';
   document.getElementById('ret-err').style.display='none';
   openMo('mo-ret');
@@ -4047,7 +4219,7 @@ async function doReturn(){
   const bks=ld(K.bks),i=bks.findIndex(b=>b.id===id);if(i<0)return;
   const bk=bks[i],vehs=ld(K.vh),vi=vehs.findIndex(v=>v.id===bk.vh_id),vh=vehs[vi];
   if(!kmVal||kmVal<(vh?.km||0)){
-    document.getElementById('ret-err').textContent='里程數不可低於原本里程（'+(vh?.km||0).toLocaleString()+' km）';
+    document.getElementById('ret-err').textContent=t('car.mileage_low').replace('%d',(vh?.km||0).toLocaleString());
     document.getElementById('ret-err').style.display='';
     return;
   }
@@ -4085,13 +4257,13 @@ function delFuel(id){if(!confirm('確定刪除？'))return;sv(K.fl,ld(K.fl).filt
 function expFuelCSV(){const logs=ld(K.fl);const rows=[['車輛','日期','油量L','金額','單價','里程','加油人','備註']];logs.forEach(l=>{const v=gVeh(l.vh_id),u=gUsr(l.u_id);rows.push([v?.name||'',l.date,l.liters,l.total||'',l.price||'',l.odo||'',u?.name||'',l.note||'']);});dl('fuel.csv',rows.map(r=>r.map(c=>`"${c}"`).join(',')).join('\n'),'text/csv');toast('已匯出','success');}
 
 function renderMaint(){let logs=ld(K.mt);const vf=document.getElementById('mtvf')?.value||'';if(vf)logs=logs.filter(l=>l.vh_id===vf);logs.sort((a,b)=>b.date.localeCompare(a.date));document.getElementById('mt-tb').innerHTML=logs.length?logs.map(l=>{const v=gVeh(l.vh_id);return`<tr><td>${VICO[v?.type]||'🔧'} ${v?.name||'—'}</td><td class="tdm">${fmtD(l.date)}</td><td>${l.items||'—'}</td><td>${l.km?l.km.toLocaleString():'—'}</td><td>${l.cost?'$'+l.cost.toLocaleString():'—'}</td><td>${l.nkm?l.nkm.toLocaleString():'—'}</td><td class="tdm">${fmtD(l.ndt)}</td><td class="tdm">${l.vendor||'—'}</td><td><button class="btn bdr bsm" onclick="delMaint('${l.id}')">${t('g.btn.delete')}</button></td></tr>`}).join(''):`<tr><td colspan="9" class="tdm" style="text-align:center;padding:22px">${t('car.no_maint')}</td></tr>`;}
-function openMaintModal(){document.getElementById('momtt').textContent='新增保養記錄';const vehs=ld(K.vh);document.getElementById('mtveh').innerHTML='<option value="">請選擇…</option>'+vehs.map(v=>`<option value="${v.id}">${v.name}(${v.plate})</option>`).join('');document.getElementById('mtdt').value=tds();['mtkm','mtit','mtcs','mtvd','mtnk','mtnt'].forEach(x=>document.getElementById(x).value='');document.getElementById('mtnd').value='';openMo('mo-maint');}
+function openMaintModal(){document.getElementById('momtt').textContent=t('car.mo.add_maint');const vehs=ld(K.vh);document.getElementById('mtveh').innerHTML='<option value="">請選擇…</option>'+vehs.map(v=>`<option value="${v.id}">${v.name}(${v.plate})</option>`).join('');document.getElementById('mtdt').value=tds();['mtkm','mtit','mtcs','mtvd','mtnk','mtnt'].forEach(x=>document.getElementById(x).value='');document.getElementById('mtnd').value='';openMo('mo-maint');}
 function saveMaint(){const vid=document.getElementById('mtveh').value,it=document.getElementById('mtit').value.trim();if(!vid)return toast('請選擇車輛','error');if(!it)return toast('請填寫保養項目','error');const nkm=parseInt(document.getElementById('mtnk').value)||null,ndt=document.getElementById('mtnd').value||null;const data={id:uid(),vh_id:vid,date:document.getElementById('mtdt').value||tds(),km:parseInt(document.getElementById('mtkm').value)||null,items:it,cost:parseInt(document.getElementById('mtcs').value)||null,vendor:document.getElementById('mtvd').value.trim(),nkm,ndt,note:document.getElementById('mtnt').value.trim()};const logs=ld(K.mt);logs.push(data);sv(K.mt,logs);if(nkm){const vehs=ld(K.vh),vi=vehs.findIndex(v=>v.id===vid);if(vi>=0){vehs[vi].next_maint_km=nkm;sv(K.vh,vehs);}}closeMo('mo-maint');renderMaint();updBadges();toast('已儲存','success');}
 function delMaint(id){if(!confirm('確定刪除？'))return;sv(K.mt,ld(K.mt).filter(l=>l.id!==id));renderMaint();toast('已刪除','success');}
 
 let editIspId=null;
 function renderInsp(){const isps=ld(K.isp);const cfg=lo(K.ccfg,DCCFG);document.getElementById('insp-tb').innerHTML=isps.length?isps.map(isp=>{const v=gVeh(isp.vh_id),d=isp.next?dDiff(isp.next):null,cls=d===null?'':d<=7?'rd':d<=cfg.insp_days?'rw':'';return`<tr class="${cls}"><td>${VICO[v?.type]||'📋'} ${v?.name||'—'} <span class="tdm">(${v?.plate||''})</span></td><td class="tdm">${fmtD(isp.last)}</td><td>${fmtD(isp.next)}</td><td>${d!==null?`<span class="badge ${d<=7?'br':d<=30?'by':'bg'}">${d}d</span>`:'—'}</td><td><span class="badge ${d!==null&&d<=cfg.insp_days?'by':'bg'}">${d!==null&&d<=cfg.insp_days?t('lib.stat.soon'):t('car.st.avail')}</span></td><td class="tdm">${isp.note||'—'}</td><td><button class="btn bg2 bsm" onclick="openInspModal('${isp.id}')">${t('lib.btn.update')}</button> <button class="btn bdr bsm" onclick="delInsp('${isp.id}')">${t('g.btn.delete')}</button></td></tr>`}).join(''):`<tr><td colspan="7" class="tdm" style="text-align:center;padding:22px">${t('car.no_insp')}</td></tr>`;}
-function openInspModal(id){editIspId=id||null;document.getElementById('moispt').textContent=id?'更新驗車':'登記驗車';const vehs=ld(K.vh);document.getElementById('ispveh').innerHTML='<option value="">請選擇…</option>'+vehs.map(v=>`<option value="${v.id}">${v.name}(${v.plate})</option>`).join('');if(id){const isp=ld(K.isp).find(i=>i.id===id);if(!isp)return;document.getElementById('ispveh').value=isp.vh_id;document.getElementById('ispls').value=isp.last||'';document.getElementById('ispnx').value=isp.next||'';document.getElementById('ispnt').value=isp.note||'';}else{['ispls','ispnx','ispnt'].forEach(x=>document.getElementById(x).value='');}openMo('mo-insp');}
+function openInspModal(id){editIspId=id||null;document.getElementById('moispt').textContent=id?t('car.mo.edit_insp'):t('car.mo.add_insp');const vehs=ld(K.vh);document.getElementById('ispveh').innerHTML='<option value="">請選擇…</option>'+vehs.map(v=>`<option value="${v.id}">${v.name}(${v.plate})</option>`).join('');if(id){const isp=ld(K.isp).find(i=>i.id===id);if(!isp)return;document.getElementById('ispveh').value=isp.vh_id;document.getElementById('ispls').value=isp.last||'';document.getElementById('ispnx').value=isp.next||'';document.getElementById('ispnt').value=isp.note||'';}else{['ispls','ispnx','ispnt'].forEach(x=>document.getElementById(x).value='');}openMo('mo-insp');}
 function saveInsp(){const vid=document.getElementById('ispveh').value,nxt=document.getElementById('ispnx').value;if(!vid)return toast('請選擇車輛','error');if(!nxt)return toast('請填寫下次驗車日期','error');const data={vh_id:vid,last:document.getElementById('ispls').value||null,next:nxt,note:document.getElementById('ispnt').value.trim()};const isps=ld(K.isp);if(editIspId){const i=isps.findIndex(x=>x.id===editIspId);if(i>=0)isps[i]={...isps[i],...data};}else isps.push({id:uid(),...data});sv(K.isp,isps);const vehs=ld(K.vh),vi=vehs.findIndex(v=>v.id===vid);if(vi>=0){vehs[vi].next_insp=nxt;sv(K.vh,vehs);}closeMo('mo-insp');renderInsp();updBadges();toast('已更新','success');}
 function delInsp(id){if(!confirm('確定刪除？'))return;sv(K.isp,ld(K.isp).filter(i=>i.id!==id));renderInsp();toast('已刪除','success');}
 
@@ -4380,7 +4552,7 @@ function renderAdvances(){
 
 // ── Fetch rates ──
 async function fetchRates(){
-  document.getElementById('rate-status').textContent='查詢中…';
+  document.getElementById('rate-status').textContent=t('g.querying');
   try{
     const r=await fetch('https://api.exchangerate-api.com/v4/latest/TWD');
     const j=await r.json();
@@ -4393,11 +4565,11 @@ async function fetchRates(){
         if(el){el.value=rate.toFixed(4);c.defRate=rate;}
       }
     });
-    document.getElementById('rate-status').textContent='已更新 '+new Date().toLocaleTimeString('zh-TW');
+    document.getElementById('rate-status').textContent=t('g.updated').replace('%s',new Date().toLocaleTimeString());
     calcTripTotal();calcAdvTotal();
     toast('匯率已更新','success');
   }catch(e){
-    document.getElementById('rate-status').textContent='更新失敗';
+    document.getElementById('rate-status').textContent=t('g.update_fail');
     toast('匯率查詢失敗，使用預設值','warn');
   }
 }
@@ -5001,8 +5173,8 @@ function renderDashCards(bks){
     const today=todayStr2();
     const todayBks=bks.filter(b=>b.roomId===room.id&&b.date===today&&b.status!=='cancelled');
     if(todayBks.length){
-      el2.textContent='今日預約：'+todayBks.map(b=>`${b.start}–${b.end} ${b.title||''}`).join('、');
-    }else{el2.textContent='今日無預約';}
+      el2.textContent=t('car.today_bk').replace('%s',todayBks.map(b=>`${b.start}–${b.end} ${b.title||''}`).join('、'));
+    }else{el2.textContent=t('car.no_bk_today2');}
   });
 }
 
@@ -5148,7 +5320,7 @@ function toggleInlineBkForm(){
   if(!body)return;
   const open=body.style.display==='none'||body.style.display==='';
   body.style.display=open?'block':'none';
-  if(tog)tog.textContent=open?'收起 ▴':'展開 ▾';
+  if(tog)tog.textContent=open?t('cal.collapse'):t('cal.expand');
   if(open)iInitBkForm();
 }
 function iInitBkForm(){
@@ -5261,7 +5433,7 @@ function iBkStep2Next(){
   const date=document.getElementById('ibk-date').value;
   const room=ROOMS.find(r=>r.id===iBkSelectedRoom);
   const el=document.getElementById('ibk-summary-box');
-  if(el)el.innerHTML=`<b>${room?.name||'—'}</b> · <b>${date}</b> · <b>${iBkSelectedSlot.start}–${iBkSelectedSlot.end}</b><br>與會人數：${document.getElementById('ibk-headcount').value} 人`;
+  if(el)el.innerHTML=`<b>${room?.name||'—'}</b> · <b>${date}</b> · <b>${iBkSelectedSlot.start}–${iBkSelectedSlot.end}</b><br>${t('room.headcount_fmt').replace('%d',document.getElementById('ibk-headcount').value)}`;
 }
 async function iBkSave(){
   const title=document.getElementById('ibk-title')?.value.trim();
@@ -5291,7 +5463,7 @@ async function iBkSave(){
   const body=document.getElementById('inline-bk-body');
   const tog=document.getElementById('inline-bk-toggle');
   if(body)body.style.display='none';
-  if(tog)tog.textContent='展開 ▾';
+  if(tog)tog.textContent=t('cal.expand');
   renderRoomDash();
 }
 function bkGoStep(n){
@@ -5421,7 +5593,7 @@ function renderBkSummary(){
   const date=document.getElementById('bk-date').value;
   const room=ROOMS.find(r=>r.id===bkSelectedRoom);
   const el=document.getElementById('bk-summary-box');
-  if(el)el.innerHTML=`<b>${room?.name||'—'}</b> · <b>${date}</b> · <b>${bkSelectedSlot.start}–${bkSelectedSlot.end}</b><br>與會人數：${document.getElementById('bk-headcount').value} 人`;
+  if(el)el.innerHTML=`<b>${room?.name||'—'}</b> · <b>${date}</b> · <b>${bkSelectedSlot.start}–${bkSelectedSlot.end}</b><br>${t('room.headcount_fmt').replace('%d',document.getElementById('bk-headcount').value)}`;
 }
 
 // Step 3: save
@@ -5781,7 +5953,7 @@ async function renderVisitDash(){
   // week list
   const weekVisits=visits.filter(v=>{const s=new Date(v.dateStart+'T00:00:00'),e=new Date(v.dateEnd+'T23:59:59');return e>=now&&s<=weekEnd;}).sort((a,b)=>a.dateStart.localeCompare(b.dateStart));
   const wl=document.getElementById('visit-week-list');
-  if(weekVisits.length===0){wl.innerHTML='<div class="es"><div class="ei">🤝</div><p>本週無排定到訪行程</p></div>';return;}
+  if(weekVisits.length===0){wl.innerHTML=`<div class="es"><div class="ei">🤝</div><p>${t('visit.no_week')}</p></div>`;return;}
   wl.innerHTML=weekVisits.map(v=>{
     const st=visitStatus(v);
     const owner=gUsr(v.ownerId);
@@ -5832,7 +6004,7 @@ function initVisitForm(){
 function resetVisitForm(){
   if(!confirm('確定清除？'))return;
   vEditId=null;vfGuests=[];vfDays=[];vfEscorts=[];vfCosts=[];
-  document.getElementById('visit-form-title').textContent='新增到訪行程';
+  document.getElementById('visit-form-title').textContent=t('visit.form.title_new');
   ['vf-company','vf-note'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   ['vf-type','vf-unit','vf-owner','vf-headcount','vf-purpose'].forEach(id=>{const el=document.getElementById(id);if(el)el.selectedIndex=0;});
   const sd=document.getElementById('vf-date-start'),ed=document.getElementById('vf-date-end');
@@ -6006,7 +6178,7 @@ function editVisit(id){
   vfEscorts=JSON.parse(JSON.stringify(v.escorts||[]));
   vfCosts=JSON.parse(JSON.stringify(v.costs||[]));
   navVisit('visit-new');
-  document.getElementById('visit-form-title').textContent='編輯到訪行程';
+  document.getElementById('visit-form-title').textContent=t('visit.form.title_edit');
   setTimeout(()=>{
     const us=ld(K.us);
     const os=document.getElementById('vf-owner');
@@ -6327,7 +6499,7 @@ function lottoInit(){
   const sites = [...new Set(_lottoAllUsers.map(u=>u.site||'TW').filter(Boolean))].sort();
   const sel = document.getElementById('lottoSiteFilter');
   if(sel){
-    sel.innerHTML = `<option value="all">全部人員（${_lottoAllUsers.length}位）</option>`
+    sel.innerHTML = `<option value="all">${t('visit.all_staff').replace('%d',_lottoAllUsers.length)}</option>`
       + sites.map(s=>{
           const cnt = _lottoAllUsers.filter(u=>(u.site||'TW')===s).length;
           return `<option value="${s}">${siteName(s)}（${cnt}位）</option>`;
@@ -6430,7 +6602,7 @@ function ensureAudioSync(){
   AC();
   if(L_actx.state==='suspended') L_actx.resume().catch(()=>{});
 }
-function toggleMute(){L_muted=!L_muted;document.getElementById('muteTag').textContent=L_muted?'🔇 音效關':'🔊 音效開';if(L_muted)stopBgm();}
+function toggleMute(){L_muted=!L_muted;document.getElementById('muteTag').textContent=L_muted?t('lot.sound_off'):t('lot.sound_on');if(L_muted)stopBgm();}
 function note(freq,dur,t0,gain=0.16,type='triangle'){
   if(L_muted||!L_actx)return;
   if(L_actx.state!=='running')return; // 未 running 不排程

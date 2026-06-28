@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>COMART Platform v1.51</title>
+<title>COMART Platform v1.52</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.js"></script>
 <style>
@@ -318,7 +318,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     <div class="login-logo">
       <div class="login-mark">C</div>
       <div class="login-name">COMART Platform</div>
-      <div class="login-sub">Internal Portal · v1.51</div>
+      <div class="login-sub">Internal Portal · v1.52</div>
     </div>
     <form id="loginForm" onsubmit="doLogin();return false;" autocomplete="on">
     <div class="field">
@@ -346,7 +346,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   <div class="topbar">
     <div class="topbar-logo" onclick="switchView('home')">
       <div class="topbar-mark">C</div>
-      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.51</span></div>
+      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.52</span></div>
     </div>
     <div class="topbar-right">
       <div class="lang-switcher">
@@ -416,6 +416,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
           <div class="section-title" id="sect-updates">Platform Updates</div>
           <div class="changelog">
+            <div class="cl-item"><div class="cl-dot" style="background:var(--grn)"></div><div><div class="cl-text">v1.52 — 全面 i18n 修正：日曆/差旅/公佈欄/名人榜/通知所有文字與 UI 元素現依語言設定顯示</div><div class="cl-date">2026-06 · i18n</div></div></div>
             <div class="cl-item"><div class="cl-dot" style="background:var(--grn)"></div><div><div class="cl-text">v1.51 — 集團行事曆日期選擇器調最亮（color-scheme: light，圖示純白）</div><div class="cl-date">2026-06 · UI</div></div></div>
             <div class="cl-item"><div class="cl-dot" style="background:var(--grn)"></div><div><div class="cl-text">v1.50 — 全系統文字顯示調亮（tx2/tx3 提高對比度），背景維持純黑</div><div class="cl-date">2026-06 · UI</div></div></div>
             <div class="cl-item"><div class="cl-dot" style="background:var(--grn)"></div><div><div class="cl-text">v1.47 — i18n 全面補完：AI Skills tab（公司調查、展後跟進）、排行榜說明、Calendar Add 按鈕全部支援 5 語言</div><div class="cl-date">2026-06 · Enhancement</div></div></div>
@@ -603,7 +604,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
         <!-- Left sidebar: category toggles -->
         <div id="cal-sidebar" style="width:200px;flex-shrink:0;background:var(--s1);border-right:1px solid var(--br);overflow-y:auto;padding:14px 12px;">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-            <div style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;">Calendars</div>
+            <div id="cal-sidebar-title" style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;">Calendars</div>
             <span id="cal-active-count" style="font-size:10px;color:var(--tx3);">1/4</span>
           </div>
           <div id="cal-category-list" style="display:flex;flex-direction:column;gap:6px;"></div>
@@ -632,7 +633,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
               <button onclick="toggleAddMenu()" id="addMenuBtn"
                 style="padding:7px 16px;border-radius:8px;background:var(--ac);color:#fff;border:none;cursor:pointer;font-size:13px;font-weight:700;">＋ Add ▾</button>
               <div id="addMenuDropdown" style="display:none;position:absolute;top:36px;right:0;background:var(--s1);border:1px solid var(--br);border-radius:10px;min-width:180px;z-index:100;box-shadow:0 4px 20px rgba(0,0,0,.3);overflow:hidden;">
-                <div onclick="closeAddMenu();openCalEventModal('group',null)"
+                <div id="cal-menu-event" onclick="closeAddMenu();openCalEventModal('group',null)"
                   style="padding:10px 16px;cursor:pointer;font-size:13px;color:var(--tx);border-bottom:1px solid var(--br);">🏢 Group Event</div>
                 <div onclick="closeAddMenu();openCalEventModal('tw-cal',null)"
                   style="padding:10px 16px;cursor:pointer;font-size:13px;color:var(--tx);border-bottom:1px solid var(--br);">🇹🇼 Taiwan Calendar</div>
@@ -640,7 +641,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
                   style="padding:10px 16px;cursor:pointer;font-size:13px;color:var(--tx);border-bottom:1px solid var(--br);">🇨🇳 China Calendar</div>
                 <div onclick="closeAddMenu();openCalEventModal('vn-cal',null)"
                   style="padding:10px 16px;cursor:pointer;font-size:13px;color:var(--tx);border-bottom:1px solid var(--br);">🇻🇳 Vietnam Calendar</div>
-                <div onclick="closeAddMenu();openTripModal(null)"
+                <div id="cal-menu-trip" onclick="closeAddMenu();openTripModal(null)"
                   style="padding:10px 16px;cursor:pointer;font-size:13px;color:var(--tx);">✈️ Business Trip</div>
               </div>
             </div>
@@ -662,30 +663,30 @@ input[type="date"]::-webkit-calendar-picker-indicator {
             <button onclick="closeCalEventModal()" style="background:transparent;border:none;cursor:pointer;color:var(--tx3);font-size:20px;">✕</button>
           </div>
           <div style="margin-bottom:10px;">
-            <label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Calendar</label>
+            <label id="cal-evt-lbl-cal" style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Calendar</label>
             <select id="cal-event-cat" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;"></select>
           </div>
           <div style="margin-bottom:10px;">
-            <label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Title *</label>
+            <label id="cal-evt-lbl-title" style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Title *</label>
             <input id="cal-event-title" placeholder="Event title" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;">
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
             <div>
-              <label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Date From *</label>
+              <label id="cal-evt-lbl-from" style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Date From *</label>
               <input id="cal-event-from" type="date" onchange="if(!document.getElementById('cal-event-to').value)document.getElementById('cal-event-to').value=this.value;" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;">
             </div>
             <div>
-              <label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Date To</label>
+              <label id="cal-evt-lbl-to" style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Date To</label>
               <input id="cal-event-to" type="date" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;">
             </div>
           </div>
           <div style="margin-bottom:14px;">
-            <label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Notes</label>
+            <label id="cal-evt-lbl-notes" style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Notes</label>
             <textarea id="cal-event-notes" rows="2" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;resize:none;font-family:inherit;"></textarea>
           </div>
           <div style="display:flex;gap:8px;">
-            <button onclick="saveCalEvent()" style="padding:9px 20px;border-radius:8px;background:var(--ac);color:#fff;border:none;cursor:pointer;font-size:13px;font-weight:700;">Save</button>
-            <button onclick="closeCalEventModal()" style="padding:9px 16px;border-radius:8px;border:1px solid var(--br);background:transparent;color:var(--tx2);cursor:pointer;font-size:13px;">Cancel</button>
+            <button id="cal-evt-save-btn" onclick="saveCalEvent()" style="padding:9px 20px;border-radius:8px;background:var(--ac);color:#fff;border:none;cursor:pointer;font-size:13px;font-weight:700;">Save</button>
+            <button id="cal-evt-cancel-btn" onclick="closeCalEventModal()" style="padding:9px 16px;border-radius:8px;border:1px solid var(--br);background:transparent;color:var(--tx2);cursor:pointer;font-size:13px;">Cancel</button>
             <button id="cal-event-del" onclick="deleteCalEvent()" style="display:none;padding:9px 16px;border-radius:8px;background:var(--red);color:#fff;border:none;cursor:pointer;font-size:13px;margin-left:auto;">Delete</button>
           </div>
         </div>
@@ -2382,28 +2383,28 @@ input[type="date"]::-webkit-calendar-picker-indicator {
             <button onclick="closeTripModal()" style="background:transparent;border:none;cursor:pointer;color:var(--tx3);font-size:20px;line-height:1;">✕</button>
           </div>
           <div class="field">
-            <label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Staff</label>
+            <label id="trip-lbl-staff" style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Staff</label>
             <select id="trip-staff" style="width:100%;padding:9px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;"></select>
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
-            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Date From</label>
+            <div class="field"><label id="trip-lbl-from" style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Date From</label>
               <input id="trip-date-from" type="date" onchange="if(!document.getElementById('trip-date-to').value)document.getElementById('trip-date-to').value=this.value;" style="width:100%;padding:9px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;"></div>
-            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Date To</label>
+            <div class="field"><label id="trip-lbl-to" style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Date To</label>
               <input id="trip-date-to" type="date" style="width:100%;padding:9px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;"></div>
           </div>
           <div class="field" style="margin-bottom:8px;">
-            <label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Destination</label>
+            <label id="trip-lbl-dest" style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Destination</label>
             <input id="trip-dest" placeholder="e.g. Tokyo, Japan" autocomplete="off" style="width:100%;padding:9px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;">
           </div>
           <div class="field" style="margin-bottom:12px;">
-            <label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Notes</label>
+            <label id="trip-lbl-notes" style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Notes</label>
             <textarea id="trip-notes" rows="2" placeholder="Purpose, client, etc." style="width:100%;padding:9px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;resize:vertical;font-family:inherit;"></textarea>
           </div>
           <!-- Outbound Flight -->
-          <div style="font-size:11px;font-weight:700;color:var(--ac);text-transform:uppercase;letter-spacing:.06em;margin:10px 0 6px;padding-bottom:4px;border-bottom:1px solid var(--br);">🛫 Outbound Flight</div>
+          <div id="trip-lbl-out" style="font-size:11px;font-weight:700;color:var(--ac);text-transform:uppercase;letter-spacing:.06em;margin:10px 0 6px;padding-bottom:4px;border-bottom:1px solid var(--br);">🛫 Outbound Flight</div>
           <div style="display:grid;grid-template-columns:1fr auto;gap:8px;margin-bottom:6px;align-items:flex-end;">
             <div class="field">
-              <label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Flight No.</label>
+              <label id="trip-lbl-out-flight" style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Flight No.</label>
               <input id="trip-flight" placeholder="e.g. CI101" autocomplete="off"
                 style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;text-transform:uppercase;"
                 onblur="autoFillFlight(this.value.trim().toUpperCase(),'out')">
@@ -2411,20 +2412,20 @@ input[type="date"]::-webkit-calendar-picker-indicator {
             </div>
           </div>
           <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px;">
-            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Dep City</label><input id="trip-out-dep-city" placeholder="Taipei" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
-            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Airport</label><input id="trip-out-dep-airport" placeholder="TPE" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
-            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Terminal</label><input id="trip-out-dep-terminal" placeholder="T2" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
-            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Dep Time</label><input id="trip-out-dep-time" placeholder="08:30" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
-            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Arr City</label><input id="trip-out-arr-city" placeholder="Tokyo" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
-            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Airport</label><input id="trip-out-arr-airport" placeholder="NRT" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
-            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Terminal</label><input id="trip-out-arr-terminal" placeholder="T1" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
-            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Arr Time</label><input id="trip-out-arr-time" placeholder="12:45" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
+            <div class="field"><label id="trip-lbl-dep-city" style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Dep City</label><input id="trip-out-dep-city" placeholder="Taipei" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
+            <div class="field"><label id="trip-lbl-dep-airport" style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Airport</label><input id="trip-out-dep-airport" placeholder="TPE" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
+            <div class="field"><label id="trip-lbl-dep-terminal" style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Terminal</label><input id="trip-out-dep-terminal" placeholder="T2" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
+            <div class="field"><label id="trip-lbl-dep-time" style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Dep Time</label><input id="trip-out-dep-time" placeholder="08:30" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
+            <div class="field"><label id="trip-lbl-arr-city" style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Arr City</label><input id="trip-out-arr-city" placeholder="Tokyo" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
+            <div class="field"><label id="trip-lbl-arr-airport" style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Airport</label><input id="trip-out-arr-airport" placeholder="NRT" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
+            <div class="field"><label id="trip-lbl-arr-terminal" style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Terminal</label><input id="trip-out-arr-terminal" placeholder="T1" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
+            <div class="field"><label id="trip-lbl-arr-time" style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Arr Time</label><input id="trip-out-arr-time" placeholder="12:45" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
           </div>
           <!-- Return Flight -->
-          <div style="font-size:11px;font-weight:700;color:var(--ac);text-transform:uppercase;letter-spacing:.06em;margin:10px 0 6px;padding-bottom:4px;border-bottom:1px solid var(--br);">🛬 Return Flight</div>
+          <div id="trip-lbl-ret" style="font-size:11px;font-weight:700;color:var(--ac);text-transform:uppercase;letter-spacing:.06em;margin:10px 0 6px;padding-bottom:4px;border-bottom:1px solid var(--br);">🛬 Return Flight</div>
           <div style="display:grid;grid-template-columns:1fr;gap:6px;margin-bottom:6px;">
             <div class="field">
-              <label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Flight No.</label>
+              <label id="trip-lbl-ret-flight" style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Flight No.</label>
               <input id="trip-return-flight" placeholder="e.g. CI102" autocomplete="off"
                 style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;text-transform:uppercase;"
                 onblur="autoFillFlight(this.value.trim().toUpperCase(),'ret')">
@@ -2432,18 +2433,18 @@ input[type="date"]::-webkit-calendar-picker-indicator {
             </div>
           </div>
           <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:16px;">
-            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Dep City</label><input id="trip-ret-dep-city" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
-            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Airport</label><input id="trip-ret-dep-airport" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
-            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Terminal</label><input id="trip-ret-dep-terminal" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
-            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Dep Time</label><input id="trip-ret-dep-time" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
-            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Arr City</label><input id="trip-ret-arr-city" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
-            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Airport</label><input id="trip-ret-arr-airport" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
-            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Terminal</label><input id="trip-ret-arr-terminal" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
-            <div class="field"><label style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Arr Time</label><input id="trip-ret-arr-time" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
+            <div class="field"><label id="trip-lbl-ret-dep-city" style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Dep City</label><input id="trip-ret-dep-city" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
+            <div class="field"><label id="trip-lbl-ret-dep-airport" style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Airport</label><input id="trip-ret-dep-airport" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
+            <div class="field"><label id="trip-lbl-ret-dep-terminal" style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Terminal</label><input id="trip-ret-dep-terminal" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
+            <div class="field"><label id="trip-lbl-ret-dep-time" style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Dep Time</label><input id="trip-ret-dep-time" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
+            <div class="field"><label id="trip-lbl-ret-arr-city" style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Arr City</label><input id="trip-ret-arr-city" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
+            <div class="field"><label id="trip-lbl-ret-arr-airport" style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Airport</label><input id="trip-ret-arr-airport" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
+            <div class="field"><label id="trip-lbl-ret-arr-terminal" style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Terminal</label><input id="trip-ret-arr-terminal" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
+            <div class="field"><label id="trip-lbl-ret-arr-time" style="font-size:11px;font-weight:700;color:var(--tx);display:block;margin-bottom:4px;">Arr Time</label><input id="trip-ret-arr-time" style="width:100%;padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;"></div>
           </div>
           <div style="display:flex;gap:8px;">
-            <button onclick="saveTrip()" style="padding:9px 20px;border-radius:8px;background:var(--ac);color:#fff;border:none;cursor:pointer;font-size:13px;font-weight:700;">Save</button>
-            <button onclick="closeTripModal()" style="padding:9px 16px;border-radius:8px;border:1px solid var(--br);background:transparent;color:var(--tx2);cursor:pointer;font-size:13px;font-family:var(--ff);">Cancel</button>
+            <button id="trip-save-btn" onclick="saveTrip()" style="padding:9px 20px;border-radius:8px;background:var(--ac);color:#fff;border:none;cursor:pointer;font-size:13px;font-weight:700;">Save</button>
+            <button id="trip-cancel-btn" onclick="closeTripModal()" style="padding:9px 16px;border-radius:8px;border:1px solid var(--br);background:transparent;color:var(--tx2);cursor:pointer;font-size:13px;font-family:var(--ff);">Cancel</button>
             <button id="trip-del" onclick="deleteTrip()" style="display:none;padding:9px 16px;border-radius:8px;background:var(--red);color:#fff;border:none;cursor:pointer;font-size:13px;margin-left:auto;">Delete</button>
           </div>
         </div>
@@ -2456,12 +2457,12 @@ input[type="date"]::-webkit-calendar-picker-indicator {
           </div>
           <!-- Compose -->
           <div class="bb-compose" id="bbCompose" style="display:none;">
-            <textarea class="bb-textarea" id="bbText" placeholder="輸入公告內容…" rows="3"></textarea>
+            <textarea class="bb-textarea" id="bbContent" placeholder="輸入公告內容…" rows="3"></textarea>
             <div class="bb-compose-footer">
               <label class="bb-pin-toggle">
-                <input type="checkbox" id="bbPin" style="accent-color:var(--amb);"> 📌 置頂
+                <input type="checkbox" id="bbPin" style="accent-color:var(--amb);"> 📌 <span id="bb-pin-label">置頂</span>
               </label>
-              <button class="bb-submit" onclick="submitPost()">發佈</button>
+              <button class="bb-submit" id="bb-submit-btn" onclick="submitPost()">發佈</button>
             </div>
           </div>
           <div id="bbList"><div class="bb-empty">載入中…</div></div>
@@ -2541,10 +2542,10 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   <!-- Bottom Nav (mobile) -->
   <div class="bottom-nav">
     <div class="bottom-nav-items">
-      <button class="bnav-btn active" id="bn-home" onclick="switchView('home')"><span class="bnav-icon">🏠</span><span class="bnav-label">Home</span></button>
-      <button class="bnav-btn" id="bn-directory" onclick="switchView('directory')"><span class="bnav-icon">👤</span><span class="bnav-label">名人榜</span></button>
-      <button class="bnav-btn" id="bn-bulletin" onclick="switchView('bulletin')"><span class="bnav-icon">📢</span><span class="bnav-label">公佈欄</span></button>
-      <button class="bnav-btn" id="bn-users" onclick="switchView('users')" style="display:none;"><span class="bnav-icon">⚙</span><span class="bnav-label">Users</span></button>
+      <button class="bnav-btn active" id="bn-home" onclick="switchView('home')"><span class="bnav-icon">🏠</span><span class="bnav-label" id="bn-home-lbl">Home</span></button>
+      <button class="bnav-btn" id="bn-directory" onclick="switchView('directory')"><span class="bnav-icon">👤</span><span class="bnav-label" id="bn-dir-lbl">名人榜</span></button>
+      <button class="bnav-btn" id="bn-bulletin" onclick="switchView('bulletin')"><span class="bnav-icon">📢</span><span class="bnav-label" id="bn-bb-lbl">公佈欄</span></button>
+      <button class="bnav-btn" id="bn-users" onclick="switchView('users')" style="display:none;"><span class="bnav-icon">⚙</span><span class="bnav-label" id="bn-users-lbl">Users</span></button>
     </div>
   </div>
 
@@ -2775,7 +2776,7 @@ async function doLogin() {
   if (!empId || !pwd) { showErr('Please enter Employee ID and password.'); return; }
 
   btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span>Signing in…';
+  btn.innerHTML = '<span class="spinner"></span>' + t('login_signing_in');
 
   function showErr(msg) { errEl.textContent = msg; errEl.style.display = 'block'; }
 
@@ -2828,7 +2829,7 @@ async function doLogin() {
     console.error(e);
   } finally {
     btn.disabled = false;
-    btn.textContent = 'Sign In';
+    btn.textContent = t('login_btn');
   }
 }
 
@@ -3134,7 +3135,7 @@ async function loadNotifications() {
     }
 
     if (!notifs.length) {
-      list.innerHTML = '<div style="padding:24px;text-align:center;color:var(--tx3);font-size:12px;">目前沒有通知</div>';
+      list.innerHTML = '<div style="padding:24px;text-align:center;color:var(--tx3);font-size:12px;">' + t('notif_empty') + '</div>';
       return;
     }
 
@@ -3352,7 +3353,7 @@ function renderDirectory() {
            (u.empId||'').toLowerCase().includes(q);
   });
   if (!users.length) {
-    grid.innerHTML = '<div style="color:var(--tx3);font-size:13px;padding:20px;grid-column:1/-1;">No employees found.</div>';
+    grid.innerHTML = '<div style="color:var(--tx3);font-size:13px;padding:20px;grid-column:1/-1;">' + t('dir_no_results') + '</div>';
     return;
   }
 
@@ -3399,7 +3400,7 @@ async function loadBulletin() {
 
 function renderBulletin() {
   const list = document.getElementById('bbList');
-  if (!BB_POSTS.length) { list.innerHTML = '<div class="bb-empty">No announcements yet.</div>'; return; }
+  if (!BB_POSTS.length) { list.innerHTML = '<div class="bb-empty">' + t('bb_empty') + '</div>'; return; }
 
   const sorted = [...BB_POSTS].sort((a,b) => (b.pinned||0) - (a.pinned||0) || b.ts - a.ts);
   list.innerHTML = sorted.map(p => {
@@ -3411,7 +3412,7 @@ function renderBulletin() {
         <div class="bb-post-avatar">${init}</div>
         <div class="bb-post-meta">
           <div class="bb-post-author">${p.authorName || p.authorId}
-            ${p.pinned ? '<span class="bb-post-pin">📌 置頂</span>' : ''}
+            ${p.pinned ? '<span class="bb-post-pin">📌 ' + t('bb_pin') + '</span>' : ''}
           </div>
           <div class="bb-post-time">${dt}</div>
         </div>
@@ -3430,8 +3431,8 @@ function renderBulletin() {
 function escHtml(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
 async function submitPost() {
-  const body = document.getElementById('bbText').value.trim();
-  if (!body) { toast('請輸入公告內容', 'err'); return; }
+  const body = document.getElementById('bbContent').value.trim();
+  if (!body) { toast(t('bb_req_body'), 'err'); return; }
   const pinned = document.getElementById('bbPin').checked;
 
   const post = {
@@ -3442,11 +3443,11 @@ async function submitPost() {
   };
 
   try { await SB.post('portal_bulletin', { ...post, id: uid() }); }
-  catch(e) { toast('發佈失敗：' + e.message, 'err'); return; }
-  document.getElementById('bbText').value = '';
+  catch(e) { toast(t('bb_post_fail') + e.message, 'err'); return; }
+  document.getElementById('bbContent').value = '';
   document.getElementById('bbPin').checked = false;
   await loadBulletin();
-  toast('已發佈', 'ok');
+  toast(t('bb_post_ok'), 'ok');
 }
 
 async function toggleLike(postId) {
@@ -3461,12 +3462,12 @@ async function toggleLike(postId) {
 }
 
 async function deletePost(postId) {
-  if (!confirm('刪除此公告？')) return;
+  if (!confirm(t('bb_delete_confirm'))) return;
   try { await SB.delete('portal_bulletin', 'id=eq.'+encodeURIComponent(postId)); }
-  catch(e) { toast('刪除失敗','err'); return; }
+  catch(e) { toast(t('bb_delete_fail'),'err'); return; }
   BB_POSTS = BB_POSTS.filter(p => p.id !== postId);
   renderBulletin();
-  toast('已刪除','ok');
+  toast(t('bb_delete_ok'),'ok');
 }
 
 // ═══════════════════════════════════════════════
@@ -4187,6 +4188,21 @@ const I18N = {
     dir_ranking_desc:'Ranked by KMS knowledge base contribution count · Updated monthly',
     // calendar add btn
     cal_add_btn:'＋ Add ▾',
+    // new keys
+    dir_no_results:'No employees found.',
+    cal_no_events:'No events this month for selected calendars',
+    bb_req_body:'Please enter announcement text',
+    bb_post_ok:'Published', bb_post_fail:'Post failed:',
+    bb_delete_ok:'Deleted', bb_delete_fail:'Delete failed', bb_delete_confirm:'Delete this post?',
+    cal_evt_updated:'Event updated', cal_evt_added:'Event added',
+    cal_evt_save_fail:'Save failed:',
+    cal_evt_delete_ok:'Event deleted', cal_evt_delete_fail:'Delete failed:', cal_evt_delete_confirm:'Delete this event?',
+    cal_no_perm:'Only Admin / DCC can manage events',
+    trip_select_staff:'— Select Staff —',
+    trip_delete_ok:'Trip deleted', trip_delete_fail:'Delete failed:', trip_delete_confirm:'Delete this trip?',
+    evt_lbl_cal:'Calendar',
+    login_btn:'Sign In', login_signing_in:'Signing in…',
+    cal_sidebar_title:'Calendars', cal_max_cats:'Maximum 4 calendars at once (limit reached)',
     // general
     loading:'Loading…', save:'Save', cancel:'Cancel', delete:'Delete', edit:'Edit',
   },
@@ -4244,6 +4260,20 @@ const I18N = {
     skill_followup_btn:'產生跟進信 →',
     dir_ranking_desc:'以 KMS 知識庫發文數量計算 · 每月更新',
     cal_add_btn:'＋ 新增 ▾',
+    dir_no_results:'找不到員工。',
+    cal_no_events:'本月所選日曆無活動',
+    bb_req_body:'請輸入公告內容',
+    bb_post_ok:'已發佈', bb_post_fail:'發佈失敗：',
+    bb_delete_ok:'已刪除', bb_delete_fail:'刪除失敗', bb_delete_confirm:'刪除此公告？',
+    cal_evt_updated:'事件已更新', cal_evt_added:'事件已新增',
+    cal_evt_save_fail:'儲存失敗：',
+    cal_evt_delete_ok:'事件已刪除', cal_evt_delete_fail:'刪除失敗：', cal_evt_delete_confirm:'刪除此事件？',
+    cal_no_perm:'僅限 Admin / DCC 管理事件',
+    trip_select_staff:'— 選擇員工 —',
+    trip_delete_ok:'差旅已刪除', trip_delete_fail:'刪除失敗：', trip_delete_confirm:'刪除此差旅記錄？',
+    evt_lbl_cal:'日曆',
+    login_btn:'登入', login_signing_in:'登入中…',
+    cal_sidebar_title:'日曆', cal_max_cats:'最多同時顯示 4 個日曆（已達上限）',
     loading:'載入中…', save:'儲存', cancel:'取消', delete:'刪除', edit:'編輯',
   },
   'zh-CN': {
@@ -4300,6 +4330,20 @@ const I18N = {
     skill_followup_btn:'生成跟进信 →',
     dir_ranking_desc:'以 KMS 知识库发文数量计算 · 每月更新',
     cal_add_btn:'＋ 新增 ▾',
+    dir_no_results:'未找到员工。',
+    cal_no_events:'本月所选日历无活动',
+    bb_req_body:'请输入公告内容',
+    bb_post_ok:'已发布', bb_post_fail:'发布失败：',
+    bb_delete_ok:'已删除', bb_delete_fail:'删除失败', bb_delete_confirm:'删除此公告？',
+    cal_evt_updated:'事件已更新', cal_evt_added:'事件已添加',
+    cal_evt_save_fail:'保存失败：',
+    cal_evt_delete_ok:'事件已删除', cal_evt_delete_fail:'删除失败：', cal_evt_delete_confirm:'删除此事件？',
+    cal_no_perm:'仅限 Admin / DCC 管理事件',
+    trip_select_staff:'— 选择员工 —',
+    trip_delete_ok:'出差已删除', trip_delete_fail:'删除失败：', trip_delete_confirm:'删除此出差记录？',
+    evt_lbl_cal:'日历',
+    login_btn:'登录', login_signing_in:'登录中…',
+    cal_sidebar_title:'日历', cal_max_cats:'最多同时显示 4 个日历（已达上限）',
     loading:'加载中…', save:'保存', cancel:'取消', delete:'删除', edit:'编辑',
   },
   vi: {
@@ -4356,6 +4400,20 @@ const I18N = {
     skill_followup_btn:'Tạo Email →',
     dir_ranking_desc:'Xếp hạng theo số bài đóng góp vào KMS · Cập nhật hàng tháng',
     cal_add_btn:'＋ Thêm ▾',
+    dir_no_results:'Không tìm thấy nhân viên.',
+    cal_no_events:'Không có sự kiện tháng này',
+    bb_req_body:'Vui lòng nhập nội dung thông báo',
+    bb_post_ok:'Đã đăng', bb_post_fail:'Đăng thất bại:',
+    bb_delete_ok:'Đã xóa', bb_delete_fail:'Xóa thất bại', bb_delete_confirm:'Xóa thông báo này?',
+    cal_evt_updated:'Đã cập nhật sự kiện', cal_evt_added:'Đã thêm sự kiện',
+    cal_evt_save_fail:'Lưu thất bại:',
+    cal_evt_delete_ok:'Đã xóa sự kiện', cal_evt_delete_fail:'Xóa thất bại:', cal_evt_delete_confirm:'Xóa sự kiện này?',
+    cal_no_perm:'Chỉ Admin / DCC mới có thể quản lý sự kiện',
+    trip_select_staff:'— Chọn nhân viên —',
+    trip_delete_ok:'Đã xóa công tác', trip_delete_fail:'Xóa thất bại:', trip_delete_confirm:'Xóa chuyến công tác này?',
+    evt_lbl_cal:'Lịch',
+    login_btn:'Đăng nhập', login_signing_in:'Đang đăng nhập…',
+    cal_sidebar_title:'Lịch', cal_max_cats:'Tối đa 4 lịch cùng lúc (đã đạt giới hạn)',
     loading:'Đang tải…', save:'Lưu', cancel:'Hủy', delete:'Xóa', edit:'Sửa',
   },
   ja: {
@@ -4412,6 +4470,20 @@ const I18N = {
     skill_followup_btn:'メール生成 →',
     dir_ranking_desc:'KMSへの投稿数でランキング · 毎月更新',
     cal_add_btn:'＋ 追加 ▾',
+    dir_no_results:'社員が見つかりません。',
+    cal_no_events:'選択したカレンダーにこの月のイベントはありません',
+    bb_req_body:'お知らせ内容を入力してください',
+    bb_post_ok:'投稿しました', bb_post_fail:'投稿失敗：',
+    bb_delete_ok:'削除しました', bb_delete_fail:'削除失敗', bb_delete_confirm:'この投稿を削除しますか？',
+    cal_evt_updated:'イベントを更新しました', cal_evt_added:'イベントを追加しました',
+    cal_evt_save_fail:'保存失敗：',
+    cal_evt_delete_ok:'イベントを削除しました', cal_evt_delete_fail:'削除失敗：', cal_evt_delete_confirm:'このイベントを削除しますか？',
+    cal_no_perm:'Admin / DCC のみイベントを管理できます',
+    trip_select_staff:'— 担当者を選択 —',
+    trip_delete_ok:'出張を削除しました', trip_delete_fail:'削除失敗：', trip_delete_confirm:'この出張を削除しますか？',
+    evt_lbl_cal:'カレンダー',
+    login_btn:'ログイン', login_signing_in:'ログイン中…',
+    cal_sidebar_title:'カレンダー', cal_max_cats:'同時に最大4つのカレンダー（上限に達しました）',
     loading:'読込中…', save:'保存', cancel:'キャンセル', delete:'削除', edit:'編集',
   },
 };
@@ -4540,12 +4612,6 @@ function applyI18nAll() {
   var addMenuBtn = document.getElementById('addMenuBtn');
   if (addMenuBtn) addMenuBtn.textContent = t('cal_add_btn');
 
-  // Calendar dropdown items
-  var calTripItem = document.getElementById('cal-menu-trip');
-  if (calTripItem) calTripItem.textContent = t('trip_title_new');
-  var calEvtItem = document.getElementById('cal-menu-event');
-  if (calEvtItem) calEvtItem.textContent = t('evt_title_new');
-
   // Users tab buttons
   var utabUsers = document.getElementById('utab-users');
   if (utabUsers) utabUsers.innerHTML = '👥 ' + t('users');
@@ -4560,9 +4626,34 @@ function applyI18nAll() {
   var usrTitle2 = document.getElementById('users-title-txt');
   if (usrTitle2) usrTitle2.textContent = t('usr_title');
 
+  // Cal sidebar title
+  var calSidebarTitle = document.getElementById('cal-sidebar-title');
+  if (calSidebarTitle) calSidebarTitle.textContent = t('cal_sidebar_title');
+
+  // Cal Event Modal labels (first copy only — browser finds first element by ID)
+  var calEvtLbls = {
+    'cal-evt-lbl-cal':   t('evt_lbl_cal'),
+    'cal-evt-lbl-title': t('evt_title_lbl') + ' *',
+    'cal-evt-lbl-from':  t('trip_date_from') + ' *',
+    'cal-evt-lbl-to':    t('trip_date_to'),
+    'cal-evt-lbl-notes': t('trip_notes'),
+    'cal-evt-save-btn':  t('cal_save'),
+    'cal-evt-cancel-btn':t('cal_cancel'),
+  };
+  Object.keys(calEvtLbls).forEach(function(id) {
+    var el = document.getElementById(id); if (el) el.textContent = calEvtLbls[id];
+  });
+  // Cal Event Modal del button
+  var calEvtDelBtn = document.getElementById('cal-event-del');
+  if (calEvtDelBtn) calEvtDelBtn.textContent = t('cal_delete');
+
+  // Cal dropdown items
+  var calTripItem = document.getElementById('cal-menu-trip');
+  if (calTripItem) calTripItem.innerHTML = '✈️ ' + t('trip_title_new');
+  var calEvtItem = document.getElementById('cal-menu-event');
+  if (calEvtItem) calEvtItem.innerHTML = '🏢 ' + t('evt_title_new');
+
   // Trip modal labels (update on open too)
-  var tfrom = document.querySelector('label[for="trip-date-from-lbl"]');
-  // Labels are set via ID in openTripModal; updateTripModalLabels handles it
   updateTripModalLabels();
 
   // AI tabs
@@ -4625,20 +4716,59 @@ function applyI18nAll() {
   // Calendar + Trip modal i18n
   updateTripModalLabels();
 
+  // Bottom Nav labels (mobile)
+  var bnMap = {
+    'bn-home-lbl':  t('home'),
+    'bn-dir-lbl':   t('directory'),
+    'bn-bb-lbl':    t('bulletin'),
+    'bn-users-lbl': t('users'),
+  };
+  Object.keys(bnMap).forEach(function(id) {
+    var el = document.getElementById(id); if (el) el.textContent = bnMap[id];
+  });
+
+  // Login button (pre-login state may still be visible on lang change before login)
+  var loginBtnEl = document.getElementById('loginBtn');
+  if (loginBtnEl && !SESSION) loginBtnEl.textContent = t('login_btn');
+
+  // Cal sidebar (re-render to pick new language for category labels)
+  if (typeof renderCatSidebar === 'function') renderCatSidebar();
+
   // App cards
   renderAppGrid();
 }
 
 function updateTripModalLabels() {
   var map = {
-    'trip-modal-title-new': t('trip_title_new'),
-    'trip-lbl-staff':   t('trip_staff'),
-    'trip-lbl-from':    t('trip_date_from'),
-    'trip-lbl-to':      t('trip_date_to'),
-    'trip-lbl-dest':    t('trip_dest'),
-    'trip-lbl-notes':   t('trip_notes'),
-    'trip-lbl-out':     '🛫 ' + t('trip_outbound'),
-    'trip-lbl-ret':     '🛬 ' + t('trip_return'),
+    'trip-modal-title-new':  t('trip_title_new'),
+    'trip-lbl-staff':        t('trip_staff'),
+    'trip-lbl-from':         t('trip_date_from'),
+    'trip-lbl-to':           t('trip_date_to'),
+    'trip-lbl-dest':         t('trip_dest'),
+    'trip-lbl-notes':        t('trip_notes'),
+    'trip-lbl-out':          '🛫 ' + t('trip_outbound'),
+    'trip-lbl-ret':          '🛬 ' + t('trip_return'),
+    'trip-lbl-out-flight':   t('trip_flight_no'),
+    'trip-lbl-ret-flight':   t('trip_flight_no'),
+    'trip-lbl-dep-city':     t('trip_dep_city'),
+    'trip-lbl-dep-airport':  t('trip_dep_airport'),
+    'trip-lbl-dep-terminal': t('trip_terminal'),
+    'trip-lbl-dep-time':     t('trip_dep_time'),
+    'trip-lbl-arr-city':     t('trip_arr_city'),
+    'trip-lbl-arr-airport':  t('trip_arr_airport'),
+    'trip-lbl-arr-terminal': t('trip_terminal'),
+    'trip-lbl-arr-time':     t('trip_arr_time'),
+    'trip-lbl-ret-dep-city':     t('trip_dep_city'),
+    'trip-lbl-ret-dep-airport':  t('trip_dep_airport'),
+    'trip-lbl-ret-dep-terminal': t('trip_terminal'),
+    'trip-lbl-ret-dep-time':     t('trip_dep_time'),
+    'trip-lbl-ret-arr-city':     t('trip_arr_city'),
+    'trip-lbl-ret-arr-airport':  t('trip_arr_airport'),
+    'trip-lbl-ret-arr-terminal': t('trip_terminal'),
+    'trip-lbl-ret-arr-time':     t('trip_arr_time'),
+    'trip-save-btn':             t('cal_save'),
+    'trip-cancel-btn':           t('cal_cancel'),
+    'trip-del':                  t('cal_delete'),
   };
   Object.keys(map).forEach(function(id) {
     var el = document.getElementById(id);
@@ -4918,7 +5048,8 @@ function tripMonthNav(delta) {
 function renderTripPage() {
   var year  = tripViewYear;
   var month = tripViewMonth;
-  var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var _mnMap = {en:['January','February','March','April','May','June','July','August','September','October','November','December'],'zh-TW':['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'],'zh-CN':['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'],vi:['Tháng 1','Tháng 2','Tháng 3','Tháng 4','Tháng 5','Tháng 6','Tháng 7','Tháng 8','Tháng 9','Tháng 10','Tháng 11','Tháng 12'],ja:['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月']};
+  var monthNames = _mnMap[LANG] || _mnMap.en;
   var lbl = document.getElementById('tripMonthLabel');
   if (lbl) lbl.textContent = monthNames[month] + ' ' + year;
 
@@ -4953,7 +5084,8 @@ function renderTripPage() {
     });
   }
 
-  var dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  var _dnMap = {en:['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],'zh-TW':['日','一','二','三','四','五','六'],'zh-CN':['日','一','二','三','四','五','六'],vi:['CN','T2','T3','T4','T5','T6','T7'],ja:['日','月','火','水','木','金','土']};
+  var dayNames = _dnMap[LANG] || _dnMap.en;
   var html = '<div class="trip-cal-wrap"><div class="trip-cal-header">';
   dayNames.forEach(function(dn) { html += '<div class="trip-cal-dayname">' + dn + '</div>'; });
   html += '</div><div class="trip-cal-grid">';
@@ -5020,11 +5152,11 @@ function openTripModal(id) {
   var _doOpen = function() {
     editTripId = id;
     var trip   = id ? TRIPS.find(function(x) { return x.id === id; }) : null;
-    document.getElementById('trip-modal-title').textContent = id ? 'Edit Trip' : 'New Trip';
+    document.getElementById('trip-modal-title').textContent = id ? t('trip_title_edit') : t('trip_title_new');
 
     var staffSel = document.getElementById('trip-staff');
     if (staffSel) {
-      staffSel.innerHTML = '<option value="">— Select Staff —</option>'
+      staffSel.innerHTML = '<option value="">' + t('trip_select_staff') + '</option>'
         + ALL_USERS.slice().sort(function(a,b) {
             return (a.nameEn||a.nameZh||a.empId||'').localeCompare(b.nameEn||b.nameZh||b.empId||'');
           }).map(function(u) {
@@ -5213,15 +5345,15 @@ async function saveTrip() {
 
 async function deleteTrip() {
   if (!editTripId) return;
-  if (!confirm('Delete this trip?')) return;
+  if (!confirm(t('trip_delete_confirm'))) return;
   try {
     await SB.delete('trips', 'id=eq.'+encodeURIComponent(editTripId));
     TRIPS = TRIPS.filter(function(x) { return x.id !== editTripId; });
     closeTripModal();
     renderTripPage();
-    toast('Trip deleted', 'ok');
+    toast(t('trip_delete_ok'), 'ok');
   } catch(e) {
-    toast('Delete failed: ' + e.message, 'err');
+    toast(t('trip_delete_fail') + ' ' + e.message, 'err');
   }
 }
 
@@ -5232,14 +5364,14 @@ async function deleteTrip() {
 
 // Category definitions
 var CAL_CATEGORIES = [
-  { id:'group',   label:'COMART Group Events', labelZh:'集團活動',   color:'#2D7FF9', icon:'🏢', editable:true  },
-  { id:'tw-hol',  label:'Taiwan Holidays',     labelZh:'台灣國定假日', color:'#E53E3E', icon:'TW', editable:false, apiCode:'TW' },
-  { id:'cn-hol',  label:'China Holidays',      labelZh:'中國國定假日', color:'#E08000', icon:'CN', editable:false, apiCode:'CN' },
-  { id:'vn-hol',  label:'Vietnam Holidays',    labelZh:'越南國定假日', color:'#2E8B57', icon:'VN', editable:false, apiCode:'VN' },
-  { id:'tw-cal',  label:'Taiwan Calendar',     labelZh:'台灣行事曆',  color:'#6B84C8', icon:'TW', editable:true  },
-  { id:'cn-cal',  label:'China Calendar',      labelZh:'中國行事曆',  color:'#C07000', icon:'CN', editable:true  },
-  { id:'vn-cal',  label:'Vietnam Calendar',    labelZh:'越南行事曆',  color:'#1A7A4A', icon:'VN', editable:true  },
-  { id:'trips',   label:'Business Trips',      labelZh:'商務出行',    color:'#805AD5', icon:'✈️', editable:false, isTrips:true },
+  { id:'group',   label:'COMART Group Events', labelZh:'集團活動',    labelVi:'Sự kiện tập đoàn',      labelJa:'グループイベント',    color:'#2D7FF9', icon:'🏢', editable:true  },
+  { id:'tw-hol',  label:'Taiwan Holidays',     labelZh:'台灣國定假日', labelVi:'Ngày nghỉ Đài Loan',    labelJa:'台湾の祝日',          color:'#E53E3E', icon:'TW', editable:false, apiCode:'TW' },
+  { id:'cn-hol',  label:'China Holidays',      labelZh:'中國國定假日', labelVi:'Ngày nghỉ Trung Quốc',  labelJa:'中国の祝日',          color:'#E08000', icon:'CN', editable:false, apiCode:'CN' },
+  { id:'vn-hol',  label:'Vietnam Holidays',    labelZh:'越南國定假日', labelVi:'Ngày nghỉ Việt Nam',    labelJa:'ベトナムの祝日',      color:'#2E8B57', icon:'VN', editable:false, apiCode:'VN' },
+  { id:'tw-cal',  label:'Taiwan Calendar',     labelZh:'台灣行事曆',  labelVi:'Lịch Đài Loan',         labelJa:'台湾カレンダー',      color:'#6B84C8', icon:'TW', editable:true  },
+  { id:'cn-cal',  label:'China Calendar',      labelZh:'中國行事曆',  labelVi:'Lịch Trung Quốc',       labelJa:'中国カレンダー',      color:'#C07000', icon:'CN', editable:true  },
+  { id:'vn-cal',  label:'Vietnam Calendar',    labelZh:'越南行事曆',  labelVi:'Lịch Việt Nam',         labelJa:'ベトナムカレンダー',  color:'#1A7A4A', icon:'VN', editable:true  },
+  { id:'trips',   label:'Business Trips',      labelZh:'商務出行',    labelVi:'Công tác',              labelJa:'出張',               color:'#805AD5', icon:'✈️', editable:false, isTrips:true },
 ];
 
 // State
@@ -5305,7 +5437,7 @@ function renderCatSidebar() {
     return '<div onclick="toggleCatFilter(\'' + cat.id + '\')" '
       + 'style="display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:8px;border:1px solid ' + border + ';background:' + bg + ';cursor:pointer;transition:all .15s;margin-bottom:2px;">'
       + '<div style="width:11px;height:11px;border-radius:50%;background:' + cat.color + ';flex-shrink:0;border:2px solid ' + (active ? cat.color : 'var(--br2)') + ';"></div>'
-      + '<span style="font-size:12px;color:' + (active ? 'var(--tx)' : 'var(--tx2)') + ';flex:1;font-weight:' + (active ? '500' : '400') + ';">' + cat.icon + ' ' + cat.label + '</span>'
+      + '<span style="font-size:12px;color:' + (active ? 'var(--tx)' : 'var(--tx2)') + ';flex:1;font-weight:' + (active ? '500' : '400') + ';">' + cat.icon + ' ' + (LANG==='zh-TW'||LANG==='zh-CN' ? (cat.labelZh||cat.label) : LANG==='vi' ? (cat.labelVi||cat.label) : LANG==='ja' ? (cat.labelJa||cat.label) : cat.label) + '</span>'
       + (active ? '<span style="font-size:11px;color:' + cat.color + ';font-weight:700;">✓</span>' : '<span style="font-size:11px;color:var(--tx3);">○</span>')
       + '</div>';
   }).join('');
@@ -5323,7 +5455,7 @@ function toggleCatFilter(catId) {
     calActiveCats.splice(idx, 1);
   } else {
     if (calActiveCats.length >= 4) {
-      toast('最多同時顯示 4 個日曆（已達上限）', '');
+      toast(t('cal_max_cats'), '');
       return;
     }
     calActiveCats.push(catId);
@@ -5587,7 +5719,8 @@ function getEventsForDate(dateStr) {
 function renderTripPage() {
   var year  = tripViewYear;
   var month = tripViewMonth;
-  var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var _mnMap2 = {en:['January','February','March','April','May','June','July','August','September','October','November','December'],'zh-TW':['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'],'zh-CN':['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'],vi:['Tháng 1','Tháng 2','Tháng 3','Tháng 4','Tháng 5','Tháng 6','Tháng 7','Tháng 8','Tháng 9','Tháng 10','Tháng 11','Tháng 12'],ja:['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月']};
+  var monthNames = _mnMap2[LANG] || _mnMap2.en;
   var lbl = document.getElementById('tripMonthLabel');
   if (lbl) lbl.textContent = monthNames[month] + ' ' + year;
 
@@ -5607,7 +5740,8 @@ function renderTripPage() {
   function pad(n) { return n < 10 ? '0' + n : '' + n; }
   function dateStr(d) { return year + '-' + pad(month+1) + '-' + pad(d); }
 
-  var dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  var _dnMap = {en:['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],'zh-TW':['日','一','二','三','四','五','六'],'zh-CN':['日','一','二','三','四','五','六'],vi:['CN','T2','T3','T4','T5','T6','T7'],ja:['日','月','火','水','木','金','土']};
+  var dayNames = _dnMap[LANG] || _dnMap.en;
   var html = '<div class="trip-cal-wrap"><div class="trip-cal-header">';
   dayNames.forEach(function(dn) { html += '<div class="trip-cal-dayname">' + dn + '</div>'; });
   html += '</div><div class="trip-cal-grid">';
@@ -5701,7 +5835,7 @@ function calDayClick(ds) {
 // ── Cal Event Modal ──
 function openCalEventModal(catId, eventId) {
   var canEdit = SESSION && (SESSION.role === 'admin' || SESSION.role === 'dcc');
-  if (!canEdit) { toast('Only Admin / DCC can manage events', ''); return; }
+  if (!canEdit) { toast(t('cal_no_perm'), ''); return; }
 
   calEventEditCat = catId || 'group';
   calEventEditId  = eventId || null;
@@ -5711,7 +5845,7 @@ function openCalEventModal(catId, eventId) {
     event = CAL_EVENTS[calEventEditCat].find(function(e) { return e.id === eventId; });
   }
 
-  document.getElementById('calEventModalTitle').textContent = event ? 'Edit Event' : 'New Event';
+  document.getElementById('calEventModalTitle').textContent = event ? t('evt_title_edit') : t('evt_title_new');
 
   // Populate category dropdown (editable only)
   var catSel = document.getElementById('cal-event-cat');
@@ -5747,8 +5881,8 @@ async function saveCalEvent() {
   var to     = document.getElementById('cal-event-to').value;
   var notes  = document.getElementById('cal-event-notes').value.trim();
 
-  if (!title || !from) { toast('Title and Date From are required', ''); return; }
-  if (to && to < from) { toast('Date To cannot be earlier than Date From', ''); return; }
+  if (!title || !from) { toast(t('evt_title_lbl') + ' / ' + t('trip_date_from') + ' required', ''); return; }
+  if (to && to < from) { toast(t('trip_date_to') + ' cannot be before ' + t('trip_date_from'), ''); return; }
 
   var cat = CAL_CATEGORIES.find(function(c) { return c.id === catId; });
   if (!cat || !cat.editable) { toast('Invalid calendar', ''); return; }
@@ -5774,15 +5908,15 @@ async function saveCalEvent() {
     }
     closeCalEventModal();
     renderTripPage();
-    toast(calEventEditId ? 'Event updated' : 'Event added', 'ok');
+    toast(calEventEditId ? t('cal_evt_updated') : t('cal_evt_added'), 'ok');
   } catch(e) {
-    toast('Save failed: ' + e.message, 'err');
+    toast(t('cal_evt_save_fail') + ' ' + e.message, 'err');
   }
 }
 
 async function deleteCalEvent() {
   if (!calEventEditId || !calEventEditCat) return;
-  if (!confirm('Delete this event?')) return;
+  if (!confirm(t('cal_evt_delete_confirm'))) return;
   try {
     await SB.delete('cal_events', 'id=eq.' + encodeURIComponent(calEventEditId));
     if (CAL_EVENTS[calEventEditCat]) {
@@ -5790,9 +5924,9 @@ async function deleteCalEvent() {
     }
     closeCalEventModal();
     renderTripPage();
-    toast('Event deleted', 'ok');
+    toast(t('cal_evt_delete_ok'), 'ok');
   } catch(e) {
-    toast('Delete failed: ' + e.message, 'err');
+    toast(t('cal_evt_delete_fail') + ' ' + e.message, 'err');
   }
 }
 

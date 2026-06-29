@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>COMART Platform v1.52</title>
+<title>COMART Platform v1.53</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.js"></script>
 <style>
@@ -318,7 +318,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     <div class="login-logo">
       <div class="login-mark">C</div>
       <div class="login-name">COMART Platform</div>
-      <div class="login-sub">Internal Portal · v1.52</div>
+      <div class="login-sub">Internal Portal · v1.53</div>
     </div>
     <form id="loginForm" onsubmit="doLogin();return false;" autocomplete="on">
     <div class="field">
@@ -346,7 +346,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   <div class="topbar">
     <div class="topbar-logo" onclick="switchView('home')">
       <div class="topbar-mark">C</div>
-      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.52</span></div>
+      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.53</span></div>
     </div>
     <div class="topbar-right">
       <div class="lang-switcher">
@@ -416,6 +416,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
           <div class="section-title" id="sect-updates">Platform Updates</div>
           <div class="changelog">
+            <div class="cl-item"><div class="cl-dot" style="background:var(--grn)"></div><div><div class="cl-text">v1.53 — i18n P2：User Modal、Dept/Site Modal、AI 工具欄位、訊息 Popup、用戶篩選器完整五語言化</div><div class="cl-date">2026-06 · i18n</div></div></div>
             <div class="cl-item"><div class="cl-dot" style="background:var(--grn)"></div><div><div class="cl-text">v1.52 — 全面 i18n 修正：日曆/差旅/公佈欄/名人榜/通知所有文字與 UI 元素現依語言設定顯示</div><div class="cl-date">2026-06 · i18n</div></div></div>
             <div class="cl-item"><div class="cl-dot" style="background:var(--grn)"></div><div><div class="cl-text">v1.51 — 集團行事曆日期選擇器調最亮（color-scheme: light，圖示純白）</div><div class="cl-date">2026-06 · UI</div></div></div>
             <div class="cl-item"><div class="cl-dot" style="background:var(--grn)"></div><div><div class="cl-text">v1.50 — 全系統文字顯示調亮（tx2/tx3 提高對比度），背景維持純黑</div><div class="cl-date">2026-06 · UI</div></div></div>
@@ -483,12 +484,12 @@ input[type="date"]::-webkit-calendar-picker-indicator {
         <div class="ai-tab-content on" id="ptab-content-translate">
           <div style="flex:1;overflow-y:auto;padding:14px 16px;max-width:900px;width:100%;margin:0 auto;">
             <div style="margin-bottom:12px;">
-              <div style="font-size:11px;font-weight:700;color:var(--tx3);letter-spacing:.06em;margin-bottom:6px;">INPUT TEXT / 輸入文字</div>
+              <div style="font-size:11px;font-weight:700;color:var(--tx3);letter-spacing:.06em;margin-bottom:6px;" id="ai-translate-input-lbl">INPUT TEXT / 輸入文字</div>
               <div style="display:flex;gap:8px;align-items:flex-start;">
                 <textarea id="p-xlat-input" rows="8" placeholder="Paste or type text hereâ¦ 貼上或輸入文字"
                   style="flex:1;padding:10px 12px;border-radius:10px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;resize:vertical;outline:none;font-family:inherit;min-height:160px;"></textarea>
                 <div style="display:flex;flex-direction:column;gap:6px;">
-                  <button onclick="pRunTranslate()"
+                  <button id="ai-translate-btn" onclick="pRunTranslate()"
                     style="padding:9px 14px;border-radius:9px;background:#7c3aed;color:#fff;border:none;cursor:pointer;font-size:12px;font-weight:700;">Translate ↓</button>
                   <button onclick="navigator.clipboard.readText().then(function(t){document.getElementById('p-xlat-input').value=t;})" title="Paste"
                     style="padding:9px 14px;border-radius:9px;border:1px solid var(--br);background:var(--s2);color:var(--tx2);cursor:pointer;font-size:14px;">📋</button>
@@ -504,9 +505,9 @@ input[type="date"]::-webkit-calendar-picker-indicator {
               <div style="font-size:22px;margin-bottom:8px;">⟳</div>Translating…
             </div>
             <div id="p-xlat-results" style="display:none;">
-              <div style="font-size:11px;font-weight:700;color:var(--tx3);letter-spacing:.06em;margin-bottom:8px;">DIRECT TRANSLATION · 直接翻譯</div>
+              <div id="ai-direct-lbl" style="font-size:11px;font-weight:700;color:var(--tx3);letter-spacing:.06em;margin-bottom:8px;">DIRECT TRANSLATION · 直接翻譯</div>
               <div id="p-xlat-direct" style="display:flex;flex-direction:column;gap:6px;margin-bottom:16px;"></div>
-              <div style="font-size:11px;font-weight:700;color:#a78bfa;letter-spacing:.06em;margin-bottom:8px;">BUSINESS VERSION · 商業用語版本</div>
+              <div id="ai-business-lbl" style="font-size:11px;font-weight:700;color:#a78bfa;letter-spacing:.06em;margin-bottom:8px;">BUSINESS VERSION · 商業用語版本</div>
               <div id="p-xlat-biz" style="display:flex;flex-direction:column;gap:6px;"></div>
             </div>
           </div>
@@ -518,7 +519,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
             <div style="text-align:center;padding:24px 0 8px;">
               <div style="font-size:26px;margin-bottom:6px;">✦</div>
               <div style="font-size:14px;font-weight:700;color:var(--tx);">Claude · COMART Assistant</div>
-              <div style="font-size:11px;color:var(--tx3);margin-top:4px;">Ask anything about COMART products, market, or business</div>
+              <div id="ai-chat-desc" style="font-size:11px;color:var(--tx3);margin-top:4px;">Ask anything about COMART products, market, or business</div>
             </div>
           </div>
           <div style="padding:10px 14px;border-top:1px solid var(--br);flex-shrink:0;">
@@ -526,7 +527,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
               <textarea id="p-chat-input" placeholder="Ask Claude… (Enter to send, Shift+Enter for new line)" rows="2"
                 style="flex:1;padding:10px 12px;border-radius:10px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;resize:none;outline:none;font-family:inherit;line-height:1.5;"
                 onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();pSendChat();}"></textarea>
-              <button onclick="pSendChat()" style="padding:10px 16px;border-radius:10px;background:#7c3aed;color:#fff;border:none;cursor:pointer;font-size:13px;font-weight:700;flex-shrink:0;height:42px;">Send</button>
+              <button id="ai-chat-send-btn" onclick="pSendChat()" style="padding:10px 16px;border-radius:10px;background:#7c3aed;color:#fff;border:none;cursor:pointer;font-size:13px;font-weight:700;flex-shrink:0;height:42px;">Send</button>
             </div>
             <div style="font-size:10px;color:var(--tx3);margin-top:5px;text-align:center;">Claude · via COMART Proxy</div>
           </div>
@@ -535,7 +536,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
         <!-- Skills Tab -->
         <div class="ai-tab-content" id="ptab-content-skills" style="overflow-y:auto;">
           <div style="padding:14px 16px;max-width:900px;width:100%;margin:0 auto;">
-            <div style="font-size:11px;font-weight:700;color:var(--tx3);letter-spacing:.08em;margin-bottom:10px;">COMART AI SKILLS</div>
+            <div id="ai-skills-title" style="font-size:11px;font-weight:700;color:var(--tx3);letter-spacing:.08em;margin-bottom:10px;">COMART AI SKILLS</div>
             <div style="display:flex;flex-direction:column;gap:10px;">
               <!-- Company Research -->
               <div style="background:var(--s2);border:1px solid var(--br);border-radius:12px;padding:14px 16px;">
@@ -2493,7 +2494,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
                   <option value="user">User</option>
                   <option value="inactive">Inactive</option>
                 </select>
-                <button onclick="resetUsersFilter()" style="padding:6px 12px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx2);cursor:pointer;font-size:12px;">✕ 清除</button>
+                <button id="usr-filter-reset-btn" onclick="resetUsersFilter()" style="padding:6px 12px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx2);cursor:pointer;font-size:12px;">✕ 清除</button>
                 <span id="usr-filter-count" style="font-size:11px;color:var(--tx3);margin-left:4px;"></span>
               </div>
               <div class="users-header" style="margin-bottom:0;">
@@ -2597,63 +2598,63 @@ input[type="date"]::-webkit-calendar-picker-indicator {
       <div id="um-avatar-preview" style="width:64px;height:64px;border-radius:50%;background:var(--ac2);color:var(--ac);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;flex-shrink:0;overflow:hidden;cursor:pointer;"
         onclick="document.getElementById('um-avatar-input').click()" title="點擊上傳頭像">?</div>
       <div style="flex:1;">
-        <div style="font-size:12px;color:var(--tx2);margin-bottom:4px;">員工頭像</div>
-        <button type="button" onclick="document.getElementById('um-avatar-input').click()"
+        <div id="um-avatar-lbl" style="font-size:12px;color:var(--tx2);margin-bottom:4px;">員工頭像</div>
+        <button type="button" id="um-upload-btn" onclick="document.getElementById('um-avatar-input').click()"
           style="font-size:11px;padding:4px 12px;border-radius:6px;border:1px solid var(--br);background:var(--s3);color:var(--tx2);cursor:pointer;">📷 上傳照片</button>
         <input type="file" id="um-avatar-input" accept="image/*" style="display:none;" onchange="umPreviewAvatar(event)">
-        <div style="font-size:10px;color:var(--tx3);margin-top:3px;">JPG/PNG，建議 200×200px</div>
+        <div id="um-avatar-hint" style="font-size:10px;color:var(--tx3);margin-top:3px;">JPG/PNG，建議 200×200px</div>
       </div>
     </div>
-    <div class="field"><label>Employee ID</label><input id="u-empId" placeholder="A00001" maxlength="6" oninput="this.value=this.value.toUpperCase()"><div class="hint">Format: 1 letter + 5 digits (A00001)</div></div>
-    <div class="field"><label>Role</label>
+    <div class="field"><label id="um-lbl-empid">Employee ID</label><input id="u-empId" placeholder="A00001" maxlength="6" oninput="this.value=this.value.toUpperCase()"><div class="hint">Format: 1 letter + 5 digits (A00001)</div></div>
+    <div class="field"><label id="um-lbl-role">Role</label>
       <select id="u-role">
-        <option value="user">User — 一般員工</option>
-        <option value="dcc">DCC — 文件控管</option>
-        <option value="admin">Admin — 系統管理員</option>
-        <option value="inactive">Inactive — 停用</option>
+        <option value="user" id="um-opt-user">User — 一般員工</option>
+        <option value="dcc" id="um-opt-dcc">DCC — 文件控管</option>
+        <option value="admin" id="um-opt-admin">Admin — 系統管理員</option>
+        <option value="inactive" id="um-opt-inactive">Inactive — 停用</option>
       </select>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-      <div class="field"><label>English Name</label><input id="u-nameEn" placeholder="John Smith"></div>
-      <div class="field"><label>中文姓名</label><input id="u-nameZh" placeholder="王大明"></div>
+      <div class="field"><label id="um-lbl-name-en">English Name</label><input id="u-nameEn" placeholder="John Smith"></div>
+      <div class="field"><label id="um-lbl-name-zh">中文姓名</label><input id="u-nameZh" placeholder="王大明"></div>
     </div>
-    <div class="field"><label>Email</label><input id="u-email" type="email" placeholder="john@comart.com"></div>
+    <div class="field"><label id="um-lbl-email">Email</label><input id="u-email" type="email" placeholder="john@comart.com"></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-      <div class="field"><label>Extension (分機)</label><input id="u-ext" placeholder="123"></div>
-      <div class="field"><label>Mobile</label><input id="u-mobile" placeholder="+886 912 345 678"></div>
+      <div class="field"><label id="um-lbl-ext">Extension (分機)</label><input id="u-ext" placeholder="123"></div>
+      <div class="field"><label id="um-lbl-mobile">Mobile</label><input id="u-mobile" placeholder="+886 912 345 678"></div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-      <div class="field"><label>Job Title (EN)</label><input id="u-title-en" placeholder="Sales Manager"></div>
-      <div class="field"><label>職稱 (ZH)</label><input id="u-title-zh" placeholder="業務經理"></div>
+      <div class="field"><label id="um-lbl-title-en">Job Title (EN)</label><input id="u-title-en" placeholder="Sales Manager"></div>
+      <div class="field"><label id="um-lbl-title-zh">職稱 (ZH)</label><input id="u-title-zh" placeholder="業務經理"></div>
     </div>
-    <div class="field"><label>Site / Location</label>
+    <div class="field"><label id="um-lbl-site">Site / Location</label>
       <select id="u-site">
-        <option value="">— 選擇地點 —</option>
+        <option value="" id="um-site-opt-default">— 選擇地點 —</option>
       </select>
     </div>
     <div class="field"><label id="u-dept-label">Department</label>
       <select id="u-dept">
-        <option value="">— 未指定 / Unassigned —</option>
+        <option value="" id="um-dept-opt-default">— 未指定 / Unassigned —</option>
       </select>
     </div>
     <!-- ─ 專業背景 ─ -->
     <div style="margin:16px 0 8px;padding-top:14px;border-top:1px solid var(--br);font-size:10px;font-weight:700;color:var(--tx3);letter-spacing:.08em;text-transform:uppercase;">專業背景 · Professional Profile <span style="font-weight:400;color:var(--tx3);font-size:9px;">(供 KMS 專家黃頁)</span></div>
     <div class="field">
-      <label>中文專業說明 (bioZh)</label>
+      <label id="um-lbl-bio-zh">中文專業說明 (bioZh)</label>
       <textarea id="u-bioZh" rows="2" placeholder="例：負責 Qi2 無線充電產品線品質管理，擅長 IQC/IPQC 流程設計與 8D 分析" style="width:100%;padding:10px 12px;border-radius:var(--r);border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;font-family:var(--ff);resize:vertical;outline:none;" onfocus="this.style.borderColor='var(--ac)'" onblur="this.style.borderColor='var(--br)'"></textarea>
     </div>
     <div class="field">
-      <label>English Bio (bioEn)</label>
+      <label id="um-lbl-bio-en">English Bio (bioEn)</label>
       <textarea id="u-bioEn" rows="2" placeholder="e.g. Responsible for Qi2 wireless charging QC, specializing in IQC/IPQC process design and 8D analysis" style="width:100%;padding:10px 12px;border-radius:var(--r);border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;font-family:var(--ff);resize:vertical;outline:none;" onfocus="this.style.borderColor='var(--ac)'" onblur="this.style.borderColor='var(--br)'"></textarea>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
       <div class="field">
-        <label>專業標籤 ZH (expertiseZh)</label>
+        <label id="um-lbl-exp-zh">專業標籤 ZH (expertiseZh)</label>
         <input id="u-expertiseZh" placeholder="Qi2 認證, IQC/IPQC, 供應商評估">
         <div class="hint">逗號分隔，自動存成陣列</div>
       </div>
       <div class="field">
-        <label>Expertise Tags EN</label>
+        <label id="um-lbl-exp-en">Expertise Tags EN</label>
         <input id="u-expertiseEn" placeholder="Qi2 Cert, IQC/IPQC, Supplier Audit">
         <div class="hint">Comma-separated</div>
       </div>
@@ -2664,8 +2665,8 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 </form></div>
     <div class="modal-actions">
       <button class="btn-danger" id="u-del-btn" style="display:none;margin-right:auto;" onclick="confirmDeleteUser()">Delete User</button>
-      <button class="btn-cancel" onclick="closeUserModal()">Cancel</button>
-      <button class="btn-save" onclick="saveUser()">Save</button>
+      <button class="btn-cancel" id="um-cancel-btn" onclick="closeUserModal()">Cancel</button>
+      <button class="btn-save" id="um-save-btn" onclick="saveUser()">Save</button>
     </div>
   </div>
 </div>
@@ -2677,13 +2678,13 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 <div class="overlay" id="deptOverlay" onclick="if(event.target===this)closeDeptModal()">
   <div class="modal" style="max-width:400px;">
     <div class="modal-title" id="deptModalTitle">Department</div>
-    <div class="field"><label>Key（小寫，唯一識別，建立後不可改）</label>
+    <div class="field"><label id="dept-lbl-key">Key（小寫，唯一識別，建立後不可改）</label>
       <input id="deptModalKey" placeholder="e.g. rd" autocomplete="off"></div>
-    <div class="field"><label>中文名稱</label><input id="deptModalZh" placeholder="例：研發" autocomplete="off"></div>
-    <div class="field"><label>英文名稱</label><input id="deptModalEn" placeholder="e.g. R&D" autocomplete="off"></div>
+    <div class="field"><label id="dept-lbl-zh">中文名稱</label><input id="deptModalZh" placeholder="例：研發" autocomplete="off"></div>
+    <div class="field"><label id="dept-lbl-en">英文名稱</label><input id="deptModalEn" placeholder="e.g. R&D" autocomplete="off"></div>
     <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeDeptModal()">Cancel</button>
-      <button class="btn-save" onclick="saveDept()">Save</button>
+      <button class="btn-cancel" id="dept-cancel-btn" onclick="closeDeptModal()">Cancel</button>
+      <button class="btn-save" id="dept-save-btn" onclick="saveDept()">Save</button>
     </div>
   </div>
 </div>
@@ -2692,13 +2693,13 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 <div class="overlay" id="siteOverlay" onclick="if(event.target===this)closeSiteModal()">
   <div class="modal" style="max-width:400px;">
     <div class="modal-title" id="siteModalTitle">Site / Location</div>
-    <div class="field"><label>Key（2-3 碼大寫，唯一識別，建立後不可改）</label>
+    <div class="field"><label id="site-lbl-key">Key（2-3 碼大寫，唯一識別，建立後不可改）</label>
       <input id="siteModalKey" placeholder="e.g. TW" autocomplete="off" style="text-transform:uppercase;"></div>
-    <div class="field"><label>中文名稱</label><input id="siteModalZh" placeholder="例：台灣總部" autocomplete="off"></div>
-    <div class="field"><label>英文名稱</label><input id="siteModalEn" placeholder="e.g. Taiwan HQ" autocomplete="off"></div>
+    <div class="field"><label id="site-lbl-zh">中文名稱</label><input id="siteModalZh" placeholder="例：台灣總部" autocomplete="off"></div>
+    <div class="field"><label id="site-lbl-en">英文名稱</label><input id="siteModalEn" placeholder="e.g. Taiwan HQ" autocomplete="off"></div>
     <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeSiteModal()">Cancel</button>
-      <button class="btn-save" onclick="saveSite()">Save</button>
+      <button class="btn-cancel" id="site-cancel-btn" onclick="closeSiteModal()">Cancel</button>
+      <button class="btn-save" id="site-save-btn" onclick="saveSite()">Save</button>
     </div>
   </div>
 </div>
@@ -2713,9 +2714,9 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   <div class="msg-popup-reply">
     <input class="msg-popup-input" id="msgPopupInput" placeholder="快速回覆…"
       onkeydown="if(event.key==='Enter')sendPopupReply()">
-    <button class="msg-popup-send" onclick="sendPopupReply()">送出</button>
+    <button class="msg-popup-send" id="msgPopup-send-btn" onclick="sendPopupReply()">送出</button>
   </div>
-  <span class="msg-popup-view" onclick="closeMsgPopup();openProfile(_msgPopupEmpId)">查看完整留言板 →</span>
+  <span id="msgPopup-view-btn" class="msg-popup-view" onclick="closeMsgPopup();openProfile(_msgPopupEmpId)">查看完整留言板 →</span>
 </div>
 
 <script>
@@ -3873,14 +3874,14 @@ async function saveUser() {
   const expertiseEn = document.getElementById('u-expertiseEn').value.split(',').map(s=>s.trim()).filter(Boolean);
   const pwd         = document.getElementById('u-pwd').value;
 
-  if (!empId) { toast('Employee ID required','err'); return; }
-  if (!/^[A-Z][0-9]{5}$/.test(empId)) { toast('Format: 1 letter + 5 digits (A00001)','err'); return; }
-  if (!nameEn) { toast('English name required','err'); return; }
-  if (!email)  { toast('Email required','err'); return; }
+  if (!empId) { toast(t('um_err_empid'),'err'); return; }
+  if (!/^[A-Z][0-9]{5}$/.test(empId)) { toast(t('um_err_empid_fmt'),'err'); return; }
+  if (!nameEn) { toast(t('um_err_name'),'err'); return; }
+  if (!email)  { toast(t('um_err_email'),'err'); return; }
 
   const existing = _editEmpId ? ALL_USERS.find(x => x.empId === _editEmpId) : null;
-  if (!existing && !pwd) { toast('Initial password required','err'); return; }
-  if (pwd && pwd.length < 8) { toast('Password min 8 characters','err'); return; }
+  if (!existing && !pwd) { toast(t('um_err_pwd_required'),'err'); return; }
+  if (pwd && pwd.length < 8) { toast(t('um_err_pwd_short'),'err'); return; }
 
   let pwdHash = existing?.pwdHash || '';
   let mustChangePwd = existing?.mustChangePwd ?? true;
@@ -3897,21 +3898,21 @@ async function saveUser() {
   };
 
   try { await sbSyncUser(user, false, !existing); }
-  catch(e) { toast('Save failed: ' + e.message, 'err'); return; }
+  catch(e) { toast(t('um_save_failed') + e.message, 'err'); return; }
   closeUserModal();
   await loadUsers();
-  toast(existing ? 'User updated' : 'User created', 'ok');
+  toast(existing ? t('um_updated') : t('um_created'), 'ok');
 }
 
 async function confirmDeleteUser() {
   if (!_editEmpId) return;
-  if (_editEmpId === SESSION?.empId) { toast('Cannot delete yourself','err'); return; }
-  if (!confirm(`Delete user ${_editEmpId}? This cannot be undone.`)) return;
+  if (_editEmpId === SESSION?.empId) { toast(t('um_err_self_delete'),'err'); return; }
+  if (!confirm(t('um_confirm_delete').replace('%s', _editEmpId))) return;
   try { await sbSyncUser({ empId: _editEmpId }, true); }
-  catch(e) { toast('Delete failed: ' + e.message, 'err'); return; }
+  catch(e) { toast(t('um_delete_failed') + e.message, 'err'); return; }
   closeUserModal();
   await loadUsers();
-  toast('User deleted','ok');
+  toast(t('um_deleted'),'ok');
 }
 
 // ═══════════════════════════════════════════════
@@ -4171,6 +4172,12 @@ const I18N = {
     um_exp_zh:'Expertise Tags ZH', um_exp_en:'Expertise Tags EN',
     um_pwd:'Initial Password', um_pwd_reset:'Reset Password (blank = keep)',
     um_cancel:'Cancel', um_save:'Save', um_delete:'Delete User',
+    um_err_empid:'Employee ID required', um_err_empid_fmt:'Format: 1 letter + 5 digits (A00001)',
+    um_err_name:'English name required', um_err_email:'Email required',
+    um_err_pwd_required:'Initial password required', um_err_pwd_short:'Password min 8 characters',
+    um_save_failed:'Save failed: ', um_updated:'User updated', um_created:'User created',
+    um_err_self_delete:'Cannot delete yourself', um_confirm_delete:'Delete user %s? This cannot be undone.',
+    um_delete_failed:'Delete failed: ', um_deleted:'User deleted',
     // ai tab
     ai_tab_translate:'Translate', ai_tab_chat:'Chat', ai_tab_skills:'Skills',
     // notifications
@@ -4249,6 +4256,12 @@ const I18N = {
     um_exp_zh:'專業標籤（中文）', um_exp_en:'Expertise Tags (EN)',
     um_pwd:'初始密碼', um_pwd_reset:'重設密碼（空白=不變）',
     um_cancel:'取消', um_save:'儲存', um_delete:'刪除用戶',
+    um_err_empid:'請輸入員工編號', um_err_empid_fmt:'格式：1個字母＋5個數字（A00001）',
+    um_err_name:'請輸入英文姓名', um_err_email:'請輸入電子郵件',
+    um_err_pwd_required:'請輸入初始密碼', um_err_pwd_short:'密碼最少 8 個字元',
+    um_save_failed:'儲存失敗：', um_updated:'用戶已更新', um_created:'用戶已建立',
+    um_err_self_delete:'無法刪除自己的帳號', um_confirm_delete:'確定刪除用戶 %s？此操作無法復原。',
+    um_delete_failed:'刪除失敗：', um_deleted:'用戶已刪除',
     ai_tab_translate:'翻譯', ai_tab_chat:'對話', ai_tab_skills:'技能',
     notif_title:'通知', notif_mark_all:'全部已讀', notif_empty:'目前沒有通知',
     prof_messages:'留言', prof_send:'送出', prof_reply:'回覆', prof_placeholder:'留言給這位同事…',
@@ -4319,6 +4332,12 @@ const I18N = {
     um_exp_zh:'专业标签（中文）', um_exp_en:'Expertise Tags (EN)',
     um_pwd:'初始密码', um_pwd_reset:'重置密码（空白=不变）',
     um_cancel:'取消', um_save:'保存', um_delete:'删除用户',
+    um_err_empid:'请输入员工编号', um_err_empid_fmt:'格式：1个字母＋5个数字（A00001）',
+    um_err_name:'请输入英文姓名', um_err_email:'请输入电子邮件',
+    um_err_pwd_required:'请输入初始密码', um_err_pwd_short:'密码最少 8 个字符',
+    um_save_failed:'保存失败：', um_updated:'用户已更新', um_created:'用户已创建',
+    um_err_self_delete:'无法删除自己的账号', um_confirm_delete:'确定删除用户 %s？此操作无法撤销。',
+    um_delete_failed:'删除失败：', um_deleted:'用户已删除',
     ai_tab_translate:'翻译', ai_tab_chat:'对话', ai_tab_skills:'技能',
     notif_title:'通知', notif_mark_all:'全部已读', notif_empty:'暂无通知',
     prof_messages:'留言', prof_send:'发送', prof_reply:'回复', prof_placeholder:'给这位同事留言…',
@@ -4389,6 +4408,12 @@ const I18N = {
     um_exp_zh:'Chuyên môn (ZH)', um_exp_en:'Chuyên môn (EN)',
     um_pwd:'Mật khẩu ban đầu', um_pwd_reset:'Đặt lại MK (để trống = giữ nguyên)',
     um_cancel:'Hủy', um_save:'Lưu', um_delete:'Xóa người dùng',
+    um_err_empid:'Vui lòng nhập mã nhân viên', um_err_empid_fmt:'Định dạng: 1 chữ cái + 5 chữ số (A00001)',
+    um_err_name:'Vui lòng nhập tên tiếng Anh', um_err_email:'Vui lòng nhập email',
+    um_err_pwd_required:'Vui lòng nhập mật khẩu ban đầu', um_err_pwd_short:'Mật khẩu tối thiểu 8 ký tự',
+    um_save_failed:'Lưu thất bại: ', um_updated:'Đã cập nhật người dùng', um_created:'Đã tạo người dùng',
+    um_err_self_delete:'Không thể xóa tài khoản của chính mình', um_confirm_delete:'Xóa người dùng %s? Không thể hoàn tác.',
+    um_delete_failed:'Xóa thất bại: ', um_deleted:'Đã xóa người dùng',
     ai_tab_translate:'Dịch thuật', ai_tab_chat:'Trò chuyện', ai_tab_skills:'Kỹ năng',
     notif_title:'Thông báo', notif_mark_all:'Đánh dấu đã đọc', notif_empty:'Không có thông báo',
     prof_messages:'Tin nhắn', prof_send:'Gửi', prof_reply:'Trả lời', prof_placeholder:'Nhắn tin cho đồng nghiệp…',
@@ -4459,6 +4484,12 @@ const I18N = {
     um_exp_zh:'専門タグ（ZH）', um_exp_en:'専門タグ（EN）',
     um_pwd:'初期パスワード', um_pwd_reset:'パスワードリセット（空白=変更なし）',
     um_cancel:'キャンセル', um_save:'保存', um_delete:'ユーザー削除',
+    um_err_empid:'従業員IDを入力してください', um_err_empid_fmt:'形式：英字1文字＋数字5桁（A00001）',
+    um_err_name:'英語名を入力してください', um_err_email:'メールアドレスを入力してください',
+    um_err_pwd_required:'初期パスワードを入力してください', um_err_pwd_short:'パスワードは8文字以上必要です',
+    um_save_failed:'保存失敗：', um_updated:'ユーザーを更新しました', um_created:'ユーザーを作成しました',
+    um_err_self_delete:'自分自身のアカウントは削除できません', um_confirm_delete:'ユーザー %s を削除しますか？元に戻せません。',
+    um_delete_failed:'削除失敗：', um_deleted:'ユーザーを削除しました',
     ai_tab_translate:'翻訳', ai_tab_chat:'チャット', ai_tab_skills:'スキル',
     notif_title:'通知', notif_mark_all:'すべて既読', notif_empty:'通知はありません',
     prof_messages:'メッセージ', prof_send:'送信', prof_reply:'返信', prof_placeholder:'同僚へのメッセージ…',
@@ -4708,6 +4739,102 @@ function applyI18nAll() {
   // User Modal section header
   var umBioSect = document.getElementById('um-bio-section-lbl');
   if (umBioSect) umBioSect.textContent = t('um_bio_section');
+
+  // User Modal labels
+  var _umTx = {
+    'um-avatar-lbl':      {en:'Profile Photo','zh-TW':'員工頭像','zh-CN':'员工头像',vi:'Ảnh đại diện',ja:'プロフィール写真'},
+    'um-upload-btn':      {en:'📷 Upload Photo','zh-TW':'📷 上傳照片','zh-CN':'📷 上传照片',vi:'📷 Tải ảnh lên',ja:'📷 写真をアップ'},
+    'um-avatar-hint':     {en:'JPG/PNG, recommended 200×200px','zh-TW':'JPG/PNG，建議 200×200px','zh-CN':'JPG/PNG，建议 200×200px',vi:'JPG/PNG, khuyến nghị 200×200px',ja:'JPG/PNG、200×200px推奨'},
+    'um-lbl-empid':       {en:t('um_emp_id'),'zh-TW':t('um_emp_id'),'zh-CN':t('um_emp_id'),vi:t('um_emp_id'),ja:t('um_emp_id')},
+    'um-lbl-role':        {en:t('um_role'),'zh-TW':t('um_role'),'zh-CN':t('um_role'),vi:t('um_role'),ja:t('um_role')},
+    'um-opt-user':        {en:'User — General Staff','zh-TW':'User — 一般員工','zh-CN':'User — 普通员工',vi:'User — Nhân viên',ja:'User — 一般スタッフ'},
+    'um-opt-dcc':         {en:'DCC — Document Control','zh-TW':'DCC — 文件控管','zh-CN':'DCC — 文件管控',vi:'DCC — Kiểm soát tài liệu',ja:'DCC — 文書管理'},
+    'um-opt-admin':       {en:'Admin — System Admin','zh-TW':'Admin — 系統管理員','zh-CN':'Admin — 系统管理员',vi:'Admin — Quản trị hệ thống',ja:'Admin — システム管理者'},
+    'um-opt-inactive':    {en:'Inactive — Disabled','zh-TW':'Inactive — 停用','zh-CN':'Inactive — 停用',vi:'Inactive — Vô hiệu hóa',ja:'Inactive — 無効'},
+    'um-lbl-name-en':     {en:t('um_name_en'),'zh-TW':t('um_name_en'),'zh-CN':t('um_name_en'),vi:t('um_name_en'),ja:t('um_name_en')},
+    'um-lbl-name-zh':     {en:'Chinese Name','zh-TW':'中文姓名','zh-CN':'中文姓名',vi:'Tên tiếng Trung',ja:'中国語名'},
+    'um-lbl-email':       {en:t('um_email'),'zh-TW':t('um_email'),'zh-CN':t('um_email'),vi:t('um_email'),ja:t('um_email')},
+    'um-lbl-ext':         {en:t('um_ext'),'zh-TW':t('um_ext'),'zh-CN':t('um_ext'),vi:t('um_ext'),ja:t('um_ext')},
+    'um-lbl-mobile':      {en:t('um_mobile'),'zh-TW':t('um_mobile'),'zh-CN':t('um_mobile'),vi:t('um_mobile'),ja:t('um_mobile')},
+    'um-lbl-title-en':    {en:t('um_title_en'),'zh-TW':t('um_title_en'),'zh-CN':t('um_title_en'),vi:t('um_title_en'),ja:t('um_title_en')},
+    'um-lbl-title-zh':    {en:'Job Title (ZH)','zh-TW':'職稱 (ZH)','zh-CN':'职称 (ZH)',vi:'Chức danh (ZH)',ja:'役職 (ZH)'},
+    'um-lbl-site':        {en:t('um_site'),'zh-TW':t('um_site'),'zh-CN':t('um_site'),vi:t('um_site'),ja:t('um_site')},
+    'um-site-opt-default':{en:'— Select Site —','zh-TW':'— 選擇地點 —','zh-CN':'— 选择地点 —',vi:'— Chọn địa điểm —',ja:'— 拠点を選択 —'},
+    'um-dept-opt-default':{en:'— Unassigned —','zh-TW':'— 未指定 —','zh-CN':'— 未分配 —',vi:'— Chưa phân công —',ja:'— 未割当 —'},
+    'um-lbl-bio-zh':      {en:'Bio (ZH)','zh-TW':'中文專業說明','zh-CN':'中文专业说明',vi:'Giới thiệu (ZH)',ja:'プロフィール (ZH)'},
+    'um-lbl-bio-en':      {en:t('um_bio_en'),'zh-TW':t('um_bio_en'),'zh-CN':t('um_bio_en'),vi:t('um_bio_en'),ja:t('um_bio_en')},
+    'um-lbl-exp-zh':      {en:'Expertise Tags (ZH)','zh-TW':'專業標籤 ZH','zh-CN':'专业标签 ZH',vi:'Tags chuyên môn (ZH)',ja:'専門タグ (ZH)'},
+    'um-lbl-exp-en':      {en:'Expertise Tags (EN)','zh-TW':'Expertise Tags EN','zh-CN':'Expertise Tags EN',vi:'Tags chuyên môn (EN)',ja:'専門タグ (EN)'},
+    'u-del-btn':          {en:t('um_delete'),'zh-TW':t('um_delete'),'zh-CN':t('um_delete'),vi:t('um_delete'),ja:t('um_delete')},
+    'um-cancel-btn':      {en:t('um_cancel'),'zh-TW':t('um_cancel'),'zh-CN':t('um_cancel'),vi:t('um_cancel'),ja:t('um_cancel')},
+    'um-save-btn':        {en:t('um_save'),'zh-TW':t('um_save'),'zh-CN':t('um_save'),vi:t('um_save'),ja:t('um_save')},
+  };
+  Object.keys(_umTx).forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.textContent = _umTx[id][LANG] || _umTx[id]['en'];
+  });
+
+  // Dept Modal labels
+  var _deptTx = {
+    'dept-lbl-key':    {en:'Key (lowercase, unique, cannot change after creation)','zh-TW':'Key（小寫，唯一識別，建立後不可改）','zh-CN':'Key（小写，唯一标识，创建后不可更改）',vi:'Key (chữ thường, duy nhất, không thể thay đổi)',ja:'キー（英小文字・一意・作成後変更不可）'},
+    'dept-lbl-zh':     {en:'Chinese Name','zh-TW':'中文名稱','zh-CN':'中文名称',vi:'Tên tiếng Trung',ja:'中国語名'},
+    'dept-lbl-en':     {en:'English Name','zh-TW':'英文名稱','zh-CN':'英文名称',vi:'Tên tiếng Anh',ja:'英語名'},
+    'dept-cancel-btn': {en:'Cancel','zh-TW':'取消','zh-CN':'取消',vi:'Hủy',ja:'キャンセル'},
+    'dept-save-btn':   {en:'Save','zh-TW':'儲存','zh-CN':'保存',vi:'Lưu',ja:'保存'},
+  };
+  Object.keys(_deptTx).forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.textContent = _deptTx[id][LANG] || _deptTx[id]['en'];
+  });
+
+  // Site Modal labels
+  var _siteTx = {
+    'site-lbl-key':    {en:'Key (2-3 uppercase, unique, cannot change after creation)','zh-TW':'Key（2-3 碼大寫，唯一識別，建立後不可改）','zh-CN':'Key（2-3位大写，唯一标识，创建后不可更改）',vi:'Key (2-3 ký tự hoa, duy nhất, không thể thay đổi)',ja:'キー（英大文字2-3文字・一意・作成後変更不可）'},
+    'site-lbl-zh':     {en:'Chinese Name','zh-TW':'中文名稱','zh-CN':'中文名称',vi:'Tên tiếng Trung',ja:'中国語名'},
+    'site-lbl-en':     {en:'English Name','zh-TW':'英文名稱','zh-CN':'英文名称',vi:'Tên tiếng Anh',ja:'英語名'},
+    'site-cancel-btn': {en:'Cancel','zh-TW':'取消','zh-CN':'取消',vi:'Hủy',ja:'キャンセル'},
+    'site-save-btn':   {en:'Save','zh-TW':'儲存','zh-CN':'保存',vi:'Lưu',ja:'保存'},
+  };
+  Object.keys(_siteTx).forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.textContent = _siteTx[id][LANG] || _siteTx[id]['en'];
+  });
+
+  // Instant Message Popup
+  var _msgPopupSend = document.getElementById('msgPopup-send-btn');
+  if (_msgPopupSend) _msgPopupSend.textContent = {en:'Send','zh-TW':'送出','zh-CN':'发送',vi:'Gửi',ja:'送信'}[LANG] || 'Send';
+  var _msgPopupView = document.getElementById('msgPopup-view-btn');
+  if (_msgPopupView) _msgPopupView.textContent = {en:'View full message board →','zh-TW':'查看完整留言板 →','zh-CN':'查看完整留言板 →',vi:'Xem bảng tin →',ja:'全メッセージを見る →'}[LANG] || 'View full message board →';
+  var _msgPopupInput = document.getElementById('msgPopupInput');
+  if (_msgPopupInput) _msgPopupInput.placeholder = {en:'Quick reply…','zh-TW':'快速回覆…','zh-CN':'快速回复…',vi:'Trả lời nhanh…',ja:'返信する…'}[LANG] || 'Quick reply…';
+
+  // AI Tools labels
+  var _aiTx = {
+    'ai-translate-input-lbl': {en:'INPUT TEXT','zh-TW':'INPUT TEXT / 輸入文字','zh-CN':'INPUT TEXT / 输入文字',vi:'NHẬP VĂN BẢN',ja:'テキスト入力'},
+    'ai-translate-btn':       {en:'Translate ↓','zh-TW':'翻譯 ↓','zh-CN':'翻译 ↓',vi:'Dịch ↓',ja:'翻訳 ↓'},
+    'ai-direct-lbl':          {en:'DIRECT TRANSLATION','zh-TW':'DIRECT TRANSLATION · 直接翻譯','zh-CN':'直接翻译',vi:'DỊCH TRỰC TIẾP',ja:'直接翻訳'},
+    'ai-business-lbl':        {en:'BUSINESS VERSION','zh-TW':'BUSINESS VERSION · 商業用語版本','zh-CN':'商业用语版本',vi:'PHIÊN BẢN THƯƠNG MẠI',ja:'ビジネス版'},
+    'ai-chat-desc':           {en:'Ask anything about COMART products, market, or business','zh-TW':'詢問 COMART 產品、市場或業務相關問題','zh-CN':'询问 COMART 产品、市场或业务相关问题',vi:'Hỏi về sản phẩm, thị trường hoặc kinh doanh của COMART',ja:'COMART の製品・市場・業務について質問'},
+    'ai-chat-send-btn':       {en:'Send','zh-TW':'送出','zh-CN':'发送',vi:'Gửi',ja:'送信'},
+    'ai-skills-title':        {en:'COMART AI SKILLS','zh-TW':'COMART AI 技能','zh-CN':'COMART AI 技能',vi:'KỸ NĂNG AI COMART',ja:'COMART AIスキル'},
+  };
+  Object.keys(_aiTx).forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.textContent = _aiTx[id][LANG] || _aiTx[id]['en'];
+  });
+  var _chatInput = document.getElementById('p-chat-input');
+  if (_chatInput) _chatInput.placeholder = {en:'Ask Claude… (Enter to send, Shift+Enter for new line)','zh-TW':'詢問 Claude… (Enter 送出，Shift+Enter 換行)','zh-CN':'询问 Claude… (Enter 发送，Shift+Enter 换行)',vi:'Hỏi Claude… (Enter để gửi, Shift+Enter xuống dòng)',ja:'Claudeに質問… (Enter送信、Shift+Enter改行)'}[LANG] || 'Ask Claude…';
+
+  // User filter reset button
+  var _usrReset = document.getElementById('usr-filter-reset-btn');
+  if (_usrReset) _usrReset.textContent = {en:'✕ Clear','zh-TW':'✕ 清除','zh-CN':'✕ 清除',vi:'✕ Xóa',ja:'✕ クリア'}[LANG] || '✕ Clear';
+  // User filter placeholders/options
+  var _usrSiteFilter = document.getElementById('usr-filter-site');
+  if (_usrSiteFilter && _usrSiteFilter.options[0]) _usrSiteFilter.options[0].text = {en:'— All Sites —','zh-TW':'— 所有地點 —','zh-CN':'— 所有地点 —',vi:'— Tất cả địa điểm —',ja:'— 全拠点 —'}[LANG] || '— All Sites —';
+  var _usrDeptFilter = document.getElementById('usr-filter-dept');
+  if (_usrDeptFilter && _usrDeptFilter.options[0]) _usrDeptFilter.options[0].text = {en:'— All Depts —','zh-TW':'— 所有部門 —','zh-CN':'— 所有部门 —',vi:'— Tất cả phòng ban —',ja:'— 全部門 —'}[LANG] || '— All Depts —';
+  var _usrRoleFilter = document.getElementById('usr-filter-role');
+  if (_usrRoleFilter && _usrRoleFilter.options[0]) _usrRoleFilter.options[0].text = {en:'— All Roles —','zh-TW':'— 所有角色 —','zh-CN':'— 所有角色 —',vi:'— Tất cả vai trò —',ja:'— 全ロール —'}[LANG] || '— All Roles —';
 
   // Bulletin empty state
   var bbEmpty = document.getElementById('bb-empty-txt');

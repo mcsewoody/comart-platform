@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART KMS v2.18</title>
+<title>COMART KMS v2.19</title>
 
 <!-- Marked for Markdown → HTML preview (classic script, no module needed) -->
 <script src="https://cdn.jsdelivr.net/npm/marked@9.1.6/marked.min.js"></script>
@@ -391,7 +391,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v2.18</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v2.19</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('en')">EN</button>
@@ -609,39 +609,43 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         <div style="padding:6px 12px;border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:var(--bg);flex-shrink:0;">
           <div style="display:flex;flex-direction:column;gap:2px;">
             <span style="font-size:9px;color:var(--text-3);letter-spacing:.05em;text-transform:uppercase;" data-i18n="label.stars">Stars</span>
-            <div style="display:flex;gap:2px;align-items:center;" id="stars-widget">
+            <div style="display:flex;gap:2px;align-items:center;height:28px;" id="stars-widget">
               <span class="star-btn" data-val="1" onclick="setDocStars(1)"
-                style="font-size:20px;cursor:pointer;color:#F59E0B;line-height:1;" title="General">★</span>
+                style="font-size:18px;cursor:pointer;color:#F59E0B;line-height:1;" title="General">★</span>
               <span class="star-btn" data-val="2" onclick="setDocStars(2)"
-                style="font-size:20px;cursor:pointer;color:#444860;line-height:1;" title="Important">★</span>
+                style="font-size:18px;cursor:pointer;color:#444860;line-height:1;" title="Important">★</span>
               <span class="star-btn" data-val="3" onclick="setDocStars(3)"
-                style="font-size:20px;cursor:pointer;color:#444860;line-height:1;" title="Must Read">★</span>
+                style="font-size:18px;cursor:pointer;color:#444860;line-height:1;" title="Must Read">★</span>
             </div>
             <input type="hidden" id="doc-stars" value="1" />
           </div>
           <div style="display:flex;flex-direction:column;gap:2px;">
             <span style="font-size:9px;color:var(--text-3);letter-spacing:.05em;text-transform:uppercase;" data-i18n="label.confidential">Confidential</span>
-            <div style="display:flex;gap:2px;align-items:center;" id="conf-widget">
+            <div style="display:flex;gap:2px;align-items:center;height:28px;" id="conf-widget">
               <span class="conf-btn" data-val="1" onclick="setDocConf(1)"
-                style="font-size:20px;cursor:pointer;color:#e74c3c;line-height:1;" title="Public — everyone">★</span>
+                style="font-size:18px;cursor:pointer;color:#e74c3c;line-height:1;" title="Public — everyone">★</span>
               <span class="conf-btn" data-val="2" onclick="setDocConf(2)"
-                style="font-size:20px;cursor:pointer;color:#444860;line-height:1;" title="Internal — DCC &amp; Admin">★</span>
+                style="font-size:18px;cursor:pointer;color:#444860;line-height:1;" title="Internal — DCC &amp; Admin">★</span>
               <span class="conf-btn" data-val="3" onclick="setDocConf(3)"
-                style="font-size:20px;cursor:pointer;color:#444860;line-height:1;" title="Confidential — Admin only">★</span>
+                style="font-size:18px;cursor:pointer;color:#444860;line-height:1;" title="Confidential — Admin only">★</span>
             </div>
             <input type="hidden" id="doc-conf-level" value="1" />
           </div>
-          <div style="display:flex;flex-direction:column;gap:1px;">
+          <div style="display:flex;flex-direction:column;gap:2px;">
             <span style="font-size:9px;color:var(--text-3);letter-spacing:.05em;text-transform:uppercase;" data-i18n="label.created">Created</span>
-            <span id="doc-created-display" style="font-size:11px;color:var(--text-3);padding:4px 2px;min-width:72px;">—</span>
+            <div style="height:28px;display:flex;align-items:center;">
+              <span id="doc-created-display" style="font-size:11px;color:var(--text-3);min-width:72px;">—</span>
+            </div>
           </div>
-          <div style="display:flex;flex-direction:column;gap:1px;">
+          <div style="display:flex;flex-direction:column;gap:2px;">
             <span style="font-size:9px;color:var(--text-3);letter-spacing:.05em;text-transform:uppercase;" data-i18n="label.modified">Modified</span>
-            <span id="doc-modified-display" style="font-size:11px;color:var(--text-3);padding:4px 2px;min-width:72px;">—</span>
+            <div style="height:28px;display:flex;align-items:center;">
+              <span id="doc-modified-display" style="font-size:11px;color:var(--text-3);min-width:72px;">—</span>
+            </div>
           </div>
           <div style="display:flex;flex-direction:column;gap:2px;">
             <span style="font-size:9px;color:var(--text-3);letter-spacing:.05em;text-transform:uppercase;" data-i18n="label.valid_until">Valid Until</span>
-            <div style="display:flex;align-items:center;gap:5px;">
+            <div style="display:flex;align-items:center;gap:5px;height:28px;">
               <input type="checkbox" id="doc-indefinitely" checked title="永久有效"
                 onchange="document.getElementById('doc-valid-until').style.display=this.checked?'none':'block';if(this.checked)document.getElementById('doc-valid-until').value='';"
                 style="cursor:pointer;width:13px;height:13px;" />
@@ -649,23 +653,27 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
               <input class="meta-input" id="doc-valid-until" type="date" title="到期後自動封存" style="width:138px;display:none;" />
             </div>
           </div>
-          <div style="position:relative;display:inline-block;">
-            <span style="font-size:9px;color:var(--text-3);letter-spacing:.05em;text-transform:uppercase;display:block;margin-bottom:1px;" data-i18n="label.author">Author</span>
-            <input class="meta-input" id="doc-author" placeholder="建立者" data-i18n-placeholder="label.author" style="width:110px;background:var(--bg);color:var(--text-3);"
-              autocomplete="off" name="kms-author-nofill" readonly title="建立者為登入使用者，不可修改"
-              oninput="filterAuthorList(this.value)" onfocus="if(!this.readOnly)showAuthorList()" onblur="setTimeout(()=>hideAuthorList(),200)" />
-            <div id="author-dropdown" style="display:none;position:absolute;top:100%;left:0;z-index:999;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:0 4px 12px rgba(0,0,0,.12);min-width:200px;max-height:160px;overflow-y:auto;font-size:12px;"></div>
+          <div style="display:flex;flex-direction:column;gap:2px;">
+            <span style="font-size:9px;color:var(--text-3);letter-spacing:.05em;text-transform:uppercase;" data-i18n="label.author">Author</span>
+            <div style="position:relative;height:28px;display:flex;align-items:center;">
+              <input class="meta-input" id="doc-author" placeholder="建立者" data-i18n-placeholder="label.author" style="width:110px;background:var(--bg);color:var(--text-3);"
+                autocomplete="off" name="kms-author-nofill" readonly title="建立者為登入使用者，不可修改"
+                oninput="filterAuthorList(this.value)" onfocus="if(!this.readOnly)showAuthorList()" onblur="setTimeout(()=>hideAuthorList(),200)" />
+              <div id="author-dropdown" style="display:none;position:absolute;top:100%;left:0;z-index:999;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:0 4px 12px rgba(0,0,0,.12);min-width:200px;max-height:160px;overflow-y:auto;font-size:12px;"></div>
+            </div>
           </div>
-          <div style="position:relative;display:inline-block;">
-            <span style="font-size:9px;color:var(--text-3);letter-spacing:.05em;text-transform:uppercase;display:block;margin-bottom:1px;" data-i18n="label.reviewer">Reviewer</span>
-            <input class="meta-input" id="doc-reviewer" placeholder="審核人" data-i18n-placeholder="label.reviewer" style="width:110px;"
-              autocomplete="off" oninput="filterReviewerList(this.value)" onfocus="showReviewerList()" onblur="setTimeout(()=>hideReviewerList(),200)" />
-            <div id="reviewer-dropdown" style="display:none;position:absolute;top:100%;left:0;z-index:999;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:0 4px 12px rgba(0,0,0,.12);min-width:220px;max-height:160px;overflow-y:auto;font-size:12px;"></div>
+          <div style="display:flex;flex-direction:column;gap:2px;">
+            <span style="font-size:9px;color:var(--text-3);letter-spacing:.05em;text-transform:uppercase;" data-i18n="label.reviewer">Reviewer</span>
+            <div style="position:relative;height:28px;display:flex;align-items:center;">
+              <input class="meta-input" id="doc-reviewer" placeholder="審核人" data-i18n-placeholder="label.reviewer" style="width:110px;"
+                autocomplete="off" oninput="filterReviewerList(this.value)" onfocus="showReviewerList()" onblur="setTimeout(()=>hideReviewerList(),200)" />
+              <div id="reviewer-dropdown" style="display:none;position:absolute;top:100%;left:0;z-index:999;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:0 4px 12px rgba(0,0,0,.12);min-width:220px;max-height:160px;overflow-y:auto;font-size:12px;"></div>
+            </div>
           </div>
 
-          <div style="display:flex;flex-direction:column;gap:1px;">
+          <div style="display:flex;flex-direction:column;gap:2px;">
             <span style="font-size:9px;color:var(--text-3);letter-spacing:.05em;text-transform:uppercase;" data-i18n="label.category">Category</span>
-            <select class="meta-select" id="doc-cat" onchange="const ind=document.getElementById('ai-cat-indicator');if(ind)ind.textContent='';">
+            <select class="meta-select" id="doc-cat" style="height:28px;" onchange="const ind=document.getElementById('ai-cat-indicator');if(ind)ind.textContent='';">
               <option value="product">Product</option>
               <option value="sales">Customer</option>
               <option value="industry">Industry</option>
@@ -678,9 +686,9 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
               <option value="article">Article</option>
             </select>
           </div>
-          <div style="display:flex;flex-direction:column;gap:1px;">
+          <div style="display:flex;flex-direction:column;gap:2px;">
             <span style="font-size:9px;color:var(--text-3);letter-spacing:.05em;text-transform:uppercase;" data-i18n="label.product_line">Product Line</span>
-            <select class="meta-select" id="doc-product-line" style="flex:1;min-width:140px;">
+            <select class="meta-select" id="doc-product-line" style="height:28px;min-width:140px;">
             <option value="" id="doc-pl-default" data-i18n="label.pl_default">— Product Line —</option>
           </select>
           </div>
@@ -845,6 +853,8 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
             <span id="rs-noauthor" onclick="filterReviewPanel('noauthor')" style="cursor:pointer;padding:5px 12px;border-radius:var(--radius);font-size:12px;font-weight:500;border:1px solid var(--amber);color:var(--amber);background:transparent;" data-i18n="label.noauthor">⚠ 未署名</span>
             <span style="color:var(--border);margin:0 2px;">|</span>
             <span id="rs-duplicate" onclick="filterReviewPanel('duplicate')" style="cursor:pointer;padding:5px 12px;border-radius:var(--radius);font-size:12px;font-weight:500;border:1px solid var(--red);color:var(--red);background:transparent;" data-i18n="label.duplicate">🔁 重複文件</span>
+            <span style="color:var(--border);margin:0 2px;">|</span>
+            <span id="rs-activity" onclick="filterReviewPanel('activity')" style="cursor:pointer;padding:5px 12px;border-radius:var(--radius);font-size:12px;font-weight:500;border:1px solid var(--blue);color:var(--blue);background:transparent;">📋 活動記錄</span>
           </div>
         </div>
         <div style="flex:1;overflow-y:auto;padding:12px 20px;" id="review-content">
@@ -2528,10 +2538,10 @@ async function initPortalSession() {
   // Admin 可修改 author（portalUser 已設定後再執行）
   const _authorInputInit = document.getElementById('doc-author');
   if (_authorInputInit) {
-    const _isAdminInit = kmsRole === 'admin';
+    const _isAdminInit = kmsRole === 'admin' || kmsRole === 'dcc';
     _authorInputInit.readOnly = !_isAdminInit;
     _authorInputInit.style.color = _isAdminInit ? 'var(--text)' : 'var(--text-3)';
-    _authorInputInit.title = _isAdminInit ? '管理員可修改建立者' : '建立者為登入使用者，不可修改';
+    _authorInputInit.title = _isAdminInit ? 'Admin / DCC 可修改建立者' : '建立者為登入使用者，不可修改';
   }
 }
 
@@ -3032,9 +3042,9 @@ async function saveDoc() {
         title, body, category, lang, status: finalStatus,
         stars: parseInt(document.getElementById('doc-stars')?.value || '1'),
         conf_level: parseInt(document.getElementById('doc-conf-level')?.value || '1'),
-        // author_name：insert 用登入者；update 時 admin 可改（讀 input），否則保留原始值
+        // author_name：insert 用登入者；update 時 admin/dcc 可改（讀 input），否則保留原始值
         author_name: editingDocId
-          ? (getKmsRole() === 'admin'
+          ? (['admin','dcc'].includes(getKmsRole())
               ? (document.getElementById('doc-author')?.value.trim() || window._editSnapshot?.author_name || buildAuthorName())
               : (window._editSnapshot?.author_name || buildAuthorName()))
           : buildAuthorName(),
@@ -3060,6 +3070,18 @@ async function saveDoc() {
         if (!doc_id) throw new Error('文件儲存後未取得 ID');
       }
       _savedDocId = doc_id; // 同步給外層 scope
+
+      // ── 活動紀錄 ──
+      try {
+        const _logActor = portalUser ? (portalUser.nameEn || portalUser.nameZh || portalUser.empId || 'Admin') : 'Admin';
+        await kmsWrite('insert', 'kms_review_log', {
+          doc_id,
+          from_status: editingDocId ? 'edit' : 'new',
+          to_status: finalStatus,
+          actor: _logActor,
+          note: title.slice(0, 100),
+        });
+      } catch(e) { console.warn('[activity_log]', e.message); }
 
       // ── 步驟 2：觸發 embedding（只有新檔案或新文件才執行）──
       if (mode === 'edge-fn') {
@@ -4959,6 +4981,17 @@ async function deleteDoc(id, title, authorName) {
 
   try {
     if (CFG.supabaseUrl && CFG.supabaseKey && !id.startsWith('demo-') && !id.startsWith('local-')) {
+      // 活動紀錄（在刪除文件前寫入，確保 FK 約束正常）
+      try {
+        const _delActor = portalUser ? (portalUser.nameEn || portalUser.nameZh || portalUser.empId || 'Admin') : 'Admin';
+        await kmsWrite('insert', 'kms_review_log', {
+          doc_id: id,
+          from_status: 'delete',
+          to_status: 'deleted',
+          actor: _delActor,
+          note: (title || '').slice(0, 100),
+        });
+      } catch(e) { console.warn('[activity_log delete]', e.message); }
       await kmsWrite('delete', 'kms_doc_versions', null, null, { doc_id: id });
       await kmsWrite('delete', 'kms_documents', null, id);
     } else if (id.startsWith('local-')) {
@@ -6042,13 +6075,13 @@ function setLang(lang) {
 function applyI18n() {
   const s = I18N[currentLang] || I18N['zh-TW'];
 
-  // admin 可修改 author
+  // admin / dcc 可修改 author
   const _authorInput = document.getElementById('doc-author');
   if (_authorInput) {
-    const _isAdmin = portalUser?.role === 'admin';
+    const _isAdmin = getKmsRole() === 'admin' || getKmsRole() === 'dcc';
     _authorInput.readOnly = !_isAdmin;
     _authorInput.style.color = _isAdmin ? 'var(--text)' : 'var(--text-3)';
-    _authorInput.title = _isAdmin ? '管理員可修改建立者' : '建立者為登入使用者，不可修改';
+    _authorInput.title = _isAdmin ? 'Admin / DCC 可修改建立者' : '建立者為登入使用者，不可修改';
   }
 
   // data-i18n 元素（文字內容）
@@ -7108,6 +7141,8 @@ function filterReviewPanel(status) {
   if (naEl) naEl.style.background = status === 'noauthor' ? 'var(--amber-bg)' : 'transparent';
   const dupEl = document.getElementById('rs-duplicate');
   if (dupEl) dupEl.style.background = status === 'duplicate' ? 'var(--red-bg)' : 'transparent';
+  const actEl = document.getElementById('rs-activity');
+  if (actEl) { actEl.style.background = status === 'activity' ? 'var(--blue-bg)' : 'transparent'; actEl.style.fontWeight = status === 'activity' ? '700' : '500'; }
   loadReviewPanel();
 }
 
@@ -7333,6 +7368,48 @@ async function batchDeleteDuplicates() {
   await findAndRenderDuplicates();
 }
 
+async function loadActivityLog() {
+  const content = document.getElementById('review-content');
+  try {
+    const logs = await sbFetch('/rest/v1/kms_review_log?select=*&order=created_at.desc&limit=200') || [];
+    if (!logs.length) {
+      content.innerHTML = '<div style="text-align:center;color:var(--text-3);padding:40px 0;font-size:13px;">尚無活動記錄</div>';
+      return;
+    }
+    const actionLabel = fs => {
+      if (fs === 'new')    return { icon:'📝', text:'新增文件',  color:'var(--green)' };
+      if (fs === 'edit')   return { icon:'✏️', text:'修改文件',  color:'var(--blue)'  };
+      if (fs === 'delete') return { icon:'🗑', text:'刪除文件',  color:'var(--red)'   };
+      return null; // 審核動作另外處理
+    };
+    const reviewLabel = (f, t_) => {
+      if (t_ === 'published')  return { icon:'✅', text:'核准發佈', color:'var(--green)'  };
+      if (t_ === 'withdrawn')  return { icon:'⚠️', text:'撤回',    color:'var(--amber)'  };
+      if (t_ === 'archived')   return { icon:'📦', text:'封存',    color:'var(--text-3)' };
+      if (t_ === 'draft')      return { icon:'↩', text:'退回草稿', color:'var(--text-2)' };
+      return { icon:'🔄', text:`${f}→${t_}`, color:'var(--text-3)' };
+    };
+    const rows = logs.map(l => {
+      const al = actionLabel(l.from_status);
+      const rl = al ? null : reviewLabel(l.from_status, l.to_status);
+      const { icon, text, color } = al || rl;
+      const dt = l.created_at ? new Date(l.created_at).toLocaleString('zh-TW',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}) : '';
+      const noteHtml = l.note ? `<span style="flex:1;font-size:11px;color:var(--text-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px;" title="${(l.note||'').replace(/"/g,'&quot;')}">${l.note}</span>` : '<span style="flex:1;"></span>';
+      return `<div class="review-log-item" style="padding:6px 0;gap:8px;">
+        <span style="color:${color};font-weight:600;white-space:nowrap;min-width:72px;">${icon} ${text}</span>
+        <span style="font-size:12px;color:var(--text-2);white-space:nowrap;min-width:70px;">${l.actor||'—'}</span>
+        ${noteHtml}
+        <span style="margin-left:auto;color:var(--text-3);white-space:nowrap;font-size:11px;">${dt}</span>
+      </div>`;
+    }).join('');
+    content.innerHTML = `
+      <div style="margin-bottom:8px;font-size:12px;color:var(--text-3);">最近 ${logs.length} 筆活動（新增／修改／刪除／審核）</div>
+      <div style="border:1px solid var(--border);border-radius:var(--radius);padding:4px 12px;">${rows}</div>`;
+  } catch(e) {
+    content.innerHTML = `<div style="color:var(--red);padding:20px;font-size:13px;">活動記錄載入失敗：${e.message}</div>`;
+  }
+}
+
 async function loadReviewPanel() {
   const content = document.getElementById('review-content');
   if (!reviewingDocId) {
@@ -7347,8 +7424,14 @@ async function loadReviewPanel() {
     if (naEl) naEl.style.background = window._reviewFilter === 'noauthor' ? 'var(--amber-bg)' : 'transparent';
     const dupEl = document.getElementById('rs-duplicate');
     if (dupEl) dupEl.style.background = window._reviewFilter === 'duplicate' ? 'var(--red-bg)' : 'transparent';
+    const actEl2 = document.getElementById('rs-activity');
+    if (actEl2) { actEl2.style.background = window._reviewFilter === 'activity' ? 'var(--blue-bg)' : 'transparent'; actEl2.style.fontWeight = window._reviewFilter === 'activity' ? '700' : '500'; }
     // 顯示待審核文件列表
     content.innerHTML = `<div style="text-align:center;color:var(--text-3);padding:20px 0;font-size:13px;">${t('label.review_loading')}</div>`;
+    if (window._reviewFilter === 'activity') {
+      await loadActivityLog();
+      return;
+    }
     if (window._reviewFilter === 'duplicate') {
       await findAndRenderDuplicates();
       return;

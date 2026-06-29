@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" href="data:,">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART 行政管理平台 v1.72</title>
+<title>COMART 行政管理平台 v1.73</title>
 <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.js"></script>
 <style>
 :root{
@@ -975,7 +975,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="logo">
     <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
     <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
-    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.72</span>
+    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.73</span>
   </div>
   <div class="trr">
     <div class="admin-lang-sw">
@@ -990,7 +990,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <span id="cur-u" style="color:var(--text-2)">載入中…</span>
       <span style="color:var(--text-3);font-size:10px">▾</span>
     </div>
-    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.72</span>
+    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.73</span>
   </div>
 </div>
 
@@ -1254,25 +1254,25 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
           <div class="trip-sec-title" data-i18n="trip.sec.basic">▌ 基本資料</div>
           <div class="fg2">
             <div class="fg"><div class="fl" data-i18n="trip.lbl.person">出差人員 *</div>
-              <select id="tr-person" onchange="trPersonChange(this.value)"><option value="">請選擇或手動輸入…</option></select>
+              <select id="tr-person" onchange="trPersonChange(this.value)"><option value="" data-i18n="g.select_or_type">請選擇或手動輸入…</option></select>
               <input type="text" id="tr-person-txt" data-i18n-ph="trip.ph.name_manual" placeholder="手動輸入姓名" style="margin-top:6px">
             </div>
             <div class="fg"><div class="fl" data-i18n="trip.lbl.dept">部門</div><input type="text" id="tr-dept" data-i18n-ph="trip.ph.dept" placeholder="部門名稱"></div>
             <div class="fg"><div class="fl" data-i18n="trip.lbl.dest">出差地點 *</div>
               <select id="tr-dest-sel" onchange="trDestChange(this.value)">
-                <option value="">請選擇…</option>
-                <option value="越南">越南</option><option value="東莞">東莞（中國）</option>
-                <option value="香港">香港</option><option value="日本">日本</option>
-                <option value="美國">美國</option><option value="__other">其他（手動輸入）</option>
+                <option value="" data-i18n="g.select">請選擇…</option>
+                <option value="越南" data-i18n="trip.dest.vn">越南</option><option value="東莞" data-i18n="trip.dest.cn">東莞（中國）</option>
+                <option value="香港" data-i18n="trip.dest.hk">香港</option><option value="日本" data-i18n="trip.dest.jp">日本</option>
+                <option value="美國" data-i18n="trip.dest.us">美國</option><option value="__other" data-i18n="trip.dest.other">其他（手動輸入）</option>
               </select>
               <input type="text" id="tr-dest-txt" data-i18n-ph="trip.ph.dest_txt" placeholder="輸入出差地點" style="margin-top:6px">
             </div>
             <div class="fg"><div class="fl" data-i18n="trip.lbl.purpose">出差目的 *</div>
               <select id="tr-purp-sel" onchange="trPurpChange(this.value)">
-                <option value="">請選擇…</option>
-                <option value="參展">參展</option><option value="工廠出差">工廠出差</option>
-                <option value="拜訪客戶">拜訪客戶</option><option value="拜訪供應商">拜訪供應商</option>
-                <option value="__other">其他（手動輸入）</option>
+                <option value="" data-i18n="g.select">請選擇…</option>
+                <option value="參展" data-i18n="trip.purp.expo">參展</option><option value="工廠出差" data-i18n="trip.purp.factory">工廠出差</option>
+                <option value="拜訪客戶" data-i18n="trip.purp.client">拜訪客戶</option><option value="拜訪供應商" data-i18n="trip.purp.supplier">拜訪供應商</option>
+                <option value="__other" data-i18n="trip.purp.other">其他（手動輸入）</option>
               </select>
               <input type="text" id="tr-purp-txt" data-i18n-ph="trip.ph.purpose_txt" placeholder="輸入出差目的" style="margin-top:6px">
             </div>
@@ -1280,7 +1280,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
             <div class="fg"><div class="fl" data-i18n="trip.lbl.date_end">出差結束日期 *</div><input type="date" id="tr-d-end"></div>
             <div class="fg full"><div class="fl" data-i18n="trip.lbl.companions">同行人員</div>
               <div style="display:flex;gap:8px;margin-bottom:6px">
-                <select id="tr-comp-sel" style="flex:1"><option value="">從人員清單選擇…</option></select>
+                <select id="tr-comp-sel" style="flex:1"><option value="" data-i18n="trip.comp.select">從人員清單選擇…</option></select>
                 <button class="btn bg2 bsm" onclick="trAddCompSel()" data-i18n="trip.lbl.add_companion">加入</button>
               </div>
               <input type="text" id="tr-comp-txt" data-i18n-ph="trip.ph.companion" placeholder="手動輸入姓名，按 Enter 加入" onkeydown="if(event.key==='Enter'){trAddCompTxt();event.preventDefault()}">
@@ -1417,17 +1417,17 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
               <div class="fg"><div class="fl" data-i18n="room.lbl.date">預約日期 *</div><input type="date" id="ibk-date" onchange="iUpdateSlots()"></div>
               <div class="fg"><div class="fl" data-i18n="room.lbl.headcount">與會人數 *</div>
                 <select id="ibk-headcount" onchange="iUpdateSlots()">
-                  <option value="2">2人</option><option value="4">4人</option><option value="6">6人</option>
-                  <option value="8">8人</option><option value="10">10人</option><option value="12">12人</option>
-                  <option value="15">15人以上</option>
+                  <option value="2" data-i18n="room.cap.2">2人</option><option value="4" data-i18n="room.cap.4">4人</option><option value="6" data-i18n="room.cap.6">6人</option>
+                  <option value="8" data-i18n="room.cap.8">8人</option><option value="10" data-i18n="room.cap.10">10人</option><option value="12" data-i18n="room.cap.12">12人</option>
+                  <option value="15" data-i18n="room.cap.15">15人以上</option>
                 </select>
               </div>
             </div>
             <div style="display:flex;gap:8px;margin-bottom:8px;align-items:center;flex-wrap:wrap">
               <select id="ibk-dur" onchange="iUpdateSlots()">
-                <option value="30">30分鐘</option><option value="60" selected>1小時</option>
-                <option value="90">1.5小時</option><option value="120">2小時</option>
-                <option value="180">3小時</option><option value="240">4小時</option>
+                <option value="30" data-i18n="room.dur.30">30分鐘</option><option value="60" selected data-i18n="room.dur.60">1小時</option>
+                <option value="90" data-i18n="room.dur.90">1.5小時</option><option value="120" data-i18n="room.dur.120">2小時</option>
+                <option value="180" data-i18n="room.dur.180">3小時</option><option value="240" data-i18n="room.dur.240">4小時</option>
               </select>
               <span style="font-size:12px;color:var(--t3)" data-i18n="room.lbl.manual">或手動：</span>
               <input type="time" id="ibk-start" value="09:00" style="width:100px" onchange="iUpdateSlots()">
@@ -1504,18 +1504,18 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
               <div class="fg"><div class="fl" data-i18n="room.lbl.date">預約日期 *</div><input type="date" id="bk-date" onchange="updateSlots()"></div>
               <div class="fg"><div class="fl" data-i18n="room.lbl.headcount">與會人數 *</div>
                 <select id="bk-headcount">
-                  <option value="2">2人</option><option value="4">4人</option><option value="6">6人</option>
-                  <option value="8">8人</option><option value="10">10人</option><option value="12">12人</option>
-                  <option value="15">15人以上</option>
+                  <option value="2" data-i18n="room.cap.2">2人</option><option value="4" data-i18n="room.cap.4">4人</option><option value="6" data-i18n="room.cap.6">6人</option>
+                  <option value="8" data-i18n="room.cap.8">8人</option><option value="10" data-i18n="room.cap.10">10人</option><option value="12" data-i18n="room.cap.12">12人</option>
+                  <option value="15" data-i18n="room.cap.15">15人以上</option>
                 </select>
               </div>
             </div>
             <div class="fl" style="margin-bottom:8px" data-i18n="room.lbl.select_slot">選擇時段</div>
             <div style="display:flex;gap:8px;margin-bottom:6px;align-items:center;flex-wrap:wrap">
               <select id="bk-dur" onchange="updateSlots()">
-                <option value="30">30分鐘</option><option value="60" selected>1小時</option>
-                <option value="90">1.5小時</option><option value="120">2小時</option>
-                <option value="180">3小時</option><option value="240">4小時</option>
+                <option value="30" data-i18n="room.dur.30">30分鐘</option><option value="60" selected data-i18n="room.dur.60">1小時</option>
+                <option value="90" data-i18n="room.dur.90">1.5小時</option><option value="120" data-i18n="room.dur.120">2小時</option>
+                <option value="180" data-i18n="room.dur.180">3小時</option><option value="240" data-i18n="room.dur.240">4小時</option>
               </select>
               <span style="font-size:12px;color:var(--t3)" data-i18n="room.lbl.manual2">或手動輸入：</span>
               <input type="time" id="bk-start" value="09:00" style="width:100px" onchange="updateSlots()">
@@ -1550,7 +1550,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
             <div class="fg2">
               <div class="fg full"><div class="fl" data-i18n="room.lbl.meeting_title">會議標題 *</div><input type="text" id="bk-title" data-i18n-ph="room.ph.title" placeholder="例：Q3產品評審會議"></div>
               <div class="fg full"><div class="fl" data-i18n="room.lbl.host">主辦人</div>
-                <select id="bk-host"><option value="">請選擇…</option></select>
+                <select id="bk-host"><option value="" data-i18n="g.select">請選擇…</option></select>
               </div>
               <div class="fg full"><div class="fl" data-i18n="room.lbl.emails">邀請人員（Email，逗號分隔）</div>
                 <input type="text" id="bk-emails" data-i18n-ph="room.ph.emails" placeholder="a@comart.com.tw, b@comart.com.tw">
@@ -1684,7 +1684,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
               </select>
             </div>
             <div class="fg"><div class="fl" data-i18n="visit.lbl.owner">負責窗口 *</div>
-              <select id="vf-owner"><option value="">請選擇…</option></select>
+              <select id="vf-owner"><option value="" data-i18n="g.select">請選擇…</option></select>
             </div>
             <div class="fg"><div class="fl" data-i18n="visit.lbl.date_start">到訪開始日期 *</div><input type="date" id="vf-date-start"></div>
             <div class="fg"><div class="fl" data-i18n="visit.lbl.date_end">到訪結束日期 *</div><input type="date" id="vf-date-end"></div>
@@ -2169,13 +2169,13 @@ async function syncUsersFromSupabase() {
       if (!el) return;
       const cur = el.value;
       if (id === 'bwu') {
-        el.innerHTML = '<option value="">請選擇員工…</option>' +
+        el.innerHTML = `<option value="">${t('g.select_staff')}</option>` +
           us.map(u => `<option value="${u.id}">${u.name}（${u.dept||'—'}）</option>`).join('');
       } else if (id === 'tr-person') {
-        el.innerHTML = '<option value="">請選擇或手動輸入↓</option>' +
+        el.innerHTML = `<option value="">${t('g.select_or_type')}</option>` +
           us.map(u => `<option value="${u.name}||${u.dept||''}">${u.name}（${u.dept||''}）</option>`).join('');
       } else {
-        el.innerHTML = '<option value="">請選擇…</option>' +
+        el.innerHTML = `<option value="">${t('g.select')}</option>` +
           us.map(u => `<option value="${u.id}">${u.name}</option>`).join('');
       }
       el.value = cur; // 還原選取值
@@ -2774,6 +2774,24 @@ const ADMIN_I18N = {
     'lot.sound_off':'🔇 Sound Off','lot.sound_on':'🔊 Sound On',
     'g.select_staff':'— Select Staff —','g.select_or_type':'— Select or type below ↓','g.select':'— Select —',
     'car.all_veh2':'All Vehicles','lib.all_cats2':'All Categories',
+    'trip.dest.vn':'Vietnam','trip.dest.cn':'Dongguan (China)','trip.dest.hk':'Hong Kong',
+    'trip.dest.jp':'Japan','trip.dest.us':'USA','trip.dest.other':'Other (manual input)',
+    'trip.purp.expo':'Exhibition','trip.purp.factory':'Factory Visit','trip.purp.client':'Client Visit',
+    'trip.purp.supplier':'Supplier Visit','trip.purp.other':'Other (manual input)',
+    'trip.comp.select':'— Select from staff list —',
+    'room.cap.2':'2 persons','room.cap.4':'4 persons','room.cap.6':'6 persons',
+    'room.cap.8':'8 persons','room.cap.10':'10 persons','room.cap.12':'12 persons','room.cap.15':'15+ persons',
+    'room.dur.30':'30 min','room.dur.60':'1 hr','room.dur.90':'1.5 hr',
+    'room.dur.120':'2 hr','room.dur.180':'3 hr','room.dur.240':'4 hr',
+    'g.toast.saved':'Saved','g.toast.deleted':'Deleted','g.toast.added':'Added',
+    'g.toast.cancelled':'Cancelled','g.toast.exported':'Exported','g.toast.imported':'Imported, reloading…',
+    'g.toast.reset':'Data cleared, reloading…','g.toast.format_err':'Format error',
+    'g.toast.select_staff':'Please select a staff member','g.toast.select_veh':'Please select a vehicle',
+    'g.toast.fill_required':'Please fill in required fields',
+    'g.toast.fault_reported':'⚠ Fault reported, IT will handle it soon',
+    'g.toast.fault_resolved':'Marked as resolved',
+    'room.fault.open':'Pending','room.fault.resolved':'Resolved','room.fault.none':'No fault reports',
+    'room.fault.reporter_lbl':'Reporter:',
   },
   'zh-TW': {
     'mod.room':'會議室','mod.car':'公務車','mod.visit':'客戶到訪',
@@ -2960,6 +2978,24 @@ const ADMIN_I18N = {
     'lot.sound_off':'🔇 音效關','lot.sound_on':'🔊 音效開',
     'g.select_staff':'— 請選擇員工 —','g.select_or_type':'— 請選擇或手動輸入↓','g.select':'— 請選擇… —',
     'car.all_veh2':'所有車輛','lib.all_cats2':'所有分類',
+    'trip.dest.vn':'越南','trip.dest.cn':'東莞（中國）','trip.dest.hk':'香港',
+    'trip.dest.jp':'日本','trip.dest.us':'美國','trip.dest.other':'其他（手動輸入）',
+    'trip.purp.expo':'參展','trip.purp.factory':'工廠出差','trip.purp.client':'拜訪客戶',
+    'trip.purp.supplier':'拜訪供應商','trip.purp.other':'其他（手動輸入）',
+    'trip.comp.select':'— 從人員清單選擇 —',
+    'room.cap.2':'2人','room.cap.4':'4人','room.cap.6':'6人',
+    'room.cap.8':'8人','room.cap.10':'10人','room.cap.12':'12人','room.cap.15':'15人以上',
+    'room.dur.30':'30分鐘','room.dur.60':'1小時','room.dur.90':'1.5小時',
+    'room.dur.120':'2小時','room.dur.180':'3小時','room.dur.240':'4小時',
+    'g.toast.saved':'已儲存','g.toast.deleted':'已刪除','g.toast.added':'已新增',
+    'g.toast.cancelled':'已取消','g.toast.exported':'已匯出','g.toast.imported':'已匯入，重整中…',
+    'g.toast.reset':'已清除，重整中…','g.toast.format_err':'格式錯誤',
+    'g.toast.select_staff':'請選擇員工','g.toast.select_veh':'請選擇車輛',
+    'g.toast.fill_required':'請填寫必填欄位',
+    'g.toast.fault_reported':'⚠ 故障已回報，IT 將盡快處理',
+    'g.toast.fault_resolved':'已標記修復',
+    'room.fault.open':'待修','room.fault.resolved':'已修復','room.fault.none':'目前無故障回報',
+    'room.fault.reporter_lbl':'回報人：',
   },
   'zh-CN': {
     'mod.room':'会议室','mod.car':'公务车','mod.visit':'客户到访',
@@ -3146,6 +3182,24 @@ const ADMIN_I18N = {
     'lot.sound_off':'🔇 音效关','lot.sound_on':'🔊 音效开',
     'g.select_staff':'— 请选择员工 —','g.select_or_type':'— 请选择或手动输入↓','g.select':'— 请选择… —',
     'car.all_veh2':'所有车辆','lib.all_cats2':'所有分类',
+    'trip.dest.vn':'越南','trip.dest.cn':'东莞（中国）','trip.dest.hk':'香港',
+    'trip.dest.jp':'日本','trip.dest.us':'美国','trip.dest.other':'其他（手动输入）',
+    'trip.purp.expo':'参展','trip.purp.factory':'工厂出差','trip.purp.client':'拜访客户',
+    'trip.purp.supplier':'拜访供应商','trip.purp.other':'其他（手动输入）',
+    'trip.comp.select':'— 从人员列表选择 —',
+    'room.cap.2':'2人','room.cap.4':'4人','room.cap.6':'6人',
+    'room.cap.8':'8人','room.cap.10':'10人','room.cap.12':'12人','room.cap.15':'15人以上',
+    'room.dur.30':'30分钟','room.dur.60':'1小时','room.dur.90':'1.5小时',
+    'room.dur.120':'2小时','room.dur.180':'3小时','room.dur.240':'4小时',
+    'g.toast.saved':'已保存','g.toast.deleted':'已删除','g.toast.added':'已新增',
+    'g.toast.cancelled':'已取消','g.toast.exported':'已导出','g.toast.imported':'已导入，刷新中…',
+    'g.toast.reset':'已清除，刷新中…','g.toast.format_err':'格式错误',
+    'g.toast.select_staff':'请选择员工','g.toast.select_veh':'请选择车辆',
+    'g.toast.fill_required':'请填写必填项',
+    'g.toast.fault_reported':'⚠ 故障已反馈，IT 将尽快处理',
+    'g.toast.fault_resolved':'已标记修复',
+    'room.fault.open':'待修','room.fault.resolved':'已修复','room.fault.none':'目前无故障反馈',
+    'room.fault.reporter_lbl':'反馈人：',
   },
   vi: {
     'mod.room':'Phòng họp','mod.car':'Xe công vụ','mod.visit':'Khách thăm',
@@ -3332,6 +3386,24 @@ const ADMIN_I18N = {
     'lot.sound_off':'🔇 Tắt âm thanh','lot.sound_on':'🔊 Bật âm thanh',
     'g.select_staff':'— Chọn nhân viên —','g.select_or_type':'— Chọn hoặc nhập bên dưới ↓','g.select':'— Chọn… —',
     'car.all_veh2':'Tất cả xe','lib.all_cats2':'Tất cả danh mục',
+    'trip.dest.vn':'Việt Nam','trip.dest.cn':'Đông Quản (Trung Quốc)','trip.dest.hk':'Hồng Kông',
+    'trip.dest.jp':'Nhật Bản','trip.dest.us':'Mỹ','trip.dest.other':'Khác (nhập tay)',
+    'trip.purp.expo':'Triển lãm','trip.purp.factory':'Công tác nhà máy','trip.purp.client':'Thăm khách hàng',
+    'trip.purp.supplier':'Thăm nhà cung cấp','trip.purp.other':'Khác (nhập tay)',
+    'trip.comp.select':'— Chọn từ danh sách nhân viên —',
+    'room.cap.2':'2 người','room.cap.4':'4 người','room.cap.6':'6 người',
+    'room.cap.8':'8 người','room.cap.10':'10 người','room.cap.12':'12 người','room.cap.15':'15+ người',
+    'room.dur.30':'30 phút','room.dur.60':'1 giờ','room.dur.90':'1,5 giờ',
+    'room.dur.120':'2 giờ','room.dur.180':'3 giờ','room.dur.240':'4 giờ',
+    'g.toast.saved':'Đã lưu','g.toast.deleted':'Đã xóa','g.toast.added':'Đã thêm',
+    'g.toast.cancelled':'Đã hủy','g.toast.exported':'Đã xuất','g.toast.imported':'Đã nhập, đang tải lại…',
+    'g.toast.reset':'Đã xóa, đang tải lại…','g.toast.format_err':'Lỗi định dạng',
+    'g.toast.select_staff':'Vui lòng chọn nhân viên','g.toast.select_veh':'Vui lòng chọn xe',
+    'g.toast.fill_required':'Vui lòng điền thông tin bắt buộc',
+    'g.toast.fault_reported':'⚠ Đã báo sự cố, IT sẽ xử lý sớm',
+    'g.toast.fault_resolved':'Đã đánh dấu đã sửa',
+    'room.fault.open':'Chờ sửa','room.fault.resolved':'Đã sửa','room.fault.none':'Không có sự cố nào',
+    'room.fault.reporter_lbl':'Người báo:',
   },
   ja: {
     'mod.room':'会議室','mod.car':'社用車','mod.visit':'来訪管理',
@@ -3518,6 +3590,24 @@ const ADMIN_I18N = {
     'lot.sound_off':'🔇 サウンドオフ','lot.sound_on':'🔊 サウンドオン',
     'g.select_staff':'— スタッフを選択 —','g.select_or_type':'— 選択または入力↓','g.select':'— 選択… —',
     'car.all_veh2':'全車両','lib.all_cats2':'全カテゴリ',
+    'trip.dest.vn':'ベトナム','trip.dest.cn':'東莞（中国）','trip.dest.hk':'香港',
+    'trip.dest.jp':'日本','trip.dest.us':'アメリカ','trip.dest.other':'その他（手動入力）',
+    'trip.purp.expo':'展示会','trip.purp.factory':'工場出張','trip.purp.client':'顧客訪問',
+    'trip.purp.supplier':'仕入先訪問','trip.purp.other':'その他（手動入力）',
+    'trip.comp.select':'— スタッフリストから選択 —',
+    'room.cap.2':'2名','room.cap.4':'4名','room.cap.6':'6名',
+    'room.cap.8':'8名','room.cap.10':'10名','room.cap.12':'12名','room.cap.15':'15名以上',
+    'room.dur.30':'30分','room.dur.60':'1時間','room.dur.90':'1.5時間',
+    'room.dur.120':'2時間','room.dur.180':'3時間','room.dur.240':'4時間',
+    'g.toast.saved':'保存しました','g.toast.deleted':'削除しました','g.toast.added':'追加しました',
+    'g.toast.cancelled':'キャンセルしました','g.toast.exported':'エクスポートしました',
+    'g.toast.imported':'インポートしました。再読込中…','g.toast.reset':'削除しました。再読込中…',
+    'g.toast.format_err':'フォーマットエラー','g.toast.select_staff':'スタッフを選択してください',
+    'g.toast.select_veh':'車両を選択してください','g.toast.fill_required':'必須項目を入力してください',
+    'g.toast.fault_reported':'⚠ 障害を報告しました。ITが対応します',
+    'g.toast.fault_resolved':'修復済みとしてマークしました',
+    'room.fault.open':'対応待ち','room.fault.resolved':'修復済み','room.fault.none':'障害報告なし',
+    'room.fault.reporter_lbl':'報告者：',
   },
 };
 function t(key) {
@@ -3965,7 +4055,7 @@ function saveBook(){
   else bks.push(fullData);
   sv(K.bk,bks);sbSaveBook(fullData);closeMo('mo-book');renderBooks();toast(editBkId?'已更新':'已新增','success');
 }
-function delBk(id){if(ld(K.ln).find(l=>l.bk_id===id&&l.st!=='returned')){toast('有借閱記錄，無法刪除','error');return;}if(!confirm('確定刪除？'))return;const _delBkId=id;sv(K.bk,ld(K.bk).filter(b=>b.id!==_delBkId));sbDelBook(_delBkId);renderBooks();toast('已刪除','success');}
+function delBk(id){if(ld(K.ln).find(l=>l.bk_id===id&&l.st!=='returned')){toast('有借閱記錄，無法刪除','error');return;}if(!confirm('確定刪除？'))return;const _delBkId=id;sv(K.bk,ld(K.bk).filter(b=>b.id!==_delBkId));sbDelBook(_delBkId);renderBooks();toast(t('g.toast.deleted'),'success');}
 async function lookupISBN(){
   const isbn=document.getElementById('bkisbn').value.trim().replace(/-/g,'');if(!isbn){toast('請輸入ISBN','error');return;}
   document.getElementById('isbnld').style.display='block';
@@ -3990,7 +4080,7 @@ function qReturn(lid){
   if(rv)toast(`已還書，${gUsr(rv.u_id)?.name}有預約等候`,'warn');else toast('已登記還書','success');
   chkOv();renderLibDash();renderLoans();renderReturn();updBadges();
 }
-function exportLoansCSV(){const ln=ld(K.ln);const rows=[['書名','作者','借閱人','部門','借出日','應還日','歸還日','狀態']];ln.forEach(l=>{const b=gBk(l.bk_id),u=gUsr(l.u_id);rows.push([b?.title||'',b?.author||'',u?.name||'',u?.dept||'',l.bw,l.due,l.ret||'',l.st]);});dl('loans.csv',rows.map(r=>r.map(c=>`"${c}"`).join(',')).join('\n'),'text/csv');toast('已匯出','success');}
+function exportLoansCSV(){const ln=ld(K.ln);const rows=[['書名','作者','借閱人','部門','借出日','應還日','歸還日','狀態']];ln.forEach(l=>{const b=gBk(l.bk_id),u=gUsr(l.u_id);rows.push([b?.title||'',b?.author||'',u?.name||'',u?.dept||'',l.bw,l.due,l.ret||'',l.st]);});dl('loans.csv',rows.map(r=>r.map(c=>`"${c}"`).join(',')).join('\n'),'text/csv');toast(t('g.toast.exported'),'success');}
 
 let selBwBk=null;
 function renderBwBooks(){
@@ -4027,9 +4117,9 @@ function renderReturn(){
 }
 
 function renderRsv(){const rv=ld(K.rv);document.getElementById('rv-tb').innerHTML=rv.length?rv.map(r=>{const b=gBk(r.bk_id),u=gUsr(r.u_id);return`<tr><td>${b?.title||'—'}</td><td>${u?.name||'—'}</td><td class="tdm">${fmtD(r.dt)}</td><td><span class="badge ${r.st==='waiting'?'by':'bm'}">${r.st==='waiting'?t('lib.rsv.waiting'):t('lib.rsv.done')}</span></td><td><button class="btn bdr bsm" onclick="delRsv('${r.id}')">${t('g.btn.cancel')}</button></td></tr>`}).join(''):`<tr><td colspan="5" class="tdm" style="text-align:center;padding:22px">${t('lib.no_rsv')}</td></tr>`;}
-function openRsvModal(){const us=ld(K.us),bks=ld(K.bk);document.getElementById('rsvu').innerHTML='<option value="">請選擇…</option>'+us.map(u=>`<option value="${u.id}">${u.name}</option>`).join('');document.getElementById('rsvb').innerHTML='<option value="">請選擇…</option>'+bks.map(b=>`<option value="${b.id}">${b.title}</option>`).join('');openMo('mo-rsv');}
+function openRsvModal(){const us=ld(K.us),bks=ld(K.bk);document.getElementById('rsvu').innerHTML=`<option value="">${t('g.select')}</option>`+us.map(u=>`<option value="${u.id}">${u.name}</option>`).join('');document.getElementById('rsvb').innerHTML=`<option value="">${t('g.select')}</option>`+bks.map(b=>`<option value="${b.id}">${b.title}</option>`).join('');openMo('mo-rsv');}
 function saveRsv(){const uid2=document.getElementById('rsvu').value,bid=document.getElementById('rsvb').value;if(!uid2||!bid)return toast('請選擇預約人與書籍','error');const rv=ld(K.rv);rv.push({id:uid(),bk_id:bid,u_id:uid2,dt:tds(),st:'waiting'});sv(K.rv,rv);closeMo('mo-rsv');renderRsv();toast('預約已登記','success');}
-function delRsv(id){if(!confirm('確定取消？'))return;sv(K.rv,ld(K.rv).filter(r=>r.id!==id));renderRsv();toast('已取消','success');}
+function delRsv(id){if(!confirm('確定取消？'))return;sv(K.rv,ld(K.rv).filter(r=>r.id!==id));renderRsv();toast(t('g.toast.cancelled'),'success');}
 
 
 
@@ -4038,25 +4128,25 @@ function delRsv(id){if(!confirm('確定取消？'))return;sv(K.rv,ld(K.rv).filte
 
 function renderCats(){const cats=ld(K.ct),bks=ld(K.bk);document.getElementById('cat-list').innerHTML=cats.map(c=>{const cnt=bks.filter(b=>b.cat_id===c.id).length;return`<div style="background:var(--bg2);border:1px solid var(--bd);border-radius:var(--rs);padding:8px 13px;display:flex;align-items:center;gap:8px"><span class="ctag">${c.name}</span><span class="tdm">${cnt}本</span><button class="btn bic bdr bsm" onclick="delCat('${c.id}')">✕</button></div>`}).join('');}
 function openCatModal(){document.getElementById('catnm').value='';openMo('mo-cat');}
-function saveCat(){const nm=document.getElementById('catnm').value.trim();if(!nm)return toast('請輸入分類名稱','error');const cats=ld(K.ct);if(cats.find(c=>c.name===nm))return toast('分類已存在','error');const _newCat={id:uid(),name:nm};cats.push(_newCat);sv(K.ct,cats);sbSaveCat(_newCat);closeMo('mo-cat');renderCats();popCatSel();toast('已新增','success');}
-function delCat(id){if(ld(K.bk).find(b=>b.cat_id===id))return toast('此分類有書籍，無法刪除','error');if(!confirm('確定刪除？'))return;const _delCatId=id;sv(K.ct,ld(K.ct).filter(c=>c.id!==_delCatId));sbDelCat(_delCatId);renderCats();popCatSel();toast('已刪除','success');}
+function saveCat(){const nm=document.getElementById('catnm').value.trim();if(!nm)return toast('請輸入分類名稱','error');const cats=ld(K.ct);if(cats.find(c=>c.name===nm))return toast('分類已存在','error');const _newCat={id:uid(),name:nm};cats.push(_newCat);sv(K.ct,cats);sbSaveCat(_newCat);closeMo('mo-cat');renderCats();popCatSel();toast(t('g.toast.added'),'success');}
+function delCat(id){if(ld(K.bk).find(b=>b.cat_id===id))return toast('此分類有書籍，無法刪除','error');if(!confirm('確定刪除？'))return;const _delCatId=id;sv(K.ct,ld(K.ct).filter(c=>c.id!==_delCatId));sbDelCat(_delCatId);renderCats();popCatSel();toast(t('g.toast.deleted'),'success');}
 
 function loadLibCfg(){const cfg=lo(K.lcfg,DLCFG);document.getElementById('cfml').value=cfg.max_loans||3;document.getElementById('cfld').value=cfg.loan_days||30;document.getElementById('cfrd').value=cfg.remind_days||3;}
-function saveLibCfg(){sv(K.lcfg,{max_loans:parseInt(document.getElementById('cfml').value)||3,loan_days:parseInt(document.getElementById('cfld').value)||30,remind_days:parseInt(document.getElementById('cfrd').value)||3});toast('已儲存','success');}
+function saveLibCfg(){sv(K.lcfg,{max_loans:parseInt(document.getElementById('cfml').value)||3,loan_days:parseInt(document.getElementById('cfld').value)||30,remind_days:parseInt(document.getElementById('cfrd').value)||3});toast(t('g.toast.saved'),'success');}
 function loadRoomCfg(){const cfg=lo(K.rcfg,DRCFG);document.getElementById('rc-hs').value=cfg.hours_start??8;document.getElementById('rc-he').value=cfg.hours_end??18;document.getElementById('rc-md').value=cfg.max_days??14;document.getElementById('rc-ar').value=cfg.autorelease_min??15;}
-function saveRoomCfg(){const cfg={hours_start:parseInt(document.getElementById('rc-hs').value)||8,hours_end:parseInt(document.getElementById('rc-he').value)||18,max_days:parseInt(document.getElementById('rc-md').value)||14,autorelease_min:parseInt(document.getElementById('rc-ar').value)||15};sv(K.rcfg,cfg);ROOM_HOURS={start:cfg.hours_start,end:cfg.hours_end};toast('已儲存','success');}
-function expData(){const data={};Object.entries(K).forEach(([k,sk])=>{data[k]=JSON.parse(localStorage.getItem(sk)||'null');});dl('comart_backup.json',JSON.stringify(data,null,2),'application/json');toast('已匯出','success');}
+function saveRoomCfg(){const cfg={hours_start:parseInt(document.getElementById('rc-hs').value)||8,hours_end:parseInt(document.getElementById('rc-he').value)||18,max_days:parseInt(document.getElementById('rc-md').value)||14,autorelease_min:parseInt(document.getElementById('rc-ar').value)||15};sv(K.rcfg,cfg);ROOM_HOURS={start:cfg.hours_start,end:cfg.hours_end};toast(t('g.toast.saved'),'success');}
+function expData(){const data={};Object.entries(K).forEach(([k,sk])=>{data[k]=JSON.parse(localStorage.getItem(sk)||'null');});dl('comart_backup.json',JSON.stringify(data,null,2),'application/json');toast(t('g.toast.exported'),'success');}
 function impTrig(){document.getElementById('impf').click();}
-function impData(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{try{const d=JSON.parse(ev.target.result);Object.entries(K).forEach(([k,sk])=>{if(d[k]!==undefined)localStorage.setItem(sk,JSON.stringify(d[k]));});toast('已匯入，重整中…','success');setTimeout(()=>location.reload(),1000);}catch{toast('格式錯誤','error');}};r.readAsText(f);}
-function resetData(){if(!confirm('⚠️ 確定清除所有資料？'))return;Object.values(K).forEach(k=>localStorage.removeItem(k));toast('已清除，重整中…','warn');setTimeout(()=>location.reload(),1000);}
+function impData(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{try{const d=JSON.parse(ev.target.result);Object.entries(K).forEach(([k,sk])=>{if(d[k]!==undefined)localStorage.setItem(sk,JSON.stringify(d[k]));});toast(t('g.toast.imported'),'success');setTimeout(()=>location.reload(),1000);}catch{toast(t('g.toast.format_err'),'error');}};r.readAsText(f);}
+function resetData(){if(!confirm('⚠️ 確定清除所有資料？'))return;Object.values(K).forEach(k=>localStorage.removeItem(k));toast(t('g.toast.reset'),'warn');setTimeout(()=>location.reload(),1000);}
 
 function popCatSel(){const cats=ld(K.ct),opts=`<option value="">${t('lib.all_cats2')}</option>`+cats.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');const el=document.getElementById('bkcat');if(el)el.innerHTML=opts;}
 function popUsrSel(){
-  const us=ld(K.us),opts='<option value="">請選擇員工…</option>'+us.map(u=>`<option value="${u.id}">${u.name}（${u.dept||'—'}）</option>`).join('');
+  const us=ld(K.us),opts=`<option value="">${t('g.select_staff')}</option>`+us.map(u=>`<option value="${u.id}">${u.name}（${u.dept||'—'}）</option>`).join('');
   const el=document.getElementById('bwu');if(el){el.innerHTML=opts;if(curUid)el.value=curUid;}
   const h=document.getElementById('bwh');if(h&&el){el.onchange=()=>{const u2=el.value;if(!u2){h.textContent='';return;}const cfg=lo(K.lcfg,DLCFG);const a=ld(K.ln).filter(l=>l.u_id===u2&&l.st!=='returned').length;h.textContent=t('lib.loan_status').replace('%d',a).replace('%d',cfg.max_loans);};}
 }
-function popCarSels(){const vehs=ld(K.vh),vOpts='<option value="">所有車輛</option>'+vehs.map(v=>`<option value="${v.id}">${v.name}(${v.plate})</option>`).join('');['cal-vf','usvf','fvf','mtvf'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=vOpts;});}
+function popCarSels(){const vehs=ld(K.vh),vOpts=`<option value="">${t('car.all_veh2')}</option>`+vehs.map(v=>`<option value="${v.id}">${v.name}(${v.plate})</option>`).join('');['cal-vf','usvf','fvf','mtvf'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=vOpts;});}
 
 async function renderCarDash(){
   await loadCarFromSB();
@@ -4102,7 +4192,7 @@ function saveVeh(){
   else vehs.push(fullVeh);
   sv(K.vh,vehs);sbSaveVehicle(fullVeh);closeMo('mo-veh');renderVeh();popCarSels();toast(editVid?'已更新':'已新增','success');
 }
-function delVeh(id){if(ld(K.bks).find(b=>b.vh_id===id&&b.st!=='done'&&b.st!=='cancelled'))return toast('有進行中預約，無法刪除','error');if(!confirm('確定刪除？'))return;const _delVhId=id;sv(K.vh,ld(K.vh).filter(v=>v.id!==_delVhId));sbDelVehicle(_delVhId);renderVeh();popCarSels();toast('已刪除','success');}
+function delVeh(id){if(ld(K.bks).find(b=>b.vh_id===id&&b.st!=='done'&&b.st!=='cancelled'))return toast('有進行中預約，無法刪除','error');if(!confirm('確定刪除？'))return;const _delVhId=id;sv(K.vh,ld(K.vh).filter(v=>v.id!==_delVhId));sbDelVehicle(_delVhId);renderVeh();popCarSels();toast(t('g.toast.deleted'),'success');}
 
 let calDt=new Date(),calV='month';
 function setCalV(v){calV=v;document.getElementById('cvbm').classList.toggle('active',v==='month');document.getElementById('cvbw').classList.toggle('active',v==='week');renderCal();}
@@ -4134,9 +4224,9 @@ async function initCarBkForm(){
     const vehs=ld(K.vh), us=ld(K.us);
     const vSel=document.getElementById('bkv');
     const uSel=document.getElementById('bku');
-    if(vSel) vSel.innerHTML='<option value="">請選擇…</option>'+vehs.map(v=>`<option value="${v.id}">${VICO[v.type]||'🚗'} ${v.name}（${v.plate}）</option>`).join('');
+    if(vSel) vSel.innerHTML=`<option value="">${t('g.select')}</option>`+vehs.map(v=>`<option value="${v.id}">${VICO[v.type]||'🚗'} ${v.name}（${v.plate}）</option>`).join('');
     if(uSel){
-      uSel.innerHTML='<option value="">請選擇…</option>'+us.map(u=>`<option value="${u.id}">${u.name}（${u.dept||'—'}）</option>`).join('');
+      uSel.innerHTML=`<option value="">${t('g.select')}</option>`+us.map(u=>`<option value="${u.id}">${u.name}（${u.dept||'—'}）</option>`).join('');
       if(curUid) uSel.value=curUid;
     }
   }
@@ -4246,34 +4336,34 @@ async function cancelCarBk(id){
   renderUse();
   toast('✓ 已取消預約','success');
 }
-function expUseCSV(){const bks=ld(K.bks);const rows=[['車輛','車牌','使用人','出發','歸還','目的','里程','狀態']];bks.forEach(b=>{const v=gVeh(b.vh_id),u=gUsr(b.u_id);rows.push([v?.name||'',v?.plate||'',u?.name||'',b.start,b.end,b.purpose||'',b.km_plan||'',b.st]);});dl('usage.csv',rows.map(r=>r.map(c=>`"${c}"`).join(',')).join('\n'),'text/csv');toast('已匯出','success');}
+function expUseCSV(){const bks=ld(K.bks);const rows=[['車輛','車牌','使用人','出發','歸還','目的','里程','狀態']];bks.forEach(b=>{const v=gVeh(b.vh_id),u=gUsr(b.u_id);rows.push([v?.name||'',v?.plate||'',u?.name||'',b.start,b.end,b.purpose||'',b.km_plan||'',b.st]);});dl('usage.csv',rows.map(r=>r.map(c=>`"${c}"`).join(',')).join('\n'),'text/csv');toast(t('g.toast.exported'),'success');}
 
 function calcFuel(){const l=parseFloat(document.getElementById('flt').value)||0,p=parseFloat(document.getElementById('fpr').value)||0;if(l&&p)document.getElementById('ftot').value=(l*p).toFixed(0);}
 function renderFuelSum(){const logs=ld(K.fl),ym=new Date().toISOString().slice(0,7),mth=logs.filter(l=>l.date.slice(0,7)===ym);document.getElementById('fl-c').textContent='$'+(mth.reduce((s,l)=>s+(l.total||0),0)).toLocaleString();document.getElementById('fl-l').textContent=mth.reduce((s,l)=>s+(l.liters||0),0).toFixed(1);document.getElementById('fl-n').textContent=logs.length;}
 function renderFuel(){let logs=ld(K.fl);const vf=document.getElementById('fvf')?.value||'';if(vf)logs=logs.filter(l=>l.vh_id===vf);logs.sort((a,b)=>b.date.localeCompare(a.date));document.getElementById('fl-tb').innerHTML=logs.length?logs.map(l=>{const v=gVeh(l.vh_id),u=gUsr(l.u_id);return`<tr><td>${VICO[v?.type]||'⛽'} ${v?.name||'—'}</td><td class="tdm">${fmtD(l.date)}</td><td>${l.liters}</td><td>${(l.total||0).toLocaleString()}</td><td>${l.price||'—'}</td><td>${l.odo?l.odo.toLocaleString():'—'}</td><td>${u?.name||'—'}</td><td class="tdm">${l.note||'—'}</td><td><button class="btn bdr bsm" onclick="delFuel('${l.id}')">${t('g.btn.delete')}</button></td></tr>`}).join(''):`<tr><td colspan="9" class="tdm" style="text-align:center;padding:22px">${t('car.no_fuel')}</td></tr>`;}
-function openFuelModal(){const vehs=ld(K.vh),us=ld(K.us);document.getElementById('fveh').innerHTML='<option value="">請選擇…</option>'+vehs.map(v=>`<option value="${v.id}">${v.name}(${v.plate})</option>`).join('');document.getElementById('fusr').innerHTML='<option value="">請選擇…</option>'+us.map(u=>`<option value="${u.id}">${u.name}</option>`).join('');document.getElementById('fdt').value=tds();['flt','fpr','ftot','fod','fnt'].forEach(x=>document.getElementById(x).value='');if(curUid)document.getElementById('fusr').value=curUid;openMo('mo-fuel');}
-function saveFuel(){const vid=document.getElementById('fveh').value,lt=parseFloat(document.getElementById('flt').value);if(!vid)return toast('請選擇車輛','error');if(!lt)return toast('請輸入加油量','error');const pr=parseFloat(document.getElementById('fpr').value)||0;const logs=ld(K.fl);logs.push({id:uid(),vh_id:vid,u_id:document.getElementById('fusr').value,date:document.getElementById('fdt').value||tds(),liters:lt,price:pr,total:parseFloat(document.getElementById('ftot').value)||(lt*pr),odo:parseInt(document.getElementById('fod').value)||null,note:document.getElementById('fnt').value.trim()});sv(K.fl,logs);sbSaveFuelLog(logs[logs.length-1]);closeMo('mo-fuel');renderFuel();renderFuelSum();toast('已儲存','success');}
-function delFuel(id){if(!confirm('確定刪除？'))return;sv(K.fl,ld(K.fl).filter(l=>l.id!==id));renderFuel();renderFuelSum();toast('已刪除','success');}
-function expFuelCSV(){const logs=ld(K.fl);const rows=[['車輛','日期','油量L','金額','單價','里程','加油人','備註']];logs.forEach(l=>{const v=gVeh(l.vh_id),u=gUsr(l.u_id);rows.push([v?.name||'',l.date,l.liters,l.total||'',l.price||'',l.odo||'',u?.name||'',l.note||'']);});dl('fuel.csv',rows.map(r=>r.map(c=>`"${c}"`).join(',')).join('\n'),'text/csv');toast('已匯出','success');}
+function openFuelModal(){const vehs=ld(K.vh),us=ld(K.us);document.getElementById('fveh').innerHTML=`<option value="">${t('g.select')}</option>`+vehs.map(v=>`<option value="${v.id}">${v.name}(${v.plate})</option>`).join('');document.getElementById('fusr').innerHTML=`<option value="">${t('g.select')}</option>`+us.map(u=>`<option value="${u.id}">${u.name}</option>`).join('');document.getElementById('fdt').value=tds();['flt','fpr','ftot','fod','fnt'].forEach(x=>document.getElementById(x).value='');if(curUid)document.getElementById('fusr').value=curUid;openMo('mo-fuel');}
+function saveFuel(){const vid=document.getElementById('fveh').value,lt=parseFloat(document.getElementById('flt').value);if(!vid)return toast('請選擇車輛','error');if(!lt)return toast('請輸入加油量','error');const pr=parseFloat(document.getElementById('fpr').value)||0;const logs=ld(K.fl);logs.push({id:uid(),vh_id:vid,u_id:document.getElementById('fusr').value,date:document.getElementById('fdt').value||tds(),liters:lt,price:pr,total:parseFloat(document.getElementById('ftot').value)||(lt*pr),odo:parseInt(document.getElementById('fod').value)||null,note:document.getElementById('fnt').value.trim()});sv(K.fl,logs);sbSaveFuelLog(logs[logs.length-1]);closeMo('mo-fuel');renderFuel();renderFuelSum();toast(t('g.toast.saved'),'success');}
+function delFuel(id){if(!confirm('確定刪除？'))return;sv(K.fl,ld(K.fl).filter(l=>l.id!==id));renderFuel();renderFuelSum();toast(t('g.toast.deleted'),'success');}
+function expFuelCSV(){const logs=ld(K.fl);const rows=[['車輛','日期','油量L','金額','單價','里程','加油人','備註']];logs.forEach(l=>{const v=gVeh(l.vh_id),u=gUsr(l.u_id);rows.push([v?.name||'',l.date,l.liters,l.total||'',l.price||'',l.odo||'',u?.name||'',l.note||'']);});dl('fuel.csv',rows.map(r=>r.map(c=>`"${c}"`).join(',')).join('\n'),'text/csv');toast(t('g.toast.exported'),'success');}
 
 function renderMaint(){let logs=ld(K.mt);const vf=document.getElementById('mtvf')?.value||'';if(vf)logs=logs.filter(l=>l.vh_id===vf);logs.sort((a,b)=>b.date.localeCompare(a.date));document.getElementById('mt-tb').innerHTML=logs.length?logs.map(l=>{const v=gVeh(l.vh_id);return`<tr><td>${VICO[v?.type]||'🔧'} ${v?.name||'—'}</td><td class="tdm">${fmtD(l.date)}</td><td>${l.items||'—'}</td><td>${l.km?l.km.toLocaleString():'—'}</td><td>${l.cost?'$'+l.cost.toLocaleString():'—'}</td><td>${l.nkm?l.nkm.toLocaleString():'—'}</td><td class="tdm">${fmtD(l.ndt)}</td><td class="tdm">${l.vendor||'—'}</td><td><button class="btn bdr bsm" onclick="delMaint('${l.id}')">${t('g.btn.delete')}</button></td></tr>`}).join(''):`<tr><td colspan="9" class="tdm" style="text-align:center;padding:22px">${t('car.no_maint')}</td></tr>`;}
-function openMaintModal(){document.getElementById('momtt').textContent=t('car.mo.add_maint');const vehs=ld(K.vh);document.getElementById('mtveh').innerHTML='<option value="">請選擇…</option>'+vehs.map(v=>`<option value="${v.id}">${v.name}(${v.plate})</option>`).join('');document.getElementById('mtdt').value=tds();['mtkm','mtit','mtcs','mtvd','mtnk','mtnt'].forEach(x=>document.getElementById(x).value='');document.getElementById('mtnd').value='';openMo('mo-maint');}
-function saveMaint(){const vid=document.getElementById('mtveh').value,it=document.getElementById('mtit').value.trim();if(!vid)return toast('請選擇車輛','error');if(!it)return toast('請填寫保養項目','error');const nkm=parseInt(document.getElementById('mtnk').value)||null,ndt=document.getElementById('mtnd').value||null;const data={id:uid(),vh_id:vid,date:document.getElementById('mtdt').value||tds(),km:parseInt(document.getElementById('mtkm').value)||null,items:it,cost:parseInt(document.getElementById('mtcs').value)||null,vendor:document.getElementById('mtvd').value.trim(),nkm,ndt,note:document.getElementById('mtnt').value.trim()};const logs=ld(K.mt);logs.push(data);sv(K.mt,logs);if(nkm){const vehs=ld(K.vh),vi=vehs.findIndex(v=>v.id===vid);if(vi>=0){vehs[vi].next_maint_km=nkm;sv(K.vh,vehs);}}closeMo('mo-maint');renderMaint();updBadges();toast('已儲存','success');}
-function delMaint(id){if(!confirm('確定刪除？'))return;sv(K.mt,ld(K.mt).filter(l=>l.id!==id));renderMaint();toast('已刪除','success');}
+function openMaintModal(){document.getElementById('momtt').textContent=t('car.mo.add_maint');const vehs=ld(K.vh);document.getElementById('mtveh').innerHTML=`<option value="">${t('g.select')}</option>`+vehs.map(v=>`<option value="${v.id}">${v.name}(${v.plate})</option>`).join('');document.getElementById('mtdt').value=tds();['mtkm','mtit','mtcs','mtvd','mtnk','mtnt'].forEach(x=>document.getElementById(x).value='');document.getElementById('mtnd').value='';openMo('mo-maint');}
+function saveMaint(){const vid=document.getElementById('mtveh').value,it=document.getElementById('mtit').value.trim();if(!vid)return toast('請選擇車輛','error');if(!it)return toast('請填寫保養項目','error');const nkm=parseInt(document.getElementById('mtnk').value)||null,ndt=document.getElementById('mtnd').value||null;const data={id:uid(),vh_id:vid,date:document.getElementById('mtdt').value||tds(),km:parseInt(document.getElementById('mtkm').value)||null,items:it,cost:parseInt(document.getElementById('mtcs').value)||null,vendor:document.getElementById('mtvd').value.trim(),nkm,ndt,note:document.getElementById('mtnt').value.trim()};const logs=ld(K.mt);logs.push(data);sv(K.mt,logs);if(nkm){const vehs=ld(K.vh),vi=vehs.findIndex(v=>v.id===vid);if(vi>=0){vehs[vi].next_maint_km=nkm;sv(K.vh,vehs);}}closeMo('mo-maint');renderMaint();updBadges();toast(t('g.toast.saved'),'success');}
+function delMaint(id){if(!confirm('確定刪除？'))return;sv(K.mt,ld(K.mt).filter(l=>l.id!==id));renderMaint();toast(t('g.toast.deleted'),'success');}
 
 let editIspId=null;
 function renderInsp(){const isps=ld(K.isp);const cfg=lo(K.ccfg,DCCFG);document.getElementById('insp-tb').innerHTML=isps.length?isps.map(isp=>{const v=gVeh(isp.vh_id),d=isp.next?dDiff(isp.next):null,cls=d===null?'':d<=7?'rd':d<=cfg.insp_days?'rw':'';return`<tr class="${cls}"><td>${VICO[v?.type]||'📋'} ${v?.name||'—'} <span class="tdm">(${v?.plate||''})</span></td><td class="tdm">${fmtD(isp.last)}</td><td>${fmtD(isp.next)}</td><td>${d!==null?`<span class="badge ${d<=7?'br':d<=30?'by':'bg'}">${d}d</span>`:'—'}</td><td><span class="badge ${d!==null&&d<=cfg.insp_days?'by':'bg'}">${d!==null&&d<=cfg.insp_days?t('lib.stat.soon'):t('car.st.avail')}</span></td><td class="tdm">${isp.note||'—'}</td><td><button class="btn bg2 bsm" onclick="openInspModal('${isp.id}')">${t('lib.btn.update')}</button> <button class="btn bdr bsm" onclick="delInsp('${isp.id}')">${t('g.btn.delete')}</button></td></tr>`}).join(''):`<tr><td colspan="7" class="tdm" style="text-align:center;padding:22px">${t('car.no_insp')}</td></tr>`;}
-function openInspModal(id){editIspId=id||null;document.getElementById('moispt').textContent=id?t('car.mo.edit_insp'):t('car.mo.add_insp');const vehs=ld(K.vh);document.getElementById('ispveh').innerHTML='<option value="">請選擇…</option>'+vehs.map(v=>`<option value="${v.id}">${v.name}(${v.plate})</option>`).join('');if(id){const isp=ld(K.isp).find(i=>i.id===id);if(!isp)return;document.getElementById('ispveh').value=isp.vh_id;document.getElementById('ispls').value=isp.last||'';document.getElementById('ispnx').value=isp.next||'';document.getElementById('ispnt').value=isp.note||'';}else{['ispls','ispnx','ispnt'].forEach(x=>document.getElementById(x).value='');}openMo('mo-insp');}
+function openInspModal(id){editIspId=id||null;document.getElementById('moispt').textContent=id?t('car.mo.edit_insp'):t('car.mo.add_insp');const vehs=ld(K.vh);document.getElementById('ispveh').innerHTML=`<option value="">${t('g.select')}</option>`+vehs.map(v=>`<option value="${v.id}">${v.name}(${v.plate})</option>`).join('');if(id){const isp=ld(K.isp).find(i=>i.id===id);if(!isp)return;document.getElementById('ispveh').value=isp.vh_id;document.getElementById('ispls').value=isp.last||'';document.getElementById('ispnx').value=isp.next||'';document.getElementById('ispnt').value=isp.note||'';}else{['ispls','ispnx','ispnt'].forEach(x=>document.getElementById(x).value='');}openMo('mo-insp');}
 function saveInsp(){const vid=document.getElementById('ispveh').value,nxt=document.getElementById('ispnx').value;if(!vid)return toast('請選擇車輛','error');if(!nxt)return toast('請填寫下次驗車日期','error');const data={vh_id:vid,last:document.getElementById('ispls').value||null,next:nxt,note:document.getElementById('ispnt').value.trim()};const isps=ld(K.isp);if(editIspId){const i=isps.findIndex(x=>x.id===editIspId);if(i>=0)isps[i]={...isps[i],...data};}else isps.push({id:uid(),...data});sv(K.isp,isps);const vehs=ld(K.vh),vi=vehs.findIndex(v=>v.id===vid);if(vi>=0){vehs[vi].next_insp=nxt;sv(K.vh,vehs);}closeMo('mo-insp');renderInsp();updBadges();toast('已更新','success');}
-function delInsp(id){if(!confirm('確定刪除？'))return;sv(K.isp,ld(K.isp).filter(i=>i.id!==id));renderInsp();toast('已刪除','success');}
+function delInsp(id){if(!confirm('確定刪除？'))return;sv(K.isp,ld(K.isp).filter(i=>i.id!==id));renderInsp();toast(t('g.toast.deleted'),'success');}
 
 function renderPark(){const pks=ld(K.pk),vehs=ld(K.vh);document.getElementById('pk-grid').innerHTML=pks.length?pks.map(p=>{const car=vehs.find(v=>v.pk_id===p.id);return`<div style="background:var(--bg2);border:1px solid ${car?'rgba(6,182,212,.3)':'var(--bd)'};border-radius:var(--r);padding:13px;text-align:center"><div style="font-size:26px;margin-bottom:5px">${car?'🚗':'🅿️'}</div><div style="font-weight:700;font-size:14px;color:var(--tl)">${p.number}</div><div style="font-size:11px;color:var(--t3);margin:3px 0">${p.location||'—'}</div>${car?`<span class="badge bt" style="margin-top:4px">${car.name}</span>`:`<span class="badge bm" style="margin-top:4px">空位</span>`}<div style="margin-top:10px"><button class="btn bic bdr bsm" onclick="delPark('${p.id}')">✕</button></div></div>`}).join(''):'<div class="es"><div class="ei">🅿️</div><p>尚未設定停車位</p></div>';}
 function openParkModal(){['pknm','pklc','pknt'].forEach(x=>document.getElementById(x).value='');openMo('mo-park');}
-function savePark(){const nm=document.getElementById('pknm').value.trim();if(!nm)return toast('請輸入格位編號','error');const pks=ld(K.pk);if(pks.find(p=>p.number===nm))return toast('格位編號已存在','error');pks.push({id:uid(),number:nm,location:document.getElementById('pklc').value.trim(),note:document.getElementById('pknt').value.trim()});sv(K.pk,pks);closeMo('mo-park');renderPark();toast('已新增','success');}
-function delPark(id){if(ld(K.vh).find(v=>v.pk_id===id))return toast('此格位有車輛，無法刪除','error');if(!confirm('確定刪除？'))return;sv(K.pk,ld(K.pk).filter(p=>p.id!==id));renderPark();toast('已刪除','success');}
+function savePark(){const nm=document.getElementById('pknm').value.trim();if(!nm)return toast('請輸入格位編號','error');const pks=ld(K.pk);if(pks.find(p=>p.number===nm))return toast('格位編號已存在','error');pks.push({id:uid(),number:nm,location:document.getElementById('pklc').value.trim(),note:document.getElementById('pknt').value.trim()});sv(K.pk,pks);closeMo('mo-park');renderPark();toast(t('g.toast.added'),'success');}
+function delPark(id){if(ld(K.vh).find(v=>v.pk_id===id))return toast('此格位有車輛，無法刪除','error');if(!confirm('確定刪除？'))return;sv(K.pk,ld(K.pk).filter(p=>p.id!==id));renderPark();toast(t('g.toast.deleted'),'success');}
 
 function loadCarCfg(){const cfg=lo(K.ccfg,DCCFG);document.getElementById('ccmk').value=cfg.maint_km||500;document.getElementById('ccid').value=cfg.insp_days||30;document.getElementById('ccmd').value=cfg.max_days||7;}
-function saveCarCfg(){sv(K.ccfg,{maint_km:parseInt(document.getElementById('ccmk').value)||500,insp_days:parseInt(document.getElementById('ccid').value)||30,max_days:parseInt(document.getElementById('ccmd').value)||7});toast('已儲存','success');}
+function saveCarCfg(){sv(K.ccfg,{maint_km:parseInt(document.getElementById('ccmk').value)||500,insp_days:parseInt(document.getElementById('ccid').value)||30,max_days:parseInt(document.getElementById('ccmd').value)||7});toast(t('g.toast.saved'),'success');}
 
 function showUsw(){
   const us=ld(K.us);
@@ -4361,10 +4451,10 @@ function initTripForm(){
   const us=ld(K.us);
   // 人員
   const pSel=document.getElementById('tr-person');
-  if(pSel) pSel.innerHTML='<option value="">請選擇或手動輸入↓</option>'+us.map(u=>`<option value="${u.name}||${u.dept||''}">${u.name}（${u.dept||''}）</option>`).join('');
+  if(pSel) pSel.innerHTML=`<option value="">${t('g.select_or_type')}</option>`+us.map(u=>`<option value="${u.name}||${u.dept||''}">${u.name}（${u.dept||''}）</option>`).join('');
   // 同行
   const cSel=document.getElementById('tr-comp-sel');
-  if(cSel) cSel.innerHTML='<option value="">從人員清單選擇…</option>'+us.map(u=>`<option value="${u.name}">${u.name}</option>`).join('');
+  if(cSel) cSel.innerHTML=`<option value="">${t('trip.comp.select')}</option>`+us.map(u=>`<option value="${u.name}">${u.name}</option>`).join('');
   // 日期預設
   const sd=document.getElementById('tr-d-start');
   const ed=document.getElementById('tr-d-end');
@@ -4728,7 +4818,7 @@ function copyTrip(id){
   saveTripForm_SB(nf); // 同步到 SB
   toast('已複製，日期已調整為今天起','success');renderTripList();
 }
-async function deleteTrip(id){if(!confirm('確定刪除？'))return;await delTripForm(id);renderTripList();toast('已刪除','success');}
+async function deleteTrip(id){if(!confirm('確定刪除？'))return;await delTripForm(id);renderTripList();toast(t('g.toast.deleted'),'success');}
 
 // ── DOCX 產生 ──
 function genDocx(data){
@@ -5308,7 +5398,7 @@ function initBkForm(){
   // host select
   const us=ld(K.us);
   const hs=document.getElementById('bk-host');
-  if(hs)hs.innerHTML='<option value="">請選擇…</option>'+us.map(u=>`<option value="${u.id}">${u.name}（${u.dept||''}）</option>`).join('');
+  if(hs)hs.innerHTML=`<option value="">${t('g.select')}</option>`+us.map(u=>`<option value="${u.id}">${u.name}（${u.dept||''}）</option>`).join('');
   updateSlots();
 }
 
@@ -5330,7 +5420,7 @@ function iInitBkForm(){
   if(dateEl&&!dateEl.value)dateEl.value=todayStr2();
   const us=ld(K.us);
   const hs=document.getElementById('ibk-host');
-  if(hs)hs.innerHTML='<option value="">請選擇…</option>'+us.map(u=>`<option value="${u.id}">${u.name}（${u.dept||''}）</option>`).join('');
+  if(hs)hs.innerHTML=`<option value="">${t('g.select')}</option>`+us.map(u=>`<option value="${u.id}">${u.name}（${u.dept||''}）</option>`).join('');
   iUpdateSlots();
 }
 function iBkGoStep(n){
@@ -5828,15 +5918,15 @@ async function renderFaults(){
         <div>
           <div style="font-weight:600;margin-bottom:3px">${room?.icon||''} ${room?.name||'—'} · ${f.equip||'—'}</div>
           <div style="color:var(--t2);margin-bottom:3px">${f.desc||'—'}</div>
-          <div style="color:var(--t3);font-size:10px">回報人：${gUsr(f.reporterId)?.name||f.reporterId||'—'} · ${f.createdAt?.slice(0,16)||'—'}</div>
+          <div style="color:var(--t3);font-size:10px">${t('room.fault.reporter_lbl')}${gUsr(f.reporterId)?.name||f.reporterId||'—'} · ${f.createdAt?.slice(0,16)||'—'}</div>
         </div>
         <div style="display:flex;flex-direction:column;gap:5px;flex-shrink:0">
-          <span class="badge ${f.status==='resolved'?'bg':'br'}">${f.status==='resolved'?'已修復':'待修'}</span>
-          ${f.status!=='resolved'?`<button class="btn bg2 bsm" onclick="resolveFault('${f.id}')">標記已修</button>`:''}
+          <span class="badge ${f.status==='resolved'?'bg':'br'}">${f.status==='resolved'?t('room.fault.resolved'):t('room.fault.open')}</span>
+          ${f.status!=='resolved'?`<button class="btn bg2 bsm" onclick="resolveFault('${f.id}')">${t('room.fault.resolved')}</button>`:''}
         </div>
       </div>
     </div>`;
-  }).join(''):'<div class="es"><div class="ei">🔧</div><p>目前無故障回報</p></div>';
+  }).join(''):`<div class="es"><div class="ei">🔧</div><p>${t('room.fault.none')}</p></div>`;
   updRoomBadge();
 }
 function openFaultModal(roomId){
@@ -5844,7 +5934,7 @@ function openFaultModal(roomId){
   const rSel=document.getElementById('ft-room');
   if(rSel){rSel.innerHTML=visRooms().map(r=>`<option value="${r.id}">${SITEFLAGS[r.site]||''} ${r.name}</option>`).join('');if(roomId)rSel.value=roomId;}
   const rep=document.getElementById('ft-reporter');
-  if(rep)rep.innerHTML='<option value="">請選擇…</option>'+us.map(u=>`<option value="${u.id}">${u.name}</option>`).join('');
+  if(rep)rep.innerHTML=`<option value="">${t('g.select')}</option>`+us.map(u=>`<option value="${u.id}">${u.name}</option>`).join('');
   document.getElementById('ft-desc').value='';
   openMo('mo-fault');
 }
@@ -5863,14 +5953,14 @@ function submitFault(){
   const arr=getFaults();arr.push(f);saveFaults(arr);
   saveRoomFault(f); // 同步到 SB
   closeMo('mo-fault');
-  toast('⚠ 故障已回報，IT 將盡快處理','warn');
+  toast(t('g.toast.fault_reported'),'warn');
   updRoomBadge();
   navRoom('room-fault');
 }
 async function resolveFault(id){
   const arr=getFaults();const i=arr.findIndex(f=>f.id===id);
   if(i>=0){arr[i].status='resolved';saveFaults(arr);saveRoomFault(arr[i]);}
-  renderFaults();toast('已標記修復','success');updRoomBadge();
+  renderFaults();toast(t('g.toast.fault_resolved'),'success');updRoomBadge();
 }
 function updRoomBadge(){
   const open=getFaults().filter(f=>f.status==='open').length;
@@ -5991,7 +6081,7 @@ function initVisitForm(){
   const us=ld(K.us);
   // owner select
   const os=document.getElementById('vf-owner');
-  if(os)os.innerHTML='<option value="">請選擇…</option>'+us.map(u=>`<option value="${u.id}">${u.name}</option>`).join('');
+  if(os)os.innerHTML=`<option value="">${t('g.select')}</option>`+us.map(u=>`<option value="${u.id}">${u.name}</option>`).join('');
   // guest db select
   const gs=document.getElementById('vf-guest-sel');
   if(gs)gs.innerHTML='<option value="">從資料庫選…</option>'+getGuests().map(g=>`<option value="${g.id}">${g.name}（${g.company||''}）</option>`).join('');
@@ -6182,7 +6272,7 @@ function editVisit(id){
   setTimeout(()=>{
     const us=ld(K.us);
     const os=document.getElementById('vf-owner');
-    if(os)os.innerHTML='<option value="">請選擇…</option>'+us.map(u=>`<option value="${u.id}">${u.name}</option>`).join('');
+    if(os)os.innerHTML=`<option value="">${t('g.select')}</option>`+us.map(u=>`<option value="${u.id}">${u.name}</option>`).join('');
     const gs=document.getElementById('vf-guest-sel');
     if(gs)gs.innerHTML='<option value="">從資料庫選…</option>'+getGuests().map(g=>`<option value="${g.id}">${g.name}（${g.company||''}）</option>`).join('');
     document.getElementById('vf-company').value=v.company||'';
@@ -6290,7 +6380,7 @@ async function renderVisitList(){
     </td></tr>`;
   }).join(''):'<tr><td colspan="9" class="tdm" style="text-align:center;padding:22px">無到訪記錄</td></tr>';
 }
-async function deleteVisit(id){if(!confirm('確定刪除？'))return;await delVisitRecord(id);renderVisitList();toast('已刪除','success');}
+async function deleteVisit(id){if(!confirm('確定刪除？'))return;await delVisitRecord(id);renderVisitList();toast(t('g.toast.deleted'),'success');}
 
 // ── Guest DB ──
 async function renderGuestDB(){
@@ -6354,7 +6444,7 @@ function saveGuest(){
   // auto add to vfGuests if in form context
   if(!editGuestId&&data.name){const g=arr[arr.length-1];vfGuests.push({guestId:g.id,name:g.name,title:g.title||'',note:''});renderVfGuests();}
 }
-async function deleteGuest(id){if(!confirm('確定刪除？'))return;await delVisitGuest(id);renderGuestDB();toast('已刪除','success');}
+async function deleteGuest(id){if(!confirm('確定刪除？'))return;await delVisitGuest(id);renderGuestDB();toast(t('g.toast.deleted'),'success');}
 
 // ── Broadcast ──
 function openBroadcast(visitId){

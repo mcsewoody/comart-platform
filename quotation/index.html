@@ -292,7 +292,7 @@ img{display:block}
       <div class="logo-mark">C</div>
       <div>
         <div class="logo-text">COMART</div>
-        <div id="appVersionDiv" style="font-size:10px;color:var(--ac);font-weight:600;letter-spacing:.04em;line-height:1.3">v3.50</div>
+        <div id="appVersionDiv" style="font-size:10px;color:var(--ac);font-weight:600;letter-spacing:.04em;line-height:1.3">v3.51</div>
       </div>
     </div>
     <div class="topbar-right">
@@ -2238,6 +2238,44 @@ function applyLang(){
   s('qf-all','all');s('qf-draft','draft');s('qf-sent','sent');
   // Nav labels
   s('np-quotes','quotes');s('np-products','products');s('np-files','files');s('np-crm','crm');s('np-settings','settings');
+  // Account modal labels & options
+  s('acct-lbl-company','acctCompanyName'); s('acct-lbl-country','acctCountry'); s('acct-lbl-industry','acctIndustry');
+  s('acct-lbl-type','acctType'); s('acct-lbl-status','acctStatus'); s('acct-lbl-source','acctSource');
+  s('acct-lbl-factory','acctFactory'); s('acct-lbl-website','acctWebsite'); s('acct-lbl-owner','acctOwner'); s('acct-lbl-notes','acctNotes');
+  s('acct-lbl-tabcontacts','tabContactsLabel'); s('acct-lbl-tabactivities','tabActivitiesLabel');
+  s('acct-lbl-tabquotes','tabQuoteHistory'); s('acct-lbl-tabtasks','tabTasksLabel');
+  s('acct-save-btn','saveAccount'); s('acct-cancel-btn','cancel');
+  s('acct-opt-brand','typeBrand'); s('acct-opt-distributor','typeDistributor'); s('acct-opt-retailer','typeRetailer');
+  s('acct-opt-manufacturer','typeManufacturer'); s('acct-opt-other','typeOther');
+  s('acct-opt-statuslead','statusLead'); s('acct-opt-statusactive','statusActive'); s('acct-opt-statuscustomer','statusCustomer');
+  s('acct-opt-statuslost','statusLost'); s('acct-opt-statusdormant','statusDormant');
+  s('acct-opt-either','factoryEither'); s('acct-opt-china','factoryChina'); s('acct-opt-vietnam','factoryVietnam');
+  const _aac=document.getElementById('acct-add-contact-btn'); if(_aac) _aac.textContent=t('addContact');
+  const _aaa=document.getElementById('acct-add-activity-btn'); if(_aaa) _aaa.textContent=t('addActivityBtn');
+  const _aat=document.getElementById('acct-add-task-btn'); if(_aat) _aat.textContent=t('addTask');
+  // Contact modal
+  s('ct-modal-title','contactModal');
+  s('ct-lbl-name','ctName'); s('ct-lbl-title','ctJobTitle'); s('ct-lbl-role','ctRole'); s('ct-lbl-phone','ctPhone');
+  s('ct-opt-decision','roleDecision'); s('ct-opt-purchasing','rolePurchasing'); s('ct-opt-engineer','roleEngineer');
+  s('ct-opt-owner','roleOwner'); s('ct-opt-other','roleOther');
+  const _ctsv=document.getElementById('ct-save-btn'); if(_ctsv) _ctsv.textContent='💾 '+t('save');
+  s('ct-cancel-btn','cancel');
+  // Activity modal
+  s('av-modal-title','activityModal');
+  s('av-lbl-type','avType'); s('av-lbl-date','avDate'); s('av-lbl-summary','avSummary');
+  s('av-lbl-detail','avDetail'); s('av-lbl-followup','avFollowup');
+  s('av-opt-meeting','actMeeting'); s('av-opt-show','actShow'); s('av-opt-quote','actQuote');
+  s('av-opt-sample','actSample'); s('av-opt-contract','actContract'); s('av-opt-order','actOrder');
+  s('av-opt-email','actEmail'); s('av-opt-call','actCall'); s('av-opt-note','actNote');
+  const _avsv=document.getElementById('av-save-btn'); if(_avsv) _avsv.textContent='💾 '+t('save');
+  s('av-cancel-btn','cancel');
+  // Task modal
+  s('tk-modal-title','taskModal');
+  s('tk-lbl-content','tkContent'); s('tk-lbl-due','tkDue'); s('tk-lbl-priority','tkPriority');
+  s('tk-lbl-account','tkAccount'); s('tk-lbl-notes','tkNotes');
+  s('tk-opt-high','priHigh'); s('tk-opt-med','priMed'); s('tk-opt-low','priLow');
+  const _tksv=document.getElementById('tk-save-btn'); if(_tksv) _tksv.textContent='💾 '+t('save');
+  s('tk-cancel-btn','cancel');
   // Re-render current page to sync language
   if(page==='products') renderProductList();
   if(page==='settings') renderSettingsPage();

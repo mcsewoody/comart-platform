@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART KMS v2.17</title>
+<title>COMART KMS v2.18</title>
 
 <!-- Marked for Markdown → HTML preview (classic script, no module needed) -->
 <script src="https://cdn.jsdelivr.net/npm/marked@9.1.6/marked.min.js"></script>
@@ -391,7 +391,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v2.17</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v2.18</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('en')">EN</button>
@@ -1248,6 +1248,100 @@ const I18N = {
     'label.summary_start':'🤖 開始批次產生摘要…','label.summary_progress':'處理 {n}/{total}：{title}',
     'label.summary_done':'✅ 批次摘要完成，共處理 {n} 篇',
     'label.expert_empty':'尚無人員資料','label.expert_fail':'載入失敗：{msg}','label.expert_no_result':'無符合人員',
+    'btn.update_with_file':'更新文件（含新檔案）','btn.save_continue':'儲存並繼續（{cur}/{total}）',
+    'label.editor_loading':'編輯器載入中…',
+    'label.rag_searching':'搜尋知識庫中…','label.rag_analyzing':'AI 分析中，請稍候…',
+    'label.error_prefix':'錯誤：{msg}','label.connecting':'連線中…','label.conn_fail':'⚠ 連線失敗：{msg}',
+    'label.ai_answer':'🤖 AI 彙整回答 — 來源：知識庫（{n} 份相關文件）',
+    'label.ref_docs':'📎 參考文件（{n} 筆，依相關度排序）',
+    'label.search_cancelled':'已取消搜尋。',
+    'label.load_fail':'載入失敗','label.load_fail_msg':'載入失敗：{msg}',
+    'label.all_summarized':'✅ 所有文件都已有摘要！',
+    'btn.batch_summary':'🤖 批次產生摘要（補齊無摘要的文件）',
+    'label.batch_found':'找到 {n} 份無摘要文件，開始處理…',
+    'label.batch_summary_done':'✅ 完成！已處理 {n} 份文件',
+    'label.batch_fail':'❌ 失敗：{msg}',
+    'label.expert_no_site':'此 site 尚無人員資料',
+    'label.no_duplicates':'✅ 未發現重複文件',
+    'toast.dup_no_perm':'僅 Admin 或 DCC 可刪除重複文件',
+    'toast.delete_fail':'刪除失敗：{msg}',
+    'toast.dup_batch_no_perm':'僅 Admin 或 DCC 可批次刪除',
+    'toast.dup_select_first':'請先勾選要刪除的文件',
+    'toast.ai_prefilled':'已預填至編輯器，請驗證內容後再發佈',
+    'toast.parse_ok':'✅ 解析完成（{cur}/{total}）· {chars} 字元 — 確認欄位後按「儲存」',
+    'toast.parse_no_text':'⚠ 無法抽取文字（{cur}/{total}）— 可手動填寫後按「儲存」',
+    'toast.parse_fail':'解析失敗（{cur}/{total}）：{msg}',
+    'toast.no_files':'沒有可處理的檔案',
+    'toast.batch_done_ok':'批次完成：{ok} 筆成功',
+    'toast.batch_done_fail':'批次完成：{ok} 筆成功，{fail} 筆失敗',
+    'toast.batch_del_ok':'批次刪除完成：{ok} 份成功',
+    'toast.batch_del_fail':'批次刪除完成：{ok} 份成功，{fail} 份失敗',
+    'toast.republish_ok':'重新發佈完成：{ok} 份成功',
+    'toast.republish_fail':'重新發佈完成：{ok} 份成功，{fail} 份失敗',
+    'toast.republish_select':'請先勾選要重新發佈的文件',
+    'toast.file_too_large_mb':'檔案過大（{size} MB），上限為 50 MB',
+    'toast.file_parsed':'✅ 已解析 {size} · {chars} 字元',
+    'toast.doc_deleted_title':'「{title}」已刪除',
+    'toast.item_added':'已新增：{name}',
+    'toast.file_invalid_office':'下載的檔案不是有效的 Office 格式，Storage 連結可能已失效',
+    'toast.file_invalid_pdf':'下載的檔案不是有效 PDF，可能是 Storage 連結失效',
+    'toast.reparsing':'重新解析內容中…',
+    'toast.reparse_done_chars':'✅ 重新解析完成 · {chars} 字元，確認後按「更新文件」儲存',
+    'toast.no_extract':'無法從原始檔抽取文字，請手動貼上內容',
+    'toast.batch_cancelled':'已取消批次上傳',
+    'toast.no_supported_format':'沒有支援的檔案格式',
+    'toast.url_required':'請輸入網址',
+    'toast.url_invalid':'請輸入完整網址（含 https://）',
+    'toast.url_fetching':'⏳ 擷取中，請稍候…',
+    'toast.ai_processing':'⏳ AI 整理內容中…',
+    'toast.url_fetched':'✅ 內容已擷取完成',
+    'toast.url_fetch_fail':'擷取失敗：{msg}',
+    'toast.format_unsupported':'不支援此格式：{ext}',
+    'toast.parsing':'解析檔案內容中…',
+    'toast.no_text_fallback':'無法自動萃取文字，已填入檔名作為標題，可直接儲存原始檔',
+    'toast.parse_single_fail':'解析失敗：{msg}',
+    'toast.no_delete_perm':'你沒有刪除文件的權限（僅 Admin 或文件作者本人可刪除）',
+    'toast.upload_expired':'⚠ 此文件上傳已超過 2 天，無法刪除。如需刪除請聯繫管理員。',
+    'toast.demo_no_delete':'示範文件無法刪除',
+    'toast.delete_doc_fail':'刪除失敗：{msg}',
+    'toast.doc_load_fail':'文件載入失敗',
+    'toast.pl_name_required':'請輸入產品線名稱',
+    'toast.pl_exists':'此產品線已存在',
+    'toast.pl_add_fail':'新增失敗：{msg}',
+    'toast.comment_fail_msg':'留言失敗：{msg}',
+    'toast.copy_ok':'✅ 已複製全文',
+    'toast.answer_not_ready':'回答尚未完成，請稍候再儲存',
+    'toast.url_copied':'URL 已複製！在新電腦或新瀏覽器貼上此 URL 即可自動載入設定',
+    'toast.snapshot_fail':'快照讀取失敗',
+    'toast.restored_ver':'已還原至選取版本',
+    'toast.restore_fail':'還原失敗：{msg}',
+    'toast.ver_load_fail':'無法載入版本資料',
+    'toast.compare_fail':'比較失敗：{msg}',
+    'toast.restored_v':'已還原至 v{v}',
+    'toast.ver_not_exist':'版本資料不存在',
+    'toast.ver_fetch_fail':'載入版本失敗：{msg}',
+    'toast.sql_copied':'SQL 概要已複製，完整版見 setup.sql',
+    'toast.sql_full':'請從下載的 setup.sql 複製完整 SQL',
+    'toast.user_mgmt':'人員資料請至 Platform → User Management 管理',
+    'toast.copied_short':'已複製',
+    'toast.rate_limit':'Rate limit，{sec} 秒後重試（第 {n}/{max} 次）…',
+    'toast.rate_limit_retry':'Rate limit，{sec} 秒後重試…',
+    'toast.auto_archived':'📦 {n} 份文件已到期自動封存',
+    'toast.item_updated':'已更新：{name}',
+    'toast.update_fail':'更新失敗：{msg}',
+    'toast.item_deleted':'已刪除：{name}',
+    'toast.cat_deleted':'已刪除分類',
+    'toast.key_name_required':'請填寫 key 和名稱',
+    'toast.review_published':'✅ 已核准發佈：{title}',
+    'toast.review_draft':'↩ 已退回草稿：{title}',
+    'toast.review_withdrawn':'⚠ 已撤回：{title}',
+    'toast.review_withdrawn_note':'⚠ 已撤回：{title}，原因：{note}',
+    'toast.review_archived':'📦 已封存：{title}',
+    'toast.review_archived_note':'📦 已封存：{title}，原因：{note}',
+    'toast.review_done':'已執行：{action}',
+    'toast.ocr_start':'⏳ 圖片型 PDF，OCR 解析中（共 {total} 頁，處理前 {n} 頁）…',
+    'toast.ocr_page':'⏳ OCR 第 {n} / {total} 頁…',
+    'toast.show_user_articles':'顯示 {name} 的文章',
   },
   'zh-CN': {
     'nav.search':'AI 问答', 'nav.editor':'新增', 'nav.docs':'知识库',
@@ -1393,6 +1487,100 @@ const I18N = {
     'label.summary_start':'🤖 开始批次产生摘要…','label.summary_progress':'处理 {n}/{total}：{title}',
     'label.summary_done':'✅ 批次摘要完成，共处理 {n} 篇',
     'label.expert_empty':'暂无人员数据','label.expert_fail':'加载失败：{msg}','label.expert_no_result':'无符合人员',
+    'btn.update_with_file':'更新文档（含新文件）','btn.save_continue':'保存并继续（{cur}/{total}）',
+    'label.editor_loading':'编辑器加载中…',
+    'label.rag_searching':'搜索知识库中…','label.rag_analyzing':'AI 分析中，请稍候…',
+    'label.error_prefix':'错误：{msg}','label.connecting':'连线中…','label.conn_fail':'⚠ 连线失败：{msg}',
+    'label.ai_answer':'🤖 AI 汇总回答 — 来源：知识库（{n} 份相关文档）',
+    'label.ref_docs':'📎 参考文档（{n} 条，按相关度排序）',
+    'label.search_cancelled':'已取消搜索。',
+    'label.load_fail':'加载失败','label.load_fail_msg':'加载失败：{msg}',
+    'label.all_summarized':'✅ 所有文档都已有摘要！',
+    'btn.batch_summary':'🤖 批量生成摘要（补齐无摘要文档）',
+    'label.batch_found':'找到 {n} 份无摘要文档，开始处理…',
+    'label.batch_summary_done':'✅ 完成！已处理 {n} 份文档',
+    'label.batch_fail':'❌ 失败：{msg}',
+    'label.expert_no_site':'此 site 无人员资料',
+    'label.no_duplicates':'✅ 未发现重复文档',
+    'toast.dup_no_perm':'仅 Admin 或 DCC 可删除重复文档',
+    'toast.delete_fail':'删除失败：{msg}',
+    'toast.dup_batch_no_perm':'仅 Admin 或 DCC 可批次删除',
+    'toast.dup_select_first':'请先勾选要删除的文档',
+    'toast.ai_prefilled':'已预填至编辑器，请验证内容后再发布',
+    'toast.parse_ok':'✅ 解析完成（{cur}/{total}）· {chars} 字符 — 确认字段后点「保存」',
+    'toast.parse_no_text':'⚠ 无法提取文字（{cur}/{total}）— 可手动填写后点「保存」',
+    'toast.parse_fail':'解析失败（{cur}/{total}）：{msg}',
+    'toast.no_files':'没有可处理的文件',
+    'toast.batch_done_ok':'批次完成：{ok} 份成功',
+    'toast.batch_done_fail':'批次完成：{ok} 份成功，{fail} 份失败',
+    'toast.batch_del_ok':'批次删除完成：{ok} 份成功',
+    'toast.batch_del_fail':'批次删除完成：{ok} 份成功，{fail} 份失败',
+    'toast.republish_ok':'重新发布完成：{ok} 份成功',
+    'toast.republish_fail':'重新发布完成：{ok} 份成功，{fail} 份失败',
+    'toast.republish_select':'请先勾选要重新发布的文档',
+    'toast.file_too_large_mb':'文件过大（{size} MB），上限 50 MB',
+    'toast.file_parsed':'✅ 已解析 {size} · {chars} 字符',
+    'toast.doc_deleted_title':'「{title}」已删除',
+    'toast.item_added':'已添加：{name}',
+    'toast.file_invalid_office':'下载的文件不是有效的 Office 格式，Storage 链接可能已失效',
+    'toast.file_invalid_pdf':'下载的文件不是有效 PDF，可能是 Storage 链接失效',
+    'toast.reparsing':'重新解析内容中…',
+    'toast.reparse_done_chars':'✅ 重新解析完成 · {chars} 字符，确认后点「更新文档」保存',
+    'toast.no_extract':'无法自动提取文字，已填入文件名，可直接保存原始文件',
+    'toast.batch_cancelled':'已取消批次上传',
+    'toast.no_supported_format':'没有支持的文件格式',
+    'toast.url_required':'请输入网址',
+    'toast.url_invalid':'请输入完整网址（含 https://）',
+    'toast.url_fetching':'⏳ 提取中，请稍候…',
+    'toast.ai_processing':'⏳ AI 整理内容中…',
+    'toast.url_fetched':'✅ 内容已提取完成',
+    'toast.url_fetch_fail':'提取失败：{msg}',
+    'toast.format_unsupported':'不支持此格式：{ext}',
+    'toast.parsing':'解析文件内容中…',
+    'toast.no_text_fallback':'无法自动提取文字，已填入文件名，可直接保存原始文件',
+    'toast.parse_single_fail':'解析失败：{msg}',
+    'toast.no_delete_perm':'你没有删除文档的权限（仅 Admin 或文档作者可删除）',
+    'toast.upload_expired':'⚠ 此文档上传已超过 2 天，无法删除。如需删除请联系管理员。',
+    'toast.demo_no_delete':'示范文档无法删除',
+    'toast.delete_doc_fail':'删除失败：{msg}',
+    'toast.doc_load_fail':'文档加载失败',
+    'toast.pl_name_required':'请输入产品线名称',
+    'toast.pl_exists':'此产品线已存在',
+    'toast.pl_add_fail':'新增失败：{msg}',
+    'toast.comment_fail_msg':'留言失败：{msg}',
+    'toast.copy_ok':'✅ 已复制全文',
+    'toast.answer_not_ready':'回答尚未完成，请稍候再保存',
+    'toast.url_copied':'URL 已复制！在新电脑或浏览器粘贴此 URL 即可自动加载设置',
+    'toast.snapshot_fail':'快照读取失败',
+    'toast.restored_ver':'已还原至选取版本',
+    'toast.restore_fail':'还原失败：{msg}',
+    'toast.ver_load_fail':'无法加载版本数据',
+    'toast.compare_fail':'比较失败：{msg}',
+    'toast.restored_v':'已还原至 v{v}',
+    'toast.ver_not_exist':'版本数据不存在',
+    'toast.ver_fetch_fail':'加载版本失败：{msg}',
+    'toast.sql_copied':'SQL 概要已复制，完整版见 setup.sql',
+    'toast.sql_full':'请从下载的 setup.sql 复制完整 SQL',
+    'toast.user_mgmt':'人员数据请至 Platform → User Management 管理',
+    'toast.copied_short':'已复制',
+    'toast.rate_limit':'Rate limit，{sec} 秒后重试（第 {n}/{max} 次）…',
+    'toast.rate_limit_retry':'Rate limit，{sec} 秒后重试…',
+    'toast.auto_archived':'📦 {n} 份文档已到期自动封存',
+    'toast.item_updated':'已更新：{name}',
+    'toast.update_fail':'更新失败：{msg}',
+    'toast.item_deleted':'已删除：{name}',
+    'toast.cat_deleted':'已删除分类',
+    'toast.key_name_required':'请填写 key 和名称',
+    'toast.review_published':'✅ 已核准发布：{title}',
+    'toast.review_draft':'↩ 已退回草稿：{title}',
+    'toast.review_withdrawn':'⚠ 已撤回：{title}',
+    'toast.review_withdrawn_note':'⚠ 已撤回：{title}，原因：{note}',
+    'toast.review_archived':'📦 已封存：{title}',
+    'toast.review_archived_note':'📦 已封存：{title}，原因：{note}',
+    'toast.review_done':'已执行：{action}',
+    'toast.ocr_start':'⏳ 图片型 PDF，OCR 解析中（共 {total} 页，处理前 {n} 页）…',
+    'toast.ocr_page':'⏳ OCR 第 {n} / {total} 页…',
+    'toast.show_user_articles':'显示 {name} 的文章',
   },
   'en': {
     'nav.search':'AI Q&A', 'nav.editor':'Create', 'nav.docs':'Knowledge Base',
@@ -1540,6 +1728,100 @@ const I18N = {
     'label.summary_start':'🤖 Starting batch summary…','label.summary_progress':'Processing {n}/{total}: {title}',
     'label.summary_done':'✅ Batch summary done, {n} documents processed',
     'label.expert_empty':'No users yet','label.expert_fail':'Load failed: {msg}','label.expert_no_result':'No matching users',
+    'btn.update_with_file':'Update Document (with new file)','btn.save_continue':'Save & Next ({cur}/{total})',
+    'label.editor_loading':'Loading editor…',
+    'label.rag_searching':'Searching knowledge base…','label.rag_analyzing':'AI analyzing, please wait…',
+    'label.error_prefix':'Error: {msg}','label.connecting':'Connecting…','label.conn_fail':'⚠ Connection failed: {msg}',
+    'label.ai_answer':'🤖 AI Answer — Source: Knowledge Base ({n} related docs)',
+    'label.ref_docs':'📎 Reference Documents ({n}, by relevance)',
+    'label.search_cancelled':'Search cancelled.',
+    'label.load_fail':'Load failed','label.load_fail_msg':'Load failed: {msg}',
+    'label.all_summarized':'✅ All documents already have summaries!',
+    'btn.batch_summary':'🤖 Batch Summarize (fill missing)',
+    'label.batch_found':'Found {n} documents without summaries, starting…',
+    'label.batch_summary_done':'✅ Done! {n} documents processed',
+    'label.batch_fail':'❌ Failed: {msg}',
+    'label.expert_no_site':'No staff for this site',
+    'label.no_duplicates':'✅ No duplicate documents found',
+    'toast.dup_no_perm':'Only Admin or DCC can delete duplicates',
+    'toast.delete_fail':'Delete failed: {msg}',
+    'toast.dup_batch_no_perm':'Only Admin or DCC can batch delete',
+    'toast.dup_select_first':'Please select documents to delete first',
+    'toast.ai_prefilled':'Pre-filled to editor, please verify before publishing',
+    'toast.parse_ok':'✅ Parsed ({cur}/{total}) · {chars} chars — confirm fields then save',
+    'toast.parse_no_text':'⚠ No text extracted ({cur}/{total}) — fill in manually then save',
+    'toast.parse_fail':'Parse failed ({cur}/{total}): {msg}',
+    'toast.no_files':'No processable files',
+    'toast.batch_done_ok':'Batch complete: {ok} succeeded',
+    'toast.batch_done_fail':'Batch complete: {ok} succeeded, {fail} failed',
+    'toast.batch_del_ok':'Batch delete done: {ok} succeeded',
+    'toast.batch_del_fail':'Batch delete done: {ok} succeeded, {fail} failed',
+    'toast.republish_ok':'Re-publish done: {ok} succeeded',
+    'toast.republish_fail':'Re-publish done: {ok} succeeded, {fail} failed',
+    'toast.republish_select':'Please select documents to re-publish first',
+    'toast.file_too_large_mb':'File too large ({size} MB), max 50 MB',
+    'toast.file_parsed':'✅ Parsed {size} · {chars} chars',
+    'toast.doc_deleted_title':'"{title}" deleted',
+    'toast.item_added':'Added: {name}',
+    'toast.file_invalid_office':'Downloaded file is not a valid Office format — Storage URL may have expired',
+    'toast.file_invalid_pdf':'Downloaded file is not a valid PDF — Storage URL may have expired',
+    'toast.reparsing':'Re-parsing content…',
+    'toast.reparse_done_chars':'✅ Re-parsed · {chars} chars — confirm and click "Update Document" to save',
+    'toast.no_extract':'Could not extract text. File name used as title — you can save the original file directly',
+    'toast.batch_cancelled':'Batch upload cancelled',
+    'toast.no_supported_format':'No supported file formats',
+    'toast.url_required':'Please enter a URL',
+    'toast.url_invalid':'Please enter a full URL (including https://)',
+    'toast.url_fetching':'⏳ Fetching, please wait…',
+    'toast.ai_processing':'⏳ AI processing content…',
+    'toast.url_fetched':'✅ Content fetched successfully',
+    'toast.url_fetch_fail':'Fetch failed: {msg}',
+    'toast.format_unsupported':'Unsupported format: {ext}',
+    'toast.parsing':'Parsing file content…',
+    'toast.no_text_fallback':'Could not extract text. File name used as title — you can save the original file directly',
+    'toast.parse_single_fail':'Parse failed: {msg}',
+    'toast.no_delete_perm':'You do not have permission to delete (only Admin or document author)',
+    'toast.upload_expired':'⚠ This upload is over 2 days old and cannot be deleted. Contact admin if needed.',
+    'toast.demo_no_delete':'Demo documents cannot be deleted',
+    'toast.delete_doc_fail':'Delete failed: {msg}',
+    'toast.doc_load_fail':'Document load failed',
+    'toast.pl_name_required':'Please enter a product line name',
+    'toast.pl_exists':'This product line already exists',
+    'toast.pl_add_fail':'Add failed: {msg}',
+    'toast.comment_fail_msg':'Comment failed: {msg}',
+    'toast.copy_ok':'✅ Full text copied',
+    'toast.answer_not_ready':'Answer not ready yet, please wait before saving',
+    'toast.url_copied':'URL copied! Paste in a new computer or browser to auto-load settings',
+    'toast.snapshot_fail':'Snapshot read failed',
+    'toast.restored_ver':'Restored to selected version',
+    'toast.restore_fail':'Restore failed: {msg}',
+    'toast.ver_load_fail':'Could not load version data',
+    'toast.compare_fail':'Compare failed: {msg}',
+    'toast.restored_v':'Restored to v{v}',
+    'toast.ver_not_exist':'Version data not found',
+    'toast.ver_fetch_fail':'Load version failed: {msg}',
+    'toast.sql_copied':'SQL summary copied — see setup.sql for full version',
+    'toast.sql_full':'Please copy full SQL from downloaded setup.sql',
+    'toast.user_mgmt':'Manage users at Platform → User Management',
+    'toast.copied_short':'Copied',
+    'toast.rate_limit':'Rate limit — retrying in {sec}s (attempt {n}/{max})…',
+    'toast.rate_limit_retry':'Rate limit — retrying in {sec}s…',
+    'toast.auto_archived':'📦 {n} document(s) auto-archived due to expiry',
+    'toast.item_updated':'Updated: {name}',
+    'toast.update_fail':'Update failed: {msg}',
+    'toast.item_deleted':'Deleted: {name}',
+    'toast.cat_deleted':'Category deleted',
+    'toast.key_name_required':'Please fill in the key and name',
+    'toast.review_published':'✅ Approved & Published: {title}',
+    'toast.review_draft':'↩ Returned to Draft: {title}',
+    'toast.review_withdrawn':'⚠ Withdrawn: {title}',
+    'toast.review_withdrawn_note':'⚠ Withdrawn: {title}, Reason: {note}',
+    'toast.review_archived':'📦 Archived: {title}',
+    'toast.review_archived_note':'📦 Archived: {title}, Reason: {note}',
+    'toast.review_done':'Executed: {action}',
+    'toast.ocr_start':'⏳ Image-based PDF, OCR in progress ({total} pages total, processing first {n} pages)…',
+    'toast.ocr_page':'⏳ OCR page {n} / {total}…',
+    'toast.show_user_articles':'Showing articles by {name}',
   },
   'vi': {
     'nav.search':'Hỏi đáp AI', 'nav.editor':'Tạo mới', 'nav.docs':'Kho kiến thức',
@@ -1687,6 +1969,100 @@ const I18N = {
     'label.summary_start':'🤖 Bắt đầu tóm tắt hàng loạt…','label.summary_progress':'Đang xử lý {n}/{total}: {title}',
     'label.summary_done':'✅ Tóm tắt hoàn thành, đã xử lý {n} tài liệu',
     'label.expert_empty':'Chưa có dữ liệu','label.expert_fail':'Tải thất bại: {msg}','label.expert_no_result':'Không tìm thấy',
+    'btn.update_with_file':'Cập nhật tài liệu (kèm file mới)','btn.save_continue':'Lưu & tiếp ({cur}/{total})',
+    'label.editor_loading':'Đang tải trình soạn thảo…',
+    'label.rag_searching':'Đang tìm kiếm kho kiến thức…','label.rag_analyzing':'AI đang phân tích, vui lòng chờ…',
+    'label.error_prefix':'Lỗi: {msg}','label.connecting':'Đang kết nối…','label.conn_fail':'⚠ Kết nối thất bại: {msg}',
+    'label.ai_answer':'🤖 AI Tổng hợp — Nguồn: Kho KT ({n} tài liệu liên quan)',
+    'label.ref_docs':'📎 Tài liệu tham khảo ({n} mục, theo độ liên quan)',
+    'label.search_cancelled':'Đã hủy tìm kiếm.',
+    'label.load_fail':'Tải thất bại','label.load_fail_msg':'Tải thất bại: {msg}',
+    'label.all_summarized':'✅ Tất cả tài liệu đã có tóm tắt!',
+    'btn.batch_summary':'🤖 Tóm tắt hàng loạt (điền thiếu)',
+    'label.batch_found':'Tìm thấy {n} tài liệu chưa tóm tắt, bắt đầu…',
+    'label.batch_summary_done':'✅ Hoàn thành! Đã xử lý {n} tài liệu',
+    'label.batch_fail':'❌ Thất bại: {msg}',
+    'label.expert_no_site':'Không có nhân viên cho site này',
+    'label.no_duplicates':'✅ Không tìm thấy tài liệu trùng lặp',
+    'toast.dup_no_perm':'Chỉ Admin hoặc DCC mới được xóa tài liệu trùng lặp',
+    'toast.delete_fail':'Xóa thất bại: {msg}',
+    'toast.dup_batch_no_perm':'Chỉ Admin hoặc DCC mới được xóa hàng loạt',
+    'toast.dup_select_first':'Vui lòng chọn tài liệu cần xóa trước',
+    'toast.ai_prefilled':'Đã điền vào trình soạn thảo, vui lòng xác minh trước khi xuất bản',
+    'toast.parse_ok':'✅ Đã phân tích ({cur}/{total}) · {chars} ký tự — xác nhận và lưu',
+    'toast.parse_no_text':'⚠ Không trích xuất được văn bản ({cur}/{total}) — điền thủ công rồi lưu',
+    'toast.parse_fail':'Phân tích thất bại ({cur}/{total}): {msg}',
+    'toast.no_files':'Không có tệp nào để xử lý',
+    'toast.batch_done_ok':'Xong hàng loạt: {ok} thành công',
+    'toast.batch_done_fail':'Xong hàng loạt: {ok} thành công, {fail} thất bại',
+    'toast.batch_del_ok':'Xóa hàng loạt xong: {ok} thành công',
+    'toast.batch_del_fail':'Xóa hàng loạt xong: {ok} thành công, {fail} thất bại',
+    'toast.republish_ok':'Tái xuất bản xong: {ok} thành công',
+    'toast.republish_fail':'Tái xuất bản xong: {ok} thành công, {fail} thất bại',
+    'toast.republish_select':'Vui lòng chọn tài liệu để tái xuất bản trước',
+    'toast.file_too_large_mb':'Tệp quá lớn ({size} MB), tối đa 50 MB',
+    'toast.file_parsed':'✅ Đã phân tích {size} · {chars} ký tự',
+    'toast.doc_deleted_title':'Đã xóa "{title}"',
+    'toast.item_added':'Đã thêm: {name}',
+    'toast.file_invalid_office':'Tệp tải về không phải định dạng Office hợp lệ — liên kết Storage có thể đã hết hạn',
+    'toast.file_invalid_pdf':'Tệp tải về không phải PDF hợp lệ — liên kết Storage có thể đã hết hạn',
+    'toast.reparsing':'Đang phân tích lại nội dung…',
+    'toast.reparse_done_chars':'✅ Phân tích lại xong · {chars} ký tự — xác nhận rồi nhấn "Cập nhật tài liệu" để lưu',
+    'toast.no_extract':'Không trích xuất được văn bản. Tên tệp dùng làm tiêu đề — bạn có thể lưu tệp gốc trực tiếp',
+    'toast.batch_cancelled':'Đã hủy tải lên hàng loạt',
+    'toast.no_supported_format':'Không có định dạng tệp được hỗ trợ',
+    'toast.url_required':'Vui lòng nhập URL',
+    'toast.url_invalid':'Vui lòng nhập URL đầy đủ (bao gồm https://)',
+    'toast.url_fetching':'⏳ Đang tải, vui lòng chờ…',
+    'toast.ai_processing':'⏳ AI đang xử lý nội dung…',
+    'toast.url_fetched':'✅ Đã tải nội dung thành công',
+    'toast.url_fetch_fail':'Tải thất bại: {msg}',
+    'toast.format_unsupported':'Định dạng không được hỗ trợ: {ext}',
+    'toast.parsing':'Đang phân tích nội dung tệp…',
+    'toast.no_text_fallback':'Không trích xuất được văn bản. Tên tệp dùng làm tiêu đề — bạn có thể lưu tệp gốc trực tiếp',
+    'toast.parse_single_fail':'Phân tích thất bại: {msg}',
+    'toast.no_delete_perm':'Bạn không có quyền xóa (chỉ Admin hoặc tác giả tài liệu)',
+    'toast.upload_expired':'⚠ Tệp đã tải lên hơn 2 ngày, không thể xóa. Liên hệ quản trị viên nếu cần.',
+    'toast.demo_no_delete':'Không thể xóa tài liệu demo',
+    'toast.delete_doc_fail':'Xóa thất bại: {msg}',
+    'toast.doc_load_fail':'Tải tài liệu thất bại',
+    'toast.pl_name_required':'Vui lòng nhập tên dòng sản phẩm',
+    'toast.pl_exists':'Dòng sản phẩm này đã tồn tại',
+    'toast.pl_add_fail':'Thêm thất bại: {msg}',
+    'toast.comment_fail_msg':'Bình luận thất bại: {msg}',
+    'toast.copy_ok':'✅ Đã sao chép toàn văn',
+    'toast.answer_not_ready':'Câu trả lời chưa hoàn thành, vui lòng chờ trước khi lưu',
+    'toast.url_copied':'Đã sao chép URL! Dán vào máy tính hoặc trình duyệt mới để tự động tải cài đặt',
+    'toast.snapshot_fail':'Đọc snapshot thất bại',
+    'toast.restored_ver':'Đã khôi phục về phiên bản đã chọn',
+    'toast.restore_fail':'Khôi phục thất bại: {msg}',
+    'toast.ver_load_fail':'Không thể tải dữ liệu phiên bản',
+    'toast.compare_fail':'So sánh thất bại: {msg}',
+    'toast.restored_v':'Đã khôi phục về v{v}',
+    'toast.ver_not_exist':'Dữ liệu phiên bản không tồn tại',
+    'toast.ver_fetch_fail':'Tải phiên bản thất bại: {msg}',
+    'toast.sql_copied':'Đã sao chép tóm tắt SQL — xem setup.sql để lấy phiên bản đầy đủ',
+    'toast.sql_full':'Vui lòng sao chép SQL đầy đủ từ file setup.sql đã tải',
+    'toast.user_mgmt':'Quản lý nhân sự tại Platform → User Management',
+    'toast.copied_short':'Đã sao chép',
+    'toast.rate_limit':'Rate limit — thử lại sau {sec}s (lần {n}/{max})…',
+    'toast.rate_limit_retry':'Rate limit — thử lại sau {sec}s…',
+    'toast.auto_archived':'📦 {n} tài liệu đã tự động lưu trữ do hết hạn',
+    'toast.item_updated':'Đã cập nhật: {name}',
+    'toast.update_fail':'Cập nhật thất bại: {msg}',
+    'toast.item_deleted':'Đã xóa: {name}',
+    'toast.cat_deleted':'Đã xóa danh mục',
+    'toast.key_name_required':'Vui lòng điền key và tên',
+    'toast.review_published':'✅ Đã duyệt và xuất bản: {title}',
+    'toast.review_draft':'↩ Trả về bản nháp: {title}',
+    'toast.review_withdrawn':'⚠ Đã rút lại: {title}',
+    'toast.review_withdrawn_note':'⚠ Đã rút lại: {title}，Lý do: {note}',
+    'toast.review_archived':'📦 Đã lưu trữ: {title}',
+    'toast.review_archived_note':'📦 Đã lưu trữ: {title}，Lý do: {note}',
+    'toast.review_done':'Đã thực hiện: {action}',
+    'toast.ocr_start':'⏳ PDF dạng ảnh, đang OCR ({total} trang, xử lý {n} trang đầu)…',
+    'toast.ocr_page':'⏳ OCR trang {n} / {total}…',
+    'toast.show_user_articles':'Hiển thị bài viết của {name}',
   },
   'ja': {
     'nav.search':'AI 質問', 'nav.editor':'新規作成', 'nav.docs':'ナレッジベース',
@@ -1834,6 +2210,100 @@ const I18N = {
     'label.summary_start':'🤖 バッチ要約を開始…','label.summary_progress':'{n}/{total} 処理中：{title}',
     'label.summary_done':'✅ バッチ要約完了、{n}件処理しました',
     'label.expert_empty':'データなし','label.expert_fail':'読み込み失敗：{msg}','label.expert_no_result':'該当者なし',
+    'btn.update_with_file':'ドキュメントを更新（新しいファイル付き）','btn.save_continue':'保存して次へ（{cur}/{total}）',
+    'label.editor_loading':'エディターを読み込み中…',
+    'label.rag_searching':'ナレッジベースを検索中…','label.rag_analyzing':'AI分析中、しばらくお待ちください…',
+    'label.error_prefix':'エラー：{msg}','label.connecting':'接続中…','label.conn_fail':'⚠ 接続失敗：{msg}',
+    'label.ai_answer':'🤖 AI 回答 — ソース：ナレッジベース（{n} 件の関連文書）',
+    'label.ref_docs':'📎 参考文書（{n} 件、関連度順）',
+    'label.search_cancelled':'検索をキャンセルしました。',
+    'label.load_fail':'読み込み失敗','label.load_fail_msg':'読み込み失敗：{msg}',
+    'label.all_summarized':'✅ すべてのドキュメントに概要があります！',
+    'btn.batch_summary':'🤖 バッチ要約（未設定補完）',
+    'label.batch_found':'概要なし {n} 件を検出、処理開始…',
+    'label.batch_summary_done':'✅ 完了！{n} 件を処理しました',
+    'label.batch_fail':'❌ 失敗：{msg}',
+    'label.expert_no_site':'このサイトにスタッフがいません',
+    'label.no_duplicates':'✅ 重複ドキュメントは見つかりません',
+    'toast.dup_no_perm':'AdminまたはDCCのみ重複削除可能',
+    'toast.delete_fail':'削除に失敗しました：{msg}',
+    'toast.dup_batch_no_perm':'AdminまたはDCCのみ一括削除可能',
+    'toast.dup_select_first':'削除するドキュメントを先に選択してください',
+    'toast.ai_prefilled':'エディターに事前入力しました。公開前に内容を確認してください',
+    'toast.parse_ok':'✅ 解析完了（{cur}/{total}）· {chars} 文字 — フィールド確認後に保存',
+    'toast.parse_no_text':'⚠ テキスト抽出不可（{cur}/{total}）— 手入力後に保存',
+    'toast.parse_fail':'解析失敗（{cur}/{total}）：{msg}',
+    'toast.no_files':'処理可能なファイルがありません',
+    'toast.batch_done_ok':'バッチ完了：{ok} 件成功',
+    'toast.batch_done_fail':'バッチ完了：{ok} 件成功、{fail} 件失敗',
+    'toast.batch_del_ok':'一括削除完了：{ok} 件成功',
+    'toast.batch_del_fail':'一括削除完了：{ok} 件成功、{fail} 件失敗',
+    'toast.republish_ok':'再公開完了：{ok} 件成功',
+    'toast.republish_fail':'再公開完了：{ok} 件成功、{fail} 件失敗',
+    'toast.republish_select':'再公開するドキュメントを先に選択してください',
+    'toast.file_too_large_mb':'ファイルが大きすぎます（{size} MB）、上限 50 MB',
+    'toast.file_parsed':'✅ 解析完了 {size} · {chars} 文字',
+    'toast.doc_deleted_title':'「{title}」を削除しました',
+    'toast.item_added':'追加しました：{name}',
+    'toast.file_invalid_office':'ダウンロードしたファイルは有効な Office 形式ではありません — Storage URLの有効期限が切れた可能性があります',
+    'toast.file_invalid_pdf':'ダウンロードしたファイルは有効な PDF ではありません — Storage URLの有効期限が切れた可能性があります',
+    'toast.reparsing':'コンテンツを再解析中…',
+    'toast.reparse_done_chars':'✅ 再解析完了 · {chars} 文字 — 確認後「ドキュメントを更新」で保存',
+    'toast.no_extract':'テキストを抽出できませんでした。ファイル名をタイトルに設定 — そのまま原本を保存できます',
+    'toast.batch_cancelled':'一括アップロードをキャンセルしました',
+    'toast.no_supported_format':'サポートされているファイル形式がありません',
+    'toast.url_required':'URLを入力してください',
+    'toast.url_invalid':'完全なURL（https://を含む）を入力してください',
+    'toast.url_fetching':'⏳ 取得中、しばらくお待ちください…',
+    'toast.ai_processing':'⏳ AI がコンテンツを処理中…',
+    'toast.url_fetched':'✅ コンテンツの取得が完了しました',
+    'toast.url_fetch_fail':'取得失敗：{msg}',
+    'toast.format_unsupported':'サポートされていない形式：{ext}',
+    'toast.parsing':'ファイルコンテンツを解析中…',
+    'toast.no_text_fallback':'テキストを抽出できませんでした。ファイル名をタイトルに設定 — そのまま原本を保存できます',
+    'toast.parse_single_fail':'解析失敗：{msg}',
+    'toast.no_delete_perm':'削除権限がありません（AdminまたはドキュメントのみAuthorが削除可能）',
+    'toast.upload_expired':'⚠ このアップロードは 2 日以上経過しており削除できません。管理者にお問い合わせください。',
+    'toast.demo_no_delete':'デモドキュメントは削除できません',
+    'toast.delete_doc_fail':'削除失敗：{msg}',
+    'toast.doc_load_fail':'ドキュメントの読み込みに失敗しました',
+    'toast.pl_name_required':'製品ライン名を入力してください',
+    'toast.pl_exists':'この製品ラインはすでに存在します',
+    'toast.pl_add_fail':'追加失敗：{msg}',
+    'toast.comment_fail_msg':'コメントの送信に失敗しました：{msg}',
+    'toast.copy_ok':'✅ 全文をコピーしました',
+    'toast.answer_not_ready':'回答がまだ完了していません。しばらく待ってから保存してください',
+    'toast.url_copied':'URLをコピーしました！新しいコンピュータまたはブラウザに貼り付けると設定が自動読み込みされます',
+    'toast.snapshot_fail':'スナップショットの読み取りに失敗しました',
+    'toast.restored_ver':'選択したバージョンに復元しました',
+    'toast.restore_fail':'復元失敗：{msg}',
+    'toast.ver_load_fail':'バージョンデータを読み込めませんでした',
+    'toast.compare_fail':'比較失敗：{msg}',
+    'toast.restored_v':'v{v} に復元しました',
+    'toast.ver_not_exist':'バージョンデータが存在しません',
+    'toast.ver_fetch_fail':'バージョンの読み込み失敗：{msg}',
+    'toast.sql_copied':'SQL概要をコピーしました — 完全版は setup.sql を参照',
+    'toast.sql_full':'ダウンロードした setup.sql から完全な SQL をコピーしてください',
+    'toast.user_mgmt':'ユーザー管理は Platform → User Management から',
+    'toast.copied_short':'コピーしました',
+    'toast.rate_limit':'レート制限 — {sec}秒後に再試行（{n}/{max}回目）…',
+    'toast.rate_limit_retry':'レート制限 — {sec}秒後に再試行…',
+    'toast.auto_archived':'📦 {n} 件のドキュメントが有効期限切れにより自動アーカイブされました',
+    'toast.item_updated':'更新しました：{name}',
+    'toast.update_fail':'更新に失敗しました：{msg}',
+    'toast.item_deleted':'削除しました：{name}',
+    'toast.cat_deleted':'カテゴリを削除しました',
+    'toast.key_name_required':'キーと名前を入力してください',
+    'toast.review_published':'✅ 承認・公開しました：{title}',
+    'toast.review_draft':'↩ 下書きに戻しました：{title}',
+    'toast.review_withdrawn':'⚠ 取り下げました：{title}',
+    'toast.review_withdrawn_note':'⚠ 取り下げました：{title}，理由：{note}',
+    'toast.review_archived':'📦 アーカイブしました：{title}',
+    'toast.review_archived_note':'📦 アーカイブしました：{title}，理由：{note}',
+    'toast.review_done':'実行しました：{action}',
+    'toast.ocr_start':'⏳ 画像型PDF、OCR処理中（全{total}ページ、先頭{n}ページ処理）…',
+    'toast.ocr_page':'⏳ OCR {n} / {total} ページ目…',
+    'toast.show_user_articles':'{name} の記事を表示',
   },
 };
 
@@ -2120,7 +2590,7 @@ function updateStatus() {
 // ═══════════════════════════════════════════════
 async function initTipTap() {
   const editorEl = document.getElementById('tiptap-editor');
-  editorEl.innerHTML = '<div style="color:var(--text-3);padding:20px;font-size:13px;">編輯器載入中…</div>';
+  editorEl.innerHTML = `<div style="color:var(--text-3);padding:20px;font-size:13px;">${t('label.editor_loading')}</div>`;
 
   try {
     // esm.sh 提供穩定的 ESM build，相容所有現代瀏覽器
@@ -2864,7 +3334,7 @@ async function reparseCurrentDoc() {
       const bytes = new Uint8Array(header);
       const isPK = bytes[0] === 0x50 && bytes[1] === 0x4B;
       if (!isPK) {
-        toast('下載的檔案不是有效的 Office 格式，Storage 連結可能已失效', 'error');
+        toast(t('toast.file_invalid_office'), 'error');
         if (tiptapEditor) tiptapEditor.commands.clearContent();
         return;
       }
@@ -2875,14 +3345,14 @@ async function reparseCurrentDoc() {
       const bytes = new Uint8Array(header);
       const isPdf = bytes[0] === 0x25 && bytes[1] === 0x50 && bytes[2] === 0x44 && bytes[3] === 0x46;
       if (!isPdf) {
-        toast('下載的檔案不是有效 PDF，可能是 Storage 連結失效', 'error');
+        toast(t('toast.file_invalid_pdf'), 'error');
         if (tiptapEditor) tiptapEditor.commands.clearContent();
         return;
       }
     }
     const file = new File([blob], fileName, { type: mimeType });
     if (tiptapEditor) tiptapEditor.commands.setContent('<p style="color:var(--text-3);font-style:italic;">⏳ 重新解析中，請稍候…</p>');
-    toast('重新解析內容中…', '');
+    toast(t('toast.reparsing'), '');
     // extractText 已內建 pdfjs 優先 → claude-proxy fallback
     const text = await extractText(file, ext);
     if (text && text.length > 10) {
@@ -2893,10 +3363,10 @@ async function reparseCurrentDoc() {
         .replace(/\n\n+/g, '</p><p>')
         .replace(/\n/g, '<br>');
       if (tiptapEditor) tiptapEditor.commands.setContent('<p>' + escaped + '</p>');
-      toast('✅ 重新解析完成 · ' + text.length + ' 字元，確認後按「更新文件」儲存', 'success');
+      toast(t('toast.reparse_done_chars').replace('{chars}', text.length), 'success');
     } else {
       if (tiptapEditor) tiptapEditor.commands.clearContent();
-      toast('無法從原始檔抽取文字，請手動貼上內容', '');
+      toast(t('toast.no_extract'), '');
     }
   } catch(e) {
     toast(t('toast.reparse_fail').replace('{msg}', e.message), 'error');
@@ -2935,11 +3405,11 @@ async function processBatchFiles(files) {
   const MAX_BYTES = 50 * 1024 * 1024;
   const validFiles = files.filter(f => {
     const ext = getExt(f.name);
-    if (!allowed.includes(ext)) { toast(`跳過不支援格式：${f.name}`, ''); return false; }
-    if (f.size > MAX_BYTES) { toast(`跳過過大檔案：${f.name}（${(f.size/1024/1024).toFixed(1)}MB > 50MB）`, ''); return false; }
+    if (!allowed.includes(ext)) { toast(t('toast.batch_unsupported').replace('{name}', f.name), ''); return false; }
+    if (f.size > MAX_BYTES) { toast(t('toast.batch_file_too_large').replace('{name}', f.name), ''); return false; }
     return true;
   });
-  if (!validFiles.length) { toast('沒有可處理的檔案', 'error'); return; }
+  if (!validFiles.length) { toast(t('toast.no_files'), 'error'); return; }
   _batchFiles = validFiles;
   _batchIdx = 0;
   _batchSuccess = 0;
@@ -2950,7 +3420,10 @@ async function processBatchFiles(files) {
 async function processBatchNext() {
   if (_batchIdx >= _batchFiles.length) {
     // 全部完成
-    toast(`批次完成：${_batchSuccess} 筆成功${_batchFail ? `，${_batchFail} 筆失敗` : ''}`, 'success');
+    const _batchMsg = _batchFail
+      ? t('toast.batch_done_fail').replace('{ok}', _batchSuccess).replace('{fail}', _batchFail)
+      : t('toast.batch_done_ok').replace('{ok}', _batchSuccess);
+    toast(_batchMsg, 'success');
     await loadDocs();
     switchPanel('docs');
     return;
@@ -3041,20 +3514,20 @@ async function processBatchNext() {
     if (text && text.length > 10) {
       const html = text.slice(0,50000).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n\n+/g,'</p><p>').replace(/\n/g,'<br>');
       if (tiptapEditor) tiptapEditor.commands.setContent('<p>' + html + '</p>');
-      toast(`✅ 解析完成（${current}/${total}）· ${text.length} 字元 — 確認欄位後按「儲存」`, 'success');
+      toast(t('toast.parse_ok').replace('{cur}', current).replace('{total}', total).replace('{chars}', text.length), 'success');
     } else {
       if (tiptapEditor) tiptapEditor.commands.clearContent();
-      toast(`⚠ 無法抽取文字（${current}/${total}）— 可手動填寫後按「儲存」`, '');
+      toast(t('toast.parse_no_text').replace('{cur}', current).replace('{total}', total), '');
     }
   } catch(e) {
     if (tiptapEditor) tiptapEditor.commands.clearContent();
-    toast(`解析失敗（${current}/${total}）：${e.message}`, 'error');
+    toast(t('toast.parse_fail').replace('{cur}', current).replace('{total}', total).replace('{msg}', e.message), 'error');
   }
 
   // 覆寫「儲存」按鈕行為：存完後自動進下一份
   const saveBtn = document.querySelector('.save-btn');
   if (saveBtn) {
-    saveBtn.textContent = `儲存並繼續（${current}/${total}）`;
+    saveBtn.textContent = t('btn.save_continue').replace('{cur}', current).replace('{total}', total);
     saveBtn.onclick = async () => {
       await saveDoc();
       _batchIdx++;
@@ -3078,7 +3551,7 @@ function skipAllBatch() {
   _batchFiles = [];
   _batchIdx = 0;
   document.getElementById('batch-progress-bar')?.remove();
-  toast('已取消批次上傳', '');
+  toast(t('toast.batch_cancelled'), '');
   if (window._openDocFromReview) {
     const _retFilter = window._openDocFromReview;
     window._openDocFromReview = false;
@@ -3094,7 +3567,7 @@ function skipAllBatch() {
 async function _processBatchFiles_legacy(files) {
   const allowed = ['pdf','doc','docx','xls','xlsx','csv','pptx','ppt','jpg','jpeg','png','txt','md'];
   const validFiles = files.filter(f => allowed.includes(getExt(f.name)));
-  if (!validFiles.length) { toast('沒有支援的檔案格式', 'error'); return; }
+  if (!validFiles.length) { toast(t('toast.no_supported_format'), 'error'); return; }
 }
 
 
@@ -3104,10 +3577,10 @@ async function _processBatchFiles_legacy(files) {
 async function fetchUrlContent() {
   const input = document.getElementById('url-fetch-input');
   const url = input?.value.trim();
-  if (!url) { toast('請輸入網址', ''); return; }
-  if (!url.startsWith('http')) { toast('請輸入完整網址（含 https://）', 'error'); return; }
+  if (!url) { toast(t('toast.url_required'), ''); return; }
+  if (!url.startsWith('http')) { toast(t('toast.url_invalid'), 'error'); return; }
 
-  toast('⏳ 擷取中，請稍候…', '', true);
+  toast(t('toast.url_fetching'), '', true);
   input.disabled = true;
 
   try {
@@ -3120,7 +3593,7 @@ async function fetchUrlContent() {
     const raw = await res.text();
     if (!raw || raw.length < 100) throw new Error('擷取到的內容太少，可能是需要登入的頁面');
 
-    toast('⏳ AI 整理內容中…', '', true);
+    toast(t('toast.ai_processing'), '', true);
 
     // 送給 Claude 整理成知識條目格式
     const organized = await callClaudeProxy(
@@ -3158,13 +3631,13 @@ async function fetchUrlContent() {
     if (srcEl) srcEl.value = url;
     input.value = '';
     toastClear();
-    toast('✅ 內容已擷取完成', 'success');
+    toast(t('toast.url_fetched'), 'success');
     // 擷取後立即觸發摘要（非同步）
     const _fetchedTitle = document.getElementById('doc-title')?.value || url;
     // 摘要由 saveDoc 儲存後自動觸發 generateAndSaveSummary
   } catch(e) {
     toastClear();
-    toast('擷取失敗：' + e.message, 'error');
+    toast(t('toast.url_fetch_fail').replace('{msg}', e.message), 'error');
   } finally {
     input.disabled = false;
   }
@@ -3174,7 +3647,7 @@ async function processFile(file) {
   const ext = getExt(file.name);
   const allowed = ['pdf','doc','docx','xls','xlsx','csv','pptx','ppt','jpg','jpeg','png','txt','md'];
   if (!allowed.includes(ext)) {
-    toast('不支援此格式：' + ext, 'error');
+    toast(t('toast.format_unsupported').replace('{ext}', ext), 'error');
     window._uploadBlocked = true;
     return;
   }
@@ -3184,7 +3657,7 @@ async function processFile(file) {
   const MAX_BYTES = 50 * 1024 * 1024; // 50MB
   if (file.size > MAX_BYTES) {
     const sizeMB = (file.size / 1024 / 1024).toFixed(1);
-    toast(`檔案過大（${sizeMB} MB），上限為 50 MB`, 'error');
+    toast(t('toast.file_too_large_mb').replace('{size}', sizeMB), 'error');
     window._uploadBlocked = true;
     return;
   }
@@ -3254,7 +3727,7 @@ ${dupList}
   showFilePreview(file, ext);
 
   // 解析文字並填入編輯器
-  toast('解析檔案內容中…', '');
+  toast(t('toast.parsing'), '');
   try {
     const text = await extractText(file, ext);
     // 確認此次解析仍是最新選取的檔案（防 race condition）
@@ -3270,7 +3743,7 @@ ${dupList}
         const ta = document.getElementById('tiptap-fallback');
         if (ta) ta.value = text.slice(0, 50000);
       }
-      toast(`✅ 已解析 ${formatBytes(file.size)} · ${text.length} 字元`, 'success');
+      toast(t('toast.file_parsed').replace('{size}', formatBytes(file.size)).replace('{chars}', text.length), 'success');
     } else {
       if (tiptapEditor) tiptapEditor.commands.clearContent();
       const titleEl = document.getElementById('doc-title');
@@ -3278,12 +3751,12 @@ ${dupList}
       if (!titleEl.value) titleEl.value = baseName;
       const extTag = ext.toUpperCase();
       if (!currentTags.includes(extTag)) { currentTags.push(extTag); renderTags(); }
-      toast('無法自動萃取文字，已填入檔名作為標題，可直接儲存原始檔', '');
+      toast(t('toast.no_text_fallback'), '');
     }
   } catch(e) {
     if (window._currentParseToken !== parseToken) return; // 已被新選檔取消
     if (tiptapEditor) tiptapEditor.commands.clearContent();
-    toast('解析失敗：' + e.message, 'error');
+    toast(t('toast.parse_single_fail').replace('{msg}', e.message), 'error');
     console.error(e);
   }
 }
@@ -3466,7 +3939,7 @@ async function callClaudeProxyRaw(body, timeoutMs = 60000) {
     if (attempt > 0) {
       // 指數退避：5s → 15s → 40s，加隨機 jitter
       const delay = (5000 * Math.pow(3, attempt - 1)) + Math.random() * 2000;
-      toast(`Rate limit，${Math.round(delay/1000)} 秒後重試（第 ${attempt}/${MAX_RETRIES-1} 次）…`, '');
+      toast(t('toast.rate_limit').replace('{sec}', Math.round(delay/1000)).replace('{n}', attempt).replace('{max}', MAX_RETRIES-1), '');
       await new Promise(r => setTimeout(r, delay));
     }
     const controller = new AbortController();
@@ -3479,7 +3952,7 @@ async function callClaudeProxyRaw(body, timeoutMs = 60000) {
         const retryAfter = parseInt(res.headers.get('retry-after') || '0') * 1000;
         lastErr = new Error('rate_limit_429');
         if (retryAfter > 0 && attempt < MAX_RETRIES - 1) {
-          toast(`Rate limit，${Math.round(retryAfter/1000)} 秒後重試…`, '');
+          toast(t('toast.rate_limit_retry').replace('{sec}', Math.round(retryAfter/1000)), '');
           await new Promise(r => setTimeout(r, retryAfter));
         }
         continue;
@@ -3569,11 +4042,11 @@ async function extractImagePdfWithVision(file) {
   const MAX_OCR_PAGES = 30; // Vision OCR 最多處理 30 頁（每頁需 API 呼叫）
   const pagesToProcess = Math.min(totalPages, MAX_OCR_PAGES);
 
-  toast(`⏳ 圖片型 PDF，OCR 解析中（共 ${totalPages} 頁，處理前 ${pagesToProcess} 頁）…`, '');
+  toast(t('toast.ocr_start').replace('{total}', totalPages).replace('{n}', pagesToProcess), '');
 
   const results = [];
   for (let i = 1; i <= pagesToProcess; i++) {
-    toast(`⏳ OCR 第 ${i} / ${pagesToProcess} 頁…`, '');
+    toast(t('toast.ocr_page').replace('{n}', i).replace('{total}', pagesToProcess), '');
     const page = await pdf.getPage(i);
     const viewport = page.getViewport({ scale: 1.5 }); // 1.5x 提高 OCR 精度
     const canvas = document.createElement('canvas');
@@ -3716,7 +4189,7 @@ function renderAuthorDropdown(users) {
   const dd = document.getElementById('author-dropdown');
   if (!dd) return;
   if (!users.length) {
-    dd.innerHTML = '<div style="padding:8px 12px;color:var(--text-3);font-size:12px;">無符合人員</div>';
+    dd.innerHTML = `<div style="padding:8px 12px;color:var(--text-3);font-size:12px;">${t('label.no_results')}</div>`;
     dd.style.display = 'block';
     return;
   }
@@ -3792,7 +4265,7 @@ function viewExpertDocs(nameEn) {
     if (searchEl) { searchEl.value = nameEn; }
     window._expertAuthorFilter = [nameEn];
     loadDocs();
-    toast(`顯示 ${nameEn} 的文章`, '');
+    toast(t('toast.show_user_articles').replace('{name}', nameEn), '');
   }, 100);
 }
 
@@ -3827,7 +4300,7 @@ async function loadReviewerUsers(forceRefresh = false) {
 function renderReviewerDropdown(users) {
   const dd = document.getElementById('reviewer-dropdown');
   if (!dd) return;
-  if (!users.length) { dd.innerHTML = '<div style="padding:8px 12px;color:var(--text-3);">無符合人員</div>'; return; }
+  if (!users.length) { dd.innerHTML = `<div style="padding:8px 12px;color:var(--text-3);">${t('label.no_results')}</div>`; return; }
   dd.innerHTML = users.slice(0, 50).map(u => `
     <div onclick="selectReviewer('${u.empId}','${u.nameEn||u.nameZh}')"
       style="padding:7px 12px;cursor:pointer;display:flex;gap:8px;align-items:center;"
@@ -3983,7 +4456,7 @@ async function loadSettingContent() {
 
 // ── Product Line 管理 ──
 async function loadSettingProductLines(wrap) {
-  wrap.innerHTML = '<div style="color:var(--text-3);font-size:13px;">載入中…</div>';
+  wrap.innerHTML = `<div style="color:var(--text-3);font-size:13px;">${t('label.loading')}</div>`;
   let lines = [];
   try {
     if (CFG.supabaseUrl && CFG.supabaseKey) {
@@ -4017,10 +4490,10 @@ async function addProductLine() {
   try {
     await kmsWrite('insert', 'kms_product_lines', { name, sort_order: 999, active: true });
     input.value = '';
-    toast('✅ 已新增：' + name, 'success');
+    toast(t('toast.item_added').replace('{name}', name), 'success');
     loadSettingContent();
     loadProductLines();
-  } catch(e) { toast('新增失敗：' + e.message, 'error'); }
+  } catch(e) { toast(t('toast.pl_add_fail').replace('{msg}', e.message), 'error'); }
 }
 
 async function updateProductLine(id, newName) {
@@ -4028,23 +4501,23 @@ async function updateProductLine(id, newName) {
   try {
     await kmsWrite('update', 'kms_product_lines', { name: newName }, id);
     loadProductLines();
-    toast('已更新：' + newName, 'success');
-  } catch(e) { toast('更新失敗：' + e.message, 'error'); }
+    toast(t('toast.item_updated').replace('{name}', newName), 'success');
+  } catch(e) { toast(t('toast.update_fail').replace('{msg}', e.message), 'error'); }
 }
 
 async function deleteProductLine(id, name) {
   if (!confirm(`確定刪除「${name}」？`)) return;
   try {
     await kmsWrite('delete', 'kms_product_lines', null, id);
-    toast('已刪除：' + name, '');
+    toast(t('toast.item_deleted').replace('{name}', name), '');
     loadSettingContent();
     loadProductLines();
-  } catch(e) { toast('刪除失敗：' + e.message, 'error'); }
+  } catch(e) { toast(t('toast.delete_fail').replace('{msg}', e.message), 'error'); }
 }
 
 // ── Categories 管理（從 DB 讀寫）──
 async function loadSettingCategories(wrap) {
-  wrap.innerHTML = '<div style="color:var(--text-3);font-size:13px;">載入中…</div>';
+  wrap.innerHTML = `<div style="color:var(--text-3);font-size:13px;">${t('label.loading')}</div>`;
   let rows = [];
   try {
     rows = await sbFetch('/rest/v1/kms_categories?select=id,cat_key,name,name_en,icon,color,sort_order&active=eq.true&order=sort_order.asc') || [];
@@ -4077,13 +4550,13 @@ async function addCategory() {
   const nameEn   = document.getElementById('cat-new-name')?.value.trim();
   const icon     = document.getElementById('cat-new-icon')?.value.trim() || '📁';
   const color    = document.getElementById('cat-new-color')?.value || '#6B7280';
-  if (!catKey || !nameEn) { toast('請填寫 key 和名稱', 'error'); return; }
+  if (!catKey || !nameEn) { toast(t('toast.key_name_required'), 'error'); return; }
   try {
     await kmsWrite('insert', 'kms_categories', { cat_key: catKey, name: nameEn, name_en: nameEn, icon, color, sort_order: 99, active: true });
-    toast('✅ 已新增分類：' + nameEn, 'success');
+    toast(t('toast.item_added').replace('{name}', nameEn), 'success');
     await loadCategoriesFromDB();
     loadSettingContent();
-  } catch(e) { toast('新增失敗：' + e.message, 'error'); }
+  } catch(e) { toast(t('toast.pl_add_fail').replace('{msg}', e.message), 'error'); }
 }
 
 async function updateCategoryName(id, catKey, newName) {
@@ -4095,8 +4568,8 @@ async function updateCategoryName(id, catKey, newName) {
     if (opt) opt.textContent = newName;
     const fopt = document.querySelector(`#docs-filter-cat option[value="${catKey}"]`);
     if (fopt) fopt.textContent = newName;
-    toast('已更新：' + newName, 'success');
-  } catch(e) { toast('更新失敗：' + e.message, 'error'); }
+    toast(t('toast.item_updated').replace('{name}', newName), 'success');
+  } catch(e) { toast(t('toast.update_fail').replace('{msg}', e.message), 'error'); }
 }
 
 async function deleteCategory(id, catKey) {
@@ -4106,8 +4579,8 @@ async function deleteCategory(id, catKey) {
     delete CAT_META[catKey];
     await loadCategoriesFromDB();
     loadSettingContent();
-    toast('已刪除分類', '');
-  } catch(e) { toast('刪除失敗：' + e.message, 'error'); }
+    toast(t('toast.cat_deleted'), '');
+  } catch(e) { toast(t('toast.delete_fail').replace('{msg}', e.message), 'error'); }
 }
 
 
@@ -4164,7 +4637,7 @@ async function checkAndArchiveExpired(docs) {
     } catch(e) { console.warn('[expire]', e.message); }
   }
   if (expired.length > 0) {
-    toast(`📦 ${expired.length} 份文件已到期自動封存`, '');
+    toast(t('toast.auto_archived').replace('{n}', expired.length), '');
     await loadDocs();
   }
 }
@@ -4314,10 +4787,10 @@ function updateEditorModeLabel() {
   const btn = document.querySelector('.save-btn');
   if (!btn) return;
   if (editingDocId) {
-    btn.textContent = '更新文件';
+    btn.textContent = t('editor.update');
     btn.style.background = 'var(--green)';
   } else {
-    btn.textContent = '儲存並向量化';
+    btn.textContent = t('editor.save');
     btn.style.background = 'var(--blue)';
   }
   // 重新解析按鈕：編輯既有文件，或新建但已上傳檔案時顯示
@@ -4334,9 +4807,9 @@ function refreshSaveBtnLabel() {
   const btn = document.querySelector('.save-btn');
   if (!btn) return;
   if (uploadedFile || uploadedFileUrl === '__REMOVE__') {
-    btn.textContent = '更新文件（含新檔案）';
+    btn.textContent = t('btn.update_with_file');
   } else {
-    btn.textContent = '更新文件';
+    btn.textContent = t('editor.update');
   }
 }
 
@@ -4464,7 +4937,7 @@ function cancelEdit() {
 async function deleteDoc(id, title, authorName) {
   // 權限檢查
   if (!canDelete(authorName)) {
-    toast('你沒有刪除文件的權限（僅 Admin 或文件作者本人可刪除）', 'error');
+    toast(t('toast.no_delete_perm'), 'error');
     return;
   }
   // 非 admin：2 天內才可刪（從 created_at 計算）
@@ -4476,7 +4949,7 @@ async function deleteDoc(id, title, authorName) {
         const createdAt = new Date(docData[0].created_at);
         const diffDays = (Date.now() - createdAt.getTime()) / (1000 * 60 * 60 * 24);
         if (diffDays > 2) {
-          toast(`⚠ 此文件上傳已超過 2 天，無法刪除。如需刪除請聯繫管理員。`, 'error');
+          toast(t('toast.upload_expired'), 'error');
           return;
         }
       }
@@ -4492,7 +4965,7 @@ async function deleteDoc(id, title, authorName) {
       localDocs = localDocs.filter(d => d.id !== id);
       localStorage.setItem('kms-local-docs', JSON.stringify(localDocs));
     } else {
-      toast('示範文件無法刪除', '');
+      toast(t('toast.demo_no_delete'), '');
       return;
     }
 
@@ -4501,7 +4974,7 @@ async function deleteDoc(id, title, authorName) {
     document.getElementById('doc-count').textContent = remaining;
     document.getElementById('docs-loaded').textContent = remaining;
 
-    toast(`「${title}」已刪除`, 'success');
+    toast(t('toast.doc_deleted_title').replace('{title}', title), 'success');
 
     // 若在 review panel，重新載入列表
     const reviewPanel = document.getElementById('panel-review');
@@ -4512,7 +4985,7 @@ async function deleteDoc(id, title, authorName) {
       }, 300);
     }
   } catch(e) {
-    toast('刪除失敗：' + e.message, 'error');
+    toast(t('toast.delete_doc_fail').replace('{msg}', e.message), 'error');
   }
 }
 
@@ -4529,7 +5002,7 @@ async function openDoc(id) {
     }
   } catch(e) {}
 
-  if (!doc) { toast('文件載入失敗', 'error'); return; }
+  if (!doc) { toast(t('toast.doc_load_fail'), 'error'); return; }
 
   document.getElementById('doc-title').value = doc.title;
   document.getElementById('doc-cat').value = doc.category || 'product';
@@ -4652,13 +5125,13 @@ async function doSearch() {
   if (aiBtn) aiBtn.disabled = true;
   if (!btn) return;
   btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span> <span onclick="cancelSearch()" style="cursor:pointer;text-decoration:underline;font-size:11px;">取消</span>';
+  btn.innerHTML = `<span class="spinner"></span> <span onclick="cancelSearch()" style="cursor:pointer;text-decoration:underline;font-size:11px;">${t('btn.cancel')}</span>`;
 
   const ragBody = document.getElementById('rag-body');
   if (!ragBody) { btn.disabled = false; return; }
   const ragEmpty = document.getElementById('rag-empty');
   if (ragEmpty) ragEmpty.style.display = 'none';
-  ragBody.innerHTML = `<div style="display:flex;align-items:center;gap:8px;color:var(--text-3);font-size:13px;"><span class="spinner"></span>搜尋知識庫中…</div>`;
+  ragBody.innerHTML = `<div style="display:flex;align-items:center;gap:8px;color:var(--text-3);font-size:13px;"><span class="spinner"></span>${t('label.rag_searching')}</div>`;
   window._searchAborted = false;
 
   try {
@@ -4720,7 +5193,7 @@ async function doSearch() {
 
   } catch(e) {
     if (!window._searchAborted) {
-      ragBody.innerHTML = `<div style="color:var(--red);font-size:13px;">錯誤：${e.message}</div>`;
+      ragBody.innerHTML = `<div style="color:var(--red);font-size:13px;">${t('label.error_prefix').replace('{msg}', e.message)}</div>`;
     }
   } finally {
     const aiBtn2 = document.getElementById('ai-search-btn');
@@ -4743,7 +5216,7 @@ async function doAiSearch() {
   if (!ragBody) { if (aiBtn) { aiBtn.disabled = false; aiBtn.innerHTML = '<span data-i18n="rag.ai_btn">🤖 AI 搜尋</span>'; } return; }
   const ragEmpty = document.getElementById('rag-empty');
   if (ragEmpty) ragEmpty.style.display = 'none';
-  ragBody.innerHTML = `<div style="display:flex;align-items:center;gap:8px;color:var(--text-3);font-size:13px;"><span class="spinner"></span> AI 分析中，請稍候…</div>`;
+  ragBody.innerHTML = `<div style="display:flex;align-items:center;gap:8px;color:var(--text-3);font-size:13px;"><span class="spinner"></span> ${t('label.rag_analyzing')}</div>`;
   window._searchAborted = false;
 
   try {
@@ -4784,7 +5257,7 @@ async function doAiSearch() {
 
     ragBody.innerHTML = `
       <div class="ai-answer">
-        <div class="ai-label">🤖 AI 彙整回答 — 來源：知識庫（${topChunks.length} 份相關文件）</div>
+        <div class="ai-label">${t('label.ai_answer').replace('{n}', topChunks.length)}</div>
         <div class="ai-text streaming" id="ai-output"></div>
       </div>
       <div class="ref-docs" id="ref-docs-container"></div>`;
@@ -4794,7 +5267,7 @@ async function doAiSearch() {
     // 渲染參考文件（顯示 hybrid score）
     const refContainer = document.getElementById('ref-docs-container');
     if (refContainer && displayChunks.length) {
-      refContainer.innerHTML = `<div class="ref-docs-title">📎 參考文件（${displayChunks.length} 筆，依相關度排序）</div>` +
+      refContainer.innerHTML = `<div class="ref-docs-title">${t('label.ref_docs').replace('{n}', displayChunks.length)}</div>` +
         displayChunks.map(c => {
           const pct = Math.round((c.hybridScore || c.score || 0) * 100);
           const inContext = topChunks.some(t => t.id === c.id);
@@ -4808,7 +5281,7 @@ async function doAiSearch() {
     }
   } catch(e) {
     if (!window._searchAborted) {
-      ragBody.innerHTML = `<div style="color:var(--red);font-size:13px;">錯誤：${e.message}</div>`;
+      ragBody.innerHTML = `<div style="color:var(--red);font-size:13px;">${t('label.error_prefix').replace('{msg}', e.message)}</div>`;
     }
   } finally {
     if (aiBtn) { aiBtn.disabled = false; aiBtn.innerHTML = '<span data-i18n="rag.ai_btn">🤖 AI 搜尋</span>'; }
@@ -4820,7 +5293,7 @@ function cancelSearch() {
   window._searchAborted = true;
   resetSearchBtn();
   document.getElementById('rag-body').innerHTML =
-    '<div style="color:var(--text-3);font-size:13px;padding:20px;">已取消搜尋。</div>';
+    `<div style="color:var(--text-3);font-size:13px;padding:20px;">${t('label.search_cancelled')}</div>`;
 }
 
 function getSnippetForLang(chunk, lang) {
@@ -5022,7 +5495,7 @@ async function callClaudeProxy(system, user, maxTokens = 1500) {
 async function streamClaude(system, user) {
   const el = document.getElementById('ai-output');
   if (!el) return;
-  el.textContent = '連線中…';
+  el.textContent = t('label.connecting');
   el.classList.add('streaming');
 
   try {
@@ -5033,7 +5506,7 @@ async function streamClaude(system, user) {
       if (i % 60 === 0) await new Promise(r => setTimeout(r, 8));
     }
   } catch(e) {
-    el.textContent = `⚠ 連線失敗：${e.message}`;
+    el.textContent = t('label.conn_fail').replace('{msg}', e.message);
   } finally {
     el.classList.remove('streaming');
   }
@@ -5113,8 +5586,8 @@ function closeAddProductLineModal() {
 
 async function saveNewProductLine() {
   const name = document.getElementById('new-product-line-input').value.trim();
-  if (!name) { toast('請輸入產品線名稱', 'error'); return; }
-  if (PRODUCT_LINES.includes(name)) { toast('此產品線已存在', ''); closeAddProductLineModal(); return; }
+  if (!name) { toast(t('toast.pl_name_required'), 'error'); return; }
+  if (PRODUCT_LINES.includes(name)) { toast(t('toast.pl_exists'), ''); closeAddProductLineModal(); return; }
 
   try {
     if (CFG.supabaseUrl && CFG.supabaseKey) {
@@ -5126,9 +5599,9 @@ async function saveNewProductLine() {
     const sel = document.getElementById('doc-product-line');
     if (sel) sel.value = name;
     closeAddProductLineModal();
-    toast(`已新增：${name}`, 'success');
+    toast(t('toast.item_added').replace('{name}', name), 'success');
   } catch(e) {
-    toast('新增失敗：' + e.message, 'error');
+    toast(t('toast.pl_add_fail').replace('{msg}', e.message), 'error');
   }
 }
 
@@ -5194,7 +5667,7 @@ async function openReader(id) {
     }
   } catch(e) {}
 
-  if (!doc) { toast('文件載入失敗', 'error'); return; }
+  if (!doc) { toast(t('toast.doc_load_fail'), 'error'); return; }
   _readerDoc = doc;
 
   // 標題
@@ -5230,7 +5703,7 @@ async function openReader(id) {
   const dlBtn = document.getElementById('reader-dl-btn');
   if (doc.file_url) {
     dlBtn.style.display = '';
-    dlBtn.textContent = `↓ ${doc.file_name || '下載原始檔'}`;
+    dlBtn.textContent = doc.file_name ? `↓ ${doc.file_name}` : t('btn.download');
   } else {
     dlBtn.style.display = 'none';
   }
@@ -5279,11 +5752,11 @@ async function loadReaderComments() {
   const docId = window._readerDocId;
   const list  = document.getElementById('reader-comment-list');
   if (!docId || !list) return;
-  list.innerHTML = '<div style="color:var(--text-3);font-size:12px;">載入中…</div>';
+  list.innerHTML = `<div style="color:var(--text-3);font-size:12px;">${t('label.loading')}</div>`;
   try {
     const rows = await sbFetch(`/rest/v1/kms_comments?doc_id=eq.${docId}&select=id,body,author,created_at&order=created_at.asc`) || [];
     if (!rows.length) {
-      list.innerHTML = '<div style="color:var(--text-3);font-size:12px;text-align:center;padding:12px 0;">尚無留言</div>';
+      list.innerHTML = `<div style="color:var(--text-3);font-size:12px;text-align:center;padding:12px 0;">${t('label.comments_empty')}</div>`;
       return;
     }
     list.innerHTML = rows.map(c => {
@@ -5296,7 +5769,7 @@ async function loadReaderComments() {
         <div style="font-size:13px;color:var(--text);line-height:1.5;">${c.body||''}</div>
       </div>`;
     }).join('');
-  } catch(e) { list.innerHTML = '<div style="color:var(--text-3);font-size:12px;">載入失敗</div>'; }
+  } catch(e) { list.innerHTML = `<div style="color:var(--text-3);font-size:12px;">${t('label.load_fail')}</div>`; }
 }
 
 async function submitReaderComment() {
@@ -5311,7 +5784,7 @@ async function submitReaderComment() {
     });
     input.value = '';
     await loadReaderComments();
-  } catch(e) { toast('留言失敗：' + e.message, 'error'); }
+  } catch(e) { toast(t('toast.comment_fail_msg').replace('{msg}', e.message), 'error'); }
 }
 
 function copyReaderContent() {
@@ -5319,7 +5792,7 @@ function copyReaderContent() {
   if (!bodyEl) return;
   const text = bodyEl.innerText || bodyEl.textContent || '';
   navigator.clipboard?.writeText(text)
-    .then(() => toast('✅ 已複製全文', 'success'))
+    .then(() => toast(t('toast.copy_ok'), 'success'))
     .catch(() => {
       // fallback
       const ta = document.createElement('textarea');
@@ -5328,7 +5801,7 @@ function copyReaderContent() {
       ta.select();
       document.execCommand('copy');
       document.body.removeChild(ta);
-      toast('✅ 已複製全文', 'success');
+      toast(t('toast.copy_ok'), 'success');
     });
 }
 
@@ -5506,7 +5979,7 @@ function saveExternalAnswerToKB(query, answerId) {
   const answerEl = document.getElementById(answerId);
   const answerText = answerEl?.textContent || '';
   if (!answerText || answerText === '連線中…') {
-    toast('回答尚未完成，請稍候再儲存', '');
+    toast(t('toast.answer_not_ready'), '');
     return;
   }
   // 切換到編輯器，預填內容
@@ -5525,14 +5998,14 @@ function saveExternalAnswerToKB(query, answerId) {
   editingDocId = null;
   updateEditorModeLabel();
   switchPanel('editor');
-  toast('已預填至編輯器，請驗證內容後再發佈', '');
+  toast(t('toast.ai_prefilled'), '');
 }
 
 // 獨立的 Claude streaming，可指定目標 element id
 async function streamClaudeToElement(system, user, elementId) {
   const el = document.getElementById(elementId);
   if (!el) return;
-  el.textContent = '連線中…';
+  el.textContent = t('label.connecting');
   el.classList.add('streaming');
   try {
     const text = await callClaudeProxy(system, user, 1500);
@@ -5542,7 +6015,7 @@ async function streamClaudeToElement(system, user, elementId) {
       if (i % 80 === 0) await new Promise(r => setTimeout(r, 8));
     }
   } catch(e) {
-    el.textContent = `連線失敗：${e.message}`;
+    el.textContent = t('label.conn_fail').replace('{msg}', e.message);
   } finally {
     el.classList.remove('streaming');
   }
@@ -5745,7 +6218,7 @@ async function loadDiscussModalComments() {
     }).join('');
   } catch(e) {
     console.error('[discuss]', e);
-    list.innerHTML = `<div style="color:var(--text-3);font-size:12px;text-align:center;padding:12px;">載入失敗：${e.message}</div>`;
+    list.innerHTML = `<div style="color:var(--text-3);font-size:12px;text-align:center;padding:12px;">${t('label.load_fail_msg').replace('{msg}', e.message)}</div>`;
   }
 }
 
@@ -5764,7 +6237,7 @@ async function submitDiscussModal() {
     const ccEl = document.getElementById('cc-' + _discussDocId);
     if (ccEl) ccEl.textContent = parseInt(ccEl.textContent || '0') + 1;
     await loadDiscussModalComments();
-  } catch(e) { toast('留言失敗：' + e.message, 'error'); }
+  } catch(e) { toast(t('toast.comment_fail_msg').replace('{msg}', e.message), 'error'); }
 }
 
 function toggleMobileMenu() {
@@ -5870,7 +6343,7 @@ function copyConfigAsEnv() {
   const encoded = btoa(JSON.stringify(CFG));
   const url = `${window.location.origin}${window.location.pathname}?kms_cfg=${encoded}`;
   navigator.clipboard?.writeText(url).then(() => {
-    toast('URL 已複製！在新電腦或新瀏覽器貼上此 URL 即可自動載入設定', 'success');
+    toast(t('toast.url_copied'), 'success');
   }).catch(() => {
     // fallback：顯示在 prompt 讓使用者手動複製
     prompt('複製此 URL（包含設定）：', url);
@@ -5910,7 +6383,7 @@ async function loadVersionHistory() {
       ) || [];
       countEl.textContent = snaps.length;
       if (!snaps.length) {
-        list.innerHTML = '<div style="color:var(--text-3);font-size:12px;text-align:center;padding:20px 0;">尚無版本紀錄</div>';
+        list.innerHTML = `<div style="color:var(--text-3);font-size:12px;text-align:center;padding:20px 0;">${t('label.no_versions')}</div>`;
         return;
       }
       list.innerHTML = snaps.map((s, i) => {
@@ -5990,7 +6463,7 @@ async function restoreSnapshot(snapId) {
   try {
     const rows = await sbFetch(`/rest/v1/kms_snapshots?id=eq.${snapId}&select=title,body,category,status`);
     const s = rows?.[0];
-    if (!s) { toast('快照讀取失敗', 'error'); return; }
+    if (!s) { toast(t('toast.snapshot_fail'), 'error'); return; }
     document.getElementById('doc-title').value = s.title || '';
     document.getElementById('doc-cat').value = s.category || 'product';
     document.getElementById('doc-status').value = s.status || 'draft';
@@ -5998,8 +6471,8 @@ async function restoreSnapshot(snapId) {
       const html = (s.body||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n\n+/g,'</p><p>').replace(/\n/g,'<br>');
       tiptapEditor.commands.setContent('<p>' + html + '</p>');
     }
-    toast('已還原至選取版本', 'success');
-  } catch(e) { toast('還原失敗：' + e.message, 'error'); }
+    toast(t('toast.restored_ver'), 'success');
+  } catch(e) { toast(t('toast.restore_fail').replace('{msg}', e.message), 'error'); }
 }
 
 // ─── 版本 diff：比對兩個快照的差異 ───
@@ -6010,7 +6483,7 @@ async function showVersionDiff(snapId1, snapId2) {
       sbFetch(`/rest/v1/kms_snapshots?id=eq.${snapId2}&select=title,body,created_at,saved_by`),
     ]);
     const s1 = rows1?.[0], s2 = rows2?.[0];
-    if (!s1 || !s2) { toast('無法載入版本資料', 'error'); return; }
+    if (!s1 || !s2) { toast(t('toast.ver_load_fail'), 'error'); return; }
 
     // 簡單 diff：逐行比對
     const lines1 = (s1.body || '').split('\n');
@@ -6039,7 +6512,7 @@ async function showVersionDiff(snapId1, snapId2) {
           ${diffHtml || '<div style="color:var(--text-3);text-align:center;padding:20px;">兩版本內容相同</div>'}
         </div>
       </div>`;
-  } catch(e) { toast('比較失敗：' + e.message, 'error'); }
+  } catch(e) { toast(t('toast.compare_fail').replace('{msg}', e.message), 'error'); }
 }
 
 function computeSimpleDiff(oldLines, newLines) {
@@ -6085,7 +6558,7 @@ function restoreVersion(idx) {
       `<p>${(s.body || '').replace(/\n\n/g,'</p><p>').replace(/\n/g,'<br>')}</p>`
     );
   }
-  toast('已還原至 v' + (snaps.length - idx), 'success');
+  toast(t('toast.restored_v').replace('{v}', snaps.length - idx), 'success');
 }
 
 async function showVersionDiff(doc_id, version_no) {
@@ -6093,14 +6566,14 @@ async function showVersionDiff(doc_id, version_no) {
   try {
     const res = await sbFetch(`/rest/v1/kms_doc_versions?doc_id=eq.${doc_id}&version_no=eq.${version_no}&select=*`);
     const ver = res?.[0];
-    if (!ver) { toast('版本資料不存在', 'error'); return; }
+    if (!ver) { toast(t('toast.ver_not_exist'), 'error'); return; }
     // 簡單 diff：開新視窗顯示舊版內容
     const w = window.open('', '_blank', 'width=700,height=500');
     w.document.write(`<html><head><title>v${version_no} — ${ver.title}</title>
       <style>body{font-family:sans-serif;padding:20px;line-height:1.7;white-space:pre-wrap;font-size:14px;}</style></head>
       <body><h2>v${version_no} — ${ver.title}</h2><hr><p>${ver.body}</p></body></html>`);
   } catch(e) {
-    toast('載入版本失敗：' + e.message, 'error');
+    toast(t('toast.ver_fetch_fail').replace('{msg}', e.message), 'error');
   }
 }
 
@@ -6119,9 +6592,9 @@ const SETUP_SQL_PREVIEW = `-- 完整 SQL 請見 comart-kms/sql/setup.sql
 
 function copySql() {
   navigator.clipboard?.writeText(SETUP_SQL_PREVIEW).then(() => {
-    toast('SQL 概要已複製，完整版見 setup.sql', 'success');
+    toast(t('toast.sql_copied'), 'success');
   }).catch(() => {
-    toast('請從下載的 setup.sql 複製完整 SQL', '');
+    toast(t('toast.sql_full'), '');
   });
 }
 
@@ -6220,7 +6693,7 @@ async function loadKmap(filterCat) {
   const content = document.getElementById('kmap-content');
   const headerTitle = document.getElementById('kmap-header-title');
   const headerActions = document.getElementById('kmap-header-actions');
-  content.innerHTML = '<div style="text-align:center;color:var(--text-3);padding:40px 0;font-size:13px;">載入中…</div>';
+  content.innerHTML = `<div style="text-align:center;color:var(--text-3);padding:40px 0;font-size:13px;">${t('label.loading')}</div>`;
 
   let docs = [];
   try {
@@ -6286,7 +6759,7 @@ async function loadKmap(filterCat) {
 // ═══════════════════════════════════════════════
 async function loadAnalytics(siteFilter = '') {
   const wrap = document.getElementById('analytics-content');
-  wrap.innerHTML = '<div style="text-align:center;color:var(--text-3);padding:40px 0;">載入中…</div>';
+  wrap.innerHTML = `<div style="text-align:center;color:var(--text-3);padding:40px 0;">${t('label.loading')}</div>`;
 
   let docs = [], authorStats = [], gaps = [], usersData = [];
   try {
@@ -6417,7 +6890,7 @@ async function batchGenerateSummaries() {
   if (!btn || !prog) return;
 
   btn.disabled = true;
-  btn.textContent = '載入中…';
+  btn.textContent = t('label.loading');
 
   try {
     // 抓所有無摘要的已發佈文件
@@ -6426,18 +6899,18 @@ async function batchGenerateSummaries() {
     ) || [];
 
     if (!docs.length) {
-      prog.textContent = '✅ 所有文件都已有摘要！';
+      prog.textContent = t('label.all_summarized');
       btn.disabled = false;
-      btn.textContent = '🤖 批次產生摘要（補齊無摘要的文件）';
+      btn.textContent = t('btn.batch_summary');
       return;
     }
 
-    prog.textContent = `找到 ${docs.length} 份無摘要文件，開始處理…`;
+    prog.textContent = t('label.batch_found').replace('{n}', docs.length);
     let done = 0;
 
     for (const doc of docs) {
       if (!doc.body || doc.body.length < 50) { done++; continue; }
-      prog.textContent = `處理中 ${done + 1} / ${docs.length}：${doc.title}`;
+      prog.textContent = t('label.batch_processing').replace('{n}', done + 1).replace('{total}', docs.length).replace('{name}', doc.title);
       try {
         const summary = await callClaudeProxy(
           '你是知識管理系統的摘要助手。請用 2-3 句話（繁體中文）摘要以下文件的核心重點，每句不超過 30 字，直接輸出摘要，不要加任何前言或說明。',
@@ -6457,14 +6930,14 @@ ${doc.body.slice(0, 6000)}`,
       await new Promise(r => setTimeout(r, 1000));
     }
 
-    prog.textContent = `✅ 完成！已處理 ${done} 份文件`;
-    btn.textContent = '🤖 批次產生摘要（補齊無摘要的文件）';
+    prog.textContent = t('label.batch_summary_done').replace('{n}', done);
+    btn.textContent = t('btn.batch_summary');
     btn.disabled = false;
     await loadDocs();
   } catch(e) {
-    prog.textContent = '❌ 失敗：' + e.message;
+    prog.textContent = t('label.batch_fail').replace('{msg}', e.message);
     btn.disabled = false;
-    btn.textContent = '🤖 批次產生摘要（補齊無摘要的文件）';
+    btn.textContent = t('btn.batch_summary');
   }
 }
 
@@ -6483,7 +6956,7 @@ let _expertSiteFilter = '';
 
 async function loadExperts() {
   const grid = document.getElementById('expert-grid');
-  grid.innerHTML = '<div style="color:var(--text-3);font-size:13px;padding:20px;grid-column:1/-1;">載入中…</div>';
+  grid.innerHTML = `<div style="color:var(--text-3);font-size:13px;padding:20px;grid-column:1/-1;">${t('label.loading')}</div>`;
 
   // 首次載入時，預設篩選登入使用者的 site
   if (!_expertAllUsers.length) {
@@ -6515,7 +6988,7 @@ async function loadExperts() {
     }
   } catch(e) {
     console.error('[loadExperts]', e);
-    grid.innerHTML = `<div style="color:var(--text-3);font-size:13px;padding:20px;grid-column:1/-1;">無法載入人員資料：${e.message}</div>`;
+    grid.innerHTML = `<div style="color:var(--text-3);font-size:13px;padding:20px;grid-column:1/-1;">${t('label.expert_fail').replace('{msg}', e.message)}</div>`;
     return;
   }
 
@@ -6533,7 +7006,7 @@ function _renderExpertContent() {
   const SITE_FLAG = { TW:'🇹🇼', CN:'🇨🇳', VN:'🇻🇳' };
 
   if (!_expertAllUsers.length) {
-    if (grid) grid.innerHTML = '<div style="color:var(--text-3);font-size:13px;padding:20px;grid-column:1/-1;">尚無人員資料</div>';
+    if (grid) grid.innerHTML = `<div style="color:var(--text-3);font-size:13px;padding:20px;grid-column:1/-1;">${t('label.expert_empty')}</div>`;
     return;
   }
 
@@ -6551,7 +7024,7 @@ function _renderExpertContent() {
     : _expertAllUsers;
 
   if (!users.length) {
-    grid.innerHTML = '<div style="color:var(--text-3);font-size:13px;padding:20px;grid-column:1/-1;">此 site 尚無人員資料</div>';
+    grid.innerHTML = `<div style="color:var(--text-3);font-size:13px;padding:20px;grid-column:1/-1;">${t('label.expert_no_site')}</div>`;
     return;
   }
 
@@ -6577,8 +7050,8 @@ function _renderExpertContent() {
         ? `<img src="${u.photoURL}" style="width:44px;height:44px;border-radius:50%;object-fit:cover;margin-bottom:8px;flex-shrink:0;" onerror="this.style.display='none';this.nextSibling.style.display='flex';" /><div class="expert-avatar" style="display:none;">${initial}</div>`
         : `<div class="expert-avatar">${initial}</div>`;
       const contact = [
-        u.email  ? `<span onclick="navigator.clipboard?.writeText('${u.email}');toast('已複製','success')" style="cursor:pointer;color:var(--blue);">✉ ${u.email}</span>` : '',
-        u.mobile ? `<span onclick="navigator.clipboard?.writeText('${u.mobile}');toast('已複製','success')" style="cursor:pointer;">📱 ${u.mobile}</span>` : '',
+        u.email  ? `<span onclick="navigator.clipboard?.writeText('${u.email}');toast(t('toast.copied_short'),'success')" style="cursor:pointer;color:var(--blue);">✉ ${u.email}</span>` : '',
+        u.mobile ? `<span onclick="navigator.clipboard?.writeText('${u.mobile}');toast(t('toast.copied_short'),'success')" style="cursor:pointer;">📱 ${u.mobile}</span>` : '',
         u.ext    ? `<span>🔢 分機 ${u.ext}</span>` : '',
       ].filter(Boolean).join('');
       const tags = Array.isArray(expertise) && expertise.length
@@ -6601,7 +7074,7 @@ function _renderExpertContent() {
 
 // 新增 / 刪除功能已移除，改由 Platform User Management 管理
 function openAddExpertModal() {
-  toast('人員資料請至 Platform → User Management 管理', '');
+  toast(t('toast.user_mgmt'), '');
 }
 
 // ═══════════════════════════════════════════════
@@ -6705,7 +7178,7 @@ function renderReviewList(filterStatus) {
 
 async function batchRepublish() {
   const cbs = [...document.querySelectorAll('.rv-cb:checked')];
-  if (!cbs.length) { toast('請先勾選要重新發佈的文件', 'error'); return; }
+  if (!cbs.length) { toast(t('toast.republish_select'), 'error'); return; }
   if (!confirm(`確定將選取的 ${cbs.length} 份封存文件重新發佈，並設為 Indefinitely？`)) return;
 
   const ids = cbs.map(cb => cb.dataset.id);
@@ -6725,7 +7198,10 @@ async function batchRepublish() {
     await new Promise(r => setTimeout(r, 200)); // 間隔避免 429
   }
 
-  toast(`重新發佈完成：${ok} 份成功${fail ? `，${fail} 份失敗` : ''}`, ok ? 'success' : 'error');
+  const _repMsg = fail
+    ? t('toast.republish_fail').replace('{ok}', ok).replace('{fail}', fail)
+    : t('toast.republish_ok').replace('{ok}', ok);
+  toast(_repMsg, ok ? 'success' : 'error');
   window._reviewAllDocs = null;
   loadReviewPanel();
 }
@@ -6758,7 +7234,7 @@ async function findAndRenderDuplicates() {
     const dupGroups = Object.values(groups).filter(g => g.length >= 2);
 
     if (!dupGroups.length) {
-      content.innerHTML = `<div style="text-align:center;color:var(--text-3);padding:40px 0;font-size:13px;">✅ 未發現重複文件</div>`;
+      content.innerHTML = `<div style="text-align:center;color:var(--text-3);padding:40px 0;font-size:13px;">${t('label.no_duplicates')}</div>`;
       return;
     }
 
@@ -6809,33 +7285,33 @@ async function findAndRenderDuplicates() {
 
     content.innerHTML = html;
   } catch(e) {
-    content.innerHTML = `<div style="color:var(--red);padding:20px;">載入失敗：${e.message}</div>`;
+    content.innerHTML = `<div style="color:var(--red);padding:20px;">${t('label.load_fail_msg').replace('{msg}', e.message)}</div>`;
   }
 }
 
 async function deleteDupDoc(id, title, authorName) {
   const role = getKmsRole();
   if (role !== 'admin' && role !== 'dcc') {
-    toast('僅 Admin 或 DCC 可刪除重複文件', 'error'); return;
+    toast(t('toast.dup_no_perm'), 'error'); return;
   }
   if (!confirm(`確定刪除「${title}」？\n此動作無法復原，版本歷史也會一併刪除。`)) return;
   try {
     await kmsWrite('delete', 'kms_doc_versions', null, null, { doc_id: id });
     await kmsWrite('delete', 'kms_documents', null, id);
-    toast('已刪除', 'success');
+    toast(t('toast.deleted'), 'success');
     await findAndRenderDuplicates();
   } catch(e) {
-    toast('刪除失敗：' + e.message, 'error');
+    toast(t('toast.delete_fail').replace('{msg}', e.message), 'error');
   }
 }
 
 async function batchDeleteDuplicates() {
   const role = getKmsRole();
   if (role !== 'admin' && role !== 'dcc') {
-    toast('僅 Admin 或 DCC 可批次刪除', 'error'); return;
+    toast(t('toast.dup_batch_no_perm'), 'error'); return;
   }
   const cbs = [...document.querySelectorAll('.dup-cb:checked')];
-  if (!cbs.length) { toast('請先勾選要刪除的文件', 'error'); return; }
+  if (!cbs.length) { toast(t('toast.dup_select_first'), 'error'); return; }
   if (!confirm(`確定刪除選取的 ${cbs.length} 份文件？\n此動作無法復原。`)) return;
   const ids = cbs.map(cb => cb.dataset.id);
   let ok = 0, fail = 0;
@@ -6850,7 +7326,10 @@ async function batchDeleteDuplicates() {
     }
     await new Promise(r => setTimeout(r, 200));
   }
-  toast(`批次刪除完成：${ok} 份成功${fail ? `，${fail} 份失敗` : ''}`, ok ? 'success' : 'error');
+  const _delMsg = fail
+    ? t('toast.batch_del_fail').replace('{ok}', ok).replace('{fail}', fail)
+    : t('toast.batch_del_ok').replace('{ok}', ok);
+  toast(_delMsg, ok ? 'success' : 'error');
   await findAndRenderDuplicates();
 }
 
@@ -6998,12 +7477,16 @@ async function executeReview(docId, newStatus, actionLabel, needReason = false) 
     }
 
     const msgs = {
-      published:  `✅ 已核准發佈：${docTitle}`,
-      draft:      `↩ 已退回草稿：${docTitle}`,
-      withdrawn:  `⚠ 已撤回：${docTitle}${note ? '，原因：'+note : ''}`,
-      archived:   `📦 已封存：${docTitle}${note ? '，原因：'+note : ''}`,
+      published: t('toast.review_published').replace('{title}', docTitle),
+      draft:     t('toast.review_draft').replace('{title}', docTitle),
+      withdrawn: note
+        ? t('toast.review_withdrawn_note').replace('{title}', docTitle).replace('{note}', note)
+        : t('toast.review_withdrawn').replace('{title}', docTitle),
+      archived:  note
+        ? t('toast.review_archived_note').replace('{title}', docTitle).replace('{note}', note)
+        : t('toast.review_archived').replace('{title}', docTitle),
     };
-    toast(msgs[newStatus] || `已執行：${actionLabel}`, newStatus === 'published' ? 'success' : '');
+    toast(msgs[newStatus] || t('toast.review_done').replace('{action}', actionLabel), newStatus === 'published' ? 'success' : '');
 
     // 回到草稿列表
     reviewingDocId = null;

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART KMS v2.19</title>
+<title>COMART KMS v2.20</title>
 
 <!-- Marked for Markdown → HTML preview (classic script, no module needed) -->
 <script src="https://cdn.jsdelivr.net/npm/marked@9.1.6/marked.min.js"></script>
@@ -391,7 +391,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v2.19</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v2.20</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('en')">EN</button>
@@ -606,9 +606,9 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         </div>
 
         <!-- Meta row — 第二行：建立者 + 審核人 + 有效期 + 產品線 -->
-        <div style="padding:6px 12px;border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:var(--bg);flex-shrink:0;">
+        <div style="padding:6px 12px;border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;background:var(--bg);flex-shrink:0;">
           <div style="display:flex;flex-direction:column;gap:2px;">
-            <span style="font-size:9px;color:var(--text-3);letter-spacing:.05em;text-transform:uppercase;" data-i18n="label.stars">Stars</span>
+            <span style="font-size:9px;color:var(--text-3);letter-spacing:.05em;text-transform:uppercase;white-space:nowrap;height:11px;line-height:11px;" data-i18n="label.stars">Stars</span>
             <div style="display:flex;gap:2px;align-items:center;height:28px;" id="stars-widget">
               <span class="star-btn" data-val="1" onclick="setDocStars(1)"
                 style="font-size:18px;cursor:pointer;color:#F59E0B;line-height:1;" title="General">★</span>
@@ -620,7 +620,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
             <input type="hidden" id="doc-stars" value="1" />
           </div>
           <div style="display:flex;flex-direction:column;gap:2px;">
-            <span style="font-size:9px;color:var(--text-3);letter-spacing:.05em;text-transform:uppercase;" data-i18n="label.confidential">Confidential</span>
+            <span style="font-size:9px;color:var(--text-3);letter-spacing:.05em;text-transform:uppercase;white-space:nowrap;height:11px;line-height:11px;" data-i18n="label.confidential">Confidential</span>
             <div style="display:flex;gap:2px;align-items:center;height:28px;" id="conf-widget">
               <span class="conf-btn" data-val="1" onclick="setDocConf(1)"
                 style="font-size:18px;cursor:pointer;color:#e74c3c;line-height:1;" title="Public — everyone">★</span>
@@ -632,19 +632,19 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
             <input type="hidden" id="doc-conf-level" value="1" />
           </div>
           <div style="display:flex;flex-direction:column;gap:2px;">
-            <span style="font-size:9px;color:var(--text-3);letter-spacing:.05em;text-transform:uppercase;" data-i18n="label.created">Created</span>
+            <span style="font-size:9px;color:var(--text-3);letter-spacing:.05em;text-transform:uppercase;white-space:nowrap;height:11px;line-height:11px;" data-i18n="label.created">Created</span>
             <div style="height:28px;display:flex;align-items:center;">
               <span id="doc-created-display" style="font-size:11px;color:var(--text-3);min-width:72px;">—</span>
             </div>
           </div>
           <div style="display:flex;flex-direction:column;gap:2px;">
-            <span style="font-size:9px;color:var(--text-3);letter-spacing:.05em;text-transform:uppercase;" data-i18n="label.modified">Modified</span>
+            <span style="font-size:9px;color:var(--text-3);letter-spacing:.05em;text-transform:uppercase;white-space:nowrap;height:11px;line-height:11px;" data-i18n="label.modified">Modified</span>
             <div style="height:28px;display:flex;align-items:center;">
               <span id="doc-modified-display" style="font-size:11px;color:var(--text-3);min-width:72px;">—</span>
             </div>
           </div>
           <div style="display:flex;flex-direction:column;gap:2px;">
-            <span style="font-size:9px;color:var(--text-3);letter-spacing:.05em;text-transform:uppercase;" data-i18n="label.valid_until">Valid Until</span>
+            <span style="font-size:9px;color:var(--text-3);letter-spacing:.05em;text-transform:uppercase;white-space:nowrap;height:11px;line-height:11px;" data-i18n="label.valid_until">Valid Until</span>
             <div style="display:flex;align-items:center;gap:5px;height:28px;">
               <input type="checkbox" id="doc-indefinitely" checked title="永久有效"
                 onchange="document.getElementById('doc-valid-until').style.display=this.checked?'none':'block';if(this.checked)document.getElementById('doc-valid-until').value='';"
@@ -654,7 +654,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
             </div>
           </div>
           <div style="display:flex;flex-direction:column;gap:2px;">
-            <span style="font-size:9px;color:var(--text-3);letter-spacing:.05em;text-transform:uppercase;" data-i18n="label.author">Author</span>
+            <span style="font-size:9px;color:var(--text-3);letter-spacing:.05em;text-transform:uppercase;white-space:nowrap;height:11px;line-height:11px;" data-i18n="label.author">Author</span>
             <div style="position:relative;height:28px;display:flex;align-items:center;">
               <input class="meta-input" id="doc-author" placeholder="建立者" data-i18n-placeholder="label.author" style="width:110px;background:var(--bg);color:var(--text-3);"
                 autocomplete="off" name="kms-author-nofill" readonly title="建立者為登入使用者，不可修改"
@@ -663,7 +663,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
             </div>
           </div>
           <div style="display:flex;flex-direction:column;gap:2px;">
-            <span style="font-size:9px;color:var(--text-3);letter-spacing:.05em;text-transform:uppercase;" data-i18n="label.reviewer">Reviewer</span>
+            <span style="font-size:9px;color:var(--text-3);letter-spacing:.05em;text-transform:uppercase;white-space:nowrap;height:11px;line-height:11px;" data-i18n="label.reviewer">Reviewer</span>
             <div style="position:relative;height:28px;display:flex;align-items:center;">
               <input class="meta-input" id="doc-reviewer" placeholder="審核人" data-i18n-placeholder="label.reviewer" style="width:110px;"
                 autocomplete="off" oninput="filterReviewerList(this.value)" onfocus="showReviewerList()" onblur="setTimeout(()=>hideReviewerList(),200)" />
@@ -672,7 +672,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
           </div>
 
           <div style="display:flex;flex-direction:column;gap:2px;">
-            <span style="font-size:9px;color:var(--text-3);letter-spacing:.05em;text-transform:uppercase;" data-i18n="label.category">Category</span>
+            <span style="font-size:9px;color:var(--text-3);letter-spacing:.05em;text-transform:uppercase;white-space:nowrap;height:11px;line-height:11px;" data-i18n="label.category">Category</span>
             <select class="meta-select" id="doc-cat" style="height:28px;" onchange="const ind=document.getElementById('ai-cat-indicator');if(ind)ind.textContent='';">
               <option value="product">Product</option>
               <option value="sales">Customer</option>
@@ -687,13 +687,13 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
             </select>
           </div>
           <div style="display:flex;flex-direction:column;gap:2px;">
-            <span style="font-size:9px;color:var(--text-3);letter-spacing:.05em;text-transform:uppercase;" data-i18n="label.product_line">Product Line</span>
+            <span style="font-size:9px;color:var(--text-3);letter-spacing:.05em;text-transform:uppercase;white-space:nowrap;height:11px;line-height:11px;" data-i18n="label.product_line">Product Line</span>
             <select class="meta-select" id="doc-product-line" style="height:28px;min-width:140px;">
             <option value="" id="doc-pl-default" data-i18n="label.pl_default">— Product Line —</option>
           </select>
           </div>
           <button onclick="openAddProductLineModal()" id="btn-add-pl"
-            style="padding:4px 8px;border-radius:6px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:12px;color:var(--text-2);align-self:flex-end;"
+            style="padding:0 8px;height:28px;border-radius:6px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:12px;color:var(--text-2);"
             data-i18n="btn.add_product_line" title="新增產品線">＋</button>
         </div>
 
@@ -1114,10 +1114,10 @@ const I18N = {
     'nav.search':'AI 問答', 'nav.editor':'新增', 'nav.docs':'知識庫',
     'nav.kmap':'知識地圖', 'nav.analytics':'分析報表', 'nav.experts':'通訊錄',
     'nav.review':'審核', 'nav.comments':'討論', 'nav.setting':'設定',
-    'label.created':'Created', 'label.modified':'Modified', 'label.valid_until':'Valid Until',
-    'label.author':'Author', 'label.reviewer':'Reviewer', 'label.product_line':'Product Line',
-    'label.category':'Category', 'label.stars':'Stars', 'status.indefinitely':'Indefinitely',
-    'label.confidential':'Confidential',
+    'label.created':'建立時間', 'label.modified':'修改時間', 'label.valid_until':'有效期限',
+    'label.author':'建立者', 'label.reviewer':'審核人', 'label.product_line':'產品線',
+    'label.category':'分類', 'label.stars':'星級',
+    'label.confidential':'機密等級',
     'conf.level.1':'Public — everyone','conf.level.2':'Internal — DCC & Admin','conf.level.3':'Confidential — Admin only',
     'btn.save':'Save', 'btn.cancel':'Cancel',
     'rag.title':'AI 問答 — 從知識庫取答案',

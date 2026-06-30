@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" href="data:,">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART 行政管理平台 v1.84</title>
+<title>COMART 行政管理平台 v1.85</title>
 <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.js"></script>
 <style>
 :root{
@@ -954,7 +954,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="logo">
     <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
     <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
-    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.84</span>
+    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.85</span>
   </div>
   <div class="trr">
     <div id="global-site-bar" style="display:flex;align-items:center;gap:4px">
@@ -976,7 +976,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <span id="cur-u" style="color:var(--text-2)">載入中…</span>
       <span style="color:var(--text-3);font-size:10px">▾</span>
     </div>
-    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.84</span>
+    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.85</span>
   </div>
 </div>
 
@@ -2453,6 +2453,15 @@ const ADMIN_I18N = {
     'car.fuel.month_cost':'This Month Fuel','car.fuel.month_vol':'Volume This Month','car.fuel.count':'Records','car.fuel.liter':'Liters',
     'car.cfg.maint_km':'Maint. Alert KM Threshold','car.cfg.insp_days':'Inspection Reminder Days','car.cfg.max_days':'Max Booking Days',
     'car.veh.type.all':'All Types','car.veh.type.sedan':'Sedan','car.veh.type.suv':'SUV','car.veh.type.van':'Van','car.veh.type.truck':'Truck',
+    'car.fuel.gas':'Gasoline','car.fuel.diesel':'Diesel','car.fuel.hybrid':'Hybrid','car.fuel.ev':'Electric',
+    'car.st.avail':'Available','car.st.inuse':'In Use','car.st.need_maint':'Needs Maint','car.st.insp_alert':'Insp. Due',
+    'car.mo.depart':'Depart','car.mo.end_use':'Return','car.mo.add_maint':'Add Maint. Log','car.mo.edit_insp':'Edit Inspection','car.mo.add_insp':'Add Inspection',
+    'car.bk.pending':'Pending','car.bk.active':'In Use','car.bk.done':'Done','car.bk.cancelled':'Cancelled',
+    'car.mileage_hint':'Current: %d km, est. return: %d km','car.mileage_low':'Mileage too low (must be ≥ current %d km)',
+    'car.all_veh2':'All Vehicles','car.today_bk':'Today\'s bookings: %s','car.no_bk_today':'No bookings today','car.no_bk_today2':'No upcoming bookings',
+    'car.type.company':'Company Car','car.type.taxi':'Taxi','car.type.none':'Personal',
+    'car.no_data':'No records','car.no_veh':'No vehicles','car.no_fuel':'No fuel records','car.no_maint':'No maint. records','car.no_insp':'No inspection records',
+    'g.select':'Select…','g.select_staff':'Select staff…','g.select_or_type':'Select or type…',
     'room.title':'🏢 Meeting Rooms',
     'room.nav.dash':'Status Board','room.nav.new':'New Booking','room.nav.cal':'Calendar',
     'room.nav.list':'Booking List','room.nav.report':'Usage Report','room.nav.fault':'Report Fault',
@@ -2565,6 +2574,15 @@ const ADMIN_I18N = {
     'car.fuel.month_cost':'本月油費','car.fuel.month_vol':'本月加油量','car.fuel.count':'記錄筆數','car.fuel.liter':'公升',
     'car.cfg.maint_km':'保養提醒里程閾值 (km)','car.cfg.insp_days':'驗車提醒天數（提前）','car.cfg.max_days':'最長單次預約天數',
     'car.veh.type.all':'所有類型','car.veh.type.sedan':'轎車','car.veh.type.suv':'SUV','car.veh.type.van':'廂型車','car.veh.type.truck':'貨車',
+    'car.fuel.gas':'汽油','car.fuel.diesel':'柴油','car.fuel.hybrid':'油電','car.fuel.ev':'純電',
+    'car.st.avail':'可用','car.st.inuse':'使用中','car.st.need_maint':'需保養','car.st.insp_alert':'驗車提醒',
+    'car.mo.depart':'出發','car.mo.end_use':'歸還','car.mo.add_maint':'新增保養記錄','car.mo.edit_insp':'編輯驗車','car.mo.add_insp':'登記驗車',
+    'car.bk.pending':'待出發','car.bk.active':'使用中','car.bk.done':'已完成','car.bk.cancelled':'已取消',
+    'car.mileage_hint':'目前里程：%d km，預估歸還：%d km','car.mileage_low':'里程不足（必須 ≥ 目前 %d km）',
+    'car.all_veh2':'所有車輛','car.today_bk':'今日預約：%s','car.no_bk_today':'今日無預約','car.no_bk_today2':'近期無預約',
+    'car.type.company':'公務車','car.type.taxi':'計程車','car.type.none':'自用',
+    'car.no_data':'無資料','car.no_veh':'無車輛資料','car.no_fuel':'無加油記錄','car.no_maint':'無保養記錄','car.no_insp':'無驗車記錄',
+    'g.select':'請選擇…','g.select_staff':'選擇員工…','g.select_or_type':'請選擇或輸入…',
     'room.title':'🏢 會議室預約',
     'room.nav.dash':'狀態看板','room.nav.new':'新增預約','room.nav.cal':'預約日曆',
     'room.nav.list':'預約清單','room.nav.report':'使用率報表','room.nav.fault':'故障回報',
@@ -2677,6 +2695,15 @@ const ADMIN_I18N = {
     'car.fuel.month_cost':'本月油费','car.fuel.month_vol':'本月加油量','car.fuel.count':'记录笔数','car.fuel.liter':'公升',
     'car.cfg.maint_km':'保养提醒里程阈值 (km)','car.cfg.insp_days':'验车提醒天数（提前）','car.cfg.max_days':'最长单次预约天数',
     'car.veh.type.all':'所有类型','car.veh.type.sedan':'轿车','car.veh.type.suv':'SUV','car.veh.type.van':'厢型车','car.veh.type.truck':'货车',
+    'car.fuel.gas':'汽油','car.fuel.diesel':'柴油','car.fuel.hybrid':'油电','car.fuel.ev':'纯电',
+    'car.st.avail':'可用','car.st.inuse':'使用中','car.st.need_maint':'需保养','car.st.insp_alert':'验车提醒',
+    'car.mo.depart':'出发','car.mo.end_use':'归还','car.mo.add_maint':'新增保养记录','car.mo.edit_insp':'编辑验车','car.mo.add_insp':'登记验车',
+    'car.bk.pending':'待出发','car.bk.active':'使用中','car.bk.done':'已完成','car.bk.cancelled':'已取消',
+    'car.mileage_hint':'当前里程：%d km，预估归还：%d km','car.mileage_low':'里程不足（必须 ≥ 当前 %d km）',
+    'car.all_veh2':'所有车辆','car.today_bk':'今日预约：%s','car.no_bk_today':'今日无预约','car.no_bk_today2':'近期无预约',
+    'car.type.company':'公务车','car.type.taxi':'出租车','car.type.none':'自用',
+    'car.no_data':'无数据','car.no_veh':'无车辆数据','car.no_fuel':'无加油记录','car.no_maint':'无保养记录','car.no_insp':'无验车记录',
+    'g.select':'请选择…','g.select_staff':'选择员工…','g.select_or_type':'请选择或输入…',
     'room.title':'🏢 会议室预约',
     'room.nav.dash':'状态看板','room.nav.new':'新增预约','room.nav.cal':'预约日历',
     'room.nav.list':'预约清单','room.nav.report':'使用率报表','room.nav.fault':'故障报告',
@@ -2789,6 +2816,15 @@ const ADMIN_I18N = {
     'car.fuel.month_cost':'Chi phí xăng tháng','car.fuel.month_vol':'Lượng xăng tháng','car.fuel.count':'Số ghi','car.fuel.liter':'Lít',
     'car.cfg.maint_km':'Ngưỡng km bảo dưỡng','car.cfg.insp_days':'Ngày nhắc kiểm định','car.cfg.max_days':'Số ngày đặt tối đa',
     'car.veh.type.all':'Tất cả loại','car.veh.type.sedan':'Sedan','car.veh.type.suv':'SUV','car.veh.type.van':'Minivan','car.veh.type.truck':'Xe tải',
+    'car.fuel.gas':'Xăng','car.fuel.diesel':'Dầu diesel','car.fuel.hybrid':'Hybrid','car.fuel.ev':'Điện',
+    'car.st.avail':'Sẵn sàng','car.st.inuse':'Đang dùng','car.st.need_maint':'Cần bảo dưỡng','car.st.insp_alert':'KĐ sắp đến',
+    'car.mo.depart':'Xuất phát','car.mo.end_use':'Trả xe','car.mo.add_maint':'Thêm bảo dưỡng','car.mo.edit_insp':'Sửa KĐ','car.mo.add_insp':'Thêm KĐ',
+    'car.bk.pending':'Chờ xuất phát','car.bk.active':'Đang dùng','car.bk.done':'Hoàn thành','car.bk.cancelled':'Đã hủy',
+    'car.mileage_hint':'Số km hiện tại: %d km, dự kiến khi trả: %d km','car.mileage_low':'Số km quá thấp (phải ≥ hiện tại %d km)',
+    'car.all_veh2':'Tất cả xe','car.today_bk':'Đặt hôm nay: %s','car.no_bk_today':'Không có đặt xe hôm nay','car.no_bk_today2':'Không có đặt xe sắp tới',
+    'car.type.company':'Xe công vụ','car.type.taxi':'Taxi','car.type.none':'Cá nhân',
+    'car.no_data':'Không có dữ liệu','car.no_veh':'Không có xe','car.no_fuel':'Không có ghi nhiên liệu','car.no_maint':'Không có ghi bảo dưỡng','car.no_insp':'Không có KĐ',
+    'g.select':'Chọn…','g.select_staff':'Chọn nhân viên…','g.select_or_type':'Chọn hoặc nhập…',
     'room.title':'🏢 Đặt phòng họp',
     'room.nav.dash':'Bảng trạng thái','room.nav.new':'Đặt phòng mới','room.nav.cal':'Lịch đặt',
     'room.nav.list':'Danh sách đặt','room.nav.report':'Báo cáo','room.nav.fault':'Báo lỗi',
@@ -2901,6 +2937,15 @@ const ADMIN_I18N = {
     'car.fuel.month_cost':'今月の燃料費','car.fuel.month_vol':'今月の給油量','car.fuel.count':'記録件数','car.fuel.liter':'リットル',
     'car.cfg.maint_km':'整備アラートKM閾値','car.cfg.insp_days':'車検リマインダー日数','car.cfg.max_days':'最大予約日数',
     'car.veh.type.all':'全タイプ','car.veh.type.sedan':'セダン','car.veh.type.suv':'SUV','car.veh.type.van':'バン','car.veh.type.truck':'トラック',
+    'car.fuel.gas':'ガソリン','car.fuel.diesel':'ディーゼル','car.fuel.hybrid':'ハイブリッド','car.fuel.ev':'電気',
+    'car.st.avail':'利用可能','car.st.inuse':'使用中','car.st.need_maint':'要整備','car.st.insp_alert':'車検注意',
+    'car.mo.depart':'出発','car.mo.end_use':'返却','car.mo.add_maint':'整備記録追加','car.mo.edit_insp':'車検編集','car.mo.add_insp':'車検登録',
+    'car.bk.pending':'出発待ち','car.bk.active':'使用中','car.bk.done':'完了','car.bk.cancelled':'キャンセル',
+    'car.mileage_hint':'現在: %d km、予定返却時: %d km','car.mileage_low':'走行距離が少なすぎます（現在 %d km 以上必要）',
+    'car.all_veh2':'全車両','car.today_bk':'本日の予約: %s','car.no_bk_today':'本日予約なし','car.no_bk_today2':'予約なし',
+    'car.type.company':'社用車','car.type.taxi':'タクシー','car.type.none':'個人用',
+    'car.no_data':'データなし','car.no_veh':'車両なし','car.no_fuel':'給油記録なし','car.no_maint':'整備記録なし','car.no_insp':'車検記録なし',
+    'g.select':'選択…','g.select_staff':'スタッフ選択…','g.select_or_type':'選択または入力…',
     'room.title':'🏢 会議室予約',
     'room.nav.dash':'ステータス','room.nav.new':'新規予約','room.nav.cal':'予約カレンダー',
     'room.nav.list':'予約一覧','room.nav.report':'利用レポート','room.nav.fault':'故障報告',

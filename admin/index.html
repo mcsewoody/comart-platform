@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" href="data:,">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART 行政管理平台 v1.78</title>
+<title>COMART 行政管理平台 v1.79</title>
 <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.js"></script>
 <style>
 :root{
@@ -983,7 +983,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="logo">
     <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
     <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
-    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.78</span>
+    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.79</span>
   </div>
   <div class="trr">
     <div class="admin-lang-sw">
@@ -998,7 +998,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <span id="cur-u" style="color:var(--text-2)">載入中…</span>
       <span style="color:var(--text-3);font-size:10px">▾</span>
     </div>
-    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.78</span>
+    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.79</span>
   </div>
 </div>
 
@@ -2204,6 +2204,18 @@ const tds=()=>new Date(Date.now()+8*3600000).toISOString().slice(0,10);
 const dtStr=d=>[d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');
 const fmtD=s=>{if(!s)return'—';const d=new Date(s+'T00:00:00');return`${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}`};
 const dDiff=s=>{const d=new Date(s+'T00:00:00');const n=new Date();n.setHours(0,0,0,0);return Math.round((d-n)/86400000)};
+let _carReminderChecked=false;
+function checkCarReminders(){
+  if(_carReminderChecked)return;_carReminderChecked=true;
+  const vehs=ld(K.vh),cfg=lo(K.ccfg,DCCFG);
+  const ms=[];const ins=[];
+  vehs.forEach(v=>{
+    if(v.next_maint_km&&v.km>=(v.next_maint_km-cfg.maint_km)){const rem=Math.max(0,v.next_maint_km-v.km);ms.push(`${v.name} 剩 ${rem}km`);}
+    if(v.next_insp){const d=dDiff(v.next_insp);if(d<=30)ins.push(`${v.name} ${d<0?`逾期${-d}天`:`剩${d}天`}`);}
+  });
+  if(ms.length)setTimeout(()=>toast('🔧 保養提醒：'+ms.join('；'),'warn'),300);
+  if(ins.length)setTimeout(()=>toast('📋 驗車提醒：'+ins.join('；'),'warn'),ms.length?1800:300);
+}
 let curUid=localStorage.getItem(K.cu)||null,curMod='lib';
 const DLCFG={max_loans:3,loan_days:30,remind_days:3};
 const DCCFG={maint_km:500,insp_days:30,max_days:7};
@@ -2636,8 +2648,8 @@ const ADMIN_I18N = {
     'lib.filter.active':'Active Loans','lib.filter.overdue':'Overdue','lib.filter.returned':'Returned','lib.filter.all':'All',
     'lib.cfg.max_books':'Max Books / Person','lib.cfg.loan_days':'Default Loan Days','lib.cfg.remind_days':'Reminder Days Before Due',
     'car.title':'🚗 Fleet',
-    'car.nav.dash':'Dashboard','car.nav.use':'Usage Log','car.nav.cal':'Calendar',
-    'car.nav.fuel':'Fuel Log','car.nav.veh':'Vehicles',
+    'car.nav.dash':'Dashboard','car.nav.use':'Usage Records','car.nav.cal':'Monthly Calendar',
+    'car.nav.fuel':'Fuel','car.nav.veh':'Vehicles',
     'car.nav.maint_grp':'Maintenance','car.nav.maint':'Maint. Log','car.nav.insp':'Inspection',
     'car.stat.total':'Total Vehicles','car.stat.avail':'Available','car.stat.inuse':'In Use',
     'car.stat.maint':'Maint. Alert','car.stat.unit':'units','car.stat.idle':'idle',
@@ -2841,8 +2853,8 @@ const ADMIN_I18N = {
     'lib.filter.active':'借閱中','lib.filter.overdue':'逾期','lib.filter.returned':'已歸還','lib.filter.all':'全部',
     'lib.cfg.max_books':'每人借閱上限（冊）','lib.cfg.loan_days':'預設借閱天數','lib.cfg.remind_days':'到期前提醒天數',
     'car.title':'🚗 公務車',
-    'car.nav.dash':'車輛看板','car.nav.use':'使用記錄','car.nav.cal':'預約日曆',
-    'car.nav.fuel':'油資記錄','car.nav.veh':'車輛清單',
+    'car.nav.dash':'車輛看板','car.nav.use':'用車紀錄','car.nav.cal':'月曆',
+    'car.nav.fuel':'油資','car.nav.veh':'車輛清單',
     'car.nav.maint_grp':'保養維修','car.nav.maint':'保養記錄','car.nav.insp':'驗車管理',
     'car.stat.total':'車輛總數','car.stat.avail':'可預約','car.stat.inuse':'使用中',
     'car.stat.maint':'保養提醒','car.stat.unit':'輛','car.stat.idle':'輛空閒',
@@ -3046,8 +3058,8 @@ const ADMIN_I18N = {
     'lib.filter.active':'借阅中','lib.filter.overdue':'逾期','lib.filter.returned':'已归还','lib.filter.all':'全部',
     'lib.cfg.max_books':'每人借阅上限（册）','lib.cfg.loan_days':'默认借阅天数','lib.cfg.remind_days':'到期前提醒天数',
     'car.title':'🚗 公务车',
-    'car.nav.dash':'车辆看板','car.nav.use':'使用记录','car.nav.cal':'预约日历',
-    'car.nav.fuel':'油费记录','car.nav.veh':'车辆清单',
+    'car.nav.dash':'车辆看板','car.nav.use':'用车纪录','car.nav.cal':'月历',
+    'car.nav.fuel':'油资','car.nav.veh':'车辆清单',
     'car.nav.maint_grp':'保养维修','car.nav.maint':'保养记录','car.nav.insp':'验车管理',
     'car.stat.total':'车辆总数','car.stat.avail':'可预约','car.stat.inuse':'使用中',
     'car.stat.maint':'保养提醒','car.stat.unit':'辆','car.stat.idle':'辆空闲',
@@ -3251,8 +3263,8 @@ const ADMIN_I18N = {
     'lib.filter.active':'Đang mượn','lib.filter.overdue':'Quá hạn','lib.filter.returned':'Đã trả','lib.filter.all':'Tất cả',
     'lib.cfg.max_books':'Giới hạn mượn/người','lib.cfg.loan_days':'Số ngày mượn mặc định','lib.cfg.remind_days':'Nhắc trước hạn (ngày)',
     'car.title':'🚗 Xe công vụ',
-    'car.nav.dash':'Bảng điều khiển','car.nav.use':'Lịch sử sử dụng','car.nav.cal':'Lịch đặt xe',
-    'car.nav.fuel':'Ghi nhiên liệu','car.nav.veh':'Danh sách xe',
+    'car.nav.dash':'Bảng điều khiển','car.nav.use':'Lịch sử dùng xe','car.nav.cal':'Lịch tháng',
+    'car.nav.fuel':'Nhiên liệu','car.nav.veh':'Danh sách xe',
     'car.nav.maint_grp':'Bảo dưỡng','car.nav.maint':'Lịch sử bảo dưỡng','car.nav.insp':'Kiểm định',
     'car.stat.total':'Tổng xe','car.stat.avail':'Sẵn sàng','car.stat.inuse':'Đang sử dụng',
     'car.stat.maint':'Cảnh báo BD','car.stat.unit':'xe','car.stat.idle':'xe rảnh',
@@ -3456,8 +3468,8 @@ const ADMIN_I18N = {
     'lib.filter.active':'貸出中','lib.filter.overdue':'延滞','lib.filter.returned':'返却済','lib.filter.all':'全て',
     'lib.cfg.max_books':'最大貸出冊数/人','lib.cfg.loan_days':'標準貸出日数','lib.cfg.remind_days':'期限前通知日数',
     'car.title':'🚗 社用車',
-    'car.nav.dash':'ダッシュボード','car.nav.use':'利用記録','car.nav.cal':'予約カレンダー',
-    'car.nav.fuel':'給油記録','car.nav.veh':'車両一覧',
+    'car.nav.dash':'ダッシュボード','car.nav.use':'用車記録','car.nav.cal':'月間カレンダー',
+    'car.nav.fuel':'燃料費','car.nav.veh':'車両一覧',
     'car.nav.maint_grp':'整備・点検','car.nav.maint':'整備記録','car.nav.insp':'車検管理',
     'car.stat.total':'車両総数','car.stat.avail':'予約可能','car.stat.inuse':'使用中',
     'car.stat.maint':'整備アラート','car.stat.unit':'台','car.stat.idle':'台空き',
@@ -3856,9 +3868,9 @@ const MOBILE_SUBNAV = {
   ],
   car:[
     {p:'car-dash',ic:'📊',lb:'看板'},
-    {p:'car-use',ic:'🚗',lb:'用車申請'},
-    {p:'car-cal',ic:'📅',lb:'行程表'},
-    {p:'car-fuel',ic:'⛽',lb:'加油'},
+    {p:'car-use',ic:'🚗',lb:'用車紀錄'},
+    {p:'car-cal',ic:'📅',lb:'月曆'},
+    {p:'car-fuel',ic:'⛽',lb:'油資'},
     {p:'car-veh',ic:'🔑',lb:'車輛'},
     {p:'car-maint',ic:'🔧',lb:'保養'},
     {p:'car-insp',ic:'📋',lb:'驗車'},
@@ -4175,6 +4187,7 @@ function popCarSels(){const vehs=ld(K.vh),vOpts=`<option value="">${t('car.all_v
 
 async function renderCarDash(){
   await loadCarFromSB();
+  checkCarReminders();
   const vehs=(_carSite?ld(K.vh).filter(v=>v.site===_carSite):ld(K.vh)),bks=ld(K.bks),now=new Date().toISOString().slice(0,16),today=tds(),cfg=lo(K.ccfg,DCCFG);
   const inU=vehs.filter(v=>bks.find(b=>b.vh_id===v.id&&b.st==='active'&&b.start<=now&&b.end>=now)).length;
   const needM=vehs.filter(v=>(v.next_maint_km&&v.km>=(v.next_maint_km-cfg.maint_km))||(v.next_insp&&dDiff(v.next_insp)<=cfg.insp_days)).length;

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" href="data:,">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART 行政管理平台 v1.75</title>
+<title>COMART 行政管理平台 v1.76</title>
 <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.js"></script>
 <style>
 :root{
@@ -983,7 +983,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="logo">
     <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
     <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
-    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.75</span>
+    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.76</span>
   </div>
   <div class="trr">
     <div class="admin-lang-sw">
@@ -998,7 +998,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <span id="cur-u" style="color:var(--text-2)">載入中…</span>
       <span style="color:var(--text-3);font-size:10px">▾</span>
     </div>
-    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.75</span>
+    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.76</span>
   </div>
 </div>
 
@@ -4130,7 +4130,7 @@ function doLoan(){
   const bw=document.getElementById('bwdt').value||tds(),due=document.getElementById('bwdu').value;if(!due)return toast('請設定應還日期','error');
   const _newLoan={id:uid(),bk_id:selBwBk,u_id:uid2,bw,due,ret:null,st:'active'};ln.push(_newLoan);sv(K.ln,ln);sbSaveLoan(_newLoan);
   selBwBk=null;document.getElementById('bwsel').style.display='none';document.getElementById('bwbq').value='';document.getElementById('bwu').value='';
-  updBwDue();renderBwBooks();toast(`已登記：${gUsr(uid2)?.name}借閱《${bk.title}》`,'success');
+  updBwDue();renderBwBooks();renderLibDash();toast(`已登記：${gUsr(uid2)?.name}借閱《${bk.title}》`,'success');
 }
 
 function renderReturn(){
@@ -4215,9 +4215,9 @@ function saveVeh(){
   const vehs=ld(K.vh);
   if(editVid){const i=vehs.findIndex(v=>v.id===editVid);if(i>=0)vehs[i]={...vehs[i],...fullVeh};}
   else vehs.push(fullVeh);
-  sv(K.vh,vehs);sbSaveVehicle(fullVeh);closeMo('mo-veh');renderVeh();popCarSels();toast(editVid?'已更新':'已新增','success');
+  sv(K.vh,vehs);sbSaveVehicle(fullVeh);closeMo('mo-veh');renderVeh();popCarSels();renderCarDash();toast(editVid?'已更新':'已新增','success');
 }
-function delVeh(id){if(ld(K.bks).find(b=>b.vh_id===id&&b.st!=='done'&&b.st!=='cancelled'))return toast('有進行中預約，無法刪除','error');if(!confirm('確定刪除？'))return;const _delVhId=id;sv(K.vh,ld(K.vh).filter(v=>v.id!==_delVhId));sbDelVehicle(_delVhId);renderVeh();popCarSels();toast(t('g.toast.deleted'),'success');}
+function delVeh(id){if(ld(K.bks).find(b=>b.vh_id===id&&b.st!=='done'&&b.st!=='cancelled'))return toast('有進行中預約，無法刪除','error');if(!confirm('確定刪除？'))return;const _delVhId=id;sv(K.vh,ld(K.vh).filter(v=>v.id!==_delVhId));sbDelVehicle(_delVhId);renderVeh();popCarSels();renderCarDash();toast(t('g.toast.deleted'),'success');}
 
 let calDt=new Date(),calV='month';
 function setCalV(v){calV=v;document.getElementById('cvbm').classList.toggle('active',v==='month');document.getElementById('cvbw').classList.toggle('active',v==='week');renderCal();}
@@ -4304,7 +4304,7 @@ function doBooking(){
   if(ld(K.bks).find(b=>b.vh_id===vid&&b.st!=='done'&&b.st!=='cancelled'&&b.start<ne&&b.end>ns))return toast('此車時段已有預約','error');
   const bks=ld(K.bks);bks.push({id:uid(),vh_id:vid,u_id:uid2,start:ns,end:ne,purpose:pur,km_plan:parseInt(document.getElementById('bkkm').value)||0,from:document.getElementById('bkfr').value.trim(),to:document.getElementById('bkto').value.trim(),note:document.getElementById('bknt').value.trim(),st:'pending'});
   sv(K.bks,bks);sbSaveCarBk(bks[bks.length-1]);const v=gVeh(vid),u=gUsr(uid2);toast(`已預約：${u?.name}使用${v?.name}（${sd}）`,'success');
-  ['bkpur','bkkm','bkfr','bkto','bknt'].forEach(x=>document.getElementById(x).value='');document.getElementById('bk-conf').style.display='none';navCar('car-cal');
+  ['bkpur','bkkm','bkfr','bkto','bknt'].forEach(x=>document.getElementById(x).value='');document.getElementById('bk-conf').style.display='none';navCar('car-dash');
 }
 
 function renderUse(){
@@ -4314,7 +4314,7 @@ function renderUse(){
   bks.sort((a,b)=>b.start.localeCompare(a.start));
   document.getElementById('use-tb').innerHTML=bks.length?bks.map(b=>{const v=gVeh(b.vh_id),u=gUsr(b.u_id);return`<tr><td>${VICO[v?.type]||'🚗'} ${v?.name||'—'}</td><td>${u?.name||'—'}</td><td class="tdm">${b.start.replace('T',' ')}</td><td class="tdm">${b.end.replace('T',' ')}</td><td>${b.purpose||'—'}</td><td class="tdm">${b.km_plan||'—'}</td><td>${bkBadge(b)}</td><td>${(b.st||b.status)==='pending'?`<button class="btn bdr bsm" onclick="cancelCarBk('${b.id}')">✕ ${t('g.btn.cancel')}</button>`:''}</td></tr>`}).join(''):`<tr><td colspan="8" class="tdm" style="text-align:center;padding:22px">${t('car.no_data')}</td></tr>`;
 }
-function startUse(id){const bks=ld(K.bks),i=bks.findIndex(b=>b.id===id);if(i>=0){bks[i].st='active';bks[i].actual_start=new Date().toISOString().slice(0,16);}sv(K.bks,bks);if(i>=0)sbSaveCarBk(bks[i]);renderUse();toast('已標記出發','success');}
+function startUse(id){const bks=ld(K.bks),i=bks.findIndex(b=>b.id===id);if(i>=0){bks[i].st='active';bks[i].actual_start=new Date().toISOString().slice(0,16);}sv(K.bks,bks);if(i>=0)sbSaveCarBk(bks[i]);renderUse();renderCarDash();toast('已標記出發','success');}
 function endUse(id){
   const bks=ld(K.bks),i=bks.findIndex(b=>b.id===id);if(i<0)return;
   const bk=bks[i],vehs=ld(K.vh),vi=vehs.findIndex(v=>v.id===bk.vh_id),vh=vehs[vi];
@@ -4375,22 +4375,22 @@ function expFuelCSV(){const logs=ld(K.fl);const rows=[['車輛','日期','油量
 
 function renderMaint(){let logs=ld(K.mt);const vf=document.getElementById('mtvf')?.value||'';if(vf)logs=logs.filter(l=>l.vh_id===vf);logs.sort((a,b)=>b.date.localeCompare(a.date));document.getElementById('mt-tb').innerHTML=logs.length?logs.map(l=>{const v=gVeh(l.vh_id);return`<tr><td>${VICO[v?.type]||'🔧'} ${v?.name||'—'}</td><td class="tdm">${fmtD(l.date)}</td><td>${l.items||'—'}</td><td>${l.km?l.km.toLocaleString():'—'}</td><td>${l.cost?'$'+l.cost.toLocaleString():'—'}</td><td>${l.nkm?l.nkm.toLocaleString():'—'}</td><td class="tdm">${fmtD(l.ndt)}</td><td class="tdm">${l.vendor||'—'}</td><td><button class="btn bdr bsm" onclick="delMaint('${l.id}')">${t('g.btn.delete')}</button></td></tr>`}).join(''):`<tr><td colspan="9" class="tdm" style="text-align:center;padding:22px">${t('car.no_maint')}</td></tr>`;}
 function openMaintModal(){document.getElementById('momtt').textContent=t('car.mo.add_maint');const vehs=ld(K.vh);document.getElementById('mtveh').innerHTML=`<option value="">${t('g.select')}</option>`+vehs.map(v=>`<option value="${v.id}">${v.name}(${v.plate})</option>`).join('');document.getElementById('mtdt').value=tds();['mtkm','mtit','mtcs','mtvd','mtnk','mtnt'].forEach(x=>document.getElementById(x).value='');document.getElementById('mtnd').value='';openMo('mo-maint');}
-function saveMaint(){const vid=document.getElementById('mtveh').value,it=document.getElementById('mtit').value.trim();if(!vid)return toast('請選擇車輛','error');if(!it)return toast('請填寫保養項目','error');const nkm=parseInt(document.getElementById('mtnk').value)||null,ndt=document.getElementById('mtnd').value||null;const data={id:uid(),vh_id:vid,date:document.getElementById('mtdt').value||tds(),km:parseInt(document.getElementById('mtkm').value)||null,items:it,cost:parseInt(document.getElementById('mtcs').value)||null,vendor:document.getElementById('mtvd').value.trim(),nkm,ndt,note:document.getElementById('mtnt').value.trim()};const logs=ld(K.mt);logs.push(data);sv(K.mt,logs);if(nkm){const vehs=ld(K.vh),vi=vehs.findIndex(v=>v.id===vid);if(vi>=0){vehs[vi].next_maint_km=nkm;sv(K.vh,vehs);}}closeMo('mo-maint');renderMaint();updBadges();toast(t('g.toast.saved'),'success');}
+function saveMaint(){const vid=document.getElementById('mtveh').value,it=document.getElementById('mtit').value.trim();if(!vid)return toast('請選擇車輛','error');if(!it)return toast('請填寫保養項目','error');const nkm=parseInt(document.getElementById('mtnk').value)||null,ndt=document.getElementById('mtnd').value||null;const data={id:uid(),vh_id:vid,date:document.getElementById('mtdt').value||tds(),km:parseInt(document.getElementById('mtkm').value)||null,items:it,cost:parseInt(document.getElementById('mtcs').value)||null,vendor:document.getElementById('mtvd').value.trim(),nkm,ndt,note:document.getElementById('mtnt').value.trim()};const logs=ld(K.mt);logs.push(data);sv(K.mt,logs);if(nkm){const vehs=ld(K.vh),vi=vehs.findIndex(v=>v.id===vid);if(vi>=0){vehs[vi].next_maint_km=nkm;sv(K.vh,vehs);}}closeMo('mo-maint');renderMaint();updBadges();renderCarDash();toast(t('g.toast.saved'),'success');}
 function delMaint(id){if(!confirm('確定刪除？'))return;sv(K.mt,ld(K.mt).filter(l=>l.id!==id));renderMaint();toast(t('g.toast.deleted'),'success');}
 
 let editIspId=null;
 function renderInsp(){const isps=ld(K.isp);const cfg=lo(K.ccfg,DCCFG);document.getElementById('insp-tb').innerHTML=isps.length?isps.map(isp=>{const v=gVeh(isp.vh_id),d=isp.next?dDiff(isp.next):null,cls=d===null?'':d<=7?'rd':d<=cfg.insp_days?'rw':'';return`<tr class="${cls}"><td>${VICO[v?.type]||'📋'} ${v?.name||'—'} <span class="tdm">(${v?.plate||''})</span></td><td class="tdm">${fmtD(isp.last)}</td><td>${fmtD(isp.next)}</td><td>${d!==null?`<span class="badge ${d<=7?'br':d<=30?'by':'bg'}">${d}d</span>`:'—'}</td><td><span class="badge ${d!==null&&d<=cfg.insp_days?'by':'bg'}">${d!==null&&d<=cfg.insp_days?t('lib.stat.soon'):t('car.st.avail')}</span></td><td class="tdm">${isp.note||'—'}</td><td><button class="btn bg2 bsm" onclick="openInspModal('${isp.id}')">${t('lib.btn.update')}</button> <button class="btn bdr bsm" onclick="delInsp('${isp.id}')">${t('g.btn.delete')}</button></td></tr>`}).join(''):`<tr><td colspan="7" class="tdm" style="text-align:center;padding:22px">${t('car.no_insp')}</td></tr>`;}
 function openInspModal(id){editIspId=id||null;document.getElementById('moispt').textContent=id?t('car.mo.edit_insp'):t('car.mo.add_insp');const vehs=ld(K.vh);document.getElementById('ispveh').innerHTML=`<option value="">${t('g.select')}</option>`+vehs.map(v=>`<option value="${v.id}">${v.name}(${v.plate})</option>`).join('');if(id){const isp=ld(K.isp).find(i=>i.id===id);if(!isp)return;document.getElementById('ispveh').value=isp.vh_id;document.getElementById('ispls').value=isp.last||'';document.getElementById('ispnx').value=isp.next||'';document.getElementById('ispnt').value=isp.note||'';}else{['ispls','ispnx','ispnt'].forEach(x=>document.getElementById(x).value='');}openMo('mo-insp');}
-function saveInsp(){const vid=document.getElementById('ispveh').value,nxt=document.getElementById('ispnx').value;if(!vid)return toast('請選擇車輛','error');if(!nxt)return toast('請填寫下次驗車日期','error');const data={vh_id:vid,last:document.getElementById('ispls').value||null,next:nxt,note:document.getElementById('ispnt').value.trim()};const isps=ld(K.isp);if(editIspId){const i=isps.findIndex(x=>x.id===editIspId);if(i>=0)isps[i]={...isps[i],...data};}else isps.push({id:uid(),...data});sv(K.isp,isps);const vehs=ld(K.vh),vi=vehs.findIndex(v=>v.id===vid);if(vi>=0){vehs[vi].next_insp=nxt;sv(K.vh,vehs);}closeMo('mo-insp');renderInsp();updBadges();toast('已更新','success');}
+function saveInsp(){const vid=document.getElementById('ispveh').value,nxt=document.getElementById('ispnx').value;if(!vid)return toast('請選擇車輛','error');if(!nxt)return toast('請填寫下次驗車日期','error');const data={vh_id:vid,last:document.getElementById('ispls').value||null,next:nxt,note:document.getElementById('ispnt').value.trim()};const isps=ld(K.isp);if(editIspId){const i=isps.findIndex(x=>x.id===editIspId);if(i>=0)isps[i]={...isps[i],...data};}else isps.push({id:uid(),...data});sv(K.isp,isps);const vehs=ld(K.vh),vi=vehs.findIndex(v=>v.id===vid);if(vi>=0){vehs[vi].next_insp=nxt;sv(K.vh,vehs);}closeMo('mo-insp');renderInsp();updBadges();renderCarDash();toast('已更新','success');}
 function delInsp(id){if(!confirm('確定刪除？'))return;sv(K.isp,ld(K.isp).filter(i=>i.id!==id));renderInsp();toast(t('g.toast.deleted'),'success');}
 
 function renderPark(){const pks=ld(K.pk),vehs=ld(K.vh);document.getElementById('pk-grid').innerHTML=pks.length?pks.map(p=>{const car=vehs.find(v=>v.pk_id===p.id);return`<div style="background:var(--bg2);border:1px solid ${car?'rgba(6,182,212,.3)':'var(--bd)'};border-radius:var(--r);padding:13px;text-align:center"><div style="font-size:26px;margin-bottom:5px">${car?'🚗':'🅿️'}</div><div style="font-weight:700;font-size:14px;color:var(--tl)">${p.number}</div><div style="font-size:11px;color:var(--t3);margin:3px 0">${p.location||'—'}</div>${car?`<span class="badge bt" style="margin-top:4px">${car.name}</span>`:`<span class="badge bm" style="margin-top:4px">空位</span>`}<div style="margin-top:10px"><button class="btn bic bdr bsm" onclick="delPark('${p.id}')">✕</button></div></div>`}).join(''):'<div class="es"><div class="ei">🅿️</div><p>尚未設定停車位</p></div>';}
 function openParkModal(){['pknm','pklc','pknt'].forEach(x=>document.getElementById(x).value='');openMo('mo-park');}
-function savePark(){const nm=document.getElementById('pknm').value.trim();if(!nm)return toast('請輸入格位編號','error');const pks=ld(K.pk);if(pks.find(p=>p.number===nm))return toast('格位編號已存在','error');pks.push({id:uid(),number:nm,location:document.getElementById('pklc').value.trim(),note:document.getElementById('pknt').value.trim()});sv(K.pk,pks);closeMo('mo-park');renderPark();toast(t('g.toast.added'),'success');}
-function delPark(id){if(ld(K.vh).find(v=>v.pk_id===id))return toast('此格位有車輛，無法刪除','error');if(!confirm('確定刪除？'))return;sv(K.pk,ld(K.pk).filter(p=>p.id!==id));renderPark();toast(t('g.toast.deleted'),'success');}
+function savePark(){const nm=document.getElementById('pknm').value.trim();if(!nm)return toast('請輸入格位編號','error');const pks=ld(K.pk);if(pks.find(p=>p.number===nm))return toast('格位編號已存在','error');pks.push({id:uid(),number:nm,location:document.getElementById('pklc').value.trim(),note:document.getElementById('pknt').value.trim()});sv(K.pk,pks);closeMo('mo-park');renderPark();renderCarDash();toast(t('g.toast.added'),'success');}
+function delPark(id){if(ld(K.vh).find(v=>v.pk_id===id))return toast('此格位有車輛，無法刪除','error');if(!confirm('確定刪除？'))return;sv(K.pk,ld(K.pk).filter(p=>p.id!==id));renderPark();renderCarDash();toast(t('g.toast.deleted'),'success');}
 
 function loadCarCfg(){const cfg=lo(K.ccfg,DCCFG);document.getElementById('ccmk').value=cfg.maint_km||500;document.getElementById('ccid').value=cfg.insp_days||30;document.getElementById('ccmd').value=cfg.max_days||7;}
-function saveCarCfg(){sv(K.ccfg,{maint_km:parseInt(document.getElementById('ccmk').value)||500,insp_days:parseInt(document.getElementById('ccid').value)||30,max_days:parseInt(document.getElementById('ccmd').value)||7});toast(t('g.toast.saved'),'success');}
+function saveCarCfg(){sv(K.ccfg,{maint_km:parseInt(document.getElementById('ccmk').value)||500,insp_days:parseInt(document.getElementById('ccid').value)||30,max_days:parseInt(document.getElementById('ccmd').value)||7});renderCarDash();toast(t('g.toast.saved'),'success');}
 
 function showUsw(){
   const us=ld(K.us);

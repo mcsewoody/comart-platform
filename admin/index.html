@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" href="data:,">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART 行政管理平台 v1.77</title>
+<title>COMART 行政管理平台 v1.78</title>
 <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.js"></script>
 <style>
 :root{
@@ -983,7 +983,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="logo">
     <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
     <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
-    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.77</span>
+    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.78</span>
   </div>
   <div class="trr">
     <div class="admin-lang-sw">
@@ -998,7 +998,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <span id="cur-u" style="color:var(--text-2)">載入中…</span>
       <span style="color:var(--text-3);font-size:10px">▾</span>
     </div>
-    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.77</span>
+    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.78</span>
   </div>
 </div>
 
@@ -1185,7 +1185,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
           <div class="fg2" style="margin-bottom:4px">
             <div class="fg full"><div class="fl" data-i18n="car.lbl.driver">使用人 *</div><select id="bku"><option value="">請選擇…</option></select></div>
             <div class="fg full"><div class="fl" data-i18n="car.lbl.vehicle">車輛 *</div><select id="bkv" onchange="chkConflict()"><option value="">請選擇…</option></select></div>
-            <div class="fg"><div class="fl" data-i18n="car.lbl.date_start">開始日期 *</div><input type="date" id="bksd" onchange="chkConflict()"></div>
+            <div class="fg"><div class="fl" data-i18n="car.lbl.date_start">開始日期 *</div><input type="date" id="bksd" onchange="document.getElementById('bked').value=this.value;chkConflict()"></div>
             <div class="fg"><div class="fl" data-i18n="car.lbl.time_start">開始時間</div><input type="time" id="bkst2" value="08:00" onchange="chkConflict()"></div>
             <div class="fg"><div class="fl" data-i18n="car.lbl.date_end">結束日期 *</div><input type="date" id="bked" onchange="chkConflict()"></div>
             <div class="fg"><div class="fl" data-i18n="car.lbl.time_end">結束時間</div><input type="time" id="bket" value="18:00" onchange="chkConflict()"></div>
@@ -2200,7 +2200,7 @@ const ld=k=>{if(_mem[k]!==undefined)return _mem[k];try{return JSON.parse(localSt
 const lo=(k,d)=>{if(_mem[k]!==undefined)return _mem[k];try{return JSON.parse(localStorage.getItem(k))||d}catch{return d}};
 const sv=(k,v)=>{_mem[k]=v;try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}};
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
-const tds=()=>new Date().toISOString().slice(0,10);
+const tds=()=>new Date(Date.now()+8*3600000).toISOString().slice(0,10);
 const dtStr=d=>[d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');
 const fmtD=s=>{if(!s)return'—';const d=new Date(s+'T00:00:00');return`${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}`};
 const dDiff=s=>{const d=new Date(s+'T00:00:00');const n=new Date();n.setHours(0,0,0,0);return Math.round((d-n)/86400000)};
@@ -4297,13 +4297,13 @@ function startBk(vid){
   },80);
 }
 
-function doBooking(){
+async function doBooking(){
   const vid=document.getElementById('bkv').value,uid2=document.getElementById('bku').value,sd=document.getElementById('bksd').value,st=document.getElementById('bkst2').value||'08:00',ed=document.getElementById('bked').value,et=document.getElementById('bket').value||'18:00',pur=document.getElementById('bkpur').value.trim();
   if(!vid)return toast('請選擇車輛','error');if(!uid2)return toast('請選擇使用人','error');if(!sd||!ed)return toast('請選擇日期','error');if(!pur)return toast('請填寫出行目的','error');
   const ns=`${sd}T${st}`,ne=`${ed}T${et}`;if(ne<=ns)return toast(t('err.time_order'),'error');
   if(ld(K.bks).find(b=>b.vh_id===vid&&b.st!=='done'&&b.st!=='cancelled'&&b.start<ne&&b.end>ns))return toast('此車時段已有預約','error');
   const bks=ld(K.bks);bks.push({id:uid(),vh_id:vid,u_id:uid2,start:ns,end:ne,purpose:pur,km_plan:parseInt(document.getElementById('bkkm').value)||0,from:document.getElementById('bkfr').value.trim(),to:document.getElementById('bkto').value.trim(),note:document.getElementById('bknt').value.trim(),st:'pending'});
-  sv(K.bks,bks);sbSaveCarBk(bks[bks.length-1]);const v=gVeh(vid),u=gUsr(uid2);toast(`已預約：${u?.name}使用${v?.name}（${sd}）`,'success');
+  sv(K.bks,bks);await sbSaveCarBk(bks[bks.length-1]);const v=gVeh(vid),u=gUsr(uid2);toast(`已預約：${u?.name}使用${v?.name}（${sd}）`,'success');
   ['bkpur','bkkm','bkfr','bkto','bknt'].forEach(x=>document.getElementById(x).value='');document.getElementById('bk-conf').style.display='none';navCar('car-dash');
 }
 
@@ -4314,7 +4314,7 @@ function renderUse(){
   bks.sort((a,b)=>b.start.localeCompare(a.start));
   document.getElementById('use-tb').innerHTML=bks.length?bks.map(b=>{const v=gVeh(b.vh_id),u=gUsr(b.u_id);return`<tr><td>${VICO[v?.type]||'🚗'} ${v?.name||'—'}</td><td>${u?.name||'—'}</td><td class="tdm">${b.start.replace('T',' ')}</td><td class="tdm">${b.end.replace('T',' ')}</td><td>${b.purpose||'—'}</td><td class="tdm">${b.km_plan||'—'}</td><td>${bkBadge(b)}</td><td>${(b.st||b.status)==='pending'?`<button class="btn bdr bsm" onclick="cancelCarBk('${b.id}')">✕ ${t('g.btn.cancel')}</button>`:''}</td></tr>`}).join(''):`<tr><td colspan="8" class="tdm" style="text-align:center;padding:22px">${t('car.no_data')}</td></tr>`;
 }
-function startUse(id){const bks=ld(K.bks),i=bks.findIndex(b=>b.id===id);if(i>=0){bks[i].st='active';bks[i].actual_start=new Date().toISOString().slice(0,16);}sv(K.bks,bks);if(i>=0)sbSaveCarBk(bks[i]);renderUse();renderCarDash();toast('已標記出發','success');}
+async function startUse(id){const bks=ld(K.bks),i=bks.findIndex(b=>b.id===id);if(i>=0){bks[i].st='active';bks[i].actual_start=new Date().toISOString().slice(0,16);}sv(K.bks,bks);if(i>=0)await sbSaveCarBk(bks[i]);renderUse();renderCarDash();toast('已標記出發','success');}
 function endUse(id){
   const bks=ld(K.bks),i=bks.findIndex(b=>b.id===id);if(i<0)return;
   const bk=bks[i],vehs=ld(K.vh),vi=vehs.findIndex(v=>v.id===bk.vh_id),vh=vehs[vi];

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" href="data:,">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART 行政管理平台 v1.73</title>
+<title>COMART 行政管理平台 v1.74</title>
 <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.js"></script>
 <style>
 :root{
@@ -408,6 +408,14 @@ input[type=time]::-webkit-calendar-picker-indicator{
 .ccr{display:flex;align-items:center;justify-content:space-between;font-size:12px}
 .ccl{color:var(--t3)}.ccv{color:var(--t1);font-weight:500}
 .ccf{padding:9px 15px;border-top:1px solid var(--bd);display:flex;gap:8px}
+.fuel-bar{display:flex;gap:2px;height:6px;border-radius:3px;margin-top:4px}
+.fuel-seg{flex:1;border-radius:2px;background:var(--bd);transition:background .2s}
+.fuel-seg.fl-e,.fuel-seg.fl-q{background:#ef4444}
+.fuel-seg.fl-h{background:#f59e0b}
+.fuel-seg.fl-t,.fuel-seg.fl-f{background:#22c55e}
+.fuel-lvl-btn{flex:1;padding:5px 0;border:1px solid var(--bd);border-radius:var(--rs);background:var(--bg1);color:var(--t2);cursor:pointer;font-size:12px;transition:all .15s}
+.fuel-lvl-btn:hover{border-color:var(--tl);color:var(--tl)}
+.fuel-lvl-btn.active{background:var(--tld);border-color:var(--tl);color:var(--tl);font-weight:700}
 .calw{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden}
 .calh{background:var(--bg1);padding:11px 15px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--bd)}
 .calnav{background:none;border:1px solid var(--bd);border-radius:var(--rs);color:var(--t2);cursor:pointer;padding:4px 10px;font-size:13px;transition:all var(--tr)}.calnav:hover{background:var(--bgh);color:var(--t1)}
@@ -975,7 +983,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="logo">
     <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
     <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
-    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.73</span>
+    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.74</span>
   </div>
   <div class="trr">
     <div class="admin-lang-sw">
@@ -990,7 +998,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <span id="cur-u" style="color:var(--text-2)">載入中…</span>
       <span style="color:var(--text-3);font-size:10px">▾</span>
     </div>
-    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.73</span>
+    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.74</span>
   </div>
 </div>
 
@@ -2007,7 +2015,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="mf"><button class="btn bg2" onclick="closeMo('mo-broadcast')" data-i18n="g.btn.cancel">取消</button><button class="broadcast-btn" onclick="sendBroadcast()" data-i18n="room.mo.broadcast_btn">🚨 立即廣播</button></div>
 </div></div>
 
-<div class="mo" id="mo-ret"><div class="md" style="max-width:420px"><div class="mh"><div class="mt2" data-i18n="car.mo.return">🔑 車輛歸還</div><button class="mcl" onclick="closeMo('mo-ret')">✕</button></div><input type="hidden" id="ret-bk-id"><div class="fg" style="margin-bottom:12px"><div class="fl" data-i18n="car.mo.return_km_lbl">歸還里程數（km）*</div><input type="number" id="ret-km" min="0" placeholder="請輸入歸還時里程數"><div style="font-size:11px;color:var(--text-3);margin-top:4px" id="ret-km-hint"></div></div><div class="fg" style="margin-bottom:12px"><div class="fl" data-i18n="car.mo.return_park_lbl">停車位</div><input type="text" id="ret-pk" placeholder="例：B1-001（選填）"><div style="font-size:11px;color:var(--text-3);margin-top:4px" data-i18n="car.mo.ret_park_hint">歸還後車輛停放位置</div></div><div id="ret-err" style="display:none;color:var(--red);font-size:12px;margin-bottom:8px;padding:8px;background:var(--red-bg);border-radius:var(--radius)"></div><div style="display:flex;gap:10px;margin-top:16px"><button class="btn bg2" style="flex:1" onclick="closeMo('mo-ret')" data-i18n="g.btn.cancel">取消</button><button class="btn btl" style="flex:2" onclick="doReturn()" data-i18n="car.mo.do_return">✓ 確認歸還</button></div></div></div>
+<div class="mo" id="mo-ret"><div class="md" style="max-width:420px"><div class="mh"><div class="mt2" data-i18n="car.mo.return">🔑 車輛歸還</div><button class="mcl" onclick="closeMo('mo-ret')">✕</button></div><input type="hidden" id="ret-bk-id"><div class="fg" style="margin-bottom:12px"><div class="fl" data-i18n="car.mo.return_km_lbl">歸還里程數（km）*</div><input type="number" id="ret-km" min="0" placeholder="請輸入歸還時里程數"><div style="font-size:11px;color:var(--text-3);margin-top:4px" id="ret-km-hint"></div></div><div class="fg" style="margin-bottom:12px"><div class="fl" data-i18n="car.mo.return_park_lbl">停車位</div><input type="text" id="ret-pk" placeholder="例：B1-001（選填）"><div style="font-size:11px;color:var(--text-3);margin-top:4px" data-i18n="car.mo.ret_park_hint">歸還後車輛停放位置</div></div><div class="fg" style="margin-bottom:12px"><div class="fl" data-i18n="car.mo.return_fuel_lbl">⛽ 目前油量 *</div><div style="display:flex;gap:5px;margin-top:4px" id="ret-fuel-btns"><button class="fuel-lvl-btn" data-fv="0" onclick="setRetFuel(0)">E</button><button class="fuel-lvl-btn" data-fv="1" onclick="setRetFuel(1)">1/4</button><button class="fuel-lvl-btn" data-fv="2" onclick="setRetFuel(2)">1/2</button><button class="fuel-lvl-btn" data-fv="3" onclick="setRetFuel(3)">3/4</button><button class="fuel-lvl-btn" data-fv="4" onclick="setRetFuel(4)">F</button></div><input type="hidden" id="ret-fuel-lvl" value="2"></div><div id="ret-err" style="display:none;color:var(--red);font-size:12px;margin-bottom:8px;padding:8px;background:var(--red-bg);border-radius:var(--radius)"></div><div style="display:flex;gap:10px;margin-top:16px"><button class="btn bg2" style="flex:1" onclick="closeMo('mo-ret')" data-i18n="g.btn.cancel">取消</button><button class="btn btl" style="flex:2" onclick="doReturn()" data-i18n="car.mo.do_return">✓ 確認歸還</button></div></div></div>
 <div id="toastc"></div>
 <script>
 // ── ADMIN CONFIG ──────────────────────────────────
@@ -2204,6 +2212,19 @@ const DCATS=['管理','行銷','設計','科技','財務','語言','傳記','文
 const VTLB={sedan:'轎車',suv:'SUV',van:'廂型車',truck:'貨車'};
 const VFLB={gas:'汽油',diesel:'柴油',hybrid:'油電',ev:'純電'};
 const VICO={sedan:'🚗',suv:'🚙',van:'🚐',truck:'🚚'};
+const FUEL_LBL=['E','1/4','1/2','3/4','F'];
+const FUEL_CLS=['fl-e','fl-q','fl-h','fl-t','fl-f'];
+function fuelBar(lvl){
+  const l=Math.max(0,Math.min(4,parseInt(lvl)||0));
+  const cls=FUEL_CLS[l];
+  return`<div class="fuel-bar">${[1,2,3,4].map(i=>`<div class="fuel-seg ${i<=l?cls:''}"></div>`).join('')}</div>`;
+}
+function setRetFuel(v){
+  document.getElementById('ret-fuel-lvl').value=v;
+  document.querySelectorAll('#ret-fuel-btns .fuel-lvl-btn').forEach(b=>{
+    b.classList.toggle('active',parseInt(b.dataset.fv)===v);
+  });
+}
 
 
 // ── K key → Supabase table 對應 ──────────────────────
@@ -2380,7 +2401,7 @@ async function sbSaveVehicle(vh) {
       parking_id:vh.pk_id||vh.parking_id||null,
       pk_id:vh.pk_id||vh.parking_id||null,
       notes:vh.notes||'', status:vh.st||vh.status||'available',
-      site:vh.site||'TW',
+      site:vh.site||'TW', fuel_lvl:vh.fuel_lvl??2,
     });
   } catch(e) { console.warn('sbSaveVehicle fail:', e.message); }
 }
@@ -2729,6 +2750,7 @@ const ADMIN_I18N = {
     'car.mo.add_veh':'Add Vehicle','car.mo.edit_veh':'Edit Vehicle','car.mo.fuel_log':'Log Fuel','car.mo.add_maint':'Add Maintenance','car.mo.edit_maint':'Edit Maintenance',
     'car.mo.add_insp':'Log Inspection','car.mo.edit_insp':'Edit Inspection','car.mo.add_park':'Add Parking',
     'car.mo.return':'🔑 Vehicle Return','car.mo.return_km_lbl':'Return Mileage (km) *','car.mo.return_park_lbl':'Parking Space','car.mo.ret_park_hint':'Parking space after return',
+    'car.mo.return_fuel_lbl':'⛽ Current Fuel Level *',
     'car.mo.do_return':'✓ Confirm Return','car.mo.depart':'🚗 Depart','car.mo.end_use':'🔑 Return',
     'lib.mo.add_book':'Add Book','lib.mo.edit_book':'Edit Book','lib.mo.isbn_auto':'ISBN (auto-fill)','lib.mo.lookup':'Lookup',
     'lib.mo.add_cat':'Add Category','lib.mo.add_rsv':'Add Reservation','lib.mo.switch_user':'Switch User','lib.mo.select_account':'Select your account',
@@ -2933,6 +2955,7 @@ const ADMIN_I18N = {
     'car.mo.add_veh':'新增車輛','car.mo.edit_veh':'編輯車輛','car.mo.fuel_log':'記錄加油','car.mo.add_maint':'新增保養記錄','car.mo.edit_maint':'編輯保養記錄',
     'car.mo.add_insp':'登記驗車','car.mo.edit_insp':'編輯驗車','car.mo.add_park':'新增停車位',
     'car.mo.return':'🔑 車輛歸還','car.mo.return_km_lbl':'歸還里程數（km）*','car.mo.return_park_lbl':'停車位','car.mo.ret_park_hint':'歸還後車輛停放位置',
+    'car.mo.return_fuel_lbl':'⛽ 目前油量 *',
     'car.mo.do_return':'✓ 確認歸還','car.mo.depart':'🚗 出發','car.mo.end_use':'🔑 歸還',
     'lib.mo.add_book':'新增書籍','lib.mo.edit_book':'編輯書籍','lib.mo.isbn_auto':'ISBN（可自動帶入）','lib.mo.lookup':'查詢',
     'lib.mo.add_cat':'新增分類','lib.mo.add_rsv':'新增預約','lib.mo.switch_user':'切換使用者','lib.mo.select_account':'選擇您的帳號',
@@ -3137,6 +3160,7 @@ const ADMIN_I18N = {
     'car.mo.add_veh':'新增车辆','car.mo.edit_veh':'编辑车辆','car.mo.fuel_log':'记录加油','car.mo.add_maint':'新增保养记录','car.mo.edit_maint':'编辑保养记录',
     'car.mo.add_insp':'登记验车','car.mo.edit_insp':'编辑验车','car.mo.add_park':'新增停车位',
     'car.mo.return':'🔑 车辆归还','car.mo.return_km_lbl':'归还里程数（km）*','car.mo.return_park_lbl':'停车位','car.mo.ret_park_hint':'归还后车辆停放位置',
+    'car.mo.return_fuel_lbl':'⛽ 当前油量 *',
     'car.mo.do_return':'✓ 确认归还','car.mo.depart':'🚗 出发','car.mo.end_use':'🔑 归还',
     'lib.mo.add_book':'新增书籍','lib.mo.edit_book':'编辑书籍','lib.mo.isbn_auto':'ISBN（可自动带入）','lib.mo.lookup':'查询',
     'lib.mo.add_cat':'新增分类','lib.mo.add_rsv':'新增预约','lib.mo.switch_user':'切换用户','lib.mo.select_account':'选择您的账号',
@@ -3341,6 +3365,7 @@ const ADMIN_I18N = {
     'car.mo.add_veh':'Thêm xe','car.mo.edit_veh':'Sửa xe','car.mo.fuel_log':'Ghi nhiên liệu','car.mo.add_maint':'Thêm BD','car.mo.edit_maint':'Sửa BD',
     'car.mo.add_insp':'Ghi KĐ','car.mo.edit_insp':'Sửa KĐ','car.mo.add_park':'Thêm bãi đỗ',
     'car.mo.return':'🔑 Trả xe','car.mo.return_km_lbl':'Số km khi trả *','car.mo.return_park_lbl':'Bãi đỗ xe','car.mo.ret_park_hint':'Nơi đỗ xe sau khi trả',
+    'car.mo.return_fuel_lbl':'⛽ Mức nhiên liệu hiện tại *',
     'car.mo.do_return':'✓ Xác nhận trả xe','car.mo.depart':'🚗 Xuất phát','car.mo.end_use':'🔑 Trả xe',
     'lib.mo.add_book':'Thêm sách','lib.mo.edit_book':'Sửa sách','lib.mo.isbn_auto':'ISBN (tự điền)','lib.mo.lookup':'Tra cứu',
     'lib.mo.add_cat':'Thêm danh mục','lib.mo.add_rsv':'Thêm đặt trước','lib.mo.switch_user':'Đổi người dùng','lib.mo.select_account':'Chọn tài khoản',
@@ -3545,6 +3570,7 @@ const ADMIN_I18N = {
     'car.mo.add_veh':'車両追加','car.mo.edit_veh':'車両編集','car.mo.fuel_log':'給油記録','car.mo.add_maint':'整備記録追加','car.mo.edit_maint':'整備記録編集',
     'car.mo.add_insp':'車検登録','car.mo.edit_insp':'車検編集','car.mo.add_park':'駐車場追加',
     'car.mo.return':'🔑 車両返却','car.mo.return_km_lbl':'返却時走行距離 (km) *','car.mo.return_park_lbl':'駐車場','car.mo.ret_park_hint':'返却後の駐車場所',
+    'car.mo.return_fuel_lbl':'⛽ 現在の燃料レベル *',
     'car.mo.do_return':'✓ 返却確認','car.mo.depart':'🚗 出発','car.mo.end_use':'🔑 返却',
     'lib.mo.add_book':'蔵書追加','lib.mo.edit_book':'蔵書編集','lib.mo.isbn_auto':'ISBN（自動入力）','lib.mo.lookup':'検索',
     'lib.mo.add_cat':'カテゴリ追加','lib.mo.add_rsv':'予約追加','lib.mo.switch_user':'ユーザー切替','lib.mo.select_account':'アカウントを選択',
@@ -4159,7 +4185,7 @@ async function renderCarDash(){
   document.getElementById('cd-td').innerHTML=tdBks.length?tdBks.map(b=>{const v=gVeh(b.vh_id),u=gUsr(b.u_id);return`<tr><td>${VICO[v?.type]||'🚗'} ${v?.name||'—'}</td><td>${u?.name||'—'}</td><td class="tdm">${b.start.slice(11,16)}–${b.end.slice(11,16)}</td><td class="tdm">${b.purpose||'—'}</td><td>${bkBadge(b)}</td></tr>`}).join(''):`<tr><td colspan="5" class="tdm" style="text-align:center;padding:14px">${t('car.no_bk_today')}</td></tr>`;
   const rems=[];vehs.forEach(v=>{if(v.next_maint_km&&v.km>=(v.next_maint_km-cfg.maint_km))rems.push({v,item:t('car.nav.maint'),diff:v.next_maint_km-v.km,type:'km'});if(v.next_insp&&dDiff(v.next_insp)<=cfg.insp_days)rems.push({v,item:t('car.nav.insp'),diff:dDiff(v.next_insp),date:v.next_insp,type:'dt'});});
   document.getElementById('cd-rm').innerHTML=rems.length?rems.map(r=>`<tr><td>${VICO[r.v.type]||'🚗'} ${r.v.name}</td><td>${r.item}</td><td class="tdm">${r.type==='dt'?fmtD(r.date):`${r.v.next_maint_km}km`}</td><td>${r.type==='dt'?`<span class="badge ${r.diff<=7?'br':r.diff<=30?'by':'bo'}">${r.diff}d</span>`:`<span class="badge bo">-${r.diff}km</span>`}</td></tr>`).join(''):`<tr><td colspan="4" class="tdm" style="text-align:center;padding:14px">${t('lib.no_overdue')}</td></tr>`;
-  document.getElementById('cd-cards').innerHTML=vehs.map(v=>{const st=vStBadge(v),pk=gPk(v.pk_id),pendBk=bks.find(b=>b.vh_id===v.id&&(b.st||b.status)==='pending'),actBk=bks.find(b=>b.vh_id===v.id&&(b.st||b.status)==='active'),curU=actBk?gUsr(actBk.u_id):null;return`<div class="ccard"><div class="cch"><div class="ccico">${VICO[v.type]||'🚗'}</div><div><div class="ccn">${v.name}</div><div class="ccp">${v.plate}</div></div><span class="badge ${st.cls}" style="margin-left:auto">${st.lbl}</span></div><div class="ccb"><div class="ccr"><span class="ccl">${t('car.veh.fuel.label')}</span><span class="ccv">${t('car.veh.type.'+v.type)||v.type}·${t('car.fuel.'+v.fuel)||v.fuel}</span></div><div class="ccr"><span class="ccl">${t('car.veh.km_label')}</span><span class="ccv">${v.km.toLocaleString()}km</span></div><div class="ccr"><span class="ccl">${t('car.veh.park_label')}</span><span class="ccv">${v.pk_id||'—'}</span></div>${curU?`<div class="ccr"><span class="ccl">${t('car.veh.user_label')}</span><span class="ccv" style="color:var(--tl)">${curU.name}</span></div>`:''}</div><div class="ccf" style="flex-wrap:wrap;gap:6px"> ${pendBk?`<button class=\"btn bsm\" style=\"background:var(--acd);color:var(--ac)\" onclick=\"startUse('${pendBk.id}')\">${t('car.mo.depart')}</button> `:''} ${actBk?`<button class=\"btn bg2 bsm\" onclick=\"endUse('${actBk.id}')\">${t('car.mo.end_use')}</button>`:''} ${!actBk&&!pendBk?`<button class=\"btn bsm\" style=\"background:var(--acd);color:var(--ac)\" onclick=\"startBk('${v.id}')\">${t('car.btn.add_bk')}</button>`:''}</div></div>`}).join('');
+  document.getElementById('cd-cards').innerHTML=vehs.map(v=>{const st=vStBadge(v),pk=gPk(v.pk_id),pendBk=bks.find(b=>b.vh_id===v.id&&(b.st||b.status)==='pending'),actBk=bks.find(b=>b.vh_id===v.id&&(b.st||b.status)==='active'),curU=actBk?gUsr(actBk.u_id):null;return`<div class="ccard"><div class="cch"><div class="ccico">${VICO[v.type]||'🚗'}</div><div><div class="ccn">${v.name}</div><div class="ccp">${v.plate}</div></div><span class="badge ${st.cls}" style="margin-left:auto">${st.lbl}</span></div><div class="ccb"><div class="ccr"><span class="ccl">${t('car.veh.fuel.label')}</span><span class="ccv">${t('car.veh.type.'+v.type)||v.type}·${t('car.fuel.'+v.fuel)||v.fuel}</span></div><div class="ccr"><span class="ccl">${t('car.veh.km_label')}</span><span class="ccv">${v.km.toLocaleString()}km</span></div><div class="ccr"><span class="ccl">⛽</span><span class="ccv">${FUEL_LBL[v.fuel_lvl??2]}</span></div>${fuelBar(v.fuel_lvl??2)}<div class="ccr"><span class="ccl">${t('car.veh.park_label')}</span><span class="ccv">${v.pk_id||'—'}</span></div>${curU?`<div class="ccr"><span class="ccl">${t('car.veh.user_label')}</span><span class="ccv" style="color:var(--tl)">${curU.name}</span></div>`:''}</div><div class="ccf" style="flex-wrap:wrap;gap:6px"> ${pendBk?`<button class=\"btn bsm\" style=\"background:var(--acd);color:var(--ac)\" onclick=\"startUse('${pendBk.id}')\">${t('car.mo.depart')}</button> `:''} ${actBk?`<button class=\"btn bg2 bsm\" onclick=\"endUse('${actBk.id}')\">${t('car.mo.end_use')}</button>`:''} ${!actBk&&!pendBk?`<button class=\"btn bsm\" style=\"background:var(--acd);color:var(--ac)\" onclick=\"startBk('${v.id}')\">${t('car.btn.add_bk')}</button>`:''}</div></div>`}).join('');
 }
 
 let editVid=null;
@@ -4299,6 +4325,7 @@ function endUse(id){
   document.getElementById('ret-km').min=vh?.km||0;
   document.getElementById('ret-km-hint').textContent=t('car.mileage_hint').replace('%d',(vh?.km||0).toLocaleString()).replace('%d',defKm.toLocaleString());
   document.getElementById('ret-pk').value=vh?.pk_id||'';
+  setRetFuel(vh?.fuel_lvl??2);
   document.getElementById('ret-err').style.display='none';
   openMo('mo-ret');
 }
@@ -4313,9 +4340,10 @@ async function doReturn(){
     document.getElementById('ret-err').style.display='';
     return;
   }
+  const fuelLvl=parseInt(document.getElementById('ret-fuel-lvl').value)||0;
   bks[i].st='done';bks[i].actual_end=new Date().toISOString().slice(0,16);bks[i].actual_km=kmVal;
   sv(K.bks,bks);sbSaveCarBk(bks[i]);
-  if(vi>=0){vehs[vi].km=kmVal;vehs[vi].pk_id=pkVal;vehs[vi].parking_id=pkVal||null;vehs[vi].st='available';vehs[vi].status='available';sv(K.vh,vehs);sbSaveVehicle(vehs[vi]);}
+  if(vi>=0){vehs[vi].km=kmVal;vehs[vi].pk_id=pkVal;vehs[vi].parking_id=pkVal||null;vehs[vi].st='available';vehs[vi].status='available';vehs[vi].fuel_lvl=fuelLvl;sv(K.vh,vehs);sbSaveVehicle(vehs[vi]);}
   closeMo('mo-ret');renderCarDash();toast('已登記歸還','success');
 }
 async function cancelCarBk(id){

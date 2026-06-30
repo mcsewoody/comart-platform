@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" href="data:,">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART 行政管理平台 v1.76</title>
+<title>COMART 行政管理平台 v1.77</title>
 <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.js"></script>
 <style>
 :root{
@@ -983,7 +983,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="logo">
     <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
     <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
-    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.76</span>
+    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.77</span>
   </div>
   <div class="trr">
     <div class="admin-lang-sw">
@@ -998,7 +998,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <span id="cur-u" style="color:var(--text-2)">載入中…</span>
       <span style="color:var(--text-3);font-size:10px">▾</span>
     </div>
-    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.76</span>
+    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.77</span>
   </div>
 </div>
 
@@ -2400,7 +2400,7 @@ async function sbSaveVehicle(vh) {
       parking_id:vh.pk_id||vh.parking_id||null,
       pk_id:vh.pk_id||vh.parking_id||null,
       notes:vh.notes||'', status:vh.st||vh.status||'available',
-      site:vh.site||'TW', fuel_lvl:vh.fuel_lvl??2,
+      site:vh.site||'TW', fuel_lvl:vh.fuel_lvl??4,
     });
   } catch(e) { console.warn('sbSaveVehicle fail:', e.message); }
 }
@@ -4341,8 +4341,8 @@ async function doReturn(){
   }
   const fuelLvl=parseInt(document.getElementById('ret-fuel-lvl').value)||0;
   bks[i].st='done';bks[i].actual_end=new Date().toISOString().slice(0,16);bks[i].actual_km=kmVal;
-  sv(K.bks,bks);sbSaveCarBk(bks[i]);
-  if(vi>=0){vehs[vi].km=kmVal;vehs[vi].pk_id=pkVal;vehs[vi].parking_id=pkVal||null;vehs[vi].st='available';vehs[vi].status='available';vehs[vi].fuel_lvl=fuelLvl;sv(K.vh,vehs);sbSaveVehicle(vehs[vi]);}
+  sv(K.bks,bks);await sbSaveCarBk(bks[i]);
+  if(vi>=0){vehs[vi].km=kmVal;vehs[vi].pk_id=pkVal;vehs[vi].parking_id=pkVal||null;vehs[vi].st='available';vehs[vi].status='available';vehs[vi].fuel_lvl=fuelLvl;sv(K.vh,vehs);await sbSaveVehicle(vehs[vi]);}
   closeMo('mo-ret');renderCarDash();toast('已登記歸還','success');
 }
 async function cancelCarBk(id){

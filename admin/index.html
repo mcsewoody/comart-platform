@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" href="data:,">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART 行政管理平台 v2.00</title>
+<title>COMART 行政管理平台 v2.01</title>
 <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.js"></script>
 <style>
 :root{
@@ -953,7 +953,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="logo">
     <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
     <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
-    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v2.00</span>
+    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v2.01</span>
   </div>
   <div class="trr">
     <div id="global-site-bar" style="display:flex;align-items:center;gap:4px"><span style="font-size:13px;color:var(--text-3);white-space:nowrap;font-weight:500">單位：</span>
@@ -975,7 +975,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <span id="cur-u" style="color:var(--text-2)">載入中…</span>
       <span style="color:var(--text-3);font-size:10px">▾</span>
     </div>
-    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v2.00</span>
+    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v2.01</span>
   </div>
 </div>
 
@@ -1763,7 +1763,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
 <!-- MODALS -->
 <div class="mo" id="mo-book"><div class="md"><div class="mh"><div class="mt2" id="mobkt" data-i18n="lib.mo.add_book">新增書籍</div><button class="mc2" onclick="closeMo('mo-book')">✕</button></div><div class="mb"><div class="fg"><div class="fl" data-i18n="lib.mo.isbn_auto">ISBN（可自動帶入）</div><div style="display:flex;gap:8px"><input type="text" id="bkisbn" placeholder="978-…" style="flex:1"><button class="btn bg2 bsm" onclick="lookupISBN()" data-i18n="lib.mo.lookup">查詢</button></div><div class="isbnld" id="isbnld">🔄 查詢中…</div></div><div class="fg2"><div class="fg full"><div class="fl" data-i18n="lib.tbl.title">書名 *</div><input type="text" id="bktit"></div><div class="fg"><div class="fl" data-i18n="lib.tbl.author">作者</div><input type="text" id="bkaut"></div><div class="fg"><div class="fl">出版年</div><input type="number" id="bkyr" min="1900" max="2099"></div><div class="fg"><div class="fl" data-i18n="lib.tbl.cat">分類</div><select id="bkcatsel"><option value="">未分類</option></select></div><div class="fg"><div class="fl" data-i18n="lib.tbl.status">語言</div><select id="bklng"><option value="繁中">繁體中文</option><option value="简中">簡體中文</option><option value="EN">英文</option><option value="日文">日文</option><option value="其他">其他</option></select></div><div class="fg"><div class="fl" data-i18n="lib.tbl.copies">館藏數量</div><input type="number" id="bkcp" value="1" min="1"></div><div class="fg full"><div class="fl">封面圖片 URL</div><input type="text" id="bkcov" placeholder="https://…"></div><div class="fg full"><div class="fl" data-i18n="lib.tbl.notes">備註</div><textarea id="bknt2" style="min-height:58px"></textarea></div></div></div><div class="mf"><button class="btn bdr" id="mo-book-del" style="display:none;margin-right:auto" onclick="delBkFromModal()">🗑 刪除</button><button class="btn bg2" onclick="closeMo('mo-book')" data-i18n="g.btn.cancel">取消</button><button class="btn bp" onclick="saveBook()" data-i18n="g.btn.save">儲存</button></div></div></div>
 <div class="mo" id="mo-cat"><div class="md" style="max-width:340px"><div class="mh"><div class="mt2" data-i18n="lib.mo.add_cat">新增分類</div><button class="mc2" onclick="closeMo('mo-cat')">✕</button></div><div class="mb"><div class="fg"><div class="fl" data-i18n="cat.name.label">分類名稱 *</div><input type="text" id="catnm" placeholder="管理、設計…"></div></div><div class="mf"><button class="btn bg2" onclick="closeMo('mo-cat')" data-i18n="g.btn.cancel">取消</button><button class="btn bp" onclick="saveCat()" data-i18n="lib.btn.add">＋ 新增</button></div></div></div>
-<div class="mo" id="mo-xlsxsave"><div class="md" style="max-width:420px"><div class="mh"><div class="mt2" id="xlsxsave-ttl">下載檔案</div><button class="mc2" onclick="closeMo('mo-xlsxsave')">✕</button></div><div class="mb"><div class="fg"><div class="fl">檔案名稱</div><div style="display:flex;gap:8px;align-items:center"><input type="text" id="xlsxsave-name" style="flex:1"><span style="color:var(--t3);font-size:13px">.xlsx</span></div></div><div style="background:var(--bg2);border:1px solid var(--bd);border-radius:var(--rs);padding:12px 14px;margin-top:4px"><div style="font-size:12px;color:var(--t2);line-height:1.7">📁 <b>儲存位置</b>由瀏覽器下載設定決定（通常為「下載」資料夾）。<br>若想每次自選路徑，請至瀏覽器設定 → 下載 → 開啟「下載前詢問儲存位置」。</div></div></div><div class="mf"><button class="btn bg2" onclick="closeMo('mo-xlsxsave')">取消</button><button class="btn bp" onclick="_doXlsxSave()">↓ 下載</button></div></div></div>
+<dialog id="dlg-xlsx" style="padding:0;border:1px solid var(--border-mid,#2a2f3d);border-radius:12px;background:var(--surface-2,#1a1f2e);color:var(--text-1,#e8eaf0);min-width:340px;max-width:440px;box-shadow:0 8px 32px rgba(0,0,0,.6)"><div style="padding:20px 22px 0"><div style="font-weight:600;font-size:15px;margin-bottom:18px" id="dlg-xlsx-ttl">下載檔案</div><div style="margin-bottom:14px"><div style="font-size:12px;color:var(--text-3,#8892a4);margin-bottom:6px">檔案名稱</div><div style="display:flex;align-items:center;gap:6px"><input type="text" id="dlg-xlsx-name" style="flex:1;background:var(--bg2,#0f1117);border:1px solid var(--bd,#2a2f3d);border-radius:6px;padding:8px 10px;color:inherit;font-size:14px;outline:none" onkeydown="if(event.key==='Enter')_dlgXlsxDo()"><span style="color:var(--t3,#8892a4);font-size:13px;white-space:nowrap">.xlsx</span></div></div><div style="background:var(--bg2,#0f1117);border:1px solid var(--bd,#2a2f3d);border-radius:6px;padding:11px 13px;font-size:12px;color:var(--t2,#b0b8cc);line-height:1.7;margin-bottom:4px">📁 <b>儲存位置</b>由瀏覽器下載設定決定（通常為「下載」資料夾）。<br>若要每次自選路徑：瀏覽器設定 → 下載 → 開啟「詢問每個檔案的儲存位置」。</div></div><div style="display:flex;gap:8px;padding:14px 22px;border-top:1px solid var(--bd,#2a2f3d);justify-content:flex-end;margin-top:14px"><button class="btn bg2" onclick="document.getElementById('dlg-xlsx').close()">取消</button><button class="btn bp" onclick="_dlgXlsxDo()">↓ 下載</button></div></dialog>
 <div class="mo" id="mo-rsv"><div class="md" style="max-width:430px"><div class="mh"><div class="mt2" data-i18n="lib.mo.add_rsv">新增預約</div><button class="mc2" onclick="closeMo('mo-rsv')">✕</button></div><div class="mb"><div class="fg"><div class="fl" data-i18n="lib.lbl.borrower">預約人 *</div><select id="rsvu"><option value="">請選擇…</option></select></div><div class="fg"><div class="fl" data-i18n="lib.lbl.book">書籍 *</div><select id="rsvb"><option value="">請選擇…</option></select></div></div><div class="mf"><button class="btn bg2" onclick="closeMo('mo-rsv')" data-i18n="g.btn.cancel">取消</button><button class="btn bp" onclick="saveRsv()" data-i18n="g.btn.confirm">確認</button></div></div></div>
 <div class="mo" id="mo-quickloan"><div class="md" style="max-width:420px"><div class="mh"><div class="mt2" id="ql-header">借閱確認</div><button class="mc2" onclick="closeMo('mo-quickloan')">✕</button></div><div class="mb"><div style="background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);padding:12px;margin-bottom:16px"><div style="font-weight:600;font-size:14px;margin-bottom:4px" id="ql-bktitle">—</div><div style="font-size:12px;color:var(--t3)" id="ql-bkinfo">—</div></div><div class="fg"><div class="fl">借閱人 *</div><select id="ql-usr"><option value="">請選擇員工…</option></select><div class="fh" id="ql-uinfo" style="margin-top:4px"></div></div><div class="frow" style="gap:12px;margin-top:4px"><div style="flex:1;display:flex;flex-direction:column;gap:5px"><div class="fl">借出日期</div><input type="date" id="ql-bwdt"></div><div style="flex:1;display:flex;flex-direction:column;gap:5px"><div class="fl">應還日期</div><input type="date" id="ql-dudt"></div></div></div><div class="mf"><button class="btn bg2" onclick="closeMo('mo-quickloan')">取消</button><button class="btn bp" id="ql-btn" onclick="doQuickLoan()">✓ 確認借出</button></div></div></div>
 <div class="mo" id="mo-usw"><div class="md" style="max-width:400px"><div class="mh"><div class="mt2" data-i18n="lib.mo.switch_user">切換使用者</div><button class="mc2" onclick="closeMo('mo-usw')">✕</button></div><div class="mb"><div class="fh" data-i18n="lib.mo.select_account" style="margin-bottom:10px">選擇您的帳號</div><div class="ugrid" id="usw-list"></div></div></div></div>
@@ -3817,39 +3817,44 @@ function impTrig(){document.getElementById('impf').click();}
 function impData(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{try{const d=JSON.parse(ev.target.result);Object.entries(K).forEach(([k,sk])=>{if(d[k]!==undefined)localStorage.setItem(sk,JSON.stringify(d[k]));});toast(t('g.toast.imported'),'success');setTimeout(()=>location.reload(),1000);}catch{toast(t('g.toast.format_err'),'error');}};r.readAsText(f);}
 async function _loadXLSX(){if(window.XLSX)return;await new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';s.onload=res;s.onerror=rej;document.head.appendChild(s);});}
 let _xlsxPendingWb=null;
-function _showXlsxDialog(wb,defaultName,title){
+function _dlgXlsxShow(wb,defaultName,title){
   _xlsxPendingWb=wb;
-  document.getElementById('xlsxsave-ttl').textContent=title||'下載檔案';
-  const nameEl=document.getElementById('xlsxsave-name');
+  document.getElementById('dlg-xlsx-ttl').textContent=title||'下載檔案';
+  const nameEl=document.getElementById('dlg-xlsx-name');
   nameEl.value=(defaultName||'export').replace(/\.xlsx$/i,'');
-  openMo('mo-xlsxsave');
-  setTimeout(()=>{nameEl.focus();nameEl.select();},120);
+  document.getElementById('dlg-xlsx').showModal();
+  setTimeout(()=>{nameEl.focus();nameEl.select();},80);
 }
-function _doXlsxSave(){
+function _dlgXlsxDo(){
   if(!_xlsxPendingWb)return;
-  let name=(document.getElementById('xlsxsave-name')?.value||'export').trim().replace(/\.xlsx$/i,'');
+  let name=(document.getElementById('dlg-xlsx-name')?.value||'export').trim().replace(/\.xlsx$/i,'');
   if(!name)name='export';
   const filename=name+'.xlsx';
-  XLSX.writeFile(_xlsxPendingWb,filename);
+  try{XLSX.writeFile(_xlsxPendingWb,filename);}catch(e){toast('下載失敗：'+e.message,'error');return;}
   _xlsxPendingWb=null;
-  closeMo('mo-xlsxsave');
+  document.getElementById('dlg-xlsx').close();
   toast(`✓ 已下載「${filename}」至您的下載資料夾`,'success');
 }
 async function exportBooksXlsx(){
-  toast('準備中…','info');
-  await _loadXLSX();
-  const cats=ld(K.ct);
-  const allBks=_libSite?ld(K.bk).filter(b=>b.site===_libSite):ld(K.bk);
-  const rows=allBks.map(b=>{const cat=cats.find(c=>c.id===b.cat_id);return{'ISBN':b.isbn||'','書名':b.title||'','作者':b.author||'','出版年':b.year||'','分類':cat?cat.name:'',' 語言':b.lang||'繁中','館藏數量':b.copies||1,'封面圖片URL':b.cover||'','備註':b.notes||''};});
-  const ws=XLSX.utils.json_to_sheet(rows);
-  const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,'書目',ws);
-  _showXlsxDialog(wb,'comart_books',`匯出書目（共 ${rows.length} 本）`);
+  const btn=event?.currentTarget;if(btn){btn.disabled=true;btn.textContent='準備中…';}
+  try{
+    await _loadXLSX();
+    const cats=ld(K.ct);
+    const allBks=_libSite?ld(K.bk).filter(b=>b.site===_libSite):ld(K.bk);
+    const rows=allBks.map(b=>{const cat=cats.find(c=>c.id===b.cat_id);return{'ISBN':b.isbn||'','書名':b.title||'','作者':b.author||'','出版年':b.year||'','分類':cat?cat.name:'',' 語言':b.lang||'繁中','館藏數量':b.copies||1,'封面圖片URL':b.cover||'','備註':b.notes||''};});
+    const ws=XLSX.utils.json_to_sheet(rows);
+    const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,'書目',ws);
+    _dlgXlsxShow(wb,'comart_books',`匯出書目（共 ${rows.length} 本）`);
+  }catch(e){toast('準備失敗：'+e.message,'error');}
+  finally{if(btn){btn.disabled=false;btn.textContent='↓ 匯出書目';}}
 }
 async function downloadBooksTemplate(){
-  await _loadXLSX();
-  const ws=XLSX.utils.json_to_sheet([{'ISBN':'9789867757289','書名':'設計的法則','作者':'William Lidwell','出版年':2010,'分類':'設計','語言':'繁中','館藏數量':1,'封面圖片URL':'','備註':'範例書目，請替換'}]);
-  const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,'書目',ws);
-  _showXlsxDialog(wb,'comart_books_template','下載匯入範本');
+  try{
+    await _loadXLSX();
+    const ws=XLSX.utils.json_to_sheet([{'ISBN':'9789867757289','書名':'設計的法則','作者':'William Lidwell','出版年':2010,'分類':'設計','語言':'繁中','館藏數量':1,'封面圖片URL':'','備註':'範例書目，請替換'}]);
+    const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,'書目',ws);
+    _dlgXlsxShow(wb,'comart_books_template','下載匯入範本');
+  }catch(e){toast('準備失敗：'+e.message,'error');}
 }
 function importBooksTrig(){document.getElementById('bk-impf').click();}
 async function importBooksXlsx(e){

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" href="data:,">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART 行政管理平台 v1.91</title>
+<title>COMART 行政管理平台 v1.92</title>
 <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.js"></script>
 <style>
 :root{
@@ -954,7 +954,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="logo">
     <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
     <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
-    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.91</span>
+    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.92</span>
   </div>
   <div class="trr">
     <div id="global-site-bar" style="display:flex;align-items:center;gap:4px"><span style="font-size:13px;color:var(--text-3);white-space:nowrap;font-weight:500">單位：</span>
@@ -976,7 +976,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <span id="cur-u" style="color:var(--text-2)">載入中…</span>
       <span style="color:var(--text-3);font-size:10px">▾</span>
     </div>
-    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.91</span>
+    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.92</span>
   </div>
 </div>
 
@@ -4118,13 +4118,18 @@ function roomLiveStatus(roomId,bks){
 
 // ── Dashboard ──
 async function renderRoomDash(){
+  // 先用快取即時渲染（visRooms() 已反映最新 site，不需等 Supabase）
+  const cachedBks=ld(RK)||[];
+  renderDashCards(cachedBks);
+  renderDashGantt(cachedBks);
+  const lbl=document.getElementById('room-today-label');if(lbl)lbl.textContent=todayStr2();
+  // 再拉 Supabase 最新資料二次刷新
   const [bks]=await Promise.all([getRoomBookings(),getRoomFaults()]);
   updateRoomClock();
   if(roomClockTimer)clearInterval(roomClockTimer);
   roomClockTimer=setInterval(()=>{updateRoomClock();renderDashCards(bks);renderDashGantt(bks);},30000);
   renderDashCards(bks);
   renderDashGantt(bks);
-  document.getElementById('room-today-label').textContent=todayStr2();
   updRoomBadge();
   setTimeout(initGanttDrag,100);
 }

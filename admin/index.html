@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" href="data:,">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART 行政管理平台 v1.92</title>
+<title>COMART 行政管理平台 v1.93</title>
 <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.js"></script>
 <style>
 :root{
@@ -954,7 +954,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="logo">
     <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
     <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
-    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.92</span>
+    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.93</span>
   </div>
   <div class="trr">
     <div id="global-site-bar" style="display:flex;align-items:center;gap:4px"><span style="font-size:13px;color:var(--text-3);white-space:nowrap;font-weight:500">單位：</span>
@@ -976,7 +976,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <span id="cur-u" style="color:var(--text-2)">載入中…</span>
       <span style="color:var(--text-3);font-size:10px">▾</span>
     </div>
-    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.92</span>
+    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.93</span>
   </div>
 </div>
 
@@ -3277,35 +3277,8 @@ async function init(){
   if(bd){bd.value=tds();bd.addEventListener('change',updBwDue);updBwDue();}
 }
 
-async function seedLib(){
-  // 只有在 lib_categories 是空的時才執行
-  const existing = await SB.get('lib_categories', '?select=id&limit=1');
-  if(existing && existing.length > 0){
-    console.log('seedLib: seed data exists, skipping');
-    return;
-  }
-  // 先建預設分類
-  const defCats = ['管理','設計','技術','行銷','傳記','其他'].map(n=>({id:uid(),name:n}));
-  sv(K.ct, defCats);
-  // 寫分類到 Supabase
-  for(const cat of defCats){
-    await SB.post('lib_categories', cat, 'resolution=merge-duplicates,return=minimal');
-  }
-  const cid = n => defCats.find(x=>x.name===n)?.id||'';
-  const bks=[
-    {id:uid(),title:'從A到A+',author:'詹姆‧柯林斯',isbn:'9789573258674',cat_id:cid('管理'),lang:'繁中',year:2002,copies:2,cover:'',notes:'',site:'TW'},
-    {id:uid(),title:'Hooked 鉤癮效應',author:'尼爾‧艾歐',isbn:'9789863213307',cat_id:cid('設計'),lang:'繁中',year:2014,copies:1,cover:'',notes:'',site:'TW'},
-    {id:uid(),title:'精實創業',author:'艾瑞克‧萊斯',isbn:'',cat_id:cid('管理'),lang:'繁中',year:2012,copies:1,cover:'',notes:'',site:'TW'},
-    {id:uid(),title:'Steve Jobs',author:'Walter Isaacson',isbn:'9781451648539',cat_id:cid('傳記'),lang:'EN',year:2011,copies:1,cover:'',notes:'',site:'TW'},
-    {id:uid(),title:'原則',author:'瑞‧達利歐',isbn:'',cat_id:cid('管理'),lang:'繁中',year:2018,copies:2,cover:'',notes:'',site:'TW'},
-  ];
-  sv(K.bk, bks);
-  // 寫書目到 Supabase
-  for(const bk of bks){
-    await SB.post('lib_books', bk, 'resolution=merge-duplicates,return=minimal');
-  }
-  console.log(`✓ seedLib: ${defCats.length} cats, ${bks.length} books → Supabase`);
-}
+// seedLib 已移除 mock data：書目正本由 012_lib_books_import.sql 匯入 Supabase
+async function seedLib(){}
 
 async function seedCar(){
   // 只有在固定 seed 車輛不存在時才執行

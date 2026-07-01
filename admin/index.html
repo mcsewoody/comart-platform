@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" href="data:,">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART 行政管理平台 v1.98</title>
+<title>COMART 行政管理平台 v1.99</title>
 <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.js"></script>
 <style>
 :root{
@@ -953,7 +953,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="logo">
     <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
     <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
-    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.98</span>
+    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.99</span>
   </div>
   <div class="trr">
     <div id="global-site-bar" style="display:flex;align-items:center;gap:4px"><span style="font-size:13px;color:var(--text-3);white-space:nowrap;font-weight:500">單位：</span>
@@ -975,7 +975,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <span id="cur-u" style="color:var(--text-2)">載入中…</span>
       <span style="color:var(--text-3);font-size:10px">▾</span>
     </div>
-    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.98</span>
+    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.99</span>
   </div>
 </div>
 
@@ -1062,7 +1062,8 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
         <button id="mgmt-tab-add" class="btn bp bsm" onclick="showMgmtTab('add')">＋ 新增書籍</button>
         <button id="mgmt-tab-edit" class="btn bg2 bsm" onclick="showMgmtTab('edit')">📝 資料更新</button>
         <button id="mgmt-tab-cats" class="btn bg2 bsm" onclick="showMgmtTab('cats')">🏷️ 分類管理</button>
-        <div style="margin-left:auto;display:flex;gap:8px">
+        <div style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn bg2 bsm" id="btn-fetchcovers" onclick="batchFetchCovers()">🖼 批次補圖</button>
           <button class="btn bg2 bsm" onclick="exportBooksXlsx()">↓ 匯出書目</button>
           <button class="btn bg2 bsm" onclick="importBooksTrig()">↑ 匯入書目</button>
           <input type="file" id="bk-impf" accept=".xlsx,.xls" style="display:none" onchange="importBooksXlsx(event)">
@@ -3874,6 +3875,50 @@ async function importBooksXlsx(e){
   reader.readAsArrayBuffer(f);
 }
 function resetData(){if(!confirm('⚠️ 確定清除所有資料？'))return;Object.values(K).forEach(k=>localStorage.removeItem(k));toast(t('g.toast.reset'),'warn');setTimeout(()=>location.reload(),1000);}
+
+// ── 批次補圖 ─────────────────────────────────────────
+let _fetchCoverAbort=false;
+async function _checkImgUrl(url){return new Promise(res=>{const i=new Image();i.onload=()=>res(i.naturalWidth>2);i.onerror=()=>res(false);i.src=url+'?_t='+Date.now();});}
+async function _fetchCoverByIsbn(isbn){
+  const clean=isbn.replace(/-/g,'');
+  // 1. Google Books（繁中/簡中 覆蓋率佳）
+  try{
+    const r=await fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${clean}&maxResults=1&fields=items(volumeInfo(imageLinks))`,{signal:AbortSignal.timeout(5000)});
+    const d=await r.json();
+    const il=d.items?.[0]?.volumeInfo?.imageLinks;
+    if(il){const u=(il.extraLarge||il.large||il.medium||il.small||il.thumbnail||'').replace('&edge=curl','').replace('zoom=1','zoom=3');if(u)return u;}
+  }catch{}
+  // 2. Open Library（英文書覆蓋率高）
+  const olU=`https://covers.openlibrary.org/b/isbn/${clean}-L.jpg`;
+  if(await _checkImgUrl(olU))return olU;
+  return '';
+}
+async function batchFetchCovers(){
+  const allBks=ld(K.bk);
+  const targets=allBks.filter(b=>!b.cover&&b.isbn);
+  if(!targets.length)return toast('所有有ISBN的書目已有封面圖片','info');
+  const btn=document.getElementById('btn-fetchcovers');
+  if(btn){btn.disabled=true;btn.textContent='⏳ 補圖中…';}
+  _fetchCoverAbort=false;
+  let ok=0,fail=0,total=targets.length;
+  toast(`開始批次補圖，共 ${total} 本（有ISBN）…`,'info');
+  for(let i=0;i<targets.length;i++){
+    if(_fetchCoverAbort)break;
+    const b=targets[i];
+    const cover=await _fetchCoverByIsbn(b.isbn);
+    if(cover){
+      const idx=allBks.findIndex(x=>x.id===b.id);
+      if(idx>=0){allBks[idx]={...allBks[idx],cover};sbSaveBook(allBks[idx]);}
+      ok++;
+    }else fail++;
+    if((i+1)%20===0||i===targets.length-1)toast(`進度 ${i+1}/${total}：找到封面 ${ok} 本，未找到 ${fail} 本`,'info');
+    await new Promise(r=>setTimeout(r,250)); // 每筆間隔 250ms 避免限速
+  }
+  sv(K.bk,allBks);
+  renderBooks();renderMgmtBookList();
+  if(btn){btn.disabled=false;btn.textContent='🖼 批次補圖';}
+  toast(`補圖完成！成功 ${ok} 本，未找到封面 ${fail} 本`,'success');
+}
 
 function popCatSel(){const cats=ld(K.ct),opts=`<option value="">${t('lib.all_cats2')}</option>`+cats.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');const el=document.getElementById('bkcat');if(el)el.innerHTML=opts;}
 function popUsrSel(){

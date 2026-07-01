@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" href="data:,">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART 行政管理平台 v2.01</title>
+<title>COMART 行政管理平台 v2.02</title>
 <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.js"></script>
 <style>
 :root{
@@ -953,7 +953,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="logo">
     <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
     <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
-    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v2.01</span>
+    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v2.02</span>
   </div>
   <div class="trr">
     <div id="global-site-bar" style="display:flex;align-items:center;gap:4px"><span style="font-size:13px;color:var(--text-3);white-space:nowrap;font-weight:500">單位：</span>
@@ -975,7 +975,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <span id="cur-u" style="color:var(--text-2)">載入中…</span>
       <span style="color:var(--text-3);font-size:10px">▾</span>
     </div>
-    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v2.01</span>
+    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v2.02</span>
   </div>
 </div>
 
@@ -3815,7 +3815,16 @@ function saveRoomCfg(){const cfg={hours_start:parseInt(document.getElementById('
 function expData(){const data={};Object.entries(K).forEach(([k,sk])=>{data[k]=JSON.parse(localStorage.getItem(sk)||'null');});dl('comart_backup.json',JSON.stringify(data,null,2),'application/json');toast(t('g.toast.exported'),'success');}
 function impTrig(){document.getElementById('impf').click();}
 function impData(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{try{const d=JSON.parse(ev.target.result);Object.entries(K).forEach(([k,sk])=>{if(d[k]!==undefined)localStorage.setItem(sk,JSON.stringify(d[k]));});toast(t('g.toast.imported'),'success');setTimeout(()=>location.reload(),1000);}catch{toast(t('g.toast.format_err'),'error');}};r.readAsText(f);}
-async function _loadXLSX(){if(window.XLSX)return;await new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';s.onload=res;s.onerror=rej;document.head.appendChild(s);});}
+async function _loadXLSX(){
+  if(window.XLSX)return;
+  await new Promise((res,rej)=>{
+    const s=document.createElement('script');
+    s.src='https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js';
+    s.onload=()=>res();
+    s.onerror=()=>rej(new Error('無法載入 Excel 套件，請檢查網路連線'));
+    document.head.appendChild(s);
+  });
+}
 let _xlsxPendingWb=null;
 function _dlgXlsxShow(wb,defaultName,title){
   _xlsxPendingWb=wb;
@@ -3866,7 +3875,7 @@ async function importBooksXlsx(e){
     try{
       const wb=XLSX.read(ev.target.result,{type:'array'});
       const ws=wb.Sheets[wb.SheetNames[0]];
-      const rows=XLSX.utils.sheet_to_json(ws);
+      const rows=XLSX.utils.sheet_to_json(ws,{raw:false,defval:''});
       if(!rows.length)return toast('檔案無資料','error');
       const cats=ld(K.ct);
       let bks=ld(K.bk);
@@ -3894,7 +3903,8 @@ function resetData(){if(!confirm('⚠️ 確定清除所有資料？'))return;Ob
 let _fetchCoverAbort=false;
 async function _checkImgUrl(url){return new Promise(res=>{const i=new Image();i.onload=()=>res(i.naturalWidth>2);i.onerror=()=>res(false);i.src=url+'?_t='+Date.now();});}
 async function _fetchCoverByIsbn(isbn){
-  const clean=isbn.replace(/-/g,'');
+  const clean=String(isbn||'').replace(/-/g,'');
+  if(!clean)return '';
   // 1. Google Books（繁中/簡中 覆蓋率佳）
   try{
     const r=await fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${clean}&maxResults=1&fields=items(volumeInfo(imageLinks))`,{signal:AbortSignal.timeout(5000)});

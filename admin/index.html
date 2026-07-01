@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" href="data:,">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART 行政管理平台 v1.89</title>
+<title>COMART 行政管理平台 v1.90</title>
 <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.js"></script>
 <style>
 :root{
@@ -954,7 +954,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="logo">
     <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
     <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
-    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.89</span>
+    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.90</span>
   </div>
   <div class="trr">
     <div id="global-site-bar" style="display:flex;align-items:center;gap:4px"><span style="font-size:11px;color:var(--text-3);white-space:nowrap">單位：</span>
@@ -976,7 +976,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <span id="cur-u" style="color:var(--text-2)">載入中…</span>
       <span style="color:var(--text-3);font-size:10px">▾</span>
     </div>
-    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.89</span>
+    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.90</span>
   </div>
 </div>
 
@@ -3644,7 +3644,7 @@ async function lookupISBN(){
 }
 
 function renderLoans(){
-  chkOv();let ln=ld(K.ln);
+  chkOv();const _sbids=_siteBkIds();let ln=ld(K.ln).filter(l=>_sbids.has(l.bk_id));
   const q=document.getElementById('lnq')?.value.toLowerCase()||'',st=document.getElementById('lnst')?.value||'';
   if(st)ln=ln.filter(l=>l.st===st);
   if(q)ln=ln.filter(l=>{const b=gBk(l.bk_id),u=gUsr(l.u_id);return b?.title.toLowerCase().includes(q)||u?.name.toLowerCase().includes(q);});
@@ -3658,12 +3658,12 @@ function qReturn(lid){
   if(rv)toast(`已還書，${gUsr(rv.u_id)?.name}有預約等候`,'warn');else toast('已登記還書','success');
   chkOv();renderLibDash();renderLoans();renderReturn();updBadges();
 }
-function exportLoansCSV(){const ln=ld(K.ln);const rows=[['書名','作者','借閱人','部門','借出日','應還日','歸還日','狀態']];ln.forEach(l=>{const b=gBk(l.bk_id),u=gUsr(l.u_id);rows.push([b?.title||'',b?.author||'',u?.name||'',u?.dept||'',l.bw,l.due,l.ret||'',l.st]);});dl('loans.csv',rows.map(r=>r.map(c=>`"${c}"`).join(',')).join('\n'),'text/csv');toast(t('g.toast.exported'),'success');}
+function exportLoansCSV(){const _sbids=_siteBkIds();const ln=ld(K.ln).filter(l=>_sbids.has(l.bk_id));const rows=[['書名','作者','借閱人','部門','借出日','應還日','歸還日','狀態']];ln.forEach(l=>{const b=gBk(l.bk_id),u=gUsr(l.u_id);rows.push([b?.title||'',b?.author||'',u?.name||'',u?.dept||'',l.bw,l.due,l.ret||'',l.st]);});dl('loans.csv',rows.map(r=>r.map(c=>`"${c}"`).join(',')).join('\n'),'text/csv');toast(t('g.toast.exported'),'success');}
 
 let selBwBk=null;
 function renderBwBooks(){
   const q=document.getElementById('bwbq')?.value.toLowerCase()||'';
-  let bks=ld(K.bk).filter(b=>bkAvail(b)>0);
+  let bks=(_libSite?ld(K.bk).filter(b=>b.site===_libSite):ld(K.bk)).filter(b=>bkAvail(b)>0);
   if(q)bks=bks.filter(b=>b.title.toLowerCase().includes(q)||b.author?.toLowerCase().includes(q));
   document.getElementById('bwbl').innerHTML=bks.length?bks.map(b=>{const av=bkAvail(b),s=selBwBk===b.id;return`<div onclick="selBw('${b.id}')" style="padding:8px 12px;cursor:pointer;border-bottom:1px solid var(--bd);font-size:13px;background:${s?'var(--acd)':'transparent'};color:${s?'var(--ac)':'var(--t1)'}"><b>${b.title}</b><span style="color:var(--t3);font-size:11px;margin-left:6px">${b.author||''}</span><span class="badge bg" style="float:right">${t('lib.grid.instock').replace('%d',av)}</span></div>`}).join(''):`<div style="padding:14px;text-align:center;color:var(--t3);font-size:13px">${t('lib.no_books_in')}</div>`;
 }
@@ -3687,15 +3687,15 @@ function doLoan(){
 }
 
 function renderReturn(){
-  chkOv();let ln=ld(K.ln).filter(l=>l.st!=='returned');
+  chkOv();const _sbids=_siteBkIds();let ln=ld(K.ln).filter(l=>l.st!=='returned'&&_sbids.has(l.bk_id));
   const q=document.getElementById('rtq')?.value.toLowerCase()||'';
   if(q)ln=ln.filter(l=>{const b=gBk(l.bk_id),u=gUsr(l.u_id);return b?.title.toLowerCase().includes(q)||u?.name.toLowerCase().includes(q);});
   ln.sort((a,b)=>a.due.localeCompare(b.due));
   document.getElementById('rt-tb').innerHTML=ln.length?ln.map(l=>{const b=gBk(l.bk_id),u=gUsr(l.u_id);return`<tr class="${l.st==='overdue'?'rd':''}"><td><b>${b?.title||'—'}</b></td><td>${u?.name||'—'}</td><td class="tdm">${fmtD(l.bw)}</td><td>${fmtD(l.due)}</td><td>${lnBadge(l)}</td><td><button class="btn bp bsm" onclick="qReturn('${l.id}')">✓${t('lib.btn.return')}</button></td></tr>`}).join(''):`<tr><td colspan="6" class="tdm" style="text-align:center;padding:22px">${t('lib.no_overdue')} ✓</td></tr>`;
 }
 
-function renderRsv(){const rv=ld(K.rv);document.getElementById('rv-tb').innerHTML=rv.length?rv.map(r=>{const b=gBk(r.bk_id),u=gUsr(r.u_id);return`<tr><td>${b?.title||'—'}</td><td>${u?.name||'—'}</td><td class="tdm">${fmtD(r.dt)}</td><td><span class="badge ${r.st==='waiting'?'by':'bm'}">${r.st==='waiting'?t('lib.rsv.waiting'):t('lib.rsv.done')}</span></td><td><button class="btn bdr bsm" onclick="delRsv('${r.id}')">${t('g.btn.cancel')}</button></td></tr>`}).join(''):`<tr><td colspan="5" class="tdm" style="text-align:center;padding:22px">${t('lib.no_rsv')}</td></tr>`;}
-function openRsvModal(){const us=ld(K.us),bks=ld(K.bk);document.getElementById('rsvu').innerHTML=`<option value="">${t('g.select')}</option>`+us.map(u=>`<option value="${u.id}">${u.name}</option>`).join('');document.getElementById('rsvb').innerHTML=`<option value="">${t('g.select')}</option>`+bks.map(b=>`<option value="${b.id}">${b.title}</option>`).join('');openMo('mo-rsv');}
+function renderRsv(){const _sbids=_siteBkIds();const rv=ld(K.rv).filter(r=>_sbids.has(r.bk_id));document.getElementById('rv-tb').innerHTML=rv.length?rv.map(r=>{const b=gBk(r.bk_id),u=gUsr(r.u_id);return`<tr><td>${b?.title||'—'}</td><td>${u?.name||'—'}</td><td class="tdm">${fmtD(r.dt)}</td><td><span class="badge ${r.st==='waiting'?'by':'bm'}">${r.st==='waiting'?t('lib.rsv.waiting'):t('lib.rsv.done')}</span></td><td><button class="btn bdr bsm" onclick="delRsv('${r.id}')">${t('g.btn.cancel')}</button></td></tr>`}).join(''):`<tr><td colspan="5" class="tdm" style="text-align:center;padding:22px">${t('lib.no_rsv')}</td></tr>`;}
+function openRsvModal(){const us=ld(K.us),bks=_libSite?ld(K.bk).filter(b=>b.site===_libSite):ld(K.bk);document.getElementById('rsvu').innerHTML=`<option value="">${t('g.select')}</option>`+us.map(u=>`<option value="${u.id}">${u.name}</option>`).join('');document.getElementById('rsvb').innerHTML=`<option value="">${t('g.select')}</option>`+bks.map(b=>`<option value="${b.id}">${b.title}</option>`).join('');openMo('mo-rsv');}
 function saveRsv(){const uid2=document.getElementById('rsvu').value,bid=document.getElementById('rsvb').value;if(!uid2||!bid)return toast('請選擇預約人與書籍','error');const rv=ld(K.rv);rv.push({id:uid(),bk_id:bid,u_id:uid2,dt:tds(),st:'waiting'});sv(K.rv,rv);closeMo('mo-rsv');renderRsv();toast('預約已登記','success');}
 function delRsv(id){if(!confirm('確定取消？'))return;sv(K.rv,ld(K.rv).filter(r=>r.id!==id));renderRsv();toast(t('g.toast.cancelled'),'success');}
 
@@ -3724,7 +3724,9 @@ function popUsrSel(){
   const el=document.getElementById('bwu');if(el){el.innerHTML=opts;if(curUid)el.value=curUid;}
   const h=document.getElementById('bwh');if(h&&el){el.onchange=()=>{const u2=el.value;if(!u2){h.textContent='';return;}const cfg=lo(K.lcfg,DLCFG);const a=ld(K.ln).filter(l=>l.u_id===u2&&l.st!=='returned').length;h.textContent=t('lib.loan_status').replace('%d',a).replace('%d',cfg.max_loans);};}
 }
-function popCarSels(){const vehs=ld(K.vh),vOpts=`<option value="">${t('car.all_veh2')}</option>`+vehs.map(v=>`<option value="${v.id}">${v.name}(${v.plate})</option>`).join('');['cal-vf','usvf','fvf','mtvf'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=vOpts;});}
+function _siteVehIds(){return new Set((_carSite?ld(K.vh).filter(v=>v.site===_carSite):ld(K.vh)).map(v=>v.id));}
+function _siteBkIds(){return new Set((_libSite?ld(K.bk).filter(b=>b.site===_libSite):ld(K.bk)).map(b=>b.id));}
+function popCarSels(){const vehs=_carSite?ld(K.vh).filter(v=>v.site===_carSite):ld(K.vh),vOpts=`<option value="">${t('car.all_veh2')}</option>`+vehs.map(v=>`<option value="${v.id}">${v.name}(${v.plate})</option>`).join('');['cal-vf','usvf','fvf','mtvf'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=vOpts;});}
 
 async function renderCarDash(){
   await loadCarFromSB();
@@ -3777,7 +3779,7 @@ let calDt=new Date(),calV='month';
 function setCalV(v){calV=v;document.getElementById('cvbm').classList.toggle('active',v==='month');document.getElementById('cvbw').classList.toggle('active',v==='week');renderCal();}
 function calMov(d){if(calV==='month')calDt.setMonth(calDt.getMonth()+d);else calDt.setDate(calDt.getDate()+d*7);renderCal();}
 function calToday(){calDt=new Date();renderCal();}
-function renderCal(){const vf=document.getElementById('cal-vf')?.value||'';let bks=ld(K.bks);if(vf)bks=bks.filter(b=>b.vh_id===vf);const mts=ld(K.mt),isps=ld(K.isp);if(calV==='month')renderMoCal(bks,mts,isps,vf);else renderWkCal(bks,mts,isps,vf);}
+function renderCal(){const vf=document.getElementById('cal-vf')?.value||'';const _svids=_siteVehIds();let bks=ld(K.bks).filter(b=>_svids.has(b.vh_id));if(vf)bks=bks.filter(b=>b.vh_id===vf);const mts=ld(K.mt).filter(m=>_svids.has(m.vh_id)),isps=ld(K.isp).filter(i=>_svids.has(i.vh_id));if(calV==='month')renderMoCal(bks,mts,isps,vf);else renderWkCal(bks,mts,isps,vf);}
 function renderMoCal(bks,mts,isps,vf){
   const y=calDt.getFullYear(),m=calDt.getMonth();document.getElementById('cal-tit').textContent=t('cal.month_fmt').replace('%Y',y).replace('%m',String(m+1).padStart(2,'0'));
   const first=new Date(y,m,1),last=new Date(y,m+1,0),sd=first.getDay();
@@ -3862,7 +3864,7 @@ async function doBooking(){
 }
 
 function renderUse(){
-  let bks=ld(K.bks);const q=document.getElementById('usq2')?.value.toLowerCase()||'',vf=document.getElementById('usvf')?.value||'',sf=document.getElementById('ussf')?.value||'';
+  const _svids=_siteVehIds();let bks=ld(K.bks).filter(b=>_svids.has(b.vh_id));const q=document.getElementById('usq2')?.value.toLowerCase()||'',vf=document.getElementById('usvf')?.value||'',sf=document.getElementById('ussf')?.value||'';
   if(vf)bks=bks.filter(b=>b.vh_id===vf);if(sf)bks=bks.filter(b=>b.st===sf);
   if(q)bks=bks.filter(b=>{const v=gVeh(b.vh_id),u=gUsr(b.u_id);return v?.name.toLowerCase().includes(q)||v?.plate.toLowerCase().includes(q)||u?.name.toLowerCase().includes(q)||b.purpose?.toLowerCase().includes(q);});
   bks.sort((a,b)=>b.start.localeCompare(a.start));
@@ -3920,27 +3922,27 @@ async function cancelCarBk(id){
 function expUseCSV(){const bks=ld(K.bks);const rows=[['車輛','車牌','使用人','出發','歸還','目的','里程','狀態']];bks.forEach(b=>{const v=gVeh(b.vh_id),u=gUsr(b.u_id);rows.push([v?.name||'',v?.plate||'',u?.name||'',b.start,b.end,b.purpose||'',b.km_plan||'',b.st]);});dl('usage.csv',rows.map(r=>r.map(c=>`"${c}"`).join(',')).join('\n'),'text/csv');toast(t('g.toast.exported'),'success');}
 
 function calcFuel(){const l=parseFloat(document.getElementById('flt').value)||0,p=parseFloat(document.getElementById('fpr').value)||0;if(l&&p)document.getElementById('ftot').value=(l*p).toFixed(0);}
-function renderFuelSum(){const logs=ld(K.fl),ym=new Date().toISOString().slice(0,7),mth=logs.filter(l=>l.date.slice(0,7)===ym);document.getElementById('fl-c').textContent='$'+(mth.reduce((s,l)=>s+(l.total||0),0)).toLocaleString();document.getElementById('fl-l').textContent=mth.reduce((s,l)=>s+(l.liters||0),0).toFixed(1);document.getElementById('fl-n').textContent=logs.length;}
-function renderFuel(){let logs=ld(K.fl);const vf=document.getElementById('fvf')?.value||'';if(vf)logs=logs.filter(l=>l.vh_id===vf);logs.sort((a,b)=>b.date.localeCompare(a.date));document.getElementById('fl-tb').innerHTML=logs.length?logs.map(l=>{const v=gVeh(l.vh_id),u=gUsr(l.u_id);return`<tr><td>${VICO[v?.type]||'⛽'} ${v?.name||'—'}</td><td class="tdm">${fmtD(l.date)}</td><td>${l.liters}</td><td>${(l.total||0).toLocaleString()}</td><td>${l.price||'—'}</td><td>${l.odo?l.odo.toLocaleString():'—'}</td><td>${u?.name||'—'}</td><td class="tdm">${l.note||'—'}</td><td><button class="btn bdr bsm" onclick="delFuel('${l.id}')">${t('g.btn.delete')}</button></td></tr>`}).join(''):`<tr><td colspan="9" class="tdm" style="text-align:center;padding:22px">${t('car.no_fuel')}</td></tr>`;}
-function openFuelModal(){const vehs=ld(K.vh),us=ld(K.us);document.getElementById('fveh').innerHTML=`<option value="">${t('g.select')}</option>`+vehs.map(v=>`<option value="${v.id}">${v.name}(${v.plate})</option>`).join('');document.getElementById('fusr').innerHTML=`<option value="">${t('g.select')}</option>`+us.map(u=>`<option value="${u.id}">${u.name}</option>`).join('');document.getElementById('fdt').value=tds();['flt','fpr','ftot','fod','fnt'].forEach(x=>document.getElementById(x).value='');if(curUid)document.getElementById('fusr').value=curUid;openMo('mo-fuel');}
+function renderFuelSum(){const logs=ld(K.fl).filter(l=>_siteVehIds().has(l.vh_id)),ym=new Date().toISOString().slice(0,7),mth=logs.filter(l=>l.date.slice(0,7)===ym);document.getElementById('fl-c').textContent='$'+(mth.reduce((s,l)=>s+(l.total||0),0)).toLocaleString();document.getElementById('fl-l').textContent=mth.reduce((s,l)=>s+(l.liters||0),0).toFixed(1);document.getElementById('fl-n').textContent=logs.length;}
+function renderFuel(){let logs=ld(K.fl).filter(l=>_siteVehIds().has(l.vh_id));const vf=document.getElementById('fvf')?.value||'';if(vf)logs=logs.filter(l=>l.vh_id===vf);logs.sort((a,b)=>b.date.localeCompare(a.date));document.getElementById('fl-tb').innerHTML=logs.length?logs.map(l=>{const v=gVeh(l.vh_id),u=gUsr(l.u_id);return`<tr><td>${VICO[v?.type]||'⛽'} ${v?.name||'—'}</td><td class="tdm">${fmtD(l.date)}</td><td>${l.liters}</td><td>${(l.total||0).toLocaleString()}</td><td>${l.price||'—'}</td><td>${l.odo?l.odo.toLocaleString():'—'}</td><td>${u?.name||'—'}</td><td class="tdm">${l.note||'—'}</td><td><button class="btn bdr bsm" onclick="delFuel('${l.id}')">${t('g.btn.delete')}</button></td></tr>`}).join(''):`<tr><td colspan="9" class="tdm" style="text-align:center;padding:22px">${t('car.no_fuel')}</td></tr>`;}
+function openFuelModal(){const vehs=_carSite?ld(K.vh).filter(v=>v.site===_carSite):ld(K.vh),us=ld(K.us);document.getElementById('fveh').innerHTML=`<option value="">${t('g.select')}</option>`+vehs.map(v=>`<option value="${v.id}">${v.name}(${v.plate})</option>`).join('');document.getElementById('fusr').innerHTML=`<option value="">${t('g.select')}</option>`+us.map(u=>`<option value="${u.id}">${u.name}</option>`).join('');document.getElementById('fdt').value=tds();['flt','fpr','ftot','fod','fnt'].forEach(x=>document.getElementById(x).value='');if(curUid)document.getElementById('fusr').value=curUid;openMo('mo-fuel');}
 function saveFuel(){const vid=document.getElementById('fveh').value,lt=parseFloat(document.getElementById('flt').value);if(!vid)return toast('請選擇車輛','error');if(!lt)return toast('請輸入加油量','error');const pr=parseFloat(document.getElementById('fpr').value)||0;const logs=ld(K.fl);logs.push({id:uid(),vh_id:vid,u_id:document.getElementById('fusr').value,date:document.getElementById('fdt').value||tds(),liters:lt,price:pr,total:parseFloat(document.getElementById('ftot').value)||(lt*pr),odo:parseInt(document.getElementById('fod').value)||null,note:document.getElementById('fnt').value.trim()});sv(K.fl,logs);sbSaveFuelLog(logs[logs.length-1]);closeMo('mo-fuel');renderFuel();renderFuelSum();toast(t('g.toast.saved'),'success');}
 function delFuel(id){if(!confirm('確定刪除？'))return;sv(K.fl,ld(K.fl).filter(l=>l.id!==id));renderFuel();renderFuelSum();toast(t('g.toast.deleted'),'success');}
 function expFuelCSV(){const logs=ld(K.fl);const rows=[['車輛','日期','油量L','金額','單價','里程','加油人','備註']];logs.forEach(l=>{const v=gVeh(l.vh_id),u=gUsr(l.u_id);rows.push([v?.name||'',l.date,l.liters,l.total||'',l.price||'',l.odo||'',u?.name||'',l.note||'']);});dl('fuel.csv',rows.map(r=>r.map(c=>`"${c}"`).join(',')).join('\n'),'text/csv');toast(t('g.toast.exported'),'success');}
 
-function renderMaint(){let logs=ld(K.mt);const vf=document.getElementById('mtvf')?.value||'';if(vf)logs=logs.filter(l=>l.vh_id===vf);logs.sort((a,b)=>b.date.localeCompare(a.date));document.getElementById('mt-tb').innerHTML=logs.length?logs.map(l=>{const v=gVeh(l.vh_id);return`<tr><td>${VICO[v?.type]||'🔧'} ${v?.name||'—'}</td><td class="tdm">${fmtD(l.date)}</td><td>${l.items||'—'}</td><td>${l.km?l.km.toLocaleString():'—'}</td><td>${l.cost?'$'+l.cost.toLocaleString():'—'}</td><td>${l.nkm?l.nkm.toLocaleString():'—'}</td><td class="tdm">${fmtD(l.ndt)}</td><td class="tdm">${l.vendor||'—'}</td><td><button class="btn bdr bsm" onclick="delMaint('${l.id}')">${t('g.btn.delete')}</button></td></tr>`}).join(''):`<tr><td colspan="9" class="tdm" style="text-align:center;padding:22px">${t('car.no_maint')}</td></tr>`;}
-function openMaintModal(){document.getElementById('momtt').textContent=t('car.mo.add_maint');const vehs=ld(K.vh);document.getElementById('mtveh').innerHTML=`<option value="">${t('g.select')}</option>`+vehs.map(v=>`<option value="${v.id}">${v.name}(${v.plate})</option>`).join('');document.getElementById('mtdt').value=tds();['mtkm','mtit','mtcs','mtvd','mtnk','mtnt'].forEach(x=>document.getElementById(x).value='');document.getElementById('mtnd').value='';openMo('mo-maint');}
+function renderMaint(){let logs=ld(K.mt).filter(l=>_siteVehIds().has(l.vh_id));const vf=document.getElementById('mtvf')?.value||'';if(vf)logs=logs.filter(l=>l.vh_id===vf);logs.sort((a,b)=>b.date.localeCompare(a.date));document.getElementById('mt-tb').innerHTML=logs.length?logs.map(l=>{const v=gVeh(l.vh_id);return`<tr><td>${VICO[v?.type]||'🔧'} ${v?.name||'—'}</td><td class="tdm">${fmtD(l.date)}</td><td>${l.items||'—'}</td><td>${l.km?l.km.toLocaleString():'—'}</td><td>${l.cost?'$'+l.cost.toLocaleString():'—'}</td><td>${l.nkm?l.nkm.toLocaleString():'—'}</td><td class="tdm">${fmtD(l.ndt)}</td><td class="tdm">${l.vendor||'—'}</td><td><button class="btn bdr bsm" onclick="delMaint('${l.id}')">${t('g.btn.delete')}</button></td></tr>`}).join(''):`<tr><td colspan="9" class="tdm" style="text-align:center;padding:22px">${t('car.no_maint')}</td></tr>`;}
+function openMaintModal(){document.getElementById('momtt').textContent=t('car.mo.add_maint');const vehs=_carSite?ld(K.vh).filter(v=>v.site===_carSite):ld(K.vh);document.getElementById('mtveh').innerHTML=`<option value="">${t('g.select')}</option>`+vehs.map(v=>`<option value="${v.id}">${v.name}(${v.plate})</option>`).join('');document.getElementById('mtdt').value=tds();['mtkm','mtit','mtcs','mtvd','mtnk','mtnt'].forEach(x=>document.getElementById(x).value='');document.getElementById('mtnd').value='';openMo('mo-maint');}
 function saveMaint(){const vid=document.getElementById('mtveh').value,it=document.getElementById('mtit').value.trim();if(!vid)return toast('請選擇車輛','error');if(!it)return toast('請填寫保養項目','error');const nkm=parseInt(document.getElementById('mtnk').value)||null,ndt=document.getElementById('mtnd').value||null;const data={id:uid(),vh_id:vid,date:document.getElementById('mtdt').value||tds(),km:parseInt(document.getElementById('mtkm').value)||null,items:it,cost:parseInt(document.getElementById('mtcs').value)||null,vendor:document.getElementById('mtvd').value.trim(),nkm,ndt,note:document.getElementById('mtnt').value.trim()};const logs=ld(K.mt);logs.push(data);sv(K.mt,logs);if(nkm){const vehs=ld(K.vh),vi=vehs.findIndex(v=>v.id===vid);if(vi>=0){vehs[vi].next_maint_km=nkm;sv(K.vh,vehs);}}closeMo('mo-maint');renderMaint();updBadges();renderCarDash();toast(t('g.toast.saved'),'success');}
 function delMaint(id){if(!confirm('確定刪除？'))return;sv(K.mt,ld(K.mt).filter(l=>l.id!==id));renderMaint();toast(t('g.toast.deleted'),'success');}
 
 let editIspId=null;
-function renderInsp(){const isps=ld(K.isp);const cfg=lo(K.ccfg,DCCFG);document.getElementById('insp-tb').innerHTML=isps.length?isps.map(isp=>{const v=gVeh(isp.vh_id),d=isp.next?dDiff(isp.next):null,cls=d===null?'':d<=7?'rd':d<=cfg.insp_days?'rw':'';return`<tr class="${cls}"><td>${VICO[v?.type]||'📋'} ${v?.name||'—'} <span class="tdm">(${v?.plate||''})</span></td><td class="tdm">${fmtD(isp.last)}</td><td>${fmtD(isp.next)}</td><td>${d!==null?`<span class="badge ${d<=7?'br':d<=30?'by':'bg'}">${d}d</span>`:'—'}</td><td><span class="badge ${d!==null&&d<=cfg.insp_days?'by':'bg'}">${d!==null&&d<=cfg.insp_days?t('lib.stat.soon'):t('car.st.avail')}</span></td><td class="tdm">${isp.note||'—'}</td><td><button class="btn bg2 bsm" onclick="openInspModal('${isp.id}')">${t('lib.btn.update')}</button> <button class="btn bdr bsm" onclick="delInsp('${isp.id}')">${t('g.btn.delete')}</button></td></tr>`}).join(''):`<tr><td colspan="7" class="tdm" style="text-align:center;padding:22px">${t('car.no_insp')}</td></tr>`;}
-function openInspModal(id){editIspId=id||null;document.getElementById('moispt').textContent=id?t('car.mo.edit_insp'):t('car.mo.add_insp');const vehs=ld(K.vh);document.getElementById('ispveh').innerHTML=`<option value="">${t('g.select')}</option>`+vehs.map(v=>`<option value="${v.id}">${v.name}(${v.plate})</option>`).join('');if(id){const isp=ld(K.isp).find(i=>i.id===id);if(!isp)return;document.getElementById('ispveh').value=isp.vh_id;document.getElementById('ispls').value=isp.last||'';document.getElementById('ispnx').value=isp.next||'';document.getElementById('ispnt').value=isp.note||'';}else{['ispls','ispnx','ispnt'].forEach(x=>document.getElementById(x).value='');}openMo('mo-insp');}
+function renderInsp(){const isps=ld(K.isp).filter(i=>_siteVehIds().has(i.vh_id));const cfg=lo(K.ccfg,DCCFG);document.getElementById('insp-tb').innerHTML=isps.length?isps.map(isp=>{const v=gVeh(isp.vh_id),d=isp.next?dDiff(isp.next):null,cls=d===null?'':d<=7?'rd':d<=cfg.insp_days?'rw':'';return`<tr class="${cls}"><td>${VICO[v?.type]||'📋'} ${v?.name||'—'} <span class="tdm">(${v?.plate||''})</span></td><td class="tdm">${fmtD(isp.last)}</td><td>${fmtD(isp.next)}</td><td>${d!==null?`<span class="badge ${d<=7?'br':d<=30?'by':'bg'}">${d}d</span>`:'—'}</td><td><span class="badge ${d!==null&&d<=cfg.insp_days?'by':'bg'}">${d!==null&&d<=cfg.insp_days?t('lib.stat.soon'):t('car.st.avail')}</span></td><td class="tdm">${isp.note||'—'}</td><td><button class="btn bg2 bsm" onclick="openInspModal('${isp.id}')">${t('lib.btn.update')}</button> <button class="btn bdr bsm" onclick="delInsp('${isp.id}')">${t('g.btn.delete')}</button></td></tr>`}).join(''):`<tr><td colspan="7" class="tdm" style="text-align:center;padding:22px">${t('car.no_insp')}</td></tr>`;}
+function openInspModal(id){editIspId=id||null;document.getElementById('moispt').textContent=id?t('car.mo.edit_insp'):t('car.mo.add_insp');const vehs=_carSite?ld(K.vh).filter(v=>v.site===_carSite):ld(K.vh);document.getElementById('ispveh').innerHTML=`<option value="">${t('g.select')}</option>`+vehs.map(v=>`<option value="${v.id}">${v.name}(${v.plate})</option>`).join('');if(id){const isp=ld(K.isp).find(i=>i.id===id);if(!isp)return;document.getElementById('ispveh').value=isp.vh_id;document.getElementById('ispls').value=isp.last||'';document.getElementById('ispnx').value=isp.next||'';document.getElementById('ispnt').value=isp.note||'';}else{['ispls','ispnx','ispnt'].forEach(x=>document.getElementById(x).value='');}openMo('mo-insp');}
 function saveInsp(){const vid=document.getElementById('ispveh').value,nxt=document.getElementById('ispnx').value;if(!vid)return toast('請選擇車輛','error');if(!nxt)return toast('請填寫下次驗車日期','error');const data={vh_id:vid,last:document.getElementById('ispls').value||null,next:nxt,note:document.getElementById('ispnt').value.trim()};const isps=ld(K.isp);if(editIspId){const i=isps.findIndex(x=>x.id===editIspId);if(i>=0)isps[i]={...isps[i],...data};}else isps.push({id:uid(),...data});sv(K.isp,isps);const vehs=ld(K.vh),vi=vehs.findIndex(v=>v.id===vid);if(vi>=0){vehs[vi].next_insp=nxt;sv(K.vh,vehs);}closeMo('mo-insp');renderInsp();updBadges();renderCarDash();toast('已更新','success');}
 function delInsp(id){if(!confirm('確定刪除？'))return;sv(K.isp,ld(K.isp).filter(i=>i.id!==id));renderInsp();toast(t('g.toast.deleted'),'success');}
 
-function renderPark(){const pks=ld(K.pk),vehs=ld(K.vh);document.getElementById('pk-grid').innerHTML=pks.length?pks.map(p=>{const car=vehs.find(v=>v.pk_id===p.id);return`<div style="background:var(--bg2);border:1px solid ${car?'rgba(6,182,212,.3)':'var(--bd)'};border-radius:var(--r);padding:13px;text-align:center"><div style="font-size:26px;margin-bottom:5px">${car?'🚗':'🅿️'}</div><div style="font-weight:700;font-size:14px;color:var(--tl)">${p.number}</div><div style="font-size:11px;color:var(--t3);margin:3px 0">${p.location||'—'}</div>${car?`<span class="badge bt" style="margin-top:4px">${car.name}</span>`:`<span class="badge bm" style="margin-top:4px">${t('car.pk.empty')}</span>`}<div style="margin-top:10px"><button class="btn bic bdr bsm" onclick="delPark('${p.id}')">✕</button></div></div>`}).join(''):'<div class="es"><div class="ei">🅿️</div><p>'+t('car.pk.none')+'</p></div>';}
+function renderPark(){const pks=(_carSite?ld(K.pk).filter(p=>p.site===_carSite):ld(K.pk)),vehs=ld(K.vh);document.getElementById('pk-grid').innerHTML=pks.length?pks.map(p=>{const car=vehs.find(v=>v.pk_id===p.id);return`<div style="background:var(--bg2);border:1px solid ${car?'rgba(6,182,212,.3)':'var(--bd)'};border-radius:var(--r);padding:13px;text-align:center"><div style="font-size:26px;margin-bottom:5px">${car?'🚗':'🅿️'}</div><div style="font-weight:700;font-size:14px;color:var(--tl)">${p.number}</div><div style="font-size:11px;color:var(--t3);margin:3px 0">${p.location||'—'}</div>${car?`<span class="badge bt" style="margin-top:4px">${car.name}</span>`:`<span class="badge bm" style="margin-top:4px">${t('car.pk.empty')}</span>`}<div style="margin-top:10px"><button class="btn bic bdr bsm" onclick="delPark('${p.id}')">✕</button></div></div>`}).join(''):'<div class="es"><div class="ei">🅿️</div><p>'+t('car.pk.none')+'</p></div>';}
 function openParkModal(){['pknm','pklc','pknt'].forEach(x=>document.getElementById(x).value='');openMo('mo-park');}
-function savePark(){const nm=document.getElementById('pknm').value.trim();if(!nm)return toast('請輸入格位編號','error');const pks=ld(K.pk);if(pks.find(p=>p.number===nm))return toast('格位編號已存在','error');pks.push({id:uid(),number:nm,location:document.getElementById('pklc').value.trim(),note:document.getElementById('pknt').value.trim()});sv(K.pk,pks);closeMo('mo-park');renderPark();renderCarDash();toast(t('g.toast.added'),'success');}
+function savePark(){const nm=document.getElementById('pknm').value.trim();if(!nm)return toast('請輸入格位編號','error');const pks=ld(K.pk);const site=_carSite||'TW';if(pks.find(p=>p.number===nm&&(p.site||'TW')===site))return toast('格位編號已存在','error');pks.push({id:uid(),number:nm,location:document.getElementById('pklc').value.trim(),note:document.getElementById('pknt').value.trim(),site});sv(K.pk,pks);closeMo('mo-park');renderPark();renderCarDash();toast(t('g.toast.added'),'success');}
 function delPark(id){if(ld(K.vh).find(v=>v.pk_id===id))return toast('此格位有車輛，無法刪除','error');if(!confirm('確定刪除？'))return;sv(K.pk,ld(K.pk).filter(p=>p.id!==id));renderPark();renderCarDash();toast(t('g.toast.deleted'),'success');}
 
 function loadCarCfg(){const cfg=lo(K.ccfg,DCCFG);document.getElementById('ccmk').value=cfg.maint_km||500;document.getElementById('ccid').value=cfg.insp_days||30;document.getElementById('ccmd').value=cfg.max_days||7;}
@@ -4653,7 +4655,8 @@ async function renderRoomList(){
   const rf=document.getElementById('rl-room-f');
   const sf=document.getElementById('rl-status-f');
   if(rf){const cur=rf.value;rf.innerHTML='<option value="">所有會議室</option>'+visRooms().map(r=>`<option value="${r.id}" ${cur===r.id?'selected':''}>${SITEFLAGS[r.site]||''} ${r.name}</option>`).join('');rf.value=cur||'';}
-  let bks=(await getRoomBookings()).sort((a,b)=>bkKey(b).localeCompare(bkKey(a)));
+  const _sRoomIds=new Set(visRooms().map(r=>r.id));
+  let bks=(await getRoomBookings()).filter(b=>_sRoomIds.has(b.roomId)).sort((a,b)=>bkKey(b).localeCompare(bkKey(a)));
   const rFilt=rf?.value||'';const sFilt=sf?.value||'';
   if(rFilt)bks=bks.filter(b=>b.roomId===rFilt);
   const stLabel={confirmed:t('room.status.confirmed'),inprogress:t('room.status.inprogress'),done:t('room.status.done'),cancelled:t('room.status.cancelled'),pending:t('room.legend.pending')};
@@ -4763,9 +4766,10 @@ function renderReport(period){
     startDate=new Date(now.getFullYear(),now.getMonth(),1);
     label='本月';
   }
+  const _sRoomIds=new Set(visRooms().map(r=>r.id));
   const bks=getBookings().filter(b=>{
     const bd=new Date(b.date);
-    return bd>=startDate&&bd<=now&&b.status!=='cancelled';
+    return bd>=startDate&&bd<=now&&b.status!=='cancelled'&&_sRoomIds.has(b.roomId);
   });
   const totalHours=(ROOM_HOURS.end-ROOM_HOURS.start);
   const days=period==='week'?7:new Date(now.getFullYear(),now.getMonth()+1,0).getDate();
@@ -4812,7 +4816,8 @@ function renderReport(period){
 
 // ── Faults ──
 async function renderFaults(){
-  const faults=(await getRoomFaults()).sort((a,b)=>b.createdAt.localeCompare(a.createdAt));
+  const _sRoomIds=new Set(visRooms().map(r=>r.id));
+  const faults=(await getRoomFaults()).filter(f=>_sRoomIds.has(f.roomId)).sort((a,b)=>b.createdAt.localeCompare(a.createdAt));
   const el=document.getElementById('fault-list');if(!el)return;
   el.innerHTML=faults.length?faults.map(f=>{
     const room=ROOMS.find(r=>r.id===f.roomId);

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" href="data:,">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART 行政管理平台 v1.93</title>
+<title>COMART 行政管理平台 v1.94</title>
 <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.js"></script>
 <style>
 :root{
@@ -954,7 +954,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="logo">
     <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
     <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
-    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.93</span>
+    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.94</span>
   </div>
   <div class="trr">
     <div id="global-site-bar" style="display:flex;align-items:center;gap:4px"><span style="font-size:13px;color:var(--text-3);white-space:nowrap;font-weight:500">單位：</span>
@@ -976,7 +976,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <span id="cur-u" style="color:var(--text-2)">載入中…</span>
       <span style="color:var(--text-3);font-size:10px">▾</span>
     </div>
-    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.93</span>
+    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.94</span>
   </div>
 </div>
 
@@ -1020,21 +1020,18 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="msb">
     <div class="sbh" data-i18n="lib.title">📚 圖書館</div>
     <div class="navs"><div class="navl" data-i18n="g.nav.main">主選單</div>
-      <div class="navi active" data-p="lib-dash"><span class="ic">🏠</span><span data-i18n="lib.nav.dash">總覽</span></div>
-      <div class="navi" data-p="lib-books"><span class="ic">📖</span><span data-i18n="lib.nav.books">書目管理</span></div>
-      <div class="navi" data-p="lib-loans"><span class="ic">📋</span><span data-i18n="lib.nav.loans">借閱管理</span><span class="nbadge" id="nb-ov" style="display:none">0</span></div>
-      <div class="navi" data-p="lib-borrow"><span class="ic">➕</span><span data-i18n="lib.nav.borrow">借書登記</span></div>
-      <div class="navi" data-p="lib-return"><span class="ic">↩️</span><span data-i18n="lib.nav.return">還書作業</span></div>
-      <div class="navi" data-p="lib-rsv"><span class="ic">🔖</span><span data-i18n="lib.nav.rsv">預約管理</span></div>
+      <div class="navi cn active" data-p="lib-books"><span class="ic">📖</span><span>書目</span></div>
+      <div class="navi cn" data-p="lib-return"><span class="ic">↩️</span><span>歸還</span></div>
+      <div class="navi cn" data-p="lib-mgmt"><span class="ic">🏷️</span><span>管理</span></div>
     </div>
     <div class="navs"><div class="navl" data-i18n="g.nav.settings">設定</div>
-      <div class="navi" data-p="lib-cats"><span class="ic">🏷️</span><span data-i18n="lib.nav.cats">分類管理</span></div>
-      <div class="navi" data-p="lib-cfg"><span class="ic">⚙️</span><span data-i18n="lib.nav.cfg">系統設定</span></div>
+      <div class="navi cn" data-p="lib-loans"><span class="ic">📋</span><span>借閱記錄</span><span class="nbadge" id="nb-ov" style="display:none">0</span></div>
+      <div class="navi cn" data-p="lib-cfg"><span class="ic">⚙️</span><span data-i18n="lib.nav.cfg">系統設定</span></div>
     </div>
     <div class="sbf">v1.56 · Supabase<br><span style="color:var(--ac)">● 本機存儲</span></div>
   </div>
   <div class="mc" id="lc">
-    <div class="pg active" id="pg-lib-dash">
+    <div class="pg" id="pg-lib-dash">
       <div class="sg">
         <div class="sc ca"><div class="sl" data-i18n="lib.stat.total">館藏總數</div><div class="sv" id="sl-tot">0</div><div class="ss" data-i18n="lib.stat.unit">冊</div></div>
         <div class="sc"><div class="sl" data-i18n="lib.stat.loaned">借閱中</div><div class="sv" id="sl-act">0</div><div class="ss" data-i18n="lib.stat.unit">冊</div></div>
@@ -1048,35 +1045,46 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="sth"><div class="stt" data-i18n="lib.dash.top">📈 借閱排行</div></div>
       <div class="tw"><table><thead><tr><th data-i18n="lib.tbl.rank">#</th><th data-i18n="lib.tbl.title">書名</th><th data-i18n="lib.tbl.author">作者</th><th data-i18n="lib.tbl.times">次數</th><th data-i18n="lib.tbl.cat">分類</th></tr></thead><tbody id="ld-top"></tbody></table></div>
     </div>
-    <div class="pg" id="pg-lib-books">
-      <div class="fb"><div class="sw2"><span class="si">🔍</span><input type="text" id="bkq" data-i18n-ph="lib.ph.book_search" placeholder="書名、作者、ISBN…" oninput="renderBooks()"></div><select id="bkcat" style="width:135px" onchange="renderBooks()"><option value="" data-i18n="lib.filter.all_cats">所有分類</option></select><select id="bkst" style="width:108px" onchange="renderBooks()"><option value="" data-i18n="lib.filter.all_status">所有狀態</option><option value="av" data-i18n="lib.filter.in_stock">在館</option><option value="bw" data-i18n="lib.filter.loaned">借出中</option></select><div class="vt"><button class="vb active" id="vbg" onclick="setBookV('g')">⊞</button><button class="vb" id="vbl" onclick="setBookV('l')">≡</button></div><button class="btn bp" onclick="openBkModal()" data-i18n="lib.btn.add">＋ 新增</button></div>
+    <div class="pg active" id="pg-lib-books">
+      <div class="fb"><div class="sw2"><span class="si">🔍</span><input type="text" id="bkq" placeholder="書名、作者、出版社…" oninput="renderBooks()"></div><select id="bkcat" style="width:135px" onchange="renderBooks()"><option value="">所有分類</option></select><select id="bkst" style="width:108px" onchange="renderBooks()"><option value="">所有狀態</option><option value="av">在館</option><option value="bw">借出中</option></select><div class="vt"><button class="vb active" id="vbg" onclick="setBookV('g')">⊞</button><button class="vb" id="vbl" onclick="setBookV('l')">≡</button></div></div>
       <div id="bk-gv" class="bkgrid"></div>
-      <div id="bk-lv" style="display:none"><div class="tw"><table><thead><tr><th data-i18n="lib.tbl.title">書名</th><th data-i18n="lib.tbl.author">作者</th><th data-i18n="lib.tbl.isbn">ISBN</th><th data-i18n="lib.tbl.cat">分類</th><th data-i18n="lib.tbl.copies">館藏</th><th data-i18n="lib.tbl.avail">可借</th><th data-i18n="lib.tbl.status">狀態</th></tr></thead><tbody id="bk-lt"></tbody></table></div></div>
+      <div id="bk-lv" style="display:none"><div class="tw"><table><thead><tr><th>書名</th><th>作者</th><th>分類</th><th>在館</th><th>操作</th></tr></thead><tbody id="bk-lt"></tbody></table></div></div>
     </div>
     <div class="pg" id="pg-lib-loans">
       <div class="fb"><div class="sw2"><span class="si">🔍</span><input type="text" id="lnq" data-i18n-ph="lib.ph.loan_search" placeholder="書名或借閱人…" oninput="renderLoans()"></div><select id="lnst" style="width:115px" onchange="renderLoans()"><option value="active" data-i18n="lib.filter.active">借閱中</option><option value="overdue" data-i18n="lib.filter.overdue">逾期</option><option value="returned" data-i18n="lib.filter.returned">已歸還</option><option value="" data-i18n="lib.filter.all">全部</option></select><button class="btn bg2 bsm" onclick="exportLoansCSV()" data-i18n="g.btn.csv">↓ CSV</button></div>
       <div class="tw"><table><thead><tr><th data-i18n="lib.tbl.title">書名</th><th data-i18n="lib.tbl.borrower">借閱人</th><th data-i18n="lib.tbl.dept">部門</th><th data-i18n="lib.tbl.borrow_date">借出日</th><th data-i18n="lib.tbl.due">應還日</th><th data-i18n="lib.tbl.return_date">歸還日</th><th data-i18n="lib.tbl.status">狀態</th></tr></thead><tbody id="ln-tb"></tbody></table></div>
     </div>
-    <div class="pg" id="pg-lib-borrow">
-      <div style="max-width:530px"><div class="sth" style="margin-bottom:14px"><div class="stt" data-i18n="lib.page.borrow">借書登記</div></div>
+    <div class="pg" id="pg-lib-return">
+      <div style="max-width:700px"><div class="sth" style="margin-bottom:13px"><div class="stt">還書作業</div></div><div class="fb"><div class="sw2"><span class="si">🔍</span><input type="text" id="rtq" placeholder="借閱人或書名…" oninput="renderReturn()"></div></div><div class="tw"><table><thead><tr><th>書名</th><th>借閱人</th><th>借出日</th><th>應還日</th><th>狀態</th><th></th></tr></thead><tbody id="rt-tb"></tbody></table></div></div>
+    </div>
+    <div class="pg" id="pg-lib-mgmt">
+      <div style="display:flex;gap:8px;margin-bottom:18px">
+        <button id="mgmt-tab-add" class="btn bp bsm" onclick="showMgmtTab('add')">＋ 新增書籍</button>
+        <button id="mgmt-tab-cats" class="btn bg2 bsm" onclick="showMgmtTab('cats')">🏷️ 分類管理</button>
+      </div>
+      <div id="mgmt-add" style="max-width:540px">
         <div style="background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);padding:20px">
-          <div class="fg"><div class="fl" data-i18n="lib.lbl.borrower">借閱人 *</div><select id="bwu"><option value="">請選擇員工…</option></select><div class="fh" id="bwh"></div></div>
-          <div class="fg"><div class="fl" data-i18n="lib.lbl.book">選擇書籍 *</div><div class="sw2" style="margin-bottom:6px"><span class="si">🔍</span><input type="text" id="bwbq" data-i18n-ph="lib.ph.book_name" placeholder="搜尋書名…" oninput="renderBwBooks()"></div><div id="bwbl" style="max-height:165px;overflow-y:auto;border:1px solid var(--bd);border-radius:var(--rs)"></div><div id="bwsel" style="display:none;margin-top:6px;padding:8px 12px;background:var(--acd);border:1px solid rgba(67,97,238,.3);border-radius:var(--rs);font-size:13px;color:var(--ac)"></div></div>
-          <div class="frow" style="margin-bottom:13px"><div style="flex:1;display:flex;flex-direction:column;gap:5px"><div class="fl" data-i18n="lib.lbl.borrow_date">借出日期</div><input type="date" id="bwdt"></div><div style="flex:1;display:flex;flex-direction:column;gap:5px"><div class="fl" data-i18n="lib.lbl.due_date">應還日期</div><input type="date" id="bwdu"><div class="fh"><span data-i18n="lib.ph.default_days">預設</span><span id="bwdy">30</span>天</div></div></div>
-          <button class="btn bp" style="width:100%" onclick="doLoan()" data-i18n="lib.btn.confirm_loan">✓ 確認借出</button>
+          <div class="fg"><div class="fl">ISBN（可自動帶入）</div><div style="display:flex;gap:8px"><input type="text" id="mgbk-isbn" placeholder="978-…" style="flex:1"><button class="btn bg2 bsm" onclick="lookupISBNMgmt()">查詢</button></div><div id="mgbk-isbnld" style="display:none;font-size:12px;color:var(--t3);margin-top:4px">🔄 查詢中…</div></div>
+          <div class="fg2">
+            <div class="fg full"><div class="fl">書名 *</div><input type="text" id="mgbk-tit"></div>
+            <div class="fg"><div class="fl">作者</div><input type="text" id="mgbk-aut"></div>
+            <div class="fg"><div class="fl">出版年</div><input type="number" id="mgbk-yr" min="1900" max="2099"></div>
+            <div class="fg"><div class="fl">分類</div><select id="mgbk-cat"><option value="">未分類</option></select></div>
+            <div class="fg"><div class="fl">語言</div><select id="mgbk-lng"><option value="繁中">繁體中文</option><option value="简中">簡體中文</option><option value="EN">英文</option><option value="日文">日文</option><option value="其他">其他</option></select></div>
+            <div class="fg"><div class="fl">館藏數量</div><input type="number" id="mgbk-cp" value="1" min="1"></div>
+            <div class="fg full"><div class="fl">封面圖片 URL</div><input type="text" id="mgbk-cov" placeholder="https://…"></div>
+            <div class="fg full"><div class="fl">備註</div><textarea id="mgbk-nt" style="min-height:58px"></textarea></div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:12px">
+          <button class="btn bg2" onclick="clearMgmtForm()">清除</button>
+          <button class="btn bp" onclick="saveMgmtBook()">✓ 儲存書籍</button>
         </div>
       </div>
-    </div>
-    <div class="pg" id="pg-lib-return">
-      <div style="max-width:700px"><div class="sth" style="margin-bottom:13px"><div class="stt" data-i18n="lib.page.return">還書作業</div></div><div class="fb"><div class="sw2"><span class="si">🔍</span><input type="text" id="rtq" data-i18n-ph="lib.ph.return_search" placeholder="借閱人或書名…" oninput="renderReturn()"></div></div><div class="tw"><table><thead><tr><th data-i18n="lib.tbl.title">書名</th><th data-i18n="lib.tbl.borrower">借閱人</th><th data-i18n="lib.tbl.borrow_date">借出日</th><th data-i18n="lib.tbl.due">應還日</th><th data-i18n="lib.tbl.status">狀態</th></tr></thead><tbody id="rt-tb"></tbody></table></div></div>
-    </div>
-    <div class="pg" id="pg-lib-rsv">
-      <div class="fb"><div class="stt" data-i18n="lib.page.rsv">預約佇列</div><div style="margin-left:auto"></div><button class="btn bp" onclick="openRsvModal()" data-i18n="lib.btn.add_rsv">＋ 新增預約</button></div>
-      <div class="tw"><table><thead><tr><th data-i18n="lib.tbl.title">書名</th><th data-i18n="lib.tbl.borrower">預約人</th><th data-i18n="lib.tbl.borrow_date">預約時間</th><th data-i18n="lib.tbl.status">狀態</th></tr></thead><tbody id="rv-tb"></tbody></table></div>
-    </div>
-    <div class="pg" id="pg-lib-cats">
-      <div class="fb"><div class="stt" data-i18n="lib.page.cats">分類管理</div><div style="margin-left:auto"></div><button class="btn bp" onclick="openCatModal()" data-i18n="lib.btn.add_cat">＋ 新增分類</button></div>
-      <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:8px" id="cat-list"></div>
+      <div id="mgmt-cats" style="display:none">
+        <div class="fb" style="margin-bottom:12px"><div style="font-weight:600">分類管理</div><div style="margin-left:auto"></div><button class="btn bp bsm" onclick="openCatModal()">＋ 新增分類</button></div>
+        <div style="display:flex;flex-wrap:wrap;gap:10px" id="cat-list"></div>
+      </div>
     </div>
     <div class="pg" id="pg-lib-cfg">
       <div style="max-width:440px"><div class="stt" style="margin-bottom:15px" data-i18n="lib.page.cfg">圖書館設定</div>
@@ -1742,6 +1750,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
 <div class="mo" id="mo-book"><div class="md"><div class="mh"><div class="mt2" id="mobkt" data-i18n="lib.mo.add_book">新增書籍</div><button class="mc2" onclick="closeMo('mo-book')">✕</button></div><div class="mb"><div class="fg"><div class="fl" data-i18n="lib.mo.isbn_auto">ISBN（可自動帶入）</div><div style="display:flex;gap:8px"><input type="text" id="bkisbn" placeholder="978-…" style="flex:1"><button class="btn bg2 bsm" onclick="lookupISBN()" data-i18n="lib.mo.lookup">查詢</button></div><div class="isbnld" id="isbnld">🔄 查詢中…</div></div><div class="fg2"><div class="fg full"><div class="fl" data-i18n="lib.tbl.title">書名 *</div><input type="text" id="bktit"></div><div class="fg"><div class="fl" data-i18n="lib.tbl.author">作者</div><input type="text" id="bkaut"></div><div class="fg"><div class="fl">出版年</div><input type="number" id="bkyr" min="1900" max="2099"></div><div class="fg"><div class="fl" data-i18n="lib.tbl.cat">分類</div><select id="bkcatsel"><option value="">未分類</option></select></div><div class="fg"><div class="fl" data-i18n="lib.tbl.status">語言</div><select id="bklng"><option value="繁中">繁體中文</option><option value="简中">簡體中文</option><option value="EN">英文</option><option value="日文">日文</option><option value="其他">其他</option></select></div><div class="fg"><div class="fl" data-i18n="lib.tbl.copies">館藏數量</div><input type="number" id="bkcp" value="1" min="1"></div><div class="fg full"><div class="fl">封面圖片 URL</div><input type="text" id="bkcov" placeholder="https://…"></div><div class="fg full"><div class="fl" data-i18n="lib.tbl.notes">備註</div><textarea id="bknt2" style="min-height:58px"></textarea></div></div></div><div class="mf"><button class="btn bg2" onclick="closeMo('mo-book')" data-i18n="g.btn.cancel">取消</button><button class="btn bp" onclick="saveBook()" data-i18n="g.btn.save">儲存</button></div></div></div>
 <div class="mo" id="mo-cat"><div class="md" style="max-width:340px"><div class="mh"><div class="mt2" data-i18n="lib.mo.add_cat">新增分類</div><button class="mc2" onclick="closeMo('mo-cat')">✕</button></div><div class="mb"><div class="fg"><div class="fl" data-i18n="cat.name.label">分類名稱 *</div><input type="text" id="catnm" placeholder="管理、設計…"></div></div><div class="mf"><button class="btn bg2" onclick="closeMo('mo-cat')" data-i18n="g.btn.cancel">取消</button><button class="btn bp" onclick="saveCat()" data-i18n="lib.btn.add">＋ 新增</button></div></div></div>
 <div class="mo" id="mo-rsv"><div class="md" style="max-width:430px"><div class="mh"><div class="mt2" data-i18n="lib.mo.add_rsv">新增預約</div><button class="mc2" onclick="closeMo('mo-rsv')">✕</button></div><div class="mb"><div class="fg"><div class="fl" data-i18n="lib.lbl.borrower">預約人 *</div><select id="rsvu"><option value="">請選擇…</option></select></div><div class="fg"><div class="fl" data-i18n="lib.lbl.book">書籍 *</div><select id="rsvb"><option value="">請選擇…</option></select></div></div><div class="mf"><button class="btn bg2" onclick="closeMo('mo-rsv')" data-i18n="g.btn.cancel">取消</button><button class="btn bp" onclick="saveRsv()" data-i18n="g.btn.confirm">確認</button></div></div></div>
+<div class="mo" id="mo-quickloan"><div class="md" style="max-width:420px"><div class="mh"><div class="mt2" id="ql-header">借閱確認</div><button class="mc2" onclick="closeMo('mo-quickloan')">✕</button></div><div class="mb"><div style="background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);padding:12px;margin-bottom:16px"><div style="font-weight:600;font-size:14px;margin-bottom:4px" id="ql-bktitle">—</div><div style="font-size:12px;color:var(--t3)" id="ql-bkinfo">—</div></div><div class="fg"><div class="fl">借閱人 *</div><select id="ql-usr"><option value="">請選擇員工…</option></select><div class="fh" id="ql-uinfo" style="margin-top:4px"></div></div><div class="frow" style="gap:12px;margin-top:4px"><div style="flex:1;display:flex;flex-direction:column;gap:5px"><div class="fl">借出日期</div><input type="date" id="ql-bwdt"></div><div style="flex:1;display:flex;flex-direction:column;gap:5px"><div class="fl">應還日期</div><input type="date" id="ql-dudt"></div></div></div><div class="mf"><button class="btn bg2" onclick="closeMo('mo-quickloan')">取消</button><button class="btn bp" id="ql-btn" onclick="doQuickLoan()">✓ 確認借出</button></div></div></div>
 <div class="mo" id="mo-usw"><div class="md" style="max-width:400px"><div class="mh"><div class="mt2" data-i18n="lib.mo.switch_user">切換使用者</div><button class="mc2" onclick="closeMo('mo-usw')">✕</button></div><div class="mb"><div class="fh" data-i18n="lib.mo.select_account" style="margin-bottom:10px">選擇您的帳號</div><div class="ugrid" id="usw-list"></div></div></div></div>
 <div class="mo" id="mo-veh"><div class="md"><div class="mh"><div class="mt2" id="movht" data-i18n="car.mo.add_veh">新增車輛</div><button class="mc2" onclick="closeMo('mo-veh')">✕</button></div><div class="mb cf"><div class="fg2"><div class="fg full"><div class="fl" data-i18n="car.tbl.vehicle">車輛名稱 *</div><input type="text" id="vnm" placeholder="Toyota Camry 白"></div><div class="fg"><div class="fl" data-i18n="car.tbl.plate">車牌號碼 *</div><input type="text" id="vpl" placeholder="ABC-1234"></div><div class="fg"><div class="fl" data-i18n="car.tbl.type">類型</div><select id="vtp"><option value="sedan" data-i18n="car.veh.type.sedan">轎車</option><option value="suv">SUV</option><option value="van" data-i18n="car.veh.type.van">廂型車</option><option value="truck" data-i18n="car.veh.type.truck">貨車</option></select></div><div class="fg"><div class="fl" data-i18n="car.tbl.fuel">燃料</div><select id="vfl"><option value="gas" data-i18n="car.fuel.gas">汽油</option><option value="diesel" data-i18n="car.fuel.diesel">柴油</option><option value="hybrid" data-i18n="car.fuel.hybrid">油電</option><option value="ev" data-i18n="car.fuel.ev">純電</option></select></div><div class="fg"><div class="fl" data-i18n="car.tbl.km">目前里程 (km)</div><input type="number" id="vkm" value="0" min="0"></div><div class="fg"><div class="fl" data-i18n="car.tbl.next_km">下次保養里程</div><input type="number" id="vnmk" placeholder="50000"></div><div class="fg"><div class="fl" data-i18n="car.tbl.next_insp">下次驗車日期</div><input type="date" id="vni"></div><div class="fg"><div class="fl" data-i18n="car.tbl.park">停車位（選填）</div><input type="text" id="vpk" placeholder="例：B1-001"></div><div class="fg"><div class="fl" data-i18n="car.tbl.status">狀態</div><select id="vstatus"><option value="available" data-i18n="car.st.avail">可用</option><option value="maintenance" data-i18n="car.st.need_maint">保養中</option><option value="retired">已除役</option></select></div><div class="fg full"><div class="fl" data-i18n="car.tbl.notes">備註</div><textarea id="vnt" style="min-height:55px"></textarea></div></div></div><div class="mf"><button class="btn bg2" onclick="closeMo('mo-veh')" data-i18n="g.btn.cancel">取消</button><button class="btn btl" onclick="saveVeh()" data-i18n="g.btn.save">儲存</button></div></div></div>
 <div class="mo" id="mo-fuel"><div class="md" style="max-width:480px"><div class="mh"><div class="mt2" data-i18n="car.mo.fuel_log">記錄加油</div><button class="mc2" onclick="closeMo('mo-fuel')">✕</button></div><div class="mb cf"><div class="fg2"><div class="fg full"><div class="fl" data-i18n="car.lbl.vehicle">車輛 *</div><select id="fveh"><option value="">請選擇…</option></select></div><div class="fg"><div class="fl" data-i18n="fuel.date.label">加油日期 *</div><input type="date" id="fdt"></div><div class="fg"><div class="fl" data-i18n="car.tbl.fueler">加油人</div><select id="fusr"><option value="">請選擇…</option></select></div><div class="fg"><div class="fl" data-i18n="car.tbl.km_vol">加油量 (公升) *</div><input type="number" id="flt" placeholder="40" min="0" step="0.1" oninput="calcFuel()"></div><div class="fg"><div class="fl" data-i18n="car.tbl.price">單價 (元/L)</div><input type="number" id="fpr" placeholder="32" min="0" step="0.1" oninput="calcFuel()"></div><div class="fg"><div class="fl" data-i18n="car.tbl.amount">總金額 (元)</div><input type="number" id="ftot" placeholder="自動計算"></div><div class="fg"><div class="fl" data-i18n="car.tbl.km">油表里程 (km)</div><input type="number" id="fod" placeholder="0" min="0"></div><div class="fg full"><div class="fl" data-i18n="car.tbl.notes">備註</div><input type="text" id="fnt" placeholder="加油站、油種…"></div></div></div><div class="mf"><button class="btn bg2" onclick="closeMo('mo-fuel')" data-i18n="g.btn.cancel">取消</button><button class="btn btl" onclick="saveFuel()" data-i18n="g.btn.save">儲存</button></div></div></div>
@@ -2136,7 +2145,7 @@ async function sbDel(lsKey, id) {
 async function loadLibFromSB() {
   const results = await Promise.allSettled([
     SB.get('lib_categories','?order=name'),
-    SB.get('lib_books','?order=title'),
+    SB.get('lib_books','?order=created_at.desc'),
     SB.get('lib_loans','?order=borrowed_at.desc'),
     SB.get('lib_reservations','?order=reserved_at.desc&status=eq.waiting'),
   ]);
@@ -3252,7 +3261,7 @@ async function init(){
   await syncUsersFromSupabase();
 
   // 3. 從 Supabase 載入圖書館/公務車資料（背景，失敗時用 localStorage 快取）
-  loadLibFromSB().then(()=>{ popCatSel(); renderLibPg('lib-dash'); }).catch(()=>{});
+  loadLibFromSB().then(()=>{ popCatSel(); renderLibPg('lib-books'); }).catch(()=>{});
   await loadCarFromSB();
 
   // 4. 初始化本機設定
@@ -3363,7 +3372,7 @@ function switchMod(m){
   document.getElementById(`panel-${m}`).classList.add('active');
   // 手機版模塊 tab bar
   mobileModSwitch(m);
-  if(m==='lib')renderLibPg('lib-dash');
+  if(m==='lib'){loadLibFromSB().then(()=>{popCatSel();renderLibPg('lib-books');}).catch(()=>renderLibPg('lib-books'));}
   if(m==='car')renderCarPg('car-dash');
   if(m==='lottery'){syncUsersFromSupabase().catch(()=>{}).then(()=>lottoInit());}
   if(m==='room'){getRoomBookings().then(bks=>{
@@ -3396,13 +3405,10 @@ const MOBILE_SUBNAV = {
     {p:'car-cfg',ic:'⚙️',lb:'設定'},
   ],
   lib:[
-    {p:'lib-dash',ic:'📊',lb:'總覽'},
     {p:'lib-books',ic:'📖',lb:'書目'},
-    {p:'lib-loans',ic:'📋',lb:'借閱'},
-    {p:'lib-borrow',ic:'➕',lb:'借書'},
-    {p:'lib-return',ic:'↩️',lb:'還書'},
-    {p:'lib-rsv',ic:'🔖',lb:'預約'},
-    {p:'lib-cats',ic:'🏷️',lb:'分類'},
+    {p:'lib-return',ic:'↩️',lb:'歸還'},
+    {p:'lib-mgmt',ic:'🏷️',lb:'管理'},
+    {p:'lib-loans',ic:'📋',lb:'借閱記錄'},
     {p:'lib-cfg',ic:'⚙️',lb:'設定'},
   ],
   visit:[
@@ -3485,14 +3491,10 @@ function navLib(p){
 function renderLibPg(p){
   document.querySelectorAll('#lc .pg').forEach(el=>el.classList.remove('active'));
   document.getElementById(`pg-${p}`)?.classList.add('active');
-  if(p==='lib-dash'){renderLibDash();}
   if(p==='lib-books'){popCatSel();renderBooks();}
   if(p==='lib-loans')renderLoans();
-  if(p==='lib-borrow'){popUsrSel();renderBwBooks();updBwDue();}
   if(p==='lib-return')renderReturn();
-  if(p==='lib-rsv')renderRsv();
-  if(p==='lib-users')renderUsers();
-  if(p==='lib-cats')renderCats();
+  if(p==='lib-mgmt'){popCatSel4Mgmt();showMgmtTab('add');}
   if(p==='lib-cfg')loadLibCfg();
 }
 function navCar(p){
@@ -3581,14 +3583,17 @@ function setBookV(v){bkV=v;document.getElementById('bk-gv').style.display=v==='g
 function renderBooks(){
   let bks=_libSite?ld(K.bk).filter(b=>b.site===_libSite):ld(K.bk);
   const q=document.getElementById('bkq')?.value.toLowerCase()||'',cat=document.getElementById('bkcat')?.value||'',st=document.getElementById('bkst')?.value||'';
-  if(q)bks=bks.filter(b=>b.title?.toLowerCase().includes(q)||b.author?.toLowerCase().includes(q)||b.isbn?.includes(q));
+  if(q)bks=bks.filter(b=>b.title?.toLowerCase().includes(q)||b.author?.toLowerCase().includes(q)||b.isbn?.includes(q)||b.notes?.toLowerCase().includes(q));
+  else bks=bks.slice(0,50); // 無搜尋時顯示最新 50 本（Supabase 已依 created_at desc 排序）
   if(cat)bks=bks.filter(b=>b.cat_id===cat);
   if(st==='av')bks=bks.filter(b=>bkAvail(b)>0);
   if(st==='bw')bks=bks.filter(b=>bkAvail(b)===0);
+  const hint=q?'':`<div style="font-size:12px;color:var(--t3);margin-bottom:10px">顯示最新加入的 ${Math.min(50,bks.length)} 本，搜尋可查詢全部 ${(_libSite?ld(K.bk).filter(b=>b.site===_libSite):ld(K.bk)).length} 本</div>`;
   if(bkV==='g'){
-    document.getElementById('bk-gv').innerHTML=bks.length?bks.map(b=>{const av=bkAvail(b),cat=gCat(b.cat_id);return`<div class="bkcard" onclick="openBkModal('${b.id}')"><div class="bkcov">${b.cover?`<img src="${b.cover}" onerror="this.style.display='none'">`:''}<div class="bkph" style="${b.cover?'display:none':''}">📗</div></div><div class="bki"><div class="bktt">${b.title}</div><div class="bkau">${b.author||'—'}</div><div class="bkft">${cat?`<span class="ctag">${cat.name}</span>`:'<span></span>'}<span class="badge ${av>0?'bg':'br'}">${av>0?t('lib.grid.instock').replace('%d',av):t('lib.grid.loaned')}</span></div></div></div>`}).join(''):'<div class="es" style="grid-column:1/-1"><div class="ei">📚</div><p>'+t('lib.no_books')+'</p></div>';
+    document.getElementById('bk-gv').innerHTML=hint+(bks.length?bks.map(b=>{const av=bkAvail(b),cat=gCat(b.cat_id);const btn=av>0?`<button class="btn bp bsm" style="width:100%;margin-top:8px" onclick="event.stopPropagation();quickBorrow('${b.id}')">借閱</button>`:`<button class="btn bg2 bsm" style="width:100%;margin-top:8px" onclick="event.stopPropagation();quickReserve('${b.id}')">預約</button>`;return`<div class="bkcard"><div class="bkcov">${b.cover?`<img src="${b.cover}" onerror="this.style.display='none'">`:''}<div class="bkph" style="${b.cover?'display:none':''}">📗</div></div><div class="bki"><div class="bktt">${b.title}</div><div class="bkau">${b.author||'—'}</div><div class="bkft">${cat?`<span class="ctag">${cat.name}</span>`:'<span></span>'}<span class="badge ${av>0?'bg':'br'}">${av>0?`在館 ${av}`:t('lib.grid.loaned')}</span></div>${btn}</div></div>`}).join(''):'<div class="es" style="grid-column:1/-1"><div class="ei">📚</div><p>查無書目</p></div>');
   }else{
-    document.getElementById('bk-lt').innerHTML=bks.length?bks.map(b=>{const av=bkAvail(b),cat=gCat(b.cat_id);return`<tr><td><b>${b.title}</b>${b.lang?` <span class="badge bm">${b.lang}</span>`:''}</td><td class="tdm">${b.author||'—'}</td><td class="tdm">${b.isbn||'—'}</td><td>${cat?`<span class="ctag">${cat.name}</span>`:'—'}</td><td>${b.copies}</td><td>${av}</td><td><span class="badge ${av>0?'bg':'br'}">${av>0?t('lib.book_instock'):t('lib.book_loaned')}</span></td><td><button class="btn bg2 bsm" onclick="openBkModal('${b.id}')">${t('g.btn.edit')}</button> <button class="btn bdr bsm" onclick="delBk('${b.id}')">${t('g.btn.delete')}</button></td></tr>`}).join(''):`<tr><td colspan="8" class="tdm" style="text-align:center;padding:22px">${t('lib.no_books')}</td></tr>`;
+    document.getElementById('bk-lt').innerHTML=bks.length?bks.map(b=>{const av=bkAvail(b),cat=gCat(b.cat_id);return`<tr><td><b>${b.title}</b>${b.lang?` <span class="badge bm">${b.lang}</span>`:''}</td><td class="tdm">${b.author||'—'}</td><td>${cat?`<span class="ctag">${cat.name}</span>`:'—'}</td><td><span class="badge ${av>0?'bg':'br'}">${av>0?`在館 ${av}`:t('lib.grid.loaned')}</span></td><td>${av>0?`<button class="btn bp bsm" onclick="quickBorrow('${b.id}')">借閱</button>`:`<button class="btn bg2 bsm" onclick="quickReserve('${b.id}')">預約</button>`}</td></tr>`}).join(''):`<tr><td colspan="5" style="text-align:center;padding:22px;color:var(--t3)">查無書目</td></tr>`;
+    document.getElementById('bk-lv').insertAdjacentHTML('afterbegin',hint);
   }
 }
 function openBkModal(id){
@@ -3618,6 +3623,82 @@ async function lookupISBN(){
   document.getElementById('isbnld').style.display='none';
 }
 
+let _qlBkId=null,_qlIsRsv=false;
+function quickBorrow(bid){
+  const b=gBk(bid);if(!b)return;
+  _qlBkId=bid;_qlIsRsv=false;
+  document.getElementById('ql-header').textContent='借閱確認';
+  document.getElementById('ql-bktitle').textContent=b.title;
+  const cat=gCat(b.cat_id);
+  document.getElementById('ql-bkinfo').textContent=`${b.author||''}${cat?' · '+cat.name:''}`;
+  const us=ld(K.us),opts=`<option value="">請選擇員工…</option>`+us.map(u=>`<option value="${u.id}">${u.name}（${u.dept||'—'}）</option>`).join('');
+  const qlUsr=document.getElementById('ql-usr');qlUsr.innerHTML=opts;if(curUid)qlUsr.value=curUid;
+  qlUsr.onchange=()=>{const cfg=lo(K.lcfg,DLCFG),uid2=qlUsr.value,a=uid2?ld(K.ln).filter(l=>l.u_id===uid2&&l.st!=='returned').length:0;document.getElementById('ql-uinfo').textContent=uid2?`已借 ${a}/${cfg.max_loans} 冊`:'';};
+  qlUsr.onchange();
+  const cfg=lo(K.lcfg,DLCFG),d=new Date();d.setDate(d.getDate()+(cfg.loan_days||30));
+  document.getElementById('ql-bwdt').value=tds();
+  document.getElementById('ql-dudt').value=d.toISOString().slice(0,10);
+  document.getElementById('ql-btn').textContent='✓ 確認借出';
+  openMo('mo-quickloan');
+}
+function quickReserve(bid){
+  const b=gBk(bid);if(!b)return;
+  _qlBkId=bid;_qlIsRsv=true;
+  document.getElementById('ql-header').textContent='預約確認';
+  document.getElementById('ql-bktitle').textContent=b.title;
+  document.getElementById('ql-bkinfo').textContent='目前全數借出，預約後待書歸還通知';
+  const us=ld(K.us),opts=`<option value="">請選擇員工…</option>`+us.map(u=>`<option value="${u.id}">${u.name}（${u.dept||'—'}）</option>`).join('');
+  const qlUsr=document.getElementById('ql-usr');qlUsr.innerHTML=opts;if(curUid)qlUsr.value=curUid;
+  qlUsr.onchange=()=>{};
+  document.getElementById('ql-uinfo').textContent='';
+  document.getElementById('ql-bwdt').value='';document.getElementById('ql-dudt').value='';
+  document.getElementById('ql-btn').textContent='✓ 確認預約';
+  openMo('mo-quickloan');
+}
+function doQuickLoan(){
+  const uid2=document.getElementById('ql-usr').value;if(!uid2)return toast('請選擇借閱人','error');
+  if(_qlIsRsv){
+    const rv=ld(K.rv);rv.push({id:uid(),bk_id:_qlBkId,u_id:uid2,dt:tds(),st:'waiting'});sv(K.rv,rv);
+    closeMo('mo-quickloan');renderBooks();toast(`已預約《${gBk(_qlBkId)?.title}》`,'success');return;
+  }
+  const cfg=lo(K.lcfg,DLCFG);
+  if(ld(K.ln).filter(l=>l.u_id===uid2&&l.st!=='returned').length>=cfg.max_loans)return toast(`已達借閱上限（${cfg.max_loans}冊）`,'error');
+  const bk=gBk(_qlBkId);if(!bk||bkAvail(bk)===0)return toast('目前無在館書籍','error');
+  const bw=document.getElementById('ql-bwdt').value||tds(),due=document.getElementById('ql-dudt').value;if(!due)return toast('請設定應還日期','error');
+  const loan={id:uid(),bk_id:_qlBkId,u_id:uid2,bw,due,ret:null,st:'active'};
+  const ln=ld(K.ln);ln.push(loan);sv(K.ln,ln);sbSaveLoan(loan);
+  closeMo('mo-quickloan');renderBooks();updBadges();toast(`已借出《${bk.title}》給 ${gUsr(uid2)?.name}`,'success');
+}
+function showMgmtTab(tab){
+  document.getElementById('mgmt-add').style.display=tab==='add'?'':'none';
+  document.getElementById('mgmt-cats').style.display=tab==='cats'?'':'none';
+  document.getElementById('mgmt-tab-add').className=`btn bsm ${tab==='add'?'bp':'bg2'}`;
+  document.getElementById('mgmt-tab-cats').className=`btn bsm ${tab==='cats'?'bp':'bg2'}`;
+  if(tab==='cats')renderCats();
+}
+function popCatSel4Mgmt(){const cats=ld(K.ct);const opts=`<option value="">未分類</option>`+cats.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');const el=document.getElementById('mgbk-cat');if(el)el.innerHTML=opts;}
+function clearMgmtForm(){['mgbk-isbn','mgbk-tit','mgbk-aut','mgbk-cov','mgbk-nt'].forEach(x=>{const el=document.getElementById(x);if(el)el.value='';});const yr=document.getElementById('mgbk-yr');if(yr)yr.value='';const cp=document.getElementById('mgbk-cp');if(cp)cp.value=1;const lng=document.getElementById('mgbk-lng');if(lng)lng.value='繁中';const cat=document.getElementById('mgbk-cat');if(cat)cat.value='';}
+function saveMgmtBook(){
+  const tit=(document.getElementById('mgbk-tit')?.value||'').trim();if(!tit)return toast('請輸入書名','error');
+  const data={isbn:(document.getElementById('mgbk-isbn')?.value||'').trim(),title:tit,author:(document.getElementById('mgbk-aut')?.value||'').trim(),year:parseInt(document.getElementById('mgbk-yr')?.value)||null,cat_id:document.getElementById('mgbk-cat')?.value||'',lang:document.getElementById('mgbk-lng')?.value||'繁中',copies:parseInt(document.getElementById('mgbk-cp')?.value)||1,cover:(document.getElementById('mgbk-cov')?.value||'').trim(),notes:(document.getElementById('mgbk-nt')?.value||'').trim(),site:_libSite||'TW'};
+  const fullData={id:uid(),...data};
+  const bks=ld(K.bk);bks.unshift(fullData);sv(K.bk,bks);sbSaveBook(fullData);clearMgmtForm();toast('書籍已新增','success');
+}
+async function lookupISBNMgmt(){
+  const isbn=(document.getElementById('mgbk-isbn')?.value||'').trim();if(!isbn)return toast('請輸入 ISBN','error');
+  const ld2=document.getElementById('mgbk-isbnld');if(ld2){ld2.style.display='';ld2.textContent='🔄 查詢中…';}
+  try{
+    const r=await fetch(`https://openlibrary.org/api/books?bibkeys=ISBN:${isbn}&format=json&jscmd=data`);
+    const d=await r.json();const k=`ISBN:${isbn}`;
+    if(!d[k])throw new Error('找不到書目');
+    const b=d[k];
+    const ti=document.getElementById('mgbk-tit');if(ti&&!ti.value)ti.value=b.title||'';
+    const au=document.getElementById('mgbk-aut');if(au&&!au.value)au.value=(b.authors||[]).map(a=>a.name).join(', ')||'';
+    const yr=document.getElementById('mgbk-yr');if(yr&&!yr.value&&b.publish_date)yr.value=b.publish_date.slice(-4)||'';
+    const cv=document.getElementById('mgbk-cov');if(cv&&!cv.value&&b.cover)cv.value=b.cover.medium||b.cover.large||'';
+    if(ld2)ld2.textContent='✓ 已帶入書目資訊';
+  }catch(e){if(ld2)ld2.textContent='❌ 查詢失敗：'+e.message;}
+}
 function renderLoans(){
   chkOv();const _sbids=_siteBkIds();let ln=ld(K.ln).filter(l=>_sbids.has(l.bk_id));
   const q=document.getElementById('lnq')?.value.toLowerCase()||'',st=document.getElementById('lnst')?.value||'';
@@ -3631,7 +3712,7 @@ function qReturn(lid){
   l.st='returned';l.ret=tds();sv(K.ln,ln);sbSaveLoan(l);
   const rv=ld(K.rv).find(r=>r.bk_id===l.bk_id&&r.st==='waiting');
   if(rv)toast(`已還書，${gUsr(rv.u_id)?.name}有預約等候`,'warn');else toast('已登記還書','success');
-  chkOv();renderLibDash();renderLoans();renderReturn();updBadges();
+  chkOv();renderLoans();renderReturn();updBadges();
 }
 function exportLoansCSV(){const _sbids=_siteBkIds();const ln=ld(K.ln).filter(l=>_sbids.has(l.bk_id));const rows=[['書名','作者','借閱人','部門','借出日','應還日','歸還日','狀態']];ln.forEach(l=>{const b=gBk(l.bk_id),u=gUsr(l.u_id);rows.push([b?.title||'',b?.author||'',u?.name||'',u?.dept||'',l.bw,l.due,l.ret||'',l.st]);});dl('loans.csv',rows.map(r=>r.map(c=>`"${c}"`).join(',')).join('\n'),'text/csv');toast(t('g.toast.exported'),'success');}
 
@@ -4001,7 +4082,7 @@ function setGlobalSite(site){
   _roomSite=site;_carSite=site;_libSite=site;
   if(curMod==='room')navRoom(curRoomPg||'room-dash');
   else if(curMod==='car')renderCarPg(curCarPg||'car-dash');
-  else if(curMod==='lib')renderLibPg(curLibPg||'lib-dash');
+  else if(curMod==='lib')renderLibPg(curLibPg||'lib-books');
   document.querySelectorAll('.site-gbtn').forEach(b=>{
     const act=b.dataset.site===site;
     b.style.background=act?'var(--ac)':'';b.style.color=act?'#fff':'';b.style.borderColor=act?'var(--ac)':'';

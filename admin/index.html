@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" href="data:,">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART 行政管理平台 v1.86</title>
+<title>COMART 行政管理平台 v1.87</title>
 <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.js"></script>
 <style>
 :root{
@@ -954,7 +954,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="logo">
     <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
     <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
-    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.86</span>
+    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.87</span>
   </div>
   <div class="trr">
     <div id="global-site-bar" style="display:flex;align-items:center;gap:4px">
@@ -976,7 +976,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <span id="cur-u" style="color:var(--text-2)">載入中…</span>
       <span style="color:var(--text-3);font-size:10px">▾</span>
     </div>
-    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.86</span>
+    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.87</span>
   </div>
 </div>
 
@@ -2519,6 +2519,28 @@ const ADMIN_I18N = {
     'g.toast.fault_resolved':'Marked as resolved',
     'room.fault.open':'Pending','room.fault.resolved':'Resolved','room.fault.none':'No fault reports',
     'room.fault.reporter_lbl':'Reporter:',
+    'lib.st.returned':'Returned','lib.st.overdue_days':'Overdue %d days','lib.st.due_soon_days':'%d days left','lib.st.loaned':'Borrowed',
+    'lib.no_loans':'No loan records','lib.no_overdue':'No overdue','lib.grid.no_data':'No data',
+    'lib.grid.instock':'%d in stock','lib.grid.loaned':'Loaned','lib.no_books':'No books found',
+    'lib.book_instock':'In Stock','lib.book_loaned':'Loaned','lib.grid.uncat':'All Categories',
+    'lib.btn.return':'Return','lib.no_books_in':'No books available','lib.loan_status':'Borrowed %d / Max %d',
+    'lib.rsv.waiting':'Waiting','lib.rsv.done':'Done','lib.no_rsv':'No reservations','lib.all_cats2':'All Categories',
+    'lib.btn.update':'Update','lib.stat.borrow_cnt':'%d times',
+    'car.card.type_lbl':'Type','car.card.km_lbl':'Mileage','car.card.fuel_lbl':'Fuel Lvl','car.card.park_lbl':'Parking','car.card.driver_lbl':'Driver',
+    'car.pk.empty':'Empty','car.pk.none':'No parking slots configured',
+    'cal.month_fmt':'%Y/%m','cal.expand':'Expand ▾','cal.collapse':'Collapse ▲',
+    'err.no_copies':'No copies available','err.time_order':'End time must be after start time',
+    'g.lbl.day_n':'Day %d','g.toast.csv_done':'CSV exported','g.toast.no_data':'No data',
+    'room.headcount_fmt':'~%d persons','room.avail_fmt':'%d available',
+    'room.toast.check_in':'Checked in — meeting in progress','room.toast.cancel_ok':'Booking cancelled, room released',
+    'room.report.heat':'📈 Hourly Heatmap','room.report.top_dept':'🏢 Top Departments',
+    'room.report.room_stat':'%d sessions · %d hrs','room.report.sessions':'%d sessions',
+    'visit.no_week':'No visits this week','visit.st.upcoming':'Upcoming','visit.st.ongoing':'Ongoing','visit.st.done':'Done',
+    'visit.lbl.period':'Period','visit.lbl.tasks':'Tasks','visit.lbl.guests':'Guest List','visit.lbl.itinerary':'Itinerary',
+    'visit.lbl.no_task':'No tasks this day','visit.all_staff':'All staff (%d)','visit.sec.escorts':'Escort Staff','visit.sec.costs':'Cost Breakdown',
+    'visit.confirmed':'✓ Confirmed','visit.unconfirmed':'Pending',
+    'visit.report.by_type':'By Visit Type','visit.report.by_unit':'By Unit','visit.report.top_guests':'Most Frequent Guests',
+    'lot.sound_on':'🔔 Sound On','lot.sound_off':'🔇 Mute',
   },
   'zh-TW': {
     'mod.room':'會議室','mod.car':'公務車','mod.visit':'客戶到訪',
@@ -2640,6 +2662,28 @@ const ADMIN_I18N = {
     'g.toast.fault_resolved':'已標記修復',
     'room.fault.open':'待修','room.fault.resolved':'已修復','room.fault.none':'目前無故障回報',
     'room.fault.reporter_lbl':'回報人：',
+    'lib.st.returned':'已歸還','lib.st.overdue_days':'逾期 %d 天','lib.st.due_soon_days':'剩 %d 天','lib.st.loaned':'借閱中',
+    'lib.no_loans':'無借閱記錄','lib.no_overdue':'無逾期記錄','lib.grid.no_data':'無資料',
+    'lib.grid.instock':'在館 %d 冊','lib.grid.loaned':'借出中','lib.no_books':'無書籍資料',
+    'lib.book_instock':'在館','lib.book_loaned':'借出','lib.grid.uncat':'所有分類',
+    'lib.btn.return':'還書','lib.no_books_in':'無可借書籍','lib.loan_status':'目前借 %d / 上限 %d 冊',
+    'lib.rsv.waiting':'等待中','lib.rsv.done':'已完成','lib.no_rsv':'無預約記錄','lib.all_cats2':'所有分類',
+    'lib.btn.update':'更新','lib.stat.borrow_cnt':'%d 次',
+    'car.card.type_lbl':'車型','car.card.km_lbl':'里程','car.card.fuel_lbl':'油量','car.card.park_lbl':'停車位','car.card.driver_lbl':'用車人',
+    'car.pk.empty':'空位','car.pk.none':'尚未設定停車位',
+    'cal.month_fmt':'%Y年%m月','cal.expand':'展開 ▾','cal.collapse':'收合 ▲',
+    'err.no_copies':'無可借書籍','err.time_order':'結束時間不可早於開始時間',
+    'g.lbl.day_n':'第 %d 天','g.toast.csv_done':'CSV 匯出完成','g.toast.no_data':'無資料可操作',
+    'room.headcount_fmt':'約 %d 人','room.avail_fmt':'%d 間可用',
+    'room.toast.check_in':'已確認報到，會議進行中','room.toast.cancel_ok':'已取消預約，會議室已釋出',
+    'room.report.heat':'📈 時段使用熱力','room.report.top_dept':'🏢 最常使用部門',
+    'room.report.room_stat':'共 %d 場 · %d 小時','room.report.sessions':'%d 場',
+    'visit.no_week':'本週無到訪行程','visit.st.upcoming':'即將到訪','visit.st.ongoing':'進行中','visit.st.done':'已完成',
+    'visit.lbl.period':'期間','visit.lbl.tasks':'任務完成','visit.lbl.guests':'來賓名單','visit.lbl.itinerary':'行程安排',
+    'visit.lbl.no_task':'當天無任務安排','visit.all_staff':'全部員工 %d 人','visit.sec.escorts':'公司陪同人員','visit.sec.costs':'費用明細',
+    'visit.confirmed':'✓ 已確認','visit.unconfirmed':'待確認',
+    'visit.report.by_type':'依來訪類型','visit.report.by_unit':'依接待單位','visit.report.top_guests':'最常來訪來賓',
+    'lot.sound_on':'🔔 聲音開','lot.sound_off':'🔇 靜音',
   },
   'zh-CN': {
     'mod.room':'会议室','mod.car':'公务车','mod.visit':'客户到访',
@@ -2761,6 +2805,28 @@ const ADMIN_I18N = {
     'g.toast.fault_resolved':'已标记修复',
     'room.fault.open':'待修','room.fault.resolved':'已修复','room.fault.none':'目前无故障反馈',
     'room.fault.reporter_lbl':'反馈人：',
+    'lib.st.returned':'已归还','lib.st.overdue_days':'逾期 %d 天','lib.st.due_soon_days':'剩 %d 天','lib.st.loaned':'借阅中',
+    'lib.no_loans':'无借阅记录','lib.no_overdue':'无逾期记录','lib.grid.no_data':'无数据',
+    'lib.grid.instock':'在馆 %d 册','lib.grid.loaned':'借出中','lib.no_books':'无书籍资料',
+    'lib.book_instock':'在馆','lib.book_loaned':'借出','lib.grid.uncat':'所有分类',
+    'lib.btn.return':'还书','lib.no_books_in':'无可借书籍','lib.loan_status':'目前借 %d / 上限 %d 册',
+    'lib.rsv.waiting':'等待中','lib.rsv.done':'已完成','lib.no_rsv':'无预约记录','lib.all_cats2':'所有分类',
+    'lib.btn.update':'更新','lib.stat.borrow_cnt':'%d 次',
+    'car.card.type_lbl':'车型','car.card.km_lbl':'里程','car.card.fuel_lbl':'油量','car.card.park_lbl':'停车位','car.card.driver_lbl':'用车人',
+    'car.pk.empty':'空位','car.pk.none':'尚未设置停车位',
+    'cal.month_fmt':'%Y年%m月','cal.expand':'展开 ▾','cal.collapse':'收合 ▲',
+    'err.no_copies':'无可借书籍','err.time_order':'结束时间不可早于开始时间',
+    'g.lbl.day_n':'第 %d 天','g.toast.csv_done':'CSV 导出完成','g.toast.no_data':'无数据可操作',
+    'room.headcount_fmt':'约 %d 人','room.avail_fmt':'%d 间可用',
+    'room.toast.check_in':'已确认报到，会议进行中','room.toast.cancel_ok':'已取消预约，会议室已释出',
+    'room.report.heat':'📈 时段使用热力','room.report.top_dept':'🏢 最常使用部门',
+    'room.report.room_stat':'共 %d 场 · %d 小时','room.report.sessions':'%d 场',
+    'visit.no_week':'本周无到访行程','visit.st.upcoming':'即将到访','visit.st.ongoing':'进行中','visit.st.done':'已完成',
+    'visit.lbl.period':'期间','visit.lbl.tasks':'任务完成','visit.lbl.guests':'来宾名单','visit.lbl.itinerary':'行程安排',
+    'visit.lbl.no_task':'当天无任务安排','visit.all_staff':'全部员工 %d 人','visit.sec.escorts':'公司陪同人员','visit.sec.costs':'费用明细',
+    'visit.confirmed':'✓ 已确认','visit.unconfirmed':'待确认',
+    'visit.report.by_type':'依来访类型','visit.report.by_unit':'依接待单位','visit.report.top_guests':'最常来访来宾',
+    'lot.sound_on':'🔔 声音开','lot.sound_off':'🔇 静音',
   },
   vi: {
     'mod.room':'Phòng họp','mod.car':'Xe công vụ','mod.visit':'Khách thăm',
@@ -2882,6 +2948,28 @@ const ADMIN_I18N = {
     'g.toast.fault_resolved':'Đã đánh dấu đã sửa',
     'room.fault.open':'Chờ sửa','room.fault.resolved':'Đã sửa','room.fault.none':'Không có sự cố nào',
     'room.fault.reporter_lbl':'Người báo:',
+    'lib.st.returned':'Đã trả','lib.st.overdue_days':'Quá hạn %d ngày','lib.st.due_soon_days':'Còn %d ngày','lib.st.loaned':'Đang mượn',
+    'lib.no_loans':'Không có lịch sử mượn','lib.no_overdue':'Không có quá hạn','lib.grid.no_data':'Không có dữ liệu',
+    'lib.grid.instock':'Còn %d cuốn','lib.grid.loaned':'Đang cho mượn','lib.no_books':'Không có sách',
+    'lib.book_instock':'Còn trong kho','lib.book_loaned':'Đang mượn','lib.grid.uncat':'Tất cả danh mục',
+    'lib.btn.return':'Trả sách','lib.no_books_in':'Không có sách','lib.loan_status':'Đang mượn %d / Tối đa %d',
+    'lib.rsv.waiting':'Đang chờ','lib.rsv.done':'Hoàn thành','lib.no_rsv':'Không có đặt trước','lib.all_cats2':'Tất cả danh mục',
+    'lib.btn.update':'Cập nhật','lib.stat.borrow_cnt':'%d lượt',
+    'car.card.type_lbl':'Loại xe','car.card.km_lbl':'Số km','car.card.fuel_lbl':'Nhiên liệu','car.card.park_lbl':'Bãi đỗ','car.card.driver_lbl':'Người dùng',
+    'car.pk.empty':'Trống','car.pk.none':'Chưa thiết lập bãi đỗ',
+    'cal.month_fmt':'Tháng %m/%Y','cal.expand':'Mở rộng ▾','cal.collapse':'Thu gọn ▲',
+    'err.no_copies':'Không còn sách','err.time_order':'Giờ kết thúc phải sau giờ bắt đầu',
+    'g.lbl.day_n':'Ngày %d','g.toast.csv_done':'Đã xuất CSV','g.toast.no_data':'Không có dữ liệu',
+    'room.headcount_fmt':'~%d người','room.avail_fmt':'%d phòng trống',
+    'room.toast.check_in':'Đã xác nhận, cuộc họp đang diễn ra','room.toast.cancel_ok':'Đã hủy, phòng được giải phóng',
+    'room.report.heat':'📈 Biểu đồ sử dụng','room.report.top_dept':'🏢 Phòng ban dùng nhiều nhất',
+    'room.report.room_stat':'%d buổi · %d giờ','room.report.sessions':'%d buổi',
+    'visit.no_week':'Không có lịch thăm tuần này','visit.st.upcoming':'Sắp đến','visit.st.ongoing':'Đang diễn ra','visit.st.done':'Hoàn thành',
+    'visit.lbl.period':'Thời gian','visit.lbl.tasks':'Nhiệm vụ','visit.lbl.guests':'Danh sách khách','visit.lbl.itinerary':'Lịch trình',
+    'visit.lbl.no_task':'Không có nhiệm vụ hôm nay','visit.all_staff':'Tất cả %d nhân viên','visit.sec.escorts':'Nhân viên hộ tống','visit.sec.costs':'Chi phí',
+    'visit.confirmed':'✓ Đã xác nhận','visit.unconfirmed':'Chờ xác nhận',
+    'visit.report.by_type':'Theo loại thăm','visit.report.by_unit':'Theo đơn vị','visit.report.top_guests':'Khách thường xuyên',
+    'lot.sound_on':'🔔 Âm thanh bật','lot.sound_off':'🔇 Tắt tiếng',
   },
   ja: {
     'mod.room':'会議室','mod.car':'社用車','mod.visit':'来訪管理',
@@ -3003,6 +3091,28 @@ const ADMIN_I18N = {
     'g.toast.fault_resolved':'修復済みとしてマークしました',
     'room.fault.open':'対応待ち','room.fault.resolved':'修復済み','room.fault.none':'障害報告なし',
     'room.fault.reporter_lbl':'報告者：',
+    'lib.st.returned':'返却済','lib.st.overdue_days':'%d日延滞','lib.st.due_soon_days':'残り%d日','lib.st.loaned':'貸出中',
+    'lib.no_loans':'貸出記録なし','lib.no_overdue':'延滞なし','lib.grid.no_data':'データなし',
+    'lib.grid.instock':'%d冊在庫','lib.grid.loaned':'貸出中','lib.no_books':'蔵書なし',
+    'lib.book_instock':'館内','lib.book_loaned':'貸出中','lib.grid.uncat':'全カテゴリ',
+    'lib.btn.return':'返却','lib.no_books_in':'貸出可能な本なし','lib.loan_status':'借出%d冊 / 上限%d冊',
+    'lib.rsv.waiting':'待機中','lib.rsv.done':'完了','lib.no_rsv':'予約なし','lib.all_cats2':'全カテゴリ',
+    'lib.btn.update':'更新','lib.stat.borrow_cnt':'%d回',
+    'car.card.type_lbl':'車種','car.card.km_lbl':'走行距離','car.card.fuel_lbl':'燃料','car.card.park_lbl':'駐車場','car.card.driver_lbl':'利用者',
+    'car.pk.empty':'空き','car.pk.none':'駐車場未設定',
+    'cal.month_fmt':'%Y年%m月','cal.expand':'展開 ▾','cal.collapse':'閉じる ▲',
+    'err.no_copies':'貸出可能な本なし','err.time_order':'終了時刻は開始時刻より後にしてください',
+    'g.lbl.day_n':'第%d日','g.toast.csv_done':'CSVエクスポート完了','g.toast.no_data':'データなし',
+    'room.headcount_fmt':'約%d名','room.avail_fmt':'%d室利用可',
+    'room.toast.check_in':'チェックイン完了 — 会議進行中','room.toast.cancel_ok':'予約キャンセル、会議室を解放',
+    'room.report.heat':'📈 時間帯別利用状況','room.report.top_dept':'🏢 上位利用部署',
+    'room.report.room_stat':'%d件 · %d時間','room.report.sessions':'%d件',
+    'visit.no_week':'今週の来訪なし','visit.st.upcoming':'来訪予定','visit.st.ongoing':'来訪中','visit.st.done':'完了',
+    'visit.lbl.period':'期間','visit.lbl.tasks':'タスク','visit.lbl.guests':'ゲスト一覧','visit.lbl.itinerary':'日程',
+    'visit.lbl.no_task':'この日タスクなし','visit.all_staff':'全スタッフ%d名','visit.sec.escorts':'担当スタッフ','visit.sec.costs':'費用内訳',
+    'visit.confirmed':'✓ 確認済','visit.unconfirmed':'未確認',
+    'visit.report.by_type':'種別別','visit.report.by_unit':'部門別','visit.report.top_guests':'最多来訪ゲスト',
+    'lot.sound_on':'🔔 音声オン','lot.sound_off':'🔇 消音',
   },
 };
 function t(key) {
@@ -3397,7 +3507,7 @@ function renderLibDash(){
   document.getElementById('ld-ov').innerHTML=ov.length?ov.map(l=>{const b=gBk(l.bk_id),u=gUsr(l.u_id);return`<tr class="rd"><td>${b?.title||'—'}</td><td>${u?.name||'—'}</td><td><span class="badge br">${-dDiff(l.due)}d</span></td><td><button class="btn bg2 bsm" onclick="qReturn('${l.id}')">${t('lib.btn.return')}</button></td></tr>`}).join(''):`<tr><td colspan="4" class="tdm" style="text-align:center;padding:14px">${t('lib.no_overdue')}</td></tr>`;
   const lc={};ln.forEach(l=>{lc[l.bk_id]=(lc[l.bk_id]||0)+1;});
   const top=Object.entries(lc).sort((a,b)=>b[1]-a[1]).slice(0,5);
-  document.getElementById('ld-top').innerHTML=top.length?top.map(([bid,cnt],i)=>{const b=gBk(bid),cat=gCat(b?.cat_id);return`<tr><td><b>${i+1}</b></td><td>${b?.title||'—'}</td><td class="tdm">${b?.author||'—'}</td><td><span class="badge ba">${cnt}次</span></td><td>${cat?`<span class="ctag">${cat.name}</span>`:'—'}</td></tr>`}).join(''):`<tr><td colspan="5" class="tdm" style="text-align:center;padding:14px">${t('lib.grid.no_data')}</td></tr>`;
+  document.getElementById('ld-top').innerHTML=top.length?top.map(([bid,cnt],i)=>{const b=gBk(bid),cat=gCat(b?.cat_id);return`<tr><td><b>${i+1}</b></td><td>${b?.title||'—'}</td><td class="tdm">${b?.author||'—'}</td><td><span class="badge ba">${t('lib.stat.borrow_cnt').replace('%d',cnt)}</span></td><td>${cat?`<span class="ctag">${cat.name}</span>`:'—'}</td></tr>`}).join(''):`<tr><td colspan="5" class="tdm" style="text-align:center;padding:14px">${t('lib.grid.no_data')}</td></tr>`;
   document.getElementById('ld-dt').textContent=`截至 ${fmtD(tds())}`;
 }
 
@@ -3411,7 +3521,7 @@ function renderBooks(){
   if(st==='av')bks=bks.filter(b=>bkAvail(b)>0);
   if(st==='bw')bks=bks.filter(b=>bkAvail(b)===0);
   if(bkV==='g'){
-    document.getElementById('bk-gv').innerHTML=bks.length?bks.map(b=>{const av=bkAvail(b),cat=gCat(b.cat_id);return`<div class="bkcard" onclick="openBkModal('${b.id}')"><div class="bkcov">${b.cover?`<img src="${b.cover}" onerror="this.style.display='none'">`:''}<div class="bkph" style="${b.cover?'display:none':''}">📗</div></div><div class="bki"><div class="bktt">${b.title}</div><div class="bkau">${b.author||'—'}</div><div class="bkft">${cat?`<span class="ctag">${cat.name}</span>`:'<span></span>'}<span class="badge ${av>0?'bg':'br'}">${av>0?t('lib.grid.instock').replace('%d',av):t('lib.grid.loaned')}</span></div></div></div>`}).join(''):'<div class="es" style="grid-column:1/-1"><div class="ei">📚</div><p>找不到書籍</p></div>';
+    document.getElementById('bk-gv').innerHTML=bks.length?bks.map(b=>{const av=bkAvail(b),cat=gCat(b.cat_id);return`<div class="bkcard" onclick="openBkModal('${b.id}')"><div class="bkcov">${b.cover?`<img src="${b.cover}" onerror="this.style.display='none'">`:''}<div class="bkph" style="${b.cover?'display:none':''}">📗</div></div><div class="bki"><div class="bktt">${b.title}</div><div class="bkau">${b.author||'—'}</div><div class="bkft">${cat?`<span class="ctag">${cat.name}</span>`:'<span></span>'}<span class="badge ${av>0?'bg':'br'}">${av>0?t('lib.grid.instock').replace('%d',av):t('lib.grid.loaned')}</span></div></div></div>`}).join(''):'<div class="es" style="grid-column:1/-1"><div class="ei">📚</div><p>'+t('lib.no_books')+'</p></div>';
   }else{
     document.getElementById('bk-lt').innerHTML=bks.length?bks.map(b=>{const av=bkAvail(b),cat=gCat(b.cat_id);return`<tr><td><b>${b.title}</b>${b.lang?` <span class="badge bm">${b.lang}</span>`:''}</td><td class="tdm">${b.author||'—'}</td><td class="tdm">${b.isbn||'—'}</td><td>${cat?`<span class="ctag">${cat.name}</span>`:'—'}</td><td>${b.copies}</td><td>${av}</td><td><span class="badge ${av>0?'bg':'br'}">${av>0?t('lib.book_instock'):t('lib.book_loaned')}</span></td><td><button class="btn bg2 bsm" onclick="openBkModal('${b.id}')">${t('g.btn.edit')}</button> <button class="btn bdr bsm" onclick="delBk('${b.id}')">${t('g.btn.delete')}</button></td></tr>`}).join(''):`<tr><td colspan="8" class="tdm" style="text-align:center;padding:22px">${t('lib.no_books')}</td></tr>`;
   }
@@ -3538,7 +3648,7 @@ async function renderCarDash(){
   document.getElementById('cd-td').innerHTML=tdBks.length?tdBks.map(b=>{const v=gVeh(b.vh_id),u=gUsr(b.u_id);return`<tr><td>${VICO[v?.type]||'🚗'} ${v?.name||'—'}</td><td>${u?.name||'—'}</td><td class="tdm">${b.start.slice(11,16)}–${b.end.slice(11,16)}</td><td class="tdm">${b.purpose||'—'}</td><td>${bkBadge(b)}</td></tr>`}).join(''):`<tr><td colspan="5" class="tdm" style="text-align:center;padding:14px">${t('car.no_bk_today')}</td></tr>`;
   const rems=[];vehs.forEach(v=>{if(v.next_maint_km&&v.km>=(v.next_maint_km-cfg.maint_km))rems.push({v,item:t('car.nav.maint'),diff:v.next_maint_km-v.km,type:'km'});if(v.next_insp&&dDiff(v.next_insp)<=cfg.insp_days)rems.push({v,item:t('car.nav.insp'),diff:dDiff(v.next_insp),date:v.next_insp,type:'dt'});});
   document.getElementById('cd-rm').innerHTML=rems.length?rems.map(r=>`<tr><td>${VICO[r.v.type]||'🚗'} ${r.v.name}</td><td>${r.item}</td><td class="tdm">${r.type==='dt'?fmtD(r.date):`${r.v.next_maint_km}km`}</td><td>${r.type==='dt'?`<span class="badge ${r.diff<=7?'br':r.diff<=30?'by':'bo'}">${r.diff}d</span>`:`<span class="badge bo">-${r.diff}km</span>`}</td></tr>`).join(''):`<tr><td colspan="4" class="tdm" style="text-align:center;padding:14px">${t('lib.no_overdue')}</td></tr>`;
-  document.getElementById('cd-cards').innerHTML=vehs.map(v=>{const st=vStBadge(v),pk=gPk(v.pk_id),pendBk=bks.find(b=>b.vh_id===v.id&&(b.st||b.status)==='pending'),actBk=bks.find(b=>b.vh_id===v.id&&(b.st||b.status)==='active'),curU=actBk?gUsr(actBk.u_id):null;const cardStyle=st.inuse?'border-left:3px solid var(--tl);background:linear-gradient(135deg,rgba(20,184,166,.08) 0%,transparent 50%)':'';const badgeStyle=st.inuse?'margin-left:auto;font-size:13px;padding:4px 12px;font-weight:700;letter-spacing:.3px':'margin-left:auto';return`<div class="ccard" style="${cardStyle}"><div class="cch"><div class="ccico">${VICO[v.type]||'🚗'}</div><div><div class="ccn">${v.name}</div><div class="ccp">${v.plate}</div></div><span class="badge ${st.cls}" style="${badgeStyle}">${st.lbl}</span></div><div class="ccb"><div class="ccr"><span class="ccl">車型</span><span class="ccv">${t('car.veh.type.'+v.type)||v.type}·${t('car.fuel.'+v.fuel)||v.fuel}</span></div><div class="ccr"><span class="ccl">里程</span><span class="ccv">${v.km.toLocaleString()}km</span></div><div class="ccr"><span class="ccl">油量</span><span class="ccv">${FUEL_LBL[v.fuel_lvl??4]}</span></div>${fuelBar(v.fuel_lvl??4)}<div class="ccr"><span class="ccl">停車位</span><span class="ccv">${v.pk_id||'—'}</span></div>${curU?`<div class="ccr"><span class="ccl">用車人</span><span class="ccv" style="color:var(--tl)">${curU.name}</span></div>`:''}</div><div class="ccf" style="flex-wrap:wrap;gap:6px"> ${pendBk?`<button class=\"btn bsm\" style=\"background:var(--acd);color:var(--ac)\" onclick=\"startUse('${pendBk.id}')\">${t('car.mo.depart')}</button> `:''} ${actBk?`<button class=\"btn bg2 bsm\" onclick=\"endUse('${actBk.id}')\">${t('car.mo.end_use')}</button>`:''} ${!actBk&&!pendBk?`<button class=\"btn bsm\" style=\"background:var(--acd);color:var(--ac)\" onclick=\"startBk('${v.id}')\">${t('car.btn.add_bk')}</button>`:''}</div></div>`}).join('');
+  document.getElementById('cd-cards').innerHTML=vehs.map(v=>{const st=vStBadge(v),pk=gPk(v.pk_id),pendBk=bks.find(b=>b.vh_id===v.id&&(b.st||b.status)==='pending'),actBk=bks.find(b=>b.vh_id===v.id&&(b.st||b.status)==='active'),curU=actBk?gUsr(actBk.u_id):null;const cardStyle=st.inuse?'border-left:3px solid var(--tl);background:linear-gradient(135deg,rgba(20,184,166,.08) 0%,transparent 50%)':'';const badgeStyle=st.inuse?'margin-left:auto;font-size:13px;padding:4px 12px;font-weight:700;letter-spacing:.3px':'margin-left:auto';return`<div class="ccard" style="${cardStyle}"><div class="cch"><div class="ccico">${VICO[v.type]||'🚗'}</div><div><div class="ccn">${v.name}</div><div class="ccp">${v.plate}</div></div><span class="badge ${st.cls}" style="${badgeStyle}">${st.lbl}</span></div><div class="ccb"><div class="ccr"><span class="ccl">${t('car.card.type_lbl')}</span><span class="ccv">${t('car.veh.type.'+v.type)||v.type}·${t('car.fuel.'+v.fuel)||v.fuel}</span></div><div class="ccr"><span class="ccl">${t('car.card.km_lbl')}</span><span class="ccv">${v.km.toLocaleString()}km</span></div><div class="ccr"><span class="ccl">${t('car.card.fuel_lbl')}</span><span class="ccv">${FUEL_LBL[v.fuel_lvl??4]}</span></div>${fuelBar(v.fuel_lvl??4)}<div class="ccr"><span class="ccl">${t('car.card.park_lbl')}</span><span class="ccv">${v.pk_id||'—'}</span></div>${curU?`<div class="ccr"><span class="ccl">${t('car.card.driver_lbl')}</span><span class="ccv" style="color:var(--tl)">${curU.name}</span></div>`:''}</div><div class="ccf" style="flex-wrap:wrap;gap:6px"> ${pendBk?`<button class=\"btn bsm\" style=\"background:var(--acd);color:var(--ac)\" onclick=\"startUse('${pendBk.id}')\">${t('car.mo.depart')}</button> `:''} ${actBk?`<button class=\"btn bg2 bsm\" onclick=\"endUse('${actBk.id}')\">${t('car.mo.end_use')}</button>`:''} ${!actBk&&!pendBk?`<button class=\"btn bsm\" style=\"background:var(--acd);color:var(--ac)\" onclick=\"startBk('${v.id}')\">${t('car.btn.add_bk')}</button>`:''}</div></div>`}).join('');
 }
 
 let editVid=null;
@@ -3738,7 +3848,7 @@ function openInspModal(id){editIspId=id||null;document.getElementById('moispt').
 function saveInsp(){const vid=document.getElementById('ispveh').value,nxt=document.getElementById('ispnx').value;if(!vid)return toast('請選擇車輛','error');if(!nxt)return toast('請填寫下次驗車日期','error');const data={vh_id:vid,last:document.getElementById('ispls').value||null,next:nxt,note:document.getElementById('ispnt').value.trim()};const isps=ld(K.isp);if(editIspId){const i=isps.findIndex(x=>x.id===editIspId);if(i>=0)isps[i]={...isps[i],...data};}else isps.push({id:uid(),...data});sv(K.isp,isps);const vehs=ld(K.vh),vi=vehs.findIndex(v=>v.id===vid);if(vi>=0){vehs[vi].next_insp=nxt;sv(K.vh,vehs);}closeMo('mo-insp');renderInsp();updBadges();renderCarDash();toast('已更新','success');}
 function delInsp(id){if(!confirm('確定刪除？'))return;sv(K.isp,ld(K.isp).filter(i=>i.id!==id));renderInsp();toast(t('g.toast.deleted'),'success');}
 
-function renderPark(){const pks=ld(K.pk),vehs=ld(K.vh);document.getElementById('pk-grid').innerHTML=pks.length?pks.map(p=>{const car=vehs.find(v=>v.pk_id===p.id);return`<div style="background:var(--bg2);border:1px solid ${car?'rgba(6,182,212,.3)':'var(--bd)'};border-radius:var(--r);padding:13px;text-align:center"><div style="font-size:26px;margin-bottom:5px">${car?'🚗':'🅿️'}</div><div style="font-weight:700;font-size:14px;color:var(--tl)">${p.number}</div><div style="font-size:11px;color:var(--t3);margin:3px 0">${p.location||'—'}</div>${car?`<span class="badge bt" style="margin-top:4px">${car.name}</span>`:`<span class="badge bm" style="margin-top:4px">空位</span>`}<div style="margin-top:10px"><button class="btn bic bdr bsm" onclick="delPark('${p.id}')">✕</button></div></div>`}).join(''):'<div class="es"><div class="ei">🅿️</div><p>尚未設定停車位</p></div>';}
+function renderPark(){const pks=ld(K.pk),vehs=ld(K.vh);document.getElementById('pk-grid').innerHTML=pks.length?pks.map(p=>{const car=vehs.find(v=>v.pk_id===p.id);return`<div style="background:var(--bg2);border:1px solid ${car?'rgba(6,182,212,.3)':'var(--bd)'};border-radius:var(--r);padding:13px;text-align:center"><div style="font-size:26px;margin-bottom:5px">${car?'🚗':'🅿️'}</div><div style="font-weight:700;font-size:14px;color:var(--tl)">${p.number}</div><div style="font-size:11px;color:var(--t3);margin:3px 0">${p.location||'—'}</div>${car?`<span class="badge bt" style="margin-top:4px">${car.name}</span>`:`<span class="badge bm" style="margin-top:4px">${t('car.pk.empty')}</span>`}<div style="margin-top:10px"><button class="btn bic bdr bsm" onclick="delPark('${p.id}')">✕</button></div></div>`}).join(''):'<div class="es"><div class="ei">🅿️</div><p>'+t('car.pk.none')+'</p></div>';}
 function openParkModal(){['pknm','pklc','pknt'].forEach(x=>document.getElementById(x).value='');openMo('mo-park');}
 function savePark(){const nm=document.getElementById('pknm').value.trim();if(!nm)return toast('請輸入格位編號','error');const pks=ld(K.pk);if(pks.find(p=>p.number===nm))return toast('格位編號已存在','error');pks.push({id:uid(),number:nm,location:document.getElementById('pklc').value.trim(),note:document.getElementById('pknt').value.trim()});sv(K.pk,pks);closeMo('mo-park');renderPark();renderCarDash();toast(t('g.toast.added'),'success');}
 function delPark(id){if(ld(K.vh).find(v=>v.pk_id===id))return toast('此格位有車輛，無法刪除','error');if(!confirm('確定刪除？'))return;sv(K.pk,ld(K.pk).filter(p=>p.id!==id));renderPark();renderCarDash();toast(t('g.toast.deleted'),'success');}
@@ -4087,7 +4197,7 @@ function showBkPopup(id,e){
   const bk=getBookings().find(b=>b.id===id);if(!bk)return;
   const room=ROOMS.find(r=>r.id===bk.roomId);
   const st=bkStatus(bk);
-  const stLabel={confirmed:'已確認',inprogress:'進行中',done:'已結束',cancelled:'已取消',pending:'待確認'};
+  const stLabel={confirmed:t('room.status.confirmed'),inprogress:t('room.status.inprogress'),done:t('room.status.done'),cancelled:t('room.status.cancelled'),pending:t('room.legend.pending')};
   const msg=`${room?.name||'—'}\n${bk.date} ${bk.start}–${bk.end}\n${bk.title||'（無標題）'}\n主辦：${gUsr(bk.hostId)?.name||bk.hostId||'—'}\n狀態：${stLabel[st]||st}`;
   if(confirm(msg+'\n\n點確定取消此預約')){cancelBk(id);}
 }
@@ -4215,7 +4325,7 @@ function iRenderRoomRecommend(){
       const fr=visRooms().filter(r=>!bks.some(b=>b.roomId===r.id&&timeToMin(b.start)<m+dur&&timeToMin(b.end)>m));
       if(fr.length)alts.push({start:as,end:ae,rooms:fr});
     }
-    altList.innerHTML=alts.slice(0,8).map(a=>`<div class="slot" onclick="iSelectAltSlot('${a.start}','${a.end}')">${a.start}<br><span style="font-size:9px">${a.rooms.length}間可用</span></div>`).join('');
+    altList.innerHTML=alts.slice(0,8).map(a=>`<div class="slot" onclick="iSelectAltSlot('${a.start}','${a.end}')">${a.start}<br><span style="font-size:9px">${t('room.avail_fmt').replace('%d',a.rooms.length)}</span></div>`).join('');
   }else if(altEl)altEl.style.display='none';
 }
 function iBkSelectRoom(id){iBkSelectedRoom=id;iRenderRoomRecommend();}
@@ -4370,7 +4480,7 @@ function renderRoomRecommend(){
       const fr=visRooms().filter(r=>!altBks.some(b=>b.roomId===r.id&&timeToMin(b.start)<m+dur&&timeToMin(b.end)>m));
       if(fr.length)alts.push({start:as,end:ae,rooms:fr});
     }
-    altList.innerHTML=alts.slice(0,8).map(a=>`<div class="slot" onclick="selectAltSlot('${a.start}','${a.end}')">${a.start}<br><span style="font-size:9px">${a.rooms.length}間可用</span></div>`).join('');
+    altList.innerHTML=alts.slice(0,8).map(a=>`<div class="slot" onclick="selectAltSlot('${a.start}','${a.end}')">${a.start}<br><span style="font-size:9px">${t('room.avail_fmt').replace('%d',a.rooms.length)}</span></div>`).join('');
   }else if(altEl)altEl.style.display='none';
 }
 function bkSelectRoom(id){
@@ -4456,7 +4566,7 @@ async function renderRoomList(){
   let bks=(await getRoomBookings()).sort((a,b)=>bkKey(b).localeCompare(bkKey(a)));
   const rFilt=rf?.value||'';const sFilt=sf?.value||'';
   if(rFilt)bks=bks.filter(b=>b.roomId===rFilt);
-  const stLabel={confirmed:'已確認',inprogress:'進行中',done:'已結束',cancelled:'已取消',pending:'待確認'};
+  const stLabel={confirmed:t('room.status.confirmed'),inprogress:t('room.status.inprogress'),done:t('room.status.done'),cancelled:t('room.status.cancelled'),pending:t('room.legend.pending')};
   const stCls={confirmed:'ba',inprogress:'bg',done:'bm',cancelled:'br',pending:'by'};
   if(sFilt)bks=bks.filter(b=>bkStatus(b)===sFilt);
   const tb=document.getElementById('rl-body');
@@ -4509,7 +4619,7 @@ async function checkinAction(started){
   }
   closeMo('mo-checkin');
   checkinBkId=null;
-  toast(started?'已確認報到，會議進行中':'已取消預約，會議室已釋出','success');
+  toast(started?t('room.toast.check_in'):t('room.toast.cancel_ok'),'success');
   renderRoomDash();renderRoomList();updRoomBadge();
 }
 let _autoReleaseLastRun=0;
@@ -4581,7 +4691,7 @@ function renderReport(period){
       <div class="sv" style="color:var(--gn)">${pct2}%</div>
       <div class="ss">${label}使用率</div>
       <div class="usage-bar-wrap"><div class="usage-bar" style="width:${pct2}%"></div></div>
-      <div style="margin-top:8px;font-size:11px;color:var(--t3)">共 ${roomBks.length} 場 · ${Math.round(usedMin/60)} 小時</div>
+      <div style="margin-top:8px;font-size:11px;color:var(--t3)">${t('room.report.room_stat').replace('%d',roomBks.length).replace('%d',Math.round(usedMin/60))}</div>
     </div>`;
   });
   html+='</div>';
@@ -4594,7 +4704,7 @@ function renderReport(period){
   });
   const maxCount=Math.max(...hourCount,1);
   const hotHour=hourCount.indexOf(Math.max(...hourCount));
-  html+=`<div style="margin-top:16px"><div class="stt" style="margin-bottom:10px">📈 時段使用熱力</div>
+  html+=`<div style="margin-top:16px"><div class="stt" style="margin-bottom:10px">${t('room.report.heat')}</div>
   <div style="display:flex;gap:3px;align-items:flex-end;height:60px">
   ${hourCount.map((cnt,i)=>`<div style="flex:1;background:rgba(34,197,94,${(cnt/maxCount*.8+.1).toFixed(2)});border-radius:2px 2px 0 0;height:${Math.max(10,(cnt/maxCount*100))}%;position:relative" title="${ROOM_HOURS.start+i}:00  ${cnt}場"><div style="position:absolute;bottom:-16px;font-size:9px;color:var(--t3);text-align:center;left:0;right:0">${ROOM_HOURS.start+i}</div></div>`).join('')}
   </div><div style="margin-top:20px;font-size:12px;color:var(--t3)">最熱門時段：<b style="color:var(--gn)">${ROOM_HOURS.start+hotHour}:00–${ROOM_HOURS.start+hotHour+1}:00</b></div></div>`;
@@ -4603,8 +4713,8 @@ function renderReport(period){
   bks.forEach(b=>{const u=gUsr(b.hostId);const dept=u?.dept||'其他';deptCount[dept]=(deptCount[dept]||0)+1;});
   const topDepts=Object.entries(deptCount).sort((a,b)=>b[1]-a[1]).slice(0,5);
   if(topDepts.length){
-    html+=`<div style="margin-top:16px"><div class="stt" style="margin-bottom:10px">🏢 最常使用部門</div><div style="display:flex;flex-direction:column;gap:6px">`;
-    topDepts.forEach(([dept,cnt])=>{html+=`<div style="display:flex;align-items:center;gap:10px;font-size:13px"><span style="width:80px;color:var(--t2)">${dept}</span><div style="flex:1;background:var(--bg0);border-radius:3px;height:8px;overflow:hidden"><div style="width:${(cnt/topDepts[0][1]*100)}%;height:100%;background:var(--tl);border-radius:3px"></div></div><span style="color:var(--t3);font-size:12px">${cnt}場</span></div>`;});
+    html+=`<div style="margin-top:16px"><div class="stt" style="margin-bottom:10px">${t('room.report.top_dept')}</div><div style="display:flex;flex-direction:column;gap:6px">`;
+    topDepts.forEach(([dept,cnt])=>{html+=`<div style="display:flex;align-items:center;gap:10px;font-size:13px"><span style="width:80px;color:var(--t2)">${dept}</span><div style="flex:1;background:var(--bg0);border-radius:3px;height:8px;overflow:hidden"><div style="width:${(cnt/topDepts[0][1]*100)}%;height:100%;background:var(--tl);border-radius:3px"></div></div><span style="color:var(--t3);font-size:12px">${t('room.report.sessions').replace('%d',cnt)}</span></div>`;});
     html+='</div></div>';
   }
   el.innerHTML=html;
@@ -4896,7 +5006,7 @@ function renderVfEscorts(){
       <option value="">選擇人員…</option>${us.map(u=>`<option value="${u.id}" ${e.userId===u.id?'selected':''}>${u.name}（${u.dept||''}）</option>`).join('')}
     </select>
     <input type="text" value="${e.role||''}" placeholder="負責環節（接機/陪同參觀/用餐）" style="flex:1;font-size:12px;padding:4px 6px" onchange="vfEscorts[${i}].role=this.value">
-    <span class="badge ${e.confirmed?'bg':'by'}" style="cursor:pointer" onclick="vfEscorts[${i}].confirmed=!vfEscorts[${i}].confirmed;renderVfEscorts()">${e.confirmed?'✓ 已確認':'待確認'}</span>
+    <span class="badge ${e.confirmed?'bg':'by'}" style="cursor:pointer" onclick="vfEscorts[${i}].confirmed=!vfEscorts[${i}].confirmed;renderVfEscorts()">${e.confirmed?t('visit.confirmed'):t('visit.unconfirmed')}</span>
     <button class="btn bdr bsm bic" onclick="vfEscorts.splice(${i},1);renderVfEscorts()">✕</button>
   </div>`).join(''):'<div style="font-size:12px;color:var(--t3);padding:4px 0">尚未新增陪同人員</div>';
 }
@@ -5029,12 +5139,12 @@ function openVisitDetail(id){
     });
     html+='</div></div>';
   });}
-  if(v.escorts?.length){html+=`<div style="font-weight:600;margin:12px 0 7px;font-size:13px">公司陪同人員</div>
+  if(v.escorts?.length){html+=`<div style="font-weight:600;margin:12px 0 7px;font-size:13px">${t('visit.sec.escorts')}</div>
   <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:12px">
   ${v.escorts.map(e=>{const u=gUsr(e.userId);return`<div style="display:flex;align-items:center;gap:8px;font-size:12px;padding:5px 8px;background:var(--bg0);border-radius:var(--rs)"><span style="flex:1">${u?.name||e.userId||'—'}</span><span style="color:var(--t3)">${e.role||''}</span><span class="badge ${e.confirmed?'bg':'by'}">${e.confirmed?'已確認':'待確認'}</span></div>`;}).join('')}
   </div>`;}
   const totalCost=(v.costs||[]).reduce((s,c)=>s+(+c.amount||0),0);
-  if(v.costs?.length){html+=`<div style="font-weight:600;margin-bottom:7px;font-size:13px">費用明細</div>
+  if(v.costs?.length){html+=`<div style="font-weight:600;margin-bottom:7px;font-size:13px">${t('visit.sec.costs')}</div>
   ${v.costs.map(c=>`<div class="cost-row"><span style="color:var(--t3);width:70px">${c.cat}</span><span style="flex:1">${c.desc||''}</span><span style="font-weight:600">${c.currency||'TWD'} ${(+c.amount||0).toLocaleString()}</span></div>`).join('')}
   <div style="padding:8px 0;font-size:13px;font-weight:700;color:#a78bfa;text-align:right">合計 NT$${totalCost.toLocaleString()}</div>`;}
   document.getElementById('mo-vd-body').innerHTML=html;
@@ -5192,13 +5302,13 @@ function renderVisitReport(period){
   const typeCnt={};visits.forEach(v=>typeCnt[v.type]=(typeCnt[v.type]||0)+1);
   const maxType=Math.max(...Object.values(typeCnt),1);
   html+=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
-  <div><div class="stt" style="margin-bottom:10px">依來訪類型</div>${Object.entries(typeCnt).sort((a,b)=>b[1]-a[1]).map(([type,cnt])=>`<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:13px"><span class="visit-type-badge ${TYPE_CLS[type]||'vt-other'}" style="width:80px;text-align:center">${TYPE_LABEL[type]||type}</span><div style="flex:1;background:var(--bg0);border-radius:3px;height:8px;overflow:hidden"><div style="width:${cnt/maxType*100}%;height:100%;background:#a78bfa;border-radius:3px"></div></div><span style="color:var(--t3);font-size:12px;width:24px;text-align:right">${cnt}</span></div>`).join('')}</div>
-  <div><div class="stt" style="margin-bottom:10px">依接待單位</div>${['tw','dg','vn'].map(u=>{const cnt=visits.filter(v=>v.unit===u).length;return`<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:13px"><span style="width:80px;color:var(--t2)">${UNIT_LABEL[u]}</span><div style="flex:1;background:var(--bg0);border-radius:3px;height:8px;overflow:hidden"><div style="width:${total?cnt/total*100:0}%;height:100%;background:var(--tl);border-radius:3px"></div></div><span style="color:var(--t3);font-size:12px;width:24px;text-align:right">${cnt}</span></div>`;}).join('')}</div>
+  <div><div class="stt" style="margin-bottom:10px">${t('visit.report.by_type')}</div>${Object.entries(typeCnt).sort((a,b)=>b[1]-a[1]).map(([type,cnt])=>`<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:13px"><span class="visit-type-badge ${TYPE_CLS[type]||'vt-other'}" style="width:80px;text-align:center">${TYPE_LABEL[type]||type}</span><div style="flex:1;background:var(--bg0);border-radius:3px;height:8px;overflow:hidden"><div style="width:${cnt/maxType*100}%;height:100%;background:#a78bfa;border-radius:3px"></div></div><span style="color:var(--t3);font-size:12px;width:24px;text-align:right">${cnt}</span></div>`).join('')}</div>
+  <div><div class="stt" style="margin-bottom:10px">${t('visit.report.by_unit')}</div>${['tw','dg','vn'].map(u=>{const cnt=visits.filter(v=>v.unit===u).length;return`<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:13px"><span style="width:80px;color:var(--t2)">${UNIT_LABEL[u]}</span><div style="flex:1;background:var(--bg0);border-radius:3px;height:8px;overflow:hidden"><div style="width:${total?cnt/total*100:0}%;height:100%;background:var(--tl);border-radius:3px"></div></div><span style="color:var(--t3);font-size:12px;width:24px;text-align:right">${cnt}</span></div>`;}).join('')}</div>
   </div>`;
   // top guests by visit count
   const guestCnt={};visits.forEach(v=>(v.guests||[]).forEach(g=>{const name=g.name||getGuests().find(x=>x.id===g.guestId)?.name||'未知';guestCnt[name]=(guestCnt[name]||0)+1;}));
   const topGuests=Object.entries(guestCnt).sort((a,b)=>b[1]-a[1]).slice(0,5);
-  if(topGuests.length){html+=`<div style="margin-top:4px"><div class="stt" style="margin-bottom:10px">最常來訪來賓</div><div style="display:flex;flex-direction:column;gap:6px">${topGuests.map(([name,cnt])=>`<div style="display:flex;align-items:center;gap:10px;font-size:13px"><span style="flex:1;color:var(--t2)">${name}</span><span style="color:var(--t3)">${cnt} 次</span></div>`).join('')}</div></div>`;}
+  if(topGuests.length){html+=`<div style="margin-top:4px"><div class="stt" style="margin-bottom:10px">${t('visit.report.top_guests')}</div><div style="display:flex;flex-direction:column;gap:6px">${topGuests.map(([name,cnt])=>`<div style="display:flex;align-items:center;gap:10px;font-size:13px"><span style="flex:1;color:var(--t2)">${name}</span><span style="color:var(--t3)">${t('lib.stat.borrow_cnt').replace('%d',cnt)}</span></div>`).join('')}</div></div>`;}
   el.innerHTML=html;
 }
 function exportVisitCSV(){

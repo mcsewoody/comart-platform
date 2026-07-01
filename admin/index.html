@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" href="data:,">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART 行政管理平台 v1.96</title>
+<title>COMART 行政管理平台 v1.97</title>
 <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.js"></script>
 <style>
 :root{
@@ -953,7 +953,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="logo">
     <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
     <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
-    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.96</span>
+    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.97</span>
   </div>
   <div class="trr">
     <div id="global-site-bar" style="display:flex;align-items:center;gap:4px"><span style="font-size:13px;color:var(--text-3);white-space:nowrap;font-weight:500">單位：</span>
@@ -975,7 +975,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <span id="cur-u" style="color:var(--text-2)">載入中…</span>
       <span style="color:var(--text-3);font-size:10px">▾</span>
     </div>
-    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.96</span>
+    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.97</span>
   </div>
 </div>
 
@@ -1058,9 +1058,15 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div style="max-width:700px"><div class="sth" style="margin-bottom:13px"><div class="stt">還書作業</div></div><div class="fb"><div class="sw2"><span class="si">🔍</span><input type="text" id="rtq" placeholder="借閱人或書名…" oninput="renderReturn()"></div></div><div class="tw"><table><thead><tr><th>書名</th><th>借閱人</th><th>借出日</th><th>應還日</th><th>狀態</th><th></th></tr></thead><tbody id="rt-tb"></tbody></table></div></div>
     </div>
     <div class="pg" id="pg-lib-mgmt">
-      <div style="display:flex;gap:8px;margin-bottom:18px">
+      <div style="display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;align-items:center">
         <button id="mgmt-tab-add" class="btn bp bsm" onclick="showMgmtTab('add')">＋ 新增書籍</button>
+        <button id="mgmt-tab-edit" class="btn bg2 bsm" onclick="showMgmtTab('edit')">📝 資料更新</button>
         <button id="mgmt-tab-cats" class="btn bg2 bsm" onclick="showMgmtTab('cats')">🏷️ 分類管理</button>
+        <div style="margin-left:auto;display:flex;gap:8px">
+          <button class="btn bg2 bsm" onclick="exportBooksXlsx()">↓ 匯出書目</button>
+          <button class="btn bg2 bsm" onclick="importBooksTrig()">↑ 匯入書目</button>
+          <input type="file" id="bk-impf" accept=".xlsx,.xls" style="display:none" onchange="importBooksXlsx(event)">
+        </div>
       </div>
       <div id="mgmt-add" style="max-width:540px">
         <div style="background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);padding:20px">
@@ -1080,6 +1086,13 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
           <button class="btn bg2" onclick="clearMgmtForm()">清除</button>
           <button class="btn bp" onclick="saveMgmtBook()">✓ 儲存書籍</button>
         </div>
+      </div>
+      <div id="mgmt-edit" style="display:none">
+        <div class="fb" style="margin-bottom:12px;gap:8px">
+          <div class="sw2" style="flex:1"><span class="si">🔍</span><input type="text" id="bkedit-q" placeholder="書名、作者、ISBN…" oninput="renderMgmtBookList()"></div>
+          <button class="btn bg2 bsm" onclick="downloadBooksTemplate()" style="white-space:nowrap">↓ 匯入範本</button>
+        </div>
+        <div id="bkedit-list"></div>
       </div>
       <div id="mgmt-cats" style="display:none">
         <div class="fb" style="margin-bottom:12px"><div style="font-weight:600">分類管理</div><div style="margin-left:auto"></div><button class="btn bp bsm" onclick="openCatModal()">＋ 新增分類</button></div>
@@ -3613,7 +3626,7 @@ function saveBook(){
   const bks=ld(K.bk);
   if(editBkId){const i=bks.findIndex(b=>b.id===editBkId);if(i>=0)bks[i]={...bks[i],...fullData};}
   else bks.push(fullData);
-  sv(K.bk,bks);sbSaveBook(fullData);closeMo('mo-book');renderBooks();toast(editBkId?'已更新':'已新增','success');
+  sv(K.bk,bks);sbSaveBook(fullData);closeMo('mo-book');renderBooks();if(_editFromMgmt){renderMgmtBookList();_editFromMgmt=false;}toast(editBkId?'已更新':'已新增','success');
 }
 function delBk(id){if(ld(K.ln).find(l=>l.bk_id===id&&l.st!=='returned')){toast('有借閱記錄，無法刪除','error');return;}if(!confirm('確定刪除？'))return;const _delBkId=id;sv(K.bk,ld(K.bk).filter(b=>b.id!==_delBkId));sbDelBook(_delBkId);renderBooks();toast(t('g.toast.deleted'),'success');}
 async function lookupISBN(){
@@ -3672,12 +3685,27 @@ function doQuickLoan(){
   closeMo('mo-quickloan');renderBooks();updBadges();toast(`已借出《${bk.title}》給 ${gUsr(uid2)?.name}`,'success');
 }
 function showMgmtTab(tab){
-  document.getElementById('mgmt-add').style.display=tab==='add'?'':'none';
-  document.getElementById('mgmt-cats').style.display=tab==='cats'?'':'none';
-  document.getElementById('mgmt-tab-add').className=`btn bsm ${tab==='add'?'bp':'bg2'}`;
-  document.getElementById('mgmt-tab-cats').className=`btn bsm ${tab==='cats'?'bp':'bg2'}`;
+  ['add','edit','cats'].forEach(k=>{
+    const el=document.getElementById('mgmt-'+k);if(el)el.style.display='none';
+    const btn=document.getElementById('mgmt-tab-'+k);if(btn)btn.className=`btn bsm ${k===tab?'bp':'bg2'}`;
+  });
+  const active=document.getElementById('mgmt-'+tab);if(active)active.style.display='';
   if(tab==='cats')renderCats();
+  if(tab==='edit'){popCatSel4Mgmt();renderMgmtBookList();}
 }
+function renderMgmtBookList(){
+  const q=(document.getElementById('bkedit-q')?.value||'').trim().toLowerCase();
+  const allBks=_libSite?ld(K.bk).filter(b=>b.site===_libSite):ld(K.bk);
+  const cats=ld(K.ct);
+  const list=document.getElementById('bkedit-list');if(!list)return;
+  const filtered=q?allBks.filter(b=>(b.title||'').toLowerCase().includes(q)||(b.author||'').toLowerCase().includes(q)||(b.isbn||'').includes(q)):allBks;
+  if(!filtered.length){list.innerHTML='<div style="color:var(--t3);padding:20px;text-align:center">無書目資料</div>';return;}
+  list.innerHTML=`<div class="tw"><table><thead><tr><th>書名</th><th>作者</th><th>分類</th><th>ISBN</th><th>語言</th><th>館藏</th><th></th></tr></thead><tbody>${
+    filtered.map(b=>{const cat=cats.find(c=>c.id===b.cat_id);return`<tr><td>${b.title||''}</td><td style="color:var(--t2)">${b.author||''}</td><td>${cat?`<span class="ctag">${cat.name}</span>`:'<span style="color:var(--t3)">未分類</span>'}</td><td style="font-size:12px;color:var(--t3)">${b.isbn||''}</td><td style="color:var(--t2)">${b.lang||''}</td><td style="text-align:center">${b.copies||1}</td><td><button class="btn bg2 bsm" onclick="openBkModalFromEdit('${b.id}')">編輯</button></td></tr>`;}).join('')
+  }</tbody></table></div>`;
+}
+function openBkModalFromEdit(id){openBkModal(id);_editFromMgmt=true;}
+let _editFromMgmt=false;
 function popCatSel4Mgmt(){const cats=ld(K.ct);const opts=`<option value="">未分類</option>`+cats.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');const el=document.getElementById('mgbk-cat');if(el)el.innerHTML=opts;}
 function clearMgmtForm(){['mgbk-isbn','mgbk-tit','mgbk-aut','mgbk-cov','mgbk-nt'].forEach(x=>{const el=document.getElementById(x);if(el)el.value='';});const yr=document.getElementById('mgbk-yr');if(yr)yr.value='';const cp=document.getElementById('mgbk-cp');if(cp)cp.value=1;const lng=document.getElementById('mgbk-lng');if(lng)lng.value='繁中';const cat=document.getElementById('mgbk-cat');if(cat)cat.value='';}
 function saveMgmtBook(){
@@ -3774,6 +3802,57 @@ function saveRoomCfg(){const cfg={hours_start:parseInt(document.getElementById('
 function expData(){const data={};Object.entries(K).forEach(([k,sk])=>{data[k]=JSON.parse(localStorage.getItem(sk)||'null');});dl('comart_backup.json',JSON.stringify(data,null,2),'application/json');toast(t('g.toast.exported'),'success');}
 function impTrig(){document.getElementById('impf').click();}
 function impData(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{try{const d=JSON.parse(ev.target.result);Object.entries(K).forEach(([k,sk])=>{if(d[k]!==undefined)localStorage.setItem(sk,JSON.stringify(d[k]));});toast(t('g.toast.imported'),'success');setTimeout(()=>location.reload(),1000);}catch{toast(t('g.toast.format_err'),'error');}};r.readAsText(f);}
+async function _loadXLSX(){if(window.XLSX)return;await new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';s.onload=res;s.onerror=rej;document.head.appendChild(s);});}
+async function exportBooksXlsx(){
+  toast('匯出中…','info');
+  await _loadXLSX();
+  const cats=ld(K.ct);
+  const allBks=_libSite?ld(K.bk).filter(b=>b.site===_libSite):ld(K.bk);
+  const rows=allBks.map(b=>{const cat=cats.find(c=>c.id===b.cat_id);return{'ISBN':b.isbn||'','書名':b.title||'','作者':b.author||'','出版年':b.year||'','分類':cat?cat.name:'',' 語言':b.lang||'繁中','館藏數量':b.copies||1,'封面圖片URL':b.cover||'','備註':b.notes||''};});
+  const ws=XLSX.utils.json_to_sheet(rows);
+  const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,'書目',ws);
+  XLSX.writeFile(wb,'comart_books.xlsx');
+  toast(`已匯出 ${rows.length} 本書目`,'success');
+}
+async function downloadBooksTemplate(){
+  await _loadXLSX();
+  const ws=XLSX.utils.json_to_sheet([{'ISBN':'9789867757289','書名':'設計的法則','作者':'William Lidwell','出版年':2010,'分類':'設計','語言':'繁中','館藏數量':1,'封面圖片URL':'','備註':'範例書目，請替換'}]);
+  const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,'書目',ws);
+  XLSX.writeFile(wb,'comart_books_template.xlsx');
+  toast('範本已下載','success');
+}
+function importBooksTrig(){document.getElementById('bk-impf').click();}
+async function importBooksXlsx(e){
+  const f=e.target.files[0];if(!f)return;e.target.value='';
+  toast('匯入中…','info');
+  await _loadXLSX();
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    try{
+      const wb=XLSX.read(ev.target.result,{type:'array'});
+      const ws=wb.Sheets[wb.SheetNames[0]];
+      const rows=XLSX.utils.sheet_to_json(ws);
+      if(!rows.length)return toast('檔案無資料','error');
+      const cats=ld(K.ct);
+      let bks=ld(K.bk);
+      let addCnt=0,updCnt=0;
+      rows.forEach(r=>{
+        const title=(r['書名']||'').toString().trim();if(!title)return;
+        const catName=(r['分類']||'').toString().trim();
+        let cat_id='';
+        if(catName){let cat=cats.find(c=>c.name===catName);if(!cat){cat={id:uid(),name:catName};cats.push(cat);sbSaveCat(cat);}cat_id=cat.id;}
+        const isbn=(r['ISBN']||'').toString().trim();
+        let updated=false;
+        if(isbn){const idx=bks.findIndex(b=>b.isbn===isbn);if(idx>=0){bks[idx]={...bks[idx],title,author:(r['作者']||'').toString().trim(),year:parseInt(r['出版年'])||bks[idx].year||null,cat_id:cat_id||bks[idx].cat_id,lang:(r['語言']||bks[idx].lang||'繁中').toString(),copies:parseInt(r['館藏數量'])||bks[idx].copies||1,cover:(r['封面圖片URL']||'').toString().trim()||bks[idx].cover||'',notes:(r['備註']||'').toString().trim()||bks[idx].notes||''};sbSaveBook(bks[idx]);updCnt++;updated=true;}}
+        if(!updated){const book={id:uid(),isbn,title,author:(r['作者']||'').toString().trim(),year:parseInt(r['出版年'])||null,cat_id,lang:(r['語言']||'繁中').toString(),copies:parseInt(r['館藏數量'])||1,cover:(r['封面圖片URL']||'').toString().trim(),notes:(r['備註']||'').toString().trim(),site:_libSite||'TW'};bks.unshift(book);sbSaveBook(book);addCnt++;}
+      });
+      sv(K.bk,bks);sv(K.ct,cats);
+      renderMgmtBookList();renderBooks();popCatSel();popCatSel4Mgmt();
+      toast(`已新增 ${addCnt} 本，更新 ${updCnt} 本`,'success');
+    }catch(err){toast('匯入失敗：'+err.message,'error');}
+  };
+  reader.readAsArrayBuffer(f);
+}
 function resetData(){if(!confirm('⚠️ 確定清除所有資料？'))return;Object.values(K).forEach(k=>localStorage.removeItem(k));toast(t('g.toast.reset'),'warn');setTimeout(()=>location.reload(),1000);}
 
 function popCatSel(){const cats=ld(K.ct),opts=`<option value="">${t('lib.all_cats2')}</option>`+cats.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');const el=document.getElementById('bkcat');if(el)el.innerHTML=opts;}

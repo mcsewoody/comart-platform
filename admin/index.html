@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" href="data:,">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART 行政管理平台 v1.90</title>
+<title>COMART 行政管理平台 v1.91</title>
 <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.js"></script>
 <style>
 :root{
@@ -954,10 +954,10 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="logo">
     <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
     <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
-    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.90</span>
+    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.91</span>
   </div>
   <div class="trr">
-    <div id="global-site-bar" style="display:flex;align-items:center;gap:4px"><span style="font-size:11px;color:var(--text-3);white-space:nowrap">單位：</span>
+    <div id="global-site-bar" style="display:flex;align-items:center;gap:4px"><span style="font-size:13px;color:var(--text-3);white-space:nowrap;font-weight:500">單位：</span>
       <button class="admin-lang-btn site-gbtn active" data-site="" onclick="setGlobalSite('')">全部</button>
       <button class="admin-lang-btn site-gbtn" data-site="TW" onclick="setGlobalSite('TW')">TW</button>
       <button class="admin-lang-btn site-gbtn" data-site="CN" onclick="setGlobalSite('CN')">CN</button>
@@ -976,7 +976,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <span id="cur-u" style="color:var(--text-2)">載入中…</span>
       <span style="color:var(--text-3);font-size:10px">▾</span>
     </div>
-    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.90</span>
+    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.91</span>
   </div>
 </div>
 
@@ -2035,7 +2035,7 @@ function checkCarReminders(){
   if(ms.length)setTimeout(()=>toast('🔧 保養提醒：'+ms.join('；'),'warn'),300);
   if(ins.length)setTimeout(()=>toast('📋 驗車提醒：'+ins.join('；'),'warn'),ms.length?1800:300);
 }
-let curUid=localStorage.getItem(K.cu)||null,curMod='lib';
+let curUid=localStorage.getItem(K.cu)||null,curMod='lib',curCarPg='car-dash',curLibPg='lib-dash',curRoomPg='room-dash';
 const DLCFG={max_loans:3,loan_days:30,remind_days:3};
 const DCCFG={maint_km:500,insp_days:30,max_days:7};
 const DRCFG={hours_start:8,hours_end:18,max_days:14,autorelease_min:15};
@@ -3502,6 +3502,7 @@ function syncMobileBadges(){
 }
 
 function navLib(p){
+  curLibPg=p;
   document.querySelectorAll('#panel-lib .navi').forEach(el=>el.classList.remove('active'));
   document.querySelector(`#panel-lib .navi[data-p="${p}"]`)?.classList.add('active');
   mobileSubNav('lib',p);
@@ -3522,6 +3523,7 @@ function renderLibPg(p){
   if(p==='lib-cfg')loadLibCfg();
 }
 function navCar(p){
+  curCarPg=p;
   document.querySelectorAll('#panel-car .navi').forEach(el=>el.classList.remove('active'));
   document.querySelector(`#panel-car .navi[data-p="${p}"]`)?.classList.add('active');
   mobileSubNav('car',p);
@@ -3736,7 +3738,7 @@ async function renderCarDash(){
   const needM=vehs.filter(v=>(v.next_maint_km&&v.km>=(v.next_maint_km-cfg.maint_km))||(v.next_insp&&dDiff(v.next_insp)<=cfg.insp_days)).length;
   document.getElementById('sc-tot').textContent=vehs.length;document.getElementById('sc-av').textContent=vehs.length-inU;document.getElementById('sc-in').textContent=inU;document.getElementById('sc-mt').textContent=needM;
   document.getElementById('cd-dt').textContent=fmtD(today);updBadges();
-  const tdBks=bks.filter(b=>b.start.slice(0,10)<=today&&b.end.slice(0,10)>=today);
+  const _svids=_siteVehIds();const tdBks=bks.filter(b=>_svids.has(b.vh_id)&&b.start.slice(0,10)<=today&&b.end.slice(0,10)>=today);
   document.getElementById('cd-td').innerHTML=tdBks.length?tdBks.map(b=>{const v=gVeh(b.vh_id),u=gUsr(b.u_id);return`<tr><td>${VICO[v?.type]||'🚗'} ${v?.name||'—'}</td><td>${u?.name||'—'}</td><td class="tdm">${b.start.slice(11,16)}–${b.end.slice(11,16)}</td><td class="tdm">${b.purpose||'—'}</td><td>${bkBadge(b)}</td></tr>`}).join(''):`<tr><td colspan="5" class="tdm" style="text-align:center;padding:14px">${t('car.no_bk_today')}</td></tr>`;
   const rems=[];vehs.forEach(v=>{if(v.next_maint_km&&v.km>=(v.next_maint_km-cfg.maint_km))rems.push({v,item:t('car.nav.maint'),diff:v.next_maint_km-v.km,type:'km'});if(v.next_insp&&dDiff(v.next_insp)<=cfg.insp_days)rems.push({v,item:t('car.nav.insp'),diff:dDiff(v.next_insp),date:v.next_insp,type:'dt'});});
   document.getElementById('cd-rm').innerHTML=rems.length?rems.map(r=>`<tr><td>${VICO[r.v.type]||'🚗'} ${r.v.name}</td><td>${r.item}</td><td class="tdm">${r.type==='dt'?fmtD(r.date):`${r.v.next_maint_km}km`}</td><td>${r.type==='dt'?`<span class="badge ${r.diff<=7?'br':r.diff<=30?'by':'bo'}">${r.diff}d</span>`:`<span class="badge bo">-${r.diff}km</span>`}</td></tr>`).join(''):`<tr><td colspan="4" class="tdm" style="text-align:center;padding:14px">${t('lib.no_overdue')}</td></tr>`;
@@ -4024,9 +4026,9 @@ function setSiteFilter(mod,site){
 function setGlobalSite(site){
   _curSite=site;
   _roomSite=site;_carSite=site;_libSite=site;
-  if(curMod==='room')renderRoomDash();
-  else if(curMod==='car')renderCarDash();
-  else if(curMod==='lib')renderLibDash();
+  if(curMod==='room')navRoom(curRoomPg||'room-dash');
+  else if(curMod==='car')renderCarPg(curCarPg||'car-dash');
+  else if(curMod==='lib')renderLibPg(curLibPg||'lib-dash');
   document.querySelectorAll('.site-gbtn').forEach(b=>{
     const act=b.dataset.site===site;
     b.style.background=act?'var(--ac)':'';b.style.color=act?'#fff':'';b.style.borderColor=act?'var(--ac)':'';
@@ -4042,6 +4044,7 @@ document.querySelectorAll('#panel-room .navi').forEach(el=>
   el.addEventListener('click',()=>{const p=el.dataset.p;if(p)navRoom(p);}));
 
 function navRoom(p){
+  curRoomPg=p;
   document.querySelectorAll('#panel-room .navi').forEach(el=>el.classList.remove('active'));
   document.querySelector(`#panel-room .navi[data-p="${p}"]`)?.classList.add('active');
   document.querySelectorAll('#rmc .pg').forEach(el=>el.classList.remove('active'));

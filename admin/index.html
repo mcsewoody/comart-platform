@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" href="data:,">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART 行政管理平台 v1.94</title>
+<title>COMART 行政管理平台 v1.95</title>
 <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.js"></script>
 <style>
 :root{
@@ -948,13 +948,12 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
 </style>
 </head>
 <body>
-<div id="diag-btn" onclick="runDiag()" style="position:fixed;bottom:80px;right:12px;z-index:9999;background:#4361EE;color:#fff;border-radius:999px;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.3)">🔍 診斷</div>
 <div id="app">
 <div id="tabs">
   <div class="logo">
     <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
     <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
-    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.94</span>
+    <span>🏢</span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v1.95</span>
   </div>
   <div class="trr">
     <div id="global-site-bar" style="display:flex;align-items:center;gap:4px"><span style="font-size:13px;color:var(--text-3);white-space:nowrap;font-weight:500">單位：</span>
@@ -976,7 +975,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <span id="cur-u" style="color:var(--text-2)">載入中…</span>
       <span style="color:var(--text-3);font-size:10px">▾</span>
     </div>
-    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.94</span>
+    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v1.95</span>
   </div>
 </div>
 
@@ -5943,50 +5942,6 @@ function confLoop(){
 }
 function stopConfetti(){cancelAnimationFrame(confAnim);if(L_confCanvas)L_confCanvas.style.display='none';}
 
-function runDiag(){
-  // ── 音效診斷 ──
-  const actxState = L_actx?.state ?? 'null';
-  const muted = L_muted;
-
-  // ── Gantt 診斷 ──
-  const wrap = document.getElementById('room-dash-gantt');
-  const inner = wrap?.querySelector('.gantt-inner');
-  const wOW = wrap?.offsetWidth ?? 'N/A';
-  const wSW = wrap?.scrollWidth ?? 'N/A';
-  const innerW = inner?.style.width ?? 'N/A';
-  const wrapOX = wrap ? getComputedStyle(wrap).overflowX : 'N/A';
-  const mcEl = wrap?.closest('.mc');
-  const mcOX = mcEl ? getComputedStyle(mcEl).overflowX : 'N/A';
-  const mcOY = mcEl ? getComputedStyle(mcEl).overflowY : 'N/A';
-
-  // ── Subnav 診斷 ──
-  const bar = document.getElementById('mobile-subnav');
-  const barDisplay = bar?.style.display ?? 'N/A';
-  const barComputed = bar ? getComputedStyle(bar).display : 'N/A';
-  const barHTML = bar?.innerHTML?.slice(0,120) ?? 'N/A';
-
-  const msg = [
-    '=== 音效 ===',
-    `L_actx state: ${actxState}`,
-    `L_muted: ${muted}`,
-    '',
-    '=== Gantt ===',
-    `wrap offsetW: ${wOW}`,
-    `wrap scrollW: ${wSW}`,
-    `inner width: ${innerW}`,
-    `wrap overflowX: ${wrapOX}`,
-    `mc overflowX: ${mcOX}`,
-    `mc overflowY: ${mcOY}`,
-    '',
-    '=== Subnav ===',
-    `display(style): ${barDisplay}`,
-    `display(computed): ${barComputed}`,
-    `innerHTML: ${barHTML}`,
-    `curMod: ${typeof curMod!=='undefined'?curMod:'undef'}`,
-  ].join('\n');
-
-  alert(msg);
-}
 
 init();
 </script>

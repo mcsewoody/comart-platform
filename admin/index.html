@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART 行政管理平台 v2.06</title>
+<title>COMART 行政管理平台 v2.07</title>
 <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.js"></script>
 <style>
 :root{
@@ -953,7 +953,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="logo">
     <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
     <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
-    <span><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="38" height="20" style="display:inline-block;vertical-align:middle;margin-top:-2px"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v2.06</span>
+    <span><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="38" height="20" style="display:inline-block;vertical-align:middle;margin-top:-2px"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v2.07</span>
   </div>
   <div class="trr">
     <div id="global-site-bar" style="display:flex;align-items:center;gap:4px"><span style="font-size:13px;color:var(--text-3);white-space:nowrap;font-weight:500">單位：</span>
@@ -975,7 +975,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <span id="cur-u" style="color:var(--text-2)">載入中…</span>
       <span style="color:var(--text-3);font-size:10px">▾</span>
     </div>
-    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v2.06</span>
+    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v2.07</span>
   </div>
 </div>
 
@@ -1278,10 +1278,10 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
                 <option value="90" data-i18n="room.dur.90">1.5小時</option><option value="120" data-i18n="room.dur.120">2小時</option>
                 <option value="180" data-i18n="room.dur.180">3小時</option><option value="240" data-i18n="room.dur.240">4小時</option>
               </select>
-              <span style="font-size:12px;color:var(--t3)" data-i18n="room.lbl.manual">或手動：</span>
-              <input type="time" id="ibk-start" value="09:00" style="width:100px" onchange="iUpdateSlots()">
+              <span style="font-size:12px;color:var(--t3)" data-i18n="room.lbl.manual">起迄時間</span>
+              <input type="time" id="ibk-start" value="09:00" style="width:130px;min-width:120px" onchange="iUpdateSlots()">
               <span style="font-size:12px;color:var(--t3)">~</span>
-              <input type="time" id="ibk-end" value="10:00" style="width:100px" onchange="iUpdateSlots()">
+              <input type="time" id="ibk-end" value="10:00" style="width:130px;min-width:120px" onchange="iUpdateSlots()">
             </div>
             <div id="ibk-slots" class="slot-grid" style="margin-bottom:12px"></div>
             <button class="btn" style="background:var(--gn);color:#0f1117;padding:7px 16px;border-radius:var(--rs);font-size:13px;font-weight:600;border:none;cursor:pointer;width:100%" onclick="iBkStep1Next()" data-i18n="room.btn.next_rooms">下一步：查看推薦會議室 →</button>
@@ -1304,6 +1304,10 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
             <div class="fg2">
               <div class="fg full"><div class="fl" data-i18n="room.lbl.meeting_title">會議標題 *</div><input type="text" id="ibk-title" data-i18n-ph="room.ph.title" placeholder="例：Q3產品評審會議"></div>
               <div class="fg full"><div class="fl" data-i18n="room.lbl.host">主辦人</div><select id="ibk-host"><option value="">請選擇…</option></select></div>
+              <div class="fg full"><div class="fl">邀請人員</div>
+                <div id="ibk-invite-chips" style="background:var(--bg2);border:1px solid var(--bd);border-radius:var(--rs);padding:6px 8px;min-height:36px;display:flex;flex-wrap:wrap;gap:4px;align-items:center;margin-bottom:4px"></div>
+                <select id="ibk-invite-sel" onchange="iBkAddInvitee(this)" style="width:100%"><option value="">＋ 選擇人員加入…</option></select>
+              </div>
               <div class="fg"><div class="fl" data-i18n="room.lbl.vc">是否需要視訊</div><select id="ibk-vc"><option value="0" data-i18n="room.vc.no">否</option><option value="1" data-i18n="room.vc.yes">是</option></select></div>
               <div class="fg"><div class="fl" data-i18n="room.lbl.notes">備註</div><input type="text" id="ibk-note" data-i18n-ph="room.ph.notes" placeholder="其他需求"></div>
             </div>
@@ -1366,10 +1370,10 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
                 <option value="90" data-i18n="room.dur.90">1.5小時</option><option value="120" data-i18n="room.dur.120">2小時</option>
                 <option value="180" data-i18n="room.dur.180">3小時</option><option value="240" data-i18n="room.dur.240">4小時</option>
               </select>
-              <span style="font-size:12px;color:var(--t3)" data-i18n="room.lbl.manual2">或手動輸入：</span>
-              <input type="time" id="bk-start" value="09:00" style="width:100px" onchange="updateSlots()">
+              <span style="font-size:12px;color:var(--t3)" data-i18n="room.lbl.manual2">起迄時間</span>
+              <input type="time" id="bk-start" value="09:00" style="width:130px;min-width:120px" onchange="updateSlots()">
               <span style="font-size:12px;color:var(--t3)">~</span>
-              <input type="time" id="bk-end" value="10:00" style="width:100px" onchange="updateSlots()">
+              <input type="time" id="bk-end" value="10:00" style="width:130px;min-width:120px" onchange="updateSlots()">
             </div>
             <div id="bk-slots" class="slot-grid"></div>
             <div id="bk-step1-conflict" style="display:none;margin-top:10px;padding:10px;border-radius:var(--rs);background:var(--red-d);border:1px solid rgba(239,68,68,.3);color:var(--rd);font-size:13px"></div>
@@ -1401,8 +1405,9 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
               <div class="fg full"><div class="fl" data-i18n="room.lbl.host">主辦人</div>
                 <select id="bk-host"><option value="" data-i18n="g.select">請選擇…</option></select>
               </div>
-              <div class="fg full"><div class="fl" data-i18n="room.lbl.emails">邀請人員（Email，逗號分隔）</div>
-                <input type="text" id="bk-emails" data-i18n-ph="room.ph.emails" placeholder="a@comart.com.tw, b@comart.com.tw">
+              <div class="fg full"><div class="fl">邀請人員</div>
+                <div id="bk-invite-chips" style="background:var(--bg2);border:1px solid var(--bd);border-radius:var(--rs);padding:6px 8px;min-height:36px;display:flex;flex-wrap:wrap;gap:4px;align-items:center;margin-bottom:4px"></div>
+                <select id="bk-invite-sel" onchange="bkAddInvitee(this)" style="width:100%"><option value="">＋ 選擇人員加入…</option></select>
               </div>
               <div class="fg"><div class="fl" data-i18n="room.lbl.vc">是否需要視訊</div>
                 <select id="bk-vc"><option value="0" data-i18n="room.vc.no">否</option><option value="1" data-i18n="room.vc.yes">是</option></select>
@@ -2532,7 +2537,7 @@ const ADMIN_I18N = {
     'room.step.time':'Select Time','room.step.room':'Recommended Rooms','room.step.info':'Fill Info',
     'room.step.time2':'Select Time','room.step.room2':'Select Room','room.step.info2':'Fill Info',
     'room.lbl.date':'Booking Date *','room.lbl.headcount':'Attendees *','room.lbl.select_slot':'Select Slot',
-    'room.lbl.manual':'or manual:','room.lbl.manual2':'or manual input:',
+    'room.lbl.manual':'Time Range','room.lbl.manual2':'Time Range',
     'room.lbl.meeting_title':'Meeting Title *','room.lbl.host':'Organizer',
     'room.lbl.emails':'Invitees (Email, comma-sep)','room.lbl.vc':'Video Conference','room.lbl.notes':'Notes',
     'room.vc.no':'No','room.vc.yes':'Yes',
@@ -2693,7 +2698,7 @@ const ADMIN_I18N = {
     'room.step.time':'選時段','room.step.room':'推薦會議室','room.step.info':'填資料',
     'room.step.time2':'選時段','room.step.room2':'選會議室','room.step.info2':'填資料',
     'room.lbl.date':'預約日期 *','room.lbl.headcount':'與會人數 *','room.lbl.select_slot':'選擇時段',
-    'room.lbl.manual':'或手動：','room.lbl.manual2':'或手動輸入：',
+    'room.lbl.manual':'起迄時間','room.lbl.manual2':'起迄時間',
     'room.lbl.meeting_title':'會議標題 *','room.lbl.host':'主辦人',
     'room.lbl.emails':'邀請人員（Email，逗號分隔）','room.lbl.vc':'是否需要視訊','room.lbl.notes':'備註',
     'room.vc.no':'否','room.vc.yes':'是',
@@ -2854,7 +2859,7 @@ const ADMIN_I18N = {
     'room.step.time':'选时段','room.step.room':'推荐会议室','room.step.info':'填资料',
     'room.step.time2':'选时段','room.step.room2':'选会议室','room.step.info2':'填资料',
     'room.lbl.date':'预约日期 *','room.lbl.headcount':'与会人数 *','room.lbl.select_slot':'选择时段',
-    'room.lbl.manual':'或手动：','room.lbl.manual2':'或手动输入：',
+    'room.lbl.manual':'起止时间','room.lbl.manual2':'起止时间',
     'room.lbl.meeting_title':'会议标题 *','room.lbl.host':'主办人',
     'room.lbl.emails':'邀请人员（Email，逗号分隔）','room.lbl.vc':'是否需要视频','room.lbl.notes':'备注',
     'room.vc.no':'否','room.vc.yes':'是',
@@ -3015,7 +3020,7 @@ const ADMIN_I18N = {
     'room.step.time':'Chọn giờ','room.step.room':'Phòng đề xuất','room.step.info':'Điền thông tin',
     'room.step.time2':'Chọn giờ','room.step.room2':'Chọn phòng','room.step.info2':'Điền thông tin',
     'room.lbl.date':'Ngày đặt *','room.lbl.headcount':'Số người tham dự *','room.lbl.select_slot':'Chọn khung giờ',
-    'room.lbl.manual':'hoặc thủ công:','room.lbl.manual2':'hoặc nhập thủ công:',
+    'room.lbl.manual':'Khoảng thời gian','room.lbl.manual2':'Khoảng thời gian',
     'room.lbl.meeting_title':'Tiêu đề cuộc họp *','room.lbl.host':'Người tổ chức',
     'room.lbl.emails':'Người mời (Email, cách bằng dấu phẩy)','room.lbl.vc':'Hội nghị video','room.lbl.notes':'Ghi chú',
     'room.vc.no':'Không','room.vc.yes':'Có',
@@ -3176,7 +3181,7 @@ const ADMIN_I18N = {
     'room.step.time':'時間選択','room.step.room':'推薦会議室','room.step.info':'情報入力',
     'room.step.time2':'時間選択','room.step.room2':'会議室選択','room.step.info2':'情報入力',
     'room.lbl.date':'予約日 *','room.lbl.headcount':'参加人数 *','room.lbl.select_slot':'時間帯選択',
-    'room.lbl.manual':'または手動:','room.lbl.manual2':'または手動入力:',
+    'room.lbl.manual':'時間帯','room.lbl.manual2':'時間帯',
     'room.lbl.meeting_title':'会議タイトル *','room.lbl.host':'主催者',
     'room.lbl.emails':'招待者（Email、カンマ区切り）','room.lbl.vc':'ビデオ会議','room.lbl.notes':'備考',
     'room.vc.no':'なし','room.vc.yes':'あり',
@@ -4565,16 +4570,67 @@ function showBkPopup(id,e){
   if(confirm(msg+'\n\n點確定取消此預約')){cancelBk(id);}
 }
 
+// ── 依使用者 site 取得當地時間，進位到下一個 30 分 ──
+function _localNow(){
+  const tz={TW:'Asia/Taipei',CN:'Asia/Shanghai',VN:'Asia/Ho_Chi_Minh'}[PORTAL_SESSION?.site]||'Asia/Taipei';
+  const pts=new Intl.DateTimeFormat('en-CA',{timeZone:tz,hour:'2-digit',minute:'2-digit',hour12:false}).formatToParts(new Date());
+  let h=+pts.find(p=>p.type==='hour').value,m=+pts.find(p=>p.type==='minute').value;
+  if(m>0){if(m<=30)m=30;else{m=0;h++;}}
+  if(h>=24)h=23;
+  return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+}
+
+// ── 邀請人員管理（主表單 / inline 表單各自一份陣列）──
+let _bkInvitees=[],_iBkInvitees=[];
+function _invSiteUsers(){
+  const site=PORTAL_SESSION?.site||'',myId=PORTAL_SESSION?.empId||'';
+  return ld(K.us).filter(u=>u.id!==myId&&(!site||u.site===site));
+}
+function _renderInvChips(pfx,arr){
+  const el=document.getElementById(`${pfx}-invite-chips`);if(!el)return;
+  el.innerHTML=arr.length?arr.map(id=>{const u=gUsr(id);return`<span style="display:inline-flex;align-items:center;gap:3px;padding:2px 8px 2px 10px;background:rgba(91,155,213,.18);color:var(--blue,#5b9bd5);border-radius:20px;font-size:12px;white-space:nowrap">${u?.name||id}<span onclick="${pfx==='bk'?'bkRmInvitee':'iBkRmInvitee'}('${id}')" style="cursor:pointer;margin-left:3px;opacity:.55">✕</span></span>`;}).join(''):'<span style="color:var(--t3);font-size:12px">（未選擇）</span>';
+}
+function _popInvSel(pfx,arr){
+  const sel=document.getElementById(`${pfx}-invite-sel`);if(!sel)return;
+  const ex=new Set(arr);
+  sel.innerHTML=`<option value="">＋ 選擇人員加入…</option>`+_invSiteUsers().filter(u=>!ex.has(u.id)).map(u=>`<option value="${u.id}">${u.name}（${u.dept||''}）</option>`).join('');
+  _renderInvChips(pfx,arr);
+}
+function bkAddInvitee(sel){const id=sel.value;if(!id)return;if(!_bkInvitees.includes(id))_bkInvitees.push(id);sel.value='';_popInvSel('bk',_bkInvitees);}
+function bkRmInvitee(id){_bkInvitees=_bkInvitees.filter(x=>x!==id);_popInvSel('bk',_bkInvitees);}
+function iBkAddInvitee(sel){const id=sel.value;if(!id)return;if(!_iBkInvitees.includes(id))_iBkInvitees.push(id);sel.value='';_popInvSel('ibk',_iBkInvitees);}
+function iBkRmInvitee(id){_iBkInvitees=_iBkInvitees.filter(x=>x!==id);_popInvSel('ibk',_iBkInvitees);}
+
+// ── 傳系統通知給被邀請人 ──
+async function sendMeetingNotifs(bk,invitees){
+  if(!invitees?.length)return;
+  const room=ROOMS.find(r=>r.id===bk.roomId);
+  const from=PORTAL_SESSION?.empId||'';
+  const body=`${room?.name||'—'} · ${bk.date} ${bk.start}–${bk.end}`;
+  await Promise.allSettled(invitees.map(to_user=>
+    SB.post('notifications',{id:uid(),to_user,from_user:from,type:'meeting',title:`📅 會議邀請：${bk.title}`,body,is_read:false})
+  ));
+}
+
 // ── Booking form ──
 function initBkForm(){
   bkStep=1;bkSelectedSlot=null;bkSelectedRoom=null;
   bkGoStep(1);
   const dateEl=document.getElementById('bk-date');
   if(dateEl&&!dateEl.value)dateEl.value=todayStr2();
-  // host select
+  // 起始時間 = 現在本地時間，結束時間 = +duration
+  const nowT=_localNow();
+  const sEl=document.getElementById('bk-start'),eEl=document.getElementById('bk-end');
+  const dur=parseInt(document.getElementById('bk-dur')?.value||60);
+  if(sEl)sEl.value=nowT;
+  if(eEl)eEl.value=minToTime(timeToMin(nowT)+dur);
+  // host 預設為當前使用者
+  const myId=PORTAL_SESSION?.empId||'';
   const us=ld(K.us);
   const hs=document.getElementById('bk-host');
-  if(hs)hs.innerHTML=`<option value="">${t('g.select')}</option>`+us.map(u=>`<option value="${u.id}">${u.name}（${u.dept||''}）</option>`).join('');
+  if(hs){hs.innerHTML=`<option value="">${t('g.select')}</option>`+us.map(u=>`<option value="${u.id}">${u.name}（${u.dept||''}）</option>`).join('');hs.value=myId;}
+  // 邀請人員
+  _bkInvitees=[];_popInvSel('bk',_bkInvitees);
   updateSlots();
 }
 
@@ -4594,9 +4650,19 @@ function iInitBkForm(){
   iBkGoStep(1);
   const dateEl=document.getElementById('ibk-date');
   if(dateEl&&!dateEl.value)dateEl.value=todayStr2();
+  // 起始時間 = 現在本地時間，結束時間 = +duration
+  const nowT=_localNow();
+  const sEl=document.getElementById('ibk-start'),eEl=document.getElementById('ibk-end');
+  const dur=parseInt(document.getElementById('ibk-dur')?.value||60);
+  if(sEl)sEl.value=nowT;
+  if(eEl)eEl.value=minToTime(timeToMin(nowT)+dur);
+  // host 預設為當前使用者
+  const myId=PORTAL_SESSION?.empId||'';
   const us=ld(K.us);
   const hs=document.getElementById('ibk-host');
-  if(hs)hs.innerHTML=`<option value="">${t('g.select')}</option>`+us.map(u=>`<option value="${u.id}">${u.name}（${u.dept||''}）</option>`).join('');
+  if(hs){hs.innerHTML=`<option value="">${t('g.select')}</option>`+us.map(u=>`<option value="${u.id}">${u.name}（${u.dept||''}）</option>`).join('');hs.value=myId;}
+  // 邀請人員
+  _iBkInvitees=[];_popInvSel('ibk',_iBkInvitees);
   iUpdateSlots();
 }
 function iBkGoStep(n){
@@ -4706,6 +4772,7 @@ async function iBkSave(){
   if(!title){toast('請填寫會議標題','error');return;}
   if(!iBkSelectedRoom){toast('請先選擇會議室','error');return;}
   const date=document.getElementById('ibk-date').value;
+  const invEmails=_iBkInvitees.map(id=>gUsr(id)?.email||'').filter(Boolean).join(', ');
   const bk={
     id:uid(),roomId:iBkSelectedRoom,date,
     start:iBkSelectedSlot.start,end:iBkSelectedSlot.end,
@@ -4713,7 +4780,7 @@ async function iBkSave(){
     hostId:document.getElementById('ibk-host').value,
     vc:document.getElementById('ibk-vc').value==='1',
     note:document.getElementById('ibk-note').value.trim(),
-    emails:'',status:'confirmed',createdAt:new Date().toISOString(),checkedIn:false,
+    emails:invEmails,status:'confirmed',createdAt:new Date().toISOString(),checkedIn:false,
   };
   const existing=getBookings().filter(b=>b.roomId===iBkSelectedRoom&&b.date===date&&b.status!=='cancelled');
   if(existing.some(b=>timeToMin(b.start)<timeToMin(bk.end)&&timeToMin(b.end)>timeToMin(bk.start))){
@@ -4724,6 +4791,7 @@ async function iBkSave(){
   await getRoomBookings(); // 從 SB 重新拉取確保快取一致
   const roomName=ROOMS.find(r=>r.id===iBkSelectedRoom)?.name||'—';
   toast(`✓ 已預約${roomName} ${bk.start}–${bk.end}「${title}」`,'success');
+  sendMeetingNotifs(bk,[..._iBkInvitees]);
   updRoomBadge();
   // 收起表單並刷新看板
   const body=document.getElementById('inline-bk-body');
@@ -4868,6 +4936,7 @@ async function bkSave(){
   if(!title){toast('請填寫會議標題','error');return;}
   if(!bkSelectedRoom){toast('請先選擇會議室','error');return;}
   const date=document.getElementById('bk-date').value;
+  const invEmails=_bkInvitees.map(id=>gUsr(id)?.email||'').filter(Boolean).join(', ');
   const bk={
     id:uid(),
     roomId:bkSelectedRoom,
@@ -4877,7 +4946,7 @@ async function bkSave(){
     title,
     headcount:parseInt(document.getElementById('bk-headcount').value)||1,
     hostId:document.getElementById('bk-host').value,
-    emails:document.getElementById('bk-emails').value.trim(),
+    emails:invEmails,
     vc:document.getElementById('bk-vc').value==='1',
     note:document.getElementById('bk-note').value.trim(),
     status:'confirmed',
@@ -4896,6 +4965,7 @@ async function bkSave(){
   await getRoomBookings();
   const roomName=ROOMS.find(r=>r.id===bkSelectedRoom)?.name||'—';
   toast(`✓ 已預約${roomName} ${bk.start}–${bk.end}「${title}」`,'success');
+  sendMeetingNotifs(bk,[..._bkInvitees]);
   updRoomBadge();
   navRoom('room-dash');
 }

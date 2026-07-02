@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART 行政管理平台 v2.04</title>
+<title>COMART 行政管理平台 v2.05</title>
 <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.js"></script>
 <style>
 :root{
@@ -953,7 +953,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="logo">
     <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
     <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
-    <span><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="38" height="20" style="display:inline-block;vertical-align:middle;margin-top:-2px"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v2.04</span>
+    <span><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="38" height="20" style="display:inline-block;vertical-align:middle;margin-top:-2px"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v2.05</span>
   </div>
   <div class="trr">
     <div id="global-site-bar" style="display:flex;align-items:center;gap:4px"><span style="font-size:13px;color:var(--text-3);white-space:nowrap;font-weight:500">單位：</span>
@@ -975,7 +975,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <span id="cur-u" style="color:var(--text-2)">載入中…</span>
       <span style="color:var(--text-3);font-size:10px">▾</span>
     </div>
-    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v2.04</span>
+    <span style="font-size:11px;color:var(--text-3);padding:0 4px">v2.05</span>
   </div>
 </div>
 
@@ -2165,10 +2165,24 @@ async function loadLibFromSB() {
     SB.get('lib_reservations','?order=reserved_at.desc&status=eq.waiting'),
   ]);
   const [cats,books,loans,rvs] = results.map(r=>r.status==='fulfilled'&&Array.isArray(r.value)?r.value:null);
-  if(cats)   sv(K.ct, cats);
-  if(books)  sv(K.bk, books);
-  if(loans)  sv(K.ln, loans);
-  if(rvs)    sv(K.rv, rvs);
+  if(cats)  sv(K.ct, cats);
+  if(books) sv(K.bk, books);
+  if(loans) sv(K.ln, loans.map(l=>({
+    ...l,
+    bk_id: l.book_id || l.bk_id,
+    u_id:  l.user_id || l.u_id || '',
+    bw:    l.borrowed_at || l.bw,
+    due:   l.due_date || l.due,
+    ret:   l.returned_at || l.ret || null,
+    st:    l.status || l.st || 'active',
+  })));
+  if(rvs) sv(K.rv, rvs.map(r=>({
+    ...r,
+    bk_id: r.book_id || r.bk_id,
+    u_id:  r.user_id || r.u_id || '',
+    dt:    r.reserved_at || r.dt,
+    st:    r.status || r.st || 'waiting',
+  })));
   if(cats?.length||books?.length)console.log(`✓ lib synced: ${cats?.length||0} cats, ${books?.length||0} books, ${loans?.length||0} loans`);
 }
 
@@ -2231,8 +2245,32 @@ async function sbDelBook(id) {
   catch(e) { console.warn('sbDelBook fail:', e.message); }
 }
 async function sbSaveLoan(loan) {
-  try { await SB.upsert('lib_loans', loan); }
+  const row = {
+    id:          loan.id,
+    book_id:     loan.bk_id     || loan.book_id,
+    user_id:     loan.u_id      || loan.user_id,
+    borrowed_at: loan.bw        || loan.borrowed_at,
+    due_date:    loan.due       || loan.due_date,
+    returned_at: loan.ret       || loan.returned_at || null,
+    status:      loan.st        || loan.status      || 'active',
+  };
+  try { await SB.upsert('lib_loans', row); }
   catch(e) { console.warn('sbSaveLoan fail:', e.message); }
+}
+async function sbSaveRsv(rsv) {
+  const row = {
+    id:          rsv.id,
+    book_id:     rsv.bk_id     || rsv.book_id,
+    user_id:     rsv.u_id      || rsv.user_id,
+    reserved_at: rsv.dt        || rsv.reserved_at,
+    status:      rsv.st        || rsv.status       || 'waiting',
+  };
+  try { await SB.upsert('lib_reservations', row); }
+  catch(e) { console.warn('sbSaveRsv fail:', e.message); }
+}
+async function sbDelRsv(id) {
+  try { await SB.del('lib_reservations', `id=eq.${id}`); }
+  catch(e) { console.warn('sbDelRsv fail:', e.message); }
 }
 async function sbSaveCat(cat) {
   try { await SB.upsert('lib_categories', cat); }
@@ -3686,7 +3724,8 @@ function quickReserve(bid){
 function doQuickLoan(){
   const uid2=document.getElementById('ql-usr').value;if(!uid2)return toast('請選擇借閱人','error');
   if(_qlIsRsv){
-    const rv=ld(K.rv);rv.push({id:uid(),bk_id:_qlBkId,u_id:uid2,dt:tds(),st:'waiting'});sv(K.rv,rv);
+    const _nrsv={id:uid(),bk_id:_qlBkId,u_id:uid2,dt:tds(),st:'waiting'};
+    const rv=ld(K.rv);rv.push(_nrsv);sv(K.rv,rv);sbSaveRsv(_nrsv);
     closeMo('mo-quickloan');renderBooks();toast(`已預約《${gBk(_qlBkId)?.title}》`,'success');return;
   }
   const cfg=lo(K.lcfg,DLCFG);
@@ -3795,8 +3834,8 @@ function renderReturn(){
 
 function renderRsv(){const _sbids=_siteBkIds();const rv=ld(K.rv).filter(r=>_sbids.has(r.bk_id));document.getElementById('rv-tb').innerHTML=rv.length?rv.map(r=>{const b=gBk(r.bk_id),u=gUsr(r.u_id);return`<tr><td>${b?.title||'—'}</td><td>${u?.name||'—'}</td><td class="tdm">${fmtD(r.dt)}</td><td><span class="badge ${r.st==='waiting'?'by':'bm'}">${r.st==='waiting'?t('lib.rsv.waiting'):t('lib.rsv.done')}</span></td><td><button class="btn bdr bsm" onclick="delRsv('${r.id}')">${t('g.btn.cancel')}</button></td></tr>`}).join(''):`<tr><td colspan="5" class="tdm" style="text-align:center;padding:22px">${t('lib.no_rsv')}</td></tr>`;}
 function openRsvModal(){const us=ld(K.us),bks=_libSite?ld(K.bk).filter(b=>b.site===_libSite):ld(K.bk);document.getElementById('rsvu').innerHTML=`<option value="">${t('g.select')}</option>`+us.map(u=>`<option value="${u.id}">${u.name}</option>`).join('');document.getElementById('rsvb').innerHTML=`<option value="">${t('g.select')}</option>`+bks.map(b=>`<option value="${b.id}">${b.title}</option>`).join('');openMo('mo-rsv');}
-function saveRsv(){const uid2=document.getElementById('rsvu').value,bid=document.getElementById('rsvb').value;if(!uid2||!bid)return toast('請選擇預約人與書籍','error');const rv=ld(K.rv);rv.push({id:uid(),bk_id:bid,u_id:uid2,dt:tds(),st:'waiting'});sv(K.rv,rv);closeMo('mo-rsv');renderRsv();toast('預約已登記','success');}
-function delRsv(id){if(!confirm('確定取消？'))return;sv(K.rv,ld(K.rv).filter(r=>r.id!==id));renderRsv();toast(t('g.toast.cancelled'),'success');}
+function saveRsv(){const uid2=document.getElementById('rsvu').value,bid=document.getElementById('rsvb').value;if(!uid2||!bid)return toast('請選擇預約人與書籍','error');const _nrsv={id:uid(),bk_id:bid,u_id:uid2,dt:tds(),st:'waiting'};const rv=ld(K.rv);rv.push(_nrsv);sv(K.rv,rv);sbSaveRsv(_nrsv);closeMo('mo-rsv');renderRsv();toast('預約已登記','success');}
+function delRsv(id){if(!confirm('確定取消？'))return;sv(K.rv,ld(K.rv).filter(r=>r.id!==id));sbDelRsv(id);renderRsv();toast(t('g.toast.cancelled'),'success');}
 
 
 

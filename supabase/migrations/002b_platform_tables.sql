@@ -58,5 +58,9 @@ CREATE TABLE IF NOT EXISTS trips (
 );
 
 -- ── Realtime ────────────────────────────────────────────────
-ALTER PUBLICATION supabase_realtime ADD TABLE portal_messages;
-ALTER PUBLICATION supabase_realtime ADD TABLE portal_bulletin;
+DO $$ BEGIN
+  ALTER PUBLICATION supabase_realtime ADD TABLE portal_messages;
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  ALTER PUBLICATION supabase_realtime ADD TABLE portal_bulletin;
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;

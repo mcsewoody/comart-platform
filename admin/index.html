@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART 行政管理平台 v2.16</title>
+<title>COMART 行政管理平台 v2.17</title>
 <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.js"></script>
 <style>
 :root{
@@ -953,7 +953,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="logo">
     <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
     <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
-    <span><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="38" height="20" style="display:inline-block;vertical-align:middle;margin-top:-2px"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v2.16</span>
+    <span><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="38" height="20" style="display:inline-block;vertical-align:middle;margin-top:-2px"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v2.17</span>
   </div>
   <div class="trr">
     <div id="global-site-bar" style="display:flex;align-items:center;gap:4px"><span style="font-size:13px;color:var(--text-3);white-space:nowrap;font-weight:500">單位：</span>
@@ -2291,16 +2291,15 @@ async function sbDelCat(id) {
 // ── 公務車寫入 SB ────────────────────────────────
 async function sbSaveVehicle(vh) {
   try {
-    await SB.upsert('car_vehicles', {
+    await SB.post('car_vehicles', {
       id:vh.id, name:vh.name||'', plate:vh.plate||'',
       type:vh.type||'sedan', fuel:vh.fuel||'gas',
       km:vh.km||0, next_maint_km:vh.next_maint_km||null,
       next_insp:vh.next_insp||null,
       parking_id:vh.pk_id||vh.parking_id||null,
-      pk_id:vh.pk_id||vh.parking_id||null,
       notes:vh.notes||'', status:vh.st||vh.status||'available',
       site:vh.site||'TW', fuel_lvl:vh.fuel_lvl??4,
-    });
+    }, 'resolution=merge-duplicates,return=minimal');
   } catch(e) { console.warn('sbSaveVehicle fail:', e.message); }
 }
 async function sbDelVehicle(id) {
@@ -2401,22 +2400,21 @@ async function saveRoomFault(f) {
 
 // ── 到訪 CRUD ──────────────────────────────────────
 async function getVisitRecords() {
-  try {
-    const rows = await SB.get('visit_records', '?order=date_start.desc');
-    if (rows && Array.isArray(rows)) {
-      const mapped = rows.map(r=>({
-        id:r.id, company:r.company, type:r.type, unit:r.unit,
-        ownerId:r.owner_id||'', dateStart:r.date_start,
-        dateEnd:r.date_end, headcount:r.headcount,
-        purpose:r.purpose, note:r.note||'',
-        guests:r.guests||[], days:r.days||[],
-        escorts:r.escorts||[], costs:r.costs||[],
-        broadcasts:r.broadcasts||[], createdAt:r.created_at,
-      }));
-      sv(VK, mapped); return mapped;
-    }
-  } catch(e) { console.warn('getVisitRecords SB fail:', e.message); }
-  return ld(VK);
+  const rows = await SB.get('visit_records', '?order=date_start.desc');
+  if (rows && Array.isArray(rows)) {
+    const mapped = rows.map(r=>({
+      id:r.id, company:r.company, type:r.type, unit:r.unit,
+      ownerId:r.owner_id||'', dateStart:r.date_start,
+      dateEnd:r.date_end, headcount:r.headcount,
+      purpose:r.purpose, note:r.note||'',
+      guests:r.guests||[], days:r.days||[],
+      escorts:r.escorts||[], costs:r.costs||[],
+      broadcasts:r.broadcasts||[], createdAt:r.created_at,
+    }));
+    sv(VK, mapped); return mapped;
+  }
+  // SB 不可用時清空舊快取（含 mock data），避免顯示過期資料
+  sv(VK, []); return [];
 }
 async function saveVisitRecord(data) {
   const arr = ld(VK); const i = arr.findIndex(v=>v.id===data.id);

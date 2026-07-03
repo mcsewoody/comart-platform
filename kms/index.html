@@ -3080,7 +3080,7 @@ async function saveDoc() {
           from_status: editingDocId ? 'edit' : 'new',
           to_status: finalStatus,
           actor: _logActor,
-          note: title.slice(0, 100),
+          note: title.slice(0, 200),
         });
       } catch(e) { console.warn('[activity_log]', e.message); }
 
@@ -4990,7 +4990,7 @@ async function deleteDoc(id, title, authorName) {
           from_status: 'delete',
           to_status: 'deleted',
           actor: _delActor,
-          note: (title || '').slice(0, 100),
+          note: (title || '').slice(0, 200),
         });
       } catch(e) { console.warn('[activity_log delete]', e.message); }
       await kmsWrite('delete', 'kms_doc_versions', null, null, { doc_id: id });
@@ -7372,40 +7372,44 @@ async function batchDeleteDuplicates() {
 async function loadActivityLog() {
   const content = document.getElementById('review-content');
   try {
-    const logs = await sbFetch('/rest/v1/kms_review_log?select=*&order=created_at.desc&limit=200') || [];
-    if (!logs.length) {
+    // 用 Cloudflare Worker（service_role）繞過 RLS，並 JOIN kms_documents 取現存文件標題
+    const res = await fetch(
+      `${KMS_SB_WORKER}/supabase/rest/v1/kms_review_log?select=*,kms_documents(title)&order=created_at.desc&limit=300`,
+      { headers: { 'x-admin-token': KMS_SB_TOKEN } }
+    );
+    const logs = res.ok ? await res.json() : [];
+    if (!Array.isArray(logs) || !logs.length) {
       content.innerHTML = '<div style="text-align:center;color:var(--text-3);padding:40px 0;font-size:13px;">尚無活動記錄</div>';
       return;
     }
-    const actionLabel = fs => {
-      if (fs === 'new')    return { icon:'📝', text:'新增文件',  color:'var(--green)' };
-      if (fs === 'edit')   return { icon:'✏️', text:'修改文件',  color:'var(--blue)'  };
-      if (fs === 'delete') return { icon:'🗑', text:'刪除文件',  color:'var(--red)'   };
-      return null; // 審核動作另外處理
+    const CRUD = {
+      new:    { icon:'📝', text:'新增文件', color:'var(--green)' },
+      edit:   { icon:'✏️', text:'修改文件', color:'var(--blue)'  },
+      delete: { icon:'🗑', text:'刪除文件', color:'var(--red)'   },
     };
-    const reviewLabel = (f, t_) => {
-      if (t_ === 'published')  return { icon:'✅', text:'核准發佈', color:'var(--green)'  };
-      if (t_ === 'withdrawn')  return { icon:'⚠️', text:'撤回',    color:'var(--amber)'  };
-      if (t_ === 'archived')   return { icon:'📦', text:'封存',    color:'var(--text-3)' };
-      if (t_ === 'draft')      return { icon:'↩', text:'退回草稿', color:'var(--text-2)' };
-      return { icon:'🔄', text:`${f}→${t_}`, color:'var(--text-3)' };
+    const REVIEW = {
+      published: { icon:'✅', text:'核准發佈', color:'var(--green)'  },
+      withdrawn: { icon:'⚠️', text:'撤回',    color:'var(--amber)'  },
+      archived:  { icon:'📦', text:'封存',    color:'var(--text-3)' },
+      draft:     { icon:'↩',  text:'退回草稿', color:'var(--text-2)' },
     };
     const rows = logs.map(l => {
-      const al = actionLabel(l.from_status);
-      const rl = al ? null : reviewLabel(l.from_status, l.to_status);
-      const { icon, text, color } = al || rl;
+      const isCRUD = l.from_status in CRUD;
+      const lbl = isCRUD ? CRUD[l.from_status] : (REVIEW[l.to_status] || { icon:'🔄', text:`${l.from_status}→${l.to_status}`, color:'var(--text-3)' });
       const dt = l.created_at ? new Date(l.created_at).toLocaleString('zh-TW',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}) : '';
-      const noteHtml = l.note ? `<span style="flex:1;font-size:11px;color:var(--text-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px;" title="${(l.note||'').replace(/"/g,'&quot;')}">${l.note}</span>` : '<span style="flex:1;"></span>';
-      return `<div class="review-log-item" style="padding:6px 0;gap:8px;">
-        <span style="color:${color};font-weight:600;white-space:nowrap;min-width:72px;">${icon} ${text}</span>
-        <span style="font-size:12px;color:var(--text-2);white-space:nowrap;min-width:70px;">${l.actor||'—'}</span>
-        ${noteHtml}
-        <span style="margin-left:auto;color:var(--text-3);white-space:nowrap;font-size:11px;">${dt}</span>
+      // note 統一存文件標題；JOIN 取 kms_documents.title 作為現存文件備援
+      const docTitle = l.note || l.kms_documents?.title || '（未知文件）';
+      const titleEsc = docTitle.replace(/"/g,'&quot;');
+      return `<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);">
+        <span style="color:${lbl.color};font-weight:600;white-space:nowrap;min-width:76px;font-size:12px;">${lbl.icon} ${lbl.text}</span>
+        <span style="flex:1;min-width:0;font-size:12px;color:var(--text-1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${titleEsc}">${docTitle}</span>
+        <span style="font-size:11px;color:var(--text-3);white-space:nowrap;">${l.actor||'—'}</span>
+        <span style="color:var(--text-3);white-space:nowrap;font-size:11px;">${dt}</span>
       </div>`;
     }).join('');
     content.innerHTML = `
-      <div style="margin-bottom:8px;font-size:12px;color:var(--text-3);">最近 ${logs.length} 筆活動（新增／修改／刪除／審核）</div>
-      <div style="border:1px solid var(--border);border-radius:var(--radius);padding:4px 12px;">${rows}</div>`;
+      <div style="margin-bottom:8px;font-size:12px;color:var(--text-3);">最近 ${logs.length} 筆活動記錄（新增 / 修改 / 刪除 / 審核）</div>
+      <div style="border:1px solid var(--border);border-radius:var(--radius);padding:0 12px;">${rows}</div>`;
   } catch(e) {
     content.innerHTML = `<div style="color:var(--red);padding:20px;font-size:13px;">活動記錄載入失敗：${e.message}</div>`;
   }
@@ -7545,11 +7549,11 @@ async function executeReview(docId, newStatus, actionLabel, needReason = false) 
 
   try {
     if (CFG.supabaseUrl && CFG.supabaseKey) {
-      // 寫入 review_log
+      // 寫入 review_log（note 固定存文件標題，reason 已存 review_note 欄位）
       try {
         await kmsWrite('insert', 'kms_review_log', {
           doc_id: docId, from_status: fromStatus, to_status: newStatus,
-          actor, note: note.trim() || null,
+          actor, note: (docTitle || '').slice(0, 200),
         });
       } catch(logErr) { console.warn('[review_log]', logErr.message); }
 

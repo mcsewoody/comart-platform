@@ -1421,6 +1421,21 @@ function _slimForCache(products){
   try { return (products||[]).map(p=>{ const {img, img2, ...rest} = p; return rest; }); }
   catch(_) { return products; }
 }
+// ── 輕量輪詢：先比對 id+updatedAt 簽章，有變更才下載全表 ──
+// products 全表約 730KB，簽章查詢僅 ~15KB；無變更時流量省 ~98%
+const _pollSigs = {};
+function _sigOf(rows){ return rows.map(r => r.id + ':' + (r.updatedAt || r.ts || r.createdAt || '')).sort().join('|'); }
+function _seedPollSig(table, rows){ if (Array.isArray(rows)) _pollSigs[table] = _sigOf(rows); }
+async function _pollTable(table, sigSel, fullParams, onData) {
+  const sigRows = await SB.get(table, 'select=' + sigSel);
+  if (!sigRows) return;                    // 簽章查詢失敗 → 本輪跳過，下輪重試
+  const sig = _sigOf(sigRows);
+  if (_pollSigs[table] === sig) return;    // 無變更
+  const full = await SB.get(table, fullParams);
+  if (!full) return;                       // 全表抓取失敗 → 簽章不更新，下輪重試
+  _pollSigs[table] = sig;
+  onData(full);
+}
 
 // ── Real-time listeners (auto-sync across all devices) ──
 let _listenersReady = false;
@@ -1448,6 +1463,7 @@ async function _reloadAfterLogin(){
     PRICE_HISTORY = phData   || [];
     if(sData?.[0]?.data) SETTINGS = {...SETTINGS, ...sData[0].data};
     _lastFullLoadTs = Date.now();
+    _seedPollSig('quotes', QUOTES); _seedPollSig('products', PRODUCTS); _seedPollSig('categories', CATEGORIES); _seedPollSig('price_history', PRICE_HISTORY);
     lsSet('qi-q-cache', QUOTES);
     lsSet('qi-p-cache', _slimForCache(PRODUCTS));
     _loadUsersFromSB().then(rows=>{ if(rows){ USERS=rows; lsSet('qi-users-cache',USERS); } }).catch(()=>{});
@@ -1469,34 +1485,32 @@ function _stopPolling() {
   _listenersReady = false;
 }
 
+async function _pollOnce() {
+  if (document.hidden) return;   // 背景分頁暫停輪詢，回前景時由 visibilitychange 立即補一次
+  try {
+    await Promise.all([
+      _pollTable('quotes', 'id,updatedAt', 'order=date', d => {
+        QUOTES = d; lsSet('qi-q-cache', QUOTES);
+        renderQuoteList();
+      }),
+      _pollTable('products', 'id,updatedAt', 'order=createdAt', d => {
+        PRODUCTS = d; lsSet('qi-p-cache', _slimForCache(PRODUCTS));
+        renderProductList();
+      }),
+      _pollTable('categories', 'id,updatedAt', 'order=code', d => { CATEGORIES = d; }),
+      _pollTable('price_history', 'id,ts', 'order=ts', d => {
+        PRICE_HISTORY = d; lsSet('qi-price-history', PRICE_HISTORY);
+      }),
+    ]);
+  } catch(e) { console.warn('poll error:', e); }
+}
+
 function startListeners() {
   if (_listenersReady) return;
   _listenersReady = true;
 
-  // Poll Supabase every 20 seconds for multi-user sync
-  _pollTimer = setInterval(async () => {
-    try {
-      const [qData, pData, cData, phData] = await Promise.all([
-        SB.get('quotes', 'order=date'),
-        SB.get('products', 'order=createdAt'),
-        SB.get('categories', 'order=code'),
-        SB.get('price_history', 'order=ts'),
-      ]);
-      if (qData) {
-        QUOTES = qData; lsSet('qi-q-cache', QUOTES);
-        if (page === 'quotes' || page === 'detail') renderQuoteList();
-        else renderQuoteList();
-      }
-      if (pData) {
-        PRODUCTS = pData; lsSet('qi-p-cache', _slimForCache(PRODUCTS));
-        if (!document.getElementById('prodOverlay')?.classList.contains('show')) renderProductList();
-      }
-      if (cData) {
-        CATEGORIES = cData;
-      }
-      if (phData) { PRICE_HISTORY = phData; lsSet('qi-price-history', PRICE_HISTORY); }
-    } catch(e) { console.warn('poll error:', e); }
-  }, 20000);
+  // Poll Supabase every 20 seconds for multi-user sync（簽章比對，有變更才下載全表）
+  _pollTimer = setInterval(_pollOnce, 20000);
 
   // Users — low change rate, load once
   _loadUsersFromSB().then(rows => {
@@ -1526,6 +1540,7 @@ async function loadAll() {
     PRICE_HISTORY = phData   || [];
     if (sData?.[0]?.data) SETTINGS = {...SETTINGS, ...sData[0].data};
     _lastFullLoadTs = Date.now();
+    _seedPollSig('quotes', QUOTES); _seedPollSig('products', PRODUCTS); _seedPollSig('categories', CATEGORIES); _seedPollSig('price_history', PRICE_HISTORY);
     lsSet('qi-q-cache', QUOTES);
     lsSet('qi-p-cache', _slimForCache(PRODUCTS));
     lsSet('qi-price-history', PRICE_HISTORY);
@@ -5850,28 +5865,36 @@ let _editTaskId   = null;
 let _crmTab       = 'accounts';
 
 // ── CRM data loader ──────────────────────────
-function subscribeCRM(){
-  async function _loadCRM() {
-    const [accts, contacts, activities, tasks] = await Promise.all([
-      SB.get('crm_accounts', 'order=createdAt'),
-      SB.get('crm_contacts', 'order=createdAt'),
-      SB.get('crm_activities', 'order=createdAt'),
-      SB.get('crm_tasks', 'order=createdAt'),
+async function _crmPollOnce() {
+  if (document.hidden) return;   // 背景分頁暫停
+  try {
+    let changed = false;
+    await Promise.all([
+      _pollTable('crm_accounts',   'id,updatedAt', 'order=createdAt', d => { CRM_ACCOUNTS = d; changed = true; }),
+      _pollTable('crm_contacts',   'id,updatedAt', 'order=createdAt', d => { CRM_CONTACTS = d; changed = true; }),
+      _pollTable('crm_activities', 'id,updatedAt', 'order=createdAt', d => { CRM_ACTIVITIES = d; changed = true; }),
+      _pollTable('crm_tasks',      'id,updatedAt', 'order=createdAt', d => { CRM_TASKS = d; changed = true; }),
     ]);
-    CRM_ACCOUNTS   = accts      || [];
-    CRM_CONTACTS   = contacts   || [];
-    CRM_ACTIVITIES = activities || [];
-    CRM_TASKS      = tasks      || [];
+    if (!changed) return;        // 無變更 → 不重新渲染
     updateCRMBadge();
     if(page==='crm' && _crmTab==='accounts') renderCRMAccounts();
     if(page==='crm' && _crmTab==='activities') renderCRMActivities();
     if(page==='crm' && _crmTab==='tasks') renderCRMTasks();
     if(_editAcctId){ renderAcctContacts(); renderAcctActivities(); renderAcctTasks(); }
-  }
-  _loadCRM();
-  if (_crmPollTimer) clearInterval(_crmPollTimer);
-  _crmPollTimer = setInterval(_loadCRM, 20000);
+  } catch(e) { console.warn('crm poll error:', e); }
 }
+function subscribeCRM(){
+  _crmPollOnce();                // 初次載入（尚無簽章 → 會下載全表）
+  if (_crmPollTimer) clearInterval(_crmPollTimer);
+  _crmPollTimer = setInterval(_crmPollOnce, 20000);
+}
+// 分頁回到前景時立即補一次輪詢（背景期間是暫停的）
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) {
+    if (_pollTimer) _pollOnce();
+    if (_crmPollTimer) _crmPollOnce();
+  }
+});
 
 function updateCRMBadge(){
   const el = document.getElementById('np-cnt-crm');

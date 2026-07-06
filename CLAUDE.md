@@ -19,7 +19,7 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 | File | Version | Purpose | ~Lines |
 |------|---------|---------|--------|
 | `index.html` | v1.37 | Main portal — login, home, directory, bulletin, calendar, AI tools | 5,889 |
-| `admin/index.html` | v1.57 | Admin System — room booking, fleet, visitor, library, trip reimbursement, lottery | 5,840 |
+| `admin/index.html` | v1.57 | Admin System — room booking, fleet, visitor, library, lottery | 5,840 |
 | `kms/index.html` | — | Knowledge Management System — RAG, document editor, AI Q&A | 6,520 |
 | `quotation/index.html` | — | Quotation & CRM system | 7,699 |
 
@@ -33,7 +33,7 @@ Numbered backup files (`index112.html`, `index328.html`, etc.) are iteration sna
 
 **Opening sub-apps**: `openApp(id)` navigates to the sub-app HTML file, passing the session via URL parameter `?_ps=<base64-JSON>` since localStorage cannot be shared cross-origin.
 
-**Within `admin/index.html`**: `switchMod(m)` activates modules — `'room'`, `'car'`, `'visit'`, `'lib'`, `'trip'`, `'lottery'`.
+**Within `admin/index.html`**: `switchMod(m)` activates modules — `'room'`, `'car'`, `'visit'`, `'lib'`, `'lottery'`.
 
 ### Backend Stack
 
@@ -112,7 +112,7 @@ The portal supports EN, 繁中, 简中, VI, 日 via `setLang(lang)`. Each langua
 
 - `cancelCarBk(id)` 公務車取消，`cancelBk(id)` 會議室取消，**不可混用**
 - localStorage 只是快取，正本在 Supabase
-- 六大模塊順序：會議室 → 公務車 → 客戶到訪 → 圖書館 → 差旅報支 → 抽籤
+- 五大模塊順序：會議室 → 公務車 → 客戶到訪 → 圖書館 → 抽籤
 
 ## Development Workflow
 

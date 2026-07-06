@@ -27,7 +27,7 @@ serve(async (req) => {
     const ALLOWED_TABLES = [
       "kms_documents", "kms_doc_versions", "kms_comments",
       "kms_review_log", "kms_experts", "kms_product_lines",
-      "kms_search_log"
+      "kms_search_log", "kms_snapshots", "kms_categories"
     ]
     if (!ALLOWED_TABLES.includes(table)) {
       return new Response(JSON.stringify({ error: "table not allowed" }), { status: 403, headers: CORS })

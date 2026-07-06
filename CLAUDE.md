@@ -112,7 +112,7 @@ The portal supports EN, 繁中, 简中, VI, 日 via `setLang(lang)`. Each langua
 
 - `cancelCarBk(id)` 公務車取消，`cancelBk(id)` 會議室取消，**不可混用**
 - localStorage 只是快取，正本在 Supabase
-- 五大模塊順序：會議室 → 公務車 → 客戶到訪 → 圖書館 → 抽籤
+- 五大模塊順序：公務車 → 圖書館 → 會議室 → 客戶到訪 → 抽籤
 
 ## Development Workflow
 

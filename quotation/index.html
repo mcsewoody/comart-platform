@@ -1123,9 +1123,10 @@ img{display:block}
 
 <div class="toast" id="toast"></div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<!-- 匯出用程式庫：defer 載入避免阻塞頁面解析（僅匯出 Excel/PDF 時才會用到，程式內已有 typeof 檢查防護） -->
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
 // ═══════════════════════════════════════
 // DEFAULT PRODUCT IMAGES (from Qi xlsx)
@@ -1734,6 +1735,15 @@ function hideSyncing() {
 // ── localStorage helpers (fallback) ───
 function lsGet(key, def=[]) { try { const v=localStorage.getItem(key); return v?JSON.parse(v):def; } catch(_){ return def; } }
 function lsSet(key, val)    { try { localStorage.setItem(key, JSON.stringify(val)); } catch(_){} }
+// 最近一次完整載入的時間戳（避免啟動流程重複下載全部資料表）
+let _lastFullLoadTs = 0;
+// localStorage 快取瘦身：去除 img/img2（合計 200KB+ 的 base64/URL 欄位），
+// 快取僅作為 Supabase 連不上時的離線備援，缺圖不影響功能，
+// 並可大幅減少同網域（platform.comart.com.tw）共用的 localStorage 配額消耗
+function _slimForCache(products){
+  try { return (products||[]).map(p=>{ const {img, img2, ...rest} = p; return rest; }); }
+  catch(_) { return products; }
+}
 
 // ── Real-time listeners (auto-sync across all devices) ──
 let _qUnsub = null;
@@ -1744,6 +1754,8 @@ let _listenersReady = false;
 async function _reloadAfterLogin(){
   _stopPolling();
   _listenersReady = false;
+  // loadAll() 剛完成過完整載入的話（10 秒內），跳過重新抓取，避免啟動時同樣 6 張表下載兩次
+  if (Date.now() - _lastFullLoadTs > 10000) {
   showSyncing();
   try{
     const [qData, pData, sData, suppData, cData, phData] = await Promise.all([
@@ -1760,11 +1772,13 @@ async function _reloadAfterLogin(){
     CATEGORIES    = cData    || [];
     PRICE_HISTORY = phData   || [];
     if(sData?.[0]?.data) SETTINGS = {...SETTINGS, ...sData[0].data};
+    _lastFullLoadTs = Date.now();
     lsSet('qi-q-cache', QUOTES);
-    lsSet('qi-p-cache', PRODUCTS);
+    lsSet('qi-p-cache', _slimForCache(PRODUCTS));
     _loadUsersFromSB().then(rows=>{ if(rows){ USERS=rows; lsSet('qi-users-cache',USERS); } }).catch(()=>{});
   }catch(e){ console.warn('_reloadAfterLogin error:',e); }
   hideSyncing();
+  }
   startListeners();
   renderQuoteList();
   renderProductList();
@@ -1800,7 +1814,7 @@ function startListeners() {
         else renderQuoteList();
       }
       if (pData) {
-        PRODUCTS = pData; lsSet('qi-p-cache', PRODUCTS);
+        PRODUCTS = pData; lsSet('qi-p-cache', _slimForCache(PRODUCTS));
         if (!document.getElementById('prodOverlay')?.classList.contains('show')) renderProductList();
       }
       if (cData) {
@@ -1840,8 +1854,9 @@ async function loadAll() {
     CATEGORIES    = cData    || [];
     PRICE_HISTORY = phData   || [];
     if (sData?.[0]?.data) SETTINGS = {...SETTINGS, ...sData[0].data};
+    _lastFullLoadTs = Date.now();
     lsSet('qi-q-cache', QUOTES);
-    lsSet('qi-p-cache', PRODUCTS);
+    lsSet('qi-p-cache', _slimForCache(PRODUCTS));
     lsSet('qi-price-history', PRICE_HISTORY);
     { const _e=document.getElementById('np-cnt-c'); if(_e) _e.textContent=CATEGORIES.length; }
   } catch(e) {
@@ -1904,8 +1919,9 @@ async function loadAll() {
         return;
       }
     }
-    // No valid portal session → redirect to Portal
-    showLoginPage(); // will redirect to platform.comart.com.tw
+    // No valid portal session → 先嘗試本地 session（30 天效期），失敗才導回 Portal
+    const _restored = await restoreSession();
+    if (!_restored) { showLoginPage(); return; } // will redirect to platform.comart.com.tw
   }
 
   // Start real-time listeners after initial load
@@ -2001,7 +2017,7 @@ async function saveOneP(idOrObj) {
   let imgUrl = p.img || null;
 
   // If img is base64 (new upload), upload to Supabase Storage
-  if (p.img && p.img.startsWith('data:') && storage) {
+  if (p.img && p.img.startsWith('data:')) {
     // Cache base64 in localStorage BEFORE uploading (for PDF/XLSX use)
     try { localStorage.setItem('qi-img-b64-' + p.id, p.img); } catch(_) {}
     const uploadedUrl = await uploadImgToStorage(p.id, p.img);
@@ -2011,9 +2027,6 @@ async function saveOneP(idOrObj) {
       const idx = PRODUCTS.findIndex(x => x.id === p.id);
       if (idx !== -1) PRODUCTS[idx].img = imgUrl;
     }
-  } else if (p.img && p.img.startsWith('data:')) {
-    // No Firebase — keep base64 in localStorage too
-    try { localStorage.setItem('qi-img-b64-' + p.id, p.img); } catch(_) {}
   }
 
   // Strip base64 + sanitize undefined → null before writing to Supabase
@@ -2049,7 +2062,7 @@ async function saveOneP(idOrObj) {
     createdAt: p.createdAt,
     updatedAt: Date.now()
   };
-  lsSet('qi-p-cache', PRODUCTS);
+  lsSet('qi-p-cache', _slimForCache(PRODUCTS));
   try {
     await SB.upsert('products', data);
   } catch(e) {
@@ -2062,7 +2075,7 @@ async function saveOneP(idOrObj) {
 async function deleteOneP(id) {
   localStorage.removeItem('qi-img-' + id);
   localStorage.removeItem('qi-img-b64-' + id);
-  lsSet('qi-p-cache', PRODUCTS);
+  lsSet('qi-p-cache', _slimForCache(PRODUCTS));
   try {
     await SB.delete('products', 'id=eq.' + encodeURIComponent(id));
     deleteImgFromStorage(id);
@@ -2088,7 +2101,7 @@ async function saveQ() {
 
 // ── Batch save all products ────────────
 async function saveP() {
-  lsSet('qi-p-cache', PRODUCTS);
+  lsSet('qi-p-cache', _slimForCache(PRODUCTS));
   try { await Promise.all(PRODUCTS.map(p => SB.upsert('products', p))); }
   catch(e) { console.error('saveP:', e); }
 }
@@ -3726,7 +3739,7 @@ function openQuoteForm(id){
   document.getElementById('f-lang').value=q?.lang||'en';
   const _ls=document.getElementById('f-lang-sel'); if(_ls) _ls.value=q?.lang||'en';
   setTimeout(syncLangChips, 0);
-  document.getElementById('f-status').value=q?q.status:'Normal'; // default to Normal for new quotes
+  document.getElementById('f-status').value=(q&&q.status)?q.status:'draft'; // 新報價預設 draft（select 只有 draft/sent 兩個合法值）
   document.getElementById('f-inco').value=q?.inco||SETTINGS.inco||'EXW';
   // Populate Sales dropdown
   (function(){
@@ -4489,9 +4502,9 @@ async function syncLatestPrices(id) {
     updated++;
   });
 
-  // Save
+  // Save（存入 quotes 表本身，先前誤用 saveS() 只存 settings，價格更新從未落地）
   const qi = QUOTES.findIndex(x=>x.id===id);
-  if(qi>-1){ QUOTES[qi]=q; await saveS(); }
+  if(qi>-1){ QUOTES[qi]=q; await saveOneQ(q); }
   renderDetail(id);
   toast(updated+' product'+(updated!==1?'s':'')+' updated with latest prices');
 }
@@ -5882,7 +5895,7 @@ function importData(e){
       }
       if(d.settings){SETTINGS={...SETTINGS,...d.settings};await saveS();}
       lsSet('qi-q-cache',QUOTES);
-      lsSet('qi-p-cache',PRODUCTS);
+      lsSet('qi-p-cache', _slimForCache(PRODUCTS));
       toast('✅ Imported!');
       renderQuoteList();renderProductList();
     }catch(e){
@@ -5931,7 +5944,7 @@ window.refreshData = async function refreshData() {
     CATEGORIES = cData || [];
     { const _e=document.getElementById('np-cnt-c'); if(_e) _e.textContent=CATEGORIES.length; }
     lsSet('qi-q-cache', QUOTES);
-    lsSet('qi-p-cache', PRODUCTS);
+    lsSet('qi-p-cache', _slimForCache(PRODUCTS));
     renderQuoteList(); renderProductList();
     toast('✅ Synced with cloud');
   } catch(e) {
@@ -5943,7 +5956,7 @@ window.refreshData = async function refreshData() {
 // ═══════════════════════════════════════════════
 // USER MANAGEMENT & AUTH
 // ═══════════════════════════════════════════════
-const COL_U_SESSION = 'qi-user-session';
+const COL_U_SESSION = 'qi-user-session-v2';
 
 // HTML escape — prevent XSS when inserting user data into innerHTML
 function escHtml(str) {
@@ -6035,6 +6048,8 @@ function updateUserBadge() {
 
 // ── Restore session ──
 async function restoreSession() {
+  // loadAll() 可能已透過 Portal session 完成登入（currentUser 已設定），直接視為已登入
+  if (currentUser) return true;
   try {
     const s = localStorage.getItem(COL_U_SESSION);
     if (!s) return false;
@@ -6820,7 +6835,7 @@ function renderAcctQuotes(){
   if(!list.length){ el.innerHTML=`<div style="padding:14px;color:var(--tx3);font-size:12px;text-align:center">${t('crmNoAcctQuotes')}</div>`; return; }
   list.sort((x,y)=>(y.date||'').localeCompare(x.date||''));
   el.innerHTML = list.map(q=>`
-    <div onclick="closeAccountModal(); editQuote('${q.id}')"
+    <div onclick="closeAccountModal(); openDetail('${q.id}')"
       style="padding:10px 12px;border:1px solid var(--br);border-radius:8px;margin-bottom:6px;background:var(--s2);cursor:pointer;display:flex;gap:10px;align-items:center">
       <div style="flex:1;min-width:0">
         <div style="font-size:12px;font-weight:600;color:var(--tx)">${escHtml(q.ref||'')}</div>
@@ -7372,15 +7387,20 @@ async function init(){
         } catch(_fe) { console.warn('[Portal _ps SB]', _fe); }
         if (_freshUser && _freshUser.role !== 'inactive') {
           currentUser = { ..._freshUser };
+          // 寫入本地 session，讓之後 F5 重新整理可經 restoreSession 恢復登入
+          try { lsSet(COL_U_SESSION, { empId: _freshUser.empId, login: _freshUser.login, ts: Date.now() }); } catch(_) {}
           // 清掉 URL token
           const _clean = window.location.pathname + '?_portal=1';
           window.history.replaceState({}, '', _clean);
-          // 正常啟動
+          // 正常啟動（loadAll 已載入全部資料，這裡只需渲染，不再重複抓取）
           await loadAll();
           applyLang();
+          renderQuoteList();
+          renderProductList();
+          renderSettingsPage();
+          populateSupplierDropdowns();
           hideLoginPage();
           updateUserBadge();
-          await _reloadAfterLogin();
           switchTab('products');
           startListeners();
           setTimeout(batchSetNormalStatus, 2000);

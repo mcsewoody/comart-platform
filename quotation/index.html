@@ -2636,8 +2636,10 @@ const SB = {
 
 async function _loadUsersFromSB() {
   try {
+    // 注意：切勿在此 select avatar_url — 頭像為 base64 大圖（全表 18MB+），
+    // 本清單僅用於下拉選單顯示姓名，抓了會拖垮啟動並撐爆 localStorage 快取
     const res = await fetch(
-      `${SB_WORKER}/supabase/rest/v1/users?select=emp_id,name_en,name_zh,role,dept,site,email,mobile,ext,title_en,title_zh,avatar_url,pwd_hash,active&order=emp_id&active=eq.true`,
+      `${SB_WORKER}/supabase/rest/v1/users?select=emp_id,name_en,name_zh,role,dept,site,email,mobile,ext,title_en,title_zh,active&order=emp_id&active=eq.true`,
       { headers: { 'x-admin-token': SB_TOKEN } }
     );
     const rows = await res.json();
@@ -2653,8 +2655,6 @@ async function _loadUsersFromSB() {
         titleEn: u.title_en  || '',
         titleZh: u.title_zh  || '',
         role:    u.active === false ? 'inactive' : (u.role || 'user'),
-        photoURL:u.avatar_url|| '',
-        pwdHash: u.pwd_hash  || '',
       }));
     }
   } catch(e) { console.warn('[quotation users SB]', e.message); }

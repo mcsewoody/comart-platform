@@ -4,18 +4,19 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART KMS v2.23</title>
+<title>COMART KMS v2.24</title>
 
+<!-- 以下解析庫僅上傳/預覽時使用，defer 載入避免阻塞頁面解析（gzip 共 ~477KB；呼叫處均有 window.X 檢查） -->
 <!-- Marked for Markdown → HTML preview (classic script, no module needed) -->
-<script src="https://cdn.jsdelivr.net/npm/marked@9.1.6/marked.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/marked@9.1.6/marked.min.js"></script>
 <!-- mammoth.js: Word (.docx) → text extraction -->
-<script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
 <!-- SheetJS: Excel (.xlsx/.xls) → text extraction -->
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <!-- JSZip: PPTX → slide text extraction -->
-<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 <!-- PapaParse: CSV → structured text extraction -->
-<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 <!-- TipTap loaded via ESM in initTipTap() using dynamic import from esm.sh -->
 
 <style>
@@ -392,7 +393,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="38" height="20" style="display:inline-block;vertical-align:middle;margin-right:4px;margin-top:-2px"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg>COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v2.23</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v2.24</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('en')">EN</button>
@@ -752,7 +753,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
             <option value="view_count.desc" id="sort-opt-views" data-i18n="label.sort_views">Most Viewed</option>
           </select>
           <input type="text" id="docs-search" placeholder="🔍 關鍵字搜尋…" data-i18n-placeholder="docs.search.placeholder"
-            oninput="loadDocs()"
+            oninput="debouncedLoadDocs()"
             style="flex:1;min-width:140px;padding:6px 10px;border-radius:var(--radius);border:1px solid var(--border);font-size:13px;font-family:var(--font);outline:none;background:var(--surface);color:var(--text);" />
           <select id="docs-filter-cat" onchange="loadDocs()"
             style="padding:6px 10px;border-radius:var(--radius);border:1px solid var(--border);font-size:12px;font-family:var(--font);background:var(--surface);color:var(--text);outline:none;cursor:pointer;">
@@ -773,7 +774,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
             <option value="" data-i18n="pl.all">All Product Lines</option>
           </select>
           <input type="text" id="docs-filter-customer" placeholder="🏢 Customer…" data-i18n-placeholder="label.customer_ph"
-            oninput="loadDocs()"
+            oninput="debouncedLoadDocs()"
             style="width:130px;padding:6px 10px;border-radius:var(--radius);border:1px solid var(--border);font-size:12px;font-family:var(--font);outline:none;background:var(--surface);color:var(--text);" />
         </div>
         <div class="doc-list" id="doc-list">
@@ -2465,7 +2466,11 @@ function canEdit(docAuthorName) {
 
 async function initPortalSession() {
   const sess = readPortalSession();
-  if (!sess) return;
+  if (!sess) {
+    // 無 Portal session → 導回 Portal 登入（與 quotation 行為一致）
+    window.location.href = 'https://platform.comart.com.tw/';
+    return;
+  }
 
   portalUser = sess;
 
@@ -2559,7 +2564,9 @@ window.addEventListener('DOMContentLoaded', async () => {
   }
   // doc-author 由 initPortalSession 填入登入者姓名（若已查到）
   // 此處不再強制清空，讓 initPortalSession 的 displayName 生效
-  await initTipTap();
+  // TipTap 改為平行載入不阻塞（原本 await 會讓文件清單等 esm.sh 模組樹載完才開始）；
+  // 需要編輯器的流程（openDoc/processFile/restoreSnapshot）以 _tiptapReady 確保就緒
+  window._tiptapReady = initTipTap();
   await loadProductLines();
   loadDocs();
   updateStatus();
@@ -3178,7 +3185,7 @@ async function saveDoc() {
       if (ta) ta.value = '';
     }
 
-    await loadDocs();
+    await loadDocs(true);
     if (window._openDocFromReview) {
       const _retFilter = window._openDocFromReview;
       window._openDocFromReview = false;
@@ -3246,7 +3253,7 @@ async function generateAndSaveSummary(docId, title, body) {
     }
     if (!Object.keys(payload).length) return;
     await kmsWrite('update', 'kms_documents', payload, docId);
-    setTimeout(() => loadDocs(), 500);
+    setTimeout(() => loadDocs(true), 500);
   } catch(e) {
     console.warn('[summary]', e.message);
   }
@@ -3449,7 +3456,7 @@ async function processBatchNext() {
       ? t('toast.batch_done_fail').replace('{ok}', _batchSuccess).replace('{fail}', _batchFail)
       : t('toast.batch_done_ok').replace('{ok}', _batchSuccess);
     toast(_batchMsg, 'success');
-    await loadDocs();
+    await loadDocs(true);
     switchPanel('docs');
     return;
   }
@@ -3669,6 +3676,7 @@ async function fetchUrlContent() {
 }
 
 async function processFile(file) {
+  try { await window._tiptapReady; } catch(_) {}
   const ext = getExt(file.name);
   const allowed = ['pdf','doc','docx','xls','xlsx','csv','pptx','ppt','jpg','jpeg','png','txt','md'];
   if (!allowed.includes(ext)) {
@@ -4663,16 +4671,35 @@ async function checkAndArchiveExpired(docs) {
   }
   if (expired.length > 0) {
     toast(t('toast.auto_archived').replace('{n}', expired.length), '');
-    await loadDocs();
+    await loadDocs(true);
   }
 }
 
-async function loadDocs() {
+// ── 文件清單快取：搜尋/篩選只在前端過濾，不重新下載（910 份 metadata 約 1MB）──
+// 60 秒內重複呼叫直接用快取；排序或語言改變（cacheKey 不同）或 force=true 才重抓
+let _docsCache = { rows: null, ts: 0, key: '' };
+let _docsSearchTimer = null;
+function debouncedLoadDocs() {
+  clearTimeout(_docsSearchTimer);
+  _docsSearchTimer = setTimeout(() => loadDocs(), 200);
+}
+
+async function loadDocs(force = false) {
   let docs = [];
+  let justFetched = false;
+  // 清單只顯示當前語言的摘要 → 只抓 summary + 當前語言變體（payload 約 -60%）
+  const _sumCol = { 'zh-CN':'summary_zh_cn', 'en':'summary_en', 'vi':'summary_vi', 'ja':'summary_ja' }[currentLang];
+  const cacheKey = (_docsOrder || 'updated_at.desc') + '|' + currentLang;
   try {
     if (CFG.supabaseUrl && CFG.supabaseKey) {
-      const cf = confAccess();
-      docs = await sbFetch(`/rest/v1/kms_documents?select=id,title,category,lang,status,stars,conf_level,product_line,customer_tag,tags,author_name,view_count,file_url,file_name,file_type,file_size,summary,summary_en,summary_zh_cn,summary_vi,summary_ja,source_url,valid_until,updated_at,created_at&status=eq.published${cf.url}&order=${_docsOrder || 'updated_at.desc'}`) || [];
+      if (!force && _docsCache.rows && _docsCache.key === cacheKey && (Date.now() - _docsCache.ts < 60000)) {
+        docs = _docsCache.rows;
+      } else {
+        const cf = confAccess();
+        docs = await sbFetch(`/rest/v1/kms_documents?select=id,title,category,lang,status,stars,conf_level,product_line,customer_tag,tags,author_name,view_count,file_url,file_name,file_type,file_size,summary${_sumCol ? ','+_sumCol : ''},source_url,valid_until,updated_at,created_at&status=eq.published${cf.url}&order=${_docsOrder || 'updated_at.desc'}`) || [];
+        _docsCache = { rows: docs, ts: Date.now(), key: cacheKey };
+        justFetched = true;
+      }
     } else {
       const saved = localStorage.getItem('kms-local-docs');
       if (saved) localDocs = JSON.parse(saved);
@@ -4722,10 +4749,12 @@ async function loadDocs() {
   const s__ = I18N[currentLang]||I18N['zh-TW']; const statusLabel = { draft:s__['status.draft']||'Draft', published:s__['status.published']||'Publish', archived:s__['status.archived']||'Archive', withdrawn:s__['status.withdrawn']||'Withdraw' };
   const statusCls   = { draft:'sb-draft', published:'sb-published', archived:'sb-archived' };
 
-  // 到期自動封存（背景執行）
-  checkAndArchiveExpired(docs).catch(()=>{});
-  // 非同步載入留言數（分批查詢避免 URL 過長 400 錯誤）
-  if (CFG.supabaseUrl && CFG.supabaseKey && docs.length) {
+  // 到期自動封存與留言數查詢：只在真正重新抓取資料時執行（快取命中的純前端篩選不重跑）
+  if (justFetched) {
+    checkAndArchiveExpired(docs).catch(()=>{});
+  }
+  // 非同步載入留言數（分批查詢避免 URL 過長 400 錯誤）；結果快取供篩選重繪使用
+  if (justFetched && CFG.supabaseUrl && CFG.supabaseKey && docs.length) {
     const BATCH = 50;
     const cnt = {};
     const allIds = docs.map(d => d.id);
@@ -4737,12 +4766,21 @@ async function loadDocs() {
           if (rows) rows.forEach(r => { cnt[r.doc_id] = (cnt[r.doc_id]||0) + 1; });
         } catch(e) {}
       }
+      window._docCommentCnt = cnt;
       docs.forEach(d => {
         const el = document.getElementById('cc-' + d.id);
         if (el) el.textContent = cnt[d.id] || 0;
       });
     };
     fetchBatch();
+  } else if (window._docCommentCnt) {
+    // 快取命中：用上次查到的留言數回填（清單剛重繪，元素是新的）
+    setTimeout(() => {
+      docs.forEach(d => {
+        const el = document.getElementById('cc-' + d.id);
+        if (el) el.textContent = window._docCommentCnt[d.id] || 0;
+      });
+    }, 0);
   }
 
   list.innerHTML = filtered.map(d => {
@@ -5005,6 +5043,8 @@ async function deleteDoc(id, title, authorName) {
       return;
     }
 
+    // 同步更新前端快取，避免之後篩選重繪時已刪文件「復活」
+    if (_docsCache.rows) _docsCache.rows = _docsCache.rows.filter(d => d.id !== id);
     document.getElementById('doc-item-' + id)?.remove();
     const remaining = document.querySelectorAll('.doc-item').length;
     document.getElementById('doc-count').textContent = remaining;
@@ -5027,6 +5067,7 @@ async function deleteDoc(id, title, authorName) {
 
 async function openDoc(id) {
   // ── 載入文件到 editor（合併所有 openDoc 擴充邏輯）──
+  try { await window._tiptapReady; } catch(_) {} // 確保編輯器就緒，避免 setContent 被靜默跳過
   let doc;
   try {
     if (CFG.supabaseUrl && CFG.supabaseKey && !id.startsWith('demo-') && !id.startsWith('local-')) {
@@ -6495,6 +6536,7 @@ async function loadVersionHistoryFromSupabase(doc_id) {
 
 // ─── 版本快照還原（從 Supabase）───
 async function restoreSnapshot(snapId) {
+  try { await window._tiptapReady; } catch(_) {}
   if (!confirm('還原至此版本？目前編輯內容將被覆蓋。')) return;
   try {
     const rows = await sbFetch(`/rest/v1/kms_snapshots?id=eq.${snapId}&select=title,body,category,status`);
@@ -6971,7 +7013,7 @@ ${doc.body.slice(0, 6000)}`,
     prog.textContent = t('label.batch_summary_done').replace('{n}', done);
     btn.textContent = t('btn.batch_summary');
     btn.disabled = false;
-    await loadDocs();
+    await loadDocs(true);
   } catch(e) {
     prog.textContent = t('label.batch_fail').replace('{msg}', e.message);
     btn.disabled = false;
@@ -7585,7 +7627,7 @@ async function executeReview(docId, newStatus, actionLabel, needReason = false) 
     reviewingDoc   = null;
     window._reviewAllDocs = null;
     window._reviewFilter  = 'draft';
-    await Promise.all([loadReviewPanel(), loadDocs()]);
+    await Promise.all([loadReviewPanel(), loadDocs(true)]);
     updateReviewBadge();
   } catch(e) {
     toast(t('toast.review_fail').replace('{msg}', e.message), 'error');

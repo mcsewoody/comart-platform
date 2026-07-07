@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART KMS v2.24</title>
+<title>COMART KMS v2.25</title>
 
 <!-- 以下解析庫僅上傳/預覽時使用，defer 載入避免阻塞頁面解析（gzip 共 ~477KB；呼叫處均有 window.X 檢查） -->
 <!-- Marked for Markdown → HTML preview (classic script, no module needed) -->
@@ -60,8 +60,6 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
 .lang-selector { margin-left: auto; display: flex; gap: 4px; }
 .lang-btn { padding: 4px 10px; border-radius: 20px; border: 1px solid var(--border); background: transparent; cursor: pointer; font-size: 12px; color: var(--text-2); transition: all .15s; }
 .lang-btn.active, .lang-btn:hover { background: var(--blue-bg); border-color: var(--blue-border); color: var(--blue); }
-.config-btn { padding: 5px 12px; border-radius: var(--radius); border: 1px solid var(--border); background: transparent; cursor: pointer; font-size: 12px; color: var(--text-2); }
-.config-btn:hover { background: var(--bg); }
 
 /* ─── Sidebar nav ─── */
 .nav-section { font-size: 11px; color: var(--text-3); padding: 8px 8px 4px; text-transform: uppercase; letter-spacing: .06em; font-weight: 500; }
@@ -180,7 +178,6 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
 .doc-cat.article { background: #302010; color: #ffd166; }
 .doc-cat.industry { background: #0a3020; color: #4edfa0; }
 .doc-title { font-size: 13px; font-weight: 500; flex: 1; }
-.doc-meta { font-size: 12px; color: var(--text-3); white-space: nowrap; }
 .doc-status { font-size: 11px; padding: 2px 7px; border-radius: 10px; }
 .doc-status.published { background: var(--green-bg); color: var(--green); }
 .doc-status.draft { background: var(--bg); color: var(--text-3); border: 1px solid var(--border); }
@@ -294,37 +291,27 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
 .comment-author { font-size:12px;font-weight:500;color:var(--text); }
 .comment-time { font-size:11px;color:var(--text-3);margin-left:auto; }
 .comment-body { font-size:13px;color:var(--text-2);line-height:1.6; }
-.comment-reply-btn { font-size:11px;color:var(--blue);cursor:pointer;margin-top:5px; }
-.comment-reply-btn:hover { text-decoration:underline; }
 .comment-input-wrap { display:flex;gap:8px;padding:12px 20px;border-top:1px solid var(--border);flex-shrink:0;background:var(--surface); }
 .comment-input { flex:1;padding:8px 12px;border-radius:var(--radius);border:1px solid var(--border);font-size:13px;font-family:var(--font);outline:none;resize:none;min-height:40px;max-height:100px; }
 .comment-input:focus { border-color:var(--blue); }
 .comment-submit { padding:8px 16px;background:var(--blue);color:#fff;border:none;border-radius:var(--radius);cursor:pointer;font-size:13px;align-self:flex-end;flex-shrink:0; }
 .comment-submit:hover { background:#1a4a7a; }
-.reply-indent { margin-left:20px;border-left:2px solid var(--border);padding-left:10px; }
 
-/* ─── Review workflow ─── */
-.review-flow { display:flex;align-items:center;gap:6px;flex-wrap:wrap; }
 .review-step { padding:5px 12px;border-radius:var(--radius);font-size:12px;font-weight:500;border:1px solid var(--border);color:var(--text-3);background:var(--bg); }
 .review-step.active { border-color:var(--blue);color:var(--blue);background:var(--blue-bg); }
 .review-step.done { border-color:var(--green);color:var(--green);background:var(--green-bg); }
 .review-arrow { color:var(--text-3);font-size:12px; }
 .review-btn { padding:5px 14px;border-radius:var(--radius);font-size:12px;font-weight:500;border:none;cursor:pointer;transition:all .15s; }
-.review-btn-submit  { background:var(--amber-bg);color:var(--amber); }
 .review-btn-approve { background:var(--green-bg);color:var(--green); }
 .review-btn-reject  { background:var(--red-bg);color:var(--red); }
 .review-btn-archive { background:#252525;color:#999; }
 .review-log-item { font-size:12px;color:var(--text-2);padding:4px 0;border-bottom:1px solid var(--border);display:flex;gap:8px; }
 .review-log-item:last-child { border-bottom:none; }
 
-/* ─── Notification dot ─── */
-.nav-dot { width:7px;height:7px;border-radius:50%;background:var(--amber);flex-shrink:0; }
 
 @media (max-width: 640px) {
   .app { grid-template-columns: 1fr; grid-template-rows: 52px 1fr 56px; }
-  .sidebar { display: none; } /* 手機隱藏側欄，改用底部導覽 */
-  .main-content { grid-row: 2; overflow-y: auto; }
-  .tiptap-wrap { padding: 12px; }
+  .sidebar { display: none; }  .tiptap-wrap { padding: 12px; }
   .mobile-bottom-nav { display: flex !important; }
   .topbar .logo span { display: none; } /* 手機隱藏版本號 */
   .panel { padding-bottom: 60px; } /* 避免內容被底部導覽遮住 */
@@ -393,7 +380,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="38" height="20" style="display:inline-block;vertical-align:middle;margin-right:4px;margin-top:-2px"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg>COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v2.24</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v2.25</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('en')">EN</button>
@@ -865,86 +852,10 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
       </div>
     </div>
 
-    <!-- ═══ Comments Panel ═══ -->
-    <div class="panel" id="panel-comments">
-      <div style="display:flex;flex-direction:column;height:100%;">
-        <div style="padding:12px 20px;border-bottom:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;gap:10px;">
-          <div style="font-size:15px;font-weight:500;" data-i18n="label.discuss">討論 / 留言</div>
-          <span id="comments-doc-title" style="font-size:12px;color:var(--text-3);" data-i18n="label.discuss_placeholder">— 請先從知識庫選擇文件</span>
-        </div>
-        <div class="comment-wrap" id="comment-list" style="flex:1;overflow-y:auto;">
-          <div style="color:var(--text-3);font-size:13px;text-align:center;padding:30px 0;" data-i18n="label.discuss_hint">從知識庫點擊文件標題旁的「💬」進入討論</div>
-        </div>
-        <div class="comment-input-wrap">
-          <textarea class="comment-input" id="comment-input" placeholder="輸入留言…" data-i18n-placeholder="comments.input.placeholder" rows="2"
-            onkeydown="if(event.isComposing)return;if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();submitComment();}"></textarea>
-          <button class="comment-submit" onclick="submitComment()" data-i18n="comments.submit">送出</button>
-        </div>
-      </div>
-    </div>
 
   </main>
 </div>
 
-<!-- Config Modal -->
-<div class="modal-overlay" id="config-modal">
-  <div class="modal">
-    <div class="modal-title" data-i18n="config.title">⚙ API 設定</div>
-
-    <div class="field">
-      <label>Supabase Project URL</label>
-      <input type="text" id="cfg-supabase-url" placeholder="https://xxxx.supabase.co" />
-      <div class="hint">Supabase → Settings → API → Project URL</div>
-    </div>
-    <div class="field">
-      <label>Supabase Anon Key</label>
-      <input type="password" id="cfg-supabase-key" placeholder="eyJhbGci..." />
-      <div class="hint">Supabase → Settings → API → anon public key</div>
-    </div>
-    <div class="field">
-      <label data-i18n="label.embed_mode">Embedding 模式</label>
-      <select id="cfg-embed-model">
-        <option value="edge-fn" data-i18n="label.embed_edge">Edge Function（推薦，Key 存在 Supabase Secrets）</option>
-        <option value="mock" data-i18n="label.embed_mock">Mock 模式（離線測試，關鍵字搜尋）</option>
-      </select>
-    </div>
-
-    <!-- 隱藏欄位保留相容性（不顯示但 saveConfig 需要） -->
-    <input type="hidden" id="cfg-claude-key" value="" />
-    <input type="hidden" id="cfg-openai-key" value="" />
-
-    <div style="background:var(--green-bg);border:1px solid #9FE1CB;border-radius:var(--radius);padding:10px 12px;font-size:12px;color:var(--green);margin-top:4px;">
-      ✓ Claude API Key 和 OpenAI Key 已安全存放在 Supabase Secrets，前端不需要填入。
-    </div>
-
-    <!-- 匯出 / 匯入設定 -->
-    <div style="margin-top:12px;padding:10px 12px;background:var(--bg);border-radius:var(--radius);border:1px solid var(--border);">
-      <div style="font-size:12px;font-weight:500;color:var(--text-2);margin-bottom:8px;" data-i18n="label.switch_hint">換檔案或換電腦時使用</div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;">
-        <button onclick="exportConfig()"
-          style="padding:5px 12px;border-radius:6px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:12px;color:var(--text-2);">
-          <span data-i18n="btn.export_cfg">📤 匯出設定</span>
-        </button>
-        <button onclick="document.getElementById('cfg-import-file').click()"
-          style="padding:5px 12px;border-radius:6px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:12px;color:var(--text-2);">
-          <span data-i18n="btn.import_cfg">📥 匯入設定</span>
-        </button>
-        <input type="file" id="cfg-import-file" accept=".json" style="display:none"
-          onchange="importConfig(event)" />
-        <button onclick="copyConfigAsEnv()"
-          style="padding:5px 12px;border-radius:6px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:12px;color:var(--text-2);">
-          <span data-i18n="btn.copy_url_param">📋 複製為 URL 參數</span>
-        </button>
-      </div>
-    </div>
-
-    <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeConfig()" data-i18n="btn.cancel">取消</button>
-      <button class="btn-save" onclick="saveConfig()" data-i18n="config.save">儲存設定</button>
-
-    </div>
-  </div>
-</div>
 
 <!-- Reader Modal -->
 <div class="reader-overlay" id="reader-modal" onclick="if(event.target===this)closeReader()">
@@ -1070,27 +981,12 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
     <span data-i18n="nav.kmap">Map</span>
   </button>
-  <button class="nav-item" onclick="switchPanel('comments');closeMobileMenu()">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-    <span data-i18n="nav.comments">Discussion</span>
-  </button>
   <button class="nav-item" id="mbn-setting" onclick="switchPanel('setting');closeMobileMenu()" style="display:none;">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
     <span data-i18n="nav.setting">Settings</span>
   </button>
 </div>
 
-<!-- SQL Setup Helper -->
-<div id="sql-helper" style="display:none;position:fixed;bottom:20px;left:20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;max-width:460px;font-size:12px;z-index:50;box-shadow:0 4px 20px rgba(0,0,0,.1);">
-  <div style="font-weight:500;margin-bottom:6px;" data-i18n="label.sql_init">🗄 Supabase 初始化 SQL</div>
-  <div style="color:var(--text-2);margin-bottom:8px;">在 Supabase → SQL Editor 執行 <code>setup.sql</code>（已含版本控制 + 全文搜尋 + 向量索引）</div>
-  <div style="display:flex;gap:6px;">
-    <button onclick="document.getElementById('sql-helper').style.display='none'"
-      style="padding:5px 12px;border-radius:6px;border:1px solid var(--border);background:transparent;cursor:pointer;font-size:12px;" data-i18n="btn.close">關閉</button>
-    <button onclick="copySql()"
-      style="padding:5px 12px;border-radius:6px;border:none;background:var(--blue);color:#fff;cursor:pointer;font-size:12px;" data-i18n="btn.copy_sql">複製 SQL</button>
-  </div>
-</div>
 
 <script>
 // ═══════════════════════════════════════════════
@@ -1115,13 +1011,13 @@ const I18N = {
   'zh-TW': {
     'nav.search':'AI 問答', 'nav.editor':'新增', 'nav.docs':'知識庫',
     'nav.kmap':'知識地圖', 'nav.analytics':'分析報表', 'nav.experts':'通訊錄',
-    'nav.review':'審核', 'nav.comments':'討論', 'nav.setting':'設定',
+    'nav.review':'審核', 'nav.setting':'設定',
     'label.created':'建立時間', 'label.modified':'修改時間', 'label.valid_until':'有效期限',
     'label.author':'建立者', 'label.reviewer':'審核人', 'label.product_line':'產品線',
     'label.category':'分類', 'label.stars':'星級',
     'label.confidential':'機密等級',
     'conf.level.1':'Public — everyone','conf.level.2':'Internal — DCC & Admin','conf.level.3':'Confidential — Admin only',
-    'btn.save':'Save', 'btn.cancel':'Cancel',
+    'btn.cancel':'Cancel',
     'rag.title':'AI 問答 — 從知識庫取答案',
     'rag.placeholder':'問任何問題，例如：Qi2 充電器良率異常如何處理？',
     'rag.btn':'送出問題', 'rag.ai_btn':'🤖 AI 搜尋', 'rag.empty':'輸入問題，AI 會從知識庫召回相關段落並彙整回答',
@@ -1132,72 +1028,32 @@ const I18N = {
     'editor.tag.placeholder':'輸入標籤後按 Enter',
     'editor.upload.text':'點擊或拖放檔案上傳', 'editor.upload.hint':'PDF · Word · Excel · CSV · PowerPoint · 圖片 · TXT · Markdown',
     'docs.title':'知識庫 — 所有文件', 'docs.new':'＋ 新增文件',
-    'kmap.title':'知識地圖 — 分類總覽', 'kmap.back':'← 回分類總覽',
-    'upload.formats':'PDF · Word · Excel · CSV · PowerPoint · 圖片（JPG/PNG）· TXT · Markdown', 'upload.limits':'單檔上限 50 MB · 不支援格式將被拒絕',
-    'batch.skip':'跳過','batch.cancel':'取消批次',
-    'analytics.title':'分析報表', 'analytics.total':'知識條目', 'analytics.published':'已發佈',
-    'analytics.views':'總閱覽數', 'analytics.gaps':'知識缺口',
-    'experts.title':'通訊錄', 'experts.add':'＋ 新增專家', 'experts.empty':'尚無人員資料',
-    'experts.copy':'已複製聯絡方式', 'experts.remove':'移除',
-    'review.title':'審核流程管理', 'review.empty':'選擇文件後可在此執行審核動作',
-    'review.actions':'執行動作', 'review.log':'審核紀錄',
-    'review.approve':'直接發佈', 'review.reject':'退回草稿',
-    'review.archive':'封存', 'review.restore':'恢復發佈', 'review.revoke':'⚠ 撤除（強制退回草稿）',
-    'review.note.prompt':'原因（可選填）：',
-    'comments.title':'討論 / 留言', 'comments.placeholder':'請先從知識庫選擇文件',
-    'comments.input.placeholder':'輸入留言…', 'comments.submit':'送出', 'comments.reply':'↩ 回覆',
-    'comments.empty':'尚無留言，成為第一個留言的人',
-    'config.title':'⚙ API 設定', 'config.save':'儲存設定', 'config.cancel':'取消',
-    'status.draft':'草稿', 'status.published':'發佈', 'status.archived':'封存', 'status.withdrawn':'撤回', 'status.template':'範本',
+    'kmap.title':'知識地圖 — 分類總覽', 'batch.skip':'跳過','batch.cancel':'取消批次',
+    'experts.title':'通訊錄', 'review.title':'審核流程管理', 'comments.input.placeholder':'輸入留言…', 'comments.submit':'送出', 'status.draft':'草稿', 'status.published':'發佈', 'status.archived':'封存', 'status.withdrawn':'撤回', 'status.template':'範本',
     'cat.product':'產品開發', 'cat.sales':'客戶資訊', 'cat.industry':'產業新知',
     'cat.hr':'教育訓練', 'cat.tacit':'知識分享', 'cat.compliance':'智財與法規',
     'cat.supply':'科技發展', 'cat.ai_tech':'AI', 'cat.template':'範本', 'cat.article':'文章',
-    'toast.copied':'已複製聯絡方式', 'toast.saved':'已儲存', 'toast.deleted':'已刪除',
-    'confirm.delete':'確定刪除「{title}」？\n此動作無法復原，版本歷史也會一併刪除。',
-    'confirm.cancel_edit':'放棄編輯？未儲存的變更將會遺失。',
-    'sys.supabase':'Supabase', 'sys.claude':'Claude API', 'sys.docs':'文件數',
-    'sys.rag':'RAG: pgvector + Claude', 'sys.storage':'儲存: Supabase Postgres',
+    'toast.deleted':'已刪除',
+    'sys.storage':'儲存: Supabase Postgres',
     'cat.all':'所有分類',
     'review.title':'審核流程管理',
     'comments.submit':'送出',
-    'btn.export_cfg':'📤 匯出設定',
-    'btn.import_cfg':'📥 匯入設定',
-    'btn.copy_url_param':'📋 複製為 URL 參數',
     'btn.add_product_line':'＋ 新增產品線',
     'pl.all':'所有產品線',
     'status.filter.draft':'草稿',
     'status.filter.published':'已發佈',
     'status.filter.archived':'已封存',
-    'label.no_comments':'尚無留言，成為第一個留言的人',
     'label.no_versions':'尚無版本紀錄',
-    'label.no_experts':'尚無專家資料',
     'label.no_results':'無符合人員',
-    'label.no_cat_docs':'此分類尚無文件',
-    'label.version_same':'兩版本內容相同',
     'label.saving_version':'儲存後自動記錄版本',
-    'label.discuss':'討論 / 留言',
-    'label.discuss_hint':'從知識庫點擊文件標題旁的「💬」進入討論',
-    'label.discuss_placeholder':'— 請先從知識庫選擇文件',
-    'btn.clear_filter':'清除篩選',
-    'btn.back_cat':'← 回分類總覽',
-    'btn.compare':'🔍 與上版比較',
     'btn.close':'關閉',
-    'btn.copy_sql':'複製 SQL',
     'btn.refresh':'重新整理',
     'btn.fetch_url':'擷取內文',
     'btn.reparse':'🔄 重新解析',
-    'btn.export_cfg':'📤 匯出設定',
-    'btn.import_cfg':'📥 匯入設定',
     'btn.add_product_line':'＋ 新增產品線',
     'nav.section.main':'主功能',
     'nav.section.info':'系統資訊',
     'label.setting_mgmt':'⚙️ 設定管理',
-    'label.sql_init':'🗄 Supabase 初始化 SQL',
-    'label.sql_hint':'在 Supabase → SQL Editor 執行',
-    'label.embed_mode':'Embedding 模式',
-    'label.embed_edge':'Edge Function（推薦，Key 存在 Supabase Secrets）',
-    'label.embed_mock':'Mock 模式（離線測試，關鍵字搜尋）',
-    'label.switch_hint':'換檔案或換電腦時使用',
     'label.versions':'版本歷史',
     'label.analytics_title':'分析報表',
     'label.top10':'熱門文件 TOP 10（閱讀次數排行）',
@@ -1236,31 +1092,19 @@ const I18N = {
     'toast.embed_mock':'Mock 向量化…','toast.save_mock_ok':'已儲存至 Supabase（Mock 向量）',
     'toast.save_local':'本機儲存中…','toast.save_local_ok':'已儲存至本機（Mock 模式）',
     'toast.save_fail':'儲存失敗：{msg}',
-    'toast.reparse_start':'🔄 重新解析文件…','toast.reparse_embed':'Edge Function 向量化…',
-    'toast.reparse_ok':'已重新解析並完成向量化 ✓','toast.reparse_fail':'重新解析失敗：{msg}',
-    'toast.reparse_embed_fail':'已重新解析，向量化失敗：{msg}',
+    'toast.reparse_start':'🔄 重新解析文件…','toast.reparse_fail':'重新解析失敗：{msg}',
     'toast.reparse_no_file':'此文件無附件可重新解析',
-    'toast.cfg_saved':'設定已儲存','toast.cfg_export_ok':'設定已匯出','toast.cfg_import_ok':'設定已匯入',
-    'toast.cfg_import_fail':'匯入失敗：檔案格式不正確',
     'label.ai_working':'🤖 AI 分析中…','label.ai_suggest':'🤖 AI 建議：{cat}（可手動修改）',
     'label.ai_conflict':'🤖 AI 建議「{sug}」，目前選擇「{cur}」',
     'label.ai_confirm':'🤖 AI 確認：{cat}',
     'label.discuss_loading':'載入中…','label.discuss_empty':'尚無留言，成為第一個留言的人',
-    'label.kmap_title':'知識地圖 — 分類總覽','label.kmap_all':'知識地圖 — 所有分類',
     'toast.review_reason_required':'請填寫原因','toast.review_no_perm':'權限不足','toast.review_fail':'操作失敗：{msg}',
     'label.review_loading':'載入中…','label.review_fail':'載入失敗：{msg}',
-    'label.comments_loading':'載入留言中…','label.comments_empty':'尚無留言，成為第一個留言的人',
-    'toast.comment_edit_fail':'編輯失敗','toast.comment_delete_fail':'刪除失敗','toast.comment_fail':'送出失敗：{msg}',
+    'label.comments_empty':'尚無留言，成為第一個留言的人',
     'toast.expert_mgmt':'請至 Platform → User Management 管理人員資料',
-    'label.batch_processing':'處理中 {n}/{total}：{name}','label.batch_done':'批次完成 {ok}/{total} 成功',
-    'toast.batch_file_too_large':'檔案過大（超過 50MB）：{name}',
+    'label.batch_processing':'處理中 {n}/{total}：{name}','toast.batch_file_too_large':'檔案過大（超過 50MB）：{name}',
     'toast.batch_unsupported':'不支援的格式：{name}',
-    'toast.batch_parse_fail':'解析失敗：{name}',
-    'toast.batch_embed_fail':'向量化失敗：{name}（{msg}）',
-    'label.summary_start':'🤖 開始批次產生摘要…','label.summary_progress':'處理 {n}/{total}：{title}',
-    'label.summary_done':'✅ 批次摘要完成，共處理 {n} 篇',
-    'label.expert_empty':'尚無人員資料','label.expert_fail':'載入失敗：{msg}','label.expert_no_result':'無符合人員',
-    'btn.update_with_file':'更新文件（含新檔案）','btn.save_continue':'儲存並繼續（{cur}/{total}）',
+    'label.expert_empty':'尚無人員資料','label.expert_fail':'載入失敗：{msg}','btn.update_with_file':'更新文件（含新檔案）','btn.save_continue':'儲存並繼續（{cur}/{total}）',
     'label.editor_loading':'編輯器載入中…',
     'label.rag_searching':'搜尋知識庫中…','label.rag_analyzing':'AI 分析中，請稍候…',
     'label.error_prefix':'錯誤：{msg}','label.connecting':'連線中…','label.conn_fail':'⚠ 連線失敗：{msg}',
@@ -1301,7 +1145,6 @@ const I18N = {
     'toast.reparse_done_chars':'✅ 重新解析完成 · {chars} 字元，確認後按「更新文件」儲存',
     'toast.no_extract':'無法從原始檔抽取文字，請手動貼上內容',
     'toast.batch_cancelled':'已取消批次上傳',
-    'toast.no_supported_format':'沒有支援的檔案格式',
     'toast.url_required':'請輸入網址',
     'toast.url_invalid':'請輸入完整網址（含 https://）',
     'toast.url_fetching':'⏳ 擷取中，請稍候…',
@@ -1323,7 +1166,6 @@ const I18N = {
     'toast.comment_fail_msg':'留言失敗：{msg}',
     'toast.copy_ok':'✅ 已複製全文',
     'toast.answer_not_ready':'回答尚未完成，請稍候再儲存',
-    'toast.url_copied':'URL 已複製！在新電腦或新瀏覽器貼上此 URL 即可自動載入設定',
     'toast.snapshot_fail':'快照讀取失敗',
     'toast.restored_ver':'已還原至選取版本',
     'toast.restore_fail':'還原失敗：{msg}',
@@ -1332,9 +1174,6 @@ const I18N = {
     'toast.restored_v':'已還原至 v{v}',
     'toast.ver_not_exist':'版本資料不存在',
     'toast.ver_fetch_fail':'載入版本失敗：{msg}',
-    'toast.sql_copied':'SQL 概要已複製，完整版見 setup.sql',
-    'toast.sql_full':'請從下載的 setup.sql 複製完整 SQL',
-    'toast.user_mgmt':'人員資料請至 Platform → User Management 管理',
     'toast.copied_short':'已複製',
     'toast.rate_limit':'Rate limit，{sec} 秒後重試（第 {n}/{max} 次）…',
     'toast.rate_limit_retry':'Rate limit，{sec} 秒後重試…',
@@ -1353,12 +1192,12 @@ const I18N = {
     'toast.review_done':'已執行：{action}',
     'toast.ocr_start':'⏳ 圖片型 PDF，OCR 解析中（共 {total} 頁，處理前 {n} 頁）…',
     'toast.ocr_page':'⏳ OCR 第 {n} / {total} 頁…',
-    'toast.show_user_articles':'顯示 {name} 的文章',
+    'toast.show_user_articles':'顯示 {name} 的文章'
   },
   'zh-CN': {
     'nav.search':'AI 问答', 'nav.editor':'新增', 'nav.docs':'知识库',
     'nav.kmap':'知识地图', 'nav.analytics':'分析报表', 'nav.experts':'通讯录',
-    'nav.review':'审核', 'nav.comments':'讨论', 'nav.setting':'设置',
+    'nav.review':'审核', 'nav.setting':'设置',
     'rag.title':'AI 问答 — 从知识库取答案',
     'rag.placeholder':'输入问题，例如：Qi2 充电器良率异常如何处理？',
     'rag.btn':'提交问题', 'rag.ai_btn':'🤖 AI 搜索', 'rag.empty':'输入问题，AI 会从知识库召回相关段落并汇总回答',
@@ -1369,70 +1208,30 @@ const I18N = {
     'editor.tag.placeholder':'输入标签后按 Enter',
     'editor.upload.text':'点击或拖放文件上传', 'editor.upload.hint':'PDF · Word · Excel · CSV · PowerPoint · 图片 · TXT · Markdown',
     'docs.title':'知识库 — 所有文档', 'docs.new':'＋ 新建文档',
-    'kmap.title':'知识地图 — 分类总览', 'kmap.back':'← 返回分类总览',
-    'upload.formats':'PDF · Word · Excel · CSV · PowerPoint · 图片（JPG/PNG）· TXT · Markdown', 'upload.limits':'单文件上限 50 MB · 不支持的格式将被拒绝',
-    'batch.skip':'跳过','batch.cancel':'取消批次',
-    'analytics.title':'分析报表', 'analytics.total':'知识条目', 'analytics.published':'已发布',
-    'analytics.views':'总阅览数', 'analytics.gaps':'知识缺口',
-    'experts.title':'通讯录', 'experts.add':'＋ 新增专家', 'experts.empty':'暂无人员数据',
-    'experts.copy':'已复制联系方式', 'experts.remove':'移除',
-    'review.title':'审核流程管理', 'review.empty':'选择文档后可在此执行审核操作',
-    'review.actions':'执行操作', 'review.log':'审核记录',
-    'review.approve':'直接发布', 'review.reject':'退回草稿',
-    'review.archive':'归档', 'review.restore':'恢复发布', 'review.revoke':'⚠ 撤销（强制退回草稿）',
-    'review.note.prompt':'原因（可选）：',
-    'comments.title':'讨论 / 留言', 'comments.placeholder':'请先从知识库选择文档',
-    'comments.input.placeholder':'输入留言…', 'comments.submit':'发送', 'comments.reply':'↩ 回复',
-    'comments.empty':'暂无留言',
-    'config.title':'⚙ API 设置', 'config.save':'保存设置', 'config.cancel':'取消',
-    'status.draft':'草稿', 'status.published':'发布', 'status.archived':'封存', 'status.withdrawn':'撤回', 'status.template':'模板',
+    'kmap.title':'知识地图 — 分类总览', 'batch.skip':'跳过','batch.cancel':'取消批次',
+    'experts.title':'通讯录', 'review.title':'审核流程管理', 'comments.input.placeholder':'输入留言…', 'comments.submit':'发送', 'status.draft':'草稿', 'status.published':'发布', 'status.archived':'封存', 'status.withdrawn':'撤回', 'status.template':'模板',
     'cat.product':'产品开发', 'cat.sales':'客户资讯', 'cat.industry':'产业资讯', 'cat.hr':'教育培训', 'cat.tacit':'知识分享', 'cat.compliance':'知产与法规', 'cat.supply':'科技发展', 'cat.ai_tech':'AI', 'cat.template':'模板', 'cat.article':'文章',
-    'toast.copied':'已复制联系方式', 'toast.saved':'已保存', 'toast.deleted':'已删除',
-    'confirm.delete':'确定删除「{title}」？\n此操作不可撤销。',
-    'confirm.cancel_edit':'放弃编辑？未保存的更改将会丢失。',
-    'sys.supabase':'Supabase', 'sys.claude':'Claude API', 'sys.docs':'文档数',
-    'sys.rag':'RAG: pgvector + Claude', 'sys.storage':'存储: Supabase Postgres',
+    'toast.deleted':'已删除',
+    'sys.storage':'存储: Supabase Postgres',
     'cat.all':'所有分类',
     'review.title':'审核流程管理',
     'comments.submit':'发送',
-    'btn.export_cfg':'📤 导出设置',
-    'btn.import_cfg':'📥 导入设置',
-    'btn.copy_url_param':'📋 复制为 URL 参数',
     'btn.add_product_line':'＋ 新增产品线',
     'pl.all':'所有产品线',
     'status.filter.draft':'草稿',
     'status.filter.published':'已发布',
     'status.filter.archived':'已归档',
-    'label.no_comments':'暂无留言',
     'label.no_versions':'暂无版本记录',
-    'label.no_experts':'暂无专家数据',
     'label.no_results':'无符合人员',
-    'label.no_cat_docs':'此分类暂无文档',
-    'label.version_same':'两版本内容相同',
     'label.saving_version':'保存后自动记录版本',
-    'label.discuss':'讨论 / 留言',
-    'label.discuss_hint':'从知识库点击文档标题旁的「💬」进入讨论',
-    'label.discuss_placeholder':'— 请先从知识库选择文档',
-    'btn.clear_filter':'清除筛选',
-    'btn.back_cat':'← 返回分类总览',
-    'btn.compare':'🔍 与上版比较',
     'btn.close':'关闭',
-    'btn.copy_sql':'复制 SQL',
     'btn.refresh':'刷新',
     'btn.fetch_url':'提取内容',
     'btn.reparse':'🔄 重新解析',
-    'btn.export_cfg':'📤 导出设置',
-    'btn.import_cfg':'📥 导入设置',
     'btn.add_product_line':'＋ 新增产品线',
     'nav.section.main':'主功能',
     'nav.section.info':'系统信息',
     'label.setting_mgmt':'⚙️ 设置管理',
-    'label.sql_init':'🗄 Supabase 初始化 SQL',
-    'label.sql_hint':'在 Supabase → SQL Editor 执行',
-    'label.embed_mode':'Embedding 模式',
-    'label.embed_edge':'Edge Function（推荐）',
-    'label.embed_mock':'Mock 模式（离线测试）',
-    'label.switch_hint':'换文件或换电脑时使用',
     'label.versions':'版本历史',
     'label.analytics_title':'分析报表',
     'label.top10':'热门文档 TOP 10',
@@ -1457,7 +1256,6 @@ const I18N = {
     'label.author':'作者','label.category':'分类','label.created':'创建时间',
     'label.modified':'修改时间','label.reviewer':'审核者','label.stars':'星级',
     'label.valid_until':'有效期限','label.product_line':'产品线',
-    'status.indefinitely':'永久有效','btn.save':'保存',
     'label.pl_default':'— 产品线 —','label.setting_pl':'📦 产品线','label.setting_cat':'分类',
     'label.experts_mgmt':'⚙ 人员管理请至 Platform',
     'label.ai_translate':'🌐 AI 翻译 ▾','label.restore_original':'↩ 恢复原文',
@@ -1475,31 +1273,19 @@ const I18N = {
     'toast.embed_mock':'Mock 向量化…','toast.save_mock_ok':'已保存至 Supabase（Mock 向量）',
     'toast.save_local':'本机保存中…','toast.save_local_ok':'已保存至本机（Mock 模式）',
     'toast.save_fail':'保存失败：{msg}',
-    'toast.reparse_start':'🔄 重新解析文件…','toast.reparse_embed':'Edge Function 向量化…',
-    'toast.reparse_ok':'已重新解析并完成向量化 ✓','toast.reparse_fail':'重新解析失败：{msg}',
-    'toast.reparse_embed_fail':'已重新解析，向量化失败：{msg}',
+    'toast.reparse_start':'🔄 重新解析文件…','toast.reparse_fail':'重新解析失败：{msg}',
     'toast.reparse_no_file':'此文件无附件可重新解析',
-    'toast.cfg_saved':'设置已保存','toast.cfg_export_ok':'设置已导出','toast.cfg_import_ok':'设置已导入',
-    'toast.cfg_import_fail':'导入失败：文件格式不正确',
     'label.ai_working':'🤖 AI 分析中…','label.ai_suggest':'🤖 AI 建议：{cat}（可手动修改）',
     'label.ai_conflict':'🤖 AI 建议「{sug}」，目前选择「{cur}」',
     'label.ai_confirm':'🤖 AI 确认：{cat}',
     'label.discuss_loading':'加载中…','label.discuss_empty':'尚无留言，成为第一个留言的人',
-    'label.kmap_title':'知识地图 — 分类总览','label.kmap_all':'知识地图 — 所有分类',
     'toast.review_reason_required':'请填写原因','toast.review_no_perm':'权限不足','toast.review_fail':'操作失败：{msg}',
     'label.review_loading':'加载中…','label.review_fail':'加载失败：{msg}',
-    'label.comments_loading':'加载留言中…','label.comments_empty':'暂无留言，成为第一个留言的人',
-    'toast.comment_edit_fail':'编辑失败','toast.comment_delete_fail':'删除失败','toast.comment_fail':'发送失败：{msg}',
+    'label.comments_empty':'暂无留言，成为第一个留言的人',
     'toast.expert_mgmt':'请至 Platform → User Management 管理人员数据',
-    'label.batch_processing':'处理中 {n}/{total}：{name}','label.batch_done':'批次完成 {ok}/{total} 成功',
-    'toast.batch_file_too_large':'文件过大（超过 50MB）：{name}',
+    'label.batch_processing':'处理中 {n}/{total}：{name}','toast.batch_file_too_large':'文件过大（超过 50MB）：{name}',
     'toast.batch_unsupported':'不支持的格式：{name}',
-    'toast.batch_parse_fail':'解析失败：{name}',
-    'toast.batch_embed_fail':'向量化失败：{name}（{msg}）',
-    'label.summary_start':'🤖 开始批次产生摘要…','label.summary_progress':'处理 {n}/{total}：{title}',
-    'label.summary_done':'✅ 批次摘要完成，共处理 {n} 篇',
-    'label.expert_empty':'暂无人员数据','label.expert_fail':'加载失败：{msg}','label.expert_no_result':'无符合人员',
-    'btn.update_with_file':'更新文档（含新文件）','btn.save_continue':'保存并继续（{cur}/{total}）',
+    'label.expert_empty':'暂无人员数据','label.expert_fail':'加载失败：{msg}','btn.update_with_file':'更新文档（含新文件）','btn.save_continue':'保存并继续（{cur}/{total}）',
     'label.editor_loading':'编辑器加载中…',
     'label.rag_searching':'搜索知识库中…','label.rag_analyzing':'AI 分析中，请稍候…',
     'label.error_prefix':'错误：{msg}','label.connecting':'连线中…','label.conn_fail':'⚠ 连线失败：{msg}',
@@ -1540,7 +1326,6 @@ const I18N = {
     'toast.reparse_done_chars':'✅ 重新解析完成 · {chars} 字符，确认后点「更新文档」保存',
     'toast.no_extract':'无法自动提取文字，已填入文件名，可直接保存原始文件',
     'toast.batch_cancelled':'已取消批次上传',
-    'toast.no_supported_format':'没有支持的文件格式',
     'toast.url_required':'请输入网址',
     'toast.url_invalid':'请输入完整网址（含 https://）',
     'toast.url_fetching':'⏳ 提取中，请稍候…',
@@ -1562,7 +1347,6 @@ const I18N = {
     'toast.comment_fail_msg':'留言失败：{msg}',
     'toast.copy_ok':'✅ 已复制全文',
     'toast.answer_not_ready':'回答尚未完成，请稍候再保存',
-    'toast.url_copied':'URL 已复制！在新电脑或浏览器粘贴此 URL 即可自动加载设置',
     'toast.snapshot_fail':'快照读取失败',
     'toast.restored_ver':'已还原至选取版本',
     'toast.restore_fail':'还原失败：{msg}',
@@ -1571,9 +1355,6 @@ const I18N = {
     'toast.restored_v':'已还原至 v{v}',
     'toast.ver_not_exist':'版本数据不存在',
     'toast.ver_fetch_fail':'加载版本失败：{msg}',
-    'toast.sql_copied':'SQL 概要已复制，完整版见 setup.sql',
-    'toast.sql_full':'请从下载的 setup.sql 复制完整 SQL',
-    'toast.user_mgmt':'人员数据请至 Platform → User Management 管理',
     'toast.copied_short':'已复制',
     'toast.rate_limit':'Rate limit，{sec} 秒后重试（第 {n}/{max} 次）…',
     'toast.rate_limit_retry':'Rate limit，{sec} 秒后重试…',
@@ -1592,12 +1373,12 @@ const I18N = {
     'toast.review_done':'已执行：{action}',
     'toast.ocr_start':'⏳ 图片型 PDF，OCR 解析中（共 {total} 页，处理前 {n} 页）…',
     'toast.ocr_page':'⏳ OCR 第 {n} / {total} 页…',
-    'toast.show_user_articles':'显示 {name} 的文章',
+    'toast.show_user_articles':'显示 {name} 的文章'
   },
   'en': {
     'nav.search':'AI Q&A', 'nav.editor':'Create', 'nav.docs':'Knowledge Base',
     'nav.kmap':'Knowledge Map', 'nav.analytics':'Analytics', 'nav.experts':'Directory',
-    'nav.review':'Review', 'nav.comments':'Discussion', 'nav.setting':'Settings',
+    'nav.review':'Review', 'nav.setting':'Settings',
     'rag.title':'AI Q&A — Answers from Knowledge Base',
     'rag.placeholder':'Ask anything, e.g.: How to handle Qi2 charger yield issues?',
     'rag.btn':'Ask', 'rag.ai_btn':'🤖 AI Search', 'rag.empty':'Enter a question. AI will retrieve relevant passages and synthesize an answer.',
@@ -1608,72 +1389,32 @@ const I18N = {
     'editor.tag.placeholder':'Type a tag and press Enter',
     'editor.upload.text':'Click or drag files to upload', 'editor.upload.hint':'PDF · Word · Excel · CSV · PowerPoint · Image · TXT · Markdown',
     'docs.title':'Knowledge Base — All Documents', 'docs.new':'＋ New Document',
-    'kmap.title':'Knowledge Map — Categories', 'kmap.back':'← Back to Categories',
-    'upload.formats':'PDF · Word · Excel · CSV · PowerPoint · Image（JPG/PNG）· TXT · Markdown', 'upload.limits':'Max 50 MB per file · Unsupported formats will be rejected',
-    'batch.skip':'Skip','batch.cancel':'Cancel Batch',
-    'analytics.title':'Analytics', 'analytics.total':'Entries', 'analytics.published':'Published',
-    'analytics.views':'Total Views', 'analytics.gaps':'Knowledge Gaps',
-    'experts.title':'Directory', 'experts.add':'＋ Add Expert', 'experts.empty':'No users yet',
-    'experts.copy':'Contact info copied', 'experts.remove':'Remove',
-    'review.title':'Review Workflow', 'review.empty':'Select a document to manage its review',
-    'review.actions':'Actions', 'review.log':'Review History',
-    'review.approve':'Publish', 'review.reject':'Return to Draft',
-    'review.archive':'Archive', 'review.restore':'Restore to Published', 'review.revoke':'⚠ Revoke (Force to Draft)',
-    'review.note.prompt':'Reason (optional):',
-    'comments.title':'Discussion', 'comments.placeholder':'Select a document from the Knowledge Base',
-    'comments.input.placeholder':'Write a comment…', 'comments.submit':'Send', 'comments.reply':'↩ Reply',
-    'comments.empty':'No comments yet. Be the first.',
-    'config.title':'⚙ API Settings', 'config.save':'Save Settings', 'config.cancel':'Cancel',
-    'status.draft':'Draft', 'status.published':'Publish', 'status.archived':'Archive', 'status.withdrawn':'Withdraw', 'status.template':'Template',
+    'kmap.title':'Knowledge Map — Categories', 'batch.skip':'Skip','batch.cancel':'Cancel Batch',
+    'experts.title':'Directory', 'review.title':'Review Workflow', 'comments.input.placeholder':'Write a comment…', 'comments.submit':'Send', 'status.draft':'Draft', 'status.published':'Publish', 'status.archived':'Archive', 'status.withdrawn':'Withdraw', 'status.template':'Template',
     'cat.product':'Product', 'cat.sales':'Customer', 'cat.industry':'Industry',
     'cat.hr':'Training', 'cat.tacit':'Sharing', 'cat.compliance':'IPR & Legal',
     'cat.supply':'Technology', 'cat.ai_tech':'AI', 'cat.template':'Template', 'cat.article':'Article',
-    'toast.copied':'Contact info copied', 'toast.saved':'Saved', 'toast.deleted':'Deleted',
-    'confirm.delete':'Delete "{title}"?\nThis cannot be undone.',
-    'confirm.cancel_edit':'Discard changes? Unsaved edits will be lost.',
-    'sys.supabase':'Supabase', 'sys.claude':'Claude API', 'sys.docs':'Documents',
-    'sys.rag':'RAG: pgvector + Claude', 'sys.storage':'Storage: Supabase Postgres',
+    'toast.deleted':'Deleted',
+    'sys.storage':'Storage: Supabase Postgres',
     'cat.all':'All Categories',
     'review.title':'Review Management',
     'comments.submit':'Send',
-    'btn.export_cfg':'📤 Export Settings',
-    'btn.import_cfg':'📥 Import Settings',
-    'btn.copy_url_param':'📋 Copy as URL Params',
     'btn.add_product_line':'＋ Add Product Line',
     'pl.all':'All Product Lines',
     'status.filter.draft':'Draft',
     'status.filter.published':'Published',
     'status.filter.archived':'Archived',
-    'label.no_comments':'No comments yet. Be the first.',
     'label.no_versions':'No version history',
-    'label.no_experts':'No experts yet',
     'label.no_results':'No matching users',
-    'label.no_cat_docs':'No documents in this category',
-    'label.version_same':'Both versions are identical',
     'label.saving_version':'Version saved automatically on save',
-    'label.discuss':'Discussion',
-    'label.discuss_hint':'Click 💬 next to a document title',
-    'label.discuss_placeholder':'— Select a document from the Knowledge Base',
-    'btn.clear_filter':'Clear Filter',
-    'btn.back_cat':'← Back to Categories',
-    'btn.compare':'🔍 Compare with Previous',
     'btn.close':'Close',
-    'btn.copy_sql':'Copy SQL',
     'btn.refresh':'Refresh',
     'btn.fetch_url':'Fetch Content',
     'btn.reparse':'🔄 Re-parse',
-    'btn.export_cfg':'📤 Export Settings',
-    'btn.import_cfg':'📥 Import Settings',
     'btn.add_product_line':'＋ Add Product Line',
     'nav.section.main':'Main',
     'nav.section.info':'System Info',
     'label.setting_mgmt':'⚙️ Settings',
-    'label.sql_init':'🗄 Supabase Init SQL',
-    'label.sql_hint':'Run in Supabase → SQL Editor',
-    'label.embed_mode':'Embedding Mode',
-    'label.embed_edge':'Edge Function (recommended)',
-    'label.embed_mock':'Mock mode (offline test)',
-    'label.switch_hint':'Use when switching files or computers',
     'label.versions':'Version History',
     'label.analytics_title':'Analytics',
     'label.top10':'Top 10 Documents (by views)',
@@ -1698,7 +1439,6 @@ const I18N = {
     'label.author':'Author','label.category':'Category','label.created':'Created',
     'label.modified':'Modified','label.reviewer':'Reviewer','label.stars':'Stars',
     'label.valid_until':'Valid Until','label.product_line':'Product Line',
-    'status.indefinitely':'Indefinitely','btn.save':'Save',
     'label.pl_default':'— Product Line —','label.setting_pl':'📦 Product Line','label.setting_cat':'Categories',
     'label.experts_mgmt':'⚙ Manage users at Platform',
     'label.ai_translate':'🌐 AI Translate ▾','label.restore_original':'↩ Restore Original',
@@ -1716,31 +1456,19 @@ const I18N = {
     'toast.embed_mock':'Mock vectorizing…','toast.save_mock_ok':'Saved to Supabase (mock vector)',
     'toast.save_local':'Saving locally…','toast.save_local_ok':'Saved locally (mock mode)',
     'toast.save_fail':'Save failed: {msg}',
-    'toast.reparse_start':'🔄 Re-parsing document…','toast.reparse_embed':'Edge Function vectorizing…',
-    'toast.reparse_ok':'Re-parsed and vectorized ✓','toast.reparse_fail':'Re-parse failed: {msg}',
-    'toast.reparse_embed_fail':'Re-parsed, vectorization failed: {msg}',
+    'toast.reparse_start':'🔄 Re-parsing document…','toast.reparse_fail':'Re-parse failed: {msg}',
     'toast.reparse_no_file':'This document has no attachment to re-parse',
-    'toast.cfg_saved':'Settings saved','toast.cfg_export_ok':'Settings exported','toast.cfg_import_ok':'Settings imported',
-    'toast.cfg_import_fail':'Import failed: invalid file format',
     'label.ai_working':'🤖 Analyzing…','label.ai_suggest':'🤖 AI suggests: {cat} (can be changed)',
     'label.ai_conflict':'🤖 AI suggests "{sug}", currently "{cur}"',
     'label.ai_confirm':'🤖 AI confirmed: {cat}',
     'label.discuss_loading':'Loading…','label.discuss_empty':'No comments yet. Be the first.',
-    'label.kmap_title':'Knowledge Map — Categories','label.kmap_all':'Knowledge Map — All Categories',
     'toast.review_reason_required':'Please enter a reason','toast.review_no_perm':'Insufficient permissions','toast.review_fail':'Action failed: {msg}',
     'label.review_loading':'Loading…','label.review_fail':'Load failed: {msg}',
-    'label.comments_loading':'Loading comments…','label.comments_empty':'No comments yet. Be the first.',
-    'toast.comment_edit_fail':'Edit failed','toast.comment_delete_fail':'Delete failed','toast.comment_fail':'Send failed: {msg}',
+    'label.comments_empty':'No comments yet. Be the first.',
     'toast.expert_mgmt':'Please go to Platform → User Management',
-    'label.batch_processing':'Processing {n}/{total}: {name}','label.batch_done':'Batch complete: {ok}/{total} succeeded',
-    'toast.batch_file_too_large':'File too large (over 50MB): {name}',
+    'label.batch_processing':'Processing {n}/{total}: {name}','toast.batch_file_too_large':'File too large (over 50MB): {name}',
     'toast.batch_unsupported':'Unsupported format: {name}',
-    'toast.batch_parse_fail':'Parse failed: {name}',
-    'toast.batch_embed_fail':'Vectorization failed: {name} ({msg})',
-    'label.summary_start':'🤖 Starting batch summary…','label.summary_progress':'Processing {n}/{total}: {title}',
-    'label.summary_done':'✅ Batch summary done, {n} documents processed',
-    'label.expert_empty':'No users yet','label.expert_fail':'Load failed: {msg}','label.expert_no_result':'No matching users',
-    'btn.update_with_file':'Update Document (with new file)','btn.save_continue':'Save & Next ({cur}/{total})',
+    'label.expert_empty':'No users yet','label.expert_fail':'Load failed: {msg}','btn.update_with_file':'Update Document (with new file)','btn.save_continue':'Save & Next ({cur}/{total})',
     'label.editor_loading':'Loading editor…',
     'label.rag_searching':'Searching knowledge base…','label.rag_analyzing':'AI analyzing, please wait…',
     'label.error_prefix':'Error: {msg}','label.connecting':'Connecting…','label.conn_fail':'⚠ Connection failed: {msg}',
@@ -1781,7 +1509,6 @@ const I18N = {
     'toast.reparse_done_chars':'✅ Re-parsed · {chars} chars — confirm and click "Update Document" to save',
     'toast.no_extract':'Could not extract text. File name used as title — you can save the original file directly',
     'toast.batch_cancelled':'Batch upload cancelled',
-    'toast.no_supported_format':'No supported file formats',
     'toast.url_required':'Please enter a URL',
     'toast.url_invalid':'Please enter a full URL (including https://)',
     'toast.url_fetching':'⏳ Fetching, please wait…',
@@ -1803,7 +1530,6 @@ const I18N = {
     'toast.comment_fail_msg':'Comment failed: {msg}',
     'toast.copy_ok':'✅ Full text copied',
     'toast.answer_not_ready':'Answer not ready yet, please wait before saving',
-    'toast.url_copied':'URL copied! Paste in a new computer or browser to auto-load settings',
     'toast.snapshot_fail':'Snapshot read failed',
     'toast.restored_ver':'Restored to selected version',
     'toast.restore_fail':'Restore failed: {msg}',
@@ -1812,9 +1538,6 @@ const I18N = {
     'toast.restored_v':'Restored to v{v}',
     'toast.ver_not_exist':'Version data not found',
     'toast.ver_fetch_fail':'Load version failed: {msg}',
-    'toast.sql_copied':'SQL summary copied — see setup.sql for full version',
-    'toast.sql_full':'Please copy full SQL from downloaded setup.sql',
-    'toast.user_mgmt':'Manage users at Platform → User Management',
     'toast.copied_short':'Copied',
     'toast.rate_limit':'Rate limit — retrying in {sec}s (attempt {n}/{max})…',
     'toast.rate_limit_retry':'Rate limit — retrying in {sec}s…',
@@ -1833,12 +1556,12 @@ const I18N = {
     'toast.review_done':'Executed: {action}',
     'toast.ocr_start':'⏳ Image-based PDF, OCR in progress ({total} pages total, processing first {n} pages)…',
     'toast.ocr_page':'⏳ OCR page {n} / {total}…',
-    'toast.show_user_articles':'Showing articles by {name}',
+    'toast.show_user_articles':'Showing articles by {name}'
   },
   'vi': {
     'nav.search':'Hỏi đáp AI', 'nav.editor':'Tạo mới', 'nav.docs':'Kho kiến thức',
     'nav.kmap':'Bản đồ kiến thức', 'nav.analytics':'Báo cáo', 'nav.experts':'Danh bạ',
-    'nav.review':'Xem xét', 'nav.comments':'Thảo luận', 'nav.setting':'Cài đặt',
+    'nav.review':'Xem xét', 'nav.setting':'Cài đặt',
     'rag.title':'Hỏi đáp AI — Từ kho kiến thức',
     'rag.placeholder':'Đặt câu hỏi, ví dụ: Xử lý lỗi tỷ lệ đạt chuẩn Qi2 như thế nào?',
     'rag.btn':'Gửi câu hỏi', 'rag.ai_btn':'🤖 Tìm kiếm AI', 'rag.empty':'Nhập câu hỏi, AI sẽ tìm và tổng hợp câu trả lời từ tài liệu',
@@ -1849,72 +1572,32 @@ const I18N = {
     'editor.tag.placeholder':'Nhập thẻ rồi nhấn Enter',
     'editor.upload.text':'Nhấp hoặc kéo tệp để tải lên', 'editor.upload.hint':'PDF · Word · Excel · Hình ảnh · TXT · Markdown',
     'docs.title':'Kho kiến thức — Tất cả tài liệu', 'docs.new':'＋ Tài liệu mới',
-    'kmap.title':'Bản đồ kiến thức — Tổng quan', 'kmap.back':'← Quay lại',
-    'upload.formats':'PDF · Word · Excel · CSV · PowerPoint · Ảnh（JPG/PNG）· TXT · Markdown', 'upload.limits':'Tối đa 50 MB mỗi tệp · Định dạng không hỗ trợ sẽ bị từ chối',
-    'batch.skip':'Bỏ qua','batch.cancel':'Hủy hàng loạt',
-    'analytics.title':'Báo cáo', 'analytics.total':'Mục kiến thức', 'analytics.published':'Đã xuất bản',
-    'analytics.views':'Tổng lượt xem', 'analytics.gaps':'Khoảng trống kiến thức',
-    'experts.title':'Danh bạ', 'experts.add':'＋ Thêm người dùng', 'experts.empty':'Chưa có dữ liệu',
-    'experts.copy':'Đã sao chép thông tin liên hệ', 'experts.remove':'Xóa',
-    'review.title':'Quy trình duyệt', 'review.empty':'Chọn tài liệu để quản lý quy trình duyệt',
-    'review.actions':'Hành động', 'review.log':'Lịch sử duyệt',
-    'review.approve':'Xuất bản', 'review.reject':'Trả về bản nháp',
-    'review.archive':'Lưu trữ', 'review.restore':'Khôi phục', 'review.revoke':'⚠ Thu hồi (Buộc về bản nháp)',
-    'review.note.prompt':'Lý do (tùy chọn):',
-    'comments.title':'Thảo luận', 'comments.placeholder':'Chọn tài liệu từ kho kiến thức',
-    'comments.input.placeholder':'Viết bình luận…', 'comments.submit':'Gửi', 'comments.reply':'↩ Trả lời',
-    'comments.empty':'Chưa có bình luận. Hãy là người đầu tiên.',
-    'config.title':'⚙ Cài đặt API', 'config.save':'Lưu cài đặt', 'config.cancel':'Hủy',
-    'status.draft':'Nháp', 'status.published':'Xuất bản', 'status.archived':'Lưu trữ', 'status.withdrawn':'Thu hồi', 'status.template':'Mẫu',
+    'kmap.title':'Bản đồ kiến thức — Tổng quan', 'batch.skip':'Bỏ qua','batch.cancel':'Hủy hàng loạt',
+    'experts.title':'Danh bạ', 'review.title':'Quy trình duyệt', 'comments.input.placeholder':'Viết bình luận…', 'comments.submit':'Gửi', 'status.draft':'Nháp', 'status.published':'Xuất bản', 'status.archived':'Lưu trữ', 'status.withdrawn':'Thu hồi', 'status.template':'Mẫu',
     'cat.product':'Phát triển sản phẩm', 'cat.sales':'Thông tin khách hàng', 'cat.industry':'Tin tức ngành',
     'cat.hr':'Đào tạo', 'cat.tacit':'Chia sẻ kiến thức', 'cat.compliance':'Sở hữu trí tuệ & Pháp lý',
     'cat.supply':'Phát triển công nghệ', 'cat.ai_tech':'AI', 'cat.template':'Mẫu', 'cat.article':'Bài viết',
-    'toast.copied':'Đã sao chép thông tin liên hệ', 'toast.saved':'Đã lưu', 'toast.deleted':'Đã xóa',
-    'confirm.delete':'Xóa "{title}"?\nHành động này không thể hoàn tác.',
-    'confirm.cancel_edit':'Hủy chỉnh sửa? Các thay đổi chưa lưu sẽ bị mất.',
-    'sys.supabase':'Supabase', 'sys.claude':'Claude API', 'sys.docs':'Tài liệu',
-    'sys.rag':'RAG: pgvector + Claude', 'sys.storage':'Lưu trữ: Supabase Postgres',
+    'toast.deleted':'Đã xóa',
+    'sys.storage':'Lưu trữ: Supabase Postgres',
     'cat.all':'Tất cả danh mục',
     'review.title':'Quản lý xem xét',
     'comments.submit':'Gửi',
-    'btn.export_cfg':'📤 Xuất cài đặt',
-    'btn.import_cfg':'📥 Nhập cài đặt',
-    'btn.copy_url_param':'📋 Sao chép tham số URL',
     'btn.add_product_line':'＋ Thêm dòng sản phẩm',
     'pl.all':'Tất cả dòng sản phẩm',
     'status.filter.draft':'Nháp',
     'status.filter.published':'Đã xuất bản',
     'status.filter.archived':'Đã lưu trữ',
-    'label.no_comments':'Chưa có bình luận.',
     'label.no_versions':'Chưa có lịch sử phiên bản',
-    'label.no_experts':'Chưa có chuyên gia',
     'label.no_results':'Không tìm thấy',
-    'label.no_cat_docs':'Không có tài liệu trong danh mục này',
-    'label.version_same':'Hai phiên bản giống nhau',
     'label.saving_version':'Tự động lưu phiên bản sau khi lưu',
-    'label.discuss':'Thảo luận',
-    'label.discuss_hint':'Nhấp 💬 bên cạnh tiêu đề tài liệu',
-    'label.discuss_placeholder':'— Chọn tài liệu từ kho kiến thức',
-    'btn.clear_filter':'Xóa bộ lọc',
-    'btn.back_cat':'← Quay lại danh mục',
-    'btn.compare':'🔍 So sánh với phiên bản trước',
     'btn.close':'Đóng',
-    'btn.copy_sql':'Sao chép SQL',
     'btn.refresh':'Làm mới',
     'btn.fetch_url':'Lấy nội dung',
     'btn.reparse':'🔄 Phân tích lại',
-    'btn.export_cfg':'📤 Xuất cài đặt',
-    'btn.import_cfg':'📥 Nhập cài đặt',
     'btn.add_product_line':'＋ Thêm dòng sản phẩm',
     'nav.section.main':'Chức năng chính',
     'nav.section.info':'Thông tin hệ thống',
     'label.setting_mgmt':'⚙️ Cài đặt',
-    'label.sql_init':'🗄 SQL khởi tạo Supabase',
-    'label.sql_hint':'Chạy trong Supabase → SQL Editor',
-    'label.embed_mode':'Chế độ Embedding',
-    'label.embed_edge':'Edge Function (khuyến nghị)',
-    'label.embed_mock':'Chế độ Mock (kiểm tra offline)',
-    'label.switch_hint':'Dùng khi đổi tệp hoặc máy tính',
     'label.versions':'Lịch sử phiên bản',
     'label.analytics_title':'Phân tích',
     'label.top10':'Top 10 tài liệu (theo lượt xem)',
@@ -1939,7 +1622,6 @@ const I18N = {
     'label.author':'Tác giả','label.category':'Danh mục','label.created':'Ngày tạo',
     'label.modified':'Ngày sửa','label.reviewer':'Người duyệt','label.stars':'Sao',
     'label.valid_until':'Hạn hiệu lực','label.product_line':'Dòng sản phẩm',
-    'status.indefinitely':'Vĩnh viễn','btn.save':'Lưu',
     'label.pl_default':'— Dòng sản phẩm —','label.setting_pl':'📦 Dòng sản phẩm','label.setting_cat':'Danh mục',
     'label.experts_mgmt':'⚙ Quản lý tại Platform',
     'label.ai_translate':'🌐 Dịch AI ▾','label.restore_original':'↩ Khôi phục gốc',
@@ -1957,31 +1639,19 @@ const I18N = {
     'toast.embed_mock':'Mock vector hóa…','toast.save_mock_ok':'Đã lưu vào Supabase (mock vector)',
     'toast.save_local':'Đang lưu cục bộ…','toast.save_local_ok':'Đã lưu cục bộ (chế độ mock)',
     'toast.save_fail':'Lưu thất bại: {msg}',
-    'toast.reparse_start':'🔄 Đang phân tích lại…','toast.reparse_embed':'Edge Function vector hóa…',
-    'toast.reparse_ok':'Đã phân tích lại và vector hóa ✓','toast.reparse_fail':'Phân tích lại thất bại: {msg}',
-    'toast.reparse_embed_fail':'Đã phân tích lại, vector hóa thất bại: {msg}',
+    'toast.reparse_start':'🔄 Đang phân tích lại…','toast.reparse_fail':'Phân tích lại thất bại: {msg}',
     'toast.reparse_no_file':'Tài liệu này không có tệp đính kèm để phân tích lại',
-    'toast.cfg_saved':'Đã lưu cài đặt','toast.cfg_export_ok':'Đã xuất cài đặt','toast.cfg_import_ok':'Đã nhập cài đặt',
-    'toast.cfg_import_fail':'Nhập thất bại: định dạng tệp không đúng',
     'label.ai_working':'🤖 Đang phân tích…','label.ai_suggest':'🤖 AI đề xuất: {cat} (có thể thay đổi)',
     'label.ai_conflict':'🤖 AI đề xuất "{sug}", hiện tại là "{cur}"',
     'label.ai_confirm':'🤖 AI xác nhận: {cat}',
     'label.discuss_loading':'Đang tải…','label.discuss_empty':'Chưa có bình luận. Hãy là người đầu tiên.',
-    'label.kmap_title':'Bản đồ kiến thức — Danh mục','label.kmap_all':'Bản đồ kiến thức — Tất cả danh mục',
     'toast.review_reason_required':'Vui lòng nhập lý do','toast.review_no_perm':'Không đủ quyền','toast.review_fail':'Thao tác thất bại: {msg}',
     'label.review_loading':'Đang tải…','label.review_fail':'Tải thất bại: {msg}',
-    'label.comments_loading':'Đang tải bình luận…','label.comments_empty':'Chưa có bình luận. Hãy là người đầu tiên.',
-    'toast.comment_edit_fail':'Sửa thất bại','toast.comment_delete_fail':'Xóa thất bại','toast.comment_fail':'Gửi thất bại: {msg}',
+    'label.comments_empty':'Chưa có bình luận. Hãy là người đầu tiên.',
     'toast.expert_mgmt':'Vui lòng vào Platform → Quản lý người dùng',
-    'label.batch_processing':'Đang xử lý {n}/{total}: {name}','label.batch_done':'Hoàn thành {ok}/{total} thành công',
-    'toast.batch_file_too_large':'Tệp quá lớn (hơn 50MB): {name}',
+    'label.batch_processing':'Đang xử lý {n}/{total}: {name}','toast.batch_file_too_large':'Tệp quá lớn (hơn 50MB): {name}',
     'toast.batch_unsupported':'Định dạng không hỗ trợ: {name}',
-    'toast.batch_parse_fail':'Phân tích thất bại: {name}',
-    'toast.batch_embed_fail':'Vector hóa thất bại: {name} ({msg})',
-    'label.summary_start':'🤖 Bắt đầu tóm tắt hàng loạt…','label.summary_progress':'Đang xử lý {n}/{total}: {title}',
-    'label.summary_done':'✅ Tóm tắt hoàn thành, đã xử lý {n} tài liệu',
-    'label.expert_empty':'Chưa có dữ liệu','label.expert_fail':'Tải thất bại: {msg}','label.expert_no_result':'Không tìm thấy',
-    'btn.update_with_file':'Cập nhật tài liệu (kèm file mới)','btn.save_continue':'Lưu & tiếp ({cur}/{total})',
+    'label.expert_empty':'Chưa có dữ liệu','label.expert_fail':'Tải thất bại: {msg}','btn.update_with_file':'Cập nhật tài liệu (kèm file mới)','btn.save_continue':'Lưu & tiếp ({cur}/{total})',
     'label.editor_loading':'Đang tải trình soạn thảo…',
     'label.rag_searching':'Đang tìm kiếm kho kiến thức…','label.rag_analyzing':'AI đang phân tích, vui lòng chờ…',
     'label.error_prefix':'Lỗi: {msg}','label.connecting':'Đang kết nối…','label.conn_fail':'⚠ Kết nối thất bại: {msg}',
@@ -2022,7 +1692,6 @@ const I18N = {
     'toast.reparse_done_chars':'✅ Phân tích lại xong · {chars} ký tự — xác nhận rồi nhấn "Cập nhật tài liệu" để lưu',
     'toast.no_extract':'Không trích xuất được văn bản. Tên tệp dùng làm tiêu đề — bạn có thể lưu tệp gốc trực tiếp',
     'toast.batch_cancelled':'Đã hủy tải lên hàng loạt',
-    'toast.no_supported_format':'Không có định dạng tệp được hỗ trợ',
     'toast.url_required':'Vui lòng nhập URL',
     'toast.url_invalid':'Vui lòng nhập URL đầy đủ (bao gồm https://)',
     'toast.url_fetching':'⏳ Đang tải, vui lòng chờ…',
@@ -2044,7 +1713,6 @@ const I18N = {
     'toast.comment_fail_msg':'Bình luận thất bại: {msg}',
     'toast.copy_ok':'✅ Đã sao chép toàn văn',
     'toast.answer_not_ready':'Câu trả lời chưa hoàn thành, vui lòng chờ trước khi lưu',
-    'toast.url_copied':'Đã sao chép URL! Dán vào máy tính hoặc trình duyệt mới để tự động tải cài đặt',
     'toast.snapshot_fail':'Đọc snapshot thất bại',
     'toast.restored_ver':'Đã khôi phục về phiên bản đã chọn',
     'toast.restore_fail':'Khôi phục thất bại: {msg}',
@@ -2053,9 +1721,6 @@ const I18N = {
     'toast.restored_v':'Đã khôi phục về v{v}',
     'toast.ver_not_exist':'Dữ liệu phiên bản không tồn tại',
     'toast.ver_fetch_fail':'Tải phiên bản thất bại: {msg}',
-    'toast.sql_copied':'Đã sao chép tóm tắt SQL — xem setup.sql để lấy phiên bản đầy đủ',
-    'toast.sql_full':'Vui lòng sao chép SQL đầy đủ từ file setup.sql đã tải',
-    'toast.user_mgmt':'Quản lý nhân sự tại Platform → User Management',
     'toast.copied_short':'Đã sao chép',
     'toast.rate_limit':'Rate limit — thử lại sau {sec}s (lần {n}/{max})…',
     'toast.rate_limit_retry':'Rate limit — thử lại sau {sec}s…',
@@ -2074,12 +1739,12 @@ const I18N = {
     'toast.review_done':'Đã thực hiện: {action}',
     'toast.ocr_start':'⏳ PDF dạng ảnh, đang OCR ({total} trang, xử lý {n} trang đầu)…',
     'toast.ocr_page':'⏳ OCR trang {n} / {total}…',
-    'toast.show_user_articles':'Hiển thị bài viết của {name}',
+    'toast.show_user_articles':'Hiển thị bài viết của {name}'
   },
   'ja': {
     'nav.search':'AI 質問', 'nav.editor':'新規作成', 'nav.docs':'ナレッジベース',
     'nav.kmap':'ナレッジマップ', 'nav.analytics':'分析レポート', 'nav.experts':'連絡先',
-    'nav.review':'レビュー', 'nav.comments':'ディスカッション', 'nav.setting':'設定',
+    'nav.review':'レビュー', 'nav.setting':'設定',
     'rag.title':'AI 質問応答 — ナレッジベースから回答',
     'rag.placeholder':'質問を入力してください（例：Qi2充電器の歩留まり異常の対処法は？）',
     'rag.btn':'質問する', 'rag.ai_btn':'🤖 AI 検索', 'rag.empty':'質問を入力すると、AIがナレッジベースから関連情報を検索して回答します',
@@ -2090,72 +1755,32 @@ const I18N = {
     'editor.tag.placeholder':'タグを入力してEnterキーを押してください',
     'editor.upload.text':'クリックまたはドラッグしてアップロード', 'editor.upload.hint':'PDF · Word · Excel · CSV · PowerPoint · 画像 · TXT · Markdown',
     'docs.title':'ナレッジベース — すべてのドキュメント', 'docs.new':'＋ 新規ドキュメント',
-    'kmap.title':'ナレッジマップ — カテゴリ一覧', 'kmap.back':'← カテゴリ一覧に戻る',
-    'upload.formats':'PDF · Word · Excel · CSV · PowerPoint · 画像（JPG/PNG）· TXT · Markdown', 'upload.limits':'1ファイル最大 50 MB · 非対応形式は拒否されます',
-    'batch.skip':'スキップ','batch.cancel':'一括キャンセル',
-    'analytics.title':'分析レポート', 'analytics.total':'ナレッジ件数', 'analytics.published':'公開済み',
-    'analytics.views':'総閲覧数', 'analytics.gaps':'ナレッジギャップ',
-    'experts.title':'連絡先', 'experts.add':'＋ ユーザーを追加', 'experts.empty':'データなし',
-    'experts.copy':'連絡先をコピーしました', 'experts.remove':'削除',
-    'review.title':'審査ワークフロー', 'review.empty':'ドキュメントを選択して審査を開始',
-    'review.actions':'操作', 'review.log':'審査履歴',
-    'review.approve':'公開する', 'review.reject':'草稿に戻す',
-    'review.archive':'アーカイブ', 'review.restore':'公開に戻す', 'review.revoke':'⚠ 取消（強制的に草稿に戻す）',
-    'review.note.prompt':'理由（任意）：',
-    'comments.title':'ディスカッション', 'comments.placeholder':'ナレッジベースからドキュメントを選択してください',
-    'comments.input.placeholder':'コメントを入力…', 'comments.submit':'送信', 'comments.reply':'↩ 返信',
-    'comments.empty':'まだコメントはありません。最初のコメントを投稿してください。',
-    'config.title':'⚙ API 設定', 'config.save':'設定を保存', 'config.cancel':'キャンセル',
-    'status.draft':'下書き', 'status.published':'公開', 'status.archived':'アーカイブ', 'status.withdrawn':'取り下げ', 'status.template':'テンプレート',
+    'kmap.title':'ナレッジマップ — カテゴリ一覧', 'batch.skip':'スキップ','batch.cancel':'一括キャンセル',
+    'experts.title':'連絡先', 'review.title':'審査ワークフロー', 'comments.input.placeholder':'コメントを入力…', 'comments.submit':'送信', 'status.draft':'下書き', 'status.published':'公開', 'status.archived':'アーカイブ', 'status.withdrawn':'取り下げ', 'status.template':'テンプレート',
     'cat.product':'製品開発', 'cat.sales':'顧客情報', 'cat.industry':'業界情報',
     'cat.hr':'教育・研修', 'cat.tacit':'ナレッジ共有', 'cat.compliance':'知財・法務',
     'cat.supply':'技術動向', 'cat.ai_tech':'AI', 'cat.template':'テンプレート', 'cat.article':'記事',
-    'toast.copied':'連絡先をコピーしました', 'toast.saved':'保存しました', 'toast.deleted':'削除しました',
-    'confirm.delete':'「{title}」を削除しますか？\n元に戻すことはできません。',
-    'confirm.cancel_edit':'編集を破棄しますか？保存されていない変更は失われます。',
-    'sys.supabase':'Supabase', 'sys.claude':'Claude API', 'sys.docs':'ドキュメント数',
-    'sys.rag':'RAG: pgvector + Claude', 'sys.storage':'ストレージ: Supabase Postgres',
+    'toast.deleted':'削除しました',
+    'sys.storage':'ストレージ: Supabase Postgres',
     'cat.all':'すべてのカテゴリ',
     'review.title':'レビュー管理',
     'comments.submit':'送信',
-    'btn.export_cfg':'📤 設定エクスポート',
-    'btn.import_cfg':'📥 設定インポート',
-    'btn.copy_url_param':'📋 URLパラメータとしてコピー',
     'btn.add_product_line':'＋ 製品ライン追加',
     'pl.all':'すべての製品ライン',
     'status.filter.draft':'下書き',
     'status.filter.published':'公開済み',
     'status.filter.archived':'アーカイブ済み',
-    'label.no_comments':'コメントはまだありません。',
     'label.no_versions':'バージョン履歴なし',
-    'label.no_experts':'専門家データなし',
     'label.no_results':'該当者なし',
-    'label.no_cat_docs':'このカテゴリにドキュメントはありません',
-    'label.version_same':'両バージョンの内容は同一です',
     'label.saving_version':'保存時に自動でバージョンを記録',
-    'label.discuss':'ディスカッション',
-    'label.discuss_hint':'💬をクリックしてディスカッションに入る',
-    'label.discuss_placeholder':'— ナレッジベースからドキュメントを選択',
-    'btn.clear_filter':'フィルターをクリア',
-    'btn.back_cat':'← カテゴリ一覧に戻る',
-    'btn.compare':'🔍 前バージョンと比較',
     'btn.close':'閉じる',
-    'btn.copy_sql':'SQLをコピー',
     'btn.refresh':'更新',
     'btn.fetch_url':'コンテンツ取得',
     'btn.reparse':'🔄 再解析',
-    'btn.export_cfg':'📤 設定エクスポート',
-    'btn.import_cfg':'📥 設定インポート',
     'btn.add_product_line':'＋ 製品ライン追加',
     'nav.section.main':'メイン機能',
     'nav.section.info':'システム情報',
     'label.setting_mgmt':'⚙️ 設定管理',
-    'label.sql_init':'🗄 Supabase 初期化 SQL',
-    'label.sql_hint':'Supabase → SQL Editor で実行',
-    'label.embed_mode':'Embedding モード',
-    'label.embed_edge':'Edge Function（推奨）',
-    'label.embed_mock':'Mock モード（オフラインテスト）',
-    'label.switch_hint':'ファイルまたは端末を変更する際に使用',
     'label.versions':'バージョン履歴',
     'label.analytics_title':'分析レポート',
     'label.top10':'人気ドキュメント TOP 10',
@@ -2180,7 +1805,6 @@ const I18N = {
     'label.author':'著者','label.category':'カテゴリ','label.created':'作成日時',
     'label.modified':'更新日時','label.reviewer':'レビュアー','label.stars':'スター',
     'label.valid_until':'有効期限','label.product_line':'製品ライン',
-    'status.indefinitely':'永続的に有効','btn.save':'保存',
     'label.pl_default':'— 製品ライン —','label.setting_pl':'📦 製品ライン','label.setting_cat':'カテゴリ',
     'label.experts_mgmt':'⚙ Platform でユーザー管理',
     'label.ai_translate':'🌐 AI 翻訳 ▾','label.restore_original':'↩ 原文に戻す',
@@ -2198,31 +1822,19 @@ const I18N = {
     'toast.embed_mock':'Mockベクトル化中…','toast.save_mock_ok':'Supabaseに保存しました（Mockベクトル）',
     'toast.save_local':'ローカルに保存中…','toast.save_local_ok':'ローカルに保存しました（Mockモード）',
     'toast.save_fail':'保存に失敗しました：{msg}',
-    'toast.reparse_start':'🔄 ドキュメントを再解析中…','toast.reparse_embed':'Edge Function ベクトル化中…',
-    'toast.reparse_ok':'再解析とベクトル化完了 ✓','toast.reparse_fail':'再解析失敗：{msg}',
-    'toast.reparse_embed_fail':'再解析済み、ベクトル化失敗：{msg}',
+    'toast.reparse_start':'🔄 ドキュメントを再解析中…','toast.reparse_fail':'再解析失敗：{msg}',
     'toast.reparse_no_file':'このドキュメントには再解析できる添付ファイルがありません',
-    'toast.cfg_saved':'設定を保存しました','toast.cfg_export_ok':'設定をエクスポートしました','toast.cfg_import_ok':'設定をインポートしました',
-    'toast.cfg_import_fail':'インポート失敗：ファイル形式が正しくありません',
     'label.ai_working':'🤖 AI 分析中…','label.ai_suggest':'🤖 AIの提案：{cat}（変更可）',
     'label.ai_conflict':'🤖 AIは「{sug}」を提案、現在は「{cur}」',
     'label.ai_confirm':'🤖 AI確認：{cat}',
     'label.discuss_loading':'読み込み中…','label.discuss_empty':'まだコメントはありません。最初のコメントを投稿してください。',
-    'label.kmap_title':'ナレッジマップ — カテゴリ一覧','label.kmap_all':'ナレッジマップ — すべてのカテゴリ',
     'toast.review_reason_required':'理由を入力してください','toast.review_no_perm':'権限が不足しています','toast.review_fail':'操作に失敗しました：{msg}',
     'label.review_loading':'読み込み中…','label.review_fail':'読み込み失敗：{msg}',
-    'label.comments_loading':'コメントを読み込み中…','label.comments_empty':'まだコメントはありません。最初のコメントを投稿してください。',
-    'toast.comment_edit_fail':'編集に失敗しました','toast.comment_delete_fail':'削除に失敗しました','toast.comment_fail':'送信に失敗しました：{msg}',
+    'label.comments_empty':'まだコメントはありません。最初のコメントを投稿してください。',
     'toast.expert_mgmt':'Platform → ユーザー管理 をご利用ください',
-    'label.batch_processing':'{n}/{total} 処理中：{name}','label.batch_done':'バッチ完了：{ok}/{total} 成功',
-    'toast.batch_file_too_large':'ファイルが大きすぎます（50MB超過）：{name}',
+    'label.batch_processing':'{n}/{total} 処理中：{name}','toast.batch_file_too_large':'ファイルが大きすぎます（50MB超過）：{name}',
     'toast.batch_unsupported':'サポートされていない形式：{name}',
-    'toast.batch_parse_fail':'解析失敗：{name}',
-    'toast.batch_embed_fail':'ベクトル化失敗：{name}（{msg}）',
-    'label.summary_start':'🤖 バッチ要約を開始…','label.summary_progress':'{n}/{total} 処理中：{title}',
-    'label.summary_done':'✅ バッチ要約完了、{n}件処理しました',
-    'label.expert_empty':'データなし','label.expert_fail':'読み込み失敗：{msg}','label.expert_no_result':'該当者なし',
-    'btn.update_with_file':'ドキュメントを更新（新しいファイル付き）','btn.save_continue':'保存して次へ（{cur}/{total}）',
+    'label.expert_empty':'データなし','label.expert_fail':'読み込み失敗：{msg}','btn.update_with_file':'ドキュメントを更新（新しいファイル付き）','btn.save_continue':'保存して次へ（{cur}/{total}）',
     'label.editor_loading':'エディターを読み込み中…',
     'label.rag_searching':'ナレッジベースを検索中…','label.rag_analyzing':'AI分析中、しばらくお待ちください…',
     'label.error_prefix':'エラー：{msg}','label.connecting':'接続中…','label.conn_fail':'⚠ 接続失敗：{msg}',
@@ -2263,7 +1875,6 @@ const I18N = {
     'toast.reparse_done_chars':'✅ 再解析完了 · {chars} 文字 — 確認後「ドキュメントを更新」で保存',
     'toast.no_extract':'テキストを抽出できませんでした。ファイル名をタイトルに設定 — そのまま原本を保存できます',
     'toast.batch_cancelled':'一括アップロードをキャンセルしました',
-    'toast.no_supported_format':'サポートされているファイル形式がありません',
     'toast.url_required':'URLを入力してください',
     'toast.url_invalid':'完全なURL（https://を含む）を入力してください',
     'toast.url_fetching':'⏳ 取得中、しばらくお待ちください…',
@@ -2285,7 +1896,6 @@ const I18N = {
     'toast.comment_fail_msg':'コメントの送信に失敗しました：{msg}',
     'toast.copy_ok':'✅ 全文をコピーしました',
     'toast.answer_not_ready':'回答がまだ完了していません。しばらく待ってから保存してください',
-    'toast.url_copied':'URLをコピーしました！新しいコンピュータまたはブラウザに貼り付けると設定が自動読み込みされます',
     'toast.snapshot_fail':'スナップショットの読み取りに失敗しました',
     'toast.restored_ver':'選択したバージョンに復元しました',
     'toast.restore_fail':'復元失敗：{msg}',
@@ -2294,9 +1904,6 @@ const I18N = {
     'toast.restored_v':'v{v} に復元しました',
     'toast.ver_not_exist':'バージョンデータが存在しません',
     'toast.ver_fetch_fail':'バージョンの読み込み失敗：{msg}',
-    'toast.sql_copied':'SQL概要をコピーしました — 完全版は setup.sql を参照',
-    'toast.sql_full':'ダウンロードした setup.sql から完全な SQL をコピーしてください',
-    'toast.user_mgmt':'ユーザー管理は Platform → User Management から',
     'toast.copied_short':'コピーしました',
     'toast.rate_limit':'レート制限 — {sec}秒後に再試行（{n}/{max}回目）…',
     'toast.rate_limit_retry':'レート制限 — {sec}秒後に再試行…',
@@ -2315,35 +1922,13 @@ const I18N = {
     'toast.review_done':'実行しました：{action}',
     'toast.ocr_start':'⏳ 画像型PDF、OCR処理中（全{total}ページ、先頭{n}ページ処理）…',
     'toast.ocr_page':'⏳ OCR {n} / {total} ページ目…',
-    'toast.show_user_articles':'{name} の記事を表示',
-  },
-};
+    'toast.show_user_articles':'{name} の記事を表示'
+  }
+  };
 
 function t(key) { return (I18N[currentLang] || I18N['zh-TW'])[key] || (I18N['zh-TW'][key] || key); }
 
 // Templates
-const TEMPLATES = {
-  sop: {
-    title: 'SOP — [作業名稱] v1.0',
-    body: `## 目的\n\n說明此 SOP 的目的與適用範圍。\n\n## 適用範圍\n\n- 適用部門：\n- 適用產品：\n\n## 作業步驟\n\n1. **步驟一**：\n2. **步驟二**：\n3. **步驟三**：\n\n## 注意事項\n\n> 重要警示或品質要求\n\n## 版本歷史\n\n| 版本 | 日期 | 修改人 | 修改內容 |\n|------|------|--------|----------|\n| v1.0 | ${new Date().toISOString().split('T')[0]} | | 初版 |`
-  },
-  meeting: {
-    title: `[${new Date().toISOString().split('T')[0]}] 會議紀錄`,
-    body: `## 基本資訊\n\n- **出席人員**：\n- **會議時間**：\n- **地點 / 形式**：\n\n## 討論議題\n\n### 1. \n\n### 2. \n\n## 決議事項\n\n1. \n\n## 待辦事項（Action Items）\n\n| 負責人 | 任務 | 截止日期 | 狀態 |\n|--------|------|----------|------|\n| | | | 未開始 |`
-  },
-  review: {
-    title: '[專案名稱] 覆盤報告',
-    body: `## 專案背景\n\n## 預期目標 vs 實際結果\n\n| 指標 | 目標 | 實際 | 差異 |\n|------|------|------|------|\n| | | | |\n\n## 做對了什麼\n\n- \n\n## 做錯了什麼 / 可改善的地方\n\n- \n\n## 根本原因分析\n\n## 下次改進方案\n\n1. `
-  },
-  tacit: {
-    title: '[主題] 實戰心得 — [作者姓名]',
-    body: `## 情境背景\n\n（在什麼條件、什麼問題下產生這份心得）\n\n## 解決方法\n\n詳細描述如何解決，包含具體操作步驟。\n\n## 為什麼這樣做有效\n\n解釋背後的原理或邏輯。\n\n## 注意事項 / 踩過的坑\n\n- \n\n## 可適用的類似情境\n\n- \n\n## 聯絡人\n\n如需進一步了解，聯絡：`
-  },
-  inspection: {
-    title: 'IQC 入料檢驗報告 — [料號]',
-    body: `## 基本資訊\n\n- **料號**：\n- **品名**：\n- **供應商**：\n- **入料日期**：\n- **數量**：\n- **批號**：\n\n## 抽樣計畫\n\n- 抽樣標準：MIL-STD-1916\n- 抽樣數量：\n- AQL：0.65\n\n## 檢驗項目\n\n| 項目 | 規格 | 實測值 | 判定 |\n|------|------|--------|------|\n| 外觀 | 無損傷 | | PASS / FAIL |\n| 尺寸 | | | |\n\n## 判定結果\n\n- [ ] 合格（PASS）入庫\n- [ ] 特採（條件如下）\n- [ ] 不合格（FAIL）退貨\n\n## 備註`
-  }
-};
 
 // Demo documents for offline/mock mode
 const DEMO_DOCS = [
@@ -2482,8 +2067,9 @@ async function initPortalSession() {
   const chip = document.getElementById('portal-user-chip');
   if (chip) chip.style.display = 'flex';
 
-  // ── 補齊真實姓名：若 session 沒帶 nameEn/nameZh，去 kms_users 查 ──
-  let displayName = sess.nameEn || sess.nameZh || sess.empId || '';
+  // ── 補齊真實姓名：若 session 沒帶 nameEn/nameZh，去 users 表查 ──
+  // 注意：不可先把 empId 混入 displayName 再判斷（那樣條件永不成立，查名邏輯變死碼）
+  let displayName = sess.nameEn || sess.nameZh || '';
   if (!displayName && sess.empId && CFG.supabaseUrl && CFG.supabaseKey) {
     try {
       const rows = await sbFetch(
@@ -2558,10 +2144,12 @@ window.addEventListener('DOMContentLoaded', async () => {
   setLang(currentLang);
   loadConfig();
   await initPortalSession();
-  if (!localStorage.getItem('kms-lang')) {
-    const _sl = { TW:'zh-TW', CN:'zh-CN', VN:'vi' }[portalUser?.site];
-    if (_sl) setLang(_sl);
-  }
+  try {
+    if (!localStorage.getItem('kms-lang')) {
+      const _sl = { TW:'zh-TW', CN:'zh-CN', VN:'vi' }[portalUser?.site];
+      if (_sl) setLang(_sl);
+    }
+  } catch(_) {} // Safari 封鎖儲存等模式下 getItem 會 throw，不可中斷 init
   // doc-author 由 initPortalSession 填入登入者姓名（若已查到）
   // 此處不再強制清空，讓 initPortalSession 的 displayName 生效
   // TipTap 改為平行載入不阻塞（原本 await 會讓文件清單等 esm.sh 模組樹載完才開始）；
@@ -2664,30 +2252,6 @@ function updateToolbarState() {
 }
 
 
-function loadTemplate(key) {
-  if (!key || !TEMPLATES[key]) return;
-  const tmpl = TEMPLATES[key];
-  document.getElementById('doc-title').value = tmpl.title;
-
-  if (window._tiptapFallback) {
-    const ta = document.getElementById('tiptap-fallback');
-    if (ta) ta.value = tmpl.body;
-    return;
-  }
-
-  if (tiptapEditor) {
-    // Convert markdown-like content to TipTap HTML
-    const html = tmpl.body
-      .replace(/^## (.+)$/gm, '<h2>$1</h2>')
-      .replace(/^### (.+)$/gm, '<h3>$1</h3>')
-      .replace(/^> (.+)$/gm, '<blockquote><p>$1</p></blockquote>')
-      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-      .replace(/^- (.+)$/gm, '<li>$1</li>')
-      .replace(/\n\n/g, '</p><p>')
-      .replace(/^(?!<[h|l|b])/gm, '');
-    tiptapEditor.commands.setContent(`<p>${html}</p>`);
-  }
-}
 
 // Simple TipTap → Markdown converter
 function editorToMarkdown() {
@@ -2878,16 +2442,6 @@ async function getQueryEmbedding(queryText) {
 }
 
 // Simple cosine similarity for local mock search
-function cosineSim(a, b) {
-  if (!a || !b || a.length !== b.length) return 0;
-  let dot = 0, na = 0, nb = 0;
-  for (let i = 0; i < a.length; i++) {
-    dot += a[i] * b[i];
-    na += a[i] * a[i];
-    nb += b[i] * b[i];
-  }
-  return dot / (Math.sqrt(na) * Math.sqrt(nb) || 1);
-}
 
 // Keyword-based scoring — checks title(×3), summary(×2), body(×1), category(×2)
 function keywordScore(query, doc) {
@@ -2947,7 +2501,9 @@ const CAT_NAMES_FOR_PROMPT = {
 let _classifyTimer = null;
 
 function scheduleAutoClassify() {
-  if (!CFG.claudeKey) return;
+  // autoClassify 走 claude-proxy edge function，有 supabaseUrl 即可；
+  // 原判斷 !CFG.claudeKey（恆為空字串）導致 AI 自動分類整個被關閉
+  if (!CFG.supabaseUrl && !CFG.claudeKey) return;
   clearTimeout(_classifyTimer);
   _classifyTimer = setTimeout(autoClassify, 1500);
 }
@@ -3006,10 +2562,10 @@ async function saveDoc() {
   const lang = document.getElementById('doc-lang').value;
   const status = document.getElementById('doc-status').value;
 
-  if (!title) { toast(t('toast.title_required'), 'error'); return; }
-  if (window._uploadBlocked) { toast(t('toast.upload_blocked'), 'error'); return; }
+  if (!title) { toast(t('toast.title_required'), 'error'); return false; }
+  if (window._uploadBlocked) { toast(t('toast.upload_blocked'), 'error'); return false; }
   // 有上傳檔案時，body 可以為空（以檔案內容為主）
-  if (!body && !uploadedFile && !uploadedFileUrl) { toast(t('toast.body_required'), 'error'); return; }
+  if (!body && !uploadedFile && !uploadedFileUrl) { toast(t('toast.body_required'), 'error'); return false; }
 
   const btn = document.querySelector('.save-btn');
   btn.disabled = true;
@@ -3032,7 +2588,10 @@ async function saveDoc() {
           fileType = uploadedFileType;
           fileSize = uploadedFileSize;
         } catch(e) {
-          toast(t('toast.upload_fail') + e.message, '');
+          // 上傳失敗：中止整個儲存（原本會繼續存檔並把 file_url 寫成 null，
+          // 編輯情境下等於把舊附件參照靜默清空且無法復原）
+          toast(t('toast.upload_fail') + e.message, 'error');
+          return false;
         }
       }
 
@@ -3193,10 +2752,12 @@ async function saveDoc() {
       switchPanel('review');
       setTimeout(() => filterReviewPanel(_retFilter), 100);
     } else { switchPanel('docs'); }
+    return true;
 
   } catch(e) {
     toast(t('toast.save_fail').replace('{msg}', e.message), 'error');
     console.error(e);
+    return false;
   } finally {
     btn.disabled = false;
     btn.textContent = editingDocId ? t('editor.update') : t('editor.save');
@@ -3292,7 +2853,6 @@ function autoSnapshot(doc) {
 // FILE UPLOAD — 狀態
 // ═══════════════════════════════════════════════
 let uploadedFile = null;      // 單檔（向後相容）
-let uploadedFiles = [];       // 多檔陣列
 let uploadedFileUrl = null;
 let uploadedFileName = null;
 let uploadedFileType = null;
@@ -3449,6 +3009,14 @@ async function processBatchFiles(files) {
   await processBatchNext();
 }
 
+
+// 批次上傳曾覆寫 .save-btn 的 onclick property（優先於 HTML attribute），
+// 結束/取消時必須還原，否則之後每次手動儲存都會誤觸批次流程
+function _restoreSaveBtn() {
+  const b = document.querySelector('.save-btn');
+  if (b) { b.onclick = saveDoc; b.textContent = t('editor.save'); }
+}
+
 async function processBatchNext() {
   if (_batchIdx >= _batchFiles.length) {
     // 全部完成
@@ -3456,6 +3024,7 @@ async function processBatchNext() {
       ? t('toast.batch_done_fail').replace('{ok}', _batchSuccess).replace('{fail}', _batchFail)
       : t('toast.batch_done_ok').replace('{ok}', _batchSuccess);
     toast(_batchMsg, 'success');
+    _restoreSaveBtn();
     await loadDocs(true);
     switchPanel('docs');
     return;
@@ -3561,7 +3130,9 @@ async function processBatchNext() {
   if (saveBtn) {
     saveBtn.textContent = t('btn.save_continue').replace('{cur}', current).replace('{total}', total);
     saveBtn.onclick = async () => {
-      await saveDoc();
+      const ok = await saveDoc();
+      // 儲存失敗（驗證未過/寫入錯誤）：停在本檔讓使用者修正或按「跳過」，不可計成功前進
+      if (ok === false) return;
       _batchIdx++;
       _batchSuccess++;
       // 移除進度條（下一份會重建）
@@ -3582,6 +3153,7 @@ function skipAllBatch() {
   if (!confirm('確定取消剩餘的批次上傳？')) return;
   _batchFiles = [];
   _batchIdx = 0;
+  _restoreSaveBtn();
   document.getElementById('batch-progress-bar')?.remove();
   toast(t('toast.batch_cancelled'), '');
   if (window._openDocFromReview) {
@@ -3596,11 +3168,6 @@ function skipAllBatch() {
 }
 
 // 舊的批次上傳迴圈（已由 processBatchNext 取代，保留殼）
-async function _processBatchFiles_legacy(files) {
-  const allowed = ['pdf','doc','docx','xls','xlsx','csv','pptx','ppt','jpg','jpeg','png','txt','md'];
-  const validFiles = files.filter(f => allowed.includes(getExt(f.name)));
-  if (!validFiles.length) { toast(t('toast.no_supported_format'), 'error'); return; }
-}
 
 
 // ─── 主流程：選檔 → 解析文字 → 顯示預覽 ───
@@ -4660,17 +4227,20 @@ async function checkAndArchiveExpired(docs) {
     d.valid_until && d.valid_until < today && d.status === 'published'
   );
   if (!expired.length) return;
+  let archived = 0;
   for (const d of expired) {
     try {
       await kmsWrite('update', 'kms_documents',
         { status: 'archived', review_note: `有效日期 ${d.valid_until} 已到期，自動封存` },
         d.id
       );
-      console.log('[expire] 自動封存:', d.title);
+      archived++;
     } catch(e) { console.warn('[expire]', e.message); }
   }
-  if (expired.length > 0) {
-    toast(t('toast.auto_archived').replace('{n}', expired.length), '');
+  // 只在真的封存成功時才重載清單：若 kmsWrite 持續失敗，
+  // 到期文件仍在清單中，重載會再次觸發本函式 → 無限請求迴圈
+  if (archived > 0) {
+    toast(t('toast.auto_archived').replace('{n}', archived), '');
     await loadDocs(true);
   }
 }
@@ -5188,6 +4758,7 @@ function resetSearchBtn() {
   const btn = document.getElementById('search-btn');
   if (!btn) return;
   btn.disabled = false;
+  btn.onclick = doSearch; // 搜尋中曾改指向 cancelSearch，還原
   btn.innerHTML = `<span>${I18N[currentLang]?.['rag.btn'] || '送出問題'}</span>`;
   window._searchAborted = false;
 }
@@ -5201,8 +4772,11 @@ async function doSearch() {
   const aiBtn = document.getElementById('ai-search-btn');
   if (aiBtn) aiBtn.disabled = true;
   if (!btn) return;
-  btn.disabled = true;
-  btn.innerHTML = `<span class="spinner"></span> <span onclick="cancelSearch()" style="cursor:pointer;text-decoration:underline;font-size:11px;">${t('btn.cancel')}</span>`;
+  // 不可 disabled：disabled 按鈕會吞掉內部「取消」span 的點擊事件，
+  // 改以 onclick 指向 cancelSearch 讓搜尋中點按鈕即取消
+  btn.disabled = false;
+  btn.onclick = cancelSearch;
+  btn.innerHTML = `<span class="spinner"></span> <span style="cursor:pointer;text-decoration:underline;font-size:11px;">${t('btn.cancel')}</span>`;
 
   const ragBody = document.getElementById('rag-body');
   if (!ragBody) { btn.disabled = false; return; }
@@ -5362,7 +4936,7 @@ async function doAiSearch() {
     }
   } finally {
     if (aiBtn) { aiBtn.disabled = false; aiBtn.innerHTML = '<span data-i18n="rag.ai_btn">🤖 AI 搜尋</span>'; }
-    if (btn) btn.disabled = false;
+    resetSearchBtn(); // 還原文字與 onclick（搜尋中曾指向 cancelSearch）
   }
 }
 
@@ -5569,46 +5143,7 @@ async function callClaudeProxy(system, user, maxTokens = 1500) {
   return '';
 }
 
-async function streamClaude(system, user) {
-  const el = document.getElementById('ai-output');
-  if (!el) return;
-  el.textContent = t('label.connecting');
-  el.classList.add('streaming');
 
-  try {
-    const text = await callClaudeProxy(system, user, 1500);
-    el.textContent = '';
-    for (let i = 0; i < text.length; i += 3) {
-      el.textContent += text.slice(i, i + 3);
-      if (i % 60 === 0) await new Promise(r => setTimeout(r, 8));
-    }
-  } catch(e) {
-    el.textContent = t('label.conn_fail').replace('{msg}', e.message);
-  } finally {
-    el.classList.remove('streaming');
-  }
-}
-
-function generateMockAnswer(query, chunks) {
-  const lang = currentLang;
-  const docLabel = lang === 'ja' ? 'ドキュメント' : '文件';
-  const intro = {
-    'zh-TW': `根據知識庫中 ${chunks.length} 份相關文件，以下是關於「${query}」的彙整說明：\n\n`,
-    'zh-CN': `根据知识库中 ${chunks.length} 份相关文档，以下是关于「${query}」的汇总说明：\n\n`,
-    'en': `Based on ${chunks.length} relevant documents in the knowledge base, here is a summary for "${query}":\n\n`,
-    'vi': `Dựa trên ${chunks.length} tài liệu liên quan trong kho kiến thức, đây là tóm tắt về "${query}":\n\n`,
-    'ja': `ナレッジベースの ${chunks.length} 件の関連ドキュメントに基づき、「${query}」についての概要は以下の通りです：\n\n`,
-  }[lang] || '';
-  const body = chunks.map((c, i) => `[${docLabel}${i+1}] ${c.title}：${c.snippet.substring(0, 80)}…`).join('\n\n');
-  const footer = {
-    'zh-TW': '',
-    'zh-CN': '',
-    'en': '',
-    'vi': '',
-    'ja': '',
-  }[lang] || '';
-  return intro + body + footer;
-}
 
 // ═══════════════════════════════════════════════
 // PRODUCT LINES
@@ -5792,6 +5327,9 @@ async function openReader(id) {
       method: 'POST',
       headers: { 'Content-Type':'application/json', 'Authorization':'Bearer '+CFG.supabaseKey, 'apikey':CFG.supabaseKey },
       body: JSON.stringify({ doc_id: id }),
+    }).then(res => {
+      // RPC 不存在回 404 時 fetch 不會 reject，需檢查 res.ok 才能觸發 fallback
+      if (!res.ok) throw new Error('rpc ' + res.status);
     }).catch(() => {
       // RPC 不存在時 fallback：直接 PATCH
       sbFetch(`/rest/v1/kms_documents?id=eq.${id}`, {
@@ -5942,11 +5480,6 @@ function closeReader() {
   _readerDoc = null;
 }
 
-function readerEdit() {
-  if (!_readerDoc) return;
-  closeReader();
-  openDoc(_readerDoc.id);
-}
 
 function readerDownload() {
   if (!_readerDoc?.file_url) return;
@@ -5958,9 +5491,12 @@ function readerDownload() {
 }
 
 function logSearchGap(query) {
-  const gaps = JSON.parse(localStorage.getItem('kms-search-gaps') || '[]');
-  gaps.push({ query, ts: new Date().toISOString() });
-  localStorage.setItem('kms-search-gaps', JSON.stringify(gaps.slice(-50)));
+  // localStorage 配額與其他子系統共用、可能已滿：任何錯誤都不可中斷搜尋流程
+  try {
+    const gaps = JSON.parse(localStorage.getItem('kms-search-gaps') || '[]');
+    gaps.push({ query, ts: new Date().toISOString() });
+    localStorage.setItem('kms-search-gaps', JSON.stringify(gaps.slice(-50)));
+  } catch(_) {}
 }
 
 // ═══════════════════════════════════════════════
@@ -6337,95 +5873,6 @@ function switchPanel(id) {
   if (id === 'docs') loadDocs();
 }
 
-// ═══════════════════════════════════════════════
-// CONFIG MODAL
-// ═══════════════════════════════════════════════
-function openConfig() {
-  document.getElementById('cfg-supabase-url').value = CFG.supabaseUrl;
-  document.getElementById('cfg-supabase-key').value = CFG.supabaseKey;
-  document.getElementById('cfg-embed-model').value = CFG.embedModel;
-  document.getElementById('config-modal').classList.add('show');
-}
-function closeConfig() { document.getElementById('config-modal').classList.remove('show'); }
-function saveConfig() {
-  CFG.supabaseUrl = document.getElementById('cfg-supabase-url').value.trim().replace(/\/$/, '');
-  CFG.supabaseKey = document.getElementById('cfg-supabase-key').value.trim();
-  CFG.embedModel  = document.getElementById('cfg-embed-model').value;
-  // Claude / OpenAI key 已移至 Supabase Secrets，前端不需要存
-  CFG.claudeKey = '';
-  CFG.openAiKey = '';
-  localStorage.setItem('comart-kms-config', JSON.stringify(CFG));
-  closeConfig();
-  updateStatus();
-  loadDocs();
-  toast(t('toast.cfg_saved'), 'success');
-}
-
-// ── 匯出設定 → 下載 JSON 檔 ──
-function exportConfig() {
-  const exportData = {
-    ...CFG,
-    _exported: new Date().toISOString(),
-    _note: 'COMART KMS Config — 請妥善保管此檔案，不要分享給他人',
-  };
-  const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `comart-kms-config-${new Date().toISOString().slice(0,10)}.json`;
-  a.click();
-  URL.revokeObjectURL(url);
-  toast(t('toast.cfg_export_ok'), 'success');
-}
-
-// ── 匯入設定 ← 讀取 JSON 檔 ──
-function importConfig(event) {
-  const file = event.target.files?.[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    try {
-      const data = JSON.parse(e.target.result);
-      // 只取已知欄位，過濾掉 _note / _exported
-      const { supabaseUrl, supabaseKey, claudeKey, openAiKey, embedModel } = data;
-      if (supabaseUrl) CFG.supabaseUrl = supabaseUrl;
-      if (supabaseKey) CFG.supabaseKey = supabaseKey;
-      if (claudeKey)   CFG.claudeKey   = claudeKey;
-      if (openAiKey)   CFG.openAiKey   = openAiKey;
-      if (embedModel)  CFG.embedModel  = embedModel;
-      // 寫入 localStorage
-      localStorage.setItem('comart-kms-config', JSON.stringify(CFG));
-      // 填回設定畫面
-      document.getElementById('cfg-supabase-url').value = CFG.supabaseUrl;
-      document.getElementById('cfg-supabase-key').value = CFG.supabaseKey;
-      document.getElementById('cfg-claude-key').value   = CFG.claudeKey;
-      document.getElementById('cfg-openai-key').value   = CFG.openAiKey;
-      document.getElementById('cfg-embed-model').value  = CFG.embedModel;
-      updateStatus();
-      loadDocs();
-      toast(t('toast.cfg_import_ok'), 'success');
-    } catch(err) {
-      toast(t('toast.cfg_import_fail'), 'error');
-    }
-  };
-  reader.readAsText(file);
-  // 清掉 input，讓同一個檔案可以重複匯入
-  event.target.value = '';
-}
-
-// ── 複製為 URL 參數 ──
-// 用途：把設定編碼進 URL，方便在新瀏覽器或新電腦直接打開就載入設定
-// 注意：URL 會包含 API Keys，只在可信任的環境使用
-function copyConfigAsEnv() {
-  const encoded = btoa(JSON.stringify(CFG));
-  const url = `${window.location.origin}${window.location.pathname}?kms_cfg=${encoded}`;
-  navigator.clipboard?.writeText(url).then(() => {
-    toast(t('toast.url_copied'), 'success');
-  }).catch(() => {
-    // fallback：顯示在 prompt 讓使用者手動複製
-    prompt('複製此 URL（包含設定）：', url);
-  });
-}
 
 // ═══════════════════════════════════════════════
 // TOAST
@@ -6504,34 +5951,6 @@ async function loadVersionHistory() {
     </div>`).join('');
 }
 
-async function loadVersionHistoryFromSupabase(doc_id) {
-  if (!CFG.supabaseUrl || !CFG.supabaseKey) return;
-  try {
-    const versions = await sbFetch(
-      `/rest/v1/kms_doc_versions?doc_id=eq.${doc_id}&select=*&order=version_no.desc&limit=20`
-    );
-    if (!versions?.length) return;
-    const list = document.getElementById('version-list');
-    const countEl = document.getElementById('ver-count');
-    countEl.textContent = versions.length;
-    list.innerHTML = versions.map((v, i) => {
-      const dt = new Date(v.created_at);
-      const timeStr = dt.toLocaleString('zh-TW', { month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit' });
-      return `
-        <div style="border:1px solid var(--border);border-radius:6px;padding:8px 10px;margin-bottom:6px;cursor:pointer;"
-          onclick="showDocVersion('${doc_id}', ${v.version_no})">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px;">
-            <span style="font-size:11px;font-weight:500;color:var(--text-2);">v${v.version_no}</span>
-            <span style="font-size:10px;color:var(--text-3);">${timeStr}</span>
-          </div>
-          <div style="font-size:11px;color:var(--text-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${v.title}</div>
-          <div style="font-size:10px;color:var(--text-3);margin-top:2px;">${v.changed_by}</div>
-        </div>`;
-    }).join('');
-  } catch(e) {
-    console.warn('Version history load failed:', e);
-  }
-}
 
 
 // ─── 版本快照還原（從 Supabase）───
@@ -6657,26 +6076,6 @@ async function showDocVersion(doc_id, version_no) {
   }
 }
 
-// SQL copy helper
-const SETUP_SQL_PREVIEW = `-- 完整 SQL 請見 comart-kms/sql/setup.sql
--- 主要包含：
--- 1. create extension vector
--- 2. create table kms_documents (含 vector(1536) 欄位)
--- 3. create table kms_doc_versions (版本歷史)
--- 4. create table kms_search_log (知識缺口偵測)
--- 5. match_documents() RPC 函數
--- 6. kms_auto_version() Trigger（自動版本快照）
--- 7. alter table ... disable row level security（POC 期間）
--- 
--- 完整內容已包含在下載的 setup.sql 檔案中`;
-
-function copySql() {
-  navigator.clipboard?.writeText(SETUP_SQL_PREVIEW).then(() => {
-    toast(t('toast.sql_copied'), 'success');
-  }).catch(() => {
-    toast(t('toast.sql_full'), '');
-  });
-}
 
 // ═══════════════════════════════════════════════
 // TAGS
@@ -6727,31 +6126,6 @@ function clearTags() {
 // SAVE DOC — 加入 metadata 欄位
 // ═══════════════════════════════════════════════
 // 覆寫 saveDoc 的 docPayload 來源，加入新欄位
-const _origGetDocPayload = () => ({
-  title: document.getElementById('doc-title').value.trim(),
-  body: editorToMarkdown(),
-  category: document.getElementById('doc-cat').value,
-  lang: document.getElementById('doc-lang').value,
-  status: document.getElementById('doc-status').value,
-  author_name: buildAuthorName(),
-  reviewer: document.getElementById('doc-reviewer').value.trim() || null,
-  valid_until: document.getElementById('doc-valid-until').value || null,
-  tags: currentTags,
-  updated_at: new Date().toISOString(),
-});
-
-// OPEN DOC — 載入 metadata 欄位
-// openDoc metadata 擴充已合併至主函式
-
-// 在 saveDoc 清空時也清 metadata 欄位
-const _origClearEditor = () => {
-  document.getElementById('doc-author').value = '';
-  resetDocAuthor();
-  document.getElementById('doc-reviewer').value = '';
-  document.getElementById('doc-valid-until').value = new Date().toISOString().split('T')[0];
-  document.getElementById('doc-related').value = '';
-  clearTags();
-};
 
 // ═══════════════════════════════════════════════
 // KNOWLEDGE MAP
@@ -6802,7 +6176,7 @@ async function loadKmap(filterCat) {
               const safeTitle = (d.title||'').replace(/'/g,'').replace(/"/g,'');
               const canEditDoc = true; // 登入即可編輯（與知識庫列表一致）
               return `
-            <div class="doc-item" style="margin-bottom:6px;" id="doc-item-${d.id}">
+            <div class="doc-item" style="margin-bottom:6px;" id="kmap-doc-${d.id}">
               <span class="doc-cat ${d.category==='tacit'?'tacit':d.category==='product'?'product':'sop'}">${catLabel}</span>
               <span class="doc-title" onclick="openReader('${d.id}')" style="cursor:pointer;flex:1;">${d.title}</span>
               <span style="font-size:11px;color:var(--text-3);margin-right:4px;">👁 ${d.view_count||0}</span>
@@ -7153,9 +6527,6 @@ function _renderExpertContent() {
 }
 
 // 新增 / 刪除功能已移除，改由 Platform User Management 管理
-function openAddExpertModal() {
-  toast(t('toast.user_mgmt'), '');
-}
 
 // ═══════════════════════════════════════════════
 // REVIEW WORKFLOW
@@ -7648,146 +7019,6 @@ async function updateReviewBadge() {
   } catch(e) {}
 }
 
-// ═══════════════════════════════════════════════
-// COMMENTS / DISCUSSION
-// ═══════════════════════════════════════════════
-let commentsDocId    = null;
-let commentsDocTitle_ = null;
-let replyToId        = null;
-
-async function openCommentsPanel(docId, docTitle) {
-  commentsDocId     = docId;
-  commentsDocTitle_ = docTitle;
-  replyToId         = null;
-  document.getElementById('comments-doc-title').textContent = '— ' + docTitle;
-  switchPanel('comments');
-  await loadComments();
-}
-
-async function loadComments() {
-  if (!commentsDocId) return;
-  const list = document.getElementById('comment-list');
-  list.innerHTML = `<div style="color:var(--text-3);font-size:13px;padding:20px;">${t('label.comments_loading')}</div>`;
-
-  let comments = [];
-  try {
-    if (CFG.supabaseUrl && CFG.supabaseKey) {
-      comments = await sbFetch(
-        `/rest/v1/kms_comments?doc_id=eq.${commentsDocId}&select=*&order=created_at.asc`
-      ) || [];
-    } else {
-      const key = 'kms-comments-' + commentsDocId;
-      comments = JSON.parse(localStorage.getItem(key) || '[]');
-    }
-  } catch(e) {}
-
-  const roots = comments.filter(c => !c.parent_id);
-  const replies = comments.filter(c => c.parent_id);
-
-  if (!comments.length) {
-    list.innerHTML = `<div style="color:var(--text-3);font-size:13px;text-align:center;padding:30px 0;">${t('label.comments_empty')}</div>`;
-    return;
-  }
-
-  list.innerHTML = roots.map(c => renderComment(c, replies)).join('');
-}
-
-function renderComment(c, replies) {
-  const childReplies = replies.filter(r => r.parent_id === c.id);
-  const dt = new Date(c.created_at).toLocaleString('zh-TW', { month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit' });
-  // 判斷目前登入者是否為作者（可編輯/刪除）
-  const myName = portalUser ? (portalUser.nameEn || portalUser.nameZh) : null;
-  const isOwner = !myName || c.author === myName || getKmsRole() === 'admin';
-  const actionBtns = isOwner ? `
-    <button onclick="editComment('${c.id}','${c.body.replace(/'/g,"\'").replace(/\n/g,' ')}')"
-      style="font-size:11px;color:var(--text-3);cursor:pointer;background:none;border:none;padding:2px 6px;border-radius:4px;"
-      onmouseover="this.style.background='var(--bg)'" onmouseout="this.style.background='none'">✏️ 編輯</button>
-    <button onclick="deleteComment('${c.id}')"
-      style="font-size:11px;color:#A32D2D;cursor:pointer;background:none;border:none;padding:2px 6px;border-radius:4px;"
-      onmouseover="this.style.background='#FEF2F2'" onmouseout="this.style.background='none'">✕ 刪除</button>` : '';
-  return `
-    <div class="comment-item" id="comment-${c.id}">
-      <div class="comment-header">
-        <div class="comment-avatar">${(c.author||'?')[0]}</div>
-        <span class="comment-author">${c.author}</span>
-        <span class="comment-time">${dt}</span>
-        <span style="margin-left:auto;display:flex;gap:2px;">${actionBtns}</span>
-      </div>
-      <div class="comment-body" id="comment-body-${c.id}">${c.body.replace(/\n/g,'<br>')}</div>
-      <div class="comment-reply-btn" onclick="setReplyTo('${c.id}','${c.author}')">↩ 回覆</div>
-      ${childReplies.length ? `<div class="reply-indent">${childReplies.map(r => renderComment(r, [])).join('')}</div>` : ''}
-    </div>`;
-}
-
-async function editComment(id, currentBody) {
-  const newBody = prompt('編輯留言：', currentBody);
-  if (!newBody || newBody.trim() === currentBody.trim()) return;
-  try {
-    if (CFG.supabaseUrl && CFG.supabaseKey) {
-      await kmsWrite('update', 'kms_comments', { body: newBody.trim(), updated_at: new Date().toISOString() }, id);
-    } else {
-      const key = 'kms-comments-' + commentsDocId;
-      const list = JSON.parse(localStorage.getItem(key) || '[]');
-      const idx = list.findIndex(c => c.id === id);
-      if (idx >= 0) { list[idx].body = newBody.trim(); localStorage.setItem(key, JSON.stringify(list)); }
-    }
-    await loadComments();
-  } catch(e) { toast(t('toast.comment_edit_fail') + '：' + e.message, 'error'); }
-}
-
-async function deleteComment(id) {
-  if (!confirm(t('confirm.delete').replace('{title}', ''))) return;
-  try {
-    if (CFG.supabaseUrl && CFG.supabaseKey) {
-      await kmsWrite('delete', 'kms_comments', null, id);
-    } else {
-      const key = 'kms-comments-' + commentsDocId;
-      const list = JSON.parse(localStorage.getItem(key) || '[]');
-      localStorage.setItem(key, JSON.stringify(list.filter(c => c.id !== id)));
-    }
-    document.getElementById('comment-' + id)?.remove();
-    toast(t('toast.deleted'), 'success');
-  } catch(e) { toast(t('toast.comment_delete_fail') + '：' + e.message, 'error'); }
-}
-
-function setReplyTo(id, author) {
-  replyToId = id;
-  const input = document.getElementById('comment-input');
-  input.placeholder = `回覆 ${author}…`;
-  input.focus();
-}
-
-async function submitComment() {
-  const input = document.getElementById('comment-input');
-  const body = input.value.trim();
-  if (!body || !commentsDocId) return;
-
-  const author = (portalUser && (portalUser.nameEn || portalUser.nameZh)) || document.getElementById('doc-author')?.value.trim() || 'Admin';
-  const comment = {
-    doc_id: commentsDocId,
-    author,
-    body,
-    parent_id: replyToId || null,
-    created_at: new Date().toISOString(),
-  };
-
-  try {
-    if (CFG.supabaseUrl && CFG.supabaseKey) {
-      await kmsWrite('insert', 'kms_comments', comment);
-    } else {
-      const key = 'kms-comments-' + commentsDocId;
-      const list = JSON.parse(localStorage.getItem(key) || '[]');
-      list.push({ ...comment, id: 'local-' + Date.now() });
-      localStorage.setItem(key, JSON.stringify(list));
-    }
-    input.value = '';
-    input.placeholder = t('comments.input.placeholder');
-    replyToId = null;
-    await loadComments();
-  } catch(e) {
-    toast(t('toast.comment_fail').replace('{msg}', e.message), 'error');
-  }
-}
 
 // ═══════════════════════════════════════════════
 // SWITCH PANEL — 統一入口，含新 panels
@@ -7819,10 +7050,6 @@ window.addEventListener('DOMContentLoaded', () => {
 // _origOpenDocMeta 已移除
 // INCREMENT VIEW COUNT — 已合併至 openDoc 主函式
 
-// Close config modal on overlay click
-document.getElementById('config-modal').addEventListener('click', function(e) {
-  if (e.target === this) closeConfig();
-});
 document.getElementById('product-line-modal').addEventListener('click', function(e) {
   if (e.target === this) closeAddProductLineModal();
 });

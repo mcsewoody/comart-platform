@@ -18,10 +18,10 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 
 | File | Version | Purpose | ~Lines |
 |------|---------|---------|--------|
-| `index.html` | v1.37 | Main portal — login, home, directory, bulletin, calendar, AI tools | 5,889 |
-| `admin/index.html` | v1.57 | Admin System — room booking, fleet, visitor, library, lottery | 5,840 |
-| `kms/index.html` | — | Knowledge Management System — RAG, document editor, AI Q&A | 6,520 |
-| `quotation/index.html` | — | Quotation & CRM system | 7,699 |
+| `index.html` | v1.57 | Main portal — login, home, directory, bulletin, calendar, AI tools | 4,372 |
+| `admin/index.html` | v2.25 | Admin System — room booking, fleet, visitor, library, lottery | 5,576 |
+| `kms/index.html` | v2.25 | Knowledge Management System — RAG, document editor, AI Q&A | 7,059 |
+| `quotation/index.html` | — (no version convention) | Quotation & CRM system | 7,288 |
 
 `admin/lottery.html` is a standalone lottery page (separate from the lottery module inside `admin/index.html`).
 
@@ -47,9 +47,7 @@ Numbered backup files (`index112.html`, `index328.html`, etc.) are iteration sna
 - Required header: `x-admin-token: COMART-ADMIN-2026`
 - Also used as translation proxy (`XLAT_PROXY`)
 
-**Firebase Firestore** (compat SDK v10.12.0, project `comart-quotation`):
-- Real-time notifications and portal messages only
-- Used as auth fallback if Supabase is unavailable
+**Firebase**: 已完全移除（2026-07 確認四個 HTML 皆無 firebase 引用）。通知與站內訊息走 Supabase 輪詢（通知 60 秒、訊息 10 秒增量），登入只有 Supabase 單一路徑。
 
 **Supabase Edge Functions** (Deno, in `supabase/functions/`):
 - `claude-proxy` — forwards requests to Anthropic API; reads `CLAUDE_API_KEY` from Supabase Secrets (never exposed to frontend)

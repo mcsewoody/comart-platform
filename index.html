@@ -2792,6 +2792,7 @@ async function doLogin() {
   try {
     const hash = await sha256(pwd);
     let user = null;
+    let netFail = false; // 網路/後端失敗須與「帳號不存在」區分，避免誤導使用者
 
     // ── 主要：從 Supabase 驗證（透過 Cloudflare Worker）──
     try {
@@ -2819,11 +2820,15 @@ async function doLogin() {
             pwdHash:  row.pwd_hash  || '',
           };
         }
+      } else {
+        netFail = true; // 後端回錯（Worker/RLS/5xx）≠ 帳號不存在
       }
     } catch(e) {
+      netFail = true; // 斷網或 Worker 掛掉 ≠ 帳號不存在
       console.warn('Supabase login failed:', e.message);
     }
 
+    if (!user && netFail)             { showErr('Login failed — check your connection and try again.'); return; }
     if (!user)                        { showErr('Account not found.');              return; }
     if (user.pwdHash !== hash)         { showErr('Incorrect password.');             return; }
     if (user.role === 'inactive')      { showErr('This account has been deactivated.'); return; }
@@ -2886,7 +2891,9 @@ function enterPortal() {
   applyI18nAll();
   // 啟動通知
   setTimeout(function() { updateNotifBadge(true); }, 1200);
-  setInterval(updateNotifBadge, 60000);
+  // 自清舊計時器：登出再登入時 enterPortal 會重跑，避免累積多個輪詢
+  if (window._notifBadgeTimer) clearInterval(window._notifBadgeTimer);
+  window._notifBadgeTimer = setInterval(updateNotifBadge, 60000);
   startMsgListener();
 }
 
@@ -3125,13 +3132,12 @@ async function loadNotifications() {
   const sbKey = await getSupabaseKey();
   if (!sbKey) return;
 
-  const myId = sess.nameEn || sess.empId || '';
   const list = document.getElementById('notifList');
   if (!list) return;
 
   try {
     const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/notifications?to_user=eq.${encodeURIComponent(myId)}&order=created_at.desc&limit=30`,
+      `${SUPABASE_URL}/rest/v1/notifications?${encodeURI(_notifFilter(sess))}&order=created_at.desc&limit=30`,
       { headers: { 'apikey': sbKey, 'Authorization': `Bearer ${sbKey}` } }
     );
     if (!res.ok) throw new Error(res.status);
@@ -3151,10 +3157,11 @@ async function loadNotifications() {
 
     list.innerHTML = notifs.map(n => {
       const dt = new Date(n.created_at).toLocaleString('zh-TW', { month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit' });
-      return `<div class="notif-item ${n.is_read ? '' : 'unread'}" onclick="openNotif('${n.id}','${(n.link||'').replace(/'/g,'')}')">
-        <div class="notif-title">${n.title || '新通知'}</div>
-        <div class="notif-body">${n.body || ''}</div>
-        <div class="notif-time">${dt} · ${n.from_user || 'KMS'}</div>
+      // title/body 含使用者輸入的留言內文，必須跳脫（儲存型 XSS 防護）
+      return `<div class="notif-item ${n.is_read ? '' : 'unread'}" onclick="openNotif('${n.id}','${escHtml((n.link||'').replace(/'/g,''))}')">
+        <div class="notif-title">${escHtml(n.title) || '新通知'}</div>
+        <div class="notif-body">${escHtml(n.body)}</div>
+        <div class="notif-time">${dt} · ${escHtml(n.from_user) || 'KMS'}</div>
       </div>`;
     }).join('');
   } catch(e) {
@@ -3181,9 +3188,8 @@ async function markAllRead() {
   const sess = readSession();
   const sbKey = await getSupabaseKey();
   if (!sbKey || !sess) return;
-  const myId = sess.nameEn || sess.empId || '';
   await fetch(
-    `${SUPABASE_URL}/rest/v1/notifications?to_user=eq.${encodeURIComponent(myId)}&is_read=eq.false`,
+    `${SUPABASE_URL}/rest/v1/notifications?${encodeURI(_notifFilter(sess))}&is_read=eq.false`,
     { method: 'PATCH', headers: { 'apikey': sbKey, 'Authorization': `Bearer ${sbKey}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' }, body: JSON.stringify({ is_read: true }) }
   ).catch(()=>{});
   document.getElementById('notifPanel')?.classList.remove('open');
@@ -3191,15 +3197,22 @@ async function markAllRead() {
   updateNotifBadge(false);
 }
 
+// 通知身份過濾：寫入端（Portal/KMS）以「姓名或工號」為 to_user，
+// 使用者可能以 nameEn / nameZh / empId 任一身份收件 → 讀取端全部涵蓋，
+// 修正「無英文名的使用者永遠收不到通知」的鍵不一致問題
+function _notifFilter(sess) {
+  const ids = [...new Set([sess.nameEn, sess.nameZh, sess.empId].filter(Boolean))];
+  return 'or=(' + ids.map(v => 'to_user.eq."' + v.replace(/"/g, '') + '"').join(',') + ')';
+}
+
 async function updateNotifBadge(autoOpen) {
   const sess = readSession();
   if (!sess) return;
   const sbKey = await getSupabaseKey();
   if (!sbKey) return;
-  const myId = sess.nameEn || sess.empId || '';
   try {
     const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/notifications?to_user=eq.${encodeURIComponent(myId)}&is_read=eq.false&select=id`,
+      `${SUPABASE_URL}/rest/v1/notifications?${encodeURI(_notifFilter(sess))}&is_read=eq.false&select=id`,
       { headers: { 'apikey': sbKey, 'Authorization': `Bearer ${sbKey}` } }
     );
     const data = await res.json();
@@ -3421,7 +3434,7 @@ function renderBulletin() {
       <div class="bb-post-header">
         <div class="bb-post-avatar">${init}</div>
         <div class="bb-post-meta">
-          <div class="bb-post-author">${p.authorName || p.authorId}
+          <div class="bb-post-author">${escHtml(p.authorName || p.authorId)}
             ${p.pinned ? '<span class="bb-post-pin">📌 ' + t('bb_pin') + '</span>' : ''}
           </div>
           <div class="bb-post-time">${dt}</div>
@@ -3813,7 +3826,7 @@ const SB = {
   async get(table, qs='') { const res = await fetch(`${this._url(table)}${qs?'?'+qs:''}`, {headers:this._h}); if(!res.ok){console.warn('SB.get',table,res.status);return null;} return res.json(); },
   async post(table, data) { const res = await fetch(this._url(table),{method:'POST',headers:this._h,body:JSON.stringify(data)}); if(!res.ok){const e=await res.text();throw new Error(`SB.post ${table}: ${e}`);} },
   async patch(table, qs, data) { const res = await fetch(`${this._url(table)}?${qs}`,{method:'PATCH',headers:{...this._h,Prefer:'return=representation'},body:JSON.stringify(data)}); if(!res.ok){const e=await res.text();throw new Error(`SB.patch ${table}: ${e}`);} return res.json(); },
-  async delete(table, qs) { await fetch(`${this._url(table)}?${qs}`,{method:'DELETE',headers:this._h}); },
+  async delete(table, qs) { const res = await fetch(`${this._url(table)}?${qs}`,{method:'DELETE',headers:this._h}); if(!res.ok) throw new Error('delete '+table+' HTTP '+res.status); },
   async upsert(table, data, pk='id') { const pkVal=data[pk]; if(!pkVal) return this.post(table,data); const patched=await this.patch(table,`${pk}=eq.${encodeURIComponent(pkVal)}`,data).catch(()=>[]); if(patched&&patched.length>0) return; return this.post(table,data); }
 };
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,8); }
@@ -4012,7 +4025,7 @@ function renderMsg(m, replies) {
   return `<div class="msg-item" id="msg-${m.id}">
     <div class="msg-header">
       <div class="msg-avatar">${init}</div>
-      <span class="msg-author">${m.authorName || m.authorId}</span>
+      <span class="msg-author">${escHtml(m.authorName || m.authorId)}</span>
       <span class="msg-time">${dt}</span>
       ${SESSION?.role === 'admin' || m.authorId === SESSION?.empId
         ? `<button onclick="deleteMsg('${m.id}')" style="margin-left:4px;padding:1px 6px;border-radius:4px;border:1px solid var(--br);background:transparent;color:var(--tx3);font-size:10px;cursor:pointer;">✕</button>`
@@ -4021,7 +4034,7 @@ function renderMsg(m, replies) {
     <div class="msg-body">${escHtml(m.body)}</div>
     <div class="msg-actions">
       <button class="msg-like-btn${liked?' liked':''}" onclick="likeMsg('${m.id}')">❤ ${(m.likes||[]).length||''}</button>
-      <span class="msg-reply-btn" onclick="setReplyTo('${m.id}','${m.authorName||m.authorId}')">↩ 回覆</span>
+      <span class="msg-reply-btn" onclick="setReplyTo('${m.id}','${escHtml((m.authorName||m.authorId||'').replace(/'/g,''))}')">↩ 回覆</span>
     </div>
     ${childReplies.length ? `<div class="msg-reply-indent">${childReplies.map(r => renderMsg(r,[])).join('')}</div>` : ''}
   </div>`;
@@ -5832,7 +5845,7 @@ function getEventsForDate(dateStr) {
       events = TRIPS.map(function(t) {
         var u    = ALL_USERS.find(function(x) { return x.empId === t.empId; });
         var name = u ? (u.nameEn || u.nameZh || t.empId) : (t.empId || '');
-        return { id: t.id, title: escHtml(name) + ' ✈ ' + escHtml(t.dest || ''), dateFrom: t.dateFrom, dateTo: t.dateTo || t.dateFrom, catId: catId, color: cat.color };
+        return { id: t.id, title: name + ' ✈ ' + (t.dest || ''), dateFrom: t.dateFrom, dateTo: t.dateTo || t.dateFrom, catId: catId, color: cat.color }; // title 為原始字串，各渲染點已各自 escHtml（先前來源+渲染雙重跳脫會顯示 &amp;lt; 之類字樣）
       });
     } else if (cat.apiCode) {
       var key = cat.apiCode + '-' + tripViewYear;

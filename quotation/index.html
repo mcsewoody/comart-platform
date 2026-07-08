@@ -4183,14 +4183,15 @@ async function downloadXLSX(id) {
             im.src = xlsxImgB64;
           });
           let iw = natSz.w || 120, ih = natSz.h || 120;
-          // 600 DPI: scale image to 600dpi equivalent pixels for the cell size
-          // ExcelJS cell pixel size is at 96dpi; 600/96 = 6.25x scale factor
-          const dpiScale = 600 / 96;
-          const maxW = (COL_PIC_PX - 14) * dpiScale;
-          const maxH = (ROW_PX - 14) * dpiScale;
-          const scale = Math.min(maxW/iw, maxH/ih, 1);
-          iw = Math.round(iw * scale / dpiScale);
-          ih = Math.round(ih * scale / dpiScale);
+          // 圖片在「圖片格」內盡量放大、保留原比例（letterbox），與 PDF 匯出一致。
+          // 內嵌的是原始高解析 base64（ExcelJS 不會重壓），ext 只決定顯示大小，
+          // 所以直接以格子像素為目標即可，不需要 600dpi 的換算（舊版多除一個
+          // dpiScale 又把 scale 卡在 1，導致圖片被縮成約 1/6.25，擠在格子裡）。
+          const boxW = COL_PIC_PX - 8;
+          const boxH = ROW_PX - 8;
+          const fit  = Math.min(boxW / iw, boxH / ih);
+          iw = Math.max(1, Math.round(iw * fit));
+          ih = Math.max(1, Math.round(ih * fit));
           const imgId = wb.addImage({ base64: b64, extension: ext });
           ws.addImage(imgId, {
             tl: { col: 1 + (COL_PIC_PX - iw)/COL_PIC_PX*0.5, row: (r-1) + (ROW_PX - ih)/(ROW_PX*2) },
@@ -4282,7 +4283,7 @@ async function downloadPDFasHTML(q) {
     const pName=(p.name&&(p.name[ql]||p.name.en))||p.series;
     const pDesc=(p.features&&(p.features[ql]||p.features.en))||'';
     const imgSrc=await getProdImgB64(pid);
-    const imgTag=imgSrc?'<img src="'+imgSrc+'" style="max-width:80px;max-height:80px;object-fit:contain">':'—';
+    const imgTag=imgSrc?'<img src="'+imgSrc+'" style="width:100%;height:110px;object-fit:contain;display:block">':'—';
     const priceCells=q.moqTiers.map(m=>{const _v=q.prices?.[pid]?.[m];const _hoc=q.outCurrency||q.currency||'USD';const v=(_v&&_hoc!=='USD')?usdToOut(_v,_hoc):_v;return '<td style="text-align:center;padding:6px 4px;border:1px solid #ccc;font-size:11px">'+(v?formatByCurrency(v,_hoc):'—')+'</td>';}).join('');
     const pFeatured=q.featured?.[pid]===true;
     const rmk=pFeatured
@@ -4312,7 +4313,7 @@ async function downloadPDFasHTML(q) {
   ].join('\n');
   const googleFont=ql==='ja'?'<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap">':(ql==='zh-TW'||ql==='zh-CN')?'<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC&display=swap">':'';
   const fontFamily=ql==='ja'?"'Noto Sans JP',sans-serif":(ql==='zh-TW'||ql==='zh-CN')?"'Noto Sans TC',sans-serif":"Arial,sans-serif";
-  const html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+fname+'</title>'+googleFont+'<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:'+fontFamily+';font-size:12px;color:#222}@media print{.no-print{display:none!important}@page{size:A4 landscape;margin:10mm}}.no-print{background:#1a6fd4;color:#fff;padding:10px 20px;margin-bottom:12px;display:flex;gap:12px;align-items:center}.no-print button{background:#fff;color:#1a6fd4;border:none;padding:6px 16px;border-radius:6px;cursor:pointer;font-weight:bold}table{width:100%;border-collapse:collapse}.it td{padding:4px 8px;font-size:11px;border:1px solid #ddd}</style></head><body><div class="no-print"><span>🖨️ '+_lQTIT+' — '+fname+'.pdf</span><button onclick="window.print()">Print / Save as PDF</button><button onclick="window.close()">Close</button></div>'+hdrImgTag+'<div style="text-align:center;font-size:18px;font-weight:bold;padding:10px 0;border-bottom:2px solid #324d82">'+_lQTIT+'</div><table class="it" style="margin:8px 0"><tr><td style="width:25%"><strong>'+_lTO+':</strong> '+q.company+'</td><td style="width:25%"><strong>'+_lATTN+':</strong> '+(q.attn||'—')+'</td><td style="width:25%"><strong>'+_lDATE+':</strong> '+q.date+'</td><td style="width:25%"><strong>'+_lPAY+':</strong> '+(q.pay||SETTINGS.pay||'')+'</td></tr><tr><td>TEL: '+(q.tel||'—')+'</td><td>EMAIL: '+(q.email||'—')+'</td><td><strong>'+_lINCO+':</strong> '+(q.inco||SETTINGS.inco||'')+'</td><td><strong>'+_lCUR+':</strong> '+(q.outCurrency||q.currency||'USD')+'</td></tr></table><table style="margin-top:8px"><thead><tr><th style="padding:6px 8px;background:#324d82;color:#fff;border:1px solid #2a3f6d;font-size:11px;width:12%">'+_lCode+'</th><th style="padding:6px 8px;background:#324d82;color:#fff;border:1px solid #2a3f6d;font-size:11px;width:10%">'+_lPic+'</th><th style="padding:6px 8px;background:#324d82;color:#fff;border:1px solid #2a3f6d;font-size:11px">'+_lFeat+'</th>'+priceHdrs+'<th style="padding:6px 8px;background:#324d82;color:#fff;border:1px solid #2a3f6d;font-size:11px;width:18%">'+_lRmkH+'</th></tr></thead><tbody>'+prodRows+'</tbody></table><div style="margin-top:12px"><strong>'+_lRMK+':</strong><div style="margin-top:4px;font-size:11px;white-space:pre-line">'+notes+'</div></div></body></html>';
+  const html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+fname+'</title>'+googleFont+'<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:'+fontFamily+';font-size:12px;color:#222}@media print{.no-print{display:none!important}@page{size:A4 landscape;margin:10mm}}.no-print{background:#1a6fd4;color:#fff;padding:10px 20px;margin-bottom:12px;display:flex;gap:12px;align-items:center}.no-print button{background:#fff;color:#1a6fd4;border:none;padding:6px 16px;border-radius:6px;cursor:pointer;font-weight:bold}table{width:100%;border-collapse:collapse}.it td{padding:4px 8px;font-size:11px;border:1px solid #ddd}</style></head><body><div class="no-print"><span>🖨️ '+_lQTIT+' — '+fname+'.pdf</span><button onclick="window.print()">Print / Save as PDF</button><button onclick="window.close()">Close</button></div>'+hdrImgTag+'<div style="text-align:center;font-size:18px;font-weight:bold;padding:10px 0;border-bottom:2px solid #324d82">'+_lQTIT+'</div><table class="it" style="margin:8px 0"><tr><td style="width:25%"><strong>'+_lTO+':</strong> '+q.company+'</td><td style="width:25%"><strong>'+_lATTN+':</strong> '+(q.attn||'—')+'</td><td style="width:25%"><strong>'+_lDATE+':</strong> '+q.date+'</td><td style="width:25%"><strong>'+_lPAY+':</strong> '+(q.pay||SETTINGS.pay||'')+'</td></tr><tr><td>TEL: '+(q.tel||'—')+'</td><td>EMAIL: '+(q.email||'—')+'</td><td><strong>'+_lINCO+':</strong> '+(q.inco||SETTINGS.inco||'')+'</td><td><strong>'+_lCUR+':</strong> '+(q.outCurrency||q.currency||'USD')+'</td></tr></table><table style="margin-top:8px"><thead><tr><th style="padding:6px 8px;background:#324d82;color:#fff;border:1px solid #2a3f6d;font-size:11px;width:12%">'+_lCode+'</th><th style="padding:6px 8px;background:#324d82;color:#fff;border:1px solid #2a3f6d;font-size:11px;width:14%">'+_lPic+'</th><th style="padding:6px 8px;background:#324d82;color:#fff;border:1px solid #2a3f6d;font-size:11px">'+_lFeat+'</th>'+priceHdrs+'<th style="padding:6px 8px;background:#324d82;color:#fff;border:1px solid #2a3f6d;font-size:11px;width:18%">'+_lRmkH+'</th></tr></thead><tbody>'+prodRows+'</tbody></table><div style="margin-top:12px"><strong>'+_lRMK+':</strong><div style="margin-top:4px;font-size:11px;white-space:pre-line">'+notes+'</div></div></body></html>';
   const blob=new Blob([html],{type:'text/html;charset=utf-8'});
   const url=URL.createObjectURL(blob);
   const win = window.open(url, '_blank');

@@ -5494,13 +5494,37 @@ function closeReader() {
 }
 
 
-function readerDownload() {
+async function readerDownload() {
   if (!_readerDoc?.file_url) return;
-  const a = document.createElement('a');
-  a.href = _readerDoc.file_url;
-  a.download = _readerDoc.file_name || 'file';
-  a.target = '_blank';
-  a.click();
+  const fileUrl = _readerDoc.file_url;
+  const name = _readerDoc.file_name || 'file';
+  const btn = document.getElementById('reader-dl-btn');
+  const orig = btn ? btn.innerHTML : '';
+  if (btn) { btn.disabled = true; btn.textContent = '⏳'; }
+  // 跨網域 storage URL 的 a.download 屬性會被瀏覽器忽略 → 下載檔名變成 URL 路徑，
+  // 與顯示檔名不符。改為抓成 blob（同源 blob: URL 才吃 download 屬性）再下載。
+  const fetchBlob = async (u) => { const r = await fetch(u); if (!r.ok) throw new Error('HTTP ' + r.status); return r.blob(); };
+  try {
+    let blob;
+    try {
+      blob = await fetchBlob(fileUrl);                       // 1. 直接抓（Supabase Storage 有 CORS）
+    } catch (e) {
+      const base = CFG.supabaseUrl.replace(/\/(rest|auth|storage)\/v\d.*$/, '');
+      blob = await fetchBlob(base + '/functions/v1/sb-proxy?imgproxy=' + encodeURIComponent(fileUrl)); // 2. 經代理（舊 Firebase 檔無 CORS）
+    }
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 10000);
+  } catch (e) {
+    console.warn('[download] fallback to direct open:', e.message);  // 3. 全部失敗 → 直接開啟
+    const a = document.createElement('a');
+    a.href = fileUrl; a.target = '_blank'; a.rel = 'noopener';
+    a.click();
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerHTML = orig; }
+  }
 }
 
 function logSearchGap(query) {

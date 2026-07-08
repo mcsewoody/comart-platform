@@ -4433,6 +4433,26 @@ function _pdfText(doc, lines, x, y, opts) {
   }
 }
 
+// Detect CJK (中日韓) characters in the text an English PDF would actually draw.
+// English quotes render via jsPDF+helvetica, which has no CJK glyphs — so Chinese
+// typed into e.g. the Remark comes out as 亂碼. We only check the fields drawn in
+// English mode (.en product fields, quote-level text), NOT the zh-TW product fields
+// — otherwise nearly every English quote would trip this (products usually carry a
+// Chinese name) and needlessly divert to the HTML path.
+function _quoteHasCJK(q) {
+  const CJK = /[　-鿿가-힯＀-￯]/;
+  const parts = [q.company, q.attn, q.tel, q.email, q.notes,
+                 q.inco || SETTINGS.inco, q.pay || SETTINGS.pay];
+  if (CJK.test(parts.filter(Boolean).join('\n'))) return true;
+  for (const pid of (q.products || [])) {
+    const p = prodById(pid);
+    if (!p) continue;
+    const pt = [getFullFeatures(p, 'en'), p.remark, p.series].filter(Boolean).join('\n');
+    if (CJK.test(pt)) return true;
+  }
+  return false;
+}
+
 // PDF DOWNLOAD — jsPDF (A4 portrait)
 // ════════════════════════════════════════════════
 async function downloadPDF(id) {
@@ -4444,6 +4464,13 @@ async function downloadPDF(id) {
   // For non-English: use HTML export (browser renders CJK fonts via Google Fonts correctly)
   // This avoids the jsPDF font embedding problem entirely
   if (ql !== 'en') {
+    await downloadPDFasHTML(q);
+    return;
+  }
+
+  // English quote, but user typed CJK somewhere (commonly the Remark): helvetica
+  // can't render it → fall back to the HTML export path, which uses browser fonts.
+  if (_quoteHasCJK(q)) {
     await downloadPDFasHTML(q);
     return;
   }

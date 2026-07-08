@@ -2045,6 +2045,8 @@ function renderQuoteList(){
     const isOpen=_expandedCompanies.has(co);
     const draftCnt=quotes.filter(x=>x.status==='draft').length;
     const sentCnt=quotes.filter(x=>x.status==='sent').length;
+    // 該客戶最新一張報價的日期（date 為 YYYY-MM-DD，字典序即時間序，取最大值）
+    const latestDate=quotes.map(x=>x.date).filter(Boolean).sort().pop()||'—';
     const safeCoName=co.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
     const hdr=`<div class="qlist-item" onclick="_toggleCompany('${safeCoName}')" style="background:var(--s2);border-bottom:2px solid var(--br2);cursor:pointer">
       <div class="qli-thumb"><div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:hsl(${hue},35%,25%);color:hsl(${hue},60%,70%);font-size:12px;font-weight:800;font-family:var(--fm);letter-spacing:.03em;border-radius:8px">${initials}</div></div>
@@ -2052,7 +2054,8 @@ function renderQuoteList(){
         <div class="qli-name" style="font-size:14px;font-weight:700">${co}</div>
         <div class="qli-meta">${quotes.length} quote${quotes.length>1?'s':''}${draftCnt?' · '+draftCnt+' draft':''}${sentCnt?' · '+sentCnt+' sent':''}</div>
       </div>
-      <div class="qli-right" style="align-items:center">
+      <div class="qli-right" style="align-items:center;gap:8px">
+        <span style="font-size:11px;color:var(--tx3);font-family:var(--fm);white-space:nowrap" title="最新報價日期 / Latest quote">📅 ${latestDate}</span>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transition:transform .2s;transform:rotate(${isOpen?90:0}deg)"><polyline points="9 18 15 12 9 6"/></svg>
       </div>
     </div>`;

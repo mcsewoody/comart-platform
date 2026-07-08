@@ -46,6 +46,25 @@ serve(async (req) => {
 
   const url = new URL(req.url)
 
+  // ── 圖片代理（?imgproxy=<url>）：PDF/Excel 匯出需要把產品圖轉 base64，但圖床
+  //    （Firebase Storage）沒有 CORS 標頭、瀏覽器讀不到；由伺服器端代抓再回傳
+  //    （順帶解決 Firebase 是 Google 網域在中國被封的問題）。限白名單圖床防 SSRF。──
+  const imgTarget = url.searchParams.get("imgproxy")
+  if (imgTarget) {
+    let host = ""
+    try { host = new URL(imgTarget).hostname } catch { return json({ error: "bad imgproxy url" }, 400) }
+    const IMG_HOSTS = ["firebasestorage.googleapis.com", "tcvlnpgpuphdalzvmoyo.supabase.co", "storage.googleapis.com"]
+    if (!IMG_HOSTS.includes(host)) return json({ error: "img host not allowed", host }, 403)
+    try {
+      const imgRes = await fetch(imgTarget)
+      if (!imgRes.ok) return json({ error: "img fetch failed", status: imgRes.status }, 502)
+      const buf = await imgRes.arrayBuffer()
+      return new Response(buf, { status: 200, headers: { ...CORS, "Content-Type": imgRes.headers.get("content-type") || "image/jpeg", "Cache-Control": "public, max-age=86400" } })
+    } catch (e) {
+      return json({ error: "img proxy exception", message: String((e as Error)?.message || e) }, 502)
+    }
+  }
+
   // ── Storage 路徑（quotation 產品圖/檔案上傳）：二進位安全轉發，不做 JSON 處理 ──
   const stIdx = url.pathname.indexOf("/storage/v1/")
   if (stIdx !== -1) {

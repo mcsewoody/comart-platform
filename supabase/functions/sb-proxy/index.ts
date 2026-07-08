@@ -65,6 +65,30 @@ serve(async (req) => {
     }
   }
 
+  // ── Drive 檔案清單（quotation Files 分頁）：用伺服器端 Google Drive API 金鑰
+  //    列出公開資料夾內容，回傳給前端以「深色主題」呈現（取代退回 Google 白底
+  //    iframe）。金鑰只存在 Supabase Secrets，不外露。順帶讓中國拿得到清單
+  //    （由境外 sb-proxy 代呼叫 Google，惟實際開檔/下載仍走 Google Drive）。──
+  if (url.pathname.endsWith("/drive")) {
+    const folder = url.searchParams.get("folder")
+    const GKEY = Deno.env.get("GOOGLE_DRIVE_API_KEY") || ""
+    if (!folder) return json({ error: "missing folder" }, 400)
+    if (!GKEY) return json({ error: "drive key not set" }, 500)
+    try {
+      const q = encodeURIComponent(`'${folder}' in parents and trashed=false`)
+      const fields = encodeURIComponent("files(id,name,mimeType,modifiedTime,size)")
+      const gurl = `https://www.googleapis.com/drive/v3/files?q=${q}&key=${GKEY}` +
+        `&fields=${fields}&orderBy=folder,name&pageSize=200` +
+        `&supportsAllDrives=true&includeItemsFromAllDrives=true`
+      const gRes = await fetch(gurl)
+      const gData = await gRes.json()
+      if (!gRes.ok || gData.error) return json({ error: gData.error || ("drive HTTP " + gRes.status) }, 502)
+      return json({ files: gData.files || [] })
+    } catch (e) {
+      return json({ error: "drive proxy exception", message: String((e as Error)?.message || e) }, 502)
+    }
+  }
+
   // ── Storage 路徑（quotation 產品圖/檔案上傳）：二進位安全轉發，不做 JSON 處理 ──
   const stIdx = url.pathname.indexOf("/storage/v1/")
   if (stIdx !== -1) {

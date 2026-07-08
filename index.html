@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>COMART Platform v1.57</title>
+<title>COMART Platform v1.58</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script defer src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.js"></script>
 <style>
@@ -312,7 +312,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     <div class="login-logo">
       <div class="login-mark" style="background:transparent"><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="44" height="23"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></div>
       <div class="login-name">COMART Platform</div>
-      <div class="login-sub">Internal Portal · v1.57</div>
+      <div class="login-sub">Internal Portal · v1.58</div>
     </div>
     <form id="loginForm" onsubmit="doLogin();return false;" autocomplete="on">
     <div class="field">
@@ -333,6 +333,34 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   </div>
 </div>
 
+<!-- 強制改密碼畫面：全體帳號因 2026-07 資安強化措施需重設密碼，登入成功後、
+     進入主畫面前顯示，換完密碼才會真正建立 session -->
+<div class="login-screen" id="pwdChangeScreen" style="display:none">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="login-mark" style="background:transparent"><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="44" height="23"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></div>
+      <div class="login-name">COMART Platform</div>
+      <div class="login-sub">Security Update · Please Set a New Password</div>
+    </div>
+    <div style="font-size:12px;color:var(--tx3);margin-bottom:14px;line-height:1.6;">
+      為配合資安強化措施，請設定新密碼後才能繼續使用。<br>For security reasons, please set a new password to continue.
+    </div>
+    <form id="pwdChangeForm" onsubmit="doForcePasswordChange();return false;" autocomplete="off">
+    <div class="field">
+      <label>New Password（at least 8 characters）</label>
+      <input id="newPwd1" type="password" placeholder="New password" autocomplete="new-password" />
+    </div>
+    <div class="field">
+      <label>Confirm New Password</label>
+      <input id="newPwd2" type="password" placeholder="Confirm new password" autocomplete="new-password"
+        onkeydown="if(event.key==='Enter')doForcePasswordChange()" />
+    </div>
+    <div class="login-err" id="pwdChangeErr"></div>
+    <button type="submit" class="login-btn" id="pwdChangeBtn">Set New Password &amp; Continue</button>
+    </form>
+  </div>
+</div>
+
 <!-- ═══ SHELL ═══ -->
 <div class="shell" id="shell">
 
@@ -340,7 +368,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   <div class="topbar">
     <div class="topbar-logo" onclick="switchView('home')">
       <div class="topbar-mark" style="background:transparent"><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="26" height="14"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></div>
-      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.57</span></div>
+      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.58</span></div>
     </div>
     <div class="topbar-right">
       <div class="lang-switcher">
@@ -1035,14 +1063,8 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 const SESSION_KEY = 'comart-portal-session';
 const SESSION_TTL = 8 * 60 * 60 * 1000; // 8h
 
-// ═══════════════════════════════════════════════
-// PASSWORD HASH (same salt as quotation system)
-// ═══════════════════════════════════════════════
-const PWD_SALT = '::COMART-QS-2024';
-async function sha256(str) {
-  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str + PWD_SALT));
-  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
-}
+// 密碼雜湊改在伺服器端（auth-verify function）進行，前端不再自己算 sha256 或
+// 持有鹽值——2026-07-08 資安事件的根因就是密碼雜湊被前端直接讀取比對。
 
 // ═══════════════════════════════════════════════
 // SESSION
@@ -1050,13 +1072,17 @@ async function sha256(str) {
 let SESSION = null;
 let ALL_USERS = [];
 
-function writeSession(user) {
+function writeSession(user, sig) {
   SESSION = {
     empId: user.empId, nameEn: user.nameEn||'', nameZh: user.nameZh||'',
     role: user.role, email: user.email||'', mobile: user.mobile||'',
     ext: user.ext||'', site: user.site||'TW',
     titleEn: user.titleEn||'', titleZh: user.titleZh||'',
     ts: Date.now(), expires: Date.now() + SESSION_TTL,
+    // sig：伺服器簽章的 session token（HMAC，密鑰只存在 Supabase Secrets）。
+    // 讓子系統／其他 function 能真正驗證角色而非只信任這個物件裡的 role 欄位
+    // （2026-07-08 起，auth-verify 的 login 動作簽發）。
+    sig: sig || '',
   };
   try { localStorage.setItem(SESSION_KEY, JSON.stringify(SESSION)); }
   catch(e){
@@ -1083,6 +1109,22 @@ function clearSession() { localStorage.removeItem(SESSION_KEY); SESSION = null; 
 // ═══════════════════════════════════════════════
 // LOGIN
 // ═══════════════════════════════════════════════
+// 密碼驗證改由伺服器端 Edge Function 執行（auth-verify），密碼雜湊永遠不會
+// 傳到前端來比對——徹底解決「pwd_hash 只要權限設錯就會外洩」的問題根源
+// （2026-07-08 資安事件；原本前端直接抓 pwd_hash 自行 sha256 比對）。
+const AUTH_FN_URL = 'https://tcvlnpgpuphdalzvmoyo.supabase.co/functions/v1/auth-verify';
+async function callAuthVerify(body) {
+  const res = await fetch(AUTH_FN_URL, {
+    method: 'POST',
+    headers: { 'apikey': SB_ANON, 'Authorization': 'Bearer ' + SB_ANON, 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  return res.json();
+}
+
+let _pendingPwdChangeEmpId = null;
+let _pendingPwdChangeCurrentPwd = null; // 剛登入驗證過的密碼，強制改密碼流程直接帶用，不必再問一次
+
 async function doLogin() {
   const empId = document.getElementById('loginEmp').value.trim().toUpperCase();
   const pwd   = document.getElementById('loginPwd').value;
@@ -1098,59 +1140,94 @@ async function doLogin() {
   function showErr(msg) { errEl.textContent = msg; errEl.style.display = 'block'; }
 
   try {
-    const hash = await sha256(pwd);
-    let user = null;
-    let netFail = false; // 網路/後端失敗須與「帳號不存在」區分，避免誤導使用者
-
-    // ── 主要：從 Supabase 驗證（透過 Cloudflare Worker）──
+    let resp;
     try {
-      const res = await fetch(
-        `${SB_WORKER}/supabase/rest/v1/users?emp_id=eq.${encodeURIComponent(empId)}&select=emp_id,name_en,name_zh,role,dept,site,email,mobile,ext,title_en,title_zh,pwd_hash,active&limit=1`,
-        { headers: { 'x-admin-token': SB_TOKEN, 'Content-Type': 'application/json' } }
-      );
-      if (res.ok) {
-        const rows = await res.json();
-        if (rows && rows.length > 0) {
-          const row = rows[0];
-          // 轉成 Portal 慣用格式（不抓 avatar_url：base64 大圖，登入用不到）
-          user = {
-            empId:    row.emp_id,
-            nameEn:   row.name_en   || '',
-            nameZh:   row.name_zh   || '',
-            role:     row.active === false ? 'inactive' : (row.role || 'user'),
-            dept:     row.dept      || '',
-            site:     row.site      || 'TW',
-            email:    row.email     || '',
-            mobile:   row.mobile    || '',
-            ext:      row.ext       || '',
-            titleEn:  row.title_en  || '',
-            titleZh:  row.title_zh  || '',
-            pwdHash:  row.pwd_hash  || '',
-          };
-        }
-      } else {
-        netFail = true; // 後端回錯（Worker/RLS/5xx）≠ 帳號不存在
-      }
+      resp = await callAuthVerify({ action: 'login', empId, password: pwd });
     } catch(e) {
-      netFail = true; // 斷網或 Worker 掛掉 ≠ 帳號不存在
-      console.warn('Supabase login failed:', e.message);
+      showErr('Login failed — check your connection and try again.');
+      console.warn('auth-verify login failed:', e.message);
+      return;
     }
 
-    if (!user && netFail)             { showErr('Login failed — check your connection and try again.'); return; }
-    if (!user)                        { showErr('Account not found.');              return; }
-    if (user.pwdHash !== hash)         { showErr('Incorrect password.');             return; }
-    if (user.role === 'inactive')      { showErr('This account has been deactivated.'); return; }
+    if (!resp.ok) {
+      if (resp.reason === 'not_found')      { showErr('Account not found.'); return; }
+      if (resp.reason === 'bad_password')   { showErr('Incorrect password.'); return; }
+      if (resp.reason === 'inactive')       { showErr('This account has been deactivated.'); return; }
+      showErr('Login failed — check your connection and try again.');
+      return;
+    }
 
-    writeSession(user);
+    const user = {
+      empId: resp.user.emp_id, nameEn: resp.user.name_en || '', nameZh: resp.user.name_zh || '',
+      role: resp.user.role, dept: resp.user.dept || '', site: resp.user.site || 'TW',
+      email: resp.user.email || '', mobile: resp.user.mobile || '', ext: resp.user.ext || '',
+      titleEn: resp.user.title_en || '', titleZh: resp.user.title_zh || '',
+    };
+
+    if (resp.mustChangePwd) {
+      // 強制改密碼：先記住剛驗證過的帳密與待寫入的 session 資料，
+      // 換完密碼成功才真正 writeSession + enterPortal
+      _pendingPwdChangeEmpId = empId;
+      _pendingPwdChangeCurrentPwd = pwd;
+      window._pendingLoginUser = user;
+      window._pendingLoginSig = resp.session;
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('pwdChangeScreen').style.display = 'flex';
+      document.getElementById('newPwd1').value = '';
+      document.getElementById('newPwd2').value = '';
+      document.getElementById('pwdChangeErr').style.display = 'none';
+      return;
+    }
+
+    writeSession(user, resp.session);
     enterPortal();
     toast('Welcome, ' + (user.nameEn || user.empId), 'ok');
 
-  } catch(e) {
-    showErr('Login failed — check your connection and try again.');
-    console.error(e);
   } finally {
     btn.disabled = false;
     btn.textContent = t('login_btn');
+  }
+}
+
+async function doForcePasswordChange() {
+  const p1 = document.getElementById('newPwd1').value;
+  const p2 = document.getElementById('newPwd2').value;
+  const errEl = document.getElementById('pwdChangeErr');
+  const btn = document.getElementById('pwdChangeBtn');
+  errEl.style.display = 'none';
+  function showErr(msg) { errEl.textContent = msg; errEl.style.display = 'block'; }
+
+  if (!p1 || p1.length < 8) { showErr('New password must be at least 8 characters.'); return; }
+  if (p1 !== p2) { showErr('Passwords do not match.'); return; }
+  if (p1 === _pendingPwdChangeCurrentPwd) { showErr('New password must be different from the old one.'); return; }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Updating…';
+  try {
+    const resp = await callAuthVerify({
+      action: 'setPassword',
+      empId: _pendingPwdChangeEmpId,
+      currentPassword: _pendingPwdChangeCurrentPwd,
+      newPassword: p1,
+    });
+    if (!resp.ok) {
+      showErr(resp.reason === 'password_too_short' ? 'New password must be at least 8 characters.' : 'Update failed — please try logging in again.');
+      return;
+    }
+    const user = window._pendingLoginUser;
+    const sig = window._pendingLoginSig;
+    _pendingPwdChangeEmpId = null; _pendingPwdChangeCurrentPwd = null;
+    window._pendingLoginUser = null; window._pendingLoginSig = null;
+    document.getElementById('pwdChangeScreen').style.display = 'none';
+    writeSession(user, sig);
+    enterPortal();
+    toast('Password updated. Welcome, ' + (user.nameEn || user.empId), 'ok');
+  } catch(e) {
+    showErr('Update failed — check your connection and try again.');
+    console.warn('setPassword failed:', e.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Set New Password & Continue';
   }
 }
 
@@ -2141,7 +2218,6 @@ async function sbSyncUser(user, isDelete, isNew) {
         ext:           user.ext          || '',
         title_en:      user.titleEn      || '',
         title_zh:      user.titleZh      || '',
-        pwd_hash:      user.pwdHash      || '',
         avatar_url:    user.photoURL     || '',
         bio_zh:        user.bioZh        || '',
         bio_en:        user.bioEn        || '',
@@ -2184,22 +2260,27 @@ async function saveUser() {
   if (!existing && !pwd) { toast(t('um_err_pwd_required'),'err'); return; }
   if (pwd && pwd.length < 8) { toast(t('um_err_pwd_short'),'err'); return; }
 
-  let pwdHash = existing?.pwdHash || '';
-  let mustChangePwd = existing?.mustChangePwd ?? true;
-  if (pwd) { pwdHash = await sha256(pwd); mustChangePwd = !existing; }
-
   const user = {
     empId, nameEn, nameZh, email, login: email,
     ext, mobile, titleEn, titleZh, site, dept, role,
     photoURL: window._umAvatarDataUrl || (existing?.photoURL || ''),
     bioZh, bioEn, expertiseZh, expertiseEn,
-    pwdHash, mustChangePwd,
     createdAt: existing?.createdAt || Date.now(),
     updatedAt: Date.now(),
   };
 
   try { await sbSyncUser(user, false, !existing); }
   catch(e) { toast(t('um_save_failed') + e.message, 'err'); return; }
+
+  // 密碼一律經 auth-verify 的 adminSetPassword 動作設定（伺服器端 PBKDF2 雜湊，
+  // 前端不再自己算 sha256）；admin 設定/重設的密碼永遠強制對方下次登入要換新密碼
+  if (pwd) {
+    try {
+      const pwdResp = await callAuthVerify({ action: 'adminSetPassword', empId, newPassword: pwd, requireChange: true, adminToken: SB_TOKEN });
+      if (!pwdResp.ok) { toast('User saved, but password update failed: ' + pwdResp.reason, 'err'); }
+    } catch(e) { toast('User saved, but password update failed: ' + e.message, 'err'); }
+  }
+
   closeUserModal();
   await loadUsers();
   toast(existing ? t('um_updated') : t('um_created'), 'ok');

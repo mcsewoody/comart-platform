@@ -21,7 +21,7 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 | `index.html` | v1.57 | Main portal — login, home, directory, bulletin, calendar, AI tools | 4,372 |
 | `admin/index.html` | v2.25 | Admin System — room booking, fleet, visitor, library, lottery | 5,576 |
 | `kms/index.html` | v2.25 | Knowledge Management System — RAG, document editor, AI Q&A | 7,059 |
-| `quotation/index.html` | — (no version convention) | Quotation & CRM system | 7,288 |
+| `quotation/index.html` | v3.53 | Quotation & CRM system | 7,288 |
 
 `admin/lottery.html` is a standalone lottery page (separate from the lottery module inside `admin/index.html`).
 
@@ -110,8 +110,10 @@ The portal supports EN, 繁中, 简中, VI, 日 via `setLang(lang)`. Each langua
 
 ## 版本規則
 
-- 每次修改版本號 +0.01
-- 版本號同步更新三處：`<title>`、`.login-sub`、topbar `<span>`
+- **四個系統（Portal、Admin、KMS、Quotation）每次修改版本號都 +0.01**，無例外
+- 版本號同步更新（有幾處就改幾處）：`<title>`、`.login-sub`、topbar 版本顯示
+  - Portal/Admin/KMS：`<title>` + `.login-sub` + topbar `<span>`
+  - Quotation：`<title>` + topbar `#appVersionDiv`（沒有自己的登入畫面／`.login-sub`）
 - 每次修改後自動 commit 並 `git push`，不需等候使用者指示
 - **每次修改完畢，回覆結尾必須告知目前各檔案最新版本號**（例如：`kms v2.06`、`admin v1.57`）
 

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART KMS v2.26</title>
+<title>COMART KMS v2.27</title>
 
 <!-- 以下解析庫僅上傳/預覽時使用，defer 載入避免阻塞頁面解析（gzip 共 ~477KB；呼叫處均有 window.X 檢查） -->
 <!-- Marked for Markdown → HTML preview (classic script, no module needed) -->
@@ -380,7 +380,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="38" height="20" style="display:inline-block;vertical-align:middle;margin-right:4px;margin-top:-2px"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg>COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v2.26</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v2.27</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('en')">EN</button>
@@ -2322,6 +2322,22 @@ async function sbFetch(path, options = {}) {
   const text = await res.text();
   if (!res.ok) throw new Error(`Supabase error ${res.status}: ${text}`);
   return text ? JSON.parse(text) : null;
+}
+
+// ── secureDocs：機密文件（list/get/搜尋）一律經 kms-secure-docs Edge Function，
+// 由伺服器端依「簽章驗證過的真實角色」決定機密等級，而不是像 confAccess() 那樣
+// 相信前端 localStorage 裡未簽章的 role 欄位（2026-07-08 修復，可被任意偽造）──
+async function secureDocs(action, extra = {}) {
+  const base = CFG.supabaseUrl.replace(/\/(rest|auth|storage)\/v\d.*$/, '')
+  const res = await fetch(`${base}/functions/v1/kms-secure-docs`, {
+    method: 'POST',
+    headers: { 'apikey': CFG.supabaseKey, 'Authorization': 'Bearer ' + CFG.supabaseKey, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action, session: portalUser?.sig || '', ...extra }),
+  })
+  const text = await res.text()
+  const data = text ? JSON.parse(text) : null
+  if (!res.ok || data?.ok === false) throw new Error(data?.reason || `secureDocs ${action} HTTP ${res.status}`)
+  return data
 }
 
 // ── kmsWrite：所有寫入操作走 kms-write Edge Function（service_role，可繞過 RLS）──
@@ -4271,8 +4287,9 @@ async function loadDocs(force = false) {
       if (!force && _docsCache.rows && _docsCache.key === cacheKey && (Date.now() - _docsCache.ts < 60000)) {
         docs = _docsCache.rows;
       } else {
-        const cf = confAccess();
-        docs = await sbFetch(`/rest/v1/kms_documents?select=id,title,category,lang,status,stars,conf_level,product_line,customer_tag,tags,author_name,view_count,file_url,file_name,file_type,file_size,summary${_sumCol ? ','+_sumCol : ''},source_url,valid_until,updated_at,created_at&status=eq.published${cf.url}&order=${_docsOrder || 'updated_at.desc'}`) || [];
+        // 機密等級由伺服器端依驗證過的角色過濾（見 secureDocs 註解）
+        const resp = await secureDocs('list', { order: _docsOrder || 'updated_at.desc', sumCol: _sumCol || null });
+        docs = resp.docs || [];
         _docsCache = { rows: docs, ts: Date.now(), key: cacheKey };
         justFetched = true;
       }
@@ -4647,13 +4664,16 @@ async function openDoc(id) {
   let doc;
   try {
     if (CFG.supabaseUrl && CFG.supabaseKey && !id.startsWith('demo-') && !id.startsWith('local-')) {
-      const res = await sbFetch(`/rest/v1/kms_documents?id=eq.${id}&select=*`);
-      doc = res?.[0];
+      // 機密等級由伺服器端依驗證過的角色判斷，拒絕時 secureDocs 會 throw
+      const resp = await secureDocs('get', { id });
+      doc = resp.doc;
     } else {
       const allDocs = [...DEMO_DOCS, ...localDocs];
       doc = allDocs.find(d => d.id === id);
     }
-  } catch(e) {}
+  } catch(e) {
+    if (e.message === 'forbidden') { toast(t('toast.doc_load_fail') + '（權限不足）', 'error'); return; }
+  }
 
   if (!doc) { toast(t('toast.doc_load_fail'), 'error'); return; }
 
@@ -4992,29 +5012,17 @@ async function translateSearchTitles(chunks, targetLang) {
 
 // Retrieve relevant chunks (Supabase vector + keyword hybrid, or local mock)
 async function retrieveChunks(query) {
-  const SELECT_FIELDS = 'id,title,body,category,lang,status,conf_level,file_url,file_name,file_type,author_name,created_at,summary,summary_en,summary_zh_cn,summary_vi,summary_ja,tags';
-  const cf = confAccess();
-
   if (CFG.supabaseUrl && CFG.supabaseKey) {
     try {
-      // ── 1. 向量搜尋（主要）──
+      // ── 1. 向量搜尋（主要）── 機密等級直接在 SQL 端過濾（見 kms-secure-docs
+      // 的 searchVector：match_documents 加了 max_conf_level 參數），確保機密
+      // 文件內容連原始回應都不會出現在瀏覽器 Network 分頁，而不只是前端不顯示
       let vecResults = [];
       const qEmbed = await getQueryEmbedding(query);
       if (qEmbed) {
-        const raw = await sbFetch('/rest/v1/rpc/match_documents', {
-          method: 'POST',
-          body: JSON.stringify({ query_embedding: qEmbed, match_threshold: 0.25, match_count: 60 }),
-        });
-        if (raw?.length) {
-          // 補抓完整欄位（RPC 只回傳 id/title/body/similarity）
-          const ids = raw.map(r => r.id).join(',');
-          let metaMap = {};
-          try {
-            const rows = await sbFetch(`/rest/v1/kms_documents?id=in.(${ids})&select=${SELECT_FIELDS}${cf.url}`);
-            for (const r of (rows || [])) metaMap[r.id] = r;
-          } catch(e) {}
+        const { raw, metaMap } = await secureDocs('searchVector', { embedding: qEmbed, threshold: 0.25, count: 60 });
 
-          vecResults = raw.filter(r => metaMap[r.id]).map(r => {
+          vecResults = (raw || []).filter(r => metaMap[r.id]).map(r => {
             const m = metaMap[r.id] || {};
             return {
               id: r.id, title: r.title,
@@ -5029,20 +5037,17 @@ async function retrieveChunks(query) {
               summary_ja:   m.summary_ja    || null,
             };
           });
-        }
       }
 
       // ── 2. 全文搜尋（title + summary + body ilike），結果與向量結果合併去重 ──
-      const enc = encodeURIComponent(query);
+      // 機密等級同樣由伺服器端過濾（見 secureDocs('searchKeyword')）
       let kwResults = [];
       try {
-        const kwRaw = await sbFetch(
-          `/rest/v1/kms_documents?select=${SELECT_FIELDS}&status=eq.published&or=(title.ilike.*${enc}*,summary.ilike.*${enc}*,body.ilike.*${enc}*)&limit=40`
-        );
+        const { rows: kwRaw } = await secureDocs('searchKeyword', { query });
         if (kwRaw?.length) {
           const existIds = new Set(vecResults.map(r => r.id));
           kwResults = kwRaw
-            .filter(r => !existIds.has(r.id) && cf.fn(r))
+            .filter(r => !existIds.has(r.id))
             .map(r => ({
               id: r.id, title: r.title,
               snippet: r.body?.substring(0, 800) || '',
@@ -5274,16 +5279,18 @@ function clearCustomerTags() {
 let _readerDoc = null; // 目前閱讀中的文件
 
 async function openReader(id) {
-  // 載入文件
+  // 載入文件（機密等級由伺服器端依驗證過的角色判斷）
   let doc = null;
   try {
     if (CFG.supabaseUrl && CFG.supabaseKey && !id.startsWith('demo-') && !id.startsWith('local-')) {
-      const res = await sbFetch(`/rest/v1/kms_documents?id=eq.${id}&select=*`);
-      doc = res?.[0];
+      const resp = await secureDocs('get', { id });
+      doc = resp.doc;
     } else {
       doc = [...DEMO_DOCS, ...localDocs].find(d => d.id === id);
     }
-  } catch(e) {}
+  } catch(e) {
+    if (e.message === 'forbidden') { toast(t('toast.doc_load_fail') + '（權限不足）', 'error'); return; }
+  }
 
   if (!doc) { toast(t('toast.doc_load_fail'), 'error'); return; }
   _readerDoc = doc;

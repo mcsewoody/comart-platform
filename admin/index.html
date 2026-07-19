@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART 行政管理平台 v2.27</title>
+<title>COMART 行政管理平台 v2.28</title>
 <style>
 :root{
   /* KMS-aligned dark theme */
@@ -664,7 +664,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="logo">
     <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
     <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
-    <span><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="38" height="20" style="display:inline-block;vertical-align:middle;margin-top:-2px"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v2.27</span>
+    <span><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="38" height="20" style="display:inline-block;vertical-align:middle;margin-top:-2px"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v2.28</span>
   </div>
   <div class="trr">
     <div id="global-site-bar" style="display:flex;align-items:center;gap:4px"><span style="font-size:13px;color:var(--text-3);white-space:nowrap;font-weight:500">單位：</span>
@@ -1024,11 +1024,11 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
         <button class="btn bg2 bsm" onclick="calRoomToday()" data-i18n="room.cal.today">今天</button>
         <button class="btn" style="margin-left:auto;background:var(--gn);color:#0f1117;padding:7px 12px;border-radius:var(--rs);font-size:13px;font-weight:500;border:none;cursor:pointer" onclick="navRoom('room-new')">＋ 新增預約</button>
       </div>
-      <div class="gantt-wrap" id="room-full-gantt"></div>
+      <div class="calw" id="room-full-gantt"></div>
       <div style="margin-top:10px;display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--t3)">
-        <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:rgba(34,197,94,.2);margin-right:4px"></span><span data-i18n="room.legend.active">進行中</span></span>
-        <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:rgba(67,97,238,.25);margin-right:4px"></span><span data-i18n="room.legend.confirmed">已確認</span></span>
-        <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:rgba(245,158,11,.15);margin-right:4px"></span><span data-i18n="room.legend.pending">待確認</span></span>
+        <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:rgba(20,184,166,.25);margin-right:4px"></span><span data-i18n="room.legend.active">進行中</span></span>
+        <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:rgba(45,127,249,.2);margin-right:4px"></span><span data-i18n="room.legend.confirmed">已確認</span></span>
+        <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:rgba(34,197,94,.15);margin-right:4px"></span><span data-i18n="room.legend.done">已結束</span></span>
       </div>
     </div>
 
@@ -2170,7 +2170,7 @@ const ADMIN_I18N = {
     'room.tbl.datetime':'Date/Time','room.tbl.room':'Room','room.tbl.title2':'Title',
     'room.tbl.host':'Organizer','room.tbl.headcount':'Attendees','room.tbl.vc':'Video','room.tbl.status':'Status',
     'room.status.confirmed':'Confirmed','room.status.inprogress':'In Progress','room.status.done':'Ended','room.status.cancelled':'Cancelled',
-    'room.legend.active':'In Progress','room.legend.confirmed':'Confirmed','room.legend.pending':'Pending',
+    'room.legend.active':'In Progress','room.legend.confirmed':'Confirmed','room.legend.pending':'Pending','room.legend.done':'Ended',
     'room.report.title':'📊 Usage Report','room.report.week':'This Week','room.report.month':'This Month',
     'room.fault.title':'🔧 Fault Report','room.fault.add':'＋ New Report',
     'room.alt_slots':'⚠️ Slot full, other available slots:','room.new.title':'New Meeting Room Booking',
@@ -2308,7 +2308,7 @@ const ADMIN_I18N = {
     'room.tbl.datetime':'日期時間','room.tbl.room':'會議室','room.tbl.title2':'標題',
     'room.tbl.host':'主辦人','room.tbl.headcount':'人數','room.tbl.vc':'視訊','room.tbl.status':'狀態',
     'room.status.confirmed':'已確認','room.status.inprogress':'進行中','room.status.done':'已結束','room.status.cancelled':'已取消',
-    'room.legend.active':'進行中','room.legend.confirmed':'已確認','room.legend.pending':'待確認',
+    'room.legend.active':'進行中','room.legend.confirmed':'已確認','room.legend.pending':'待確認','room.legend.done':'已結束',
     'room.report.title':'📊 使用率報表','room.report.week':'本週','room.report.month':'本月',
     'room.fault.title':'🔧 設備故障回報','room.fault.add':'＋ 新增回報',
     'room.alt_slots':'⚠️ 所選時段已滿，其他可用時段：','room.new.title':'新增會議室預約',
@@ -2446,7 +2446,7 @@ const ADMIN_I18N = {
     'room.tbl.datetime':'日期时间','room.tbl.room':'会议室','room.tbl.title2':'标题',
     'room.tbl.host':'主办人','room.tbl.headcount':'人数','room.tbl.vc':'视频','room.tbl.status':'状态',
     'room.status.confirmed':'已确认','room.status.inprogress':'进行中','room.status.done':'已结束','room.status.cancelled':'已取消',
-    'room.legend.active':'进行中','room.legend.confirmed':'已确认','room.legend.pending':'待确认',
+    'room.legend.active':'进行中','room.legend.confirmed':'已确认','room.legend.pending':'待确认','room.legend.done':'已结束',
     'room.report.title':'📊 使用率报表','room.report.week':'本周','room.report.month':'本月',
     'room.fault.title':'🔧 设备故障报告','room.fault.add':'＋ 新增报告',
     'room.alt_slots':'⚠️ 所选时段已满，其他可用时段：','room.new.title':'新增会议室预约',
@@ -2584,7 +2584,7 @@ const ADMIN_I18N = {
     'room.tbl.datetime':'Ngày/Giờ','room.tbl.room':'Phòng','room.tbl.title2':'Tiêu đề',
     'room.tbl.host':'Người tổ chức','room.tbl.headcount':'Số người','room.tbl.vc':'Video','room.tbl.status':'Trạng thái',
     'room.status.confirmed':'Đã xác nhận','room.status.inprogress':'Đang diễn ra','room.status.done':'Đã kết thúc','room.status.cancelled':'Đã hủy',
-    'room.legend.active':'Đang diễn ra','room.legend.confirmed':'Đã xác nhận','room.legend.pending':'Chờ xác nhận',
+    'room.legend.active':'Đang diễn ra','room.legend.confirmed':'Đã xác nhận','room.legend.pending':'Chờ xác nhận','room.legend.done':'Đã kết thúc',
     'room.report.title':'📊 Báo cáo sử dụng','room.report.week':'Tuần này','room.report.month':'Tháng này',
     'room.fault.title':'🔧 Báo cáo sự cố','room.fault.add':'＋ Thêm báo cáo',
     'room.alt_slots':'⚠️ Khung giờ đầy, khung giờ khác:','room.new.title':'Đặt phòng họp mới',
@@ -2722,7 +2722,7 @@ const ADMIN_I18N = {
     'room.tbl.datetime':'日時','room.tbl.room':'会議室','room.tbl.title2':'タイトル',
     'room.tbl.host':'主催者','room.tbl.headcount':'人数','room.tbl.vc':'ビデオ','room.tbl.status':'ステータス',
     'room.status.confirmed':'確定','room.status.inprogress':'進行中','room.status.done':'終了','room.status.cancelled':'キャンセル',
-    'room.legend.active':'進行中','room.legend.confirmed':'確定','room.legend.pending':'待機中',
+    'room.legend.active':'進行中','room.legend.confirmed':'確定','room.legend.pending':'待機中','room.legend.done':'終了',
     'room.report.title':'📊 利用レポート','room.report.week':'今週','room.report.month':'今月',
     'room.fault.title':'🔧 故障報告','room.fault.add':'＋ 新規報告',
     'room.alt_slots':'⚠️ 選択時間帯は満杯、他の利用可能時間帯:','room.new.title':'新規会議室予約',
@@ -3849,15 +3849,25 @@ function renderDashGantt(bks){
 
 // ── Full Calendar (day view) ──
 async function renderRoomCal(){
-  const d=calRoomDate.toISOString().slice(0,10);
-  document.getElementById('cal-room-title').textContent=fmtD(d);
+  const y=calRoomDate.getFullYear(),m=calRoomDate.getMonth();
+  document.getElementById('cal-room-title').textContent=`${y}/${String(m+1).padStart(2,'0')}`;
   const allBks=await getRoomBookings();
-  const bks=allBks.filter(b=>b.date===d&&b.status!=='cancelled');
-  document.getElementById('room-full-gantt').innerHTML=buildGantt(bks);
-  requestAnimationFrame(drawNowLine);
-  setTimeout(initGanttDrag,100);
+  const vids=new Set(visRooms().map(r=>r.id));
+  const bks=allBks.filter(b=>vids.has(b.roomId)&&b.status!=='cancelled');
+  const first=new Date(y,m,1),last=new Date(y,m+1,0),sd=first.getDay();
+  const days=[];for(let i=0;i<sd;i++)days.push({d:new Date(y,m,1-sd+i),cur:false});for(let i=1;i<=last.getDate();i++)days.push({d:new Date(y,m,i),cur:true});while(days.length%7)days.push({d:new Date(y,m+1,days.length-last.getDate()-sd+1),cur:false});
+  const today=todayStr2();
+  let h='<div class="cg7">';['日','一','二','三','四','五','六'].forEach(w=>h+=`<div class="cwd">${w}</div>`);
+  days.forEach(({d,cur})=>{
+    const ds=dtStr(d),dbks=bks.filter(b=>b.date===ds).sort((a,b)=>(a.start||'').localeCompare(b.start||''));
+    h+=`<div class="cday ${ds===today?'today':''} ${!cur?'om':''}"><div class="cdn">${d.getDate()}</div>`;
+    dbks.slice(0,3).forEach(b=>{const room=ROOMS.find(r=>r.id===b.roomId),st=bkStatus(b),cls=st==='inprogress'?'ev-active':st==='done'?'ev-done':'ev-pending';h+=`<div class="cev ${cls}" onclick="showBkPopup('${b.id}',event)" title="${escapeHtml(room?.name||'')} ${b.start}-${b.end}: ${escapeHtml(b.title||'會議')}">${b.start} ${escapeHtml(room?.name||b.title||'預約')}</div>`;});
+    if(dbks.length>3)h+=`<div class="cmore">+${dbks.length-3}筆</div>`;
+    h+=`</div>`;
+  });
+  h+='</div>';document.getElementById('room-full-gantt').innerHTML=h;
 }
-function calRoomMov(dir){calRoomDate.setDate(calRoomDate.getDate()+dir);renderRoomCal();}
+function calRoomMov(dir){calRoomDate=new Date(calRoomDate.getFullYear(),calRoomDate.getMonth()+dir,1);renderRoomCal();}
 function calRoomToday(){calRoomDate=new Date();renderRoomCal();}
 
 // ── Gantt builder ──

@@ -49,16 +49,23 @@ Numbered backup files (`index112.html`, `index328.html`, etc.) are iteration sna
   `x-admin-token` 就取得 service-role 全權」的後門、原始碼不在本 repo 無法修補。**不要再把任何呼叫指回 workers.dev。**
 - sb-proxy 護欄：40 張表白名單（新增表要加進 `ALLOWED_TABLES`）、回應一律移除 `users.pwd_hash` 與
   `kms_documents.body`、寫入 users 剝除 pwd_hash、storage 走二進位轉發。
+- 🔐 **驗證模型（2026-07-20 起）**：所有 sb-proxy / kms-write / claude-proxy / embed-* 請求必須帶
+  **`x-session` 標頭**（登入時 auth-verify 簽發的 HMAC 簽章 token，前端存在 session 物件的 `sig` 欄位）。
+  `users`/`departments`/`sites` 的寫入僅限簽章內 role=admin；一般使用者僅可 PATCH 自己那筆 users 的
+  個人資料欄位（`SELF_PATCH_FIELDS` 白名單）。**舊的固定 `x-admin-token`（COMART-ADMIN-2026）已全面廢除，
+  不要在任何新程式碼使用**。前端 helper：Portal `sbHdrs()`、admin `sbHdrs()`、kms `kmsSig()`、quotation `qtHdrs()`/`qtSig()`。
 
 **Firebase**: 已完全移除（2026-07 確認四個 HTML 皆無 firebase 引用）。通知與站內訊息走 Supabase 輪詢（通知 60 秒、訊息 10 秒增量）。
 
 **Supabase Edge Functions** (Deno, in `supabase/functions/`)：
-- `sb-proxy` — 通用資料代理（取代 Cloudflare Worker），`--no-verify-jwt`
+- **所有 functions 一律以 `--no-verify-jwt` 部署**（config.toml 已全數固化 `verify_jwt = false`；
+  漏帶旗標會造成全站 401，2026-07-20 曾發生）
+- `sb-proxy` — 通用資料代理（取代 Cloudflare Worker），驗 `x-session` 簽章
 - `auth-verify` — 伺服器端密碼驗證（PBKDF2，相容舊 SHA-256）+ 簽發 HMAC 簽章 session（`login`/`setPassword`/`adminSetPassword`）。**密碼驗證只在此進行，pwd_hash 永不回前端**
 - `kms-secure-docs` — KMS 機密文件依「簽章驗證過的真實角色」過濾（`list`/`get`/`searchVector`/`searchKeyword`），機密等級在 SQL 層強制
-- `kms-write` — service-role writes to KMS tables；allowed: `kms_documents`,`kms_doc_versions`,`kms_comments`,`kms_review_log`,`kms_experts`,`kms_product_lines`,`kms_search_log`,`kms_snapshots`,`kms_categories`
-- `claude-proxy` — forwards to Anthropic API; `CLAUDE_API_KEY` from Secrets
-- `embed-document` / `embed-query` — pgvector embeddings for RAG (**not** in `config.toml`; deploy with `--no-verify-jwt`)
+- `kms-write` — service-role writes to KMS tables（驗 body.session 簽章）；allowed: `kms_documents`,`kms_doc_versions`,`kms_comments`,`kms_review_log`,`kms_experts`,`kms_product_lines`,`kms_search_log`,`kms_snapshots`,`kms_categories`
+- `claude-proxy` — forwards to Anthropic API（驗 `x-session`）; `CLAUDE_API_KEY` from Secrets
+- `embed-document` / `embed-query` — pgvector embeddings for RAG（驗 `x-session`）
 - `holidays-proxy` — holiday calendar API proxy
 - Secrets：`SESSION_HMAC_SECRET`（session 簽章密鑰，只有 edge function 讀得到）、`SB_SERVICE_ROLE_KEY`、`CLAUDE_API_KEY` 等
 

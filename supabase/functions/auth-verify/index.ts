@@ -17,7 +17,7 @@ const CORS = {
 const LEGACY_SALT = "::COMART-QS-2024" // 對照前端 PWD_SALT，僅用於驗證舊格式雜湊
 // 過渡旗標：true = adminSetPassword 仍接受舊固定權杖（部署新前端期間），
 // 前端上線後改 false 再部署（固定權杖前端可見，形同無防護，2026-07-20 廢除）
-const GRACE = true
+const GRACE = false
 const LEGACY_ADMIN_TOKEN = "COMART-ADMIN-2026"
 const SESSION_TTL_MS = 8 * 60 * 60 * 1000 // 8h，比照前端既有 SESSION_TTL
 

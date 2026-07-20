@@ -7,7 +7,7 @@ const CORS = {
 }
 
 // 過渡旗標：前端上線後改 false 再部署（原本無驗證，任何人可耗用 OpenAI 額度）
-const GRACE = true
+const GRACE = false
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: CORS })

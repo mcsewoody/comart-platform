@@ -20,7 +20,7 @@ import { verifySession } from "../_shared/session.ts"
 
 // 過渡旗標：true = 新舊憑證並收（部署新前端期間避免中斷），false = 只收 x-session。
 // 前端（GitHub Pages）確認上線後改為 false 再部署一次。
-const GRACE = true
+const GRACE = false
 const LEGACY_TOKEN = "COMART-ADMIN-2026"
 
 const CORS = {

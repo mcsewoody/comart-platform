@@ -8,7 +8,7 @@ const CORS = {
 
 // 過渡旗標：true = 暫時放行未帶 session 的請求（部署新前端期間），前端上線後改 false。
 // 原本此函式完全無驗證，任何人可用公司的 Claude API 額度（2026-07-20 修復）
-const GRACE = true
+const GRACE = false
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: CORS })

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART KMS v2.28</title>
+<title>COMART KMS v2.29</title>
 
 <!-- 以下解析庫僅上傳/預覽時使用，defer 載入避免阻塞頁面解析（gzip 共 ~477KB；呼叫處均有 window.X 檢查） -->
 <!-- Marked for Markdown → HTML preview (classic script, no module needed) -->
@@ -380,7 +380,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="38" height="20" style="display:inline-block;vertical-align:middle;margin-right:4px;margin-top:-2px"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg>COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v2.28</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v2.29</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('en')">EN</button>
@@ -2309,12 +2309,17 @@ function marksToMd(node) {
 // 等級 1，KMS 本身的角色判斷（admin/dcc 可看更高等級）改由此 Worker 路徑保留
 // 原有功能（2026-07-08 修復，見 supabase/migrations/019）。
 const SB_KMS_WORKER = 'https://tcvlnpgpuphdalzvmoyo.supabase.co/functions/v1/sb-proxy';
-const SB_KMS_WORKER_TOKEN = 'COMART-ADMIN-2026';
+// sb-proxy 改驗 HMAC session 簽章（x-session），固定 x-admin-token 已廢除（2026-07-20）
+function kmsSig() {
+  let sig = portalUser?.sig || '';
+  if (!sig) { try { sig = (readPortalSession() || {}).sig || ''; } catch(e) {} }
+  return sig;
+}
 async function sbFetch(path, options = {}) {
   if (!CFG.supabaseUrl || !CFG.supabaseKey) throw new Error('Supabase 未設定');
   const url = SB_KMS_WORKER + '/supabase' + path;
   const headers = {
-    'x-admin-token': SB_KMS_WORKER_TOKEN,
+    'x-session': kmsSig(),
     'Content-Type': 'application/json',
     'Prefer': options.prefer || 'return=representation',
   };
@@ -2352,7 +2357,7 @@ async function kmsWrite(action, table, payload = null, id = null, filters = null
       'Authorization': `Bearer ${CFG.supabaseKey}`,
       'apikey': CFG.supabaseKey,
     },
-    body: JSON.stringify({ action, table, payload, id, filters }),
+    body: JSON.stringify({ action, table, payload, id, filters, session: kmsSig() }),
   });
   const text = await res.text();
   if (!res.ok) throw new Error(`kms-write error ${res.status}: ${text}`);
@@ -2420,6 +2425,7 @@ async function callEmbedEdgeFn(doc_id) {
       'Authorization': 'Bearer ' + CFG.supabaseKey,
       'apikey': CFG.supabaseKey,
       'Content-Type': 'application/json',
+      'x-session': kmsSig(),
     },
     body: JSON.stringify({ doc_id }),
   });
@@ -2446,6 +2452,7 @@ async function getQueryEmbedding(queryText) {
           'Authorization': 'Bearer ' + CFG.supabaseKey,
           'apikey': CFG.supabaseKey,
           'Content-Type': 'application/json',
+          'x-session': kmsSig(),
         },
         body: JSON.stringify({ text: queryText }),
       });
@@ -3548,6 +3555,7 @@ async function callClaudeProxyRaw(body, timeoutMs = 60000) {
     'Content-Type': 'application/json',
     'Authorization': `Bearer ${CFG.supabaseKey}`,
     'apikey': CFG.supabaseKey,
+    'x-session': kmsSig(),
   } : {
     'Content-Type': 'application/json',
     'x-api-key': CFG.claudeKey,
@@ -3894,7 +3902,6 @@ function viewExpertDocs(nameEn) {
 
 // ─── 審核人自動完成 ───
 const KMS_SB_WORKER = 'https://tcvlnpgpuphdalzvmoyo.supabase.co/functions/v1/sb-proxy';
-const KMS_SB_TOKEN  = 'COMART-ADMIN-2026';
 let _reviewerUsers = []; // 快取從 Supabase 載入的人員清單
 
 async function loadReviewerUsers(forceRefresh = false) {
@@ -3903,7 +3910,7 @@ async function loadReviewerUsers(forceRefresh = false) {
   try {
     const res = await fetch(
       `${KMS_SB_WORKER}/supabase/rest/v1/users?select=emp_id,name_en,name_zh,title_en,title_zh,site&order=emp_id&active=eq.true`,
-      { headers: { 'x-admin-token': KMS_SB_TOKEN } }
+      { headers: { 'x-session': kmsSig() } }
     );
     const rows = await res.json();
     if (Array.isArray(rows)) {
@@ -5503,14 +5510,15 @@ async function readerDownload() {
   if (btn) { btn.disabled = true; btn.textContent = '⏳'; }
   // 跨網域 storage URL 的 a.download 屬性會被瀏覽器忽略 → 下載檔名變成 URL 路徑，
   // 與顯示檔名不符。改為抓成 blob（同源 blob: URL 才吃 download 屬性）再下載。
-  const fetchBlob = async (u) => { const r = await fetch(u); if (!r.ok) throw new Error('HTTP ' + r.status); return r.blob(); };
+  const fetchBlob = async (u, opts) => { const r = await fetch(u, opts); if (!r.ok) throw new Error('HTTP ' + r.status); return r.blob(); };
   try {
     let blob;
     try {
       blob = await fetchBlob(fileUrl);                       // 1. 直接抓（Supabase Storage 有 CORS）
     } catch (e) {
       const base = CFG.supabaseUrl.replace(/\/(rest|auth|storage)\/v\d.*$/, '');
-      blob = await fetchBlob(base + '/functions/v1/sb-proxy?imgproxy=' + encodeURIComponent(fileUrl)); // 2. 經代理（舊 Firebase 檔無 CORS）
+      blob = await fetchBlob(base + '/functions/v1/sb-proxy?imgproxy=' + encodeURIComponent(fileUrl),
+        { headers: { 'x-session': kmsSig() } }); // 2. 經代理（sb-proxy 需 session 簽章）
     }
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -6260,7 +6268,7 @@ async function loadAnalytics(siteFilter = '') {
         sbFetch('/rest/v1/kms_documents?select=author_name&author_name=not.is.null'),
       ]);
       try {
-        const r = await fetch(`${KMS_SB_WORKER}/supabase/rest/v1/users?select=name_en,name_zh,site&active=eq.true`, { headers:{'x-admin-token':KMS_SB_TOKEN} });
+        const r = await fetch(`${KMS_SB_WORKER}/supabase/rest/v1/users?select=name_en,name_zh,site&active=eq.true`, { headers:{ 'x-session': kmsSig() } });
         if (r.ok) usersData = await r.json();
       } catch(_) {}
     } else {
@@ -6457,7 +6465,7 @@ async function loadExperts() {
   try {
     const res = await fetch(
       `${KMS_SB_WORKER}/supabase/rest/v1/users?select=emp_id,name_en,name_zh,role,dept,site,email,mobile,ext,title_en,title_zh,avatar_url&order=site,name_en&active=eq.true`,
-      { headers: { 'x-admin-token': KMS_SB_TOKEN } }
+      { headers: { 'x-session': kmsSig() } }
     );
     const rows = await res.json();
     if (Array.isArray(rows)) {
@@ -6829,7 +6837,7 @@ async function loadActivityLog() {
     // 用 Cloudflare Worker（service_role）繞過 RLS，並 JOIN kms_documents 取現存文件標題
     const res = await fetch(
       `${KMS_SB_WORKER}/supabase/rest/v1/kms_review_log?select=*,kms_documents(title)&order=created_at.desc&limit=300`,
-      { headers: { 'x-admin-token': KMS_SB_TOKEN } }
+      { headers: { 'x-session': kmsSig() } }
     );
     const logs = res.ok ? await res.json() : [];
     if (!Array.isArray(logs) || !logs.length) {

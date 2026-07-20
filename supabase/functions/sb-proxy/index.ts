@@ -8,20 +8,34 @@
 //
 // 本函式跑在 Supabase（supabase.co，中國可達），維持與 Worker 相同的
 // /supabase/rest/v1/<table> URL 介面（前端只需改網址常數），但加上護欄：
+//  - 【2026-07-20 起】所有請求必須帶有效的 HMAC 簽章 session（x-session 標頭，
+//    由 auth-verify 登入時簽發）；users/departments/sites 的寫入僅限 admin 角色。
+//    舊的「前端可見固定 x-admin-token」已廢除（任何人按 F12 就拿得到，形同無防護）
 //  - 資料表白名單（未列的表一律 403）
 //  - 回應一律移除 users.pwd_hash（密碼雜湊只有 auth-verify 能碰）
 //  - 回應一律移除 kms_documents.body（機密內容只有 kms-secure-docs 依角色提供）
 //  - 寫入 users 時剝除 pwd_hash（密碼只能經 auth-verify 設定）
-// 註：本函式仍可被任何知道網址的人呼叫（與 Worker 現況相同），護欄的價值在於
-//     「即使被呼叫也不會洩漏密碼雜湊與機密文件內文」，把確認的兩個洞補起來。
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import { verifySession } from "../_shared/session.ts"
+
+// 過渡旗標：true = 新舊憑證並收（部署新前端期間避免中斷），false = 只收 x-session。
+// 前端（GitHub Pages）確認上線後改為 false 再部署一次。
+const GRACE = true
+const LEGACY_TOKEN = "COMART-ADMIN-2026"
 
 const CORS = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, POST, PATCH, PUT, DELETE, OPTIONS",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-admin-token, prefer, range, x-upsert",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-admin-token, x-session, prefer, range, x-upsert",
   "Access-Control-Expose-Headers": "content-range, range-unit",
 }
+
+// admin 才能寫的表（其餘白名單表：任何有效 session 皆可讀寫）
+const ADMIN_WRITE_TABLES = new Set(["users", "departments", "sites"])
+// 一般使用者可自行更新（PATCH 自己那筆 users）的欄位白名單
+const SELF_PATCH_FIELDS = new Set([
+  "avatar_url", "bio_zh", "bio_en", "expertise_zh", "expertise_en", "mobile", "ext",
+])
 
 const ALLOWED_TABLES = new Set([
   "cal_events","car_bookings","car_fuel_logs","car_inspections","car_maint_logs",
@@ -44,6 +58,13 @@ serve(async (req) => {
   const SUPABASE_URL = Deno.env.get("SB_URL") || ""
   const SERVICE_KEY = Deno.env.get("SB_SERVICE_ROLE_KEY") || ""
   if (!SERVICE_KEY) return json({ error: "server_misconfigured" }, 500)
+
+  // ── 身分驗證：x-session（HMAC 簽章，登入時由 auth-verify 簽發）──
+  const sess = await verifySession(req.headers.get("x-session") || "")
+  const legacyOk = GRACE && req.headers.get("x-admin-token") === LEGACY_TOKEN
+  if (!sess && !legacyOk) return json({ error: "unauthorized", hint: "missing/invalid x-session" }, 401)
+  const role = sess?.role || (legacyOk ? "admin" : "")
+  const sessEmpId = String(sess?.empId || "")
 
   const url = new URL(req.url)
 
@@ -118,14 +139,31 @@ serve(async (req) => {
     return json({ error: "table not allowed", table }, 403)
   }
 
-  // 寫入 users 時剝除 pwd_hash（密碼只能經 auth-verify；防止有人用本代理改密碼雜湊）
+  const isWrite = req.method !== "GET" && req.method !== "HEAD"
+
+  // ── 寫入授權：users/departments/sites 僅限 admin；
+  //    例外：一般使用者可 PATCH「自己那筆 users」的個人資料欄位（頭像/簡介等）──
+  let selfPatch = false
+  if (isWrite && ADMIN_WRITE_TABLES.has(table) && role !== "admin") {
+    const empIdFilter = url.searchParams.get("emp_id") || ""
+    selfPatch = table === "users" && req.method === "PATCH" &&
+      sessEmpId !== "" && empIdFilter === `eq.${sessEmpId}`
+    if (!selfPatch) return json({ error: "forbidden", table, hint: "admin role required" }, 403)
+  }
+
+  // 寫入 users 時剝除 pwd_hash（密碼只能經 auth-verify；防止有人用本代理改密碼雜湊）；
+  // 自助 PATCH 再套欄位白名單（不得改 role/active/emp_id 等）
   let body: string | undefined = undefined
-  if (req.method !== "GET" && req.method !== "HEAD") {
+  if (isWrite) {
     const rawText = await req.text()
     if (table === "users" && rawText) {
       try {
         const parsed = JSON.parse(rawText)
-        const scrub = (o: Record<string, unknown>) => { delete o.pwd_hash; return o }
+        const scrub = (o: Record<string, unknown>) => {
+          delete o.pwd_hash
+          if (selfPatch) for (const k of Object.keys(o)) { if (!SELF_PATCH_FIELDS.has(k)) delete o[k] }
+          return o
+        }
         body = JSON.stringify(Array.isArray(parsed) ? parsed.map(scrub) : scrub(parsed))
       } catch { body = rawText }
     } else {

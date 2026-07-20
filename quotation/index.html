@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#080C14">
-<title>COMART · Quotation System v3.53</title>
+<title>COMART · Quotation System v3.54</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -259,7 +259,7 @@ img{display:block}
       <div class="logo-mark" style="background:transparent"><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="24" height="13"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></div>
       <div>
         <div class="logo-text">COMART</div>
-        <div id="appVersionDiv" style="font-size:10px;color:var(--ac);font-weight:600;letter-spacing:.04em;line-height:1.3">v3.53</div>
+        <div id="appVersionDiv" style="font-size:10px;color:var(--ac);font-weight:600;letter-spacing:.04em;line-height:1.3">v3.54</div>
       </div>
     </div>
     <div class="topbar-right">
@@ -1566,8 +1566,8 @@ async function loadAll() {
       let freshUser = null;
       try {
         const res = await fetch(
-          `${SB_WORKER}/supabase/rest/v1/users?select=emp_id,name_en,name_zh,role,dept,site,email,mobile,ext,title_en,title_zh,avatar_url,pwd_hash,active&emp_id=eq.${encodeURIComponent(portalSess.empId)}&limit=1`,
-          { headers: { 'x-admin-token': SB_TOKEN } }
+          `${SB_WORKER}/supabase/rest/v1/users?select=emp_id,name_en,name_zh,role,dept,site,email,mobile,ext,title_en,title_zh,avatar_url,active&emp_id=eq.${encodeURIComponent(portalSess.empId)}&limit=1`,
+          { headers: qtHdrs() }
         );
         const rows = await res.json();
         if (Array.isArray(rows) && rows.length) {
@@ -1577,7 +1577,7 @@ async function loadAll() {
             email:   u.email||'', login: u.email||'', ext: u.ext||'', mobile: u.mobile||'',
             titleEn: u.title_en||'', titleZh: u.title_zh||'',
             role:    u.active === false ? 'inactive' : (u.role || 'user'),
-            photoURL:u.avatar_url||'', pwdHash: u.pwd_hash||'',
+            photoURL:u.avatar_url||'',
             site:    u.site || 'TW',
           };
         }
@@ -1638,7 +1638,7 @@ async function uploadImgToStorage(prodId, base64DataUrl) {
     const path = 'products/' + prodId + '.' + ext;
     const up = await fetch(
       SB_WORKER + '/supabase/storage/v1/object/' + SB_STORAGE_BUCKET + '/' + path,
-      { method: 'POST', headers: { 'x-admin-token': SB_TOKEN, 'Content-Type': blob.type, 'x-upsert': 'true' }, body: blob }
+      { method: 'POST', headers: { 'x-session': qtSig(), 'Content-Type': blob.type, 'x-upsert': 'true' }, body: blob }
     );
     if (!up.ok) throw new Error(await up.text());
     return SB_STORAGE_BASE + '/' + path;
@@ -1656,7 +1656,7 @@ async function _uploadFileToStorage(path, b64, mimeType) {
   const blob = new Blob([bytes], { type: mimeType });
   const up = await fetch(
     SB_WORKER + '/supabase/storage/v1/object/' + SB_STORAGE_BUCKET + '/' + path,
-    { method: 'POST', headers: { 'x-admin-token': SB_TOKEN, 'Content-Type': mimeType, 'x-upsert': 'true' }, body: blob }
+    { method: 'POST', headers: { 'x-session': qtSig(), 'Content-Type': mimeType, 'x-upsert': 'true' }, body: blob }
   );
   if (!up.ok) throw new Error(await up.text());
   return SB_STORAGE_BASE + '/' + path;
@@ -1668,7 +1668,7 @@ async function deleteImgFromStorage(prodId) {
   try {
     await fetch(
       SB_WORKER + '/supabase/storage/v1/object/' + SB_STORAGE_BUCKET,
-      { method: 'DELETE', headers: { 'x-admin-token': SB_TOKEN, 'Content-Type': 'application/json' }, body: JSON.stringify({ prefixes }) }
+      { method: 'DELETE', headers: qtHdrs(), body: JSON.stringify({ prefixes }) }
     );
   } catch(_) {}
 }
@@ -1680,7 +1680,7 @@ async function _deleteStorageFile(storagePath) {
   try {
     await fetch(
       SB_WORKER + '/supabase/storage/v1/object/' + SB_STORAGE_BUCKET,
-      { method: 'DELETE', headers: { 'x-admin-token': SB_TOKEN, 'Content-Type': 'application/json' }, body: JSON.stringify({ prefixes: [storagePath] }) }
+      { method: 'DELETE', headers: qtHdrs(), body: JSON.stringify({ prefixes: [storagePath] }) }
     );
   } catch(_) {}
 }
@@ -2601,13 +2601,20 @@ function closeProdModal(e){
 // One language tab controls BOTH name + features
 let _pmLang = LANGS[0];
 
-// Translation proxy URL — replace with your Cloudflare Worker URL
-const XLAT_PROXY = 'https://tcvlnpgpuphdalzvmoyo.supabase.co/functions/v1/sb-proxy';
-const SB_WORKER  = 'https://tcvlnpgpuphdalzvmoyo.supabase.co/functions/v1/sb-proxy';
-const SB_TOKEN   = 'COMART-ADMIN-2026';
+const XLAT_PROXY   = 'https://tcvlnpgpuphdalzvmoyo.supabase.co/functions/v1/sb-proxy';
+const CLAUDE_PROXY = 'https://tcvlnpgpuphdalzvmoyo.supabase.co/functions/v1/claude-proxy';
+const SB_WORKER    = 'https://tcvlnpgpuphdalzvmoyo.supabase.co/functions/v1/sb-proxy';
+
+// sb-proxy/claude-proxy 改驗 HMAC session 簽章（x-session），固定 x-admin-token 已廢除（2026-07-20）
+function qtSig() {
+  try { return (readPortalSession() || {}).sig || ''; } catch(e) { return ''; }
+}
+function qtHdrs(extra) {
+  return Object.assign({ 'x-session': qtSig(), 'Content-Type': 'application/json' }, extra || {});
+}
 
 const SB = {
-  _h: { 'x-admin-token': SB_TOKEN, 'Content-Type': 'application/json' },
+  get _h() { return qtHdrs(); },
   _url: t => `${SB_WORKER}/supabase/rest/v1/${t}`,
   async get(table, qs='') {
     const res = await fetch(`${this._url(table)}${qs?'?'+qs:''}`, { headers: this._h });
@@ -2643,7 +2650,7 @@ async function _loadUsersFromSB() {
     // 本清單僅用於下拉選單顯示姓名，抓了會拖垮啟動並撐爆 localStorage 快取
     const res = await fetch(
       `${SB_WORKER}/supabase/rest/v1/users?select=emp_id,name_en,name_zh,role,dept,site,email,mobile,ext,title_en,title_zh,active&order=emp_id&active=eq.true`,
-      { headers: { 'x-admin-token': SB_TOKEN } }
+      { headers: qtHdrs() }
     );
     const rows = await res.json();
     if (Array.isArray(rows) && rows.length) {
@@ -2704,9 +2711,9 @@ async function translateAllDescriptions() {
       + 'Description (EN): ' + enFeat;
 
     try {
-      const resp = await fetch(XLAT_PROXY, {
+      const resp = await fetch(CLAUDE_PROXY, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: qtHdrs(),
         body: JSON.stringify({
           model: 'claude-haiku-4-5-20251001',
           max_tokens: 1000,
@@ -2755,9 +2762,9 @@ async function translateFeatOnly() {
     + 'Description (EN): ' + enFeat;
 
   try {
-    const resp = await fetch(XLAT_PROXY, {
+    const resp = await fetch(CLAUDE_PROXY, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: qtHdrs(),
       body: JSON.stringify({
         model: 'claude-haiku-4-5-20251001',
         max_tokens: 1000,
@@ -2806,9 +2813,9 @@ async function doTranslate() {
     + 'Description (EN): ' + enFeat;
 
   try {
-    var resp = await fetch(XLAT_PROXY, {
+    var resp = await fetch(CLAUDE_PROXY, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: qtHdrs(),
       body: JSON.stringify({
         model: 'claude-haiku-4-5-20251001',
         max_tokens: 1200,
@@ -3094,10 +3101,14 @@ async function confirmDelete(label, callback) {
       const typedPwd = inp.value;
       if (!typedPwd) { errMsg.textContent='Please enter your password'; errMsg.style.display='block'; return; }
       try {
-        // Hash the typed password and compare against stored hash
-        const hash = await sha256(typedPwd);
-        const storedHash = currentUser?.pwdHash;
-        if (hash === storedHash) {
+        // 伺服器端驗證密碼（auth-verify login）：前端已拿不到 pwd_hash（2026-07 資安改造），
+        // 舊的 sha256 前端比對永遠失敗，等於刪除功能鎖死
+        const vr = await fetch('https://tcvlnpgpuphdalzvmoyo.supabase.co/functions/v1/auth-verify', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'login', empId: currentUser?.empId || '', password: typedPwd }),
+        });
+        const vd = await vr.json().catch(() => ({}));
+        if (vd.ok) {
           document.body.removeChild(overlay);
           await callback();
           resolve(true);
@@ -3978,7 +3989,7 @@ async function getProdImgB64(pid) {
 
   try {
     const proxyUrl = XLAT_PROXY + '?imgproxy=' + encodeURIComponent(prod.img);
-    const resp = await fetch(proxyUrl);
+    const resp = await fetch(proxyUrl, { headers: { 'x-session': qtSig() } });
     if (!resp.ok) throw new Error('proxy HTTP ' + resp.status);
     const blob = await resp.blob();
     const b64 = await new Promise((res, rej) => {
@@ -5397,8 +5408,8 @@ async function restoreSession() {
     // Session valid for 30 days
     if (Date.now() - sess.ts > 30 * 86400000) { localStorage.removeItem(COL_U_SESSION); return false; }
     const _res = await fetch(
-      `${SB_WORKER}/supabase/rest/v1/users?select=emp_id,name_en,name_zh,role,dept,site,email,mobile,ext,title_en,title_zh,avatar_url,pwd_hash,active&emp_id=eq.${encodeURIComponent(sess.empId)}&limit=1`,
-      { headers: { 'x-admin-token': SB_TOKEN } }
+      `${SB_WORKER}/supabase/rest/v1/users?select=emp_id,name_en,name_zh,role,dept,site,email,mobile,ext,title_en,title_zh,avatar_url,active&emp_id=eq.${encodeURIComponent(sess.empId)}&limit=1`,
+      { headers: qtHdrs() }
     );
     const _rows = await _res.json();
     if (Array.isArray(_rows) && _rows.length) {
@@ -5408,7 +5419,7 @@ async function restoreSession() {
         empId: u.emp_id, nameEn: u.name_en||'', nameZh: u.name_zh||'',
         email: u.email||'', login: u.email||'', ext: u.ext||'', mobile: u.mobile||'',
         titleEn: u.title_en||'', titleZh: u.title_zh||'',
-        role: u.role||'user', photoURL: u.avatar_url||'', pwdHash: u.pwd_hash||'',
+        role: u.role||'user', photoURL: u.avatar_url||'',
       };
       updateUserBadge();
       await _reloadAfterLogin();
@@ -5693,7 +5704,7 @@ function _driveShareUrl(f){
 // Drive files fetched via Cloudflare Worker (API key stays server-side)
 async function _driveFetch(folderId){
   try {
-    const res  = await fetch(XLAT_PROXY + '/drive?folder=' + encodeURIComponent(folderId));
+    const res  = await fetch(XLAT_PROXY + '/drive?folder=' + encodeURIComponent(folderId), { headers: { 'x-session': qtSig() } });
     const data = await res.json();
     if (!res.ok || data.error) {
       const msg = data?.error?.message || data?.detail?.error?.message || JSON.stringify(data.error || data).slice(0,100);
@@ -6588,12 +6599,14 @@ async function init(){
     if (_psToken) {
       const _decoded = JSON.parse(decodeURIComponent(escape(atob(decodeURIComponent(_psToken)))));
       if (_decoded && _decoded.empId && _decoded.expires && Date.now() < _decoded.expires) {
-        // 直接查 Supabase 取得最新 user，不依賴任何 localStorage
+        // 先把含簽章的 session 存回 localStorage（qtSig() 靠它產生 x-session）
+        try { localStorage.setItem(PORTAL_SESSION_KEY, JSON.stringify(_decoded)); } catch(_) {}
+        // 直接查 Supabase 取得最新 user
         let _freshUser = null;
         try {
           const _r = await fetch(
-            `${SB_WORKER}/supabase/rest/v1/users?select=emp_id,name_en,name_zh,role,dept,site,email,mobile,ext,title_en,title_zh,avatar_url,pwd_hash,active&emp_id=eq.${encodeURIComponent(_decoded.empId)}&limit=1`,
-            { headers: { 'x-admin-token': SB_TOKEN } }
+            `${SB_WORKER}/supabase/rest/v1/users?select=emp_id,name_en,name_zh,role,dept,site,email,mobile,ext,title_en,title_zh,avatar_url,active&emp_id=eq.${encodeURIComponent(_decoded.empId)}&limit=1`,
+            { headers: qtHdrs() }
           );
           const _rr = await _r.json();
           if (Array.isArray(_rr) && _rr.length) {
@@ -6603,7 +6616,7 @@ async function init(){
               email: u.email||'', login: u.email||'', ext: u.ext||'', mobile: u.mobile||'',
               titleEn: u.title_en||'', titleZh: u.title_zh||'',
               role: u.active===false ? 'inactive' : (u.role||'user'),
-              photoURL: u.avatar_url||'', pwdHash: u.pwd_hash||'',
+              photoURL: u.avatar_url||'',
             };
           }
         } catch(_fe) { console.warn('[Portal _ps SB]', _fe); }

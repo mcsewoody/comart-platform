@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>COMART Platform v1.61</title>
+<title>COMART Platform v1.62</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script defer src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.js"></script>
 <style>
@@ -312,7 +312,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     <div class="login-logo">
       <div class="login-mark" style="background:transparent"><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="44" height="23"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></div>
       <div class="login-name">COMART Platform</div>
-      <div class="login-sub">Internal Portal · v1.61</div>
+      <div class="login-sub">Internal Portal · v1.62</div>
     </div>
     <form id="loginForm" onsubmit="doLogin();return false;" autocomplete="on">
     <div class="field">
@@ -368,7 +368,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   <div class="topbar">
     <div class="topbar-logo" onclick="switchView('home')">
       <div class="topbar-mark" style="background:transparent"><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="26" height="14"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></div>
-      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.61</span></div>
+      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.62</span></div>
     </div>
     <div class="topbar-right">
       <div class="lang-switcher">
@@ -1299,6 +1299,13 @@ function enterPortal() {
   if (window._notifBadgeTimer) clearInterval(window._notifBadgeTimer);
   window._notifBadgeTimer = setInterval(updateNotifBadge, 60000);
   startMsgListener();
+  // 回到前景時立即補查一次（背景期間輪詢是暫停的）
+  if (!window._visPollBound) {
+    window._visPollBound = true;
+    document.addEventListener('visibilitychange', function() {
+      if (!document.hidden && SESSION) { updateNotifBadge(false); _pollNewMessages(); }
+    });
+  }
 }
 
 // ═══════════════════════════════════════════════
@@ -1319,6 +1326,7 @@ function startMsgListener() {
 
 async function _pollNewMessages() {
   if (!SESSION) return;
+  if (document.hidden) return; // 頁面在背景時暫停輪詢，回前景由 visibilitychange 立即補跑
   try {
     const rows = await SB.get('portal_messages',
       'targetEmpId=eq.' + encodeURIComponent(SESSION.empId) +
@@ -1571,7 +1579,7 @@ async function loadNotifications() {
       </div>`;
     }).join('');
   } catch(e) {
-    list.innerHTML = `<div style="padding:16px;color:var(--tx3);font-size:12px;">載入失敗：${e.message}</div>`;
+    list.innerHTML = `<div style="padding:16px;color:var(--tx3);font-size:12px;">載入失敗：${escHtml(e.message)}</div>`;
   }
 }
 
@@ -1584,7 +1592,8 @@ async function openNotif(notifId, link) {
       body: JSON.stringify({ is_read: true }),
     }).catch(()=>{});
   }
-  if (link) window.open(link, '_blank');
+  // 只允許 http(s) 或站內相對路徑，阻擋 javascript: 等危險 scheme
+  if (link && /^(https?:\/\/|\/|\.\/)/i.test(link)) window.open(link, '_blank');
   document.getElementById('notifPanel')?.classList.remove('open');
   _notifOpen = false;
   setTimeout(loadNotifications, 500);
@@ -1614,6 +1623,7 @@ function _notifFilter(sess) {
 async function updateNotifBadge(autoOpen) {
   const sess = readSession();
   if (!sess) return;
+  if (document.hidden && autoOpen !== true) return; // 背景分頁不輪詢（登入後首查除外）
   const sbKey = await getSupabaseKey();
   if (!sbKey) return;
   try {
@@ -1699,15 +1709,15 @@ async function loadRanking(siteFilter) {
       var user = ALL_USERS.find(function(u) { return u.nameEn === name || u.nameZh === name; });
       var titleText = user?.titleEn || user?.titleZh || '';
       var initial = (name || '?')[0].toUpperCase();
-      var siteTag = site ? `<span style="font-size:10px;padding:1px 6px;border-radius:8px;background:var(--s3);color:var(--tx3);margin-left:4px;">${SITE_FLAG[site]||''} ${site}</span>` : '';
+      var siteTag = site ? `<span style="font-size:10px;padding:1px 6px;border-radius:8px;background:var(--s3);color:var(--tx3);margin-left:4px;">${SITE_FLAG[site]||''} ${escHtml(site)}</span>` : '';
       return `
         <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--br);">
           <div style="font-size:18px;width:28px;text-align:center;flex-shrink:0;">${medal}</div>
           <div style="width:36px;height:36px;border-radius:50%;background:var(--ac2);color:var(--ac);
             display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0;">${initial}</div>
           <div style="flex:1;min-width:0;">
-            <div style="font-size:13px;font-weight:600;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${name}${siteTag}</div>
-            ${titleText ? `<div style="font-size:11px;color:var(--tx3);">${titleText}</div>` : ''}
+            <div style="font-size:13px;font-weight:600;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escHtml(name)}${siteTag}</div>
+            ${titleText ? `<div style="font-size:11px;color:var(--tx3);">${escHtml(titleText)}</div>` : ''}
             <div style="margin-top:5px;height:4px;border-radius:2px;background:var(--s3);overflow:hidden;">
               <div style="height:100%;width:${pct}%;background:var(--ac);border-radius:2px;transition:width .5s;"></div>
             </div>
@@ -1725,8 +1735,8 @@ async function loadRanking(siteFilter) {
       var items = ALL_USERS.filter(function(u) { return u.role !== 'inactive'; });
       var medals2 = ['🥇','🥈','🥉'];
       listEl.innerHTML = items.map(function(u, i) {
-        var av = u.photoURL
-          ? `<img src="${u.photoURL}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;flex-shrink:0;">`
+        var av = safeUrl(u.photoURL)
+          ? `<img src="${safeUrl(u.photoURL)}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;flex-shrink:0;">`
           : `<div style="width:36px;height:36px;border-radius:50%;background:var(--ac2);color:var(--ac);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0;">${(u.nameEn||u.empId||'?')[0].toUpperCase()}</div>`;
         var medal = medals2[i] || `<span style="font-size:12px;color:var(--tx3);">${i+1}</span>`;
         return `<div style="display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--br);">
@@ -1749,7 +1759,7 @@ async function loadDirectory() {
   try {
     const res = await fetch(
       `${SB_WORKER}/supabase/rest/v1/users?select=emp_id,name_en,name_zh,role,dept,site,email,mobile,ext,title_en,title_zh,avatar_url,active&order=emp_id&active=eq.true`,
-      { headers: { 'x-admin-token': SB_TOKEN } }
+      { headers: sbHdrs() }
     );
     if (res.ok) {
       const rows = await res.json();
@@ -1787,14 +1797,15 @@ function renderDirectory() {
   var siteLabel = { TW:'Taiwan', CN:'China', VN:'Vietnam', Other:'Other' };
   grid.innerHTML = users.map(function(u) {
     var init = (u.nameEn || u.nameZh || u.empId || '?')[0].toUpperCase();
+    // 值放 data-* 屬性、handler 讀 dataset，避免把 DB 字串拼進 onclick JS（注入風險）
     var contacts = [
-      u.ext    ? '<div class="dir-contact" onclick="event.stopPropagation();navigator.clipboard&&navigator.clipboard.writeText(\'' + u.ext + '\');toast(\'分機已複製\',\'ok\')">☎ Ext. ' + u.ext + '</div>' : '',
-      u.mobile ? '<div class="dir-contact" onclick="event.stopPropagation();navigator.clipboard&&navigator.clipboard.writeText(\'' + u.mobile + '\');toast(\'手機號碼已複製\',\'ok\')">📱 ' + u.mobile + '</div>' : '',
-      u.email  ? '<div class="dir-contact" onclick="event.stopPropagation();window.location=\'mailto:' + u.email + '\'">✉ ' + u.email + '</div>' : '',
+      u.ext    ? '<div class="dir-contact" data-copy="' + escHtml(u.ext) + '" data-msg="分機已複製" onclick="event.stopPropagation();navigator.clipboard&&navigator.clipboard.writeText(this.dataset.copy);toast(this.dataset.msg,\'ok\')">☎ Ext. ' + escHtml(u.ext) + '</div>' : '',
+      u.mobile ? '<div class="dir-contact" data-copy="' + escHtml(u.mobile) + '" data-msg="手機號碼已複製" onclick="event.stopPropagation();navigator.clipboard&&navigator.clipboard.writeText(this.dataset.copy);toast(this.dataset.msg,\'ok\')">📱 ' + escHtml(u.mobile) + '</div>' : '',
+      u.email  ? '<div class="dir-contact" data-mail="' + escHtml(u.email) + '" onclick="event.stopPropagation();window.location=\'mailto:\'+encodeURIComponent(this.dataset.mail)">✉ ' + escHtml(u.email) + '</div>' : '',
     ].filter(Boolean).join('');
 
-    var avatarHtml = u.photoURL
-      ? '<img src="' + u.photoURL + '" style="width:56px;height:56px;border-radius:50%;object-fit:cover;margin:0 auto 10px;display:block;">'
+    var avatarHtml = safeUrl(u.photoURL)
+      ? '<img src="' + safeUrl(u.photoURL) + '" style="width:56px;height:56px;border-radius:50%;object-fit:cover;margin:0 auto 10px;display:block;">'
       : '<div class="dir-avatar">' + init + '</div>';
 
     return '<div class="dir-card" onclick="openProfile(\'' + u.empId + '\')">'
@@ -2059,8 +2070,8 @@ async function loadUsers() {
   // 主要：Supabase
   try {
     const res = await fetch(
-      `${SB_WORKER}/supabase/rest/v1/users?select=emp_id,name_en,name_zh,role,dept,site,email,mobile,ext,title_en,title_zh,avatar_url,pwd_hash,active,bio_zh,bio_en,expertise_zh,expertise_en&order=emp_id`,
-      { headers: { 'x-admin-token': SB_TOKEN } }
+      `${SB_WORKER}/supabase/rest/v1/users?select=emp_id,name_en,name_zh,role,dept,site,email,mobile,ext,title_en,title_zh,avatar_url,active,bio_zh,bio_en,expertise_zh,expertise_en&order=emp_id`,
+      { headers: sbHdrs() }
     );
     if (res.ok) {
       const rows = await res.json();
@@ -2079,7 +2090,6 @@ async function loadUsers() {
           dept:        u.dept       || '',
           role:        u.active === false ? 'inactive' : (u.role || 'user'),
           photoURL:     u.avatar_url   || '',
-          pwdHash:      u.pwd_hash    || '',
           active:       u.active !== false,
           bioZh:        u.bio_zh      || '',
           bioEn:        u.bio_en      || '',
@@ -2182,7 +2192,7 @@ function openUserModal(empId) {
   })();
   var avEl = document.getElementById('um-avatar-preview');
   if (avEl) {
-    if (u?.photoURL) { avEl.innerHTML = '<img src="' + u.photoURL + '" style="width:100%;height:100%;object-fit:cover;">'; }
+    if (safeUrl(u?.photoURL)) { avEl.innerHTML = '<img src="' + safeUrl(u.photoURL) + '" style="width:100%;height:100%;object-fit:cover;">'; }
     else { avEl.textContent = ((u?.nameEn||u?.nameZh||u?.empId||'?')[0]).toUpperCase(); }
   }
   window._umAvatarDataUrl = null;
@@ -2200,12 +2210,23 @@ function openUserModal(empId) {
 function closeUserModal() { document.getElementById('userOverlay').classList.remove('show'); }
 
 
-// ── Supabase Users Sync (via Cloudflare Worker) ──────────
+// ── Supabase Users Sync (via sb-proxy edge function) ──────────
 const SB_WORKER = 'https://tcvlnpgpuphdalzvmoyo.supabase.co/functions/v1/sb-proxy';
-const SB_TOKEN  = 'COMART-ADMIN-2026';
+
+// 所有 sb-proxy 呼叫改帶登入時簽發的 HMAC session 簽章（x-session），
+// 伺服器端驗簽後才放行；舊的固定 x-admin-token 已廢除（2026-07-20 資安改造）
+function sbHdrs(extra) {
+  const s = SESSION || readSession() || {};
+  return Object.assign({ 'x-session': s.sig || '', 'Content-Type': 'application/json' }, extra || {});
+}
+// 頭像等外部 URL 僅允許 http(s) 與 data:image，並跳脫屬性字元，防儲存型 XSS
+function safeUrl(u) {
+  u = String(u || '');
+  return /^(https?:\/\/|data:image\/)/i.test(u) ? escHtml(u) : '';
+}
 
 const SB = {
-  _h: { 'x-admin-token': SB_TOKEN, 'Content-Type': 'application/json' },
+  get _h() { return sbHdrs(); },
   _url: t => `${SB_WORKER}/supabase/rest/v1/${t}`,
   async get(table, qs='') { const res = await fetch(`${this._url(table)}${qs?'?'+qs:''}`, {headers:this._h}); if(!res.ok){console.warn('SB.get',table,res.status);return null;} return res.json(); },
   async post(table, data) { const res = await fetch(this._url(table),{method:'POST',headers:this._h,body:JSON.stringify(data)}); if(!res.ok){const e=await res.text();throw new Error(`SB.post ${table}: ${e}`);} },
@@ -2220,7 +2241,7 @@ async function sbSyncUser(user, isDelete, isNew) {
   if (isDelete) {
     res = await fetch(`${SB_WORKER}/supabase/rest/v1/users?emp_id=eq.${encodeURIComponent(user.empId)}`, {
       method: 'DELETE',
-      headers: { 'x-admin-token': SB_TOKEN, 'Content-Type': 'application/json' },
+      headers: sbHdrs(),
     });
   } else {
     const url = isNew
@@ -2228,10 +2249,7 @@ async function sbSyncUser(user, isDelete, isNew) {
       : `${SB_WORKER}/supabase/rest/v1/users?emp_id=eq.${encodeURIComponent(user.empId)}`;
     res = await fetch(url, {
       method: isNew ? 'POST' : 'PATCH',
-      headers: {
-        'x-admin-token': SB_TOKEN,
-        'Content-Type': 'application/json',
-      },
+      headers: sbHdrs(),
       body: JSON.stringify({
         emp_id:        user.empId,
         name_en:       user.nameEn       || '',
@@ -2249,7 +2267,9 @@ async function sbSyncUser(user, isDelete, isNew) {
         bio_en:        user.bioEn        || '',
         expertise_zh:  user.expertiseZh  || [],
         expertise_en:  user.expertiseEn  || [],
-        active:        true,
+        // 停用（role=inactive）必須真的把 active 設 false：auth-verify 擋登入、
+        // 各子系統的 active=eq.true 過濾才會生效（2026-07-20 前此處硬編 true，停用形同虛設）
+        active:        (user.role || 'user') !== 'inactive',
       }),
     });
   }
@@ -2302,7 +2322,7 @@ async function saveUser() {
   // 前端不再自己算 sha256）；admin 設定/重設的密碼永遠強制對方下次登入要換新密碼
   if (pwd) {
     try {
-      const pwdResp = await callAuthVerify({ action: 'adminSetPassword', empId, newPassword: pwd, requireChange: true, adminToken: SB_TOKEN });
+      const pwdResp = await callAuthVerify({ action: 'adminSetPassword', empId, newPassword: pwd, requireChange: true, session: (SESSION?.sig || '') });
       if (!pwdResp.ok) { toast('User saved, but password update failed: ' + pwdResp.reason, 'err'); }
     } catch(e) { toast('User saved, but password update failed: ' + e.message, 'err'); }
   }
@@ -3242,7 +3262,6 @@ window.addEventListener('DOMContentLoaded', () => {
 // ═══════════════════════════════════════════════
 // AI FUNCTIONS
 // ═══════════════════════════════════════════════
-const XLAT_PROXY = 'https://tcvlnpgpuphdalzvmoyo.supabase.co/functions/v1/sb-proxy';
 const SB_URL     = 'https://tcvlnpgpuphdalzvmoyo.supabase.co';
 const SB_ANON    = 'sb_publishable_rAVwVeUMWD-m_VTFIenMhg_Fcg6ocYJ';
 
@@ -3279,7 +3298,8 @@ async function pCallClaude(messages, system, maxTokens) {
   var headers = {
     'Content-Type': 'application/json',
     'Authorization': 'Bearer ' + SB_ANON,
-    'apikey': SB_ANON
+    'apikey': SB_ANON,
+    'x-session': (SESSION && SESSION.sig) || (readSession() || {}).sig || ''
   };
   var body = {
     model: 'claude-haiku-4-5-20251001',
@@ -3292,14 +3312,6 @@ async function pCallClaude(messages, system, maxTokens) {
     headers: headers,
     body: JSON.stringify(body)
   });
-  if (!res.ok) {
-    // Fallback: try XLAT_PROXY
-    res = await fetch(XLAT_PROXY, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body)
-    });
-  }
   if (!res.ok) throw new Error('API error ' + res.status);
   var data = await res.json();
   if (data.error) throw new Error(JSON.stringify(data.error).slice(0, 120));
@@ -3558,7 +3570,7 @@ function openTripModal(id) {
     _doOpen();
   } else {
     fetch(`${SB_WORKER}/supabase/rest/v1/users?select=emp_id,name_en,name_zh,role,dept,site,email,ext,active&order=emp_id&active=eq.true`,
-      { headers: { 'x-admin-token': SB_TOKEN } })
+      { headers: sbHdrs() })
       .then(function(r){ return r.json(); })
       .then(function(rows){
         if (Array.isArray(rows) && rows.length) {
@@ -3614,9 +3626,10 @@ async function autoFillFlight(flightNo, leg) {
   var prompt = 'Flight ' + flightNo + ' on ' + dateStr + '. Search web for scheduled timetable. Return ONLY valid JSON no markdown: {"dep_iata":"","dep_city":"","dep_terminal":"","dep_time":"HH:MM","arr_iata":"","arr_city":"","arr_terminal":"","arr_time":"HH:MM"}. Use local scheduled times. Unknown fields use empty string.';
 
   try {
-    var resp = await fetch(XLAT_PROXY, {
+    // 走 claude-proxy（舊碼指向 sb-proxy 根路徑是 Worker 時代殘留，必定 400）
+    var resp = await fetch(SB_URL + '/functions/v1/claude-proxy', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'x-session': (SESSION && SESSION.sig) || '' },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 512,
@@ -3762,7 +3775,7 @@ function initCalendar() {
   var userLoadPromise = (ALL_USERS.length > 0)
     ? Promise.resolve()
     : fetch(`${SB_WORKER}/supabase/rest/v1/users?select=emp_id,name_en,name_zh,role,dept,site,email,ext,active&order=emp_id&active=eq.true`,
-        { headers: { 'x-admin-token': SB_TOKEN } })
+        { headers: sbHdrs() })
       .then(function(r){ return r.json(); })
       .then(function(rows){
         if (Array.isArray(rows) && rows.length) {
@@ -4456,7 +4469,7 @@ async function uploadAvatar(event) {
     try {
       await fetch(`${SB_WORKER}/supabase/rest/v1/users?emp_id=eq.${encodeURIComponent(_profileUser.empId)}`, {
         method: 'PATCH',
-        headers: { 'x-admin-token': SB_TOKEN, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+        headers: sbHdrs({ 'Prefer': 'return=minimal' }),
         body: JSON.stringify({ avatar_url: dataUrl }),
       });
     } catch(e) { console.warn('Photo Supabase sync failed:', e.message); }

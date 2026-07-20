@@ -1,9 +1,13 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import { verifySession } from "../_shared/session.ts"
 
 const CORS = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-session",
 }
+
+// 過渡旗標：前端上線後改 false 再部署（原本無驗證，任何人可耗用 OpenAI 額度）
+const GRACE = true
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: CORS })
@@ -11,6 +15,9 @@ serve(async (req) => {
   try {
     const OPENAI_KEY = Deno.env.get("OPENAI_API_KEY")
     if (!OPENAI_KEY) return new Response(JSON.stringify({ error: "OPENAI_API_KEY not set" }), { status: 500, headers: CORS })
+
+    const verified = await verifySession(req.headers.get("x-session") || "")
+    if (!verified && !GRACE) return new Response(JSON.stringify({ error: "unauthorized" }), { status: 401, headers: CORS })
 
     const { text } = await req.json()
     if (!text) return new Response(JSON.stringify({ error: "text required" }), { status: 400, headers: CORS })

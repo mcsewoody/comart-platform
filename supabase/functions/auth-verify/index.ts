@@ -7,15 +7,18 @@
 // 而不是像過去單純相信前端宣稱的 role 欄位。
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
-import { signSession, verifyPassword, hashPassword } from "../_shared/session.ts"
+import { signSession, verifySession, verifyPassword, hashPassword } from "../_shared/session.ts"
 
 const CORS = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-admin-token",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-admin-token, x-session",
 }
 
 const LEGACY_SALT = "::COMART-QS-2024" // 對照前端 PWD_SALT，僅用於驗證舊格式雜湊
-const ADMIN_TOKEN = "COMART-ADMIN-2026" // 與 Cloudflare Worker 相同的管理層級權杖
+// 過渡旗標：true = adminSetPassword 仍接受舊固定權杖（部署新前端期間），
+// 前端上線後改 false 再部署（固定權杖前端可見，形同無防護，2026-07-20 廢除）
+const GRACE = true
+const LEGACY_ADMIN_TOKEN = "COMART-ADMIN-2026"
 const SESSION_TTL_MS = 8 * 60 * 60 * 1000 // 8h，比照前端既有 SESSION_TTL
 
 const USER_FIELDS =
@@ -47,7 +50,8 @@ serve(async (req) => {
       if (error) return json({ ok: false, reason: "server_error" }, 500)
       const row = rows?.[0]
       if (!row) return json({ ok: false, reason: "not_found" })
-      if (row.active === false) return json({ ok: false, reason: "inactive" })
+      // role='inactive' 與 active=false 一視同仁擋登入（歷史資料兩種標法並存）
+      if (row.active === false || String(row.role || "") === "inactive") return json({ ok: false, reason: "inactive" })
 
       const valid = await verifyPassword(password, row.pwd_hash || "", LEGACY_SALT)
       if (!valid) return json({ ok: false, reason: "bad_password" })
@@ -85,10 +89,11 @@ serve(async (req) => {
       return json({ ok: true })
     }
 
-    // ── 管理員設定/重設他人密碼（使用者管理頁）：比照 Worker 的管理層級權杖 ──
+    // ── 管理員設定/重設他人密碼（使用者管理頁）：驗證簽章 session 的真實 admin 角色 ──
     if (action === "adminSetPassword") {
-      const token = req.headers.get("x-admin-token") || body.adminToken || ""
-      if (token !== ADMIN_TOKEN) return json({ ok: false, reason: "forbidden" }, 403)
+      const verified = await verifySession(String(body.session || req.headers.get("x-session") || ""))
+      const legacyOk = GRACE && (req.headers.get("x-admin-token") || body.adminToken || "") === LEGACY_ADMIN_TOKEN
+      if (verified?.role !== "admin" && !legacyOk) return json({ ok: false, reason: "forbidden" }, 403)
 
       const empId = String(body.empId || "").trim().toUpperCase()
       const newPassword = String(body.newPassword || "")

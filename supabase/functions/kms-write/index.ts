@@ -1,10 +1,15 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
+import { verifySession } from "../_shared/session.ts"
 
 const CORS = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-session",
 }
+
+// 過渡旗標：true = 暫時放行未帶 session 的請求（部署新前端期間），
+// 前端上線後改 false 再部署。原本此函式完全無驗證，任何人可寫 KMS 表（2026-07-20 修復）
+const GRACE = true
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: CORS })
@@ -21,7 +26,13 @@ serve(async (req) => {
     // 用 service_role 建立 client，可繞過 RLS
     const sb = createClient(SUPABASE_URL, SERVICE_KEY)
 
-    const { action, table, payload, id, filters } = await req.json()
+    const { action, table, payload, id, filters, session } = await req.json()
+
+    // 驗證登入 session（HMAC 簽章，auth-verify 簽發）
+    const verified = await verifySession(String(session || req.headers.get("x-session") || ""))
+    if (!verified && !GRACE) {
+      return new Response(JSON.stringify({ error: "unauthorized" }), { status: 401, headers: CORS })
+    }
 
     // 只允許 KMS 相關的資料表
     const ALLOWED_TABLES = [

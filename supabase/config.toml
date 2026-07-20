@@ -407,6 +407,34 @@ s3_secret_key = "env(S3_SECRET_KEY)"
 # JSON string passed through to pg-delta SQL formatting.
 # format_options = "{\"keywordCase\":\"upper\",\"indent\":2,\"maxWidth\":80,\"commaStyle\":\"trailing\"}"
 
+# 以下所有 functions 一律 verify_jwt = false：前端不帶 Supabase JWT，
+# 權限由各 function 自行把關（x-admin-token / session sig / 表白名單）。
+# 固化在此可避免 CLI 部署時漏帶 --no-verify-jwt 造成全站 401（2026-07-20 曾發生）。
+[functions.sb-proxy]
+enabled = true
+verify_jwt = false
+entrypoint = "./functions/sb-proxy/index.ts"
+
+[functions.auth-verify]
+enabled = true
+verify_jwt = false
+entrypoint = "./functions/auth-verify/index.ts"
+
+[functions.kms-secure-docs]
+enabled = true
+verify_jwt = false
+entrypoint = "./functions/kms-secure-docs/index.ts"
+
+[functions.embed-document]
+enabled = true
+verify_jwt = false
+entrypoint = "./functions/embed-document/index.ts"
+
+[functions.embed-query]
+enabled = true
+verify_jwt = false
+entrypoint = "./functions/embed-query/index.ts"
+
 [functions.claude-proxy]
 enabled = true
 verify_jwt = false

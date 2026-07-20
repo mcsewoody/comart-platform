@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>COMART Platform v1.62</title>
+<title>COMART Platform v1.63</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script defer src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.js"></script>
 <style>
@@ -140,6 +140,7 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:
 .msg-list{max-height:340px;overflow-y:auto;margin-bottom:14px;}
 .msg-item{padding:10px 12px;border-bottom:1px solid var(--br);}
 .msg-item:last-child{border-bottom:none;}
+.msg-item.msg-new{background:var(--ac2);border-radius:6px;box-shadow:inset 3px 0 0 var(--ac);}
 .msg-header{display:flex;align-items:center;gap:8px;margin-bottom:5px;}
 .msg-avatar{width:24px;height:24px;border-radius:50%;background:var(--ac2);color:var(--ac);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;}
 .msg-author{font-size:12px;font-weight:600;color:var(--tx);}
@@ -312,7 +313,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     <div class="login-logo">
       <div class="login-mark" style="background:transparent"><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="44" height="23"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></div>
       <div class="login-name">COMART Platform</div>
-      <div class="login-sub">Internal Portal · v1.62</div>
+      <div class="login-sub">Internal Portal · v1.63</div>
     </div>
     <form id="loginForm" onsubmit="doLogin();return false;" autocomplete="on">
     <div class="field">
@@ -368,7 +369,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   <div class="topbar">
     <div class="topbar-logo" onclick="switchView('home')">
       <div class="topbar-mark" style="background:transparent"><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="26" height="14"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></div>
-      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.62</span></div>
+      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.63</span></div>
     </div>
     <div class="topbar-right">
       <div class="lang-switcher">
@@ -1312,6 +1313,7 @@ function enterPortal() {
 // INSTANT MESSAGE NOTIFICATION (polling portal_messages)
 // ═══════════════════════════════════════════════
 var _msgPopupEmpId   = null;  // 誰留言給我
+var _msgPopupRootId  = null;  // 目前彈窗這則訊息所屬留言串的 root id（快速回覆要掛在同一串）
 var _msgPopupQueue   = [];    // 多條訊息排隊顯示
 var _msgPopupShowing = false;
 var _msgPollTimer    = null;
@@ -1340,6 +1342,9 @@ async function _pollNewMessages() {
         fromEmpId: msg.authorId || null,
         fromName:  msg.authorName || '',
         body:      msg.body || '',
+        // 回覆要掛回「同一串」：若原留言本身已是回覆，用它的 parentId（即該串的 root），
+        // 否則就是它自己的 id 當 root；直接用 msg.id 當 parentId 在巢狀回覆上會變成孤兒（渲染時抓不到）
+        rootId:    msg.parentId || msg.id || null,
       });
     });
     _showNextMsgPopup();
@@ -1352,6 +1357,7 @@ function _showNextMsgPopup() {
   var n = _msgPopupQueue.shift();
   _msgPopupShowing  = true;
   _msgPopupEmpId    = n.fromEmpId || null;
+  _msgPopupRootId   = n.rootId    || null;
 
   var popup   = document.getElementById('msgPopup');
   var fromEl  = document.getElementById('msgPopupFrom');
@@ -1386,7 +1392,7 @@ async function sendPopupReply() {
     body:        body,
     ts:          Date.now(),
     likes:       [],
-    parentId:    null,
+    parentId:    _msgPopupRootId || null,
   };
   try {
     await SB.post('portal_messages', { ...msg, id: uid() });
@@ -1710,8 +1716,11 @@ async function loadRanking(siteFilter) {
       var titleText = user?.titleEn || user?.titleZh || '';
       var initial = (name || '?')[0].toUpperCase();
       var siteTag = site ? `<span style="font-size:10px;padding:1px 6px;border-radius:8px;background:var(--s3);color:var(--tx3);margin-left:4px;">${SITE_FLAG[site]||''} ${escHtml(site)}</span>` : '';
+      // 有對應到 users 資料才能開個人檔案（含留言板）；查無此人（如离职/姓名不符）維持不可點
+      var clickOn = user?.empId ? ` onclick="openProfile('${user.empId}')"` : '';
+      var clickCursor = user?.empId ? 'cursor:pointer;' : '';
       return `
-        <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--br);">
+        <div${clickOn} style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--br);${clickCursor}">
           <div style="font-size:18px;width:28px;text-align:center;flex-shrink:0;">${medal}</div>
           <div style="width:36px;height:36px;border-radius:50%;background:var(--ac2);color:var(--ac);
             display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0;">${initial}</div>
@@ -1739,7 +1748,7 @@ async function loadRanking(siteFilter) {
           ? `<img src="${safeUrl(u.photoURL)}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;flex-shrink:0;">`
           : `<div style="width:36px;height:36px;border-radius:50%;background:var(--ac2);color:var(--ac);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0;">${(u.nameEn||u.empId||'?')[0].toUpperCase()}</div>`;
         var medal = medals2[i] || `<span style="font-size:12px;color:var(--tx3);">${i+1}</span>`;
-        return `<div style="display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--br);">
+        return `<div onclick="openProfile('${u.empId}')" style="display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--br);cursor:pointer;">
           <div style="font-size:18px;width:28px;text-align:center;flex-shrink:0;">${medal}</div>
           ${av}
           <div style="flex:1;min-width:0;">
@@ -2352,14 +2361,23 @@ let _profileMsgs = [];
 
 async function loadMessageCounts(empIds) {
   for (const empId of empIds) {
+    let countText = '💬 留言';
     try {
       const rows = await SB.get('portal_messages', 'targetEmpId=eq.'+encodeURIComponent(empId)+'&parentId=is.null&select=id');
-      const el = document.getElementById('msgcount-' + empId);
-      if (el) el.textContent = (rows&&rows.length) ? `💬 ${rows.length} 則留言` : '💬 留言';
-    } catch(e) {
-      const el = document.getElementById('msgcount-' + empId);
-      if (el) el.textContent = '💬 留言';
+      countText = (rows && rows.length) ? `💬 ${rows.length} 則留言` : '💬 留言';
+    } catch(e) {}
+
+    // 未讀提示只對自己的卡片查詢（別人的留言板是否已讀，旁人不該看到、也沒必要多打 API）
+    let unreadHtml = '';
+    if (empId === SESSION?.empId) {
+      try {
+        const unread = await SB.get('portal_messages', 'targetEmpId=eq.'+encodeURIComponent(empId)+'&is_read=eq.false&select=id');
+        if (unread && unread.length) unreadHtml = ' <span style="color:var(--ac);font-weight:700;">● 有新留言</span>';
+      } catch(e) {}
     }
+
+    const el = document.getElementById('msgcount-' + empId);
+    if (el) el.innerHTML = escHtml(countText) + unreadHtml;
   }
 }
 
@@ -2410,6 +2428,21 @@ async function loadMessages(empId) {
     _profileMsgs = rows || [];
   } catch(e) { _profileMsgs = []; }
 
+  // 只有本人打開自己的留言板才算「已讀」——別人只是路過看，不代表本人看過。
+  // 先記下這次進來時哪些還是未讀（供畫面標示「新」），再送 PATCH 標成已讀，
+  // 避免標記動作把「原本未讀」的資訊在渲染前就洗掉。
+  const unreadIds = empId === SESSION?.empId
+    ? new Set(_profileMsgs.filter(m => m.is_read === false).map(m => m.id))
+    : new Set();
+  if (unreadIds.size) {
+    try {
+      await SB.patch('portal_messages', 'targetEmpId=eq.'+encodeURIComponent(empId)+'&is_read=eq.false', { is_read: true });
+      // 通訊錄卡片上的未讀提示同步消掉，不必等下次 loadMessageCounts 才刷新
+      const dot = document.getElementById('msgcount-' + empId);
+      if (dot) dot.innerHTML = dot.innerHTML.replace(/ <span[^>]*>● 有新留言<\/span>/, '');
+    } catch(e) { /* 標記已讀失敗不影響留言板顯示，靜默即可 */ }
+  }
+
   const roots   = _profileMsgs.filter(m => !m.parentId);
   const replies  = _profileMsgs.filter(m => m.parentId);
   countEl.textContent = roots.length ? `(${roots.length})` : '';
@@ -2419,19 +2452,21 @@ async function loadMessages(empId) {
     return;
   }
 
-  listEl.innerHTML = roots.map(m => renderMsg(m, replies)).join('');
+  listEl.innerHTML = roots.map(m => renderMsg(m, replies, unreadIds)).join('');
 }
 
-function renderMsg(m, replies) {
+function renderMsg(m, replies, unreadIds) {
   const init = (m.authorName || '?')[0].toUpperCase();
   const dt   = new Date(m.ts).toLocaleString('zh-TW',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
   const liked = (m.likes||[]).includes(SESSION?.empId);
   const childReplies = replies.filter(r => r.parentId === m.id);
+  const isNew = unreadIds && unreadIds.has(m.id);
 
-  return `<div class="msg-item" id="msg-${m.id}">
+  return `<div class="msg-item${isNew ? ' msg-new' : ''}" id="msg-${m.id}">
     <div class="msg-header">
       <div class="msg-avatar">${init}</div>
       <span class="msg-author">${escHtml(m.authorName || m.authorId)}</span>
+      ${isNew ? '<span style="font-size:9px;font-weight:700;color:var(--ac);border:1px solid var(--ac);border-radius:6px;padding:0 5px;margin-left:2px;">NEW</span>' : ''}
       <span class="msg-time">${dt}</span>
       ${SESSION?.role === 'admin' || m.authorId === SESSION?.empId
         ? `<button onclick="deleteMsg('${m.id}')" style="margin-left:4px;padding:1px 6px;border-radius:4px;border:1px solid var(--br);background:transparent;color:var(--tx3);font-size:10px;cursor:pointer;">✕</button>`
@@ -2442,7 +2477,7 @@ function renderMsg(m, replies) {
       <button class="msg-like-btn${liked?' liked':''}" onclick="likeMsg('${m.id}')">❤ ${(m.likes||[]).length||''}</button>
       <span class="msg-reply-btn" onclick="setReplyTo('${m.id}','${escHtml((m.authorName||m.authorId||'').replace(/'/g,''))}')">↩ 回覆</span>
     </div>
-    ${childReplies.length ? `<div class="msg-reply-indent">${childReplies.map(r => renderMsg(r,[])).join('')}</div>` : ''}
+    ${childReplies.length ? `<div class="msg-reply-indent">${childReplies.map(r => renderMsg(r,[],unreadIds)).join('')}</div>` : ''}
   </div>`;
 }
 

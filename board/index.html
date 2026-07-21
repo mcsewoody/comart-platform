@@ -5,7 +5,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#080C14">
-<title>COMART · 公告與紀錄 v1.00</title>
+<title>COMART · 公告與紀錄 v1.02</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -198,7 +198,7 @@ h1,h2,h3,p{margin:0}
     <a class="logo" href="javascript:void(0)">
       <div class="logo-mark">告</div>
       <div class="logo-text">公告與紀錄</div>
-      <span class="logo-ver">v1.00</span>
+      <span class="logo-ver">v1.02</span>
     </a>
     <div class="topbar-right">
       <span class="who-badge" id="whoBadge">—</span>
@@ -351,28 +351,39 @@ h1,h2,h3,p{margin:0}
   <!-- ══════════════ TAB 3：業務會議記錄（整合自 meetingminutes_V2 工具） ══════════════ -->
   <div class="tabpanel" id="tabpanel-biz">
     <div id="bm-root">
-      <div class="tabbar" style="max-width:none;padding:0;margin-bottom:16px;border-bottom:1px solid var(--br)">
-        <button class="maintab on" id="tabMeeting" data-view="main">會議記錄</button>
-        <button class="maintab" id="tabSaved" data-view="saved">已存紀錄</button>
-        <button class="maintab" id="tabTeam" data-view="team">團隊名單<span class="chip" id="teamBadge" style="margin-left:6px">13</span></button>
-        <div style="margin-left:auto;display:flex;gap:6px;align-items:center;padding:6px 0;flex-wrap:wrap">
-          <button class="btn ghost sm" id="btnReset" title="清空這場會議的內容，建立新的一筆">＋ 新建</button>
-          <button class="btn primary sm" id="btnSave">✓ 儲存到平台</button>
-          <button class="btn sm" id="btnSend">✉️ 寄送</button>
-          <button class="btn sm" id="btnExcel">Excel</button>
-          <button class="btn sm" id="btnPng">PNG</button>
-          <button class="btn sm" id="btnPdf">PDF</button>
+      <!-- ===== SAVED（已存紀錄，預設頁；比照週會紀錄：全部＋全集團＋三中心） ===== -->
+      <div id="view-saved">
+        <div class="chiprow" id="bm-filters">
+          <button class="chip-f on" data-f="" onclick="bmSetFilter('')">全部</button>
+          <button class="chip-f" data-f="ALL" onclick="bmSetFilter('ALL')">全集團</button>
+          <button class="chip-f" data-f="TW" onclick="bmSetFilter('TW')">台灣</button>
+          <button class="chip-f" data-f="CN" onclick="bmSetFilter('CN')">東莞廠</button>
+          <button class="chip-f" data-f="VN" onclick="bmSetFilter('VN')">越南廠</button>
+          <button class="btn primary sm" id="btnNewMeeting" style="margin-left:auto">＋ 新增業務會議記錄</button>
         </div>
+        <p class="hint" style="margin:0 0 12px">全公司皆可查閱；修改／刪除僅限該範圍成員或 admin。點「編輯」可帶回修改或重新匯出。</p>
+        <div id="savedList"></div>
       </div>
 
-      <!-- ===== MAIN ===== -->
-      <div id="view-main">
+      <!-- ===== MAIN（會議記錄編輯器，新增／載入才顯示） ===== -->
+      <div id="view-main" style="display:none">
+        <div class="tabbar" style="max-width:none;padding:0;margin-bottom:16px;border-bottom:1px solid var(--br)">
+          <button class="btn ghost sm" id="btnBackList">← 返回列表</button>
+          <div style="margin-left:auto;display:flex;gap:6px;align-items:center;padding:6px 0;flex-wrap:wrap">
+            <button class="btn primary sm" id="btnSave">✓ 儲存到平台</button>
+            <button class="btn sm" id="btnSend">✉️ 寄送</button>
+            <button class="btn sm" id="btnExcel">Excel</button>
+            <button class="btn sm" id="btnPng">PNG</button>
+            <button class="btn sm" id="btnPdf">PDF</button>
+          </div>
+        </div>
         <div class="grid2">
           <div>
             <div class="panel">
               <div class="panel-h"><span class="idx">01</span><h2>會議資訊</h2></div>
               <div class="panel-b">
                 <div class="fields">
+                  <div class="field"><label>會議範圍（決定預設出席的業務部同仁）</label><select id="f_scope"><option value="ALL">全集團</option><option value="TW">台灣</option><option value="CN">東莞廠</option><option value="VN">越南廠</option></select></div>
                   <div class="row2">
                     <div class="field"><label>會議名稱</label><input id="f_name" placeholder="業務會議"></div>
                     <div class="field"><label>會議日期</label><input id="f_date" type="date"></div>
@@ -398,10 +409,10 @@ h1,h2,h3,p{margin:0}
                 </div>
                 <div class="roster" id="roster"></div>
                 <div class="addbar">
-                  <input id="guestName" placeholder="新增列席人員…（如：客戶、其他部門）">
+                  <select id="guestSelect"><option value="">選擇列席人員…</option></select>
                   <button class="btn sm" id="btnAddGuest">＋ 新增列席</button>
                 </div>
-                <p class="hint">列席人員不計入「應到人數」，但會列入「實到人數」。要新增／移除正式團隊成員，請到上方「團隊名單」分頁。</p>
+                <p class="hint">出席名單依上方「會議範圍」自動帶入該範圍的業務部同仁，主持人可直接標記缺席／遲到。列席人員（非業務部）可用下方下拉加入，不計入「應到人數」但會列入「實到人數」。</p>
               </div>
             </div>
 
@@ -420,38 +431,6 @@ h1,h2,h3,p{margin:0}
               <div class="panel-b" style="background:var(--s2)">
                 <div class="preview-scroll"><div class="sheet" id="sheet"></div></div>
               </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ===== SAVED ===== -->
-      <div id="view-saved" style="display:none">
-        <div class="panel" style="max-width:820px">
-          <div class="panel-h">
-            <span class="idx">☰</span><h2>已存紀錄</h2>
-            <select id="mm-site-filter" style="margin-left:auto;font-size:12.5px;background:var(--s2);border:1px solid var(--br);border-radius:var(--r);padding:5px 9px;color:var(--tx)">
-              <option value="">全部中心</option><option value="TW">台灣</option><option value="CN">東莞廠</option><option value="VN">越南廠</option>
-            </select>
-            <button class="btn ghost sm" id="btnRefresh">↻ 重新整理</button>
-          </div>
-          <div class="panel-b">
-            <p class="hint" style="margin:0 0 14px">這裡列出已儲存到平台的會議記錄（全公司皆可查閱；修改／刪除僅限該中心成員或 admin）。點「載入」可帶回編輯或重新匯出。</p>
-            <div id="savedList"></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ===== TEAM ===== -->
-      <div id="view-team" style="display:none">
-        <div class="panel" style="max-width:620px">
-          <div class="panel-h"><span class="idx">✎</span><h2>團隊名單</h2><span class="sub" id="teamCount"></span></div>
-          <div class="panel-b">
-            <p class="hint" style="margin:0 0 14px">預設帶入你所屬營運中心「業務部」的在職人員，決定「應到人數」與出席狀況中的名單。此清單僅影響目前瀏覽器接下來新建的會議，不會回寫平台的人員資料。</p>
-            <div id="teamList" style="display:flex;flex-direction:column;gap:8px"></div>
-            <div class="addbar">
-              <input id="newMember" placeholder="新增成員姓名…">
-              <button class="btn primary sm" id="btnAddMember">＋ 新增成員</button>
             </div>
           </div>
         </div>
@@ -554,12 +533,7 @@ function canPostBulletin() { return isAdmin() || isDcc(); }
 function canEditSite(site) { return isAdmin() || (PORTAL_SESSION && PORTAL_SESSION.site === site); }
 
 function usersBySite(site) { return ALL_USERS.filter(u => u.site === site); }
-function usersBySiteDept(site, dept) {
-  const l = ALL_USERS.filter(u => u.site === site && u.dept === dept);
-  return l.length ? l : usersBySite(site);
-}
 function userName(u) { return (u && (u.nameZh || u.nameEn || u.empId)) || ''; }
-function findUserByName(name) { return ALL_USERS.find(u => u.nameZh === name || u.nameEn === name || u.empId === name); }
 
 async function syncUsers() {
   const rows = await SB.get('users', '?select=emp_id,name_en,name_zh,role,dept,site,active&order=emp_id&active=eq.true');
@@ -592,7 +566,10 @@ function switchTab(name) {
   document.getElementById('tabpanel-' + name).classList.add('on');
   if (name === 'bulletin') bbLoad();
   if (name === 'weekly') wmLoadList();
-  if (name === 'biz' && !_bizInited) { _bizInited = true; bizMeetingInit(); }
+  if (name === 'biz') {
+    if (!_bizInited) { _bizInited = true; bizMeetingInit(); }
+    else if (window.MeetingMinutes && window.MeetingMinutes.refreshList) window.MeetingMinutes.refreshList();
+  }
 }
 
 // ═══════════════════════════════════════════════
@@ -1108,32 +1085,43 @@ function wmMail() {
 // ═══════════════════════════════════════════════
 // TAB 3：業務會議記錄（改編自 meetingminutes_V2.html）
 // ═══════════════════════════════════════════════
+// 出席名單依「會議範圍」自動帶入業務部同仁：ALL=全集團業務部，TW/CN/VN=該中心業務部
+function bizSalesUsers(scope){
+  return ALL_USERS.filter(function(u){ return u.dept==='sales' && (scope==='ALL' || u.site===scope); });
+}
+function bizScopeLabel(scope){ return scope==='ALL' ? '全集團' : siteLabel(scope); }
+// 修改／刪除權限：admin、全集團會議（任何人）、或該中心成員
+function bizCanEdit(scope){ return isAdmin() || scope==='ALL' || (PORTAL_SESSION && PORTAL_SESSION.site===scope); }
+
 function bizMeetingInit(){
+  var CUR_SCOPE = PORTAL_SESSION ? (PORTAL_SESSION.site || 'TW') : 'TW';
 (function(){
   "use strict";
   var CN=["一","二","三","四","五","六","七","八","九","十","十一","十二"];
-  var DEFAULT_TEAM=(window.BIZ_DEFAULT_TEAM&&window.BIZ_DEFAULT_TEAM.length)?window.BIZ_DEFAULT_TEAM:["Angel 嚴","Angel 劉","Ariel","Esther","Emily","Henry","Jennifer","Nina","Vicky","Wendy","Aaron","燕婷","千千"];
-  var CUR_SITE=(window.PORTAL_SESSION_SITE)||'TW';
   var STORE_KEY="comart-board-mm-draft-v1";
 
   function todayISO(){ var d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
   function uid2(){ return "id"+Math.random().toString(36).slice(2,9); }
+  // 依 scope 產生出席名單快照（{id:empId,name,empId}）
+  function rosterForScope(scope){ return bizSalesUsers(scope).map(function(u){ return { id:u.empId, name:userName(u), empId:u.empId }; }); }
 
   function freshMeeting(){
     return {
+      scope: CUR_SCOPE,
       meeting:{ name:"業務會議", date:todayISO(), timeStart:"09:00", timeEnd:"09:15", time:"09:00~09:15", place:"4 樓大會議室", chair:"", rec:"" },
       attendance:{}, guests:[],
       agenda:[ {id:uid2(), title:"業務分享", items:[{id:uid2(),who:"",text:""}]} ]
     };
   }
-  function freshState(){ var s=freshMeeting(); s.team=DEFAULT_TEAM.map(function(n){return {id:uid2(),name:n};}); s._id=null; s.site=CUR_SITE; return s; }
+  function freshState(){ var s=freshMeeting(); s.team=rosterForScope(s.scope); s._id=null; s.site=s.scope; return s; }
 
   var state;
   try{ var raw=localStorage.getItem(STORE_KEY); state=raw?JSON.parse(raw):freshState(); if(!state.team||!state.meeting||!state.agenda||!state.attendance) state=freshState(); }
   catch(e){ state=freshState(); }
   if(!state.guests) state.guests=[];
   if(!("_id" in state)) state._id=null;
-  if(!state.site) state.site=CUR_SITE;
+  if(!state.scope) state.scope=state.site||CUR_SCOPE;
+  if(!state.site) state.site=state.scope;
   if(state.meeting.timeStart===undefined && state.meeting.timeEnd===undefined){ state.meeting.timeStart="09:00"; state.meeting.timeEnd="09:15"; }
   function composeTime(){ var s=state.meeting.timeStart||"", e=state.meeting.timeEnd||""; return (s&&e)?(s+"~"+e):(s||e||""); }
   state.meeting.time=composeTime();
@@ -1179,7 +1167,18 @@ function bizMeetingInit(){
     sel.appendChild(opt("__other__","＋ 其他…"));
     sel.value=current||"";
   }
+  // 切換會議範圍：重新帶入該範圍的業務部同仁為出席名單（保留已標記過的出缺席）
+  function applyScope(scope){
+    state.scope=scope; state.site=scope;
+    var newTeam=rosterForScope(scope);
+    var keepIds={}; newTeam.forEach(function(m){ keepIds[m.id]=1; });
+    // 清掉已不在名單內成員的出缺席狀態；新成員預設在場
+    Object.keys(state.attendance).forEach(function(k){ if(!keepIds[k]) delete state.attendance[k]; });
+    state.team=newTeam;
+    save(); renderSelects(); buildRoster(); renderCounts(); buildAgenda(); renderPreview();
+  }
   function bindInfo(){
+    var sc=$("f_scope"); if(sc){ sc.value=state.scope||CUR_SCOPE; sc.onchange=function(){ applyScope(this.value); }; }
     var map={f_name:"name",f_date:"date",f_place:"place"};
     Object.keys(map).forEach(function(id){ var n=$(id); n.value=state.meeting[map[id]]||""; n.oninput=function(){ state.meeting[map[id]]=n.value; save(); renderPreview(); if(id==="f_date")updateFileHint(); }; });
     var ts=$("f_timeStart"), te=$("f_timeEnd");
@@ -1218,18 +1217,14 @@ function bizMeetingInit(){
     });
   }
 
-  function renderTeamMeta(){ $("teamBadge").textContent=state.team.length; $("teamCount").textContent="目前應到人數："+state.team.length+" 人"; }
-  function buildTeam(){
-    var box=$("teamList"); box.innerHTML="";
-    state.team.forEach(function(m,i){
-      var row=el("div","item"); row.style.gridTemplateColumns="30px 1fr auto";
-      row.appendChild(el("div",null,String(i+1)));
-      var inp=document.createElement("input"); inp.value=m.name; inp.oninput=function(){ m.name=inp.value; save(); renderSelects(); buildAgenda(); renderCounts(); renderPreview(); }; row.appendChild(inp);
-      var del=el("button","rm","✕"); del.onclick=function(){ if(state.team.length<=1){toast("至少需保留一位成員");return;} delete state.attendance[m.id]; state.team=state.team.filter(function(x){return x.id!==m.id;}); save(); buildTeam(); renderTeamMeta(); buildRoster(); renderSelects(); buildAgenda(); renderCounts(); renderPreview(); }; row.appendChild(del);
-      box.appendChild(row);
-    });
+  // 以「員工名錄」填充列席下拉（排除出席名單與已列席者）
+  function fillGuestSelect(){
+    var sel=$("guestSelect"); if(!sel)return;
+    var have={}; state.team.forEach(function(m){ have[m.empId||m.id]=1; }); state.guests.forEach(function(g){ if(g.empId)have[g.empId]=1; });
+    sel.innerHTML='<option value="">選擇列席人員…</option>'+
+      ALL_USERS.filter(function(u){ return !have[u.empId]; })
+        .map(function(u){ return '<option value="'+esc(u.empId)+'">'+esc(userName(u))+'（'+esc(siteLabel(u.site))+(u.dept?'/'+esc(u.dept):'')+'）</option>'; }).join('');
   }
-  function addMember(){ var v=$("newMember").value.trim(); if(!v)return; var m={id:uid2(),name:v}; state.team.push(m); state.attendance[m.id]={status:"present",reason:""}; $("newMember").value=""; save(); buildTeam(); renderTeamMeta(); buildRoster(); renderSelects(); buildAgenda(); renderCounts(); renderPreview(); }
 
   function buildAgenda(){
     var box=$("agenda"); box.innerHTML=""; var multi=state.agenda.length>1;
@@ -1301,23 +1296,26 @@ function bizMeetingInit(){
     return {
       schema:"comart.meeting-minutes/v1",
       id: state._id||null,
-      title: (state.meeting.name||"業務會議")+"記錄　"+(state.meeting.date||""),
+      scope: state.scope||CUR_SCOPE,
+      title: bizScopeLabel(state.scope||CUR_SCOPE)+"業務會議記錄　"+(state.meeting.date||""),
       savedAt: new Date().toISOString(),
-      data:{ meeting:state.meeting, team:state.team, attendance:state.attendance, guests:state.guests, agenda:state.agenda },
+      data:{ scope:state.scope, meeting:state.meeting, team:state.team, attendance:state.attendance, guests:state.guests, agenda:state.agenda },
       view:{ expected:c.expected, actual:c.actual, absent:c.absent, late:c.late, attendance:att, agenda:ag, summaryText:summaryText() }
     };
   }
   function hydrate(rec){
     var d=(rec&&rec.data)?rec.data:rec; if(!d)return;
     var fm=freshMeeting();
+    state.scope=(rec&&rec.site)||d.scope||CUR_SCOPE;
+    state.site=state.scope;
     state.meeting=d.meeting||fm.meeting;
-    state.team=(d.team&&d.team.length)?d.team:state.team;
+    // 出席名單以存檔快照為準（忠實還原當時人員）；缺快照才依範圍重建
+    state.team=(d.team&&d.team.length)?d.team:rosterForScope(state.scope);
     state.attendance=d.attendance||{};
     state.guests=d.guests||[];
     state.agenda=(d.agenda&&d.agenda.length)?d.agenda:fm.agenda;
     state._id=(rec&&rec.id)?rec.id:null;
-    state.site=(rec&&rec.site)?rec.site:CUR_SITE;
-    save(); initUI(); switchView("main");
+    save(); openEditor();
   }
 
   function store(){
@@ -1338,16 +1336,16 @@ function bizMeetingInit(){
   }
   function buildSaved(){
     var box=$("savedList"); box.innerHTML="<div class='hint' style='padding:10px'>載入中…</div>";
-    var siteFilter=($("mm-site-filter")||{}).value||"";
     Promise.resolve().then(function(){ return store().list(); }).then(function(items){
       box.innerHTML="";
-      if(siteFilter) items=items.filter(function(it){return it.site===siteFilter;});
-      if(!items||!items.length){ box.innerHTML="<div class='empty-note'>尚無已儲存的紀錄。<br>在「會議記錄」填寫後，點右上角「儲存到平台」即可建立第一筆。</div>"; return; }
+      if(_bmFilter) items=items.filter(function(it){return it.site===_bmFilter;});
+      if(!items||!items.length){ box.innerHTML="<div class='empty-note'>此範圍尚無已儲存的紀錄。<br>點右上角「＋ 新增業務會議記錄」建立第一筆。</div>"; return; }
       items.forEach(function(it){
         var row=el("div","saved-row");
         var left=el("div");
+        var canEdit = bizCanEdit(it.site);
         var titleRow=el("div","t"); titleRow.textContent=it.title||"（未命名）";
-        var badge=el("span","site-badge site-"+(it.site||"TW"),({TW:"台灣",CN:"東莞廠",VN:"越南廠"})[it.site]||it.site||"—");
+        var badge=el("span","site-badge site-"+(it.site==='ALL'?'group':(it.site||"TW")),(it.site==='ALL'?'全集團':({TW:"台灣",CN:"東莞廠",VN:"越南廠"})[it.site]||it.site||"—"));
         titleRow.appendChild(badge);
         left.appendChild(titleRow);
         var meta=el("div","m");
@@ -1356,9 +1354,8 @@ function bizMeetingInit(){
         if(typeof v.actual==="number") meta.appendChild(el("span",null,"實到 "+v.actual+" 人"));
         left.appendChild(meta); row.appendChild(left);
         var ops=el("div","ops");
-        var open=el("button","btn sm","載入"); open.onclick=function(){ loadRecord(it.id); };
+        var open=el("button","btn sm",canEdit?"編輯":"查看"); open.onclick=function(){ loadRecord(it.id); };
         ops.appendChild(open);
-        var canEdit = window.canEditSite ? window.canEditSite(it.site) : true;
         if(canEdit){
           var del=el("button","btn sm danger","刪除"); del.onclick=function(){ if(!confirm("確定刪除這筆紀錄？")) return; Promise.resolve().then(function(){return store().remove(it.id);}).then(function(){ toast("已刪除"); buildSaved(); }).catch(function(e){ toast("刪除失敗："+((e&&e.message)||"")); }); };
           ops.appendChild(del);
@@ -1501,40 +1498,44 @@ function bizMeetingInit(){
   }
   function exportXlsx(){ try{ download(buildXlsx(),fileBase()+".xlsx"); toast("已匯出 Excel"); }catch(e){ toast("Excel 匯出失敗"); } }
 
+  // 兩種畫面：saved（已存紀錄，預設）、main（會議編輯器）
+  var _bmFilter="";
   function switchView(v){
-    $("view-main").style.display=(v==="main")?"":"none";
-    $("view-saved").style.display=(v==="saved")?"":"none";
-    $("view-team").style.display=(v==="team")?"":"none";
-    $("tabMeeting").classList.toggle("on",v==="main");
-    $("tabSaved").classList.toggle("on",v==="saved");
-    $("tabTeam").classList.toggle("on",v==="team");
+    var isMain=(v==="main");
+    $("view-main").style.display=isMain?"":"none";
+    $("view-saved").style.display=isMain?"none":"";
     if(v==="saved") buildSaved();
   }
-  $("tabMeeting").onclick=function(){ switchView("main"); };
-  $("tabSaved").onclick=function(){ switchView("saved"); };
-  $("tabTeam").onclick=function(){ switchView("team"); };
-  $("btnRefresh").onclick=function(){ buildSaved(); };
-  $("mm-site-filter").onchange=function(){ buildSaved(); };
+  function setFilter(f){ _bmFilter=f; buildSaved(); }
+  $("btnBackList").onclick=function(){ switchView("saved"); };
 
   $("btnAllPresent").onclick=function(){ attendees().forEach(function(p){ p.a.status="present"; p.a.reason=""; }); save(); buildRoster(); renderCounts(); renderPreview(); toast("已將全員設為在場"); };
-  $("btnAddGuest").onclick=addGuest; $("guestName").onkeydown=function(e){ if(e.key==="Enter")addGuest(); };
-  function addGuest(){ var v=$("guestName").value.trim(); if(!v)return; state.guests.push({id:uid2(),name:v,status:"present",reason:""}); $("guestName").value=""; save(); buildRoster(); buildAgenda(); renderCounts(); renderPreview(); }
-  $("btnAddMember").onclick=addMember; $("newMember").onkeydown=function(e){ if(e.key==="Enter")addMember(); };
+  $("btnAddGuest").onclick=addGuest;
+  function addGuest(){
+    var sel=$("guestSelect"); var empId=sel?sel.value:""; if(!empId)return;
+    var u=ALL_USERS.find(function(x){return x.empId===empId;}); if(!u)return;
+    if(state.guests.some(function(g){return g.empId===empId;})||state.team.some(function(m){return (m.empId||m.id)===empId;})){ toast("此人員已在名單中"); return; }
+    state.guests.push({id:uid2(),empId:empId,name:userName(u),status:"present",reason:""});
+    save(); buildRoster(); buildAgenda(); renderCounts(); renderPreview(); fillGuestSelect();
+  }
   $("btnAddSec").onclick=function(){ state.agenda.push({id:uid2(),title:"",items:[{id:uid2(),who:"",text:""}]}); save(); buildAgenda(); renderPreview(); };
-  $("btnReset").onclick=function(){
-    if(!confirm("確定要清空這場會議、建立新的一筆嗎？（團隊名單會保留；已儲存的紀錄不受影響）")) return;
-    var team=state.team,fm=freshMeeting();
-    state.meeting=fm.meeting; state.attendance={}; state.guests=[]; state.agenda=fm.agenda; state.team=team; state._id=null; state.site=CUR_SITE;
-    save(); initUI(); switchView("main"); toast("已建立新的一筆");
+  // 新增業務會議記錄：清空為新的一筆並進入編輯器（出席名單依範圍自動帶入）
+  $("btnNewMeeting").onclick=function(){
+    var sc=(_bmFilter && _bmFilter!=="")?_bmFilter:CUR_SCOPE;
+    var fm=freshMeeting(); fm.scope=sc;
+    state.scope=sc; state.site=sc; state.meeting=fm.meeting; state.attendance={}; state.guests=[]; state.agenda=fm.agenda; state.team=rosterForScope(sc); state._id=null;
+    save(); openEditor(); toast("已開啟新的業務會議記錄");
   };
   $("btnSave").onclick=saveRecord;
   $("btnSend").onclick=sendOutlook;
   $("btnPdf").onclick=exportPDF; $("btnPng").onclick=exportPNG; $("btnExcel").onclick=exportXlsx;
 
-  function initUI(){ bindInfo(); renderSelects(); buildRoster(); renderCounts(); buildTeam(); renderTeamMeta(); buildAgenda(); renderPreview(); updateFileHint(); }
-  initUI();
+  // 進入編輯器（建構表單並顯示 view-main）
+  function openEditor(){ bindInfo(); renderSelects(); buildRoster(); renderCounts(); buildAgenda(); renderPreview(); updateFileHint(); fillGuestSelect(); switchView("main"); }
+  // 初始化：預設停在「已存紀錄」列表
+  switchView("saved");
 
-  window.MeetingMinutes={ getRecord:serialize, load:hydrate, save:saveRecord };
+  window.MeetingMinutes={ getRecord:serialize, load:hydrate, save:saveRecord, openEditor:openEditor, setFilter:setFilter, refreshList:function(){ buildSaved(); } };
 })();
 }
 
@@ -1544,7 +1545,6 @@ function bizMeetingInit(){
 async function initBoard() {
   PORTAL_SESSION = readPortalSession();
   if (PORTAL_SESSION) {
-    window.PORTAL_SESSION_SITE = PORTAL_SESSION.site || 'TW';
     document.getElementById('whoBadge').innerHTML =
       escHtml(PORTAL_SESSION.nameZh || PORTAL_SESSION.nameEn || PORTAL_SESSION.empId) + ' ' + siteBadgeHtml('site', PORTAL_SESSION.site);
   } else {
@@ -1552,23 +1552,21 @@ async function initBoard() {
   }
   window.canEditSite = canEditSite;
   await syncUsers();
-  if (PORTAL_SESSION) {
-    window.BIZ_DEFAULT_TEAM = usersBySiteDept(PORTAL_SESSION.site, 'sales').map(userName).filter(Boolean);
-  }
 
-  // 定義業務會議記錄的儲存層介面（銜接 Supabase biz_meeting_minutes）
+  // 定義業務會議記錄的儲存層介面（銜接 Supabase biz_meeting_minutes；site 欄位存「會議範圍」ALL/TW/CN/VN）
   window.MeetingMinutesStore = {
     save: async function(rec) {
       if (!PORTAL_SESSION) throw new Error('尚未登入');
       const isNew = !rec.id;
       const id = rec.id || uid();
+      const scope = rec.scope || (rec.data && rec.data.scope) || PORTAL_SESSION.site;
       if (!isNew) {
         const existing = await SB.get('biz_meeting_minutes', '?id=eq.' + encodeURIComponent(id) + '&select=site');
-        const ownerSite = existing && existing[0] && existing[0].site;
-        if (ownerSite && !canEditSite(ownerSite)) throw new Error('無權限修改其他中心的紀錄');
+        const ownerScope = existing && existing[0] && existing[0].site;
+        if (ownerScope && !bizCanEdit(ownerScope)) throw new Error('無權限修改此範圍的紀錄');
       }
       const row = {
-        id, site: PORTAL_SESSION.site, title: rec.title || '',
+        id, site: scope, title: rec.title || '',
         meeting_date: (rec.data && rec.data.meeting && rec.data.meeting.date) || null,
         data: rec.data, view: rec.view,
         updated_by: PORTAL_SESSION.empId, updated_at: new Date().toISOString(),
@@ -1589,13 +1587,19 @@ async function initBoard() {
     },
     remove: async function(id) {
       const rows = await SB.get('biz_meeting_minutes', '?id=eq.' + encodeURIComponent(id) + '&select=site');
-      const ownerSite = rows && rows[0] && rows[0].site;
-      if (ownerSite && !canEditSite(ownerSite)) throw new Error('無權限刪除其他中心的紀錄');
+      const ownerScope = rows && rows[0] && rows[0].site;
+      if (ownerScope && !bizCanEdit(ownerScope)) throw new Error('無權限刪除此範圍的紀錄');
       await SB.del('biz_meeting_minutes', 'id=eq.' + encodeURIComponent(id));
     },
   };
 
   bbLoad();
+}
+
+// 業務會議記錄列表篩選（chip 點擊 → 委派給 IIFE 的 setFilter）
+function bmSetFilter(f){
+  document.querySelectorAll('#bm-filters .chip-f').forEach(function(b){ b.classList.toggle('on', b.dataset.f===f); });
+  if (window.MeetingMinutes && window.MeetingMinutes.setFilter) window.MeetingMinutes.setFilter(f);
 }
 initBoard();
 </script>

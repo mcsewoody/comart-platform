@@ -38,14 +38,14 @@ const SELF_PATCH_FIELDS = new Set([
 ])
 
 const ALLOWED_TABLES = new Set([
-  "cal_events","car_bookings","car_fuel_logs","car_inspections","car_maint_logs",
-  "car_parkings","car_vehicles","categories","crm_accounts","crm_activities",
-  "crm_contacts","crm_tasks","departments","kms_categories","kms_comments",
-  "kms_doc_versions","kms_documents","kms_product_lines","kms_review_log",
+  "biz_meeting_minutes","cal_events","car_bookings","car_fuel_logs","car_inspections",
+  "car_maint_logs","car_parkings","car_vehicles","categories","crm_accounts",
+  "crm_activities","crm_contacts","crm_tasks","departments","kms_categories",
+  "kms_comments","kms_doc_versions","kms_documents","kms_product_lines","kms_review_log",
   "kms_snapshots","lib_books","lib_categories","lib_loans","lib_reservations",
   "logs","notifications","portal_bulletin","portal_messages","price_history",
   "products","quotation_settings","quotes","room_bookings","room_faults",
-  "sites","suppliers","trips","users","visit_guests","visit_records",
+  "sites","suppliers","trips","users","visit_guests","visit_records","weekly_minutes",
 ])
 
 function json(obj: unknown, status = 200) {

@@ -1,0 +1,1603 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#080C14">
+<title>COMART · 公告與紀錄 v1.00</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#080C14;--s1:#0F1520;--s2:#172030;--s3:#1E2B40;
+  --br:#253247;--br2:#3A4E68;--br3:#4A6285;
+  --tx:#EBF2FF;--tx2:#A8BED8;--tx3:#6A8AAA;
+  --ac:#2D7FF9;--ac2:rgba(45,127,249,0.12);--ac3:rgba(45,127,249,0.06);
+  --red:#F25C5C;--red2:rgba(242,92,92,0.12);
+  --grn:#3DD68C;--grn2:rgba(61,214,140,0.12);
+  --amb:#F0A429;--amb2:rgba(240,164,41,0.12);
+  --ff:'DM Sans',-apple-system,"PingFang TC","Noto Sans TC",sans-serif;
+  --fd:'DM Serif Display',Georgia,serif;
+  --fm:'DM Mono',monospace;
+  --r:8px;--rl:12px;--rxl:16px;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:100vh;-webkit-font-smoothing:antialiased;font-size:15px;line-height:1.5}
+body{padding-bottom:max(env(safe-area-inset-bottom),24px)}
+button{font:inherit;cursor:pointer}
+input,select,textarea{font:inherit;color:inherit;line-height:1.4}
+h1,h2,h3,p{margin:0}
+
+/* ── TOPBAR ─────────────── */
+.topbar{position:sticky;top:0;z-index:200;background:rgba(8,12,20,0.9);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--br)}
+.topbar-main{display:flex;align-items:center;gap:10px;padding:10px 16px;max-width:1180px;margin:0 auto}
+.logo{display:flex;align-items:center;gap:9px;text-decoration:none;color:inherit}
+.logo-mark{width:30px;height:30px;background:var(--ac);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-style:italic;font-size:15px;color:#fff;font-weight:400;flex-shrink:0}
+.logo-text{font-family:var(--fd);font-style:italic;font-size:16px;color:var(--tx);letter-spacing:-.01em}
+.logo-ver{font-family:var(--fm);font-size:10px;color:var(--tx3);margin-left:6px}
+#portal-back-btn{padding:5px 11px;border:1px solid var(--br);border-radius:var(--r);font-size:12px;color:var(--tx2);text-decoration:none;background:transparent;transition:all .15s;white-space:nowrap;margin-right:6px}
+#portal-back-btn:hover{background:var(--s2);color:var(--tx)}
+.topbar-right{display:flex;gap:8px;margin-left:auto;align-items:center;font-size:12px;color:var(--tx3)}
+.who-badge{display:flex;align-items:center;gap:6px;padding:5px 10px;border:1px solid var(--br);border-radius:20px;font-size:12px;color:var(--tx2)}
+
+/* ── TABS ─────────────── */
+.tabbar{display:flex;gap:2px;max-width:1180px;margin:0 auto;padding:0 16px;border-bottom:1px solid var(--br);overflow-x:auto}
+.maintab{border:0;background:transparent;color:var(--tx3);font-size:13.5px;font-weight:600;padding:12px 16px;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;display:flex;align-items:center;gap:6px}
+.maintab:hover{color:var(--tx)}
+.maintab.on{color:var(--ac);border-bottom-color:var(--ac)}
+
+.wrap{max-width:1180px;margin:0 auto;padding:18px 16px 60px}
+.tabpanel{display:none}
+.tabpanel.on{display:block}
+
+/* ── CHIPS / FILTERS ─────────────── */
+.chiprow{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
+.chip-f{font-size:12.5px;font-weight:600;padding:6px 13px;border-radius:20px;border:1px solid var(--br);background:var(--s1);color:var(--tx2);cursor:pointer;transition:all .12s;white-space:nowrap}
+.chip-f:hover{border-color:var(--br3)}
+.chip-f.on{background:var(--ac);border-color:var(--ac);color:#fff}
+
+/* ── SITE BADGE ─────────────── */
+.site-badge{font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:20px;letter-spacing:.02em;white-space:nowrap}
+.site-TW{background:rgba(61,214,140,.15);color:var(--grn)}
+.site-CN{background:rgba(242,92,92,.15);color:var(--red)}
+.site-VN{background:rgba(240,164,41,.15);color:var(--amb)}
+.site-group{background:var(--ac2);color:var(--ac)}
+
+/* ── PANEL / FORM SYSTEM (shared by all 3 tabs) ─────────────── */
+.panel{background:var(--s1);border:1px solid var(--br);border-radius:var(--rl);box-shadow:var(--shadow)}
+.panel + .panel{margin-top:14px}
+.panel-h{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--br)}
+.panel-h .idx{font-size:11px;font-weight:700;letter-spacing:.12em;color:var(--ac);text-transform:uppercase}
+.panel-h h2{font-size:14.5px;font-weight:700}
+.panel-h .sub{margin-left:auto;font-size:12px;color:var(--tx3)}
+.panel-b{padding:16px}
+
+.field{display:flex;flex-direction:column;gap:5px}
+.field label{font-size:12px;font-weight:600;color:var(--tx3)}
+.field input,.field select,.field textarea{font-family:inherit;font-size:14px;color:var(--tx);background:var(--s2);border:1px solid var(--br);border-radius:var(--r);padding:9px 11px;width:100%}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--ac)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+@media (max-width:640px){.row2,.row3{grid-template-columns:1fr}}
+.fields{display:flex;flex-direction:column;gap:12px}
+.time-row{display:flex;align-items:center;gap:8px}
+.time-row input{flex:1;min-width:0}
+.time-row .tsep{color:var(--tx3);font-weight:600}
+
+.btn{border:1px solid var(--br);background:var(--s1);color:var(--tx);padding:9px 15px;border-radius:var(--r);font-size:13.5px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:7px;transition:.12s;white-space:nowrap}
+.btn:hover{border-color:var(--ac)}
+.btn.primary{background:var(--ac);color:#fff;border-color:var(--ac)}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn.ghost{background:transparent}
+.btn.danger{color:var(--red)}
+.btn.danger:hover{border-color:var(--red)}
+.btn.sm{padding:6px 11px;font-size:12.5px}
+.divider-v{width:1px;height:22px;background:var(--br)}
+
+.roster-tools{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.counts{display:flex;gap:8px;flex-wrap:wrap;margin-left:auto}
+.chip{font-size:12px;font-weight:600;padding:4px 10px;border-radius:20px;background:var(--s2);border:1px solid var(--br);font-variant-numeric:tabular-nums}
+.chip b{font-weight:800}
+.chip.ok{color:var(--grn)} .chip.warn{color:var(--amb)} .chip.bad{color:var(--red)}
+
+.roster{display:flex;flex-direction:column;gap:8px}
+.rr{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:8px 10px;border:1px solid var(--br);border-radius:9px;background:var(--s2)}
+.rr .who{display:flex;align-items:center;gap:9px;min-width:0}
+.rr .dot{width:9px;height:9px;border-radius:50%;flex:none;background:var(--grn)}
+.rr[data-s="late"] .dot{background:var(--amb)} .rr[data-s="absent"] .dot{background:var(--red)}
+.rr .name{font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rr .tag{font-size:10.5px;color:var(--tx3);border:1px solid var(--br);border-radius:6px;padding:1px 5px}
+.seg{display:inline-flex;border:1px solid var(--br);border-radius:8px;overflow:hidden;background:var(--s1)}
+.seg button{border:0;background:transparent;color:var(--tx3);padding:6px 10px;font-size:12.5px;font-weight:600;cursor:pointer;border-left:1px solid var(--br)}
+.seg button:first-child{border-left:0}
+.seg button.on[data-v="present"]{background:var(--grn2);color:var(--grn)}
+.seg button.on[data-v="late"]{background:var(--amb2);color:var(--amb)}
+.seg button.on[data-v="absent"]{background:var(--red2);color:var(--red)}
+.rr .reason{grid-column:1/-1}
+.rr .reason input{width:100%;font-family:inherit;font-size:13px;padding:7px 9px;border:1px dashed var(--br);border-radius:7px;background:var(--s1);color:var(--tx)}
+.rr .del{border:0;background:transparent;color:var(--tx3);cursor:pointer;font-size:16px;line-height:1;padding:2px 4px}
+.rr .del:hover{color:var(--red)}
+
+.addbar{display:flex;gap:8px;margin-top:12px}
+.addbar input{flex:1;font-family:inherit;font-size:13.5px;padding:9px 11px;border:1px solid var(--br);border-radius:var(--r);background:var(--s2);color:var(--tx)}
+
+.sec{border:1px solid var(--br);border-radius:9px;background:var(--s2);padding:12px;margin-bottom:12px}
+.sec-h{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.sec-h .num{width:24px;height:24px;flex:none;border-radius:6px;background:var(--ac2);color:var(--ac);font-weight:700;font-size:12px;display:grid;place-items:center}
+.sec-h .ttl{flex:1;font-weight:700;font-size:14px}
+.item{display:grid;grid-template-columns:140px 1fr auto;gap:8px;align-items:start;margin-bottom:8px}
+@media (max-width:640px){.item{grid-template-columns:1fr}}
+.item input,.item textarea,.item select{font-family:inherit;font-size:13.5px;background:var(--s1);border:1px solid var(--br);border-radius:7px;padding:8px 10px;color:var(--tx);width:100%}
+.item textarea{resize:vertical;min-height:38px;line-height:1.45}
+.item .rm{align-self:center;border:0;background:transparent;color:var(--tx3);cursor:pointer;font-size:16px;padding:2px 6px}
+.item .rm:hover{color:var(--red)}
+.miniadd{border:1px dashed var(--br);background:transparent;color:var(--tx3);border-radius:7px;padding:7px 10px;font-size:12.5px;font-weight:600;cursor:pointer;width:100%}
+.miniadd:hover{border-color:var(--ac);color:var(--ac)}
+
+.hint{font-size:12px;color:var(--tx3);margin-top:2px}
+.empty-note{color:var(--tx3);font-size:13px;padding:26px;text-align:center;border:1px dashed var(--br);border-radius:9px}
+
+/* saved-list rows (shared: weekly list / biz saved list) */
+.saved-row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:11px 13px;border:1px solid var(--br);border-radius:9px;background:var(--s2);margin-bottom:8px}
+.saved-row .t{font-weight:600;font-size:14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.saved-row .m{font-size:12px;color:var(--tx3);margin-top:3px;display:flex;gap:10px;flex-wrap:wrap}
+.saved-row .ops{display:flex;gap:6px}
+
+/* preview sheet (paper) — always light for fidelity/export */
+.preview-wrap{position:sticky;top:70px}
+.preview-scroll{overflow-x:auto;border-radius:var(--rl)}
+.sheet{width:100%;max-width:820px;background:#ffffff;color:#1a1a1a;font-family:"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;margin:0 auto;border:1px solid #c9ced6}
+.sheet table{border-collapse:collapse;width:100%;table-layout:fixed}
+.sheet td{border:1px solid #b7bec8;padding:7px 10px;font-size:13.5px;vertical-align:top;word-break:break-word;white-space:pre-wrap}
+.sheet .title td{background:#dfe7f1;text-align:center;font-size:19px;font-weight:800;letter-spacing:.08em;padding:13px}
+.sheet .band td{background:#eef2f7;font-weight:700;font-size:13px;letter-spacing:.03em}
+.sheet .lbl{background:#f4f5f7;font-weight:700;text-align:center;width:15%;white-space:nowrap}
+.sheet .val{width:19%}
+.sheet .val.center{text-align:center;font-weight:600}
+.sheet .ag-title{font-weight:700;margin-bottom:4px}
+.sheet .ag-body{padding:8px 12px}
+.sheet .ag-body ul{margin:2px 0 0;padding-left:1.15em}
+.sheet .ag-body li{margin:2px 0}
+.sheet .ag-empty{color:#98a0ac;font-style:italic}
+.sheet .who{font-weight:700}
+
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:18px;align-items:start}
+@media (max-width:980px){.grid2{grid-template-columns:1fr}.preview-wrap{position:static}}
+
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);background:var(--tx);color:var(--bg);padding:11px 18px;border-radius:10px;font-size:13.5px;font-weight:600;opacity:0;pointer-events:none;transition:.22s;z-index:999;box-shadow:var(--shadow);max-width:88vw;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* bulletin */
+.compose-card{margin-bottom:16px}
+.compose-scope{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+.post-card{background:var(--s1);border:1px solid var(--br);border-radius:var(--rl);padding:15px 16px;margin-bottom:10px}
+.post-head{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.post-avatar{width:34px;height:34px;border-radius:50%;background:var(--ac2);color:var(--ac);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0}
+.post-meta{flex:1;min-width:0}
+.post-author{font-weight:700;font-size:13.5px;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.post-time{font-size:11.5px;color:var(--tx3);margin-top:1px}
+.post-pin{font-size:10.5px;color:var(--amb);font-weight:700}
+.post-body{font-size:14px;line-height:1.65;white-space:pre-wrap;word-break:break-word;margin-bottom:10px}
+.post-foot{display:flex;align-items:center;gap:10px}
+.like-btn{border:1px solid var(--br);background:transparent;color:var(--tx2);padding:5px 12px;border-radius:20px;font-size:12.5px;cursor:pointer;transition:all .12s}
+.like-btn.liked{color:var(--red);border-color:var(--red2);background:var(--red2)}
+.del-x{margin-left:auto;border:1px solid var(--br);background:transparent;color:var(--tx3);border-radius:6px;padding:3px 9px;font-size:11px;cursor:pointer}
+.del-x:hover{color:var(--red);border-color:var(--red)}
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-main">
+    <a href="/" id="portal-back-btn">← Portal</a>
+    <a class="logo" href="javascript:void(0)">
+      <div class="logo-mark">告</div>
+      <div class="logo-text">公告與紀錄</div>
+      <span class="logo-ver">v1.00</span>
+    </a>
+    <div class="topbar-right">
+      <span class="who-badge" id="whoBadge">—</span>
+    </div>
+  </div>
+  <div class="tabbar">
+    <button class="maintab on" data-tab="bulletin" onclick="switchTab('bulletin')">📢 公告</button>
+    <button class="maintab" data-tab="weekly" onclick="switchTab('weekly')">🗓 週會紀錄</button>
+    <button class="maintab" data-tab="biz" onclick="switchTab('biz')">💼 業務會議記錄</button>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- ══════════════ TAB 1：公告 ══════════════ -->
+  <div class="tabpanel on" id="tabpanel-bulletin">
+    <div class="chiprow" id="bb-filters">
+      <button class="chip-f on" data-f="" onclick="bbSetFilter('')">全部</button>
+      <button class="chip-f" data-f="group" onclick="bbSetFilter('group')">集團公告</button>
+      <button class="chip-f" data-f="TW" onclick="bbSetFilter('TW')">台灣</button>
+      <button class="chip-f" data-f="CN" onclick="bbSetFilter('CN')">東莞廠</button>
+      <button class="chip-f" data-f="VN" onclick="bbSetFilter('VN')">越南廠</button>
+    </div>
+
+    <div class="panel compose-card" id="bb-compose" style="display:none">
+      <div class="panel-h"><span class="idx">✎</span><h2>發布公告</h2></div>
+      <div class="panel-b">
+        <div class="compose-scope">
+          <span class="hint" style="margin:0">發布範圍：</span>
+          <select id="bb-scope-sel" style="max-width:220px;font-family:inherit;font-size:13.5px;background:var(--s2);border:1px solid var(--br);border-radius:var(--r);padding:8px 10px;color:var(--tx)" onchange="bbOnScopeChange()"></select>
+        </div>
+        <textarea id="bb-content" placeholder="輸入公告內容…" rows="3" style="font-family:inherit;font-size:14px;background:var(--s2);border:1px solid var(--br);border-radius:var(--r);padding:10px 12px;width:100%;resize:vertical;margin-bottom:10px"></textarea>
+        <div style="display:flex;align-items:center;gap:12px">
+          <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--tx2);cursor:pointer">
+            <input type="checkbox" id="bb-pin" style="accent-color:var(--amb)"> 📌 置頂
+          </label>
+          <button class="btn primary" style="margin-left:auto" onclick="bbSubmitPost()">發佈</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="bb-list"><div class="empty-note">載入中…</div></div>
+  </div>
+
+  <!-- ══════════════ TAB 2：週會紀錄 ══════════════ -->
+  <div class="tabpanel" id="tabpanel-weekly">
+    <div id="wm-list-view">
+      <div class="chiprow">
+        <button class="chip-f on" data-f="" onclick="wmSetFilter('')">全部中心</button>
+        <button class="chip-f" data-f="TW" onclick="wmSetFilter('TW')">台灣</button>
+        <button class="chip-f" data-f="CN" onclick="wmSetFilter('CN')">東莞廠</button>
+        <button class="chip-f" data-f="VN" onclick="wmSetFilter('VN')">越南廠</button>
+        <button class="btn primary sm" style="margin-left:auto" onclick="wmNewRecord()">＋ 新增週會紀錄</button>
+      </div>
+      <div id="wm-list"><div class="empty-note">載入中…</div></div>
+    </div>
+
+    <div id="wm-editor-view" style="display:none">
+      <div class="grid2">
+        <div>
+          <div class="panel">
+            <div class="panel-h"><span class="idx">01</span><h2>會議資訊</h2><button class="btn ghost sm" style="margin-left:auto" onclick="wmBackToList()">← 返回列表</button></div>
+            <div class="panel-b">
+              <div class="fields">
+                <div class="row2">
+                  <div class="field"><label>會議名稱</label><input id="wm-name" placeholder="週會"></div>
+                  <div class="field"><label>會議日期</label><input id="wm-date" type="date"></div>
+                </div>
+                <div class="row2">
+                  <div class="field"><label>會議時間</label><div class="time-row"><input id="wm-ts" type="time" step="300"><span class="tsep">~</span><input id="wm-te" type="time" step="300"></div></div>
+                  <div class="field"><label>會議地點</label><input id="wm-place" placeholder="四樓會議室"></div>
+                </div>
+                <div class="row3">
+                  <div class="field"><label>主席</label><select id="wm-chair"></select></div>
+                  <div class="field"><label>紀錄</label><select id="wm-rec"></select></div>
+                  <div class="field"><label>下週心得分享</label><select id="wm-next"></select></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-h"><span class="idx">02</span><h2>出席狀況</h2><span class="sub">預設全員在場，只需標記例外</span></div>
+            <div class="panel-b">
+              <div class="roster-tools">
+                <button class="btn ghost sm" onclick="wmAllPresent()">✓ 全部設為在場</button>
+                <div class="counts" id="wm-counts"></div>
+              </div>
+              <div class="roster" id="wm-roster"></div>
+              <div class="addbar">
+                <input id="wm-guest-name" placeholder="新增列席人員…">
+                <button class="btn sm" onclick="wmAddGuest()">＋ 新增列席</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-h"><span class="idx">03</span><h2>本週值日生</h2></div>
+            <div class="panel-b">
+              <div id="wm-duty"></div>
+              <button class="miniadd" onclick="wmAddDuty()">＋ 新增值日生</button>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-h"><span class="idx">04</span><h2>本週業務會議</h2><span class="sub">可挑選已建立的業務會議記錄自動帶入</span></div>
+            <div class="panel-b">
+              <div class="field" style="margin-bottom:10px"><label>選擇既有業務會議記錄（選填）</label><select id="wm-biz-pick" onchange="wmPickBiz()"><option value="">— 手動輸入 —</option></select></div>
+              <div class="row3">
+                <div class="field"><label>日期</label><input id="wm-biz-date" type="date"></div>
+                <div class="field"><label>主席／簡報</label><input id="wm-biz-chair" placeholder="姓名"></div>
+                <div class="field"><label>會議記錄</label><input id="wm-biz-rec" placeholder="姓名"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-h"><span class="idx">05</span><h2>會議議程</h2></div>
+            <div class="panel-b">
+              <div class="sec"><div class="sec-h"><div class="num">一</div><div class="ttl">主席報告</div></div><textarea id="wm-ag-chair" rows="2" style="width:100%;font-family:inherit;font-size:13.5px;background:var(--s1);border:1px solid var(--br);border-radius:7px;padding:8px 10px;color:var(--tx)" placeholder="無。"></textarea></div>
+              <div class="sec"><div class="sec-h"><div class="num">二</div><div class="ttl">各同仁當週工作會報及通知事項</div></div><div id="wm-ag-work"></div><button class="miniadd" onclick="wmAddItem('work')">＋ 新增項目</button></div>
+              <div class="sec"><div class="sec-h"><div class="num">三</div><div class="ttl">主管報告</div></div><textarea id="wm-ag-mgmt" rows="2" style="width:100%;font-family:inherit;font-size:13.5px;background:var(--s1);border:1px solid var(--br);border-radius:7px;padding:8px 10px;color:var(--tx)" placeholder="無。"></textarea></div>
+              <div class="sec"><div class="sec-h"><div class="num">四</div><div class="ttl">新品介紹</div></div><textarea id="wm-ag-newprod" rows="2" style="width:100%;font-family:inherit;font-size:13.5px;background:var(--s1);border:1px solid var(--br);border-radius:7px;padding:8px 10px;color:var(--tx)" placeholder="無。"></textarea></div>
+              <div class="sec"><div class="sec-h"><div class="num">五</div><div class="ttl">讀書心得分享</div></div><div id="wm-ag-book"></div><button class="miniadd" onclick="wmAddItem('book')">＋ 新增項目</button></div>
+              <div class="sec"><div class="sec-h"><div class="num">六</div><div class="ttl">週報分享</div></div><div id="wm-ag-weekly"></div><button class="miniadd" onclick="wmAddItem('weekly')">＋ 新增項目</button></div>
+              <div class="sec"><div class="sec-h"><div class="num">七</div><div class="ttl">補充事項</div></div><textarea id="wm-ag-supp" rows="2" style="width:100%;font-family:inherit;font-size:13.5px;background:var(--s1);border:1px solid var(--br);border-radius:7px;padding:8px 10px;color:var(--tx)" placeholder="無。"></textarea></div>
+              <div class="sec" style="margin-bottom:0"><div class="sec-h"><div class="num">八</div><div class="ttl">散會</div></div></div>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:10px;margin-top:4px">
+            <button class="btn" style="flex:1" onclick="wmPrint()">🖨️ 列印／PDF</button>
+            <button class="btn" style="flex:1" onclick="wmMail()">✉️ 建立 Outlook 草稿</button>
+            <button class="btn primary" style="flex:2" onclick="wmSave()">✓ 儲存到平台</button>
+          </div>
+        </div>
+
+        <div class="preview-wrap">
+          <div class="panel">
+            <div class="panel-h"><span class="idx">◱</span><h2>即時預覽</h2></div>
+            <div class="panel-b" style="background:var(--s2)">
+              <div class="preview-scroll"><div class="sheet" id="wm-sheet"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════ TAB 3：業務會議記錄（整合自 meetingminutes_V2 工具） ══════════════ -->
+  <div class="tabpanel" id="tabpanel-biz">
+    <div id="bm-root">
+      <div class="tabbar" style="max-width:none;padding:0;margin-bottom:16px;border-bottom:1px solid var(--br)">
+        <button class="maintab on" id="tabMeeting" data-view="main">會議記錄</button>
+        <button class="maintab" id="tabSaved" data-view="saved">已存紀錄</button>
+        <button class="maintab" id="tabTeam" data-view="team">團隊名單<span class="chip" id="teamBadge" style="margin-left:6px">13</span></button>
+        <div style="margin-left:auto;display:flex;gap:6px;align-items:center;padding:6px 0;flex-wrap:wrap">
+          <button class="btn ghost sm" id="btnReset" title="清空這場會議的內容，建立新的一筆">＋ 新建</button>
+          <button class="btn primary sm" id="btnSave">✓ 儲存到平台</button>
+          <button class="btn sm" id="btnSend">✉️ 寄送</button>
+          <button class="btn sm" id="btnExcel">Excel</button>
+          <button class="btn sm" id="btnPng">PNG</button>
+          <button class="btn sm" id="btnPdf">PDF</button>
+        </div>
+      </div>
+
+      <!-- ===== MAIN ===== -->
+      <div id="view-main">
+        <div class="grid2">
+          <div>
+            <div class="panel">
+              <div class="panel-h"><span class="idx">01</span><h2>會議資訊</h2></div>
+              <div class="panel-b">
+                <div class="fields">
+                  <div class="row2">
+                    <div class="field"><label>會議名稱</label><input id="f_name" placeholder="業務會議"></div>
+                    <div class="field"><label>會議日期</label><input id="f_date" type="date"></div>
+                  </div>
+                  <div class="row2">
+                    <div class="field"><label>會議時間</label><div class="time-row"><input id="f_timeStart" type="time" step="300"><span class="tsep">~</span><input id="f_timeEnd" type="time" step="300"></div></div>
+                    <div class="field"><label>會議地點</label><input id="f_place" placeholder="4 樓大會議室"></div>
+                  </div>
+                  <div class="row2">
+                    <div class="field"><label>業務簡報／主席</label><select id="f_chair"></select></div>
+                    <div class="field"><label>紀錄</label><select id="f_rec"></select></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-h"><span class="idx">02</span><h2>出席狀況</h2><span class="sub">預設全員在場，只需標記例外</span></div>
+              <div class="panel-b">
+                <div class="roster-tools">
+                  <button class="btn ghost sm" id="btnAllPresent">✓ 全部設為在場</button>
+                  <div class="counts" id="counts"></div>
+                </div>
+                <div class="roster" id="roster"></div>
+                <div class="addbar">
+                  <input id="guestName" placeholder="新增列席人員…（如：客戶、其他部門）">
+                  <button class="btn sm" id="btnAddGuest">＋ 新增列席</button>
+                </div>
+                <p class="hint">列席人員不計入「應到人數」，但會列入「實到人數」。要新增／移除正式團隊成員，請到上方「團隊名單」分頁。</p>
+              </div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-h"><span class="idx">03</span><h2>會議議程</h2></div>
+              <div class="panel-b">
+                <div id="agenda"></div>
+                <button class="miniadd" id="btnAddSec">＋ 新增段落</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="preview-wrap">
+            <div class="panel">
+              <div class="panel-h"><span class="idx">◱</span><h2>即時預覽</h2><span class="sub" id="fileHint"></span></div>
+              <div class="panel-b" style="background:var(--s2)">
+                <div class="preview-scroll"><div class="sheet" id="sheet"></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== SAVED ===== -->
+      <div id="view-saved" style="display:none">
+        <div class="panel" style="max-width:820px">
+          <div class="panel-h">
+            <span class="idx">☰</span><h2>已存紀錄</h2>
+            <select id="mm-site-filter" style="margin-left:auto;font-size:12.5px;background:var(--s2);border:1px solid var(--br);border-radius:var(--r);padding:5px 9px;color:var(--tx)">
+              <option value="">全部中心</option><option value="TW">台灣</option><option value="CN">東莞廠</option><option value="VN">越南廠</option>
+            </select>
+            <button class="btn ghost sm" id="btnRefresh">↻ 重新整理</button>
+          </div>
+          <div class="panel-b">
+            <p class="hint" style="margin:0 0 14px">這裡列出已儲存到平台的會議記錄（全公司皆可查閱；修改／刪除僅限該中心成員或 admin）。點「載入」可帶回編輯或重新匯出。</p>
+            <div id="savedList"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== TEAM ===== -->
+      <div id="view-team" style="display:none">
+        <div class="panel" style="max-width:620px">
+          <div class="panel-h"><span class="idx">✎</span><h2>團隊名單</h2><span class="sub" id="teamCount"></span></div>
+          <div class="panel-b">
+            <p class="hint" style="margin:0 0 14px">預設帶入你所屬營運中心「業務部」的在職人員，決定「應到人數」與出席狀況中的名單。此清單僅影響目前瀏覽器接下來新建的會議，不會回寫平台的人員資料。</p>
+            <div id="teamList" style="display:flex;flex-direction:column;gap:8px"></div>
+            <div class="addbar">
+              <input id="newMember" placeholder="新增成員姓名…">
+              <button class="btn primary sm" id="btnAddMember">＋ 新增成員</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="boardToast"></div>
+
+<script>
+"use strict";
+// ═══════════════════════════════════════════════
+// 共用：Portal Session ／ Supabase 代理
+// ═══════════════════════════════════════════════
+const CFG = {
+  workerUrl: 'https://tcvlnpgpuphdalzvmoyo.supabase.co/functions/v1/sb-proxy',
+  portalSessionKey: 'comart-portal-session',
+};
+let PORTAL_SESSION = null;
+let ALL_USERS = []; // {empId,nameZh,nameEn,role,dept,site}
+
+function sbHdrs(extra) {
+  let sig = PORTAL_SESSION?.sig || '';
+  if (!sig) { try { sig = (JSON.parse(localStorage.getItem(CFG.portalSessionKey)) || {}).sig || ''; } catch(e) {} }
+  return Object.assign({ 'x-session': sig, 'Content-Type': 'application/json' }, extra || {});
+}
+const SB = {
+  async get(table, params='') {
+    try {
+      const res = await fetch(`${CFG.workerUrl}/supabase/rest/v1/${table}${params}`, { headers: sbHdrs() });
+      if (!res.ok) throw new Error(`${res.status}`);
+      return await res.json();
+    } catch(e) { console.warn(`SB.get(${table}) failed:`, e.message); return null; }
+  },
+  async post(table, data, prefer='return=representation') {
+    const res = await fetch(`${CFG.workerUrl}/supabase/rest/v1/${table}`, { method:'POST', headers: sbHdrs({ 'Prefer': prefer }), body: JSON.stringify(data) });
+    if (!res.ok) { const e = await res.text(); throw new Error(e); }
+    return await res.json();
+  },
+  async patch(table, filter, data) {
+    const res = await fetch(`${CFG.workerUrl}/supabase/rest/v1/${table}?${filter}`, { method:'PATCH', headers: sbHdrs({ 'Prefer': 'return=representation' }), body: JSON.stringify(data) });
+    if (!res.ok) { const e = await res.text(); throw new Error(e); }
+    return await res.json();
+  },
+  async upsert(table, data, pkField='id') {
+    const pkVal = data[pkField];
+    if (!pkVal) return this.post(table, data);
+    const patched = await this.patch(table, `${pkField}=eq.${encodeURIComponent(pkVal)}`, data);
+    if (patched && patched.length > 0) return patched;
+    return this.post(table, data);
+  },
+  async del(table, filter) {
+    const res = await fetch(`${CFG.workerUrl}/supabase/rest/v1/${table}?${filter}`, { method:'DELETE', headers: sbHdrs() });
+    if (!res.ok) throw new Error(`${res.status}`);
+    return true;
+  },
+};
+
+function readPortalSession() {
+  try {
+    const urlParams = new URLSearchParams(window.location.search);
+    const ps = urlParams.get('_ps');
+    if (ps) {
+      const s = JSON.parse(decodeURIComponent(escape(atob(ps))));
+      if (s && s.empId && s.expires && Date.now() < s.expires) {
+        localStorage.setItem(CFG.portalSessionKey, JSON.stringify(s));
+        window.history.replaceState({}, '', window.location.pathname);
+        return s;
+      }
+    }
+    const raw = localStorage.getItem(CFG.portalSessionKey);
+    if (!raw) return null;
+    const s = JSON.parse(raw);
+    if (!s || !s.empId || !s.expires) return null;
+    if (Date.now() > s.expires) { localStorage.removeItem(CFG.portalSessionKey); return null; }
+    return s;
+  } catch(e) { return null; }
+}
+
+function uid() { return 'b' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
+function escHtml(s) { return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function boardToast(msg) {
+  const t = document.getElementById('boardToast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+const SITE_LABEL = { TW:'台灣', CN:'東莞廠', VN:'越南廠' };
+function siteLabel(s) { return SITE_LABEL[s] || s || '—'; }
+function siteBadgeHtml(scope, site) {
+  if (scope === 'group') return `<span class="site-badge site-group">集團</span>`;
+  return `<span class="site-badge site-${site}">${siteLabel(site)}</span>`;
+}
+function isAdmin() { return PORTAL_SESSION?.role === 'admin'; }
+function isDcc() { return PORTAL_SESSION?.role === 'dcc'; }
+function canPostBulletin() { return isAdmin() || isDcc(); }
+function canEditSite(site) { return isAdmin() || (PORTAL_SESSION && PORTAL_SESSION.site === site); }
+
+function usersBySite(site) { return ALL_USERS.filter(u => u.site === site); }
+function usersBySiteDept(site, dept) {
+  const l = ALL_USERS.filter(u => u.site === site && u.dept === dept);
+  return l.length ? l : usersBySite(site);
+}
+function userName(u) { return (u && (u.nameZh || u.nameEn || u.empId)) || ''; }
+function findUserByName(name) { return ALL_USERS.find(u => u.nameZh === name || u.nameEn === name || u.empId === name); }
+
+async function syncUsers() {
+  const rows = await SB.get('users', '?select=emp_id,name_en,name_zh,role,dept,site,active&order=emp_id&active=eq.true');
+  ALL_USERS = (rows || []).map(u => ({
+    empId: u.emp_id, nameEn: u.name_en || '', nameZh: u.name_zh || '',
+    role: u.role || 'user', dept: u.dept || '', site: u.site || 'TW',
+  }));
+}
+
+// 發文後對範圍內每個人各寫一筆 notifications（沿用 Portal 既有的通知輪詢機制）
+async function notifyRecipients(recipients, fromName, title, body) {
+  const jobs = recipients.map(u => SB.post('notifications', {
+    to_user: u.nameEn || u.nameZh || u.empId,
+    from_user: fromName,
+    type: 'bulletin',
+    title, body: body.length > 80 ? body.slice(0, 80) + '…' : body,
+    link: '/board/index.html',
+    is_read: false,
+  }).catch(e => console.warn('[notify]', u.empId, e.message)));
+  await Promise.all(jobs);
+}
+
+// ═══════════════════════════════════════════════
+// 分頁切換
+// ═══════════════════════════════════════════════
+let _bizInited = false;
+function switchTab(name) {
+  document.querySelectorAll('.maintab[data-tab]').forEach(b => b.classList.toggle('on', b.dataset.tab === name));
+  document.querySelectorAll('.tabpanel').forEach(p => p.classList.remove('on'));
+  document.getElementById('tabpanel-' + name).classList.add('on');
+  if (name === 'bulletin') bbLoad();
+  if (name === 'weekly') wmLoadList();
+  if (name === 'biz' && !_bizInited) { _bizInited = true; bizMeetingInit(); }
+}
+
+// ═══════════════════════════════════════════════
+// TAB 1：公告
+// ═══════════════════════════════════════════════
+let BB_POSTS = [];
+let _bbFilter = '';
+
+function bbSetFilter(f) {
+  _bbFilter = f;
+  document.querySelectorAll('#bb-filters .chip-f').forEach(b => b.classList.toggle('on', b.dataset.f === f));
+  bbRender();
+}
+
+function bbSetupCompose() {
+  const box = document.getElementById('bb-compose');
+  if (!canPostBulletin()) { box.style.display = 'none'; return; }
+  box.style.display = '';
+  const sel = document.getElementById('bb-scope-sel');
+  if (isAdmin()) {
+    sel.innerHTML = `<option value="group">集團公告（發送給所有人）</option>` +
+      ['TW','CN','VN'].map(s => `<option value="site:${s}">${siteLabel(s)}中心公告</option>`).join('');
+  } else {
+    sel.innerHTML = `<option value="site:${PORTAL_SESSION.site}">${siteLabel(PORTAL_SESSION.site)}中心公告</option>`;
+  }
+}
+function bbOnScopeChange() {}
+
+async function bbLoad() {
+  bbSetupCompose();
+  try {
+    const rows = await SB.get('portal_bulletin', '?order=ts.desc&limit=100');
+    BB_POSTS = rows || [];
+  } catch(e) { BB_POSTS = []; }
+  bbRender();
+}
+
+function bbRender() {
+  const list = document.getElementById('bb-list');
+  let posts = BB_POSTS;
+  if (_bbFilter === 'group') posts = posts.filter(p => (p.scope || 'group') === 'group');
+  else if (_bbFilter) posts = posts.filter(p => p.scope === 'site' && p.site === _bbFilter);
+  if (!posts.length) { list.innerHTML = '<div class="empty-note">目前沒有公告。</div>'; return; }
+
+  const sorted = [...posts].sort((a,b) => (b.pinned||0) - (a.pinned||0) || b.ts - a.ts);
+  list.innerHTML = sorted.map(p => {
+    const name = p.authorName || p.authorId || '';
+    const init = (name || '?')[0].toUpperCase();
+    const dt = new Date(p.ts).toLocaleString('zh-TW', { month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit' });
+    const liked = (p.likes || []).includes(PORTAL_SESSION?.empId);
+    const canDel = isAdmin() || (PORTAL_SESSION && p.authorId === PORTAL_SESSION.empId);
+    return `<div class="post-card">
+      <div class="post-head">
+        <div class="post-avatar">${escHtml(init)}</div>
+        <div class="post-meta">
+          <div class="post-author">${escHtml(name)} ${siteBadgeHtml(p.scope || 'group', p.site)} ${p.pinned ? '<span class="post-pin">📌 置頂</span>' : ''}</div>
+          <div class="post-time">${dt}</div>
+        </div>
+        ${canDel ? `<button class="del-x" onclick="bbDeletePost('${p.id}')">✕</button>` : ''}
+      </div>
+      <div class="post-body">${escHtml(p.body)}</div>
+      <div class="post-foot">
+        <button class="like-btn${liked ? ' liked' : ''}" onclick="bbToggleLike('${p.id}')">❤ ${(p.likes||[]).length || ''}</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function bbSubmitPost() {
+  const body = document.getElementById('bb-content').value.trim();
+  if (!body) { boardToast('請輸入公告內容'); return; }
+  if (!canPostBulletin()) { boardToast('沒有發布權限'); return; }
+  const scopeVal = document.getElementById('bb-scope-sel').value; // 'group' | 'site:TW'
+  const pinned = document.getElementById('bb-pin').checked;
+  const scope = scopeVal === 'group' ? 'group' : 'site';
+  const site = scope === 'site' ? scopeVal.split(':')[1] : null;
+  if (scope === 'site' && !isAdmin() && site !== PORTAL_SESSION.site) { boardToast('只能發布自己所屬中心的公告'); return; }
+
+  const post = {
+    id: uid(), body, pinned: pinned ? 1 : 0,
+    authorId: PORTAL_SESSION.empId,
+    authorName: PORTAL_SESSION.nameZh || PORTAL_SESSION.nameEn || PORTAL_SESSION.empId,
+    ts: Date.now(), likes: [], scope, site,
+  };
+  try {
+    await SB.post('portal_bulletin', post);
+  } catch(e) { boardToast('發佈失敗：' + e.message); return; }
+  document.getElementById('bb-content').value = '';
+  document.getElementById('bb-pin').checked = false;
+  await bbLoad();
+  boardToast('已發佈');
+
+  // 逐人通知
+  const recipients = scope === 'group' ? ALL_USERS.filter(u => u.empId !== PORTAL_SESSION.empId)
+    : usersBySite(site).filter(u => u.empId !== PORTAL_SESSION.empId);
+  const title = scope === 'group' ? '📢 集團公告' : `📢 ${siteLabel(site)}中心公告`;
+  notifyRecipients(recipients, post.authorName, title, body);
+}
+
+async function bbToggleLike(postId) {
+  const post = BB_POSTS.find(p => p.id === postId);
+  if (!post || !PORTAL_SESSION) return;
+  const empId = PORTAL_SESSION.empId;
+  const likes = post.likes || [];
+  const newLikes = likes.includes(empId) ? likes.filter(l => l !== empId) : [...likes, empId];
+  post.likes = newLikes;
+  SB.patch('portal_bulletin', 'id=eq.' + encodeURIComponent(postId), { likes: newLikes }).catch(()=>{});
+  bbRender();
+}
+
+async function bbDeletePost(postId) {
+  if (!confirm('刪除此公告？')) return;
+  try { await SB.del('portal_bulletin', 'id=eq.' + encodeURIComponent(postId)); }
+  catch(e) { boardToast('刪除失敗'); return; }
+  BB_POSTS = BB_POSTS.filter(p => p.id !== postId);
+  bbRender();
+  boardToast('已刪除');
+}
+
+// ═══════════════════════════════════════════════
+// TAB 2：週會紀錄
+// ═══════════════════════════════════════════════
+let WM_LIST = [];
+let _wmFilter = '';
+let _wmEditId = null; // null = 新增
+let wmState = null;
+let _wmBizRecords = []; // 該中心的業務會議記錄（給「本週業務會議」下拉選單用）
+
+function wmSetFilter(f) {
+  _wmFilter = f;
+  document.querySelectorAll('#tabpanel-weekly .chiprow .chip-f').forEach(b => b.classList.toggle('on', b.dataset.f === f));
+  wmRenderList();
+}
+
+async function wmLoadList() {
+  try {
+    const rows = await SB.get('weekly_minutes', '?select=id,site,meeting_date,name,chair,recorder,attendance&order=meeting_date.desc&limit=200');
+    WM_LIST = rows || [];
+  } catch(e) { WM_LIST = []; }
+  wmRenderList();
+}
+
+function wmAttendCounts(attendance) {
+  const vals = Object.values(attendance || {});
+  const present = vals.filter(a => a.status === 'present').length;
+  const late = vals.filter(a => a.status === 'late').length;
+  const absent = vals.filter(a => a.status === 'absent').length;
+  return { expected: vals.length, actual: present + late, present, late, absent };
+}
+
+function wmRenderList() {
+  const box = document.getElementById('wm-list');
+  const rows = _wmFilter ? WM_LIST.filter(r => r.site === _wmFilter) : WM_LIST;
+  if (!rows.length) { box.innerHTML = '<div class="empty-note">尚無週會紀錄，點右上角「新增週會紀錄」建立第一筆。</div>'; return; }
+  box.innerHTML = rows.map(r => {
+    const c = wmAttendCounts(r.attendance);
+    const canEdit = canEditSite(r.site);
+    return `<div class="saved-row">
+      <div>
+        <div class="t">${escHtml(r.meeting_date || '')} ${siteBadgeHtml('site', r.site)}</div>
+        <div class="m"><span>主席：${escHtml(r.chair || '—')}</span><span>紀錄：${escHtml(r.recorder || '—')}</span>${c.expected ? `<span>實到 ${c.actual}/${c.expected} 人</span>` : ''}</div>
+      </div>
+      <div class="ops">
+        <button class="btn sm" onclick="wmOpenRecord('${r.id}')">${canEdit ? '編輯' : '查看'}</button>
+        ${canEdit ? `<button class="btn sm danger" onclick="wmDeleteRecord('${r.id}')">刪除</button>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function wmDeleteRecord(id) {
+  if (!confirm('確定刪除這筆週會紀錄？')) return;
+  try { await SB.del('weekly_minutes', 'id=eq.' + encodeURIComponent(id)); }
+  catch(e) { boardToast('刪除失敗'); return; }
+  await wmLoadList();
+  boardToast('已刪除');
+}
+
+function wmFreshState(site) {
+  const today = new Date().toISOString().slice(0,10);
+  const attendance = {};
+  usersBySite(site).forEach(u => { attendance[u.empId] = { status: 'present', reason: '' }; });
+  return {
+    id: null, site,
+    name: '週會', meeting_date: today, time_start: '09:00', time_end: '10:00',
+    place: '', chair: '', recorder: '', next_share: '',
+    attendance, guests: [],
+    duty_roster: [],
+    biz_ref: { biz_id: '', date: '', chair: '', recorder: '' },
+    agenda: { chair_report:'', work_reports:[], mgmt_report:'', new_product:'', book_share:[], weekly_report:[], supplement:'' },
+  };
+}
+
+function wmNewRecord() {
+  _wmEditId = null;
+  wmState = wmFreshState(PORTAL_SESSION.site);
+  wmOpenEditor();
+}
+
+async function wmOpenRecord(id) {
+  try {
+    const rows = await SB.get('weekly_minutes', '?id=eq.' + encodeURIComponent(id));
+    const r = rows && rows[0];
+    if (!r) { boardToast('找不到該筆紀錄'); return; }
+    _wmEditId = id;
+    wmState = {
+      id: r.id, site: r.site,
+      name: r.name || '週會', meeting_date: r.meeting_date, time_start: r.time_start || '', time_end: r.time_end || '',
+      place: r.place || '', chair: r.chair || '', recorder: r.recorder || '', next_share: r.next_share || '',
+      attendance: r.attendance || {}, guests: r.guests || [],
+      duty_roster: r.duty_roster || [],
+      biz_ref: r.biz_ref || { biz_id:'', date:'', chair:'', recorder:'' },
+      agenda: Object.assign({ chair_report:'', work_reports:[], mgmt_report:'', new_product:'', book_share:[], weekly_report:[], supplement:'' }, r.agenda || {}),
+    };
+    wmOpenEditor();
+  } catch(e) { boardToast('載入失敗'); }
+}
+
+async function wmOpenEditor() {
+  document.getElementById('wm-list-view').style.display = 'none';
+  document.getElementById('wm-editor-view').style.display = '';
+  await wmLoadBizPicklist();
+  wmFillForm();
+}
+
+function wmBackToList() {
+  document.getElementById('wm-editor-view').style.display = 'none';
+  document.getElementById('wm-list-view').style.display = '';
+  wmLoadList();
+}
+
+async function wmLoadBizPicklist() {
+  try {
+    const rows = await SB.get('biz_meeting_minutes', '?select=id,title,meeting_date,data&site=eq.' + encodeURIComponent(wmState.site) + '&order=meeting_date.desc&limit=50');
+    _wmBizRecords = rows || [];
+  } catch(e) { _wmBizRecords = []; }
+  const sel = document.getElementById('wm-biz-pick');
+  sel.innerHTML = '<option value="">— 手動輸入 —</option>' + _wmBizRecords.map(r =>
+    `<option value="${r.id}">${escHtml(r.title || r.meeting_date || '（未命名）')}</option>`).join('');
+}
+
+function wmPickBiz() {
+  const id = document.getElementById('wm-biz-pick').value;
+  const rec = _wmBizRecords.find(r => r.id === id);
+  if (!rec) return;
+  const m = (rec.data && rec.data.meeting) || {};
+  document.getElementById('wm-biz-date').value = m.date || '';
+  document.getElementById('wm-biz-chair').value = m.chair || '';
+  document.getElementById('wm-biz-rec').value = m.rec || '';
+  wmState.biz_ref = { biz_id: id, date: m.date || '', chair: m.chair || '', recorder: m.rec || '' };
+  wmRenderPreview();
+}
+
+function wmPopSelect(sel, current) {
+  const site = wmState.site;
+  const names = usersBySite(site).map(userName).filter(Boolean);
+  sel.innerHTML = `<option value="">— 請選擇 —</option>` + names.map(n => `<option value="${escHtml(n)}">${escHtml(n)}</option>`).join('');
+  if (current && !names.includes(current)) sel.innerHTML += `<option value="${escHtml(current)}">${escHtml(current)}（非名單成員）</option>`;
+  sel.value = current || '';
+}
+
+function wmFillForm() {
+  document.getElementById('wm-name').value = wmState.name || '';
+  document.getElementById('wm-date').value = wmState.meeting_date || '';
+  document.getElementById('wm-ts').value = wmState.time_start || '';
+  document.getElementById('wm-te').value = wmState.time_end || '';
+  document.getElementById('wm-place').value = wmState.place || '';
+  wmPopSelect(document.getElementById('wm-chair'), wmState.chair);
+  wmPopSelect(document.getElementById('wm-rec'), wmState.recorder);
+  wmPopSelect(document.getElementById('wm-next'), wmState.next_share);
+  document.getElementById('wm-biz-date').value = (wmState.biz_ref && wmState.biz_ref.date) || '';
+  document.getElementById('wm-biz-chair').value = (wmState.biz_ref && wmState.biz_ref.chair) || '';
+  document.getElementById('wm-biz-rec').value = (wmState.biz_ref && wmState.biz_ref.recorder) || '';
+  document.getElementById('wm-ag-chair').value = wmState.agenda.chair_report || '';
+  document.getElementById('wm-ag-mgmt').value = wmState.agenda.mgmt_report || '';
+  document.getElementById('wm-ag-newprod').value = wmState.agenda.new_product || '';
+  document.getElementById('wm-ag-supp').value = wmState.agenda.supplement || '';
+
+  ['wm-name','wm-date','wm-ts','wm-te','wm-place'].forEach(id => {
+    document.getElementById(id).oninput = wmSyncBasic;
+  });
+  ['wm-chair','wm-rec','wm-next'].forEach(id => { document.getElementById(id).onchange = wmSyncBasic; });
+  ['wm-biz-date','wm-biz-chair','wm-biz-rec'].forEach(id => { document.getElementById(id).oninput = wmSyncBizRef; });
+  document.getElementById('wm-ag-chair').oninput = () => { wmState.agenda.chair_report = document.getElementById('wm-ag-chair').value; wmRenderPreview(); };
+  document.getElementById('wm-ag-mgmt').oninput = () => { wmState.agenda.mgmt_report = document.getElementById('wm-ag-mgmt').value; wmRenderPreview(); };
+  document.getElementById('wm-ag-newprod').oninput = () => { wmState.agenda.new_product = document.getElementById('wm-ag-newprod').value; wmRenderPreview(); };
+  document.getElementById('wm-ag-supp').oninput = () => { wmState.agenda.supplement = document.getElementById('wm-ag-supp').value; wmRenderPreview(); };
+
+  wmBuildRoster();
+  wmRenderCounts();
+  wmBuildDuty();
+  wmBuildItems('work'); wmBuildItems('book'); wmBuildItems('weekly');
+  wmRenderPreview();
+}
+
+function wmSyncBasic() {
+  wmState.name = document.getElementById('wm-name').value;
+  wmState.meeting_date = document.getElementById('wm-date').value;
+  wmState.time_start = document.getElementById('wm-ts').value;
+  wmState.time_end = document.getElementById('wm-te').value;
+  wmState.place = document.getElementById('wm-place').value;
+  wmState.chair = document.getElementById('wm-chair').value;
+  wmState.recorder = document.getElementById('wm-rec').value;
+  wmState.next_share = document.getElementById('wm-next').value;
+  wmRenderPreview();
+}
+function wmSyncBizRef() {
+  wmState.biz_ref = {
+    biz_id: (wmState.biz_ref && wmState.biz_ref.biz_id) || '',
+    date: document.getElementById('wm-biz-date').value,
+    chair: document.getElementById('wm-biz-chair').value,
+    recorder: document.getElementById('wm-biz-rec').value,
+  };
+  wmRenderPreview();
+}
+
+function wmAttendees() {
+  const site = wmState.site;
+  const list = usersBySite(site).map(u => {
+    let a = wmState.attendance[u.empId];
+    if (!a) a = wmState.attendance[u.empId] = { status: 'present', reason: '' };
+    return { id: u.empId, name: userName(u), guest: false, a };
+  });
+  wmState.guests.forEach(g => list.push({ id: g.id, name: g.name, guest: true, a: g }));
+  return list;
+}
+function wmRenderCounts() {
+  const box = document.getElementById('wm-counts');
+  const vals = wmAttendees();
+  const present = vals.filter(p => p.a.status === 'present').length;
+  const late = vals.filter(p => p.a.status === 'late').length;
+  const absent = vals.filter(p => p.a.status === 'absent').length;
+  box.innerHTML = `<span class="chip">應到 <b>${usersBySite(wmState.site).length}</b> 人</span><span class="chip ok">實到 <b>${present+late}</b> 人</span><span class="chip bad">缺席 <b>${absent}</b> 人</span><span class="chip warn">遲到 <b>${late}</b> 人</span>`;
+}
+function wmReasonStr(status) {
+  return wmAttendees().filter(p => p.a.status === status).map(p => p.name + (p.a.reason ? ' ' + p.a.reason.trim() : '')).join('、');
+}
+function wmBuildRoster() {
+  const box = document.getElementById('wm-roster');
+  box.innerHTML = '';
+  wmAttendees().forEach(p => {
+    const row = document.createElement('div'); row.className = 'rr'; row.setAttribute('data-s', p.a.status);
+    const who = document.createElement('div'); who.className = 'who';
+    who.innerHTML = `<span class="dot"></span><span class="name">${escHtml(p.name)}</span>` + (p.guest ? `<span class="tag">列席</span>` : '');
+    row.appendChild(who);
+    const right = document.createElement('div'); right.style.cssText = 'display:flex;align-items:center;gap:8px';
+    const seg = document.createElement('div'); seg.className = 'seg';
+    [['present','在場'],['late','遲到'],['absent','缺席']].forEach(pair => {
+      const b = document.createElement('button'); b.textContent = pair[1]; b.setAttribute('data-v', pair[0]);
+      if (p.a.status === pair[0]) b.classList.add('on');
+      b.onclick = () => {
+        p.a.status = pair[0]; row.setAttribute('data-s', p.a.status);
+        seg.querySelectorAll('button').forEach(x => x.classList.toggle('on', x.getAttribute('data-v') === p.a.status));
+        rw.style.display = p.a.status === 'present' ? 'none' : 'block';
+        wmRenderCounts(); wmRenderPreview();
+      };
+      seg.appendChild(b);
+    });
+    right.appendChild(seg);
+    if (p.guest) {
+      const del = document.createElement('button'); del.className = 'del'; del.textContent = '✕';
+      del.onclick = () => { wmState.guests = wmState.guests.filter(x => x.id !== p.id); wmBuildRoster(); wmRenderCounts(); wmRenderPreview(); };
+      right.appendChild(del);
+    }
+    row.appendChild(right);
+    const rw = document.createElement('div'); rw.className = 'reason';
+    const rin = document.createElement('input'); rin.placeholder = '原因（如：出差、特休、事假…）'; rin.value = p.a.reason || '';
+    rin.oninput = () => { p.a.reason = rin.value; wmRenderPreview(); };
+    rw.appendChild(rin); rw.style.display = p.a.status === 'present' ? 'none' : 'block';
+    row.appendChild(rw);
+    box.appendChild(row);
+  });
+}
+function wmAllPresent() {
+  wmAttendees().forEach(p => { p.a.status = 'present'; p.a.reason = ''; });
+  wmBuildRoster(); wmRenderCounts(); wmRenderPreview();
+  boardToast('已將全員設為在場');
+}
+function wmAddGuest() {
+  const el = document.getElementById('wm-guest-name');
+  const v = el.value.trim(); if (!v) return;
+  wmState.guests.push({ id: uid(), name: v, status: 'present', reason: '' });
+  el.value = '';
+  wmBuildRoster(); wmRenderCounts(); wmRenderPreview();
+}
+
+function wmBuildDuty() {
+  const box = document.getElementById('wm-duty');
+  box.innerHTML = '';
+  wmState.duty_roster.forEach((d, i) => {
+    const row = document.createElement('div'); row.className = 'item'; row.style.gridTemplateColumns = '140px 1fr auto';
+    const areaIn = document.createElement('input'); areaIn.placeholder = '樓層／單位（如：四樓）'; areaIn.value = d.area || '';
+    areaIn.oninput = () => { d.area = areaIn.value; wmRenderPreview(); };
+    const personIn = document.createElement('input'); personIn.placeholder = '值日生姓名'; personIn.value = d.person || '';
+    personIn.oninput = () => { d.person = personIn.value; wmRenderPreview(); };
+    const rm = document.createElement('button'); rm.className = 'rm'; rm.textContent = '✕';
+    rm.onclick = () => { wmState.duty_roster.splice(i, 1); wmBuildDuty(); wmRenderPreview(); };
+    row.appendChild(areaIn); row.appendChild(personIn); row.appendChild(rm);
+    box.appendChild(row);
+  });
+}
+function wmAddDuty() { wmState.duty_roster.push({ area: '', person: '' }); wmBuildDuty(); wmRenderPreview(); }
+
+const WM_ITEM_LABEL = { work: '同仁', book: '分享人', weekly: '姓名' };
+function wmBuildItems(key) {
+  const box = document.getElementById('wm-ag-' + key);
+  box.innerHTML = '';
+  wmState.agenda[key === 'work' ? 'work_reports' : key === 'book' ? 'book_share' : 'weekly_report'].forEach((it, i) => {
+    const arrKey = key === 'work' ? 'work_reports' : key === 'book' ? 'book_share' : 'weekly_report';
+    const row = document.createElement('div'); row.className = 'item';
+    const who = document.createElement('input'); who.placeholder = WM_ITEM_LABEL[key]; who.value = it.who || '';
+    who.oninput = () => { it.who = who.value; wmRenderPreview(); };
+    const txt = document.createElement('textarea'); txt.rows = 1; txt.placeholder = '內容…'; txt.value = it.text || '';
+    txt.oninput = () => { it.text = txt.value; wmRenderPreview(); };
+    const rm = document.createElement('button'); rm.className = 'rm'; rm.textContent = '✕';
+    rm.onclick = () => { wmState.agenda[arrKey].splice(i, 1); wmBuildItems(key); wmRenderPreview(); };
+    row.appendChild(who); row.appendChild(txt); row.appendChild(rm);
+    box.appendChild(row);
+  });
+}
+function wmAddItem(key) {
+  const arrKey = key === 'work' ? 'work_reports' : key === 'book' ? 'book_share' : 'weekly_report';
+  wmState.agenda[arrKey].push({ who: '', text: '' });
+  wmBuildItems(key); wmRenderPreview();
+}
+
+function wmFmtDate(iso) { if (!iso) return '—'; const p = iso.split('-'); return p.length === 3 ? p.join('/') : iso; }
+function wmItemsBlock(label, num, items) {
+  const has = items.some(it => (it.text||'').trim() || (it.who||'').trim());
+  const body = has ? '<ul>' + items.filter(it => (it.text||'').trim() || (it.who||'').trim()).map(it =>
+    `<li>${it.who ? `<span class="who">${escHtml(it.who)}：</span>` : ''}${escHtml(it.text||'')}</li>`).join('') + '</ul>'
+    : `<div class="ag-empty">（尚未填寫）</div>`;
+  return `<tr><td colspan="6" class="ag-body"><div class="ag-title">${num}、${escHtml(label)}</div>${body}</td></tr>`;
+}
+function wmTextBlock(label, num, text) {
+  const t = (text||'').trim();
+  return `<tr><td colspan="6" class="ag-body"><div class="ag-title">${num}、${escHtml(label)}</div>${t ? escHtml(t) : escHtml(label) + '：無。'}</td></tr>`;
+}
+function wmRenderPreview() {
+  const s = wmState, c = wmAttendCounts(s.attendance);
+  const present = wmAttendees().filter(p => p.a.status === 'present').length;
+  const late = wmAttendees().filter(p => p.a.status === 'late').length;
+  const absent = wmAttendees().filter(p => p.a.status === 'absent').length;
+  const actual = present + late;
+  const absentTxt = absent + ' 人' + (wmReasonStr('absent') ? '\n(' + wmReasonStr('absent') + ')' : '');
+  const lateTxt = late + ' 人' + (wmReasonStr('late') ? '\n(' + wmReasonStr('late') + ')' : '');
+  const dutyTxt = s.duty_roster.length ? s.duty_roster.map(d => `${d.area||'—'}：${d.person||'—'}`).join('　') : '（尚未填寫）';
+  const bizRef = s.biz_ref || {};
+  document.getElementById('wm-sheet').innerHTML =
+    `<table><colgroup><col style="width:15%"><col style="width:19%"><col style="width:15%"><col style="width:19%"><col style="width:15%"><col style="width:17%"></colgroup>` +
+    `<tr class="title"><td colspan="6">${escHtml(siteLabel(s.site))}週會會議紀錄</td></tr>` +
+    `<tr class="band"><td colspan="6">會議資訊</td></tr>` +
+    `<tr><td class="lbl">會議名稱</td><td class="val">${escHtml(s.name)}</td><td class="lbl">應到人數</td><td class="val">${usersBySite(s.site).length} 人</td><td class="lbl">主席</td><td class="val center">${escHtml(s.chair)}</td></tr>` +
+    `<tr><td class="lbl">會議日期</td><td class="val">${escHtml(wmFmtDate(s.meeting_date))}</td><td class="lbl">實到人數</td><td class="val">${actual} 人</td><td class="lbl">紀錄</td><td class="val center">${escHtml(s.recorder)}</td></tr>` +
+    `<tr><td class="lbl">會議時間</td><td class="val">${escHtml((s.time_start||'')+'~'+(s.time_end||''))}</td><td class="lbl">缺席(原因)</td><td class="val">${escHtml(absentTxt)}</td><td class="lbl" rowspan="2">下週心得分享</td><td class="val center" rowspan="2">${escHtml(s.next_share)}</td></tr>` +
+    `<tr><td class="lbl">會議地點</td><td class="val">${escHtml(s.place)}</td><td class="lbl">遲到(原因)</td><td class="val">${escHtml(lateTxt)}</td></tr>` +
+    `<tr class="band"><td colspan="6">本週值日生</td></tr>` +
+    `<tr><td colspan="6" class="ag-body">${escHtml(dutyTxt)}</td></tr>` +
+    `<tr class="band"><td colspan="6">本週業務會議</td></tr>` +
+    `<tr><td class="lbl">日期</td><td class="val">${escHtml(wmFmtDate(bizRef.date))}</td><td class="lbl">主席／簡報</td><td class="val">${escHtml(bizRef.chair||'')}</td><td class="lbl">會議記錄</td><td class="val">${escHtml(bizRef.recorder||'')}</td></tr>` +
+    `<tr class="band"><td colspan="6">會議議程</td></tr>` +
+    wmTextBlock('主席報告', '一', s.agenda.chair_report) +
+    wmItemsBlock('各同仁當週工作會報及通知事項', '二', s.agenda.work_reports) +
+    wmTextBlock('主管報告', '三', s.agenda.mgmt_report) +
+    wmTextBlock('新品介紹', '四', s.agenda.new_product) +
+    wmItemsBlock('讀書心得分享', '五', s.agenda.book_share) +
+    wmItemsBlock('週報分享', '六', s.agenda.weekly_report) +
+    wmTextBlock('補充事項', '七', s.agenda.supplement) +
+    `<tr><td colspan="6" class="ag-body"><div class="ag-title">八、散會</div></td></tr>` +
+    `</table>`;
+}
+
+async function wmSave() {
+  const s = wmState;
+  if (!canEditSite(s.site)) { boardToast('無權限修改其他中心的紀錄'); return; }
+  if (!s.meeting_date) { boardToast('請填寫會議日期'); return; }
+  const row = {
+    id: s.id || uid(), site: s.site, meeting_date: s.meeting_date, name: s.name || '週會',
+    time_start: s.time_start || '', time_end: s.time_end || '', place: s.place || '',
+    chair: s.chair || '', recorder: s.recorder || '', next_share: s.next_share || '',
+    duty_roster: s.duty_roster, biz_ref: s.biz_ref, attendance: s.attendance, guests: s.guests, agenda: s.agenda,
+    updated_by: PORTAL_SESSION.empId, updated_at: new Date().toISOString(),
+  };
+  if (!s.id) { row.created_by = PORTAL_SESSION.empId; row.created_at = new Date().toISOString(); }
+  try {
+    await SB.upsert('weekly_minutes', row);
+  } catch(e) { boardToast('儲存失敗：' + e.message); return; }
+  s.id = row.id; _wmEditId = row.id;
+  boardToast('已儲存到平台');
+}
+
+function wmSummaryText() {
+  const s = wmState;
+  const L = [`${siteLabel(s.site)}週會會議紀錄`, `日期：${wmFmtDate(s.meeting_date)}　時間：${s.time_start||''}~${s.time_end||''}`,
+    `地點：${s.place||'—'}　主席：${s.chair||'—'}　紀錄：${s.recorder||'—'}`, ''];
+  const push = (label, text) => { if ((text||'').trim()) L.push(label + '：' + text.trim()); };
+  push('主席報告', s.agenda.chair_report);
+  s.agenda.work_reports.forEach(it => { if ((it.text||'').trim()) L.push('• ' + (it.who?it.who+'：':'') + it.text); });
+  push('主管報告', s.agenda.mgmt_report);
+  push('新品介紹', s.agenda.new_product);
+  s.agenda.book_share.forEach(it => { if ((it.text||'').trim()) L.push('• ' + (it.who?it.who+'：':'') + it.text); });
+  s.agenda.weekly_report.forEach(it => { if ((it.text||'').trim()) L.push('• ' + (it.who?it.who+'：':'') + it.text); });
+  push('補充事項', s.agenda.supplement);
+  return L.join('\n');
+}
+function wmPrint() { window.print(); }
+function wmMail() {
+  const subject = siteLabel(wmState.site) + '週會紀錄_' + (wmState.meeting_date || '');
+  const body = wmSummaryText() + '\n\n（提醒：完整表格請另以列印/PDF 方式附加。）';
+  window.location.href = 'mailto:?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+}
+
+// ═══════════════════════════════════════════════
+// TAB 3：業務會議記錄（改編自 meetingminutes_V2.html）
+// ═══════════════════════════════════════════════
+function bizMeetingInit(){
+(function(){
+  "use strict";
+  var CN=["一","二","三","四","五","六","七","八","九","十","十一","十二"];
+  var DEFAULT_TEAM=(window.BIZ_DEFAULT_TEAM&&window.BIZ_DEFAULT_TEAM.length)?window.BIZ_DEFAULT_TEAM:["Angel 嚴","Angel 劉","Ariel","Esther","Emily","Henry","Jennifer","Nina","Vicky","Wendy","Aaron","燕婷","千千"];
+  var CUR_SITE=(window.PORTAL_SESSION_SITE)||'TW';
+  var STORE_KEY="comart-board-mm-draft-v1";
+
+  function todayISO(){ var d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+  function uid2(){ return "id"+Math.random().toString(36).slice(2,9); }
+
+  function freshMeeting(){
+    return {
+      meeting:{ name:"業務會議", date:todayISO(), timeStart:"09:00", timeEnd:"09:15", time:"09:00~09:15", place:"4 樓大會議室", chair:"", rec:"" },
+      attendance:{}, guests:[],
+      agenda:[ {id:uid2(), title:"業務分享", items:[{id:uid2(),who:"",text:""}]} ]
+    };
+  }
+  function freshState(){ var s=freshMeeting(); s.team=DEFAULT_TEAM.map(function(n){return {id:uid2(),name:n};}); s._id=null; s.site=CUR_SITE; return s; }
+
+  var state;
+  try{ var raw=localStorage.getItem(STORE_KEY); state=raw?JSON.parse(raw):freshState(); if(!state.team||!state.meeting||!state.agenda||!state.attendance) state=freshState(); }
+  catch(e){ state=freshState(); }
+  if(!state.guests) state.guests=[];
+  if(!("_id" in state)) state._id=null;
+  if(!state.site) state.site=CUR_SITE;
+  if(state.meeting.timeStart===undefined && state.meeting.timeEnd===undefined){ state.meeting.timeStart="09:00"; state.meeting.timeEnd="09:15"; }
+  function composeTime(){ var s=state.meeting.timeStart||"", e=state.meeting.timeEnd||""; return (s&&e)?(s+"~"+e):(s||e||""); }
+  state.meeting.time=composeTime();
+
+  function save(){ try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }catch(e){} }
+  var $=function(id){ return document.getElementById(id); };
+  function el(t,c,x){ var e=document.createElement(t); if(c)e.className=c; if(x!=null)e.textContent=x; return e; }
+  function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+  function attendees(){
+    var list=state.team.map(function(m){ var a=state.attendance[m.id]; if(!a){a=state.attendance[m.id]={status:"present",reason:""};} return {id:m.id,name:m.name,guest:false,a:a}; });
+    state.guests.forEach(function(g){ list.push({id:g.id,name:g.name,guest:true,a:g}); });
+    return list;
+  }
+  function counts(){
+    var expected=state.team.length,present=0,late=0,absent=0;
+    attendees().forEach(function(p){ if(p.a.status==="present")present++; else if(p.a.status==="late")late++; else if(p.a.status==="absent")absent++; });
+    return {expected:expected,present:present,late:late,absent:absent,actual:present+late};
+  }
+  function reasonStr(status){ return attendees().filter(function(p){return p.a.status===status;}).map(function(p){return p.name+(p.a.reason?" "+p.a.reason.trim():"");}).join("、"); }
+  function secLabel(i,title){ var t=(title||"").trim(),multi=state.agenda.length>1,num=multi?(CN[i]||String(i+1))+"、":""; return num+(t?t+"：":""); }
+  function fmtDate(iso){ if(!iso)return ""; var p=iso.split("-"); return p.length===3?p.join("-"):iso; }
+  function fileBase(){ return (state.meeting.name||"業務會議")+"記錄_"+(state.meeting.date||todayISO()); }
+  function updateFileHint(){ $("fileHint").textContent="檔名："+fileBase(); }
+
+  function fillSelect(sel,current){
+    sel.innerHTML="";
+    var blank=document.createElement("option"); blank.value=""; blank.textContent="— 請選擇 —"; sel.appendChild(blank);
+    var names=state.team.map(function(m){return m.name;});
+    if(current&&names.indexOf(current)<0){ var o=document.createElement("option"); o.value=current; o.textContent=current+"（非名單成員）"; sel.appendChild(o); }
+    names.forEach(function(n){ var o=document.createElement("option"); o.value=n; o.textContent=n; sel.appendChild(o); });
+    sel.value=current||"";
+  }
+  function renderSelects(){ fillSelect($("f_chair"),state.meeting.chair); fillSelect($("f_rec"),state.meeting.rec); }
+  function opt(v,t){ var o=document.createElement("option"); o.value=v; o.textContent=t; return o; }
+  function nameOptions(){ var arr=state.team.map(function(m){return m.name;}); state.guests.forEach(function(g){ if(g.name&&arr.indexOf(g.name)<0)arr.push(g.name); }); return arr; }
+  function fillWhoSelect(sel,current){
+    sel.innerHTML="";
+    sel.appendChild(opt("","發言人（可留空）"));
+    var names=nameOptions();
+    names.forEach(function(n){ sel.appendChild(opt(n,n)); });
+    if(current && names.indexOf(current)<0) sel.appendChild(opt(current,current));
+    sel.appendChild(opt("__other__","＋ 其他…"));
+    sel.value=current||"";
+  }
+  function bindInfo(){
+    var map={f_name:"name",f_date:"date",f_place:"place"};
+    Object.keys(map).forEach(function(id){ var n=$(id); n.value=state.meeting[map[id]]||""; n.oninput=function(){ state.meeting[map[id]]=n.value; save(); renderPreview(); if(id==="f_date")updateFileHint(); }; });
+    var ts=$("f_timeStart"), te=$("f_timeEnd");
+    ts.value=state.meeting.timeStart||""; te.value=state.meeting.timeEnd||"";
+    function onTime(){ state.meeting.timeStart=ts.value; state.meeting.timeEnd=te.value; state.meeting.time=composeTime(); save(); renderPreview(); }
+    ts.oninput=onTime; te.oninput=onTime;
+    $("f_chair").onchange=function(){ state.meeting.chair=this.value; save(); renderPreview(); };
+    $("f_rec").onchange=function(){ state.meeting.rec=this.value; save(); renderPreview(); };
+  }
+
+  function renderCounts(){
+    var c=counts(),box=$("counts"); box.innerHTML="";
+    function chip(cls,label,val){ var s=el("span","chip "+cls); s.innerHTML=label+" <b>"+val+"</b>"; box.appendChild(s); }
+    chip("","應到",c.expected+" 人"); chip("ok","實到",c.actual+" 人"); chip("bad","缺席",c.absent+" 人"); chip("warn","遲到",c.late+" 人");
+  }
+  function buildRoster(){
+    var box=$("roster"); box.innerHTML="";
+    attendees().forEach(function(p){
+      var row=el("div","rr"); row.setAttribute("data-s",p.a.status);
+      var who=el("div","who"); who.appendChild(el("span","dot")); who.appendChild(el("span","name",p.name));
+      if(p.guest) who.appendChild(el("span","tag","列席"));
+      row.appendChild(who);
+      var right=el("div"); right.style.cssText="display:flex;align-items:center;gap:8px";
+      var seg=el("div","seg");
+      [["present","在場"],["late","遲到"],["absent","缺席"]].forEach(function(pair){
+        var b=el("button",null,pair[1]); b.setAttribute("data-v",pair[0]); if(p.a.status===pair[0])b.classList.add("on");
+        b.onclick=function(){ p.a.status=pair[0]; row.setAttribute("data-s",p.a.status); seg.querySelectorAll("button").forEach(function(x){x.classList.toggle("on",x.getAttribute("data-v")===p.a.status);}); rw.style.display=(p.a.status==="present")?"none":"block"; save(); renderCounts(); renderPreview(); };
+        seg.appendChild(b);
+      });
+      right.appendChild(seg);
+      if(p.guest){ var del=el("button","del","✕"); del.title="移除列席人員"; del.onclick=function(){ state.guests=state.guests.filter(function(x){return x.id!==p.id;}); save(); buildRoster(); buildAgenda(); renderCounts(); renderPreview(); }; right.appendChild(del); }
+      row.appendChild(right);
+      var rw=el("div","reason"); var rin=document.createElement("input"); rin.placeholder="原因（如：出差、特休、事假…）"; rin.value=p.a.reason||"";
+      rin.oninput=function(){ p.a.reason=rin.value; save(); renderPreview(); }; rw.appendChild(rin); rw.style.display=(p.a.status==="present")?"none":"block"; row.appendChild(rw);
+      box.appendChild(row);
+    });
+  }
+
+  function renderTeamMeta(){ $("teamBadge").textContent=state.team.length; $("teamCount").textContent="目前應到人數："+state.team.length+" 人"; }
+  function buildTeam(){
+    var box=$("teamList"); box.innerHTML="";
+    state.team.forEach(function(m,i){
+      var row=el("div","item"); row.style.gridTemplateColumns="30px 1fr auto";
+      row.appendChild(el("div",null,String(i+1)));
+      var inp=document.createElement("input"); inp.value=m.name; inp.oninput=function(){ m.name=inp.value; save(); renderSelects(); buildAgenda(); renderCounts(); renderPreview(); }; row.appendChild(inp);
+      var del=el("button","rm","✕"); del.onclick=function(){ if(state.team.length<=1){toast("至少需保留一位成員");return;} delete state.attendance[m.id]; state.team=state.team.filter(function(x){return x.id!==m.id;}); save(); buildTeam(); renderTeamMeta(); buildRoster(); renderSelects(); buildAgenda(); renderCounts(); renderPreview(); }; row.appendChild(del);
+      box.appendChild(row);
+    });
+  }
+  function addMember(){ var v=$("newMember").value.trim(); if(!v)return; var m={id:uid2(),name:v}; state.team.push(m); state.attendance[m.id]={status:"present",reason:""}; $("newMember").value=""; save(); buildTeam(); renderTeamMeta(); buildRoster(); renderSelects(); buildAgenda(); renderCounts(); renderPreview(); }
+
+  function buildAgenda(){
+    var box=$("agenda"); box.innerHTML=""; var multi=state.agenda.length>1;
+    state.agenda.forEach(function(sec,si){
+      var wrap=el("div","sec"),h=el("div","sec-h");
+      if(multi) h.appendChild(el("div","num",CN[si]||String(si+1)));
+      var tin=document.createElement("input"); tin.className="ttl"; tin.style.cssText="background:transparent;border:0;border-bottom:1.5px solid transparent;color:var(--tx);padding:4px 2px;font-weight:700;font-size:14px"; tin.value=sec.title; tin.placeholder="段落標題（如：業務分享）"; tin.oninput=function(){ sec.title=tin.value; save(); renderPreview(); }; h.appendChild(tin);
+      var rmsec=el("button",null,"移除段落"); rmsec.style.cssText="margin-left:auto;border:0;background:transparent;color:var(--tx3);cursor:pointer;font-size:12px"; rmsec.onclick=function(){ state.agenda.splice(si,1); if(!state.agenda.length)state.agenda.push({id:uid2(),title:"",items:[{id:uid2(),who:"",text:""}]}); save(); buildAgenda(); renderPreview(); }; h.appendChild(rmsec); wrap.appendChild(h);
+      sec.items.forEach(function(it,ii){
+        var item=el("div","item");
+        var who=document.createElement("select"); fillWhoSelect(who, it.who||"");
+        who.onchange=function(){
+          if(who.value==="__other__"){ var nm=prompt("輸入發言人姓名："); nm=(nm||"").trim(); it.who=nm; fillWhoSelect(who,it.who); save(); renderPreview(); return; }
+          it.who=who.value; save(); renderPreview();
+        };
+        var txt=document.createElement("textarea"); txt.placeholder="會議內容…"; txt.value=it.text||""; txt.rows=1; txt.oninput=function(){ it.text=txt.value; save(); renderPreview(); };
+        var rm=el("button","rm","✕"); rm.title="刪除這一項"; rm.onclick=function(){ sec.items.splice(ii,1); if(!sec.items.length)sec.items.push({id:uid2(),who:"",text:""}); save(); buildAgenda(); renderPreview(); };
+        item.appendChild(who); item.appendChild(txt); item.appendChild(rm); wrap.appendChild(item);
+      });
+      var add=el("button","miniadd","＋ 新增項目"); add.onclick=function(){ sec.items.push({id:uid2(),who:"",text:""}); save(); buildAgenda(); renderPreview(); }; wrap.appendChild(add);
+      box.appendChild(wrap);
+    });
+  }
+
+  function agendaHTML(){
+    var out="";
+    state.agenda.forEach(function(sec,si){
+      var head=secLabel(si,sec.title),lis="",has=false;
+      sec.items.forEach(function(it){ var t=(it.text||"").trim(),w=(it.who||"").trim(); if(!t&&!w)return; has=true; lis+="<li>"+(w?"<span class='who'>"+esc(w)+"：</span>":"")+esc(t)+"</li>"; });
+      var body=has?"<ul>"+lis+"</ul>":"<div class='ag-empty'>（尚未填寫）</div>";
+      out+="<tr><td colspan='6' class='ag-body'>"+(head?"<div class='ag-title'>"+esc(head)+"</div>":"")+body+"</td></tr>";
+    });
+    return out;
+  }
+  function renderPreview(){
+    var m=state.meeting,c=counts();
+    var absentTxt=c.absent+" 人"+(reasonStr("absent")?"\n("+reasonStr("absent")+")":"");
+    var lateTxt=c.late+" 人"+(reasonStr("late")?"\n("+reasonStr("late")+")":"");
+    $("sheet").innerHTML=
+      "<table><colgroup><col style='width:15%'><col style='width:19%'><col style='width:15%'><col style='width:19%'><col style='width:15%'><col style='width:17%'></colgroup>"+
+      "<tr class='title'><td colspan='6'>"+esc(m.name||"業務會議")+"記錄</td></tr>"+
+      "<tr class='band'><td colspan='6'>會議資訊</td></tr>"+
+      "<tr><td class='lbl'>會議名稱</td><td class='val'>"+esc(m.name)+"</td><td class='lbl'>應到人數</td><td class='val'>"+c.expected+" 人</td><td class='lbl'>業務簡報／主席</td><td class='val center' rowspan='2'>"+esc(m.chair)+"</td></tr>"+
+      "<tr><td class='lbl'>會議日期</td><td class='val'>"+esc(fmtDate(m.date))+"</td><td class='lbl'>實到人數</td><td class='val'>"+c.actual+" 人</td></tr>"+
+      "<tr><td class='lbl'>會議時間</td><td class='val'>"+esc(m.time)+"</td><td class='lbl'>缺席(原因)</td><td class='val'>"+esc(absentTxt)+"</td><td class='lbl'>紀錄</td><td class='val center' rowspan='2'>"+esc(m.rec)+"</td></tr>"+
+      "<tr><td class='lbl'>會議地點</td><td class='val'>"+esc(m.place)+"</td><td class='lbl'>遲到(原因)</td><td class='val'>"+esc(lateTxt)+"</td></tr>"+
+      "<tr class='band'><td colspan='6'>會議議程</td></tr>"+agendaHTML()+"</table>";
+  }
+
+  function summaryText(){
+    var m=state.meeting,c=counts(),L=[];
+    L.push((m.name||"業務會議")+"記錄");
+    L.push("日期："+(fmtDate(m.date)||"—")+"　時間："+(m.time||"—"));
+    L.push("地點："+(m.place||"—")+"　主席："+(m.chair||"—")+"　紀錄："+(m.rec||"—"));
+    L.push("應到 "+c.expected+" 人／實到 "+c.actual+" 人／缺席 "+c.absent+" 人／遲到 "+c.late+" 人");
+    var ab=reasonStr("absent"); if(ab)L.push("缺席："+ab);
+    var lt=reasonStr("late"); if(lt)L.push("遲到："+lt);
+    L.push("");
+    state.agenda.forEach(function(s,i){
+      var head=secLabel(i,s.title); if(head)L.push(head);
+      s.items.forEach(function(it){ var t=(it.text||"").trim(),w=(it.who||"").trim(); if(!t&&!w)return; L.push("• "+(w?w+"：":"")+t); });
+    });
+    return L.join("\n");
+  }
+  function serialize(){
+    var c=counts();
+    var att=attendees().map(function(p){ return {name:p.name,guest:p.guest,status:p.a.status,reason:(p.a.reason||"")}; });
+    var ag=state.agenda.map(function(s){ return {title:(s.title||""),items:s.items.filter(function(it){return (it.text||"").trim()||(it.who||"").trim();}).map(function(it){return {who:(it.who||""),text:(it.text||"")};})}; });
+    return {
+      schema:"comart.meeting-minutes/v1",
+      id: state._id||null,
+      title: (state.meeting.name||"業務會議")+"記錄　"+(state.meeting.date||""),
+      savedAt: new Date().toISOString(),
+      data:{ meeting:state.meeting, team:state.team, attendance:state.attendance, guests:state.guests, agenda:state.agenda },
+      view:{ expected:c.expected, actual:c.actual, absent:c.absent, late:c.late, attendance:att, agenda:ag, summaryText:summaryText() }
+    };
+  }
+  function hydrate(rec){
+    var d=(rec&&rec.data)?rec.data:rec; if(!d)return;
+    var fm=freshMeeting();
+    state.meeting=d.meeting||fm.meeting;
+    state.team=(d.team&&d.team.length)?d.team:state.team;
+    state.attendance=d.attendance||{};
+    state.guests=d.guests||[];
+    state.agenda=(d.agenda&&d.agenda.length)?d.agenda:fm.agenda;
+    state._id=(rec&&rec.id)?rec.id:null;
+    state.site=(rec&&rec.site)?rec.site:CUR_SITE;
+    save(); initUI(); switchView("main");
+  }
+
+  function store(){
+    return {
+      save:function(r){ return window.MeetingMinutesStore.save(r); },
+      list:function(){ return window.MeetingMinutesStore.list(); },
+      load:function(id){ return window.MeetingMinutesStore.load(id); },
+      remove:function(id){ return window.MeetingMinutesStore.remove(id); }
+    };
+  }
+  function saveRecord(){
+    var rec=serialize();
+    Promise.resolve().then(function(){ return store().save(rec); }).then(function(res){
+      if(res&&res.id){ state._id=res.id; save(); }
+      toast("已儲存到平台");
+      try{ document.dispatchEvent(new CustomEvent("meetingminutes:saved",{detail:rec})); }catch(e){}
+    }).catch(function(e){ toast("儲存失敗："+((e&&e.message)?e.message:"請聯絡系統管理員")); });
+  }
+  function buildSaved(){
+    var box=$("savedList"); box.innerHTML="<div class='hint' style='padding:10px'>載入中…</div>";
+    var siteFilter=($("mm-site-filter")||{}).value||"";
+    Promise.resolve().then(function(){ return store().list(); }).then(function(items){
+      box.innerHTML="";
+      if(siteFilter) items=items.filter(function(it){return it.site===siteFilter;});
+      if(!items||!items.length){ box.innerHTML="<div class='empty-note'>尚無已儲存的紀錄。<br>在「會議記錄」填寫後，點右上角「儲存到平台」即可建立第一筆。</div>"; return; }
+      items.forEach(function(it){
+        var row=el("div","saved-row");
+        var left=el("div");
+        var titleRow=el("div","t"); titleRow.textContent=it.title||"（未命名）";
+        var badge=el("span","site-badge site-"+(it.site||"TW"),({TW:"台灣",CN:"東莞廠",VN:"越南廠"})[it.site]||it.site||"—");
+        titleRow.appendChild(badge);
+        left.appendChild(titleRow);
+        var meta=el("div","m");
+        var v=it.view||{};
+        meta.appendChild(el("span",null,"儲存於 "+fmtWhen(it.savedAt)));
+        if(typeof v.actual==="number") meta.appendChild(el("span",null,"實到 "+v.actual+" 人"));
+        left.appendChild(meta); row.appendChild(left);
+        var ops=el("div","ops");
+        var open=el("button","btn sm","載入"); open.onclick=function(){ loadRecord(it.id); };
+        ops.appendChild(open);
+        var canEdit = window.canEditSite ? window.canEditSite(it.site) : true;
+        if(canEdit){
+          var del=el("button","btn sm danger","刪除"); del.onclick=function(){ if(!confirm("確定刪除這筆紀錄？")) return; Promise.resolve().then(function(){return store().remove(it.id);}).then(function(){ toast("已刪除"); buildSaved(); }).catch(function(e){ toast("刪除失敗："+((e&&e.message)||"")); }); };
+          ops.appendChild(del);
+        }
+        row.appendChild(ops);
+        box.appendChild(row);
+      });
+    }).catch(function(e){ box.innerHTML="<div class='empty-note'>無法載入紀錄："+esc((e&&e.message)||"")+"</div>"; });
+  }
+  function loadRecord(id){
+    Promise.resolve().then(function(){ return store().load(id); }).then(function(rec){ if(!rec){ toast("找不到該筆紀錄"); return; } hydrate(rec); toast("已載入"); }).catch(function(e){ toast("載入失敗"); });
+  }
+  function fmtWhen(iso){ if(!iso)return "—"; var s=String(iso); return s.length>=16?s.slice(0,10)+" "+s.slice(11,16):s; }
+
+  function sendOutlook(){
+    var subject=fileBase();
+    var body=summaryText()+"\n\n（提醒：完整表格請另以匯出的 Excel／PNG／PDF 檔案附加。）";
+    var url="mailto:?subject="+encodeURIComponent(subject)+"&body="+encodeURIComponent(body);
+    try{ window.location.href=url; toast("已開啟郵件草稿，請附上匯出的檔案"); }
+    catch(e){ toast("無法開啟郵件，請改用匯出後手動附加"); }
+  }
+
+  function toast(msg){ boardToast(msg); }
+  function download(blob,name){ var url=URL.createObjectURL(blob); var a=document.createElement("a"); a.href=url; a.download=name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(function(){URL.revokeObjectURL(url);},4000); }
+  function exportPDF(){ window.print(); }
+
+  var PNG_FONT='"PingFang TC","Noto Sans TC","Microsoft JhengHei","Heiti TC","Segoe UI",sans-serif';
+  function wrapLines(ctx,text,maxW){
+    var out=[];
+    String(text==null?"":text).split("\n").forEach(function(para){
+      if(para===""){ out.push(""); return; }
+      var line=""; for(var i=0;i<para.length;i++){ var ch=para[i],test=line+ch; if(ctx.measureText(test).width>maxW&&line!==""){ out.push(line); line=ch; } else line=test; } out.push(line);
+    });
+    return out;
+  }
+  function renderCanvas(scale){
+    var W=820,PAD=10,fr=[0.15,0.19,0.15,0.19,0.15,0.17],x=[0],i;
+    for(i=0;i<6;i++)x.push(x[i]+Math.round(fr[i]*W)); x[6]=W;
+    var meas=document.createElement("canvas").getContext("2d");
+    function setF(b,s){ meas.font=(b?"bold ":"")+s+"px "+PNG_FONT; }
+    function hFor(t,w,b,s,mn){ setF(b,s); return Math.max(mn||30,wrapLines(meas,t,w-2*PAD).length*s*1.5+14); }
+    var m=state.meeting,c=counts(),S=13.5;
+    var absentTxt=c.absent+" 人"+(reasonStr("absent")?"\n("+reasonStr("absent")+")":"");
+    var lateTxt=c.late+" 人"+(reasonStr("late")?"\n("+reasonStr("late")+")":"");
+    var titleH=52,bandH=32,h3=32,h4=32;
+    var h5=Math.max(hFor(m.time,x[2]-x[1],false,S),hFor(absentTxt,x[4]-x[3],false,S));
+    var h6=Math.max(hFor(m.place,x[2]-x[1],false,S),hFor(lateTxt,x[4]-x[3],false,S));
+    var blocks=[];
+    state.agenda.forEach(function(sec,si){
+      var head=secLabel(si,sec.title),lines=[];
+      sec.items.forEach(function(it){ var t=(it.text||"").trim(),w=(it.who||"").trim(); if(!t&&!w)return; lines.push("• "+(w?w+"：":"")+t); });
+      if(!lines.length)lines=["（尚未填寫）"];
+      var text=(head?head+"\n":"")+lines.join("\n"); blocks.push({text:text,h:hFor(text,W,false,S,40)});
+    });
+    var totalH=titleH+bandH+h3+h4+h5+h6+bandH+blocks.reduce(function(a,b){return a+b.h;},0);
+    var canvas=document.createElement("canvas"); canvas.width=Math.round(W*scale); canvas.height=Math.round(totalH*scale);
+    var ctx=canvas.getContext("2d"); ctx.scale(scale,scale); ctx.fillStyle="#ffffff"; ctx.fillRect(0,0,W,totalH); ctx.textBaseline="alphabetic";
+    function cell(cx,cy,cw,ch,text,o){
+      o=o||{}; if(o.fill){ctx.fillStyle=o.fill;ctx.fillRect(cx,cy,cw,ch);} ctx.strokeStyle="#b7bec8"; ctx.lineWidth=1; ctx.strokeRect(cx+0.5,cy+0.5,cw-1,ch-1);
+      var size=o.size||S; ctx.fillStyle="#1a1a1a"; ctx.font=(o.bold?"bold ":"")+size+"px "+PNG_FONT;
+      var lines=wrapLines(ctx,text,cw-2*PAD),lh=size*1.5,th=lines.length*lh,ty=(o.valign==="middle")?cy+(ch-th)/2+size:cy+9+size;
+      lines.forEach(function(ln,idx){ if(o.align==="center"){ctx.textAlign="center";ctx.fillText(ln,cx+cw/2,ty+idx*lh);}else{ctx.textAlign="left";ctx.fillText(ln,cx+PAD,ty+idx*lh);} });
+    }
+    var y=0,LF="#f4f5f7";
+    cell(0,y,W,titleH,(m.name||"業務會議")+"記錄",{fill:"#dfe7f1",bold:true,size:22,align:"center",valign:"middle"}); y+=titleH;
+    cell(0,y,W,bandH,"會議資訊",{fill:"#eef2f7",bold:true,valign:"middle"}); y+=bandH;
+    cell(x[0],y,x[1]-x[0],h3,"會議名稱",{fill:LF,bold:true,align:"center",valign:"middle"}); cell(x[1],y,x[2]-x[1],h3,m.name,{valign:"middle"});
+    cell(x[2],y,x[3]-x[2],h3,"應到人數",{fill:LF,bold:true,align:"center",valign:"middle"}); cell(x[3],y,x[4]-x[3],h3,c.expected+" 人",{valign:"middle"});
+    cell(x[4],y,x[5]-x[4],h3+h4,"業務簡報／主席",{fill:LF,bold:true,align:"center",valign:"middle"}); cell(x[5],y,x[6]-x[5],h3+h4,m.chair,{align:"center",valign:"middle"}); y+=h3;
+    cell(x[0],y,x[1]-x[0],h4,"會議日期",{fill:LF,bold:true,align:"center",valign:"middle"}); cell(x[1],y,x[2]-x[1],h4,fmtDate(m.date),{valign:"middle"});
+    cell(x[2],y,x[3]-x[2],h4,"實到人數",{fill:LF,bold:true,align:"center",valign:"middle"}); cell(x[3],y,x[4]-x[3],h4,c.actual+" 人",{valign:"middle"}); y+=h4;
+    cell(x[0],y,x[1]-x[0],h5,"會議時間",{fill:LF,bold:true,align:"center",valign:"middle"}); cell(x[1],y,x[2]-x[1],h5,m.time,{valign:"middle"});
+    cell(x[2],y,x[3]-x[2],h5,"缺席(原因)",{fill:LF,bold:true,align:"center",valign:"middle"}); cell(x[3],y,x[4]-x[3],h5,absentTxt,{});
+    cell(x[4],y,x[5]-x[4],h5+h6,"紀錄",{fill:LF,bold:true,align:"center",valign:"middle"}); cell(x[5],y,x[6]-x[5],h5+h6,m.rec,{align:"center",valign:"middle"}); y+=h5;
+    cell(x[0],y,x[1]-x[0],h6,"會議地點",{fill:LF,bold:true,align:"center",valign:"middle"}); cell(x[1],y,x[2]-x[1],h6,m.place,{valign:"middle"});
+    cell(x[2],y,x[3]-x[2],h6,"遲到(原因)",{fill:LF,bold:true,align:"center",valign:"middle"}); cell(x[3],y,x[4]-x[3],h6,lateTxt,{}); y+=h6;
+    cell(0,y,W,bandH,"會議議程",{fill:"#eef2f7",bold:true,valign:"middle"}); y+=bandH;
+    blocks.forEach(function(b){ cell(0,y,W,b.h,b.text,{}); y+=b.h; });
+    return canvas;
+  }
+  function exportPNG(){ try{ renderCanvas(2).toBlob(function(blob){ if(!blob){toast("PNG 匯出失敗，請改用 PDF");return;} download(blob,fileBase()+".png"); toast("已匯出 PNG"); },"image/png"); }catch(e){ toast("PNG 匯出失敗，請改用 PDF 列印"); } }
+
+  function crc32(bytes){ var t=crc32._t; if(!t){t=crc32._t=[];for(var n=0;n<256;n++){var c=n;for(var k=0;k<8;k++){c=(c&1)?(0xEDB88320^(c>>>1)):(c>>>1);}t[n]=c>>>0;}} var crc=0^(-1); for(var i=0;i<bytes.length;i++){crc=(crc>>>8)^t[(crc^bytes[i])&0xFF];} return (crc^(-1))>>>0; }
+  function makeZip(files){
+    var enc=new TextEncoder(),local=[],central=[],offset=0;
+    files.forEach(function(f){
+      var nameB=enc.encode(f.name),data=f.data,crc=crc32(data),size=data.length;
+      var lh=new Uint8Array(30+nameB.length),dv=new DataView(lh.buffer);
+      dv.setUint32(0,0x04034b50,true);dv.setUint16(4,20,true);dv.setUint16(6,0x0800,true);dv.setUint16(8,0,true);dv.setUint16(10,0,true);dv.setUint16(12,0x21,true);
+      dv.setUint32(14,crc,true);dv.setUint32(18,size,true);dv.setUint32(22,size,true);dv.setUint16(26,nameB.length,true);dv.setUint16(28,0,true);lh.set(nameB,30);
+      local.push(lh,data);
+      var ch=new Uint8Array(46+nameB.length),cv=new DataView(ch.buffer);
+      cv.setUint32(0,0x02014b50,true);cv.setUint16(4,20,true);cv.setUint16(6,20,true);cv.setUint16(8,0x0800,true);cv.setUint16(10,0,true);cv.setUint16(12,0,true);cv.setUint16(14,0x21,true);
+      cv.setUint32(16,crc,true);cv.setUint32(20,size,true);cv.setUint32(24,size,true);cv.setUint16(28,nameB.length,true);cv.setUint16(30,0,true);cv.setUint16(32,0,true);cv.setUint16(34,0,true);cv.setUint16(36,0,true);cv.setUint32(38,0,true);cv.setUint32(42,offset,true);
+      ch.set(nameB,46);central.push(ch);offset+=lh.length+size;
+    });
+    var cSize=central.reduce(function(a,b){return a+b.length;},0);
+    var eocd=new Uint8Array(22),ev=new DataView(eocd.buffer);
+    ev.setUint32(0,0x06054b50,true);ev.setUint16(8,files.length,true);ev.setUint16(10,files.length,true);ev.setUint32(12,cSize,true);ev.setUint32(16,offset,true);
+    var parts=local.concat(central);parts.push(eocd);
+    return new Blob(parts,{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
+  }
+  function xesc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+  function buildXlsx(){
+    var m=state.meeting,c=counts();
+    var absentTxt=c.absent+" 人"+(reasonStr("absent")?"\n("+reasonStr("absent")+")":"");
+    var lateTxt=c.late+" 人"+(reasonStr("late")?"\n("+reasonStr("late")+")":"");
+    var rows=[]; function cell(ref,v,s){return {ref:ref,v:v,s:s};}
+    rows.push({r:1,ht:26,cells:[cell("B1",(m.name||"業務會議")+"記錄",1)]});
+    rows.push({r:2,ht:20,cells:[cell("B2","會議資訊",2)]});
+    rows.push({r:3,ht:20,cells:[cell("B3","會議名稱",3),cell("C3",m.name,4),cell("D3","應到人數",3),cell("E3",c.expected+" 人",4),cell("F3","業務簡報/主席",3),cell("G3",m.chair,5)]});
+    rows.push({r:4,ht:20,cells:[cell("B4","會議日期",3),cell("C4",fmtDate(m.date),4),cell("D4","實到人數",3),cell("E4",c.actual+" 人",4)]});
+    rows.push({r:5,ht:Math.max(20,absentTxt.split("\n").length*16),cells:[cell("B5","會議時間",3),cell("C5",m.time,4),cell("D5","缺席(原因)",3),cell("E5",absentTxt,4),cell("F5","紀錄",3),cell("G5",m.rec,5)]});
+    rows.push({r:6,ht:Math.max(20,lateTxt.split("\n").length*16),cells:[cell("B6","會議地點",3),cell("C6",m.place,4),cell("D6","遲到(原因)",3),cell("E6",lateTxt,4)]});
+    rows.push({r:7,ht:20,cells:[cell("B7","會議議程",2)]});
+    var merges=["B1:G1","B2:G2","F3:F4","G3:G4","F5:F6","G5:G6","B7:G7"],rn=8;
+    state.agenda.forEach(function(sec,si){
+      var head=secLabel(si,sec.title),lines=head?[head]:[];
+      sec.items.forEach(function(it){ var t=(it.text||"").trim(),w=(it.who||"").trim(); if(!t&&!w)return; lines.push("• "+(w?w+"：":"")+t); });
+      if(!lines.length)lines=["（尚未填寫）"];
+      var text=lines.join("\n"); rows.push({r:rn,ht:Math.max(22,lines.length*16+6),cells:[cell("B"+rn,text,4)]}); merges.push("B"+rn+":G"+rn); rn++;
+    });
+    var sheetRows=rows.map(function(row){ var cs=row.cells.map(function(cl){ return (cl.v===""||cl.v==null)?"<c r=\""+cl.ref+"\" s=\""+cl.s+"\"/>":"<c r=\""+cl.ref+"\" s=\""+cl.s+"\" t=\"inlineStr\"><is><t xml:space=\"preserve\">"+xesc(cl.v)+"</t></is></c>"; }).join(""); return "<row r=\""+row.r+"\" ht=\""+row.ht+"\" customHeight=\"1\">"+cs+"</row>"; }).join("");
+    var mergeXML="<mergeCells count=\""+merges.length+"\">"+merges.map(function(x){return "<mergeCell ref=\""+x+"\"/>";}).join("")+"</mergeCells>";
+    var sheetXml="<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><worksheet xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\"><cols><col min=\"1\" max=\"1\" width=\"2.5\" customWidth=\"1\"/><col min=\"2\" max=\"2\" width=\"14\" customWidth=\"1\"/><col min=\"3\" max=\"3\" width=\"22\" customWidth=\"1\"/><col min=\"4\" max=\"4\" width=\"14\" customWidth=\"1\"/><col min=\"5\" max=\"5\" width=\"30\" customWidth=\"1\"/><col min=\"6\" max=\"6\" width=\"14\" customWidth=\"1\"/><col min=\"7\" max=\"7\" width=\"14\" customWidth=\"1\"/></cols><sheetData>"+sheetRows+"</sheetData>"+mergeXML+"</worksheet>";
+    var styles="<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><styleSheet xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\"><fonts count=\"3\"><font><sz val=\"11\"/><name val=\"Calibri\"/></font><font><b/><sz val=\"16\"/><name val=\"Calibri\"/></font><font><b/><sz val=\"11\"/><name val=\"Calibri\"/></font></fonts><fills count=\"4\"><fill><patternFill patternType=\"none\"/></fill><fill><patternFill patternType=\"gray125\"/></fill><fill><patternFill patternType=\"solid\"><fgColor rgb=\"FFDFE7F1\"/><bgColor indexed=\"64\"/></patternFill></fill><fill><patternFill patternType=\"solid\"><fgColor rgb=\"FFF4F5F7\"/><bgColor indexed=\"64\"/></patternFill></fill></fills><borders count=\"2\"><border><left/><right/><top/><bottom/><diagonal/></border><border><left style=\"thin\"><color rgb=\"FFB7BEC8\"/></left><right style=\"thin\"><color rgb=\"FFB7BEC8\"/></right><top style=\"thin\"><color rgb=\"FFB7BEC8\"/></top><bottom style=\"thin\"><color rgb=\"FFB7BEC8\"/></bottom><diagonal/></border></borders><cellStyleXfs count=\"1\"><xf numFmtId=\"0\" fontId=\"0\" fillId=\"0\" borderId=\"0\"/></cellStyleXfs><cellXfs count=\"6\"><xf numFmtId=\"0\" fontId=\"0\" fillId=\"0\" borderId=\"0\" xfId=\"0\"/><xf numFmtId=\"0\" fontId=\"1\" fillId=\"2\" borderId=\"1\" xfId=\"0\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment horizontal=\"center\" vertical=\"center\" wrapText=\"1\"/></xf><xf numFmtId=\"0\" fontId=\"2\" fillId=\"2\" borderId=\"1\" xfId=\"0\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment horizontal=\"left\" vertical=\"center\"/></xf><xf numFmtId=\"0\" fontId=\"2\" fillId=\"3\" borderId=\"1\" xfId=\"0\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment horizontal=\"center\" vertical=\"center\" wrapText=\"1\"/></xf><xf numFmtId=\"0\" fontId=\"0\" fillId=\"0\" borderId=\"1\" xfId=\"0\" applyFont=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment horizontal=\"left\" vertical=\"top\" wrapText=\"1\"/></xf><xf numFmtId=\"0\" fontId=\"0\" fillId=\"0\" borderId=\"1\" xfId=\"0\" applyFont=\"1\" applyBorder=\"1\" applyAlignment=\"1\"><alignment horizontal=\"center\" vertical=\"center\" wrapText=\"1\"/></xf></cellXfs><cellStyles count=\"1\"><cellStyle name=\"Normal\" xfId=\"0\" builtinId=\"0\"/></cellStyles></styleSheet>";
+    var contentTypes="<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><Types xmlns=\"http://schemas.openxmlformats.org/package/2006/content-types\"><Default Extension=\"rels\" ContentType=\"application/vnd.openxmlformats-package.relationships+xml\"/><Default Extension=\"xml\" ContentType=\"application/xml\"/><Override PartName=\"/xl/workbook.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml\"/><Override PartName=\"/xl/worksheets/sheet1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml\"/><Override PartName=\"/xl/styles.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml\"/></Types>";
+    var rels="<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"><Relationship Id=\"rId1\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument\" Target=\"xl/workbook.xml\"/></Relationships>";
+    var workbook="<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><workbook xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\"><sheets><sheet name=\"會議紀錄\" sheetId=\"1\" r:id=\"rId1\"/></sheets></workbook>";
+    var wbRels="<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"><Relationship Id=\"rId1\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet\" Target=\"worksheets/sheet1.xml\"/><Relationship Id=\"rId2\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles\" Target=\"styles.xml\"/></Relationships>";
+    var enc=new TextEncoder();
+    return makeZip([
+      {name:"[Content_Types].xml",data:enc.encode(contentTypes)},
+      {name:"_rels/.rels",data:enc.encode(rels)},
+      {name:"xl/workbook.xml",data:enc.encode(workbook)},
+      {name:"xl/_rels/workbook.xml.rels",data:enc.encode(wbRels)},
+      {name:"xl/styles.xml",data:enc.encode(styles)},
+      {name:"xl/worksheets/sheet1.xml",data:enc.encode(sheetXml)}
+    ]);
+  }
+  function exportXlsx(){ try{ download(buildXlsx(),fileBase()+".xlsx"); toast("已匯出 Excel"); }catch(e){ toast("Excel 匯出失敗"); } }
+
+  function switchView(v){
+    $("view-main").style.display=(v==="main")?"":"none";
+    $("view-saved").style.display=(v==="saved")?"":"none";
+    $("view-team").style.display=(v==="team")?"":"none";
+    $("tabMeeting").classList.toggle("on",v==="main");
+    $("tabSaved").classList.toggle("on",v==="saved");
+    $("tabTeam").classList.toggle("on",v==="team");
+    if(v==="saved") buildSaved();
+  }
+  $("tabMeeting").onclick=function(){ switchView("main"); };
+  $("tabSaved").onclick=function(){ switchView("saved"); };
+  $("tabTeam").onclick=function(){ switchView("team"); };
+  $("btnRefresh").onclick=function(){ buildSaved(); };
+  $("mm-site-filter").onchange=function(){ buildSaved(); };
+
+  $("btnAllPresent").onclick=function(){ attendees().forEach(function(p){ p.a.status="present"; p.a.reason=""; }); save(); buildRoster(); renderCounts(); renderPreview(); toast("已將全員設為在場"); };
+  $("btnAddGuest").onclick=addGuest; $("guestName").onkeydown=function(e){ if(e.key==="Enter")addGuest(); };
+  function addGuest(){ var v=$("guestName").value.trim(); if(!v)return; state.guests.push({id:uid2(),name:v,status:"present",reason:""}); $("guestName").value=""; save(); buildRoster(); buildAgenda(); renderCounts(); renderPreview(); }
+  $("btnAddMember").onclick=addMember; $("newMember").onkeydown=function(e){ if(e.key==="Enter")addMember(); };
+  $("btnAddSec").onclick=function(){ state.agenda.push({id:uid2(),title:"",items:[{id:uid2(),who:"",text:""}]}); save(); buildAgenda(); renderPreview(); };
+  $("btnReset").onclick=function(){
+    if(!confirm("確定要清空這場會議、建立新的一筆嗎？（團隊名單會保留；已儲存的紀錄不受影響）")) return;
+    var team=state.team,fm=freshMeeting();
+    state.meeting=fm.meeting; state.attendance={}; state.guests=[]; state.agenda=fm.agenda; state.team=team; state._id=null; state.site=CUR_SITE;
+    save(); initUI(); switchView("main"); toast("已建立新的一筆");
+  };
+  $("btnSave").onclick=saveRecord;
+  $("btnSend").onclick=sendOutlook;
+  $("btnPdf").onclick=exportPDF; $("btnPng").onclick=exportPNG; $("btnExcel").onclick=exportXlsx;
+
+  function initUI(){ bindInfo(); renderSelects(); buildRoster(); renderCounts(); buildTeam(); renderTeamMeta(); buildAgenda(); renderPreview(); updateFileHint(); }
+  initUI();
+
+  window.MeetingMinutes={ getRecord:serialize, load:hydrate, save:saveRecord };
+})();
+}
+
+// ═══════════════════════════════════════════════
+// 初始化
+// ═══════════════════════════════════════════════
+async function initBoard() {
+  PORTAL_SESSION = readPortalSession();
+  if (PORTAL_SESSION) {
+    window.PORTAL_SESSION_SITE = PORTAL_SESSION.site || 'TW';
+    document.getElementById('whoBadge').innerHTML =
+      escHtml(PORTAL_SESSION.nameZh || PORTAL_SESSION.nameEn || PORTAL_SESSION.empId) + ' ' + siteBadgeHtml('site', PORTAL_SESSION.site);
+  } else {
+    document.getElementById('whoBadge').textContent = '未登入';
+  }
+  window.canEditSite = canEditSite;
+  await syncUsers();
+  if (PORTAL_SESSION) {
+    window.BIZ_DEFAULT_TEAM = usersBySiteDept(PORTAL_SESSION.site, 'sales').map(userName).filter(Boolean);
+  }
+
+  // 定義業務會議記錄的儲存層介面（銜接 Supabase biz_meeting_minutes）
+  window.MeetingMinutesStore = {
+    save: async function(rec) {
+      if (!PORTAL_SESSION) throw new Error('尚未登入');
+      const isNew = !rec.id;
+      const id = rec.id || uid();
+      if (!isNew) {
+        const existing = await SB.get('biz_meeting_minutes', '?id=eq.' + encodeURIComponent(id) + '&select=site');
+        const ownerSite = existing && existing[0] && existing[0].site;
+        if (ownerSite && !canEditSite(ownerSite)) throw new Error('無權限修改其他中心的紀錄');
+      }
+      const row = {
+        id, site: PORTAL_SESSION.site, title: rec.title || '',
+        meeting_date: (rec.data && rec.data.meeting && rec.data.meeting.date) || null,
+        data: rec.data, view: rec.view,
+        updated_by: PORTAL_SESSION.empId, updated_at: new Date().toISOString(),
+      };
+      if (isNew) { row.created_by = PORTAL_SESSION.empId; row.created_at = new Date().toISOString(); }
+      await SB.upsert('biz_meeting_minutes', row);
+      return { id };
+    },
+    list: async function() {
+      const rows = await SB.get('biz_meeting_minutes', '?select=id,title,updated_at,view,site&order=updated_at.desc&limit=200');
+      return (rows || []).map(r => ({ id: r.id, title: r.title, savedAt: r.updated_at, view: r.view || {}, site: r.site }));
+    },
+    load: async function(id) {
+      const rows = await SB.get('biz_meeting_minutes', '?id=eq.' + encodeURIComponent(id));
+      const r = rows && rows[0];
+      if (!r) return null;
+      return { id: r.id, title: r.title, savedAt: r.updated_at, data: r.data, view: r.view, site: r.site };
+    },
+    remove: async function(id) {
+      const rows = await SB.get('biz_meeting_minutes', '?id=eq.' + encodeURIComponent(id) + '&select=site');
+      const ownerSite = rows && rows[0] && rows[0].site;
+      if (ownerSite && !canEditSite(ownerSite)) throw new Error('無權限刪除其他中心的紀錄');
+      await SB.del('biz_meeting_minutes', 'id=eq.' + encodeURIComponent(id));
+    },
+  };
+
+  bbLoad();
+}
+initBoard();
+</script>
+</body>
+</html>

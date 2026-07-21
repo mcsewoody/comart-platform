@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>COMART Platform v1.64</title>
+<title>COMART Platform v1.65</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script defer src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.js"></script>
 <style>
@@ -158,28 +158,6 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:
 .msg-send-btn{padding:8px 16px;background:var(--ac);color:#fff;border:none;border-radius:var(--r);cursor:pointer;font-size:13px;font-family:var(--ff);align-self:flex-end;flex-shrink:0;}
 .msg-empty{text-align:center;color:var(--tx3);font-size:13px;padding:24px 0;}
 
-/* ─── Bulletin Board View ─── */
-.bb-wrap{max-width:800px;margin:0 auto;padding:24px 20px;width:100%;}
-.bb-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
-.bb-post{background:var(--s1);border:1px solid var(--br);border-radius:var(--rl);padding:18px;margin-bottom:12px;}
-.bb-post-header{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;}
-.bb-post-avatar{width:32px;height:32px;border-radius:50%;background:var(--ac2);color:var(--ac);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;}
-.bb-post-meta{flex:1;}
-.bb-post-author{font-size:13px;font-weight:600;color:var(--tx);}
-.bb-post-time{font-size:11px;color:var(--tx3);}
-.bb-post-pin{font-size:10px;padding:1px 6px;border-radius:10px;background:var(--amb2);color:var(--amb);margin-left:6px;}
-.bb-post-body{font-size:14px;color:var(--tx2);line-height:1.7;white-space:pre-wrap;}
-.bb-post-footer{margin-top:10px;padding-top:8px;border-top:1px solid var(--br);display:flex;gap:8px;align-items:center;}
-.bb-like-btn{padding:3px 10px;border-radius:20px;border:1px solid var(--br);background:transparent;color:var(--tx3);font-size:12px;cursor:pointer;}
-.bb-like-btn:hover,.bb-like-btn.liked{background:var(--red2);border-color:var(--red);color:var(--red);}
-.bb-compose{background:var(--s1);border:1px solid var(--br);border-radius:var(--rl);padding:16px;margin-bottom:16px;}
-.bb-textarea{width:100%;background:var(--s2);border:1px solid var(--br);border-radius:var(--r);padding:10px 12px;color:var(--tx);font-size:14px;font-family:var(--ff);resize:none;outline:none;min-height:80px;}
-.bb-textarea:focus{border-color:var(--ac);}
-.bb-compose-footer{display:flex;gap:8px;justify-content:flex-end;margin-top:8px;align-items:center;}
-.bb-pin-toggle{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--tx3);cursor:pointer;}
-.bb-submit{padding:7px 18px;background:var(--ac);color:#fff;border:none;border-radius:var(--r);cursor:pointer;font-size:13px;font-family:var(--ff);}
-.bb-empty{text-align:center;color:var(--tx3);padding:40px 0;font-size:13px;}
-
 /* ─── Overlays / Modals ─── */
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:500;align-items:center;justify-content:center;padding:20px;}
 .overlay.show{display:flex;}
@@ -250,7 +228,7 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:
   .bottom-nav{display:block;}
   .app-grid{grid-template-columns:1fr 1fr;}
   .dir-grid{grid-template-columns:1fr 1fr;}
-  .home-wrap,.users-wrap,.dir-wrap,.bb-wrap{padding:16px 14px 80px;}
+  .home-wrap,.users-wrap,.dir-wrap{padding:16px 14px 80px;}
 }
 
 .lang-switcher{display:flex;gap:3px;margin-right:6px;}
@@ -313,7 +291,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     <div class="login-logo">
       <div class="login-mark" style="background:transparent"><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="44" height="23"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></div>
       <div class="login-name">COMART Platform</div>
-      <div class="login-sub">Internal Portal · v1.64</div>
+      <div class="login-sub">Internal Portal · v1.65</div>
     </div>
     <form id="loginForm" onsubmit="doLogin();return false;" autocomplete="on">
     <div class="field">
@@ -369,7 +347,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   <div class="topbar">
     <div class="topbar-logo" onclick="switchView('home')">
       <div class="topbar-mark" style="background:transparent"><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="26" height="14"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></div>
-      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.64</span></div>
+      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.65</span></div>
     </div>
     <div class="topbar-right">
       <div class="lang-switcher">
@@ -417,7 +395,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
       <button class="sidebar-item" id="sn-ai" onclick="switchView('ai')">🤖 <span>AI</span></button>
       <button class="sidebar-item" id="sn-directory" onclick="switchView('directory')">👤 <span>Hall of Fame</span></button>
       <button class="sidebar-item" id="sn-kms" onclick="openApp('kms')">🧠 <span>KMS</span></button>
-      <button class="sidebar-item" id="sn-bulletin" onclick="switchView('bulletin')">📢 <span>Bulletin Board</span></button>
+      <button class="sidebar-item" id="sn-bulletin" onclick="openApp('bulletin')">📢 <span>Bulletin Board</span></button>
       <button class="sidebar-item" id="sn-calendar" onclick="switchView('calendar')">📅 <span>Calendar</span></button>
       <button class="sidebar-item" id="sn-admin" onclick="openApp('admin-sys')">🏛 <span>Admin System</span></button>
       <button class="sidebar-item" id="sn-quotation" onclick="openApp('quotation')">💼 <span>Quotation</span></button>
@@ -442,6 +420,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
           <div class="section-title" id="sect-updates">Platform Updates</div>
           <div class="changelog">
+            <div class="cl-item"><div class="cl-dot" style="background:var(--grn)"></div><div><div class="cl-text">v1.65 — 公告欄升級為獨立子系統「公告與紀錄」（/board），新增集團/中心分層公告＋逐人通知、週會紀錄、業務會議記錄三大頁籤</div><div class="cl-date">2026-07 · New</div></div></div>
             <div class="cl-item"><div class="cl-dot" style="background:var(--grn)"></div><div><div class="cl-text">v1.55 — 行政管理系統卡片說明移除「差旅報支」（模組已刪除），五語言同步更新</div><div class="cl-date">2026-07 · Fix</div></div></div>
             <div class="cl-item"><div class="cl-dot" style="background:var(--grn)"></div><div><div class="cl-text">v1.54 — i18n P2：User Modal、Dept/Site Modal、AI 工具欄位、訊息 Popup、用戶篩選器完整五語言化</div><div class="cl-date">2026-06 · i18n</div></div></div>
             <div class="cl-item"><div class="cl-dot" style="background:var(--grn)"></div><div><div class="cl-text">v1.52 — 全面 i18n 修正：日曆/差旅/公佈欄/名人榜/通知所有文字與 UI 元素現依語言設定顯示</div><div class="cl-date">2026-06 · i18n</div></div></div>
@@ -794,25 +773,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
           </div>
         </div>
       </div>
-      <!-- ── BULLETIN BOARD ── -->
-      <div class="view" id="view-bulletin">
-        <div class="bb-wrap">
-          <div class="bb-header">
-            <div style="font-size:18px;font-weight:500;">📢 公告欄 · Bulletin Board</div>
-          </div>
-          <!-- Compose -->
-          <div class="bb-compose" id="bbCompose" style="display:none;">
-            <textarea class="bb-textarea" id="bbContent" placeholder="輸入公告內容…" rows="3"></textarea>
-            <div class="bb-compose-footer">
-              <label class="bb-pin-toggle">
-                <input type="checkbox" id="bbPin" style="accent-color:var(--amb);"> 📌 <span id="bb-pin-label">置頂</span>
-              </label>
-              <button class="bb-submit" id="bb-submit-btn" onclick="submitPost()">發佈</button>
-            </div>
-          </div>
-          <div id="bbList"><div class="bb-empty">載入中…</div></div>
-        </div>
-      </div>
 
       <!-- ── USERS ── -->
       <div class="view" id="view-users">
@@ -889,7 +849,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     <div class="bottom-nav-items">
       <button class="bnav-btn active" id="bn-home" onclick="switchView('home')"><span class="bnav-icon">🏠</span><span class="bnav-label" id="bn-home-lbl">Home</span></button>
       <button class="bnav-btn" id="bn-directory" onclick="switchView('directory')"><span class="bnav-icon">👤</span><span class="bnav-label" id="bn-dir-lbl">名人榜</span></button>
-      <button class="bnav-btn" id="bn-bulletin" onclick="switchView('bulletin')"><span class="bnav-icon">📢</span><span class="bnav-label" id="bn-bb-lbl">公佈欄</span></button>
+      <button class="bnav-btn" id="bn-bulletin" onclick="openApp('bulletin')"><span class="bnav-icon">📢</span><span class="bnav-label" id="bn-bb-lbl">公佈欄</span></button>
       <button class="bnav-btn" id="bn-users" onclick="switchView('users')" style="display:none;"><span class="bnav-icon">⚙</span><span class="bnav-label" id="bn-users-lbl">Users</span></button>
     </div>
   </div>
@@ -1284,7 +1244,6 @@ function enterPortal() {
   const isAdmin = s.role === 'admin';
   document.getElementById('sn-users').style.display = isAdmin ? '' : 'none';
   document.getElementById('bn-users').style.display = isAdmin ? '' : 'none';
-  document.getElementById('bbCompose').style.display = isAdmin ? '' : 'none';
   const settBtn = document.getElementById('settingsTopBtn'); if(settBtn) settBtn.style.display = isAdmin ? '' : 'none';
   var addTripBtn = document.getElementById('addTripBtn'); if(addTripBtn) addTripBtn.style.display = (isAdmin || s.role === 'dcc') ? '' : 'none';
 
@@ -1411,7 +1370,7 @@ const APPS = [
   { id:'ai',         label:'AI',             labelZh:'AI',           desc:'AI translation, chat & business tools', icon:'🤖', bg:'#130A2A', internal:true,  roles:[] },
   { id:'directory',  label:'Hall of Fame',   labelZh:'名人榜',       desc:'Employee directory, contacts & discussions', icon:'👤', bg:'#0A1A2E', internal:true, roles:[] },
   { id:'kms',        label:'KMS',            labelZh:'知識管理',     desc:'Knowledge Management — AI Q&A, document library', icon:'🧠', bg:'#0A2A1A', internal:false, path:'./kms/index.html', roles:[] },
-  { id:'bulletin',   label:'Bulletin Board', labelZh:'公告欄',       desc:'Company announcements and notices', icon:'📢', bg:'#1A1A08', internal:true, roles:[] },
+  { id:'bulletin',   label:'Bulletin Board', labelZh:'公告與紀錄',   desc:'Announcements, weekly minutes & meeting records', icon:'📢', bg:'#1A1A08', internal:false, path:'./board/index.html', roles:[] },
   { id:'calendar',   label:'Calendar',       labelZh:'集團行事曆',   desc:'Business trip management & flight tracking', icon:'📅', bg:'#0A1A1A', internal:true,  roles:[] },
   { id:'admin-sys',  label:'Admin System',   labelZh:'行政管理系統', desc:'Library · Fleet · Meetings · Visits', icon:'🏛', bg:'#1A0A1A', internal:false, path:'./admin/index.html', roles:[] },
   { id:'quotation',  label:'Quotation',      labelZh:'報價管理系統', desc:'Product quotations, CRM & AI tools', icon:'💼', bg:'#0F2A4A', internal:false, path:'https://platform.comart.com.tw/quotation/index.html', roles:[] },
@@ -1473,7 +1432,6 @@ function switchView(name) {
   if (bn) bn.classList.add('active');
 
   if (name === 'directory') loadDirectory();
-  if (name === 'bulletin')  loadBulletin();
   if (name === 'users')     loadUsers();
   if (name === 'calendar')  initCalendar();
   // 切換頁面後重跑 i18n
@@ -1830,90 +1788,6 @@ function renderDirectory() {
 
   // 非同步載入各員工留言數
   loadMessageCounts(users.map(function(u) { return u.empId; }));
-}
-
-// ═══════════════════════════════════════════════
-// BULLETIN BOARD
-// ═══════════════════════════════════════════════
-let BB_POSTS = [];
-
-async function loadBulletin() {
-  try {
-    const rows = await SB.get('portal_bulletin', 'order=ts.desc&limit=50');
-    BB_POSTS = rows || [];
-  } catch(e) { BB_POSTS = []; }
-  renderBulletin();
-}
-
-function renderBulletin() {
-  const list = document.getElementById('bbList');
-  if (!BB_POSTS.length) { list.innerHTML = '<div class="bb-empty">' + t('bb_empty') + '</div>'; return; }
-
-  const sorted = [...BB_POSTS].sort((a,b) => (b.pinned||0) - (a.pinned||0) || b.ts - a.ts);
-  list.innerHTML = sorted.map(p => {
-    const init = (p.authorName || '?')[0].toUpperCase();
-    const dt = new Date(p.ts).toLocaleString('zh-TW', { month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit' });
-    const liked = (p.likes||[]).includes(SESSION?.empId);
-    return `<div class="bb-post" id="bbp-${p.id}">
-      <div class="bb-post-header">
-        <div class="bb-post-avatar">${init}</div>
-        <div class="bb-post-meta">
-          <div class="bb-post-author">${escHtml(p.authorName || p.authorId)}
-            ${p.pinned ? '<span class="bb-post-pin">📌 ' + t('bb_pin') + '</span>' : ''}
-          </div>
-          <div class="bb-post-time">${dt}</div>
-        </div>
-        ${SESSION?.role === 'admin' ? `<button onclick="deletePost('${p.id}')" style="padding:2px 8px;border-radius:5px;border:1px solid var(--br);background:transparent;color:var(--tx3);font-size:11px;cursor:pointer;flex-shrink:0;">✕</button>` : ''}
-      </div>
-      <div class="bb-post-body">${escHtml(p.body)}</div>
-      <div class="bb-post-footer">
-        <button class="bb-like-btn${liked?' liked':''}" onclick="toggleLike('${p.id}')">
-          ❤ ${(p.likes||[]).length || ''}
-        </button>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-
-async function submitPost() {
-  const body = document.getElementById('bbContent').value.trim();
-  if (!body) { toast(t('bb_req_body'), 'err'); return; }
-  const pinned = document.getElementById('bbPin').checked;
-
-  const post = {
-    body, pinned: pinned ? 1 : 0,
-    authorId: SESSION.empId,
-    authorName: SESSION.nameEn || SESSION.nameZh || SESSION.empId,
-    ts: Date.now(), likes: [],
-  };
-
-  try { await SB.post('portal_bulletin', { ...post, id: uid() }); }
-  catch(e) { toast(t('bb_post_fail') + e.message, 'err'); return; }
-  document.getElementById('bbContent').value = '';
-  document.getElementById('bbPin').checked = false;
-  await loadBulletin();
-  toast(t('bb_post_ok'), 'ok');
-}
-
-async function toggleLike(postId) {
-  const post = BB_POSTS.find(p => p.id === postId);
-  if (!post) return;
-  const empId = SESSION.empId;
-  const likes = post.likes || [];
-  const newLikes = likes.includes(empId) ? likes.filter(l=>l!==empId) : [...likes, empId];
-  post.likes = newLikes;
-  SB.patch('portal_bulletin', 'id=eq.'+encodeURIComponent(postId), { likes: newLikes }).catch(()=>{});
-  renderBulletin();
-}
-
-async function deletePost(postId) {
-  if (!confirm(t('bb_delete_confirm'))) return;
-  try { await SB.delete('portal_bulletin', 'id=eq.'+encodeURIComponent(postId)); }
-  catch(e) { toast(t('bb_delete_fail'),'err'); return; }
-  BB_POSTS = BB_POSTS.filter(p => p.id !== postId);
-  renderBulletin();
-  toast(t('bb_delete_ok'),'ok');
 }
 
 // ═══════════════════════════════════════════════
@@ -2589,13 +2463,13 @@ function toast(msg, type='') {
 let LANG = 'en';
 const I18N = {
   en: {
-    home:'Home', directory:'Hall of Fame', bulletin:'Bulletin Board', calendar:'Calendar',
+    home:'Home', directory:'Hall of Fame', bulletin:'Board', calendar:'Calendar',
     ai:'AI Tools', users:'User Mgmt', signout:'Sign Out', signout_confirm:'Sign out of COMART Platform?',
     // cards
     card_ai_name:'AI Tools', card_ai_desc:'AI translation, chat & business tools',
     card_directory_name:'Hall of Fame', card_directory_desc:'Employee directory, contacts & discussions',
     card_kms_name:'KMS', card_kms_desc:'Knowledge Management — AI Q&A, document library',
-    card_bulletin_name:'Bulletin Board', card_bulletin_desc:'Company announcements and notices',
+    card_bulletin_name:'Board', card_bulletin_desc:'Announcements, weekly minutes & meeting records',
     card_calendar_name:'Calendar', card_calendar_desc:'Business trip management & flight tracking',
     card_admin_sys_name:'Admin System', card_admin_sys_desc:'Library · Fleet · Meetings · Visits',
     card_quotation_name:'Quotation', card_quotation_desc:'Product quotations, CRM & AI tools',
@@ -2606,8 +2480,6 @@ const I18N = {
     // dir
     dir_title:'Hall of Fame · Employee Directory', dir_search:'Search name, title…',
     dir_tab_contacts:'Contacts', dir_tab_ranking:'Knowledge Ranking',
-    // bulletin
-    bb_pin:'Pin', bb_post:'Post', bb_placeholder:'Write a company announcement…', bb_empty:'No posts yet.',
     // calendar
     cal_save:'Save', cal_cancel:'Cancel', cal_delete:'Delete',
     // trip modal
@@ -2653,9 +2525,6 @@ const I18N = {
     cal_add_btn:'＋ Add ▾',
     // new keys
     dir_no_results:'No employees found.',
-    bb_req_body:'Please enter announcement text',
-    bb_post_ok:'Published', bb_post_fail:'Post failed:',
-    bb_delete_ok:'Deleted', bb_delete_fail:'Delete failed', bb_delete_confirm:'Delete this post?',
     cal_evt_updated:'Event updated', cal_evt_added:'Event added',
     cal_evt_save_fail:'Save failed:',
     cal_evt_delete_ok:'Event deleted', cal_evt_delete_fail:'Delete failed:', cal_evt_delete_confirm:'Delete this event?',
@@ -2668,12 +2537,12 @@ const I18N = {
     // general
     },
   'zh-TW': {
-    home:'首頁', directory:'名人榜', bulletin:'公告欄', calendar:'集團行事曆',
+    home:'首頁', directory:'名人榜', bulletin:'公告與紀錄', calendar:'集團行事曆',
     ai:'AI 工具', users:'用戶管理', signout:'登出', signout_confirm:'確定登出？',
     card_ai_name:'AI 工具', card_ai_desc:'AI 翻譯、對話與商業工具',
     card_directory_name:'名人榜', card_directory_desc:'員工通訊錄、聯絡方式與留言',
     card_kms_name:'知識管理', card_kms_desc:'KMS — AI 問答、文件庫',
-    card_bulletin_name:'公告欄', card_bulletin_desc:'公司公告與通知',
+    card_bulletin_name:'公告與紀錄', card_bulletin_desc:'公告、週會紀錄與業務會議記錄',
     card_calendar_name:'集團行事曆', card_calendar_desc:'商務差旅管理與航班追蹤',
     card_admin_sys_name:'行政管理系統', card_admin_sys_desc:'圖書館 · 公務車 · 會議室 · 客戶到訪',
     card_quotation_name:'報價管理系統', card_quotation_desc:'產品報價、CRM 與 AI 工具',
@@ -2681,7 +2550,6 @@ const I18N = {
     settings:'設定',
     dir_title:'名人榜 · 員工通訊錄', dir_search:'搜尋姓名、職稱…',
     dir_tab_contacts:'通訊錄', dir_tab_ranking:'知識貢獻排行',
-    bb_pin:'置頂', bb_post:'發佈', bb_placeholder:'撰寫公司公告…', bb_empty:'目前沒有公告。',
     cal_save:'儲存', cal_cancel:'取消', cal_delete:'刪除',
     trip_title_new:'新增差旅', trip_title_edit:'編輯差旅',
     trip_staff:'員工', trip_date_from:'出發日期', trip_date_to:'返回日期',
@@ -2715,9 +2583,6 @@ const I18N = {
     dir_ranking_desc:'以 KMS 知識庫發文數量計算 · 每月更新',
     cal_add_btn:'＋ 新增 ▾',
     dir_no_results:'找不到員工。',
-    bb_req_body:'請輸入公告內容',
-    bb_post_ok:'已發佈', bb_post_fail:'發佈失敗：',
-    bb_delete_ok:'已刪除', bb_delete_fail:'刪除失敗', bb_delete_confirm:'刪除此公告？',
     cal_evt_updated:'事件已更新', cal_evt_added:'事件已新增',
     cal_evt_save_fail:'儲存失敗：',
     cal_evt_delete_ok:'事件已刪除', cal_evt_delete_fail:'刪除失敗：', cal_evt_delete_confirm:'刪除此事件？',
@@ -2729,12 +2594,12 @@ const I18N = {
     cal_sidebar_title:'日曆', cal_max_cats:'最多同時顯示 4 個日曆（已達上限）'
   },
   'zh-CN': {
-    home:'首页', directory:'员工通讯录', bulletin:'公告栏', calendar:'集团行程',
+    home:'首页', directory:'员工通讯录', bulletin:'公告与记录', calendar:'集团行程',
     ai:'AI 工具', users:'用户管理', signout:'退出', signout_confirm:'确定退出？',
     card_ai_name:'AI 工具', card_ai_desc:'AI 翻译、对话与商业工具',
     card_directory_name:'员工通讯录', card_directory_desc:'员工目录、联系方式与留言',
     card_kms_name:'知识管理', card_kms_desc:'KMS — AI 问答、文件库',
-    card_bulletin_name:'公告栏', card_bulletin_desc:'公司公告与通知',
+    card_bulletin_name:'公告与记录', card_bulletin_desc:'公告、周会记录与业务会议记录',
     card_calendar_name:'集团行程', card_calendar_desc:'商务差旅管理与航班追踪',
     card_admin_sys_name:'行政管理系统', card_admin_sys_desc:'图书馆 · 公务车 · 会议室 · 客户来访',
     card_quotation_name:'报价管理系统', card_quotation_desc:'产品报价、CRM 与 AI 工具',
@@ -2742,7 +2607,6 @@ const I18N = {
     settings:'设置',
     dir_title:'员工通讯录', dir_search:'搜索姓名、职称…',
     dir_tab_contacts:'通讯录', dir_tab_ranking:'知识贡献排行',
-    bb_pin:'置顶', bb_post:'发布', bb_placeholder:'撰写公司公告…', bb_empty:'暂无公告。',
     cal_save:'保存', cal_cancel:'取消', cal_delete:'删除',
     trip_title_new:'新建出差', trip_title_edit:'编辑出差',
     trip_staff:'员工', trip_date_from:'出发日期', trip_date_to:'返回日期',
@@ -2776,9 +2640,6 @@ const I18N = {
     dir_ranking_desc:'以 KMS 知识库发文数量计算 · 每月更新',
     cal_add_btn:'＋ 新增 ▾',
     dir_no_results:'未找到员工。',
-    bb_req_body:'请输入公告内容',
-    bb_post_ok:'已发布', bb_post_fail:'发布失败：',
-    bb_delete_ok:'已删除', bb_delete_fail:'删除失败', bb_delete_confirm:'删除此公告？',
     cal_evt_updated:'事件已更新', cal_evt_added:'事件已添加',
     cal_evt_save_fail:'保存失败：',
     cal_evt_delete_ok:'事件已删除', cal_evt_delete_fail:'删除失败：', cal_evt_delete_confirm:'删除此事件？',
@@ -2790,12 +2651,12 @@ const I18N = {
     cal_sidebar_title:'日历', cal_max_cats:'最多同时显示 4 个日历（已达上限）'
   },
   vi: {
-    home:'Trang chủ', directory:'Danh bạ', bulletin:'Thông báo', calendar:'Lịch',
+    home:'Trang chủ', directory:'Danh bạ', bulletin:'Bảng tin', calendar:'Lịch',
     ai:'Công cụ AI', users:'Quản lý User', signout:'Đăng xuất', signout_confirm:'Đăng xuất?',
     card_ai_name:'Công cụ AI', card_ai_desc:'Dịch thuật AI, trò chuyện & công cụ kinh doanh',
     card_directory_name:'Danh bạ', card_directory_desc:'Danh bạ nhân viên, liên lạc & thảo luận',
     card_kms_name:'KMS', card_kms_desc:'Quản lý tri thức — AI Q&A, thư viện tài liệu',
-    card_bulletin_name:'Thông báo', card_bulletin_desc:'Thông báo công ty',
+    card_bulletin_name:'Bảng tin', card_bulletin_desc:'Thông báo, biên bản họp tuần & họp kinh doanh',
     card_calendar_name:'Lịch', card_calendar_desc:'Quản lý công tác & theo dõi chuyến bay',
     card_admin_sys_name:'Hệ thống HC', card_admin_sys_desc:'Thư viện · Xe công · Phòng họp · Khách thăm',
     card_quotation_name:'Báo giá', card_quotation_desc:'Báo giá sản phẩm, CRM & AI',
@@ -2803,7 +2664,6 @@ const I18N = {
     settings:'Cài đặt',
     dir_title:'Danh bạ nhân viên', dir_search:'Tìm tên, chức vụ…',
     dir_tab_contacts:'Danh bạ', dir_tab_ranking:'Xếp hạng đóng góp',
-    bb_pin:'Ghim', bb_post:'Đăng', bb_placeholder:'Viết thông báo công ty…', bb_empty:'Chưa có thông báo.',
     cal_save:'Lưu', cal_cancel:'Hủy', cal_delete:'Xóa',
     trip_title_new:'Thêm công tác', trip_title_edit:'Sửa công tác',
     trip_staff:'Nhân viên', trip_date_from:'Ngày đi', trip_date_to:'Ngày về',
@@ -2837,9 +2697,6 @@ const I18N = {
     dir_ranking_desc:'Xếp hạng theo số bài đóng góp vào KMS · Cập nhật hàng tháng',
     cal_add_btn:'＋ Thêm ▾',
     dir_no_results:'Không tìm thấy nhân viên.',
-    bb_req_body:'Vui lòng nhập nội dung thông báo',
-    bb_post_ok:'Đã đăng', bb_post_fail:'Đăng thất bại:',
-    bb_delete_ok:'Đã xóa', bb_delete_fail:'Xóa thất bại', bb_delete_confirm:'Xóa thông báo này?',
     cal_evt_updated:'Đã cập nhật sự kiện', cal_evt_added:'Đã thêm sự kiện',
     cal_evt_save_fail:'Lưu thất bại:',
     cal_evt_delete_ok:'Đã xóa sự kiện', cal_evt_delete_fail:'Xóa thất bại:', cal_evt_delete_confirm:'Xóa sự kiện này?',
@@ -2851,12 +2708,12 @@ const I18N = {
     cal_sidebar_title:'Lịch', cal_max_cats:'Tối đa 4 lịch cùng lúc (đã đạt giới hạn)'
   },
   ja: {
-    home:'ホーム', directory:'社員名鑑', bulletin:'掲示板', calendar:'行程管理',
+    home:'ホーム', directory:'社員名鑑', bulletin:'掲示板・議事録', calendar:'行程管理',
     ai:'AI ツール', users:'ユーザー管理', signout:'ログアウト', signout_confirm:'ログアウトしますか？',
     card_ai_name:'AI ツール', card_ai_desc:'AI翻訳・チャット・ビジネスツール',
     card_directory_name:'社員名鑑', card_directory_desc:'社員ディレクトリ・連絡先・コメント',
     card_kms_name:'KMS', card_kms_desc:'ナレッジ管理 — AI Q&A・ドキュメント',
-    card_bulletin_name:'掲示板', card_bulletin_desc:'会社のお知らせ',
+    card_bulletin_name:'掲示板・議事録', card_bulletin_desc:'お知らせ・週会議事録・業務会議記録',
     card_calendar_name:'行程管理', card_calendar_desc:'出張管理・フライト追跡',
     card_admin_sys_name:'総務管理', card_admin_sys_desc:'図書・車両・会議室・来客',
     card_quotation_name:'見積', card_quotation_desc:'製品見積・CRM・AIツール',
@@ -2864,7 +2721,6 @@ const I18N = {
     settings:'設定',
     dir_title:'社員名鑑', dir_search:'名前・役職で検索…',
     dir_tab_contacts:'連絡先', dir_tab_ranking:'知識貢献ランキング',
-    bb_pin:'固定', bb_post:'投稿', bb_placeholder:'会社のお知らせを入力…', bb_empty:'投稿はありません。',
     cal_save:'保存', cal_cancel:'キャンセル', cal_delete:'削除',
     trip_title_new:'新規出張', trip_title_edit:'出張編集',
     trip_staff:'担当者', trip_date_from:'出発日', trip_date_to:'帰着日',
@@ -2898,9 +2754,6 @@ const I18N = {
     dir_ranking_desc:'KMSへの投稿数でランキング · 毎月更新',
     cal_add_btn:'＋ 追加 ▾',
     dir_no_results:'社員が見つかりません。',
-    bb_req_body:'お知らせ内容を入力してください',
-    bb_post_ok:'投稿しました', bb_post_fail:'投稿失敗：',
-    bb_delete_ok:'削除しました', bb_delete_fail:'削除失敗', bb_delete_confirm:'この投稿を削除しますか？',
     cal_evt_updated:'イベントを更新しました', cal_evt_added:'イベントを追加しました',
     cal_evt_save_fail:'保存失敗：',
     cal_evt_delete_ok:'イベントを削除しました', cal_evt_delete_fail:'削除失敗：', cal_evt_delete_confirm:'このイベントを削除しますか？',
@@ -2938,7 +2791,7 @@ function applyI18nAll() {
     'sn-ai':        { en:'AI',           'zh-TW':'AI',        'zh-CN':'AI',        vi:'AI',             ja:'AI' },
     'sn-directory': { en:'Hall of Fame', 'zh-TW':'名人榜',    'zh-CN':'员工通讯录', vi:'Danh bạ',        ja:'社員名鑑' },
     'sn-kms':       { en:'KMS',          'zh-TW':'知識管理',  'zh-CN':'知识管理',  vi:'KMS',            ja:'KMS' },
-    'sn-bulletin':  { en:'Bulletin Board','zh-TW':'公告欄',   'zh-CN':'公告栏',    vi:'Thông báo',      ja:'掲示板' },
+    'sn-bulletin':  { en:'Board','zh-TW':'公告與紀錄',   'zh-CN':'公告与记录',    vi:'Bảng tin',      ja:'掲示板・議事録' },
     'sn-calendar':  { en:'Calendar',     'zh-TW':'集團行事曆','zh-CN':'集团行程',  vi:'Lịch',           ja:'行程管理' },
     'sn-admin':     { en:'Admin System', 'zh-TW':'行政管理系統','zh-CN':'行政管理系统',vi:'Hệ thống HC',  ja:'総務管理' },
     'sn-quotation': { en:'Quotation',    'zh-TW':'報價系統',  'zh-CN':'报价系统',  vi:'Báo giá',        ja:'見積' },
@@ -3019,14 +2872,6 @@ function applyI18nAll() {
   if (tabContacts) tabContacts.innerHTML = '📋 ' + t('dir_tab_contacts');
   var tabRanking = document.getElementById('dir-tab-ranking');
   if (tabRanking) tabRanking.innerHTML = '🏆 ' + t('dir_tab_ranking');
-
-  // Bulletin
-  var bbTextarea = document.getElementById('bbContent');
-  if (bbTextarea) bbTextarea.placeholder = t('bb_placeholder');
-  var bbSubmit = document.getElementById('bb-submit-btn');
-  if (bbSubmit) bbSubmit.textContent = t('bb_post');
-  var bbPinLabel = document.getElementById('bb-pin-label');
-  if (bbPinLabel) bbPinLabel.textContent = t('bb_pin');
 
   // Calendar
   // addTripBtn 是包含 dropdown 的 div，只更新裡面的按鈕文字

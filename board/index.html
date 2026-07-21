@@ -5,7 +5,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#080C14">
-<title>COMART · 公告與紀錄 v1.09</title>
+<title>COMART · 公告與紀錄 v1.10</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -202,7 +202,7 @@ select,select option,option{background:var(--s2);color:var(--tx)}
     <a class="logo" href="javascript:void(0)">
       <div class="logo-mark">告</div>
       <div class="logo-text">公告與紀錄</div>
-      <span class="logo-ver">v1.09</span>
+      <span class="logo-ver">v1.10</span>
     </a>
     <div class="topbar-right">
       <span class="who-badge" id="whoBadge">—</span>
@@ -464,6 +464,7 @@ select,select option,option{background:var(--s2);color:var(--tx)}
         <button class="btn ghost sm" onclick="wrBackToList()">← 返回列表</button>
         <div style="margin-left:auto;display:flex;gap:6px;align-items:center;padding:6px 0;flex-wrap:wrap">
           <button class="btn sm danger" id="wr-del-btn" style="display:none" onclick="wrDeleteCurrent()">🗑 刪除</button>
+          <button class="btn sm" onclick="wrMail()">✉️ 寄送</button>
           <button class="btn sm" onclick="wrPrint()">🖨️ 列印全文</button>
           <button class="btn sm" onclick="wrCancel()">✕ 取消</button>
           <button class="btn primary sm" id="wr-save-btn" onclick="wrSave()">✓ 儲存到平台</button>
@@ -1861,6 +1862,29 @@ async function wrSave(){
   wrBackToList();
 }
 
+// 週報內文（純文字，供 mailto 使用）：各段落 + 固定 OKR原則 + 知識學習平台
+function wrMailText(){
+  const s = wrState, L = [];
+  L.push('COMART Weekly Report');
+  L.push((s.report_date||'') + (s.author_name ? '  ' + s.author_name : ''));
+  L.push('');
+  WR_SECTIONS.forEach(sec => {
+    const v = (s[sec.key]||'').trim(); if(!v) return;
+    L.push(sec.label + '：'); L.push(v); L.push('');
+  });
+  L.push('OKR 原則：');
+  WR_OKR.forEach((x,i) => L.push((i+1) + '. ' + x));
+  L.push('');
+  L.push('知識學習平台：');
+  WR_LEARN.forEach((x,i) => L.push('＃' + (i+1) + '：' + x));
+  return L.join('\n');
+}
+function wrMail(){
+  const subject = 'Woody 週報 ' + (wrState.report_date || '');
+  const url = 'mailto:all@comart.com.tw?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(wrMailText());
+  try{ window.location.href = url; boardToast('已開啟郵件草稿（收件人 all@comart.com.tw）'); }
+  catch(e){ boardToast('無法開啟郵件'); }
+}
 function wrPrint(){
   const w = window.open('','_blank');
   if(!w){ boardToast('請允許彈出視窗以列印'); return; }

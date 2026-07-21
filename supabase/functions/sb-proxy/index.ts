@@ -46,6 +46,7 @@ const ALLOWED_TABLES = new Set([
   "logs","notifications","portal_bulletin","portal_messages","price_history",
   "products","quotation_settings","quotes","room_bookings","room_faults",
   "sites","suppliers","trips","users","visit_guests","visit_records","weekly_minutes",
+  "woody_reports",
 ])
 
 function json(obj: unknown, status = 200) {

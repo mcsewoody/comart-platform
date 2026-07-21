@@ -5,7 +5,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#080C14">
-<title>COMART · 公告與紀錄 v1.08</title>
+<title>COMART · 公告與紀錄 v1.09</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -202,7 +202,7 @@ select,select option,option{background:var(--s2);color:var(--tx)}
     <a class="logo" href="javascript:void(0)">
       <div class="logo-mark">告</div>
       <div class="logo-text">公告與紀錄</div>
-      <span class="logo-ver">v1.08</span>
+      <span class="logo-ver">v1.09</span>
     </a>
     <div class="topbar-right">
       <span class="who-badge" id="whoBadge">—</span>
@@ -463,9 +463,10 @@ select,select option,option{background:var(--s2);color:var(--tx)}
       <div class="tabbar" style="max-width:none;padding:0;margin-bottom:16px;border-bottom:1px solid var(--br)">
         <button class="btn ghost sm" onclick="wrBackToList()">← 返回列表</button>
         <div style="margin-left:auto;display:flex;gap:6px;align-items:center;padding:6px 0;flex-wrap:wrap">
+          <button class="btn sm danger" id="wr-del-btn" style="display:none" onclick="wrDeleteCurrent()">🗑 刪除</button>
           <button class="btn sm" onclick="wrPrint()">🖨️ 列印全文</button>
           <button class="btn sm" onclick="wrCancel()">✕ 取消</button>
-          <button class="btn primary sm" onclick="wrSave()">✓ 儲存到平台</button>
+          <button class="btn primary sm" id="wr-save-btn" onclick="wrSave()">✓ 儲存到平台</button>
         </div>
       </div>
       <div class="grid2">
@@ -1718,7 +1719,6 @@ const WR_SECTIONS = [
 let WR_LIST = [];
 let wrState = null;
 
-function wrCanEdit(rec){ return isAdmin() || (PORTAL_SESSION && rec && rec.author_id === PORTAL_SESSION.empId); }
 function wrFreshState(){
   const today = new Date().toISOString().slice(0,10);
   return { id:null, report_date:today, work:"", plan:"", reflections:"", intel:"", feedback:"", other:"",
@@ -1743,12 +1743,34 @@ function wrRenderList(){
   let rows = WR_LIST;
   if(q) rows = rows.filter(r => ((r.report_date||"")+" "+(r.reflections||"")+" "+(r.intel||"")+" "+(r.feedback||"")+" "+(r.author_name||"")).toLowerCase().includes(q));
   if(!rows.length){ box.innerHTML = '<div class="empty-note">'+(q?'查無符合的週報。':'尚無週報，點右上角「＋ 新增週報」建立第一筆。')+'</div>'; return; }
+  const woody = wrIsWoody();
   box.innerHTML = rows.map(r => {
     return '<div class="saved-row" style="cursor:pointer" onclick="wrOpenRead(\''+r.id+'\')" title="點擊開啟完整週報">'+
       '<div><div class="t">'+escHtml(r.report_date||'')+' <span class="site-badge site-group">週報</span></div>'+
       '<div class="m"><span>撰寫：'+escHtml(r.author_name||'—')+'</span><span>'+escHtml(wrSnippet(r))+'</span></div></div>'+
-      '<div class="ops"><span class="btn sm">開啟閱讀 ↗</span></div></div>';
+      '<div class="ops"><span class="btn sm">開啟閱讀 ↗</span>'+
+      (woody?'<button class="btn sm" onclick="event.stopPropagation();wrOpenReport(\''+r.id+'\')">✎ 編輯</button>':'')+
+      '</div></div>';
   }).join('');
+}
+// 僅 Woody（C00001）可編輯／刪除
+function wrIsWoody(){ return PORTAL_SESSION && PORTAL_SESSION.empId === 'C00001'; }
+async function wrOpenReport(id){
+  try{
+    const rows = await SB.get('woody_reports', '?id=eq.'+encodeURIComponent(id));
+    const r = rows && rows[0];
+    if(!r){ boardToast('找不到該筆週報'); return; }
+    wrState = { id:r.id, report_date:r.report_date, work:r.work||'', plan:r.plan||'', reflections:r.reflections||'', intel:r.intel||'', feedback:r.feedback||'', other:r.other||'', author_id:r.author_id||'', author_name:r.author_name||'' };
+    wrOpenEditor();
+  }catch(e){ boardToast('載入失敗'); }
+}
+async function wrDeleteCurrent(){
+  if(!wrState || !wrState.id){ boardToast('此筆尚未儲存，無需刪除'); return; }
+  if(!wrIsWoody()){ boardToast('僅 Woody 可刪除'); return; }
+  if(!confirm('確定刪除這筆週報？此動作無法復原。')) return;
+  try{ await SB.del('woody_reports', 'id=eq.'+encodeURIComponent(wrState.id)); }
+  catch(e){ boardToast('刪除失敗'); return; }
+  boardToast('已刪除'); wrBackToList();
 }
 
 // 點擊列表 → 開新視窗，展開該份週報完整內容（唯讀）
@@ -1785,6 +1807,9 @@ function wrFillForm(){
     el.oninput = () => { wrState[map[id]] = el.value; wrRenderPreview(); };
   });
   document.getElementById('wr-date').oninput = () => { wrState.report_date = document.getElementById('wr-date').value; wrRenderPreview(); };
+  // 刪除鈕：僅 Woody 且為既有紀錄時顯示
+  const delBtn = document.getElementById('wr-del-btn');
+  if(delBtn) delBtn.style.display = (wrIsWoody() && wrState.id) ? '' : 'none';
   wrRenderPreview();
 }
 
@@ -1811,22 +1836,27 @@ function wrFullDocHTML(rec){
 }
 function wrRenderPreview(){ document.getElementById('wr-sheet').innerHTML = wrReportInnerHTML(wrState); }
 
+let _wrSaving = false;
 async function wrSave(){
   const s = wrState;
-  if(s.id && !wrCanEdit(s)){ boardToast('無權限修改此週報'); return; }
+  if(_wrSaving) return; // 防連點造成重複新增
   if(!s.report_date){ boardToast('請填寫週報日期'); return; }
-  // 全部欄位存檔（本週工作／下週計畫／其他資訊也一併保存）
+  // 先固定 id：後續（含連點）都會 upsert 同一筆，不會再新增
+  const isNew = !s.id;
+  if(isNew){ s.id = uid(); s.author_id = s.author_id || (PORTAL_SESSION?PORTAL_SESSION.empId:''); s.author_name = s.author_name || (PORTAL_SESSION?(PORTAL_SESSION.nameZh||PORTAL_SESSION.nameEn||PORTAL_SESSION.empId):''); }
   const row = {
-    id: s.id || uid(), report_date: s.report_date,
+    id: s.id, report_date: s.report_date,
     work: s.work||'', plan: s.plan||'', other: s.other||'',
     reflections: s.reflections||'', intel: s.intel||'', feedback: s.feedback||'',
-    author_id: s.author_id || (PORTAL_SESSION?PORTAL_SESSION.empId:''),
-    author_name: s.author_name || (PORTAL_SESSION?(PORTAL_SESSION.nameZh||PORTAL_SESSION.nameEn||PORTAL_SESSION.empId):''),
+    author_id: s.author_id, author_name: s.author_name,
     updated_at: new Date().toISOString(),
   };
-  if(!s.id) row.created_at = new Date().toISOString();
+  if(isNew) row.created_at = new Date().toISOString();
+  _wrSaving = true;
+  const btn = document.getElementById('wr-save-btn'); if(btn){ btn.disabled = true; }
   try{ await SB.upsert('woody_reports', row); }
-  catch(e){ boardToast('儲存失敗：'+e.message); return; }
+  catch(e){ boardToast('儲存失敗：'+e.message); _wrSaving=false; if(btn)btn.disabled=false; if(isNew) s.id=null; return; }
+  _wrSaving = false; if(btn) btn.disabled = false;
   boardToast('已儲存到平台');
   wrBackToList();
 }

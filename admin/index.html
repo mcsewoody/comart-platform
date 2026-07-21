@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART 行政管理平台 v2.29</title>
+<title>COMART 行政管理平台 v2.30</title>
 <style>
 :root{
   /* KMS-aligned dark theme */
@@ -664,7 +664,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="logo">
     <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
     <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
-    <span><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="38" height="20" style="display:inline-block;vertical-align:middle;margin-top:-2px"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v2.29</span>
+    <span><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="38" height="20" style="display:inline-block;vertical-align:middle;margin-top:-2px"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v2.30</span>
   </div>
   <div class="trr">
     <div id="global-site-bar" style="display:flex;align-items:center;gap:4px"><span style="font-size:13px;color:var(--text-3);white-space:nowrap;font-weight:500">單位：</span>
@@ -835,6 +835,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   </div>
   <div class="mc cf" id="cc">
     <div class="pg active" id="pg-car-dash">
+      <div class="fb" style="margin-bottom:12px"><button class="btn btl bsm" onclick="navCar('car-bk')" data-i18n="car.btn.add_bk">＋ 新增預約</button></div>
       <div class="sg">
         <div class="sc ct"><div class="sl" data-i18n="car.stat.total">車輛總數</div><div class="sv" id="sc-tot">0</div><div class="ss" data-i18n="car.stat.unit">輛</div></div>
         <div class="sc cs"><div class="sl" data-i18n="car.stat.avail">可預約</div><div class="sv" id="sc-av">0</div><div class="ss" data-i18n="car.stat.idle">輛空閒</div></div>
@@ -853,12 +854,12 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div class="tw"><table><thead><tr><th data-i18n="car.tbl.vehicle">車輛</th><th data-i18n="car.tbl.plate">車牌</th><th data-i18n="car.tbl.type">類型</th><th data-i18n="car.tbl.fuel">燃料</th><th data-i18n="car.tbl.park">停車位</th><th data-i18n="car.tbl.km">里程km</th><th data-i18n="car.tbl.next_km">下次保養km</th><th data-i18n="car.tbl.status">狀態</th></tr></thead><tbody id="vh-tb"></tbody></table></div>
     </div>
     <div class="pg" id="pg-car-cal">
-      <div class="fb"><select id="cal-vf" style="width:155px" onchange="renderCal()"><option value="" data-i18n="car.filter.all_veh">所有車輛</option></select><button class="btn btl bsm" onclick="navCar('car-bk')" data-i18n="car.btn.add_bk">＋ 新增預約</button></div>
+      <div class="fb"><select id="cal-vf" style="width:155px" onchange="renderCal()"><option value="" data-i18n="car.filter.all_veh">所有車輛</option></select></div>
       <div class="calw"><div class="calh"><button class="calnav" onclick="calMov(-1)">‹</button><div class="caltit" id="cal-tit"></div><button class="calnav" onclick="calMov(1)">›</button><button class="calnav" onclick="calToday()" data-i18n="g.cal.today">Today</button><div class="calvt"><button class="calvb active" id="cvbm" onclick="setCalV('month')" data-i18n="g.cal.month">Month</button><button class="calvb" id="cvbw" onclick="setCalV('week')" data-i18n="g.cal.week">Week</button></div></div><div id="cal-body"></div></div>
       <div style="margin-top:10px;display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--t3)"><span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:rgba(6,182,212,.2);margin-right:4px"></span><span data-i18n="car.legend.inuse">使用中</span></span><span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:rgba(245,158,11,.2);margin-right:4px"></span><span data-i18n="car.legend.booked">已預約</span></span><span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:rgba(249,115,22,.2);margin-right:4px"></span><span data-i18n="car.legend.maint">保養/驗車</span></span><span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:rgba(34,197,94,.15);margin-right:4px"></span><span data-i18n="car.legend.done">已完成</span></span></div>
     </div>
     <div class="pg" id="pg-car-bk">
-      <div style="max-width:550px"><div class="sth" style="margin-bottom:14px"><div class="stt" data-i18n="car.page.bk">新增用車預約</div></div>
+      <div style="max-width:550px"><div class="sth" style="margin-bottom:14px"><div class="stt" id="bk-form-title" data-i18n="car.page.bk">新增用車預約</div></div>
         <div style="background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);padding:20px">
           <div class="fg2" style="margin-bottom:4px">
             <div class="fg full"><div class="fl" data-i18n="car.lbl.driver">使用人 *</div><select id="bku"><option value="">請選擇…</option></select></div>
@@ -875,8 +876,8 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
           </div>
           <div id="bk-conf" style="display:none;padding:9px 12px;border-radius:var(--rs);background:var(--rdd);border:1px solid rgba(239,68,68,.3);color:var(--rd);font-size:13px;margin-bottom:11px"></div>
           <div style="display:flex;gap:10px">
-  <button class="btn bg2" style="flex:1" onclick="navCar('car-dash')" data-i18n="car.btn.cancel_bk">← 取消</button>
-  <button class="btn btl" style="flex:2" onclick="doBooking()" data-i18n="car.btn.confirm_bk">✓ 確認預約</button>
+  <button class="btn bg2" style="flex:1" onclick="cancelBkForm()" data-i18n="car.btn.cancel_bk">← 取消</button>
+  <button class="btn btl" id="bk-confirm-btn" style="flex:2" onclick="doBooking()" data-i18n="car.btn.confirm_bk">✓ 確認預約</button>
 </div>
         </div>
       </div>
@@ -1747,6 +1748,7 @@ function checkCarReminders(){
   if(ins.length)setTimeout(()=>toast('📋 驗車提醒：'+ins.join('；'),'warn'),ms.length?1800:300);
 }
 let curUid=localStorage.getItem(K.cu)||null,curMod='lib',curCarPg='car-dash',curLibPg='lib-books',curRoomPg='room-dash';
+let editCarBkId=null;
 const DLCFG={max_loans:3,loan_days:30,remind_days:3};
 const DCCFG={maint_km:500,insp_days:30,max_days:7};
 const DRCFG={hours_start:8,hours_end:18,max_days:14,autorelease_min:15};
@@ -2137,12 +2139,12 @@ const ADMIN_I18N = {
     'car.tbl.km_vol':'Volume(L)','car.tbl.amount':'Amount','car.tbl.price':'Unit Price','car.tbl.fueler':'Fueled By',
     'car.tbl.maint_date':'Maint. Date','car.tbl.cost':'Cost','car.tbl.next_km2':'Next(km)','car.tbl.next_date':'Next Date','car.tbl.vendor':'Vendor',
     'car.tbl.last_insp':'Last Insp.','car.tbl.next_insp':'Next Insp.','car.tbl.remain_days':'Days Left','car.tbl.notes':'Notes',
-    'car.page.bk':'New Vehicle Booking','car.page.insp':'Inspection Mgmt','car.page.cfg':'Fleet Config',
+    'car.page.bk':'New Vehicle Booking','car.page.edit_bk':'Edit Vehicle Booking','car.page.insp':'Inspection Mgmt','car.page.cfg':'Fleet Config',
     'car.lbl.driver':'Driver *','car.lbl.vehicle':'Vehicle *','car.lbl.date_start':'Start Date *','car.lbl.time_start':'Start Time',
     'car.lbl.date_end':'End Date *','car.lbl.time_end':'End Time','car.lbl.purpose':'Purpose *',
     'car.lbl.km_est':'Est. Distance(km)','car.lbl.from':'Departure','car.lbl.to':'Destination','car.btn.add_bk':'＋ New Booking','car.btn.add_fuel':'＋ Fuel Log','car.btn.add_maint':'＋ Maint. Log',
     'car.btn.add_insp':'＋ Add Inspection','car.btn.add_veh':'＋ Add Vehicle',
-    'car.btn.save_cfg':'Save Config','car.btn.cancel_bk':'← Cancel','car.btn.confirm_bk':'✓ Confirm Booking',
+    'car.btn.save_cfg':'Save Config','car.btn.cancel_bk':'← Cancel','car.btn.confirm_bk':'✓ Confirm Booking','car.btn.confirm_edit_bk':'✓ Save Changes',
     'car.legend.inuse':'In Use','car.legend.booked':'Booked','car.legend.maint':'Maintenance','car.legend.done':'Completed',
     'car.filter.all_veh':'All Vehicles','car.filter.pending':'Pending','car.filter.active':'In Use','car.filter.done':'Returned','car.filter.cancelled':'Cancelled',
     'car.fuel.month_cost':'This Month Fuel','car.fuel.month_vol':'Volume This Month','car.fuel.count':'Records','car.fuel.liter':'Liters',
@@ -2275,12 +2277,12 @@ const ADMIN_I18N = {
     'car.tbl.km_vol':'油量L','car.tbl.amount':'金額元','car.tbl.price':'單價','car.tbl.fueler':'加油人',
     'car.tbl.maint_date':'保養日期','car.tbl.cost':'費用','car.tbl.next_km2':'下次km','car.tbl.next_date':'下次日期','car.tbl.vendor':'廠商',
     'car.tbl.last_insp':'上次驗車','car.tbl.next_insp':'下次驗車','car.tbl.remain_days':'剩餘天數','car.tbl.notes':'備註',
-    'car.page.bk':'新增用車預約','car.page.insp':'驗車管理','car.page.cfg':'公務車設定',
+    'car.page.bk':'新增用車預約','car.page.edit_bk':'修改用車預約','car.page.insp':'驗車管理','car.page.cfg':'公務車設定',
     'car.lbl.driver':'使用人 *','car.lbl.vehicle':'車輛 *','car.lbl.date_start':'開始日期 *','car.lbl.time_start':'開始時間',
     'car.lbl.date_end':'結束日期 *','car.lbl.time_end':'結束時間','car.lbl.purpose':'出行目的 *',
     'car.lbl.km_est':'預計里程(km)','car.lbl.from':'出發地點','car.lbl.to':'目的地','car.btn.add_bk':'＋ 新增預約','car.btn.add_fuel':'＋ 記錄加油','car.btn.add_maint':'＋ 新增保養記錄',
     'car.btn.add_insp':'＋ 登記驗車','car.btn.add_veh':'＋ 新增車輛',
-    'car.btn.save_cfg':'儲存設定','car.btn.cancel_bk':'← 取消','car.btn.confirm_bk':'✓ 確認預約',
+    'car.btn.save_cfg':'儲存設定','car.btn.cancel_bk':'← 取消','car.btn.confirm_bk':'✓ 確認預約','car.btn.confirm_edit_bk':'✓ 確認修改',
     'car.legend.inuse':'使用中','car.legend.booked':'已預約','car.legend.maint':'保養/驗車','car.legend.done':'已完成',
     'car.filter.all_veh':'所有車輛','car.filter.pending':'待出發','car.filter.active':'使用中','car.filter.done':'已歸還','car.filter.cancelled':'已取消',
     'car.fuel.month_cost':'本月油費','car.fuel.month_vol':'本月加油量','car.fuel.count':'記錄筆數','car.fuel.liter':'公升',
@@ -2413,12 +2415,12 @@ const ADMIN_I18N = {
     'car.tbl.km_vol':'油量L','car.tbl.amount':'金额元','car.tbl.price':'单价','car.tbl.fueler':'加油人',
     'car.tbl.maint_date':'保养日期','car.tbl.cost':'费用','car.tbl.next_km2':'下次km','car.tbl.next_date':'下次日期','car.tbl.vendor':'厂商',
     'car.tbl.last_insp':'上次验车','car.tbl.next_insp':'下次验车','car.tbl.remain_days':'剩余天数','car.tbl.notes':'备注',
-    'car.page.bk':'新增用车预约','car.page.insp':'验车管理','car.page.cfg':'公务车设置',
+    'car.page.bk':'新增用车预约','car.page.edit_bk':'修改用车预约','car.page.insp':'验车管理','car.page.cfg':'公务车设置',
     'car.lbl.driver':'使用人 *','car.lbl.vehicle':'车辆 *','car.lbl.date_start':'开始日期 *','car.lbl.time_start':'开始时间',
     'car.lbl.date_end':'结束日期 *','car.lbl.time_end':'结束时间','car.lbl.purpose':'出行目的 *',
     'car.lbl.km_est':'预计里程(km)','car.lbl.from':'出发地点','car.lbl.to':'目的地','car.btn.add_bk':'＋ 新增预约','car.btn.add_fuel':'＋ 记录加油','car.btn.add_maint':'＋ 新增保养记录',
     'car.btn.add_insp':'＋ 登记验车','car.btn.add_veh':'＋ 新增车辆',
-    'car.btn.save_cfg':'保存设置','car.btn.cancel_bk':'← 取消','car.btn.confirm_bk':'✓ 确认预约',
+    'car.btn.save_cfg':'保存设置','car.btn.cancel_bk':'← 取消','car.btn.confirm_bk':'✓ 确认预约','car.btn.confirm_edit_bk':'✓ 确认修改',
     'car.legend.inuse':'使用中','car.legend.booked':'已预约','car.legend.maint':'保养/验车','car.legend.done':'已完成',
     'car.filter.all_veh':'所有车辆','car.filter.pending':'待出发','car.filter.active':'使用中','car.filter.done':'已归还','car.filter.cancelled':'已取消',
     'car.fuel.month_cost':'本月油费','car.fuel.month_vol':'本月加油量','car.fuel.count':'记录笔数','car.fuel.liter':'公升',
@@ -2551,12 +2553,12 @@ const ADMIN_I18N = {
     'car.tbl.km_vol':'Thể tích(L)','car.tbl.amount':'Số tiền','car.tbl.price':'Đơn giá','car.tbl.fueler':'Người đổ xăng',
     'car.tbl.maint_date':'Ngày BD','car.tbl.cost':'Chi phí','car.tbl.next_km2':'Tiếp(km)','car.tbl.next_date':'Ngày tiếp','car.tbl.vendor':'Đơn vị',
     'car.tbl.last_insp':'KĐ lần cuối','car.tbl.next_insp':'KĐ tiếp theo','car.tbl.remain_days':'Ngày còn lại','car.tbl.notes':'Ghi chú',
-    'car.page.bk':'Đặt xe mới','car.page.insp':'Quản lý kiểm định','car.page.cfg':'Cấu hình xe',
+    'car.page.bk':'Đặt xe mới','car.page.edit_bk':'Sửa đặt xe','car.page.insp':'Quản lý kiểm định','car.page.cfg':'Cấu hình xe',
     'car.lbl.driver':'Người dùng *','car.lbl.vehicle':'Xe *','car.lbl.date_start':'Ngày bắt đầu *','car.lbl.time_start':'Giờ bắt đầu',
     'car.lbl.date_end':'Ngày kết thúc *','car.lbl.time_end':'Giờ kết thúc','car.lbl.purpose':'Mục đích *',
     'car.lbl.km_est':'KM dự kiến','car.lbl.from':'Điểm xuất phát','car.lbl.to':'Điểm đến','car.btn.add_bk':'＋ Đặt xe','car.btn.add_fuel':'＋ Ghi nhiên liệu','car.btn.add_maint':'＋ Ghi bảo dưỡng',
     'car.btn.add_insp':'＋ Thêm kiểm định','car.btn.add_veh':'＋ Thêm xe',
-    'car.btn.save_cfg':'Lưu cài đặt','car.btn.cancel_bk':'← Hủy','car.btn.confirm_bk':'✓ Xác nhận đặt',
+    'car.btn.save_cfg':'Lưu cài đặt','car.btn.cancel_bk':'← Hủy','car.btn.confirm_bk':'✓ Xác nhận đặt','car.btn.confirm_edit_bk':'✓ Lưu thay đổi',
     'car.legend.inuse':'Đang dùng','car.legend.booked':'Đã đặt','car.legend.maint':'Bảo dưỡng','car.legend.done':'Hoàn thành',
     'car.filter.all_veh':'Tất cả xe','car.filter.pending':'Chờ xuất phát','car.filter.active':'Đang dùng','car.filter.done':'Đã trả','car.filter.cancelled':'Đã hủy',
     'car.fuel.month_cost':'Chi phí xăng tháng','car.fuel.month_vol':'Lượng xăng tháng','car.fuel.count':'Số ghi','car.fuel.liter':'Lít',
@@ -2689,12 +2691,12 @@ const ADMIN_I18N = {
     'car.tbl.km_vol':'給油量(L)','car.tbl.amount':'金額','car.tbl.price':'単価','car.tbl.fueler':'給油者',
     'car.tbl.maint_date':'整備日','car.tbl.cost':'費用','car.tbl.next_km2':'次回(km)','car.tbl.next_date':'次回日','car.tbl.vendor':'業者',
     'car.tbl.last_insp':'前回車検','car.tbl.next_insp':'次回車検','car.tbl.remain_days':'残り日数','car.tbl.notes':'備考',
-    'car.page.bk':'車両予約','car.page.insp':'車検管理','car.page.cfg':'車両設定',
+    'car.page.bk':'車両予約','car.page.edit_bk':'予約変更','car.page.insp':'車検管理','car.page.cfg':'車両設定',
     'car.lbl.driver':'利用者 *','car.lbl.vehicle':'車両 *','car.lbl.date_start':'開始日 *','car.lbl.time_start':'開始時刻',
     'car.lbl.date_end':'終了日 *','car.lbl.time_end':'終了時刻','car.lbl.purpose':'目的 *',
     'car.lbl.km_est':'予定距離(km)','car.lbl.from':'出発地','car.lbl.to':'目的地','car.btn.add_bk':'＋ 予約追加','car.btn.add_fuel':'＋ 給油記録','car.btn.add_maint':'＋ 整備記録',
     'car.btn.add_insp':'＋ 車検登録','car.btn.add_veh':'＋ 車両追加',
-    'car.btn.save_cfg':'設定保存','car.btn.cancel_bk':'← キャンセル','car.btn.confirm_bk':'✓ 予約確認',
+    'car.btn.save_cfg':'設定保存','car.btn.cancel_bk':'← キャンセル','car.btn.confirm_bk':'✓ 予約確認','car.btn.confirm_edit_bk':'✓ 変更確定',
     'car.legend.inuse':'使用中','car.legend.booked':'予約済','car.legend.maint':'整備中','car.legend.done':'完了',
     'car.filter.all_veh':'全車両','car.filter.pending':'出発待ち','car.filter.active':'使用中','car.filter.done':'返却済','car.filter.cancelled':'キャンセル',
     'car.fuel.month_cost':'今月の燃料費','car.fuel.month_vol':'今月の給油量','car.fuel.count':'記録件数','car.fuel.liter':'リットル',
@@ -3497,6 +3499,43 @@ async function initCarBkForm(){
   const etEl=document.getElementById('bket'); if(etEl&&!etEl.value)etEl.value='18:00';
   const frEl=document.getElementById('bkfr'); if(frEl&&!frEl.value)frEl.value='公司';
   const confEl=document.getElementById('bk-conf'); if(confEl)confEl.style.display='none';
+  // 修改模式：帶入既有預約資料，覆蓋上面的新增預設值
+  const titleEl=document.getElementById('bk-form-title'),btnEl=document.getElementById('bk-confirm-btn');
+  if(editCarBkId){
+    const bk=ld(K.bks).find(x=>x.id===editCarBkId);
+    if(bk&&(isAdmin()||bk.u_id===curUid)){
+      const vSel=document.getElementById('bkv'),uSel=document.getElementById('bku');
+      if(vSel)vSel.value=bk.vh_id||'';
+      if(uSel)uSel.value=bk.u_id||'';
+      const[sd,st]=(bk.start||'').split('T'),[ed,et]=(bk.end||'').split('T');
+      if(sdEl)sdEl.value=sd||_today;
+      if(stEl)stEl.value=(st||'').slice(0,5)||'08:00';
+      if(edEl)edEl.value=ed||_today;
+      if(etEl)etEl.value=(et||'').slice(0,5)||'18:00';
+      document.getElementById('bkpur').value=bk.purpose||'';
+      document.getElementById('bkkm').value=bk.km_plan||'';
+      document.getElementById('bkfr').value=bk.from||'';
+      document.getElementById('bkto').value=bk.to||'';
+      document.getElementById('bknt').value=bk.note||'';
+      if(titleEl)titleEl.textContent=t('car.page.edit_bk');
+      if(btnEl)btnEl.textContent=t('car.btn.confirm_edit_bk');
+      return;
+    }
+    // 找不到該預約或無權限，回到新增模式
+    if(bk)toast('無權限修改此預約','error');
+    editCarBkId=null;
+  }
+  if(titleEl)titleEl.textContent=t('car.page.bk');
+  if(btnEl)btnEl.textContent=t('car.btn.confirm_bk');
+}
+function cancelBkForm(){editCarBkId=null;navCar('car-dash');}
+function editCarBk(id){
+  const bk=ld(K.bks).find(b=>b.id===id);
+  if(!bk)return toast('找不到預約','error');
+  if((bk.st||bk.status)!=='pending')return toast('僅待出發的預約可修改','error');
+  if(!(isAdmin()||bk.u_id===curUid))return toast('無權限修改此預約','error');
+  editCarBkId=id;
+  navCar('car-bk');
 }
 function chkConflict(){
   const vid=document.getElementById('bkv').value,sd=document.getElementById('bksd').value,st=document.getElementById('bkst2').value||'00:00',ed=document.getElementById('bked').value,et=document.getElementById('bket').value||'23:59';
@@ -3530,9 +3569,20 @@ async function doBooking(){
   const vid=document.getElementById('bkv').value,uid2=document.getElementById('bku').value,sd=document.getElementById('bksd').value,st=document.getElementById('bkst2').value||'08:00',ed=document.getElementById('bked').value,et=document.getElementById('bket').value||'18:00',pur=document.getElementById('bkpur').value.trim();
   if(!vid)return toast('請選擇車輛','error');if(!uid2)return toast('請選擇使用人','error');if(!sd||!ed)return toast('請選擇日期','error');if(!pur)return toast('請填寫出行目的','error');
   const ns=`${sd}T${st}`,ne=`${ed}T${et}`;if(ne<=ns)return toast(t('err.time_order'),'error');
-  if(ld(K.bks).find(b=>b.vh_id===vid&&b.st!=='done'&&b.st!=='cancelled'&&b.start<ne&&b.end>ns))return toast('此車時段已有預約','error');
-  const bks=ld(K.bks);bks.push({id:uid(),vh_id:vid,u_id:uid2,start:ns,end:ne,purpose:pur,km_plan:parseInt(document.getElementById('bkkm').value)||0,from:document.getElementById('bkfr').value.trim(),to:document.getElementById('bkto').value.trim(),note:document.getElementById('bknt').value.trim(),st:'pending'});
-  sv(K.bks,bks);await sbSaveCarBk(bks[bks.length-1]);const v=gVeh(vid),u=gUsr(uid2);toast(`已預約：${u?.name}使用${v?.name}（${sd}）`,'success');
+  if(ld(K.bks).find(b=>b.vh_id===vid&&b.id!==editCarBkId&&b.st!=='done'&&b.st!=='cancelled'&&b.start<ne&&b.end>ns))return toast('此車時段已有預約','error');
+  const bks=ld(K.bks);
+  const fields={vh_id:vid,u_id:uid2,start:ns,end:ne,purpose:pur,km_plan:parseInt(document.getElementById('bkkm').value)||0,from:document.getElementById('bkfr').value.trim(),to:document.getElementById('bkto').value.trim(),note:document.getElementById('bknt').value.trim()};
+  let saved,isEdit=false;
+  if(editCarBkId){
+    const i=bks.findIndex(b=>b.id===editCarBkId);
+    if(i<0){toast('找不到原預約','error');editCarBkId=null;return;}
+    if(!(isAdmin()||bks[i].u_id===curUid)){toast('無權限修改此預約','error');editCarBkId=null;return;}
+    bks[i]={...bks[i],...fields};saved=bks[i];isEdit=true;
+  }else{
+    saved={id:uid(),...fields,st:'pending'};bks.push(saved);
+  }
+  sv(K.bks,bks);await sbSaveCarBk(saved);const v=gVeh(vid),u=gUsr(uid2);toast(isEdit?`已更新預約：${u?.name}使用${v?.name}（${sd}）`:`已預約：${u?.name}使用${v?.name}（${sd}）`,'success');
+  editCarBkId=null;
   ['bkpur','bkkm','bkfr','bkto','bknt'].forEach(x=>document.getElementById(x).value='');document.getElementById('bk-conf').style.display='none';navCar('car-dash');
 }
 
@@ -3541,7 +3591,7 @@ function renderUse(){
   if(vf)bks=bks.filter(b=>b.vh_id===vf);if(sf)bks=bks.filter(b=>b.st===sf);
   if(q)bks=bks.filter(b=>{const v=gVeh(b.vh_id),u=gUsr(b.u_id);return v?.name.toLowerCase().includes(q)||v?.plate.toLowerCase().includes(q)||u?.name.toLowerCase().includes(q)||b.purpose?.toLowerCase().includes(q);});
   bks.sort((a,b)=>b.start.localeCompare(a.start));
-  document.getElementById('use-tb').innerHTML=bks.length?bks.map(b=>{const v=gVeh(b.vh_id),u=gUsr(b.u_id);return`<tr><td>${VICO[v?.type]||'🚗'} ${v?.name||'—'}</td><td>${u?.name||'—'}</td><td class="tdm">${b.start.replace('T',' ')}</td><td class="tdm">${b.end.replace('T',' ')}</td><td>${b.purpose||'—'}</td><td class="tdm">${b.km_plan||'—'}</td><td>${bkBadge(b)}</td><td>${(b.st||b.status)==='pending'?`<button class="btn bdr bsm" onclick="cancelCarBk('${b.id}')">✕ ${t('g.btn.cancel')}</button>`:''}</td></tr>`}).join(''):`<tr><td colspan="8" class="tdm" style="text-align:center;padding:22px">${t('car.no_data')}</td></tr>`;
+  document.getElementById('use-tb').innerHTML=bks.length?bks.map(b=>{const v=gVeh(b.vh_id),u=gUsr(b.u_id),isPending=(b.st||b.status)==='pending',canEdit=isPending&&(isAdmin()||b.u_id===curUid);return`<tr><td>${VICO[v?.type]||'🚗'} ${v?.name||'—'}</td><td>${u?.name||'—'}</td><td class="tdm">${b.start.replace('T',' ')}</td><td class="tdm">${b.end.replace('T',' ')}</td><td>${b.purpose||'—'}</td><td class="tdm">${b.km_plan||'—'}</td><td>${bkBadge(b)}</td><td>${isPending?`${canEdit?`<button class="btn bg2 bsm" onclick="editCarBk('${b.id}')">✎ ${t('g.btn.edit')}</button> `:''}<button class="btn bdr bsm" onclick="cancelCarBk('${b.id}')">✕ ${t('g.btn.cancel')}</button>`:''}</td></tr>`}).join(''):`<tr><td colspan="8" class="tdm" style="text-align:center;padding:22px">${t('car.no_data')}</td></tr>`;
 }
 async function startUse(id){const bks=ld(K.bks),i=bks.findIndex(b=>b.id===id);if(i>=0){bks[i].st='active';bks[i].actual_start=new Date().toISOString().slice(0,16);}sv(K.bks,bks);if(i>=0)await sbSaveCarBk(bks[i]);renderUse();renderCarDash();toast('已標記出發','success');}
 function endUse(id){

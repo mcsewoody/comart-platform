@@ -5,7 +5,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#080C14">
-<title>COMART · 公告與紀錄 v1.02</title>
+<title>COMART · 公告與紀錄 v1.03</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -198,7 +198,7 @@ h1,h2,h3,p{margin:0}
     <a class="logo" href="javascript:void(0)">
       <div class="logo-mark">告</div>
       <div class="logo-text">公告與紀錄</div>
-      <span class="logo-ver">v1.02</span>
+      <span class="logo-ver">v1.03</span>
     </a>
     <div class="topbar-right">
       <span class="who-badge" id="whoBadge">—</span>
@@ -1122,6 +1122,8 @@ function bizMeetingInit(){
   if(!("_id" in state)) state._id=null;
   if(!state.scope) state.scope=state.site||CUR_SCOPE;
   if(!state.site) state.site=state.scope;
+  // 出席名單一律由 users 業務部即時推導（清掉任何舊 hardcode/快照殘留）
+  state.team=rosterForScope(state.scope);
   if(state.meeting.timeStart===undefined && state.meeting.timeEnd===undefined){ state.meeting.timeStart="09:00"; state.meeting.timeEnd="09:15"; }
   function composeTime(){ var s=state.meeting.timeStart||"", e=state.meeting.timeEnd||""; return (s&&e)?(s+"~"+e):(s||e||""); }
   state.meeting.time=composeTime();
@@ -1309,8 +1311,8 @@ function bizMeetingInit(){
     state.scope=(rec&&rec.site)||d.scope||CUR_SCOPE;
     state.site=state.scope;
     state.meeting=d.meeting||fm.meeting;
-    // 出席名單以存檔快照為準（忠實還原當時人員）；缺快照才依範圍重建
-    state.team=(d.team&&d.team.length)?d.team:rosterForScope(state.scope);
+    // 出席名單一律依「會議範圍」從 users 業務部即時重建；沿用存檔的出缺席標記（以 empId 對應）
+    state.team=rosterForScope(state.scope);
     state.attendance=d.attendance||{};
     state.guests=d.guests||[];
     state.agenda=(d.agenda&&d.agenda.length)?d.agenda:fm.agenda;

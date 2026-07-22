@@ -5,19 +5,19 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#080C14">
-<title>COMART · 公告與紀錄 v1.10</title>
+<title>COMART · 公告與紀錄 v1.11</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#080C14;--s1:#0F1520;--s2:#172030;--s3:#1E2B40;
-  --br:#253247;--br2:#3A4E68;--br3:#4A6285;
-  --tx:#EBF2FF;--tx2:#A8BED8;--tx3:#6A8AAA;
-  --ac:#2D7FF9;--ac2:rgba(45,127,249,0.12);--ac3:rgba(45,127,249,0.06);
-  --red:#F25C5C;--red2:rgba(242,92,92,0.12);
-  --grn:#3DD68C;--grn2:rgba(61,214,140,0.12);
-  --amb:#F0A429;--amb2:rgba(240,164,41,0.12);
+  --br:#324262;--br2:#4A6288;--br3:#5D7CA8;
+  --tx:#F5F9FF;--tx2:#C3D8F0;--tx3:#93B2D4;
+  --ac:#4C93FF;--ac2:rgba(76,147,255,0.16);--ac3:rgba(76,147,255,0.08);
+  --red:#FF6E6E;--red2:rgba(255,110,110,0.15);
+  --grn:#4FE7A0;--grn2:rgba(79,231,160,0.15);
+  --amb:#FFBB4D;--amb2:rgba(255,187,77,0.15);
   --ff:'DM Sans',-apple-system,"PingFang TC","Noto Sans TC",sans-serif;
   --fd:'DM Serif Display',Georgia,serif;
   --fm:'DM Mono',monospace;
@@ -202,7 +202,7 @@ select,select option,option{background:var(--s2);color:var(--tx)}
     <a class="logo" href="javascript:void(0)">
       <div class="logo-mark">告</div>
       <div class="logo-text">公告與紀錄</div>
-      <span class="logo-ver">v1.10</span>
+      <span class="logo-ver">v1.11</span>
     </a>
     <div class="topbar-right">
       <span class="who-badge" id="whoBadge">—</span>
@@ -222,7 +222,6 @@ select,select option,option{background:var(--s2);color:var(--tx)}
   <div class="tabpanel on" id="tabpanel-bulletin">
     <div class="chiprow" id="bb-filters">
       <button class="chip-f on" data-f="" onclick="bbSetFilter('')">全部</button>
-      <button class="chip-f" data-f="group" onclick="bbSetFilter('group')">集團公告</button>
       <button class="chip-f" data-f="TW" onclick="bbSetFilter('TW')">台灣</button>
       <button class="chip-f" data-f="CN" onclick="bbSetFilter('CN')">東莞廠</button>
       <button class="chip-f" data-f="VN" onclick="bbSetFilter('VN')">越南廠</button>
@@ -252,7 +251,7 @@ select,select option,option{background:var(--s2);color:var(--tx)}
   <div class="tabpanel" id="tabpanel-weekly">
     <div id="wm-list-view">
       <div class="chiprow">
-        <button class="chip-f on" data-f="" onclick="wmSetFilter('')">全部中心</button>
+        <button class="chip-f on" data-f="" onclick="wmSetFilter('')">全部</button>
         <button class="chip-f" data-f="TW" onclick="wmSetFilter('TW')">台灣</button>
         <button class="chip-f" data-f="CN" onclick="wmSetFilter('CN')">東莞廠</button>
         <button class="chip-f" data-f="VN" onclick="wmSetFilter('VN')">越南廠</button>
@@ -360,7 +359,6 @@ select,select option,option{background:var(--s2);color:var(--tx)}
       <div id="view-saved">
         <div class="chiprow" id="bm-filters">
           <button class="chip-f on" data-f="" onclick="bmSetFilter('')">全部</button>
-          <button class="chip-f" data-f="ALL" onclick="bmSetFilter('ALL')">全集團</button>
           <button class="chip-f" data-f="TW" onclick="bmSetFilter('TW')">台灣</button>
           <button class="chip-f" data-f="CN" onclick="bmSetFilter('CN')">東莞廠</button>
           <button class="chip-f" data-f="VN" onclick="bmSetFilter('VN')">越南廠</button>
@@ -1929,7 +1927,7 @@ async function initBoard() {
       return { id };
     },
     list: async function() {
-      const rows = await SB.get('biz_meeting_minutes', '?select=id,title,updated_at,view,site&order=updated_at.desc&limit=200');
+      const rows = await SB.get('biz_meeting_minutes', '?select=id,title,meeting_date,updated_at,view,site&order=meeting_date.desc.nullslast&limit=200');
       return (rows || []).map(r => ({ id: r.id, title: r.title, savedAt: r.updated_at, view: r.view || {}, site: r.site }));
     },
     load: async function(id) {

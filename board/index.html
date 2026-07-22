@@ -5,7 +5,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#080C14">
-<title>COMART · 公告與紀錄 v1.11</title>
+<title>COMART · 公告與紀錄 v1.12</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -202,7 +202,7 @@ select,select option,option{background:var(--s2);color:var(--tx)}
     <a class="logo" href="javascript:void(0)">
       <div class="logo-mark">告</div>
       <div class="logo-text">公告與紀錄</div>
-      <span class="logo-ver">v1.11</span>
+      <span class="logo-ver">v1.12</span>
     </a>
     <div class="topbar-right">
       <span class="who-badge" id="whoBadge">—</span>
@@ -267,6 +267,7 @@ select,select option,option{background:var(--s2);color:var(--tx)}
             <div class="panel-h"><span class="idx">01</span><h2>會議資訊</h2><button class="btn ghost sm" style="margin-left:auto" onclick="wmBackToList()">← 返回列表</button></div>
             <div class="panel-b">
               <div class="fields">
+                <div class="field"><label>營運中心（決定預設出席的同仁）</label><select id="wm-scope"><option value="TW">台灣</option><option value="CN">東莞廠</option><option value="VN">越南廠</option></select></div>
                 <div class="row2">
                   <div class="field"><label>會議名稱</label><input id="wm-name" placeholder="週會"></div>
                   <div class="field"><label>會議日期</label><input id="wm-date" type="date"></div>
@@ -293,50 +294,40 @@ select,select option,option{background:var(--s2);color:var(--tx)}
               </div>
               <div class="roster" id="wm-roster"></div>
               <div class="addbar">
-                <input id="wm-guest-name" placeholder="新增列席人員…">
+                <select id="wm-guest-sel"><option value="">選擇列席人員…</option></select>
                 <button class="btn sm" onclick="wmAddGuest()">＋ 新增列席</button>
               </div>
+              <p class="hint">出席名單依上方「營運中心」自動帶入該中心全體同仁，主持人可直接標記缺席／遲到／非出席。列席人員（其他中心）可用下方下拉加入，不計入「應到人數」但會列入「實到人數」。</p>
             </div>
           </div>
 
           <div class="panel">
             <div class="panel-h"><span class="idx">03</span><h2>本週值日生</h2></div>
             <div class="panel-b">
-              <div id="wm-duty"></div>
-              <button class="miniadd" onclick="wmAddDuty()">＋ 新增值日生</button>
+              <div class="field"><label>值日生（從本中心同仁挑選）</label><select id="wm-duty-sel" onchange="wmSyncDuty()"><option value="">— 請選擇 —</option></select></div>
             </div>
           </div>
 
           <div class="panel">
-            <div class="panel-h"><span class="idx">04</span><h2>本週業務會議</h2><span class="sub">可挑選已建立的業務會議記錄自動帶入</span></div>
-            <div class="panel-b">
-              <div class="field" style="margin-bottom:10px"><label>選擇既有業務會議記錄（選填）</label><select id="wm-biz-pick" onchange="wmPickBiz()"><option value="">— 手動輸入 —</option></select></div>
-              <div class="row3">
-                <div class="field"><label>日期</label><input id="wm-biz-date" type="date"></div>
-                <div class="field"><label>主席／簡報</label><input id="wm-biz-chair" placeholder="姓名"></div>
-                <div class="field"><label>會議記錄</label><input id="wm-biz-rec" placeholder="姓名"></div>
-              </div>
-            </div>
-          </div>
-
-          <div class="panel">
-            <div class="panel-h"><span class="idx">05</span><h2>會議議程</h2></div>
+            <div class="panel-h"><span class="idx">04</span><h2>會議議程</h2></div>
             <div class="panel-b">
               <div class="sec"><div class="sec-h"><div class="num">一</div><div class="ttl">主席報告</div></div><textarea id="wm-ag-chair" rows="2" style="width:100%;font-family:inherit;font-size:13.5px;background:var(--s1);border:1px solid var(--br);border-radius:7px;padding:8px 10px;color:var(--tx)" placeholder="無。"></textarea></div>
               <div class="sec"><div class="sec-h"><div class="num">二</div><div class="ttl">各同仁當週工作會報及通知事項</div></div><div id="wm-ag-work"></div><button class="miniadd" onclick="wmAddItem('work')">＋ 新增項目</button></div>
-              <div class="sec"><div class="sec-h"><div class="num">三</div><div class="ttl">主管報告</div></div><textarea id="wm-ag-mgmt" rows="2" style="width:100%;font-family:inherit;font-size:13.5px;background:var(--s1);border:1px solid var(--br);border-radius:7px;padding:8px 10px;color:var(--tx)" placeholder="無。"></textarea></div>
-              <div class="sec"><div class="sec-h"><div class="num">四</div><div class="ttl">新品介紹</div></div><textarea id="wm-ag-newprod" rows="2" style="width:100%;font-family:inherit;font-size:13.5px;background:var(--s1);border:1px solid var(--br);border-radius:7px;padding:8px 10px;color:var(--tx)" placeholder="無。"></textarea></div>
-              <div class="sec"><div class="sec-h"><div class="num">五</div><div class="ttl">讀書心得分享</div></div><div id="wm-ag-book"></div><button class="miniadd" onclick="wmAddItem('book')">＋ 新增項目</button></div>
-              <div class="sec"><div class="sec-h"><div class="num">六</div><div class="ttl">週報分享</div></div><div id="wm-ag-weekly"></div><button class="miniadd" onclick="wmAddItem('weekly')">＋ 新增項目</button></div>
+              <div class="sec"><div class="sec-h"><div class="num">三</div><div class="ttl">新品介紹</div></div><textarea id="wm-ag-newprod" rows="2" style="width:100%;font-family:inherit;font-size:13.5px;background:var(--s1);border:1px solid var(--br);border-radius:7px;padding:8px 10px;color:var(--tx)" placeholder="無。"></textarea></div>
+              <div class="sec"><div class="sec-h"><div class="num">四</div><div class="ttl">讀書心得分享</div></div><div id="wm-ag-book"></div><button class="miniadd" onclick="wmAddItem('book')">＋ 新增項目</button></div>
+              <div class="sec"><div class="sec-h"><div class="num">五</div><div class="ttl">Woody 週報分享</div></div><div id="wm-ag-woody"></div><button class="miniadd" onclick="wmAddItem('woody')">＋ 新增項目</button></div>
+              <div class="sec"><div class="sec-h"><div class="num">六</div><div class="ttl">個人週報分享</div></div><div id="wm-ag-personal"></div><button class="miniadd" onclick="wmAddItem('personal')">＋ 新增項目</button></div>
               <div class="sec"><div class="sec-h"><div class="num">七</div><div class="ttl">補充事項</div></div><textarea id="wm-ag-supp" rows="2" style="width:100%;font-family:inherit;font-size:13.5px;background:var(--s1);border:1px solid var(--br);border-radius:7px;padding:8px 10px;color:var(--tx)" placeholder="無。"></textarea></div>
               <div class="sec" style="margin-bottom:0"><div class="sec-h"><div class="num">八</div><div class="ttl">散會</div></div></div>
             </div>
           </div>
 
-          <div style="display:flex;gap:10px;margin-top:4px">
-            <button class="btn" style="flex:1" onclick="wmPrint()">🖨️ 列印／PDF</button>
-            <button class="btn" style="flex:1" onclick="wmMail()">✉️ 建立 Outlook 草稿</button>
-            <button class="btn primary" style="flex:2" onclick="wmSave()">✓ 儲存到平台</button>
+          <div style="display:flex;gap:8px;margin-top:4px;flex-wrap:wrap">
+            <button class="btn primary" style="flex:2 1 140px" onclick="wmSave()">✓ 儲存到平台</button>
+            <button class="btn" style="flex:1 1 90px" onclick="wmSendMail()">✉️ 寄送</button>
+            <button class="btn" style="flex:1 1 70px" onclick="wmExportXlsx()">Excel</button>
+            <button class="btn" style="flex:1 1 70px" onclick="wmExportPNG()">PNG</button>
+            <button class="btn" style="flex:1 1 70px" onclick="wmExportPDF()">PDF</button>
           </div>
         </div>
 
@@ -764,7 +755,6 @@ let WM_LIST = [];
 let _wmFilter = '';
 let _wmEditId = null; // null = 新增
 let wmState = null;
-let _wmBizRecords = []; // 該中心的業務會議記錄（給「本週業務會議」下拉選單用）
 
 function wmSetFilter(f) {
   _wmFilter = f;
@@ -781,11 +771,31 @@ async function wmLoadList() {
 }
 
 function wmAttendCounts(attendance) {
+  // 「非出席」(excluded) 不列入應到/實到/缺席任何名額（比照業務會議記錄）
   const vals = Object.values(attendance || {});
-  const present = vals.filter(a => a.status === 'present').length;
-  const late = vals.filter(a => a.status === 'late').length;
-  const absent = vals.filter(a => a.status === 'absent').length;
-  return { expected: vals.length, actual: present + late, present, late, absent };
+  let expected = 0, present = 0, late = 0, absent = 0;
+  vals.forEach(a => {
+    if (a.status === 'excluded') return;
+    expected++;
+    if (a.status === 'late') late++;
+    else if (a.status === 'absent') absent++;
+    else present++;
+  });
+  return { expected, actual: present + late, present, late, absent };
+}
+// 編輯器用的即時統計：依「營運中心」全體同仁＋列席者，排除 excluded
+function wmCounts() {
+  let expected = 0, present = 0, late = 0, absent = 0;
+  usersBySite(wmState.site).forEach(u => {
+    const a = wmState.attendance[u.empId]; const st = a ? a.status : 'present';
+    if (st === 'excluded') return;
+    expected++;
+    if (st === 'late') late++; else if (st === 'absent') absent++; else present++;
+  });
+  (wmState.guests || []).forEach(g => {
+    if (g.status === 'present') present++; else if (g.status === 'late') late++; else if (g.status === 'absent') absent++;
+  });
+  return { expected, present, late, absent, actual: present + late };
 }
 
 function wmRenderList() {
@@ -826,14 +836,14 @@ function wmFreshState(site) {
     place: '', chair: '', recorder: '', next_share: '',
     attendance, guests: [],
     duty_roster: [],
-    biz_ref: { biz_id: '', date: '', chair: '', recorder: '' },
-    agenda: { chair_report:'', work_reports:[], mgmt_report:'', new_product:'', book_share:[], weekly_report:[], supplement:'' },
+    agenda: { chair_report:'', work_reports:[], new_product:'', book_share:[], woody_report:[], personal_report:[], supplement:'' },
   };
 }
 
 function wmNewRecord() {
   _wmEditId = null;
-  wmState = wmFreshState(PORTAL_SESSION.site);
+  const site = (_wmFilter && ['TW','CN','VN'].includes(_wmFilter)) ? _wmFilter : (PORTAL_SESSION.site || 'TW');
+  wmState = wmFreshState(site);
   wmOpenEditor();
 }
 
@@ -849,17 +859,19 @@ async function wmOpenRecord(id) {
       place: r.place || '', chair: r.chair || '', recorder: r.recorder || '', next_share: r.next_share || '',
       attendance: r.attendance || {}, guests: r.guests || [],
       duty_roster: r.duty_roster || [],
-      biz_ref: r.biz_ref || { biz_id:'', date:'', chair:'', recorder:'' },
-      agenda: Object.assign({ chair_report:'', work_reports:[], mgmt_report:'', new_product:'', book_share:[], weekly_report:[], supplement:'' }, r.agenda || {}),
+      agenda: Object.assign({ chair_report:'', work_reports:[], new_product:'', book_share:[], woody_report:[], personal_report:[], supplement:'' }, r.agenda || {}),
     };
+    // 相容舊資料：舊「週報分享」(weekly_report) 併入「個人週報分享」
+    if (!wmState.agenda.personal_report.length && Array.isArray(r.agenda && r.agenda.weekly_report)) {
+      wmState.agenda.personal_report = r.agenda.weekly_report;
+    }
     wmOpenEditor();
   } catch(e) { boardToast('載入失敗'); }
 }
 
-async function wmOpenEditor() {
+function wmOpenEditor() {
   document.getElementById('wm-list-view').style.display = 'none';
   document.getElementById('wm-editor-view').style.display = '';
-  await wmLoadBizPicklist();
   wmFillForm();
 }
 
@@ -867,28 +879,6 @@ function wmBackToList() {
   document.getElementById('wm-editor-view').style.display = 'none';
   document.getElementById('wm-list-view').style.display = '';
   wmLoadList();
-}
-
-async function wmLoadBizPicklist() {
-  try {
-    const rows = await SB.get('biz_meeting_minutes', '?select=id,title,meeting_date,data&site=eq.' + encodeURIComponent(wmState.site) + '&order=meeting_date.desc&limit=50');
-    _wmBizRecords = rows || [];
-  } catch(e) { _wmBizRecords = []; }
-  const sel = document.getElementById('wm-biz-pick');
-  sel.innerHTML = '<option value="">— 手動輸入 —</option>' + _wmBizRecords.map(r =>
-    `<option value="${r.id}">${escHtml(r.title || r.meeting_date || '（未命名）')}</option>`).join('');
-}
-
-function wmPickBiz() {
-  const id = document.getElementById('wm-biz-pick').value;
-  const rec = _wmBizRecords.find(r => r.id === id);
-  if (!rec) return;
-  const m = (rec.data && rec.data.meeting) || {};
-  document.getElementById('wm-biz-date').value = m.date || '';
-  document.getElementById('wm-biz-chair').value = m.chair || '';
-  document.getElementById('wm-biz-rec').value = m.rec || '';
-  wmState.biz_ref = { biz_id: id, date: m.date || '', chair: m.chair || '', recorder: m.rec || '' };
-  wmRenderPreview();
 }
 
 function wmPopSelect(sel, current) {
@@ -899,7 +889,35 @@ function wmPopSelect(sel, current) {
   sel.value = current || '';
 }
 
+// 切換營運中心：重新帶入該中心全體同仁為出席名單（保留已標記過的出缺席，以 empId 對應）
+function wmApplyScope(site) {
+  wmState.site = site;
+  const keep = {};
+  usersBySite(site).forEach(u => { keep[u.empId] = 1; });
+  Object.keys(wmState.attendance).forEach(k => { if (!keep[k]) delete wmState.attendance[k]; });
+  usersBySite(site).forEach(u => { if (!wmState.attendance[u.empId]) wmState.attendance[u.empId] = { status: 'present', reason: '' }; });
+  wmPopSelect(document.getElementById('wm-chair'), wmState.chair);
+  wmPopSelect(document.getElementById('wm-rec'), wmState.recorder);
+  wmPopSelect(document.getElementById('wm-next'), wmState.next_share);
+  wmPopSelect(document.getElementById('wm-duty-sel'), (wmState.duty_roster[0] && wmState.duty_roster[0].person) || '');
+  wmBuildRoster(); wmRenderCounts(); wmFillGuestSelect(); wmRenderPreview();
+}
+
+// 以「員工名錄」填充列席下拉（排除本中心成員與已列席者）
+function wmFillGuestSelect() {
+  const sel = document.getElementById('wm-guest-sel'); if (!sel) return;
+  const have = {};
+  usersBySite(wmState.site).forEach(u => { have[u.empId] = 1; });
+  (wmState.guests || []).forEach(g => { if (g.empId) have[g.empId] = 1; });
+  sel.innerHTML = '<option value="">選擇列席人員…</option>' +
+    ALL_USERS.filter(u => !have[u.empId]).map(u =>
+      `<option value="${escHtml(u.empId)}">${escHtml(userName(u))}（${escHtml(siteLabel(u.site))}${u.dept ? '/' + escHtml(u.dept) : ''}）</option>`).join('');
+}
+
 function wmFillForm() {
+  const scopeSel = document.getElementById('wm-scope');
+  if (scopeSel) { scopeSel.value = wmState.site; scopeSel.onchange = function(){ wmApplyScope(this.value); }; }
+  wmFillGuestSelect();
   document.getElementById('wm-name').value = wmState.name || '';
   document.getElementById('wm-date').value = wmState.meeting_date || '';
   document.getElementById('wm-ts').value = wmState.time_start || '';
@@ -908,11 +926,8 @@ function wmFillForm() {
   wmPopSelect(document.getElementById('wm-chair'), wmState.chair);
   wmPopSelect(document.getElementById('wm-rec'), wmState.recorder);
   wmPopSelect(document.getElementById('wm-next'), wmState.next_share);
-  document.getElementById('wm-biz-date').value = (wmState.biz_ref && wmState.biz_ref.date) || '';
-  document.getElementById('wm-biz-chair').value = (wmState.biz_ref && wmState.biz_ref.chair) || '';
-  document.getElementById('wm-biz-rec').value = (wmState.biz_ref && wmState.biz_ref.recorder) || '';
+  wmPopSelect(document.getElementById('wm-duty-sel'), (wmState.duty_roster[0] && wmState.duty_roster[0].person) || '');
   document.getElementById('wm-ag-chair').value = wmState.agenda.chair_report || '';
-  document.getElementById('wm-ag-mgmt').value = wmState.agenda.mgmt_report || '';
   document.getElementById('wm-ag-newprod').value = wmState.agenda.new_product || '';
   document.getElementById('wm-ag-supp').value = wmState.agenda.supplement || '';
 
@@ -920,16 +935,13 @@ function wmFillForm() {
     document.getElementById(id).oninput = wmSyncBasic;
   });
   ['wm-chair','wm-rec','wm-next'].forEach(id => { document.getElementById(id).onchange = wmSyncBasic; });
-  ['wm-biz-date','wm-biz-chair','wm-biz-rec'].forEach(id => { document.getElementById(id).oninput = wmSyncBizRef; });
   document.getElementById('wm-ag-chair').oninput = () => { wmState.agenda.chair_report = document.getElementById('wm-ag-chair').value; wmRenderPreview(); };
-  document.getElementById('wm-ag-mgmt').oninput = () => { wmState.agenda.mgmt_report = document.getElementById('wm-ag-mgmt').value; wmRenderPreview(); };
   document.getElementById('wm-ag-newprod').oninput = () => { wmState.agenda.new_product = document.getElementById('wm-ag-newprod').value; wmRenderPreview(); };
   document.getElementById('wm-ag-supp').oninput = () => { wmState.agenda.supplement = document.getElementById('wm-ag-supp').value; wmRenderPreview(); };
 
   wmBuildRoster();
   wmRenderCounts();
-  wmBuildDuty();
-  wmBuildItems('work'); wmBuildItems('book'); wmBuildItems('weekly');
+  wmBuildItems('work'); wmBuildItems('book'); wmBuildItems('woody'); wmBuildItems('personal');
   wmRenderPreview();
 }
 
@@ -944,13 +956,9 @@ function wmSyncBasic() {
   wmState.next_share = document.getElementById('wm-next').value;
   wmRenderPreview();
 }
-function wmSyncBizRef() {
-  wmState.biz_ref = {
-    biz_id: (wmState.biz_ref && wmState.biz_ref.biz_id) || '',
-    date: document.getElementById('wm-biz-date').value,
-    chair: document.getElementById('wm-biz-chair').value,
-    recorder: document.getElementById('wm-biz-rec').value,
-  };
+function wmSyncDuty() {
+  const v = document.getElementById('wm-duty-sel').value;
+  wmState.duty_roster = v ? [{ person: v }] : [];
   wmRenderPreview();
 }
 
@@ -966,11 +974,8 @@ function wmAttendees() {
 }
 function wmRenderCounts() {
   const box = document.getElementById('wm-counts');
-  const vals = wmAttendees();
-  const present = vals.filter(p => p.a.status === 'present').length;
-  const late = vals.filter(p => p.a.status === 'late').length;
-  const absent = vals.filter(p => p.a.status === 'absent').length;
-  box.innerHTML = `<span class="chip">應到 <b>${usersBySite(wmState.site).length}</b> 人</span><span class="chip ok">實到 <b>${present+late}</b> 人</span><span class="chip bad">缺席 <b>${absent}</b> 人</span><span class="chip warn">遲到 <b>${late}</b> 人</span>`;
+  const c = wmCounts();
+  box.innerHTML = `<span class="chip">應到 <b>${c.expected}</b> 人</span><span class="chip ok">實到 <b>${c.actual}</b> 人</span><span class="chip bad">缺席 <b>${c.absent}</b> 人</span><span class="chip warn">遲到 <b>${c.late}</b> 人</span>`;
 }
 function wmReasonStr(status) {
   return wmAttendees().filter(p => p.a.status === status).map(p => p.name + (p.a.reason ? ' ' + p.a.reason.trim() : '')).join('、');
@@ -985,13 +990,16 @@ function wmBuildRoster() {
     row.appendChild(who);
     const right = document.createElement('div'); right.style.cssText = 'display:flex;align-items:center;gap:8px';
     const seg = document.createElement('div'); seg.className = 'seg';
-    [['present','在場'],['late','遲到'],['absent','缺席']].forEach(pair => {
+    const segOpts = p.guest ? [['present','在場'],['late','遲到'],['absent','缺席']]
+      : [['present','在場'],['late','遲到'],['absent','缺席'],['excluded','非出席']];
+    segOpts.forEach(pair => {
       const b = document.createElement('button'); b.textContent = pair[1]; b.setAttribute('data-v', pair[0]);
+      b.title = pair[0] === 'excluded' ? '不列入本次會議登記名額' : '';
       if (p.a.status === pair[0]) b.classList.add('on');
       b.onclick = () => {
         p.a.status = pair[0]; row.setAttribute('data-s', p.a.status);
         seg.querySelectorAll('button').forEach(x => x.classList.toggle('on', x.getAttribute('data-v') === p.a.status));
-        rw.style.display = p.a.status === 'present' ? 'none' : 'block';
+        rw.style.display = (p.a.status === 'present' || p.a.status === 'excluded') ? 'none' : 'block';
         wmRenderCounts(); wmRenderPreview();
       };
       seg.appendChild(b);
@@ -1006,7 +1014,7 @@ function wmBuildRoster() {
     const rw = document.createElement('div'); rw.className = 'reason';
     const rin = document.createElement('input'); rin.placeholder = '原因（如：出差、特休、事假…）'; rin.value = p.a.reason || '';
     rin.oninput = () => { p.a.reason = rin.value; wmRenderPreview(); };
-    rw.appendChild(rin); rw.style.display = p.a.status === 'present' ? 'none' : 'block';
+    rw.appendChild(rin); rw.style.display = (p.a.status === 'present' || p.a.status === 'excluded') ? 'none' : 'block';
     row.appendChild(rw);
     box.appendChild(row);
   });
@@ -1017,36 +1025,21 @@ function wmAllPresent() {
   boardToast('已將全員設為在場');
 }
 function wmAddGuest() {
-  const el = document.getElementById('wm-guest-name');
-  const v = el.value.trim(); if (!v) return;
-  wmState.guests.push({ id: uid(), name: v, status: 'present', reason: '' });
-  el.value = '';
-  wmBuildRoster(); wmRenderCounts(); wmRenderPreview();
+  const sel = document.getElementById('wm-guest-sel');
+  const empId = sel ? sel.value : ''; if (!empId) return;
+  const u = ALL_USERS.find(x => x.empId === empId); if (!u) return;
+  if ((wmState.guests || []).some(g => g.empId === empId) || usersBySite(wmState.site).some(m => m.empId === empId)) { boardToast('此人員已在名單中'); return; }
+  wmState.guests.push({ id: uid(), empId, name: userName(u), status: 'present', reason: '' });
+  wmBuildRoster(); wmRenderCounts(); wmRenderPreview(); wmFillGuestSelect();
 }
 
-function wmBuildDuty() {
-  const box = document.getElementById('wm-duty');
-  box.innerHTML = '';
-  wmState.duty_roster.forEach((d, i) => {
-    const row = document.createElement('div'); row.className = 'item'; row.style.gridTemplateColumns = '140px 1fr auto';
-    const areaIn = document.createElement('input'); areaIn.placeholder = '樓層／單位（如：四樓）'; areaIn.value = d.area || '';
-    areaIn.oninput = () => { d.area = areaIn.value; wmRenderPreview(); };
-    const personIn = document.createElement('input'); personIn.placeholder = '值日生姓名'; personIn.value = d.person || '';
-    personIn.oninput = () => { d.person = personIn.value; wmRenderPreview(); };
-    const rm = document.createElement('button'); rm.className = 'rm'; rm.textContent = '✕';
-    rm.onclick = () => { wmState.duty_roster.splice(i, 1); wmBuildDuty(); wmRenderPreview(); };
-    row.appendChild(areaIn); row.appendChild(personIn); row.appendChild(rm);
-    box.appendChild(row);
-  });
-}
-function wmAddDuty() { wmState.duty_roster.push({ area: '', person: '' }); wmBuildDuty(); wmRenderPreview(); }
-
-const WM_ITEM_LABEL = { work: '同仁', book: '分享人', weekly: '姓名' };
+const WM_ITEM_ARR = { work: 'work_reports', book: 'book_share', woody: 'woody_report', personal: 'personal_report' };
+const WM_ITEM_LABEL = { work: '同仁', book: '分享人', woody: '重點', personal: '姓名' };
 function wmBuildItems(key) {
   const box = document.getElementById('wm-ag-' + key);
+  const arrKey = WM_ITEM_ARR[key];
   box.innerHTML = '';
-  wmState.agenda[key === 'work' ? 'work_reports' : key === 'book' ? 'book_share' : 'weekly_report'].forEach((it, i) => {
-    const arrKey = key === 'work' ? 'work_reports' : key === 'book' ? 'book_share' : 'weekly_report';
+  wmState.agenda[arrKey].forEach((it, i) => {
     const row = document.createElement('div'); row.className = 'item';
     const who = document.createElement('input'); who.placeholder = WM_ITEM_LABEL[key]; who.value = it.who || '';
     who.oninput = () => { it.who = who.value; wmRenderPreview(); };
@@ -1059,8 +1052,7 @@ function wmBuildItems(key) {
   });
 }
 function wmAddItem(key) {
-  const arrKey = key === 'work' ? 'work_reports' : key === 'book' ? 'book_share' : 'weekly_report';
-  wmState.agenda[arrKey].push({ who: '', text: '' });
+  wmState.agenda[WM_ITEM_ARR[key]].push({ who: '', text: '' });
   wmBuildItems(key); wmRenderPreview();
 }
 
@@ -1076,38 +1068,33 @@ function wmTextBlock(label, num, text) {
   const t = (text||'').trim();
   return `<tr><td colspan="6" class="ag-body"><div class="ag-title">${num}、${escHtml(label)}</div>${t ? escHtml(t) : escHtml(label) + '：無。'}</td></tr>`;
 }
-function wmRenderPreview() {
-  const s = wmState, c = wmAttendCounts(s.attendance);
-  const present = wmAttendees().filter(p => p.a.status === 'present').length;
-  const late = wmAttendees().filter(p => p.a.status === 'late').length;
-  const absent = wmAttendees().filter(p => p.a.status === 'absent').length;
-  const actual = present + late;
-  const absentTxt = absent + ' 人' + (wmReasonStr('absent') ? '\n(' + wmReasonStr('absent') + ')' : '');
-  const lateTxt = late + ' 人' + (wmReasonStr('late') ? '\n(' + wmReasonStr('late') + ')' : '');
-  const dutyTxt = s.duty_roster.length ? s.duty_roster.map(d => `${d.area||'—'}：${d.person||'—'}`).join('　') : '（尚未填寫）';
-  const bizRef = s.biz_ref || {};
-  document.getElementById('wm-sheet').innerHTML =
-    `<table><colgroup><col style="width:15%"><col style="width:19%"><col style="width:15%"><col style="width:19%"><col style="width:15%"><col style="width:17%"></colgroup>` +
+// 產生週會紀錄表格 HTML（預覽、PDF 共用；classes 由外層 CSS 決定深/淺色）
+function wmSheetTableHTML() {
+  const s = wmState, c = wmCounts();
+  const absentTxt = c.absent + ' 人' + (wmReasonStr('absent') ? '\n(' + wmReasonStr('absent') + ')' : '');
+  const lateTxt = c.late + ' 人' + (wmReasonStr('late') ? '\n(' + wmReasonStr('late') + ')' : '');
+  return `<table><colgroup><col style="width:15%"><col style="width:19%"><col style="width:15%"><col style="width:19%"><col style="width:15%"><col style="width:17%"></colgroup>` +
     `<tr class="title"><td colspan="6">${escHtml(siteLabel(s.site))}週會會議紀錄</td></tr>` +
     `<tr class="band"><td colspan="6">會議資訊</td></tr>` +
-    `<tr><td class="lbl">會議名稱</td><td class="val">${escHtml(s.name)}</td><td class="lbl">應到人數</td><td class="val">${usersBySite(s.site).length} 人</td><td class="lbl">主席</td><td class="val center">${escHtml(s.chair)}</td></tr>` +
-    `<tr><td class="lbl">會議日期</td><td class="val">${escHtml(wmFmtDate(s.meeting_date))}</td><td class="lbl">實到人數</td><td class="val">${actual} 人</td><td class="lbl">紀錄</td><td class="val center">${escHtml(s.recorder)}</td></tr>` +
+    `<tr><td class="lbl">會議名稱</td><td class="val">${escHtml(s.name)}</td><td class="lbl">應到人數</td><td class="val">${c.expected} 人</td><td class="lbl">主席</td><td class="val center">${escHtml(s.chair)}</td></tr>` +
+    `<tr><td class="lbl">會議日期</td><td class="val">${escHtml(wmFmtDate(s.meeting_date))}</td><td class="lbl">實到人數</td><td class="val">${c.actual} 人</td><td class="lbl">紀錄</td><td class="val center">${escHtml(s.recorder)}</td></tr>` +
     `<tr><td class="lbl">會議時間</td><td class="val">${escHtml((s.time_start||'')+'~'+(s.time_end||''))}</td><td class="lbl">缺席(原因)</td><td class="val">${escHtml(absentTxt)}</td><td class="lbl" rowspan="2">下週心得分享</td><td class="val center" rowspan="2">${escHtml(s.next_share)}</td></tr>` +
     `<tr><td class="lbl">會議地點</td><td class="val">${escHtml(s.place)}</td><td class="lbl">遲到(原因)</td><td class="val">${escHtml(lateTxt)}</td></tr>` +
     `<tr class="band"><td colspan="6">本週值日生</td></tr>` +
-    `<tr><td colspan="6" class="ag-body">${escHtml(dutyTxt)}</td></tr>` +
-    `<tr class="band"><td colspan="6">本週業務會議</td></tr>` +
-    `<tr><td class="lbl">日期</td><td class="val">${escHtml(wmFmtDate(bizRef.date))}</td><td class="lbl">主席／簡報</td><td class="val">${escHtml(bizRef.chair||'')}</td><td class="lbl">會議記錄</td><td class="val">${escHtml(bizRef.recorder||'')}</td></tr>` +
+    `<tr><td colspan="6" class="ag-body">${escHtml(wmDutyText())}</td></tr>` +
     `<tr class="band"><td colspan="6">會議議程</td></tr>` +
     wmTextBlock('主席報告', '一', s.agenda.chair_report) +
     wmItemsBlock('各同仁當週工作會報及通知事項', '二', s.agenda.work_reports) +
-    wmTextBlock('主管報告', '三', s.agenda.mgmt_report) +
-    wmTextBlock('新品介紹', '四', s.agenda.new_product) +
-    wmItemsBlock('讀書心得分享', '五', s.agenda.book_share) +
-    wmItemsBlock('週報分享', '六', s.agenda.weekly_report) +
+    wmTextBlock('新品介紹', '三', s.agenda.new_product) +
+    wmItemsBlock('讀書心得分享', '四', s.agenda.book_share) +
+    wmItemsBlock('Woody 週報分享', '五', s.agenda.woody_report) +
+    wmItemsBlock('個人週報分享', '六', s.agenda.personal_report) +
     wmTextBlock('補充事項', '七', s.agenda.supplement) +
     `<tr><td colspan="6" class="ag-body"><div class="ag-title">八、散會</div></td></tr>` +
     `</table>`;
+}
+function wmRenderPreview() {
+  document.getElementById('wm-sheet').innerHTML = wmSheetTableHTML();
 }
 
 async function wmSave() {
@@ -1118,7 +1105,7 @@ async function wmSave() {
     id: s.id || uid(), site: s.site, meeting_date: s.meeting_date, name: s.name || '週會',
     time_start: s.time_start || '', time_end: s.time_end || '', place: s.place || '',
     chair: s.chair || '', recorder: s.recorder || '', next_share: s.next_share || '',
-    duty_roster: s.duty_roster, biz_ref: s.biz_ref, attendance: s.attendance, guests: s.guests, agenda: s.agenda,
+    duty_roster: s.duty_roster, attendance: s.attendance, guests: s.guests, agenda: s.agenda,
     updated_by: PORTAL_SESSION.empId, updated_at: new Date().toISOString(),
   };
   if (!s.id) { row.created_by = PORTAL_SESSION.empId; row.created_at = new Date().toISOString(); }
@@ -1129,26 +1116,204 @@ async function wmSave() {
   boardToast('已儲存到平台');
 }
 
-function wmSummaryText() {
-  const s = wmState;
-  const L = [`${siteLabel(s.site)}週會會議紀錄`, `日期：${wmFmtDate(s.meeting_date)}　時間：${s.time_start||''}~${s.time_end||''}`,
-    `地點：${s.place||'—'}　主席：${s.chair||'—'}　紀錄：${s.recorder||'—'}`, ''];
-  const push = (label, text) => { if ((text||'').trim()) L.push(label + '：' + text.trim()); };
-  push('主席報告', s.agenda.chair_report);
-  s.agenda.work_reports.forEach(it => { if ((it.text||'').trim()) L.push('• ' + (it.who?it.who+'：':'') + it.text); });
-  push('主管報告', s.agenda.mgmt_report);
-  push('新品介紹', s.agenda.new_product);
-  s.agenda.book_share.forEach(it => { if ((it.text||'').trim()) L.push('• ' + (it.who?it.who+'：':'') + it.text); });
-  s.agenda.weekly_report.forEach(it => { if ((it.text||'').trim()) L.push('• ' + (it.who?it.who+'：':'') + it.text); });
-  push('補充事項', s.agenda.supplement);
+// ───────── 匯出／寄送（比照業務會議記錄：email／PDF／PNG／Excel） ─────────
+function wmDocTitle() { return siteLabel(wmState.site) + '週會會議紀錄'; }
+function wmFileBase() { return wmDocTitle() + '_' + (wmState.meeting_date || ''); }
+function wmDutyText() { const d = wmState.duty_roster && wmState.duty_roster[0]; return (d && d.person) ? d.person : '（尚未填寫）'; }
+
+// 收件人＝該營運中心全體同仁的信箱
+function wmRecipientEmails() {
+  const set = {};
+  usersBySite(wmState.site).forEach(u => { if (u.email) set[u.email] = 1; });
+  return Object.keys(set);
+}
+// 郵件內文：按表格版面的純文字
+function wmMailText() {
+  const s = wmState, c = wmCounts(), L = [];
+  L.push(wmDocTitle()); L.push('');
+  L.push('【會議資訊】');
+  L.push('會議名稱：' + (s.name || '—'));
+  L.push('會議日期：' + wmFmtDate(s.meeting_date));
+  L.push('會議時間：' + ((s.time_start || '') + '~' + (s.time_end || '')));
+  L.push('會議地點：' + (s.place || '—'));
+  L.push('主席：' + (s.chair || '—') + '　紀錄：' + (s.recorder || '—') + '　下週心得分享：' + (s.next_share || '—'));
+  L.push('應到 ' + c.expected + ' 人／實到 ' + c.actual + ' 人／缺席 ' + c.absent + ' 人／遲到 ' + c.late + ' 人');
+  const ab = wmReasonStr('absent'); if (ab) L.push('缺席：' + ab);
+  const lt = wmReasonStr('late'); if (lt) L.push('遲到：' + lt);
+  L.push('');
+  L.push('【本週值日生】'); L.push(wmDutyText()); L.push('');
+  L.push('【會議議程】');
+  const txt = (label, num, t) => { L.push(num + '、' + label + '：' + ((t || '').trim() || '無。')); };
+  const items = (label, num, arr) => {
+    L.push(num + '、' + label); let any = false;
+    (arr || []).forEach(it => { const t = (it.text||'').trim(), w = (it.who||'').trim(); if (!t && !w) return; any = true; L.push('• ' + (w ? w + '：' : '') + t); });
+    if (!any) L.push('（尚未填寫）');
+  };
+  txt('主席報告', '一', s.agenda.chair_report);
+  items('各同仁當週工作會報及通知事項', '二', s.agenda.work_reports);
+  txt('新品介紹', '三', s.agenda.new_product);
+  items('讀書心得分享', '四', s.agenda.book_share);
+  items('Woody 週報分享', '五', s.agenda.woody_report);
+  items('個人週報分享', '六', s.agenda.personal_report);
+  txt('補充事項', '七', s.agenda.supplement);
+  L.push('八、散會');
   return L.join('\n');
 }
-function wmPrint() { window.print(); }
-function wmMail() {
-  const subject = siteLabel(wmState.site) + '週會紀錄_' + (wmState.meeting_date || '');
-  const body = wmSummaryText() + '\n\n（提醒：完整表格請另以列印/PDF 方式附加。）';
-  window.location.href = 'mailto:?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+function wmSendMail() {
+  const to = wmRecipientEmails().join(',');
+  const url = 'mailto:' + encodeURIComponent(to) + '?subject=' + encodeURIComponent(wmFileBase()) + '&body=' + encodeURIComponent(wmMailText());
+  try { window.location.href = url; boardToast('已開啟郵件草稿（收件人＝' + siteLabel(wmState.site) + '全體同仁）'); }
+  catch (e) { boardToast('無法開啟郵件，請改用匯出後手動附加'); }
 }
+
+// PDF：沿用預覽表格 HTML，套淺色列印樣式後開視窗列印
+function wmExportPDF() {
+  const css = "body{font-family:'PingFang TC','Noto Sans TC','Microsoft JhengHei',sans-serif;color:#1a1a1a;margin:24px}" +
+    "table{border-collapse:collapse;width:100%;max-width:820px;table-layout:fixed}" +
+    "td{border:1px solid #b7bec8;padding:7px 10px;font-size:13px;vertical-align:top;word-break:break-word;white-space:pre-wrap}" +
+    ".title{background:#dfe7f1;text-align:center;font-size:19px;font-weight:800;letter-spacing:.08em;padding:13px}" +
+    ".band{background:#eef2f7;font-weight:700}.lbl{background:#f4f5f7;font-weight:700;white-space:nowrap}.center{text-align:center}" +
+    ".ag-title{font-weight:700;margin-bottom:3px}.ag-body ul{margin:2px 0 0;padding-left:1.15em}.ag-body .who{font-weight:700}.ag-empty{color:#98a0ac;font-style:italic}";
+  const html = "<!doctype html><html lang='zh-Hant'><head><meta charset='utf-8'><title>" + wmXesc(wmFileBase()) + "</title><style>" + css + "</style></head><body>" + wmSheetTableHTML() + "</body></html>";
+  const w = window.open('', '_blank');
+  if (!w) { boardToast('請允許彈出視窗以列印 PDF'); return; }
+  w.document.write(html); w.document.close();
+  w.onload = function () { try { w.focus(); w.print(); } catch (e) {} };
+}
+
+// PNG：手繪 canvas（比照業務會議記錄，無外部套件）
+const WM_PNG_FONT = '"PingFang TC","Noto Sans TC","Microsoft JhengHei","Heiti TC","Segoe UI",sans-serif';
+function wmWrapLines(ctx, text, maxW) {
+  const out = [];
+  String(text == null ? '' : text).split('\n').forEach(para => {
+    if (para === '') { out.push(''); return; }
+    let line = ''; for (let i = 0; i < para.length; i++) { const ch = para[i], test = line + ch; if (ctx.measureText(test).width > maxW && line !== '') { out.push(line); line = ch; } else line = test; } out.push(line);
+  });
+  return out;
+}
+function wmDownload(blob, name) { const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 4000); }
+function wmAgendaBlocks() {
+  const s = wmState, blocks = [];
+  const pushText = (label, num, t) => { const val = (t || '').trim(); blocks.push((num + '、' + label) + (val ? '\n' + val : '：無。')); };
+  const pushItems = (label, num, arr) => { const lines = [num + '、' + label]; let any = false; (arr || []).forEach(it => { const tt = (it.text||'').trim(), w = (it.who||'').trim(); if (!tt && !w) return; any = true; lines.push('• ' + (w ? w + '：' : '') + tt); }); if (!any) lines.push('（尚未填寫）'); blocks.push(lines.join('\n')); };
+  pushText('主席報告', '一', s.agenda.chair_report);
+  pushItems('各同仁當週工作會報及通知事項', '二', s.agenda.work_reports);
+  pushText('新品介紹', '三', s.agenda.new_product);
+  pushItems('讀書心得分享', '四', s.agenda.book_share);
+  pushItems('Woody 週報分享', '五', s.agenda.woody_report);
+  pushItems('個人週報分享', '六', s.agenda.personal_report);
+  pushText('補充事項', '七', s.agenda.supplement);
+  blocks.push('八、散會');
+  return blocks;
+}
+function wmRenderCanvas(scale) {
+  const W = 820, PAD = 10, fr = [0.15, 0.19, 0.15, 0.19, 0.15, 0.17], x = [0];
+  for (let i = 0; i < 6; i++) x.push(x[i] + Math.round(fr[i] * W)); x[6] = W;
+  const meas = document.createElement('canvas').getContext('2d'), S = 13.5;
+  function hFor(t, w, b, s, mn) { meas.font = (b ? 'bold ' : '') + (s || S) + 'px ' + WM_PNG_FONT; return Math.max(mn || 30, wmWrapLines(meas, t, w - 2 * PAD).length * (s || S) * 1.5 + 14); }
+  const s = wmState, c = wmCounts();
+  const absentTxt = c.absent + ' 人' + (wmReasonStr('absent') ? '\n(' + wmReasonStr('absent') + ')' : '');
+  const lateTxt = c.late + ' 人' + (wmReasonStr('late') ? '\n(' + wmReasonStr('late') + ')' : '');
+  const dutyTxt = wmDutyText();
+  const time = (s.time_start || '') + '~' + (s.time_end || '');
+  const colV1 = x[2] - x[1], colV3 = x[4] - x[3];
+  const hA = Math.max(hFor(s.name, colV1), 32), hB = 32;
+  const hC = Math.max(hFor(time, colV1), hFor(absentTxt, colV3), 32);
+  const hD = Math.max(hFor(s.place, colV1), hFor(lateTxt, colV3), 32);
+  const blocks = wmAgendaBlocks(), blockH = blocks.map(t => hFor(t, W, false, S, 34));
+  const titleH = 52, bandH = 32, dutyH = hFor(dutyTxt, W, false, S, 34);
+  const totalH = titleH + bandH + hA + hB + hC + hD + bandH + dutyH + bandH + blockH.reduce((a, v) => a + v, 0);
+  const canvas = document.createElement('canvas'); canvas.width = Math.round(W * scale); canvas.height = Math.round(totalH * scale);
+  const ctx = canvas.getContext('2d'); ctx.scale(scale, scale); ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, W, totalH); ctx.textBaseline = 'alphabetic';
+  function cell(cx, cy, cw, ch, text, o) {
+    o = o || {}; if (o.fill) { ctx.fillStyle = o.fill; ctx.fillRect(cx, cy, cw, ch); } ctx.strokeStyle = '#b7bec8'; ctx.lineWidth = 1; ctx.strokeRect(cx + 0.5, cy + 0.5, cw - 1, ch - 1);
+    const size = o.size || S; ctx.fillStyle = '#1a1a1a'; ctx.font = (o.bold ? 'bold ' : '') + size + 'px ' + WM_PNG_FONT;
+    const lines = wmWrapLines(ctx, text, cw - 2 * PAD), lh = size * 1.5, th = lines.length * lh, ty = (o.valign === 'middle') ? cy + (ch - th) / 2 + size : cy + 9 + size;
+    lines.forEach((ln, idx) => { if (o.align === 'center') { ctx.textAlign = 'center'; ctx.fillText(ln, cx + cw / 2, ty + idx * lh); } else { ctx.textAlign = 'left'; ctx.fillText(ln, cx + PAD, ty + idx * lh); } });
+  }
+  let y = 0; const LF = '#f4f5f7';
+  cell(0, y, W, titleH, siteLabel(s.site) + '週會會議紀錄', { fill: '#dfe7f1', bold: true, size: 20, align: 'center', valign: 'middle' }); y += titleH;
+  cell(0, y, W, bandH, '會議資訊', { fill: '#eef2f7', bold: true, valign: 'middle' }); y += bandH;
+  cell(x[0], y, x[1]-x[0], hA, '會議名稱', { fill: LF, bold: true, align: 'center', valign: 'middle' }); cell(x[1], y, x[2]-x[1], hA, s.name, { valign: 'middle' });
+  cell(x[2], y, x[3]-x[2], hA, '應到人數', { fill: LF, bold: true, align: 'center', valign: 'middle' }); cell(x[3], y, x[4]-x[3], hA, c.expected + ' 人', { valign: 'middle' });
+  cell(x[4], y, x[5]-x[4], hA, '主席', { fill: LF, bold: true, align: 'center', valign: 'middle' }); cell(x[5], y, x[6]-x[5], hA, s.chair, { align: 'center', valign: 'middle' }); y += hA;
+  cell(x[0], y, x[1]-x[0], hB, '會議日期', { fill: LF, bold: true, align: 'center', valign: 'middle' }); cell(x[1], y, x[2]-x[1], hB, wmFmtDate(s.meeting_date), { valign: 'middle' });
+  cell(x[2], y, x[3]-x[2], hB, '實到人數', { fill: LF, bold: true, align: 'center', valign: 'middle' }); cell(x[3], y, x[4]-x[3], hB, c.actual + ' 人', { valign: 'middle' });
+  cell(x[4], y, x[5]-x[4], hB, '紀錄', { fill: LF, bold: true, align: 'center', valign: 'middle' }); cell(x[5], y, x[6]-x[5], hB, s.recorder, { align: 'center', valign: 'middle' }); y += hB;
+  cell(x[0], y, x[1]-x[0], hC, '會議時間', { fill: LF, bold: true, align: 'center', valign: 'middle' }); cell(x[1], y, x[2]-x[1], hC, time, { valign: 'middle' });
+  cell(x[2], y, x[3]-x[2], hC, '缺席(原因)', { fill: LF, bold: true, align: 'center', valign: 'middle' }); cell(x[3], y, x[4]-x[3], hC, absentTxt, {});
+  cell(x[4], y, x[5]-x[4], hC+hD, '下週心得分享', { fill: LF, bold: true, align: 'center', valign: 'middle' }); cell(x[5], y, x[6]-x[5], hC+hD, s.next_share, { align: 'center', valign: 'middle' }); y += hC;
+  cell(x[0], y, x[1]-x[0], hD, '會議地點', { fill: LF, bold: true, align: 'center', valign: 'middle' }); cell(x[1], y, x[2]-x[1], hD, s.place, { valign: 'middle' });
+  cell(x[2], y, x[3]-x[2], hD, '遲到(原因)', { fill: LF, bold: true, align: 'center', valign: 'middle' }); cell(x[3], y, x[4]-x[3], hD, lateTxt, {}); y += hD;
+  cell(0, y, W, bandH, '本週值日生', { fill: '#eef2f7', bold: true, valign: 'middle' }); y += bandH;
+  cell(0, y, W, dutyH, dutyTxt, {}); y += dutyH;
+  cell(0, y, W, bandH, '會議議程', { fill: '#eef2f7', bold: true, valign: 'middle' }); y += bandH;
+  blocks.forEach((t, i) => { cell(0, y, W, blockH[i], t, {}); y += blockH[i]; });
+  return canvas;
+}
+function wmExportPNG() { try { wmRenderCanvas(2).toBlob(function (blob) { if (!blob) { boardToast('PNG 匯出失敗，請改用 PDF'); return; } wmDownload(blob, wmFileBase() + '.png'); boardToast('已匯出 PNG'); }, 'image/png'); } catch (e) { boardToast('PNG 匯出失敗，請改用 PDF 列印'); } }
+
+// Excel：自建 xlsx（比照業務會議記錄的 zip/xml 手法）
+function wmCrc32(bytes) { let t = wmCrc32._t; if (!t) { t = wmCrc32._t = []; for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) { c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1); } t[n] = c >>> 0; } } let crc = 0 ^ (-1); for (let i = 0; i < bytes.length; i++) { crc = (crc >>> 8) ^ t[(crc ^ bytes[i]) & 0xFF]; } return (crc ^ (-1)) >>> 0; }
+function wmMakeZip(files) {
+  const enc = new TextEncoder(), local = [], central = []; let offset = 0;
+  files.forEach(f => {
+    const nameB = enc.encode(f.name), data = f.data, crc = wmCrc32(data), size = data.length;
+    const lh = new Uint8Array(30 + nameB.length), dv = new DataView(lh.buffer);
+    dv.setUint32(0, 0x04034b50, true); dv.setUint16(4, 20, true); dv.setUint16(6, 0x0800, true); dv.setUint16(8, 0, true); dv.setUint16(10, 0, true); dv.setUint16(12, 0x21, true);
+    dv.setUint32(14, crc, true); dv.setUint32(18, size, true); dv.setUint32(22, size, true); dv.setUint16(26, nameB.length, true); dv.setUint16(28, 0, true); lh.set(nameB, 30);
+    local.push(lh, data);
+    const ch = new Uint8Array(46 + nameB.length), cv = new DataView(ch.buffer);
+    cv.setUint32(0, 0x02014b50, true); cv.setUint16(4, 20, true); cv.setUint16(6, 20, true); cv.setUint16(8, 0x0800, true); cv.setUint16(10, 0, true); cv.setUint16(12, 0, true); cv.setUint16(14, 0x21, true);
+    cv.setUint32(16, crc, true); cv.setUint32(20, size, true); cv.setUint32(24, size, true); cv.setUint16(28, nameB.length, true); cv.setUint16(30, 0, true); cv.setUint16(32, 0, true); cv.setUint16(34, 0, true); cv.setUint16(36, 0, true); cv.setUint32(38, 0, true); cv.setUint32(42, offset, true);
+    ch.set(nameB, 46); central.push(ch); offset += lh.length + size;
+  });
+  const cSize = central.reduce((a, v) => a + v.length, 0);
+  const eocd = new Uint8Array(22), ev = new DataView(eocd.buffer);
+  ev.setUint32(0, 0x06054b50, true); ev.setUint16(8, files.length, true); ev.setUint16(10, files.length, true); ev.setUint32(12, cSize, true); ev.setUint32(16, offset, true);
+  const parts = local.concat(central); parts.push(eocd);
+  return new Blob(parts, { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+}
+function wmXesc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+function wmBuildXlsx() {
+  const s = wmState, c = wmCounts();
+  const absentTxt = c.absent + ' 人' + (wmReasonStr('absent') ? '\n(' + wmReasonStr('absent') + ')' : '');
+  const lateTxt = c.late + ' 人' + (wmReasonStr('late') ? '\n(' + wmReasonStr('late') + ')' : '');
+  const dutyTxt = wmDutyText();
+  const time = (s.time_start || '') + '~' + (s.time_end || '');
+  const rows = [], merges = [];
+  const cl = (ref, v, st) => ({ ref, v, s: st });
+  rows.push({ r: 1, ht: 26, cells: [cl('B1', siteLabel(s.site) + '週會會議紀錄', 1)] }); merges.push('B1:G1');
+  rows.push({ r: 2, ht: 20, cells: [cl('B2', '會議資訊', 2)] }); merges.push('B2:G2');
+  rows.push({ r: 3, ht: 20, cells: [cl('B3', '會議名稱', 3), cl('C3', s.name, 4), cl('D3', '應到人數', 3), cl('E3', c.expected + ' 人', 4), cl('F3', '主席', 3), cl('G3', s.chair, 5)] });
+  rows.push({ r: 4, ht: 20, cells: [cl('B4', '會議日期', 3), cl('C4', wmFmtDate(s.meeting_date), 4), cl('D4', '實到人數', 3), cl('E4', c.actual + ' 人', 4), cl('F4', '紀錄', 3), cl('G4', s.recorder, 5)] });
+  rows.push({ r: 5, ht: Math.max(20, absentTxt.split('\n').length * 16), cells: [cl('B5', '會議時間', 3), cl('C5', time, 4), cl('D5', '缺席(原因)', 3), cl('E5', absentTxt, 4), cl('F5', '下週心得分享', 3), cl('G5', s.next_share, 5)] });
+  rows.push({ r: 6, ht: Math.max(20, lateTxt.split('\n').length * 16), cells: [cl('B6', '會議地點', 3), cl('C6', s.place, 4), cl('D6', '遲到(原因)', 3), cl('E6', lateTxt, 4)] });
+  merges.push('F5:F6', 'G5:G6');
+  rows.push({ r: 7, ht: 20, cells: [cl('B7', '本週值日生', 2)] }); merges.push('B7:G7');
+  rows.push({ r: 8, ht: Math.max(20, dutyTxt.split('\n').length * 16), cells: [cl('B8', dutyTxt, 4)] }); merges.push('B8:G8');
+  rows.push({ r: 9, ht: 20, cells: [cl('B9', '會議議程', 2)] }); merges.push('B9:G9');
+  let rn = 10;
+  wmAgendaBlocks().forEach(text => { const lc = text.split('\n').length; rows.push({ r: rn, ht: Math.max(22, lc * 16 + 6), cells: [cl('B' + rn, text, 4)] }); merges.push('B' + rn + ':G' + rn); rn++; });
+  const sheetRows = rows.map(row => { const cs = row.cells.map(c2 => (c2.v === '' || c2.v == null) ? '<c r="' + c2.ref + '" s="' + c2.s + '"/>' : '<c r="' + c2.ref + '" s="' + c2.s + '" t="inlineStr"><is><t xml:space="preserve">' + wmXesc(c2.v) + '</t></is></c>').join(''); return '<row r="' + row.r + '" ht="' + row.ht + '" customHeight="1">' + cs + '</row>'; }).join('');
+  const mergeXML = '<mergeCells count="' + merges.length + '">' + merges.map(m => '<mergeCell ref="' + m + '"/>').join('') + '</mergeCells>';
+  const sheetXml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><cols><col min="1" max="1" width="2.5" customWidth="1"/><col min="2" max="2" width="14" customWidth="1"/><col min="3" max="3" width="22" customWidth="1"/><col min="4" max="4" width="14" customWidth="1"/><col min="5" max="5" width="30" customWidth="1"/><col min="6" max="6" width="14" customWidth="1"/><col min="7" max="7" width="14" customWidth="1"/></cols><sheetData>' + sheetRows + '</sheetData>' + mergeXML + '</worksheet>';
+  const styles = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="3"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="16"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font></fonts><fills count="4"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FFDFE7F1"/><bgColor indexed="64"/></patternFill></fill><fill><patternFill patternType="solid"><fgColor rgb="FFF4F5F7"/><bgColor indexed="64"/></patternFill></fill></fills><borders count="2"><border><left/><right/><top/><bottom/><diagonal/></border><border><left style="thin"><color rgb="FFB7BEC8"/></left><right style="thin"><color rgb="FFB7BEC8"/></right><top style="thin"><color rgb="FFB7BEC8"/></top><bottom style="thin"><color rgb="FFB7BEC8"/></bottom><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="6"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="2" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf><xf numFmtId="0" fontId="2" fillId="2" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="left" vertical="center"/></xf><xf numFmtId="0" fontId="2" fillId="3" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf><xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyFont="1" applyBorder="1" applyAlignment="1"><alignment horizontal="left" vertical="top" wrapText="1"/></xf><xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyFont="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>';
+  const contentTypes = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/></Types>';
+  const rels = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>';
+  const workbook = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="週會紀錄" sheetId="1" r:id="rId1"/></sheets></workbook>';
+  const wbRels = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>';
+  const enc = new TextEncoder();
+  return wmMakeZip([
+    { name: '[Content_Types].xml', data: enc.encode(contentTypes) },
+    { name: '_rels/.rels', data: enc.encode(rels) },
+    { name: 'xl/workbook.xml', data: enc.encode(workbook) },
+    { name: 'xl/_rels/workbook.xml.rels', data: enc.encode(wbRels) },
+    { name: 'xl/styles.xml', data: enc.encode(styles) },
+    { name: 'xl/worksheets/sheet1.xml', data: enc.encode(sheetXml) }
+  ]);
+}
+function wmExportXlsx() { try { wmDownload(wmBuildXlsx(), wmFileBase() + '.xlsx'); boardToast('已匯出 Excel'); } catch (e) { boardToast('Excel 匯出失敗'); } }
 
 // ═══════════════════════════════════════════════
 // TAB 3：業務會議記錄（改編自 meetingminutes_V2.html）

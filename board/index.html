@@ -5,7 +5,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#080C14">
-<title>COMART · 公告與紀錄 v1.13</title>
+<title>COMART · 公告與紀錄 v1.14</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -94,6 +94,8 @@ h1,h2,h3,p{margin:0}
 .btn.ghost{background:transparent}
 .btn.danger{color:var(--red)}
 .btn.danger:hover{border-color:var(--red)}
+/* 深色主題下，日期欄位的日曆挑選 icon 反白，避免看不到 */
+input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(1);opacity:.85;cursor:pointer}
 .btn.sm{padding:6px 11px;font-size:12.5px}
 .divider-v{width:1px;height:22px;background:var(--br)}
 
@@ -202,7 +204,7 @@ select,select option,option{background:var(--s2);color:var(--tx)}
     <a class="logo" href="javascript:void(0)">
       <div class="logo-mark">告</div>
       <div class="logo-text">公告與紀錄</div>
-      <span class="logo-ver">v1.13</span>
+      <span class="logo-ver">v1.14</span>
     </a>
     <div class="topbar-right">
       <span class="who-badge" id="whoBadge">—</span>
@@ -323,7 +325,7 @@ select,select option,option{background:var(--s2);color:var(--tx)}
           </div>
 
           <div style="display:flex;gap:8px;margin-top:4px;flex-wrap:wrap">
-            <button class="btn primary" style="flex:2 1 140px" onclick="wmSave()">✓ 儲存到平台</button>
+            <button class="btn primary" style="flex:2 1 140px" onclick="wmSave()">✓ 儲存</button>
             <button class="btn" style="flex:1 1 90px" onclick="wmSendMail()">✉️ 寄送</button>
             <button class="btn" style="flex:1 1 70px" onclick="wmExportXlsx()">Excel</button>
             <button class="btn" style="flex:1 1 70px" onclick="wmExportPNG()">PNG</button>
@@ -355,7 +357,7 @@ select,select option,option{background:var(--s2);color:var(--tx)}
           <button class="chip-f" data-f="VN" onclick="bmSetFilter('VN')">越南廠</button>
           <button class="btn primary sm" id="btnNewMeeting" style="margin-left:auto">＋ 新增業務會議記錄</button>
         </div>
-        <p class="hint" style="margin:0 0 12px">全公司皆可查閱；修改／刪除僅限該範圍成員或 admin。點「編輯」可帶回修改或重新匯出。</p>
+        <p class="hint" style="margin:0 0 12px">全公司皆可查閱；修改僅限該範圍成員或 admin，刪除僅限 admin。點「編輯」可帶回修改或重新匯出。</p>
         <div id="savedList"></div>
       </div>
 
@@ -365,7 +367,7 @@ select,select option,option{background:var(--s2);color:var(--tx)}
           <button class="btn ghost sm" id="btnBackList">← 返回列表</button>
           <div style="margin-left:auto;display:flex;gap:6px;align-items:center;padding:6px 0;flex-wrap:wrap">
             <button class="btn sm" id="btnCancel">✕ 取消</button>
-            <button class="btn primary sm" id="btnSave">✓ 儲存到平台</button>
+            <button class="btn primary sm" id="btnSave">✓ 儲存</button>
             <button class="btn sm" id="btnSend">✉️ 寄送</button>
             <button class="btn sm" id="btnExcel">Excel</button>
             <button class="btn sm" id="btnPng">PNG</button>
@@ -456,7 +458,7 @@ select,select option,option{background:var(--s2);color:var(--tx)}
           <button class="btn sm" onclick="wrMail()">✉️ 寄送</button>
           <button class="btn sm" onclick="wrPrint()">🖨️ 列印全文</button>
           <button class="btn sm" onclick="wrCancel()">✕ 取消</button>
-          <button class="btn primary sm" id="wr-save-btn" onclick="wrSave()">✓ 儲存到平台</button>
+          <button class="btn primary sm" id="wr-save-btn" onclick="wrSave()">✓ 儲存</button>
         </div>
       </div>
       <div class="grid2">
@@ -679,7 +681,7 @@ function bbRender() {
     const init = (name || '?')[0].toUpperCase();
     const dt = new Date(p.ts).toLocaleString('zh-TW', { month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit' });
     const liked = (p.likes || []).includes(PORTAL_SESSION?.empId);
-    const canDel = isAdmin() || (PORTAL_SESSION && p.authorId === PORTAL_SESSION.empId);
+    const canDel = isAdmin();
     return `<div class="post-card">
       <div class="post-head">
         <div class="post-avatar">${escHtml(init)}</div>
@@ -740,6 +742,7 @@ async function bbToggleLike(postId) {
 }
 
 async function bbDeletePost(postId) {
+  if (!isAdmin()) { boardToast('僅管理員可刪除'); return; }
   if (!confirm('刪除此公告？')) return;
   try { await SB.del('portal_bulletin', 'id=eq.' + encodeURIComponent(postId)); }
   catch(e) { boardToast('刪除失敗'); return; }
@@ -812,13 +815,14 @@ function wmRenderList() {
       </div>
       <div class="ops">
         <button class="btn sm" onclick="wmOpenRecord('${r.id}')">${canEdit ? '編輯' : '查看'}</button>
-        ${canEdit ? `<button class="btn sm danger" onclick="wmDeleteRecord('${r.id}')">刪除</button>` : ''}
+        ${isAdmin() ? `<button class="btn sm danger" onclick="wmDeleteRecord('${r.id}')">刪除</button>` : ''}
       </div>
     </div>`;
   }).join('');
 }
 
 async function wmDeleteRecord(id) {
+  if (!isAdmin()) { boardToast('僅管理員可刪除'); return; }
   if (!confirm('確定刪除這筆週會紀錄？')) return;
   try { await SB.del('weekly_minutes', 'id=eq.' + encodeURIComponent(id)); }
   catch(e) { boardToast('刪除失敗'); return; }
@@ -1122,7 +1126,8 @@ async function wmSave() {
     await SB.upsert('weekly_minutes', row);
   } catch(e) { boardToast('儲存失敗：' + e.message); return; }
   s.id = row.id; _wmEditId = row.id;
-  boardToast('已儲存到平台');
+  boardToast('已儲存');
+  wmBackToList();
 }
 
 // ───────── 匯出／寄送（比照業務會議記錄：email／PDF／PNG／Excel） ─────────
@@ -1609,7 +1614,7 @@ function bizMeetingInit(){
         var ops=el("div","ops");
         var open=el("button","btn sm",canEdit?"編輯":"查看"); open.onclick=function(){ loadRecord(it.id); };
         ops.appendChild(open);
-        if(canEdit){
+        if(isAdmin()){
           var del=el("button","btn sm danger","刪除"); del.onclick=function(){ if(!confirm("確定刪除這筆紀錄？")) return; Promise.resolve().then(function(){return store().remove(it.id);}).then(function(){ toast("已刪除"); buildSaved(); }).catch(function(e){ toast("刪除失敗："+((e&&e.message)||"")); }); };
           ops.appendChild(del);
         }
@@ -2112,9 +2117,7 @@ async function initBoard() {
       return { id: r.id, title: r.title, savedAt: r.updated_at, data: r.data, view: r.view, site: r.site };
     },
     remove: async function(id) {
-      const rows = await SB.get('biz_meeting_minutes', '?id=eq.' + encodeURIComponent(id) + '&select=site');
-      const ownerScope = rows && rows[0] && rows[0].site;
-      if (ownerScope && !bizCanEdit(ownerScope)) throw new Error('無權限刪除此範圍的紀錄');
+      if (!isAdmin()) throw new Error('僅管理員可刪除');
       await SB.del('biz_meeting_minutes', 'id=eq.' + encodeURIComponent(id));
     },
   };

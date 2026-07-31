@@ -171,6 +171,34 @@ export function SearchPage() {
                 { value: "conflict", label: "有衝突" },
               ]}
             />
+            <label className="flex h-10 items-center gap-2 self-end rounded-xl border border-slate-300 px-3 text-sm font-semibold text-slate-700">
+              <input
+                type="checkbox"
+                checked={filters.uncategorized ?? false}
+                onChange={(event) =>
+                  setFilters((current) => ({
+                    ...current,
+                    uncategorized: event.target.checked || undefined,
+                  }))
+                }
+                className="h-4 w-4 accent-cyan-600"
+              />
+              僅顯示未分類
+            </label>
+            <label className="flex h-10 items-center gap-2 self-end rounded-xl border border-slate-300 px-3 text-sm font-semibold text-slate-700">
+              <input
+                type="checkbox"
+                checked={filters.withoutSupplier ?? false}
+                onChange={(event) =>
+                  setFilters((current) => ({
+                    ...current,
+                    withoutSupplier: event.target.checked || undefined,
+                  }))
+                }
+                className="h-4 w-4 accent-cyan-600"
+              />
+              僅顯示未連結廠商
+            </label>
           </div>
         )}
       </form>

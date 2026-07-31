@@ -12,7 +12,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Card, Badge, Button, ConfirmationBadge } from "../components/ui";
 import { api } from "../lib/api";
-import type { ProductDetail } from "../lib/types";
+import type { Category, ProductDetail, SupplierOption } from "../lib/types";
 import { formatBytes, formatDate } from "../lib/utils";
 import { useAuth } from "../auth/AuthProvider";
 
@@ -21,8 +21,12 @@ export function ProductDetailPage() {
   const { profile } = useAuth();
   const [product, setProduct] = useState<ProductDetail | null | undefined>();
   const [editing, setEditing] = useState(false);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [supplierOptions, setSupplierOptions] = useState<SupplierOption[]>([]);
 
   useEffect(() => {
+    void api.getCategories().then(setCategories);
+    void api.getSuppliers().then(setSupplierOptions);
     void api.getProduct(id).then(async (result) => {
       if (result) {
         const thumbnailUrl = await api.getProductThumbnailUrl(result.id);
@@ -57,6 +61,13 @@ export function ProductDetailPage() {
       modelNumbers: list("modelNumbers"),
       functions: list("functions"),
       keywords: list("keywords"),
+      categoryId: String(form.get("categoryId") ?? "") || null,
+      suppliers: supplierOptions
+        .filter((supplier) => form.get(`supplier-${supplier.id}`) === "on")
+        .map((supplier) => ({
+          id: supplier.id,
+          role: String(form.get(`supplier-role-${supplier.id}`) ?? "unknown"),
+        })),
     });
     setEditing(false);
     const refreshed = await api.getProduct(product!.id);
@@ -108,6 +119,58 @@ export function ProductDetailPage() {
                 />
               </label>
             ))}
+            <label className="text-xs font-bold text-slate-600">
+              正式分類
+              <select
+                name="categoryId"
+                defaultValue={product.category?.id ?? ""}
+                className="mt-1.5 h-10 w-full rounded-xl border border-slate-300 px-3 text-sm"
+              >
+                <option value="">未分類</option>
+                {categories.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.nameZhTw}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <fieldset className="rounded-xl border border-slate-200 p-4 md:col-span-2">
+              <legend className="px-2 text-xs font-black text-slate-700">
+                廠商與角色（可複選）
+              </legend>
+              {supplierOptions.length ? (
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                  {supplierOptions.map((supplier) => {
+                    const current = product.suppliers.find((item) => item.id === supplier.id);
+                    return (
+                      <div key={supplier.id} className="rounded-xl bg-slate-50 p-3">
+                        <label className="flex items-center gap-2 text-sm font-bold text-slate-900">
+                          <input
+                            type="checkbox"
+                            name={`supplier-${supplier.id}`}
+                            defaultChecked={Boolean(current)}
+                            className="h-4 w-4 accent-cyan-600"
+                          />
+                          {supplier.name}
+                        </label>
+                        <select
+                          name={`supplier-role-${supplier.id}`}
+                          defaultValue={current?.role ?? "unknown"}
+                          className="mt-2 h-9 w-full rounded-lg border border-slate-300 px-2 text-xs"
+                        >
+                          <option value="manufacturer">原廠</option>
+                          <option value="trader">貿易商</option>
+                          <option value="partner">合作夥伴</option>
+                          <option value="unknown">角色待確認</option>
+                        </select>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <p className="text-sm text-slate-500">請先在管理頁建立廠商主檔。</p>
+              )}
+            </fieldset>
             <div className="md:col-span-2 flex justify-end">
               <Button>儲存並標記人工確認</Button>
             </div>

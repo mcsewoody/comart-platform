@@ -31,6 +31,31 @@ async function signPaths(
   ))
 }
 
+async function embedQuery(query: string) {
+  if (!query.trim()) return null
+  const key = Deno.env.get("OPENAI_API_KEY") || ""
+  if (!key) return null
+  try {
+    const response = await fetch("https://api.openai.com/v1/embeddings", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${key}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "text-embedding-3-large",
+        input: query.slice(0, 4000),
+        encoding_format: "float",
+      }),
+    })
+    if (!response.ok) return null
+    const result = await response.json()
+    return result?.data?.[0]?.embedding || null
+  } catch {
+    return null
+  }
+}
+
 function cpfRole(platformRole: string) {
   if (platformRole === "admin") return "admin"
   if (platformRole === "dcc") return "editor"
@@ -172,20 +197,32 @@ serve(async (req) => {
   }
 
   if (action === "categories") {
-    const { data, error } = await sb.from("cpf_categories")
+    const [{ data, error }, { data: aliases }, { data: usage }] = await Promise.all([
+      sb.from("cpf_categories")
       .select("id,name_zh_tw,parent_id").is("deleted_at", null).order("sort_order")
+      , sb.from("cpf_category_aliases").select("category_id,alias,locale")
+      , sb.from("cpf_products").select("category_id").is("deleted_at", null)
+    ])
     if (error) return json({ error: error.message }, 500)
     return json({ items: (data || []).map((row: any) => ({
       id: row.id, nameZhTw: row.name_zh_tw, parentId: row.parent_id,
+      aliases: (aliases || []).filter((a: any) => a.category_id === row.id).map((a: any) => a.alias),
+      productCount: (usage || []).filter((p: any) => p.category_id === row.id).length,
     })) })
   }
 
   if (action === "suppliers") {
-    const { data, error } = await sb.from("cpf_suppliers")
+    const [{ data, error }, { data: aliases }, { data: usage }] = await Promise.all([
+      sb.from("cpf_suppliers")
       .select("id,legal_name").is("deleted_at", null).order("legal_name")
+      , sb.from("cpf_supplier_aliases").select("supplier_id,alias,locale")
+      , sb.from("cpf_product_suppliers").select("supplier_id,product_id")
+    ])
     if (error) return json({ error: error.message }, 500)
     return json({ items: (data || []).map((row: any) => ({
       id: row.id, name: row.legal_name,
+      aliases: (aliases || []).filter((a: any) => a.supplier_id === row.id).map((a: any) => a.alias),
+      productCount: new Set((usage || []).filter((p: any) => p.supplier_id === row.id).map((p: any) => p.product_id)).size,
     })) })
   }
 
@@ -209,6 +246,47 @@ serve(async (req) => {
     return json({ item: { id: data.id, name: data.legal_name } })
   }
 
+  if (action === "updateMaster") {
+    if (sess.role !== "admin") return json({ error: "forbidden" }, 403)
+    const kind = String(body.kind || "")
+    const id = String(body.id || "")
+    const name = String(body.name || "").trim()
+    const aliases = [...new Set((body.aliases || []).map((item: unknown) => String(item).trim()).filter(Boolean))]
+    if (!id || !name || !["category", "supplier"].includes(kind)) return json({ error: "bad_master_data" }, 400)
+    const table = kind === "category" ? "cpf_categories" : "cpf_suppliers"
+    const nameField = kind === "category" ? "name_zh_tw" : "legal_name"
+    const aliasTable = kind === "category" ? "cpf_category_aliases" : "cpf_supplier_aliases"
+    const foreignKey = kind === "category" ? "category_id" : "supplier_id"
+    const { error } = await sb.from(table).update({ [nameField]: name, updated_at: new Date().toISOString() }).eq("id", id)
+    if (error) return json({ error: error.message }, 400)
+    await sb.from(aliasTable).delete().eq(foreignKey, id)
+    if (aliases.length) {
+      const { error: aliasError } = await sb.from(aliasTable).insert(aliases.map(alias => ({ [foreignKey]: id, alias })))
+      if (aliasError) return json({ error: aliasError.message }, 400)
+    }
+    await sb.from("cpf_audit_log").insert({
+      action: `platform_update_${kind}`, entity_type: kind, entity_id: id,
+      details: { empId: sess.empId, platform: true, name, aliases },
+    })
+    return json({ ok: true })
+  }
+
+  if (action === "mergeMaster") {
+    if (sess.role !== "admin") return json({ error: "forbidden" }, 403)
+    const kind = String(body.kind || "")
+    if (!["category", "supplier"].includes(kind)) return json({ error: "bad_master_kind" }, 400)
+    const rpc = kind === "category" ? "cpf_merge_category" : "cpf_merge_supplier"
+    const { data, error } = await sb.rpc(rpc, {
+      p_source_id: body.sourceId, p_target_id: body.targetId, p_actor: sess.empId,
+    })
+    if (error) return json({ error: error.message }, 400)
+    await sb.from("cpf_audit_log").insert({
+      action: `platform_merge_${kind}`, entity_type: kind, entity_id: String(body.sourceId),
+      details: { empId: sess.empId, platform: true, targetId: body.targetId, result: data },
+    })
+    return json({ result: data })
+  }
+
   const { data: documents, error: documentError } = await sb.from("cpf_documents")
     .select("*")
   if (documentError) return json({ error: documentError.message }, 500)
@@ -224,14 +302,22 @@ serve(async (req) => {
 
   if (action === "searchDocuments") {
     const started = performance.now()
-    const query = String(body.query || "").trim().toLowerCase()
+    const query = String(body.query || "").trim()
     const filters = body.filters || {}
+    const embedding = await embedQuery(query)
+    const { data: rankedRows } = await sb.rpc("cpf_platform_rank_documents", {
+      p_query: query, p_embedding: embedding,
+    })
+    const rankMap = new Map((rankedRows || []).map((row: any) => [row.document_id, Number(row.score)]))
     const rows = visibleDocuments.filter((doc: any) => {
       if (doc.deleted_at) return false
       const version: any = versionsById.get(doc.current_version_id)
       if (filters.extension && version?.extension !== filters.extension) return false
-      return !query || `${doc.title} ${doc.source_path}`.toLowerCase().includes(query)
-    }).slice(0, 100).map((doc: any) => documentSummary(doc, versionsById.get(doc.current_version_id) as any))
+      return !query || rankMap.has(doc.id)
+    }).map((doc: any) => ({
+      ...documentSummary(doc, versionsById.get(doc.current_version_id) as any),
+      score: rankMap.get(doc.id) || 0,
+    })).sort((a: any, b: any) => b.score - a.score || b.updatedAt.localeCompare(a.updatedAt)).slice(0, 100)
     const signed = await signPaths(sb, "cpf_thumbnail", rows.map((row: any) => row.thumbnailUrl))
     for (const row of rows) row.thumbnailUrl = signed.get(row.thumbnailUrl) || null
     return json({ items: rows, total: rows.length, elapsedMs: Math.round(performance.now() - started) })
@@ -317,6 +403,11 @@ serve(async (req) => {
     const started = performance.now()
     const query = String(body.query || "")
     const filters = body.filters || {}
+    const embedding = await embedQuery(query)
+    const { data: rankedRows } = await sb.rpc("cpf_platform_rank_products", {
+      p_query: query, p_embedding: embedding,
+    })
+    const rankMap = new Map((rankedRows || []).map((row: any) => [row.product_id, Number(row.score)]))
     const ranked = (products || []).filter((product: any) => {
       if (product.deleted_at) return false
       const linked = (docsByProduct.get(product.id) || []).filter(id => visibleDocumentIds.has(id))
@@ -324,10 +415,12 @@ serve(async (req) => {
       if (filters.categoryId && product.category_id !== filters.categoryId) return false
       if (filters.confirmationStatus && product.confirmation_status !== filters.confirmationStatus) return false
       if (filters.supplierId && !(supplierMap.get(product.id) || []).some(s => s.id === filters.supplierId)) return false
-      return !query.trim() || scoreProduct(product, query) > 0
+      if (filters.uncategorized && product.category_id) return false
+      if (filters.withoutSupplier && (supplierMap.get(product.id) || []).length) return false
+      return !query.trim() || rankMap.has(product.id)
     }).map((product: any) => {
       const linked = (docsByProduct.get(product.id) || []).filter(id => visibleDocumentIds.has(id))
-      return productSummary(product, categoryMap, supplierMap, linked.length, scoreProduct(product, query))
+      return productSummary(product, categoryMap, supplierMap, linked.length, rankMap.get(product.id) || scoreProduct(product, query))
     }).sort((a: any, b: any) => b.score - a.score || b.updatedAt.localeCompare(a.updatedAt))
     const items = ranked.slice(0, 100)
     const signed = await signPaths(sb, "cpf_thumbnail", items.map((item: any) => item.thumbnailUrl))
@@ -404,6 +497,38 @@ serve(async (req) => {
     })) })
   }
 
+  if (action === "mappingSuggestions") {
+    if (!canEdit(sess)) return json({ error: "forbidden" }, 403)
+    const { data, error } = await sb.from("cpf_master_mapping_suggestions")
+      .select("*,cpf_products(id,name_zh_tw,model_numbers),cpf_categories(id,name_zh_tw),cpf_suppliers(id,legal_name)")
+      .eq("status", "pending").order("confidence", { ascending: false })
+    if (error) return json({ error: error.message }, 500)
+    return json({ items: (data || []).map((row: any) => ({
+      id: row.id, type: row.mapping_type, productId: row.product_id,
+      productName: row.cpf_products?.name_zh_tw || "未命名產品",
+      modelNumbers: row.cpf_products?.model_numbers || [],
+      masterId: row.category_id || row.supplier_id,
+      masterName: row.cpf_categories?.name_zh_tw || row.cpf_suppliers?.legal_name || "未命名主檔",
+      supplierRole: row.supplier_role, confidence: Number(row.confidence),
+      rationale: row.rationale, evidenceExcerpt: row.evidence_excerpt,
+    })) })
+  }
+
+  if (action === "applyMappingSuggestions") {
+    if (!canEdit(sess)) return json({ error: "forbidden" }, 403)
+    const ids = [...new Set((body.ids || []).map(String))].slice(0, 500)
+    if (!ids.length) return json({ error: "suggestion_ids_required" }, 400)
+    const { data, error } = await sb.rpc("cpf_apply_mapping_suggestions", {
+      p_suggestion_ids: ids, p_actor: sess.empId,
+    })
+    if (error) return json({ error: error.message }, 400)
+    await sb.from("cpf_audit_log").insert({
+      action: "platform_apply_mapping_suggestions", entity_type: "mapping_batch",
+      details: { empId: sess.empId, platform: true, ids, result: data },
+    })
+    return json({ result: data })
+  }
+
   if (action === "closeReview") {
     if (!canEdit(sess)) return json({ error: "forbidden" }, 403)
     const status = String(body.status)
@@ -450,15 +575,30 @@ serve(async (req) => {
       model_numbers: patch.modelNumbers,
       functions: patch.functions,
       keywords: patch.keywords,
+      category_id: patch.categoryId || null,
       confirmation_status: "human_confirmed",
       manual_overrides: {
         name_original: true, name_zh_tw: true, name_en: true, name_vi: true,
         brand: true, model_numbers: true, functions: true, keywords: true,
+        category_id: true,
       },
       updated_at: new Date().toISOString(),
     }
     const { error } = await sb.from("cpf_products").update(mapped).eq("id", body.id)
     if (error) return json({ error: error.message }, 400)
+    if (Array.isArray(patch.suppliers)) {
+      await sb.from("cpf_product_suppliers").delete().eq("product_id", body.id)
+      if (patch.suppliers.length) {
+        const { error: supplierError } = await sb.from("cpf_product_suppliers").insert(
+          patch.suppliers.map((supplier: any) => ({
+            product_id: body.id, supplier_id: supplier.id,
+            supplier_role: supplier.role || "unknown",
+            confirmation_status: "human_confirmed",
+          })),
+        )
+        if (supplierError) return json({ error: supplierError.message }, 400)
+      }
+    }
     await sb.from("cpf_audit_log").insert({
       action: "platform_manual_update", entity_type: "product", entity_id: body.id,
       details: { empId: sess.empId, platform: true },

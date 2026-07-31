@@ -11,6 +11,7 @@ import { getPlatformSession } from "./platform-session";
 import type {
   Category,
   BatchApprovalResult,
+  MappingSuggestion,
   DocumentSummary,
   ProcessingJob,
   ProductDetail,
@@ -229,6 +230,25 @@ export const api = {
     ).item;
   },
 
+  async updateMaster(
+    kind: "category" | "supplier",
+    id: string,
+    name: string,
+    aliases: string[],
+  ) {
+    if (appConfig.demoMode) return;
+    await platformCall("updateMaster", { kind, id, name, aliases });
+  },
+
+  async mergeMaster(
+    kind: "category" | "supplier",
+    sourceId: string,
+    targetId: string,
+  ) {
+    if (appConfig.demoMode) return;
+    await platformCall("mergeMaster", { kind, sourceId, targetId });
+  },
+
   async getJobs(): Promise<ProcessingJob[]> {
     if (appConfig.demoMode) return demoJobs;
     return (await platformCall<{ items: ProcessingJob[] }>("jobs")).items;
@@ -237,6 +257,23 @@ export const api = {
   async getReviewTasks(): Promise<ReviewTask[]> {
     if (appConfig.demoMode) return demoReviewTasks;
     return (await platformCall<{ items: ReviewTask[] }>("reviews")).items;
+  },
+
+  async getMappingSuggestions(): Promise<MappingSuggestion[]> {
+    if (appConfig.demoMode) return [];
+    return (
+      await platformCall<{ items: MappingSuggestion[] }>("mappingSuggestions")
+    ).items;
+  },
+
+  async applyMappingSuggestions(ids: string[]): Promise<{ applied: number }> {
+    if (appConfig.demoMode) return { applied: ids.length };
+    return (
+      await platformCall<{ result: { applied: number } }>(
+        "applyMappingSuggestions",
+        { ids },
+      )
+    ).result;
   },
 
   async closeReviewTask(id: string, status: "resolved" | "dismissed") {

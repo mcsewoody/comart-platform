@@ -4,14 +4,20 @@ import {
   ChevronDown,
   Factory,
   GitCompareArrows,
+  Link2,
   Layers3,
+  Sparkles,
   ShieldAlert,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Badge, Button, Card, EmptyState, PageHeader } from "../components/ui";
 import { api } from "../lib/api";
-import type { BatchApprovalResult, ReviewTask } from "../lib/types";
+import type {
+  BatchApprovalResult,
+  MappingSuggestion,
+  ReviewTask,
+} from "../lib/types";
 import { formatDate } from "../lib/utils";
 
 const taskIcons = {
@@ -95,6 +101,8 @@ export function ReviewPage() {
         title="以來源文件審核 AI 結果"
         description="一份文件可能產生多個欄位提醒。只確認文件裡實際出現的資料；不適用或沒有證據的欄位可以保持空白。"
       />
+
+      <MasterMappingPanel />
 
       <Card className="mb-5 p-5">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
@@ -180,6 +188,116 @@ export function ReviewPage() {
       )}
     </>
   );
+}
+
+function MasterMappingPanel() {
+  const [suggestions, setSuggestions] = useState<MappingSuggestion[]>([]);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState("");
+
+  useEffect(() => {
+    void api.getMappingSuggestions().then(setSuggestions);
+  }, []);
+
+  const groups = useMemo(() => {
+    const map = new Map<string, MappingSuggestion[]>();
+    for (const item of suggestions) {
+      const key = `${item.type}:${item.masterId}:${item.supplierRole || ""}`;
+      map.set(key, [...(map.get(key) || []), item]);
+    }
+    return [...map.entries()].map(([key, items]) => ({ key, items }));
+  }, [suggestions]);
+
+  async function applySelected() {
+    const ids = groups
+      .filter((group) => selected.has(group.key))
+      .flatMap((group) => group.items.map((item) => item.id));
+    if (!ids.length) return;
+    setBusy(true);
+    try {
+      const result = await api.applyMappingSuggestions(ids);
+      setSuggestions((current) => current.filter((item) => !ids.includes(item.id)));
+      setSelected(new Set());
+      setMessage(`已套用 ${result.applied} 個產品主檔對應。`);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <Card className="mb-5 overflow-hidden border-cyan-200">
+      <div className="flex flex-col gap-4 bg-cyan-50 p-5 lg:flex-row lg:items-center lg:justify-between">
+        <div>
+          <h2 className="flex items-center gap-2 font-black text-slate-950">
+            <Sparkles className="text-cyan-800" size={19} />
+            AI 正式分類／廠商對應
+          </h2>
+          <p className="mt-1 text-sm leading-6 text-slate-500">
+            相同建議會自動成組；勾選後一次套用。廠商建議只收來源文件明確出現的名稱，不依資料夾或 Logo 猜測。
+          </p>
+        </div>
+        <Button disabled={!selected.size || busy} onClick={() => void applySelected()}>
+          <Link2 size={17} />
+          {busy ? "套用中…" : `批次套用 ${selected.size || ""} 組`}
+        </Button>
+      </div>
+      {message && <p className="px-5 pt-4 text-sm font-bold text-emerald-700">{message}</p>}
+      {groups.length ? (
+        <div className="divide-y divide-slate-100">
+          {groups.map((group) => {
+            const sample = group.items[0];
+            const average = Math.round(
+              group.items.reduce((sum, item) => sum + item.confidence, 0) /
+                group.items.length * 100,
+            );
+            return (
+              <label key={group.key} className="grid cursor-pointer gap-3 p-5 hover:bg-slate-50 md:grid-cols-[24px_minmax(0,1fr)_auto]">
+                <input
+                  type="checkbox"
+                  checked={selected.has(group.key)}
+                  onChange={(event) => setSelected((current) => {
+                    const next = new Set(current);
+                    if (event.target.checked) next.add(group.key);
+                    else next.delete(group.key);
+                    return next;
+                  })}
+                  className="mt-1 h-5 w-5 accent-cyan-600"
+                />
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Badge tone="accent">{sample.type === "category" ? "正式分類" : "廠商"}</Badge>
+                    <strong className="text-slate-950">{sample.masterName}</strong>
+                    {sample.supplierRole && <Badge>{supplierRoleLabel(sample.supplierRole)}</Badge>}
+                  </div>
+                  <p className="mt-2 text-sm text-slate-500">
+                    {group.items.slice(0, 4).map((item) => item.productName).join("、")}
+                    {group.items.length > 4 ? ` 等 ${group.items.length} 個產品` : ""}
+                  </p>
+                  <p className="mt-1 text-xs text-slate-400">{sample.rationale}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-lg font-black text-cyan-800">{average}%</p>
+                  <p className="text-xs text-slate-500">平均信心</p>
+                </div>
+              </label>
+            );
+          })}
+        </div>
+      ) : (
+        <p className="p-5 text-sm text-slate-500">目前沒有待套用的分類或廠商建議。</p>
+      )}
+    </Card>
+  );
+}
+
+function supplierRoleLabel(role: NonNullable<MappingSuggestion["supplierRole"]>) {
+  return {
+    manufacturer: "原廠",
+    trader: "貿易商",
+    partner: "合作夥伴",
+    unknown: "角色待確認",
+  }[role];
 }
 
 function DocumentReviewGroup({

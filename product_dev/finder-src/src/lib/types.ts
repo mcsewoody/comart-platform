@@ -33,6 +33,8 @@ export interface Category {
   id: string;
   nameZhTw: string;
   parentId?: string | null;
+  aliases?: string[];
+  productCount?: number;
 }
 
 export interface SupplierRef {
@@ -45,6 +47,8 @@ export interface SupplierRef {
 export interface SupplierOption {
   id: string;
   name: string;
+  aliases?: string[];
+  productCount?: number;
 }
 
 export interface Specification {
@@ -125,6 +129,8 @@ export interface SearchFilters {
   supplierId?: string;
   extension?: string;
   confirmationStatus?: ConfirmationStatus;
+  uncategorized?: boolean;
+  withoutSupplier?: boolean;
 }
 
 export interface SearchResponse<T> {
@@ -160,6 +166,20 @@ export interface BatchApprovalResult {
   documentsApproved: number;
   productsConfirmed: number;
   reviewTasksResolved: number;
+}
+
+export interface MappingSuggestion {
+  id: string;
+  type: "category" | "supplier";
+  productId: string;
+  productName: string;
+  modelNumbers: string[];
+  masterId: string;
+  masterName: string;
+  supplierRole?: SupplierRef["role"] | null;
+  confidence: number;
+  rationale: string;
+  evidenceExcerpt?: string | null;
 }
 
 export interface TrashItem {

@@ -1,0 +1,503 @@
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
+import { verifySession } from "../_shared/session.ts"
+
+const CORS = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Access-Control-Allow-Headers": "content-type, x-session",
+}
+
+type Session = { empId: string; role: string; site?: string }
+
+function json(value: unknown, status = 200) {
+  return new Response(JSON.stringify(value), {
+    status,
+    headers: { ...CORS, "Content-Type": "application/json" },
+  })
+}
+
+function cpfRole(platformRole: string) {
+  if (platformRole === "admin") return "admin"
+  if (platformRole === "dcc") return "editor"
+  return "viewer"
+}
+
+function canEdit(sess: Session) {
+  return sess.role === "admin" || sess.role === "dcc"
+}
+
+function canReadSensitivity(
+  sensitivity: string,
+  sess: Session,
+  grants: Map<string, boolean>,
+  documentId: string,
+) {
+  if (sess.role === "admin") return true
+  if (sensitivity === "general") return true
+  if (sensitivity === "commercial") return sess.role === "dcc"
+  return grants.get(documentId) === true
+}
+
+function scoreProduct(row: Record<string, any>, query: string) {
+  const q = query.trim().toLowerCase()
+  if (!q) return 0
+  if ((row.model_numbers || []).some((model: string) => model.toLowerCase() === q)) return 1000
+  const haystack = [
+    row.name_original, row.name_zh_tw, row.name_en, row.name_vi, row.brand,
+    ...(row.model_numbers || []), ...(row.functions || []), ...(row.keywords || []),
+  ].filter(Boolean).join(" ").toLowerCase()
+  if (haystack === q) return 500
+  if (haystack.includes(q)) return 100
+  const words = q.split(/\s+/).filter(Boolean)
+  return words.reduce((sum, word) => sum + (haystack.includes(word) ? 8 : 0), 0)
+}
+
+function productSummary(
+  row: Record<string, any>,
+  categories: Map<string, any>,
+  suppliers: Map<string, any[]>,
+  documentCount: number,
+  score = 0,
+) {
+  return {
+    id: row.id,
+    nameOriginal: row.name_original,
+    nameZhTw: row.name_zh_tw,
+    nameEn: row.name_en,
+    nameVi: row.name_vi,
+    brand: row.brand,
+    modelNumbers: row.model_numbers || [],
+    category: row.category_id ? categories.get(row.category_id) || null : null,
+    functions: row.functions || [],
+    keywords: row.keywords || [],
+    suppliers: suppliers.get(row.id) || [],
+    confirmationStatus: row.confirmation_status,
+    thumbnailUrl: row.representative_thumbnail_path,
+    documentCount,
+    updatedAt: row.updated_at,
+    score,
+  }
+}
+
+function documentSummary(row: Record<string, any>, version: Record<string, any>) {
+  return {
+    id: row.id,
+    title: row.title,
+    extension: version?.extension || "",
+    documentType: row.document_type,
+    sensitivity: row.sensitivity,
+    processingStatus: row.processing_status,
+    sourcePath: row.source_path,
+    version: Number(version?.version_number || 1),
+    byteSize: Number(version?.byte_size || 0),
+    pageCount: version?.page_count ?? null,
+    previewUrl: version?.preview_path || null,
+    thumbnailUrl: version?.thumbnail_path || null,
+    updatedAt: row.updated_at,
+  }
+}
+
+serve(async (req) => {
+  if (req.method === "OPTIONS") return new Response("ok", { headers: CORS })
+  if (req.method !== "POST") return json({ error: "method_not_allowed" }, 405)
+
+  const verified = await verifySession(req.headers.get("x-session") || "")
+  if (!verified?.empId) return json({ error: "unauthorized" }, 401)
+  const sess: Session = {
+    empId: String(verified.empId),
+    role: String(verified.role || "user"),
+    site: String(verified.site || ""),
+  }
+
+  const url = Deno.env.get("SB_URL") || ""
+  const key = Deno.env.get("SB_SERVICE_ROLE_KEY") || ""
+  if (!url || !key) return json({ error: "server_misconfigured" }, 500)
+  const sb = createClient(url, key)
+  const body = await req.json().catch(() => ({}))
+  const action = String(body.action || "")
+
+  const { data: user } = await sb.from("users")
+    .select("emp_id,name_en,name_zh,email,role,active")
+    .eq("emp_id", sess.empId).maybeSingle()
+  if (!user || user.active === false || user.role === "inactive") {
+    return json({ error: "account_inactive" }, 403)
+  }
+
+  const role = cpfRole(sess.role)
+  if (action === "bootstrap") {
+    return json({
+      profile: {
+        id: user.emp_id,
+        email: user.email || `${user.emp_id}@comart.com.tw`,
+        displayName: user.name_zh || user.name_en || user.emp_id,
+        role,
+        active: true,
+      },
+    })
+  }
+
+  const { data: grantRows } = await sb
+    .from("cpf_platform_document_access_grants")
+    .select("document_id,can_read")
+    .eq("emp_id", sess.empId)
+  const grants = new Map((grantRows || []).map((g: any) => [g.document_id, g.can_read]))
+
+  if (action === "profiles") {
+    if (sess.role !== "admin") return json({ error: "forbidden" }, 403)
+    const { data, error } = await sb.from("users")
+      .select("emp_id,name_en,name_zh,email,role,active").order("emp_id")
+    if (error) return json({ error: error.message }, 500)
+    return json({ items: (data || []).map((row: any) => ({
+      id: row.emp_id,
+      email: row.email || "",
+      displayName: row.name_zh || row.name_en || row.emp_id,
+      role: cpfRole(row.role),
+      active: row.active !== false && row.role !== "inactive",
+    })) })
+  }
+
+  if (action === "categories") {
+    const { data, error } = await sb.from("cpf_categories")
+      .select("id,name_zh_tw,parent_id").is("deleted_at", null).order("sort_order")
+    if (error) return json({ error: error.message }, 500)
+    return json({ items: (data || []).map((row: any) => ({
+      id: row.id, nameZhTw: row.name_zh_tw, parentId: row.parent_id,
+    })) })
+  }
+
+  if (action === "suppliers") {
+    const { data, error } = await sb.from("cpf_suppliers")
+      .select("id,legal_name").is("deleted_at", null).order("legal_name")
+    if (error) return json({ error: error.message }, 500)
+    return json({ items: (data || []).map((row: any) => ({
+      id: row.id, name: row.legal_name,
+    })) })
+  }
+
+  if (action === "createCategory" || action === "createSupplier") {
+    if (sess.role !== "admin") return json({ error: "forbidden" }, 403)
+    if (action === "createCategory") {
+      const name = String(body.nameZhTw || "").trim()
+      if (!name) return json({ error: "name_required" }, 400)
+      const { data, error } = await sb.from("cpf_categories").insert({
+        name_zh_tw: name,
+        slug: `category-${crypto.randomUUID()}`,
+      }).select("id,name_zh_tw,parent_id").single()
+      if (error) return json({ error: error.message }, 400)
+      return json({ item: { id: data.id, nameZhTw: data.name_zh_tw, parentId: data.parent_id } })
+    }
+    const name = String(body.legalName || "").trim()
+    if (!name) return json({ error: "name_required" }, 400)
+    const { data, error } = await sb.from("cpf_suppliers")
+      .insert({ legal_name: name }).select("id,legal_name").single()
+    if (error) return json({ error: error.message }, 400)
+    return json({ item: { id: data.id, name: data.legal_name } })
+  }
+
+  const { data: documents, error: documentError } = await sb.from("cpf_documents")
+    .select("*")
+  if (documentError) return json({ error: documentError.message }, 500)
+  const visibleDocuments = (documents || []).filter((doc: any) =>
+    canReadSensitivity(doc.sensitivity, sess, grants, doc.id)
+  )
+  const visibleDocumentIds = new Set(visibleDocuments.map((doc: any) => doc.id))
+  const versionIds = visibleDocuments.map((doc: any) => doc.current_version_id).filter(Boolean)
+  const { data: versions } = versionIds.length
+    ? await sb.from("cpf_document_versions").select("*").in("id", versionIds)
+    : { data: [] }
+  const versionsById = new Map((versions || []).map((v: any) => [v.id, v]))
+
+  if (action === "searchDocuments") {
+    const started = performance.now()
+    const query = String(body.query || "").trim().toLowerCase()
+    const filters = body.filters || {}
+    const rows = visibleDocuments.filter((doc: any) => {
+      if (doc.deleted_at) return false
+      const version: any = versionsById.get(doc.current_version_id)
+      if (filters.extension && version?.extension !== filters.extension) return false
+      return !query || `${doc.title} ${doc.source_path}`.toLowerCase().includes(query)
+    }).slice(0, 100).map((doc: any) => documentSummary(doc, versionsById.get(doc.current_version_id) as any))
+    return json({ items: rows, total: rows.length, elapsedMs: Math.round(performance.now() - started) })
+  }
+
+  if (action === "document") {
+    const doc: any = visibleDocuments.find((item: any) => item.id === body.id && !item.deleted_at)
+    return json({ item: doc ? documentSummary(doc, versionsById.get(doc.current_version_id) as any) : null })
+  }
+
+  if (action === "fileUrl") {
+    let doc: any = null
+    let path = ""
+    let bucket = ""
+    if (body.kind === "product_thumbnail") {
+      const { data: product } = await sb.from("cpf_products")
+        .select("id,representative_thumbnail_path").eq("id", body.productId).maybeSingle()
+      if (!product?.representative_thumbnail_path) return json({ url: null })
+      const { data: links } = await sb.from("cpf_product_documents")
+        .select("document_id").eq("product_id", product.id)
+      if (!(links || []).some((link: any) => visibleDocumentIds.has(link.document_id))) {
+        return json({ error: "forbidden" }, 403)
+      }
+      path = product.representative_thumbnail_path
+      bucket = "cpf_thumbnail"
+    } else {
+      doc = visibleDocuments.find((item: any) => item.id === body.documentId && !item.deleted_at)
+      if (!doc) return json({ error: "forbidden" }, 403)
+      const version: any = versionsById.get(doc.current_version_id)
+      if (body.kind === "source") { path = version?.storage_path; bucket = "cpf_source" }
+      if (body.kind === "preview") { path = version?.preview_path; bucket = "cpf_preview" }
+      if (body.kind === "thumbnail") { path = version?.thumbnail_path; bucket = "cpf_thumbnail" }
+    }
+    if (!path || !bucket) return json({ url: null })
+    const { data, error } = await sb.storage.from(bucket).createSignedUrl(path, 300)
+    if (error) return json({ error: error.message }, 500)
+    await sb.from("cpf_audit_log").insert({
+      action: "download",
+      entity_type: body.kind === "product_thumbnail" ? "product_thumbnail" : "document",
+      entity_id: String(body.productId || body.documentId),
+      sensitivity: doc?.sensitivity || null,
+      details: { empId: sess.empId, platform: true, kind: body.kind },
+    })
+    return json({ url: data.signedUrl })
+  }
+
+  const { data: products, error: productError } = await sb.from("cpf_products").select("*")
+  if (productError) return json({ error: productError.message }, 500)
+  const productIds = (products || []).map((p: any) => p.id)
+  const [{ data: categories }, { data: productSuppliers }, { data: productDocs }] = await Promise.all([
+    sb.from("cpf_categories").select("id,name_zh_tw,parent_id"),
+    productIds.length
+      ? sb.from("cpf_product_suppliers").select("product_id,supplier_role,confirmation_status,cpf_suppliers(id,legal_name)").in("product_id", productIds)
+      : Promise.resolve({ data: [] }),
+    productIds.length
+      ? sb.from("cpf_product_documents").select("product_id,document_id").in("product_id", productIds)
+      : Promise.resolve({ data: [] }),
+  ])
+  const categoryMap = new Map((categories || []).map((c: any) => [c.id, {
+    id: c.id, nameZhTw: c.name_zh_tw, parentId: c.parent_id,
+  }]))
+  const supplierMap = new Map<string, any[]>()
+  for (const row of productSuppliers || []) {
+    const supplier: any = (row as any).cpf_suppliers
+    if (!supplier) continue
+    const list = supplierMap.get((row as any).product_id) || []
+    list.push({
+      id: supplier.id,
+      name: supplier.legal_name,
+      role: (row as any).supplier_role,
+      confirmationStatus: (row as any).confirmation_status,
+    })
+    supplierMap.set((row as any).product_id, list)
+  }
+  const docsByProduct = new Map<string, string[]>()
+  for (const row of productDocs || []) {
+    const list = docsByProduct.get((row as any).product_id) || []
+    list.push((row as any).document_id)
+    docsByProduct.set((row as any).product_id, list)
+  }
+
+  if (action === "searchProducts") {
+    const started = performance.now()
+    const query = String(body.query || "")
+    const filters = body.filters || {}
+    const ranked = (products || []).filter((product: any) => {
+      if (product.deleted_at) return false
+      const linked = (docsByProduct.get(product.id) || []).filter(id => visibleDocumentIds.has(id))
+      if (!linked.length) return false
+      if (filters.categoryId && product.category_id !== filters.categoryId) return false
+      if (filters.confirmationStatus && product.confirmation_status !== filters.confirmationStatus) return false
+      if (filters.supplierId && !(supplierMap.get(product.id) || []).some(s => s.id === filters.supplierId)) return false
+      return !query.trim() || scoreProduct(product, query) > 0
+    }).map((product: any) => {
+      const linked = (docsByProduct.get(product.id) || []).filter(id => visibleDocumentIds.has(id))
+      return productSummary(product, categoryMap, supplierMap, linked.length, scoreProduct(product, query))
+    }).sort((a: any, b: any) => b.score - a.score || b.updatedAt.localeCompare(a.updatedAt))
+    const items = ranked.slice(0, 100)
+    return json({ items, total: ranked.length, elapsedMs: Math.round(performance.now() - started) })
+  }
+
+  if (action === "product") {
+    const product: any = (products || []).find((item: any) => item.id === body.id && !item.deleted_at)
+    if (!product) return json({ item: null })
+    const linkedIds = (docsByProduct.get(product.id) || []).filter(id => visibleDocumentIds.has(id))
+    if (!linkedIds.length) return json({ item: null })
+    const [{ data: specs }, { data: evidence }, { data: quotes }] = await Promise.all([
+      sb.from("cpf_specifications").select("*").eq("product_id", product.id),
+      sb.from("cpf_evidence").select("*,cpf_document_versions(document_id)").eq("product_id", product.id),
+      sb.from("cpf_quotes").select("*,cpf_suppliers(legal_name),cpf_quote_tiers(unit_price)").eq("product_id", product.id).eq("confirmation_status", "human_confirmed").order("quote_date", { ascending: false }).limit(1),
+    ])
+    const detail: any = productSummary(product, categoryMap, supplierMap, linkedIds.length)
+    detail.specifications = (specs || []).map((s: any) => ({
+      id: s.id, name: s.name, valueText: s.value_text, valueNumber: s.value_number,
+      unit: s.unit, sourceText: s.source_text, confirmationStatus: s.confirmation_status,
+    }))
+    detail.evidence = (evidence || []).filter((e: any) =>
+      visibleDocumentIds.has(e.cpf_document_versions?.document_id)
+    ).map((e: any) => ({
+      id: e.id, fieldName: e.field_name, sourceLabel: "",
+      sourceLocator: e.source_locator, excerpt: e.excerpt,
+      confirmationStatus: e.confirmation_status,
+    }))
+    detail.documents = linkedIds.map(id => {
+      const doc: any = visibleDocuments.find((d: any) => d.id === id)
+      return documentSummary(doc, versionsById.get(doc.current_version_id) as any)
+    })
+    const quote: any = quotes?.[0]
+    detail.latestConfirmedQuote = quote ? {
+      id: quote.id,
+      supplierName: quote.cpf_suppliers?.legal_name || "",
+      currency: quote.currency,
+      unitPrice: Math.min(...(quote.cpf_quote_tiers || []).map((t: any) => Number(t.unit_price))),
+      moq: quote.moq,
+      leadTimeDays: quote.lead_time_days,
+      quoteDate: quote.quote_date,
+      incoterm: quote.incoterm,
+    } : null
+    return json({ item: detail })
+  }
+
+  if (action === "jobs") {
+    if (!canEdit(sess)) return json({ error: "forbidden" }, 403)
+    const { data, error } = await sb.from("cpf_processing_jobs")
+      .select("*,cpf_documents(title,sensitivity)").order("created_at", { ascending: false }).limit(50)
+    if (error) return json({ error: error.message }, 500)
+    return json({ items: (data || []).filter((row: any) =>
+      canReadSensitivity(row.cpf_documents?.sensitivity, sess, grants, row.document_id)
+    ).map((row: any) => ({
+      id: row.id, documentTitle: row.cpf_documents?.title || "未命名文件",
+      status: row.status, progress: row.progress, message: row.message,
+      createdAt: row.created_at, updatedAt: row.updated_at,
+    })) })
+  }
+
+  if (action === "reviews") {
+    if (!canEdit(sess)) return json({ error: "forbidden" }, 403)
+    const { data, error } = await sb.from("cpf_review_tasks")
+      .select("*,cpf_documents(title,sensitivity)").eq("status", "open").order("created_at", { ascending: false })
+    if (error) return json({ error: error.message }, 500)
+    return json({ items: (data || []).filter((row: any) =>
+      !row.document_id || canReadSensitivity(row.cpf_documents?.sensitivity, sess, grants, row.document_id)
+    ).map((row: any) => ({
+      id: row.id, type: row.review_type, title: row.title, description: row.description,
+      documentTitle: row.cpf_documents?.title || "未連結文件",
+      documentId: row.document_id, productId: row.product_id,
+      priority: row.priority, createdAt: row.created_at,
+    })) })
+  }
+
+  if (action === "closeReview") {
+    if (!canEdit(sess)) return json({ error: "forbidden" }, 403)
+    const status = String(body.status)
+    if (!["resolved", "dismissed"].includes(status)) return json({ error: "bad_status" }, 400)
+    const { error } = await sb.from("cpf_review_tasks").update({
+      status, resolved_at: new Date().toISOString(),
+    }).eq("id", body.id)
+    if (error) return json({ error: error.message }, 400)
+    await sb.from("cpf_audit_log").insert({
+      action: `platform_review_${status}`, entity_type: "review_task", entity_id: body.id,
+      details: { empId: sess.empId, platform: true },
+    })
+    return json({ ok: true })
+  }
+
+  if (action === "updateProduct") {
+    if (!canEdit(sess)) return json({ error: "forbidden" }, 403)
+    const patch = body.patch || {}
+    const mapped = {
+      name_original: patch.nameOriginal,
+      name_zh_tw: patch.nameZhTw,
+      name_en: patch.nameEn,
+      name_vi: patch.nameVi,
+      brand: patch.brand,
+      model_numbers: patch.modelNumbers,
+      functions: patch.functions,
+      keywords: patch.keywords,
+      confirmation_status: "human_confirmed",
+      manual_overrides: {
+        name_original: true, name_zh_tw: true, name_en: true, name_vi: true,
+        brand: true, model_numbers: true, functions: true, keywords: true,
+      },
+      updated_at: new Date().toISOString(),
+    }
+    const { error } = await sb.from("cpf_products").update(mapped).eq("id", body.id)
+    if (error) return json({ error: error.message }, 400)
+    await sb.from("cpf_audit_log").insert({
+      action: "platform_manual_update", entity_type: "product", entity_id: body.id,
+      details: { empId: sess.empId, platform: true },
+    })
+    return json({ ok: true })
+  }
+
+  if (action === "trash") {
+    if (sess.role !== "admin") return json({ error: "forbidden" }, 403)
+    const items = [
+      ...(products || []).filter((p: any) => p.deleted_at).map((p: any) => ({
+        id: p.id, kind: "product", title: p.name_zh_tw, deletedAt: p.deleted_at,
+      })),
+      ...(documents || []).filter((d: any) => d.deleted_at).map((d: any) => ({
+        id: d.id, kind: "document", title: d.title, deletedAt: d.deleted_at,
+      })),
+    ].sort((a, b) => b.deletedAt.localeCompare(a.deletedAt))
+    return json({ items })
+  }
+
+  if (action === "restore") {
+    if (sess.role !== "admin") return json({ error: "forbidden" }, 403)
+    const table = body.item?.kind === "product" ? "cpf_products" : "cpf_documents"
+    const { error } = await sb.from(table).update({ deleted_at: null, deleted_by: null }).eq("id", body.item?.id)
+    if (error) return json({ error: error.message }, 400)
+    return json({ ok: true })
+  }
+
+  if (action === "initUpload") {
+    if (!canEdit(sess)) return json({ error: "forbidden" }, 403)
+    const name = String(body.name || "").replace(/[\/\\]/g, "_")
+    const size = Number(body.byteSize || 0)
+    if (!name || size <= 0 || size > 524288000) return json({ error: "invalid_file" }, 400)
+    const path = `${crypto.randomUUID()}/${name}`
+    const { data, error } = await sb.storage.from("cpf_source").createSignedUploadUrl(path)
+    if (error) return json({ error: error.message }, 400)
+    return json({ path, signedUrl: data.signedUrl })
+  }
+
+  if (action === "completeUpload") {
+    if (!canEdit(sess)) return json({ error: "forbidden" }, 403)
+    const sensitivity = String(body.sensitivity || "general")
+    if (!["general", "commercial", "highly_confidential"].includes(sensitivity)) {
+      return json({ error: "bad_sensitivity" }, 400)
+    }
+    const { data: object } = await sb.storage.from("cpf_source")
+      .list(String(body.path).split("/")[0], { search: String(body.path).split("/").slice(1).join("/") })
+    if (!object?.length) return json({ error: "upload_not_found" }, 400)
+    const { data: doc, error: docError } = await sb.from("cpf_documents").insert({
+      title: String(body.name), sensitivity, source_kind: "web_upload",
+      source_path: String(body.path),
+    }).select("id").single()
+    if (docError) return json({ error: docError.message }, 400)
+    const extension = String(body.name).includes(".")
+      ? String(body.name).split(".").pop()?.toLowerCase() || ""
+      : ""
+    const { data: version, error: versionError } = await sb.from("cpf_document_versions").insert({
+      document_id: doc.id, version_number: 1, storage_path: body.path,
+      mime_type: body.mimeType || "application/octet-stream",
+      extension, byte_size: Number(body.byteSize),
+      sha256: "0".repeat(64), deep_analysis_eligible: Number(body.byteSize) <= 104857600,
+    }).select("id").single()
+    if (versionError) {
+      await sb.from("cpf_documents").delete().eq("id", doc.id)
+      return json({ error: versionError.message }, 400)
+    }
+    await sb.from("cpf_documents").update({ current_version_id: version.id }).eq("id", doc.id)
+    await sb.from("cpf_processing_jobs").insert({
+      document_id: doc.id, document_version_id: version.id,
+    })
+    await sb.from("cpf_audit_log").insert({
+      action: "platform_upload", entity_type: "document", entity_id: doc.id,
+      sensitivity, details: { empId: sess.empId, platform: true, path: body.path },
+    })
+    return json({ documentId: doc.id, versionId: version.id, status: "queued" })
+  }
+
+  return json({ error: "unknown_action" }, 400)
+})

@@ -16,6 +16,7 @@ export function ProductCard({ product }: { product: ProductSummary }) {
             <img
               src={product.thumbnailUrl}
               alt={`${product.nameZhTw} 來源代表圖`}
+              loading="lazy"
               className="h-full w-full object-contain p-4"
             />
           ) : (

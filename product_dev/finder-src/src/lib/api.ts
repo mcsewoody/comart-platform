@@ -10,6 +10,7 @@ import {
 import { getPlatformSession } from "./platform-session";
 import type {
   Category,
+  BatchApprovalResult,
   DocumentSummary,
   ProcessingJob,
   ProductDetail,
@@ -241,6 +242,22 @@ export const api = {
   async closeReviewTask(id: string, status: "resolved" | "dismissed") {
     if (appConfig.demoMode) return;
     await platformCall("closeReview", { id, status });
+  },
+
+  async batchApproveDocuments(documentIds: string[]) {
+    if (appConfig.demoMode) {
+      return {
+        documentsApproved: documentIds.length,
+        productsConfirmed: documentIds.length,
+        reviewTasksResolved: documentIds.length,
+      } satisfies BatchApprovalResult;
+    }
+    return (
+      await platformCall<{ result: BatchApprovalResult }>(
+        "batchApproveDocuments",
+        { documentIds },
+      )
+    ).result;
   },
 
   async uploadFiles(files: File[], sensitivity: string) {

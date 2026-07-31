@@ -1,4 +1,4 @@
-import { ArrowUpRight, FileArchive, FileText } from "lucide-react";
+import { ArrowUpRight, FileArchive, FileText, ImageOff } from "lucide-react";
 import { Link } from "react-router-dom";
 import type { DocumentSummary } from "../lib/types";
 import {
@@ -16,12 +16,22 @@ export function DocumentRow({ document }: { document: DocumentSummary }) {
       className="grid gap-4 border-b border-slate-100 px-4 py-4 transition last:border-b-0 hover:bg-slate-50 md:grid-cols-[minmax(0,1fr)_120px_120px_32px] md:items-center"
     >
       <div className="flex min-w-0 items-start gap-3">
-        <div className="rounded-xl bg-slate-100 p-2.5 text-slate-600">
-          {document.extension === "zip" ? (
-            <FileArchive size={20} />
+        <div className="relative flex h-20 w-24 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-slate-200 bg-slate-100 text-slate-500">
+          {document.thumbnailUrl ? (
+            <img
+              src={document.thumbnailUrl}
+              alt={`${document.title} 預覽`}
+              loading="lazy"
+              className="h-full w-full object-contain p-1"
+            />
+          ) : document.extension === "zip" ? (
+            <FileArchive size={24} />
           ) : (
-            <FileText size={20} />
+            <ImageOff size={24} />
           )}
+          <span className="absolute bottom-1 left-1 rounded bg-slate-950/80 px-1.5 py-0.5 text-[10px] font-black text-white">
+            {document.extension.toUpperCase() || <FileText size={11} />}
+          </span>
         </div>
         <div className="min-w-0">
           <p className="truncate text-sm font-bold text-slate-950">

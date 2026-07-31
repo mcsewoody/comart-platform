@@ -17,6 +17,20 @@ function json(value: unknown, status = 200) {
   })
 }
 
+async function signPaths(
+  sb: any,
+  bucket: string,
+  paths: Array<string | null | undefined>,
+) {
+  const unique = [...new Set(paths.filter((path): path is string => Boolean(path)))]
+  if (!unique.length) return new Map<string, string>()
+  const { data, error } = await sb.storage.from(bucket).createSignedUrls(unique, 300)
+  if (error) return new Map<string, string>()
+  return new Map((data || []).flatMap((item: any) =>
+    item.signedUrl ? [[item.path, item.signedUrl] as [string, string]] : []
+  ))
+}
+
 function cpfRole(platformRole: string) {
   if (platformRole === "admin") return "admin"
   if (platformRole === "dcc") return "editor"
@@ -218,6 +232,8 @@ serve(async (req) => {
       if (filters.extension && version?.extension !== filters.extension) return false
       return !query || `${doc.title} ${doc.source_path}`.toLowerCase().includes(query)
     }).slice(0, 100).map((doc: any) => documentSummary(doc, versionsById.get(doc.current_version_id) as any))
+    const signed = await signPaths(sb, "cpf_thumbnail", rows.map((row: any) => row.thumbnailUrl))
+    for (const row of rows) row.thumbnailUrl = signed.get(row.thumbnailUrl) || null
     return json({ items: rows, total: rows.length, elapsedMs: Math.round(performance.now() - started) })
   }
 
@@ -314,6 +330,8 @@ serve(async (req) => {
       return productSummary(product, categoryMap, supplierMap, linked.length, scoreProduct(product, query))
     }).sort((a: any, b: any) => b.score - a.score || b.updatedAt.localeCompare(a.updatedAt))
     const items = ranked.slice(0, 100)
+    const signed = await signPaths(sb, "cpf_thumbnail", items.map((item: any) => item.thumbnailUrl))
+    for (const item of items) item.thumbnailUrl = signed.get(item.thumbnailUrl) || null
     return json({ items, total: ranked.length, elapsedMs: Math.round(performance.now() - started) })
   }
 
@@ -399,6 +417,25 @@ serve(async (req) => {
       details: { empId: sess.empId, platform: true },
     })
     return json({ ok: true })
+  }
+
+  if (action === "batchApproveDocuments") {
+    if (!canEdit(sess)) return json({ error: "forbidden" }, 403)
+    const requested = [...new Set((body.documentIds || []).map(String))].slice(0, 100)
+    if (!requested.length) return json({ error: "document_ids_required" }, 400)
+    const allowed = requested.filter((id) => visibleDocumentIds.has(id))
+    if (allowed.length !== requested.length) return json({ error: "forbidden_document" }, 403)
+    const { data, error } = await sb.rpc("cpf_batch_approve_documents", {
+      p_document_ids: allowed,
+      p_actor: sess.empId,
+    })
+    if (error) return json({ error: error.message }, 400)
+    await sb.from("cpf_audit_log").insert({
+      action: "platform_batch_approve_documents",
+      entity_type: "document_batch",
+      details: { empId: sess.empId, platform: true, documentIds: allowed, result: data },
+    })
+    return json({ result: data })
   }
 
   if (action === "updateProduct") {

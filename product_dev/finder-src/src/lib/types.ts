@@ -156,6 +156,12 @@ export interface ReviewTask {
   createdAt: string;
 }
 
+export interface BatchApprovalResult {
+  documentsApproved: number;
+  productsConfirmed: number;
+  reviewTasksResolved: number;
+}
+
 export interface TrashItem {
   id: string;
   kind: "product" | "document";

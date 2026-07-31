@@ -24,9 +24,13 @@ export function DocumentDetailPage() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   useEffect(() => {
+    setPreviewUrl(null);
     void api.getDocument(id).then(async (result) => {
       setDocument(result);
-      if (result) setPreviewUrl(await api.getFileUrl(result.id, "preview"));
+      if (result) {
+        const kind = isImageExtension(result.extension) ? "source" : "preview";
+        setPreviewUrl(await api.getFileUrl(result.id, kind));
+      }
     });
   }, [id]);
 
@@ -65,7 +69,13 @@ export function DocumentDetailPage() {
             <Badge tone="success">{processingLabels[document.processingStatus]}</Badge>
           </div>
           <div className="flex min-h-[628px] items-center justify-center bg-slate-100 text-center">
-            {previewUrl ? (
+            {previewUrl && isImageExtension(document.extension) ? (
+              <img
+                src={previewUrl}
+                alt={`${document.title} 預覽`}
+                className="max-h-[628px] max-w-full object-contain"
+              />
+            ) : previewUrl ? (
               <iframe
                 src={previewUrl}
                 title={`${document.title} 預覽`}
@@ -75,12 +85,14 @@ export function DocumentDetailPage() {
             <div className="p-8">
               <FileText className="mx-auto text-slate-400" size={54} />
               <p className="mt-4 font-bold text-slate-700">
-                {document.extension === "pdf"
-                  ? "部署後由私有 signed URL 載入 PDF"
-                  : "Office 預覽將由背景工作器轉為 PDF"}
+                {isImageExtension(document.extension)
+                  ? "圖片預覽暫時無法載入"
+                  : document.extension.toLowerCase() === "pdf"
+                    ? "PDF 預覽暫時無法載入"
+                    : "Office 預覽由背景工作器轉為 PDF"}
               </p>
               <p className="mt-2 text-sm text-slate-500">
-                Demo Mode 不載入真實原檔。
+                可先使用右上角「下載原檔」。
               </p>
             </div>
             )}
@@ -182,6 +194,10 @@ export function DocumentDetailPage() {
       )}
     </>
   );
+}
+
+function isImageExtension(extension: string) {
+  return ["jpg", "jpeg", "png"].includes(extension.toLowerCase());
 }
 
 const itemKindLabels = {

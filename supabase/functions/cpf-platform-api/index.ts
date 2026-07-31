@@ -329,14 +329,38 @@ serve(async (req) => {
     const version: any = versionsById.get(doc.current_version_id)
     const { data: extractedItems, error: extractedItemsError } = await sb
       .from("cpf_extracted_items")
-      .select("id,item_kind,name_original,name_zh_tw,family_key,parent_product_name,model_numbers,identity_signals,creation_rationale,confidence,review_status")
+      .select("id,item_index,item_kind,name_original,name_zh_tw,family_key,parent_product_name,model_numbers,identity_signals,creation_rationale,confidence,review_status")
       .eq("document_version_id", version.id)
       .order("item_index")
     if (extractedItemsError) return json({ error: extractedItemsError.message }, 500)
-    return json({
-      item: {
-        ...documentSummary(doc, version),
-        extractedItems: (extractedItems || []).map((item: any) => ({
+    const analysisResult = version?.analysis_result && typeof version.analysis_result === "object"
+      ? version.analysis_result
+      : null
+    const rawProducts = Array.isArray(analysisResult?.products) ? analysisResult.products : []
+    const persistedByIndex = new Map(
+      (extractedItems || []).map((item: any) => [Number(item.item_index), item]),
+    )
+    const analysisItems = rawProducts.length
+      ? rawProducts.map((item: any, index: number) => {
+          const persisted: any = persistedByIndex.get(index)
+          const recordKind = [
+            "complete_product", "product_variant", "design_asset", "component",
+            "commercial_line_item", "product_candidate",
+          ].includes(item.record_kind) ? item.record_kind : "complete_product"
+          return {
+            id: persisted?.id || `analysis-${version.id}-${index}`,
+            kind: recordKind,
+            name: item.name_zh_tw || item.name_original || "未命名項目",
+            familyKey: item.family_key || null,
+            parentProductName: item.parent_product_name || null,
+            modelNumbers: item.model_numbers || [],
+            identitySignals: item.identity_signals || [],
+            rationale: item.creation_rationale || "",
+            confidence: Number(item.confidence || 0),
+            reviewStatus: persisted?.review_status || "resolved",
+          }
+        })
+      : (extractedItems || []).map((item: any) => ({
           id: item.id,
           kind: item.item_kind,
           name: item.name_zh_tw || item.name_original,
@@ -347,7 +371,31 @@ serve(async (req) => {
           rationale: item.creation_rationale || "",
           confidence: Number(item.confidence),
           reviewStatus: item.review_status,
-        })),
+        }))
+    const policyVersion = String(analysisResult?.policyVersion || "")
+    const analysisStatus = !analysisResult
+      ? "not_analyzed"
+      : policyVersion === "cpf-product-creation-v2" ? "current" : "legacy"
+    return json({
+      item: {
+        ...documentSummary(doc, version),
+        extractedItems: analysisItems,
+        analysis: {
+          status: analysisStatus,
+          policyVersion: policyVersion || null,
+          summary: String(analysisResult?.summary_zh_tw || ""),
+          reviewReasons: Array.isArray(analysisResult?.review_reasons)
+            ? analysisResult.review_reasons.map(String) : [],
+          masterProductCount: Number(
+            analysisResult?.masterProductCount
+              ?? rawProducts.filter((item: any) =>
+                !item.record_kind || item.record_kind === "complete_product"
+              ).length,
+          ),
+          extractedItemCount: Number(
+            analysisResult?.extractedItemCount ?? (extractedItems || []).length,
+          ),
+        },
       },
     })
   }

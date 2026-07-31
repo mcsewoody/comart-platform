@@ -140,17 +140,37 @@ export function DocumentDetailPage() {
           </Card>
         </aside>
       </div>
-      {!!document.extractedItems?.length && (
-        <Card className="mt-6 overflow-hidden">
-          <div className="border-b border-slate-700 bg-slate-800/60 p-5">
-            <h2 className="flex items-center gap-2 font-black text-slate-100">
-              <Boxes className="text-cyan-300" size={19} />
-              文件內辨識項目
-            </h2>
-            <p className="mt-1 text-sm leading-6 text-slate-400">
-              以下項目保留於文件索引，但證據不足時不會建立產品主檔。判斷依據顯示的是實際建立門檻，不是單看 AI 信心分數。
+      <Card className="mt-6 overflow-hidden">
+        <div className="border-b border-slate-700 bg-slate-800/60 p-5">
+          <h2 className="flex items-center gap-2 font-black text-slate-100">
+            <Boxes className="text-cyan-300" size={19} />
+            AI 文件分析
+          </h2>
+          <p className="mt-1 text-sm leading-6 text-slate-400">
+            完整產品、產品候選、變體、設計資產與零件都會列在這裡；沒有項目時會明確說明原因。
+          </p>
+        </div>
+        {document.analysis?.summary && (
+          <div className="border-b border-slate-700 bg-slate-900/40 px-5 py-4">
+            <p className="text-xs font-bold uppercase tracking-[0.12em] text-slate-500">
+              文件摘要
+            </p>
+            <p className="mt-2 text-sm leading-6 text-slate-300">
+              {document.analysis.summary}
             </p>
           </div>
+        )}
+        {document.analysis?.status === "legacy" && (
+          <div className="border-b border-amber-700/40 bg-amber-950/30 px-5 py-4 text-sm leading-6 text-amber-200">
+            這是舊版 AI 分析。當時沒有保存「建立理由」與「身分證據」，不是檔案內容不存在；重新分析後才會補齊。
+          </div>
+        )}
+        {document.analysis?.status === "not_analyzed" && (
+          <div className="border-b border-slate-700 bg-slate-900/40 px-5 py-4 text-sm leading-6 text-slate-300">
+            這份文件尚未完成 AI 分析，因此目前沒有文件摘要、建立理由或身分證據。
+          </div>
+        )}
+        {document.extractedItems?.length ? (
           <div className="divide-y divide-slate-700">
             {document.extractedItems.map((item) => (
               <article
@@ -170,7 +190,11 @@ export function DocumentDetailPage() {
                     )}
                   </div>
                   <p className="mt-2 text-sm leading-6 text-slate-300">
-                    {item.rationale || "尚未提供建立理由。"}
+                    {item.rationale || (
+                      document.analysis?.status === "legacy"
+                        ? "舊版分析未保存建立理由。"
+                        : "AI 未提供建立理由，需重新分析或人工補充。"
+                    )}
                   </p>
                   <p className="mt-2 text-xs text-slate-500">
                     身分證據：
@@ -190,8 +214,22 @@ export function DocumentDetailPage() {
               </article>
             ))}
           </div>
-        </Card>
-      )}
+        ) : (
+          <div className="p-8 text-center">
+            <Boxes className="mx-auto text-slate-600" size={38} />
+            <p className="mt-4 font-bold text-slate-200">
+              {document.analysis?.status === "current"
+                ? "AI 未辨識到產品型項"
+                : "目前沒有可顯示的辨識項目"}
+            </p>
+            <p className="mx-auto mt-2 max-w-2xl text-sm leading-6 text-slate-500">
+              {document.analysis?.status === "current"
+                ? "這可能是合約、會議、供應商資料，或圖片／Office 內容不足以證明一個可獨立識別的產品。文件仍保留於全文索引。"
+                : "舊版分析需要重新執行 v2，才能補上產品類型、建立理由與身分證據。"}
+            </p>
+          </div>
+        )}
+      </Card>
     </>
   );
 }
@@ -201,6 +239,7 @@ function isImageExtension(extension: string) {
 }
 
 const itemKindLabels = {
+  complete_product: "完整產品",
   product_variant: "產品變體",
   design_asset: "設計資產",
   component: "零件／模組",

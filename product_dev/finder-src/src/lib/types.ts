@@ -112,9 +112,11 @@ export interface DocumentSummary {
   updatedAt: string;
   score?: number;
   extractedItems?: ExtractedDocumentItem[];
+  analysis?: DocumentAnalysisSummary;
 }
 
 export type ExtractedItemKind =
+  | "complete_product"
   | "product_variant"
   | "design_asset"
   | "component"
@@ -132,6 +134,15 @@ export interface ExtractedDocumentItem {
   rationale: string;
   confidence: number;
   reviewStatus: "open" | "resolved" | "dismissed";
+}
+
+export interface DocumentAnalysisSummary {
+  status: "not_analyzed" | "legacy" | "current";
+  policyVersion?: string | null;
+  summary: string;
+  reviewReasons: string[];
+  masterProductCount: number;
+  extractedItemCount: number;
 }
 
 export interface QuoteSummary {

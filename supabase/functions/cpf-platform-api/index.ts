@@ -325,7 +325,31 @@ serve(async (req) => {
 
   if (action === "document") {
     const doc: any = visibleDocuments.find((item: any) => item.id === body.id && !item.deleted_at)
-    return json({ item: doc ? documentSummary(doc, versionsById.get(doc.current_version_id) as any) : null })
+    if (!doc) return json({ item: null })
+    const version: any = versionsById.get(doc.current_version_id)
+    const { data: extractedItems, error: extractedItemsError } = await sb
+      .from("cpf_extracted_items")
+      .select("id,item_kind,name_original,name_zh_tw,family_key,parent_product_name,model_numbers,identity_signals,creation_rationale,confidence,review_status")
+      .eq("document_version_id", version.id)
+      .order("item_index")
+    if (extractedItemsError) return json({ error: extractedItemsError.message }, 500)
+    return json({
+      item: {
+        ...documentSummary(doc, version),
+        extractedItems: (extractedItems || []).map((item: any) => ({
+          id: item.id,
+          kind: item.item_kind,
+          name: item.name_zh_tw || item.name_original,
+          familyKey: item.family_key,
+          parentProductName: item.parent_product_name,
+          modelNumbers: item.model_numbers || [],
+          identitySignals: item.identity_signals || [],
+          rationale: item.creation_rationale || "",
+          confidence: Number(item.confidence),
+          reviewStatus: item.review_status,
+        })),
+      },
+    })
   }
 
   if (action === "fileUrl") {

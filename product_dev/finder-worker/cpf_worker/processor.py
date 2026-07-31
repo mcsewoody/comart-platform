@@ -21,9 +21,12 @@ class JobProcessor:
         version_id = job["document_version_id"]
         try:
             version = self.repository.get_version(version_id)
-            source_name = (
-                version.get("cpf_documents", {}).get("title")
-                or Path(version["storage_path"]).name
+            document_row = version.get("cpf_documents", {})
+            source_name = document_row.get("title") or Path(version["storage_path"]).name
+            source_context = " | ".join(
+                value
+                for value in [source_name, document_row.get("source_path")]
+                if value
             )
             suffix = Path(version["storage_path"]).suffix
             with tempfile.TemporaryDirectory(prefix="cpf-worker-") as directory:
@@ -56,7 +59,7 @@ class JobProcessor:
                     job_id, worker_id, "analyzing", 55, "AI 分析與結構化抽取"
                 )
                 extraction, model, usage = self.analyzer.analyze(
-                    extracted, source_name
+                    extracted, source_context
                 )
                 self.repository.upload_product_thumbnails(
                     version_id, extraction, extracted, work_dir

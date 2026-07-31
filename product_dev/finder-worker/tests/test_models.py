@@ -13,6 +13,12 @@ def product(**overrides):
         "name_en": "3-in-1 charger",
         "name_vi": "Bộ sạc 3 trong 1",
         "confidence": 0.95,
+        "record_kind": "complete_product",
+        "is_complete_product": True,
+        "identity_signals": [
+            "explicit_product_name",
+            "function_description",
+        ],
     }
     data.update(overrides)
     return ProductExtract(**data)
@@ -67,3 +73,53 @@ def test_representative_bbox_has_exactly_four_values():
         confidence=0.9,
     )
     assert image.bbox_normalized[2] == 0.7
+
+
+def test_weak_product_is_downgraded_to_candidate():
+    from cpf_worker.ai import ProductAnalyzer
+
+    result = DocumentExtraction(
+        document_type="product",
+        summary_zh_tw="只有檔名",
+        confidence=0.95,
+        products=[
+            product(
+                identity_signals=["filename_or_folder_only"],
+                is_complete_product=False,
+            )
+        ],
+    )
+    ProductAnalyzer.enforce_creation_policy(result, "產品資料.pdf")
+    assert result.products[0].record_kind == "product_candidate"
+    assert result.needs_review is True
+
+
+def test_design_source_cannot_create_unproven_master_product():
+    from cpf_worker.ai import ProductAnalyzer
+
+    result = DocumentExtraction(
+        document_type="product",
+        summary_zh_tw="外觀提案",
+        confidence=0.95,
+        products=[product()],
+    )
+    ProductAnalyzer.enforce_creation_policy(result, "Magsafe Deco 外觀圖案.pdf")
+    assert result.products[0].record_kind == "design_asset"
+
+
+def test_bom_source_requires_complete_product_image_and_function():
+    from cpf_worker.ai import ProductAnalyzer
+
+    result = DocumentExtraction(
+        document_type="quote",
+        summary_zh_tw="BOM",
+        confidence=0.95,
+        products=[
+            product(
+                model_numbers=["PS-04"],
+                identity_signals=["model_number", "specification_set"],
+            )
+        ],
+    )
+    ProductAnalyzer.enforce_creation_policy(result, "PS-04 三合一 BOM.xls")
+    assert result.products[0].record_kind == "product_candidate"

@@ -13,7 +13,7 @@ class Settings:
     routine_model: str = "gpt-5.6-luna"
     escalation_model: str = "gpt-5.6-terra"
     embedding_model: str = "text-embedding-3-large"
-    prompt_version: str = "cpf-extract-v1"
+    prompt_version: str = "cpf-extract-v2"
     max_deep_bytes: int = 100 * 1024 * 1024
     max_deep_pages: int = 100
 

@@ -18,6 +18,23 @@ DocumentType = Literal[
     "contract_commercial",
     "other",
 ]
+RecordKind = Literal[
+    "complete_product",
+    "product_variant",
+    "design_asset",
+    "component",
+    "commercial_line_item",
+    "product_candidate",
+]
+IdentitySignal = Literal[
+    "explicit_product_name",
+    "model_number",
+    "complete_product_image",
+    "function_description",
+    "specification_set",
+    "pricing_line",
+    "filename_or_folder_only",
+]
 
 
 class EvidenceExtract(BaseModel):
@@ -83,6 +100,12 @@ class ProductExtract(BaseModel):
     evidence: list[EvidenceExtract] = Field(default_factory=list)
     representative_image: RepresentativeImageExtract | None = None
     representative_thumbnail_path: str | None = None
+    record_kind: RecordKind = "product_candidate"
+    family_key: str | None = None
+    parent_product_name: str | None = None
+    is_complete_product: bool = False
+    identity_signals: list[IdentitySignal] = Field(default_factory=list)
+    creation_rationale: str = ""
 
 
 class DocumentExtraction(BaseModel):
@@ -94,6 +117,14 @@ class DocumentExtraction(BaseModel):
     confidence: float = Field(ge=0, le=1)
 
     @property
+    def master_products(self) -> list[ProductExtract]:
+        return [
+            product
+            for product in self.products
+            if product.record_kind == "complete_product"
+        ]
+
+    @property
     def needs_escalation(self) -> bool:
         supplier_risk = any(
             supplier.original_name and not supplier.explicit_in_document
@@ -102,18 +133,26 @@ class DocumentExtraction(BaseModel):
         )
         return (
             self.confidence < 0.86
-            or len(self.products) > 1
+            or len(self.master_products) > 1
             or bool(self.review_reasons)
             or supplier_risk
+            or any(
+                product.record_kind == "product_candidate"
+                for product in self.products
+            )
         )
 
     @property
     def needs_review(self) -> bool:
         return (
             self.confidence < 0.9
-            or len(self.products) > 1
+            or len(self.master_products) > 1
             or bool(self.review_reasons)
-            or any(product.confidence < 0.9 for product in self.products)
+            or any(product.confidence < 0.9 for product in self.master_products)
+            or any(
+                product.record_kind == "product_candidate"
+                for product in self.products
+            )
         )
 
 

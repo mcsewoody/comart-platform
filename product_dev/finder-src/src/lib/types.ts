@@ -111,6 +111,27 @@ export interface DocumentSummary {
   thumbnailUrl?: string | null;
   updatedAt: string;
   score?: number;
+  extractedItems?: ExtractedDocumentItem[];
+}
+
+export type ExtractedItemKind =
+  | "product_variant"
+  | "design_asset"
+  | "component"
+  | "commercial_line_item"
+  | "product_candidate";
+
+export interface ExtractedDocumentItem {
+  id: string;
+  kind: ExtractedItemKind;
+  name: string;
+  familyKey?: string | null;
+  parentProductName?: string | null;
+  modelNumbers: string[];
+  identitySignals: string[];
+  rationale: string;
+  confidence: number;
+  reviewStatus: "open" | "resolved" | "dismissed";
 }
 
 export interface QuoteSummary {

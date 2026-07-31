@@ -150,7 +150,7 @@ class Repository:
         usage: dict[str, Any],
     ) -> dict[str, Any]:
         result = self.client.rpc(
-            "cpf_apply_ai_extraction",
+            "cpf_apply_ai_extraction_v2",
             {
                 "p_document_version_id": version_id,
                 "p_result": extraction.model_dump(mode="json"),

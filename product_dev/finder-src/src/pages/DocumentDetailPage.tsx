@@ -1,5 +1,6 @@
 import {
   ArrowLeft,
+  Boxes,
   Download,
   FileText,
   FolderOpen,
@@ -127,9 +128,79 @@ export function DocumentDetailPage() {
           </Card>
         </aside>
       </div>
+      {!!document.extractedItems?.length && (
+        <Card className="mt-6 overflow-hidden">
+          <div className="border-b border-slate-700 bg-slate-800/60 p-5">
+            <h2 className="flex items-center gap-2 font-black text-slate-100">
+              <Boxes className="text-cyan-300" size={19} />
+              文件內辨識項目
+            </h2>
+            <p className="mt-1 text-sm leading-6 text-slate-400">
+              以下項目保留於文件索引，但證據不足時不會建立產品主檔。判斷依據顯示的是實際建立門檻，不是單看 AI 信心分數。
+            </p>
+          </div>
+          <div className="divide-y divide-slate-700">
+            {document.extractedItems.map((item) => (
+              <article
+                key={item.id}
+                className="grid gap-3 p-5 md:grid-cols-[minmax(0,1fr)_auto]"
+              >
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Badge tone={item.kind === "product_candidate" ? "warning" : "neutral"}>
+                      {itemKindLabels[item.kind]}
+                    </Badge>
+                    <strong className="text-slate-100">{item.name}</strong>
+                    {!!item.modelNumbers.length && (
+                      <span className="text-xs font-bold text-slate-500">
+                        {item.modelNumbers.join("、")}
+                      </span>
+                    )}
+                  </div>
+                  <p className="mt-2 text-sm leading-6 text-slate-300">
+                    {item.rationale || "尚未提供建立理由。"}
+                  </p>
+                  <p className="mt-2 text-xs text-slate-500">
+                    身分證據：
+                    {item.identitySignals.length
+                      ? item.identitySignals
+                          .map((signal) => identitySignalLabels[signal] || signal)
+                          .join("、")
+                      : "無足夠身分證據"}
+                  </p>
+                </div>
+                <div className="text-left md:text-right">
+                  <p className="text-lg font-black text-cyan-300">
+                    {Math.round(item.confidence * 100)}%
+                  </p>
+                  <p className="text-xs text-slate-500">AI 自評信心</p>
+                </div>
+              </article>
+            ))}
+          </div>
+        </Card>
+      )}
     </>
   );
 }
+
+const itemKindLabels = {
+  product_variant: "產品變體",
+  design_asset: "設計資產",
+  component: "零件／模組",
+  commercial_line_item: "商業品項",
+  product_candidate: "產品候選",
+};
+
+const identitySignalLabels: Record<string, string> = {
+  explicit_product_name: "文件內明確產品名稱",
+  model_number: "型號",
+  complete_product_image: "完整產品影像",
+  function_description: "功能說明",
+  specification_set: "規格組",
+  pricing_line: "價格品項",
+  filename_or_folder_only: "僅檔名／資料夾",
+};
 
 function Info({ label, value }: { label: string; value: string }) {
   return (

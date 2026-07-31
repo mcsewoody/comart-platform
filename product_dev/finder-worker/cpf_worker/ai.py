@@ -3,6 +3,7 @@ from __future__ import annotations
 import base64
 import io
 import mimetypes
+import re
 from pathlib import Path
 
 import httpx
@@ -26,20 +27,56 @@ consumer-electronics knowledge system. Follow these rules:
 4. A filename, folder name, logo or email domain alone is not proof that an
    organization is the manufacturer. Set explicit_in_document=false and add a
    review reason whenever supplier identity or role is inferred.
-5. Split true variants (for example 2-in-1 and 3-in-1, or ID-001A/ID-001B)
-   into separate products. Add a review reason so a human confirms the split.
-6. Every model, supplier, dimension and commercial fact must have short,
+5. First classify every product-like item using record_kind:
+   - complete_product: a complete, independently identifiable sellable product.
+   - product_variant: a configuration, color, decoration or capacity variant of
+     a parent product; do not treat it as a separate product master.
+   - design_asset: an appearance proposal, pattern, concept render, vote option,
+     sketch or numbered design.
+   - component: a part, PCBA, charging module, accessory or BOM-only item.
+   - commercial_line_item: a quotation/cost row that does not independently
+     prove a complete product.
+   - product_candidate: product-like evidence that is too weak to create a
+     product master.
+   Only complete_product may become a product master.
+6. A complete_product requires at least two independent identity_signals and
+   is_complete_product=true. Filename/folder text, a logo, a BOM row, a price,
+   or a decorative image alone never qualifies. At least one signal must be an
+   explicit product name, model number or complete-product image, and another
+   must describe function, specifications or show the complete product.
+7. 2-in-1 versus 3-in-1 may be separate complete products only when the source
+   proves complete configurations. Color, graphic, surface decoration and
+   numbered appearance choices are product_variant or design_asset. Use a
+   shared family_key to group related records.
+8. Every model, supplier, dimension and commercial fact must have short,
    precise evidence with a page/slide/sheet/image locator.
-7. Do not generate or imagine a product appearance.
+9. Do not generate or imagine a product appearance.
    For representative_image, select only a real product image visible in the
    supplied page images. bbox_normalized is [x, y, width, height] from 0 to 1.
    Exclude unrelated products and keep the complete product in frame. Return
    null when no suitable real product image exists.
-8. Use confidence conservatively. Conflicts between pages or sources must be
+10. Use confidence conservatively. Conflicts between pages or sources must be
    listed in review_reasons.
-9. Use original units and values. Prices belong in quote, never in the product
+11. Use original units and values. Prices belong in quote, never in the product
    master fields.
+12. Explain record creation in creation_rationale. If evidence is insufficient,
+    return product_candidate rather than guessing. It is valid to return zero
+    complete products while still returning design assets or candidates.
 """.strip()
+
+DESIGN_SOURCE_PATTERN = re.compile(
+    r"(?:design|deco|vote|外觀|外观|圖案|图案|概念|concept|render|sketch)", re.I
+)
+COMMERCIAL_SOURCE_PATTERN = re.compile(
+    r"(?:\bbom\b|報價|报价|估價|估价|成本|cost|quotation|quote)", re.I
+)
+STRONG_IDENTITY_SIGNALS = {
+    "explicit_product_name",
+    "model_number",
+    "complete_product_image",
+    "function_description",
+    "specification_set",
+}
 
 
 class ProductAnalyzer:
@@ -143,6 +180,74 @@ class ProductAnalyzer:
             proxy_result.get("usage") or {},
         )
 
+    @staticmethod
+    def enforce_creation_policy(
+        extraction: DocumentExtraction,
+        source_context: str,
+    ) -> DocumentExtraction:
+        review_reasons = list(extraction.review_reasons)
+        design_source = bool(DESIGN_SOURCE_PATTERN.search(source_context))
+        commercial_source = bool(COMMERCIAL_SOURCE_PATTERN.search(source_context))
+
+        for product in extraction.products:
+            original_kind = product.record_kind
+            strong = set(product.identity_signals) & STRONG_IDENTITY_SIGNALS
+            has_primary = bool(
+                strong
+                & {
+                    "explicit_product_name",
+                    "model_number",
+                    "complete_product_image",
+                }
+            )
+            has_secondary = bool(
+                strong
+                & {
+                    "function_description",
+                    "specification_set",
+                    "complete_product_image",
+                }
+            )
+
+            if product.record_kind == "complete_product" and (
+                not product.is_complete_product
+                or len(strong) < 2
+                or not has_primary
+                or not has_secondary
+            ):
+                product.record_kind = "product_candidate"
+
+            if design_source and product.record_kind == "complete_product":
+                proven_model_product = (
+                    "model_number" in strong
+                    and "complete_product_image" in strong
+                    and "function_description" in strong
+                )
+                if not proven_model_product:
+                    product.record_kind = "design_asset"
+
+            if commercial_source and product.record_kind == "complete_product":
+                proven_complete_product = (
+                    "model_number" in strong
+                    and "complete_product_image" in strong
+                    and "function_description" in strong
+                )
+                if not proven_complete_product:
+                    product.record_kind = "product_candidate"
+
+            if product.record_kind == "product_variant" and not product.family_key:
+                product.record_kind = "product_candidate"
+
+            if product.record_kind != original_kind:
+                reason = (
+                    f"建立門檻覆核：{product.name_original} 從 {original_kind} "
+                    f"調整為 {product.record_kind}；來源或證據不足以建立獨立產品主檔。"
+                )
+                review_reasons.append(reason)
+
+        extraction.review_reasons = list(dict.fromkeys(review_reasons))
+        return extraction
+
     def analyze(
         self,
         document: ExtractedDocument,
@@ -151,6 +256,7 @@ class ProductAnalyzer:
         routine, routine_usage = self._analyze_with_model(
             self.settings.routine_model, document, source_name
         )
+        routine = self.enforce_creation_policy(routine, source_name)
         if not routine.needs_escalation:
             return routine, self.settings.routine_model, {"routine": routine_usage}
         escalated, terra_usage = self._analyze_with_model(
@@ -159,6 +265,7 @@ class ProductAnalyzer:
             source_name,
             previous=routine,
         )
+        escalated = self.enforce_creation_policy(escalated, source_name)
         return (
             escalated,
             self.settings.escalation_model,
@@ -179,7 +286,7 @@ class ProductAnalyzer:
                     *product.keywords,
                 ]
             )
-            for product in extraction.products
+            for product in extraction.master_products
         )
         input_text = (
             f"{extraction.summary_zh_tw}\n{product_text}\n{extracted_text[:40_000]}"

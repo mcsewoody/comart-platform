@@ -104,6 +104,7 @@ export function ReviewPage() {
 
       <MasterMappingPanel />
 
+      {groups.length > 0 && (
       <Card className="mb-5 p-5">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
@@ -167,6 +168,7 @@ export function ReviewPage() {
           </p>
         )}
       </Card>
+      )}
 
       {groups.length === 0 ? (
         <EmptyState

@@ -57,7 +57,7 @@ export function AppShell() {
   const { profile, demoMode, signOut } = useAuth();
 
   return (
-    <div className="min-h-screen bg-[#f5f7f6]">
+    <div className="min-h-screen bg-[#070b12] text-slate-100">
       <a
         href="#main-content"
         className="sr-only z-50 rounded-lg bg-white px-4 py-2 focus:not-sr-only focus:fixed focus:left-4 focus:top-4"
@@ -65,12 +65,12 @@ export function AppShell() {
         跳到主要內容
       </a>
 
-      <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur">
+      <header className="sticky top-0 z-30 border-b border-slate-800 bg-[#0a111b]/95 backdrop-blur">
         <div className="mx-auto flex h-16 max-w-[1600px] items-center justify-between px-4 md:px-6">
           <div className="flex items-center gap-3">
             <a
               href="/product_dev/index.html"
-              className="hidden rounded-lg p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-950 sm:inline-flex"
+              className="hidden rounded-lg p-2 text-slate-400 transition hover:bg-slate-800 hover:text-white sm:inline-flex"
               aria-label="返回 Product Dev"
             >
               <ArrowLeft size={19} />
@@ -83,7 +83,7 @@ export function AppShell() {
             >
               <Menu size={21} />
             </button>
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-950 text-white">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-cyan-400 text-slate-950">
               <Boxes size={20} strokeWidth={2.2} />
             </div>
             <div>
@@ -116,10 +116,10 @@ export function AppShell() {
       </header>
 
       <div className="mx-auto grid max-w-[1600px] lg:grid-cols-[240px_minmax(0,1fr)]">
-        <aside className="sticky top-16 hidden h-[calc(100vh-4rem)] border-r border-slate-200 bg-white p-4 lg:flex lg:flex-col">
+        <aside className="sticky top-16 hidden h-[calc(100vh-4rem)] border-r border-slate-800 bg-[#0a111b] p-4 lg:flex lg:flex-col">
           <Navigation />
           <div className="mt-auto border-t border-slate-200 pt-4">
-            <div className="mb-3 rounded-xl bg-slate-50 p-3">
+            <div className="mb-3 rounded-xl border border-slate-800 bg-slate-900 p-3">
               <p className="text-xs font-bold text-slate-700">資料權限</p>
               <p className="mt-1 text-xs leading-5 text-slate-500">
                 {profile?.role === "admin"
@@ -152,7 +152,7 @@ export function AppShell() {
             aria-label="關閉選單"
             onClick={() => setMobileOpen(false)}
           />
-          <aside className="relative h-full w-[84%] max-w-xs bg-white p-4 shadow-2xl">
+          <aside className="relative h-full w-[84%] max-w-xs bg-[#0a111b] p-4 shadow-2xl">
             <div className="mb-5 flex items-center justify-between">
               <p className="font-black text-slate-950">功能選單</p>
               <button
@@ -208,8 +208,8 @@ function Navigation({
               cn(
                 "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition",
                 isActive
-                  ? "bg-slate-950 text-white shadow-sm"
-                  : "text-slate-600 hover:bg-slate-100 hover:text-slate-950",
+                  ? "bg-cyan-400 text-slate-950 shadow-sm"
+                  : "text-slate-400 hover:bg-slate-800 hover:text-white",
               )
             }
           >
@@ -225,8 +225,8 @@ function Navigation({
             cn(
               "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition",
               isActive
-                ? "bg-slate-950 text-white"
-                : "text-slate-600 hover:bg-slate-100",
+                ? "bg-cyan-400 text-slate-950"
+                : "text-slate-400 hover:bg-slate-800",
             )
           }
         >

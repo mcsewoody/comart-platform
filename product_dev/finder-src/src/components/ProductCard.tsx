@@ -11,7 +11,7 @@ export function ProductCard({ product }: { product: ProductSummary }) {
         to={`/products/${product.id}`}
         className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-cyan-700"
       >
-        <div className="relative flex aspect-[4/3] items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_30%_20%,#e6f7f7,transparent_36%),linear-gradient(145deg,#f8fafc,#e9eeed)]">
+        <div className="relative flex aspect-[4/3] items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_30%_20%,rgba(54,197,190,0.16),transparent_38%),linear-gradient(145deg,#121d2a,#0b111a)]">
           {product.thumbnailUrl ? (
             <img
               src={product.thumbnailUrl}

@@ -39,7 +39,7 @@ export default function App() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-50 text-sm font-semibold text-slate-500">
+      <div className="flex min-h-screen items-center justify-center bg-[#070b12] text-sm font-semibold text-slate-400">
         驗證登入狀態…
       </div>
     );

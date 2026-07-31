@@ -16,13 +16,13 @@ export function Button({
   return (
     <button
       className={cn(
-        "inline-flex min-h-10 items-center justify-center gap-2 rounded-xl px-4 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-700 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-45",
+        "inline-flex min-h-10 items-center justify-center gap-2 rounded-xl px-4 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 disabled:pointer-events-none disabled:opacity-45",
         variant === "primary" &&
-          "bg-slate-950 text-white shadow-sm hover:bg-slate-800",
+          "bg-cyan-400 text-slate-950 shadow-sm hover:bg-cyan-300",
         variant === "secondary" &&
-          "border border-slate-300 bg-white text-slate-800 hover:border-slate-400 hover:bg-slate-50",
+          "border border-slate-600 bg-slate-900 text-slate-100 hover:border-slate-500 hover:bg-slate-800",
         variant === "ghost" &&
-          "text-slate-600 hover:bg-slate-100 hover:text-slate-950",
+          "text-slate-300 hover:bg-slate-800 hover:text-white",
         variant === "danger" &&
           "bg-red-700 text-white hover:bg-red-800",
         className,
@@ -39,7 +39,7 @@ export function Card({
   return (
     <div
       className={cn(
-        "rounded-2xl border border-slate-200 bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04)]",
+        "rounded-2xl border border-slate-700 bg-slate-900 shadow-[0_16px_40px_rgba(0,0,0,0.16)]",
         className,
       )}
       {...props}
@@ -58,11 +58,11 @@ export function Badge({
     <span
       className={cn(
         "inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold",
-        tone === "neutral" && "bg-slate-100 text-slate-700",
-        tone === "success" && "bg-emerald-50 text-emerald-700",
-        tone === "warning" && "bg-amber-50 text-amber-800",
-        tone === "danger" && "bg-red-50 text-red-700",
-        tone === "accent" && "bg-cyan-50 text-cyan-800",
+        tone === "neutral" && "bg-slate-800 text-slate-300",
+        tone === "success" && "bg-emerald-950/60 text-emerald-300",
+        tone === "warning" && "bg-amber-950/60 text-amber-300",
+        tone === "danger" && "bg-red-950/60 text-red-300",
+        tone === "accent" && "bg-cyan-950/60 text-cyan-300",
       )}
     >
       {children}
@@ -96,12 +96,12 @@ export function EmptyState({
   icon: ReactNode;
 }) {
   return (
-    <div className="flex min-h-64 flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center">
-      <div className="mb-4 rounded-2xl bg-slate-100 p-4 text-slate-600">
+    <div className="flex min-h-64 flex-col items-center justify-center rounded-2xl border border-dashed border-slate-700 bg-slate-900 p-8 text-center">
+      <div className="mb-4 rounded-2xl bg-slate-800 p-4 text-slate-300">
         {icon}
       </div>
-      <h3 className="text-lg font-bold text-slate-950">{title}</h3>
-      <p className="mt-2 max-w-md text-sm leading-6 text-slate-500">
+      <h3 className="text-lg font-bold text-slate-100">{title}</h3>
+      <p className="mt-2 max-w-md text-sm leading-6 text-slate-400">
         {description}
       </p>
     </div>
@@ -123,15 +123,15 @@ export function PageHeader({
     <header className="mb-7 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
       <div>
         {eyebrow && (
-          <p className="mb-2 text-xs font-bold uppercase tracking-[0.18em] text-cyan-800">
+          <p className="mb-2 text-xs font-bold uppercase tracking-[0.18em] text-cyan-300">
             {eyebrow}
           </p>
         )}
-        <h1 className="text-2xl font-black tracking-tight text-slate-950 md:text-3xl">
+        <h1 className="text-2xl font-black tracking-tight text-slate-100 md:text-3xl">
           {title}
         </h1>
         {description && (
-          <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
+          <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-400">
             {description}
           </p>
         )}

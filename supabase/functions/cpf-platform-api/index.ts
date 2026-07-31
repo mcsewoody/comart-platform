@@ -524,10 +524,12 @@ serve(async (req) => {
   if (action === "mappingSuggestions") {
     if (!canEdit(sess)) return json({ error: "forbidden" }, 403)
     const { data, error } = await sb.from("cpf_master_mapping_suggestions")
-      .select("*,cpf_products(id,name_zh_tw,model_numbers),cpf_categories(id,name_zh_tw),cpf_suppliers(id,legal_name)")
+      .select("*,cpf_products(id,name_zh_tw,model_numbers,deleted_at),cpf_categories(id,name_zh_tw),cpf_suppliers(id,legal_name)")
       .eq("status", "pending").order("confidence", { ascending: false })
     if (error) return json({ error: error.message }, 500)
-    return json({ items: (data || []).map((row: any) => ({
+    return json({ items: (data || []).filter((row: any) => (
+      row.cpf_products && !row.cpf_products.deleted_at
+    )).map((row: any) => ({
       id: row.id, type: row.mapping_type, productId: row.product_id,
       productName: row.cpf_products?.name_zh_tw || "未命名產品",
       modelNumbers: row.cpf_products?.model_numbers || [],

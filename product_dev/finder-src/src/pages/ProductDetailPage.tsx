@@ -201,7 +201,10 @@ export function ProductDetailPage() {
               <div className="p-6 md:p-8">
                 <div className="flex flex-wrap items-center gap-2">
                   <ConfirmationBadge status={product.confirmationStatus} />
-                  <Badge>{product.category?.nameZhTw ?? "待分類"}</Badge>
+                  <span className="inline-flex items-center gap-2 rounded-full bg-slate-800 px-3 py-1.5 text-sm font-black text-slate-100">
+                    <span className="text-xs font-bold text-slate-400">正式分類</span>
+                    {product.category?.nameZhTw ?? "待分類"}
+                  </span>
                 </div>
                 <p className="mt-6 text-sm font-black uppercase tracking-[0.12em] text-cyan-800">
                   {product.modelNumbers.join(" · ")}

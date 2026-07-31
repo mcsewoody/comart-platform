@@ -231,7 +231,7 @@ function MasterDataCard({
 }) {
   return (
     <Card className="p-6">
-      <h2 className="text-lg font-black text-slate-950">{title}</h2>
+      <h2 className="text-xl font-black text-slate-950">{title}</h2>
       <p className="mt-1 text-sm text-slate-500">{description}</p>
       <form onSubmit={onSubmit} className="mt-4 flex gap-2">
         <input
@@ -291,7 +291,12 @@ function MasterDataRow({
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
-            <p className="font-black text-slate-950">{item.name}</p>
+            <p className={kind === "category"
+              ? "text-lg font-black text-slate-950"
+              : "font-black text-slate-950"}
+            >
+              {item.name}
+            </p>
             <span className="rounded-full bg-cyan-100 px-2 py-0.5 text-[11px] font-bold text-cyan-900">
               {item.count} 個產品
             </span>

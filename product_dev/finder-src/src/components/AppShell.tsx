@@ -17,6 +17,7 @@ import { NavLink, Outlet } from "react-router-dom";
 import { useAuth } from "../auth/AuthProvider";
 import type { UserRole } from "../lib/types";
 import { cn } from "../lib/utils";
+import { CPF_VERSION } from "../version";
 import { Badge, Button } from "./ui";
 
 const navigation: Array<{
@@ -92,6 +93,9 @@ export function AppShell() {
               </p>
               <p className="-mt-0.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">
                 Product Dev / Product Finder
+                <span className="ml-2 rounded bg-slate-800 px-1.5 py-0.5 text-[9px] tracking-normal text-cyan-300">
+                  v{CPF_VERSION}
+                </span>
               </p>
             </div>
             {demoMode && <Badge tone="warning">Demo</Badge>}

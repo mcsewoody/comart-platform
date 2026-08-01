@@ -113,6 +113,7 @@ export interface DocumentSummary {
   score?: number;
   extractedItems?: ExtractedDocumentItem[];
   analysis?: DocumentAnalysisSummary;
+  linkedProducts?: ProductSummary[];
 }
 
 export type ExtractedItemKind =
@@ -134,6 +135,28 @@ export interface ExtractedDocumentItem {
   rationale: string;
   confidence: number;
   reviewStatus: "open" | "resolved" | "dismissed";
+  promotedProductId?: string | null;
+  actionable?: boolean;
+}
+
+export type ExtractedItemResolutionAction = "create" | "link" | "keep";
+
+export interface ExtractedItemResolution {
+  action: ExtractedItemResolutionAction;
+  productId?: string | null;
+  categoryId?: string | null;
+  suppliers?: Array<{ id: string; role: SupplierRef["role"] }> | null;
+}
+
+export type ProductReviewGapKind =
+  | "category"
+  | "supplier"
+  | "model"
+  | "thumbnail";
+
+export interface ProductReviewGap {
+  product: ProductSummary;
+  missing: ProductReviewGapKind[];
 }
 
 export interface DocumentAnalysisSummary {

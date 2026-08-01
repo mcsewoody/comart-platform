@@ -329,7 +329,7 @@ serve(async (req) => {
     const version: any = versionsById.get(doc.current_version_id)
     const { data: extractedItems, error: extractedItemsError } = await sb
       .from("cpf_extracted_items")
-      .select("id,item_index,item_kind,name_original,name_zh_tw,family_key,parent_product_name,model_numbers,identity_signals,creation_rationale,confidence,review_status")
+      .select("id,item_index,item_kind,name_original,name_zh_tw,family_key,parent_product_name,model_numbers,identity_signals,creation_rationale,confidence,review_status,promoted_product_id")
       .eq("document_version_id", version.id)
       .order("item_index")
     if (extractedItemsError) return json({ error: extractedItemsError.message }, 500)
@@ -340,6 +340,9 @@ serve(async (req) => {
     const persistedByIndex = new Map(
       (extractedItems || []).map((item: any) => [Number(item.item_index), item]),
     )
+    const createdProductIds = Array.isArray(analysisResult?.productIds)
+      ? analysisResult.productIds.map(String) : []
+    let completeProductIndex = 0
     const analysisItems = rawProducts.length
       ? rawProducts.map((item: any, index: number) => {
           const persisted: any = persistedByIndex.get(index)
@@ -347,6 +350,10 @@ serve(async (req) => {
             "complete_product", "product_variant", "design_asset", "component",
             "commercial_line_item", "product_candidate",
           ].includes(item.record_kind) ? item.record_kind : "complete_product"
+          const createdProductId = recordKind === "complete_product"
+            ? createdProductIds[completeProductIndex++] || null
+            : null
+          const promotedProductId = persisted?.promoted_product_id || createdProductId
           return {
             id: persisted?.id || `analysis-${version.id}-${index}`,
             kind: recordKind,
@@ -358,6 +365,8 @@ serve(async (req) => {
             rationale: item.creation_rationale || "",
             confidence: Number(item.confidence || 0),
             reviewStatus: persisted?.review_status || "resolved",
+            promotedProductId,
+            actionable: Boolean(persisted) && persisted.review_status === "open",
           }
         })
       : (extractedItems || []).map((item: any) => ({
@@ -371,7 +380,48 @@ serve(async (req) => {
           rationale: item.creation_rationale || "",
           confidence: Number(item.confidence),
           reviewStatus: item.review_status,
+          promotedProductId: item.promoted_product_id,
+          actionable: item.review_status === "open",
         }))
+    const { data: linkedRows, error: linkedRowsError } = await sb
+      .from("cpf_product_documents")
+      .select("product_id")
+      .eq("document_id", doc.id)
+    if (linkedRowsError) return json({ error: linkedRowsError.message }, 500)
+    const linkedProductIds = [...new Set((linkedRows || []).map((row: any) => row.product_id))]
+    const [{ data: linkedProducts }, { data: linkedCategories }, { data: linkedSuppliers }] =
+      linkedProductIds.length ? await Promise.all([
+        sb.from("cpf_products").select("*").in("id", linkedProductIds).is("deleted_at", null),
+        sb.from("cpf_categories").select("id,name_zh_tw,parent_id"),
+        sb.from("cpf_product_suppliers")
+          .select("product_id,supplier_role,confirmation_status,cpf_suppliers(id,legal_name)")
+          .in("product_id", linkedProductIds),
+      ]) : [{ data: [] }, { data: [] }, { data: [] }]
+    const linkedCategoryMap = new Map((linkedCategories || []).map((category: any) => [
+      category.id,
+      { id: category.id, nameZhTw: category.name_zh_tw, parentId: category.parent_id },
+    ]))
+    const linkedSupplierMap = new Map<string, any[]>()
+    for (const row of linkedSuppliers || []) {
+      const supplier: any = (row as any).cpf_suppliers
+      if (!supplier) continue
+      linkedSupplierMap.set((row as any).product_id, [
+        ...(linkedSupplierMap.get((row as any).product_id) || []),
+        {
+          id: supplier.id, name: supplier.legal_name, role: (row as any).supplier_role,
+          confirmationStatus: (row as any).confirmation_status,
+        },
+      ])
+    }
+    const linkedProductItems = (linkedProducts || []).map((product: any) =>
+      productSummary(product, linkedCategoryMap, linkedSupplierMap, 1)
+    )
+    const linkedThumbs = await signPaths(
+      sb, "cpf_thumbnail", linkedProductItems.map((item: any) => item.thumbnailUrl),
+    )
+    for (const item of linkedProductItems) {
+      item.thumbnailUrl = linkedThumbs.get(item.thumbnailUrl) || null
+    }
     const policyVersion = String(analysisResult?.policyVersion || "")
     const analysisStatus = !analysisResult
       ? "not_analyzed"
@@ -380,6 +430,7 @@ serve(async (req) => {
       item: {
         ...documentSummary(doc, version),
         extractedItems: analysisItems,
+        linkedProducts: linkedProductItems,
         analysis: {
           status: analysisStatus,
           policyVersion: policyVersion || null,
@@ -398,6 +449,38 @@ serve(async (req) => {
         },
       },
     })
+  }
+
+  if (action === "resolveExtractedItem") {
+    if (!canEdit(sess)) return json({ error: "forbidden" }, 403)
+    const resolution = body.resolution || {}
+    const resolutionAction = String(resolution.action || "")
+    if (!["create", "link", "keep"].includes(resolutionAction)) {
+      return json({ error: "bad_resolution_action" }, 400)
+    }
+    const { data: item, error: itemError } = await sb.from("cpf_extracted_items")
+      .select("id,document_version_id").eq("id", body.itemId).maybeSingle()
+    if (itemError || !item) return json({ error: itemError?.message || "item_not_found" }, 404)
+    const { data: itemVersion } = await sb.from("cpf_document_versions")
+      .select("document_id").eq("id", item.document_version_id).maybeSingle()
+    if (!itemVersion || !visibleDocumentIds.has(itemVersion.document_id)) {
+      return json({ error: "forbidden_document" }, 403)
+    }
+    const suppliers = Array.isArray(resolution.suppliers)
+      ? resolution.suppliers.slice(0, 100).map((supplier: any) => ({
+          id: String(supplier.id), role: String(supplier.role || "unknown"),
+        }))
+      : null
+    const { data, error } = await sb.rpc("cpf_resolve_extracted_item", {
+      p_item_id: item.id,
+      p_action: resolutionAction,
+      p_product_id: resolution.productId || null,
+      p_category_id: resolution.categoryId || null,
+      p_supplier_links: suppliers,
+      p_actor: sess.empId,
+    })
+    if (error) return json({ error: error.message }, 400)
+    return json({ result: data })
   }
 
   if (action === "fileUrl") {
@@ -503,6 +586,36 @@ serve(async (req) => {
     const signed = await signPaths(sb, "cpf_thumbnail", items.map((item: any) => item.thumbnailUrl))
     for (const item of items) item.thumbnailUrl = signed.get(item.thumbnailUrl) || null
     return json({ items, total: ranked.length, elapsedMs: Math.round(performance.now() - started) })
+  }
+
+  if (action === "productReviewGaps") {
+    if (!canEdit(sess)) return json({ error: "forbidden" }, 403)
+    const items = (products || []).filter((product: any) => {
+      if (product.deleted_at) return false
+      return (docsByProduct.get(product.id) || []).some(id => visibleDocumentIds.has(id))
+    }).map((product: any) => {
+      const missing: string[] = []
+      if (!product.category_id) missing.push("category")
+      if (!(supplierMap.get(product.id) || []).length) missing.push("supplier")
+      if (!(product.model_numbers || []).length) missing.push("model")
+      if (!product.representative_thumbnail_path) missing.push("thumbnail")
+      const linkedCount = (docsByProduct.get(product.id) || [])
+        .filter(id => visibleDocumentIds.has(id)).length
+      return {
+        product: productSummary(product, categoryMap, supplierMap, linkedCount),
+        missing,
+      }
+    }).filter((item: any) => item.missing.length)
+      .sort((a: any, b: any) => b.missing.length - a.missing.length
+        || b.product.updatedAt.localeCompare(a.product.updatedAt))
+      .slice(0, 200)
+    const signed = await signPaths(
+      sb, "cpf_thumbnail", items.map((item: any) => item.product.thumbnailUrl),
+    )
+    for (const item of items) {
+      item.product.thumbnailUrl = signed.get(item.product.thumbnailUrl) || null
+    }
+    return json({ items })
   }
 
   if (action === "product") {

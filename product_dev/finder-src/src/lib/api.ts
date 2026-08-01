@@ -13,9 +13,11 @@ import type {
   BatchApprovalResult,
   MappingSuggestion,
   DocumentSummary,
+  ExtractedItemResolution,
   ProcessingJob,
   ProductDetail,
   ProductSummary,
+  ProductReviewGap,
   Profile,
   ReviewTask,
   SearchFilters,
@@ -198,6 +200,26 @@ export const api = {
     return (
       await platformCall<{ item: DocumentSummary | null }>("document", { id })
     ).item;
+  },
+
+  async resolveExtractedItem(
+    itemId: string,
+    resolution: ExtractedItemResolution,
+  ): Promise<{ productId: string | null }> {
+    if (appConfig.demoMode) return { productId: resolution.productId ?? null };
+    return (
+      await platformCall<{ result: { productId: string | null } }>(
+        "resolveExtractedItem",
+        { itemId, resolution },
+      )
+    ).result;
+  },
+
+  async getProductReviewGaps(): Promise<ProductReviewGap[]> {
+    if (appConfig.demoMode) return [];
+    return (
+      await platformCall<{ items: ProductReviewGap[] }>("productReviewGaps")
+    ).items;
   },
 
   async getCategories(): Promise<Category[]> {

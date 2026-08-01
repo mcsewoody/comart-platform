@@ -1,16 +1,27 @@
 import {
   ArrowLeft,
   Boxes,
+  Check,
   Download,
   FileText,
   FolderOpen,
+  Link2,
   LockKeyhole,
+  Plus,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { Link, useParams } from "react-router-dom";
+import { useAuth } from "../auth/AuthProvider";
 import { Badge, Button, Card, PageHeader } from "../components/ui";
 import { api } from "../lib/api";
-import type { DocumentSummary } from "../lib/types";
+import type {
+  Category,
+  DocumentSummary,
+  ExtractedDocumentItem,
+  ProductSummary,
+  SupplierOption,
+  SupplierRef,
+} from "../lib/types";
 import {
   formatBytes,
   formatDate,
@@ -20,19 +31,37 @@ import {
 
 export function DocumentDetailPage() {
   const { id = "" } = useParams();
+  const { profile } = useAuth();
   const [document, setDocument] = useState<DocumentSummary | null | undefined>();
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [suppliers, setSuppliers] = useState<SupplierOption[]>([]);
+  const [products, setProducts] = useState<ProductSummary[]>([]);
+
+  const loadDocument = useCallback(async () => {
+    const result = await api.getDocument(id);
+    setDocument(result);
+    if (result) {
+      const kind = usesSourcePreview(result.extension) ? "source" : "preview";
+      setPreviewUrl(await api.getFileUrl(result.id, kind));
+    }
+  }, [id]);
 
   useEffect(() => {
     setPreviewUrl(null);
-    void api.getDocument(id).then(async (result) => {
-      setDocument(result);
-      if (result) {
-        const kind = usesSourcePreview(result.extension) ? "source" : "preview";
-        setPreviewUrl(await api.getFileUrl(result.id, kind));
-      }
-    });
-  }, [id]);
+    void loadDocument();
+    if (profile?.role !== "viewer") {
+      void Promise.all([
+        api.getCategories(),
+        api.getSuppliers(),
+        api.searchProducts("", {}),
+      ]).then(([nextCategories, nextSuppliers, nextProducts]) => {
+        setCategories(nextCategories);
+        setSuppliers(nextSuppliers);
+        setProducts(nextProducts.items);
+      });
+    }
+  }, [loadDocument, profile?.role]);
 
   async function download() {
     const url = await api.getFileUrl(id, "source");
@@ -143,6 +172,28 @@ export function DocumentDetailPage() {
       <Card className="mt-6 overflow-hidden">
         <div className="border-b border-slate-700 bg-slate-800/60 p-5">
           <h2 className="flex items-center gap-2 font-black text-slate-100">
+            <Link2 className="text-cyan-300" size={19} />
+            已連結產品主檔
+          </h2>
+          <p className="mt-1 text-sm text-slate-400">
+            這裡才是可搜尋、可維護正式分類與廠商角色的產品資料。
+          </p>
+        </div>
+        {document.linkedProducts?.length ? (
+          <div className="grid gap-4 p-5 lg:grid-cols-2">
+            {document.linkedProducts.map((product) => (
+              <LinkedProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        ) : (
+          <p className="p-5 text-sm text-slate-400">
+            目前沒有連結產品主檔。若下方有待處理辨識項目，可建立新主檔或連結既有主檔。
+          </p>
+        )}
+      </Card>
+      <Card className="mt-6 overflow-hidden">
+        <div className="border-b border-slate-700 bg-slate-800/60 p-5">
+          <h2 className="flex items-center gap-2 font-black text-slate-100">
             <Boxes className="text-cyan-300" size={19} />
             AI 文件分析
           </h2>
@@ -175,9 +226,10 @@ export function DocumentDetailPage() {
             {document.extractedItems.map((item) => (
               <article
                 key={item.id}
-                className="grid gap-3 p-5 md:grid-cols-[minmax(0,1fr)_auto]"
+                className="p-5"
               >
-                <div className="min-w-0">
+                <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_auto]">
+                  <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
                     <Badge tone={item.kind === "product_candidate" ? "warning" : "neutral"}>
                       {itemKindLabels[item.kind]}
@@ -204,13 +256,31 @@ export function DocumentDetailPage() {
                           .join("、")
                       : "無足夠身分證據"}
                   </p>
+                  {item.promotedProductId && (
+                    <Link
+                      to={`/products/${item.promotedProductId}`}
+                      className="mt-3 inline-flex items-center gap-2 text-sm font-bold text-cyan-300 hover:text-cyan-200"
+                    >
+                      <Check size={16} /> 已連結產品主檔
+                    </Link>
+                  )}
+                  </div>
+                  <div className="text-left md:text-right">
+                    <p className="text-lg font-black text-cyan-300">
+                      {Math.round(item.confidence * 100)}%
+                    </p>
+                    <p className="text-xs text-slate-500">AI 自評信心</p>
+                  </div>
                 </div>
-                <div className="text-left md:text-right">
-                  <p className="text-lg font-black text-cyan-300">
-                    {Math.round(item.confidence * 100)}%
-                  </p>
-                  <p className="text-xs text-slate-500">AI 自評信心</p>
-                </div>
+                {profile?.role !== "viewer" && item.actionable && (
+                  <ExtractedItemResolutionPanel
+                    item={item}
+                    categories={categories}
+                    suppliers={suppliers}
+                    products={products}
+                    onDone={() => void loadDocument()}
+                  />
+                )}
               </article>
             ))}
           </div>
@@ -231,6 +301,162 @@ export function DocumentDetailPage() {
         )}
       </Card>
     </>
+  );
+}
+
+function LinkedProductCard({ product }: { product: ProductSummary }) {
+  return (
+    <Link
+      to={`/products/${product.id}`}
+      className="rounded-xl border border-slate-700 bg-slate-950/50 p-4 transition hover:border-cyan-700"
+    >
+      <div className="flex gap-4">
+        {product.thumbnailUrl ? (
+          <img src={product.thumbnailUrl} alt="" className="h-20 w-20 rounded-lg object-cover" />
+        ) : (
+          <div className="flex h-20 w-20 items-center justify-center rounded-lg bg-slate-800 text-slate-500">
+            <Boxes size={26} />
+          </div>
+        )}
+        <div className="min-w-0">
+          <p className="font-black text-slate-100">{product.nameZhTw}</p>
+          <p className="mt-1 text-xs text-slate-400">
+            {product.modelNumbers.length ? product.modelNumbers.join("、") : "型號未填"}
+          </p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            <Badge tone={product.category ? "accent" : "warning"}>
+              {product.category?.nameZhTw || "未設定正式分類"}
+            </Badge>
+            {product.suppliers.length ? product.suppliers.map((supplier) => (
+              <Badge key={`${supplier.id}-${supplier.role}`}>
+                {supplier.name} · {supplierRoleLabel(supplier.role)}
+              </Badge>
+            )) : <Badge tone="warning">未連結廠商</Badge>}
+          </div>
+        </div>
+      </div>
+    </Link>
+  );
+}
+
+function ExtractedItemResolutionPanel({
+  item,
+  categories,
+  suppliers,
+  products,
+  onDone,
+}: {
+  item: ExtractedDocumentItem;
+  categories: Category[];
+  suppliers: SupplierOption[];
+  products: ProductSummary[];
+  onDone: () => void;
+}) {
+  const [mode, setMode] = useState<"create" | "link" | "keep" | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+
+  async function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!mode) return;
+    const form = new FormData(event.currentTarget);
+    setBusy(true);
+    setError("");
+    try {
+      const selectedSuppliers = suppliers
+        .filter((supplier) => form.get(`supplier-${supplier.id}`) === "on")
+        .map((supplier) => ({
+          id: supplier.id,
+          role: String(form.get(`supplier-role-${supplier.id}`) || "unknown") as SupplierRef["role"],
+        }));
+      await api.resolveExtractedItem(item.id, {
+        action: mode,
+        productId: mode === "link" ? String(form.get("productId") || "") : null,
+        categoryId: mode !== "keep" ? String(form.get("categoryId") || "") || null : null,
+        suppliers: mode === "keep" || (mode === "link" && !selectedSuppliers.length)
+          ? null : selectedSuppliers,
+      });
+      setMode(null);
+      onDone();
+    } catch (nextError) {
+      setError(nextError instanceof Error ? nextError.message : "處理失敗");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="mt-4 rounded-xl border border-cyan-900 bg-slate-950/60 p-4">
+      <p className="text-sm font-black text-slate-100">人工決定這個辨識項目的去向</p>
+      <div className="mt-3 flex flex-wrap gap-2">
+        <Button variant={mode === "create" ? "primary" : "secondary"} onClick={() => setMode("create")}>
+          <Plus size={16} /> 建立產品主檔
+        </Button>
+        <Button variant={mode === "link" ? "primary" : "secondary"} onClick={() => setMode("link")}>
+          <Link2 size={16} /> 連結既有主檔
+        </Button>
+        <Button variant={mode === "keep" ? "primary" : "secondary"} onClick={() => setMode("keep")}>
+          只保留為文件項目
+        </Button>
+      </div>
+      {mode && (
+        <form className="mt-4 space-y-4 border-t border-slate-800 pt-4" onSubmit={submit}>
+          {mode === "link" && (
+            <label className="block text-sm font-bold text-slate-300">
+              既有產品主檔
+              <select name="productId" required className="mt-2 w-full rounded-xl border border-slate-600 bg-slate-900 p-3 text-slate-100">
+                <option value="">請選擇產品</option>
+                {products.map((product) => (
+                  <option key={product.id} value={product.id}>
+                    {product.nameZhTw}{product.modelNumbers.length ? ` · ${product.modelNumbers.join("/")}` : ""}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
+          {mode !== "keep" && (
+            <>
+              <label className="block text-sm font-bold text-slate-300">
+                正式分類（可留空）
+                <select name="categoryId" className="mt-2 w-full rounded-xl border border-slate-600 bg-slate-900 p-3 text-slate-100">
+                  <option value="">尚不設定</option>
+                  {categories.map((category) => <option key={category.id} value={category.id}>{category.nameZhTw}</option>)}
+                </select>
+              </label>
+              <fieldset>
+                <legend className="text-sm font-bold text-slate-300">廠商與角色（只勾選有來源證據者）</legend>
+                <div className="mt-2 max-h-56 space-y-2 overflow-auto rounded-xl border border-slate-700 p-3">
+                  {suppliers.length ? suppliers.map((supplier) => (
+                    <div key={supplier.id} className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_160px] sm:items-center">
+                      <label className="flex items-center gap-2 text-sm text-slate-300">
+                        <input type="checkbox" name={`supplier-${supplier.id}`} className="h-4 w-4 accent-cyan-400" />
+                        {supplier.name}
+                      </label>
+                      <select name={`supplier-role-${supplier.id}`} className="rounded-lg border border-slate-700 bg-slate-900 p-2 text-xs text-slate-200">
+                        <option value="manufacturer">原廠</option>
+                        <option value="trader">貿易商</option>
+                        <option value="partner">合作夥伴</option>
+                        <option value="unknown">角色待確認</option>
+                      </select>
+                    </div>
+                  )) : <p className="text-sm text-slate-500">廠商主檔尚無資料。</p>}
+                </div>
+              </fieldset>
+            </>
+          )}
+          {mode === "keep" && (
+            <p className="text-sm leading-6 text-amber-200">
+              這會關閉此項提醒，但不建立產品、不改動其他產品主檔；日後仍可從來源文件查到。
+            </p>
+          )}
+          {error && <p className="text-sm font-bold text-red-300" role="alert">{error}</p>}
+          <div className="flex gap-2">
+            <Button type="submit" disabled={busy}>{busy ? "處理中…" : "確認這項決定"}</Button>
+            <Button type="button" variant="ghost" onClick={() => setMode(null)}>取消</Button>
+          </div>
+        </form>
+      )}
+    </div>
   );
 }
 
@@ -260,6 +486,15 @@ const identitySignalLabels: Record<string, string> = {
   pricing_line: "價格品項",
   filename_or_folder_only: "僅檔名／資料夾",
 };
+
+function supplierRoleLabel(role: SupplierRef["role"]) {
+  return {
+    manufacturer: "原廠",
+    trader: "貿易商",
+    partner: "合作夥伴",
+    unknown: "角色待確認",
+  }[role];
+}
 
 function Info({ label, value }: { label: string; value: string }) {
   return (

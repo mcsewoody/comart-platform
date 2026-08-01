@@ -1,5 +1,6 @@
 import {
   ArrowRight,
+  AlertTriangle,
   CheckCheck,
   ChevronDown,
   Factory,
@@ -16,6 +17,8 @@ import { api } from "../lib/api";
 import type {
   BatchApprovalResult,
   MappingSuggestion,
+  ProductReviewGap,
+  ProductReviewGapKind,
   ReviewTask,
 } from "../lib/types";
 import { formatDate } from "../lib/utils";
@@ -103,6 +106,7 @@ export function ReviewPage() {
       />
 
       <MasterMappingPanel />
+      <ProductGapPanel />
 
       {groups.length > 0 && (
       <Card className="mb-5 p-5">
@@ -189,6 +193,85 @@ export function ReviewPage() {
         </div>
       )}
     </>
+  );
+}
+
+const gapLabels: Record<ProductReviewGapKind, string> = {
+  category: "缺正式分類",
+  supplier: "缺廠商",
+  model: "缺型號",
+  thumbnail: "缺代表圖",
+};
+
+function ProductGapPanel() {
+  const [items, setItems] = useState<ProductReviewGap[]>([]);
+  const [filter, setFilter] = useState<ProductReviewGapKind | "all">("all");
+
+  useEffect(() => {
+    void api.getProductReviewGaps().then(setItems);
+  }, []);
+
+  const visible = filter === "all"
+    ? items
+    : items.filter((item) => item.missing.includes(filter));
+
+  return (
+    <Card className="mb-5 overflow-hidden">
+      <div className="flex flex-col gap-4 border-b border-slate-700 bg-slate-800/60 p-5 lg:flex-row lg:items-end lg:justify-between">
+        <div>
+          <h2 className="flex items-center gap-2 font-black text-slate-100">
+            <AlertTriangle className="text-amber-300" size={19} />
+            產品主檔待補清單
+          </h2>
+          <p className="mt-1 text-sm leading-6 text-slate-400">
+            文件已接受，不代表產品主檔完整。這裡集中列出缺正式分類、廠商、型號或代表圖的產品。
+          </p>
+        </div>
+        <label className="text-sm font-bold text-slate-300">
+          缺口篩選
+          <select
+            value={filter}
+            onChange={(event) => setFilter(event.target.value as ProductReviewGapKind | "all")}
+            className="ml-3 rounded-xl border border-slate-600 bg-slate-900 px-3 py-2 text-slate-100"
+          >
+            <option value="all">全部（{items.length}）</option>
+            {(Object.keys(gapLabels) as ProductReviewGapKind[]).map((kind) => (
+              <option key={kind} value={kind}>
+                {gapLabels[kind]}（{items.filter((item) => item.missing.includes(kind)).length}）
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
+      {visible.length ? (
+        <div className="divide-y divide-slate-700">
+          {visible.map(({ product, missing }) => (
+            <div key={product.id} className="grid gap-4 p-5 md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
+              <div className="min-w-0">
+                <p className="font-black text-slate-100">{product.nameZhTw}</p>
+                <p className="mt-1 text-xs text-slate-400">
+                  {product.modelNumbers.length ? product.modelNumbers.join("、") : "型號未填"}
+                  {product.category ? ` · ${product.category.nameZhTw}` : ""}
+                  {product.suppliers.length ? ` · ${product.suppliers.map((supplier) => supplier.name).join("、")}` : ""}
+                </p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {missing.map((kind) => <Badge key={kind} tone="warning">{gapLabels[kind]}</Badge>)}
+                </div>
+              </div>
+              <Link to={`/products/${product.id}`}>
+                <Button variant="secondary">
+                  補產品資料 <ArrowRight size={16} />
+                </Button>
+              </Link>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p className="p-5 text-sm text-slate-400">
+          {items.length ? "此篩選沒有待補產品。" : "目前沒有產品主檔缺口。"}
+        </p>
+      )}
+    </Card>
   );
 }
 

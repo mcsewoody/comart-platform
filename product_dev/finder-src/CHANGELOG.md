@@ -7,6 +7,13 @@
 - 每次改版必須先更新 `src/version.ts`，並在本檔新增日期、範圍與驗證結果。
 - 單純重新執行既有匯入工作或修正資料內容，不增加程式版本。
 
+## v1.08 — 2026-08-01
+
+- CPF worker 與 AI proxy 支援 Supabase 新式 `sb_secret_...` 金鑰。
+- `cpf-ai-worker` 優先驗證名為 `cpf_worker` 的新 Secret Key，遷移期間保留 legacy service-role 回退。
+- Worker、主檔回填及 resumable upload 改以 `apikey` header 傳送 Supabase API key。
+- 本版不變更 KMS 金鑰，也不停用 legacy API keys。
+
 ## v1.07 — 2026-08-01
 
 - 修正長篇 Office／PDF 文件建立 embedding 時可能超過 8,192-token 上限的問題。

@@ -67,7 +67,7 @@ def call_proxy(proxy_url: str, service_key: str, model: str, schema, prompt: str
     response = httpx.post(
         proxy_url,
         headers={
-            "Authorization": f"Bearer {service_key}",
+            "apikey": service_key,
             "Content-Type": "application/json",
         },
         json={

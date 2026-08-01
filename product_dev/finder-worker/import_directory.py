@@ -90,7 +90,7 @@ def upload_resumable(
     uploader = tus_client.TusClient(
         f"{supabase_url}/storage/v1/upload/resumable",
         headers={
-            "Authorization": f"Bearer {service_key}",
+            "apikey": service_key,
             "x-upsert": "false",
         },
     ).uploader(

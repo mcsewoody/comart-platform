@@ -31,16 +31,34 @@ function jwtRole(authorization: string) {
   }
 }
 
+function namedSecretKey(name: string) {
+  try {
+    const keys = JSON.parse(Deno.env.get("SUPABASE_SECRET_KEYS") || "{}")
+    return typeof keys?.[name] === "string" ? keys[name] : ""
+  } catch {
+    return ""
+  }
+}
+
 serve(async (req) => {
   if (req.method !== "POST") return json({ error: "method_not_allowed" }, 405)
 
-  const serviceKeys = [
+  const currentSecretKey = namedSecretKey("cpf_worker")
+  const legacyServiceKeys = [
     Deno.env.get("SB_SERVICE_ROLE_KEY"),
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY"),
   ].filter((value): value is string => Boolean(value))
-  const supplied = req.headers.get("authorization") || ""
-  const exactKey = serviceKeys.some((key) => supplied === `Bearer ${key}`)
-  if (!exactKey && jwtRole(supplied) !== "service_role") {
+  const suppliedApiKey = req.headers.get("apikey") || ""
+  const suppliedAuthorization = req.headers.get("authorization") || ""
+  const exactCurrentKey = Boolean(currentSecretKey) && suppliedApiKey === currentSecretKey
+  const exactLegacyKey = legacyServiceKeys.some((key) =>
+    suppliedApiKey === key || suppliedAuthorization === `Bearer ${key}`
+  )
+  if (
+    !exactCurrentKey &&
+    !exactLegacyKey &&
+    jwtRole(suppliedAuthorization) !== "service_role"
+  ) {
     return json({ error: "unauthorized" }, 401)
   }
 

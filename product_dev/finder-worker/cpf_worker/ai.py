@@ -115,9 +115,7 @@ class ProductAnalyzer:
         response = httpx.post(
             self.settings.ai_proxy_url,
             headers={
-                "Authorization": (
-                    f"Bearer {self.settings.supabase_service_role_key}"
-                ),
+                "apikey": self.settings.supabase_service_role_key,
                 "Content-Type": "application/json",
             },
             json=payload,

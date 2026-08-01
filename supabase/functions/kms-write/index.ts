@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
 import { verifySession } from "../_shared/session.ts"
+import { namedSecretKey } from "../_shared/api-keys.ts"
 
 const CORS = {
   "Access-Control-Allow-Origin": "*",
@@ -16,7 +17,7 @@ serve(async (req) => {
 
   try {
     const SUPABASE_URL = Deno.env.get("SB_URL") || ""
-    const SERVICE_KEY  = Deno.env.get("SB_SERVICE_ROLE_KEY") || ""
+    const SERVICE_KEY = namedSecretKey("kms_edge")
 
     if (!SERVICE_KEY) return new Response(
       JSON.stringify({ error: "SERVICE_ROLE_KEY not set" }),

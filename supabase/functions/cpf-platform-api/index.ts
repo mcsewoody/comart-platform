@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
 import { verifySession } from "../_shared/session.ts"
+import { namedSecretKey } from "../_shared/api-keys.ts"
 
 const CORS = {
   "Access-Control-Allow-Origin": "*",
@@ -150,7 +151,7 @@ serve(async (req) => {
   }
 
   const url = Deno.env.get("SB_URL") || ""
-  const key = Deno.env.get("SB_SERVICE_ROLE_KEY") || ""
+  const key = namedSecretKey("cpf_worker")
   if (!url || !key) return json({ error: "server_misconfigured" }, 500)
   const sb = createClient(url, key)
   const body = await req.json().catch(() => ({}))

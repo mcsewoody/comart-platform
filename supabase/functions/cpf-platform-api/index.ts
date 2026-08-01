@@ -618,6 +618,27 @@ serve(async (req) => {
     return json({ items })
   }
 
+  if (action === "batchFillProductGaps") {
+    if (!canEdit(sess)) return json({ error: "forbidden" }, 403)
+    const requested = [...new Set((body.productIds || []).map(String))].slice(0, 200)
+    const field = String(body.field || "")
+    if (!requested.length || !["category", "supplier", "model"].includes(field)) {
+      return json({ error: "bad_batch_request" }, 400)
+    }
+    const allowed = requested.filter((productId) =>
+      (docsByProduct.get(productId) || []).some(documentId => visibleDocumentIds.has(documentId))
+    )
+    if (allowed.length !== requested.length) return json({ error: "forbidden_product" }, 403)
+    const { data, error } = await sb.rpc("cpf_batch_fill_product_gaps", {
+      p_product_ids: allowed,
+      p_field: field,
+      p_value: body.value || {},
+      p_actor: sess.empId,
+    })
+    if (error) return json({ error: error.message }, 400)
+    return json({ result: data })
+  }
+
   if (action === "product") {
     const product: any = (products || []).find((item: any) => item.id === body.id && !item.deleted_at)
     if (!product) return json({ item: null })

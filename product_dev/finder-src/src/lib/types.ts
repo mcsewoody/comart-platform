@@ -159,6 +159,12 @@ export interface ProductReviewGap {
   missing: ProductReviewGapKind[];
 }
 
+export interface BatchProductGapResult {
+  requested: number;
+  updated: number;
+  field: Exclude<ProductReviewGapKind, "thumbnail">;
+}
+
 export interface DocumentAnalysisSummary {
   status: "not_analyzed" | "legacy" | "current";
   policyVersion?: string | null;

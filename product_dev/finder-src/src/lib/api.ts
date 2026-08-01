@@ -11,6 +11,7 @@ import { getPlatformSession } from "./platform-session";
 import type {
   Category,
   BatchApprovalResult,
+  BatchProductGapResult,
   MappingSuggestion,
   DocumentSummary,
   ExtractedItemResolution,
@@ -220,6 +221,22 @@ export const api = {
     return (
       await platformCall<{ items: ProductReviewGap[] }>("productReviewGaps")
     ).items;
+  },
+
+  async batchFillProductGaps(
+    productIds: string[],
+    field: "category" | "supplier" | "model",
+    value: Record<string, unknown>,
+  ): Promise<BatchProductGapResult> {
+    if (appConfig.demoMode) {
+      return { requested: productIds.length, updated: productIds.length, field };
+    }
+    return (
+      await platformCall<{ result: BatchProductGapResult }>(
+        "batchFillProductGaps",
+        { productIds, field, value },
+      )
+    ).result;
   },
 
   async getCategories(): Promise<Category[]> {

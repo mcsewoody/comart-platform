@@ -15,8 +15,8 @@ import { Link } from "react-router-dom";
 import { Badge, Button, Card, EmptyState, PageHeader } from "../components/ui";
 import { api } from "../lib/api";
 import type {
-  BatchApprovalResult,
   Category,
+  DeferredReviewResult,
   MappingSuggestion,
   ProductReviewGap,
   ProductReviewGapKind,
@@ -58,143 +58,116 @@ function groupReviewTasks(tasks: ReviewTask[]): ReviewGroup[] {
 
 export function ReviewPage() {
   const [tasks, setTasks] = useState<ReviewTask[]>([]);
-  const [selected, setSelected] = useState<Set<string>>(new Set());
   const [confirming, setConfirming] = useState(false);
   const [busy, setBusy] = useState(false);
-  const [result, setResult] = useState<BatchApprovalResult | null>(null);
+  const [result, setResult] = useState<DeferredReviewResult | null>(null);
   const [error, setError] = useState("");
-  const groups = useMemo(() => groupReviewTasks(tasks), [tasks]);
+  const highTasks = useMemo(() => tasks.filter((task) => task.priority === "high"), [tasks]);
+  const routineTasks = useMemo(() => tasks.filter((task) => task.priority !== "high"), [tasks]);
+  const highGroups = useMemo(() => groupReviewTasks(highTasks), [highTasks]);
+  const routineDocumentIds = useMemo(
+    () => [...new Set(routineTasks.flatMap((task) => task.documentId ? [task.documentId] : []))],
+    [routineTasks],
+  );
 
   useEffect(() => {
     void api.getReviewTasks().then(setTasks);
   }, []);
 
-  function toggle(id: string) {
-    setSelected((current) => {
-      const next = new Set(current);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-    setConfirming(false);
-  }
-
-  async function approveSelected() {
+  async function deferRoutine() {
     setBusy(true);
     setError("");
     try {
-      const approvedIds = [...selected];
-      const nextResult = await api.batchApproveDocuments(approvedIds);
+      const nextResult = await api.deferRoutineReviews(routineDocumentIds);
       setResult(nextResult);
-      setTasks((current) =>
-        current.filter((task) => !task.documentId || !selected.has(task.documentId)),
-      );
-      setSelected(new Set());
+      setTasks(await api.getReviewTasks());
       setConfirming(false);
     } catch (nextError) {
-      setError(nextError instanceof Error ? nextError.message : "批次審核失敗");
+      setError(nextError instanceof Error ? nextError.message : "略過一般提醒失敗");
     } finally {
       setBusy(false);
     }
   }
 
-  const allSelected = groups.length > 0 && selected.size === groups.length;
-
   return (
     <>
       <PageHeader
-        eyebrow="Human in the loop"
-        title="以來源文件審核 AI 結果"
-        description="一份文件可能產生多個欄位提醒。只確認文件裡實際出現的資料；不適用或沒有證據的欄位可以保持空白。"
+        eyebrow="Exception center"
+        title="AI 例外與資料補充"
+        description="AI 分析完成後即可搜尋使用，不需要逐一確認。只有可能影響產品身分、廠商判斷或重複資料的高風險例外需要處理。"
       />
 
-      <MasterMappingPanel />
-      <ProductGapPanel />
-
-      {groups.length > 0 && (
-      <Card className="mb-5 p-5">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+      <Card className="mb-5 overflow-hidden border-emerald-800">
+        <div className="flex flex-col gap-4 bg-emerald-950/30 p-5 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <div className="flex flex-wrap gap-2">
-              <Badge tone="danger">
-                {tasks.filter((item) => item.priority === "high").length} 個高優先提醒
-              </Badge>
-              <Badge>{groups.length} 份文件待審</Badge>
-              <Badge>{tasks.length} 個欄位提醒</Badge>
+              <Badge tone="success">AI 結果已可直接搜尋</Badge>
+              <Badge tone={highTasks.length ? "danger" : "success"}>{highTasks.length} 個高風險例外</Badge>
+              <Badge>{routineTasks.length} 個一般提醒</Badge>
             </div>
-            <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-500">
-              「接受目前結果」只確認已抽出的值，不會要求品牌、型號、廠商、規格全部存在；沒有產品的合約、會議或供應商文件也能直接完成文件審核。
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
+              一般提醒可以全部略過，日後在報價、開案或實際使用產品時再補資料。略過不會把 AI 值標成人工確認，也不會刪除產品候選或來源證據。
             </p>
           </div>
-          <div className="flex flex-wrap gap-2">
+          {!!routineDocumentIds.length && (
             <Button
-              variant="secondary"
-              onClick={() =>
-                setSelected(allSelected ? new Set() : new Set(groups.map((g) => g.documentId)))
-              }
-            >
-              {allSelected ? "取消全選" : "全選所有文件"}
-            </Button>
-            <Button
-              disabled={selected.size === 0 || busy}
+              disabled={busy}
               onClick={() => setConfirming(true)}
             >
               <CheckCheck size={17} />
-              批次接受 {selected.size || ""} 份
+              一次略過 {routineDocumentIds.length} 份一般提醒
             </Button>
-          </div>
+          )}
         </div>
 
         {confirming && (
-          <div className="mt-5 rounded-xl border border-amber-200 bg-amber-50 p-4">
-            <p className="font-black text-amber-950">
-              確認接受所選 {selected.size} 份文件目前的 AI 結果？
+          <div className="border-t border-amber-800/60 bg-amber-950/30 p-5">
+            <p className="font-black text-amber-100">
+              確認略過 {routineDocumentIds.length} 份文件的一般提醒？
             </p>
-            <p className="mt-1 text-sm leading-6 text-amber-800">
-              有值的欄位會標成人工確認並防止 AI 重跑覆蓋；空白欄位維持空白。這不會合併產品，也不會刪除來源文件。
+            <p className="mt-1 text-sm leading-6 text-amber-200/80">
+              文件會標示為分析完成；AI 欄位仍維持 AI 狀態，缺少的分類、廠商或型號也會保持空白，日後仍可補充。
             </p>
             <div className="mt-3 flex gap-2">
-              <Button disabled={busy} onClick={() => void approveSelected()}>
-                {busy ? "處理中…" : "確認批次接受"}
+              <Button disabled={busy} onClick={() => void deferRoutine()}>
+                {busy ? "處理中…" : "確認全部略過"}
               </Button>
               <Button variant="ghost" onClick={() => setConfirming(false)}>
-                返回檢查
+                返回
               </Button>
             </div>
           </div>
         )}
 
         {result && (
-          <p className="mt-4 text-sm font-bold text-emerald-700" role="status">
-            已完成 {result.documentsApproved} 份文件、確認 {result.productsConfirmed} 個產品，關閉 {result.reviewTasksResolved} 個欄位提醒。
+          <p className="border-t border-emerald-800/50 px-5 py-4 text-sm font-bold text-emerald-300" role="status">
+            已略過 {result.routineTasksDeferred} 個一般提醒，{result.documentsCompleted} 份文件改為分析完成；沒有任何 AI 值被標成人工確認。
           </p>
         )}
         {error && (
-          <p className="mt-4 text-sm font-bold text-red-700" role="alert">
+          <p className="border-t border-red-800/50 px-5 py-4 text-sm font-bold text-red-300" role="alert">
             {error}
           </p>
         )}
       </Card>
-      )}
 
-      {groups.length === 0 ? (
+      <h2 className="mb-4 text-lg font-black text-slate-100">必須判斷的高風險例外</h2>
+      {highGroups.length === 0 ? (
         <EmptyState
           icon={<CheckCheck size={28} />}
-          title="目前沒有待審文件"
-          description="所有來源文件的 AI 結果都已處理。"
+          title="目前沒有高風險例外"
+          description="可直接使用產品與文件搜尋；分類、廠商、型號等一般缺口可在需要時再補。"
         />
       ) : (
-        <div className="space-y-4">
-          {groups.map((group) => (
-            <DocumentReviewGroup
-              key={group.documentId}
-              group={group}
-              checked={selected.has(group.documentId)}
-              onToggle={() => toggle(group.documentId)}
-            />
+        <div className="mb-7 space-y-4">
+          {highGroups.map((group) => (
+            <DocumentReviewGroup key={group.documentId} group={group} />
           ))}
         </div>
       )}
+
+      <MasterMappingPanel />
+      <ProductGapPanel />
     </>
   );
 }
@@ -312,10 +285,10 @@ function ProductGapPanel() {
         <div>
           <h2 className="flex items-center gap-2 font-black text-slate-100">
             <AlertTriangle className="text-amber-300" size={19} />
-            產品主檔待補清單
+            選用：產品資料完善清單
           </h2>
           <p className="mt-1 text-sm leading-6 text-slate-400">
-            文件已接受，不代表產品主檔完整。這裡集中列出缺正式分類、廠商、型號或代表圖的產品。
+            不需要清空這份清單。只在產品準備報價、開案、推薦或輸出規格時，再補正式分類、廠商、型號或代表圖。
           </p>
         </div>
         <label className="text-sm font-bold text-slate-300">
@@ -554,7 +527,7 @@ function MasterMappingPanel() {
         <div>
           <h2 className="flex items-center gap-2 font-black text-slate-950">
             <Sparkles className="text-cyan-800" size={19} />
-            AI 正式分類／廠商對應
+            選用：AI 正式分類／廠商對應
           </h2>
           <p className="mt-1 text-sm leading-6 text-slate-500">
             相同建議會自動成組；勾選後一次套用。廠商建議只收來源文件明確出現的名稱，不依資料夾或 Logo 猜測。
@@ -623,36 +596,21 @@ function supplierRoleLabel(role: NonNullable<MappingSuggestion["supplierRole"]>)
   }[role];
 }
 
-function DocumentReviewGroup({
-  group,
-  checked,
-  onToggle,
-}: {
-  group: ReviewGroup;
-  checked: boolean;
-  onToggle: () => void;
-}) {
+function DocumentReviewGroup({ group }: { group: ReviewGroup }) {
   const [open, setOpen] = useState(false);
   const productIds = [...new Set(group.tasks.flatMap((task) => task.productId ? [task.productId] : []))];
   const high = group.tasks.filter((task) => task.priority === "high").length;
   return (
-    <Card className={checked ? "border-cyan-700 p-5 ring-1 ring-cyan-700" : "p-5"}>
-      <div className="grid gap-4 md:grid-cols-[28px_minmax(0,1fr)_auto] md:items-start">
-        <input
-          type="checkbox"
-          checked={checked}
-          onChange={onToggle}
-          className="mt-1 h-5 w-5 accent-cyan-600"
-          aria-label={`選取 ${group.documentTitle}`}
-        />
+    <Card className="border-red-900/70 p-5">
+      <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_auto] md:items-start">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
-            <h2 className="truncate font-black text-slate-950">{group.documentTitle}</h2>
+            <h2 className="truncate font-black text-slate-100">{group.documentTitle}</h2>
             {high > 0 && <Badge tone="danger">{high} 個高優先</Badge>}
             <Badge>{group.tasks.length} 個提醒</Badge>
             <Badge>{productIds.length} 個產品候選</Badge>
           </div>
-          <p className="mt-2 text-sm text-slate-500">
+          <p className="mt-2 text-sm text-slate-400">
             最近提醒：{group.tasks[0]?.description} · {formatDate(group.tasks[0]?.createdAt)}
           </p>
         </div>
@@ -669,18 +627,18 @@ function DocumentReviewGroup({
         </div>
       </div>
       {open && (
-        <div className="mt-4 space-y-3 border-t border-slate-100 pt-4">
+        <div className="mt-4 space-y-3 border-t border-slate-700 pt-4">
           {group.tasks.map((task) => {
             const Icon = taskIcons[task.type];
             return (
-              <div key={task.id} className="flex gap-3 rounded-xl bg-slate-50 p-3">
-                <Icon className="mt-0.5 shrink-0 text-slate-500" size={18} />
+              <div key={task.id} className="flex gap-3 rounded-xl bg-slate-950/60 p-3">
+                <Icon className="mt-0.5 shrink-0 text-red-300" size={18} />
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-black text-slate-950">{task.title}</p>
-                  <p className="mt-1 text-sm leading-6 text-slate-500">{task.description}</p>
+                  <p className="text-sm font-black text-slate-100">{task.title}</p>
+                  <p className="mt-1 text-sm leading-6 text-slate-400">{task.description}</p>
                 </div>
                 {task.productId && (
-                  <Link className="text-sm font-bold text-cyan-800" to={`/products/${task.productId}`}>
+                  <Link className="text-sm font-bold text-cyan-300" to={`/products/${task.productId}`}>
                     產品
                   </Link>
                 )}

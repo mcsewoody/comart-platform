@@ -39,7 +39,7 @@ const navigation: Array<{
   },
   {
     to: "/review",
-    label: "AI 審核",
+    label: "AI 例外",
     icon: ShieldCheck,
     desktopOnly: true,
     minimumRole: "editor",

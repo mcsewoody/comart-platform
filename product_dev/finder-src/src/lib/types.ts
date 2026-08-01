@@ -229,6 +229,11 @@ export interface BatchApprovalResult {
   reviewTasksResolved: number;
 }
 
+export interface DeferredReviewResult {
+  documentsCompleted: number;
+  routineTasksDeferred: number;
+}
+
 export interface MappingSuggestion {
   id: string;
   type: "category" | "supplier";

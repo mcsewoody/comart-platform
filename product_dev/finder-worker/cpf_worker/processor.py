@@ -73,8 +73,10 @@ class JobProcessor:
                     self.settings.prompt_version,
                     usage,
                 )
-                final_status = "needs_review" if extraction.needs_review else "completed"
-                message = "等待人工審核" if extraction.needs_review else "分析完成"
+                review = self.repository.finalize_optional_review(version_id)
+                requires_review = bool(review.get("requiresReview"))
+                final_status = "needs_review" if requires_review else "completed"
+                message = "發現高風險例外，需人工判斷" if requires_review else "AI 分析完成，可直接搜尋使用"
                 self.repository.update_job(
                     job_id, worker_id, final_status, 100, message
                 )

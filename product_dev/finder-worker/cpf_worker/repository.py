@@ -178,3 +178,10 @@ class Repository:
         return self.apply_extraction(
             version_id, extraction, None, None, prompt_version, {}
         )
+
+    def finalize_optional_review(self, version_id: str) -> dict[str, Any]:
+        result = self.client.rpc(
+            "cpf_finalize_optional_review",
+            {"p_document_version_id": version_id, "p_actor": "cpf-worker"},
+        ).execute()
+        return result.data or {}

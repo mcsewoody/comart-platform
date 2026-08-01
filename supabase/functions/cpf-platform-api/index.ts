@@ -785,6 +785,20 @@ serve(async (req) => {
     return json({ result: data })
   }
 
+  if (action === "deferRoutineReviews") {
+    if (!canEdit(sess)) return json({ error: "forbidden" }, 403)
+    const requested = [...new Set((body.documentIds || []).map(String))].slice(0, 1000)
+    if (!requested.length) return json({ error: "document_ids_required" }, 400)
+    const allowed = requested.filter((id) => visibleDocumentIds.has(id))
+    if (allowed.length !== requested.length) return json({ error: "forbidden_document" }, 403)
+    const { data, error } = await sb.rpc("cpf_defer_routine_reviews", {
+      p_document_ids: allowed,
+      p_actor: sess.empId,
+    })
+    if (error) return json({ error: error.message }, 400)
+    return json({ result: data })
+  }
+
   if (action === "updateProduct") {
     if (!canEdit(sess)) return json({ error: "forbidden" }, 403)
     const patch = body.patch || {}

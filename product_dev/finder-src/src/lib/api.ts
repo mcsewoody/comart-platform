@@ -14,6 +14,7 @@ import type {
   BatchProductGapResult,
   MappingSuggestion,
   DocumentSummary,
+  DeferredReviewResult,
   ExtractedItemResolution,
   ProcessingJob,
   ProductDetail,
@@ -331,6 +332,21 @@ export const api = {
     return (
       await platformCall<{ result: BatchApprovalResult }>(
         "batchApproveDocuments",
+        { documentIds },
+      )
+    ).result;
+  },
+
+  async deferRoutineReviews(documentIds: string[]): Promise<DeferredReviewResult> {
+    if (appConfig.demoMode) {
+      return {
+        documentsCompleted: documentIds.length,
+        routineTasksDeferred: documentIds.length,
+      };
+    }
+    return (
+      await platformCall<{ result: DeferredReviewResult }>(
+        "deferRoutineReviews",
         { documentIds },
       )
     ).result;

@@ -17,6 +17,7 @@
 //  - 寫入 users 時剝除 pwd_hash（密碼只能經 auth-verify 設定）
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { verifySession } from "../_shared/session.ts"
+import { elevatedApiHeaders, namedSecretKey } from "../_shared/api-keys.ts"
 
 // 過渡旗標：true = 新舊憑證並收（部署新前端期間避免中斷），false = 只收 x-session。
 // 前端（GitHub Pages）確認上線後改為 false 再部署一次。
@@ -57,7 +58,7 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: CORS })
 
   const SUPABASE_URL = Deno.env.get("SB_URL") || ""
-  const SERVICE_KEY = Deno.env.get("SB_SERVICE_ROLE_KEY") || ""
+  const SERVICE_KEY = namedSecretKey("kms_edge")
   if (!SERVICE_KEY) return json({ error: "server_misconfigured" }, 500)
 
   // ── 身分驗證：x-session（HMAC 簽章，登入時由 auth-verify 簽發）──
@@ -116,10 +117,7 @@ serve(async (req) => {
   const stIdx = url.pathname.indexOf("/storage/v1/")
   if (stIdx !== -1) {
     const stPath = url.pathname.slice(stIdx + "/storage/v1/".length) + url.search
-    const stHeaders: Record<string, string> = {
-      "apikey": SERVICE_KEY,
-      "Authorization": `Bearer ${SERVICE_KEY}`,
-    }
+    const stHeaders: Record<string, string> = elevatedApiHeaders(SERVICE_KEY)
     const ct = req.headers.get("content-type"); if (ct) stHeaders["Content-Type"] = ct
     const xup = req.headers.get("x-upsert"); if (xup) stHeaders["x-upsert"] = xup
     const stBody = (req.method === "GET" || req.method === "HEAD") ? undefined : new Uint8Array(await req.arrayBuffer())
@@ -174,8 +172,7 @@ serve(async (req) => {
 
   // 轉發到 Supabase REST，注入 service_role（繞過 RLS，與 Worker 行為一致）
   const fwHeaders: Record<string, string> = {
-    "apikey": SERVICE_KEY,
-    "Authorization": `Bearer ${SERVICE_KEY}`,
+    ...elevatedApiHeaders(SERVICE_KEY),
     "Content-Type": req.headers.get("content-type") || "application/json",
   }
   const prefer = req.headers.get("prefer"); if (prefer) fwHeaders["Prefer"] = prefer

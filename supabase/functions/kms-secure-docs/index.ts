@@ -12,6 +12,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
 import { verifySession } from "../_shared/session.ts"
+import { namedSecretKey } from "../_shared/api-keys.ts"
 
 const CORS = {
   "Access-Control-Allow-Origin": "*",
@@ -34,7 +35,7 @@ serve(async (req) => {
 
   try {
     const SUPABASE_URL = Deno.env.get("SB_URL") || ""
-    const SERVICE_KEY = Deno.env.get("SB_SERVICE_ROLE_KEY") || ""
+    const SERVICE_KEY = namedSecretKey("kms_edge")
     if (!SERVICE_KEY) return json({ ok: false, reason: "server_misconfigured" }, 500)
     const sb = createClient(SUPABASE_URL, SERVICE_KEY)
 
@@ -63,17 +64,26 @@ serve(async (req) => {
       const orderStr = typeof body.order === "string" ? body.order : "updated_at.desc"
       const sumCol = typeof body.sumCol === "string" && /^summary(_[a-z_]+)?$/.test(body.sumCol) ? body.sumCol : null
       const select = LIST_FIELDS + (sumCol ? "," + sumCol : "")
-      let q = sb.from("kms_documents").select(select).eq("status", "published")
-      const clauses = orderStr.split(",").map((c) => c.trim()).filter(Boolean)
-      let appliedAny = false
-      for (const clause of clauses) {
+      const orderCols: Array<[string, boolean]> = []
+      for (const clause of orderStr.split(",").map((c) => c.trim()).filter(Boolean)) {
         const [col, dir] = clause.split(".")
-        if (SORTABLE.has(col)) { q = q.order(col, { ascending: dir === "asc" }); appliedAny = true }
+        if (SORTABLE.has(col)) orderCols.push([col, dir === "asc"])
       }
-      if (!appliedAny) q = q.order("updated_at", { ascending: false })
-      const { data, error } = await q
-      if (error) return json({ ok: false, reason: "server_error", message: error.message }, 500)
-      const rows = (data || []).filter(allowed)
+      if (orderCols.length === 0) orderCols.push(["updated_at", false])
+
+      // PostgREST 單次查詢預設上限 1000 筆，文件數超過就會被靜默截斷（2026-07-24 發現：
+      // 1060 筆文件只顯示 1000）。改用 .range() 分頁抓到底，避免未來文件數再度卡住。
+      const PAGE = 1000
+      const allRows: Array<{ conf_level?: number | null; author_name?: string | null; [key: string]: unknown }> = []
+      for (let from = 0; ; from += PAGE) {
+        let q = sb.from("kms_documents").select(select).eq("status", "published").range(from, from + PAGE - 1)
+        for (const [col, ascending] of orderCols) q = q.order(col, { ascending })
+        const { data, error } = await q
+        if (error) return json({ ok: false, reason: "server_error", message: error.message }, 500)
+        allRows.push(...(data || []))
+        if (!data || data.length < PAGE) break
+      }
+      const rows = allRows.filter(allowed)
       return json({ ok: true, docs: rows })
     }
 

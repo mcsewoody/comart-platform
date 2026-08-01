@@ -440,8 +440,8 @@ function ProductGapPanel() {
         <div className="divide-y divide-slate-700">
           {visible.map(({ product, missing }) => (
             <div key={product.id} className={selected.has(product.id)
-              ? "grid gap-4 bg-cyan-950/20 p-5 md:grid-cols-[28px_minmax(0,1fr)_auto] md:items-center"
-              : "grid gap-4 p-5 md:grid-cols-[28px_minmax(0,1fr)_auto] md:items-center"}>
+              ? "grid gap-4 bg-cyan-950/20 p-5 md:grid-cols-[28px_104px_minmax(0,1fr)_auto] md:items-center"
+              : "grid gap-4 p-5 md:grid-cols-[28px_104px_minmax(0,1fr)_auto] md:items-center"}>
               <input
                 type="checkbox"
                 checked={selected.has(product.id)}
@@ -450,6 +450,24 @@ function ProductGapPanel() {
                 aria-label={`選取 ${product.nameZhTw}`}
                 className="h-5 w-5 accent-cyan-400 disabled:opacity-25"
               />
+              <Link
+                to={`/products/${product.id}`}
+                className="flex h-20 w-[104px] items-center justify-center overflow-hidden rounded-xl border border-slate-700 bg-slate-950 transition hover:border-cyan-600"
+                aria-label={`查看 ${product.nameZhTw} 產品詳情`}
+              >
+                {product.thumbnailUrl ? (
+                  <img
+                    src={product.thumbnailUrl}
+                    alt={`${product.nameZhTw} 來源縮圖`}
+                    loading="lazy"
+                    className="h-full w-full object-contain p-1"
+                  />
+                ) : (
+                  <span className="px-2 text-center text-xs font-bold leading-5 text-slate-500">
+                    無縮圖
+                  </span>
+                )}
+              </Link>
               <div className="min-w-0">
                 <p className="font-black text-slate-100">{product.nameZhTw}</p>
                 <p className="mt-1 text-xs text-slate-400">

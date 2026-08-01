@@ -601,8 +601,17 @@ serve(async (req) => {
       if (!product.representative_thumbnail_path) missing.push("thumbnail")
       const linkedCount = (docsByProduct.get(product.id) || [])
         .filter(id => visibleDocumentIds.has(id)).length
+      const summary = productSummary(product, categoryMap, supplierMap, linkedCount)
+      if (!summary.thumbnailUrl) {
+        const sourceDocumentId = (docsByProduct.get(product.id) || [])
+          .find(id => visibleDocumentIds.has(id))
+        const sourceDocument: any = visibleDocuments.find((doc: any) => doc.id === sourceDocumentId)
+        const sourceVersion: any = sourceDocument
+          ? versionsById.get(sourceDocument.current_version_id) : null
+        summary.thumbnailUrl = sourceVersion?.thumbnail_path || null
+      }
       return {
-        product: productSummary(product, categoryMap, supplierMap, linkedCount),
+        product: summary,
         missing,
       }
     }).filter((item: any) => item.missing.length)

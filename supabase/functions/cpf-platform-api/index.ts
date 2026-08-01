@@ -419,11 +419,12 @@ serve(async (req) => {
       doc = visibleDocuments.find((item: any) => item.id === body.documentId && !item.deleted_at)
       if (!doc) return json({ error: "forbidden" }, 403)
       const version: any = versionsById.get(doc.current_version_id)
-      const isImage = ["jpg", "jpeg", "png"].includes(String(version?.extension || "").toLowerCase())
+      const extension = String(version?.extension || "").toLowerCase()
+      const usesSourcePreview = ["jpg", "jpeg", "png", "pdf"].includes(extension)
       if (body.kind === "source") { path = version?.storage_path; bucket = "cpf_source" }
       if (body.kind === "preview") {
-        path = isImage ? version?.storage_path : version?.preview_path
-        bucket = isImage ? "cpf_source" : "cpf_preview"
+        path = usesSourcePreview ? version?.storage_path : version?.preview_path
+        bucket = usesSourcePreview ? "cpf_source" : "cpf_preview"
       }
       if (body.kind === "thumbnail") { path = version?.thumbnail_path; bucket = "cpf_thumbnail" }
     }

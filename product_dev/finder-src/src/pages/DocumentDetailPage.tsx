@@ -28,7 +28,7 @@ export function DocumentDetailPage() {
     void api.getDocument(id).then(async (result) => {
       setDocument(result);
       if (result) {
-        const kind = isImageExtension(result.extension) ? "source" : "preview";
+        const kind = usesSourcePreview(result.extension) ? "source" : "preview";
         setPreviewUrl(await api.getFileUrl(result.id, kind));
       }
     });
@@ -236,6 +236,10 @@ export function DocumentDetailPage() {
 
 function isImageExtension(extension: string) {
   return ["jpg", "jpeg", "png"].includes(extension.toLowerCase());
+}
+
+function usesSourcePreview(extension: string) {
+  return isImageExtension(extension) || extension.toLowerCase() === "pdf";
 }
 
 const itemKindLabels = {

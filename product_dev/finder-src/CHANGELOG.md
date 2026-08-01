@@ -7,6 +7,11 @@
 - 每次改版必須先更新 `src/version.ts`，並在本檔新增日期、範圍與驗證結果。
 - 單純重新執行既有匯入工作或修正資料內容，不增加程式版本。
 
+## v1.01 — 2026-07-31
+
+- 修正 PDF 預覽：直接使用 `cpf_source` 的短效 signed URL，不再錯誤要求不存在的 `preview_path`。
+- 後端 `preview` 接口對 JPG、JPEG、PNG、PDF 統一回傳原始來源；Office 文件仍使用轉換後的 `cpf_preview`。
+
 ## v1.00 — 2026-07-31
 
 - Product Finder 整合至 COMART Platform / Product Dev。

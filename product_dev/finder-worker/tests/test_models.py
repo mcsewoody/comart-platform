@@ -123,3 +123,33 @@ def test_bom_source_requires_complete_product_image_and_function():
     )
     ProductAnalyzer.enforce_creation_policy(result, "PS-04 三合一 BOM.xls")
     assert result.products[0].record_kind == "product_candidate"
+
+
+def test_embedding_input_is_capped_for_multilingual_documents(monkeypatch):
+    from cpf_worker.ai import ProductAnalyzer
+    from cpf_worker.settings import Settings
+
+    analyzer = ProductAnalyzer(
+        Settings(
+            supabase_url="https://example.supabase.co",
+            supabase_service_role_key="test-key",
+            ai_proxy_url="https://example.supabase.co/functions/v1/cpf-ai-worker",
+        )
+    )
+    captured = {}
+
+    def fake_proxy(payload):
+        captured.update(payload)
+        return {"embedding": [0.1, 0.2]}
+
+    monkeypatch.setattr(analyzer, "_proxy", fake_proxy)
+    extraction = DocumentExtraction(
+        document_type="product",
+        summary_zh_tw="產品摘要應優先保留",
+        confidence=0.95,
+        products=[product()],
+    )
+
+    assert analyzer.embed(extraction, "長篇中文內容" * 10_000) == [0.1, 0.2]
+    assert captured["input"].startswith("產品摘要應優先保留")
+    assert len(captured["input"]) <= 6_000

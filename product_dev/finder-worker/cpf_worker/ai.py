@@ -288,9 +288,13 @@ class ProductAnalyzer:
             )
             for product in extraction.master_products
         )
+        # text-embedding-3-large accepts at most 8,192 tokens. Chinese and
+        # Vietnamese text can consume substantially more tokens per character
+        # than English, so keep a conservative character ceiling after placing
+        # the AI summary and normalized product facts first.
         input_text = (
-            f"{extraction.summary_zh_tw}\n{product_text}\n{extracted_text[:40_000]}"
-        )
+            f"{extraction.summary_zh_tw}\n{product_text}\n{extracted_text}"
+        )[:6_000]
         if self.client:
             response = self.client.embeddings.create(
                 model=self.settings.embedding_model,

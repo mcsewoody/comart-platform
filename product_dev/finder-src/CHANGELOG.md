@@ -7,6 +7,12 @@
 - 每次改版必須先更新 `src/version.ts`，並在本檔新增日期、範圍與驗證結果。
 - 單純重新執行既有匯入工作或修正資料內容，不增加程式版本。
 
+## v1.09 — 2026-08-01
+
+- GitHub Actions 手動執行不再受到自動排程開關阻擋，可安全單次驗證新 Secret Key。
+- 每五分鐘排程仍只有在 `CPF_WORKER_ENABLED=true` 時才會執行。
+- 本版不啟用自動排程，也不修改 KMS。
+
 ## v1.08 — 2026-08-01
 
 - CPF worker 與 AI proxy 支援 Supabase 新式 `sb_secret_...` 金鑰。

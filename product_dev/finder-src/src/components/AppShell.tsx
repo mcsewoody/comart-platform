@@ -10,7 +10,6 @@ import {
   ShieldCheck,
   UploadCloud,
   X,
-  ArrowLeft,
 } from "lucide-react";
 import { useState } from "react";
 import { NavLink, Outlet } from "react-router-dom";
@@ -56,6 +55,10 @@ const navigation: Array<{
 export function AppShell() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { profile, demoMode, signOut } = useAuth();
+  const portalHref =
+    typeof window !== "undefined" && window.location.protocol === "file:"
+      ? "../../index.html"
+      : "/";
 
   return (
     <div className="min-h-screen bg-[#070b12] text-slate-100">
@@ -70,11 +73,12 @@ export function AppShell() {
         <div className="mx-auto flex h-16 max-w-[1600px] items-center justify-between px-4 md:px-6">
           <div className="flex items-center gap-3">
             <a
-              href="/product_dev/index.html"
-              className="hidden rounded-lg p-2 text-slate-400 transition hover:bg-slate-800 hover:text-white sm:inline-flex"
-              aria-label="返回 Product Dev"
+              href={portalHref}
+              className="inline-flex shrink-0 items-center gap-1 rounded-xl border border-slate-700 px-2.5 py-1.5 text-xs font-semibold text-slate-300 transition hover:border-slate-500 hover:bg-slate-800 hover:text-white sm:px-3 sm:py-2 sm:text-sm"
+              aria-label="返回 Portal"
             >
-              <ArrowLeft size={19} />
+              <span aria-hidden="true">←</span>
+              Portal
             </a>
             <button
               type="button"

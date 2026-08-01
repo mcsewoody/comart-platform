@@ -12,16 +12,23 @@ export function DocumentsPage() {
   const [extension, setExtension] = useState("");
   const [documents, setDocuments] = useState<DocumentSummary[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     let active = true;
     const filters: SearchFilters = { extension: extension || undefined };
     setLoading(true);
+    setError("");
     void api.searchDocuments(params.get("q") ?? "", filters).then((result) => {
       if (active) {
         setDocuments(result.items);
         setLoading(false);
       }
+    }).catch((reason: unknown) => {
+      if (!active) return;
+      setDocuments([]);
+      setError(reason instanceof Error ? reason.message : "文件搜尋失敗");
+      setLoading(false);
     });
     return () => {
       active = false;
@@ -77,6 +84,12 @@ export function DocumentsPage() {
           搜尋文件
         </Button>
       </form>
+
+      {error && (
+        <p role="alert" className="mt-4 rounded-xl border border-red-800/60 bg-red-950/40 p-4 text-sm text-red-200">
+          文件搜尋暫時無法載入：{error}
+        </p>
+      )}
 
       <p className="my-5 text-sm text-slate-500">
         {loading ? "搜尋中…" : `${documents.length} 份文件`}

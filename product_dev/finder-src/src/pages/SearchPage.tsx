@@ -21,6 +21,7 @@ export function SearchPage() {
   const [products, setProducts] = useState<ProductSummary[]>([]);
   const [elapsed, setElapsed] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [filtersOpen, setFiltersOpen] = useState(false);
 
   useEffect(() => {
@@ -31,10 +32,16 @@ export function SearchPage() {
   useEffect(() => {
     let active = true;
     setLoading(true);
+    setError("");
     void api.searchProducts(params.get("q") ?? "", filters).then((result) => {
       if (!active) return;
       setProducts(result.items);
       setElapsed(result.elapsedMs);
+      setLoading(false);
+    }).catch((reason: unknown) => {
+      if (!active) return;
+      setProducts([]);
+      setError(reason instanceof Error ? reason.message : "產品搜尋失敗");
       setLoading(false);
     });
     return () => {
@@ -202,6 +209,12 @@ export function SearchPage() {
           </div>
         )}
       </form>
+
+      {error && (
+        <p role="alert" className="mt-4 rounded-xl border border-red-800/60 bg-red-950/40 p-4 text-sm text-red-200">
+          產品搜尋暫時無法載入：{error}
+        </p>
+      )}
 
       <div className="mt-6 flex items-center justify-between">
         <p className="text-sm text-slate-500">

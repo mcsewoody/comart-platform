@@ -37,13 +37,20 @@ export function DocumentDetailPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [suppliers, setSuppliers] = useState<SupplierOption[]>([]);
   const [products, setProducts] = useState<ProductSummary[]>([]);
+  const [error, setError] = useState("");
 
   const loadDocument = useCallback(async () => {
-    const result = await api.getDocument(id);
-    setDocument(result);
-    if (result) {
-      const kind = usesSourcePreview(result.extension) ? "source" : "preview";
-      setPreviewUrl(await api.getFileUrl(result.id, kind));
+    setError("");
+    try {
+      const result = await api.getDocument(id);
+      setDocument(result);
+      if (result) {
+        const kind = usesSourcePreview(result.extension) ? "source" : "preview";
+        setPreviewUrl(await api.getFileUrl(result.id, kind));
+      }
+    } catch (reason: unknown) {
+      setDocument(null);
+      setError(reason instanceof Error ? reason.message : "文件詳情載入失敗");
     }
   }, [id]);
 
@@ -69,6 +76,7 @@ export function DocumentDetailPage() {
   }
 
   if (document === undefined) return <p>載入文件…</p>;
+  if (error) return <p role="alert" className="rounded-xl border border-red-800/60 bg-red-950/40 p-4 text-red-200">文件詳情暫時無法載入：{error}</p>;
   if (!document) return <p>找不到文件。</p>;
 
   return (

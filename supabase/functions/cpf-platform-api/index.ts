@@ -18,6 +18,25 @@ function json(value: unknown, status = 200) {
   })
 }
 
+async function selectInBatches(
+  sb: any,
+  table: string,
+  columns: string,
+  field: string,
+  values: string[],
+  batchSize = 100,
+) {
+  const uniqueValues = [...new Set(values.filter(Boolean))]
+  const rows: any[] = []
+  for (let start = 0; start < uniqueValues.length; start += batchSize) {
+    const batch = uniqueValues.slice(start, start + batchSize)
+    const { data, error } = await sb.from(table).select(columns).in(field, batch)
+    if (error) throw error
+    rows.push(...(data || []))
+  }
+  return rows
+}
+
 async function signPaths(
   sb: any,
   bucket: string,
@@ -296,10 +315,15 @@ serve(async (req) => {
   )
   const visibleDocumentIds = new Set(visibleDocuments.map((doc: any) => doc.id))
   const versionIds = visibleDocuments.map((doc: any) => doc.current_version_id).filter(Boolean)
-  const { data: versions } = versionIds.length
-    ? await sb.from("cpf_document_versions").select("*").in("id", versionIds)
-    : { data: [] }
-  const versionsById = new Map((versions || []).map((v: any) => [v.id, v]))
+  let versions: any[] = []
+  try {
+    versions = await selectInBatches(
+      sb, "cpf_document_versions", "*", "id", versionIds,
+    )
+  } catch (error) {
+    return json({ error: String((error as Error)?.message || error) }, 500)
+  }
+  const versionsById = new Map(versions.map((v: any) => [v.id, v]))
 
   if (action === "searchDocuments") {
     const started = performance.now()
@@ -528,15 +552,35 @@ serve(async (req) => {
   const { data: products, error: productError } = await sb.from("cpf_products").select("*")
   if (productError) return json({ error: productError.message }, 500)
   const productIds = (products || []).map((p: any) => p.id)
-  const [{ data: categories }, { data: productSuppliers }, { data: productDocs }] = await Promise.all([
-    sb.from("cpf_categories").select("id,name_zh_tw,parent_id"),
-    productIds.length
-      ? sb.from("cpf_product_suppliers").select("product_id,supplier_role,confirmation_status,cpf_suppliers(id,legal_name)").in("product_id", productIds)
-      : Promise.resolve({ data: [] }),
-    productIds.length
-      ? sb.from("cpf_product_documents").select("product_id,document_id").in("product_id", productIds)
-      : Promise.resolve({ data: [] }),
-  ])
+  let categories: any[] = []
+  let productSuppliers: any[] = []
+  let productDocs: any[] = []
+  try {
+    const results = await Promise.all([
+      sb.from("cpf_categories").select("id,name_zh_tw,parent_id"),
+      selectInBatches(
+        sb,
+        "cpf_product_suppliers",
+        "product_id,supplier_role,confirmation_status,cpf_suppliers(id,legal_name)",
+        "product_id",
+        productIds,
+      ),
+      selectInBatches(
+        sb,
+        "cpf_product_documents",
+        "product_id,document_id",
+        "product_id",
+        productIds,
+      ),
+    ])
+    const categoryResult: any = results[0]
+    if (categoryResult.error) throw categoryResult.error
+    categories = categoryResult.data || []
+    productSuppliers = results[1] as any[]
+    productDocs = results[2] as any[]
+  } catch (error) {
+    return json({ error: String((error as Error)?.message || error) }, 500)
+  }
   const categoryMap = new Map((categories || []).map((c: any) => [c.id, {
     id: c.id, nameZhTw: c.name_zh_tw, parentId: c.parent_id,
   }]))

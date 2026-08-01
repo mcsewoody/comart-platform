@@ -133,7 +133,10 @@ class Repository:
                 "sha256": sha256,
                 "page_count": extracted.page_count,
                 "deep_analysis_eligible": extracted.deep_analysis_eligible,
-                "extracted_text": extracted.text,
+                # PostgreSQL text/jsonb cannot store the NUL character. Some
+                # malformed PDFs emit it during text extraction, so strip it
+                # before persisting while preserving all other source text.
+                "extracted_text": extracted.text.replace("\x00", ""),
                 "preview_path": preview_path,
                 "thumbnail_path": thumbnail_path,
             }

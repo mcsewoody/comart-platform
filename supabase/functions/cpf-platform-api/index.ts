@@ -112,6 +112,77 @@ function scoreProduct(row: Record<string, any>, query: string) {
   return words.reduce((sum, word) => sum + (haystack.includes(word) ? 8 : 0), 0)
 }
 
+function normalSearchText(value: unknown) {
+  return String(value || "")
+    .toLocaleLowerCase("zh-Hant")
+    .replace(/[\s_\-./\\()[\]{}]+/g, " ")
+    .trim()
+}
+
+function compactSearchText(value: unknown) {
+  return normalSearchText(value).replace(/\s+/g, "")
+}
+
+function lexicalMatch(query: string, fields: Array<{ label: string; value: unknown; weight: number }>) {
+  const q = normalSearchText(query)
+  const compactQuery = compactSearchText(query)
+  if (!q) return { score: 0, reason: null as string | null }
+  const words = q.split(" ").filter((word) => word.length >= 2)
+  let bestScore = 0
+  let bestReason: string | null = null
+  for (const field of fields) {
+    const text = normalSearchText(field.value)
+    const compactText = compactSearchText(field.value)
+    if (!text) continue
+    if (text === q || compactText === compactQuery) {
+      const score = 1200 + field.weight
+      if (score > bestScore) { bestScore = score; bestReason = `${field.label}完全符合` }
+      continue
+    }
+    if (text.includes(q) || (compactQuery.length >= 3 && compactText.includes(compactQuery))) {
+      const score = 700 + field.weight
+      if (score > bestScore) { bestScore = score; bestReason = `${field.label}命中` }
+      continue
+    }
+    const matched = words.filter((word) => text.includes(word)).length
+    if (matched && matched === words.length) {
+      const score = 120 + field.weight + matched * 18
+      if (score > bestScore) { bestScore = score; bestReason = `${field.label}包含關鍵字` }
+    }
+  }
+  return { score: bestScore, reason: bestReason }
+}
+
+function productLexicalMatch(row: Record<string, any>, query: string) {
+  const q = normalSearchText(query)
+  const models = (row.model_numbers || []).map((model: unknown) => String(model))
+  if (models.some((model: string) => normalSearchText(model) === q)) {
+    return { score: 3000, reason: "型號完全符合" }
+  }
+  return lexicalMatch(query, [
+    ...models.map((model: string) => ({ label: "型號", value: model, weight: 900 })),
+    { label: "產品名稱", value: row.name_original, weight: 600 },
+    { label: "產品名稱", value: row.name_zh_tw, weight: 600 },
+    { label: "英文名稱", value: row.name_en, weight: 520 },
+    { label: "品牌", value: row.brand, weight: 420 },
+    { label: "功能", value: (row.functions || []).join(" "), weight: 260 },
+    { label: "關鍵字", value: (row.keywords || []).join(" "), weight: 240 },
+  ])
+}
+
+function documentLexicalMatch(doc: Record<string, any>, version: Record<string, any>, query: string) {
+  return lexicalMatch(query, [
+    { label: "檔名", value: doc.title, weight: 950 },
+    { label: "來源路徑", value: doc.source_path, weight: 800 },
+    { label: "文件全文", value: version?.extracted_text, weight: 140 },
+  ])
+}
+
+function inSearchCorpus(item: Record<string, any>, includeReference: boolean) {
+  const scope = String(item.search_scope || "primary")
+  return scope === "primary" || (includeReference && scope === "reference")
+}
+
 function productSummary(
   row: Record<string, any>,
   categories: Map<string, any>,
@@ -329,20 +400,33 @@ serve(async (req) => {
     const started = performance.now()
     const query = String(body.query || "").trim()
     const filters = body.filters || {}
-    const embedding = await embedQuery(query)
-    const { data: rankedRows } = await sb.rpc("cpf_platform_rank_documents", {
-      p_query: query, p_embedding: embedding,
-    })
-    const rankMap = new Map((rankedRows || []).map((row: any) => [row.document_id, Number(row.score)]))
-    const rows = visibleDocuments.filter((doc: any) => {
+    const candidates = visibleDocuments.filter((doc: any) => {
       if (doc.deleted_at) return false
       const version: any = versionsById.get(doc.current_version_id)
       if (filters.extension && version?.extension !== filters.extension) return false
-      return !query || rankMap.has(doc.id)
-    }).map((doc: any) => ({
-      ...documentSummary(doc, versionsById.get(doc.current_version_id) as any),
-      score: rankMap.get(doc.id) || 0,
-    })).sort((a: any, b: any) => b.score - a.score || b.updatedAt.localeCompare(a.updatedAt)).slice(0, 100)
+      return inSearchCorpus(doc, Boolean(filters.includeReference))
+    })
+    let rows = candidates.map((doc: any) => {
+      const match = documentLexicalMatch(doc, versionsById.get(doc.current_version_id), query)
+      return {
+        ...documentSummary(doc, versionsById.get(doc.current_version_id) as any),
+        score: match.score,
+        matchReason: match.reason,
+      }
+    }).filter((row: any) => !query || row.score > 0)
+    if (!rows.length && query && filters.semantic) {
+      const embedding = await embedQuery(query)
+      const { data: rankedRows } = await sb.rpc("cpf_platform_rank_documents", {
+        p_query: query, p_embedding: embedding,
+      })
+      const rankMap = new Map((rankedRows || []).map((row: any) => [row.document_id, Number(row.score)]))
+      rows = candidates.filter((doc: any) => rankMap.has(doc.id)).map((doc: any) => ({
+        ...documentSummary(doc, versionsById.get(doc.current_version_id) as any),
+        score: rankMap.get(doc.id) || 0,
+        matchReason: "語意相關（已擴大）",
+      }))
+    }
+    rows = rows.sort((a: any, b: any) => b.score - a.score || b.updatedAt.localeCompare(a.updatedAt)).slice(0, 100)
     const signed = await signPaths(sb, "cpf_thumbnail", rows.map((row: any) => row.thumbnailUrl))
     for (const row of rows) row.thumbnailUrl = signed.get(row.thumbnailUrl) || null
     return json({ items: rows, total: rows.length, elapsedMs: Math.round(performance.now() - started) })
@@ -608,25 +692,44 @@ serve(async (req) => {
     const started = performance.now()
     const query = String(body.query || "")
     const filters = body.filters || {}
-    const embedding = await embedQuery(query)
-    const { data: rankedRows } = await sb.rpc("cpf_platform_rank_products", {
-      p_query: query, p_embedding: embedding,
-    })
-    const rankMap = new Map((rankedRows || []).map((row: any) => [row.product_id, Number(row.score)]))
-    const ranked = (products || []).filter((product: any) => {
+    const searchableDocumentIds = new Set(visibleDocuments
+      .filter((doc: any) => !doc.deleted_at && inSearchCorpus(doc, Boolean(filters.includeReference)))
+      .map((doc: any) => doc.id))
+    const candidates = (products || []).filter((product: any) => {
       if (product.deleted_at) return false
-      const linked = (docsByProduct.get(product.id) || []).filter(id => visibleDocumentIds.has(id))
+      if (!inSearchCorpus(product, Boolean(filters.includeReference))) return false
+      const linked = (docsByProduct.get(product.id) || []).filter(id => searchableDocumentIds.has(id))
       if (!linked.length) return false
       if (filters.categoryId && product.category_id !== filters.categoryId) return false
       if (filters.confirmationStatus && product.confirmation_status !== filters.confirmationStatus) return false
       if (filters.supplierId && !(supplierMap.get(product.id) || []).some(s => s.id === filters.supplierId)) return false
       if (filters.uncategorized && product.category_id) return false
       if (filters.withoutSupplier && (supplierMap.get(product.id) || []).length) return false
-      return !query.trim() || rankMap.has(product.id)
-    }).map((product: any) => {
-      const linked = (docsByProduct.get(product.id) || []).filter(id => visibleDocumentIds.has(id))
-      return productSummary(product, categoryMap, supplierMap, linked.length, rankMap.get(product.id) || scoreProduct(product, query))
-    }).sort((a: any, b: any) => b.score - a.score || b.updatedAt.localeCompare(a.updatedAt))
+      return true
+    })
+    let ranked = candidates.map((product: any) => {
+      const linked = (docsByProduct.get(product.id) || []).filter(id => searchableDocumentIds.has(id))
+      const match = productLexicalMatch(product, query)
+      return {
+        ...productSummary(product, categoryMap, supplierMap, linked.length, match.score || scoreProduct(product, query)),
+        matchReason: match.reason,
+      }
+    }).filter((product: any) => !query.trim() || product.matchReason)
+    if (!ranked.length && query.trim() && filters.semantic) {
+      const embedding = await embedQuery(query)
+      const { data: rankedRows } = await sb.rpc("cpf_platform_rank_products", {
+        p_query: query, p_embedding: embedding,
+      })
+      const rankMap = new Map((rankedRows || []).map((row: any) => [row.product_id, Number(row.score)]))
+      ranked = candidates.filter((product: any) => rankMap.has(product.id)).map((product: any) => {
+        const linked = (docsByProduct.get(product.id) || []).filter(id => searchableDocumentIds.has(id))
+        return {
+          ...productSummary(product, categoryMap, supplierMap, linked.length, rankMap.get(product.id) || 0),
+          matchReason: "語意相關（已擴大）",
+        }
+      })
+    }
+    ranked = ranked.sort((a: any, b: any) => b.score - a.score || b.updatedAt.localeCompare(a.updatedAt))
     const items = ranked.slice(0, 100)
     const signed = await signPaths(sb, "cpf_thumbnail", items.map((item: any) => item.thumbnailUrl))
     for (const item of items) item.thumbnailUrl = signed.get(item.thumbnailUrl) || null

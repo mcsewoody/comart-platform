@@ -87,6 +87,7 @@ export interface ProductSummary {
   documentCount: number;
   updatedAt: string;
   score?: number;
+  matchReason?: string | null;
 }
 
 export interface ProductDetail extends ProductSummary {
@@ -111,6 +112,7 @@ export interface DocumentSummary {
   thumbnailUrl?: string | null;
   updatedAt: string;
   score?: number;
+  matchReason?: string | null;
   extractedItems?: ExtractedDocumentItem[];
   analysis?: DocumentAnalysisSummary;
   linkedProducts?: ProductSummary[];
@@ -192,6 +194,8 @@ export interface SearchFilters {
   confirmationStatus?: ConfirmationStatus;
   uncategorized?: boolean;
   withoutSupplier?: boolean;
+  includeReference?: boolean;
+  semantic?: boolean;
 }
 
 export interface SearchResponse<T> {

@@ -40,6 +40,11 @@ export function DocumentRow({ document }: { document: DocumentSummary }) {
           <p className="mt-1 truncate text-xs text-slate-500">
             {document.sourcePath}
           </p>
+          {document.matchReason && (
+            <p className="mt-1 truncate text-xs font-semibold text-cyan-800">
+              命中：{document.matchReason}
+            </p>
+          )}
           <div className="mt-2 flex flex-wrap gap-1.5 md:hidden">
             <Badge>{document.extension.toUpperCase()}</Badge>
             <Badge tone={document.sensitivity === "general" ? "neutral" : "warning"}>

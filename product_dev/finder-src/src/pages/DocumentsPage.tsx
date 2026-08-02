@@ -13,10 +13,12 @@ export function DocumentsPage() {
   const [documents, setDocuments] = useState<DocumentSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [includeReference, setIncludeReference] = useState(false);
+  const [semantic, setSemantic] = useState(false);
 
   useEffect(() => {
     let active = true;
-    const filters: SearchFilters = { extension: extension || undefined };
+    const filters: SearchFilters = { extension: extension || undefined, includeReference, semantic };
     setLoading(true);
     setError("");
     void api.searchDocuments(params.get("q") ?? "", filters).then((result) => {
@@ -33,7 +35,7 @@ export function DocumentsPage() {
     return () => {
       active = false;
     };
-  }, [extension, params]);
+  }, [extension, includeReference, semantic, params]);
 
   function submit(event: FormEvent) {
     event.preventDefault();
@@ -47,7 +49,7 @@ export function DocumentsPage() {
       <PageHeader
         eyebrow="Source library"
         title="文件搜尋"
-        description="找到尚未建立產品主檔的會議、報價、測試、供應商與合約文件。搜尋結果依你的敏感資料權限過濾。"
+        description="預設只顯示可直接使用的產品文件；精確比對檔名、路徑與全文，不自動混入相似圖片。"
       />
       <form
         onSubmit={submit}
@@ -83,6 +85,15 @@ export function DocumentsPage() {
         <Button type="submit" className="h-12 px-6">
           搜尋文件
         </Button>
+        <label className="flex h-12 items-center gap-2 rounded-xl border border-slate-300 px-3 text-sm font-semibold text-slate-700">
+          <input
+            type="checkbox"
+            checked={includeReference}
+            onChange={(event) => setIncludeReference(event.target.checked)}
+            className="h-4 w-4 accent-cyan-600"
+          />
+          包含參考資料
+        </label>
       </form>
 
       {error && (
@@ -95,11 +106,20 @@ export function DocumentsPage() {
         {loading ? "搜尋中…" : `${documents.length} 份文件`}
       </p>
       {!loading && documents.length === 0 ? (
-        <EmptyState
-          icon={<FileQuestion size={26} />}
-          title="沒有找到相符文件"
-          description="請改用較短的檔名片段，或清除格式篩選。"
-        />
+        <div>
+          <EmptyState
+            icon={<FileQuestion size={26} />}
+            title="沒有找到相符文件"
+            description="請改用較短的檔名片段，或清除格式篩選。"
+          />
+          {params.get("q")?.trim() && !semantic && (
+            <div className="mt-3 text-center">
+              <Button type="button" variant="secondary" onClick={() => setSemantic(true)}>
+                沒有精準結果，查看相關文件
+              </Button>
+            </div>
+          )}
+        </div>
       ) : (
         <Card className="overflow-hidden">
           {documents.map((document) => (

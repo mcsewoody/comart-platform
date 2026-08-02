@@ -23,6 +23,7 @@ export function SearchPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [semantic, setSemantic] = useState(false);
 
   useEffect(() => {
     void api.getCategories().then(setCategories);
@@ -33,7 +34,7 @@ export function SearchPage() {
     let active = true;
     setLoading(true);
     setError("");
-    void api.searchProducts(params.get("q") ?? "", filters).then((result) => {
+    void api.searchProducts(params.get("q") ?? "", { ...filters, semantic }).then((result) => {
       if (!active) return;
       setProducts(result.items);
       setElapsed(result.elapsedMs);
@@ -47,7 +48,7 @@ export function SearchPage() {
     return () => {
       active = false;
     };
-  }, [filters, params]);
+  }, [filters, params, semantic]);
 
   function submit(event: FormEvent) {
     event.preventDefault();
@@ -63,8 +64,8 @@ export function SearchPage() {
     <>
       <PageHeader
         eyebrow="Product intelligence"
-        title="找到既有產品，不從零開始"
-        description="輸入型號、廠商、產品類別，或用自然語句描述需求。精確型號優先，再融合全文與跨語言語意結果。"
+        title="先精準找到，再擴大關聯"
+        description="預設只比對型號、產品名稱與關鍵字；不自動混入相似圖片或語意結果。"
       />
 
       <form
@@ -206,6 +207,20 @@ export function SearchPage() {
               />
               僅顯示未連結廠商
             </label>
+            <label className="flex h-10 items-center gap-2 self-end rounded-xl border border-slate-300 px-3 text-sm font-semibold text-slate-700">
+              <input
+                type="checkbox"
+                checked={filters.includeReference ?? false}
+                onChange={(event) =>
+                  setFilters((current) => ({
+                    ...current,
+                    includeReference: event.target.checked || undefined,
+                  }))
+                }
+                className="h-4 w-4 accent-cyan-600"
+              />
+              包含參考資料
+            </label>
           </div>
         )}
       </form>
@@ -238,6 +253,14 @@ export function SearchPage() {
             title="沒有找到相符產品"
             description="嘗試縮短型號、改用功能描述，或切換到文件搜尋查看尚未建立產品主檔的來源。"
           />
+          {params.get("q")?.trim() && !semantic && (
+            <div className="mt-3 text-center">
+              <Button type="button" variant="secondary" onClick={() => setSemantic(true)}>
+                沒有精準結果，查看相關產品
+              </Button>
+              <p className="mt-2 text-xs text-slate-500">此操作才會使用語意相似度，結果會明確標示為相關。</p>
+            </div>
+          )}
         </div>
       ) : (
         <div className="mt-5 grid gap-5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">

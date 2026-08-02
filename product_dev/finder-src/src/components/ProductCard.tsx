@@ -49,6 +49,11 @@ export function ProductCard({ product }: { product: ProductSummary }) {
               <Badge key={item}>{item}</Badge>
             ))}
           </div>
+          {product.matchReason && (
+            <p className="mt-3 truncate text-xs font-semibold text-cyan-800">
+              命中：{product.matchReason}
+            </p>
+          )}
           <div className="mt-5 grid grid-cols-2 gap-3 border-t border-slate-100 pt-4 text-xs text-slate-500">
             <span className="flex items-center gap-1.5">
               <Factory size={14} />

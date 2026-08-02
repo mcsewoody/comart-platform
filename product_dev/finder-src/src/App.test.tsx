@@ -15,7 +15,7 @@ describe("App", () => {
     );
     expect(
       await screen.findByRole("heading", {
-        name: "找到既有產品，不從零開始",
+        name: "先精準找到，再擴大關聯",
       }),
     ).toBeInTheDocument();
     expect(screen.getByRole("textbox", { name: "搜尋產品" })).toBeVisible();

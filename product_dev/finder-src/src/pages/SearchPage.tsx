@@ -23,7 +23,6 @@ export function SearchPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const [semantic, setSemantic] = useState(false);
 
   useEffect(() => {
     void api.getCategories().then(setCategories);
@@ -34,7 +33,7 @@ export function SearchPage() {
     let active = true;
     setLoading(true);
     setError("");
-    void api.searchProducts(params.get("q") ?? "", { ...filters, semantic }).then((result) => {
+    void api.searchProducts(params.get("q") ?? "", filters).then((result) => {
       if (!active) return;
       setProducts(result.items);
       setElapsed(result.elapsedMs);
@@ -48,7 +47,7 @@ export function SearchPage() {
     return () => {
       active = false;
     };
-  }, [filters, params, semantic]);
+  }, [filters, params]);
 
   function submit(event: FormEvent) {
     event.preventDefault();
@@ -253,14 +252,6 @@ export function SearchPage() {
             title="沒有找到相符產品"
             description="嘗試縮短型號、改用功能描述，或切換到文件搜尋查看尚未建立產品主檔的來源。"
           />
-          {params.get("q")?.trim() && !semantic && (
-            <div className="mt-3 text-center">
-              <Button type="button" variant="secondary" onClick={() => setSemantic(true)}>
-                沒有精準結果，查看相關產品
-              </Button>
-              <p className="mt-2 text-xs text-slate-500">此操作才會使用語意相似度，結果會明確標示為相關。</p>
-            </div>
-          )}
         </div>
       ) : (
         <div className="mt-5 grid gap-5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">

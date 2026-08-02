@@ -202,6 +202,121 @@ serve(async (req) => {
     .eq("emp_id", sess.empId)
   const grants = new Map((grantRows || []).map((g: any) => [g.document_id, g.can_read]))
 
+  // Search is deliberately handled before loading the complete corpus.  The
+  // previous implementation fetched every document, version and product on
+  // every keystroke, then ranked all embeddings; that became unusable at 696
+  // documents and can exceed the database statement timeout.
+  if (action === "searchDocuments") {
+    const started = performance.now()
+    const query = String(body.query || "").trim()
+    const filters = body.filters || {}
+    const { data: rankedRows, error: rankError } = await sb.rpc("cpf_fast_search_documents", {
+      p_query: query,
+      p_include_reference: Boolean(filters.includeReference),
+      p_limit: 200,
+    })
+    if (rankError) return json({ error: rankError.message }, 500)
+    const ranks = rankedRows || []
+    const documentIds = ranks.map((row: any) => row.document_id)
+    const rows = documentIds.length
+      ? await selectInBatches(sb, "cpf_documents", "*", "id", documentIds)
+      : []
+    const documentsById = new Map(rows.map((row: any) => [row.id, row]))
+    const visible = ranks.map((rank: any) => {
+      const doc: any = documentsById.get(rank.document_id)
+      return doc && canReadSensitivity(doc.sensitivity, sess, grants, doc.id) ? { doc, rank } : null
+    }).filter(Boolean) as Array<{ doc: any; rank: any }>
+    const versionIds = visible.map(({ doc }) => doc.current_version_id).filter(Boolean)
+    const versions = versionIds.length
+      ? await selectInBatches(sb, "cpf_document_versions", "*", "id", versionIds)
+      : []
+    const versionsById = new Map(versions.map((row: any) => [row.id, row]))
+    const items = visible.filter(({ doc }) => {
+      const version: any = versionsById.get(doc.current_version_id)
+      return !filters.extension || version?.extension === filters.extension
+    }).map(({ doc, rank }) => ({
+      ...documentSummary(doc, versionsById.get(doc.current_version_id) as any),
+      score: Number(rank.score || 0),
+      matchReason: rank.match_reason || null,
+    })).slice(0, 100)
+    const signed = await signPaths(sb, "cpf_thumbnail", items.map((row: any) => row.thumbnailUrl))
+    for (const item of items) item.thumbnailUrl = signed.get(item.thumbnailUrl) || null
+    return json({ items, total: items.length, elapsedMs: Math.round(performance.now() - started) })
+  }
+
+  if (action === "searchProducts") {
+    const started = performance.now()
+    const query = String(body.query || "").trim()
+    const filters = body.filters || {}
+    const { data: rankedRows, error: rankError } = await sb.rpc("cpf_fast_search_products", {
+      p_query: query,
+      p_include_reference: Boolean(filters.includeReference),
+      p_limit: 200,
+    })
+    if (rankError) return json({ error: rankError.message }, 500)
+    const ranks = rankedRows || []
+    const productIds = ranks.map((row: any) => row.product_id)
+    const candidateProducts = productIds.length
+      ? await selectInBatches(sb, "cpf_products", "*", "id", productIds)
+      : []
+    const productsById = new Map(candidateProducts.map((row: any) => [row.id, row]))
+    const productDocs = productIds.length
+      ? await selectInBatches(sb, "cpf_product_documents", "product_id,document_id", "product_id", productIds)
+      : []
+    const linkedDocumentIds = [...new Set(productDocs.map((row: any) => row.document_id))]
+    const linkedDocuments = linkedDocumentIds.length
+      ? await selectInBatches(sb, "cpf_documents", "id,sensitivity,deleted_at", "id", linkedDocumentIds)
+      : []
+    const readableDocumentIds = new Set((linkedDocuments || []).filter((doc: any) =>
+      !doc.deleted_at && canReadSensitivity(doc.sensitivity, sess, grants, doc.id)
+    ).map((doc: any) => doc.id))
+    const docsByProduct = new Map<string, string[]>()
+    for (const row of productDocs) {
+      if (!readableDocumentIds.has(row.document_id)) continue
+      docsByProduct.set(row.product_id, [...(docsByProduct.get(row.product_id) || []), row.document_id])
+    }
+    const [categoryResult, supplierRows] = await Promise.all([
+      sb.from("cpf_categories").select("id,name_zh_tw,parent_id"),
+      productIds.length ? selectInBatches(
+        sb,
+        "cpf_product_suppliers",
+        "product_id,supplier_role,confirmation_status,cpf_suppliers(id,legal_name)",
+        "product_id",
+        productIds,
+      ) : Promise.resolve([]),
+    ])
+    if (categoryResult.error) return json({ error: categoryResult.error.message }, 500)
+    const categoryMap = new Map((categoryResult.data || []).map((category: any) => [category.id, {
+      id: category.id, nameZhTw: category.name_zh_tw, parentId: category.parent_id,
+    }]))
+    const supplierMap = new Map<string, any[]>()
+    for (const row of supplierRows as any[]) {
+      const supplier: any = row.cpf_suppliers
+      if (!supplier) continue
+      supplierMap.set(row.product_id, [...(supplierMap.get(row.product_id) || []), {
+        id: supplier.id, name: supplier.legal_name, role: row.supplier_role,
+        confirmationStatus: row.confirmation_status,
+      }])
+    }
+    const ranked = ranks.map((rank: any) => {
+      const product: any = productsById.get(rank.product_id)
+      const linked = docsByProduct.get(rank.product_id) || []
+      if (!product || !linked.length || product.deleted_at) return null
+      if (filters.categoryId && product.category_id !== filters.categoryId) return null
+      if (filters.confirmationStatus && product.confirmation_status !== filters.confirmationStatus) return null
+      if (filters.supplierId && !(supplierMap.get(product.id) || []).some((item: any) => item.id === filters.supplierId)) return null
+      if (filters.uncategorized && product.category_id) return null
+      if (filters.withoutSupplier && (supplierMap.get(product.id) || []).length) return null
+      return {
+        ...productSummary(product, categoryMap, supplierMap, linked.length, Number(rank.score || 0)),
+        matchReason: rank.match_reason || null,
+      }
+    }).filter(Boolean).slice(0, 100) as any[]
+    const signed = await signPaths(sb, "cpf_thumbnail", ranked.map((item: any) => item.thumbnailUrl))
+    for (const item of ranked) item.thumbnailUrl = signed.get(item.thumbnailUrl) || null
+    return json({ items: ranked, total: ranked.length, elapsedMs: Math.round(performance.now() - started) })
+  }
+
   if (action === "profiles") {
     if (sess.role !== "admin") return json({ error: "forbidden" }, 403)
     const { data, error } = await sb.from("users")

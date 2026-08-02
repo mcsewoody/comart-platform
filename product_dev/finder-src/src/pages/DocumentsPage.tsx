@@ -14,11 +14,10 @@ export function DocumentsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [includeReference, setIncludeReference] = useState(false);
-  const [semantic, setSemantic] = useState(false);
 
   useEffect(() => {
     let active = true;
-    const filters: SearchFilters = { extension: extension || undefined, includeReference, semantic };
+    const filters: SearchFilters = { extension: extension || undefined, includeReference };
     setLoading(true);
     setError("");
     void api.searchDocuments(params.get("q") ?? "", filters).then((result) => {
@@ -35,7 +34,7 @@ export function DocumentsPage() {
     return () => {
       active = false;
     };
-  }, [extension, includeReference, semantic, params]);
+  }, [extension, includeReference, params]);
 
   function submit(event: FormEvent) {
     event.preventDefault();
@@ -112,13 +111,6 @@ export function DocumentsPage() {
             title="沒有找到相符文件"
             description="請改用較短的檔名片段，或清除格式篩選。"
           />
-          {params.get("q")?.trim() && !semantic && (
-            <div className="mt-3 text-center">
-              <Button type="button" variant="secondary" onClick={() => setSemantic(true)}>
-                沒有精準結果，查看相關文件
-              </Button>
-            </div>
-          )}
         </div>
       ) : (
         <Card className="overflow-hidden">

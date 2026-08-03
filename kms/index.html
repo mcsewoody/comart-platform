@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART KMS v2.31</title>
+<title>COMART KMS v2.32</title>
 
 <!-- 以下解析庫僅上傳/預覽時使用，defer 載入避免阻塞頁面解析（gzip 共 ~477KB；呼叫處均有 window.X 檢查） -->
 <!-- Marked for Markdown → HTML preview (classic script, no module needed) -->
@@ -380,7 +380,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="38" height="20" style="display:inline-block;vertical-align:middle;margin-right:4px;margin-top:-2px"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg>COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v2.31</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v2.32</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('en')">EN</button>
@@ -6276,13 +6276,12 @@ async function loadAnalytics(siteFilter = '') {
   const wrap = document.getElementById('analytics-content');
   wrap.innerHTML = `<div style="text-align:center;color:var(--text-3);padding:40px 0;">${t('label.loading')}</div>`;
 
-  let docs = [], authorStats = [], gaps = [], usersData = [];
+  let docs = [], gaps = [], usersData = [];
   try {
     if (CFG.supabaseUrl && CFG.supabaseKey) {
-      [docs, authorStats] = await Promise.all([
-        sbFetchAll('/rest/v1/kms_documents?select=id,title,category,author_name,view_count,status,updated_at&order=view_count.desc'),
-        sbFetchAll('/rest/v1/kms_documents?select=author_name&author_name=not.is.null'),
-      ]);
+      // 名人榜改由同一份 docs 衍生（見下方 countMap），不再另發獨立查詢，
+      // 避免與總覽/已發佈/文件清單口徑不一致
+      docs = await sbFetchAll('/rest/v1/kms_documents?select=id,title,category,author_name,view_count,status,updated_at&order=view_count.desc');
       try {
         const r = await fetch(`${KMS_SB_WORKER}/supabase/rest/v1/users?select=name_en,name_zh,site&active=eq.true`, { headers:{ 'x-session': kmsSig() } });
         if (r.ok) usersData = await r.json();
@@ -6314,9 +6313,12 @@ async function loadAnalytics(siteFilter = '') {
   const maxViews = Math.max(...docs.map(d => d.view_count||0), 1);
 
   // Build knowledge ranking with site info
+  // 與「已發佈」卡片、文件清單同口徑：只計 published，且由同一份 docs 衍生
+  // （之前名人榜用獨立查詢、含草稿/封存全狀態，導致與 KMS 其他統計對不上）
   const countMap = {};
-  (authorStats || []).forEach(d => {
-    const name = (d.author_name || '').trim() || '未知';
+  docs.filter(d => d.status === 'published').forEach(d => {
+    const name = (d.author_name || '').trim();
+    if (!name) return;
     if (!countMap[name]) countMap[name] = { count: 0, site: nameSiteMap[name] || '' };
     countMap[name].count++;
   });

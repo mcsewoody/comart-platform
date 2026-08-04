@@ -5,7 +5,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#080C14">
-<title>COMART · 公告與紀錄 v1.16</title>
+<title>COMART · 公告與紀錄 v1.17</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -204,7 +204,7 @@ select,select option,option{background:var(--s2);color:var(--tx)}
     <a class="logo" href="javascript:void(0)">
       <div class="logo-mark">告</div>
       <div class="logo-text">公告與紀錄</div>
-      <span class="logo-ver">v1.16</span>
+      <span class="logo-ver">v1.17</span>
     </a>
     <div class="topbar-right">
       <span class="who-badge" id="whoBadge">—</span>
@@ -263,10 +263,20 @@ select,select option,option{background:var(--s2);color:var(--tx)}
     </div>
 
     <div id="wm-editor-view" style="display:none">
+      <div class="tabbar" style="max-width:none;padding:0;margin-bottom:16px;border-bottom:1px solid var(--br)">
+        <button class="btn ghost sm" onclick="wmBackToList()">← 返回列表</button>
+        <div style="margin-left:auto;display:flex;gap:6px;align-items:center;padding:6px 0;flex-wrap:wrap">
+          <button class="btn primary sm" onclick="wmSave()">✓ 儲存</button>
+          <button class="btn sm" onclick="wmSendMail()">✉️ 寄送</button>
+          <button class="btn sm" onclick="wmExportXlsx()">Excel</button>
+          <button class="btn sm" onclick="wmExportPNG()">PNG</button>
+          <button class="btn sm" onclick="wmExportPDF()">PDF</button>
+        </div>
+      </div>
       <div class="grid2">
         <div>
           <div class="panel">
-            <div class="panel-h"><span class="idx">01</span><h2>會議資訊</h2><button class="btn ghost sm" style="margin-left:auto" onclick="wmBackToList()">← 返回列表</button></div>
+            <div class="panel-h"><span class="idx">01</span><h2>會議資訊</h2></div>
             <div class="panel-b">
               <div class="fields">
                 <div class="field"><label>營運中心（決定預設出席的同仁）</label><select id="wm-scope"><option value="TW">台灣</option><option value="CN">東莞廠</option><option value="VN">越南廠</option></select></div>
@@ -324,13 +334,6 @@ select,select option,option{background:var(--s2);color:var(--tx)}
             </div>
           </div>
 
-          <div style="display:flex;gap:8px;margin-top:4px;flex-wrap:wrap">
-            <button class="btn primary" style="flex:2 1 140px" onclick="wmSave()">✓ 儲存</button>
-            <button class="btn" style="flex:1 1 90px" onclick="wmSendMail()">✉️ 寄送</button>
-            <button class="btn" style="flex:1 1 70px" onclick="wmExportXlsx()">Excel</button>
-            <button class="btn" style="flex:1 1 70px" onclick="wmExportPNG()">PNG</button>
-            <button class="btn" style="flex:1 1 70px" onclick="wmExportPDF()">PDF</button>
-          </div>
         </div>
 
         <div class="preview-wrap">
@@ -1142,7 +1145,9 @@ function wmRecipientEmails() {
 // 郵件內文：按表格版面的純文字
 function wmMailText() {
   const s = wmState, c = wmCounts(), L = [];
+  const DIV = '━━━━━━━━━━━━━━━━━━━━━━━━';
   L.push(wmDocTitle()); L.push('');
+  L.push(DIV);
   L.push('【會議資訊】');
   L.push('會議名稱：' + (s.name || '—'));
   L.push('會議日期：' + wmFmtDate(s.meeting_date));
@@ -1153,7 +1158,9 @@ function wmMailText() {
   const ab = wmReasonStr('absent'); if (ab) L.push('缺席：' + ab);
   const lt = wmReasonStr('late'); if (lt) L.push('遲到：' + lt);
   L.push('');
+  L.push(DIV);
   L.push('【本週值日生】'); L.push(wmDutyText()); L.push('');
+  L.push(DIV);
   L.push('【會議議程】');
   const txt = (label, num, t) => { L.push(num + '、' + label + '：' + ((t || '').trim() || '無。')); L.push(''); };
   const items = (label, num, arr) => {
@@ -1639,8 +1646,10 @@ function bizMeetingInit(){
   // 郵件內文：按 PDF 版面（會議資訊＋出席人員姓名＋議程）的純文字格式
   function pdfStyleText(){
     var m=state.meeting, L=[];
+    var DIV="━━━━━━━━━━━━━━━━━━━━━━━━";
     var present=attendees().filter(function(p){return p.a.status==="present"||p.a.status==="late";}).map(function(p){return p.name+(p.a.status==="late"?"（遲到）":"");});
     L.push(docTitle()); L.push("");
+    L.push(DIV);
     L.push("【會議資訊】");
     L.push("會議名稱："+(m.name||"—"));
     L.push("會議日期："+(fmtDate(m.date)||"—"));
@@ -1648,8 +1657,10 @@ function bizMeetingInit(){
     L.push("會議地點："+(m.place||"—"));
     L.push("業務簡報／主席："+(m.chair||"—"));
     L.push("紀錄："+(m.rec||"—")); L.push("");
+    L.push(DIV);
     L.push("【出席人員（"+present.length+" 人）】");
     L.push(present.length?present.join("、"):"（無）"); L.push("");
+    L.push(DIV);
     L.push("【會議議程】");
     state.agenda.forEach(function(s,i){
       var head=secLabel(i,s.title); if(head)L.push(head);

@@ -5,7 +5,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#080C14">
-<title>COMART · 公告與紀錄 v1.21</title>
+<title>COMART · 公告與紀錄 v1.22</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -145,6 +145,11 @@ select,select option,option{background:var(--s2);color:var(--tx)}
 .miniadd:hover{border-color:var(--ac);color:var(--ac)}
 
 .hint{font-size:12px;color:var(--tx3);margin-top:2px}
+.pm-bi{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:640px){.pm-bi{grid-template-columns:1fr}}
+.pm-lc{border-left:2px solid var(--br);padding-left:9px}
+.pm-lc .lbl{font-size:10px;color:var(--tx3);letter-spacing:.03em;margin-bottom:2px}
+.pm-lc .txt{white-space:pre-wrap;font-size:13.5px}
 .empty-note{color:var(--tx3);font-size:13px;padding:26px;text-align:center;border:1px dashed var(--br);border-radius:9px}
 
 /* saved-list rows (shared: weekly list / biz saved list) */
@@ -205,7 +210,7 @@ select,select option,option{background:var(--s2);color:var(--tx)}
     <a class="logo" href="javascript:void(0)">
       <div class="logo-mark">告</div>
       <div class="logo-text">公告與紀錄</div>
-      <span class="logo-ver">v1.21</span>
+      <span class="logo-ver">v1.22</span>
     </a>
     <div class="topbar-right">
       <span class="who-badge" id="whoBadge">—</span>
@@ -2174,6 +2179,39 @@ let pmSession = null;      // 目前開啟的 session
 let pmEntries = [];        // 目前 session 的 entries
 let pmPollTimer = null;
 let pmDraft = '';          // 填寫中的草稿（輪詢重繪時保留）
+let pmSrcLang = '';        // 填寫者選的來源語言（重繪時保留）
+let pmRetrying = false;    // 背景補翻防重入
+
+// ── 翻譯（claude-proxy，帶 x-session；一次回兩種目標語言）──
+const PM_LANG_NAME = { 'zh-TW':'Traditional Chinese', 'zh-CN':'Simplified Chinese', 'vi':'Vietnamese', 'en':'English', 'ja':'Japanese' };
+const PM_SB_BASE = 'https://tcvlnpgpuphdalzvmoyo.supabase.co';
+function pmLangShort(c) { return PM_LANG_SHORT[c] || c; }
+function pmPortalLang() {
+  let l = ''; try { l = localStorage.getItem('comart-lang') || ''; } catch (e) {}
+  if (PM_LANG_SHORT[l]) return l;
+  return ({ TW:'zh-TW', CN:'zh-CN', VN:'vi' })[PORTAL_SESSION && PORTAL_SESSION.site] || 'zh-TW';
+}
+async function pmClaude(system, user, maxTokens) {
+  const res = await fetch(PM_SB_BASE + '/functions/v1/claude-proxy', {
+    method: 'POST', headers: sbHdrs(),
+    body: JSON.stringify({ model: 'claude-haiku-4-5-20251001', max_tokens: maxTokens || 1000, system, messages: [{ role: 'user', content: user }], stream: false })
+  });
+  if (!res.ok) { const t = await res.text(); throw new Error('claude-proxy ' + res.status + ': ' + t.slice(0, 120)); }
+  const data = await res.json();
+  return (data && data.content && data.content[0] && data.content[0].text) || '';
+}
+async function pmTranslate(text, langA, langB, srcLang) {
+  const t = (text || '').trim(); if (!t) return { a: '', b: '' };
+  const sys = 'You are a professional translator for corporate meeting minutes. Translate faithfully; keep technical terms, product names and model numbers unchanged. Output ONLY a minified JSON object and nothing else.';
+  const usr = 'Source language: ' + (PM_LANG_NAME[srcLang] || srcLang) + '.\n' +
+    'Translate the text into A=' + (PM_LANG_NAME[langA] || langA) + ' and B=' + (PM_LANG_NAME[langB] || langB) + '.\n' +
+    'If a target language equals the source, return the original text for that field.\n' +
+    'Return exactly {"a":"...","b":"..."}\n\nText:\n"""' + t + '"""';
+  const raw = await pmClaude(sys, usr, 1200);
+  const m = raw.match(/\{[\s\S]*\}/); if (!m) throw new Error('翻譯格式錯誤');
+  const obj = JSON.parse(m[0]);
+  return { a: String(obj.a || '').trim(), b: String(obj.b || '').trim() };
+}
 
 function pmIsChair(s) { return !!(s && PORTAL_SESSION && (s.chair_emp_id === PORTAL_SESSION.empId || isAdmin())); }
 function pmInScope(s) {
@@ -2277,6 +2315,12 @@ async function pmCreateSubmit() {
     created_by: PORTAL_SESSION.empId,
     created_at: new Date().toISOString(), updated_at: new Date().toISOString(),
   };
+  boardToast('建立中（翻譯情境）…');
+  const srcL = pmPortalLang();
+  try {
+    if (row.project_desc) { const d = await pmTranslate(row.project_desc, row.lang_a, row.lang_b, srcL); row.desc_a = d.a; row.desc_b = d.b; }
+    if (row.scenario) { const sc = await pmTranslate(row.scenario, row.lang_a, row.lang_b, srcL); row.scenario_a = sc.a; row.scenario_b = sc.b; }
+  } catch (e) { /* 翻譯失敗留空，主席端輪詢時會背景補翻 */ }
   try { await SB.post('premortem_sessions', row); boardToast('已建立驗屍會議'); pmOpen(row.id); }
   catch (e) { boardToast('建立失敗：' + (e.message || e)); }
 }
@@ -2289,6 +2333,7 @@ async function pmOpen(id) {
   if (!pmCanSee(s)) { boardToast('你不在這場會議的開放範圍內'); return; }
   pmSession = s;
   pmDraft = '';
+  pmSrcLang = pmPortalLang();
   await pmFetchEntries();
   pmShowView('room');
   pmRenderRoom();
@@ -2304,14 +2349,37 @@ function pmBackToList() { pmPollStop(); pmSession = null; pmEntries = []; pmLoad
 // ── 輪詢（每 7 秒；phase 或 entries 有變才重繪，並保留填寫草稿）──
 function pmPollStart() { pmPollStop(); pmPollTimer = setInterval(pmPollTick, 7000); }
 function pmPollStop() { if (pmPollTimer) { clearInterval(pmPollTimer); pmPollTimer = null; } }
-function pmSig() { return (pmSession ? pmSession.phase : '') + '|' + pmEntries.map(e => e.id + ':' + (e.updated_at || '') + ':' + (e.text_src || '').length).join(','); }
+function pmSig() { return (pmSession ? pmSession.phase + '|' + (pmSession.desc_a ? 1 : 0) + (pmSession.scenario_a ? 1 : 0) : '') + '|' + pmEntries.map(e => e.id + ':' + (e.updated_at || '') + ':' + (e.text_a ? 1 : 0) + (e.text_b ? 1 : 0)).join(','); }
 async function pmPollTick() {
   if (!pmSession || document.getElementById('tabpanel-premortem').classList.contains('on') === false) return;
   const before = pmSig();
-  const rows = await SB.get('premortem_sessions', '?id=eq.' + encodeURIComponent(pmSession.id) + '&select=phase,title,project_desc,scenario,lang_a,lang_b,roster_locked');
-  if (rows && rows[0]) { pmSession.phase = rows[0].phase; pmSession.roster_locked = rows[0].roster_locked; }
+  const rows = await SB.get('premortem_sessions', '?id=eq.' + encodeURIComponent(pmSession.id) + '&select=phase,roster_locked,desc_a,desc_b,scenario_a,scenario_b');
+  if (rows && rows[0]) {
+    pmSession.phase = rows[0].phase; pmSession.roster_locked = rows[0].roster_locked;
+    pmSession.desc_a = rows[0].desc_a; pmSession.desc_b = rows[0].desc_b;
+    pmSession.scenario_a = rows[0].scenario_a; pmSession.scenario_b = rows[0].scenario_b;
+  }
   await pmFetchEntries();
   if (pmSig() !== before) { pmSaveDraft(); pmRenderRoom(); pmRestoreDraft(); }
+  pmRetryTranslations();
+}
+// 主席端背景補翻：把翻譯失敗（text_a/text_b 空）的條目與標頭補上並寫回；失敗達3次就停
+async function pmRetryTranslations() {
+  if (pmRetrying || !pmSession || !pmIsChair(pmSession)) return;
+  pmRetrying = true;
+  try {
+    const s = pmSession, la = s.lang_a, lb = s.lang_b;
+    if (s.project_desc && !s.desc_a) { try { const d = await pmTranslate(s.project_desc, la, lb, 'zh-TW'); await SB.patch('premortem_sessions', 'id=eq.' + encodeURIComponent(s.id), { desc_a: d.a, desc_b: d.b }); s.desc_a = d.a; s.desc_b = d.b; } catch (e) {} }
+    if (s.scenario && !s.scenario_a) { try { const d = await pmTranslate(s.scenario, la, lb, 'zh-TW'); await SB.patch('premortem_sessions', 'id=eq.' + encodeURIComponent(s.id), { scenario_a: d.a, scenario_b: d.b }); s.scenario_a = d.a; s.scenario_b = d.b; } catch (e) {} }
+    let changed = false;
+    for (const e of pmEntries) {
+      if (e.text_src && !e.text_a && !e.text_b && (e._trFails || 0) < 3) {
+        try { const tr = await pmTranslate(e.text_src, la, lb, e.src_lang || la); await SB.patch('premortem_entries', 'id=eq.' + encodeURIComponent(e.id), { text_a: tr.a, text_b: tr.b, updated_at: new Date().toISOString() }); e.text_a = tr.a; e.text_b = tr.b; changed = true; }
+        catch (err) { e._trFails = (e._trFails || 0) + 1; }
+      }
+    }
+    if (changed) pmRenderRoom();
+  } finally { pmRetrying = false; }
 }
 function pmSaveDraft() { const el = document.getElementById('pm-writebox'); if (el) pmDraft = el.value; }
 function pmRestoreDraft() { const el = document.getElementById('pm-writebox'); if (el && pmDraft) el.value = pmDraft; }
@@ -2344,11 +2412,11 @@ function pmRenderRoom() {
   if (!pmSession) { body.innerHTML = ''; return; }
   const s = pmSession, chair = pmIsChair(s);
   let html = '';
-  // 專案／情境卡
+  // 專案／情境卡（雙語並陳）
   html += '<div class="panel"><div class="panel-h"><span class="idx">◎</span><h2>' + escHtml(s.title || '(未命名)') + '</h2>' +
     (chair ? '<span class="sub">你是主席</span>' : '') + '</div><div class="panel-b">' +
-    (s.project_desc ? '<div style="font-size:13.5px;margin-bottom:8px;white-space:pre-wrap">' + escHtml(s.project_desc) + '</div>' : '') +
-    '<div style="font-size:13px;color:var(--tx2);background:var(--s2);border-left:3px solid var(--ac);border-radius:6px;padding:9px 12px;white-space:pre-wrap">' + escHtml(s.scenario || '') + '</div></div></div>';
+    (s.project_desc ? '<div style="margin-bottom:10px">' + pmHeaderField(s.project_desc, s.desc_a, s.desc_b) + '</div>' : '') +
+    '<div style="background:var(--s2);border-left:3px solid var(--ac);border-radius:6px;padding:9px 12px">' + pmHeaderField(s.scenario, s.scenario_a, s.scenario_b, true) + '</div></div></div>';
 
   const myEntries = pmEntries.filter(e => e.author_emp_id === (PORTAL_SESSION && PORTAL_SESSION.empId));
 
@@ -2359,31 +2427,62 @@ function pmRenderRoom() {
   } else if (s.phase === 'writing') {
     if (chair) {
       html += '<div class="panel"><div class="panel-h"><span class="idx">✎</span><h2>填寫中（主席即時彙整）</h2><span class="sub">已收 ' + pmEntries.length + ' 則</span></div>' +
-        '<div class="panel-b">' + (pmEntries.length ? pmEntries.map(e => pmEntryHtml(e, true)).join('') : '<div class="empty-note">尚無人填寫。</div>') +
-        '<div class="hint" style="margin-top:8px">與會者此刻只看得到自己填的；按上方「揭露」後全體才會一起看到。</div></div></div>';
+        '<div class="panel-b">' + (pmEntries.length ? pmEntries.map(e => pmEntryHtml(e, true, false, true)).join('') : '<div class="empty-note">尚無人填寫。</div>') +
+        '<div class="hint" style="margin-top:8px">與會者此刻只看得到自己填的；按上方「揭露」後全體才會一起看到。每條自動翻成 ' + pmLangShort(s.lang_a) + '／' + pmLangShort(s.lang_b) + '。</div></div></div>';
     } else {
+      const langOpts = PM_LANGS.map(l => '<option value="' + l[0] + '"' + (l[0] === (pmSrcLang || pmPortalLang()) ? ' selected' : '') + '>' + l[1] + '</option>').join('');
       html += '<div class="panel"><div class="panel-h"><span class="idx">✎</span><h2>寫下你認為的失敗原因</h2></div><div class="panel-b">' +
+        '<div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap"><label style="font-size:12px;color:var(--tx3)">我用的語言</label>' +
+        '<select id="pm-src-lang" onchange="pmSrcLang=this.value" style="width:auto;padding:5px 8px;font-size:13px;background:var(--s2);border:1px solid var(--br);border-radius:6px;color:var(--tx)">' + langOpts + '</select>' +
+        '<span style="font-size:11px;color:var(--tx3)">送出後自動翻成 ' + pmLangShort(s.lang_a) + '／' + pmLangShort(s.lang_b) + '</span></div>' +
         '<textarea id="pm-writebox" rows="3" placeholder="一則一個原因，越具體越好…" style="width:100%;font-family:inherit;font-size:14px;background:var(--s2);border:1px solid var(--br);border-radius:8px;padding:9px 11px;color:var(--tx)" oninput="pmDraft=this.value"></textarea>' +
-        '<div style="margin-top:8px"><button class="btn primary sm" onclick="pmSubmitEntry()">＋ 送出這則</button></div>' +
+        '<div style="margin-top:8px"><button id="pm-submit-btn" class="btn primary sm" onclick="pmSubmitEntry()">＋ 送出這則</button></div>' +
         '<div class="hint" style="margin-top:6px">🔒 填寫階段只有你看得到自己的內容，主席揭露後才會一起顯示。</div>' +
-        '<div style="margin-top:12px">' + (myEntries.length ? myEntries.map(e => pmEntryHtml(e, false, true)).join('') : '') + '</div>' +
+        '<div style="margin-top:12px">' + (myEntries.length ? myEntries.map(e => pmEntryHtml(e, false, true, false)).join('') : '') + '</div>' +
         '</div></div>';
     }
   } else {
-    // reveal / ranking / mitigation / locked：全體看得到全部（匿名；主席可見作者）
+    // reveal / ranking / mitigation / locked：全體看得到全部（雙語並陳；匿名，主席可見作者）
     html += '<div class="panel"><div class="panel-h"><span class="idx">▤</span><h2>全部失敗原因</h2><span class="sub">共 ' + pmEntries.length + ' 則</span></div>' +
-      '<div class="panel-b">' + (pmEntries.length ? pmEntries.map(e => pmEntryHtml(e, chair)).join('') : '<div class="empty-note">沒有任何填寫內容。</div>') + '</div></div>';
+      '<div class="panel-b">' + (pmEntries.length ? pmEntries.map(e => pmEntryHtml(e, chair, false, true)).join('') : '<div class="empty-note">沒有任何填寫內容。</div>') + '</div></div>';
     if (s.phase !== 'locked') html += '<div class="hint" style="margin-top:10px">投票、AI 分群與對策擬定將於階段三加入；目前先呈現彙整結果。</div>';
   }
   body.innerHTML = html;
   pmRestoreDraft();
 }
 
-function pmEntryHtml(e, showAuthor, allowDelete) {
+function pmLangCellHtml(label, txt, pending) {
+  return '<div class="pm-lc"><div class="lbl">' + escHtml(label) + (pending ? ' · 待補' : '') + '</div><div class="txt">' + escHtml(txt || '') + '</div></div>';
+}
+function pmHeaderField(origin, a, b, muted) {
+  if (pmSession && (a || b)) {
+    return '<div class="pm-bi">' + pmLangCellHtml(pmLangShort(pmSession.lang_a), a || origin, !a) + pmLangCellHtml(pmLangShort(pmSession.lang_b), b || origin, !b) + '</div>';
+  }
+  return '<div style="white-space:pre-wrap;font-size:' + (muted ? '13px;color:var(--tx2)' : '13.5px') + '">' + escHtml(origin || '') + '</div>';
+}
+function pmEntryHtml(e, showAuthor, allowDelete, bilingual) {
   const author = (showAuthor && e.author_name) ? '<span style="font-size:11px;color:var(--tx3)">— ' + escHtml(e.author_name) + '</span>' : '';
   const del = allowDelete ? '<button class="btn ghost sm danger" style="padding:2px 8px" onclick="pmDeleteMyEntry(\'' + e.id + '\')">✕</button>' : '';
+  const editT = (showAuthor && bilingual && pmIsChair(pmSession)) ? '<button class="btn ghost sm" style="padding:2px 8px" title="修正譯文" onclick="pmEditTrans(\'' + e.id + '\')">✎譯</button>' : '';
+  let content;
+  if (bilingual) {
+    if (e.text_a || e.text_b) {
+      content = '<div class="pm-bi">' + pmLangCellHtml(pmLangShort(pmSession.lang_a), e.text_a || e.text_src, !e.text_a) + pmLangCellHtml(pmLangShort(pmSession.lang_b), e.text_b || e.text_src, !e.text_b) + '</div>';
+    } else {
+      content = '<div style="white-space:pre-wrap;font-size:14px">' + escHtml(e.text_src || '') + '</div><div style="font-size:11px;color:var(--tx3);margin-top:3px">翻譯待補…</div>';
+    }
+  } else {
+    content = '<div style="white-space:pre-wrap;font-size:14px">' + escHtml(e.text_src || '') + '</div>';
+  }
   return '<div style="border:1px solid var(--br);border-radius:8px;padding:10px 12px;background:var(--s2);margin-bottom:8px;display:flex;gap:10px;align-items:flex-start">' +
-    '<div style="flex:1;min-width:0"><div style="white-space:pre-wrap;font-size:14px">' + escHtml(e.text_src || '') + '</div>' + author + '</div>' + del + '</div>';
+    '<div style="flex:1;min-width:0">' + content + author + '</div><div style="display:flex;gap:4px;flex-shrink:0">' + editT + del + '</div></div>';
+}
+async function pmEditTrans(id) {
+  const e = pmEntries.find(x => x.id === id); if (!e || !pmIsChair(pmSession)) return;
+  const a = prompt(pmLangShort(pmSession.lang_a) + ' 譯文：', e.text_a || ''); if (a === null) return;
+  const b = prompt(pmLangShort(pmSession.lang_b) + ' 譯文：', e.text_b || ''); if (b === null) return;
+  try { await SB.patch('premortem_entries', 'id=eq.' + encodeURIComponent(id), { text_a: a, text_b: b, updated_at: new Date().toISOString() }); e.text_a = a; e.text_b = b; pmRenderRoom(); boardToast('已更新譯文'); }
+  catch (err) { boardToast('更新失敗：' + (err.message || err)); }
 }
 
 async function pmSubmitEntry() {
@@ -2391,20 +2490,26 @@ async function pmSubmitEntry() {
   const el = document.getElementById('pm-writebox');
   const text = (el.value || '').trim();
   if (!text) { boardToast('請先輸入內容'); return; }
+  const selEl = document.getElementById('pm-src-lang');
+  const src = (selEl && selEl.value) || pmSrcLang || pmPortalLang();
+  pmSrcLang = src;
+  const btn = document.getElementById('pm-submit-btn'); if (btn) btn.disabled = true;
+  boardToast('翻譯並送出中…');
   const row = {
     id: uid(), session_id: pmSession.id,
     author_emp_id: PORTAL_SESSION.empId,
     author_name: PORTAL_SESSION.nameZh || PORTAL_SESSION.nameEn || PORTAL_SESSION.empId,
-    src_lang: pmSession.lang_a || 'zh-TW',
-    text_src: text,
+    src_lang: src, text_src: text,
     created_at: new Date().toISOString(), updated_at: new Date().toISOString(),
   };
+  try { const tr = await pmTranslate(text, pmSession.lang_a, pmSession.lang_b, src); row.text_a = tr.a; row.text_b = tr.b; }
+  catch (e) { /* 翻譯失敗留空，主席端會背景補翻 */ }
   try {
     await SB.post('premortem_entries', row);
-    el.value = ''; pmDraft = '';
+    if (el) el.value = ''; pmDraft = '';
     await pmFetchEntries(); pmRenderRoom();
-    boardToast('已送出');
-  } catch (e2) { boardToast('送出失敗：' + (e2.message || e2)); }
+    boardToast(row.text_a ? '已送出' : '已送出（翻譯稍後補上）');
+  } catch (e2) { if (btn) btn.disabled = false; boardToast('送出失敗：' + (e2.message || e2)); }
 }
 async function pmDeleteMyEntry(id) {
   const e = pmEntries.find(x => x.id === id);

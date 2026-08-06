@@ -5,7 +5,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#080C14">
-<title>COMART · 公告與紀錄 v1.23</title>
+<title>COMART · 公告與紀錄 v1.24</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -210,7 +210,7 @@ select,select option,option{background:var(--s2);color:var(--tx)}
     <a class="logo" href="javascript:void(0)">
       <div class="logo-mark">告</div>
       <div class="logo-text">公告與紀錄</div>
-      <span class="logo-ver">v1.23</span>
+      <span class="logo-ver">v1.24</span>
     </a>
     <div class="topbar-right">
       <span class="who-badge" id="whoBadge">—</span>
@@ -2169,9 +2169,52 @@ function wrPrint(){
 // ═══════════════════════════════════════════════
 const PM_LANGS = [['zh-TW','繁體中文'],['zh-CN','简体中文'],['vi','Tiếng Việt'],['en','English'],['ja','日本語']];
 const PM_LANG_SHORT = { 'zh-TW':'繁中','zh-CN':'简中','vi':'越南語','en':'English','ja':'日本語' };
-const PM_PHASES = ['setup','writing','reveal','ranking','mitigation','locked'];
-const PM_PHASE_LABEL = { setup:'情境設定', writing:'開放填寫', reveal:'揭露', ranking:'排序分類', mitigation:'對策', locked:'定稿' };
+const PM_PHASES = ['intro','setup','writing','reveal','ranking','mitigation','locked'];
+const PM_PHASE_LABEL = { intro:'說明', setup:'情境設定', writing:'開放填寫', reveal:'揭露', ranking:'排序分類', mitigation:'對策', locked:'定稿' };
+const PM_VOTE_CAP = 3;     // 每人最多投幾票（排序階段）
 const PM_DEFAULT_SCENARIO = '想像現在是專案結束之後 —— 這個專案徹底失敗了，不是小挫折，而是一場災難。請寫下你認為導致它失敗的所有原因（越具體越好，一條一則）。';
+
+// 說明頁 i18n（概念／規則／時間分配／操作）
+const PM_INTRO_I18N = {
+  'zh-TW': { title:'事前驗屍會議 · 說明',
+    concept:'事前驗屍（Premortem）由心理學家 Gary Klein 提出：在專案正式開始前，先想像「這個專案已經徹底失敗」，再回頭找出失敗原因。這種「前瞻性後見之明」比一般問「可能出什麼錯」多找出約 30% 的風險。',
+    rulesT:'規則', rules:['心理安全第一：任何顧慮都能提出，不會被貼「唱衰」標籤。','先各自默寫、再一起揭露：填寫階段彼此看不到，避免從眾。','匿名：預設不顯示作者（主席可見），鼓勵直言。','收集時不批評：先把原因全部列出，之後再討論。'],
+    timeT:'時間分配（約 20–30 分鐘）', time:['情境設定：2–3 分鐘','各自默寫失敗原因：3–5 分鐘','揭露與輪流說明：約 10 分鐘','投票與分類：約 5 分鐘','擬定對策：5–10 分鐘'],
+    howtoT:'本程式操作', howto:['主席用上方階段列控制流程：說明 → 情境設定 → 開放填寫 → 揭露 → 排序分類 → 對策 → 定稿。','用你自己的語言填寫，系統自動翻成會議設定的兩種語言並排顯示。','「開放填寫」時各自輸入、只看得到自己；主席按「揭露」後全體一起看。','「排序分類」可投票選出最重要的風險（每人最多 3 票），並用 AI 自動歸類主題。','「對策」針對重點風險記錄 措施／負責人／期限。','「定稿」後鎖定，內容轉為唯讀。'] },
+  'zh-CN': { title:'事前验尸会议 · 说明',
+    concept:'事前验尸（Premortem）由心理学家 Gary Klein 提出：在项目正式开始前，先想象“这个项目已经彻底失败”，再回头找出失败原因。这种“前瞻性后见之明”比一般问“可能出什么错”多找出约 30% 的风险。',
+    rulesT:'规则', rules:['心理安全第一：任何顾虑都能提出，不会被贴“唱衰”标签。','先各自默写、再一起揭示：填写阶段彼此看不到，避免从众。','匿名：默认不显示作者（主席可见），鼓励直言。','收集时不批评：先把原因全部列出，之后再讨论。'],
+    timeT:'时间分配（约 20–30 分钟）', time:['情境设定：2–3 分钟','各自默写失败原因：3–5 分钟','揭示与轮流说明：约 10 分钟','投票与分类：约 5 分钟','拟定对策：5–10 分钟'],
+    howtoT:'本程序操作', howto:['主席用上方阶段栏控制流程：说明 → 情境设定 → 开放填写 → 揭示 → 排序分类 → 对策 → 定稿。','用你自己的语言填写，系统自动翻成会议设定的两种语言并排显示。','“开放填写”时各自输入、只看得到自己；主席按“揭示”后全体一起看。','“排序分类”可投票选出最重要的风险（每人最多 3 票），并用 AI 自动归类主题。','“对策”针对重点风险记录 措施／负责人／期限。','“定稿”后锁定，内容转为只读。'] },
+  'en': { title:'Project Premortem · Guide',
+    concept:'The Premortem, developed by psychologist Gary Klein, asks the team to imagine — before the project starts — that it has already failed completely, then work backward to find the reasons. This "prospective hindsight" surfaces about 30% more risks than simply asking "what might go wrong?".',
+    rulesT:'Rules', rules:['Psychological safety first: raise any concern without being labeled a naysayer.','Write alone first, reveal together: during writing you cannot see others, to avoid groupthink.','Anonymous: authors are hidden by default (visible to the chair) to encourage candor.','No criticism while collecting: list every reason first, discuss later.'],
+    timeT:'Time allocation (about 20–30 min)', time:['Set the scenario: 2–3 min','Write failure reasons individually: 3–5 min','Reveal and round-robin sharing: about 10 min','Vote and cluster: about 5 min','Define countermeasures: 5–10 min'],
+    howtoT:'Using this tool', howto:['The chair drives the flow with the phase bar above: Guide → Scenario → Writing → Reveal → Ranking → Countermeasures → Finalize.','Write in your own language; the system auto-translates into the two meeting languages, shown side by side.','During Writing everyone types privately and sees only their own; after the chair clicks Reveal, all see everything.','In Ranking, vote for the most important risks (up to 3 votes each) and let AI cluster them into themes.','In Countermeasures, record measure / owner / due date for each key risk.','After Finalize the record is locked and read-only.'] },
+  'vi': { title:'Họp Premortem · Hướng dẫn',
+    concept:'Premortem, do nhà tâm lý học Gary Klein đề xuất: trước khi dự án bắt đầu, hãy tưởng tượng dự án đã thất bại hoàn toàn, rồi truy ngược lại để tìm nguyên nhân. "Sự nhìn lại từ tương lai" này giúp phát hiện thêm khoảng 30% rủi ro so với chỉ hỏi "có thể sai ở đâu?".',
+    rulesT:'Quy tắc', rules:['An toàn tâm lý là trên hết: nêu bất kỳ lo ngại nào mà không bị gán nhãn "kẻ bàn lùi".','Viết riêng trước, công bố cùng nhau: khi viết bạn không thấy của người khác, tránh tâm lý đám đông.','Ẩn danh: mặc định không hiện tác giả (chủ tọa vẫn thấy), khuyến khích nói thẳng.','Không phê bình khi đang thu thập: liệt kê hết lý do trước, thảo luận sau.'],
+    timeT:'Phân bổ thời gian (khoảng 20–30 phút)', time:['Thiết lập bối cảnh: 2–3 phút','Tự viết lý do thất bại: 3–5 phút','Công bố và chia sẻ lần lượt: khoảng 10 phút','Bỏ phiếu và phân nhóm: khoảng 5 phút','Đề ra biện pháp: 5–10 phút'],
+    howtoT:'Sử dụng công cụ này', howto:['Chủ tọa điều khiển quy trình bằng thanh giai đoạn phía trên: Hướng dẫn → Bối cảnh → Viết → Công bố → Xếp hạng → Biện pháp → Chốt.','Viết bằng ngôn ngữ của bạn; hệ thống tự dịch sang hai ngôn ngữ của cuộc họp, hiển thị song song.','Khi Viết, mọi người nhập riêng và chỉ thấy của mình; sau khi chủ tọa bấm Công bố, tất cả cùng xem.','Ở Xếp hạng, bỏ phiếu cho các rủi ro quan trọng nhất (tối đa 3 phiếu mỗi người) và để AI phân nhóm chủ đề.','Ở Biện pháp, ghi lại biện pháp / người phụ trách / hạn hoàn thành cho từng rủi ro chính.','Sau khi Chốt, hồ sơ bị khóa và chỉ đọc.'] },
+  'ja': { title:'プレモータム会議 · 説明',
+    concept:'プレモータム（Premortem）は心理学者 Gary Klein が提唱した手法です。プロジェクト開始前に「すでに完全に失敗した」と想像し、そこから逆算して失敗の原因を洗い出します。この「予期的後知恵」により、「何が問題になり得るか」と尋ねるより約30％多くのリスクを発見できます。',
+    rulesT:'ルール', rules:['心理的安全を最優先：どんな懸念も「水を差す人」と見なされずに出せる。','まず各自で書き、その後一斉に公開：記入中は他者の内容が見えず、同調を防ぐ。','匿名：既定では著者を表示しない（司会は閲覧可）。率直な発言を促す。','収集中は批判しない：まず原因を全て挙げ、議論は後で。'],
+    timeT:'時間配分（約20〜30分）', time:['シナリオ設定：2〜3分','失敗理由を各自記入：3〜5分','公開と順番共有：約10分','投票と分類：約5分','対策の策定：5〜10分'],
+    howtoT:'このツールの操作', howto:['司会は上部のフェーズバーで進行を操作：説明 → シナリオ → 記入 → 公開 → ランキング → 対策 → 確定。','自分の言語で記入すると、会議で設定した2言語へ自動翻訳し並べて表示します。','「記入」中は各自入力し自分の分のみ表示；司会が「公開」を押すと全員で閲覧。','「ランキング」で重要なリスクに投票（1人最大3票）し、AIがテーマに自動分類。','「対策」で重点リスクごとに 対策／担当者／期限 を記録。','「確定」後はロックされ読み取り専用になります。'] },
+};
+function pmSetIntroLang(c) { pmIntroLang = c; pmRenderRoom(); }
+function pmIntroHtml() {
+  const lang = pmIntroLang || pmPortalLang();
+  const d = PM_INTRO_I18N[lang] || PM_INTRO_I18N['zh-TW'];
+  const list = arr => '<ul style="margin:5px 0 0;padding-left:20px;display:flex;flex-direction:column;gap:5px">' + arr.map(x => '<li style="font-size:13.5px;line-height:1.55">' + escHtml(x) + '</li>').join('') + '</ul>';
+  const sec = (t, inner) => '<div style="margin-top:15px"><div style="font-size:13px;font-weight:700;color:var(--ac);margin-bottom:2px">' + escHtml(t) + '</div>' + inner + '</div>';
+  const langBar = '<div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px">' + PM_LANGS.map(l => {
+    const on = lang === l[0];
+    return '<button class="chip-f' + (on ? ' on' : '') + '" onclick="pmSetIntroLang(\'' + l[0] + '\')">' + l[1] + '</button>';
+  }).join('') + '</div>';
+  return langBar + '<div style="font-size:14px;line-height:1.6">' + escHtml(d.concept) + '</div>' +
+    sec(d.rulesT, list(d.rules)) + sec(d.timeT, list(d.time)) + sec(d.howtoT, list(d.howto));
+}
 
 let pmFilter = 'open';
 let pmAllSessions = [];
@@ -2181,6 +2224,8 @@ let pmPollTimer = null;
 let pmDraft = '';          // 填寫中的草稿（輪詢重繪時保留）
 let pmSrcLang = '';        // 填寫者選的來源語言（重繪時保留）
 let pmRetrying = false;    // 背景補翻防重入
+let pmIntroLang = '';      // 說明頁顯示語言
+let pmMitigations = [];    // 目前 session 的對策清單
 
 // ── 翻譯（claude-proxy，帶 x-session；一次回兩種目標語言）──
 const PM_LANG_NAME = { 'zh-TW':'Traditional Chinese', 'zh-CN':'Simplified Chinese', 'vi':'Vietnamese', 'en':'English', 'ja':'Japanese' };
@@ -2311,7 +2356,7 @@ async function pmCreateSubmit() {
     scope_members: members,
     chair_emp_id: PORTAL_SESSION.empId,
     chair_name: PORTAL_SESSION.nameZh || PORTAL_SESSION.nameEn || PORTAL_SESSION.empId,
-    phase: 'setup', roster_locked: false,
+    phase: 'intro', roster_locked: false,
     created_by: PORTAL_SESSION.empId,
     created_at: new Date().toISOString(), updated_at: new Date().toISOString(),
   };
@@ -2335,6 +2380,7 @@ async function pmOpen(id) {
   pmDraft = '';
   pmSrcLang = pmPortalLang();
   await pmFetchEntries();
+  await pmFetchMitigations();
   pmShowView('room');
   pmRenderRoom();
   pmPollStart();
@@ -2344,12 +2390,17 @@ async function pmFetchEntries() {
   const rows = await SB.get('premortem_entries', '?session_id=eq.' + encodeURIComponent(pmSession.id) + '&order=created_at.asc');
   pmEntries = rows || [];
 }
-function pmBackToList() { pmPollStop(); pmSession = null; pmEntries = []; pmLoadList(); }
+function pmBackToList() { pmPollStop(); pmSession = null; pmEntries = []; pmMitigations = []; pmLoadList(); }
 
 // ── 輪詢（每 7 秒；phase 或 entries 有變才重繪，並保留填寫草稿）──
 function pmPollStart() { pmPollStop(); pmPollTimer = setInterval(pmPollTick, 7000); }
 function pmPollStop() { if (pmPollTimer) { clearInterval(pmPollTimer); pmPollTimer = null; } }
-function pmSig() { return (pmSession ? pmSession.phase + '|' + (pmSession.desc_a ? 1 : 0) + (pmSession.scenario_a ? 1 : 0) : '') + '|' + pmEntries.map(e => e.id + ':' + (e.updated_at || '') + ':' + (e.text_a ? 1 : 0) + (e.text_b ? 1 : 0)).join(','); }
+function pmSig() {
+  const sp = pmSession ? pmSession.phase + '|' + (pmSession.desc_a ? 1 : 0) + (pmSession.scenario_a ? 1 : 0) : '';
+  const es = pmEntries.map(e => e.id + ':' + (e.updated_at || '') + ':' + (e.text_a ? 1 : 0) + (e.text_b ? 1 : 0) + ':' + pmVoteCount(e) + ':' + (e.theme || '')).join(',');
+  const ms = pmMitigations.map(m => m.id + ':' + (m.updated_at || m.created_at || '')).join(',');
+  return sp + '|' + es + '|' + ms;
+}
 async function pmPollTick() {
   if (!pmSession || document.getElementById('tabpanel-premortem').classList.contains('on') === false) return;
   const before = pmSig();
@@ -2360,6 +2411,7 @@ async function pmPollTick() {
     pmSession.scenario_a = rows[0].scenario_a; pmSession.scenario_b = rows[0].scenario_b;
   }
   await pmFetchEntries();
+  await pmFetchMitigations();
   if (pmSig() !== before) { pmSaveDraft(); pmRenderRoom(); pmRestoreDraft(); }
   pmRetryTranslations();
 }
@@ -2420,7 +2472,10 @@ function pmRenderRoom() {
 
   const myEntries = pmEntries.filter(e => e.author_emp_id === (PORTAL_SESSION && PORTAL_SESSION.empId));
 
-  if (s.phase === 'setup') {
+  if (s.phase === 'intro') {
+    html += '<div class="panel"><div class="panel-h"><span class="idx">ℹ︎</span><h2>說明</h2></div><div class="panel-b">' + pmIntroHtml() +
+      '<div class="hint" style="margin-top:14px">' + (chair ? '看完後，按上方階段列的「情境設定 / 開放填寫」開始。' : '主席將帶大家開始，請先閱讀本頁。') + '</div></div></div>';
+  } else if (s.phase === 'setup') {
     html += '<div class="panel"><div class="panel-b">' +
       (chair ? '<div class="hint">情境設定完成後，按上方「開放填寫」讓與會者開始各自默寫失敗原因。</div>'
              : '<div class="empty-note">主席尚未開放填寫，請稍候。</div>') + '</div></div>';
@@ -2441,11 +2496,25 @@ function pmRenderRoom() {
         '<div class="panel-b">' + (pmEntries.length ? pmEntries.map(e => pmEntryHtml(e, true, false, true)).join('') : '<div class="empty-note">尚無人填寫。</div>') +
         '<div class="hint" style="margin-top:8px">與會者此刻只看得到自己填的；按上方「揭露」後全體才會一起看到。</div></div></div>';
     }
-  } else {
-    // reveal / ranking / mitigation / locked：全體看得到全部（雙語並陳；匿名，主席可見作者）
+  } else if (s.phase === 'reveal') {
     html += '<div class="panel"><div class="panel-h"><span class="idx">▤</span><h2>全部失敗原因</h2><span class="sub">共 ' + pmEntries.length + ' 則</span></div>' +
-      '<div class="panel-b">' + (pmEntries.length ? pmEntries.map(e => pmEntryHtml(e, chair, false, true)).join('') : '<div class="empty-note">沒有任何填寫內容。</div>') + '</div></div>';
-    if (s.phase !== 'locked') html += '<div class="hint" style="margin-top:10px">投票、AI 分群與對策擬定將於階段三加入；目前先呈現彙整結果。</div>';
+      '<div class="panel-b">' + (pmEntries.length ? pmEntries.map(e => pmEntryHtml(e, chair, false, true, 0)).join('') : '<div class="empty-note">沒有任何填寫內容。</div>') +
+      '<div class="hint" style="margin-top:8px">已揭露全部內容。主席可切到「排序分類」開始投票與 AI 分群。</div></div></div>';
+  } else if (s.phase === 'ranking') {
+    const mine = pmMyVoteCount();
+    html += '<div class="panel"><div class="panel-h"><span class="idx">▤</span><h2>排序分類</h2><span class="sub">你已投 ' + mine + '／' + PM_VOTE_CAP + ' 票</span></div><div class="panel-b">' +
+      (chair ? '<div style="margin-bottom:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center"><button class="btn sm" onclick="pmAiCluster()">🤖 AI 分群</button><span style="font-size:11px;color:var(--tx3)">把相似原因自動歸類成主題（可再按重跑）</span></div>' : '') +
+      '<div class="hint" style="margin-bottom:8px">為你認為最重要的風險投票（每人最多 ' + PM_VOTE_CAP + ' 票）。</div>' +
+      (pmEntries.length ? pmGroupedHtml(1) : '<div class="empty-note">沒有任何填寫內容。</div>') + '</div></div>';
+  } else if (s.phase === 'mitigation') {
+    html += '<div class="panel"><div class="panel-h"><span class="idx">▤</span><h2>風險（依票數）</h2></div><div class="panel-b">' +
+      (pmEntries.length ? pmGroupedHtml(2) : '<div class="empty-note">沒有任何填寫內容。</div>') + '</div></div>';
+    html += '<div class="panel"><div class="panel-h"><span class="idx">✔</span><h2>對策</h2><span class="sub">措施／負責人／期限</span></div><div class="panel-b">' + pmMitigationsHtml(chair) + '</div></div>';
+  } else {
+    // locked：唯讀總結
+    html += '<div class="panel"><div class="panel-h"><span class="idx">▤</span><h2>失敗原因（依票數）</h2><span class="sub">共 ' + pmEntries.length + ' 則</span></div><div class="panel-b">' +
+      (pmEntries.length ? pmGroupedHtml(2) : '<div class="empty-note">沒有任何填寫內容。</div>') + '</div></div>';
+    html += '<div class="panel"><div class="panel-h"><span class="idx">✔</span><h2>對策</h2></div><div class="panel-b">' + pmMitigationsHtml(false) + '</div></div>';
   }
   body.innerHTML = html;
   pmRestoreDraft();
@@ -2460,22 +2529,24 @@ function pmHeaderField(origin, a, b, muted) {
   }
   return '<div style="white-space:pre-wrap;font-size:' + (muted ? '13px;color:var(--tx2)' : '13.5px') + '">' + escHtml(origin || '') + '</div>';
 }
-function pmEntryHtml(e, showAuthor, allowDelete, bilingual) {
+function pmEntryHtml(e, showAuthor, allowDelete, bilingual, voteMode) {
   const author = (showAuthor && e.author_name) ? '<span style="font-size:11px;color:var(--tx3)">— ' + escHtml(e.author_name) + '</span>' : '';
   const del = allowDelete ? '<button class="btn ghost sm danger" style="padding:2px 8px" onclick="pmDeleteMyEntry(\'' + e.id + '\')">✕</button>' : '';
   const editT = (showAuthor && bilingual && pmIsChair(pmSession)) ? '<button class="btn ghost sm" style="padding:2px 8px" title="修正譯文" onclick="pmEditTrans(\'' + e.id + '\')">✎譯</button>' : '';
+  const vc = pmVoteCount(e);
+  let voteUi = '';
+  if (voteMode === 1) voteUi = '<button class="btn ghost sm' + (pmIVoted(e) ? ' primary' : '') + '" style="padding:2px 9px" onclick="pmToggleVote(\'' + e.id + '\')">👍 ' + vc + '</button>';
+  else if (voteMode === 2) voteUi = '<span style="font-size:12px;color:var(--tx3);white-space:nowrap">👍 ' + vc + '</span>';
+  const theme = e.theme ? '<span class="site-badge" style="background:var(--s3);color:var(--tx3);margin-bottom:5px;display:inline-block">' + escHtml(e.theme) + '</span> ' : '';
   let content;
   if (bilingual) {
-    if (e.text_a || e.text_b) {
-      content = '<div class="pm-bi">' + pmLangCellHtml(pmLangShort(pmSession.lang_a), e.text_a || e.text_src, !e.text_a) + pmLangCellHtml(pmLangShort(pmSession.lang_b), e.text_b || e.text_src, !e.text_b) + '</div>';
-    } else {
-      content = '<div style="white-space:pre-wrap;font-size:14px">' + escHtml(e.text_src || '') + '</div><div style="font-size:11px;color:var(--tx3);margin-top:3px">翻譯待補…</div>';
-    }
+    if (e.text_a || e.text_b) content = '<div class="pm-bi">' + pmLangCellHtml(pmLangShort(pmSession.lang_a), e.text_a || e.text_src, !e.text_a) + pmLangCellHtml(pmLangShort(pmSession.lang_b), e.text_b || e.text_src, !e.text_b) + '</div>';
+    else content = '<div style="white-space:pre-wrap;font-size:14px">' + escHtml(e.text_src || '') + '</div><div style="font-size:11px;color:var(--tx3);margin-top:3px">翻譯待補…</div>';
   } else {
     content = '<div style="white-space:pre-wrap;font-size:14px">' + escHtml(e.text_src || '') + '</div>';
   }
   return '<div style="border:1px solid var(--br);border-radius:8px;padding:10px 12px;background:var(--s2);margin-bottom:8px;display:flex;gap:10px;align-items:flex-start">' +
-    '<div style="flex:1;min-width:0">' + content + author + '</div><div style="display:flex;gap:4px;flex-shrink:0">' + editT + del + '</div></div>';
+    '<div style="flex:1;min-width:0">' + theme + content + author + '</div><div style="display:flex;gap:4px;flex-shrink:0;align-items:center">' + voteUi + editT + del + '</div></div>';
 }
 async function pmEditTrans(id) {
   const e = pmEntries.find(x => x.id === id); if (!e || !pmIsChair(pmSession)) return;
@@ -2483,6 +2554,117 @@ async function pmEditTrans(id) {
   const b = prompt(pmLangShort(pmSession.lang_b) + ' 譯文：', e.text_b || ''); if (b === null) return;
   try { await SB.patch('premortem_entries', 'id=eq.' + encodeURIComponent(id), { text_a: a, text_b: b, updated_at: new Date().toISOString() }); e.text_a = a; e.text_b = b; pmRenderRoom(); boardToast('已更新譯文'); }
   catch (err) { boardToast('更新失敗：' + (err.message || err)); }
+}
+
+// ── 投票（排序階段；每人最多 PM_VOTE_CAP 票）──
+function pmVoteCount(e) { return Array.isArray(e.voters) ? e.voters.length : 0; }
+function pmIVoted(e) { const me = PORTAL_SESSION && PORTAL_SESSION.empId; return Array.isArray(e.voters) && e.voters.indexOf(me) >= 0; }
+function pmMyVoteCount() { const me = PORTAL_SESSION && PORTAL_SESSION.empId; return pmEntries.filter(e => Array.isArray(e.voters) && e.voters.indexOf(me) >= 0).length; }
+async function pmToggleVote(id) {
+  if (!pmSession || pmSession.phase !== 'ranking' || !PORTAL_SESSION) return;
+  const e = pmEntries.find(x => x.id === id); if (!e) return;
+  const me = PORTAL_SESSION.empId;
+  let voters = Array.isArray(e.voters) ? e.voters.slice() : [];
+  const has = voters.indexOf(me) >= 0;
+  if (!has && pmMyVoteCount() >= PM_VOTE_CAP) { boardToast('每人最多 ' + PM_VOTE_CAP + ' 票'); return; }
+  voters = has ? voters.filter(x => x !== me) : voters.concat([me]);
+  e.voters = voters; pmRenderRoom();
+  try { await SB.patch('premortem_entries', 'id=eq.' + encodeURIComponent(id), { voters, updated_at: new Date().toISOString() }); }
+  catch (err) { boardToast('投票失敗：' + (err.message || err)); }
+}
+
+// ── AI 分群（主席，排序階段）──
+async function pmAiCluster() {
+  if (!pmIsChair(pmSession) || !pmEntries.length) return;
+  boardToast('AI 分群中…');
+  const items = pmEntries.map(e => ({ id: e.id, text: (e.text_a || e.text_src || '').slice(0, 200) }));
+  const sys = 'You cluster risk statements into a few concise themes. Output ONLY a minified JSON object.';
+  const usr = 'Group the following failure-risk items into 3 to 6 concise themes. Theme names in Traditional Chinese, 2-6 characters. Return {"map":{"<id>":"<theme>"}}.\nItems:\n' + JSON.stringify(items);
+  try {
+    const raw = await pmClaude(sys, usr, 1500);
+    const m = raw.match(/\{[\s\S]*\}/); if (!m) throw new Error('分群格式錯誤');
+    const map = (JSON.parse(m[0]).map) || {};
+    for (const e of pmEntries) { const th = map[e.id]; if (th && th !== e.theme) { e.theme = th; try { await SB.patch('premortem_entries', 'id=eq.' + encodeURIComponent(e.id), { theme: th, updated_at: new Date().toISOString() }); } catch (x) {} } }
+    pmRenderRoom(); boardToast('已完成 AI 分群');
+  } catch (err) { boardToast('分群失敗：' + (err.message || err)); }
+}
+
+// 依主題分組、組內依票數排序（無主題時退化為單一票數排序清單）
+function pmGroupedHtml(voteMode) {
+  const groups = {}; pmEntries.forEach(e => { const t = e.theme || '未分類'; (groups[t] = groups[t] || []).push(e); });
+  const hasTheme = pmEntries.some(e => e.theme);
+  const sv = arr => arr.reduce((s, e) => s + pmVoteCount(e), 0);
+  const names = Object.keys(groups).sort((a, b) => sv(groups[b]) - sv(groups[a]));
+  return names.map(name => {
+    const arr = groups[name].slice().sort((a, b) => pmVoteCount(b) - pmVoteCount(a));
+    const header = hasTheme ? '<div style="font-size:12.5px;font-weight:700;color:var(--ac);margin:12px 0 6px">▸ ' + escHtml(name) + '（' + arr.length + '）</div>' : '';
+    return header + arr.map(e => pmEntryHtml(e, pmIsChair(pmSession), false, true, voteMode)).join('');
+  }).join('');
+}
+
+// ── 對策 ──
+async function pmFetchMitigations() {
+  if (!pmSession) { pmMitigations = []; return; }
+  const rows = await SB.get('premortem_mitigations', '?session_id=eq.' + encodeURIComponent(pmSession.id) + '&order=created_at.asc');
+  pmMitigations = rows || [];
+}
+async function pmAddMitigation() {
+  if (!pmIsChair(pmSession)) return;
+  const risk = (document.getElementById('pm-mit-risk').value || '').trim();
+  const measure = (document.getElementById('pm-mit-measure').value || '').trim();
+  if (!risk && !measure) { boardToast('請填寫風險或對策'); return; }
+  const owner = document.getElementById('pm-mit-owner').value || '';
+  const ownerU = ALL_USERS.find(u => u.empId === owner);
+  const row = {
+    id: uid(), session_id: pmSession.id, risk_summary: risk, measure,
+    owner_emp_id: owner || null, owner_name: ownerU ? (ownerU.nameZh || ownerU.nameEn) : null,
+    due_date: document.getElementById('pm-mit-due').value || null, created_at: new Date().toISOString(),
+  };
+  boardToast('翻譯並儲存中…');
+  const src = pmPortalLang();
+  try { if (risk) { const t = await pmTranslate(risk, pmSession.lang_a, pmSession.lang_b, src); row.risk_a = t.a; row.risk_b = t.b; } } catch (e) {}
+  try { if (measure) { const t = await pmTranslate(measure, pmSession.lang_a, pmSession.lang_b, src); row.measure_a = t.a; row.measure_b = t.b; } } catch (e) {}
+  try {
+    await SB.post('premortem_mitigations', row);
+    document.getElementById('pm-mit-risk').value = ''; document.getElementById('pm-mit-measure').value = ''; document.getElementById('pm-mit-due').value = '';
+    await pmFetchMitigations(); pmRenderRoom(); boardToast('已新增對策');
+  } catch (e) { boardToast('新增失敗：' + (e.message || e)); }
+}
+async function pmDeleteMitigation(id) {
+  if (!pmIsChair(pmSession)) return;
+  if (!confirm('刪除這筆對策？')) return;
+  try { await SB.del('premortem_mitigations', 'id=eq.' + encodeURIComponent(id)); await pmFetchMitigations(); pmRenderRoom(); }
+  catch (e) { boardToast('刪除失敗：' + (e.message || e)); }
+}
+function pmBiInline(origin, a, b) {
+  if (a || b) return '<span>' + escHtml(a || origin) + '</span> <span style="color:var(--tx3)">｜</span> <span>' + escHtml(b || origin) + '</span>';
+  return '<span>' + escHtml(origin || '') + '</span>';
+}
+function pmMitigationsHtml(canEdit) {
+  let h = pmMitigations.length ? pmMitigations.map(m => {
+    const del = canEdit ? '<button class="btn ghost sm danger" style="padding:2px 8px" onclick="pmDeleteMitigation(\'' + m.id + '\')">✕</button>' : '';
+    const meta = [];
+    if (m.owner_name) meta.push('負責人：' + escHtml(m.owner_name));
+    if (m.due_date) meta.push('期限：' + escHtml(m.due_date));
+    return '<div style="border:1px solid var(--br);border-radius:8px;padding:10px 12px;background:var(--s2);margin-bottom:8px;display:flex;gap:10px;align-items:flex-start">' +
+      '<div style="flex:1;min-width:0">' +
+      (m.risk_summary ? '<div style="font-size:12px;color:var(--tx3);margin-bottom:3px">風險：' + pmBiInline(m.risk_summary, m.risk_a, m.risk_b) + '</div>' : '') +
+      '<div style="font-size:14px">' + pmBiInline(m.measure, m.measure_a, m.measure_b) + '</div>' +
+      (meta.length ? '<div style="font-size:11px;color:var(--tx3);margin-top:4px">' + meta.join('　') + '</div>' : '') +
+      '</div>' + del + '</div>';
+  }).join('') : '<div class="empty-note">尚無對策。</div>';
+  if (canEdit) {
+    const ownerOpts = '<option value="">（未指定負責人）</option>' + (ALL_USERS || []).map(u => '<option value="' + u.empId + '">' + escHtml(u.nameZh || u.nameEn || u.empId) + '</option>').join('');
+    h += '<div style="border-top:1px dashed var(--br);margin-top:10px;padding-top:12px;display:flex;flex-direction:column;gap:8px">' +
+      '<input id="pm-mit-risk" placeholder="重點風險（可留空）" style="font-family:inherit;font-size:14px;background:var(--s2);border:1px solid var(--br);border-radius:7px;padding:8px 10px;color:var(--tx);width:100%">' +
+      '<textarea id="pm-mit-measure" rows="2" placeholder="對策措施…" style="font-family:inherit;font-size:14px;background:var(--s2);border:1px solid var(--br);border-radius:7px;padding:8px 10px;color:var(--tx);width:100%"></textarea>' +
+      '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">' +
+      '<select id="pm-mit-owner" style="flex:1;min-width:140px;font-size:13px;background:var(--s2);border:1px solid var(--br);border-radius:7px;padding:7px 9px;color:var(--tx)">' + ownerOpts + '</select>' +
+      '<input id="pm-mit-due" type="date" style="font-size:13px;background:var(--s2);border:1px solid var(--br);border-radius:7px;padding:6px 9px;color:var(--tx)">' +
+      '<button class="btn primary sm" onclick="pmAddMitigation()">＋ 新增對策</button>' +
+      '</div></div>';
+  }
+  return h;
 }
 
 async function pmSubmitEntry() {

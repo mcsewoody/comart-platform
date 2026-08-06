@@ -5,7 +5,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#080C14">
-<title>COMART · 公告與紀錄 v1.20</title>
+<title>COMART · 公告與紀錄 v1.21</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -205,7 +205,7 @@ select,select option,option{background:var(--s2);color:var(--tx)}
     <a class="logo" href="javascript:void(0)">
       <div class="logo-mark">告</div>
       <div class="logo-text">公告與紀錄</div>
-      <span class="logo-ver">v1.20</span>
+      <span class="logo-ver">v1.21</span>
     </a>
     <div class="topbar-right">
       <span class="who-badge" id="whoBadge">—</span>
@@ -216,6 +216,7 @@ select,select option,option{background:var(--s2);color:var(--tx)}
     <button class="maintab" data-tab="weekly" onclick="switchTab('weekly')">🗓 週會紀錄</button>
     <button class="maintab" data-tab="biz" onclick="switchTab('biz')">💼 業務會議記錄</button>
     <button class="maintab" data-tab="woody" onclick="switchTab('woody')">📝 Woody 週報</button>
+    <button class="maintab" data-tab="premortem" onclick="switchTab('premortem')">🩺 事前驗屍</button>
   </div>
 </div>
 
@@ -500,6 +501,65 @@ select,select option,option{background:var(--s2);color:var(--tx)}
     </div>
   </div>
 
+  <!-- ══════════════ TAB 5：事前驗屍 Premortem ══════════════ -->
+  <div class="tabpanel" id="tabpanel-premortem">
+    <!-- 清單 -->
+    <div id="pm-list-view">
+      <div class="chiprow">
+        <button class="chip-f on" data-pf="open" onclick="pmSetFilter('open')">進行中</button>
+        <button class="chip-f" data-pf="locked" onclick="pmSetFilter('locked')">已定稿</button>
+        <button class="btn primary sm" style="margin-left:auto" onclick="pmNewSession()">＋ 新增驗屍會議</button>
+      </div>
+      <div id="pm-list"><div class="empty-note">載入中…</div></div>
+    </div>
+
+    <!-- 建立 -->
+    <div id="pm-create-view" style="display:none">
+      <div class="tabbar" style="max-width:none;padding:0;margin-bottom:16px;border-bottom:1px solid var(--br)">
+        <button class="btn ghost sm" onclick="pmBackToList()">← 返回列表</button>
+        <div style="margin-left:auto;display:flex;gap:6px;align-items:center;padding:6px 0">
+          <button class="btn primary sm" onclick="pmCreateSubmit()">✓ 建立並開場</button>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-h"><span class="idx">＋</span><h2>新增事前驗屍會議</h2></div>
+        <div class="panel-b">
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div class="field"><label>專案 / 主題名稱</label><input id="pm-c-title" placeholder="例如：新品 X 上市專案"></div>
+            <div class="field"><label>專案描述（被驗屍的對象）</label><textarea id="pm-c-desc" rows="3" placeholder="簡述這個專案的目標、範圍與時程…"></textarea></div>
+            <div class="field"><label>情境設定（引導語，可修改）</label><textarea id="pm-c-scenario" rows="3"></textarea></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+              <div class="field"><label>並陳語言 A</label><select id="pm-c-langa"></select></div>
+              <div class="field"><label>並陳語言 B</label><select id="pm-c-langb"></select></div>
+            </div>
+            <div class="field"><label>開放參與範圍</label>
+              <select id="pm-c-scope" onchange="pmScopeChanged()">
+                <option value="all">全公司</option>
+                <option value="site">單一中心</option>
+                <option value="list">指定人員</option>
+              </select>
+            </div>
+            <div class="field" id="pm-c-site-wrap" style="display:none"><label>中心</label>
+              <select id="pm-c-site"><option value="TW">台灣</option><option value="CN">東莞廠</option><option value="VN">越南廠</option></select>
+            </div>
+            <div class="field" id="pm-c-members-wrap" style="display:none"><label>指定人員（可複選）</label>
+              <div id="pm-c-members" style="max-height:220px;overflow:auto;border:1px solid var(--br);border-radius:8px;padding:8px;display:flex;flex-direction:column;gap:5px"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 會議室（主席／與會者，內容依角色＋階段由 JS 渲染） -->
+    <div id="pm-room-view" style="display:none">
+      <div class="tabbar" style="max-width:none;padding:0;margin-bottom:16px;border-bottom:1px solid var(--br)">
+        <button class="btn ghost sm" onclick="pmBackToList()">← 返回列表</button>
+        <div id="pm-phasebar" style="margin-left:auto;display:flex;gap:6px;align-items:center;padding:6px 0;flex-wrap:wrap"></div>
+      </div>
+      <div id="pm-room-body"></div>
+    </div>
+  </div>
+
 </div>
 
 <div class="toast" id="boardToast"></div>
@@ -634,6 +694,8 @@ function switchTab(name) {
     else if (window.MeetingMinutes && window.MeetingMinutes.refreshList) window.MeetingMinutes.refreshList();
   }
   if (name === 'woody') wrLoadList();
+  if (name === 'premortem') pmLoadList();
+  if (name !== 'premortem') pmPollStop();
 }
 
 // ═══════════════════════════════════════════════
@@ -2095,6 +2157,261 @@ function wrPrint(){
   if(!w){ boardToast('請允許彈出視窗以列印'); return; }
   w.document.write(wrFullDocHTML(wrState)); w.document.close();
   w.onload = function(){ try{ w.focus(); w.print(); }catch(e){} };
+}
+
+// ═══════════════════════════════════════════════
+// TAB 5：事前驗屍 Premortem（階段1 骨架：建會／清單／填寫／主席彙整＋階段控制＋輪詢）
+// ═══════════════════════════════════════════════
+const PM_LANGS = [['zh-TW','繁體中文'],['zh-CN','简体中文'],['vi','Tiếng Việt'],['en','English'],['ja','日本語']];
+const PM_LANG_SHORT = { 'zh-TW':'繁中','zh-CN':'简中','vi':'越南語','en':'English','ja':'日本語' };
+const PM_PHASES = ['setup','writing','reveal','ranking','mitigation','locked'];
+const PM_PHASE_LABEL = { setup:'情境設定', writing:'開放填寫', reveal:'揭露', ranking:'排序分類', mitigation:'對策', locked:'定稿' };
+const PM_DEFAULT_SCENARIO = '想像現在是專案結束之後 —— 這個專案徹底失敗了，不是小挫折，而是一場災難。請寫下你認為導致它失敗的所有原因（越具體越好，一條一則）。';
+
+let pmFilter = 'open';
+let pmAllSessions = [];
+let pmSession = null;      // 目前開啟的 session
+let pmEntries = [];        // 目前 session 的 entries
+let pmPollTimer = null;
+let pmDraft = '';          // 填寫中的草稿（輪詢重繪時保留）
+
+function pmIsChair(s) { return !!(s && PORTAL_SESSION && (s.chair_emp_id === PORTAL_SESSION.empId || isAdmin())); }
+function pmInScope(s) {
+  if (!PORTAL_SESSION) return false;
+  if (s.scope_type === 'all') return true;
+  if (s.scope_type === 'site') return s.scope_site === PORTAL_SESSION.site;
+  if (s.scope_type === 'list') return (s.scope_members || []).indexOf(PORTAL_SESSION.empId) >= 0;
+  return false;
+}
+function pmCanSee(s) { return pmIsChair(s) || pmInScope(s); }
+function pmScopeText(s) {
+  if (s.scope_type === 'site') return siteLabel(s.scope_site);
+  if (s.scope_type === 'list') return '指定 ' + ((s.scope_members || []).length) + ' 人';
+  return '全公司';
+}
+
+function pmShowView(which) {
+  document.getElementById('pm-list-view').style.display   = which === 'list'   ? '' : 'none';
+  document.getElementById('pm-create-view').style.display = which === 'create' ? '' : 'none';
+  document.getElementById('pm-room-view').style.display   = which === 'room'   ? '' : 'none';
+}
+
+function pmSetFilter(f) {
+  pmFilter = f;
+  document.querySelectorAll('#tabpanel-premortem .chip-f[data-pf]').forEach(b => b.classList.toggle('on', b.dataset.pf === f));
+  pmRenderList();
+}
+
+async function pmLoadList() {
+  pmPollStop();
+  pmShowView('list');
+  const rows = await SB.get('premortem_sessions', '?select=id,title,phase,scope_type,scope_site,scope_members,chair_emp_id,chair_name,created_by,updated_at&order=updated_at.desc&limit=200');
+  pmAllSessions = (rows || []).filter(pmCanSee);
+  pmRenderList();
+}
+
+function pmRenderList() {
+  const box = document.getElementById('pm-list');
+  const rows = pmAllSessions.filter(s => pmFilter === 'locked' ? s.phase === 'locked' : s.phase !== 'locked');
+  if (!rows.length) { box.innerHTML = '<div class="empty-note">' + (pmFilter === 'locked' ? '尚無已定稿的驗屍會議。' : '目前沒有進行中的驗屍會議，點右上角「＋ 新增驗屍會議」開一場。') + '</div>'; return; }
+  box.innerHTML = rows.map(s => {
+    const phaseBadge = '<span class="site-badge" style="background:var(--ac2);color:var(--ac)">' + escHtml(PM_PHASE_LABEL[s.phase] || s.phase) + '</span>';
+    const delBtn = isAdmin() ? '<button class="btn ghost sm danger" onclick="event.stopPropagation();pmDeleteSession(\'' + s.id + '\')">刪除</button>' : '';
+    return '<div class="saved-row" style="cursor:pointer" onclick="pmOpen(\'' + s.id + '\')">' +
+      '<div><div class="t">' + escHtml(s.title || '(未命名)') + ' ' + phaseBadge + '</div>' +
+      '<div class="m"><span>主席：' + escHtml(s.chair_name || '—') + '</span><span>範圍：' + escHtml(pmScopeText(s)) + '</span></div></div>' +
+      '<div class="ops">' + delBtn + '</div></div>';
+  }).join('');
+}
+
+async function pmDeleteSession(id) {
+  if (!isAdmin()) { boardToast('僅管理員可刪除'); return; }
+  if (!confirm('確定刪除這場驗屍會議？所有填寫內容都會一併刪除，無法復原。')) return;
+  try { await SB.del('premortem_sessions', 'id=eq.' + encodeURIComponent(id)); boardToast('已刪除'); pmLoadList(); }
+  catch (e) { boardToast('刪除失敗：' + (e.message || e)); }
+}
+
+// ── 建立 ──
+function pmNewSession() {
+  const optHtml = PM_LANGS.map(l => '<option value="' + l[0] + '">' + l[1] + '</option>').join('');
+  const la = document.getElementById('pm-c-langa'), lb = document.getElementById('pm-c-langb');
+  la.innerHTML = optHtml; lb.innerHTML = optHtml;
+  la.value = (PORTAL_SESSION && PORTAL_SESSION.site === 'VN') ? 'vi' : 'zh-TW';
+  lb.value = (PORTAL_SESSION && PORTAL_SESSION.site === 'VN') ? 'zh-TW' : 'vi';
+  document.getElementById('pm-c-title').value = '';
+  document.getElementById('pm-c-desc').value = '';
+  document.getElementById('pm-c-scenario').value = PM_DEFAULT_SCENARIO;
+  document.getElementById('pm-c-scope').value = 'all';
+  pmScopeChanged();
+  pmShowView('create');
+}
+function pmScopeChanged() {
+  const v = document.getElementById('pm-c-scope').value;
+  document.getElementById('pm-c-site-wrap').style.display = v === 'site' ? '' : 'none';
+  document.getElementById('pm-c-members-wrap').style.display = v === 'list' ? '' : 'none';
+  if (v === 'list') {
+    document.getElementById('pm-c-members').innerHTML = (ALL_USERS || []).map(u =>
+      '<label style="display:flex;align-items:center;gap:7px;font-size:13px;cursor:pointer"><input type="checkbox" class="pm-mem" value="' + u.empId + '" style="width:auto"> ' +
+      escHtml((u.nameZh || u.nameEn || u.empId)) + ' <span style="color:var(--tx3);font-size:11px">' + siteLabel(u.site) + '</span></label>').join('');
+  }
+}
+async function pmCreateSubmit() {
+  if (!PORTAL_SESSION) { boardToast('尚未登入'); return; }
+  const title = document.getElementById('pm-c-title').value.trim();
+  if (!title) { boardToast('請填寫專案／主題名稱'); return; }
+  const scope = document.getElementById('pm-c-scope').value;
+  const members = scope === 'list' ? Array.from(document.querySelectorAll('#pm-c-members .pm-mem:checked')).map(c => c.value) : [];
+  if (scope === 'list' && !members.length) { boardToast('請至少勾選一位指定人員'); return; }
+  const row = {
+    id: uid(), title,
+    project_desc: document.getElementById('pm-c-desc').value.trim(),
+    scenario: document.getElementById('pm-c-scenario').value.trim() || PM_DEFAULT_SCENARIO,
+    lang_a: document.getElementById('pm-c-langa').value,
+    lang_b: document.getElementById('pm-c-langb').value,
+    scope_type: scope,
+    scope_site: scope === 'site' ? document.getElementById('pm-c-site').value : null,
+    scope_members: members,
+    chair_emp_id: PORTAL_SESSION.empId,
+    chair_name: PORTAL_SESSION.nameZh || PORTAL_SESSION.nameEn || PORTAL_SESSION.empId,
+    phase: 'setup', roster_locked: false,
+    created_by: PORTAL_SESSION.empId,
+    created_at: new Date().toISOString(), updated_at: new Date().toISOString(),
+  };
+  try { await SB.post('premortem_sessions', row); boardToast('已建立驗屍會議'); pmOpen(row.id); }
+  catch (e) { boardToast('建立失敗：' + (e.message || e)); }
+}
+
+// ── 開啟會議室 ──
+async function pmOpen(id) {
+  const rows = await SB.get('premortem_sessions', '?id=eq.' + encodeURIComponent(id));
+  const s = rows && rows[0];
+  if (!s) { boardToast('找不到該場會議'); return; }
+  if (!pmCanSee(s)) { boardToast('你不在這場會議的開放範圍內'); return; }
+  pmSession = s;
+  pmDraft = '';
+  await pmFetchEntries();
+  pmShowView('room');
+  pmRenderRoom();
+  pmPollStart();
+}
+async function pmFetchEntries() {
+  if (!pmSession) return;
+  const rows = await SB.get('premortem_entries', '?session_id=eq.' + encodeURIComponent(pmSession.id) + '&order=created_at.asc');
+  pmEntries = rows || [];
+}
+function pmBackToList() { pmPollStop(); pmSession = null; pmEntries = []; pmLoadList(); }
+
+// ── 輪詢（每 7 秒；phase 或 entries 有變才重繪，並保留填寫草稿）──
+function pmPollStart() { pmPollStop(); pmPollTimer = setInterval(pmPollTick, 7000); }
+function pmPollStop() { if (pmPollTimer) { clearInterval(pmPollTimer); pmPollTimer = null; } }
+function pmSig() { return (pmSession ? pmSession.phase : '') + '|' + pmEntries.map(e => e.id + ':' + (e.updated_at || '') + ':' + (e.text_src || '').length).join(','); }
+async function pmPollTick() {
+  if (!pmSession || document.getElementById('tabpanel-premortem').classList.contains('on') === false) return;
+  const before = pmSig();
+  const rows = await SB.get('premortem_sessions', '?id=eq.' + encodeURIComponent(pmSession.id) + '&select=phase,title,project_desc,scenario,lang_a,lang_b,roster_locked');
+  if (rows && rows[0]) { pmSession.phase = rows[0].phase; pmSession.roster_locked = rows[0].roster_locked; }
+  await pmFetchEntries();
+  if (pmSig() !== before) { pmSaveDraft(); pmRenderRoom(); pmRestoreDraft(); }
+}
+function pmSaveDraft() { const el = document.getElementById('pm-writebox'); if (el) pmDraft = el.value; }
+function pmRestoreDraft() { const el = document.getElementById('pm-writebox'); if (el && pmDraft) el.value = pmDraft; }
+
+// ── 主席階段控制列 ──
+function pmRenderPhasebar() {
+  const bar = document.getElementById('pm-phasebar');
+  if (!pmSession) { bar.innerHTML = ''; return; }
+  if (pmIsChair(pmSession)) {
+    bar.innerHTML = '<span style="font-size:12px;color:var(--tx3);margin-right:2px">階段：</span>' + PM_PHASES.map(p => {
+      const on = pmSession.phase === p;
+      return '<button class="chip-f' + (on ? ' on' : '') + '" onclick="pmSetPhase(\'' + p + '\')">' + PM_PHASE_LABEL[p] + '</button>';
+    }).join('');
+  } else {
+    bar.innerHTML = '<span class="site-badge" style="background:var(--ac2);color:var(--ac)">目前階段：' + escHtml(PM_PHASE_LABEL[pmSession.phase] || pmSession.phase) + '</span>';
+  }
+}
+async function pmSetPhase(p) {
+  if (!pmIsChair(pmSession)) return;
+  const prev = pmSession.phase;
+  pmSession.phase = p; pmRenderRoom();
+  try { await SB.patch('premortem_sessions', 'id=eq.' + encodeURIComponent(pmSession.id), { phase: p, updated_at: new Date().toISOString() }); }
+  catch (e) { pmSession.phase = prev; pmRenderRoom(); boardToast('切換階段失敗：' + (e.message || e)); }
+}
+
+// ── 會議室主體（依角色＋階段）──
+function pmRenderRoom() {
+  pmRenderPhasebar();
+  const body = document.getElementById('pm-room-body');
+  if (!pmSession) { body.innerHTML = ''; return; }
+  const s = pmSession, chair = pmIsChair(s);
+  let html = '';
+  // 專案／情境卡
+  html += '<div class="panel"><div class="panel-h"><span class="idx">◎</span><h2>' + escHtml(s.title || '(未命名)') + '</h2>' +
+    (chair ? '<span class="sub">你是主席</span>' : '') + '</div><div class="panel-b">' +
+    (s.project_desc ? '<div style="font-size:13.5px;margin-bottom:8px;white-space:pre-wrap">' + escHtml(s.project_desc) + '</div>' : '') +
+    '<div style="font-size:13px;color:var(--tx2);background:var(--s2);border-left:3px solid var(--ac);border-radius:6px;padding:9px 12px;white-space:pre-wrap">' + escHtml(s.scenario || '') + '</div></div></div>';
+
+  const myEntries = pmEntries.filter(e => e.author_emp_id === (PORTAL_SESSION && PORTAL_SESSION.empId));
+
+  if (s.phase === 'setup') {
+    html += '<div class="panel"><div class="panel-b">' +
+      (chair ? '<div class="hint">情境設定完成後，按上方「開放填寫」讓與會者開始各自默寫失敗原因。</div>'
+             : '<div class="empty-note">主席尚未開放填寫，請稍候。</div>') + '</div></div>';
+  } else if (s.phase === 'writing') {
+    if (chair) {
+      html += '<div class="panel"><div class="panel-h"><span class="idx">✎</span><h2>填寫中（主席即時彙整）</h2><span class="sub">已收 ' + pmEntries.length + ' 則</span></div>' +
+        '<div class="panel-b">' + (pmEntries.length ? pmEntries.map(e => pmEntryHtml(e, true)).join('') : '<div class="empty-note">尚無人填寫。</div>') +
+        '<div class="hint" style="margin-top:8px">與會者此刻只看得到自己填的；按上方「揭露」後全體才會一起看到。</div></div></div>';
+    } else {
+      html += '<div class="panel"><div class="panel-h"><span class="idx">✎</span><h2>寫下你認為的失敗原因</h2></div><div class="panel-b">' +
+        '<textarea id="pm-writebox" rows="3" placeholder="一則一個原因，越具體越好…" style="width:100%;font-family:inherit;font-size:14px;background:var(--s2);border:1px solid var(--br);border-radius:8px;padding:9px 11px;color:var(--tx)" oninput="pmDraft=this.value"></textarea>' +
+        '<div style="margin-top:8px"><button class="btn primary sm" onclick="pmSubmitEntry()">＋ 送出這則</button></div>' +
+        '<div class="hint" style="margin-top:6px">🔒 填寫階段只有你看得到自己的內容，主席揭露後才會一起顯示。</div>' +
+        '<div style="margin-top:12px">' + (myEntries.length ? myEntries.map(e => pmEntryHtml(e, false, true)).join('') : '') + '</div>' +
+        '</div></div>';
+    }
+  } else {
+    // reveal / ranking / mitigation / locked：全體看得到全部（匿名；主席可見作者）
+    html += '<div class="panel"><div class="panel-h"><span class="idx">▤</span><h2>全部失敗原因</h2><span class="sub">共 ' + pmEntries.length + ' 則</span></div>' +
+      '<div class="panel-b">' + (pmEntries.length ? pmEntries.map(e => pmEntryHtml(e, chair)).join('') : '<div class="empty-note">沒有任何填寫內容。</div>') + '</div></div>';
+    if (s.phase !== 'locked') html += '<div class="hint" style="margin-top:10px">投票、AI 分群與對策擬定將於階段三加入；目前先呈現彙整結果。</div>';
+  }
+  body.innerHTML = html;
+  pmRestoreDraft();
+}
+
+function pmEntryHtml(e, showAuthor, allowDelete) {
+  const author = (showAuthor && e.author_name) ? '<span style="font-size:11px;color:var(--tx3)">— ' + escHtml(e.author_name) + '</span>' : '';
+  const del = allowDelete ? '<button class="btn ghost sm danger" style="padding:2px 8px" onclick="pmDeleteMyEntry(\'' + e.id + '\')">✕</button>' : '';
+  return '<div style="border:1px solid var(--br);border-radius:8px;padding:10px 12px;background:var(--s2);margin-bottom:8px;display:flex;gap:10px;align-items:flex-start">' +
+    '<div style="flex:1;min-width:0"><div style="white-space:pre-wrap;font-size:14px">' + escHtml(e.text_src || '') + '</div>' + author + '</div>' + del + '</div>';
+}
+
+async function pmSubmitEntry() {
+  if (!pmSession || !PORTAL_SESSION) return;
+  const el = document.getElementById('pm-writebox');
+  const text = (el.value || '').trim();
+  if (!text) { boardToast('請先輸入內容'); return; }
+  const row = {
+    id: uid(), session_id: pmSession.id,
+    author_emp_id: PORTAL_SESSION.empId,
+    author_name: PORTAL_SESSION.nameZh || PORTAL_SESSION.nameEn || PORTAL_SESSION.empId,
+    src_lang: pmSession.lang_a || 'zh-TW',
+    text_src: text,
+    created_at: new Date().toISOString(), updated_at: new Date().toISOString(),
+  };
+  try {
+    await SB.post('premortem_entries', row);
+    el.value = ''; pmDraft = '';
+    await pmFetchEntries(); pmRenderRoom();
+    boardToast('已送出');
+  } catch (e2) { boardToast('送出失敗：' + (e2.message || e2)); }
+}
+async function pmDeleteMyEntry(id) {
+  const e = pmEntries.find(x => x.id === id);
+  if (!e || !PORTAL_SESSION || e.author_emp_id !== PORTAL_SESSION.empId) return;
+  if (pmSession.phase !== 'writing') { boardToast('揭露後不可刪除'); return; }
+  try { await SB.del('premortem_entries', 'id=eq.' + encodeURIComponent(id)); await pmFetchEntries(); pmRenderRoom(); }
+  catch (e2) { boardToast('刪除失敗：' + (e2.message || e2)); }
 }
 
 // ═══════════════════════════════════════════════

@@ -5,7 +5,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#080C14">
-<title>COMART · 公告與紀錄 v1.24</title>
+<title>COMART · 公告與紀錄 v1.25</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -210,7 +210,7 @@ select,select option,option{background:var(--s2);color:var(--tx)}
     <a class="logo" href="javascript:void(0)">
       <div class="logo-mark">告</div>
       <div class="logo-text">公告與紀錄</div>
-      <span class="logo-ver">v1.24</span>
+      <span class="logo-ver">v1.25</span>
     </a>
     <div class="topbar-right">
       <span class="who-badge" id="whoBadge">—</span>
@@ -2470,6 +2470,15 @@ function pmRenderRoom() {
     (s.project_desc ? '<div style="margin-bottom:10px">' + pmHeaderField(s.project_desc, s.desc_a, s.desc_b) + '</div>' : '') +
     '<div style="background:var(--s2);border-left:3px solid var(--ac);border-radius:6px;padding:9px 12px">' + pmHeaderField(s.scenario, s.scenario_a, s.scenario_b, true) + '</div></div></div>';
 
+  // 輸出工具列（揭露後才顯示）
+  if (['reveal', 'ranking', 'mitigation', 'locked'].indexOf(s.phase) >= 0) {
+    html += '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">' +
+      '<button class="btn sm" onclick="pmSendMail()">✉️ 寄送</button>' +
+      '<button class="btn sm" onclick="pmExportXlsx()">Excel</button>' +
+      '<button class="btn sm" onclick="pmExportPNG()">PNG</button>' +
+      '<button class="btn sm" onclick="pmExportPDF()">PDF</button></div>';
+  }
+
   const myEntries = pmEntries.filter(e => e.author_emp_id === (PORTAL_SESSION && PORTAL_SESSION.empId));
 
   if (s.phase === 'intro') {
@@ -2665,6 +2674,124 @@ function pmMitigationsHtml(canEdit) {
       '</div></div>';
   }
   return h;
+}
+
+// ── 輸出（PDF／PNG／Excel／Email，雙語）──
+function pmFileBase() { const s = pmSession; return 'Premortem_' + ((s && s.title) || '').replace(/[\\/:*?"<>|]/g, '').slice(0, 40); }
+function pmGroupsSorted() {
+  const groups = {}; pmEntries.forEach(e => { const t = e.theme || '未分類'; (groups[t] = groups[t] || []).push(e); });
+  const sv = arr => arr.reduce((x, e) => x + pmVoteCount(e), 0);
+  return Object.keys(groups).sort((a, b) => sv(groups[b]) - sv(groups[a])).map(name => ({ name, items: groups[name].slice().sort((a, b) => pmVoteCount(b) - pmVoteCount(a)) }));
+}
+function pmReportHtml() {
+  const s = pmSession, la = escHtml(pmLangShort(s.lang_a)), lb = escHtml(pmLangShort(s.lang_b));
+  const bi = (o, a, b) => '<table style="width:100%;border-collapse:collapse;margin:2px 0"><tr>' +
+    '<td style="width:50%;vertical-align:top;padding:5px 8px;border:1px solid #ddd"><div style="font-size:10px;color:#999">' + la + '</div>' + escHtml(a || o || '') + '</td>' +
+    '<td style="width:50%;vertical-align:top;padding:5px 8px;border:1px solid #ddd"><div style="font-size:10px;color:#999">' + lb + '</div>' + escHtml(b || o || '') + '</td></tr></table>';
+  let h = '<h1>' + escHtml(s.title || '(未命名)') + '</h1>';
+  h += '<div style="color:#666;font-size:12px">事前驗屍會議紀錄　主席：' + escHtml(s.chair_name || '—') + '</div>';
+  if (s.project_desc) h += '<h2>專案描述</h2>' + bi(s.project_desc, s.desc_a, s.desc_b);
+  h += '<h2>情境</h2>' + bi(s.scenario, s.scenario_a, s.scenario_b);
+  h += '<h2>失敗原因（依票數）</h2>';
+  const hasTheme = pmEntries.some(e => e.theme);
+  if (!pmEntries.length) h += '<div style="color:#999">（無）</div>';
+  pmGroupsSorted().forEach(g => {
+    if (hasTheme) h += '<div style="font-weight:700;margin:10px 0 4px;color:#333">▸ ' + escHtml(g.name) + '</div>';
+    g.items.forEach(e => { h += '<div style="font-size:11px;color:#c00;margin-top:6px">👍 ' + pmVoteCount(e) + '</div>' + bi(e.text_src, e.text_a, e.text_b); });
+  });
+  if (pmMitigations.length) {
+    h += '<h2>對策</h2>';
+    pmMitigations.forEach(m => {
+      if (m.risk_summary) h += '<div style="font-size:11px;color:#666;margin-top:8px">風險：' + escHtml(m.risk_summary) + '</div>';
+      h += bi(m.measure, m.measure_a, m.measure_b);
+      const meta = []; if (m.owner_name) meta.push('負責人：' + escHtml(m.owner_name)); if (m.due_date) meta.push('期限：' + escHtml(m.due_date));
+      if (meta.length) h += '<div style="font-size:11px;color:#666">' + meta.join('　') + '</div>';
+    });
+  }
+  return h;
+}
+function pmExportPDF() {
+  const w = window.open('', '_blank');
+  if (!w) { boardToast('請允許彈出視窗以列印 PDF'); return; }
+  const doc = '<!doctype html><html><head><meta charset="utf-8"><title>' + wmXesc(pmFileBase()) + '</title>' +
+    '<style>body{font-family:"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;color:#1a1a1a;margin:28px;font-size:13px;line-height:1.5}h1{font-size:20px;margin:0 0 4px}h2{font-size:14px;border-bottom:2px solid #333;padding-bottom:3px;margin:18px 0 8px}table{border-collapse:collapse}@media print{@page{margin:14mm}}</style>' +
+    '</head><body>' + pmReportHtml() + '</body></html>';
+  w.document.write(doc); w.document.close();
+  w.onload = function () { try { w.focus(); w.print(); } catch (e) {} };
+}
+function pmExportPNG() {
+  try {
+    const width = 820, frag = pmReportHtml();
+    const holder = document.createElement('div');
+    holder.style.cssText = 'position:fixed;left:-9999px;top:0;width:' + width + 'px;background:#fff;color:#1a1a1a;padding:24px;font-family:sans-serif;font-size:14px;line-height:1.5';
+    holder.innerHTML = frag; document.body.appendChild(holder);
+    const h = holder.scrollHeight + 48; document.body.removeChild(holder);
+    const xhtml = '<div xmlns="http://www.w3.org/1999/xhtml" style="width:' + width + 'px;background:#fff;color:#1a1a1a;padding:24px;font-family:sans-serif;font-size:14px;line-height:1.5">' + frag + '</div>';
+    const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + width + '" height="' + h + '"><foreignObject width="100%" height="100%">' + xhtml + '</foreignObject></svg>';
+    const url = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml;charset=utf-8' }));
+    const img = new Image();
+    img.onload = function () {
+      const scale = 2, canvas = document.createElement('canvas'); canvas.width = width * scale; canvas.height = h * scale;
+      const ctx = canvas.getContext('2d'); ctx.setTransform(scale, 0, 0, scale, 0, 0); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, width, h); ctx.drawImage(img, 0, 0);
+      URL.revokeObjectURL(url);
+      canvas.toBlob(function (blob) { if (!blob) { boardToast('PNG 匯出失敗，請改用 PDF'); return; } wmDownload(blob, pmFileBase() + '.png'); boardToast('已匯出 PNG'); }, 'image/png');
+    };
+    img.onerror = function () { URL.revokeObjectURL(url); boardToast('PNG 匯出失敗，請改用 PDF'); };
+    img.src = url;
+  } catch (e) { boardToast('PNG 匯出失敗，請改用 PDF'); }
+}
+function pmBuildXlsx() {
+  const s = pmSession, la = pmLangShort(s.lang_a), lb = pmLangShort(s.lang_b), data = [];
+  data.push(['事前驗屍會議紀錄：' + (s.title || ''), '', '', '']);
+  data.push(['分類', '內容（' + la + '）', '內容（' + lb + '）', '備註']);
+  if (s.project_desc) data.push(['專案描述', s.desc_a || s.project_desc, s.desc_b || s.project_desc, '']);
+  data.push(['情境', s.scenario_a || s.scenario || '', s.scenario_b || s.scenario || '', '']);
+  pmGroupsSorted().forEach(g => g.items.forEach(e => data.push(['失敗原因 · ' + g.name, e.text_a || e.text_src || '', e.text_b || e.text_src || '', '票數 ' + pmVoteCount(e)])));
+  pmMitigations.forEach(m => { const meta = []; if (m.owner_name) meta.push('負責人:' + m.owner_name); if (m.due_date) meta.push('期限:' + m.due_date); data.push(['對策', m.measure_a || m.measure || '', m.measure_b || m.measure || '', (m.risk_summary ? '風險:' + m.risk_summary + '  ' : '') + meta.join(' ')]); });
+  const colL = i => String.fromCharCode(65 + i);
+  const rowsXml = data.map((row, ri) => '<row r="' + (ri + 1) + '">' + row.map((v, ci) => (v === '' || v == null) ? '' : '<c r="' + colL(ci) + (ri + 1) + '" t="inlineStr"><is><t xml:space="preserve">' + wmXesc(v) + '</t></is></c>').join('') + '</row>').join('');
+  const sheetXml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><cols><col min="1" max="1" width="18" customWidth="1"/><col min="2" max="3" width="42" customWidth="1"/><col min="4" max="4" width="20" customWidth="1"/></cols><sheetData>' + rowsXml + '</sheetData></worksheet>';
+  const contentTypes = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/></Types>';
+  const rels = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>';
+  const workbook = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="事前驗屍" sheetId="1" r:id="rId1"/></sheets></workbook>';
+  const wbRels = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/></Relationships>';
+  const enc = new TextEncoder();
+  return wmMakeZip([
+    { name: '[Content_Types].xml', data: enc.encode(contentTypes) },
+    { name: '_rels/.rels', data: enc.encode(rels) },
+    { name: 'xl/workbook.xml', data: enc.encode(workbook) },
+    { name: 'xl/_rels/workbook.xml.rels', data: enc.encode(wbRels) },
+    { name: 'xl/worksheets/sheet1.xml', data: enc.encode(sheetXml) },
+  ]);
+}
+function pmExportXlsx() { try { wmDownload(pmBuildXlsx(), pmFileBase() + '.xlsx'); boardToast('已匯出 Excel'); } catch (e) { boardToast('Excel 匯出失敗'); } }
+function pmSendMail() {
+  const s = pmSession, la = pmLangShort(s.lang_a), lb = pmLangShort(s.lang_b), DIV = '━━━━━━━━━━━━━━━━━━━━━━━━', L = [];
+  L.push('事前驗屍會議紀錄：' + (s.title || '')); L.push('');
+  L.push(DIV); L.push('【情境】');
+  L.push('[' + la + '] ' + (s.scenario_a || s.scenario || ''));
+  L.push('[' + lb + '] ' + (s.scenario_b || s.scenario || '')); L.push('');
+  L.push(DIV); L.push('【失敗原因（依票數）】');
+  const hasTheme = pmEntries.some(e => e.theme);
+  pmGroupsSorted().forEach(g => {
+    if (hasTheme) L.push('■ ' + g.name);
+    g.items.forEach(e => { L.push('• (' + pmVoteCount(e) + '票) ' + (e.text_a || e.text_src || '')); L.push('    ' + (e.text_b || e.text_src || '')); });
+  });
+  L.push('');
+  if (pmMitigations.length) {
+    L.push(DIV); L.push('【對策】');
+    pmMitigations.forEach(m => {
+      L.push('• ' + (m.measure_a || m.measure || '')); L.push('    ' + (m.measure_b || m.measure || ''));
+      const meta = []; if (m.owner_name) meta.push('負責人:' + m.owner_name); if (m.due_date) meta.push('期限:' + m.due_date);
+      if (meta.length) L.push('    (' + meta.join('  ') + ')');
+    });
+    L.push('');
+  }
+  L.push(''); L.push('');
+  const ids = {}; pmEntries.forEach(e => { if (e.author_emp_id) ids[e.author_emp_id] = 1; }); if (s.chair_emp_id) ids[s.chair_emp_id] = 1;
+  const to = Object.keys(ids).map(userEmail).filter(Boolean).join(',');
+  const url = 'mailto:' + encodeURIComponent(to) + '?subject=' + encodeURIComponent('事前驗屍會議紀錄 ' + (s.title || '')) + '&body=' + encodeURIComponent(L.join('\n'));
+  try { window.location.href = url; boardToast('已開啟郵件草稿（收件人＝與會者）'); } catch (e) { boardToast('無法開啟郵件'); }
 }
 
 async function pmSubmitEntry() {

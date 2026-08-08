@@ -5,7 +5,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#080C14">
-<title>COMART · 公告與紀錄 v1.40</title>
+<title>COMART · 公告與紀錄 v1.41</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -78,9 +78,11 @@ h1,h2,h3,p{margin:0}
 .field{display:flex;flex-direction:column;gap:5px}
 .field label{font-size:12px;font-weight:600;color:var(--tx3)}
 .field input,.field select,.field textarea{font-family:inherit;font-size:14px;color:var(--tx);background:var(--s2);border:1px solid var(--br);border-radius:var(--r);padding:9px 11px;width:100%}
-/* datetime-local 在深色底下原生挑選器圖示與面板幾乎看不見，這一欄改成亮白 */
-input.pm-dt,.field input.pm-dt{background:#fff;color:#111;border:1px solid #c9ced6;color-scheme:light}
-input.pm-dt::-webkit-calendar-picker-indicator{opacity:1;cursor:pointer}
+/* datetime-local：只讓「彈出的挑選器面板」走亮白（color-scheme:light），
+   輸入框本身沿用原本深色配色（不覆蓋 background/color）。
+   代價是日曆圖示會變成深色貼在深色底上看不見，故把圖示反轉成白色。 */
+input.pm-dt,.field input.pm-dt{color-scheme:light}
+input.pm-dt::-webkit-calendar-picker-indicator{filter:invert(1);opacity:.85;cursor:pointer}
 .field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--ac)}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
@@ -213,7 +215,7 @@ select,select option,option{background:var(--s2);color:var(--tx)}
     <a class="logo" href="javascript:void(0)">
       <div class="logo-mark">告</div>
       <div class="logo-text">公告與紀錄</div>
-      <span class="logo-ver">v1.40</span>
+      <span class="logo-ver">v1.41</span>
     </a>
     <div class="topbar-right">
       <span class="who-badge" id="whoBadge">—</span>
@@ -2963,13 +2965,20 @@ function pmRenderRoom() {
   const body = document.getElementById('pm-room-body');
   if (!pmSession) { body.innerHTML = ''; return; }
   const s = pmSession, chair = pmIsChair(s);
+  if (pmMeetEditing && s.phase !== 'intro' && s.phase !== 'locked') pmMeetEditing = false;  // 卡片不顯示的階段不留編輯模式
   let html = '';
   // 專案／情境卡（雙語並陳）
+  const cardBody = [];
+  // 會議資訊只在開場（intro）與定稿（locked）出現——中間的進行過程用不到，只會佔畫面
+  if (s.phase === 'intro' || s.phase === 'locked') cardBody.push(pmMeetInfoHtml(s, chair));
+  // 情境設定階段下方已有可編輯的專案描述／情境，這裡不再重複顯示同一套資訊
+  if (s.phase !== 'setup') {
+    if (s.project_desc) cardBody.push('<div style="margin-bottom:10px">' + pmHeaderField(s.project_desc, s.desc_a, s.desc_b) + '</div>');
+    cardBody.push('<div style="background:var(--s2);border-left:3px solid var(--ac);border-radius:6px;padding:9px 12px">' + pmHeaderField(s.scenario, s.scenario_a, s.scenario_b, true) + '</div>');
+  }
   html += '<div class="panel"><div class="panel-h"><span class="idx">◎</span><h2>' + escHtml(s.title || '(未命名)') + '</h2>' +
-    (chair ? '<span class="sub">你是主席</span>' : '') + '</div><div class="panel-b">' +
-    pmMeetInfoHtml(s, chair) +
-    (s.project_desc ? '<div style="margin-bottom:10px">' + pmHeaderField(s.project_desc, s.desc_a, s.desc_b) + '</div>' : '') +
-    '<div style="background:var(--s2);border-left:3px solid var(--ac);border-radius:6px;padding:9px 12px">' + pmHeaderField(s.scenario, s.scenario_a, s.scenario_b, true) + '</div></div></div>';
+    (chair ? '<span class="sub">你是主席</span>' : '') + '</div>' +
+    (cardBody.length ? '<div class="panel-b">' + cardBody.join('') + '</div>' : '') + '</div>';
 
   // 輸出工具列（揭露後才顯示）
   if (['reveal', 'ranking', 'mitigation', 'locked'].indexOf(s.phase) >= 0) {

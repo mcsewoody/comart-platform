@@ -163,10 +163,12 @@ The portal supports EN, 繁中, 简中, VI, 日 via `setLang(lang)`. Each langua
   - `attendees`（紀錄用的與會名單，自由文字）與 `scope_members`（決定誰打得開這場會議的權限範圍）是兩件事；
     建會表單有「＋ 帶入指定人員」（`pmFillAttendees`）把勾選的人附加進來並去重，列席者仍可手動補打
   - 對策期限預設改以 `meet_at` 為基準（沒填才退回 `created_at`）
-  - **主席可在任何階段（含定稿後）按資訊卡的「✎ 修改」改日期／地點／與會人員**（v1.40，`pmSaveMeetInfo`）；
-    主席欄位固定為開場者不可改。編輯中暫停輪詢
-  - `datetime-local` 欄位一律加 `class="pm-dt"`（白底黑字 + `color-scheme:light`）：深色底下原生挑選器的
-    圖示與面板幾乎看不見
+  - **資訊卡只在 `intro`（開場）與 `locked`（定稿）出現**（v1.41）：中間的進行過程用不到，只佔畫面。
+    主席在這兩個階段可按「✎ 修改」改日期／地點／與會人員（`pmSaveMeetInfo`）；主席欄位固定為開場者不可改
+  - `setup` 階段頂端卡片**不顯示**專案描述／情境（下方已有可編輯的同一套資訊，不要出現兩份）
+  - `datetime-local` 欄位一律加 `class="pm-dt"`：只有 `color-scheme:light`（讓**彈出的挑選器面板**亮白），
+    輸入框本身沿用深色配色；代價是日曆圖示變深色看不見，故 `::-webkit-calendar-picker-indicator` 用
+    `filter:invert(1)` 反白
 - 🔴 **主席＝開場的那一個人，`pmIsChair()` 只認 `chair_emp_id`，絕對不要在裡面加 `isAdmin()`**（v1.31）。
   admin 在驗屍會議裡就是一般與會者：不能控制階段（只看到唯讀 badge）、看不到填寫人姓名、
   不能改情境／譯文、不能新增或刪除對策。唯一保留給 admin 的是清單上的「刪除整場會議」（資料治理，不在會議室內）

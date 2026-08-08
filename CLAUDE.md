@@ -18,10 +18,11 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 
 | File | Version | Purpose | ~Lines |
 |------|---------|---------|--------|
-| `index.html` | v1.57 | Main portal — login, home, directory, bulletin, calendar, AI tools | 4,372 |
-| `admin/index.html` | v2.25 | Admin System — room booking, fleet, visitor, library, lottery | 5,576 |
-| `kms/index.html` | v2.25 | Knowledge Management System — RAG, document editor, AI Q&A | 7,059 |
-| `quotation/index.html` | v3.53 | Quotation & CRM system | 7,288 |
+| `index.html` | v1.67 | Main portal — login, home, directory, bulletin, calendar, AI tools | 4,394 |
+| `admin/index.html` | v2.30 | Admin System — room booking, fleet, visitor, library, lottery | 5,650 |
+| `kms/index.html` | v2.33 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
+| `quotation/index.html` | v3.54 | Quotation & CRM system | 7,332 |
+| `board/index.html` | v1.28 | 公告與紀錄 Bulletin & Records — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍 | 2,934 |
 
 `admin/lottery.html` is a standalone lottery page (separate from the lottery module inside `admin/index.html`).
 
@@ -34,6 +35,8 @@ Numbered backup files (`index112.html`, `index328.html`, etc.) are iteration sna
 **Opening sub-apps**: `openApp(id)` navigates to the sub-app HTML file, passing the session via URL parameter `?_ps=<base64-JSON>` since localStorage cannot be shared cross-origin.
 
 **Within `admin/index.html`**: `switchMod(m)` activates modules — `'room'`, `'car'`, `'visit'`, `'lib'`, `'lottery'`.
+
+**Within `board/index.html`**: `switchTab(name)` activates 主頁籤 — `'bulletin'`、`'weekly'`、`'biz'`、`'woody'`、`'premortem'`。Portal 端由 `index.html` 的 app 清單項目 `id:'bulletin'`（`path:'./board/index.html'`）進入。
 
 ### Backend Stack
 
@@ -53,7 +56,7 @@ Numbered backup files (`index112.html`, `index328.html`, etc.) are iteration sna
   **`x-session` 標頭**（登入時 auth-verify 簽發的 HMAC 簽章 token，前端存在 session 物件的 `sig` 欄位）。
   `users`/`departments`/`sites` 的寫入僅限簽章內 role=admin；一般使用者僅可 PATCH 自己那筆 users 的
   個人資料欄位（`SELF_PATCH_FIELDS` 白名單）。**舊的固定 `x-admin-token`（COMART-ADMIN-2026）已全面廢除，
-  不要在任何新程式碼使用**。前端 helper：Portal `sbHdrs()`、admin `sbHdrs()`、kms `kmsSig()`、quotation `qtHdrs()`/`qtSig()`。
+  不要在任何新程式碼使用**。前端 helper：Portal `sbHdrs()`、admin `sbHdrs()`、kms `kmsSig()`、quotation `qtHdrs()`/`qtSig()`、board `sbHdrs()`（配 `SB.get/post/patch/del` 包裝）。
 
 **Firebase**: 已完全移除（2026-07 確認四個 HTML 皆無 firebase 引用）。通知與站內訊息走 Supabase 輪詢（通知 60 秒、訊息 10 秒增量）。
 
@@ -90,8 +93,10 @@ KMS (`kms/index.html`) implements RAG (Retrieval-Augmented Generation):
 ### Design System
 
 All apps use a dark theme with CSS custom properties. Two slightly different palettes:
-- **Portal + Quotation**: `--bg:#080C14`, accent `--ac:#2D7FF9`, fonts: DM Sans / DM Serif Display / DM Mono
+- **Portal + Quotation + Board**: `--bg:#080C14`, accent `--ac:#2D7FF9`, fonts: DM Sans / DM Serif Display / DM Mono
 - **Admin + KMS**: `--bg:#0f1117`, accent `--blue:#5b9bd5`, fonts: Segoe UI / PingFang TC
+
+Board 的列印／匯出版面（`.sheet`）刻意反轉為白底黑字（PingFang TC），供 PDF／PNG／Email 輸出使用。
 
 Responsive breakpoint at 768px: desktop shows sidebar, mobile shows bottom nav. Safe-area insets are handled for iOS.
 
@@ -102,9 +107,10 @@ The portal supports EN, 繁中, 简中, VI, 日 via `setLang(lang)`. Each langua
 ## 系統架構
 
 - **Platform** (`/`) — 入口門戶，`index.html`
-- **Admin** (`/admin`) — 行政管理平台，目前 v1.57，5840 行
+- **Admin** (`/admin`) — 行政管理平台
 - **KMS** (`/kms`) — 知識管理系統
 - **Quotation** (`/quotation`) — 報價系統
+- **Board** (`/board`) — 公告與紀錄（2026-07 由 Portal 公告欄獨立出來，Portal v1.65 changelog 有記載）
 
 ## 技術棧
 
@@ -117,10 +123,11 @@ The portal supports EN, 繁中, 简中, VI, 日 via `setLang(lang)`. Each langua
 
 ## 版本規則
 
-- **四個系統（Portal、Admin、KMS、Quotation）每次修改版本號都 +0.01**，無例外
+- **五個系統（Portal、Admin、KMS、Quotation、Board）每次修改版本號都 +0.01**，無例外
 - 版本號同步更新（有幾處就改幾處）：`<title>`、`.login-sub`、topbar 版本顯示
   - Portal/Admin/KMS：`<title>` + `.login-sub` + topbar `<span>`
   - Quotation：`<title>` + topbar `#appVersionDiv`（沒有自己的登入畫面／`.login-sub`）
+  - Board：`<title>` + topbar `.logo-ver`（沒有自己的登入畫面，session 只從 `?_ps=` 取得）
 - 每次修改後自動 commit 並 `git push`，不需等候使用者指示
 - **每次修改完畢，回覆結尾必須告知目前各檔案最新版本號**（例如：`kms v2.06`、`admin v1.57`）
 
@@ -129,6 +136,31 @@ The portal supports EN, 繁中, 简中, VI, 日 via `setLang(lang)`. Each langua
 - `cancelCarBk(id)` 公務車取消，`cancelBk(id)` 會議室取消，**不可混用**
 - localStorage 只是快取，正本在 Supabase
 - 五大模塊順序：公務車 → 圖書館 → 會議室 → 客戶到訪 → 抽籤
+
+## Board 重要細節
+
+`board/index.html`（公告與紀錄，v1.28）五個頁籤，各自一組前綴命名的函式與 Supabase 表：
+
+| 頁籤 | 前綴 | 主要資料表 |
+|------|------|-----------|
+| 公告 | `bb*` | `portal_bulletin`、`notifications`（逐人通知） |
+| 週會紀錄 | `wm*` | `weekly_minutes` |
+| 業務會議記錄 | `bm*` | `biz_meeting_minutes` |
+| Woody 週報 | `wr*` | `woody_reports` |
+| 事前驗屍 | `pm*` | `premortem_sessions`、`premortem_entries`、`premortem_mitigations` |
+
+**事前驗屍 Premortem**（Gary Klein 方法，v1.21 起分階段開發，v1.28 完成）：
+- 階段機（`PM_PHASES`，`board/index.html:2180`）：`intro` 說明 → `setup` 情境設定 → `writing` 開放填寫 →
+  `reveal` 揭露 → `ranking` 排序分類 → `mitigation` 對策 → `locked` 定稿。階段推進只有主席／admin 可操作
+- 填寫階段**所有人（含主席／admin）都可填寫**（v1.23 決定，別再改回只有成員可填）
+- 投票上限 `PM_VOTE_CAP = 3`（排序階段）
+- 雙語：每則失敗原因寫入後自動經 `claude-proxy` 翻成會議設定的兩種語言，存 `text_a`/`text_b`
+  （情境與專案說明同理存 `desc_a`/`desc_b`、`scenario_a`/`scenario_b`）。**已翻譯過的不重翻**
+- 對策的「重點風險」是**下拉挑選高票失敗原因**（v1.28），風險文字與雙語直接沿用該原因，不再重翻
+- 多人同步靠輪詢：`pmPollStart()` 每 7 秒抓一次 phase 與 entries；離開頁籤即 `pmPollStop()`
+- 定稿可輸出四種格式（PDF／PNG／Excel／Email），皆為雙語版面
+
+新增 `premortem_*` 之類的新表時，記得同步加進 sb-proxy 的 `ALLOWED_TABLES` 白名單，否則前端一律 403。
 
 ## Development Workflow
 

@@ -5,7 +5,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#080C14">
-<title>COMART · 公告與紀錄 v1.46</title>
+<title>COMART · 公告與紀錄 v1.47</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -217,7 +217,7 @@ select,select option,option{background:var(--s2);color:var(--tx)}
     <a class="logo" href="javascript:void(0)">
       <div class="logo-mark">告</div>
       <div class="logo-text">公告與紀錄</div>
-      <span class="logo-ver">v1.46</span>
+      <span class="logo-ver">v1.47</span>
     </a>
     <div class="topbar-right">
       <span class="who-badge" id="whoBadge">—</span>
@@ -229,6 +229,7 @@ select,select option,option{background:var(--s2);color:var(--tx)}
     <button class="maintab" data-tab="biz" onclick="switchTab('biz')">💼 業務會議記錄</button>
     <button class="maintab" data-tab="woody" onclick="switchTab('woody')">📝 Woody 週報</button>
     <button class="maintab" data-tab="premortem" onclick="switchTab('premortem')">🩺 事前驗屍</button>
+    <button class="maintab" data-tab="brainstorm" onclick="switchTab('brainstorm')">💡 腦力激盪</button>
   </div>
 </div>
 
@@ -513,14 +514,18 @@ select,select option,option{background:var(--s2);color:var(--tx)}
     </div>
   </div>
 
-  <!-- ══════════════ TAB 5：事前驗屍 Premortem ══════════════ -->
+  <!-- ══════ TAB 5／6：事前驗屍 Premortem ／ 腦力激盪 Brainstorm ══════ -->
+  <!-- 兩個頁籤共用同一份 DOM（#pm-shell）：切換頁籤時把整塊搬到對應的 tabpanel 底下
+       （pmMountShell），這樣不必把 60 行 HTML 與 40 處 getElementById 複製成兩份。
+       兩者的差異全部集中在 PM_KINDS 設定表。 -->
   <div class="tabpanel" id="tabpanel-premortem">
+   <div id="pm-shell">
     <!-- 清單 -->
     <div id="pm-list-view">
       <div class="chiprow">
         <button class="chip-f on" data-pf="open" onclick="pmSetFilter('open')">進行中</button>
         <button class="chip-f" data-pf="locked" onclick="pmSetFilter('locked')">已定稿</button>
-        <button class="btn primary sm" style="margin-left:auto" onclick="pmNewSession()">＋ 新增驗屍會議</button>
+        <button class="btn primary sm" id="pm-new-btn" style="margin-left:auto" onclick="pmNewSession()">＋ 新增會議</button>
       </div>
       <div id="pm-list"><div class="empty-note">載入中…</div></div>
     </div>
@@ -534,7 +539,7 @@ select,select option,option{background:var(--s2);color:var(--tx)}
         </div>
       </div>
       <div class="panel">
-        <div class="panel-h"><span class="idx">＋</span><h2>新增事前驗屍會議</h2></div>
+        <div class="panel-h"><span class="idx">＋</span><h2 id="pm-c-h2">新增會議</h2></div>
         <div class="panel-b">
           <div style="display:flex;flex-direction:column;gap:12px">
             <div class="field"><label>專案 / 主題名稱</label><input id="pm-c-title" placeholder="例如：新品 X 上市專案"></div>
@@ -546,8 +551,8 @@ select,select option,option{background:var(--s2);color:var(--tx)}
               <div class="field"><label>主席</label><input id="pm-c-chair" readonly style="background:var(--s1);color:var(--tx2)"></div>
               <div class="field"><label>與會人員 <button type="button" class="btn ghost sm" style="padding:1px 7px;font-size:11px;margin-left:4px" onclick="pmFillAttendees()">＋ 帶入指定人員</button></label><textarea id="pm-c-attend" rows="2" placeholder="例如：王大明、李小華、越南廠 Nguyen…"></textarea></div>
             </div>
-            <div class="field"><label>專案描述（被驗屍的對象）</label><textarea id="pm-c-desc" rows="3" placeholder="簡述這個專案的目標、範圍與時程…"></textarea></div>
-            <div class="field"><label>情境設定（引導語，可修改）</label><textarea id="pm-c-scenario" rows="3"></textarea></div>
+            <div class="field"><label id="pm-c-desc-lb">專案描述</label><textarea id="pm-c-desc" rows="3"></textarea></div>
+            <div class="field"><label id="pm-c-scen-lb">情境設定（引導語，可修改）</label><textarea id="pm-c-scenario" rows="3"></textarea></div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
               <div class="field"><label>並陳語言 A</label><select id="pm-c-langa"></select></div>
               <div class="field"><label>並陳語言 B</label><select id="pm-c-langb"></select></div>
@@ -578,7 +583,11 @@ select,select option,option{background:var(--s2);color:var(--tx)}
       </div>
       <div id="pm-room-body"></div>
     </div>
+   </div>
   </div>
+
+  <!-- 腦力激盪：切到這個頁籤時 #pm-shell 會被搬進來（見 pmMountShell） -->
+  <div class="tabpanel" id="tabpanel-brainstorm"></div>
 
 </div>
 
@@ -722,8 +731,9 @@ function switchTab(name) {
     else if (window.MeetingMinutes && window.MeetingMinutes.refreshList) window.MeetingMinutes.refreshList();
   }
   if (name === 'woody') wrLoadList();
-  if (name === 'premortem') pmLoadList();
-  if (name !== 'premortem') pmPollStop();
+  // 事前驗屍與腦力激盪共用 #pm-shell：先把它搬到目前的頁籤，再依 kind 載入清單
+  if (name === 'premortem' || name === 'brainstorm') { pmMountShell(name); pmLoadList(); }
+  else pmPollStop();
 }
 
 // ═══════════════════════════════════════════════
@@ -2195,12 +2205,9 @@ function wrPrint(){
 const PM_LANGS = [['zh-TW','繁體中文'],['zh-CN','简体中文'],['vi','Tiếng Việt'],['en','English'],['ja','日本語']];
 const PM_LANG_SHORT = { 'zh-TW':'繁中','zh-CN':'简中','vi':'越南語','en':'English','ja':'日本語' };
 const PM_PHASES = ['intro','setup','writing','reveal','ranking','mitigation','locked'];
-const PM_PHASE_LABEL = { intro:'說明', setup:'情境設定', writing:'開放填寫', reveal:'揭露', ranking:'投票', mitigation:'對策', locked:'定稿' };
-const PM_VOTE_CAP = 3;     // 每人最多投幾票（排序階段）
-const PM_DEFAULT_SCENARIO = '想像現在是專案結束之後 —— 這個專案徹底失敗了，不是小挫折，而是一場災難。請寫下你認為導致它失敗的所有原因（越具體越好，一條一則）。';
 
-// 說明頁 i18n（概念／規則／時間分配／操作）
-const PM_INTRO_I18N = {
+// 說明頁 i18n（概念／規則／時間分配／操作）── 事前驗屍版
+const PM_INTRO_PM = {
   'zh-TW': { title:'事前驗屍會議 · 說明',
     concept:'事前驗屍（Premortem）由心理學家 Gary Klein 提出：在專案正式開始前，先想像「這個專案已經徹底失敗」，再回頭找出失敗原因。這種「前瞻性後見之明」比一般問「可能出什麼錯」多找出約 30% 的風險。',
     rulesT:'規則', rules:['心理安全第一：任何顧慮都能提出，不會被貼「唱衰」標籤。','先各自默寫、再一起揭露：填寫階段彼此看不到，避免從眾。','完全匿名：不顯示填寫者姓名，連主席也看不到，請放心直言。','收集時不批評：先把原因全部列出，之後再討論。'],
@@ -2227,10 +2234,190 @@ const PM_INTRO_I18N = {
     timeT:'時間配分（約20〜30分）', time:['シナリオ設定：2〜3分','失敗理由を各自記入：3〜5分','公開と順番共有：約10分','投票と分類：約5分','対策の策定：5〜10分'],
     howtoT:'このツールの操作', howto:['司会は上部のフェーズバーで進行を操作：説明 → シナリオ → 記入 → 公開 → 投票 → 対策 → 確定。フェーズは順番に進みます（戻れますが飛ばせません）。','自分の言語で記入すると、会議で設定した2言語へ自動翻訳し並べて表示します。','「記入」中は各自入力し自分の分のみ表示；司会が「公開」を押すと全員で閲覧。','「投票」で重要なリスクを選び（1人最大3票）、AIがテーマに自動分類。','「対策」で重点リスクごとに 対策／担当者／期限 を記録。','「確定」後はロックされ読み取り専用になります。'] },
 };
+// 說明頁 i18n ── 腦力激盪版
+const PM_INTRO_BS = {
+  'zh-TW': { title:'腦力激盪會議 · 說明',
+    concept:'腦力激盪（Brainstorming）由 Alex Osborn 於 1953 年提出，四項原則是：延遲批判、歡迎狂想、量重於質、結合改進。研究顯示「先各自默寫、再一起討論」比一開始就七嘴八舌產出更多也更多元的點子，所以本程式分成「各自發想」與「互相加碼」兩段。',
+    rulesT:'規則', rules:['延遲批判：發想階段不評價任何點子，「這行不通」留到票選之後再說。','量重於質：先求多、再求好。荒謬的點子常常是好點子的前身。','歡迎狂想：暫時不管預算、人力與現有流程，先寫下來。','搭別人的便車：這個階段看得到別人的點子，請在上面加碼、變形或組合成新的一則。','具名：會顯示提出者，方便後續認領與追問 —— 這裡沒有講錯話的風險。'],
+    timeT:'時間分配（約 20–30 分鐘）', time:['題目設定：2–3 分鐘','各自發想：5–8 分鐘','輪流說明與互相加碼：約 10 分鐘','票選：約 5 分鐘','擬定行動項：5–10 分鐘'],
+    howtoT:'本程式操作', howto:['主席用上方階段列控制流程：說明 → 題目設定 → 開放發想 → 匯整 → 票選 → 行動 → 定稿。階段必須依序進行，可以退回但不能跳過。','用你自己的語言填寫，系統自動翻成會議設定的兩種語言並排顯示。','「開放發想」時所有人的點子即時可見，看到別人的就往上加碼。','「票選」選出最值得做的點子（每人最多 5 票），並用 AI 自動歸類主題。','「行動」針對高票點子記錄 行動內容／負責人／期限。','「定稿」後鎖定，並自動產生 AI 的補充發想與會議結論。'] },
+  'zh-CN': { title:'头脑风暴会议 · 说明',
+    concept:'头脑风暴（Brainstorming）由 Alex Osborn 于 1953 年提出，四项原则是：延迟批判、欢迎狂想、量重于质、结合改进。研究显示“先各自默写、再一起讨论”比一开始就七嘴八舌产出更多也更多元的点子，所以本程序分成“各自发想”与“互相加码”两段。',
+    rulesT:'规则', rules:['延迟批判：发想阶段不评价任何点子，“这行不通”留到票选之后再说。','量重于质：先求多、再求好。荒谬的点子常常是好点子的前身。','欢迎狂想：暂时不管预算、人力与现有流程，先写下来。','搭别人的便车：这个阶段看得到别人的点子，请在上面加码、变形或组合成新的一则。','具名：会显示提出者，方便后续认领与追问 —— 这里没有讲错话的风险。'],
+    timeT:'时间分配（约 20–30 分钟）', time:['题目设定：2–3 分钟','各自发想：5–8 分钟','轮流说明与互相加码：约 10 分钟','票选：约 5 分钟','拟定行动项：5–10 分钟'],
+    howtoT:'本程序操作', howto:['主席用上方阶段栏控制流程：说明 → 题目设定 → 开放发想 → 汇整 → 票选 → 行动 → 定稿。阶段必须依序进行，可以退回但不能跳过。','用你自己的语言填写，系统自动翻成会议设定的两种语言并排显示。','“开放发想”时所有人的点子即时可见，看到别人的就往上加码。','“票选”选出最值得做的点子（每人最多 5 票），并用 AI 自动归类主题。','“行动”针对高票点子记录 行动内容／负责人／期限。','“定稿”后锁定，并自动产生 AI 的补充发想与会议结论。'] },
+  'en': { title:'Brainstorming Session · Guide',
+    concept:'Brainstorming, formulated by Alex Osborn in 1953, rests on four rules: defer judgment, welcome wild ideas, go for quantity, and combine and improve. Research shows that writing alone first and discussing afterwards produces more — and more varied — ideas than jumping straight into open discussion, so this tool splits the session into "write on your own" and "build on each other".',
+    rulesT:'Rules', rules:['Defer judgment: no evaluation during idea generation. "That won\'t work" waits until after the vote.','Quantity over quality: get many first, get good later. Absurd ideas are often the ancestors of great ones.','Welcome wild ideas: ignore budget, headcount and current process for now — just write it down.','Hitchhike: at this stage you can see everyone\'s ideas. Build on them, twist them, combine them into new ones.','Attributed: author names are shown, so ideas can be claimed and followed up. There is no risk in saying the wrong thing here.'],
+    timeT:'Time allocation (about 20–30 min)', time:['Frame the question: 2–3 min','Generate ideas individually: 5–8 min','Round-robin sharing and building: about 10 min','Vote: about 5 min','Define action items: 5–10 min'],
+    howtoT:'Using this tool', howto:['The chair drives the flow with the phase bar above: Guide → Question → Ideation → Consolidate → Vote → Actions → Finalize. Phases run in order — you can go back but not skip ahead.','Write in your own language; the system auto-translates into the two meeting languages, shown side by side.','During Ideation everyone\'s ideas are visible in real time — build on what you see.','In Vote, pick the ideas most worth doing (up to 5 votes each) and let AI cluster them into themes.','In Actions, record action / owner / due date for each top idea.','After Finalize the record is locked and AI writes additional ideas plus the meeting conclusion.'] },
+  'vi': { title:'Họp Brainstorming · Hướng dẫn',
+    concept:'Brainstorming do Alex Osborn đề xuất năm 1953, dựa trên bốn nguyên tắc: hoãn phán xét, hoan nghênh ý tưởng táo bạo, coi trọng số lượng, kết hợp và cải tiến. Nghiên cứu cho thấy viết riêng trước rồi mới thảo luận chung tạo ra nhiều ý tưởng và đa dạng hơn, nên công cụ này chia thành hai phần: "tự nghĩ" và "cùng nâng cấp".',
+    rulesT:'Quy tắc', rules:['Hoãn phán xét: không đánh giá ý tưởng nào trong giai đoạn phát ý; "cái này không khả thi" để sau khi bỏ phiếu.','Số lượng trước chất lượng: nhiều trước, tốt sau. Ý tưởng ngớ ngẩn thường là tiền thân của ý tưởng hay.','Hoan nghênh ý tưởng táo bạo: tạm gác ngân sách, nhân lực và quy trình hiện có — cứ viết ra trước.','Đi nhờ ý tưởng người khác: ở giai đoạn này bạn thấy được ý tưởng của mọi người, hãy nâng cấp, biến đổi hoặc kết hợp thành ý mới.','Ghi tên: có hiển thị người đề xuất để tiện nhận việc và trao đổi thêm — ở đây không có rủi ro nói sai.'],
+    timeT:'Phân bổ thời gian (khoảng 20–30 phút)', time:['Xác định đề bài: 2–3 phút','Tự phát ý tưởng: 5–8 phút','Chia sẻ lần lượt và nâng cấp lẫn nhau: khoảng 10 phút','Bỏ phiếu: khoảng 5 phút','Đề ra hạng mục hành động: 5–10 phút'],
+    howtoT:'Sử dụng công cụ này', howto:['Chủ tọa điều khiển quy trình bằng thanh giai đoạn phía trên: Hướng dẫn → Đề bài → Phát ý tưởng → Tổng hợp → Bỏ phiếu → Hành động → Chốt. Các giai đoạn diễn ra tuần tự — có thể quay lại nhưng không thể bỏ qua.','Viết bằng ngôn ngữ của bạn; hệ thống tự dịch sang hai ngôn ngữ của cuộc họp, hiển thị song song.','Khi Phát ý tưởng, ý tưởng của mọi người hiển thị theo thời gian thực — hãy nâng cấp trên những gì bạn thấy.','Ở Bỏ phiếu, chọn các ý tưởng đáng làm nhất (tối đa 5 phiếu mỗi người) và để AI phân nhóm chủ đề.','Ở Hành động, ghi lại nội dung hành động / người phụ trách / hạn hoàn thành cho từng ý tưởng nổi bật.','Sau khi Chốt, hồ sơ bị khóa và AI tự động viết phần ý tưởng bổ sung cùng kết luận cuộc họp.'] },
+  'ja': { title:'ブレインストーミング会議 · 説明',
+    concept:'ブレインストーミングは Alex Osborn が 1953 年に提唱した手法で、4つの原則は「判断を保留する」「奔放な発想を歓迎する」「量を求める」「結合し改善する」です。まず各自で書き、その後に議論するほうが、最初から話し合うより多く多様なアイデアが出ることが分かっています。本ツールも「各自で発想」と「互いに上乗せ」の2段構成です。',
+    rulesT:'ルール', rules:['判断を保留：発想中はどのアイデアも評価しない。「それは無理」は投票後に。','量が質に先立つ：まず数、次に質。ばかげた案は良案の前身であることが多い。','奔放な発想を歓迎：予算・人員・既存プロセスはいったん脇に置いて、まず書く。','他人の案に乗る：この段階では全員のアイデアが見えます。上乗せ・変形・結合して新しい一件にしてください。','記名：提案者を表示します。後の担当決めや確認がしやすくなります —— ここに失言のリスクはありません。'],
+    timeT:'時間配分（約20〜30分）', time:['お題の設定：2〜3分','各自で発想：5〜8分','順番共有と上乗せ：約10分','投票：約5分','アクション項目の策定：5〜10分'],
+    howtoT:'このツールの操作', howto:['司会は上部のフェーズバーで進行を操作：説明 → お題 → 発想 → 集約 → 投票 → アクション → 確定。フェーズは順番に進みます（戻れますが飛ばせません）。','自分の言語で記入すると、会議で設定した2言語へ自動翻訳し並べて表示します。','「発想」中は全員のアイデアがリアルタイムで見えます。見えた案に上乗せしてください。','「投票」で最もやる価値のあるアイデアを選び（1人最大5票）、AIがテーマに自動分類。','「アクション」で上位アイデアごとに 行動内容／担当者／期限 を記録。','「確定」後はロックされ、AI が補足アイデアと会議結論を自動生成します。'] },
+};
+
+// ── AI 三段分析的系統提示（語氣是兩種會議最大的差異，不能共用）──
+// 事前驗屍：全程嚴厲。腦力激盪：前兩段建設性、第三段才收斂下判斷
+// —— 用驗屍的語氣批評剛冒出來的點子，正是 Osborn 第一原則禁止的事，會直接殺死會議成果。
+const PM_SUM_TAIL =
+  '- 篇幅：每個部分約 350–500 字（中文以字計，其他語言取相當篇幅），不要超過。\n' +
+  '  控制篇幅的方法是「少寫幾項、每項都有份量」，不是把句子壓成電報。刪掉任何不會改變讀者下一步行動的細節；\n' +
+  '  絕對不要為了湊篇幅重複同一個論點、也不要寫沒有資訊量的鋪陳句。\n' +
+  '- 形式：可用短標題與編號分項，但每一項底下要有完整推理，不要只留一行標語。不要輸出 Markdown 符號（#、**、```）。\n' +
+  '\n<tone_preference>控制篇幅，每個部分 350–500 字，不要冗長。</tone_preference>';
+const PM_SUM_SYS_PM =
+  '你是一位資深的專案風險審查顧問，以直接、犀利、不留情面著稱。你正在審查一場「事前驗屍（Premortem）」會議，' +
+  '你寫出的內容會成為這場會議的正式結論並永久存檔。\n\n' +
+  '寫作要求：\n' +
+  '- 直接：第一句就講最致命的問題。不要開場白、不要客套、不要重述輸入內容。\n' +
+  '- 深刻：指出問題背後的結構性成因（組織分工、流程缺口、誘因錯置、資訊落差、時程假設），' +
+  '而不是把與會者說過的話重新排列一次。要點出他們「沒有說出口」但資料已經指向的問題。\n' +
+  '- 嚴厲：該說專案準備不足就說，該說對策是安慰劑就說，該說責任被含糊帶過就說。\n' +
+  '- 不留情面：不要為了讓人好過而軟化結論，不要用「或許」「建議可以考慮」稀釋判斷。' +
+  '但只針對事實、決策與流程，絕不做人格攻擊，也不點名個人優劣。\n' + PM_SUM_TAIL;
+const PM_SUM_SYS_BS =
+  '你是一位資深的創新引導顧問與事業開發主管。你正在總結一場「腦力激盪（Brainstorming）」會議，' +
+  '你寫出的內容會成為這場會議的正式結論並永久存檔。\n\n' +
+  '寫作要求：\n' +
+  '- 建設性優先：前兩個部分的任務是「把想法變大、變具體」，不是評價誰想得好不好。' +
+  '看到不成熟的點子，先想辦法補到可行，而不是先否定 —— 這是腦力激盪的第一原則（延遲批判）。\n' +
+  '- 具體：每一個提案都要寫出「做什麼、為什麼是現在、第一步是什麼」，不要停在概念名詞或口號。\n' +
+  '- 有想像力：敢提與會者不敢提的方向（換使用者、換商業模式、換技術路徑、把限制拿掉），' +
+  '但每一個都要說明它為什麼可能成立。\n' +
+  '- 到第三部分才收斂：明確指出哪些值得投入、哪些應該放掉、放掉的理由是什麼。' +
+  '這一段可以直接、不必客套，但只針對想法本身，絕不評論個人。\n' + PM_SUM_TAIL;
+
+// 三個部分：補發想 → 補具體化／對策 → 總結。分三次呼叫，每次都短一些，避免單次超時，
+// 也讓第三段能讀到前兩段的內容再下結論。disp 是各語言的段落小標（越南文版不該夾中文標題）。
+const PM_SUM_PARTS_PM = [
+  { key: 'p1', title: '【第一部分】AI 補充的失敗原因（補會議發想之不足）',
+    disp: { 'zh-TW':'【第一部分】AI 補充的失敗原因', 'zh-CN':'【第一部分】AI 补充的失败原因',
+      vi:'【Phần 1】Nguyên nhân thất bại do AI bổ sung', en:'[Part 1] Additional failure causes identified by AI',
+      ja:'【第1部】AI が追加した失敗要因' },
+    ask: '針對這個會議主題，獨立發想與會者「沒有想到」或「想得太淺」的失敗原因。\n' +
+      '- 不要重複與會者已列出的原因，除非你要指出他們把方向理解錯了。\n' +
+      '- 每一項都要寫出失敗的傳導路徑：什麼先出問題 → 導致什麼 → 最後怎麼收場。\n' +
+      '- 挑最致命、最容易被整個團隊集體忽略的，不要為了數量硬湊。\n' +
+      '- 最後明確指出：他們漏掉的這些原因，反映團隊在哪一類風險上有系統性盲點。' },
+  { key: 'p2', title: '【第二部分】對策的補強與缺口（補團隊思考深度之不足）',
+    disp: { 'zh-TW':'【第二部分】對策的補強與缺口', 'zh-CN':'【第二部分】对策的补强与缺口',
+      vi:'【Phần 2】Lỗ hổng và cách củng cố các biện pháp đối phó', en:'[Part 2] Gaps in the countermeasures and how to close them',
+      ja:'【第2部】対策の補強と欠落' },
+    ask: '針對與會者提出的每一項對策做補強與挑戰。\n' +
+      '- 逐項指出：這條對策防不住什麼、有什麼副作用、它成立的前提是否真的被滿足、缺少什麼驗收標準。\n' +
+      '- 沒有負責人或沒有期限的對策，直接點出「這條等於沒做」。\n' +
+      '- 若某條對策本質上只是安慰劑（做了讓人安心但不改變失敗機率），直說。\n' +
+      '- 補上高票風險中「完全沒有對應對策」的部分，並給出具體可執行的補強方向（做什麼、誰做、如何驗收）。' },
+  { key: 'p3', title: '【第三部分】AI 會議結論',
+    disp: { 'zh-TW':'【第三部分】AI 會議結論', 'zh-CN':'【第三部分】AI 会议结论',
+      vi:'【Phần 3】Kết luận cuộc họp của AI', en:'[Part 3] AI meeting conclusion',
+      ja:'【第3部】AI による会議結論' },
+    ask: '彙整整場會議的討論過程，寫出結論。\n' +
+      '- 這場會議真正的發現是什麼；哪些是雜訊。\n' +
+      '- 評估團隊的判斷品質：發想的廣度夠不夠、投票有沒有集中在真正致命的風險上、對策是否對得上高票風險。\n' +
+      '- 最關鍵的三到五個風險，以及它們現在的實際覆蓋狀況。\n' +
+      '- 給出明確結論：這個專案現在該不該按原計畫走，還是必須先補什麼才能往下推。不要停在描述層，要下判斷。' },
+];
+const PM_SUM_PARTS_BS = [
+  { key: 'p1', title: '【第一部分】AI 補充的點子（補會議發想之不足）',
+    disp: { 'zh-TW':'【第一部分】AI 補充的點子', 'zh-CN':'【第一部分】AI 补充的点子',
+      vi:'【Phần 1】Ý tưởng do AI bổ sung', en:'[Part 1] Additional ideas from AI',
+      ja:'【第1部】AI が追加したアイデア' },
+    ask: '針對這個發想題目，獨立提出與會者沒有想到的點子。\n' +
+      '- 從他們沒用過的角度切入：換一種使用者、換一種商業模式、換一條技術路徑、把某個被視為理所當然的限制拿掉。\n' +
+      '- 把與會者已有的點子互相組合或加碼，產生新的變形（這正是腦力激盪的「結合改進」）。\n' +
+      '- 每一項都要寫出它為什麼可能成立、對誰有價值，不要只丟一個名詞。\n' +
+      '- 不要為了數量硬湊，也不要在這一段評價與會者的點子好壞。\n' +
+      '- 最後指出：他們的發想集中在哪些方向、還有哪一整片區域沒有人踏進去。' },
+  { key: 'p2', title: '【第二部分】重點點子的具體化與缺口',
+    disp: { 'zh-TW':'【第二部分】重點點子的具體化與缺口', 'zh-CN':'【第二部分】重点点子的具体化与缺口',
+      vi:'【Phần 2】Cụ thể hóa các ý tưởng trọng điểm và những lỗ hổng', en:'[Part 2] Turning the top ideas into concrete plans',
+      ja:'【第2部】重点アイデアの具体化と欠落' },
+    ask: '針對高票點子與已提出的行動項，把它們從概念推到可執行。\n' +
+      '- 逐項寫出：實際要做什麼、需要哪些資源與能力、最大的未知數是什麼、如何用最小成本先驗證這個未知數。\n' +
+      '- 沒有負責人或沒有期限的行動項，直接點出「這條還沒有真的開始」。\n' +
+      '- 補上高票點子中「完全沒有對應行動」的部分，並給出具體的第一步（做什麼、誰做、多久內看得到結果）。\n' +
+      '- 這一段仍以建設性為主：遇到看似不可行的點子，先問「什麼條件成立它就可行」，再決定要不要放棄。' },
+  { key: 'p3', title: '【第三部分】AI 會議結論',
+    disp: { 'zh-TW':'【第三部分】AI 會議結論', 'zh-CN':'【第三部分】AI 会议结论',
+      vi:'【Phần 3】Kết luận cuộc họp của AI', en:'[Part 3] AI meeting conclusion',
+      ja:'【第3部】AI による会議結論' },
+    ask: '彙整整場會議，寫出結論。這一段開始收斂，可以直接下判斷。\n' +
+      '- 這場會議真正有價值的發現是什麼；哪些只是既有做法的換句話說。\n' +
+      '- 評估發想的廣度與多樣性：是不是都擠在同一個方向？票有沒有投給真正有潛力的、還是投給最安全的？\n' +
+      '- 最值得投入的三個方向，各自的理由與最大風險。\n' +
+      '- 明確建議下一步：先做哪一個、如何驗證、哪些點子建議先放掉以及為什麼。不要停在描述層。' },
+];
+
+// ═══════════ 會議類型設定表 PM_KINDS ═══════════
+// 🔴 事前驗屍與腦力激盪是**同一套程式**：階段機、雙語翻譯、投票、AI 分群、AI 三段分析、
+//    四種輸出、主席控制、寫入防護全部共用，資料也在同一組 premortem_* 表（以 kind 欄位區分）。
+//    要再加第三種會議，請在這張表加一筆，**不要複製程式**——複製的代價是每次改動都要做兩遍。
+// 只有三個旗標是真正的行為差異，其餘都是文案：
+//    anonymous   驗屍全程匿名（連主席也看不到誰寫的）＝靠匿名換誠實；
+//                腦力激盪具名＝認領點子是誘因，而且沒有「報憂被貼標籤」的壓力
+//    liveVisible 驗屍填寫時互相看不到（nominal group，避免錨定與從眾）；
+//                腦力激盪即時可見＝Osborn 的 hitchhiking，看到別人的點子才長得出新的
+//    voteCap     每人票數上限（點子通常比失敗原因多，故給多一點）
+const PM_KINDS = {
+  premortem: {
+    label: '事前驗屍', icon: '🩺', tab: 'premortem',
+    anonymous: true, liveVisible: false, voteCap: 3,
+    phaseLabel: { intro:'說明', setup:'情境設定', writing:'開放填寫', reveal:'揭露', ranking:'投票', mitigation:'對策', locked:'定稿' },
+    defaultScenario: '想像現在是專案結束之後 —— 這個專案徹底失敗了，不是小挫折，而是一場災難。請寫下你認為導致它失敗的所有原因（越具體越好，一條一則）。',
+    intro: PM_INTRO_PM, sumSys: PM_SUM_SYS_PM, sumParts: PM_SUM_PARTS_PM,
+    cluster: { sys: 'You cluster risk statements into a few concise themes. Output ONLY a minified JSON object.',
+               usr: 'Group the following failure-risk items into 3 to 6 concise themes.' },
+    t: {
+      meet: '事前驗屍會議', item: '失敗原因', target: '風險', mit: '對策', measure: '措施',
+      desc: '專案描述', scen: '情境設定', fileTag: 'Premortem',
+      titlePh: '例如：新品 X 上市專案', descPh: '簡述這個專案的目標、範圍與時程…',
+      writeTitle: '寫下你認為的失敗原因（建議 3–5 則）', writePh: '一則一個原因，越具體越好…',
+      voteHint: '為你認為最重要的風險投票',
+    },
+  },
+  brainstorm: {
+    label: '腦力激盪', icon: '💡', tab: 'brainstorm',
+    anonymous: false, liveVisible: true, voteCap: 5,
+    phaseLabel: { intro:'說明', setup:'題目設定', writing:'開放發想', reveal:'匯整', ranking:'票選', mitigation:'行動', locked:'定稿' },
+    defaultScenario: '請盡量寫下你想到的點子 —— 這個階段不評價可行性，數量比品質重要，看到別人的點子也歡迎加碼或組合成新的一則。',
+    intro: PM_INTRO_BS, sumSys: PM_SUM_SYS_BS, sumParts: PM_SUM_PARTS_BS,
+    cluster: { sys: 'You cluster ideas into a few concise themes. Output ONLY a minified JSON object.',
+               usr: 'Group the following ideas into 3 to 6 concise themes.' },
+    t: {
+      meet: '腦力激盪會議', item: '點子', target: '點子', mit: '行動項', measure: '行動內容',
+      desc: '主題背景', scen: '發想題目', fileTag: 'Brainstorm',
+      titlePh: '例如：2027 年新事業方向', descPh: '簡述這次發想的背景、既有限制與希望達成的目標…',
+      writeTitle: '寫下你的點子（越多越好，先不用管可行性）', writePh: '一則一個點子，天馬行空也沒關係…',
+      voteHint: '為你認為最值得做的點子投票',
+    },
+  },
+};
+let pmKind = 'premortem';           // 目前所在頁籤的會議類型（清單／建會用）
+// 開著會議室時一律以該場會議的 kind 為準（避免頁籤與資料不一致時render錯文案）
+function PMK() { return PM_KINDS[(pmSession && pmSession.kind) || pmKind] || PM_KINDS.premortem; }
+function PMT() { return PMK().t; }
+function pmPhaseLabel(p) { return PMK().phaseLabel[p] || p; }
+function pmVoteCap() { return PMK().voteCap; }
+// 兩個頁籤共用同一份 DOM：把 #pm-shell 搬到目前頁籤底下（只有一份，id 不會重複）
+function pmMountShell(kind) {
+  pmKind = (kind === 'brainstorm') ? 'brainstorm' : 'premortem';
+  const host = document.getElementById('tabpanel-' + pmKind), shell = document.getElementById('pm-shell');
+  if (host && shell && shell.parentNode !== host) host.appendChild(shell);
+}
+
 function pmSetIntroLang(c) { pmIntroLang = c; pmRenderRoom(); }
 function pmIntroHtml() {
   const lang = pmIntroLang || pmPortalLang();
-  const d = PM_INTRO_I18N[lang] || PM_INTRO_I18N['zh-TW'];
+  const I = PMK().intro;
+  const d = I[lang] || I['zh-TW'];
   const list = arr => '<ul style="margin:5px 0 0;padding-left:20px;display:flex;flex-direction:column;gap:5px">' + arr.map(x => '<li style="font-size:13.5px;line-height:1.55">' + escHtml(x) + '</li>').join('') + '</ul>';
   const sec = (t, inner) => '<div style="margin-top:15px"><div style="font-size:13px;font-weight:700;color:var(--ac);margin-bottom:2px">' + escHtml(t) + '</div>' + inner + '</div>';
   const langBar = '<div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px">' + PM_LANGS.map(l => {
@@ -2253,9 +2440,11 @@ let pmIntroLang = '';      // 說明頁顯示語言
 let pmMitigations = [];    // 目前 session 的對策清單
 // 專案描述／情境設定：雙語可編輯欄位（src=原文、a/b=兩種語言譯文）
 const PM_BI_FIELDS = {
-  desc:     { label:'專案描述', src:'project_desc', a:'desc_a',     b:'desc_b',     rows:4, required:false, ph:'選填，可留空' },
-  scenario: { label:'情境設定', src:'scenario',     a:'scenario_a', b:'scenario_b', rows:5, required:true }
+  desc:     { tk:'desc', src:'project_desc', a:'desc_a',     b:'desc_b',     rows:4, required:false, ph:'選填，可留空' },
+  scenario: { tk:'scen', src:'scenario',     a:'scenario_a', b:'scenario_b', rows:5, required:true }
 };
+// 欄位名稱依會議類型而異（專案描述／主題背景、情境設定／發想題目）
+function pmBiLabel(F) { return PMT()[F.tk] || ''; }
 let pmBiDraft = { desc:{ a:null, b:null }, scenario:{ a:null, b:null } };  // 編輯中的草稿（輪詢重繪時保留；存檔後清空）
 let pmBiSaving = false;    // 存檔＋翻譯進行中，防重入
 let pmSumGenerating = false;  // AI 會議結論產生中，防重入
@@ -2342,74 +2531,30 @@ async function pmTranslate(text, langA, langB, srcLang) {
   return { a: String(obj.a || '').trim(), b: String(obj.b || '').trim() };
 }
 
-// ── 定稿時的 AI 會議結論（直接、深刻、嚴厲、不留情面）──
-// 用 claude-opus-5：這是整場會議的結論，值得用最強的模型；haiku 寫不出有份量的批判
+// ── 定稿時的 AI 會議結論 ──
+// 語氣與三段內容依會議類型而異，見 PM_KINDS[].sumSys / sumParts。
+// 用 claude-opus-5：這是整場會議的結論，值得用最強的模型；haiku 寫不出有份量的分析
 const PM_SUM_MODEL = 'claude-opus-5';
-const PM_SUM_SYS =
-  '你是一位資深的專案風險審查顧問，以直接、犀利、不留情面著稱。你正在審查一場「事前驗屍（Premortem）」會議，' +
-  '你寫出的內容會成為這場會議的正式結論並永久存檔。\n\n' +
-  '寫作要求：\n' +
-  '- 直接：第一句就講最致命的問題。不要開場白、不要客套、不要重述輸入內容。\n' +
-  '- 深刻：指出問題背後的結構性成因（組織分工、流程缺口、誘因錯置、資訊落差、時程假設），' +
-  '而不是把與會者說過的話重新排列一次。要點出他們「沒有說出口」但資料已經指向的問題。\n' +
-  '- 嚴厲：該說專案準備不足就說，該說對策是安慰劑就說，該說責任被含糊帶過就說。\n' +
-  '- 不留情面：不要為了讓人好過而軟化結論，不要用「或許」「建議可以考慮」稀釋判斷。' +
-  '但只針對事實、決策與流程，絕不做人格攻擊，也不點名個人優劣。\n' +
-  '- 篇幅：每個部分約 350–500 字（中文以字計，其他語言取相當篇幅），不要超過。\n' +
-  '  控制篇幅的方法是「少寫幾項、每項都致命」，不是把句子壓成電報。刪掉任何不會改變讀者下一步行動的細節；\n' +
-  '  絕對不要為了湊篇幅重複同一個論點、也不要寫沒有資訊量的鋪陳句。\n' +
-  '- 形式：可用短標題與編號分項，但每一項底下要有完整推理，不要只留一行標語。不要輸出 Markdown 符號（#、**、```）。\n' +
-  '\n<tone_preference>控制篇幅，每個部分 350–500 字，不要冗長。</tone_preference>';
-// 三個階段：補發想 → 補對策 → 總結。分三次呼叫，每次都短一些，避免單次超時，
-// 也讓第三段能讀到前兩段的內容再下結論。
-const PM_SUM_PARTS = [
-  { key: 'p1', title: '【第一部分】AI 補充的失敗原因（補會議發想之不足）',
-    disp: { 'zh-TW':'【第一部分】AI 補充的失敗原因', 'zh-CN':'【第一部分】AI 补充的失败原因',
-      vi:'【Phần 1】Nguyên nhân thất bại do AI bổ sung', en:'[Part 1] Additional failure causes identified by AI',
-      ja:'【第1部】AI が追加した失敗要因' },
-    ask: '針對這個會議主題，獨立發想與會者「沒有想到」或「想得太淺」的失敗原因。\n' +
-      '- 不要重複與會者已列出的原因，除非你要指出他們把方向理解錯了。\n' +
-      '- 每一項都要寫出失敗的傳導路徑：什麼先出問題 → 導致什麼 → 最後怎麼收場。\n' +
-      '- 挑最致命、最容易被整個團隊集體忽略的，不要為了數量硬湊。\n' +
-      '- 最後明確指出：他們漏掉的這些原因，反映團隊在哪一類風險上有系統性盲點。' },
-  { key: 'p2', title: '【第二部分】對策的補強與缺口（補團隊思考深度之不足）',
-    disp: { 'zh-TW':'【第二部分】對策的補強與缺口', 'zh-CN':'【第二部分】对策的补强与缺口',
-      vi:'【Phần 2】Lỗ hổng và cách củng cố các biện pháp đối phó', en:'[Part 2] Gaps in the countermeasures and how to close them',
-      ja:'【第2部】対策の補強と欠落' },
-    ask: '針對與會者提出的每一項對策做補強與挑戰。\n' +
-      '- 逐項指出：這條對策防不住什麼、有什麼副作用、它成立的前提是否真的被滿足、缺少什麼驗收標準。\n' +
-      '- 沒有負責人或沒有期限的對策，直接點出「這條等於沒做」。\n' +
-      '- 若某條對策本質上只是安慰劑（做了讓人安心但不改變失敗機率），直說。\n' +
-      '- 補上高票風險中「完全沒有對應對策」的部分，並給出具體可執行的補強方向（做什麼、誰做、如何驗收）。' },
-  { key: 'p3', title: '【第三部分】AI 會議結論',
-    disp: { 'zh-TW':'【第三部分】AI 會議結論', 'zh-CN':'【第三部分】AI 会议结论',
-      vi:'【Phần 3】Kết luận cuộc họp của AI', en:'[Part 3] AI meeting conclusion',
-      ja:'【第3部】AI による会議結論' },
-    ask: '彙整整場會議的討論過程，寫出結論。\n' +
-      '- 這場會議真正的發現是什麼；哪些是雜訊。\n' +
-      '- 評估團隊的判斷品質：發想的廣度夠不夠、投票有沒有集中在真正致命的風險上、對策是否對得上高票風險。\n' +
-      '- 最關鍵的三到五個風險，以及它們現在的實際覆蓋狀況。\n' +
-      '- 給出明確結論：這個專案現在該不該按原計畫走，還是必須先補什麼才能往下推。不要停在描述層，要下判斷。' },
-];
 function pmSummaryContext() {
-  const s = pmSession, L = [];
+  const s = pmSession, T = PMT(), L = [];
+  L.push('會議類型：' + T.meet);
   L.push('會議主題：' + (s.title || '(未命名)'));
   L.push('主席：' + (s.chair_name || '—'));
-  if (s.project_desc) L.push('專案描述：' + s.project_desc);
-  L.push('情境設定：' + (s.scenario || ''));
+  if (s.project_desc) L.push(T.desc + '：' + s.project_desc);
+  L.push(T.scen + '：' + (s.scenario || ''));
   L.push('');
-  L.push('與會者共列出 ' + pmEntries.length + ' 項失敗原因（依主題分群，括號內為投票數，每人最多 ' + PM_VOTE_CAP + ' 票）：');
+  L.push('與會者共列出 ' + pmEntries.length + ' 項' + T.item + '（依主題分群，括號內為投票數，每人最多 ' + pmVoteCap() + ' 票）：');
   pmGroupsSorted().forEach(g => {
     L.push('【' + g.name + '】');
     g.items.forEach(e => L.push('  - (' + pmVoteCount(e) + ' 票) ' + (e.text_src || e.text_a || '')));
   });
   L.push('');
   if (pmMitigations.length) {
-    L.push('會議提出的對策共 ' + pmMitigations.length + ' 項：');
-    pmMitigations.forEach(m => L.push('  - 針對「' + (m.risk_summary || '未指定風險') + '」：' + (m.measure || '') +
+    L.push('會議提出的' + T.mit + '共 ' + pmMitigations.length + ' 項：');
+    pmMitigations.forEach(m => L.push('  - 針對「' + (m.risk_summary || ('未指定' + T.target)) + '」：' + (m.measure || '') +
       '（負責人：' + (m.owner_name || '未指定') + '／期限：' + (m.due_date || '未定') + '）'));
   } else {
-    L.push('會議結束時尚未提出任何對策。');
+    L.push('會議結束時尚未提出任何' + T.mit + '。');
   }
   return L.join('\n');
 }
@@ -2418,7 +2563,7 @@ function pmSummaryContext() {
 async function pmTranslateLong(text, toLang) {
   const t = (text || '').trim(); if (!t) return '';
   const sys = '你是專業的企業會議紀錄譯者。忠實翻譯，**保留原文的語氣強度與段落結構**——' +
-    '這是一份措辭嚴厲的風險審查報告，絕對不要把批判性的判斷翻得比原文客氣、也不要加上原文沒有的緩衝語。' +
+    '這是一份要永久存檔的會議正式結論，絕對不要把原文的判斷翻得比原文客氣、也不要加上原文沒有的緩衝語。' +
     '專有名詞、產品名、型號、數字、日期一律保持原樣。' +
     '只輸出譯文本身，不要任何前言、說明或標記。不要在回覆中包含任何內部或系統 XML 標籤。';
   const usr = '請把以下內容翻譯成 ' + (PM_LANG_NAME[toLang] || toLang) + '：\n\n"""\n' + t + '\n"""';
@@ -2429,7 +2574,7 @@ async function pmTranslateLong(text, toLang) {
 function pmSumAssemble(parts, side) {
   // 小標要跟著該版本的語言走，否則越南文版會夾著中文標題
   const lang = pmSession ? (side === 'b' ? pmSession.lang_b : pmSession.lang_a) : 'zh-TW';
-  return PM_SUM_PARTS.filter(p => parts[p.key] && parts[p.key][side])
+  return PMK().sumParts.filter(p => parts[p.key] && parts[p.key][side])
     .map(p => ((p.disp && (p.disp[lang] || p.disp['zh-TW'])) || p.title) + '\n' + parts[p.key][side]).join('\n\n');
 }
 // 產生並存檔：分三段依序呼叫，每段完成就立刻寫回（第三段失敗，前兩段仍保得住）
@@ -2442,7 +2587,8 @@ async function pmGenSummary(silent) {
   // 深度分析只做一次（語言 A），語言 B 是翻譯而非重新發想。理由有二：
   // 1. 重新發想＝同一份分析跑兩遍，慢一倍；
   // 2. 更重要的是兩個語言版本會講出不同的風險與不同的結論——同一場會議不該有兩種結論。
-  pmSumGenerating = true; pmSumStep = 0; pmSumJobs = PM_SUM_PARTS.length; pmSumLive = ''; pmSumPhase = 'write'; pmSumXlating = 0;
+  const PARTS = PMK().sumParts;
+  pmSumGenerating = true; pmSumStep = 0; pmSumJobs = PARTS.length; pmSumLive = ''; pmSumPhase = 'write'; pmSumXlating = 0;
   pmRenderRoom();
   if (!silent) boardToast('AI 正在撰寫會議結論…' + (same ? '' : '（' + langName.b + '版隨後翻譯）'));
   const ctx = pmSummaryContext();
@@ -2455,8 +2601,8 @@ async function pmGenSummary(silent) {
   };
   try {
     // ── 階段一：以語言 A 依序產生三個部分（第三部分要讀得到前兩部分）──
-    for (let i = 0; i < PM_SUM_PARTS.length; i++) {
-      const P = PM_SUM_PARTS[i];
+    for (let i = 0; i < PARTS.length; i++) {
+      const P = PARTS[i];
       pmSumPhase = 'write'; pmSumStep = i + 1; pmSumLabel = P.title + '（' + langName.a + '）'; pmSumLive = '';
       pmRenderRoom();
       let usr = '以下是會議資料：\n\n' + ctx + '\n\n';
@@ -2468,7 +2614,7 @@ async function pmGenSummary(silent) {
         '請以 ' + langName.a + ' 撰寫，直接輸出內容本身，不要任何前言、標記或說明。';
       // 走串流：非串流時 edge function 會等 Anthropic 全部產完，長輸出必逾時 504。
       // opus-5 預設開 thinking，max_tokens 涵蓋 thinking + 回覆，單段給 8000 足夠。
-      const txt = await pmClaudeStream(PM_SUM_SYS, usr, 8000, PM_SUM_MODEL, liveDelta);
+      const txt = await pmClaudeStream(PMK().sumSys, usr, 8000, PM_SUM_MODEL, liveDelta);
       const clean = txt.trim();
       if (!clean) throw new Error(P.title + ' 未產生內容');
       parts[P.key] = { a: clean, b: same ? clean : '' };
@@ -2573,7 +2719,7 @@ async function pmSaveSummaryEdit() {
 // 收集所有已知的段落標題（各語言版本），用來把存檔的長文切回三個部分
 function pmSumTitles() {
   const out = [];
-  PM_SUM_PARTS.forEach(p => {
+  PMK().sumParts.forEach(p => {
     if (p.disp) Object.keys(p.disp).forEach(k => { if (out.indexOf(p.disp[k]) < 0) out.push(p.disp[k]); });
     if (out.indexOf(p.title) < 0) out.push(p.title);
   });
@@ -2719,16 +2865,31 @@ function pmShowView(which) {
 
 function pmSetFilter(f) {
   pmFilter = f;
-  document.querySelectorAll('#tabpanel-premortem .chip-f[data-pf]').forEach(b => b.classList.toggle('on', b.dataset.pf === f));
+  document.querySelectorAll('#pm-shell .chip-f[data-pf]').forEach(b => b.classList.toggle('on', b.dataset.pf === f));
   pmRenderList();
 }
 
 async function pmLoadList() {
   pmPollStop();
+  pmSession = null;          // 回到清單就沒有「目前會議」，PMK() 才會跟著頁籤（pmKind）走
   pmShowView('list');
-  const rows = await SB.get('premortem_sessions', '?select=id,title,phase,scope_type,scope_site,scope_members,chair_emp_id,chair_name,created_by,updated_at,meet_at,meet_location&order=updated_at.desc&limit=200');
-  pmAllSessions = (rows || []).filter(pmCanSee);
+  pmApplyKindLabels();
+  const rows = await SB.get('premortem_sessions', '?select=id,kind,title,phase,scope_type,scope_site,scope_members,chair_emp_id,chair_name,created_by,updated_at,meet_at,meet_location&order=updated_at.desc&limit=200');
+  // kind 是 migration 033 才加的欄位；舊資料一律視為 premortem
+  pmAllSessions = (rows || []).filter(x => (x.kind || 'premortem') === pmKind).filter(pmCanSee);
   pmRenderList();
+}
+// 清單／建會畫面上會隨會議類型變動的靜態文字（HTML 只有一份，文字由這裡套）
+function pmApplyKindLabels() {
+  const T = PMT();
+  const set = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+  const ph  = (id, v) => { const e = document.getElementById(id); if (e) e.placeholder = v; };
+  set('pm-new-btn', '＋ 新增' + T.meet);
+  set('pm-c-h2', '新增' + T.meet);
+  set('pm-c-desc-lb', T.desc);
+  set('pm-c-scen-lb', T.scen + '（引導語，可修改）');
+  ph('pm-c-title', T.titlePh);
+  ph('pm-c-desc', T.descPh);
 }
 
 function pmRenderList() {
@@ -2745,11 +2906,13 @@ function pmRenderList() {
     html += '<div style="background:rgba(45,127,249,.12);border:1px solid var(--ac);border-radius:10px;padding:13px 15px;margin-bottom:14px"><div style="font-weight:700;color:var(--ac);font-size:15px">🟢 會議進行中，請點選加入本次會議！</div></div>';
   }
   if (!rows.length) {
-    box.innerHTML = html + '<div class="empty-note">' + (pmFilter === 'locked' ? '尚無已定稿的驗屍會議。' : '目前沒有進行中的驗屍會議，點右上角「＋ 新增驗屍會議」開一場。') + '</div>';
+    const T0 = PMT();
+    box.innerHTML = html + '<div class="empty-note">' + (pmFilter === 'locked' ? '尚無已定稿的' + T0.meet + '。' : '目前沒有進行中的' + T0.meet + '，點右上角「＋ 新增' + T0.meet + '」開一場。') + '</div>';
     return;
   }
   html += rows.map(s => {
-    const phaseBadge = '<span class="site-badge" style="background:var(--ac2);color:var(--ac)">' + escHtml(PM_PHASE_LABEL[s.phase] || s.phase) + '</span>';
+    const K = PM_KINDS[s.kind || 'premortem'] || PM_KINDS.premortem;
+    const phaseBadge = '<span class="site-badge" style="background:var(--ac2);color:var(--ac)">' + escHtml(K.phaseLabel[s.phase] || s.phase) + '</span>';
     const delBtn = pmIsChair(s) ? '<button class="btn ghost sm danger" onclick="event.stopPropagation();pmDeleteSession(\'' + s.id + '\')">刪除</button>' : '';
     const joinBtn = s.phase !== 'locked'
       ? '<button class="btn primary sm" onclick="event.stopPropagation();pmOpen(\'' + s.id + '\')">▶ 加入本次會議</button>'
@@ -2768,7 +2931,7 @@ async function pmDeleteSession(id) {
   // 只有該場主席能刪自己的會議——admin 在驗屍會議裡沒有特權（sb-proxy 亦同步擋下）
   const row = (pmAllSessions || []).find(x => x.id === id);
   if (!row || !pmIsChair(row)) { boardToast('只有該場主席能刪除這場會議'); return; }
-  if (!confirm('確定刪除這場驗屍會議？所有填寫內容都會一併刪除，無法復原。')) return;
+  if (!confirm('確定刪除這場' + PMT().meet + '？所有填寫內容都會一併刪除，無法復原。')) return;
   try { await SB.del('premortem_sessions', 'id=eq.' + encodeURIComponent(id)); boardToast('已刪除'); pmLoadList(); }
   catch (e) { boardToast('刪除失敗：' + (e.message || e)); }
 }
@@ -2780,6 +2943,7 @@ function pmNowLocal() {
   return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + 'T' + p(d.getHours()) + ':' + p(d.getMinutes());
 }
 function pmNewSession() {
+  pmApplyKindLabels();
   const optHtml = PM_LANGS.map(l => '<option value="' + l[0] + '">' + l[1] + '</option>').join('');
   const la = document.getElementById('pm-c-langa'), lb = document.getElementById('pm-c-langb');
   la.innerHTML = optHtml; lb.innerHTML = optHtml;
@@ -2787,7 +2951,7 @@ function pmNewSession() {
   lb.value = (PORTAL_SESSION && PORTAL_SESSION.site === 'VN') ? 'zh-TW' : 'vi';
   document.getElementById('pm-c-title').value = '';
   document.getElementById('pm-c-desc').value = '';
-  document.getElementById('pm-c-scenario').value = PM_DEFAULT_SCENARIO;
+  document.getElementById('pm-c-scenario').value = PMK().defaultScenario;
   document.getElementById('pm-c-scope').value = 'all';
   // 會議日期／時間自動帶入「現在」（當地時間，主席仍可改）；主席自動帶入登入者
   document.getElementById('pm-c-meetat').value = pmNowLocal();
@@ -2834,13 +2998,13 @@ async function pmCreateSubmit() {
   const members = scope === 'list' ? Array.from(document.querySelectorAll('#pm-c-members .pm-mem:checked')).map(c => c.value) : [];
   if (scope === 'list' && !members.length) { boardToast('請至少勾選一位指定人員'); return; }
   const row = {
-    id: uid(), title,
+    id: uid(), kind: pmKind, title,
     // meet_at 存主席看到的當地時間字串，不轉 UTC（避免顯示差時區）
     meet_at: (document.getElementById('pm-c-meetat').value || '').replace('T', ' '),
     meet_location: document.getElementById('pm-c-place').value.trim(),
     attendees: document.getElementById('pm-c-attend').value.trim(),
     project_desc: document.getElementById('pm-c-desc').value.trim(),
-    scenario: document.getElementById('pm-c-scenario').value.trim() || PM_DEFAULT_SCENARIO,
+    scenario: document.getElementById('pm-c-scenario').value.trim() || PMK().defaultScenario,
     lang_a: document.getElementById('pm-c-langa').value,
     lang_b: document.getElementById('pm-c-langb').value,
     scope_type: scope,
@@ -2858,7 +3022,7 @@ async function pmCreateSubmit() {
     if (row.project_desc) { const d = await pmTranslate(row.project_desc, row.lang_a, row.lang_b, srcL); row.desc_a = d.a; row.desc_b = d.b; }
     if (row.scenario) { const sc = await pmTranslate(row.scenario, row.lang_a, row.lang_b, srcL); row.scenario_a = sc.a; row.scenario_b = sc.b; }
   } catch (e) { /* 翻譯失敗留空，主席端輪詢時會背景補翻 */ }
-  try { await SB.post('premortem_sessions', row); boardToast('已建立驗屍會議'); pmOpen(row.id); }
+  try { await SB.post('premortem_sessions', row); boardToast('已建立' + PMT().meet); pmOpen(row.id); }
   catch (e) { boardToast('建立失敗：' + (e.message || e)); }
 }
 
@@ -2868,6 +3032,7 @@ async function pmOpen(id) {
   const s = rows && rows[0];
   if (!s) { boardToast('找不到該場會議'); return; }
   if (!pmCanSee(s)) { boardToast('你不在這場會議的開放範圍內'); return; }
+  s.kind = s.kind || 'premortem';     // 舊資料沒有 kind
   pmSession = s;
   pmDraft = '';
   pmBiDraft = { desc:{ a:null, b:null }, scenario:{ a:null, b:null } };
@@ -2902,7 +3067,8 @@ function pmSig() {
   return sp + '|' + es + '|' + ms;
 }
 async function pmPollTick() {
-  if (!pmSession || document.getElementById('tabpanel-premortem').classList.contains('on') === false) return;
+  const shell = document.getElementById('pm-shell');
+  if (!pmSession || !shell || !shell.parentNode || !shell.parentNode.classList.contains('on')) return;
   if (pmSumGenerating || pmSumEditing || pmMeetEditing) return;   // 產生中／編輯中不輪詢：免得蓋回 null 或把主席打的字弄掉
   const before = pmSig();
   // 取整列（select=*）而不逐一列欄位：欄位一多就容易漏，且 migration 尚未跑完時不會整個 poll 掛掉
@@ -2949,11 +3115,11 @@ function pmRenderPhasebar() {
       const on = pmSession.phase === p, ok = on || pmCanGoPhase(p);
       return '<button class="chip-f' + (on ? ' on' : '') + '"' +
         (ok ? '' : ' disabled title="請依序進行，不能跳過中間階段"') +
-        ' onclick="pmSetPhase(\'' + p + '\')">' + PM_PHASE_LABEL[p] + '</button>';
+        ' onclick="pmSetPhase(\'' + p + '\')">' + pmPhaseLabel(p) + '</button>';
     }).join('');
   } else {
     // 非主席只看得到目前階段（唯讀 badge），沒有任何可按的階段鈕
-    bar.innerHTML = '<span class="site-badge" style="background:var(--ac2);color:var(--ac)">目前階段：' + escHtml(PM_PHASE_LABEL[pmSession.phase] || pmSession.phase) + '</span>' +
+    bar.innerHTML = '<span class="site-badge" style="background:var(--ac2);color:var(--ac)">目前階段：' + escHtml(pmPhaseLabel(pmSession.phase)) + '</span>' +
       '<span style="font-size:11px;color:var(--tx3)">會議節奏由主席（' + escHtml(pmSession.chair_name || '—') + '）控制</span>';
   }
 }
@@ -2970,7 +3136,7 @@ async function pmSetPhase(p) {
   if (p === pmSession.phase) return;
   if (!pmCanGoPhase(p)) {
     const nxt = PM_PHASES[pmPhaseIdx(pmSession.phase) + 1];
-    boardToast('請依序進行，下一步是「' + (PM_PHASE_LABEL[nxt] || '—') + '」');
+    boardToast('請依序進行，下一步是「' + (nxt ? pmPhaseLabel(nxt) : '—') + '」');
     return;
   }
   const prev = pmSession.phase;
@@ -2986,7 +3152,7 @@ function pmRenderRoom() {
   pmRenderPhasebar();
   const body = document.getElementById('pm-room-body');
   if (!pmSession) { body.innerHTML = ''; return; }
-  const s = pmSession, chair = pmIsChair(s);
+  const s = pmSession, chair = pmIsChair(s), K = PMK(), T = K.t;
   if (pmMeetEditing && s.phase !== 'intro' && s.phase !== 'locked') pmMeetEditing = false;  // 卡片不顯示的階段不留編輯模式
   let html = '';
   // 專案／情境卡（雙語並陳）
@@ -3015,52 +3181,65 @@ function pmRenderRoom() {
 
   if (s.phase === 'intro') {
     html += '<div class="panel"><div class="panel-h"><span class="idx">ℹ︎</span><h2>說明</h2></div><div class="panel-b">' + pmIntroHtml() +
-      '<div class="hint" style="margin-top:14px">' + (chair ? '看完後，按上方階段列的「情境設定 / 開放填寫」開始。' : '主席將帶大家開始，請先閱讀本頁。') + '</div></div></div>';
+      '<div class="hint" style="margin-top:14px">' + (chair ? '看完後，按上方階段列的「' + pmPhaseLabel('setup') + ' / ' + pmPhaseLabel('writing') + '」開始。' : '主席將帶大家開始，請先閱讀本頁。') + '</div></div></div>';
   } else if (s.phase === 'setup') {
     if (chair) {
-      html += '<div class="panel"><div class="panel-h"><span class="idx">✎</span><h2>專案描述</h2>' +
+      html += '<div class="panel"><div class="panel-h"><span class="idx">✎</span><h2>' + escHtml(T.desc) + '</h2>' +
         '<span class="sub">編輯任一語言，另一語言自動翻譯</span></div><div class="panel-b">' +
         pmBiEditorHtml(s, 'desc') + '</div></div>';
-      html += '<div class="panel"><div class="panel-h"><span class="idx">✎</span><h2>情境設定</h2>' +
+      html += '<div class="panel"><div class="panel-h"><span class="idx">✎</span><h2>' + escHtml(T.scen) + '</h2>' +
         '<span class="sub">編輯任一語言，另一語言自動翻譯</span></div><div class="panel-b">' +
         pmBiEditorHtml(s, 'scenario') +
-        '<div class="hint" style="margin-top:10px">情境設定完成後，按上方「開放填寫」讓與會者開始各自默寫失敗原因。</div>' +
+        '<div class="hint" style="margin-top:10px">' + escHtml(T.scen + '完成後，按上方「' + pmPhaseLabel('writing') + '」讓與會者開始寫下' + T.item + '。') + '</div>' +
         '</div></div>';
     } else {
-      html += '<div class="panel"><div class="panel-b"><div class="empty-note">主席尚未開放填寫，請稍候。</div></div></div>';
+      html += '<div class="panel"><div class="panel-b"><div class="empty-note">主席尚未' + escHtml(pmPhaseLabel('writing')) + '，請稍候。</div></div></div>';
     }
   } else if (s.phase === 'writing') {
     // 填寫階段：所有在範圍內的人（含主席）都有填寫框
     const langOpts = PM_LANGS.map(l => '<option value="' + l[0] + '"' + (l[0] === (pmSrcLang || pmPortalLang()) ? ' selected' : '') + '>' + l[1] + '</option>').join('');
-    html += '<div class="panel"><div class="panel-h"><span class="idx">✎</span><h2>寫下你認為的失敗原因（建議 3–5 則）</h2></div><div class="panel-b">' +
+    html += '<div class="panel"><div class="panel-h"><span class="idx">✎</span><h2>' + escHtml(T.writeTitle) + '</h2></div><div class="panel-b">' +
       '<div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap"><label style="font-size:12px;color:var(--tx3)">我用的語言</label>' +
       '<select id="pm-src-lang" onchange="pmSrcLang=this.value" style="width:auto;padding:5px 8px;font-size:13px;background:var(--s2);border:1px solid var(--br);border-radius:6px;color:var(--tx)">' + langOpts + '</select>' +
       '<span style="font-size:11px;color:var(--tx3)">送出後自動翻成 ' + pmLangShort(s.lang_a) + '／' + pmLangShort(s.lang_b) + '</span></div>' +
-      '<textarea id="pm-writebox" rows="3" placeholder="一則一個原因，越具體越好…" style="width:100%;font-family:inherit;font-size:14px;background:var(--s2);border:1px solid var(--br);border-radius:8px;padding:9px 11px;color:var(--tx)" oninput="pmDraft=this.value"></textarea>' +
+      '<textarea id="pm-writebox" rows="3" placeholder="' + escHtml(T.writePh) + '" style="width:100%;font-family:inherit;font-size:14px;background:var(--s2);border:1px solid var(--br);border-radius:8px;padding:9px 11px;color:var(--tx)" oninput="pmDraft=this.value"></textarea>' +
       '<div style="margin-top:8px"><button id="pm-submit-btn" class="btn primary sm" onclick="pmSubmitEntry()">＋ 送出這則</button></div>' +
-      '<div class="hint" style="margin-top:6px">🔒 填寫階段只有你看得到自己填的，主席揭露後全體才會一起顯示。</div>' +
+      '<div class="hint" style="margin-top:6px">' + (K.liveVisible
+        ? '💡 大家的' + escHtml(T.item) + '即時顯示在下方 —— 看到有感覺的就往上加碼、變形，或組合成新的一則。'
+        : '🔒 填寫階段只有你看得到自己填的，主席' + escHtml(pmPhaseLabel('reveal')) + '後全體才會一起顯示。') + '</div>' +
       '<div style="margin-top:12px">' + (myEntries.length ? '<div style="font-size:12px;color:var(--tx3);margin-bottom:6px">你已填 ' + myEntries.length + ' 則：</div>' + myEntries.map(e => pmEntryHtml(e, true, false)).join('') : '') + '</div>' +
       '</div></div>';
+    // 🔴 liveVisible：腦力激盪要「看得到別人的」才長得出新點子（Osborn 的 hitchhiking）；
+    //    事前驗屍相反，寫的時候彼此看不到才不會被錨定、不會從眾。這是兩者最關鍵的行為差異。
+    if (K.liveVisible) {
+      html += '<div class="panel"><div class="panel-h"><span class="idx">▤</span><h2>目前收集到的' + escHtml(T.item) + '</h2>' +
+        '<span class="sub">共 ' + pmEntries.length + ' 則</span></div><div class="panel-b">' +
+        (pmEntries.length ? pmEntries.map(e => pmEntryHtml(e, false, true)).join('') : '<div class="empty-note">還沒有人送出，你可以當第一個。</div>') +
+        '</div></div>';
+    }
     if (chair) {
       html += '<div class="panel"><div class="panel-h"><span class="idx">▤</span><h2>主席即時彙整</h2><span class="sub">已收 ' + pmEntries.length + ' 則</span></div>' +
         '<div class="panel-b">' + pmSubmittedHtml(s) +
-        (pmEntries.length ? pmEntries.map(e => pmEntryHtml(e, false, true)).join('') : '<div class="empty-note">尚無人填寫。</div>') +
-        '<div class="hint" style="margin-top:8px">與會者此刻只看得到自己填的；按上方「揭露」後全體才會一起看到。</div></div></div>';
+        (K.liveVisible
+          ? '<div class="hint">內容已在上方對全體公開，這裡只列出誰交了、誰還沒交。</div>'
+          : (pmEntries.length ? pmEntries.map(e => pmEntryHtml(e, false, true)).join('') : '<div class="empty-note">尚無人填寫。</div>') +
+            '<div class="hint" style="margin-top:8px">與會者此刻只看得到自己填的；按上方「' + escHtml(pmPhaseLabel('reveal')) + '」後全體才會一起看到。</div>') +
+        '</div></div>';
     }
   } else if (s.phase === 'reveal') {
-    html += '<div class="panel"><div class="panel-h"><span class="idx">▤</span><h2>全部失敗原因</h2><span class="sub">共 ' + pmEntries.length + ' 則</span></div>' +
+    html += '<div class="panel"><div class="panel-h"><span class="idx">▤</span><h2>全部' + escHtml(T.item) + '</h2><span class="sub">共 ' + pmEntries.length + ' 則</span></div>' +
       '<div class="panel-b">' + (pmEntries.length ? pmEntries.map(e => pmEntryHtml(e, false, true, 0)).join('') : '<div class="empty-note">沒有任何填寫內容。</div>') +
-      '<div class="hint" style="margin-top:8px">已揭露全部內容。主席可切到「投票」開始計票與 AI 分群。</div></div></div>';
+      '<div class="hint" style="margin-top:8px">全部內容已公開。主席可切到「' + escHtml(pmPhaseLabel('ranking')) + '」開始計票與 AI 分群。</div></div></div>';
   } else if (s.phase === 'ranking') {
     const mine = pmMyVoteCount();
-    html += '<div class="panel"><div class="panel-h"><span class="idx">▤</span><h2>投票</h2><span class="sub">你已投 ' + mine + '／' + PM_VOTE_CAP + ' 票</span></div><div class="panel-b">' +
-      (chair ? '<div style="margin-bottom:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center"><button class="btn sm" onclick="pmAiCluster()">🤖 AI 分群</button><span style="font-size:11px;color:var(--tx3)">把相似原因自動歸類成主題（可再按重跑）</span></div>' : '') +
-      '<div class="hint" style="margin-bottom:8px">為你認為最重要的風險投票（每人最多 ' + PM_VOTE_CAP + ' 票）。</div>' +
+    html += '<div class="panel"><div class="panel-h"><span class="idx">▤</span><h2>' + escHtml(pmPhaseLabel('ranking')) + '</h2><span class="sub">你已投 ' + mine + '／' + pmVoteCap() + ' 票</span></div><div class="panel-b">' +
+      (chair ? '<div style="margin-bottom:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center"><button class="btn sm" onclick="pmAiCluster()">🤖 AI 分群</button><span style="font-size:11px;color:var(--tx3)">把相似的' + escHtml(T.item) + '自動歸類成主題（可再按重跑）</span></div>' : '') +
+      '<div class="hint" style="margin-bottom:8px">' + escHtml(T.voteHint) + '（每人最多 ' + pmVoteCap() + ' 票）。</div>' +
       (pmEntries.length ? pmGroupedHtml(1) : '<div class="empty-note">沒有任何填寫內容。</div>') + '</div></div>';
   } else if (s.phase === 'mitigation') {
-    html += '<div class="panel"><div class="panel-h"><span class="idx">▤</span><h2>風險（依票數）</h2></div><div class="panel-b">' +
+    html += '<div class="panel"><div class="panel-h"><span class="idx">▤</span><h2>' + escHtml(T.target) + '（依票數）</h2></div><div class="panel-b">' +
       (pmEntries.length ? pmGroupedHtml(2) : '<div class="empty-note">沒有任何填寫內容。</div>') + '</div></div>';
-    html += '<div class="panel"><div class="panel-h"><span class="idx">✔</span><h2>對策</h2><span class="sub">措施／負責人／期限</span></div><div class="panel-b">' + pmMitigationsHtml(chair) + '</div></div>';
+    html += '<div class="panel"><div class="panel-h"><span class="idx">✔</span><h2>' + escHtml(T.mit) + '</h2><span class="sub">' + escHtml(T.measure) + '／負責人／期限</span></div><div class="panel-b">' + pmMitigationsHtml(chair) + '</div></div>';
   } else {
     // locked：唯讀總結。AI 會議結論擺在最前面——這才是這場會議的結論
     const hasSum = !!(s.ai_summary_a || s.ai_summary);
@@ -3071,11 +3250,11 @@ function pmRenderRoom() {
         '<button class="btn sm" onclick="pmGenSummary(false)">↻ 重新生成</button></span>';
     }
     html += '<div class="panel" style="border-color:var(--ac)"><div class="panel-h"><span class="idx">✦</span><h2>AI 評論與總結</h2>' +
-      '<span class="sub">' + (pmSumEditing ? '主席修訂中' : '補發想 · 補對策 · 會議結論') + '</span>' + sumOps +
+      '<span class="sub">' + (pmSumEditing ? '主席修訂中' : '補發想 · 補' + T.mit + ' · 會議結論') + '</span>' + sumOps +
       '</div><div class="panel-b">' + pmSummaryHtml(chair) + '</div></div>';
-    html += '<div class="panel"><div class="panel-h"><span class="idx">▤</span><h2>失敗原因（依票數）</h2><span class="sub">共 ' + pmEntries.length + ' 則</span></div><div class="panel-b">' +
+    html += '<div class="panel"><div class="panel-h"><span class="idx">▤</span><h2>' + escHtml(T.item) + '（依票數）</h2><span class="sub">共 ' + pmEntries.length + ' 則</span></div><div class="panel-b">' +
       (pmEntries.length ? pmGroupedHtml(2) : '<div class="empty-note">沒有任何填寫內容。</div>') + '</div></div>';
-    html += '<div class="panel"><div class="panel-h"><span class="idx">✔</span><h2>對策</h2></div><div class="panel-b">' + pmMitigationsHtml(false) + '</div></div>';
+    html += '<div class="panel"><div class="panel-h"><span class="idx">✔</span><h2>' + escHtml(T.mit) + '</h2></div><div class="panel-b">' + pmMitigationsHtml(false) + '</div></div>';
   }
   body.innerHTML = html;
   pmRestoreDraft();
@@ -3113,7 +3292,7 @@ async function pmSaveBiField(key, side) {
   if (!s || !F || !pmIsChair(s) || pmBiSaving) return;
   const el = document.getElementById('pm-bi-' + key + '-' + side);
   const text = (el ? el.value : '').trim();
-  if (!text && F.required) { boardToast(F.label + '不可空白'); return; }
+  if (!text && F.required) { boardToast(pmBiLabel(F) + '不可空白'); return; }
   const btn = document.getElementById('pm-bi-btn-' + key + '-' + side);
   const label = btn ? btn.textContent : '';
   if (btn) { btn.disabled = true; btn.textContent = text ? '翻譯中…' : '清除中…'; }
@@ -3131,15 +3310,17 @@ async function pmSaveBiField(key, side) {
     s[F.src] = text; s[F.a] = a; s[F.b] = b;
     pmBiDraft[key] = { a: null, b: null };
     pmRenderRoom();   // 重繪後 btn 已失效，故只在失敗時還原按鈕
-    boardToast(text ? (F.label + '已更新，' + pmLangShort(side === 'a' ? s.lang_b : s.lang_a) + ' 譯文已同步') : (F.label + '已清空'));
+    const FL = pmBiLabel(F);
+    boardToast(text ? (FL + '已更新，' + pmLangShort(side === 'a' ? s.lang_b : s.lang_a) + ' 譯文已同步') : (FL + '已清空'));
   } catch (e) {
     if (btn) { btn.disabled = false; btn.textContent = label; }
     boardToast('儲存失敗：' + (e.message || e));
   } finally { pmBiSaving = false; }
 }
-// 主席的催填視角：只給「誰交了／誰沒交」，不給「誰寫了哪一條」。
+// 主席的催填視角：匿名會議只給「誰交了／誰沒交」，不給「誰寫了哪一條」。
 // 🔴 3 人門檻對「已填」與「未填」兩份名單都要套用——名單是互補的：
 // 5 人裡列出 4 個未填，等於指名剩下那 1 個人就是即時彙整裡那些內容的作者。
+// 具名會議（腦力激盪）本來就顯示提出者，這個門檻沒有意義，直接列名單。
 function pmSubmittedHtml(s) {
   const done = [], doneIds = [];
   pmEntries.forEach(e => {
@@ -3152,7 +3333,7 @@ function pmSubmittedHtml(s) {
   }) : null;
   const box = 'background:var(--s1);border:1px solid var(--br);border-radius:8px;padding:8px 10px;margin-bottom:10px;font-size:12px;line-height:1.7';
   let h = '<div style="' + box + '">';
-  if (done.length < 3) {
+  if (PMK().anonymous && done.length < 3) {
     // 未達 3 人：只給數字。此時內容與人的對應太容易被推出來
     h += '<span style="color:var(--tx3)">已填 </span>' + done.length + ' 人' +
       (pending ? '<span style="color:var(--tx3)">　未填 </span>' + pending.length + ' 人' : '') +
@@ -3164,8 +3345,10 @@ function pmSubmittedHtml(s) {
   }
   return h + '</div>';
 }
-// 🔴 不顯示填寫者姓名——連主席也不顯示。事前驗屍靠匿名換誠實，主席若看得到誰寫了哪一條，
-// 與會者就會自我審查。催填改看「已填名單」（pmSubmittedHtml）。**不要把 author_name 加回來。**
+// 🔴 匿名會議（事前驗屍）不顯示填寫者姓名——連主席也不顯示。驗屍靠匿名換誠實，主席若看得到
+// 誰寫了哪一條，與會者就會自我審查。催填改看「已填名單」（pmSubmittedHtml）。
+// **不要把 author_name 加回匿名會議的畫面。** 具名會議（腦力激盪）則相反：顯示提出者是刻意的，
+// 方便後續認領與追問，而且發想點子沒有「講錯話」的風險。
 function pmEntryHtml(e, allowDelete, bilingual, voteMode) {
   const del = allowDelete ? '<button class="btn ghost sm danger" style="padding:2px 8px" onclick="pmDeleteMyEntry(\'' + e.id + '\')">✕</button>' : '';
   // ✎譯 原本綁在 showAuthor 上，拿掉姓名後必須改綁 bilingual，否則主席的修正譯文按鈕會跟著消失
@@ -3175,6 +3358,8 @@ function pmEntryHtml(e, allowDelete, bilingual, voteMode) {
   if (voteMode === 1) voteUi = '<button class="btn ghost sm' + (pmIVoted(e) ? ' primary' : '') + '" style="padding:2px 9px" onclick="pmToggleVote(\'' + e.id + '\')">👍 ' + vc + '</button>';
   else if (voteMode === 2) voteUi = '<span style="font-size:12px;color:var(--tx3);white-space:nowrap">👍 ' + vc + '</span>';
   const theme = e.theme ? '<span class="site-badge" style="background:var(--s3);color:var(--tx3);margin-bottom:5px;display:inline-block">' + escHtml(e.theme) + '</span> ' : '';
+  const who = (!PMK().anonymous && e.author_name)
+    ? '<span class="site-badge" style="background:var(--ac2);color:var(--ac);margin-bottom:5px;display:inline-block">' + escHtml(e.author_name) + '</span> ' : '';
   let content;
   if (bilingual) {
     if (e.text_a || e.text_b) content = '<div class="pm-bi">' + pmLangCellHtml(pmLangShort(pmSession.lang_a), e.text_a || e.text_src, !e.text_a) + pmLangCellHtml(pmLangShort(pmSession.lang_b), e.text_b || e.text_src, !e.text_b) + '</div>';
@@ -3183,7 +3368,7 @@ function pmEntryHtml(e, allowDelete, bilingual, voteMode) {
     content = '<div style="white-space:pre-wrap;font-size:14px">' + escHtml(e.text_src || '') + '</div>';
   }
   return '<div style="border:1px solid var(--br);border-radius:8px;padding:10px 12px;background:var(--s2);margin-bottom:8px;display:flex;gap:10px;align-items:flex-start">' +
-    '<div style="flex:1;min-width:0">' + theme + content + '</div><div style="display:flex;gap:4px;flex-shrink:0;align-items:center">' + voteUi + editT + del + '</div></div>';
+    '<div style="flex:1;min-width:0">' + who + theme + content + '</div><div style="display:flex;gap:4px;flex-shrink:0;align-items:center">' + voteUi + editT + del + '</div></div>';
 }
 async function pmEditTrans(id) {
   const e = pmEntries.find(x => x.id === id); if (!e || !pmIsChair(pmSession)) return;
@@ -3193,7 +3378,7 @@ async function pmEditTrans(id) {
   catch (err) { boardToast('更新失敗：' + (err.message || err)); }
 }
 
-// ── 投票（排序階段；每人最多 PM_VOTE_CAP 票）──
+// ── 投票（票選階段；上限見 PM_KINDS[].voteCap）──
 function pmVoteCount(e) { return Array.isArray(e.voters) ? e.voters.length : 0; }
 function pmIVoted(e) { const me = PORTAL_SESSION && PORTAL_SESSION.empId; return Array.isArray(e.voters) && e.voters.indexOf(me) >= 0; }
 function pmMyVoteCount() { const me = PORTAL_SESSION && PORTAL_SESSION.empId; return pmEntries.filter(e => Array.isArray(e.voters) && e.voters.indexOf(me) >= 0).length; }
@@ -3203,7 +3388,7 @@ async function pmToggleVote(id) {
   const me = PORTAL_SESSION.empId;
   let voters = Array.isArray(e.voters) ? e.voters.slice() : [];
   const has = voters.indexOf(me) >= 0;
-  if (!has && pmMyVoteCount() >= PM_VOTE_CAP) { boardToast('每人最多 ' + PM_VOTE_CAP + ' 票'); return; }
+  if (!has && pmMyVoteCount() >= pmVoteCap()) { boardToast('每人最多 ' + pmVoteCap() + ' 票'); return; }
   voters = has ? voters.filter(x => x !== me) : voters.concat([me]);
   e.voters = voters; pmRenderRoom();
   try { await SB.patch('premortem_entries', 'id=eq.' + encodeURIComponent(id), { voters, updated_at: new Date().toISOString() }); }
@@ -3215,10 +3400,10 @@ async function pmAiCluster() {
   if (!pmIsChair(pmSession) || !pmEntries.length) return;
   boardToast('AI 分群中…');
   const items = pmEntries.map(e => ({ id: e.id, text: (e.text_a || e.text_src || '').slice(0, 200) }));
-  const sys = 'You cluster risk statements into a few concise themes. Output ONLY a minified JSON object.';
-  const usr = 'Group the following failure-risk items into 3 to 6 concise themes. Theme names in Traditional Chinese, 2-6 characters. Return {"map":{"<id>":"<theme>"}}.\nItems:\n' + JSON.stringify(items);
+  const C = PMK().cluster;
+  const usr = C.usr + ' Theme names in Traditional Chinese, 2-6 characters. Return {"map":{"<id>":"<theme>"}}.\nItems:\n' + JSON.stringify(items);
   try {
-    const raw = await pmClaude(sys, usr, 1500);
+    const raw = await pmClaude(C.sys, usr, 1500);
     const m = raw.match(/\{[\s\S]*\}/); if (!m) throw new Error('分群格式錯誤');
     const map = (JSON.parse(m[0]).map) || {};
     for (const e of pmEntries) { const th = map[e.id]; if (th && th !== e.theme) { e.theme = th; try { await SB.patch('premortem_entries', 'id=eq.' + encodeURIComponent(e.id), { theme: th, updated_at: new Date().toISOString() }); } catch (x) {} } }
@@ -3250,12 +3435,12 @@ async function pmAddMitigation() {
   const riskId = document.getElementById('pm-mit-risk-sel').value;
   const riskE = riskId ? pmEntries.find(e => e.id === riskId) : null;
   const measure = (document.getElementById('pm-mit-measure').value || '').trim();
-  if (!measure) { boardToast('請填寫對策措施'); return; }
+  if (!measure) { boardToast('請填寫' + PMT().measure); return; }
   const owner = document.getElementById('pm-mit-owner').value || '';
   const ownerU = ALL_USERS.find(u => u.empId === owner);
   const row = {
     id: uid(), session_id: pmSession.id,
-    // 風險直接取自被選的失敗原因（已翻譯，不必重翻）
+    // 風險／點子直接取自被選的那一則（已翻譯，不必重翻）
     risk_summary: riskE ? (riskE.text_src || riskE.text_a || '') : '',
     risk_a: riskE ? (riskE.text_a || riskE.text_src || '') : null,
     risk_b: riskE ? (riskE.text_b || riskE.text_src || '') : null,
@@ -3270,12 +3455,12 @@ async function pmAddMitigation() {
     await SB.post('premortem_mitigations', row);
     document.getElementById('pm-mit-measure').value = ''; document.getElementById('pm-mit-due').value = pmDefaultDue();
     const rs = document.getElementById('pm-mit-risk-sel'); if (rs) rs.value = '';
-    await pmFetchMitigations(); pmRenderRoom(); boardToast('已新增對策');
+    await pmFetchMitigations(); pmRenderRoom(); boardToast('已新增' + PMT().mit);
   } catch (e) { boardToast('新增失敗：' + (e.message || e)); }
 }
 async function pmDeleteMitigation(id) {
   if (!pmIsChair(pmSession)) return;
-  if (!confirm('刪除這筆對策？')) return;
+  if (!confirm('刪除這筆' + PMT().mit + '？')) return;
   try { await SB.del('premortem_mitigations', 'id=eq.' + encodeURIComponent(id)); await pmFetchMitigations(); pmRenderRoom(); }
   catch (e) { boardToast('刪除失敗：' + (e.message || e)); }
 }
@@ -3314,6 +3499,7 @@ function pmDefaultDue() {
   return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate());
 }
 function pmMitigationsHtml(canEdit) {
+  const T = PMT();
   let h = pmMitigations.length ? pmMitigations.map(m => {
     const del = canEdit ? '<button class="btn ghost sm danger" style="padding:2px 8px" onclick="pmDeleteMitigation(\'' + m.id + '\')">✕</button>' : '';
     const meta = [];
@@ -3322,29 +3508,29 @@ function pmMitigationsHtml(canEdit) {
     return '<div style="border:1px solid var(--br);border-radius:8px;padding:10px 12px;background:var(--s2);margin-bottom:8px;display:flex;gap:10px;align-items:flex-start">' +
       '<div style="flex:1;min-width:0">' +
       (m.risk_summary ? '<div style="margin-bottom:14px">' +
-        '<div style="font-size:13.5px;color:var(--tx3);margin-bottom:4px">風險：</div>' +
+        '<div style="font-size:13.5px;color:var(--tx3);margin-bottom:4px">' + escHtml(T.target) + '：</div>' +
         pmBiOrdered(m.risk_summary, m.risk_a, m.risk_b) + '</div>' : '') +
-      '<div style="font-size:13.5px;color:var(--tx3);margin-bottom:4px">措施：</div>' +
+      '<div style="font-size:13.5px;color:var(--tx3);margin-bottom:4px">' + escHtml(T.measure) + '：</div>' +
       pmBiOrdered(m.measure, m.measure_a, m.measure_b) +
       (meta.length ? '<div style="font-size:13.5px;color:var(--tx3);margin-top:10px">' + meta.join('　') + '</div>' : '') +
       '</div>' + del + '</div>';
-  }).join('') : '<div class="empty-note">尚無對策。</div>';
+  }).join('') : '<div class="empty-note">尚無' + escHtml(T.mit) + '。</div>';
   if (canEdit) {
     const ownerOpts = '<option value="">（未指定負責人）</option>' + (ALL_USERS || []).map(u => '<option value="' + u.empId + '">' + escHtml(u.nameZh || u.nameEn || u.empId) + '</option>').join('');
     const sorted = pmEntries.slice().sort((a, b) => pmVoteCount(b) - pmVoteCount(a));
-    const riskOpts = '<option value="">（不指定特定風險）</option>' + sorted.map(e => {
+    const riskOpts = '<option value="">（不指定特定' + escHtml(T.target) + '）</option>' + sorted.map(e => {
       const label = '(' + pmVoteCount(e) + '票) ' + (e.theme ? '[' + e.theme + '] ' : '') + (e.text_a || e.text_src || '').replace(/\s+/g, ' ').slice(0, 40);
       return '<option value="' + e.id + '">' + escHtml(label) + '</option>';
     }).join('');
     h += '<div style="border-top:1px dashed var(--br);margin-top:10px;padding-top:12px;display:flex;flex-direction:column;gap:8px">' +
-      '<label style="font-size:12px;color:var(--tx3)">針對哪個風險（依票數）</label>' +
+      '<label style="font-size:12px;color:var(--tx3)">針對哪個' + escHtml(T.target) + '（依票數）</label>' +
       '<select id="pm-mit-risk-sel" style="font-size:13px;background:var(--s2);border:1px solid var(--br);border-radius:7px;padding:8px 10px;color:var(--tx);width:100%">' + riskOpts + '</select>' +
-      '<label style="font-size:12px;color:var(--tx3);margin-top:2px">對策措施</label>' +
-      '<textarea id="pm-mit-measure" rows="6" placeholder="對策措施…" style="font-family:inherit;font-size:14px;background:var(--s2);border:1px solid var(--br);border-radius:7px;padding:8px 10px;color:var(--tx);width:100%"></textarea>' +
+      '<label style="font-size:12px;color:var(--tx3);margin-top:2px">' + escHtml(T.measure) + '</label>' +
+      '<textarea id="pm-mit-measure" rows="6" placeholder="' + escHtml(T.measure) + '…" style="font-family:inherit;font-size:14px;background:var(--s2);border:1px solid var(--br);border-radius:7px;padding:8px 10px;color:var(--tx);width:100%"></textarea>' +
       '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">' +
       '<select id="pm-mit-owner" style="flex:1;min-width:140px;font-size:13px;background:var(--s2);border:1px solid var(--br);border-radius:7px;padding:7px 9px;color:var(--tx)">' + ownerOpts + '</select>' +
       '<input id="pm-mit-due" type="date" value="' + pmDefaultDue() + '" title="期限，預設為會議日期＋兩週" style="font-size:13px;background:var(--s2);border:1px solid var(--br);border-radius:7px;padding:6px 9px;color:var(--tx)">' +
-      '<button class="btn primary sm" onclick="pmAddMitigation()">＋ 新增對策</button>' +
+      '<button class="btn primary sm" onclick="pmAddMitigation()">＋ 新增' + escHtml(T.mit) + '</button>' +
       '</div>' +
       '<div style="font-size:11px;color:var(--tx3)">期限預設為會議日期＋兩週（' + escHtml(pmDefaultDue()) + '），可自行調整。</div>' +
       '</div>';
@@ -3353,21 +3539,21 @@ function pmMitigationsHtml(canEdit) {
 }
 
 // ── 輸出（PDF／PNG／Excel／Email，雙語）──
-function pmFileBase() { const s = pmSession; return 'Premortem_' + ((s && s.title) || '').replace(/[\\/:*?"<>|]/g, '').slice(0, 40); }
+function pmFileBase() { const s = pmSession; return PMT().fileTag + '_' + ((s && s.title) || '').replace(/[\\/:*?"<>|]/g, '').slice(0, 40); }
 function pmGroupsSorted() {
   const groups = {}; pmEntries.forEach(e => { const t = e.theme || '未分類'; (groups[t] = groups[t] || []).push(e); });
   const sv = arr => arr.reduce((x, e) => x + pmVoteCount(e), 0);
   return Object.keys(groups).sort((a, b) => sv(groups[b]) - sv(groups[a])).map(name => ({ name, items: groups[name].slice().sort((a, b) => pmVoteCount(b) - pmVoteCount(a)) }));
 }
 function pmReportHtml() {
-  const s = pmSession, la = escHtml(pmLangShort(s.lang_a)), lb = escHtml(pmLangShort(s.lang_b));
+  const s = pmSession, T = PMT(), la = escHtml(pmLangShort(s.lang_a)), lb = escHtml(pmLangShort(s.lang_b));
   // white-space:pre-wrap 是必要的：AI 評論與總結是分段長文，少了它換行會全部塌成一團
   const td = 'width:50%;vertical-align:top;padding:5px 8px;border:1px solid #ddd;white-space:pre-wrap';
   const bi = (o, a, b) => '<table style="width:100%;border-collapse:collapse;margin:2px 0"><tr>' +
     '<td style="' + td + '"><div style="font-size:10px;color:#999">' + la + '</div>' + escHtml(a || o || '') + '</td>' +
     '<td style="' + td + '"><div style="font-size:10px;color:#999">' + lb + '</div>' + escHtml(b || o || '') + '</td></tr></table>';
   let h = '<h1>' + escHtml(s.title || '(未命名)') + '</h1>';
-  h += '<div style="color:#666;font-size:12px">事前驗屍會議紀錄</div>';
+  h += '<div style="color:#666;font-size:12px">' + escHtml(T.meet + '紀錄') + '</div>';
   h += '<table style="width:100%;border-collapse:collapse;margin:8px 0;font-size:11.5px">' +
     [['會議日期／時間', s.meet_at || '—'], ['會議地點', s.meet_location || '—'],
      ['主席', s.chair_name || '—'], ['與會人員', s.attendees || '—']]
@@ -3381,9 +3567,9 @@ function pmReportHtml() {
         (s.summary_edited_at ? '　│　已由主席' + (s.summary_edited_by ? '（' + s.summary_edited_by + '）' : '') + '修訂：' + pmTs(s.summary_edited_at) : '')) + '</div>';
     h += bi(s.ai_summary, s.ai_summary_a, s.ai_summary_b);
   }
-  if (s.project_desc) h += '<h2>專案描述</h2>' + bi(s.project_desc, s.desc_a, s.desc_b);
-  h += '<h2>情境</h2>' + bi(s.scenario, s.scenario_a, s.scenario_b);
-  h += '<h2>失敗原因（依票數）</h2>';
+  if (s.project_desc) h += '<h2>' + escHtml(T.desc) + '</h2>' + bi(s.project_desc, s.desc_a, s.desc_b);
+  h += '<h2>' + escHtml(T.scen) + '</h2>' + bi(s.scenario, s.scenario_a, s.scenario_b);
+  h += '<h2>' + escHtml(T.item) + '（依票數）</h2>';
   const hasTheme = pmEntries.some(e => e.theme);
   if (!pmEntries.length) h += '<div style="color:#999">（無）</div>';
   pmGroupsSorted().forEach(g => {
@@ -3391,9 +3577,9 @@ function pmReportHtml() {
     g.items.forEach(e => { h += '<div style="font-size:11px;color:#c00;margin-top:6px">👍 ' + pmVoteCount(e) + '</div>' + bi(e.text_src, e.text_a, e.text_b); });
   });
   if (pmMitigations.length) {
-    h += '<h2>對策</h2>';
+    h += '<h2>' + escHtml(T.mit) + '</h2>';
     pmMitigations.forEach(m => {
-      if (m.risk_summary) h += '<div style="font-size:11px;color:#666;margin-top:8px">風險：' + escHtml(m.risk_summary) + '</div>';
+      if (m.risk_summary) h += '<div style="font-size:11px;color:#666;margin-top:8px">' + escHtml(T.target) + '：' + escHtml(m.risk_summary) + '</div>';
       h += bi(m.measure, m.measure_a, m.measure_b);
       const meta = []; if (m.owner_name) meta.push('負責人：' + escHtml(m.owner_name)); if (m.due_date) meta.push('期限：' + escHtml(m.due_date));
       if (meta.length) h += '<div style="font-size:11px;color:#666">' + meta.join('　') + '</div>';
@@ -3432,24 +3618,24 @@ function pmExportPNG() {
   } catch (e) { boardToast('PNG 匯出失敗，請改用 PDF'); }
 }
 function pmBuildXlsx() {
-  const s = pmSession, la = pmLangShort(s.lang_a), lb = pmLangShort(s.lang_b), data = [];
-  data.push(['事前驗屍會議紀錄：' + (s.title || ''), '', '', '']);
+  const s = pmSession, T = PMT(), la = pmLangShort(s.lang_a), lb = pmLangShort(s.lang_b), data = [];
+  data.push([T.meet + '紀錄：' + (s.title || ''), '', '', '']);
   data.push(['分類', '內容（' + la + '）', '內容（' + lb + '）', '備註']);
   data.push(['會議日期／時間', s.meet_at || '', '', '']);
   data.push(['會議地點', s.meet_location || '', '', '']);
   data.push(['主席', s.chair_name || '', '', '']);
   data.push(['與會人員', s.attendees || '', '', '']);
   if (s.ai_summary_a || s.ai_summary) data.push(['AI 評論與總結', s.ai_summary_a || s.ai_summary, s.ai_summary_b || s.ai_summary, PM_SUM_MODEL + (s.summary_edited_at ? '／已由主席' + (s.summary_edited_by || '') + '修訂 ' + pmTs(s.summary_edited_at) : '')]);
-  if (s.project_desc) data.push(['專案描述', s.desc_a || s.project_desc, s.desc_b || s.project_desc, '']);
-  data.push(['情境', s.scenario_a || s.scenario || '', s.scenario_b || s.scenario || '', '']);
-  pmGroupsSorted().forEach(g => g.items.forEach(e => data.push(['失敗原因 · ' + g.name, e.text_a || e.text_src || '', e.text_b || e.text_src || '', '票數 ' + pmVoteCount(e)])));
-  pmMitigations.forEach(m => { const meta = []; if (m.owner_name) meta.push('負責人:' + m.owner_name); if (m.due_date) meta.push('期限:' + m.due_date); data.push(['對策', m.measure_a || m.measure || '', m.measure_b || m.measure || '', (m.risk_summary ? '風險:' + m.risk_summary + '  ' : '') + meta.join(' ')]); });
+  if (s.project_desc) data.push([T.desc, s.desc_a || s.project_desc, s.desc_b || s.project_desc, '']);
+  data.push([T.scen, s.scenario_a || s.scenario || '', s.scenario_b || s.scenario || '', '']);
+  pmGroupsSorted().forEach(g => g.items.forEach(e => data.push([T.item + ' · ' + g.name, e.text_a || e.text_src || '', e.text_b || e.text_src || '', '票數 ' + pmVoteCount(e)])));
+  pmMitigations.forEach(m => { const meta = []; if (m.owner_name) meta.push('負責人:' + m.owner_name); if (m.due_date) meta.push('期限:' + m.due_date); data.push([T.mit, m.measure_a || m.measure || '', m.measure_b || m.measure || '', (m.risk_summary ? '風險:' + m.risk_summary + '  ' : '') + meta.join(' ')]); });
   const colL = i => String.fromCharCode(65 + i);
   const rowsXml = data.map((row, ri) => '<row r="' + (ri + 1) + '">' + row.map((v, ci) => (v === '' || v == null) ? '' : '<c r="' + colL(ci) + (ri + 1) + '" t="inlineStr"><is><t xml:space="preserve">' + wmXesc(v) + '</t></is></c>').join('') + '</row>').join('');
   const sheetXml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><cols><col min="1" max="1" width="18" customWidth="1"/><col min="2" max="3" width="42" customWidth="1"/><col min="4" max="4" width="20" customWidth="1"/></cols><sheetData>' + rowsXml + '</sheetData></worksheet>';
   const contentTypes = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/></Types>';
   const rels = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>';
-  const workbook = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="事前驗屍" sheetId="1" r:id="rId1"/></sheets></workbook>';
+  const workbook = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="' + wmXesc(PMK().label) + '" sheetId="1" r:id="rId1"/></sheets></workbook>';
   const wbRels = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/></Relationships>';
   const enc = new TextEncoder();
   return wmMakeZip([
@@ -3462,8 +3648,8 @@ function pmBuildXlsx() {
 }
 function pmExportXlsx() { try { wmDownload(pmBuildXlsx(), pmFileBase() + '.xlsx'); boardToast('已匯出 Excel'); } catch (e) { boardToast('Excel 匯出失敗'); } }
 function pmSendMail() {
-  const s = pmSession, la = pmLangShort(s.lang_a), lb = pmLangShort(s.lang_b), DIV = '━━━━━━━━━━━━━━━━━━━━━━━━', L = [];
-  L.push('事前驗屍會議紀錄：' + (s.title || ''));
+  const s = pmSession, T = PMT(), la = pmLangShort(s.lang_a), lb = pmLangShort(s.lang_b), DIV = '━━━━━━━━━━━━━━━━━━━━━━━━', L = [];
+  L.push(T.meet + '紀錄：' + (s.title || ''));
   if (s.meet_at) L.push('會議日期／時間：' + s.meet_at);
   if (s.meet_location) L.push('會議地點：' + s.meet_location);
   L.push('主席：' + (s.chair_name || '—'));
@@ -3474,10 +3660,10 @@ function pmSendMail() {
     L.push('[' + la + '] ' + (s.ai_summary_a || s.ai_summary)); L.push('');
     L.push('[' + lb + '] ' + (s.ai_summary_b || s.ai_summary)); L.push('');
   }
-  L.push(DIV); L.push('【情境】');
+  L.push(DIV); L.push('【' + T.scen + '】');
   L.push('[' + la + '] ' + (s.scenario_a || s.scenario || ''));
   L.push('[' + lb + '] ' + (s.scenario_b || s.scenario || '')); L.push('');
-  L.push(DIV); L.push('【失敗原因（依票數）】');
+  L.push(DIV); L.push('【' + T.item + '（依票數）】');
   const hasTheme = pmEntries.some(e => e.theme);
   pmGroupsSorted().forEach(g => {
     if (hasTheme) L.push('■ ' + g.name);
@@ -3485,7 +3671,7 @@ function pmSendMail() {
   });
   L.push('');
   if (pmMitigations.length) {
-    L.push(DIV); L.push('【對策】');
+    L.push(DIV); L.push('【' + T.mit + '】');
     pmMitigations.forEach(m => {
       L.push('• ' + (m.measure_a || m.measure || '')); L.push('    ' + (m.measure_b || m.measure || ''));
       const meta = []; if (m.owner_name) meta.push('負責人:' + m.owner_name); if (m.due_date) meta.push('期限:' + m.due_date);
@@ -3496,7 +3682,7 @@ function pmSendMail() {
   L.push(''); L.push('');
   const ids = {}; pmEntries.forEach(e => { if (e.author_emp_id) ids[e.author_emp_id] = 1; }); if (s.chair_emp_id) ids[s.chair_emp_id] = 1;
   const to = Object.keys(ids).map(userEmail).filter(Boolean).join(',');
-  const url = 'mailto:' + encodeURIComponent(to) + '?subject=' + encodeURIComponent('事前驗屍會議紀錄 ' + (s.title || '')) + '&body=' + encodeURIComponent(L.join('\n'));
+  const url = 'mailto:' + encodeURIComponent(to) + '?subject=' + encodeURIComponent(T.meet + '紀錄 ' + (s.title || '')) + '&body=' + encodeURIComponent(L.join('\n'));
   try { window.location.href = url; boardToast('已開啟郵件草稿（收件人＝與會者）'); } catch (e) { boardToast('無法開啟郵件'); }
 }
 
@@ -3529,7 +3715,7 @@ async function pmSubmitEntry() {
 async function pmDeleteMyEntry(id) {
   const e = pmEntries.find(x => x.id === id);
   if (!e || !PORTAL_SESSION || e.author_emp_id !== PORTAL_SESSION.empId) return;
-  if (pmSession.phase !== 'writing') { boardToast('揭露後不可刪除'); return; }
+  if (pmSession.phase !== 'writing') { boardToast(pmPhaseLabel('reveal') + '後不可刪除'); return; }
   try { await SB.del('premortem_entries', 'id=eq.' + encodeURIComponent(id)); await pmFetchEntries(); pmRenderRoom(); }
   catch (e2) { boardToast('刪除失敗：' + (e2.message || e2)); }
 }

@@ -61,7 +61,8 @@ const PM_PROTECTED = new Set([
   "summary_edited_at", "summary_edited_by", "phase",
 ])
 // chair_emp_id 完全禁止改：沒有任何正當情境要換主席，改了等於接管整場會議
-const PM_IMMUTABLE = new Set(["chair_emp_id", "created_by"])
+// kind 同理：一場已定稿的驗屍紀錄若能被改成腦力激盪，等於竄改正式紀錄的性質
+const PM_IMMUTABLE = new Set(["chair_emp_id", "created_by", "kind"])
 
 function json(obj: unknown, status = 200) {
   return new Response(JSON.stringify(obj), { status, headers: { ...CORS, "Content-Type": "application/json" } })

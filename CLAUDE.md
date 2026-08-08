@@ -22,7 +22,7 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 | `admin/index.html` | v2.30 | Admin System — room booking, fleet, visitor, library, lottery | 5,650 |
 | `kms/index.html` | v2.33 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
 | `quotation/index.html` | v3.54 | Quotation & CRM system | 7,332 |
-| `board/index.html` | v1.28 | 公告與紀錄 Bulletin & Records — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍 | 2,934 |
+| `board/index.html` | v1.47 | 公告與紀錄 Bulletin & Records — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍、腦力激盪 | 3,786 |
 
 `admin/lottery.html` is a standalone lottery page (separate from the lottery module inside `admin/index.html`).
 
@@ -36,7 +36,7 @@ Numbered backup files (`index112.html`, `index328.html`, etc.) are iteration sna
 
 **Within `admin/index.html`**: `switchMod(m)` activates modules — `'room'`, `'car'`, `'visit'`, `'lib'`, `'lottery'`.
 
-**Within `board/index.html`**: `switchTab(name)` activates 主頁籤 — `'bulletin'`、`'weekly'`、`'biz'`、`'woody'`、`'premortem'`。Portal 端由 `index.html` 的 app 清單項目 `id:'bulletin'`（`path:'./board/index.html'`）進入。
+**Within `board/index.html`**: `switchTab(name)` activates 主頁籤 — `'bulletin'`、`'weekly'`、`'biz'`、`'woody'`、`'premortem'`、`'brainstorm'`。後兩者共用同一份 DOM（`#pm-shell`）與同一套 `pm*` 函式，切換時由 `pmMountShell()` 把 shell 搬進當前 tabpanel。Portal 端由 `index.html` 的 app 清單項目 `id:'bulletin'`（`path:'./board/index.html'`）進入。
 
 ### Backend Stack
 
@@ -141,7 +141,7 @@ The portal supports EN, 繁中, 简中, VI, 日 via `setLang(lang)`. Each langua
 
 ## Board 重要細節
 
-`board/index.html`（公告與紀錄，v1.28）五個頁籤，各自一組前綴命名的函式與 Supabase 表：
+`board/index.html`（公告與紀錄，v1.47）六個頁籤，各自一組前綴命名的函式與 Supabase 表：
 
 | 頁籤 | 前綴 | 主要資料表 |
 |------|------|-----------|
@@ -149,9 +149,10 @@ The portal supports EN, 繁中, 简中, VI, 日 via `setLang(lang)`. Each langua
 | 週會紀錄 | `wm*` | `weekly_minutes` |
 | 業務會議記錄 | `bm*` | `biz_meeting_minutes` |
 | Woody 週報 | `wr*` | `woody_reports` |
-| 事前驗屍 | `pm*` | `premortem_sessions`、`premortem_entries`、`premortem_mitigations` |
+| 事前驗屍 | `pm*` | `premortem_sessions`、`premortem_entries`、`premortem_mitigations`（`kind='premortem'`） |
+| 腦力激盪 | `pm*`（同一套） | 同上三張表（`kind='brainstorm'`） |
 
-**事前驗屍 Premortem**（Gary Klein 方法，v1.21 起分階段開發，v1.28 完成）：
+**事前驗屍 Premortem**（Gary Klein 方法，v1.21 起分階段開發，v1.46 完成）：
 - 階段機（`PM_PHASES`）：`intro` 說明 → `setup` 情境設定 → `writing` 開放填寫 →
   `reveal` 揭露 → `ranking` 排序分類 → `mitigation` 對策 → `locked` 定稿
   - **必須依序進行**（v1.44，`pmCanGoPhase`）：往前只能走一步，往回不限。
@@ -248,12 +249,32 @@ The portal supports EN, 繁中, 简中, VI, 日 via `setLang(lang)`. Each langua
 | 讀取權限 | 維持前端 `pmCanSee()` 判斷（sb-proxy 對 premortem 三表**不做列級過濾**） | 同上。**這是已知且已接受的取捨，不是待修的 bug** |
 | 寫入防護 | ✅ 已做（見上方「兩層寫入防護」） | 「看到」與「改到／刪掉」是兩回事：正式紀錄被無痕竄改、整場會議被 cascade 刪除，損害等級不同 |
 
-### 未來工作：腦力激盪子系統
+### 腦力激盪 Brainstorm（v1.47，migration 033）
 
-要用**參數化同一套程式**（`kind` 欄位 + `PM_KINDS` 文案設定表），**不要複製成第二份 3,000 行**。
-兩者是同一台機器換文案：階段機、雙語翻譯、投票、AI 分群、AI 三段分析、四種輸出全部共用，
-差別只有名詞（失敗原因↔點子、對策↔行動項）、引導語與三段 AI prompt。
-複製的代價是每次改動都要做兩遍 —— 光 2026-08 這一輪 premortem 就改了 18 個版本。
+**與事前驗屍是同一套程式**，用 `premortem_sessions.kind` 區分（`'premortem'` / `'brainstorm'`）。
+階段機、雙語翻譯、投票、AI 分群、AI 三段分析、四種輸出、主席控制、寫入防護全部共用，
+資料也在同一組 `premortem_*` 表。**要再加第三種會議，就在 `PM_KINDS` 加一筆，不要複製程式。**
+
+- `PM_KINDS`（board/index.html）是唯一的差異來源。取用一律經 `PMK()`／`PMT()`／
+  `pmPhaseLabel()`／`pmVoteCap()`，**不要在 render 裡寫死「失敗原因」「對策」之類的名詞**。
+  `PMK()` 開著會議室時以 `pmSession.kind` 為準、在清單時以 `pmKind`（目前頁籤）為準
+- 兩個頁籤共用同一份 DOM `#pm-shell`（`pmMountShell()` 把它搬到當前 tabpanel）。
+  這樣 60 行 HTML 與 40 處 `getElementById('pm-…')` 都只有一份；會隨類型變的靜態文字
+  由 `pmApplyKindLabels()` 套上
+- 🔴 **只有三個旗標是真正的行為差異，其餘都是文案**：
+
+  | 旗標 | 事前驗屍 | 腦力激盪 | 為什麼相反 |
+  |---|---|---|---|
+  | `anonymous` | `true` 全程匿名 | `false` 顯示提出者 | 驗屍靠匿名換誠實（主席常是被驗屍專案的負責人）；發想點子沒有「講錯話」的風險，具名反而方便認領與追問 |
+  | `liveVisible` | `false` 填寫時互相看不到 | `true` 即時可見 | 驗屍要避免錨定與從眾（nominal group）；腦力激盪要 Osborn 的 hitchhiking，看到別人的才長得出新的 |
+  | `voteCap` | 3 | 5 | 點子通常比失敗原因多 |
+
+- 🔴 **AI 三段分析的語氣必須跟著換**（`sumSys` / `sumParts`）：驗屍全程嚴厲；腦力激盪
+  **前兩段建設性、第三段才收斂下判斷**。用驗屍的語氣批評剛冒出來的點子，正是 Osborn 第一原則
+  （延遲批判）禁止的事，會直接殺死會議成果。這是複製程式最容易漏掉、也最傷的一項
+- `anonymous:false` 時 `pmSubmittedHtml()` 的 3 人門檻自動停用（名單本來就看得到人名，門檻沒有意義）
+- `kind` 在 sb-proxy 的 `PM_IMMUTABLE`：建立後不可更改（把一場已定稿的驗屍紀錄改成腦力激盪
+  等於竄改正式紀錄的性質）
 
 ## Development Workflow
 

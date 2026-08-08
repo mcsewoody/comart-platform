@@ -154,6 +154,14 @@ The portal supports EN, 繁中, 简中, VI, 日 via `setLang(lang)`. Each langua
 **事前驗屍 Premortem**（Gary Klein 方法，v1.21 起分階段開發，v1.28 完成）：
 - 階段機（`PM_PHASES`）：`intro` 說明 → `setup` 情境設定 → `writing` 開放填寫 →
   `reveal` 揭露 → `ranking` 排序分類 → `mitigation` 對策 → `locked` 定稿
+- **建會時登錄會議基本資訊**（v1.39，migration 031）：會議日期／時間（`meet_at`，自動帶入建會當下的
+  **當地時間**）、會議地點（`meet_location`）、主席（自動帶入，唯讀）、與會人員（`attendees`，自由文字）。
+  會議室頂端、清單列、四種輸出都會顯示
+  - `meet_at` 刻意存 **text（'YYYY-MM-DD HH:mm' 當地時間）而非 timestamptz**：主席填的是當地時間，
+    存 text 就不會有 UTC 換算導致顯示差 8 小時的問題；此格式字典序＝時間序，排序照樣正確。
+    **產生 datetime-local 的預設值不可用 `toISOString()`**（那是 UTC），要用 `pmNowLocal()`
+  - `attendees`（紀錄用的與會名單，自由文字）與 `scope_members`（決定誰打得開這場會議的權限範圍）是兩件事
+  - 對策期限預設改以 `meet_at` 為基準（沒填才退回 `created_at`）
 - 🔴 **主席＝開場的那一個人，`pmIsChair()` 只認 `chair_emp_id`，絕對不要在裡面加 `isAdmin()`**（v1.31）。
   admin 在驗屍會議裡就是一般與會者：不能控制階段（只看到唯讀 badge）、看不到填寫人姓名、
   不能改情境／譯文、不能新增或刪除對策。唯一保留給 admin 的是清單上的「刪除整場會議」（資料治理，不在會議室內）

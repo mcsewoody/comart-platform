@@ -67,7 +67,9 @@ Numbered backup files (`index112.html`, `index328.html`, etc.) are iteration sna
 - `auth-verify` — 伺服器端密碼驗證（PBKDF2，相容舊 SHA-256）+ 簽發 HMAC 簽章 session（`login`/`setPassword`/`adminSetPassword`）。**密碼驗證只在此進行，pwd_hash 永不回前端**
 - `kms-secure-docs` — KMS 機密文件依「簽章驗證過的真實角色」過濾（`list`/`get`/`searchVector`/`searchKeyword`），機密等級在 SQL 層強制
 - `kms-write` — service-role writes to KMS tables（驗 body.session 簽章）；allowed: `kms_documents`,`kms_doc_versions`,`kms_comments`,`kms_review_log`,`kms_experts`,`kms_product_lines`,`kms_search_log`,`kms_snapshots`,`kms_categories`
-- `claude-proxy` — forwards to Anthropic API（驗 `x-session`）; `CLAUDE_API_KEY` from Secrets
+- `claude-proxy` — forwards to Anthropic API（驗 `x-session`）; `CLAUDE_API_KEY` from Secrets。
+  **`body.stream === true` 時直接轉發上游 SSE**（不做 `res.json()`）：長輸出若等 Anthropic 全部產完才回應，
+  會被 gateway 判逾時回 **504**（2026-08-08 board v1.33 實際踩到）。長分析一律走串流
 - `embed-document` / `embed-query` — pgvector embeddings for RAG（驗 `x-session`）
 - `holidays-proxy` — holiday calendar API proxy
 - Secrets：`SESSION_HMAC_SECRET`（session 簽章密鑰，只有 edge function 讀得到）、`SB_SERVICE_ROLE_KEY`、`CLAUDE_API_KEY` 等
@@ -169,9 +171,12 @@ The portal supports EN, 繁中, 简中, VI, 日 via `setLang(lang)`. Each langua
   不留情面、**字數不限**的雙語分析，分三部分 —— ① AI 補充與會者沒想到的失敗原因 ② 逐條挑戰並補強對策
   ③ 彙整全場的會議結論。存進 `premortem_sessions.ai_summary` / `ai_summary_a` / `ai_summary_b` / `summary_at`
   （migration 029），未來可查
-  - **分三次呼叫**，每段完成就立刻 patch 落地（第三段失敗前兩段仍保得住）；第三段會讀到前兩段內容再下結論
+  - 🔴 **必須走串流 `pmClaudeStream()`**（v1.34）：非串流時 claude-proxy 要等 Anthropic 全部產完才回應，
+    長分析必逾時 **504**。不要為了省事改回 `pmClaude()`
+  - 拆成「**一個部分 × 一種語言**」一次呼叫（雙語共 6 段），每段完成立刻 patch 落地（後面失敗前面仍保得住）；
+    第三部分會讀到同語言的前兩部分再下結論。單語言輸出也不必再解析 `===A===` 分隔線
   - 這是唯一用 **`claude-opus-5`** 的地方（`PM_SUM_MODEL`；翻譯與 AI 分群仍用 haiku）。opus-5 預設開 thinking 且
-    `max_tokens` 同時涵蓋 thinking＋回覆，字數不限故每段給 12000
+    `max_tokens` 同時涵蓋 thinking＋回覆，單段單語言給 8000
   - 先鎖定再背景生成，AI 失敗不會卡住定稿；生成中暫停輪詢（否則會把剛寫好的總結蓋回 null）；主席可「↻ 重新生成」
   - 四種輸出都含這段；PDF 的雙語表格 `td` 必須保留 `white-space:pre-wrap`，否則分段長文會塌成一團
 - 多人同步靠輪詢：`pmPollStart()` 每 7 秒抓一次 phase 與 entries；離開頁籤即 `pmPollStop()`

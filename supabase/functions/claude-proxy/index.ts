@@ -32,6 +32,22 @@ serve(async (req) => {
       body: JSON.stringify(body),
     })
 
+    // stream:true → 直接把上游 SSE 轉發給前端。長輸出（如 board 的 AI 評論與總結，
+    // opus-5 + thinking 動輒數十秒到數分鐘）若等 Anthropic 全部產生完才回應，
+    // 這個 function 會被 gateway 判定逾時回 504（2026-08-08 實際踩到）。
+    // 串流讓資料持續流動，連線就不會被中斷。非串流呼叫端（KMS/Portal/quotation）行為不變。
+    if (body && body.stream === true) {
+      return new Response(res.body, {
+        status: res.status,
+        headers: {
+          ...CORS,
+          "Content-Type": res.headers.get("content-type") || "text/event-stream",
+          "Cache-Control": "no-cache",
+          "Connection": "keep-alive",
+        },
+      })
+    }
+
     const data = await res.json()
     return new Response(JSON.stringify(data), {
       status: res.status,

@@ -165,6 +165,11 @@ The portal supports EN, 繁中, 简中, VI, 日 via `setLang(lang)`. Each langua
   改任一語言就自動翻另一語言，親手輸入的那一邊原文照留不回譯
 - 對策的「重點風險」是**下拉挑選高票失敗原因**（v1.28），風險文字與雙語直接沿用該原因，不再重翻
 - 對策期限預設 `pmDefaultDue()` ＝**會議日期（`created_at`）＋14 天**；對策清單雙語上下並排、中間 `---------` 分隔線（v1.31）
+- **定稿（`locked`）會自動產生「AI 會議結論」**（v1.32，`pmGenSummary`）：約 500 字、直接／深刻／嚴厲／不留情面的
+  雙語分析，存進 `premortem_sessions.ai_summary` / `ai_summary_a` / `ai_summary_b` / `summary_at`（migration 029）。
+  這是唯一用 **`claude-opus-5`** 的地方（`PM_SUM_MODEL`；翻譯與 AI 分群仍用 haiku）；opus-5 預設開 thinking 且
+  `max_tokens` 同時涵蓋 thinking＋回覆，故給 8000。先鎖定再背景生成，AI 失敗不會卡住定稿；主席可「↻ 重新生成」。
+  四種輸出都含這段結論
 - 多人同步靠輪詢：`pmPollStart()` 每 7 秒抓一次 phase 與 entries；離開頁籤即 `pmPollStop()`
 - 定稿可輸出四種格式（PDF／PNG／Excel／Email），皆為雙語版面
 

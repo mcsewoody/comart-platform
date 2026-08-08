@@ -154,6 +154,9 @@ The portal supports EN, 繁中, 简中, VI, 日 via `setLang(lang)`. Each langua
 **事前驗屍 Premortem**（Gary Klein 方法，v1.21 起分階段開發，v1.28 完成）：
 - 階段機（`PM_PHASES`）：`intro` 說明 → `setup` 情境設定 → `writing` 開放填寫 →
   `reveal` 揭露 → `ranking` 排序分類 → `mitigation` 對策 → `locked` 定稿
+  - **必須依序進行**（v1.44，`pmCanGoPhase`）：往前只能走一步，往回不限。
+    否則開場就能直接按定稿，產生一場沒有任何內容的「已定稿」紀錄。
+    不可到達的階段鈕會 `disabled` 變灰
 - **建會時登錄會議基本資訊**（v1.39，migration 031）：會議日期／時間（`meet_at`，自動帶入建會當下的
   **當地時間**）、會議地點（`meet_location`）、主席（自動帶入，唯讀）、與會人員（`attendees`，自由文字）。
   會議室頂端、清單列、四種輸出都會顯示

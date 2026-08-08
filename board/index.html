@@ -5,7 +5,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#080C14">
-<title>COMART · 公告與紀錄 v1.32</title>
+<title>COMART · 公告與紀錄 v1.33</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -210,7 +210,7 @@ select,select option,option{background:var(--s2);color:var(--tx)}
     <a class="logo" href="javascript:void(0)">
       <div class="logo-mark">告</div>
       <div class="logo-text">公告與紀錄</div>
-      <span class="logo-ver">v1.32</span>
+      <span class="logo-ver">v1.33</span>
     </a>
     <div class="topbar-right">
       <span class="who-badge" id="whoBadge">—</span>
@@ -2242,6 +2242,7 @@ const PM_BI_FIELDS = {
 let pmBiDraft = { desc:{ a:null, b:null }, scenario:{ a:null, b:null } };  // 編輯中的草稿（輪詢重繪時保留；存檔後清空）
 let pmBiSaving = false;    // 存檔＋翻譯進行中，防重入
 let pmSumGenerating = false;  // AI 會議結論產生中，防重入
+let pmSumStep = 0;            // 目前正在產生第幾部分（1..3），0=未進行
 
 // ── 翻譯（claude-proxy，帶 x-session；一次回兩種目標語言）──
 const PM_LANG_NAME = { 'zh-TW':'Traditional Chinese', 'zh-CN':'Simplified Chinese', 'vi':'Vietnamese', 'en':'English', 'ja':'Japanese' };
@@ -2282,18 +2283,39 @@ async function pmTranslate(text, langA, langB, srcLang) {
 // 用 claude-opus-5：這是整場會議的結論，值得用最強的模型；haiku 寫不出有份量的批判
 const PM_SUM_MODEL = 'claude-opus-5';
 const PM_SUM_SYS =
-  '你是一位資深的專案風險審查顧問，以直接、犀利、不留情面著稱。你的任務是為一場「事前驗屍（Premortem）」會議寫出結論性的總結分析，' +
-  '這段文字會成為這場會議的正式結論並存檔。\n\n' +
+  '你是一位資深的專案風險審查顧問，以直接、犀利、不留情面著稱。你正在審查一場「事前驗屍（Premortem）」會議，' +
+  '你寫出的內容會成為這場會議的正式結論並永久存檔。\n\n' +
   '寫作要求：\n' +
   '- 直接：第一句就講最致命的問題。不要開場白、不要客套、不要重述輸入內容。\n' +
-  '- 深刻：指出風險背後的結構性成因（組織分工、流程缺口、誘因錯置、資訊落差、時程假設），' +
-  '而不是把票數高的原因重新排列一次。指出與會者「沒有說出口」但資料已經指向的問題。\n' +
-  '- 嚴厲：明確寫出這個專案最可能以什麼方式失敗、現有對策哪些只是安慰劑（無負責人、無期限、無驗收標準）、' +
-  '哪些責任被含糊帶過。該說專案準備不足就說。\n' +
+  '- 深刻：指出問題背後的結構性成因（組織分工、流程缺口、誘因錯置、資訊落差、時程假設），' +
+  '而不是把與會者說過的話重新排列一次。要點出他們「沒有說出口」但資料已經指向的問題。\n' +
+  '- 嚴厲：該說專案準備不足就說，該說對策是安慰劑就說，該說責任被含糊帶過就說。\n' +
   '- 不留情面：不要為了讓人好過而軟化結論，不要用「或許」「建議可以考慮」稀釋判斷。' +
   '但只針對事實、決策與流程，絕不做人格攻擊，也不點名個人優劣。\n' +
-  '- 長度：每個語言版本約 500 字（中文以字計，其他語言取相當篇幅），正負 15% 以內。\n' +
-  '- 形式：連續段落散文，2–4 段。不要條列、不要標題、不要 Markdown 符號。';
+  '- 字數不限，但每一句都要有資訊量。寧可少寫幾項而每項都致命，也不要湊數量、不要為了篇幅重複同一個論點。\n' +
+  '- 形式：可用短標題與編號分項，但每一項底下要有完整推理，不要只留一行標語。不要輸出 Markdown 符號（#、**、```）。';
+// 三個階段：補發想 → 補對策 → 總結。分三次呼叫，每次都短一些，避免單次超時，
+// 也讓第三段能讀到前兩段的內容再下結論。
+const PM_SUM_PARTS = [
+  { key: 'p1', title: '【第一部分】AI 補充的失敗原因（補會議發想之不足）',
+    ask: '針對這個會議主題，獨立發想與會者「沒有想到」或「想得太淺」的失敗原因。\n' +
+      '- 不要重複與會者已列出的原因，除非你要指出他們把方向理解錯了。\n' +
+      '- 每一項都要寫出失敗的傳導路徑：什麼先出問題 → 導致什麼 → 最後怎麼收場。\n' +
+      '- 挑最致命、最容易被整個團隊集體忽略的，不要為了數量硬湊。\n' +
+      '- 最後明確指出：他們漏掉的這些原因，反映團隊在哪一類風險上有系統性盲點。' },
+  { key: 'p2', title: '【第二部分】對策的補強與缺口（補團隊思考深度之不足）',
+    ask: '針對與會者提出的每一項對策做補強與挑戰。\n' +
+      '- 逐項指出：這條對策防不住什麼、有什麼副作用、它成立的前提是否真的被滿足、缺少什麼驗收標準。\n' +
+      '- 沒有負責人或沒有期限的對策，直接點出「這條等於沒做」。\n' +
+      '- 若某條對策本質上只是安慰劑（做了讓人安心但不改變失敗機率），直說。\n' +
+      '- 補上高票風險中「完全沒有對應對策」的部分，並給出具體可執行的補強方向（做什麼、誰做、如何驗收）。' },
+  { key: 'p3', title: '【第三部分】AI 會議結論',
+    ask: '彙整整場會議的討論過程，寫出結論。\n' +
+      '- 這場會議真正的發現是什麼；哪些是雜訊。\n' +
+      '- 評估團隊的判斷品質：發想的廣度夠不夠、投票有沒有集中在真正致命的風險上、對策是否對得上高票風險。\n' +
+      '- 最關鍵的三到五個風險，以及它們現在的實際覆蓋狀況。\n' +
+      '- 給出明確結論：這個專案現在該不該按原計畫走，還是必須先補什麼才能往下推。不要停在描述層，要下判斷。' },
+];
 function pmSummaryContext() {
   const s = pmSession, L = [];
   L.push('會議主題：' + (s.title || '(未命名)'));
@@ -2316,49 +2338,74 @@ function pmSummaryContext() {
   }
   return L.join('\n');
 }
-// 產生並存檔；silent=true 時不跳提示（背景自動產生用）
+// 把三段組合成一份完整文稿（side='a'／'b'）；缺的段落留註記，不讓整份看起來像沒產生
+function pmSumAssemble(parts, side) {
+  return PM_SUM_PARTS.filter(p => parts[p.key]).map(p => p.title + '\n' + parts[p.key][side]).join('\n\n');
+}
+// 產生並存檔：分三段依序呼叫，每段完成就立刻寫回（第三段失敗，前兩段仍保得住）
+// silent=true 時不跳開場提示（背景自動產生用）
 async function pmGenSummary(silent) {
   const s = pmSession;
   if (!s || !pmIsChair(s) || pmSumGenerating) return;
-  pmSumGenerating = true;
+  pmSumGenerating = true; pmSumStep = 0;
   pmRenderRoom();
-  if (!silent) boardToast('AI 正在彙整會議結論…');
+  if (!silent) boardToast('AI 正在分三段撰寫會議結論…');
+  const la = PM_LANG_NAME[s.lang_a] || s.lang_a, lb = PM_LANG_NAME[s.lang_b] || s.lang_b;
+  const same = s.lang_a === s.lang_b;
+  const ctx = pmSummaryContext();
+  const parts = {};
   try {
-    const la = PM_LANG_NAME[s.lang_a] || s.lang_a, lb = PM_LANG_NAME[s.lang_b] || s.lang_b;
-    const same = s.lang_a === s.lang_b;
-    const usr = pmSummaryContext() + '\n\n' +
-      '請根據以上會議內容寫出結論分析' + (same ? '（語言：' + la + '）。' : '，並分別以 ' + la + ' 與 ' + lb + ' 各寫一份（兩份都是獨立撰寫的完整分析，不是逐句翻譯）。') + '\n' +
-      '嚴格依下列格式輸出，除了分析內容與分隔線之外不要有任何其他文字：\n' +
-      '===A===\n' + (same ? '（分析）' : '（' + la + ' 的分析）') + '\n===B===\n' + (same ? '（同上，重複一次）' : '（' + lb + ' 的分析）');
-    // opus-5 預設開啟 thinking，max_tokens 涵蓋 thinking + 回覆，故給足 8000
-    const raw = await pmClaude(PM_SUM_SYS, usr, 8000, PM_SUM_MODEL);
-    const mA = raw.indexOf('===A==='), mB = raw.indexOf('===B===');
-    let a, b;
-    if (mA >= 0 && mB > mA) {
-      a = raw.slice(mA + 7, mB).trim();
-      b = raw.slice(mB + 7).trim();
-    } else {              // 模型沒照格式時，整段當單一版本，不讓總結整個掉失
-      a = raw.trim(); b = raw.trim();
+    for (let i = 0; i < PM_SUM_PARTS.length; i++) {
+      const P = PM_SUM_PARTS[i];
+      pmSumStep = i + 1; pmRenderRoom();
+      let usr = '以下是會議資料：\n\n' + ctx + '\n\n';
+      // 第三段要讀得到前兩段，結論才接得上（只餵語言 A 版本，省 token）
+      if (P.key === 'p3' && (parts.p1 || parts.p2)) {
+        usr += '你在前兩個部分已經寫出以下內容，請在結論中一併考慮，但不要整段複述：\n\n' +
+          pmSumAssemble(parts, 'a') + '\n\n';
+      }
+      usr += '現在只寫這一個部分（不要寫其他部分、不要加總結語）：\n' + P.title + '\n' + P.ask + '\n\n' +
+        (same ? '語言：' + la + '。\n'
+              : '請以 ' + la + ' 與 ' + lb + ' 各寫一份，兩份都是獨立撰寫的完整內容，不是逐句翻譯。\n') +
+        '嚴格依下列格式輸出，除了內容與分隔線之外不要有任何其他文字：\n' +
+        '===A===\n' + (same ? '（內容）' : '（' + la + ' 的內容）') + '\n===B===\n' + (same ? '（同上，重複一次）' : '（' + lb + ' 的內容）');
+      // opus-5 預設開啟 thinking，max_tokens 涵蓋 thinking + 回覆；字數不限故給足 12000
+      const raw = await pmClaude(PM_SUM_SYS, usr, 12000, PM_SUM_MODEL);
+      const mA = raw.indexOf('===A==='), mB = raw.indexOf('===B===');
+      let a, b;
+      if (mA >= 0 && mB > mA) { a = raw.slice(mA + 7, mB).trim(); b = raw.slice(mB + 7).trim(); }
+      else { a = raw.trim(); b = raw.trim(); }   // 模型沒照格式時整段當單一版本，不讓這段掉失
+      if (!a) throw new Error(P.title + ' 未產生內容');
+      parts[P.key] = { a: a, b: b || a };
+      await pmSaveSummary(parts);               // 每段各自落地
     }
-    if (!a) throw new Error('AI 未產生內容');
-    if (!b) b = a;
-    const patch = { ai_summary: a, ai_summary_a: a, ai_summary_b: b, summary_at: new Date().toISOString(), updated_at: new Date().toISOString() };
-    await SB.patch('premortem_sessions', 'id=eq.' + encodeURIComponent(s.id), patch);
-    s.ai_summary = a; s.ai_summary_a = a; s.ai_summary_b = b; s.summary_at = patch.summary_at;
-    boardToast('AI 會議結論已產生並存檔');
+    boardToast('AI 會議結論（三部分）已產生並存檔');
   } catch (e) {
     const msg = String(e.message || e);
     // 欄位還沒建立時 PostgREST 會回 42703 / column ... does not exist
-    if (/ai_summary|42703|column/i.test(msg)) boardToast('存檔失敗：資料庫缺少 ai_summary 欄位，請先執行 migration 029');
-    else boardToast('AI 總結失敗：' + msg.slice(0, 80));
+    if (/42703|does not exist|ai_summary/i.test(msg)) boardToast('存檔失敗：資料庫缺少 ai_summary 欄位，請先執行 migration 029');
+    else boardToast('第 ' + pmSumStep + '／' + PM_SUM_PARTS.length + ' 段失敗：' + msg.slice(0, 70) + (Object.keys(parts).length ? '（已完成的段落已存檔，可按重新生成續做）' : ''));
   } finally {
-    pmSumGenerating = false;
+    pmSumGenerating = false; pmSumStep = 0;
     pmRenderRoom();
   }
 }
+async function pmSaveSummary(parts) {
+  const s = pmSession;
+  const a = pmSumAssemble(parts, 'a'), b = pmSumAssemble(parts, 'b');
+  const at = new Date().toISOString();
+  await SB.patch('premortem_sessions', 'id=eq.' + encodeURIComponent(s.id),
+    { ai_summary: a, ai_summary_a: a, ai_summary_b: b, summary_at: at, updated_at: at });
+  s.ai_summary = a; s.ai_summary_a = a; s.ai_summary_b = b; s.summary_at = at;
+}
 function pmSummaryHtml(chair) {
   const s = pmSession;
-  if (pmSumGenerating) return '<div class="empty-note">🤖 AI 正在彙整會議結論…（約需 30–60 秒，請勿離開此頁）</div>';
+  if (pmSumGenerating) {
+    const P = PM_SUM_PARTS[pmSumStep - 1];
+    return '<div class="empty-note">🤖 AI 正在撰寫' + (P ? '（' + pmSumStep + '／' + PM_SUM_PARTS.length + '）' + escHtml(P.title) : '會議結論') +
+      '…<br>三個部分共約需 2–4 分鐘，請勿離開此頁。已完成的段落會即時存檔。</div>' +
+      ((s.ai_summary_a || s.ai_summary) ? '<div style="margin-top:10px">' + pmBiStacked(s.ai_summary, s.ai_summary_a, s.ai_summary_b) + '</div>' : '');
+  }
   if (s.ai_summary_a || s.ai_summary) {
     return pmBiStacked(s.ai_summary, s.ai_summary_a, s.ai_summary_b) +
       (s.summary_at ? '<div style="font-size:11px;color:var(--tx3);margin-top:8px">產生時間：' + escHtml(String(s.summary_at).slice(0, 16).replace('T', ' ')) + '　模型：' + escHtml(PM_SUM_MODEL) + '</div>' : '');
@@ -2668,7 +2715,8 @@ function pmRenderRoom() {
     html += '<div class="panel"><div class="panel-h"><span class="idx">✔</span><h2>對策</h2><span class="sub">措施／負責人／期限</span></div><div class="panel-b">' + pmMitigationsHtml(chair) + '</div></div>';
   } else {
     // locked：唯讀總結。AI 會議結論擺在最前面——這才是這場會議的結論
-    html += '<div class="panel" style="border-color:var(--ac)"><div class="panel-h"><span class="idx">✦</span><h2>AI 會議結論</h2>' +
+    html += '<div class="panel" style="border-color:var(--ac)"><div class="panel-h"><span class="idx">✦</span><h2>AI 評論與總結</h2>' +
+      '<span class="sub">補發想 · 補對策 · 會議結論</span>' +
       (chair && !pmSumGenerating ? '<button class="btn sm" style="margin-left:auto" onclick="pmGenSummary(false)">↻ 重新生成</button>' : '') +
       '</div><div class="panel-b">' + pmSummaryHtml(chair) + '</div></div>';
     html += '<div class="panel"><div class="panel-h"><span class="idx">▤</span><h2>失敗原因（依票數）</h2><span class="sub">共 ' + pmEntries.length + ' 則</span></div><div class="panel-b">' +
@@ -2909,12 +2957,14 @@ function pmGroupsSorted() {
 }
 function pmReportHtml() {
   const s = pmSession, la = escHtml(pmLangShort(s.lang_a)), lb = escHtml(pmLangShort(s.lang_b));
+  // white-space:pre-wrap 是必要的：AI 評論與總結是分段長文，少了它換行會全部塌成一團
+  const td = 'width:50%;vertical-align:top;padding:5px 8px;border:1px solid #ddd;white-space:pre-wrap';
   const bi = (o, a, b) => '<table style="width:100%;border-collapse:collapse;margin:2px 0"><tr>' +
-    '<td style="width:50%;vertical-align:top;padding:5px 8px;border:1px solid #ddd"><div style="font-size:10px;color:#999">' + la + '</div>' + escHtml(a || o || '') + '</td>' +
-    '<td style="width:50%;vertical-align:top;padding:5px 8px;border:1px solid #ddd"><div style="font-size:10px;color:#999">' + lb + '</div>' + escHtml(b || o || '') + '</td></tr></table>';
+    '<td style="' + td + '"><div style="font-size:10px;color:#999">' + la + '</div>' + escHtml(a || o || '') + '</td>' +
+    '<td style="' + td + '"><div style="font-size:10px;color:#999">' + lb + '</div>' + escHtml(b || o || '') + '</td></tr></table>';
   let h = '<h1>' + escHtml(s.title || '(未命名)') + '</h1>';
   h += '<div style="color:#666;font-size:12px">事前驗屍會議紀錄　主席：' + escHtml(s.chair_name || '—') + '</div>';
-  if (s.ai_summary_a || s.ai_summary) h += '<h2>AI 會議結論</h2>' + bi(s.ai_summary, s.ai_summary_a, s.ai_summary_b);
+  if (s.ai_summary_a || s.ai_summary) h += '<h2>AI 評論與總結</h2>' + bi(s.ai_summary, s.ai_summary_a, s.ai_summary_b);
   if (s.project_desc) h += '<h2>專案描述</h2>' + bi(s.project_desc, s.desc_a, s.desc_b);
   h += '<h2>情境</h2>' + bi(s.scenario, s.scenario_a, s.scenario_b);
   h += '<h2>失敗原因（依票數）</h2>';
@@ -2969,7 +3019,7 @@ function pmBuildXlsx() {
   const s = pmSession, la = pmLangShort(s.lang_a), lb = pmLangShort(s.lang_b), data = [];
   data.push(['事前驗屍會議紀錄：' + (s.title || ''), '', '', '']);
   data.push(['分類', '內容（' + la + '）', '內容（' + lb + '）', '備註']);
-  if (s.ai_summary_a || s.ai_summary) data.push(['AI 會議結論', s.ai_summary_a || s.ai_summary, s.ai_summary_b || s.ai_summary, PM_SUM_MODEL]);
+  if (s.ai_summary_a || s.ai_summary) data.push(['AI 評論與總結', s.ai_summary_a || s.ai_summary, s.ai_summary_b || s.ai_summary, PM_SUM_MODEL]);
   if (s.project_desc) data.push(['專案描述', s.desc_a || s.project_desc, s.desc_b || s.project_desc, '']);
   data.push(['情境', s.scenario_a || s.scenario || '', s.scenario_b || s.scenario || '', '']);
   pmGroupsSorted().forEach(g => g.items.forEach(e => data.push(['失敗原因 · ' + g.name, e.text_a || e.text_src || '', e.text_b || e.text_src || '', '票數 ' + pmVoteCount(e)])));
@@ -2995,7 +3045,7 @@ function pmSendMail() {
   const s = pmSession, la = pmLangShort(s.lang_a), lb = pmLangShort(s.lang_b), DIV = '━━━━━━━━━━━━━━━━━━━━━━━━', L = [];
   L.push('事前驗屍會議紀錄：' + (s.title || '')); L.push('');
   if (s.ai_summary_a || s.ai_summary) {
-    L.push(DIV); L.push('【AI 會議結論】');
+    L.push(DIV); L.push('【AI 評論與總結】');
     L.push('[' + la + '] ' + (s.ai_summary_a || s.ai_summary)); L.push('');
     L.push('[' + lb + '] ' + (s.ai_summary_b || s.ai_summary)); L.push('');
   }

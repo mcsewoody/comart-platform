@@ -178,6 +178,10 @@ The portal supports EN, 繁中, 简中, VI, 日 via `setLang(lang)`. Each langua
   - 這是唯一用 **`claude-opus-5`** 的地方（`PM_SUM_MODEL`；翻譯與 AI 分群仍用 haiku）。opus-5 預設開 thinking 且
     `max_tokens` 同時涵蓋 thinking＋回覆，單段單語言給 8000
   - 先鎖定再背景生成，AI 失敗不會卡住定稿；生成中暫停輪詢（否則會把剛寫好的總結蓋回 null）；主席可「↻ 重新生成」
+  - **定稿後主席可「✎ 編輯」修訂這段結論**（v1.35，`pmSumEditToggle`/`pmSaveSummaryEdit`）：雙語各一個大 textarea，
+    存檔時寫 `summary_edited_at` / `summary_edited_by`（migration 030），畫面與四種輸出都會標示「已由主席（○○）修訂」
+    —— AI 產出的正式紀錄若無法分辨是否被人改過，日後追溯就失去意義。**「↻ 重新生成」會把修訂軌跡清成 null**
+    （那是全新的 AI 產出）。編輯中暫停輪詢，免得把主席正在打的字弄掉
   - 四種輸出都含這段；PDF 的雙語表格 `td` 必須保留 `white-space:pre-wrap`，否則分段長文會塌成一團
 - 多人同步靠輪詢：`pmPollStart()` 每 7 秒抓一次 phase 與 entries；離開頁籤即 `pmPollStop()`
 - 定稿可輸出四種格式（PDF／PNG／Excel／Email），皆為雙語版面

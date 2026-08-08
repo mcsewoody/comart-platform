@@ -5,7 +5,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#080C14">
-<title>COMART · 公告與紀錄 v1.34</title>
+<title>COMART · 公告與紀錄 v1.35</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -210,7 +210,7 @@ select,select option,option{background:var(--s2);color:var(--tx)}
     <a class="logo" href="javascript:void(0)">
       <div class="logo-mark">告</div>
       <div class="logo-text">公告與紀錄</div>
-      <span class="logo-ver">v1.34</span>
+      <span class="logo-ver">v1.35</span>
     </a>
     <div class="topbar-right">
       <span class="who-badge" id="whoBadge">—</span>
@@ -2246,6 +2246,9 @@ let pmSumStep = 0;            // 目前產生到第幾段（1..pmSumJobs），0=
 let pmSumJobs = 0;            // 這次總共要產生幾段（部分數 × 語言數）
 let pmSumLabel = '';          // 目前段落的標題（含語言）
 let pmSumLive = '';           // 目前段落已串流回來的文字（即時顯示用）
+let pmSumEditing = false;     // 主席正在編輯 AI 評論與總結
+let pmSumDraft = { a: null, b: null };  // 編輯中的草稿（輪詢重繪時保留；存檔後清空）
+let pmSumSaving = false;      // 編輯存檔中，防重入
 
 // ── 翻譯（claude-proxy，帶 x-session；一次回兩種目標語言）──
 const PM_LANG_NAME = { 'zh-TW':'Traditional Chinese', 'zh-CN':'Simplified Chinese', 'vi':'Vietnamese', 'en':'English', 'ja':'Japanese' };
@@ -2437,10 +2440,65 @@ async function pmSaveSummary(parts) {
   const s = pmSession;
   const a = pmSumAssemble(parts, 'a'), b = pmSumAssemble(parts, 'b');
   const at = new Date().toISOString();
-  await SB.patch('premortem_sessions', 'id=eq.' + encodeURIComponent(s.id),
-    { ai_summary: a, ai_summary_a: a, ai_summary_b: b, summary_at: at, updated_at: at });
-  s.ai_summary = a; s.ai_summary_a = a; s.ai_summary_b = b; s.summary_at = at;
+  // 重新生成＝全新的 AI 產出，清掉舊的人工修訂軌跡
+  const patch = { ai_summary: a, ai_summary_a: a, ai_summary_b: b, summary_at: at, updated_at: at,
+                  summary_edited_at: null, summary_edited_by: null };
+  await SB.patch('premortem_sessions', 'id=eq.' + encodeURIComponent(s.id), patch);
+  Object.assign(s, patch);
 }
+
+// ── 定稿後主席可編輯 AI 評論與總結（AI 寫的正式結論，人必須能修正）──
+function pmSumEditToggle(on) {
+  if (on && !pmIsChair(pmSession)) { boardToast('只有主席能編輯會議結論'); return; }
+  pmSumEditing = !!on;
+  pmSumDraft = { a: null, b: null };
+  pmRenderRoom();
+}
+function pmSumEditorHtml(s) {
+  const la = pmLangShort(s.lang_a), lb = pmLangShort(s.lang_b);
+  const va = pmSumDraft.a !== null ? pmSumDraft.a : (s.ai_summary_a || s.ai_summary || '');
+  const vb = pmSumDraft.b !== null ? pmSumDraft.b : (s.ai_summary_b || s.ai_summary || '');
+  const ta = 'width:100%;font-family:inherit;font-size:13px;line-height:1.6;background:var(--s2);border:1px solid var(--br);border-radius:8px;padding:10px 12px;color:var(--tx);resize:vertical';
+  function box(side, label, val) {
+    return '<div><div style="font-size:11px;color:var(--tx3);letter-spacing:.03em;margin-bottom:4px">' + escHtml(label) + '</div>' +
+      '<textarea id="pm-sum-' + side + '" rows="20" style="' + ta + '" oninput="pmSumDraft.' + side + '=this.value">' + escHtml(val) + '</textarea></div>';
+  }
+  const boxes = s.lang_a === s.lang_b ? box('a', la, va)
+    : '<div class="pm-bi">' + box('a', la, va) + box('b', lb, vb) + '</div>';
+  return boxes +
+    '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px">' +
+    '<button class="btn primary sm" id="pm-sum-save" onclick="pmSaveSummaryEdit()">💾 儲存修訂</button>' +
+    '<button class="btn sm" onclick="pmSumEditToggle(false)">取消</button>' +
+    '<span style="font-size:11px;color:var(--tx3)">修訂後會標示「已由主席修訂」，並同步到四種輸出。</span></div>';
+}
+async function pmSaveSummaryEdit() {
+  const s = pmSession;
+  if (!s || !pmIsChair(s) || pmSumSaving) return;
+  const ea = document.getElementById('pm-sum-a'), eb = document.getElementById('pm-sum-b');
+  const a = (ea ? ea.value : '').trim();
+  const b = eb ? (eb.value || '').trim() : a;          // 單語言時 B 跟 A 一致
+  if (!a) { boardToast('會議結論不可空白'); return; }
+  const btn = document.getElementById('pm-sum-save');
+  if (btn) { btn.disabled = true; btn.textContent = '儲存中…'; }
+  pmSumSaving = true;
+  try {
+    const at = new Date().toISOString();
+    const who = PORTAL_SESSION ? (PORTAL_SESSION.nameZh || PORTAL_SESSION.nameEn || PORTAL_SESSION.empId) : '';
+    const patch = { ai_summary: a, ai_summary_a: a, ai_summary_b: b || a,
+                    summary_edited_at: at, summary_edited_by: who, updated_at: at };
+    await SB.patch('premortem_sessions', 'id=eq.' + encodeURIComponent(s.id), patch);
+    Object.assign(s, patch);
+    pmSumEditing = false; pmSumDraft = { a: null, b: null };
+    pmRenderRoom();                                     // 重繪後 btn 失效，故只在失敗時還原
+    boardToast('會議結論已修訂並存檔');
+  } catch (e) {
+    const msg = String(e.message || e);
+    if (btn) { btn.disabled = false; btn.textContent = '💾 儲存修訂'; }
+    if (/42703|does not exist|summary_edited/i.test(msg)) boardToast('存檔失敗：資料庫缺少 summary_edited_at 欄位，請先執行 migration 030');
+    else boardToast('存檔失敗：' + msg.slice(0, 80));
+  } finally { pmSumSaving = false; }
+}
+function pmTs(v) { return String(v || '').slice(0, 16).replace('T', ' '); }
 function pmSummaryHtml(chair) {
   const s = pmSession;
   if (pmSumGenerating) {
@@ -2451,9 +2509,13 @@ function pmSummaryHtml(chair) {
       '</div>' +
       ((s.ai_summary_a || s.ai_summary) ? '<div style="margin-top:10px">' + pmBiStacked(s.ai_summary, s.ai_summary_a, s.ai_summary_b) + '</div>' : '');
   }
+  if (pmSumEditing) return pmSumEditorHtml(s);
   if (s.ai_summary_a || s.ai_summary) {
+    const meta = [];
+    if (s.summary_at) meta.push('AI 產生：' + pmTs(s.summary_at) + '（' + PM_SUM_MODEL + '）');
+    if (s.summary_edited_at) meta.push('✎ 已由主席' + (s.summary_edited_by ? '（' + s.summary_edited_by + '）' : '') + '修訂：' + pmTs(s.summary_edited_at));
     return pmBiStacked(s.ai_summary, s.ai_summary_a, s.ai_summary_b) +
-      (s.summary_at ? '<div style="font-size:11px;color:var(--tx3);margin-top:8px">產生時間：' + escHtml(String(s.summary_at).slice(0, 16).replace('T', ' ')) + '　模型：' + escHtml(PM_SUM_MODEL) + '</div>' : '');
+      (meta.length ? '<div style="font-size:11px;color:var(--tx3);margin-top:8px">' + escHtml(meta.join('　│　')) + '</div>' : '');
   }
   return '<div class="empty-note">' + (chair ? '尚無 AI 結論，可按右上「重新生成」產生。' : '主席尚未產生 AI 結論。') + '</div>';
 }
@@ -2598,6 +2660,7 @@ async function pmOpen(id) {
   pmSession = s;
   pmDraft = '';
   pmBiDraft = { desc:{ a:null, b:null }, scenario:{ a:null, b:null } };
+  pmSumEditing = false; pmSumDraft = { a: null, b: null };
   pmSrcLang = pmPortalLang();
   await pmFetchEntries();
   await pmFetchMitigations();
@@ -2610,7 +2673,8 @@ async function pmFetchEntries() {
   const rows = await SB.get('premortem_entries', '?session_id=eq.' + encodeURIComponent(pmSession.id) + '&order=created_at.asc');
   pmEntries = rows || [];
 }
-function pmBackToList() { pmPollStop(); pmSession = null; pmEntries = []; pmMitigations = []; pmBiDraft = { desc:{ a:null, b:null }, scenario:{ a:null, b:null } }; pmLoadList(); }
+function pmBackToList() { pmPollStop(); pmSession = null; pmEntries = []; pmMitigations = []; pmBiDraft = { desc:{ a:null, b:null }, scenario:{ a:null, b:null } };
+  pmSumEditing = false; pmSumDraft = { a: null, b: null }; pmLoadList(); }
 
 // ── 輪詢（每 7 秒；phase 或 entries 有變才重繪，並保留填寫草稿）──
 function pmPollStart() { pmPollStop(); pmPollTimer = setInterval(pmPollTick, 7000); }
@@ -2619,14 +2683,14 @@ function pmSig() {
   // 情境／專案描述比對「內容」而非只比有無譯文，主席改字後其他人才會即時更新
   const sp = pmSession ? [pmSession.phase, pmSession.project_desc, pmSession.desc_a, pmSession.desc_b,
     pmSession.scenario, pmSession.scenario_a, pmSession.scenario_b, pmSession.summary_at,
-    pmSession.ai_summary_a, pmSession.ai_summary_b].join('¦') : '';
+    pmSession.ai_summary_a, pmSession.ai_summary_b, pmSession.summary_edited_at].join('¦') : '';
   const es = pmEntries.map(e => e.id + ':' + (e.updated_at || '') + ':' + (e.text_a ? 1 : 0) + (e.text_b ? 1 : 0) + ':' + pmVoteCount(e) + ':' + (e.theme || '')).join(',');
   const ms = pmMitigations.map(m => m.id + ':' + (m.updated_at || m.created_at || '')).join(',');
   return sp + '|' + es + '|' + ms;
 }
 async function pmPollTick() {
   if (!pmSession || document.getElementById('tabpanel-premortem').classList.contains('on') === false) return;
-  if (pmSumGenerating) return;   // 產生中先不輪詢，免得把剛寫好的總結蓋回 null
+  if (pmSumGenerating || pmSumEditing) return;   // 產生中／編輯中不輪詢：免得蓋回 null 或把主席打的字弄掉
   const before = pmSig();
   // 取整列（select=*）而不逐一列欄位：欄位一多就容易漏，且 migration 尚未跑完時不會整個 poll 掛掉
   const rows = await SB.get('premortem_sessions', '?id=eq.' + encodeURIComponent(pmSession.id) + '&select=*');
@@ -2634,7 +2698,7 @@ async function pmPollTick() {
     const r = rows[0];
     // 保留本地正在產生中的狀態，其餘欄位以伺服器為準
     ['phase','roster_locked','project_desc','desc_a','desc_b','scenario','scenario_a','scenario_b',
-     'ai_summary','ai_summary_a','ai_summary_b','summary_at'].forEach(k => { pmSession[k] = r[k]; });
+     'ai_summary','ai_summary_a','ai_summary_b','summary_at','summary_edited_at','summary_edited_by'].forEach(k => { pmSession[k] = r[k]; });
   }
   await pmFetchEntries();
   await pmFetchMitigations();
@@ -2760,9 +2824,15 @@ function pmRenderRoom() {
     html += '<div class="panel"><div class="panel-h"><span class="idx">✔</span><h2>對策</h2><span class="sub">措施／負責人／期限</span></div><div class="panel-b">' + pmMitigationsHtml(chair) + '</div></div>';
   } else {
     // locked：唯讀總結。AI 會議結論擺在最前面——這才是這場會議的結論
+    const hasSum = !!(s.ai_summary_a || s.ai_summary);
+    let sumOps = '';
+    if (chair && !pmSumGenerating && !pmSumEditing) {
+      sumOps = '<span style="margin-left:auto;display:flex;gap:6px">' +
+        (hasSum ? '<button class="btn sm" onclick="pmSumEditToggle(true)">✎ 編輯</button>' : '') +
+        '<button class="btn sm" onclick="pmGenSummary(false)">↻ 重新生成</button></span>';
+    }
     html += '<div class="panel" style="border-color:var(--ac)"><div class="panel-h"><span class="idx">✦</span><h2>AI 評論與總結</h2>' +
-      '<span class="sub">補發想 · 補對策 · 會議結論</span>' +
-      (chair && !pmSumGenerating ? '<button class="btn sm" style="margin-left:auto" onclick="pmGenSummary(false)">↻ 重新生成</button>' : '') +
+      '<span class="sub">' + (pmSumEditing ? '主席修訂中' : '補發想 · 補對策 · 會議結論') + '</span>' + sumOps +
       '</div><div class="panel-b">' + pmSummaryHtml(chair) + '</div></div>';
     html += '<div class="panel"><div class="panel-h"><span class="idx">▤</span><h2>失敗原因（依票數）</h2><span class="sub">共 ' + pmEntries.length + ' 則</span></div><div class="panel-b">' +
       (pmEntries.length ? pmGroupedHtml(2) : '<div class="empty-note">沒有任何填寫內容。</div>') + '</div></div>';
@@ -3009,7 +3079,13 @@ function pmReportHtml() {
     '<td style="' + td + '"><div style="font-size:10px;color:#999">' + lb + '</div>' + escHtml(b || o || '') + '</td></tr></table>';
   let h = '<h1>' + escHtml(s.title || '(未命名)') + '</h1>';
   h += '<div style="color:#666;font-size:12px">事前驗屍會議紀錄　主席：' + escHtml(s.chair_name || '—') + '</div>';
-  if (s.ai_summary_a || s.ai_summary) h += '<h2>AI 評論與總結</h2>' + bi(s.ai_summary, s.ai_summary_a, s.ai_summary_b);
+  if (s.ai_summary_a || s.ai_summary) {
+    h += '<h2>AI 評論與總結</h2>';
+    h += '<div style="font-size:10px;color:#888;margin:-4px 0 4px">' +
+      escHtml('AI 產生：' + pmTs(s.summary_at) + '（' + PM_SUM_MODEL + '）' +
+        (s.summary_edited_at ? '　│　已由主席' + (s.summary_edited_by ? '（' + s.summary_edited_by + '）' : '') + '修訂：' + pmTs(s.summary_edited_at) : '')) + '</div>';
+    h += bi(s.ai_summary, s.ai_summary_a, s.ai_summary_b);
+  }
   if (s.project_desc) h += '<h2>專案描述</h2>' + bi(s.project_desc, s.desc_a, s.desc_b);
   h += '<h2>情境</h2>' + bi(s.scenario, s.scenario_a, s.scenario_b);
   h += '<h2>失敗原因（依票數）</h2>';
@@ -3064,7 +3140,7 @@ function pmBuildXlsx() {
   const s = pmSession, la = pmLangShort(s.lang_a), lb = pmLangShort(s.lang_b), data = [];
   data.push(['事前驗屍會議紀錄：' + (s.title || ''), '', '', '']);
   data.push(['分類', '內容（' + la + '）', '內容（' + lb + '）', '備註']);
-  if (s.ai_summary_a || s.ai_summary) data.push(['AI 評論與總結', s.ai_summary_a || s.ai_summary, s.ai_summary_b || s.ai_summary, PM_SUM_MODEL]);
+  if (s.ai_summary_a || s.ai_summary) data.push(['AI 評論與總結', s.ai_summary_a || s.ai_summary, s.ai_summary_b || s.ai_summary, PM_SUM_MODEL + (s.summary_edited_at ? '／已由主席' + (s.summary_edited_by || '') + '修訂 ' + pmTs(s.summary_edited_at) : '')]);
   if (s.project_desc) data.push(['專案描述', s.desc_a || s.project_desc, s.desc_b || s.project_desc, '']);
   data.push(['情境', s.scenario_a || s.scenario || '', s.scenario_b || s.scenario || '', '']);
   pmGroupsSorted().forEach(g => g.items.forEach(e => data.push(['失敗原因 · ' + g.name, e.text_a || e.text_src || '', e.text_b || e.text_src || '', '票數 ' + pmVoteCount(e)])));
@@ -3090,7 +3166,7 @@ function pmSendMail() {
   const s = pmSession, la = pmLangShort(s.lang_a), lb = pmLangShort(s.lang_b), DIV = '━━━━━━━━━━━━━━━━━━━━━━━━', L = [];
   L.push('事前驗屍會議紀錄：' + (s.title || '')); L.push('');
   if (s.ai_summary_a || s.ai_summary) {
-    L.push(DIV); L.push('【AI 評論與總結】');
+    L.push(DIV); L.push('【AI 評論與總結】' + (s.summary_edited_at ? '（已由主席' + (s.summary_edited_by || '') + '修訂 ' + pmTs(s.summary_edited_at) + '）' : ''));
     L.push('[' + la + '] ' + (s.ai_summary_a || s.ai_summary)); L.push('');
     L.push('[' + lb + '] ' + (s.ai_summary_b || s.ai_summary)); L.push('');
   }

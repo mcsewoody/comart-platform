@@ -173,8 +173,13 @@ The portal supports EN, 繁中, 简中, VI, 日 via `setLang(lang)`. Each langua
   （migration 029），未來可查
   - 🔴 **必須走串流 `pmClaudeStream()`**（v1.34）：非串流時 claude-proxy 要等 Anthropic 全部產完才回應，
     長分析必逾時 **504**。不要為了省事改回 `pmClaude()`
-  - 拆成「**一個部分 × 一種語言**」一次呼叫（雙語共 6 段），每段完成立刻 patch 落地（後面失敗前面仍保得住）；
-    第三部分會讀到同語言的前兩部分再下結論。單語言輸出也不必再解析 `===A===` 分隔線
+  - 🔴 **深度分析只做一次（語言 A），語言 B 是翻譯（`pmTranslateLong`）不是重新發想**（v1.36 修正）。
+    v1.34 讓兩個語言各自重新發想，結果慢一倍、而且**兩個版本會講出不同的風險與不同的結論**——
+    同一場會議不該有兩種結論。翻譯用 opus-5 但 `output_config.effort='low'`（翻譯不需要深度推理），
+    三段譯文 `Promise.all` 並行；單段翻譯失敗就退回原文，不讓整份掉失
+  - 流程：語言 A 依序三段（第三部分要讀到前兩部分才下結論）→ 三段譯文並行。每段完成立刻 patch 落地
+  - 段落小標存在 `PM_SUM_PARTS[].disp`（五語對照），`pmSumAssemble()` 依該版本語言挑選，
+    否則越南文版會夾著中文小標
   - 這是唯一用 **`claude-opus-5`** 的地方（`PM_SUM_MODEL`；翻譯與 AI 分群仍用 haiku）。opus-5 預設開 thinking 且
     `max_tokens` 同時涵蓋 thinking＋回覆，單段單語言給 8000
   - 先鎖定再背景生成，AI 失敗不會卡住定稿；生成中暫停輪詢（否則會把剛寫好的總結蓋回 null）；主席可「↻ 重新生成」

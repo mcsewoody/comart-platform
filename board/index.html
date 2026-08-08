@@ -5,7 +5,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#080C14">
-<title>COMART · 公告與紀錄 v1.35</title>
+<title>COMART · 公告與紀錄 v1.36</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -210,7 +210,7 @@ select,select option,option{background:var(--s2);color:var(--tx)}
     <a class="logo" href="javascript:void(0)">
       <div class="logo-mark">告</div>
       <div class="logo-text">公告與紀錄</div>
-      <span class="logo-ver">v1.35</span>
+      <span class="logo-ver">v1.36</span>
     </a>
     <div class="topbar-right">
       <span class="who-badge" id="whoBadge">—</span>
@@ -2275,10 +2275,11 @@ async function pmClaude(system, user, maxTokens, model) {
 // 串流版：長輸出必須走這條。非串流時 claude-proxy 要等 Anthropic 全部產完才回應，
 // opus-5 + thinking 的長分析會讓 edge function 逾時回 504（2026-08-08 實際踩到）。
 // onDelta(累積文字) 可即時把內容顯示出來。
-async function pmClaudeStream(system, user, maxTokens, model, onDelta) {
+async function pmClaudeStream(system, user, maxTokens, model, onDelta, extra) {
+  const body = { model: model, max_tokens: maxTokens, system, messages: [{ role: 'user', content: user }], stream: true };
+  if (extra) Object.assign(body, extra);        // 例如 output_config:{effort:'low'}
   const res = await fetch(PM_SB_BASE + '/functions/v1/claude-proxy', {
-    method: 'POST', headers: sbHdrs(),
-    body: JSON.stringify({ model: model, max_tokens: maxTokens, system, messages: [{ role: 'user', content: user }], stream: true })
+    method: 'POST', headers: sbHdrs(), body: JSON.stringify(body)
   });
   if (!res.ok) { if (res.status === 401) sbNoteAuth(401); const t = await res.text(); throw new Error('claude-proxy ' + res.status + ': ' + t.slice(0, 120)); }
   if (!res.body) throw new Error('此瀏覽器不支援串流回應');
@@ -2338,18 +2339,27 @@ const PM_SUM_SYS =
 // 也讓第三段能讀到前兩段的內容再下結論。
 const PM_SUM_PARTS = [
   { key: 'p1', title: '【第一部分】AI 補充的失敗原因（補會議發想之不足）',
+    disp: { 'zh-TW':'【第一部分】AI 補充的失敗原因', 'zh-CN':'【第一部分】AI 补充的失败原因',
+      vi:'【Phần 1】Nguyên nhân thất bại do AI bổ sung', en:'[Part 1] Additional failure causes identified by AI',
+      ja:'【第1部】AI が追加した失敗要因' },
     ask: '針對這個會議主題，獨立發想與會者「沒有想到」或「想得太淺」的失敗原因。\n' +
       '- 不要重複與會者已列出的原因，除非你要指出他們把方向理解錯了。\n' +
       '- 每一項都要寫出失敗的傳導路徑：什麼先出問題 → 導致什麼 → 最後怎麼收場。\n' +
       '- 挑最致命、最容易被整個團隊集體忽略的，不要為了數量硬湊。\n' +
       '- 最後明確指出：他們漏掉的這些原因，反映團隊在哪一類風險上有系統性盲點。' },
   { key: 'p2', title: '【第二部分】對策的補強與缺口（補團隊思考深度之不足）',
+    disp: { 'zh-TW':'【第二部分】對策的補強與缺口', 'zh-CN':'【第二部分】对策的补强与缺口',
+      vi:'【Phần 2】Lỗ hổng và cách củng cố các biện pháp đối phó', en:'[Part 2] Gaps in the countermeasures and how to close them',
+      ja:'【第2部】対策の補強と欠落' },
     ask: '針對與會者提出的每一項對策做補強與挑戰。\n' +
       '- 逐項指出：這條對策防不住什麼、有什麼副作用、它成立的前提是否真的被滿足、缺少什麼驗收標準。\n' +
       '- 沒有負責人或沒有期限的對策，直接點出「這條等於沒做」。\n' +
       '- 若某條對策本質上只是安慰劑（做了讓人安心但不改變失敗機率），直說。\n' +
       '- 補上高票風險中「完全沒有對應對策」的部分，並給出具體可執行的補強方向（做什麼、誰做、如何驗收）。' },
   { key: 'p3', title: '【第三部分】AI 會議結論',
+    disp: { 'zh-TW':'【第三部分】AI 會議結論', 'zh-CN':'【第三部分】AI 会议结论',
+      vi:'【Phần 3】Kết luận cuộc họp của AI', en:'[Part 3] AI meeting conclusion',
+      ja:'【第3部】AI による会議結論' },
     ask: '彙整整場會議的討論過程，寫出結論。\n' +
       '- 這場會議真正的發現是什麼；哪些是雜訊。\n' +
       '- 評估團隊的判斷品質：發想的廣度夠不夠、投票有沒有集中在真正致命的風險上、對策是否對得上高票風險。\n' +
@@ -2378,10 +2388,24 @@ function pmSummaryContext() {
   }
   return L.join('\n');
 }
+// 長文翻譯：語言 B 版本走這條，不重新發想。effort=low 讓翻譯快很多（翻譯不需要深度推理），
+// 但仍用 opus-5——這是要存檔的正式結論，譯文品質不能將就。
+async function pmTranslateLong(text, toLang) {
+  const t = (text || '').trim(); if (!t) return '';
+  const sys = '你是專業的企業會議紀錄譯者。忠實翻譯，**保留原文的語氣強度與段落結構**——' +
+    '這是一份措辭嚴厲的風險審查報告，絕對不要把批判性的判斷翻得比原文客氣、也不要加上原文沒有的緩衝語。' +
+    '專有名詞、產品名、型號、數字、日期一律保持原樣。' +
+    '只輸出譯文本身，不要任何前言、說明或標記。不要在回覆中包含任何內部或系統 XML 標籤。';
+  const usr = '請把以下內容翻譯成 ' + (PM_LANG_NAME[toLang] || toLang) + '：\n\n"""\n' + t + '\n"""';
+  const out = await pmClaudeStream(sys, usr, 8000, PM_SUM_MODEL, null, { output_config: { effort: 'low' } });
+  return out.trim();
+}
 // 把三段組合成一份完整文稿（side='a'／'b'）；缺的段落留註記，不讓整份看起來像沒產生
 function pmSumAssemble(parts, side) {
+  // 小標要跟著該版本的語言走，否則越南文版會夾著中文標題
+  const lang = pmSession ? (side === 'b' ? pmSession.lang_b : pmSession.lang_a) : 'zh-TW';
   return PM_SUM_PARTS.filter(p => parts[p.key] && parts[p.key][side])
-    .map(p => p.title + '\n' + parts[p.key][side]).join('\n\n');
+    .map(p => ((p.disp && (p.disp[lang] || p.disp['zh-TW'])) || p.title) + '\n' + parts[p.key][side]).join('\n\n');
 }
 // 產生並存檔：分三段依序呼叫，每段完成就立刻寫回（第三段失敗，前兩段仍保得住）
 // silent=true 時不跳開場提示（背景自動產生用）
@@ -2390,40 +2414,49 @@ async function pmGenSummary(silent) {
   if (!s || !pmIsChair(s) || pmSumGenerating) return;
   const same = s.lang_a === s.lang_b;
   const langName = { a: PM_LANG_NAME[s.lang_a] || s.lang_a, b: PM_LANG_NAME[s.lang_b] || s.lang_b };
-  // 一次只產生「一個部分 × 一種語言」：呼叫短、失敗granularity 細，也不必再解析分隔線
-  const jobs = [];
-  PM_SUM_PARTS.forEach(P => { jobs.push({ P: P, side: 'a' }); if (!same) jobs.push({ P: P, side: 'b' }); });
-  pmSumGenerating = true; pmSumStep = 0; pmSumJobs = jobs.length; pmSumLive = '';
+  // 深度分析只做一次（語言 A），語言 B 是翻譯而非重新發想。理由有二：
+  // 1. 重新發想＝同一份分析跑兩遍，慢一倍；
+  // 2. 更重要的是兩個語言版本會講出不同的風險與不同的結論——同一場會議不該有兩種結論。
+  pmSumGenerating = true; pmSumStep = 0; pmSumJobs = PM_SUM_PARTS.length + (same ? 0 : 1); pmSumLive = '';
   pmRenderRoom();
-  if (!silent) boardToast('AI 正在撰寫會議結論（共 ' + jobs.length + ' 段）…');
+  if (!silent) boardToast('AI 正在撰寫會議結論…' + (same ? '' : '（' + langName.b + '版隨後翻譯）'));
   const ctx = pmSummaryContext();
   const parts = {};
+  const liveDelta = function (partial) {
+    pmSumLive = partial;
+    const el = document.getElementById('pm-sum-live');
+    if (el) el.textContent = partial.slice(-600);
+  };
   try {
-    for (let i = 0; i < jobs.length; i++) {
-      const J = jobs[i], P = J.P;
-      pmSumStep = i + 1; pmSumLabel = P.title + '（' + langName[J.side] + '）'; pmSumLive = '';
+    // ── 階段一：以語言 A 依序產生三個部分（第三部分要讀得到前兩部分）──
+    for (let i = 0; i < PM_SUM_PARTS.length; i++) {
+      const P = PM_SUM_PARTS[i];
+      pmSumStep = i + 1; pmSumLabel = P.title + '（' + langName.a + '）'; pmSumLive = '';
       pmRenderRoom();
       let usr = '以下是會議資料：\n\n' + ctx + '\n\n';
-      // 第三部分要讀得到前兩部分（同語言版本），結論才接得上
       if (P.key === 'p3' && (parts.p1 || parts.p2)) {
         usr += '你在前兩個部分已經寫出以下內容，請在結論中一併考慮，但不要整段複述：\n\n' +
-          pmSumAssemble(parts, J.side) + '\n\n';
+          pmSumAssemble(parts, 'a') + '\n\n';
       }
       usr += '現在只寫這一個部分（不要寫其他部分、不要加開場或收尾語）：\n' + P.title + '\n' + P.ask + '\n\n' +
-        '請以 ' + langName[J.side] + ' 撰寫，直接輸出內容本身，不要任何前言、標記或說明。';
+        '請以 ' + langName.a + ' 撰寫，直接輸出內容本身，不要任何前言、標記或說明。';
       // 走串流：非串流時 edge function 會等 Anthropic 全部產完，長輸出必逾時 504。
-      // opus-5 預設開 thinking，max_tokens 涵蓋 thinking + 回覆，單段單語言給 8000 足夠。
-      const txt = await pmClaudeStream(PM_SUM_SYS, usr, 8000, PM_SUM_MODEL, function (partial) {
-        pmSumLive = partial;
-        const el = document.getElementById('pm-sum-live');
-        if (el) el.textContent = partial.slice(-600);
-      });
+      // opus-5 預設開 thinking，max_tokens 涵蓋 thinking + 回覆，單段給 8000 足夠。
+      const txt = await pmClaudeStream(PM_SUM_SYS, usr, 8000, PM_SUM_MODEL, liveDelta);
       const clean = txt.trim();
       if (!clean) throw new Error(P.title + ' 未產生內容');
-      parts[P.key] = parts[P.key] || {};
-      parts[P.key][J.side] = clean;
-      if (same) parts[P.key].b = clean;
+      parts[P.key] = { a: clean, b: same ? clean : '' };
       await pmSaveSummary(parts);               // 每段各自落地
+    }
+    // ── 階段二：三段譯文並行（翻譯不需要深度思考，三段同時跑可省一大段時間）──
+    if (!same) {
+      pmSumStep = pmSumJobs; pmSumLabel = '翻譯成 ' + langName.b + '（三段同時進行）'; pmSumLive = '';
+      pmRenderRoom();
+      await Promise.all(PM_SUM_PARTS.map(async function (P) {
+        try { parts[P.key].b = await pmTranslateLong(parts[P.key].a, s.lang_b); }
+        catch (err) { parts[P.key].b = parts[P.key].a; }   // 單段翻譯失敗就先放原文，不讓整份掉失
+      }));
+      await pmSaveSummary(parts);
     }
     boardToast('AI 評論與總結已產生並存檔');
   } catch (e) {

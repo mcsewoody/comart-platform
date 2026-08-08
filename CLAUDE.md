@@ -171,9 +171,16 @@ The portal supports EN, 繁中, 简中, VI, 日 via `setLang(lang)`. Each langua
     `filter:invert(1)` 反白
 - 🔴 **主席＝開場的那一個人，`pmIsChair()` 只認 `chair_emp_id`，絕對不要在裡面加 `isAdmin()`**（v1.31）。
   admin 在驗屍會議裡就是一般與會者：不能控制階段（只看到唯讀 badge）、看不到填寫人姓名、
-  不能改情境／譯文、不能新增或刪除對策。唯一保留給 admin 的是清單上的「刪除整場會議」（資料治理，不在會議室內）
-- 作者姓名只有主席看得到（`pmEntryHtml` 的 `showAuthor` 一律傳 `pmIsChair()`）；PDF／PNG／Excel／Email
-  四種輸出都不含姓名
+  不能改情境／譯文、不能新增或刪除對策。唯一保留給 admin 的是清單上的「刪除整場會議」（資料治理，不在會議室內）；
+  **這條在 sb-proxy 也擋了**（`DELETE premortem_sessions` 需 role=admin）——一場會議被刪會 cascade
+  帶走 entries/mitigations，比覆寫更嚴重
+- 🔴 **填寫者姓名一律不顯示，連主席也不顯示**（v1.43）：事前驗屍靠匿名換誠實，主席若看得到誰寫了哪一條，
+  與會者就會自我審查。`pmEntryHtml()` 已無 `showAuthor` 參數，**不要把 author_name 加回畫面**
+  （DB 仍存 `author_emp_id`，供「只看得到自己填的」「刪自己填的」與必要時的後台稽核）
+  - 主席改看 `pmSubmittedHtml()` 的「已填／未填名單」催填。**3 人門檻對兩份名單都要套用** ——
+    名單是互補的，5 人裡列出 4 個未填，等於指名剩下那 1 人就是即時彙整裡那些內容的作者
+  - 「✎譯」按鈕原本綁在 `showAuthor` 上，已改綁 `bilingual && pmIsChair()`；**動這裡要順便確認它還在**
+- 投票只顯示票數，畫面上從不顯示投票人；PDF／PNG／Excel／Email 四種輸出都不含姓名
 - 填寫階段**範圍內所有人（含主席）都可填寫**（v1.23 決定，別再改回只有成員可填）
 - 投票上限 `PM_VOTE_CAP = 3`（排序階段）
 - 雙語：每則失敗原因寫入後自動經 `claude-proxy` 翻成會議設定的兩種語言，存 `text_a`/`text_b`
@@ -209,6 +216,13 @@ The portal supports EN, 繁中, 简中, VI, 日 via `setLang(lang)`. Each langua
     —— AI 產出的正式紀錄若無法分辨是否被人改過，日後追溯就失去意義。**「↻ 重新生成」會把修訂軌跡清成 null**
     （那是全新的 AI 產出）。編輯中暫停輪詢，免得把主席正在打的字弄掉
   - 四種輸出都含這段；PDF 的雙語表格 `td` 必須保留 `white-space:pre-wrap`，否則分段長文會塌成一團
+  - 🔐 **兩層寫入防護**（v1.43）：
+    ① `premortem_summary_audit` trigger（migration 032）—— `ai_summary` 每次被改動就把舊版存進
+    `premortem_summary_log`。**trigger 不會被 service_role 繞過**（RLS 會），這是前端與代理都繞不過的一層。
+    該 log 表**刻意不在 sb-proxy 的 `ALLOWED_TABLES`**：稽核紀錄不該能被應用程式讀取或刪除，只能從後台查
+    ② sb-proxy 欄位守衛 —— PATCH `premortem_sessions` 若含 `ai_summary*`／`summary_*`／`phase`，
+    必須是該場主席本人（比對簽章 empId 與 `chair_emp_id`）；`chair_emp_id`／`created_by` 完全禁改；
+    取不到 `?id=eq.<id>` 一律拒絕（不猜其他 filter 的語意），查詢失敗也拒絕（fail-closed）
 - 多人同步靠輪詢：`pmPollStart()` 每 7 秒抓一次 phase 與 entries；離開頁籤即 `pmPollStop()`
 - 定稿可輸出四種格式（PDF／PNG／Excel／Email），皆為雙語版面
 

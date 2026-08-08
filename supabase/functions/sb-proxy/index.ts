@@ -49,7 +49,19 @@ const ALLOWED_TABLES = new Set([
   "sites","suppliers","trips","users","visit_guests","visit_records","weekly_minutes",
   "woody_reports",
   "premortem_sessions","premortem_entries","premortem_mitigations",
+  // 注意：premortem_summary_log（AI 結論的版本歷史）**刻意不列入**——
+  // 稽核紀錄不該能被應用程式讀取或刪除，只能從 Supabase 後台查。
 ])
+
+// ── 事前驗屍：受保護欄位 ──
+// AI 評論與總結是永久存檔的會議正式結論；phase 決定會議進程；chair_emp_id 是整套權限的根。
+// 這些欄位的 PATCH 必須是「該場會議的主席本人」，不能只靠前端的 pmIsChair()（那是 UI）。
+const PM_PROTECTED = new Set([
+  "ai_summary", "ai_summary_a", "ai_summary_b", "summary_at",
+  "summary_edited_at", "summary_edited_by", "phase",
+])
+// chair_emp_id 完全禁止改：沒有任何正當情境要換主席，改了等於接管整場會議
+const PM_IMMUTABLE = new Set(["chair_emp_id", "created_by"])
 
 function json(obj: unknown, status = 200) {
   return new Response(JSON.stringify(obj), { status, headers: { ...CORS, "Content-Type": "application/json" } })
@@ -151,6 +163,12 @@ serve(async (req) => {
     if (!selfPatch) return json({ error: "forbidden", table, hint: "admin role required" }, 403)
   }
 
+  // ── 事前驗屍：刪除整場會議僅限 admin（前端的 isAdmin() 只是 UI，這裡才是真的擋） ──
+  // 一場會議被刪，連帶 entries/mitigations 因 on delete cascade 一起消失，比覆寫更嚴重
+  if (req.method === "DELETE" && table === "premortem_sessions" && role !== "admin") {
+    return json({ error: "forbidden", hint: "admin role required to delete a premortem session" }, 403)
+  }
+
   // 寫入 users 時剝除 pwd_hash（密碼只能經 auth-verify；防止有人用本代理改密碼雜湊）；
   // 自助 PATCH 再套欄位白名單（不得改 role/active/emp_id 等）
   let body: string | undefined = undefined
@@ -166,6 +184,34 @@ serve(async (req) => {
         }
         body = JSON.stringify(Array.isArray(parsed) ? parsed.map(scrub) : scrub(parsed))
       } catch { body = rawText }
+    } else if (table === "premortem_sessions" && req.method === "PATCH" && rawText) {
+      // ── 受保護欄位：必須是該場會議的主席本人 ──
+      let parsed: Record<string, unknown>
+      try { parsed = JSON.parse(rawText) } catch { return json({ error: "bad_json" }, 400) }
+      const keys = Object.keys(parsed || {})
+      if (keys.some((k) => PM_IMMUTABLE.has(k))) {
+        return json({ error: "forbidden", hint: "chair_emp_id/created_by are immutable" }, 403)
+      }
+      if (keys.some((k) => PM_PROTECTED.has(k))) {
+        // 只認 ?id=eq.<id> 這一種形式；取不到 id 就預設拒絕（不去猜其他 filter 的語意）
+        const idFilter = url.searchParams.get("id") || ""
+        const sid = idFilter.startsWith("eq.") ? idFilter.slice(3) : ""
+        if (!sid) return json({ error: "forbidden", hint: "protected fields require ?id=eq.<session_id>" }, 403)
+        // 這支 function 沒有全域 try/catch，查詢若拋例外會變成 500；包起來並「失敗即拒絕」
+        let chairId = ""
+        try {
+          const chk = await fetch(
+            `${SUPABASE_URL}/rest/v1/premortem_sessions?id=eq.${encodeURIComponent(sid)}&select=chair_emp_id`,
+            { headers: elevatedApiHeaders(SERVICE_KEY) },
+          )
+          const rows = chk.ok ? await chk.json() : []
+          chairId = Array.isArray(rows) && rows[0] ? String(rows[0].chair_emp_id || "") : ""
+        } catch { chairId = "" }
+        if (!chairId || chairId !== sessEmpId) {
+          return json({ error: "forbidden", hint: "only the chair of this session may change it" }, 403)
+        }
+      }
+      body = rawText
     } else {
       body = rawText || undefined
     }

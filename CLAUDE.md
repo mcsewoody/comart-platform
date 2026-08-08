@@ -150,13 +150,21 @@ The portal supports EN, 繁中, 简中, VI, 日 via `setLang(lang)`. Each langua
 | 事前驗屍 | `pm*` | `premortem_sessions`、`premortem_entries`、`premortem_mitigations` |
 
 **事前驗屍 Premortem**（Gary Klein 方法，v1.21 起分階段開發，v1.28 完成）：
-- 階段機（`PM_PHASES`，`board/index.html:2180`）：`intro` 說明 → `setup` 情境設定 → `writing` 開放填寫 →
-  `reveal` 揭露 → `ranking` 排序分類 → `mitigation` 對策 → `locked` 定稿。階段推進只有主席／admin 可操作
-- 填寫階段**所有人（含主席／admin）都可填寫**（v1.23 決定，別再改回只有成員可填）
+- 階段機（`PM_PHASES`）：`intro` 說明 → `setup` 情境設定 → `writing` 開放填寫 →
+  `reveal` 揭露 → `ranking` 排序分類 → `mitigation` 對策 → `locked` 定稿
+- 🔴 **主席＝開場的那一個人，`pmIsChair()` 只認 `chair_emp_id`，絕對不要在裡面加 `isAdmin()`**（v1.31）。
+  admin 在驗屍會議裡就是一般與會者：不能控制階段（只看到唯讀 badge）、看不到填寫人姓名、
+  不能改情境／譯文、不能新增或刪除對策。唯一保留給 admin 的是清單上的「刪除整場會議」（資料治理，不在會議室內）
+- 作者姓名只有主席看得到（`pmEntryHtml` 的 `showAuthor` 一律傳 `pmIsChair()`）；PDF／PNG／Excel／Email
+  四種輸出都不含姓名
+- 填寫階段**範圍內所有人（含主席）都可填寫**（v1.23 決定，別再改回只有成員可填）
 - 投票上限 `PM_VOTE_CAP = 3`（排序階段）
 - 雙語：每則失敗原因寫入後自動經 `claude-proxy` 翻成會議設定的兩種語言，存 `text_a`/`text_b`
   （情境與專案說明同理存 `desc_a`/`desc_b`、`scenario_a`/`scenario_b`）。**已翻譯過的不重翻**
+- `setup` 階段主席可雙語編輯專案描述與情境（`PM_BI_FIELDS` + `pmBiEditorHtml`/`pmSaveBiField`，v1.29–v1.30）：
+  改任一語言就自動翻另一語言，親手輸入的那一邊原文照留不回譯
 - 對策的「重點風險」是**下拉挑選高票失敗原因**（v1.28），風險文字與雙語直接沿用該原因，不再重翻
+- 對策期限預設 `pmDefaultDue()` ＝**會議日期（`created_at`）＋14 天**；對策清單雙語上下並排、中間 `---------` 分隔線（v1.31）
 - 多人同步靠輪詢：`pmPollStart()` 每 7 秒抓一次 phase 與 entries；離開頁籤即 `pmPollStop()`
 - 定稿可輸出四種格式（PDF／PNG／Excel／Email），皆為雙語版面
 

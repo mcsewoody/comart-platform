@@ -160,8 +160,13 @@ The portal supports EN, 繁中, 简中, VI, 日 via `setLang(lang)`. Each langua
   - `meet_at` 刻意存 **text（'YYYY-MM-DD HH:mm' 當地時間）而非 timestamptz**：主席填的是當地時間，
     存 text 就不會有 UTC 換算導致顯示差 8 小時的問題；此格式字典序＝時間序，排序照樣正確。
     **產生 datetime-local 的預設值不可用 `toISOString()`**（那是 UTC），要用 `pmNowLocal()`
-  - `attendees`（紀錄用的與會名單，自由文字）與 `scope_members`（決定誰打得開這場會議的權限範圍）是兩件事
+  - `attendees`（紀錄用的與會名單，自由文字）與 `scope_members`（決定誰打得開這場會議的權限範圍）是兩件事；
+    建會表單有「＋ 帶入指定人員」（`pmFillAttendees`）把勾選的人附加進來並去重，列席者仍可手動補打
   - 對策期限預設改以 `meet_at` 為基準（沒填才退回 `created_at`）
+  - **主席可在任何階段（含定稿後）按資訊卡的「✎ 修改」改日期／地點／與會人員**（v1.40，`pmSaveMeetInfo`）；
+    主席欄位固定為開場者不可改。編輯中暫停輪詢
+  - `datetime-local` 欄位一律加 `class="pm-dt"`（白底黑字 + `color-scheme:light`）：深色底下原生挑選器的
+    圖示與面板幾乎看不見
 - 🔴 **主席＝開場的那一個人，`pmIsChair()` 只認 `chair_emp_id`，絕對不要在裡面加 `isAdmin()`**（v1.31）。
   admin 在驗屍會議裡就是一般與會者：不能控制階段（只看到唯讀 badge）、看不到填寫人姓名、
   不能改情境／譯文、不能新增或刪除對策。唯一保留給 admin 的是清單上的「刪除整場會議」（資料治理，不在會議室內）

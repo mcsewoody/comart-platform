@@ -163,10 +163,25 @@ serve(async (req) => {
     if (!selfPatch) return json({ error: "forbidden", table, hint: "admin role required" }, 403)
   }
 
-  // ── 事前驗屍：刪除整場會議僅限 admin（前端的 isAdmin() 只是 UI，這裡才是真的擋） ──
-  // 一場會議被刪，連帶 entries/mitigations 因 on delete cascade 一起消失，比覆寫更嚴重
-  if (req.method === "DELETE" && table === "premortem_sessions" && role !== "admin") {
-    return json({ error: "forbidden", hint: "admin role required to delete a premortem session" }, 403)
+  // ── 事前驗屍：刪除整場會議僅限「該場主席本人」 ──
+  // admin 在驗屍會議裡沒有任何特權，刪除也不例外（與 pmIsChair 的設計一致）。
+  // 一場會議被刪，連帶 entries/mitigations 因 on delete cascade 一起消失，比覆寫更嚴重。
+  if (req.method === "DELETE" && table === "premortem_sessions") {
+    const idFilter = url.searchParams.get("id") || ""
+    const sid = idFilter.startsWith("eq.") ? idFilter.slice(3) : ""
+    if (!sid) return json({ error: "forbidden", hint: "delete requires ?id=eq.<session_id>" }, 403)
+    let chairId = ""
+    try {
+      const chk = await fetch(
+        `${SUPABASE_URL}/rest/v1/premortem_sessions?id=eq.${encodeURIComponent(sid)}&select=chair_emp_id`,
+        { headers: elevatedApiHeaders(SERVICE_KEY) },
+      )
+      const rows = chk.ok ? await chk.json() : []
+      chairId = Array.isArray(rows) && rows[0] ? String(rows[0].chair_emp_id || "") : ""
+    } catch { chairId = "" }
+    if (!chairId || chairId !== sessEmpId) {
+      return json({ error: "forbidden", hint: "only the chair of this session may delete it" }, 403)
+    }
   }
 
   // 寫入 users 時剝除 pwd_hash（密碼只能經 auth-verify；防止有人用本代理改密碼雜湊）；

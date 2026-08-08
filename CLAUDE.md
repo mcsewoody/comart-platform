@@ -174,8 +174,8 @@ The portal supports EN, 繁中, 简中, VI, 日 via `setLang(lang)`. Each langua
     `filter:invert(1)` 反白
 - 🔴 **主席＝開場的那一個人，`pmIsChair()` 只認 `chair_emp_id`，絕對不要在裡面加 `isAdmin()`**（v1.31）。
   admin 在驗屍會議裡就是一般與會者：不能控制階段（只看到唯讀 badge）、看不到填寫人姓名、
-  不能改情境／譯文、不能新增或刪除對策。唯一保留給 admin 的是清單上的「刪除整場會議」（資料治理，不在會議室內）；
-  **這條在 sb-proxy 也擋了**（`DELETE premortem_sessions` 需 role=admin）——一場會議被刪會 cascade
+  不能改情境／譯文、不能新增或刪除對策。**刪除整場會議也只有該場主席能做**（v1.45，admin 沒有例外），
+  sb-proxy 同步擋下（`DELETE premortem_sessions` 需比對 `chair_emp_id`）——一場會議被刪會 cascade
   帶走 entries/mitigations，比覆寫更嚴重
 - 🔴 **填寫者姓名一律不顯示，連主席也不顯示**（v1.43）：事前驗屍靠匿名換誠實，主席若看得到誰寫了哪一條，
   與會者就會自我審查。`pmEntryHtml()` 已無 `showAuthor` 參數，**不要把 author_name 加回畫面**
@@ -191,6 +191,8 @@ The portal supports EN, 繁中, 简中, VI, 日 via `setLang(lang)`. Each langua
 - `setup` 階段主席可雙語編輯專案描述與情境（`PM_BI_FIELDS` + `pmBiEditorHtml`/`pmSaveBiField`，v1.29–v1.30）：
   改任一語言就自動翻另一語言，親手輸入的那一邊原文照留不回譯
 - 對策的「重點風險」是**下拉挑選高票失敗原因**（v1.28），風險文字與雙語直接沿用該原因，不再重翻
+- 對策的雙語顯示用 `pmBiOrdered()`（v1.45）：**中文一律排在上面**（不管它是設定的語言 A 還是 B）、
+  風險與措施與 meta 同一字級（13.5px）、兩語言之間留一條間隔線
 - 對策期限預設 `pmDefaultDue()` ＝**會議日期（`created_at`）＋14 天**；對策清單雙語上下並排、中間 `---------` 分隔線（v1.31）
 - **定稿（`locked`）會自動產生「AI 評論與總結」**（v1.33，`pmGenSummary` + `PM_SUM_PARTS`）：直接／深刻／嚴厲／
   不留情面、**字數不限**的雙語分析，分三部分 —— ① AI 補充與會者沒想到的失敗原因 ② 逐條挑戰並補強對策

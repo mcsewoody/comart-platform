@@ -5,7 +5,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#080C14">
-<title>COMART · 公告與紀錄 v1.44</title>
+<title>COMART · 公告與紀錄 v1.45</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -217,7 +217,7 @@ select,select option,option{background:var(--s2);color:var(--tx)}
     <a class="logo" href="javascript:void(0)">
       <div class="logo-mark">告</div>
       <div class="logo-text">公告與紀錄</div>
-      <span class="logo-ver">v1.44</span>
+      <span class="logo-ver">v1.45</span>
     </a>
     <div class="topbar-right">
       <span class="who-badge" id="whoBadge">—</span>
@@ -2195,7 +2195,7 @@ function wrPrint(){
 const PM_LANGS = [['zh-TW','繁體中文'],['zh-CN','简体中文'],['vi','Tiếng Việt'],['en','English'],['ja','日本語']];
 const PM_LANG_SHORT = { 'zh-TW':'繁中','zh-CN':'简中','vi':'越南語','en':'English','ja':'日本語' };
 const PM_PHASES = ['intro','setup','writing','reveal','ranking','mitigation','locked'];
-const PM_PHASE_LABEL = { intro:'說明', setup:'情境設定', writing:'開放填寫', reveal:'揭露', ranking:'排序分類', mitigation:'對策', locked:'定稿' };
+const PM_PHASE_LABEL = { intro:'說明', setup:'情境設定', writing:'開放填寫', reveal:'揭露', ranking:'投票', mitigation:'對策', locked:'定稿' };
 const PM_VOTE_CAP = 3;     // 每人最多投幾票（排序階段）
 const PM_DEFAULT_SCENARIO = '想像現在是專案結束之後 —— 這個專案徹底失敗了，不是小挫折，而是一場災難。請寫下你認為導致它失敗的所有原因（越具體越好，一條一則）。';
 
@@ -2203,29 +2203,29 @@ const PM_DEFAULT_SCENARIO = '想像現在是專案結束之後 —— 這個專�
 const PM_INTRO_I18N = {
   'zh-TW': { title:'事前驗屍會議 · 說明',
     concept:'事前驗屍（Premortem）由心理學家 Gary Klein 提出：在專案正式開始前，先想像「這個專案已經徹底失敗」，再回頭找出失敗原因。這種「前瞻性後見之明」比一般問「可能出什麼錯」多找出約 30% 的風險。',
-    rulesT:'規則', rules:['心理安全第一：任何顧慮都能提出，不會被貼「唱衰」標籤。','先各自默寫、再一起揭露：填寫階段彼此看不到，避免從眾。','匿名：預設不顯示作者（主席可見），鼓勵直言。','收集時不批評：先把原因全部列出，之後再討論。'],
+    rulesT:'規則', rules:['心理安全第一：任何顧慮都能提出，不會被貼「唱衰」標籤。','先各自默寫、再一起揭露：填寫階段彼此看不到，避免從眾。','完全匿名：不顯示填寫者姓名，連主席也看不到，請放心直言。','收集時不批評：先把原因全部列出，之後再討論。'],
     timeT:'時間分配（約 20–30 分鐘）', time:['情境設定：2–3 分鐘','各自默寫失敗原因：3–5 分鐘','揭露與輪流說明：約 10 分鐘','投票與分類：約 5 分鐘','擬定對策：5–10 分鐘'],
-    howtoT:'本程式操作', howto:['主席用上方階段列控制流程：說明 → 情境設定 → 開放填寫 → 揭露 → 排序分類 → 對策 → 定稿。','用你自己的語言填寫，系統自動翻成會議設定的兩種語言並排顯示。','「開放填寫」時各自輸入、只看得到自己；主席按「揭露」後全體一起看。','「排序分類」可投票選出最重要的風險（每人最多 3 票），並用 AI 自動歸類主題。','「對策」針對重點風險記錄 措施／負責人／期限。','「定稿」後鎖定，內容轉為唯讀。'] },
+    howtoT:'本程式操作', howto:['主席用上方階段列控制流程：說明 → 情境設定 → 開放填寫 → 揭露 → 投票 → 對策 → 定稿。階段必須依序進行，可以退回但不能跳過。','用你自己的語言填寫，系統自動翻成會議設定的兩種語言並排顯示。','「開放填寫」時各自輸入、只看得到自己；主席按「揭露」後全體一起看。','「投票」選出最重要的風險（每人最多 3 票），並用 AI 自動歸類主題。','「對策」針對重點風險記錄 措施／負責人／期限。','「定稿」後鎖定，內容轉為唯讀。'] },
   'zh-CN': { title:'事前验尸会议 · 说明',
     concept:'事前验尸（Premortem）由心理学家 Gary Klein 提出：在项目正式开始前，先想象“这个项目已经彻底失败”，再回头找出失败原因。这种“前瞻性后见之明”比一般问“可能出什么错”多找出约 30% 的风险。',
-    rulesT:'规则', rules:['心理安全第一：任何顾虑都能提出，不会被贴“唱衰”标签。','先各自默写、再一起揭示：填写阶段彼此看不到，避免从众。','匿名：默认不显示作者（主席可见），鼓励直言。','收集时不批评：先把原因全部列出，之后再讨论。'],
+    rulesT:'规则', rules:['心理安全第一：任何顾虑都能提出，不会被贴“唱衰”标签。','先各自默写、再一起揭示：填写阶段彼此看不到，避免从众。','完全匿名：不显示填写者姓名，连主席也看不到，请放心直言。','收集时不批评：先把原因全部列出，之后再讨论。'],
     timeT:'时间分配（约 20–30 分钟）', time:['情境设定：2–3 分钟','各自默写失败原因：3–5 分钟','揭示与轮流说明：约 10 分钟','投票与分类：约 5 分钟','拟定对策：5–10 分钟'],
-    howtoT:'本程序操作', howto:['主席用上方阶段栏控制流程：说明 → 情境设定 → 开放填写 → 揭示 → 排序分类 → 对策 → 定稿。','用你自己的语言填写，系统自动翻成会议设定的两种语言并排显示。','“开放填写”时各自输入、只看得到自己；主席按“揭示”后全体一起看。','“排序分类”可投票选出最重要的风险（每人最多 3 票），并用 AI 自动归类主题。','“对策”针对重点风险记录 措施／负责人／期限。','“定稿”后锁定，内容转为只读。'] },
+    howtoT:'本程序操作', howto:['主席用上方阶段栏控制流程：说明 → 情境设定 → 开放填写 → 揭示 → 投票 → 对策 → 定稿。阶段必须依序进行，可以退回但不能跳过。','用你自己的语言填写，系统自动翻成会议设定的两种语言并排显示。','“开放填写”时各自输入、只看得到自己；主席按“揭示”后全体一起看。','“投票”选出最重要的风险（每人最多 3 票），并用 AI 自动归类主题。','“对策”针对重点风险记录 措施／负责人／期限。','“定稿”后锁定，内容转为只读。'] },
   'en': { title:'Project Premortem · Guide',
     concept:'The Premortem, developed by psychologist Gary Klein, asks the team to imagine — before the project starts — that it has already failed completely, then work backward to find the reasons. This "prospective hindsight" surfaces about 30% more risks than simply asking "what might go wrong?".',
-    rulesT:'Rules', rules:['Psychological safety first: raise any concern without being labeled a naysayer.','Write alone first, reveal together: during writing you cannot see others, to avoid groupthink.','Anonymous: authors are hidden by default (visible to the chair) to encourage candor.','No criticism while collecting: list every reason first, discuss later.'],
+    rulesT:'Rules', rules:['Psychological safety first: raise any concern without being labeled a naysayer.','Write alone first, reveal together: during writing you cannot see others, to avoid groupthink.','Fully anonymous: author names are never shown — not even to the chair. Speak freely.','No criticism while collecting: list every reason first, discuss later.'],
     timeT:'Time allocation (about 20–30 min)', time:['Set the scenario: 2–3 min','Write failure reasons individually: 3–5 min','Reveal and round-robin sharing: about 10 min','Vote and cluster: about 5 min','Define countermeasures: 5–10 min'],
-    howtoT:'Using this tool', howto:['The chair drives the flow with the phase bar above: Guide → Scenario → Writing → Reveal → Ranking → Countermeasures → Finalize.','Write in your own language; the system auto-translates into the two meeting languages, shown side by side.','During Writing everyone types privately and sees only their own; after the chair clicks Reveal, all see everything.','In Ranking, vote for the most important risks (up to 3 votes each) and let AI cluster them into themes.','In Countermeasures, record measure / owner / due date for each key risk.','After Finalize the record is locked and read-only.'] },
+    howtoT:'Using this tool', howto:['The chair drives the flow with the phase bar above: Guide → Scenario → Writing → Reveal → Vote → Countermeasures → Finalize. Phases run in order — you can go back but not skip ahead.','Write in your own language; the system auto-translates into the two meeting languages, shown side by side.','During Writing everyone types privately and sees only their own; after the chair clicks Reveal, all see everything.','In Vote, choose the most important risks (up to 3 votes each) and let AI cluster them into themes.','In Countermeasures, record measure / owner / due date for each key risk.','After Finalize the record is locked and read-only.'] },
   'vi': { title:'Họp Premortem · Hướng dẫn',
     concept:'Premortem, do nhà tâm lý học Gary Klein đề xuất: trước khi dự án bắt đầu, hãy tưởng tượng dự án đã thất bại hoàn toàn, rồi truy ngược lại để tìm nguyên nhân. "Sự nhìn lại từ tương lai" này giúp phát hiện thêm khoảng 30% rủi ro so với chỉ hỏi "có thể sai ở đâu?".',
-    rulesT:'Quy tắc', rules:['An toàn tâm lý là trên hết: nêu bất kỳ lo ngại nào mà không bị gán nhãn "kẻ bàn lùi".','Viết riêng trước, công bố cùng nhau: khi viết bạn không thấy của người khác, tránh tâm lý đám đông.','Ẩn danh: mặc định không hiện tác giả (chủ tọa vẫn thấy), khuyến khích nói thẳng.','Không phê bình khi đang thu thập: liệt kê hết lý do trước, thảo luận sau.'],
+    rulesT:'Quy tắc', rules:['An toàn tâm lý là trên hết: nêu bất kỳ lo ngại nào mà không bị gán nhãn "kẻ bàn lùi".','Viết riêng trước, công bố cùng nhau: khi viết bạn không thấy của người khác, tránh tâm lý đám đông.','Hoàn toàn ẩn danh: không hiển thị tên người viết — kể cả chủ tọa cũng không thấy. Hãy nói thẳng.','Không phê bình khi đang thu thập: liệt kê hết lý do trước, thảo luận sau.'],
     timeT:'Phân bổ thời gian (khoảng 20–30 phút)', time:['Thiết lập bối cảnh: 2–3 phút','Tự viết lý do thất bại: 3–5 phút','Công bố và chia sẻ lần lượt: khoảng 10 phút','Bỏ phiếu và phân nhóm: khoảng 5 phút','Đề ra biện pháp: 5–10 phút'],
-    howtoT:'Sử dụng công cụ này', howto:['Chủ tọa điều khiển quy trình bằng thanh giai đoạn phía trên: Hướng dẫn → Bối cảnh → Viết → Công bố → Xếp hạng → Biện pháp → Chốt.','Viết bằng ngôn ngữ của bạn; hệ thống tự dịch sang hai ngôn ngữ của cuộc họp, hiển thị song song.','Khi Viết, mọi người nhập riêng và chỉ thấy của mình; sau khi chủ tọa bấm Công bố, tất cả cùng xem.','Ở Xếp hạng, bỏ phiếu cho các rủi ro quan trọng nhất (tối đa 3 phiếu mỗi người) và để AI phân nhóm chủ đề.','Ở Biện pháp, ghi lại biện pháp / người phụ trách / hạn hoàn thành cho từng rủi ro chính.','Sau khi Chốt, hồ sơ bị khóa và chỉ đọc.'] },
+    howtoT:'Sử dụng công cụ này', howto:['Chủ tọa điều khiển quy trình bằng thanh giai đoạn phía trên: Hướng dẫn → Bối cảnh → Viết → Công bố → Bỏ phiếu → Biện pháp → Chốt. Các giai đoạn diễn ra tuần tự — có thể quay lại nhưng không thể bỏ qua.','Viết bằng ngôn ngữ của bạn; hệ thống tự dịch sang hai ngôn ngữ của cuộc họp, hiển thị song song.','Khi Viết, mọi người nhập riêng và chỉ thấy của mình; sau khi chủ tọa bấm Công bố, tất cả cùng xem.','Ở Bỏ phiếu, chọn các rủi ro quan trọng nhất (tối đa 3 phiếu mỗi người) và để AI phân nhóm chủ đề.','Ở Biện pháp, ghi lại biện pháp / người phụ trách / hạn hoàn thành cho từng rủi ro chính.','Sau khi Chốt, hồ sơ bị khóa và chỉ đọc.'] },
   'ja': { title:'プレモータム会議 · 説明',
     concept:'プレモータム（Premortem）は心理学者 Gary Klein が提唱した手法です。プロジェクト開始前に「すでに完全に失敗した」と想像し、そこから逆算して失敗の原因を洗い出します。この「予期的後知恵」により、「何が問題になり得るか」と尋ねるより約30％多くのリスクを発見できます。',
-    rulesT:'ルール', rules:['心理的安全を最優先：どんな懸念も「水を差す人」と見なされずに出せる。','まず各自で書き、その後一斉に公開：記入中は他者の内容が見えず、同調を防ぐ。','匿名：既定では著者を表示しない（司会は閲覧可）。率直な発言を促す。','収集中は批判しない：まず原因を全て挙げ、議論は後で。'],
+    rulesT:'ルール', rules:['心理的安全を最優先：どんな懸念も「水を差す人」と見なされずに出せる。','まず各自で書き、その後一斉に公開：記入中は他者の内容が見えず、同調を防ぐ。','完全匿名：記入者の氏名は表示されません。司会にも見えません。安心して率直にお書きください。','収集中は批判しない：まず原因を全て挙げ、議論は後で。'],
     timeT:'時間配分（約20〜30分）', time:['シナリオ設定：2〜3分','失敗理由を各自記入：3〜5分','公開と順番共有：約10分','投票と分類：約5分','対策の策定：5〜10分'],
-    howtoT:'このツールの操作', howto:['司会は上部のフェーズバーで進行を操作：説明 → シナリオ → 記入 → 公開 → ランキング → 対策 → 確定。','自分の言語で記入すると、会議で設定した2言語へ自動翻訳し並べて表示します。','「記入」中は各自入力し自分の分のみ表示；司会が「公開」を押すと全員で閲覧。','「ランキング」で重要なリスクに投票（1人最大3票）し、AIがテーマに自動分類。','「対策」で重点リスクごとに 対策／担当者／期限 を記録。','「確定」後はロックされ読み取り専用になります。'] },
+    howtoT:'このツールの操作', howto:['司会は上部のフェーズバーで進行を操作：説明 → シナリオ → 記入 → 公開 → 投票 → 対策 → 確定。フェーズは順番に進みます（戻れますが飛ばせません）。','自分の言語で記入すると、会議で設定した2言語へ自動翻訳し並べて表示します。','「記入」中は各自入力し自分の分のみ表示；司会が「公開」を押すと全員で閲覧。','「投票」で重要なリスクを選び（1人最大3票）、AIがテーマに自動分類。','「対策」で重点リスクごとに 対策／担当者／期限 を記録。','「確定」後はロックされ読み取り専用になります。'] },
 };
 function pmSetIntroLang(c) { pmIntroLang = c; pmRenderRoom(); }
 function pmIntroHtml() {
@@ -2750,7 +2750,7 @@ function pmRenderList() {
   }
   html += rows.map(s => {
     const phaseBadge = '<span class="site-badge" style="background:var(--ac2);color:var(--ac)">' + escHtml(PM_PHASE_LABEL[s.phase] || s.phase) + '</span>';
-    const delBtn = isAdmin() ? '<button class="btn ghost sm danger" onclick="event.stopPropagation();pmDeleteSession(\'' + s.id + '\')">刪除</button>' : '';
+    const delBtn = pmIsChair(s) ? '<button class="btn ghost sm danger" onclick="event.stopPropagation();pmDeleteSession(\'' + s.id + '\')">刪除</button>' : '';
     const joinBtn = s.phase !== 'locked'
       ? '<button class="btn primary sm" onclick="event.stopPropagation();pmOpen(\'' + s.id + '\')">▶ 加入本次會議</button>'
       : '<button class="btn sm" onclick="event.stopPropagation();pmOpen(\'' + s.id + '\')">查看</button>';
@@ -2765,7 +2765,9 @@ function pmRenderList() {
 }
 
 async function pmDeleteSession(id) {
-  if (!isAdmin()) { boardToast('僅管理員可刪除'); return; }
+  // 只有該場主席能刪自己的會議——admin 在驗屍會議裡沒有特權（sb-proxy 亦同步擋下）
+  const row = (pmAllSessions || []).find(x => x.id === id);
+  if (!row || !pmIsChair(row)) { boardToast('只有該場主席能刪除這場會議'); return; }
   if (!confirm('確定刪除這場驗屍會議？所有填寫內容都會一併刪除，無法復原。')) return;
   try { await SB.del('premortem_sessions', 'id=eq.' + encodeURIComponent(id)); boardToast('已刪除'); pmLoadList(); }
   catch (e) { boardToast('刪除失敗：' + (e.message || e)); }
@@ -3048,10 +3050,10 @@ function pmRenderRoom() {
   } else if (s.phase === 'reveal') {
     html += '<div class="panel"><div class="panel-h"><span class="idx">▤</span><h2>全部失敗原因</h2><span class="sub">共 ' + pmEntries.length + ' 則</span></div>' +
       '<div class="panel-b">' + (pmEntries.length ? pmEntries.map(e => pmEntryHtml(e, false, true, 0)).join('') : '<div class="empty-note">沒有任何填寫內容。</div>') +
-      '<div class="hint" style="margin-top:8px">已揭露全部內容。主席可切到「排序分類」開始投票與 AI 分群。</div></div></div>';
+      '<div class="hint" style="margin-top:8px">已揭露全部內容。主席可切到「投票」開始計票與 AI 分群。</div></div></div>';
   } else if (s.phase === 'ranking') {
     const mine = pmMyVoteCount();
-    html += '<div class="panel"><div class="panel-h"><span class="idx">▤</span><h2>排序分類</h2><span class="sub">你已投 ' + mine + '／' + PM_VOTE_CAP + ' 票</span></div><div class="panel-b">' +
+    html += '<div class="panel"><div class="panel-h"><span class="idx">▤</span><h2>投票</h2><span class="sub">你已投 ' + mine + '／' + PM_VOTE_CAP + ' 票</span></div><div class="panel-b">' +
       (chair ? '<div style="margin-bottom:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center"><button class="btn sm" onclick="pmAiCluster()">🤖 AI 分群</button><span style="font-size:11px;color:var(--tx3)">把相似原因自動歸類成主題（可再按重跑）</span></div>' : '') +
       '<div class="hint" style="margin-bottom:8px">為你認為最重要的風險投票（每人最多 ' + PM_VOTE_CAP + ' 票）。</div>' +
       (pmEntries.length ? pmGroupedHtml(1) : '<div class="empty-note">沒有任何填寫內容。</div>') + '</div></div>';
@@ -3277,6 +3279,22 @@ async function pmDeleteMitigation(id) {
   try { await SB.del('premortem_mitigations', 'id=eq.' + encodeURIComponent(id)); await pmFetchMitigations(); pmRenderRoom(); }
   catch (e) { boardToast('刪除失敗：' + (e.message || e)); }
 }
+// 對策的雙語呈現：中文一律排在上面（不管它是會議設定的語言 A 還是 B）、
+// 兩個語言同一個字級（風險與措施也同級）、中間留出間隔線。
+function pmBiOrdered(origin, a, b) {
+  const s = pmSession || {};
+  const ta = (a || origin || '').trim(), tb = (b || origin || '').trim();
+  let first = ta, second = tb;
+  // 中文優先：若語言 B 才是中文就對調
+  if (!String(s.lang_a || '').startsWith('zh') && String(s.lang_b || '').startsWith('zh')) {
+    first = tb; second = ta;
+  }
+  const T = 'white-space:pre-wrap;font-size:13.5px;line-height:1.7';
+  if (!second || first === second) return '<div style="' + T + '">' + escHtml(first) + '</div>';
+  return '<div style="' + T + '">' + escHtml(first) + '</div>' +
+    '<div style="border-top:1px dashed var(--br);margin:10px 0"></div>' +
+    '<div style="' + T + '">' + escHtml(second) + '</div>';
+}
 // 對策清單的雙語呈現：上下兩行，中間一條 --------- 分隔線（不並排，長句才讀得完）
 function pmBiStacked(origin, a, b) {
   const ta = a || origin || '', tb = b || origin || '';
@@ -3304,9 +3322,12 @@ function pmMitigationsHtml(canEdit) {
     if (m.due_date) meta.push('期限：' + escHtml(m.due_date));
     return '<div style="border:1px solid var(--br);border-radius:8px;padding:10px 12px;background:var(--s2);margin-bottom:8px;display:flex;gap:10px;align-items:flex-start">' +
       '<div style="flex:1;min-width:0">' +
-      (m.risk_summary ? '<div style="font-size:12px;color:var(--tx3);margin-bottom:6px">風險：' + pmBiStacked(m.risk_summary, m.risk_a, m.risk_b) + '</div>' : '') +
-      '<div style="font-size:14px">' + pmBiStacked(m.measure, m.measure_a, m.measure_b) + '</div>' +
-      (meta.length ? '<div style="font-size:11px;color:var(--tx3);margin-top:4px">' + meta.join('　') + '</div>' : '') +
+      (m.risk_summary ? '<div style="margin-bottom:12px">' +
+        '<div style="font-size:13.5px;color:var(--tx3);margin-bottom:4px">風險：</div>' +
+        pmBiOrdered(m.risk_summary, m.risk_a, m.risk_b) + '</div>' : '') +
+      '<div style="font-size:13.5px;color:var(--tx3);margin-bottom:4px">措施：</div>' +
+      pmBiOrdered(m.measure, m.measure_a, m.measure_b) +
+      (meta.length ? '<div style="font-size:13.5px;color:var(--tx3);margin-top:10px">' + meta.join('　') + '</div>' : '') +
       '</div>' + del + '</div>';
   }).join('') : '<div class="empty-note">尚無對策。</div>';
   if (canEdit) {

@@ -176,7 +176,7 @@ The portal supports EN, 繁中, 简中, VI, 日 via `setLang(lang)`. Each langua
   - 🔴 **深度分析只做一次（語言 A），語言 B 是翻譯（`pmTranslateLong`）不是重新發想**（v1.36 修正）。
     v1.34 讓兩個語言各自重新發想，結果慢一倍、而且**兩個版本會講出不同的風險與不同的結論**——
     同一場會議不該有兩種結論。翻譯用 opus-5 但 `output_config.effort='low'`（翻譯不需要深度推理），
-    三段譯文 `Promise.all` 並行；單段翻譯失敗就退回原文，不讓整份掉失
+    譯者提示詞明令「保留原文語氣強度，不得把批判翻得比原文客氣」；單段翻譯失敗就退回原文，不讓整份掉失
   - 流程（v1.38）：每段分析完**立刻**把譯文丟到背景，與下一段的分析重疊進行，三段寫完只等剩下的譯文。
     分析與翻譯會同時想寫回，故存檔走 `pmSumSaveQ()` 佇列序列化（組稿在執行時才做，較舊的內容不會蓋掉較新的）
   - **篇幅**：每個部分約 350–500 字（`PM_SUM_SYS`，尾端另有 `<tone_preference>` 提醒）。
@@ -185,8 +185,9 @@ The portal supports EN, 繁中, 简中, VI, 日 via `setLang(lang)`. Each langua
     主席若把標題改掉會退化成單一區塊（不會壞）
   - 段落小標存在 `PM_SUM_PARTS[].disp`（五語對照），`pmSumAssemble()` 依該版本語言挑選，
     否則越南文版會夾著中文小標
-  - 這是唯一用 **`claude-opus-5`** 的地方（`PM_SUM_MODEL`；翻譯與 AI 分群仍用 haiku）。opus-5 預設開 thinking 且
-    `max_tokens` 同時涵蓋 thinking＋回覆，單段單語言給 8000
+  - 這是唯一用 **`claude-opus-5`** 的地方（`PM_SUM_MODEL`）：三段分析與其譯文都用它，
+    其餘（`pmTranslate` 的條目／情境翻譯、`pmAiCluster` 分群）仍用 haiku。opus-5 預設開 thinking 且
+    `max_tokens` 同時涵蓋 thinking＋回覆，單段給 8000
   - 先鎖定再背景生成，AI 失敗不會卡住定稿；生成中暫停輪詢（否則會把剛寫好的總結蓋回 null）；主席可「↻ 重新生成」
   - **定稿後主席可「✎ 編輯」修訂這段結論**（v1.35，`pmSumEditToggle`/`pmSaveSummaryEdit`）：雙語各一個大 textarea，
     存檔時寫 `summary_edited_at` / `summary_edited_by`（migration 030），畫面與四種輸出都會標示「已由主席（○○）修訂」

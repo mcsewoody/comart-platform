@@ -5,7 +5,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#080C14">
-<title>COMART · 公告與紀錄 v1.45</title>
+<title>COMART · 公告與紀錄 v1.46</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -156,7 +156,7 @@ select,select option,option{background:var(--s2);color:var(--tx)}
 @media (max-width:640px){.pm-bi{grid-template-columns:1fr}}
 .pm-lc{border-left:2px solid var(--br);padding-left:9px}
 .pm-lc .lbl{font-size:10px;color:var(--tx3);letter-spacing:.03em;margin-bottom:2px}
-.pm-lc .txt{white-space:pre-wrap;font-size:13.5px}
+.pm-lc .txt{white-space:pre-wrap;font-size:13.5px;line-height:1.7}
 .empty-note{color:var(--tx3);font-size:13px;padding:26px;text-align:center;border:1px dashed var(--br);border-radius:9px}
 
 /* saved-list rows (shared: weekly list / biz saved list) */
@@ -217,7 +217,7 @@ select,select option,option{background:var(--s2);color:var(--tx)}
     <a class="logo" href="javascript:void(0)">
       <div class="logo-mark">告</div>
       <div class="logo-text">公告與紀錄</div>
-      <span class="logo-ver">v1.45</span>
+      <span class="logo-ver">v1.46</span>
     </a>
     <div class="topbar-right">
       <span class="who-badge" id="whoBadge">—</span>
@@ -3279,21 +3279,20 @@ async function pmDeleteMitigation(id) {
   try { await SB.del('premortem_mitigations', 'id=eq.' + encodeURIComponent(id)); await pmFetchMitigations(); pmRenderRoom(); }
   catch (e) { boardToast('刪除失敗：' + (e.message || e)); }
 }
-// 對策的雙語呈現：中文一律排在上面（不管它是會議設定的語言 A 還是 B）、
-// 兩個語言同一個字級（風險與措施也同級）、中間留出間隔線。
+// 對策的雙語呈現：左右兩欄（與失敗原因清單同一套 .pm-bi 排版），中文一律在左欄。
+// 每欄有語言標籤與左側分隔線；窄螢幕（≤640px）由 CSS 自動改為上下堆疊。
 function pmBiOrdered(origin, a, b) {
   const s = pmSession || {};
   const ta = (a || origin || '').trim(), tb = (b || origin || '').trim();
-  let first = ta, second = tb;
-  // 中文優先：若語言 B 才是中文就對調
+  let first = ta, second = tb, fl = pmLangShort(s.lang_a), sl = pmLangShort(s.lang_b);
+  // 中文優先放左欄：若語言 B 才是中文就對調
   if (!String(s.lang_a || '').startsWith('zh') && String(s.lang_b || '').startsWith('zh')) {
-    first = tb; second = ta;
+    first = tb; second = ta; fl = pmLangShort(s.lang_b); sl = pmLangShort(s.lang_a);
   }
-  const T = 'white-space:pre-wrap;font-size:13.5px;line-height:1.7';
-  if (!second || first === second) return '<div style="' + T + '">' + escHtml(first) + '</div>';
-  return '<div style="' + T + '">' + escHtml(first) + '</div>' +
-    '<div style="border-top:1px dashed var(--br);margin:10px 0"></div>' +
-    '<div style="' + T + '">' + escHtml(second) + '</div>';
+  if (!second || first === second) {
+    return '<div style="white-space:pre-wrap;font-size:13.5px;line-height:1.7">' + escHtml(first) + '</div>';
+  }
+  return '<div class="pm-bi">' + pmLangCellHtml(fl, first) + pmLangCellHtml(sl, second) + '</div>';
 }
 // 對策清單的雙語呈現：上下兩行，中間一條 --------- 分隔線（不並排，長句才讀得完）
 function pmBiStacked(origin, a, b) {
@@ -3322,7 +3321,7 @@ function pmMitigationsHtml(canEdit) {
     if (m.due_date) meta.push('期限：' + escHtml(m.due_date));
     return '<div style="border:1px solid var(--br);border-radius:8px;padding:10px 12px;background:var(--s2);margin-bottom:8px;display:flex;gap:10px;align-items:flex-start">' +
       '<div style="flex:1;min-width:0">' +
-      (m.risk_summary ? '<div style="margin-bottom:12px">' +
+      (m.risk_summary ? '<div style="margin-bottom:14px">' +
         '<div style="font-size:13.5px;color:var(--tx3);margin-bottom:4px">風險：</div>' +
         pmBiOrdered(m.risk_summary, m.risk_a, m.risk_b) + '</div>' : '') +
       '<div style="font-size:13.5px;color:var(--tx3);margin-bottom:4px">措施：</div>' +

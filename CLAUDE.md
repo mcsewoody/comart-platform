@@ -22,7 +22,7 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 | `admin/index.html` | v2.30 | Admin System — room booking, fleet, visitor, library, lottery | 5,650 |
 | `kms/index.html` | v2.33 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
 | `quotation/index.html` | v3.54 | Quotation & CRM system | 7,332 |
-| `board/index.html` | v1.47 | 公告與紀錄 Bulletin & Records — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍、腦力激盪 | 3,786 |
+| `board/index.html` | v1.48 | 公告與紀錄 Bulletin & Records — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍、腦力激盪 | 4,600 |
 
 `admin/lottery.html` is a standalone lottery page (separate from the lottery module inside `admin/index.html`).
 
@@ -105,6 +105,27 @@ Responsive breakpoint at 768px: desktop shows sidebar, mobile shows bottom nav. 
 ### Multi-language Support
 
 The portal supports EN, 繁中, 简中, VI, 日 via `setLang(lang)`. Each language has a full i18n dictionary stored as a JS object in the HTML file. KMS and admin have their own i18n dictionaries.
+
+五個系統共用 `localStorage['comart-lang']`（值為 `en` / `zh-TW` / `zh-CN` / `vi` / `ja`），在任一系統切換語言，其他系統下次載入就跟著換。
+
+**Board 的 i18n（v1.48）**：`B_I18N`（330 key × 5 語）＋ `BT(key, params)`，`{n}` 佔位。
+靜態 HTML 用 `data-i18n` / `data-i18n-ph` / `data-i18n-title`，由 `bApplyI18n()` 套上；
+動態渲染的字串直接呼叫 `BT()`。topbar 有 `.lchip` 語言鈕（`bSetLang`），切換後 `bRerenderAll()`
+把五個頁籤各自重畫（業務會議在 IIFE 裡，靠 `window.MeetingMinutes.relabel()` 進去）。
+
+- 🔴 **介面翻譯，正式紀錄的版面不翻**。這是刻意的取捨，不是漏做：
+  - **翻**：頁籤、面板標題、欄位標籤、按鈕、提示、清單列、toast、confirm。
+  - **不翻**：`.sheet` 即時預覽、PDF、PNG、Excel、Email 內文，以及寄給別人的 `notifications` 標題。
+    那是公司的存檔格式，同一份紀錄不該因為誰按了匯出鍵、介面剛好切成哪一國語言就長得不一樣；
+    而且內文本來就是使用者打的中文，只翻表頭會變成半中半外。
+  - 因此有成對的存取器：介面走 `siteLabel()` / `bizScopeLabel()` / `PMT()` / `pmPhaseLabel()`，
+    輸出與 AI 提示詞走 `siteLabelZ()` / `bizScopeLabelZ()` / `PMTZ()` / `PMKZ()`（固定繁中）。
+    **新增輸出格式或改 AI 提示詞時，用 Z 版本。**
+- 事前驗屍／腦力激盪：`PM_KINDS` 維持繁中＝文件詞彙；`PM_KIND_I18N` 只覆寫畫面上看得到的
+  `label` / `phaseLabel` / `defaultScenario` / `t`。**三個行為旗標（`anonymous`／`liveVisible`／`voteCap`）
+  與 `sumSys`／`sumParts`／`cluster`／`intro` 一律只從 `PM_KINDS` 取，不進 `PM_KIND_I18N`** ——
+  那是行為與 AI 語氣，不是文案。加第三種會議時兩張表都要加（缺語言會自動退回繁中，不會壞）。
+- migration 缺欄位的錯誤訊息（`migration 029/030/031`）刻意留繁中：那是給管理者看的，不是一般使用者路徑。
 
 ## 系統架構
 

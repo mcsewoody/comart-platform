@@ -5,7 +5,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#080C14">
-<title>COMART · 公告與紀錄 v1.49</title>
+<title>COMART · 公告與紀錄 v1.50</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -222,7 +222,7 @@ select,select option,option{background:var(--s2);color:var(--tx)}
     <a class="logo" href="javascript:void(0)">
       <div class="logo-mark">告</div>
       <div class="logo-text" data-i18n="app_title">公告與紀錄</div>
-      <span class="logo-ver">v1.49</span>
+      <span class="logo-ver">v1.50</span>
     </a>
     <div class="topbar-right">
       <div id="langChips" style="display:flex;gap:4px"></div>
@@ -3353,6 +3353,7 @@ let pmRetrying = false;    // 背景補翻防重入
 let pmIntroLang = '';      // 說明頁顯示語言
 let pmMitigations = [];    // 目前 session 的對策清單
 let pmCreating = false;    // 建會防重入：建立要等翻譯，連按會建出多場空會議
+let pmCreateId = '';       // 這張建會表單的 id：整張表單共用同一個，重送會撞主鍵而不是多開一場
 // 專案描述／情境設定：雙語可編輯欄位（src=原文、a/b=兩種語言譯文）
 const PM_BI_FIELDS = {
   desc:     { tk:'desc', src:'project_desc', a:'desc_a',     b:'desc_b',     rows:4, required:false, ph:'pm_bi_optional' },
@@ -3874,6 +3875,8 @@ function pmNewSession() {
   document.getElementById('pm-c-chair').value = PORTAL_SESSION
     ? (PORTAL_SESSION.nameZh || PORTAL_SESSION.nameEn || PORTAL_SESSION.empId) : '';
   pmScopeChanged();
+  // 這張表單的 id 現在就決定：不管按幾次「建立並開場」，寫進去的都是同一列（第二次撞主鍵）
+  pmCreateId = uid();
   pmShowView('create');
 }
 // 把「指定人員」勾選的人帶進與會人員欄（附加而非覆蓋，並去重；列席者仍可手動補打）
@@ -3912,8 +3915,9 @@ async function pmCreateSubmit() {
   const scope = document.getElementById('pm-c-scope').value;
   const members = scope === 'list' ? Array.from(document.querySelectorAll('#pm-c-members .pm-mem:checked')).map(c => c.value) : [];
   if (scope === 'list' && !members.length) { boardToast(BT('pm_need_member')); return; }
+  if (!pmCreateId) pmCreateId = uid();   // 保險：表單不是經 pmShowCreate 開的
   const row = {
-    id: uid(), kind: pmKind, title,
+    id: pmCreateId, kind: pmKind, title,
     // meet_at 存主席看到的當地時間字串，不轉 UTC（避免顯示差時區）
     meet_at: (document.getElementById('pm-c-meetat').value || '').replace('T', ' '),
     meet_location: document.getElementById('pm-c-place').value.trim(),
@@ -3941,8 +3945,20 @@ async function pmCreateSubmit() {
       if (row.project_desc) { const d = await pmTranslate(row.project_desc, row.lang_a, row.lang_b, srcL); row.desc_a = d.a; row.desc_b = d.b; }
       if (row.scenario) { const sc = await pmTranslate(row.scenario, row.lang_a, row.lang_b, srcL); row.scenario_a = sc.a; row.scenario_b = sc.b; }
     } catch (e) { /* 翻譯失敗留空，主席端輪詢時會背景補翻 */ }
-    try { await SB.post('premortem_sessions', row); boardToast(BT('pm_created', { meet: PMT().meet })); pmOpen(row.id); }
-    catch (e) { boardToast(BT('pm_create_failed') + (e.message || e)); }
+    let ok = false;
+    try { await SB.post('premortem_sessions', row); ok = true; }
+    catch (e) {
+      // 主鍵已存在＝這張表單先前那次其實寫成功了（例如回應在路上、或另一個分頁送出過）：
+      // 這時不是失敗，直接開那一場，不要再寫第二列
+      try { const ex = await SB.get('premortem_sessions', '?id=eq.' + encodeURIComponent(row.id) + '&select=id'); ok = !!(ex && ex[0]); } catch (x) {}
+      if (!ok) boardToast(BT('pm_create_failed') + (e.message || e));
+    }
+    if (ok) {
+      pmCreateId = '';                   // 這個 id 已用掉；下次進建會表單再產一個新的
+      boardToast(BT('pm_created', { meet: PMT().meet }));
+      // 必須 await：pmOpen 期間建會畫面還在，提早解鎖按鈕等於又開一次窗
+      try { await pmOpen(row.id); } catch (e) { boardToast(BT('pm_create_failed') + (e.message || e)); }
+    }
   } finally {
     pmCreating = false;
     if (btn) { btn.disabled = false; btn.style.opacity = ''; }

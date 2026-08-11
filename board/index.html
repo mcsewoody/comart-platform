@@ -5,7 +5,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#080C14">
-<title>COMART · 公告與紀錄 v1.48</title>
+<title>COMART · 公告與紀錄 v1.49</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -222,7 +222,7 @@ select,select option,option{background:var(--s2);color:var(--tx)}
     <a class="logo" href="javascript:void(0)">
       <div class="logo-mark">告</div>
       <div class="logo-text" data-i18n="app_title">公告與紀錄</div>
-      <span class="logo-ver">v1.48</span>
+      <span class="logo-ver">v1.49</span>
     </a>
     <div class="topbar-right">
       <div id="langChips" style="display:flex;gap:4px"></div>
@@ -541,7 +541,7 @@ select,select option,option{background:var(--s2);color:var(--tx)}
       <div class="tabbar" style="max-width:none;padding:0;margin-bottom:16px;border-bottom:1px solid var(--br)">
         <button class="btn ghost sm" onclick="pmBackToList()" data-i18n="btn_back_list">← 返回列表</button>
         <div style="margin-left:auto;display:flex;gap:6px;align-items:center;padding:6px 0">
-          <button class="btn primary sm" onclick="pmCreateSubmit()" data-i18n="pm_create_go">✓ 建立並開場</button>
+          <button id="pm-c-submit" class="btn primary sm" onclick="pmCreateSubmit()" data-i18n="pm_create_go">✓ 建立並開場</button>
         </div>
       </div>
       <div class="panel">
@@ -721,7 +721,7 @@ const B_I18N = {
   pm_mit_sub:'{measure}／負責人／期限', pm_ai_summary:'AI 評論與總結',
   pm_sum_sub:'補發想 · 補{mit} · 會議結論', pm_chair_editing:'主席修訂中',
   pm_regen:'↻ 重新生成', pm_edit:'✎ 編輯', pm_owner:'負責人', pm_due:'期限',
-  pm_no_mit:'尚無{mit}。', pm_no_owner:'（未指定負責人）', pm_no_target:'（不指定特定{target}）',
+  pm_no_mit:'尚無{mit}。', pm_no_owner:'（未指定負責人）', pm_pick_owner:'（請指定負責人）', pm_need_owner:'請指定負責人', pm_no_target:'（不指定特定{target}）',
   pm_for_target:'針對哪個{target}（依票數）', pm_add_mit:'＋ 新增{mit}',
   pm_due_default:'期限預設為會議日期＋兩週（{d}），可自行調整。', pm_due_tip:'期限，預設為會議日期＋兩週',
   pm_votes_n:'{n}票', pm_uncategorized:'未分類', pm_untitled:'(未命名)',
@@ -871,7 +871,7 @@ const B_I18N = {
   pm_mit_sub:'{measure}／负责人／期限', pm_ai_summary:'AI 评论与总结',
   pm_sum_sub:'补发想 · 补{mit} · 会议结论', pm_chair_editing:'主席修订中',
   pm_regen:'↻ 重新生成', pm_edit:'✎ 编辑', pm_owner:'负责人', pm_due:'期限',
-  pm_no_mit:'尚无{mit}。', pm_no_owner:'（未指定负责人）', pm_no_target:'（不指定特定{target}）',
+  pm_no_mit:'尚无{mit}。', pm_no_owner:'（未指定负责人）', pm_pick_owner:'（请指定负责人）', pm_need_owner:'请指定负责人', pm_no_target:'（不指定特定{target}）',
   pm_for_target:'针对哪个{target}（依票数）', pm_add_mit:'＋ 新增{mit}',
   pm_due_default:'期限默认为会议日期＋两周（{d}），可自行调整。', pm_due_tip:'期限，默认为会议日期＋两周',
   pm_votes_n:'{n}票', pm_uncategorized:'未分类', pm_untitled:'(未命名)',
@@ -1021,7 +1021,7 @@ const B_I18N = {
   pm_mit_sub:'{measure} / owner / due date', pm_ai_summary:'AI review & conclusion',
   pm_sum_sub:'Added ideas · added {mit} · conclusion', pm_chair_editing:'Chair is editing',
   pm_regen:'↻ Regenerate', pm_edit:'✎ Edit', pm_owner:'Owner', pm_due:'Due',
-  pm_no_mit:'No {mit} yet.', pm_no_owner:'(no owner assigned)', pm_no_target:'(no specific {target})',
+  pm_no_mit:'No {mit} yet.', pm_no_owner:'(no owner assigned)', pm_pick_owner:'(select an owner)', pm_need_owner:'Please assign an owner', pm_no_target:'(no specific {target})',
   pm_for_target:'Which {target} (by votes)', pm_add_mit:'＋ Add {mit}',
   pm_due_default:'Due date defaults to the meeting date + 2 weeks ({d}); you can change it.', pm_due_tip:'Due date — defaults to meeting date + 2 weeks',
   pm_votes_n:'{n} votes', pm_uncategorized:'Uncategorized', pm_untitled:'(untitled)',
@@ -1171,7 +1171,7 @@ const B_I18N = {
   pm_mit_sub:'{measure} / người phụ trách / hạn', pm_ai_summary:'Nhận xét & kết luận của AI',
   pm_sum_sub:'Bổ sung ý tưởng · bổ sung {mit} · kết luận', pm_chair_editing:'Chủ tọa đang sửa',
   pm_regen:'↻ Tạo lại', pm_edit:'✎ Sửa', pm_owner:'Người phụ trách', pm_due:'Hạn',
-  pm_no_mit:'Chưa có {mit}.', pm_no_owner:'(chưa chỉ định người phụ trách)', pm_no_target:'(không chỉ định {target} cụ thể)',
+  pm_no_mit:'Chưa có {mit}.', pm_no_owner:'(chưa chỉ định người phụ trách)', pm_pick_owner:'(chọn người phụ trách)', pm_need_owner:'Vui lòng chỉ định người phụ trách', pm_no_target:'(không chỉ định {target} cụ thể)',
   pm_for_target:'Nhắm vào {target} nào (theo số phiếu)', pm_add_mit:'＋ Thêm {mit}',
   pm_due_default:'Hạn mặc định là ngày họp + 2 tuần ({d}), có thể tự điều chỉnh.', pm_due_tip:'Hạn — mặc định là ngày họp + 2 tuần',
   pm_votes_n:'{n} phiếu', pm_uncategorized:'Chưa phân loại', pm_untitled:'(chưa đặt tên)',
@@ -1321,7 +1321,7 @@ const B_I18N = {
   pm_mit_sub:'{measure}／担当者／期限', pm_ai_summary:'AI 講評と総括',
   pm_sum_sub:'発想の補完 · {mit}の補強 · 会議結論', pm_chair_editing:'司会が修正中',
   pm_regen:'↻ 再生成', pm_edit:'✎ 編集', pm_owner:'担当者', pm_due:'期限',
-  pm_no_mit:'{mit}はまだありません。', pm_no_owner:'（担当者未指定）', pm_no_target:'（特定の{target}を指定しない）',
+  pm_no_mit:'{mit}はまだありません。', pm_no_owner:'（担当者未指定）', pm_pick_owner:'（担当者を選択）', pm_need_owner:'担当者を指定してください', pm_no_target:'（特定の{target}を指定しない）',
   pm_for_target:'どの{target}に対して（得票順）', pm_add_mit:'＋ {mit}を追加',
   pm_due_default:'期限の既定値は開催日＋2週間（{d}）です。変更できます。', pm_due_tip:'期限（既定は開催日＋2週間）',
   pm_votes_n:'{n}票', pm_uncategorized:'未分類', pm_untitled:'（無題）',
@@ -3352,6 +3352,7 @@ let pmSrcLang = '';        // 填寫者選的來源語言（重繪時保留）
 let pmRetrying = false;    // 背景補翻防重入
 let pmIntroLang = '';      // 說明頁顯示語言
 let pmMitigations = [];    // 目前 session 的對策清單
+let pmCreating = false;    // 建會防重入：建立要等翻譯，連按會建出多場空會議
 // 專案描述／情境設定：雙語可編輯欄位（src=原文、a/b=兩種語言譯文）
 const PM_BI_FIELDS = {
   desc:     { tk:'desc', src:'project_desc', a:'desc_a',     b:'desc_b',     rows:4, required:false, ph:'pm_bi_optional' },
@@ -3904,6 +3905,7 @@ function pmScopeChanged() {
   }
 }
 async function pmCreateSubmit() {
+  if (pmCreating) return;   // 建立要等情境翻譯（數秒），期間連按會建出多場會議
   if (!PORTAL_SESSION) { boardToast(BT('pm_not_logged_in')); return; }
   const title = document.getElementById('pm-c-title').value.trim();
   if (!title) { boardToast(BT('pm_need_title')); return; }
@@ -3929,14 +3931,22 @@ async function pmCreateSubmit() {
     created_by: PORTAL_SESSION.empId,
     created_at: new Date().toISOString(), updated_at: new Date().toISOString(),
   };
+  pmCreating = true;
+  const btn = document.getElementById('pm-c-submit');
+  if (btn) { btn.disabled = true; btn.style.opacity = '.55'; }
   boardToast(BT('pm_creating'));
   const srcL = pmPortalLang();
   try {
-    if (row.project_desc) { const d = await pmTranslate(row.project_desc, row.lang_a, row.lang_b, srcL); row.desc_a = d.a; row.desc_b = d.b; }
-    if (row.scenario) { const sc = await pmTranslate(row.scenario, row.lang_a, row.lang_b, srcL); row.scenario_a = sc.a; row.scenario_b = sc.b; }
-  } catch (e) { /* 翻譯失敗留空，主席端輪詢時會背景補翻 */ }
-  try { await SB.post('premortem_sessions', row); boardToast(BT('pm_created', { meet: PMT().meet })); pmOpen(row.id); }
-  catch (e) { boardToast(BT('pm_create_failed') + (e.message || e)); }
+    try {
+      if (row.project_desc) { const d = await pmTranslate(row.project_desc, row.lang_a, row.lang_b, srcL); row.desc_a = d.a; row.desc_b = d.b; }
+      if (row.scenario) { const sc = await pmTranslate(row.scenario, row.lang_a, row.lang_b, srcL); row.scenario_a = sc.a; row.scenario_b = sc.b; }
+    } catch (e) { /* 翻譯失敗留空，主席端輪詢時會背景補翻 */ }
+    try { await SB.post('premortem_sessions', row); boardToast(BT('pm_created', { meet: PMT().meet })); pmOpen(row.id); }
+    catch (e) { boardToast(BT('pm_create_failed') + (e.message || e)); }
+  } finally {
+    pmCreating = false;
+    if (btn) { btn.disabled = false; btn.style.opacity = ''; }
+  }
 }
 
 // ── 開啟會議室 ──
@@ -4344,6 +4354,17 @@ async function pmFetchMitigations() {
   const rows = await SB.get('premortem_mitigations', '?session_id=eq.' + encodeURIComponent(pmSession.id) + '&order=created_at.asc');
   pmMitigations = rows || [];
 }
+// 選好風險後在下拉底下顯示完整雙語全文（下拉本身受寬度限制，長句在關閉狀態只看得到開頭）
+function pmMitRiskChanged() {
+  const sel = document.getElementById('pm-mit-risk-sel'), box = document.getElementById('pm-mit-risk-view');
+  if (!sel || !box) return;
+  const e = sel.value ? pmEntries.find(x => x.id === sel.value) : null;
+  if (!e) { box.style.display = 'none'; box.innerHTML = ''; return; }
+  box.style.display = '';
+  box.innerHTML = '<div style="font-size:11px;color:var(--tx3);margin-bottom:4px">' +
+    escHtml('👍 ' + BT('pm_votes_n', { n: pmVoteCount(e) })) + (e.theme ? '　' + escHtml('[' + e.theme + ']') : '') + '</div>' +
+    pmBiOrdered(e.text_src, e.text_a, e.text_b);
+}
 async function pmAddMitigation() {
   if (!pmIsChair(pmSession)) return;
   const riskId = document.getElementById('pm-mit-risk-sel').value;
@@ -4351,6 +4372,8 @@ async function pmAddMitigation() {
   const measure = (document.getElementById('pm-mit-measure').value || '').trim();
   if (!measure) { boardToast(BT('pm_need_measure', { measure: PMT().measure })); return; }
   const owner = document.getElementById('pm-mit-owner').value || '';
+  // 沒有負責人的對策等於沒人做，不予存檔
+  if (!owner) { boardToast(BT('pm_need_owner')); document.getElementById('pm-mit-owner').focus(); return; }
   const ownerU = ALL_USERS.find(u => u.empId === owner);
   const row = {
     id: uid(), session_id: pmSession.id,
@@ -4369,6 +4392,8 @@ async function pmAddMitigation() {
     await SB.post('premortem_mitigations', row);
     document.getElementById('pm-mit-measure').value = ''; document.getElementById('pm-mit-due').value = pmDefaultDue();
     const rs = document.getElementById('pm-mit-risk-sel'); if (rs) rs.value = '';
+    const os = document.getElementById('pm-mit-owner'); if (os) os.value = '';
+    pmMitRiskChanged();
     await pmFetchMitigations(); pmRenderRoom(); boardToast(BT('pm_mit_added', { mit: PMT().mit }));
   } catch (e) { boardToast(BT('pm_add_failed') + (e.message || e)); }
 }
@@ -4430,15 +4455,17 @@ function pmMitigationsHtml(canEdit) {
       '</div>' + del + '</div>';
   }).join('') : '<div class="empty-note">' + escHtml(BT('pm_no_mit', { mit: T.mit })) + '</div>';
   if (canEdit) {
-    const ownerOpts = '<option value="">' + escHtml(BT('pm_no_owner')) + '</option>' + (ALL_USERS || []).map(u => '<option value="' + u.empId + '">' + escHtml(u.nameZh || u.nameEn || u.empId) + '</option>').join('');
+    const ownerOpts = '<option value="">' + escHtml(BT('pm_pick_owner')) + '</option>' + (ALL_USERS || []).map(u => '<option value="' + u.empId + '">' + escHtml(u.nameZh || u.nameEn || u.empId) + '</option>').join('');
     const sorted = pmEntries.slice().sort((a, b) => pmVoteCount(b) - pmVoteCount(a));
+    // 選項不截斷：截短過的風險文字讓主席分不出相近的兩則；選好後下方 pm-mit-risk-view 再完整顯示雙語全文
     const riskOpts = '<option value="">' + escHtml(BT('pm_no_target', { target: T.target })) + '</option>' + sorted.map(e => {
-      const label = '(' + BT('pm_votes_n', { n: pmVoteCount(e) }) + ') ' + (e.theme ? '[' + e.theme + '] ' : '') + (e.text_a || e.text_src || '').replace(/\s+/g, ' ').slice(0, 40);
-      return '<option value="' + e.id + '">' + escHtml(label) + '</option>';
+      const label = '(' + BT('pm_votes_n', { n: pmVoteCount(e) }) + ') ' + (e.theme ? '[' + e.theme + '] ' : '') + (e.text_a || e.text_src || '').replace(/\s+/g, ' ');
+      return '<option value="' + e.id + '" title="' + escHtml(label) + '">' + escHtml(label) + '</option>';
     }).join('');
     h += '<div style="border-top:1px dashed var(--br);margin-top:10px;padding-top:12px;display:flex;flex-direction:column;gap:8px">' +
       '<label style="font-size:12px;color:var(--tx3)">' + escHtml(BT('pm_for_target', { target: T.target })) + '</label>' +
-      '<select id="pm-mit-risk-sel" style="font-size:13px;background:var(--s2);border:1px solid var(--br);border-radius:7px;padding:8px 10px;color:var(--tx);width:100%">' + riskOpts + '</select>' +
+      '<select id="pm-mit-risk-sel" onchange="pmMitRiskChanged()" style="font-size:13px;background:var(--s2);border:1px solid var(--br);border-radius:7px;padding:8px 10px;color:var(--tx);width:100%">' + riskOpts + '</select>' +
+      '<div id="pm-mit-risk-view" style="display:none;border:1px solid var(--br);border-radius:7px;padding:8px 10px;background:var(--s1)"></div>' +
       '<label style="font-size:12px;color:var(--tx3);margin-top:2px">' + escHtml(T.measure) + '</label>' +
       '<textarea id="pm-mit-measure" rows="6" placeholder="' + escHtml(T.measure) + '…" style="font-family:inherit;font-size:14px;background:var(--s2);border:1px solid var(--br);border-radius:7px;padding:8px 10px;color:var(--tx);width:100%"></textarea>' +
       '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">' +

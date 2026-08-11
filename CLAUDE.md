@@ -159,6 +159,17 @@ The portal supports EN, 繁中, 简中, VI, 日 via `setLang(lang)`. Each langua
 - `cancelCarBk(id)` 公務車取消，`cancelBk(id)` 會議室取消，**不可混用**
 - localStorage 只是快取，正本在 Supabase
 - 五大模塊順序：公務車 → 圖書館 → 會議室 → 客戶到訪 → 抽籤
+- 🔴 **日期一律用 `tds()`／`tdm()`／`ymdL()`／`ymL()`（裝置當地時間），不要用 `toISOString()`
+  取日期或月份**（v2.32）。`toISOString()` 是 UTC，台灣 00:00–08:00 之間會少算一天；
+  也**不要寫死 `+8*3600000`**（v2.32 前的 `tds()` 就是），越南廠是 UTC+7 會在 23:00 後跳成明天。
+  完整時間戳（`createdAt` 之類）維持 `new Date().toISOString()`，那本來就該是絕對時刻
+- 🔴 **公務車「出發／歸還」要指定是哪一筆預約**（v2.31）。`K.bks` 以 `start_dt DESC` 載入，
+  車輛看板原本用 `bks.find(…'pending')` 抓到的是**最晚開始**那筆——一輛車同時有 8/10 與 8/14
+  兩筆待出發時，8/10 的人按出發動到的是 8/14 那筆，接著歸還就把別人的預約結掉（實際發生過）。
+  改用 `pendBkOf()`（取最早開始）／`actBkOf()`（優先取現在落在時段內的）；
+  用車記錄表格每列也有自己的出發／歸還鈕，那才是使用者該走的路徑
+- 時間字串比較一律經 `dtn()`：DB 回 `'YYYY-MM-DD HH:mm'`（空白）而 `datetime-local`
+  是 `'…THH:mm'`，直接比大小會在第 11 個字元分岔（`' '` < `'T'`）
 
 ## Board 重要細節
 

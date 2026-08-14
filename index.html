@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>COMART Platform v1.71</title>
+<title>COMART Platform v1.72</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script defer src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.js"></script>
 <style>
@@ -164,6 +164,16 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:
 .modal{background:var(--s1);border:1px solid var(--br);border-radius:var(--rl);padding:24px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;}
 .modal-title{font-size:16px;font-weight:600;margin-bottom:18px;}
 .modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:20px;}
+/* 用戶管理 modal：放大＋分區雙欄佈局 */
+.um-modal{max-width:860px;padding:28px 32px;}
+.um-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px 22px;align-items:start;}
+.um-grid .field{margin-bottom:0;}
+.um-grid .um-full{grid-column:1 / -1;}
+.um-sec{grid-column:1 / -1;margin:8px 0 -2px;padding-top:16px;border-top:1px solid var(--br);font-size:10.5px;font-weight:700;color:var(--tx3);letter-spacing:.08em;text-transform:uppercase;}
+.um-sec:first-of-type{border-top:none;padding-top:0;margin-top:0;}
+.um-modal .field input,.um-modal .field select,.um-modal .field textarea{padding:11px 13px;font-size:14.5px;}
+.um-modal .field label{font-size:12.5px;margin-bottom:6px;}
+@media(max-width:680px){.um-modal{padding:22px 18px;}.um-grid{grid-template-columns:1fr;}}
 .btn-cancel{padding:8px 16px;border-radius:var(--r);border:1px solid var(--br);background:transparent;color:var(--tx2);cursor:pointer;font-family:var(--ff);font-size:13px;}
 .btn-save{padding:8px 16px;border-radius:var(--r);border:none;background:var(--ac);color:#fff;cursor:pointer;font-family:var(--ff);font-size:13px;font-weight:600;}
 .btn-danger{padding:8px 16px;border-radius:var(--r);border:none;background:var(--red);color:#fff;cursor:pointer;font-family:var(--ff);font-size:13px;}
@@ -294,7 +304,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     <div class="login-logo">
       <div class="login-mark" style="background:transparent"><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="44" height="23"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></div>
       <div class="login-name">COMART Platform</div>
-      <div class="login-sub">Internal Portal · v1.71</div>
+      <div class="login-sub">Internal Portal · v1.72</div>
     </div>
     <form id="loginForm" onsubmit="doLogin();return false;" autocomplete="on">
     <div class="field">
@@ -350,7 +360,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   <div class="topbar">
     <div class="topbar-logo" onclick="switchView('home')">
       <div class="topbar-mark" style="background:transparent"><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="26" height="14"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></div>
-      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.71</span></div>
+      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.72</span></div>
     </div>
     <div class="topbar-right">
       <div class="lang-switcher">
@@ -900,63 +910,65 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 <!-- User Modal -->
 <div class="overlay" id="userOverlay" onclick="if(event.target===this)closeUserModal()">
-  <div class="modal">
+  <div class="modal um-modal">
     <div class="modal-title" id="userModalTitle">New User</div>
-    <!-- Avatar -->
-    <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px;padding:12px;background:var(--s2);border-radius:10px;">
-      <div id="um-avatar-preview" style="width:64px;height:64px;border-radius:50%;background:var(--ac2);color:var(--ac);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;flex-shrink:0;overflow:hidden;cursor:pointer;"
-        onclick="document.getElementById('um-avatar-input').click()" title="點擊上傳頭像">?</div>
-      <div style="flex:1;">
-        <div id="um-avatar-lbl" style="font-size:12px;color:var(--tx2);margin-bottom:4px;">員工頭像</div>
-        <button type="button" id="um-upload-btn" onclick="document.getElementById('um-avatar-input').click()"
-          style="font-size:11px;padding:4px 12px;border-radius:6px;border:1px solid var(--br);background:var(--s3);color:var(--tx2);cursor:pointer;">📷 上傳照片</button>
-        <input type="file" id="um-avatar-input" accept="image/*" style="display:none;" onchange="umPreviewAvatar(event)">
-        <div id="um-avatar-hint" style="font-size:10px;color:var(--tx3);margin-top:3px;">JPG/PNG，建議 200×200px</div>
+    <div class="um-grid">
+      <!-- Avatar -->
+      <div class="um-full" style="display:flex;align-items:center;gap:16px;padding:14px 16px;background:var(--s2);border-radius:10px;">
+        <div id="um-avatar-preview" style="width:72px;height:72px;border-radius:50%;background:var(--ac2);color:var(--ac);display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700;flex-shrink:0;overflow:hidden;cursor:pointer;"
+          onclick="document.getElementById('um-avatar-input').click()" title="點擊上傳頭像">?</div>
+        <div style="flex:1;">
+          <div id="um-avatar-lbl" style="font-size:13px;color:var(--tx2);margin-bottom:6px;">員工頭像</div>
+          <button type="button" id="um-upload-btn" onclick="document.getElementById('um-avatar-input').click()"
+            style="font-size:12px;padding:6px 14px;border-radius:6px;border:1px solid var(--br);background:var(--s3);color:var(--tx2);cursor:pointer;">📷 上傳照片</button>
+          <input type="file" id="um-avatar-input" accept="image/*" style="display:none;" onchange="umPreviewAvatar(event)">
+          <div id="um-avatar-hint" style="font-size:10px;color:var(--tx3);margin-top:4px;">JPG/PNG，建議 200×200px</div>
+        </div>
       </div>
-    </div>
-    <div class="field"><label id="um-lbl-empid">Employee ID</label><input id="u-empId" placeholder="A00001" maxlength="6" oninput="this.value=this.value.toUpperCase()"><div class="hint">Format: 1 letter + 5 digits (A00001)</div></div>
-    <div class="field"><label id="um-lbl-role">Role</label>
-      <select id="u-role">
-        <option value="user" id="um-opt-user">User — 一般員工</option>
-        <option value="dcc" id="um-opt-dcc">DCC — 文件控管</option>
-        <option value="admin" id="um-opt-admin">Admin — 系統管理員</option>
-        <option value="inactive" id="um-opt-inactive">Inactive — 停用</option>
-      </select>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+
+      <div class="um-sec">帳號 · Account</div>
+      <div class="field"><label id="um-lbl-empid">Employee ID</label><input id="u-empId" placeholder="A00001" maxlength="6" oninput="this.value=this.value.toUpperCase()"><div class="hint">Format: 1 letter + 5 digits (A00001)</div></div>
+      <div class="field"><label id="um-lbl-role">Role</label>
+        <select id="u-role">
+          <option value="user" id="um-opt-user">User — 一般員工</option>
+          <option value="dcc" id="um-opt-dcc">DCC — 文件控管</option>
+          <option value="admin" id="um-opt-admin">Admin — 系統管理員</option>
+          <option value="inactive" id="um-opt-inactive">Inactive — 停用</option>
+        </select>
+      </div>
+      <div class="field um-full"><label id="u-pwd-label">Initial Password</label><form onsubmit="return false;" style="margin:0;padding:0;display:contents;">
+        <input type="text" name="username" style="display:none;" aria-hidden="true" tabindex="-1">
+        <input id="u-pwd" type="password" name="password" placeholder="Min 8 characters" autocomplete="new-password">
+      </form></div>
+
+      <div class="um-sec">姓名 · Name</div>
       <div class="field"><label id="um-lbl-name-en">English Name</label><input id="u-nameEn" placeholder="John Smith"></div>
       <div class="field"><label id="um-lbl-name-zh">中文姓名</label><input id="u-nameZh" placeholder="王大明"></div>
-    </div>
-    <div class="field"><label id="um-lbl-email">Email</label><input id="u-email" type="email" placeholder="john@comart.com"></div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+
+      <div class="um-sec">聯絡方式 · Contact</div>
+      <div class="field um-full"><label id="um-lbl-email">Email</label><input id="u-email" type="email" placeholder="john@comart.com"></div>
       <div class="field"><label id="um-lbl-ext">Extension (分機)</label><input id="u-ext" placeholder="123"></div>
       <div class="field"><label id="um-lbl-mobile">Mobile</label><input id="u-mobile" placeholder="+886 912 345 678"></div>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+
+      <div class="um-sec">職稱與組織 · Title &amp; Org</div>
       <div class="field"><label id="um-lbl-title-en">Job Title (EN)</label><input id="u-title-en" placeholder="Sales Manager"></div>
       <div class="field"><label id="um-lbl-title-zh">職稱 (ZH)</label><input id="u-title-zh" placeholder="業務經理"></div>
-    </div>
-    <div class="field"><label id="um-lbl-site">Site / Location</label>
-      <select id="u-site">
-        <option value="" id="um-site-opt-default">— 選擇地點 —</option>
-      </select>
-    </div>
-    <div class="field"><label id="u-dept-label">Department</label>
-      <select id="u-dept">
-        <option value="" id="um-dept-opt-default">— 未指定 / Unassigned —</option>
-      </select>
-    </div>
-    <!-- ─ 專業背景 ─ -->
-    <div style="margin:16px 0 8px;padding-top:14px;border-top:1px solid var(--br);font-size:10px;font-weight:700;color:var(--tx3);letter-spacing:.08em;text-transform:uppercase;">專業背景 · Professional Profile <span style="font-weight:400;color:var(--tx3);font-size:9px;">(供 KMS 專家黃頁)</span></div>
-    <div class="field">
-      <label id="um-lbl-bio-zh">中文專業說明 (bioZh)</label>
-      <textarea id="u-bioZh" rows="2" placeholder="例：負責 Qi2 無線充電產品線品質管理，擅長 IQC/IPQC 流程設計與 8D 分析" style="width:100%;padding:10px 12px;border-radius:var(--r);border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;font-family:var(--ff);resize:vertical;outline:none;" onfocus="this.style.borderColor='var(--ac)'" onblur="this.style.borderColor='var(--br)'"></textarea>
-    </div>
-    <div class="field">
-      <label id="um-lbl-bio-en">English Bio (bioEn)</label>
-      <textarea id="u-bioEn" rows="2" placeholder="e.g. Responsible for Qi2 wireless charging QC, specializing in IQC/IPQC process design and 8D analysis" style="width:100%;padding:10px 12px;border-radius:var(--r);border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;font-family:var(--ff);resize:vertical;outline:none;" onfocus="this.style.borderColor='var(--ac)'" onblur="this.style.borderColor='var(--br)'"></textarea>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div class="field"><label id="um-lbl-site">Site / Location</label>
+        <select id="u-site"><option value="" id="um-site-opt-default">— 選擇地點 —</option></select>
+      </div>
+      <div class="field"><label id="u-dept-label">Department</label>
+        <select id="u-dept"><option value="" id="um-dept-opt-default">— 未指定 / Unassigned —</option></select>
+      </div>
+
+      <div class="um-sec">專業背景 · Professional Profile <span style="font-weight:400;font-size:9px;">(供 KMS 專家黃頁)</span></div>
+      <div class="field um-full">
+        <label id="um-lbl-bio-zh">中文專業說明 (bioZh)</label>
+        <textarea id="u-bioZh" rows="3" placeholder="例：負責 Qi2 無線充電產品線品質管理，擅長 IQC/IPQC 流程設計與 8D 分析" style="width:100%;padding:11px 13px;border-radius:var(--r);border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:14px;font-family:var(--ff);resize:vertical;outline:none;" onfocus="this.style.borderColor='var(--ac)'" onblur="this.style.borderColor='var(--br)'"></textarea>
+      </div>
+      <div class="field um-full">
+        <label id="um-lbl-bio-en">English Bio (bioEn)</label>
+        <textarea id="u-bioEn" rows="3" placeholder="e.g. Responsible for Qi2 wireless charging QC, specializing in IQC/IPQC process design and 8D analysis" style="width:100%;padding:11px 13px;border-radius:var(--r);border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:14px;font-family:var(--ff);resize:vertical;outline:none;" onfocus="this.style.borderColor='var(--ac)'" onblur="this.style.borderColor='var(--br)'"></textarea>
+      </div>
       <div class="field">
         <label id="um-lbl-exp-zh">專業標籤 ZH (expertiseZh)</label>
         <input id="u-expertiseZh" placeholder="Qi2 認證, IQC/IPQC, 供應商評估">
@@ -968,10 +980,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
         <div class="hint">Comma-separated</div>
       </div>
     </div>
-    <div class="field"><label id="u-pwd-label">Initial Password</label><form onsubmit="return false;" style="margin:0;padding:0;display:contents;">
-  <input type="text" name="username" style="display:none;" aria-hidden="true" tabindex="-1">
-  <input id="u-pwd" type="password" name="password" placeholder="Min 8 characters" autocomplete="new-password">
-</form></div>
     <div class="modal-actions">
       <button class="btn-danger" id="u-del-btn" style="display:none;margin-right:auto;" onclick="confirmDeleteUser()">Delete User</button>
       <button class="btn-cancel" id="um-cancel-btn" onclick="closeUserModal()">Cancel</button>

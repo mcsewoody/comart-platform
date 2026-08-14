@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>COMART Platform v1.67</title>
+<title>COMART Platform v1.68</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script defer src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.js"></script>
 <style>
@@ -185,6 +185,9 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:
 .notif-badge{position:absolute;top:0;right:0;background:#E53935;color:#fff;font-size:9px;font-weight:700;padding:1px 4px;border-radius:8px;min-width:14px;text-align:center;display:none;}
 .notif-panel{position:absolute;top:calc(100% + 8px);right:0;width:320px;max-height:420px;background:var(--s1);border:1px solid var(--br);border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.3);z-index:999;display:none;flex-direction:column;overflow:hidden;}
 .notif-panel.open{display:flex;}
+.notif-hint{position:fixed;top:64px;right:16px;z-index:1000;display:flex;align-items:center;gap:9px;max-width:min(340px,calc(100vw - 32px));padding:11px 14px;background:var(--s1);border:1px solid var(--br);border-left:3px solid var(--ac);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.35);font-size:13px;color:var(--tx);cursor:pointer;opacity:0;transform:translateY(-8px);transition:opacity .25s,transform .25s;}
+.notif-hint.show{opacity:1;transform:translateY(0);}
+@media(max-width:768px){.notif-hint{top:calc(env(safe-area-inset-top) + 60px);right:12px;left:12px;max-width:none;}}
 .notif-item{padding:10px 14px;border-bottom:1px solid var(--br);cursor:pointer;transition:background .15s;}
 .notif-item:hover{background:var(--s2);}
 .notif-item.unread{border-left:3px solid var(--ac);}
@@ -291,7 +294,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     <div class="login-logo">
       <div class="login-mark" style="background:transparent"><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="44" height="23"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></div>
       <div class="login-name">COMART Platform</div>
-      <div class="login-sub">Internal Portal · v1.67</div>
+      <div class="login-sub">Internal Portal · v1.68</div>
     </div>
     <form id="loginForm" onsubmit="doLogin();return false;" autocomplete="on">
     <div class="field">
@@ -347,7 +350,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   <div class="topbar">
     <div class="topbar-logo" onclick="switchView('home')">
       <div class="topbar-mark" style="background:transparent"><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="26" height="14"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></div>
-      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.67</span></div>
+      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.68</span></div>
     </div>
     <div class="topbar-right">
       <div class="lang-switcher">
@@ -1508,19 +1511,17 @@ document.addEventListener('click', e => {
 async function loadNotifications() {
   const sess = readSession();
   if (!sess?.empId && !sess?.nameEn) return;
-  const sbKey = await getSupabaseKey();
-  if (!sbKey) return;
 
   const list = document.getElementById('notifList');
   if (!list) return;
 
   try {
-    const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/notifications?${encodeURI(_notifFilter(sess))}&order=created_at.desc&limit=30`,
-      { headers: { 'apikey': sbKey, 'Authorization': `Bearer ${sbKey}` } }
-    );
-    if (!res.ok) throw new Error(res.status);
-    const notifs = await res.json();
+    // 🔴 一律走 sb-proxy（帶 x-session 簽章）。原本用 anon key 直連 REST：
+    //    讀得到（有 select policy），但寫入被 RLS 擋掉且沒人檢查回應
+    //    → 「全部已讀」看起來成功、實際沒寫進去，下次登入原封不動再出現一次
+    const notifs = await SB.get('notifications',
+      `${encodeURI(_notifFilter(sess))}&order=created_at.desc&limit=30`);
+    if (!notifs) throw new Error('load failed');
 
     const unread = notifs.filter(n => !n.is_read).length;
     const badge = document.getElementById('notifBadge');
@@ -1544,18 +1545,14 @@ async function loadNotifications() {
       </div>`;
     }).join('');
   } catch(e) {
-    list.innerHTML = `<div style="padding:16px;color:var(--tx3);font-size:12px;">載入失敗：${escHtml(e.message)}</div>`;
+    list.innerHTML = `<div style="padding:16px;color:var(--tx3);font-size:12px;">${t('notif_load_failed')}${escHtml(e.message)}</div>`;
   }
 }
 
 async function openNotif(notifId, link) {
-  const sbKey = await getSupabaseKey();
-  if (sbKey && notifId) {
-    fetch(`${SUPABASE_URL}/rest/v1/notifications?id=eq.${notifId}`, {
-      method: 'PATCH',
-      headers: { 'apikey': sbKey, 'Authorization': `Bearer ${sbKey}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
-      body: JSON.stringify({ is_read: true }),
-    }).catch(()=>{});
+  if (notifId) {
+    try { await SB.patch('notifications', 'id=eq.' + encodeURIComponent(notifId), { is_read: true }); }
+    catch(e) { console.warn('markRead fail:', e.message); }
   }
   // 只允許 http(s) 或站內相對路徑，阻擋 javascript: 等危險 scheme
   if (link && /^(https?:\/\/|\/|\.\/)/i.test(link)) window.open(link, '_blank');
@@ -1566,15 +1563,20 @@ async function openNotif(notifId, link) {
 
 async function markAllRead() {
   const sess = readSession();
-  const sbKey = await getSupabaseKey();
-  if (!sbKey || !sess) return;
-  await fetch(
-    `${SUPABASE_URL}/rest/v1/notifications?${encodeURI(_notifFilter(sess))}&is_read=eq.false`,
-    { method: 'PATCH', headers: { 'apikey': sbKey, 'Authorization': `Bearer ${sbKey}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' }, body: JSON.stringify({ is_read: true }) }
-  ).catch(()=>{});
+  if (!sess) return;
+  try {
+    // return=representation：拿得到實際被改的列數，寫不進去就不會再假裝成功
+    const rows = await SB.patch('notifications',
+      `${encodeURI(_notifFilter(sess))}&is_read=eq.false`, { is_read: true });
+    toast(t('notif_marked_n').replace('{n}', Array.isArray(rows) ? rows.length : 0), 'success');
+  } catch(e) {
+    toast(t('notif_mark_failed') + (e.message || e), 'error');
+    return;                       // 失敗就不關面板、不清 badge，維持真實狀態
+  }
   document.getElementById('notifPanel')?.classList.remove('open');
   _notifOpen = false;
-  updateNotifBadge(false);
+  await updateNotifBadge(false);
+  if (_notifOpen) loadNotifications();
 }
 
 // 通知身份過濾：寫入端（Portal/KMS）以「姓名或工號」為 to_user，
@@ -1589,24 +1591,38 @@ async function updateNotifBadge(autoOpen) {
   const sess = readSession();
   if (!sess) return;
   if (document.hidden && autoOpen !== true) return; // 背景分頁不輪詢（登入後首查除外）
-  const sbKey = await getSupabaseKey();
-  if (!sbKey) return;
   try {
-    const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/notifications?${encodeURI(_notifFilter(sess))}&is_read=eq.false&select=id`,
-      { headers: { 'apikey': sbKey, 'Authorization': `Bearer ${sbKey}` } }
-    );
-    const data = await res.json();
+    const data = await SB.get('notifications',
+      `${encodeURI(_notifFilter(sess))}&is_read=eq.false&select=id`);
     const cnt = Array.isArray(data) ? data.length : 0;
     const badge = document.getElementById('notifBadge');
     if (badge) { badge.textContent = cnt; badge.style.display = cnt > 0 ? 'block' : 'none'; }
-    // 登入後有未讀通知 → 自動開通知面板
-    if (autoOpen && cnt > 0) {
-      _notifOpen = true;
-      const panel = document.getElementById('notifPanel');
-      if (panel) { panel.classList.add('open'); loadNotifications(); }
-    }
+    // 登入後有未讀通知：只提醒，不自動展開面板。
+    // 舊行為是直接 panel.classList.add('open')，每次登入都蓋住版面；
+    // 改成一則可點的提醒，要看內容自己點進去（點鈴鐺也一樣）
+    if (autoOpen && cnt > 0) notifHint(cnt);
   } catch(e) {}
+}
+
+// 登入後的新通知提醒：右上角一則可點的橫幅，8 秒自動收起；點了才展開面板
+function notifHint(cnt) {
+  const old = document.getElementById('notifHint');
+  if (old) old.remove();
+  const el = document.createElement('div');
+  el.id = 'notifHint';
+  el.className = 'notif-hint';
+  el.innerHTML = '<span style="font-size:15px">🔔</span><span>' +
+    escHtml(t('notif_hint_n').replace('{n}', cnt)) + '</span>' +
+    '<span style="margin-left:auto;color:var(--ac);font-weight:600">' + escHtml(t('notif_hint_view')) + ' ›</span>';
+  el.onclick = () => {
+    el.remove();
+    _notifOpen = true;
+    document.getElementById('notifPanel')?.classList.add('open');
+    loadNotifications();
+  };
+  document.body.appendChild(el);
+  requestAnimationFrame(() => el.classList.add('show'));
+  setTimeout(() => { el.classList.remove('show'); setTimeout(() => el.remove(), 300); }, 8000);
 }
 
 async function loadRanking(siteFilter) {
@@ -2522,6 +2538,7 @@ const I18N = {
     ai_tab_translate:'Translate', ai_tab_chat:'Chat', ai_tab_skills:'Skills',
     // notifications
     notif_title:'Notifications', notif_mark_all:'Mark all read', notif_empty:'No notifications',
+    notif_hint_n:'You have {n} new notification(s)', notif_hint_view:'View', notif_marked_n:'{n} notification(s) marked as read', notif_mark_failed:'Could not mark as read: ', notif_load_failed:'Could not load: ',
     // profile
     // skills tab
     skill_company_title:'Company Research Bot',
@@ -2586,6 +2603,7 @@ const I18N = {
     um_delete_failed:'刪除失敗：', um_deleted:'用戶已刪除',
     ai_tab_translate:'翻譯', ai_tab_chat:'對話', ai_tab_skills:'技能',
     notif_title:'通知', notif_mark_all:'全部已讀', notif_empty:'目前沒有通知',
+    notif_hint_n:'你有 {n} 則新通知', notif_hint_view:'查看', notif_marked_n:'已將 {n} 則通知標為已讀', notif_mark_failed:'標記已讀失敗：', notif_load_failed:'載入失敗：',
     skill_company_title:'公司調查機器人',
     skill_company_desc:'輸入公司名稱，自動調查公司背景、聯絡資訊、產品方向，輸出完整調查報告與商業開發信。',
     skill_company_btn:'調查 →',
@@ -2644,6 +2662,7 @@ const I18N = {
     um_delete_failed:'删除失败：', um_deleted:'用户已删除',
     ai_tab_translate:'翻译', ai_tab_chat:'对话', ai_tab_skills:'技能',
     notif_title:'通知', notif_mark_all:'全部已读', notif_empty:'暂无通知',
+    notif_hint_n:'你有 {n} 条新通知', notif_hint_view:'查看', notif_marked_n:'已将 {n} 条通知标为已读', notif_mark_failed:'标记已读失败：', notif_load_failed:'加载失败：',
     skill_company_title:'公司调查机器人',
     skill_company_desc:'输入公司名称，自动调查公司背景、联系信息、产品方向，输出完整调查报告与商业开发信。',
     skill_company_btn:'调查 →',
@@ -2702,6 +2721,7 @@ const I18N = {
     um_delete_failed:'Xóa thất bại: ', um_deleted:'Đã xóa người dùng',
     ai_tab_translate:'Dịch thuật', ai_tab_chat:'Trò chuyện', ai_tab_skills:'Kỹ năng',
     notif_title:'Thông báo', notif_mark_all:'Đánh dấu đã đọc', notif_empty:'Không có thông báo',
+    notif_hint_n:'Bạn có {n} thông báo mới', notif_hint_view:'Xem', notif_marked_n:'Đã đánh dấu {n} thông báo là đã đọc', notif_mark_failed:'Không đánh dấu được: ', notif_load_failed:'Tải thất bại: ',
     skill_company_title:'Bot Nghiên cứu Công ty',
     skill_company_desc:'Nhập tên công ty để tự động tra cứu thông tin nền tảng, liên lạc và hướng sản phẩm. Xuất báo cáo điều tra đầy đủ và thư phát triển kinh doanh.',
     skill_company_btn:'Tra cứu →',
@@ -2760,6 +2780,7 @@ const I18N = {
     um_delete_failed:'削除失敗：', um_deleted:'ユーザーを削除しました',
     ai_tab_translate:'翻訳', ai_tab_chat:'チャット', ai_tab_skills:'スキル',
     notif_title:'通知', notif_mark_all:'すべて既読', notif_empty:'通知はありません',
+    notif_hint_n:'新しい通知が {n} 件あります', notif_hint_view:'表示', notif_marked_n:'{n} 件を既読にしました', notif_mark_failed:'既読にできませんでした：', notif_load_failed:'読み込みに失敗しました：',
     skill_company_title:'会社調査ボット',
     skill_company_desc:'会社名を入力すると、会社概要・連絡先・製品方向を自動調査し、詳細報告書とビジネス開発レターを出力します。',
     skill_company_btn:'調査 →',

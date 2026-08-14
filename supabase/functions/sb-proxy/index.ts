@@ -51,6 +51,7 @@ const ALLOWED_TABLES = new Set([
   "premortem_sessions","premortem_entries","premortem_mitigations",
   // 注意：premortem_summary_log（AI 結論的版本歷史）**刻意不列入**——
   // 稽核紀錄不該能被應用程式讀取或刪除，只能從 Supabase 後台查。
+  "poll_sessions","poll_options","poll_votes","poll_comments",
 ])
 
 // ── 事前驗屍：受保護欄位 ──

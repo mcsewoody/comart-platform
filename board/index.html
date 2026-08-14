@@ -5,7 +5,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#080C14">
-<title>COMART · 公告與紀錄 v1.54</title>
+<title>COMART · 公告與紀錄 v1.55</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -222,7 +222,7 @@ select,select option,option{background:var(--s2);color:var(--tx)}
     <a class="logo" href="javascript:void(0)">
       <div class="logo-mark">告</div>
       <div class="logo-text" data-i18n="app_title">公告與紀錄</div>
-      <span class="logo-ver">v1.54</span>
+      <span class="logo-ver">v1.55</span>
     </a>
     <div class="topbar-right">
       <div id="langChips" style="display:flex;gap:4px"></div>
@@ -640,6 +640,15 @@ select,select option,option{background:var(--s2);color:var(--tx)}
               <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:400;font-size:13.5px"><input type="checkbox" id="pl-c-decision" style="width:auto"> 決策模式（截止後自動標示最高票為「勝出」）</label>
               <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:400;font-size:13.5px"><input type="checkbox" id="pl-c-comment" style="width:auto"> 可書寫建議（每人可附一段整體意見）</label>
               <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:400;font-size:13.5px"><input type="checkbox" id="pl-c-qty" style="width:auto"> 數量模式（點餐／物資：可對選項填份數）</label>
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:400;font-size:13.5px"><input type="checkbox" id="pl-c-bi" onchange="document.getElementById('pl-c-lang-wrap').style.display=this.checked?'':'none'" style="width:auto"> 雙語（題目/選項/背景自動翻成兩種語言並陳）</label>
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:400;font-size:13.5px"><input type="checkbox" id="pl-c-nopersist" style="width:auto"> 不存檔（快閃投票，結束後直接刪除）</label>
+            </div>
+            <div class="field" id="pl-c-lang-wrap" style="display:none">
+              <label>並陳語言</label>
+              <div style="display:flex;gap:10px">
+                <select id="pl-c-langa" style="flex:1"><option value="zh-TW">繁體中文</option><option value="zh-CN">简体中文</option><option value="vi">Tiếng Việt</option><option value="en">English</option><option value="ja">日本語</option></select>
+                <select id="pl-c-langb" style="flex:1"><option value="vi">Tiếng Việt</option><option value="zh-TW">繁體中文</option><option value="zh-CN">简体中文</option><option value="en">English</option><option value="ja">日本語</option></select>
+              </div>
             </div>
             <div class="field"><label>開放參與範圍</label>
               <select id="pl-c-scope" onchange="plScopeChanged()">
@@ -4771,6 +4780,11 @@ let plBgImages = [];       // 建立中的背景附圖 URL
 let plComments = [];        // 目前投票的意見
 let plCenterFilter = '';    // 結果分中心篩選（''=全部）
 function plSiteOf(empId) { const u = (ALL_USERS || []).find(x => x.empId === empId); return u ? (u.site || '') : ''; }
+// 雙語行內顯示（A ｜ B）；非雙語就回原文
+function plBiLine(orig, a, b, s) {
+  if (s && s.bilingual && (a || b)) return escHtml(a || orig || '') + ' <span style="color:var(--tx3)">｜</span> ' + escHtml(b || orig || '');
+  return escHtml(orig || '');
+}
 
 // ── 圖片：前端壓縮後經 sb-proxy(service_role)上傳到公開 bucket poll-images ──
 function plCompressImage(file, maxDim, quality) {
@@ -4845,7 +4859,7 @@ async function plLoadList() {
     document.getElementById('pl-list').innerHTML = '<div class="empty-note" style="border-color:var(--ac);color:var(--tx)">🔑 登入已過期或尚未登入，請回入口網站重新登入。</div>';
     return;
   }
-  const rows = await SB.get('poll_sessions', '?select=id,title,status,scope_type,scope_site,scope_members,creator_emp_id,creator_name,close_at,updated_at&order=updated_at.desc&limit=200');
+  const rows = await SB.get('poll_sessions', '?select=id,title,status,scope_type,scope_site,scope_members,creator_emp_id,creator_name,close_at,persist,updated_at&order=updated_at.desc&limit=200');
   plAll = (rows || []).filter(plCanSee);
   plRenderList();
 }
@@ -4863,7 +4877,7 @@ function plRenderList() {
     const join = s.status !== 'closed' ? '<button class="btn primary sm" onclick="event.stopPropagation();plOpen(\'' + s.id + '\')">▶ 參與投票</button>' : '<button class="btn sm" onclick="event.stopPropagation();plOpen(\'' + s.id + '\')">查看結果</button>';
     return '<div class="saved-row" style="cursor:pointer" onclick="plOpen(\'' + s.id + '\')">' +
       '<div><div class="t">' + escHtml(s.title || '(未命名)') + ' ' + st + '</div>' +
-      '<div class="m"><span>發起：' + escHtml(s.creator_name || '—') + '</span><span>範圍：' + escHtml(plScopeText(s)) + '</span>' + (s.close_at ? '<span>截止：' + escHtml(plFmtDt(s.close_at)) + '</span>' : '') + '</div></div>' +
+      '<div class="m"><span>發起：' + escHtml(s.creator_name || '—') + '</span><span>範圍：' + escHtml(plScopeText(s)) + '</span>' + (s.close_at ? '<span>截止：' + escHtml(plFmtDt(s.close_at)) + '</span>' : '') + (s.persist === false ? '<span style="color:var(--tx3)">未存檔</span>' : '') + '</div></div>' +
       '<div class="ops">' + join + del + '</div></div>';
   }).join('');
   box.innerHTML = html;
@@ -4892,6 +4906,11 @@ function plNewSession() {
   document.getElementById('pl-c-decision').checked = false;
   document.getElementById('pl-c-comment').checked = false;
   document.getElementById('pl-c-qty').checked = false;
+  document.getElementById('pl-c-bi').checked = false;
+  document.getElementById('pl-c-lang-wrap').style.display = 'none';
+  document.getElementById('pl-c-langa').value = 'zh-TW';
+  document.getElementById('pl-c-langb').value = 'vi';
+  document.getElementById('pl-c-nopersist').checked = false;
   plScopeChanged();
   plShowView('create');
 }
@@ -4942,6 +4961,10 @@ async function plCreateSubmit() {
     decision_mode: document.getElementById('pl-c-decision').checked,
     allow_comment: document.getElementById('pl-c-comment').checked,
     quantity_mode: document.getElementById('pl-c-qty').checked,
+    bilingual: document.getElementById('pl-c-bi').checked,
+    lang_a: document.getElementById('pl-c-langa').value,
+    lang_b: document.getElementById('pl-c-langb').value,
+    persist: !document.getElementById('pl-c-nopersist').checked,
     scope_type: scope,
     scope_site: scope === 'site' ? document.getElementById('pl-c-site').value : null,
     scope_members: members,
@@ -4951,9 +4974,21 @@ async function plCreateSubmit() {
     creator_name: PORTAL_SESSION.nameZh || PORTAL_SESSION.nameEn || PORTAL_SESSION.empId,
     created_at: new Date().toISOString(), updated_at: new Date().toISOString(),
   };
+  const orows = opts.map((o, i) => ({ id: uid(), session_id: sid, label: o.label, image_url: o.image, sort_order: i, created_at: new Date().toISOString() }));
+  // 雙語：翻譯 題目/背景/各選項 到 A、B（沿用 premortem 的 pmTranslate/claude-proxy）
+  if (srow.bilingual) {
+    boardToast('建立中（翻譯雙語）…');
+    const src = (typeof pmPortalLang === 'function') ? pmPortalLang() : 'zh-TW';
+    try {
+      const jobs = [];
+      jobs.push(pmTranslate(srow.title, srow.lang_a, srow.lang_b, src).then(t => { srow.title_a = t.a; srow.title_b = t.b; }).catch(() => {}));
+      if (srow.description) jobs.push(pmTranslate(srow.description, srow.lang_a, srow.lang_b, src).then(t => { srow.desc_a = t.a; srow.desc_b = t.b; }).catch(() => {}));
+      orows.forEach(o => jobs.push(pmTranslate(o.label, srow.lang_a, srow.lang_b, src).then(t => { o.label_a = t.a; o.label_b = t.b; }).catch(() => {})));
+      await Promise.all(jobs);
+    } catch (e) {}
+  }
   try {
     await SB.post('poll_sessions', srow);
-    const orows = opts.map((o, i) => ({ id: uid(), session_id: sid, label: o.label, image_url: o.image, sort_order: i, created_at: new Date().toISOString() }));
     await SB.post('poll_options', orows);
     boardToast('已建立投票'); plOpen(sid);
   } catch (e) { boardToast('建立失敗：' + (e.message || e)); }
@@ -5022,6 +5057,12 @@ async function plVote(optionId) {
 }
 async function plCloseSession() {
   if (!plIsCreator(plSession)) return;
+  if (plSession.persist === false) {
+    if (!confirm('這是「不存檔」投票，結束後將直接刪除、不留紀錄，確定？')) return;
+    try { await SB.del('poll_sessions', 'id=eq.' + encodeURIComponent(plSession.id)); boardToast('已結束並刪除'); plBackToList(); }
+    catch (e) { boardToast('刪除失敗：' + (e.message || e)); }
+    return;
+  }
   if (!confirm('結束這場投票？結束後不能再投。')) return;
   plSession.status = 'closed'; plRenderRoom();
   try { await SB.patch('poll_sessions', 'id=eq.' + encodeURIComponent(plSession.id), { status: 'closed', updated_at: new Date().toISOString() }); }
@@ -5059,14 +5100,15 @@ function plRenderRoom() {
   const bg = Array.isArray(s.bg_images) ? s.bg_images : [];
   const bgHtml = bg.length ? '<div style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0">' + bg.map(u => '<a href="' + escHtml(u) + '" target="_blank" rel="noopener"><img src="' + escHtml(u) + '" style="max-width:180px;max-height:140px;border-radius:8px;border:1px solid var(--br);object-fit:cover"></a>').join('') + '</div>' : '';
   const modeTag = (qty ? '數量' : (s.multi ? ('複選' + (s.multi_cap ? '，最多 ' + s.multi_cap + ' 項' : '')) : '單選'));
-  let html = '<div class="panel"><div class="panel-h"><span class="idx">🗳</span><h2>' + escHtml(s.title || '(未命名)') + '</h2></div><div class="panel-b">' +
-    (s.description ? '<div style="font-size:13.5px;white-space:pre-wrap;margin-bottom:6px">' + escHtml(s.description) + '</div>' : '') + bgHtml +
+  let html = '<div class="panel"><div class="panel-h"><span class="idx">🗳</span><h2>' + plBiLine(s.title || '(未命名)', s.title_a, s.title_b, s) + '</h2></div><div class="panel-b">' +
+    (s.description ? '<div style="font-size:13.5px;white-space:pre-wrap;margin-bottom:6px">' + plBiLine(s.description, s.desc_a, s.desc_b, s) + '</div>' : '') + bgHtml +
     '<div style="font-size:12px;color:var(--tx3)">發起：' + escHtml(s.creator_name || '—') + '　範圍：' + escHtml(plScopeText(s)) + '　' + modeTag + '　' + (s.anonymous ? '匿名' : '記名') + (s.close_at ? '　截止：' + escHtml(plFmtDt(s.close_at)) : '') + '</div></div></div>';
 
   html += '<div class="panel"><div class="panel-h"><span class="idx">✔</span><h2>' + (plClosed() ? '投票結果' : ('請投票（' + modeTag + '）')) + '</h2><span class="sub">' + total + ' 人 · ' + grand + ' ' + unit + '</span></div><div class="panel-b">';
   if (!showCounts) html += '<div class="hint" style="margin-bottom:8px">🔒 結果將於截止後才揭曉；你仍可先投票（截止前可改）。</div>';
   // 分中心篩選
   if (showCounts) html += '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">' + ['', 'TW', 'CN', 'VN'].map(st => '<button class="chip-f' + (plCenterFilter === st ? ' on' : '') + '" onclick="plSetCenter(\'' + st + '\')">' + (st ? escHtml(siteLabel(st)) : '全部') + '</button>').join('') + '</div>';
+  if (showCounts) html += '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px"><button class="btn sm" onclick="plSendMail()">✉️ 寄送</button><button class="btn sm" onclick="plExportXlsx()">Excel</button><button class="btn sm" onclick="plExportPNG()">PNG</button><button class="btn sm" onclick="plExportPDF()">PDF</button></div>';
   // 圓餅圖
   if (showCounts && grand > 0) {
     let acc = 0; const segs = [];
@@ -5089,7 +5131,7 @@ function plRenderRoom() {
       '<div style="position:relative;display:flex;align-items:center;gap:10px">' +
       (qty ? '' : '<div style="width:18px;flex-shrink:0">' + (chosen ? (s.multi ? '☑' : '●') : (s.multi ? '☐' : '○')) + '</div>') +
       (o.image_url ? '<img src="' + escHtml(o.image_url) + '" onclick="event.stopPropagation();window.open(this.src)" style="width:44px;height:44px;object-fit:cover;border-radius:6px;border:1px solid var(--br);flex-shrink:0;cursor:zoom-in">' : '') +
-      '<div style="flex:1;min-width:0;font-size:14px">' + escHtml(o.label || '') + (win ? ' <span style="color:var(--grn,#4caf50);font-weight:700">🏆 勝出</span>' : '') + '</div>' +
+      '<div style="flex:1;min-width:0;font-size:14px">' + plBiLine(o.label, o.label_a, o.label_b, s) + (win ? ' <span style="color:var(--grn,#4caf50);font-weight:700">🏆 勝出</span>' : '') + '</div>' +
       (showCounts ? '<div style="flex-shrink:0;font-size:13px;color:var(--tx3);white-space:nowrap">' + c + ' ' + unit + ' · ' + pct + '%</div>' : '') +
       stepper +
       '</div>' + nameList + '</div>';
@@ -5132,6 +5174,81 @@ async function plSaveComment() {
     else { const row = { id: uid(), session_id: plSession.id, voter_emp_id: me, voter_name: PORTAL_SESSION.nameZh || PORTAL_SESSION.nameEn || me, text, created_at: new Date().toISOString() }; await SB.post('poll_comments', row); plComments.push(row); }
     plRenderRoom(); boardToast('已送出');
   } catch (e) { boardToast('送出失敗：' + (e.message || e)); }
+}
+
+// ── 輸出（PDF／PNG／Excel／Email）──
+function plFileBase() { return 'Poll_' + ((plSession && plSession.title) || '').replace(/[\\/:*?"<>|]/g, '').slice(0, 40); }
+function plBiPlain(orig, a, b, s) { return (s && s.bilingual && (a || b)) ? ((a || orig || '') + ' ｜ ' + (b || orig || '')) : (orig || ''); }
+function plReportData() {
+  const s = plSession, qty = !!s.quantity_mode, cnt = {}, voters = {};
+  plVotes.forEach(v => { cnt[v.option_id] = (cnt[v.option_id] || 0) + (qty ? (v.quantity || 1) : 1); (voters[v.option_id] = voters[v.option_id] || []).push(v.voter_name || v.voter_emp_id); });
+  const total = new Set(plVotes.map(v => v.voter_emp_id)).size;
+  const grand = Object.keys(cnt).reduce((a, k) => a + cnt[k], 0);
+  const winMax = s.decision_mode ? Math.max(0, ...plOptions.map(o => cnt[o.id] || 0)) : -1;
+  return { cnt, voters, total, grand, winMax, unit: qty ? '份' : '票' };
+}
+function plReportHtml() {
+  const s = plSession, d = plReportData(), esc = escHtml;
+  let h = '<h1>' + esc(plBiPlain(s.title || '(未命名)', s.title_a, s.title_b, s)) + '</h1>';
+  h += '<div style="color:#666;font-size:12px">投票結果　發起：' + esc(s.creator_name || '—') + '　' + d.total + ' 人 · ' + d.grand + ' ' + d.unit + '</div>';
+  if (s.description) h += '<div style="margin:8px 0;white-space:pre-wrap">' + esc(plBiPlain(s.description, s.desc_a, s.desc_b, s)) + '</div>';
+  h += '<table style="width:100%;border-collapse:collapse;margin-top:10px"><tr><th style="text-align:left;border-bottom:2px solid #333;padding:5px">選項</th><th style="text-align:right;border-bottom:2px solid #333;padding:5px">' + d.unit + '</th><th style="text-align:right;border-bottom:2px solid #333;padding:5px">%</th></tr>';
+  plOptions.forEach(o => {
+    const c = d.cnt[o.id] || 0, pct = d.grand ? Math.round(c / d.grand * 100) : 0, win = d.winMax >= 0 && c === d.winMax && c > 0;
+    h += '<tr><td style="padding:5px;border-bottom:1px solid #ddd">' + esc(plBiPlain(o.label, o.label_a, o.label_b, s)) + (win ? ' 🏆' : '') + (!s.anonymous && (d.voters[o.id] || []).length ? '<div style="font-size:11px;color:#888">' + esc((d.voters[o.id] || []).join('、')) + '</div>' : '') + '</td><td style="text-align:right;padding:5px;border-bottom:1px solid #ddd">' + c + '</td><td style="text-align:right;padding:5px;border-bottom:1px solid #ddd">' + pct + '%</td></tr>';
+  });
+  h += '</table>';
+  if (s.allow_comment && plComments.length) {
+    h += '<h2 style="font-size:14px;border-bottom:2px solid #333;padding-bottom:3px;margin:16px 0 8px">意見</h2>';
+    h += plComments.map(c => '<div style="margin-bottom:6px">• ' + esc(c.text || '') + (!s.anonymous && c.voter_name ? ' <span style="color:#888">（' + esc(c.voter_name) + '）</span>' : '') + '</div>').join('');
+  }
+  return h;
+}
+function plExportPDF() {
+  const w = window.open('', '_blank'); if (!w) { boardToast('請允許彈出視窗以列印 PDF'); return; }
+  w.document.write('<!doctype html><html><head><meta charset="utf-8"><title>' + wmXesc(plFileBase()) + '</title><style>body{font-family:"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;color:#1a1a1a;margin:28px;font-size:13px;line-height:1.5}h1{font-size:20px;margin:0 0 4px}table{border-collapse:collapse}@media print{@page{margin:14mm}}</style></head><body>' + plReportHtml() + '</body></html>');
+  w.document.close(); w.onload = function () { try { w.focus(); w.print(); } catch (e) {} };
+}
+function plExportPNG() {
+  try {
+    const width = 760, frag = plReportHtml();
+    const holder = document.createElement('div'); holder.style.cssText = 'position:fixed;left:-9999px;top:0;width:' + width + 'px;background:#fff;color:#1a1a1a;padding:24px;font-family:sans-serif;font-size:14px;line-height:1.5'; holder.innerHTML = frag; document.body.appendChild(holder);
+    const h = holder.scrollHeight + 48; document.body.removeChild(holder);
+    const xhtml = '<div xmlns="http://www.w3.org/1999/xhtml" style="width:' + width + 'px;background:#fff;color:#1a1a1a;padding:24px;font-family:sans-serif;font-size:14px;line-height:1.5">' + frag + '</div>';
+    const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + width + '" height="' + h + '"><foreignObject width="100%" height="100%">' + xhtml + '</foreignObject></svg>';
+    const url = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml;charset=utf-8' })); const img = new Image();
+    img.onload = function () { const sc = 2, cv = document.createElement('canvas'); cv.width = width * sc; cv.height = h * sc; const ctx = cv.getContext('2d'); ctx.setTransform(sc, 0, 0, sc, 0, 0); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, width, h); ctx.drawImage(img, 0, 0); URL.revokeObjectURL(url); cv.toBlob(function (b) { if (!b) { boardToast('PNG 匯出失敗，請改用 PDF'); return; } wmDownload(b, plFileBase() + '.png'); boardToast('已匯出 PNG'); }, 'image/png'); };
+    img.onerror = function () { URL.revokeObjectURL(url); boardToast('PNG 匯出失敗，請改用 PDF'); }; img.src = url;
+  } catch (e) { boardToast('PNG 匯出失敗，請改用 PDF'); }
+}
+function plBuildXlsx() {
+  const s = plSession, d = plReportData(), rows = [];
+  rows.push(['投票結果：' + (s.title || ''), '', '']);
+  rows.push(['選項', d.unit, '%']);
+  plOptions.forEach(o => { const c = d.cnt[o.id] || 0, pct = d.grand ? Math.round(c / d.grand * 100) : 0; rows.push([plBiPlain(o.label, o.label_a, o.label_b, s) + (!s.anonymous && (d.voters[o.id] || []).length ? '（' + (d.voters[o.id] || []).join('、') + '）' : ''), String(c), pct + '%']); });
+  if (s.allow_comment) plComments.forEach(c => rows.push(['意見', (c.text || '') + (!s.anonymous && c.voter_name ? '（' + c.voter_name + '）' : ''), '']));
+  const colL = i => String.fromCharCode(65 + i);
+  const rowsXml = rows.map((row, ri) => '<row r="' + (ri + 1) + '">' + row.map((v, ci) => (v === '' || v == null) ? '' : '<c r="' + colL(ci) + (ri + 1) + '" t="inlineStr"><is><t xml:space="preserve">' + wmXesc(v) + '</t></is></c>').join('') + '</row>').join('');
+  const sheetXml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><cols><col min="1" max="1" width="46" customWidth="1"/><col min="2" max="2" width="16" customWidth="1"/><col min="3" max="3" width="8" customWidth="1"/></cols><sheetData>' + rowsXml + '</sheetData></worksheet>';
+  const ct = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/></Types>';
+  const rels = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>';
+  const wb = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="投票結果" sheetId="1" r:id="rId1"/></sheets></workbook>';
+  const wbr = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/></Relationships>';
+  const enc = new TextEncoder();
+  return wmMakeZip([{ name: '[Content_Types].xml', data: enc.encode(ct) }, { name: '_rels/.rels', data: enc.encode(rels) }, { name: 'xl/workbook.xml', data: enc.encode(wb) }, { name: 'xl/_rels/workbook.xml.rels', data: enc.encode(wbr) }, { name: 'xl/worksheets/sheet1.xml', data: enc.encode(sheetXml) }]);
+}
+function plExportXlsx() { try { wmDownload(plBuildXlsx(), plFileBase() + '.xlsx'); boardToast('已匯出 Excel'); } catch (e) { boardToast('Excel 匯出失敗'); } }
+function plSendMail() {
+  const s = plSession, d = plReportData(), L = [];
+  L.push('投票結果：' + (s.title || '')); L.push(s.total + '人');
+  L.push('（' + d.total + ' 人 · ' + d.grand + ' ' + d.unit + '）'); L.push('');
+  plOptions.forEach(o => { const c = d.cnt[o.id] || 0, pct = d.grand ? Math.round(c / d.grand * 100) : 0, win = d.winMax >= 0 && c === d.winMax && c > 0; L.push('• ' + plBiPlain(o.label, o.label_a, o.label_b, s) + '：' + c + ' ' + d.unit + ' (' + pct + '%)' + (win ? ' 🏆' : '')); });
+  if (s.allow_comment && plComments.length) { L.push(''); L.push('【意見】'); plComments.forEach(c => L.push('• ' + (c.text || '') + (!s.anonymous && c.voter_name ? '（' + c.voter_name + '）' : ''))); }
+  L.push(''); L.push('');
+  const ids = {}; plVotes.forEach(v => { if (v.voter_emp_id) ids[v.voter_emp_id] = 1; }); if (s.creator_emp_id) ids[s.creator_emp_id] = 1;
+  const to = Object.keys(ids).map(userEmail).filter(Boolean).join(',');
+  const url = 'mailto:' + encodeURIComponent(to) + '?subject=' + encodeURIComponent('投票結果 ' + (s.title || '')) + '&body=' + encodeURIComponent(L.join('\n'));
+  try { window.location.href = url; boardToast('已開啟郵件草稿'); } catch (e) { boardToast('無法開啟郵件'); }
 }
 function plPollStart() { plPollStop(); plPollTimer = setInterval(plPollTick, 7000); }
 function plPollStop() { if (plPollTimer) { clearInterval(plPollTimer); plPollTimer = null; } }

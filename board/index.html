@@ -5,7 +5,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#080C14">
-<title>COMART · 公告與紀錄 v1.55</title>
+<title>COMART · 公告與紀錄 v1.56</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -222,7 +222,7 @@ select,select option,option{background:var(--s2);color:var(--tx)}
     <a class="logo" href="javascript:void(0)">
       <div class="logo-mark">告</div>
       <div class="logo-text" data-i18n="app_title">公告與紀錄</div>
-      <span class="logo-ver">v1.55</span>
+      <span class="logo-ver">v1.56</span>
     </a>
     <div class="topbar-right">
       <div id="langChips" style="display:flex;gap:4px"></div>
@@ -236,7 +236,7 @@ select,select option,option{background:var(--s2);color:var(--tx)}
     <button class="maintab" data-tab="woody" onclick="switchTab('woody')">📝 <span data-i18n="nav_woody">Woody 週報</span></button>
     <button class="maintab" data-tab="premortem" onclick="switchTab('premortem')">🩺 <span data-i18n="nav_premortem">事前驗屍</span></button>
     <button class="maintab" data-tab="brainstorm" onclick="switchTab('brainstorm')">💡 <span data-i18n="nav_brainstorm">腦力激盪</span></button>
-    <button class="maintab" data-tab="poll" onclick="switchTab('poll')">🗳 投票</button>
+    <button class="maintab" data-tab="poll" onclick="switchTab('poll')">🗳 <span data-i18n="pl_nav">投票</span></button>
   </div>
 </div>
 
@@ -600,70 +600,70 @@ select,select option,option{background:var(--s2);color:var(--tx)}
   <div class="tabpanel" id="tabpanel-poll">
     <div id="pl-list-view">
       <div class="chiprow">
-        <button class="chip-f on" data-pf="open" onclick="plSetFilter('open')">進行中</button>
-        <button class="chip-f" data-pf="closed" onclick="plSetFilter('closed')">已結束</button>
-        <button class="btn primary sm" style="margin-left:auto" onclick="plNewSession()">＋ 新增投票</button>
+        <button class="chip-f on" data-pf="open" onclick="plSetFilter('open')" data-i18n="pl_f_open">進行中</button>
+        <button class="chip-f" data-pf="closed" onclick="plSetFilter('closed')" data-i18n="pl_f_closed">已結束</button>
+        <button class="btn primary sm" style="margin-left:auto" onclick="plNewSession()" data-i18n="pl_new">＋ 新增投票</button>
       </div>
-      <div id="pl-list"><div class="empty-note">載入中…</div></div>
+      <div id="pl-list"><div class="empty-note" data-i18n="loading">載入中…</div></div>
     </div>
 
     <div id="pl-create-view" style="display:none">
       <div class="tabbar" style="max-width:none;padding:0;margin-bottom:16px;border-bottom:1px solid var(--br)">
-        <button class="btn ghost sm" onclick="plBackToList()">← 返回列表</button>
+        <button class="btn ghost sm" onclick="plBackToList()" data-i18n="btn_back_list">← 返回列表</button>
         <div style="margin-left:auto;display:flex;gap:6px;align-items:center;padding:6px 0">
-          <button class="btn primary sm" onclick="plCreateSubmit()">✓ 建立投票</button>
+          <button class="btn primary sm" onclick="plCreateSubmit()" data-i18n="pl_create_submit">✓ 建立投票</button>
         </div>
       </div>
       <div class="panel">
-        <div class="panel-h"><span class="idx">＋</span><h2>新增投票</h2></div>
+        <div class="panel-h"><span class="idx">＋</span><h2 data-i18n="pl_create_title">新增投票</h2></div>
         <div class="panel-b">
           <div style="display:flex;flex-direction:column;gap:12px">
-            <div class="field"><label>題目</label><input id="pl-c-title" placeholder="例如：中秋活動要辦哪一種？"></div>
-            <div class="field"><label>背景說明（可留空）</label><textarea id="pl-c-desc" rows="3" placeholder="說明投票的背景、目的…"></textarea></div>
-            <div class="field"><label>背景附圖（可多張，決策參考用）</label>
+            <div class="field"><label data-i18n="pl_l_title">題目</label><input id="pl-c-title" data-i18n-ph="pl_ph_title" placeholder="例如：中秋活動要辦哪一種？"></div>
+            <div class="field"><label data-i18n="pl_l_desc">背景說明（可留空）</label><textarea id="pl-c-desc" rows="3" data-i18n-ph="pl_ph_desc" placeholder="說明投票的背景、目的…"></textarea></div>
+            <div class="field"><label data-i18n="pl_l_bg">背景附圖（可多張，決策參考用）</label>
               <div id="pl-c-bg-thumbs" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px"></div>
               <input id="pl-c-bg-file" type="file" accept="image/*" multiple onchange="plBgAdd(this)" style="font-size:12px;color:var(--tx3)"></div>
-            <div class="field"><label>選項（每項可按 🖼 配一張圖）</label><div id="pl-c-options" style="display:flex;flex-direction:column;gap:6px"></div>
-              <button class="btn ghost sm" style="align-self:flex-start;margin-top:6px" onclick="plAddOptionRow()">＋ 新增選項</button></div>
+            <div class="field"><label data-i18n="pl_l_options">選項（每項可按 🖼 配一張圖）</label><div id="pl-c-options" style="display:flex;flex-direction:column;gap:6px"></div>
+              <button class="btn ghost sm" style="align-self:flex-start;margin-top:6px" onclick="plAddOptionRow()" data-i18n="pl_add_option">＋ 新增選項</button></div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-              <div class="field"><label>投票方式</label>
+              <div class="field"><label data-i18n="pl_l_mode">投票方式</label>
                 <select id="pl-c-multi" onchange="document.getElementById('pl-c-cap-wrap').style.display=this.value==='1'?'':'none'">
-                  <option value="0">單選</option><option value="1">複選</option>
+                  <option value="0" data-i18n="pl_single">單選</option><option value="1" data-i18n="pl_multi">複選</option>
                 </select></div>
-              <div class="field" id="pl-c-cap-wrap" style="display:none"><label>複選上限（留空＝不限）</label><input id="pl-c-cap" type="number" min="1" placeholder="例如 3"></div>
-              <div class="field"><label>記名方式</label>
-                <select id="pl-c-anon"><option value="0">記名（顯示誰投哪項）</option><option value="1">匿名（只計票數）</option></select></div>
-              <div class="field"><label>結果可見</label>
-                <select id="pl-c-reveal"><option value="live">即時可見</option><option value="closed">截止後才揭曉</option></select></div>
+              <div class="field" id="pl-c-cap-wrap" style="display:none"><label data-i18n="pl_l_cap">複選上限（留空＝不限）</label><input id="pl-c-cap" type="number" min="1" data-i18n-ph="pl_ph_cap" placeholder="例如 3"></div>
+              <div class="field"><label data-i18n="pl_l_anon">記名方式</label>
+                <select id="pl-c-anon"><option value="0" data-i18n="pl_named_opt">記名（顯示誰投哪項）</option><option value="1" data-i18n="pl_anon_opt">匿名（只計票數）</option></select></div>
+              <div class="field"><label data-i18n="pl_l_reveal">結果可見</label>
+                <select id="pl-c-reveal"><option value="live" data-i18n="pl_reveal_live">即時可見</option><option value="closed" data-i18n="pl_reveal_closed">截止後才揭曉</option></select></div>
             </div>
             <div class="field" style="gap:8px">
-              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:400;font-size:13.5px"><input type="checkbox" id="pl-c-decision" style="width:auto"> 決策模式（截止後自動標示最高票為「勝出」）</label>
-              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:400;font-size:13.5px"><input type="checkbox" id="pl-c-comment" style="width:auto"> 可書寫建議（每人可附一段整體意見）</label>
-              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:400;font-size:13.5px"><input type="checkbox" id="pl-c-qty" style="width:auto"> 數量模式（點餐／物資：可對選項填份數）</label>
-              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:400;font-size:13.5px"><input type="checkbox" id="pl-c-bi" onchange="document.getElementById('pl-c-lang-wrap').style.display=this.checked?'':'none'" style="width:auto"> 雙語（題目/選項/背景自動翻成兩種語言並陳）</label>
-              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:400;font-size:13.5px"><input type="checkbox" id="pl-c-nopersist" style="width:auto"> 不存檔（快閃投票，結束後直接刪除）</label>
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:400;font-size:13.5px"><input type="checkbox" id="pl-c-decision" style="width:auto"> <span data-i18n="pl_decision">決策模式（截止後自動標示最高票為「勝出」）</span></label>
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:400;font-size:13.5px"><input type="checkbox" id="pl-c-comment" style="width:auto"> <span data-i18n="pl_comment_opt">可書寫建議（每人可附一段整體意見）</span></label>
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:400;font-size:13.5px"><input type="checkbox" id="pl-c-qty" style="width:auto"> <span data-i18n="pl_qty_opt">數量模式（點餐／物資：可對選項填份數）</span></label>
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:400;font-size:13.5px"><input type="checkbox" id="pl-c-bi" onchange="document.getElementById('pl-c-lang-wrap').style.display=this.checked?'':'none'" style="width:auto"> <span data-i18n="pl_bi_opt">雙語（題目/選項/背景自動翻成兩種語言並陳）</span></label>
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:400;font-size:13.5px"><input type="checkbox" id="pl-c-nopersist" style="width:auto"> <span data-i18n="pl_nopersist">不存檔（快閃投票，結束後直接刪除）</span></label>
             </div>
             <div class="field" id="pl-c-lang-wrap" style="display:none">
-              <label>並陳語言</label>
+              <label data-i18n="pl_l_langs">並陳語言</label>
               <div style="display:flex;gap:10px">
                 <select id="pl-c-langa" style="flex:1"><option value="zh-TW">繁體中文</option><option value="zh-CN">简体中文</option><option value="vi">Tiếng Việt</option><option value="en">English</option><option value="ja">日本語</option></select>
                 <select id="pl-c-langb" style="flex:1"><option value="vi">Tiếng Việt</option><option value="zh-TW">繁體中文</option><option value="zh-CN">简体中文</option><option value="en">English</option><option value="ja">日本語</option></select>
               </div>
             </div>
-            <div class="field"><label>開放參與範圍</label>
+            <div class="field"><label data-i18n="pl_l_scope">開放參與範圍</label>
               <select id="pl-c-scope" onchange="plScopeChanged()">
-                <option value="all">全公司</option>
-                <option value="site">單一中心</option>
-                <option value="list">指定人員</option>
+                <option value="all" data-i18n="pl_scope_all">全公司</option>
+                <option value="site" data-i18n="pl_scope_site">單一中心</option>
+                <option value="list" data-i18n="pl_scope_list">指定人員</option>
               </select>
             </div>
-            <div class="field" id="pl-c-site-wrap" style="display:none"><label>中心</label>
-              <select id="pl-c-site"><option value="TW">台灣</option><option value="CN">東莞廠</option><option value="VN">越南廠</option></select>
+            <div class="field" id="pl-c-site-wrap" style="display:none"><label data-i18n="pl_l_center">中心</label>
+              <select id="pl-c-site"><option value="TW" data-i18n="site_TW">台灣</option><option value="CN" data-i18n="site_CN">東莞廠</option><option value="VN" data-i18n="site_VN">越南廠</option></select>
             </div>
-            <div class="field" id="pl-c-members-wrap" style="display:none"><label>指定人員（可複選）</label>
+            <div class="field" id="pl-c-members-wrap" style="display:none"><label data-i18n="pl_l_members">指定人員（可複選）</label>
               <div id="pl-c-members" style="max-height:220px;overflow:auto;border:1px solid var(--br);border-radius:8px;padding:8px;display:flex;flex-direction:column;gap:5px"></div>
             </div>
-            <div class="field"><label>自動截止時間（可留空＝不自動截止）</label><input id="pl-c-close" type="datetime-local"></div>
+            <div class="field"><label data-i18n="pl_l_close">自動截止時間（可留空＝不自動截止）</label><input id="pl-c-close" type="datetime-local"></div>
           </div>
         </div>
       </div>
@@ -1449,6 +1449,260 @@ const B_I18N = {
 },
 };
 // BT('key', {n:3}) —— 缺 key 時退回繁中，再缺就回傳 key 本身（不會顯示成 undefined）
+// ── 投票 Poll 的 i18n：獨立維護後併入 B_I18N（BT/data-i18n/語言切換自動生效）。
+//    匯出的正式紀錄內容(plReportHtml/plBuildXlsx/plSendMail)刻意維持繁中不翻，比照事前驗屍慣例。──
+const PL_I18N = {
+'zh-TW': {
+  pl_new:'＋ 新增投票', pl_f_open:'進行中', pl_f_closed:'已結束',
+  pl_cta:'🗳 有投票進行中，點選參與！',
+  pl_none_open:'目前沒有進行中的投票，點右上角「＋ 新增投票」開一場。', pl_none_closed:'尚無已結束的投票。',
+  pl_login_expired:'🔑 登入已過期或尚未登入，請回入口網站重新登入。',
+  pl_join:'▶ 參與投票', pl_view:'查看結果', pl_delete:'刪除',
+  pl_by:'發起：', pl_scope:'範圍：', pl_deadline:'截止：', pl_unsaved:'未存檔',
+  pl_create_submit:'✓ 建立投票', pl_create_title:'新增投票',
+  pl_l_title:'題目', pl_ph_title:'例如：中秋活動要辦哪一種？',
+  pl_l_desc:'背景說明（可留空）', pl_ph_desc:'說明投票的背景、目的…',
+  pl_l_bg:'背景附圖（可多張，決策參考用）',
+  pl_l_options:'選項（每項可按 🖼 配一張圖）', pl_add_option:'＋ 新增選項', pl_ph_option:'選項…',
+  pl_l_mode:'投票方式', pl_single:'單選', pl_multi:'複選',
+  pl_l_cap:'複選上限（留空＝不限）', pl_ph_cap:'例如 3',
+  pl_l_anon:'記名方式', pl_named_opt:'記名（顯示誰投哪項）', pl_anon_opt:'匿名（只計票數）',
+  pl_l_reveal:'結果可見', pl_reveal_live:'即時可見', pl_reveal_closed:'截止後才揭曉',
+  pl_decision:'決策模式（截止後自動標示最高票為「勝出」）',
+  pl_comment_opt:'可書寫建議（每人可附一段整體意見）',
+  pl_qty_opt:'數量模式（點餐／物資：可對選項填份數）',
+  pl_bi_opt:'雙語（題目/選項/背景自動翻成兩種語言並陳）',
+  pl_nopersist:'不存檔（快閃投票，結束後直接刪除）',
+  pl_l_langs:'並陳語言',
+  pl_l_scope:'開放參與範圍', pl_scope_all:'全公司', pl_scope_site:'單一中心', pl_scope_list:'指定人員',
+  pl_l_center:'中心', pl_l_members:'指定人員（可複選）', pl_l_close:'自動截止時間（可留空＝不自動截止）',
+  pl_reopen:'↻ 重新開放', pl_close:'■ 結束投票',
+  pl_result_head:'投票結果', pl_vote_head:'請投票（{mode}）',
+  pl_mode_single:'單選', pl_mode_multi:'複選', pl_mode_multi_cap:'複選，最多 {n} 項', pl_mode_qty:'數量',
+  pl_people:'人', pl_unit_vote:'票', pl_unit_qty:'份', pl_all:'全部',
+  pl_reveal_note:'🔒 結果將於截止後才揭曉；你仍可先投票（截止前可改）。', pl_win:'🏆 勝出',
+  pl_hint_single:'點選項即投票；再點一次可取消。截止前可改。',
+  pl_hint_multi:'點選項可多選，再點一次取消。截止前可改。',
+  pl_hint_multi_cap:'點選項可多選（最多 {n} 項），再點一次取消。截止前可改。',
+  pl_hint_qty:'用 −／＋ 填各項份數；截止前可改。',
+  pl_named:'記名', pl_anon:'匿名',
+  pl_comments_head:'意見', pl_comments_empty:'尚無意見。', pl_ph_comment:'寫下你的建議…',
+  pl_comment_send:'送出意見', pl_comment_update:'更新我的意見', pl_exp_send:'✉️ 寄送',
+  pl_t_admin_only:'僅管理員可刪除', pl_t_del_confirm:'確定刪除這場投票？所有選項與投票都會一併刪除。',
+  pl_t_deleted:'已刪除', pl_t_not_login:'尚未登入', pl_t_need_title:'請填寫題目',
+  pl_t_need_2opts:'請至少填兩個選項', pl_t_need_member:'請至少勾選一位指定人員',
+  pl_t_creating:'建立中（翻譯雙語）…', pl_t_created:'已建立投票', pl_t_create_fail:'建立失敗：',
+  pl_t_not_found:'找不到該投票', pl_t_not_in_scope:'你不在這場投票的開放範圍內',
+  pl_t_uploading:'上傳中…', pl_t_uploaded:'已上傳', pl_t_upload_fail:'上傳失敗',
+  pl_t_min2opts:'至少要有兩個選項', pl_t_vote_closed:'投票已結束', pl_t_cap:'最多選 {n} 項',
+  pl_t_vote_fail:'投票失敗：', pl_t_close_confirm:'結束這場投票？結束後不能再投。',
+  pl_t_nopersist_confirm:'這是「不存檔」投票，結束後將直接刪除、不留紀錄，確定？',
+  pl_t_closed_deleted:'已結束並刪除', pl_t_need_comment:'請先輸入意見', pl_t_sent:'已送出',
+  pl_t_xlsx_done:'已匯出 Excel', pl_t_png_done:'已匯出 PNG', pl_t_png_fail:'PNG 匯出失敗，請改用 PDF',
+  pl_t_mail_opened:'已開啟郵件草稿', pl_t_popup_pdf:'請允許彈出視窗以列印 PDF',
+},
+'zh-CN': {
+  pl_new:'＋ 新增投票', pl_f_open:'进行中', pl_f_closed:'已结束',
+  pl_cta:'🗳 有投票进行中，点选参与！',
+  pl_none_open:'目前没有进行中的投票，点右上角“＋ 新增投票”开一场。', pl_none_closed:'尚无已结束的投票。',
+  pl_login_expired:'🔑 登录已过期或尚未登录，请回入口网站重新登录。',
+  pl_join:'▶ 参与投票', pl_view:'查看结果', pl_delete:'删除',
+  pl_by:'发起：', pl_scope:'范围：', pl_deadline:'截止：', pl_unsaved:'未存档',
+  pl_create_submit:'✓ 建立投票', pl_create_title:'新增投票',
+  pl_l_title:'题目', pl_ph_title:'例如：中秋活动要办哪一种？',
+  pl_l_desc:'背景说明（可留空）', pl_ph_desc:'说明投票的背景、目的…',
+  pl_l_bg:'背景附图（可多张，决策参考用）',
+  pl_l_options:'选项（每项可按 🖼 配一张图）', pl_add_option:'＋ 新增选项', pl_ph_option:'选项…',
+  pl_l_mode:'投票方式', pl_single:'单选', pl_multi:'复选',
+  pl_l_cap:'复选上限（留空＝不限）', pl_ph_cap:'例如 3',
+  pl_l_anon:'记名方式', pl_named_opt:'记名（显示谁投哪项）', pl_anon_opt:'匿名（只计票数）',
+  pl_l_reveal:'结果可见', pl_reveal_live:'即时可见', pl_reveal_closed:'截止后才揭晓',
+  pl_decision:'决策模式（截止后自动标示最高票为“胜出”）',
+  pl_comment_opt:'可书写建议（每人可附一段整体意见）',
+  pl_qty_opt:'数量模式（点餐／物资：可对选项填份数）',
+  pl_bi_opt:'双语（题目/选项/背景自动翻成两种语言并陈）',
+  pl_nopersist:'不存档（快闪投票，结束后直接删除）',
+  pl_l_langs:'并陈语言',
+  pl_l_scope:'开放参与范围', pl_scope_all:'全公司', pl_scope_site:'单一中心', pl_scope_list:'指定人员',
+  pl_l_center:'中心', pl_l_members:'指定人员（可复选）', pl_l_close:'自动截止时间（可留空＝不自动截止）',
+  pl_reopen:'↻ 重新开放', pl_close:'■ 结束投票',
+  pl_result_head:'投票结果', pl_vote_head:'请投票（{mode}）',
+  pl_mode_single:'单选', pl_mode_multi:'复选', pl_mode_multi_cap:'复选，最多 {n} 项', pl_mode_qty:'数量',
+  pl_people:'人', pl_unit_vote:'票', pl_unit_qty:'份', pl_all:'全部',
+  pl_reveal_note:'🔒 结果将于截止后才揭晓；你仍可先投票（截止前可改）。', pl_win:'🏆 胜出',
+  pl_hint_single:'点选项即投票；再点一次可取消。截止前可改。',
+  pl_hint_multi:'点选项可多选，再点一次取消。截止前可改。',
+  pl_hint_multi_cap:'点选项可多选（最多 {n} 项），再点一次取消。截止前可改。',
+  pl_hint_qty:'用 −／＋ 填各项份数；截止前可改。',
+  pl_named:'记名', pl_anon:'匿名',
+  pl_comments_head:'意见', pl_comments_empty:'尚无意见。', pl_ph_comment:'写下你的建议…',
+  pl_comment_send:'送出意见', pl_comment_update:'更新我的意见', pl_exp_send:'✉️ 寄送',
+  pl_t_admin_only:'仅管理员可删除', pl_t_del_confirm:'确定删除这场投票？所有选项与投票都会一并删除。',
+  pl_t_deleted:'已删除', pl_t_not_login:'尚未登录', pl_t_need_title:'请填写题目',
+  pl_t_need_2opts:'请至少填两个选项', pl_t_need_member:'请至少勾选一位指定人员',
+  pl_t_creating:'建立中（翻译双语）…', pl_t_created:'已建立投票', pl_t_create_fail:'建立失败：',
+  pl_t_not_found:'找不到该投票', pl_t_not_in_scope:'你不在这场投票的开放范围内',
+  pl_t_uploading:'上传中…', pl_t_uploaded:'已上传', pl_t_upload_fail:'上传失败',
+  pl_t_min2opts:'至少要有两个选项', pl_t_vote_closed:'投票已结束', pl_t_cap:'最多选 {n} 项',
+  pl_t_vote_fail:'投票失败：', pl_t_close_confirm:'结束这场投票？结束后不能再投。',
+  pl_t_nopersist_confirm:'这是“不存档”投票，结束后将直接删除、不留纪录，确定？',
+  pl_t_closed_deleted:'已结束并删除', pl_t_need_comment:'请先输入意见', pl_t_sent:'已送出',
+  pl_t_xlsx_done:'已导出 Excel', pl_t_png_done:'已导出 PNG', pl_t_png_fail:'PNG 导出失败，请改用 PDF',
+  pl_t_mail_opened:'已开启邮件草稿', pl_t_popup_pdf:'请允许弹出视窗以打印 PDF',
+},
+'en': {
+  pl_new:'＋ New poll', pl_f_open:'Open', pl_f_closed:'Closed',
+  pl_cta:'🗳 A poll is open — tap to take part!',
+  pl_none_open:'No open polls. Tap “＋ New poll” at top right to start one.', pl_none_closed:'No closed polls yet.',
+  pl_login_expired:'🔑 Session expired or not signed in. Please sign in again from the portal.',
+  pl_join:'▶ Vote', pl_view:'View results', pl_delete:'Delete',
+  pl_by:'By: ', pl_scope:'Scope: ', pl_deadline:'Deadline: ', pl_unsaved:'Not saved',
+  pl_create_submit:'✓ Create poll', pl_create_title:'New poll',
+  pl_l_title:'Question', pl_ph_title:'e.g. Which event should we hold?',
+  pl_l_desc:'Background (optional)', pl_ph_desc:'Explain the context and purpose…',
+  pl_l_bg:'Background images (multiple, for reference)',
+  pl_l_options:'Options (tap 🖼 to add an image to each)', pl_add_option:'＋ Add option', pl_ph_option:'Option…',
+  pl_l_mode:'Voting', pl_single:'Single', pl_multi:'Multiple',
+  pl_l_cap:'Max choices (blank = unlimited)', pl_ph_cap:'e.g. 3',
+  pl_l_anon:'Attribution', pl_named_opt:'Named (show who chose what)', pl_anon_opt:'Anonymous (counts only)',
+  pl_l_reveal:'Results', pl_reveal_live:'Visible live', pl_reveal_closed:'Reveal after close',
+  pl_decision:'Decision mode (mark the top choice as “winner” after close)',
+  pl_comment_opt:'Allow comments (each person may add one overall comment)',
+  pl_qty_opt:'Quantity mode (meals/supplies: set a count per option)',
+  pl_bi_opt:'Bilingual (auto-translate question/options/background into two languages)',
+  pl_nopersist:'Do not save (quick poll, deleted after close)',
+  pl_l_langs:'Languages',
+  pl_l_scope:'Who can vote', pl_scope_all:'Whole company', pl_scope_site:'One center', pl_scope_list:'Specific people',
+  pl_l_center:'Center', pl_l_members:'Specific people (multi-select)', pl_l_close:'Auto-close time (blank = none)',
+  pl_reopen:'↻ Reopen', pl_close:'■ Close poll',
+  pl_result_head:'Results', pl_vote_head:'Vote ({mode})',
+  pl_mode_single:'single', pl_mode_multi:'multiple', pl_mode_multi_cap:'multiple, up to {n}', pl_mode_qty:'quantity',
+  pl_people:'people', pl_unit_vote:'votes', pl_unit_qty:'units', pl_all:'All',
+  pl_reveal_note:'🔒 Results are revealed after close; you can still vote now (editable until close).', pl_win:'🏆 Winner',
+  pl_hint_single:'Tap an option to vote; tap again to cancel. Editable until close.',
+  pl_hint_multi:'Tap options to multi-select; tap again to remove. Editable until close.',
+  pl_hint_multi_cap:'Tap options to multi-select (up to {n}); tap again to remove. Editable until close.',
+  pl_hint_qty:'Use −／＋ to set quantities; editable until close.',
+  pl_named:'Named', pl_anon:'Anonymous',
+  pl_comments_head:'Comments', pl_comments_empty:'No comments yet.', pl_ph_comment:'Write your suggestion…',
+  pl_comment_send:'Submit', pl_comment_update:'Update my comment', pl_exp_send:'✉️ Send',
+  pl_t_admin_only:'Only admins can delete', pl_t_del_confirm:'Delete this poll? All options and votes will be removed.',
+  pl_t_deleted:'Deleted', pl_t_not_login:'Not signed in', pl_t_need_title:'Please enter a question',
+  pl_t_need_2opts:'Please enter at least two options', pl_t_need_member:'Please select at least one person',
+  pl_t_creating:'Creating (translating)…', pl_t_created:'Poll created', pl_t_create_fail:'Create failed: ',
+  pl_t_not_found:'Poll not found', pl_t_not_in_scope:'You are not in this poll’s scope',
+  pl_t_uploading:'Uploading…', pl_t_uploaded:'Uploaded', pl_t_upload_fail:'Upload failed',
+  pl_t_min2opts:'At least two options required', pl_t_vote_closed:'Voting is closed', pl_t_cap:'Up to {n} choices',
+  pl_t_vote_fail:'Vote failed: ', pl_t_close_confirm:'Close this poll? No more voting after that.',
+  pl_t_nopersist_confirm:'This is a “not saved” poll; it will be deleted after closing. Continue?',
+  pl_t_closed_deleted:'Closed and deleted', pl_t_need_comment:'Please enter a comment', pl_t_sent:'Submitted',
+  pl_t_xlsx_done:'Excel exported', pl_t_png_done:'PNG exported', pl_t_png_fail:'PNG export failed, use PDF',
+  pl_t_mail_opened:'Email draft opened', pl_t_popup_pdf:'Please allow pop-ups to print the PDF',
+},
+'vi': {
+  pl_new:'＋ Cuộc bình chọn mới', pl_f_open:'Đang mở', pl_f_closed:'Đã đóng',
+  pl_cta:'🗳 Có cuộc bình chọn đang mở — bấm để tham gia!',
+  pl_none_open:'Chưa có cuộc bình chọn nào đang mở. Bấm “＋ Cuộc bình chọn mới” ở góc trên phải để tạo.', pl_none_closed:'Chưa có cuộc bình chọn đã đóng.',
+  pl_login_expired:'🔑 Phiên đã hết hạn hoặc chưa đăng nhập. Vui lòng đăng nhập lại từ cổng.',
+  pl_join:'▶ Bình chọn', pl_view:'Xem kết quả', pl_delete:'Xóa',
+  pl_by:'Người tạo: ', pl_scope:'Phạm vi: ', pl_deadline:'Hạn: ', pl_unsaved:'Không lưu',
+  pl_create_submit:'✓ Tạo cuộc bình chọn', pl_create_title:'Cuộc bình chọn mới',
+  pl_l_title:'Câu hỏi', pl_ph_title:'VD: Nên tổ chức hoạt động nào?',
+  pl_l_desc:'Bối cảnh (không bắt buộc)', pl_ph_desc:'Giải thích bối cảnh, mục đích…',
+  pl_l_bg:'Ảnh bối cảnh (nhiều ảnh, để tham khảo)',
+  pl_l_options:'Lựa chọn (bấm 🖼 để thêm ảnh cho mỗi mục)', pl_add_option:'＋ Thêm lựa chọn', pl_ph_option:'Lựa chọn…',
+  pl_l_mode:'Cách bình chọn', pl_single:'Chọn một', pl_multi:'Chọn nhiều',
+  pl_l_cap:'Số lựa chọn tối đa (để trống = không giới hạn)', pl_ph_cap:'VD: 3',
+  pl_l_anon:'Danh tính', pl_named_opt:'Ghi tên (hiện ai chọn gì)', pl_anon_opt:'Ẩn danh (chỉ đếm phiếu)',
+  pl_l_reveal:'Kết quả', pl_reveal_live:'Hiện ngay', pl_reveal_closed:'Công bố sau khi đóng',
+  pl_decision:'Chế độ quyết định (đánh dấu lựa chọn cao nhất là “thắng” sau khi đóng)',
+  pl_comment_opt:'Cho phép góp ý (mỗi người một ý kiến chung)',
+  pl_qty_opt:'Chế độ số lượng (đặt cơm/vật tư: nhập số lượng cho mỗi mục)',
+  pl_bi_opt:'Song ngữ (tự dịch câu hỏi/lựa chọn/bối cảnh sang hai ngôn ngữ)',
+  pl_nopersist:'Không lưu (bình chọn nhanh, xóa sau khi đóng)',
+  pl_l_langs:'Ngôn ngữ',
+  pl_l_scope:'Ai được bình chọn', pl_scope_all:'Toàn công ty', pl_scope_site:'Một trung tâm', pl_scope_list:'Người chỉ định',
+  pl_l_center:'Trung tâm', pl_l_members:'Người chỉ định (chọn nhiều)', pl_l_close:'Thời gian tự đóng (để trống = không)',
+  pl_reopen:'↻ Mở lại', pl_close:'■ Đóng bình chọn',
+  pl_result_head:'Kết quả', pl_vote_head:'Bình chọn ({mode})',
+  pl_mode_single:'chọn một', pl_mode_multi:'chọn nhiều', pl_mode_multi_cap:'chọn nhiều, tối đa {n}', pl_mode_qty:'số lượng',
+  pl_people:'người', pl_unit_vote:'phiếu', pl_unit_qty:'phần', pl_all:'Tất cả',
+  pl_reveal_note:'🔒 Kết quả sẽ công bố sau khi đóng; bạn vẫn có thể bình chọn trước (sửa được đến khi đóng).', pl_win:'🏆 Thắng',
+  pl_hint_single:'Bấm một lựa chọn để bình chọn; bấm lại để hủy. Sửa được đến khi đóng.',
+  pl_hint_multi:'Bấm các lựa chọn để chọn nhiều; bấm lại để bỏ. Sửa được đến khi đóng.',
+  pl_hint_multi_cap:'Bấm để chọn nhiều (tối đa {n}); bấm lại để bỏ. Sửa được đến khi đóng.',
+  pl_hint_qty:'Dùng −／＋ để nhập số lượng; sửa được đến khi đóng.',
+  pl_named:'Ghi tên', pl_anon:'Ẩn danh',
+  pl_comments_head:'Ý kiến', pl_comments_empty:'Chưa có ý kiến.', pl_ph_comment:'Viết góp ý của bạn…',
+  pl_comment_send:'Gửi', pl_comment_update:'Cập nhật ý kiến', pl_exp_send:'✉️ Gửi',
+  pl_t_admin_only:'Chỉ quản trị viên được xóa', pl_t_del_confirm:'Xóa cuộc bình chọn này? Mọi lựa chọn và phiếu sẽ bị xóa.',
+  pl_t_deleted:'Đã xóa', pl_t_not_login:'Chưa đăng nhập', pl_t_need_title:'Vui lòng nhập câu hỏi',
+  pl_t_need_2opts:'Vui lòng nhập ít nhất hai lựa chọn', pl_t_need_member:'Vui lòng chọn ít nhất một người',
+  pl_t_creating:'Đang tạo (dịch)…', pl_t_created:'Đã tạo', pl_t_create_fail:'Tạo thất bại: ',
+  pl_t_not_found:'Không tìm thấy', pl_t_not_in_scope:'Bạn không thuộc phạm vi cuộc bình chọn này',
+  pl_t_uploading:'Đang tải lên…', pl_t_uploaded:'Đã tải lên', pl_t_upload_fail:'Tải lên thất bại',
+  pl_t_min2opts:'Cần ít nhất hai lựa chọn', pl_t_vote_closed:'Đã đóng bình chọn', pl_t_cap:'Tối đa {n} lựa chọn',
+  pl_t_vote_fail:'Bình chọn thất bại: ', pl_t_close_confirm:'Đóng cuộc bình chọn? Sau đó không bình chọn được nữa.',
+  pl_t_nopersist_confirm:'Đây là cuộc bình chọn “không lưu”; sẽ bị xóa sau khi đóng. Tiếp tục?',
+  pl_t_closed_deleted:'Đã đóng và xóa', pl_t_need_comment:'Vui lòng nhập ý kiến', pl_t_sent:'Đã gửi',
+  pl_t_xlsx_done:'Đã xuất Excel', pl_t_png_done:'Đã xuất PNG', pl_t_png_fail:'Xuất PNG lỗi, dùng PDF',
+  pl_t_mail_opened:'Đã mở nháp email', pl_t_popup_pdf:'Vui lòng cho phép pop-up để in PDF',
+},
+'ja': {
+  pl_new:'＋ 新規投票', pl_f_open:'進行中', pl_f_closed:'終了',
+  pl_cta:'🗳 投票が進行中です — タップして参加！',
+  pl_none_open:'進行中の投票はありません。右上の「＋ 新規投票」から作成してください。', pl_none_closed:'終了した投票はまだありません。',
+  pl_login_expired:'🔑 セッション切れまたは未ログインです。ポータルから再度ログインしてください。',
+  pl_join:'▶ 投票する', pl_view:'結果を見る', pl_delete:'削除',
+  pl_by:'発起：', pl_scope:'範囲：', pl_deadline:'締切：', pl_unsaved:'未保存',
+  pl_create_submit:'✓ 投票を作成', pl_create_title:'新規投票',
+  pl_l_title:'議題', pl_ph_title:'例：どの活動を実施しますか？',
+  pl_l_desc:'背景説明（任意）', pl_ph_desc:'投票の背景・目的を記入…',
+  pl_l_bg:'背景画像（複数可、判断の参考）',
+  pl_l_options:'選択肢（🖼 で各項目に画像を追加）', pl_add_option:'＋ 選択肢を追加', pl_ph_option:'選択肢…',
+  pl_l_mode:'投票方式', pl_single:'単一選択', pl_multi:'複数選択',
+  pl_l_cap:'複数選択の上限（空欄＝無制限）', pl_ph_cap:'例：3',
+  pl_l_anon:'記名方式', pl_named_opt:'記名（誰が何を選んだか表示）', pl_anon_opt:'匿名（票数のみ）',
+  pl_l_reveal:'結果表示', pl_reveal_live:'即時表示', pl_reveal_closed:'締切後に公開',
+  pl_decision:'決定モード（締切後に最多票を「当選」と表示）',
+  pl_comment_opt:'意見の記入を許可（各自ひとこと）',
+  pl_qty_opt:'数量モード（食事／物資：選択肢ごとに数量を入力）',
+  pl_bi_opt:'二言語（議題/選択肢/背景を自動で二言語に翻訳し並記）',
+  pl_nopersist:'保存しない（クイック投票、終了後に削除）',
+  pl_l_langs:'並記言語',
+  pl_l_scope:'参加範囲', pl_scope_all:'全社', pl_scope_site:'単一拠点', pl_scope_list:'指定メンバー',
+  pl_l_center:'拠点', pl_l_members:'指定メンバー（複数選択）', pl_l_close:'自動締切（空欄＝なし）',
+  pl_reopen:'↻ 再開', pl_close:'■ 投票終了',
+  pl_result_head:'投票結果', pl_vote_head:'投票（{mode}）',
+  pl_mode_single:'単一', pl_mode_multi:'複数', pl_mode_multi_cap:'複数、最大 {n} 件', pl_mode_qty:'数量',
+  pl_people:'人', pl_unit_vote:'票', pl_unit_qty:'個', pl_all:'すべて',
+  pl_reveal_note:'🔒 結果は締切後に公開されます。今のうちに投票できます（締切まで変更可）。', pl_win:'🏆 当選',
+  pl_hint_single:'選択肢をタップで投票、もう一度で取消。締切まで変更可。',
+  pl_hint_multi:'選択肢をタップで複数選択、もう一度で解除。締切まで変更可。',
+  pl_hint_multi_cap:'タップで複数選択（最大 {n} 件）、もう一度で解除。締切まで変更可。',
+  pl_hint_qty:'−／＋ で各数量を入力。締切まで変更可。',
+  pl_named:'記名', pl_anon:'匿名',
+  pl_comments_head:'意見', pl_comments_empty:'まだ意見はありません。', pl_ph_comment:'ご意見を記入…',
+  pl_comment_send:'送信', pl_comment_update:'意見を更新', pl_exp_send:'✉️ 送信',
+  pl_t_admin_only:'削除は管理者のみ', pl_t_del_confirm:'この投票を削除しますか？選択肢と票もすべて削除されます。',
+  pl_t_deleted:'削除しました', pl_t_not_login:'未ログイン', pl_t_need_title:'議題を入力してください',
+  pl_t_need_2opts:'選択肢を2つ以上入力してください', pl_t_need_member:'メンバーを1名以上選んでください',
+  pl_t_creating:'作成中（翻訳）…', pl_t_created:'投票を作成しました', pl_t_create_fail:'作成に失敗：',
+  pl_t_not_found:'投票が見つかりません', pl_t_not_in_scope:'この投票の範囲に含まれていません',
+  pl_t_uploading:'アップロード中…', pl_t_uploaded:'アップロード完了', pl_t_upload_fail:'アップロード失敗',
+  pl_t_min2opts:'選択肢は2つ以上必要です', pl_t_vote_closed:'投票は終了しました', pl_t_cap:'最大 {n} 件まで',
+  pl_t_vote_fail:'投票に失敗：', pl_t_close_confirm:'投票を終了しますか？以降は投票できません。',
+  pl_t_nopersist_confirm:'これは「保存しない」投票です。終了後に削除されます。続けますか？',
+  pl_t_closed_deleted:'終了して削除しました', pl_t_need_comment:'意見を入力してください', pl_t_sent:'送信しました',
+  pl_t_xlsx_done:'Excel を出力しました', pl_t_png_done:'PNG を出力しました', pl_t_png_fail:'PNG 出力に失敗、PDF をご利用ください',
+  pl_t_mail_opened:'メール下書きを開きました', pl_t_popup_pdf:'PDF 印刷のためポップアップを許可してください',
+},
+};
+Object.keys(PL_I18N).forEach(function (lg) { B_I18N[lg] = Object.assign(B_I18N[lg] || {}, PL_I18N[lg]); });
+B_I18N['zh-TW'].pl_nav = '投票'; B_I18N['zh-CN'].pl_nav = '投票'; B_I18N['en'].pl_nav = 'Poll'; B_I18N['vi'].pl_nav = 'Bình chọn'; B_I18N['ja'].pl_nav = '投票';
+B_I18N['zh-TW'].pl_t_fail = '操作失敗：'; B_I18N['zh-CN'].pl_t_fail = '操作失败：'; B_I18N['en'].pl_t_fail = 'Failed: '; B_I18N['vi'].pl_t_fail = 'Thất bại: '; B_I18N['ja'].pl_t_fail = '失敗：';
+B_I18N['zh-TW'].pl_t_mail_fail = '無法開啟郵件'; B_I18N['zh-CN'].pl_t_mail_fail = '无法打开邮件'; B_I18N['en'].pl_t_mail_fail = 'Cannot open email'; B_I18N['vi'].pl_t_mail_fail = 'Không mở được email'; B_I18N['ja'].pl_t_mail_fail = 'メールを開けません';
+
 function BT(k, p) {
   const d = B_I18N[BLANG] || B_I18N['zh-TW'];
   let v = d[k];
@@ -1494,6 +1748,7 @@ function bRerenderAll() {
   try { if (window.MeetingMinutes && window.MeetingMinutes.relabel) window.MeetingMinutes.relabel(); } catch (e) {}
   try { wrRenderList(); if (wrState) wrFillForm(); } catch (e) {}
   try { pmApplyKindLabels(); if (pmSession) pmRenderRoom(); else pmRenderList(); } catch (e) {}
+  try { if (plSession) plRenderRoom(); else plRenderList(); } catch (e) {}
 }
 
 // ═══════════════════════════════════════════════
@@ -4814,10 +5069,10 @@ async function plUploadImage(file) {
 async function plBgAdd(input) {
   const files = Array.from(input.files || []); input.value = '';
   for (const f of files) {
-    boardToast('上傳中…');
-    try { const u = await plUploadImage(f); plBgImages.push(u); } catch (e) { boardToast(e.message || '上傳失敗'); }
+    boardToast(BT('pl_t_uploading'));
+    try { const u = await plUploadImage(f); plBgImages.push(u); } catch (e) { boardToast(e.message || BT('pl_t_upload_fail')); }
   }
-  plRenderBgThumbs(); boardToast('已上傳');
+  plRenderBgThumbs(); boardToast(BT('pl_t_uploaded'));
 }
 function plRenderBgThumbs() {
   const box = document.getElementById('pl-c-bg-thumbs'); if (!box) return;
@@ -4838,8 +5093,8 @@ function plInScope(s) {
 function plCanSee(s) { return plIsCreator(s) || plInScope(s); }
 function plScopeText(s) {
   if (s.scope_type === 'site') return siteLabel(s.scope_site);
-  if (s.scope_type === 'list') return '指定 ' + ((s.scope_members || []).length) + ' 人';
-  return '全公司';
+  if (s.scope_type === 'list') return BT('pl_scope_list');
+  return BT('pl_scope_all');
 }
 function plFmtDt(iso) { if (!iso) return ''; try { return new Date(iso).toLocaleString('zh-TW', { month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit' }); } catch (e) { return iso; } }
 function plShowView(w) {
@@ -4856,7 +5111,7 @@ async function plLoadList() {
   plPollStop();
   plShowView('list');
   if (!PORTAL_SESSION || !PORTAL_SESSION.sig) {
-    document.getElementById('pl-list').innerHTML = '<div class="empty-note" style="border-color:var(--ac);color:var(--tx)">🔑 登入已過期或尚未登入，請回入口網站重新登入。</div>';
+    document.getElementById('pl-list').innerHTML = '<div class="empty-note" style="border-color:var(--ac);color:var(--tx)">' + BT('pl_login_expired') + '</div>';
     return;
   }
   const rows = await SB.get('poll_sessions', '?select=id,title,status,scope_type,scope_site,scope_members,creator_emp_id,creator_name,close_at,persist,updated_at&order=updated_at.desc&limit=200');
@@ -4868,25 +5123,25 @@ function plRenderList() {
   const rows = plAll.filter(s => plFilter === 'closed' ? s.status === 'closed' : s.status !== 'closed');
   let html = '';
   if (plFilter !== 'closed' && rows.length) {
-    html += '<div style="background:rgba(45,127,249,.12);border:1px solid var(--ac);border-radius:10px;padding:13px 15px;margin-bottom:14px"><div style="font-weight:700;color:var(--ac);font-size:15px">🗳 有投票進行中，點選參與！</div></div>';
+    html += '<div style="background:rgba(45,127,249,.12);border:1px solid var(--ac);border-radius:10px;padding:13px 15px;margin-bottom:14px"><div style="font-weight:700;color:var(--ac);font-size:15px">' + BT('pl_cta') + '</div></div>';
   }
-  if (!rows.length) { box.innerHTML = html + '<div class="empty-note">' + (plFilter === 'closed' ? '尚無已結束的投票。' : '目前沒有進行中的投票，點右上角「＋ 新增投票」開一場。') + '</div>'; return; }
+  if (!rows.length) { box.innerHTML = html + '<div class="empty-note">' + (plFilter === 'closed' ? BT('pl_none_closed') : BT('pl_none_open')) + '</div>'; return; }
   html += rows.map(s => {
-    const st = s.status === 'closed' ? '<span class="site-badge" style="background:var(--s3);color:var(--tx3)">已結束</span>' : '<span class="site-badge" style="background:var(--ac2);color:var(--ac)">進行中</span>';
-    const del = isAdmin() ? '<button class="btn ghost sm danger" onclick="event.stopPropagation();plDeleteSession(\'' + s.id + '\')">刪除</button>' : '';
-    const join = s.status !== 'closed' ? '<button class="btn primary sm" onclick="event.stopPropagation();plOpen(\'' + s.id + '\')">▶ 參與投票</button>' : '<button class="btn sm" onclick="event.stopPropagation();plOpen(\'' + s.id + '\')">查看結果</button>';
+    const st = s.status === 'closed' ? '<span class="site-badge" style="background:var(--s3);color:var(--tx3)">' + BT('pl_f_closed') + '</span>' : '<span class="site-badge" style="background:var(--ac2);color:var(--ac)">' + BT('pl_f_open') + '</span>';
+    const del = isAdmin() ? '<button class="btn ghost sm danger" onclick="event.stopPropagation();plDeleteSession(\'' + s.id + '\')">' + BT('pl_delete') + '</button>' : '';
+    const join = s.status !== 'closed' ? '<button class="btn primary sm" onclick="event.stopPropagation();plOpen(\'' + s.id + '\')">' + BT('pl_join') + '</button>' : '<button class="btn sm" onclick="event.stopPropagation();plOpen(\'' + s.id + '\')">' + BT('pl_view') + '</button>';
     return '<div class="saved-row" style="cursor:pointer" onclick="plOpen(\'' + s.id + '\')">' +
       '<div><div class="t">' + escHtml(s.title || '(未命名)') + ' ' + st + '</div>' +
-      '<div class="m"><span>發起：' + escHtml(s.creator_name || '—') + '</span><span>範圍：' + escHtml(plScopeText(s)) + '</span>' + (s.close_at ? '<span>截止：' + escHtml(plFmtDt(s.close_at)) + '</span>' : '') + (s.persist === false ? '<span style="color:var(--tx3)">未存檔</span>' : '') + '</div></div>' +
+      '<div class="m"><span>' + BT('pl_by') + escHtml(s.creator_name || '—') + '</span><span>' + BT('pl_scope') + escHtml(plScopeText(s)) + '</span>' + (s.close_at ? '<span>' + BT('pl_deadline') + escHtml(plFmtDt(s.close_at)) + '</span>' : '') + (s.persist === false ? '<span style="color:var(--tx3)">' + BT('pl_unsaved') + '</span>' : '') + '</div></div>' +
       '<div class="ops">' + join + del + '</div></div>';
   }).join('');
   box.innerHTML = html;
 }
 async function plDeleteSession(id) {
-  if (!isAdmin()) { boardToast('僅管理員可刪除'); return; }
-  if (!confirm('確定刪除這場投票？所有選項與投票都會一併刪除。')) return;
-  try { await SB.del('poll_sessions', 'id=eq.' + encodeURIComponent(id)); boardToast('已刪除'); plLoadList(); }
-  catch (e) { boardToast('刪除失敗：' + (e.message || e)); }
+  if (!isAdmin()) { boardToast(BT('pl_t_admin_only')); return; }
+  if (!confirm(BT('pl_t_del_confirm'))) return;
+  try { await SB.del('poll_sessions', 'id=eq.' + encodeURIComponent(id)); boardToast(BT('pl_t_deleted')); plLoadList(); }
+  catch (e) { boardToast(BT('pl_t_fail') + (e.message || e)); }
 }
 
 // ── 建立 ──
@@ -4917,15 +5172,15 @@ function plNewSession() {
 function plAddOptionRow(val, imgUrl) {
   const box = document.getElementById('pl-c-options');
   const row = document.createElement('div'); row.style.cssText = 'display:flex;gap:6px;align-items:center';
-  const inp = document.createElement('input'); inp.className = 'pl-opt'; inp.placeholder = '選項…'; inp.value = val || '';
+  const inp = document.createElement('input'); inp.className = 'pl-opt'; inp.placeholder = BT('pl_ph_option'); inp.value = val || '';
   inp.style.cssText = 'flex:1;font-family:inherit;font-size:14px;background:var(--s2);border:1px solid var(--br);border-radius:7px;padding:8px 10px;color:var(--tx)';
   const hid = document.createElement('input'); hid.type = 'hidden'; hid.className = 'pl-opt-img'; hid.value = imgUrl || '';
   const thumb = document.createElement('img'); thumb.className = 'pl-opt-thumb'; thumb.style.cssText = 'width:34px;height:34px;object-fit:cover;border-radius:6px;border:1px solid var(--br);flex-shrink:0;' + (imgUrl ? '' : 'display:none'); if (imgUrl) thumb.src = imgUrl;
   const file = document.createElement('input'); file.type = 'file'; file.accept = 'image/*'; file.style.display = 'none';
-  file.onchange = async () => { const f = file.files[0]; file.value = ''; if (!f) return; boardToast('上傳中…'); try { const u = await plUploadImage(f); hid.value = u; thumb.src = u; thumb.style.display = ''; boardToast('已上傳'); } catch (e) { boardToast(e.message || '上傳失敗'); } };
+  file.onchange = async () => { const f = file.files[0]; file.value = ''; if (!f) return; boardToast(BT('pl_t_uploading')); try { const u = await plUploadImage(f); hid.value = u; thumb.src = u; thumb.style.display = ''; boardToast(BT('pl_t_uploaded')); } catch (e) { boardToast(e.message || BT('pl_t_upload_fail')); } };
   const imgBtn = document.createElement('button'); imgBtn.className = 'btn ghost sm'; imgBtn.textContent = '🖼'; imgBtn.title = '選項配圖'; imgBtn.style.padding = '4px 9px'; imgBtn.onclick = () => file.click();
   const rm = document.createElement('button'); rm.className = 'btn ghost sm danger'; rm.textContent = '✕'; rm.style.padding = '4px 9px';
-  rm.onclick = () => { if (box.children.length > 2) row.remove(); else boardToast('至少要有兩個選項'); };
+  rm.onclick = () => { if (box.children.length > 2) row.remove(); else boardToast(BT('pl_t_min2opts')); };
   row.appendChild(inp); row.appendChild(thumb); row.appendChild(imgBtn); row.appendChild(file); row.appendChild(hid); row.appendChild(rm);
   box.appendChild(row);
 }
@@ -4940,14 +5195,14 @@ function plScopeChanged() {
   }
 }
 async function plCreateSubmit() {
-  if (!PORTAL_SESSION) { boardToast('尚未登入'); return; }
+  if (!PORTAL_SESSION) { boardToast(BT('pl_t_not_login')); return; }
   const title = document.getElementById('pl-c-title').value.trim();
-  if (!title) { boardToast('請填寫題目'); return; }
+  if (!title) { boardToast(BT('pl_t_need_title')); return; }
   const opts = Array.from(document.querySelectorAll('#pl-c-options > div')).map(r => ({ label: (r.querySelector('.pl-opt').value || '').trim(), image: (r.querySelector('.pl-opt-img').value || '') || null })).filter(o => o.label);
-  if (opts.length < 2) { boardToast('請至少填兩個選項'); return; }
+  if (opts.length < 2) { boardToast(BT('pl_t_need_2opts')); return; }
   const scope = document.getElementById('pl-c-scope').value;
   const members = scope === 'list' ? Array.from(document.querySelectorAll('#pl-c-members .pl-mem:checked')).map(c => c.value) : [];
-  if (scope === 'list' && !members.length) { boardToast('請至少勾選一位指定人員'); return; }
+  if (scope === 'list' && !members.length) { boardToast(BT('pl_t_need_member')); return; }
   const closeVal = document.getElementById('pl-c-close').value;
   const sid = uid();
   const srow = {
@@ -4977,7 +5232,7 @@ async function plCreateSubmit() {
   const orows = opts.map((o, i) => ({ id: uid(), session_id: sid, label: o.label, image_url: o.image, sort_order: i, created_at: new Date().toISOString() }));
   // 雙語：翻譯 題目/背景/各選項 到 A、B（沿用 premortem 的 pmTranslate/claude-proxy）
   if (srow.bilingual) {
-    boardToast('建立中（翻譯雙語）…');
+    boardToast(BT('pl_t_creating'));
     const src = (typeof pmPortalLang === 'function') ? pmPortalLang() : 'zh-TW';
     try {
       const jobs = [];
@@ -4990,16 +5245,16 @@ async function plCreateSubmit() {
   try {
     await SB.post('poll_sessions', srow);
     await SB.post('poll_options', orows);
-    boardToast('已建立投票'); plOpen(sid);
-  } catch (e) { boardToast('建立失敗：' + (e.message || e)); }
+    boardToast(BT('pl_t_created')); plOpen(sid);
+  } catch (e) { boardToast(BT('pl_t_create_fail') + (e.message || e)); }
 }
 
 // ── 房間 ──
 async function plOpen(id) {
   const rows = await SB.get('poll_sessions', '?id=eq.' + encodeURIComponent(id));
   const s = rows && rows[0];
-  if (!s) { boardToast('找不到該投票'); return; }
-  if (!plCanSee(s)) { boardToast('你不在這場投票的開放範圍內'); return; }
+  if (!s) { boardToast(BT('pl_t_not_found')); return; }
+  if (!plCanSee(s)) { boardToast(BT('pl_t_not_in_scope')); return; }
   plSession = s;
   await plFetch();
   await plMaybeAutoClose();
@@ -5032,7 +5287,7 @@ function plNewVoteRow(optionId) {
 }
 async function plVote(optionId) {
   if (!plSession || !PORTAL_SESSION) return;
-  if (plClosed()) { boardToast('投票已結束'); return; }
+  if (plClosed()) { boardToast(BT('pl_t_vote_closed')); return; }
   const me = PORTAL_SESSION.empId;
   const mine = plVotes.filter(v => v.voter_emp_id === me);
   const has = mine.some(v => v.option_id === optionId);
@@ -5043,7 +5298,7 @@ async function plVote(optionId) {
         await SB.del('poll_votes', 'session_id=eq.' + encodeURIComponent(plSession.id) + '&voter_emp_id=eq.' + encodeURIComponent(me) + '&option_id=eq.' + encodeURIComponent(optionId));
         plVotes = plVotes.filter(v => !(v.voter_emp_id === me && v.option_id === optionId));
       } else {
-        if (plSession.multi_cap && mine.length >= plSession.multi_cap) { boardToast('最多選 ' + plSession.multi_cap + ' 項'); return; }
+        if (plSession.multi_cap && mine.length >= plSession.multi_cap) { boardToast(BT('pl_t_cap', { n: plSession.multi_cap })); return; }
         const row = plNewVoteRow(optionId); await SB.post('poll_votes', row); plVotes.push(row);
       }
     } else {
@@ -5053,37 +5308,37 @@ async function plVote(optionId) {
       if (!has) { const row = plNewVoteRow(optionId); await SB.post('poll_votes', row); plVotes.push(row); }
     }
     plRenderRoom();
-  } catch (e) { boardToast('投票失敗：' + (e.message || e)); await plFetch(); plRenderRoom(); }
+  } catch (e) { boardToast(BT('pl_t_vote_fail') + (e.message || e)); await plFetch(); plRenderRoom(); }
 }
 async function plCloseSession() {
   if (!plIsCreator(plSession)) return;
   if (plSession.persist === false) {
-    if (!confirm('這是「不存檔」投票，結束後將直接刪除、不留紀錄，確定？')) return;
-    try { await SB.del('poll_sessions', 'id=eq.' + encodeURIComponent(plSession.id)); boardToast('已結束並刪除'); plBackToList(); }
-    catch (e) { boardToast('刪除失敗：' + (e.message || e)); }
+    if (!confirm(BT('pl_t_nopersist_confirm'))) return;
+    try { await SB.del('poll_sessions', 'id=eq.' + encodeURIComponent(plSession.id)); boardToast(BT('pl_t_closed_deleted')); plBackToList(); }
+    catch (e) { boardToast(BT('pl_t_fail') + (e.message || e)); }
     return;
   }
-  if (!confirm('結束這場投票？結束後不能再投。')) return;
+  if (!confirm(BT('pl_t_close_confirm'))) return;
   plSession.status = 'closed'; plRenderRoom();
   try { await SB.patch('poll_sessions', 'id=eq.' + encodeURIComponent(plSession.id), { status: 'closed', updated_at: new Date().toISOString() }); }
-  catch (e) { boardToast('結束失敗：' + (e.message || e)); }
+  catch (e) { boardToast(BT('pl_t_fail') + (e.message || e)); }
 }
 async function plReopenSession() {
   if (!plIsCreator(plSession)) return;
   plSession.status = 'open'; plRenderRoom();
   try { await SB.patch('poll_sessions', 'id=eq.' + encodeURIComponent(plSession.id), { status: 'open', updated_at: new Date().toISOString() }); }
-  catch (e) { boardToast('重開失敗：' + (e.message || e)); }
+  catch (e) { boardToast(BT('pl_t_fail') + (e.message || e)); }
 }
 function plRenderRoom() {
   const s = plSession; if (!s) return;
   const acts = document.getElementById('pl-room-actions');
-  let a = '<span class="site-badge" style="background:' + (plClosed() ? 'var(--s3);color:var(--tx3)' : 'var(--ac2);color:var(--ac)') + '">' + (plClosed() ? '已結束' : '進行中') + '</span>';
-  if (plIsCreator(s)) a += plClosed() ? '<button class="btn sm" onclick="plReopenSession()">↻ 重新開放</button>' : '<button class="btn sm" onclick="plCloseSession()">■ 結束投票</button>';
+  let a = '<span class="site-badge" style="background:' + (plClosed() ? 'var(--s3);color:var(--tx3)' : 'var(--ac2);color:var(--ac)') + '">' + (plClosed() ? BT('pl_f_closed') : BT('pl_f_open')) + '</span>';
+  if (plIsCreator(s)) a += plClosed() ? '<button class="btn sm" onclick="plReopenSession()">' + BT('pl_reopen') + '</button>' : '<button class="btn sm" onclick="plCloseSession()">' + BT('pl_close') + '</button>';
   acts.innerHTML = a;
 
   const me = PORTAL_SESSION && PORTAL_SESSION.empId;
   const qty = !!s.quantity_mode;
-  const unit = qty ? '份' : '票';
+  const unit = qty ? BT('pl_unit_qty') : BT('pl_unit_vote');
   const PAL = ['#2D7FF9', '#4caf50', '#ff9800', '#e91e63', '#9c27b0', '#00bcd4', '#ffc107', '#8bc34a', '#795548', '#607d8b'];
   // 我的選擇（不受分中心篩選影響）
   const myChosen = {}, myQty = {};
@@ -5099,16 +5354,16 @@ function plRenderRoom() {
   const winMax = (s.decision_mode && plClosed()) ? Math.max(0, ...plOptions.map(o => cnt[o.id] || 0)) : -1;
   const bg = Array.isArray(s.bg_images) ? s.bg_images : [];
   const bgHtml = bg.length ? '<div style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0">' + bg.map(u => '<a href="' + escHtml(u) + '" target="_blank" rel="noopener"><img src="' + escHtml(u) + '" style="max-width:180px;max-height:140px;border-radius:8px;border:1px solid var(--br);object-fit:cover"></a>').join('') + '</div>' : '';
-  const modeTag = (qty ? '數量' : (s.multi ? ('複選' + (s.multi_cap ? '，最多 ' + s.multi_cap + ' 項' : '')) : '單選'));
+  const modeTag = qty ? BT('pl_mode_qty') : (s.multi ? (s.multi_cap ? BT('pl_mode_multi_cap', { n: s.multi_cap }) : BT('pl_mode_multi')) : BT('pl_mode_single'));
   let html = '<div class="panel"><div class="panel-h"><span class="idx">🗳</span><h2>' + plBiLine(s.title || '(未命名)', s.title_a, s.title_b, s) + '</h2></div><div class="panel-b">' +
     (s.description ? '<div style="font-size:13.5px;white-space:pre-wrap;margin-bottom:6px">' + plBiLine(s.description, s.desc_a, s.desc_b, s) + '</div>' : '') + bgHtml +
-    '<div style="font-size:12px;color:var(--tx3)">發起：' + escHtml(s.creator_name || '—') + '　範圍：' + escHtml(plScopeText(s)) + '　' + modeTag + '　' + (s.anonymous ? '匿名' : '記名') + (s.close_at ? '　截止：' + escHtml(plFmtDt(s.close_at)) : '') + '</div></div></div>';
+    '<div style="font-size:12px;color:var(--tx3)">' + BT('pl_by') + escHtml(s.creator_name || '—') + '　' + BT('pl_scope') + escHtml(plScopeText(s)) + '　' + modeTag + '　' + (s.anonymous ? BT('pl_anon') : BT('pl_named')) + (s.close_at ? '　' + BT('pl_deadline') + escHtml(plFmtDt(s.close_at)) : '') + '</div></div></div>';
 
-  html += '<div class="panel"><div class="panel-h"><span class="idx">✔</span><h2>' + (plClosed() ? '投票結果' : ('請投票（' + modeTag + '）')) + '</h2><span class="sub">' + total + ' 人 · ' + grand + ' ' + unit + '</span></div><div class="panel-b">';
-  if (!showCounts) html += '<div class="hint" style="margin-bottom:8px">🔒 結果將於截止後才揭曉；你仍可先投票（截止前可改）。</div>';
+  html += '<div class="panel"><div class="panel-h"><span class="idx">✔</span><h2>' + (plClosed() ? BT('pl_result_head') : BT('pl_vote_head', { mode: modeTag })) + '</h2><span class="sub">' + total + ' ' + BT('pl_people') + ' · ' + grand + ' ' + unit + '</span></div><div class="panel-b">';
+  if (!showCounts) html += '<div class="hint" style="margin-bottom:8px">' + BT('pl_reveal_note') + '</div>';
   // 分中心篩選
-  if (showCounts) html += '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">' + ['', 'TW', 'CN', 'VN'].map(st => '<button class="chip-f' + (plCenterFilter === st ? ' on' : '') + '" onclick="plSetCenter(\'' + st + '\')">' + (st ? escHtml(siteLabel(st)) : '全部') + '</button>').join('') + '</div>';
-  if (showCounts) html += '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px"><button class="btn sm" onclick="plSendMail()">✉️ 寄送</button><button class="btn sm" onclick="plExportXlsx()">Excel</button><button class="btn sm" onclick="plExportPNG()">PNG</button><button class="btn sm" onclick="plExportPDF()">PDF</button></div>';
+  if (showCounts) html += '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">' + ['', 'TW', 'CN', 'VN'].map(st => '<button class="chip-f' + (plCenterFilter === st ? ' on' : '') + '" onclick="plSetCenter(\'' + st + '\')">' + (st ? escHtml(siteLabel(st)) : BT('pl_all')) + '</button>').join('') + '</div>';
+  if (showCounts) html += '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px"><button class="btn sm" onclick="plSendMail()">' + BT('pl_exp_send') + '</button><button class="btn sm" onclick="plExportXlsx()">Excel</button><button class="btn sm" onclick="plExportPNG()">PNG</button><button class="btn sm" onclick="plExportPDF()">PDF</button></div>';
   // 圓餅圖
   if (showCounts && grand > 0) {
     let acc = 0; const segs = [];
@@ -5131,19 +5386,20 @@ function plRenderRoom() {
       '<div style="position:relative;display:flex;align-items:center;gap:10px">' +
       (qty ? '' : '<div style="width:18px;flex-shrink:0">' + (chosen ? (s.multi ? '☑' : '●') : (s.multi ? '☐' : '○')) + '</div>') +
       (o.image_url ? '<img src="' + escHtml(o.image_url) + '" onclick="event.stopPropagation();window.open(this.src)" style="width:44px;height:44px;object-fit:cover;border-radius:6px;border:1px solid var(--br);flex-shrink:0;cursor:zoom-in">' : '') +
-      '<div style="flex:1;min-width:0;font-size:14px">' + plBiLine(o.label, o.label_a, o.label_b, s) + (win ? ' <span style="color:var(--grn,#4caf50);font-weight:700">🏆 勝出</span>' : '') + '</div>' +
+      '<div style="flex:1;min-width:0;font-size:14px">' + plBiLine(o.label, o.label_a, o.label_b, s) + (win ? ' <span style="color:var(--grn,#4caf50);font-weight:700">' + BT('pl_win') + '</span>' : '') + '</div>' +
       (showCounts ? '<div style="flex-shrink:0;font-size:13px;color:var(--tx3);white-space:nowrap">' + c + ' ' + unit + ' · ' + pct + '%</div>' : '') +
       stepper +
       '</div>' + nameList + '</div>';
   }).join('');
-  html += (plClosed() ? '' : '<div class="hint" style="margin-top:4px">' + (qty ? '用 −／＋ 填各項份數；截止前可改。' : (s.multi ? ('點選項可多選' + (s.multi_cap ? '（最多 ' + s.multi_cap + ' 項）' : '') + '，再點一次取消。') : '點選項即投票；再點一次可取消。') + '截止前可改。') + '</div>') + '</div></div>';
+  const hint = qty ? BT('pl_hint_qty') : (s.multi ? (s.multi_cap ? BT('pl_hint_multi_cap', { n: s.multi_cap }) : BT('pl_hint_multi')) : BT('pl_hint_single'));
+  html += (plClosed() ? '' : '<div class="hint" style="margin-top:4px">' + hint + '</div>') + '</div></div>';
 
   // 意見面板
   if (s.allow_comment) {
     const myC = plComments.find(c => c.voter_emp_id === me);
-    html += '<div class="panel"><div class="panel-h"><span class="idx">💬</span><h2>意見</h2><span class="sub">' + plComments.length + ' 則</span></div><div class="panel-b">';
-    if (!plClosed()) html += '<textarea id="pl-comment-box" rows="2" placeholder="寫下你的建議…" style="width:100%;font-family:inherit;font-size:14px;background:var(--s2);border:1px solid var(--br);border-radius:8px;padding:9px 11px;color:var(--tx)">' + escHtml(myC ? myC.text : '') + '</textarea><div style="margin-top:6px"><button class="btn primary sm" onclick="plSaveComment()">' + (myC ? '更新我的意見' : '送出意見') + '</button></div>';
-    html += '<div style="margin-top:10px">' + (plComments.length ? plComments.map(c => '<div style="border:1px solid var(--br);border-radius:8px;padding:9px 11px;background:var(--s2);margin-bottom:6px"><div style="white-space:pre-wrap;font-size:13.5px">' + escHtml(c.text || '') + '</div>' + ((!s.anonymous && c.voter_name) ? '<div style="font-size:11px;color:var(--tx3);margin-top:3px">— ' + escHtml(c.voter_name) + '</div>' : '') + '</div>').join('') : '<div class="empty-note">尚無意見。</div>') + '</div></div></div>';
+    html += '<div class="panel"><div class="panel-h"><span class="idx">💬</span><h2>' + BT('pl_comments_head') + '</h2><span class="sub">' + plComments.length + '</span></div><div class="panel-b">';
+    if (!plClosed()) html += '<textarea id="pl-comment-box" rows="2" placeholder="' + escHtml(BT('pl_ph_comment')) + '" style="width:100%;font-family:inherit;font-size:14px;background:var(--s2);border:1px solid var(--br);border-radius:8px;padding:9px 11px;color:var(--tx)">' + escHtml(myC ? myC.text : '') + '</textarea><div style="margin-top:6px"><button class="btn primary sm" onclick="plSaveComment()">' + (myC ? BT('pl_comment_update') : BT('pl_comment_send')) + '</button></div>';
+    html += '<div style="margin-top:10px">' + (plComments.length ? plComments.map(c => '<div style="border:1px solid var(--br);border-radius:8px;padding:9px 11px;background:var(--s2);margin-bottom:6px"><div style="white-space:pre-wrap;font-size:13.5px">' + escHtml(c.text || '') + '</div>' + ((!s.anonymous && c.voter_name) ? '<div style="font-size:11px;color:var(--tx3);margin-top:3px">— ' + escHtml(c.voter_name) + '</div>' : '') + '</div>').join('') : '<div class="empty-note">' + BT('pl_comments_empty') + '</div>') + '</div></div></div>';
   }
 
   const _cb = document.getElementById('pl-comment-box'); const _cbv = _cb ? _cb.value : null;
@@ -5161,19 +5417,19 @@ async function plSetQty(optionId, delta) {
     plVotes = plVotes.filter(v => !(v.voter_emp_id === me && v.option_id === optionId));
     if (q > 0) { const row = plNewVoteRow(optionId); row.quantity = q; await SB.post('poll_votes', row); plVotes.push(row); }
     plRenderRoom();
-  } catch (e) { boardToast('更新失敗：' + (e.message || e)); await plFetch(); plRenderRoom(); }
+  } catch (e) { boardToast(BT('pl_t_fail') + (e.message || e)); await plFetch(); plRenderRoom(); }
 }
 async function plSaveComment() {
   if (!plSession || !PORTAL_SESSION) return;
   const box = document.getElementById('pl-comment-box'); const text = (box.value || '').trim();
-  if (!text) { boardToast('請先輸入意見'); return; }
+  if (!text) { boardToast(BT('pl_t_need_comment')); return; }
   const me = PORTAL_SESSION.empId;
   const mine = plComments.find(c => c.voter_emp_id === me);
   try {
     if (mine) { await SB.patch('poll_comments', 'id=eq.' + encodeURIComponent(mine.id), { text }); mine.text = text; }
     else { const row = { id: uid(), session_id: plSession.id, voter_emp_id: me, voter_name: PORTAL_SESSION.nameZh || PORTAL_SESSION.nameEn || me, text, created_at: new Date().toISOString() }; await SB.post('poll_comments', row); plComments.push(row); }
-    plRenderRoom(); boardToast('已送出');
-  } catch (e) { boardToast('送出失敗：' + (e.message || e)); }
+    plRenderRoom(); boardToast(BT('pl_t_sent'));
+  } catch (e) { boardToast(BT('pl_t_fail') + (e.message || e)); }
 }
 
 // ── 輸出（PDF／PNG／Excel／Email）──
@@ -5205,7 +5461,7 @@ function plReportHtml() {
   return h;
 }
 function plExportPDF() {
-  const w = window.open('', '_blank'); if (!w) { boardToast('請允許彈出視窗以列印 PDF'); return; }
+  const w = window.open('', '_blank'); if (!w) { boardToast(BT('pl_t_popup_pdf')); return; }
   w.document.write('<!doctype html><html><head><meta charset="utf-8"><title>' + wmXesc(plFileBase()) + '</title><style>body{font-family:"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;color:#1a1a1a;margin:28px;font-size:13px;line-height:1.5}h1{font-size:20px;margin:0 0 4px}table{border-collapse:collapse}@media print{@page{margin:14mm}}</style></head><body>' + plReportHtml() + '</body></html>');
   w.document.close(); w.onload = function () { try { w.focus(); w.print(); } catch (e) {} };
 }
@@ -5217,9 +5473,9 @@ function plExportPNG() {
     const xhtml = '<div xmlns="http://www.w3.org/1999/xhtml" style="width:' + width + 'px;background:#fff;color:#1a1a1a;padding:24px;font-family:sans-serif;font-size:14px;line-height:1.5">' + frag + '</div>';
     const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + width + '" height="' + h + '"><foreignObject width="100%" height="100%">' + xhtml + '</foreignObject></svg>';
     const url = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml;charset=utf-8' })); const img = new Image();
-    img.onload = function () { const sc = 2, cv = document.createElement('canvas'); cv.width = width * sc; cv.height = h * sc; const ctx = cv.getContext('2d'); ctx.setTransform(sc, 0, 0, sc, 0, 0); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, width, h); ctx.drawImage(img, 0, 0); URL.revokeObjectURL(url); cv.toBlob(function (b) { if (!b) { boardToast('PNG 匯出失敗，請改用 PDF'); return; } wmDownload(b, plFileBase() + '.png'); boardToast('已匯出 PNG'); }, 'image/png'); };
-    img.onerror = function () { URL.revokeObjectURL(url); boardToast('PNG 匯出失敗，請改用 PDF'); }; img.src = url;
-  } catch (e) { boardToast('PNG 匯出失敗，請改用 PDF'); }
+    img.onload = function () { const sc = 2, cv = document.createElement('canvas'); cv.width = width * sc; cv.height = h * sc; const ctx = cv.getContext('2d'); ctx.setTransform(sc, 0, 0, sc, 0, 0); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, width, h); ctx.drawImage(img, 0, 0); URL.revokeObjectURL(url); cv.toBlob(function (b) { if (!b) { boardToast(BT('pl_t_png_fail')); return; } wmDownload(b, plFileBase() + '.png'); boardToast(BT('pl_t_png_done')); }, 'image/png'); };
+    img.onerror = function () { URL.revokeObjectURL(url); boardToast(BT('pl_t_png_fail')); }; img.src = url;
+  } catch (e) { boardToast(BT('pl_t_png_fail')); }
 }
 function plBuildXlsx() {
   const s = plSession, d = plReportData(), rows = [];
@@ -5237,7 +5493,7 @@ function plBuildXlsx() {
   const enc = new TextEncoder();
   return wmMakeZip([{ name: '[Content_Types].xml', data: enc.encode(ct) }, { name: '_rels/.rels', data: enc.encode(rels) }, { name: 'xl/workbook.xml', data: enc.encode(wb) }, { name: 'xl/_rels/workbook.xml.rels', data: enc.encode(wbr) }, { name: 'xl/worksheets/sheet1.xml', data: enc.encode(sheetXml) }]);
 }
-function plExportXlsx() { try { wmDownload(plBuildXlsx(), plFileBase() + '.xlsx'); boardToast('已匯出 Excel'); } catch (e) { boardToast('Excel 匯出失敗'); } }
+function plExportXlsx() { try { wmDownload(plBuildXlsx(), plFileBase() + '.xlsx'); boardToast(BT('pl_t_xlsx_done')); } catch (e) { boardToast(BT('pl_t_fail') + 'Excel'); } }
 function plSendMail() {
   const s = plSession, d = plReportData(), L = [];
   L.push('投票結果：' + (s.title || '')); L.push(s.total + '人');
@@ -5248,7 +5504,7 @@ function plSendMail() {
   const ids = {}; plVotes.forEach(v => { if (v.voter_emp_id) ids[v.voter_emp_id] = 1; }); if (s.creator_emp_id) ids[s.creator_emp_id] = 1;
   const to = Object.keys(ids).map(userEmail).filter(Boolean).join(',');
   const url = 'mailto:' + encodeURIComponent(to) + '?subject=' + encodeURIComponent('投票結果 ' + (s.title || '')) + '&body=' + encodeURIComponent(L.join('\n'));
-  try { window.location.href = url; boardToast('已開啟郵件草稿'); } catch (e) { boardToast('無法開啟郵件'); }
+  try { window.location.href = url; boardToast(BT('pl_t_mail_opened')); } catch (e) { boardToast(BT('pl_t_mail_fail')); }
 }
 function plPollStart() { plPollStop(); plPollTimer = setInterval(plPollTick, 7000); }
 function plPollStop() { if (plPollTimer) { clearInterval(plPollTimer); plPollTimer = null; } }

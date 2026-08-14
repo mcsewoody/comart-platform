@@ -5,7 +5,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#080C14">
-<title>COMART · 公告與紀錄 v1.53</title>
+<title>COMART · 公告與紀錄 v1.54</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -222,7 +222,7 @@ select,select option,option{background:var(--s2);color:var(--tx)}
     <a class="logo" href="javascript:void(0)">
       <div class="logo-mark">告</div>
       <div class="logo-text" data-i18n="app_title">公告與紀錄</div>
-      <span class="logo-ver">v1.53</span>
+      <span class="logo-ver">v1.54</span>
     </a>
     <div class="topbar-right">
       <div id="langChips" style="display:flex;gap:4px"></div>
@@ -636,7 +636,11 @@ select,select option,option{background:var(--s2);color:var(--tx)}
               <div class="field"><label>結果可見</label>
                 <select id="pl-c-reveal"><option value="live">即時可見</option><option value="closed">截止後才揭曉</option></select></div>
             </div>
-            <div class="field"><label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:400"><input type="checkbox" id="pl-c-decision" style="width:auto"> 決策模式（截止後自動標示最高票為「勝出」）</label></div>
+            <div class="field" style="gap:8px">
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:400;font-size:13.5px"><input type="checkbox" id="pl-c-decision" style="width:auto"> 決策模式（截止後自動標示最高票為「勝出」）</label>
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:400;font-size:13.5px"><input type="checkbox" id="pl-c-comment" style="width:auto"> 可書寫建議（每人可附一段整體意見）</label>
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:400;font-size:13.5px"><input type="checkbox" id="pl-c-qty" style="width:auto"> 數量模式（點餐／物資：可對選項填份數）</label>
+            </div>
             <div class="field"><label>開放參與範圍</label>
               <select id="pl-c-scope" onchange="plScopeChanged()">
                 <option value="all">全公司</option>
@@ -4764,6 +4768,9 @@ let plOptions = [];
 let plVotes = [];
 let plPollTimer = null;
 let plBgImages = [];       // 建立中的背景附圖 URL
+let plComments = [];        // 目前投票的意見
+let plCenterFilter = '';    // 結果分中心篩選（''=全部）
+function plSiteOf(empId) { const u = (ALL_USERS || []).find(x => x.empId === empId); return u ? (u.site || '') : ''; }
 
 // ── 圖片：前端壓縮後經 sb-proxy(service_role)上傳到公開 bucket poll-images ──
 function plCompressImage(file, maxDim, quality) {
@@ -4883,6 +4890,8 @@ function plNewSession() {
   document.getElementById('pl-c-anon').value = '0';
   document.getElementById('pl-c-reveal').value = 'live';
   document.getElementById('pl-c-decision').checked = false;
+  document.getElementById('pl-c-comment').checked = false;
+  document.getElementById('pl-c-qty').checked = false;
   plScopeChanged();
   plShowView('create');
 }
@@ -4931,6 +4940,8 @@ async function plCreateSubmit() {
     anonymous: document.getElementById('pl-c-anon').value === '1',
     reveal: document.getElementById('pl-c-reveal').value,
     decision_mode: document.getElementById('pl-c-decision').checked,
+    allow_comment: document.getElementById('pl-c-comment').checked,
+    quantity_mode: document.getElementById('pl-c-qty').checked,
     scope_type: scope,
     scope_site: scope === 'site' ? document.getElementById('pl-c-site').value : null,
     scope_members: members,
@@ -4963,13 +4974,14 @@ async function plOpen(id) {
 }
 async function plFetch() {
   if (!plSession) return;
-  const [o, v] = await Promise.all([
+  const [o, v, c] = await Promise.all([
     SB.get('poll_options', '?session_id=eq.' + encodeURIComponent(plSession.id) + '&order=sort_order.asc'),
     SB.get('poll_votes', '?session_id=eq.' + encodeURIComponent(plSession.id)),
+    plSession.allow_comment ? SB.get('poll_comments', '?session_id=eq.' + encodeURIComponent(plSession.id) + '&order=created_at.asc') : Promise.resolve([]),
   ]);
-  plOptions = o || []; plVotes = v || [];
+  plOptions = o || []; plVotes = v || []; plComments = c || [];
 }
-function plBackToList() { plPollStop(); plSession = null; plOptions = []; plVotes = []; plLoadList(); }
+function plBackToList() { plPollStop(); plSession = null; plOptions = []; plVotes = []; plComments = []; plCenterFilter = ''; plLoadList(); }
 function plClosed() { return plSession && plSession.status === 'closed'; }
 function plMyVote() { const me = PORTAL_SESSION && PORTAL_SESSION.empId; return plVotes.find(v => v.voter_emp_id === me); }
 async function plMaybeAutoClose() {
@@ -5029,43 +5041,101 @@ function plRenderRoom() {
   acts.innerHTML = a;
 
   const me = PORTAL_SESSION && PORTAL_SESSION.empId;
-  const myChosen = {}; plVotes.forEach(v => { if (v.voter_emp_id === me) myChosen[v.option_id] = true; });
-  const total = new Set(plVotes.map(v => v.voter_emp_id)).size;
-  const cnt = {}; const voters = {}; plVotes.forEach(v => { cnt[v.option_id] = (cnt[v.option_id] || 0) + 1; (voters[v.option_id] = voters[v.option_id] || []).push(v.voter_name || v.voter_emp_id); });
+  const qty = !!s.quantity_mode;
+  const unit = qty ? '份' : '票';
+  const PAL = ['#2D7FF9', '#4caf50', '#ff9800', '#e91e63', '#9c27b0', '#00bcd4', '#ffc107', '#8bc34a', '#795548', '#607d8b'];
+  // 我的選擇（不受分中心篩選影響）
+  const myChosen = {}, myQty = {};
+  plVotes.forEach(v => { if (v.voter_emp_id === me) { myChosen[v.option_id] = true; myQty[v.option_id] = v.quantity || 1; } });
+  // 結果統計（受分中心篩選）
+  const votesF = plCenterFilter ? plVotes.filter(v => plSiteOf(v.voter_emp_id) === plCenterFilter) : plVotes;
+  const cnt = {}, voters = {};
+  votesF.forEach(v => { cnt[v.option_id] = (cnt[v.option_id] || 0) + (qty ? (v.quantity || 1) : 1); (voters[v.option_id] = voters[v.option_id] || []).push(v.voter_name || v.voter_emp_id); });
+  const total = new Set(votesF.map(v => v.voter_emp_id)).size;
+  const grand = Object.keys(cnt).reduce((a, k) => a + cnt[k], 0);
   const maxc = Math.max(1, ...plOptions.map(o => cnt[o.id] || 0));
   const showCounts = !(s.reveal === 'closed' && !plClosed());
   const winMax = (s.decision_mode && plClosed()) ? Math.max(0, ...plOptions.map(o => cnt[o.id] || 0)) : -1;
   const bg = Array.isArray(s.bg_images) ? s.bg_images : [];
   const bgHtml = bg.length ? '<div style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0">' + bg.map(u => '<a href="' + escHtml(u) + '" target="_blank" rel="noopener"><img src="' + escHtml(u) + '" style="max-width:180px;max-height:140px;border-radius:8px;border:1px solid var(--br);object-fit:cover"></a>').join('') + '</div>' : '';
-  const modeTag = s.multi ? ('複選' + (s.multi_cap ? '，最多 ' + s.multi_cap + ' 項' : '')) : '單選';
+  const modeTag = (qty ? '數量' : (s.multi ? ('複選' + (s.multi_cap ? '，最多 ' + s.multi_cap + ' 項' : '')) : '單選'));
   let html = '<div class="panel"><div class="panel-h"><span class="idx">🗳</span><h2>' + escHtml(s.title || '(未命名)') + '</h2></div><div class="panel-b">' +
     (s.description ? '<div style="font-size:13.5px;white-space:pre-wrap;margin-bottom:6px">' + escHtml(s.description) + '</div>' : '') + bgHtml +
     '<div style="font-size:12px;color:var(--tx3)">發起：' + escHtml(s.creator_name || '—') + '　範圍：' + escHtml(plScopeText(s)) + '　' + modeTag + '　' + (s.anonymous ? '匿名' : '記名') + (s.close_at ? '　截止：' + escHtml(plFmtDt(s.close_at)) : '') + '</div></div></div>';
-  html += '<div class="panel"><div class="panel-h"><span class="idx">✔</span><h2>' + (plClosed() ? '投票結果' : ('請投票（' + modeTag + '）')) + '</h2><span class="sub">' + total + ' 人已投</span></div><div class="panel-b">';
+
+  html += '<div class="panel"><div class="panel-h"><span class="idx">✔</span><h2>' + (plClosed() ? '投票結果' : ('請投票（' + modeTag + '）')) + '</h2><span class="sub">' + total + ' 人 · ' + grand + ' ' + unit + '</span></div><div class="panel-b">';
   if (!showCounts) html += '<div class="hint" style="margin-bottom:8px">🔒 結果將於截止後才揭曉；你仍可先投票（截止前可改）。</div>';
-  html += plOptions.map(o => {
+  // 分中心篩選
+  if (showCounts) html += '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">' + ['', 'TW', 'CN', 'VN'].map(st => '<button class="chip-f' + (plCenterFilter === st ? ' on' : '') + '" onclick="plSetCenter(\'' + st + '\')">' + (st ? escHtml(siteLabel(st)) : '全部') + '</button>').join('') + '</div>';
+  // 圓餅圖
+  if (showCounts && grand > 0) {
+    let acc = 0; const segs = [];
+    plOptions.forEach((o, i) => { const c = cnt[o.id] || 0; if (!c) return; const from = acc / grand * 100; acc += c; const to = acc / grand * 100; segs.push(PAL[i % PAL.length] + ' ' + from.toFixed(2) + '% ' + to.toFixed(2) + '%'); });
+    html += '<div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-bottom:14px">' +
+      '<div style="width:130px;height:130px;border-radius:50%;background:conic-gradient(' + segs.join(',') + ');flex-shrink:0;position:relative"><div style="position:absolute;inset:26px;border-radius:50%;background:var(--s1);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--tx3)">' + grand + ' ' + unit + '</div></div>' +
+      '<div style="display:flex;flex-direction:column;gap:4px;font-size:12px">' + plOptions.map((o, i) => '<div style="display:flex;align-items:center;gap:6px"><span style="width:11px;height:11px;border-radius:2px;background:' + PAL[i % PAL.length] + ';flex-shrink:0"></span><span style="color:var(--tx2)">' + escHtml(o.label || '') + '</span><span style="color:var(--tx3)">· ' + (cnt[o.id] || 0) + ' ' + unit + '</span></div>').join('') + '</div></div>';
+  }
+  html += plOptions.map((o, i) => {
     const c = cnt[o.id] || 0;
-    const pct = total ? Math.round(c / total * 100) : 0;
-    const chosen = !!myChosen[o.id];
+    const pct = grand ? Math.round(c / grand * 100) : 0;
+    const chosen = qty ? (myQty[o.id] > 0) : !!myChosen[o.id];
     const win = winMax >= 0 && c === winMax && c > 0;
     const barW = showCounts ? Math.round((c / maxc) * 100) : 0;
-    const clickable = !plClosed();
-    const nameList = (!s.anonymous && showCounts && (voters[o.id] || []).length) ? '<div style="font-size:11px;color:var(--tx3);margin-top:5px;padding-left:28px">' + (voters[o.id] || []).map(escHtml).join('、') + '</div>' : '';
+    const clickable = !plClosed() && !qty;
+    const nameList = (!s.anonymous && showCounts && (voters[o.id] || []).length) ? '<div style="font-size:11px;color:var(--tx3);margin-top:5px">' + (voters[o.id] || []).map(escHtml).join('、') + '</div>' : '';
+    const stepper = (qty && !plClosed()) ? '<div style="display:flex;align-items:center;gap:6px;flex-shrink:0"><button class="btn ghost sm" style="padding:2px 10px" onclick="plSetQty(\'' + o.id + '\',-1)">−</button><span style="min-width:22px;text-align:center;font-size:15px;font-weight:600">' + (myQty[o.id] || 0) + '</span><button class="btn ghost sm" style="padding:2px 10px" onclick="plSetQty(\'' + o.id + '\',1)">＋</button></div>' : '';
     return '<div ' + (clickable ? 'onclick="plVote(\'' + o.id + '\')"' : '') + ' style="border:1px solid ' + (win ? 'var(--grn,#4caf50)' : (chosen ? 'var(--ac)' : 'var(--br)')) + ';border-radius:9px;padding:10px 12px;margin-bottom:8px;background:var(--s2);' + (clickable ? 'cursor:pointer' : '') + ';position:relative;overflow:hidden">' +
       '<div style="position:absolute;left:0;top:0;bottom:0;width:' + barW + '%;background:' + (chosen ? 'rgba(45,127,249,.20)' : 'rgba(255,255,255,.05)') + ';transition:width .4s"></div>' +
       '<div style="position:relative;display:flex;align-items:center;gap:10px">' +
-      '<div style="width:18px;flex-shrink:0">' + (chosen ? (s.multi ? '☑' : '●') : (s.multi ? '☐' : '○')) + '</div>' +
+      (qty ? '' : '<div style="width:18px;flex-shrink:0">' + (chosen ? (s.multi ? '☑' : '●') : (s.multi ? '☐' : '○')) + '</div>') +
       (o.image_url ? '<img src="' + escHtml(o.image_url) + '" onclick="event.stopPropagation();window.open(this.src)" style="width:44px;height:44px;object-fit:cover;border-radius:6px;border:1px solid var(--br);flex-shrink:0;cursor:zoom-in">' : '') +
       '<div style="flex:1;min-width:0;font-size:14px">' + escHtml(o.label || '') + (win ? ' <span style="color:var(--grn,#4caf50);font-weight:700">🏆 勝出</span>' : '') + '</div>' +
-      (showCounts ? '<div style="flex-shrink:0;font-size:13px;color:var(--tx3);white-space:nowrap">' + c + ' 票 · ' + pct + '%</div>' : '') +
+      (showCounts ? '<div style="flex-shrink:0;font-size:13px;color:var(--tx3);white-space:nowrap">' + c + ' ' + unit + ' · ' + pct + '%</div>' : '') +
+      stepper +
       '</div>' + nameList + '</div>';
   }).join('');
-  html += (plClosed() ? '' : '<div class="hint" style="margin-top:4px">' + (s.multi ? ('點選項可多選' + (s.multi_cap ? '（最多 ' + s.multi_cap + ' 項）' : '') + '，再點一次取消。') : '點選項即投票；再點一次可取消。') + '截止前可改。</div>') + '</div></div>';
+  html += (plClosed() ? '' : '<div class="hint" style="margin-top:4px">' + (qty ? '用 −／＋ 填各項份數；截止前可改。' : (s.multi ? ('點選項可多選' + (s.multi_cap ? '（最多 ' + s.multi_cap + ' 項）' : '') + '，再點一次取消。') : '點選項即投票；再點一次可取消。') + '截止前可改。') + '</div>') + '</div></div>';
+
+  // 意見面板
+  if (s.allow_comment) {
+    const myC = plComments.find(c => c.voter_emp_id === me);
+    html += '<div class="panel"><div class="panel-h"><span class="idx">💬</span><h2>意見</h2><span class="sub">' + plComments.length + ' 則</span></div><div class="panel-b">';
+    if (!plClosed()) html += '<textarea id="pl-comment-box" rows="2" placeholder="寫下你的建議…" style="width:100%;font-family:inherit;font-size:14px;background:var(--s2);border:1px solid var(--br);border-radius:8px;padding:9px 11px;color:var(--tx)">' + escHtml(myC ? myC.text : '') + '</textarea><div style="margin-top:6px"><button class="btn primary sm" onclick="plSaveComment()">' + (myC ? '更新我的意見' : '送出意見') + '</button></div>';
+    html += '<div style="margin-top:10px">' + (plComments.length ? plComments.map(c => '<div style="border:1px solid var(--br);border-radius:8px;padding:9px 11px;background:var(--s2);margin-bottom:6px"><div style="white-space:pre-wrap;font-size:13.5px">' + escHtml(c.text || '') + '</div>' + ((!s.anonymous && c.voter_name) ? '<div style="font-size:11px;color:var(--tx3);margin-top:3px">— ' + escHtml(c.voter_name) + '</div>' : '') + '</div>').join('') : '<div class="empty-note">尚無意見。</div>') + '</div></div></div>';
+  }
+
+  const _cb = document.getElementById('pl-comment-box'); const _cbv = _cb ? _cb.value : null;
   document.getElementById('pl-room-body').innerHTML = html;
+  if (_cbv !== null) { const nb = document.getElementById('pl-comment-box'); if (nb && nb.value !== _cbv) nb.value = _cbv; }
+}
+function plSetCenter(st) { plCenterFilter = st; plRenderRoom(); }
+async function plSetQty(optionId, delta) {
+  if (!plSession || !PORTAL_SESSION || plClosed()) return;
+  const me = PORTAL_SESSION.empId;
+  const existing = plVotes.find(v => v.voter_emp_id === me && v.option_id === optionId);
+  let q = (existing ? (existing.quantity || 1) : 0) + delta; if (q < 0) q = 0;
+  try {
+    await SB.del('poll_votes', 'session_id=eq.' + encodeURIComponent(plSession.id) + '&voter_emp_id=eq.' + encodeURIComponent(me) + '&option_id=eq.' + encodeURIComponent(optionId));
+    plVotes = plVotes.filter(v => !(v.voter_emp_id === me && v.option_id === optionId));
+    if (q > 0) { const row = plNewVoteRow(optionId); row.quantity = q; await SB.post('poll_votes', row); plVotes.push(row); }
+    plRenderRoom();
+  } catch (e) { boardToast('更新失敗：' + (e.message || e)); await plFetch(); plRenderRoom(); }
+}
+async function plSaveComment() {
+  if (!plSession || !PORTAL_SESSION) return;
+  const box = document.getElementById('pl-comment-box'); const text = (box.value || '').trim();
+  if (!text) { boardToast('請先輸入意見'); return; }
+  const me = PORTAL_SESSION.empId;
+  const mine = plComments.find(c => c.voter_emp_id === me);
+  try {
+    if (mine) { await SB.patch('poll_comments', 'id=eq.' + encodeURIComponent(mine.id), { text }); mine.text = text; }
+    else { const row = { id: uid(), session_id: plSession.id, voter_emp_id: me, voter_name: PORTAL_SESSION.nameZh || PORTAL_SESSION.nameEn || me, text, created_at: new Date().toISOString() }; await SB.post('poll_comments', row); plComments.push(row); }
+    plRenderRoom(); boardToast('已送出');
+  } catch (e) { boardToast('送出失敗：' + (e.message || e)); }
 }
 function plPollStart() { plPollStop(); plPollTimer = setInterval(plPollTick, 7000); }
 function plPollStop() { if (plPollTimer) { clearInterval(plPollTimer); plPollTimer = null; } }
-function plSig() { return (plSession ? plSession.status : '') + '|' + plVotes.map(v => v.voter_emp_id + ':' + v.option_id).sort().join(',') + '|' + plOptions.map(o => o.id).join(','); }
+function plSig() { return (plSession ? plSession.status : '') + '|' + plVotes.map(v => v.voter_emp_id + ':' + v.option_id + ':' + (v.quantity || 1)).sort().join(',') + '|' + plOptions.map(o => o.id).join(',') + '|' + plComments.map(c => c.id + ':' + (c.text || '').length).join(','); }
 async function plPollTick() {
   if (!plSession || !document.getElementById('tabpanel-poll').classList.contains('on')) return;
   const before = plSig();

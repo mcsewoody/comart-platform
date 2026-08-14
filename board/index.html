@@ -5,7 +5,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#080C14">
-<title>COMART · 公告與紀錄 v1.52</title>
+<title>COMART · 公告與紀錄 v1.53</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -222,7 +222,7 @@ select,select option,option{background:var(--s2);color:var(--tx)}
     <a class="logo" href="javascript:void(0)">
       <div class="logo-mark">告</div>
       <div class="logo-text" data-i18n="app_title">公告與紀錄</div>
-      <span class="logo-ver">v1.52</span>
+      <span class="logo-ver">v1.53</span>
     </a>
     <div class="topbar-right">
       <div id="langChips" style="display:flex;gap:4px"></div>
@@ -625,6 +625,18 @@ select,select option,option{background:var(--s2);color:var(--tx)}
               <input id="pl-c-bg-file" type="file" accept="image/*" multiple onchange="plBgAdd(this)" style="font-size:12px;color:var(--tx3)"></div>
             <div class="field"><label>選項（每項可按 🖼 配一張圖）</label><div id="pl-c-options" style="display:flex;flex-direction:column;gap:6px"></div>
               <button class="btn ghost sm" style="align-self:flex-start;margin-top:6px" onclick="plAddOptionRow()">＋ 新增選項</button></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+              <div class="field"><label>投票方式</label>
+                <select id="pl-c-multi" onchange="document.getElementById('pl-c-cap-wrap').style.display=this.value==='1'?'':'none'">
+                  <option value="0">單選</option><option value="1">複選</option>
+                </select></div>
+              <div class="field" id="pl-c-cap-wrap" style="display:none"><label>複選上限（留空＝不限）</label><input id="pl-c-cap" type="number" min="1" placeholder="例如 3"></div>
+              <div class="field"><label>記名方式</label>
+                <select id="pl-c-anon"><option value="0">記名（顯示誰投哪項）</option><option value="1">匿名（只計票數）</option></select></div>
+              <div class="field"><label>結果可見</label>
+                <select id="pl-c-reveal"><option value="live">即時可見</option><option value="closed">截止後才揭曉</option></select></div>
+            </div>
+            <div class="field"><label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:400"><input type="checkbox" id="pl-c-decision" style="width:auto"> 決策模式（截止後自動標示最高票為「勝出」）</label></div>
             <div class="field"><label>開放參與範圍</label>
               <select id="pl-c-scope" onchange="plScopeChanged()">
                 <option value="all">全公司</option>
@@ -4865,6 +4877,12 @@ function plNewSession() {
   document.getElementById('pl-c-options').innerHTML = '';
   plAddOptionRow(); plAddOptionRow();
   plBgImages = []; plRenderBgThumbs();
+  document.getElementById('pl-c-multi').value = '0';
+  document.getElementById('pl-c-cap').value = '';
+  document.getElementById('pl-c-cap-wrap').style.display = 'none';
+  document.getElementById('pl-c-anon').value = '0';
+  document.getElementById('pl-c-reveal').value = 'live';
+  document.getElementById('pl-c-decision').checked = false;
   plScopeChanged();
   plShowView('create');
 }
@@ -4908,6 +4926,11 @@ async function plCreateSubmit() {
     id: sid, title,
     description: document.getElementById('pl-c-desc').value.trim(),
     bg_images: plBgImages.slice(),
+    multi: document.getElementById('pl-c-multi').value === '1',
+    multi_cap: (document.getElementById('pl-c-multi').value === '1' && document.getElementById('pl-c-cap').value) ? parseInt(document.getElementById('pl-c-cap').value, 10) : null,
+    anonymous: document.getElementById('pl-c-anon').value === '1',
+    reveal: document.getElementById('pl-c-reveal').value,
+    decision_mode: document.getElementById('pl-c-decision').checked,
     scope_type: scope,
     scope_site: scope === 'site' ? document.getElementById('pl-c-site').value : null,
     scope_members: members,
@@ -4956,18 +4979,31 @@ async function plMaybeAutoClose() {
     try { await SB.patch('poll_sessions', 'id=eq.' + encodeURIComponent(plSession.id), { status: 'closed', updated_at: new Date().toISOString() }); } catch (e) {}
   }
 }
+function plNewVoteRow(optionId) {
+  const me = PORTAL_SESSION.empId;
+  return { id: uid(), session_id: plSession.id, option_id: optionId, voter_emp_id: me, voter_name: PORTAL_SESSION.nameZh || PORTAL_SESSION.nameEn || me, quantity: 1, created_at: new Date().toISOString(), updated_at: new Date().toISOString() };
+}
 async function plVote(optionId) {
   if (!plSession || !PORTAL_SESSION) return;
   if (plClosed()) { boardToast('投票已結束'); return; }
   const me = PORTAL_SESSION.empId;
-  const already = plVotes.some(v => v.voter_emp_id === me && v.option_id === optionId);
+  const mine = plVotes.filter(v => v.voter_emp_id === me);
+  const has = mine.some(v => v.option_id === optionId);
   try {
-    await SB.del('poll_votes', 'session_id=eq.' + encodeURIComponent(plSession.id) + '&voter_emp_id=eq.' + encodeURIComponent(me));
-    plVotes = plVotes.filter(v => v.voter_emp_id !== me);
-    if (!already) {
-      const row = { id: uid(), session_id: plSession.id, option_id: optionId, voter_emp_id: me, voter_name: PORTAL_SESSION.nameZh || PORTAL_SESSION.nameEn || me, quantity: 1, created_at: new Date().toISOString(), updated_at: new Date().toISOString() };
-      await SB.post('poll_votes', row);
-      plVotes.push(row);
+    if (plSession.multi) {
+      // 複選：逐項切換，受上限限制
+      if (has) {
+        await SB.del('poll_votes', 'session_id=eq.' + encodeURIComponent(plSession.id) + '&voter_emp_id=eq.' + encodeURIComponent(me) + '&option_id=eq.' + encodeURIComponent(optionId));
+        plVotes = plVotes.filter(v => !(v.voter_emp_id === me && v.option_id === optionId));
+      } else {
+        if (plSession.multi_cap && mine.length >= plSession.multi_cap) { boardToast('最多選 ' + plSession.multi_cap + ' 項'); return; }
+        const row = plNewVoteRow(optionId); await SB.post('poll_votes', row); plVotes.push(row);
+      }
+    } else {
+      // 單選：先清自己的票，再投一張（點原本那項＝取消）
+      await SB.del('poll_votes', 'session_id=eq.' + encodeURIComponent(plSession.id) + '&voter_emp_id=eq.' + encodeURIComponent(me));
+      plVotes = plVotes.filter(v => v.voter_emp_id !== me);
+      if (!has) { const row = plNewVoteRow(optionId); await SB.post('poll_votes', row); plVotes.push(row); }
     }
     plRenderRoom();
   } catch (e) { boardToast('投票失敗：' + (e.message || e)); await plFetch(); plRenderRoom(); }
@@ -4992,32 +5028,39 @@ function plRenderRoom() {
   if (plIsCreator(s)) a += plClosed() ? '<button class="btn sm" onclick="plReopenSession()">↻ 重新開放</button>' : '<button class="btn sm" onclick="plCloseSession()">■ 結束投票</button>';
   acts.innerHTML = a;
 
-  const myV = plMyVote();
+  const me = PORTAL_SESSION && PORTAL_SESSION.empId;
+  const myChosen = {}; plVotes.forEach(v => { if (v.voter_emp_id === me) myChosen[v.option_id] = true; });
   const total = new Set(plVotes.map(v => v.voter_emp_id)).size;
-  const cnt = {}; plVotes.forEach(v => { cnt[v.option_id] = (cnt[v.option_id] || 0) + 1; });
+  const cnt = {}; const voters = {}; plVotes.forEach(v => { cnt[v.option_id] = (cnt[v.option_id] || 0) + 1; (voters[v.option_id] = voters[v.option_id] || []).push(v.voter_name || v.voter_emp_id); });
   const maxc = Math.max(1, ...plOptions.map(o => cnt[o.id] || 0));
+  const showCounts = !(s.reveal === 'closed' && !plClosed());
+  const winMax = (s.decision_mode && plClosed()) ? Math.max(0, ...plOptions.map(o => cnt[o.id] || 0)) : -1;
   const bg = Array.isArray(s.bg_images) ? s.bg_images : [];
   const bgHtml = bg.length ? '<div style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0">' + bg.map(u => '<a href="' + escHtml(u) + '" target="_blank" rel="noopener"><img src="' + escHtml(u) + '" style="max-width:180px;max-height:140px;border-radius:8px;border:1px solid var(--br);object-fit:cover"></a>').join('') + '</div>' : '';
+  const modeTag = s.multi ? ('複選' + (s.multi_cap ? '，最多 ' + s.multi_cap + ' 項' : '')) : '單選';
   let html = '<div class="panel"><div class="panel-h"><span class="idx">🗳</span><h2>' + escHtml(s.title || '(未命名)') + '</h2></div><div class="panel-b">' +
     (s.description ? '<div style="font-size:13.5px;white-space:pre-wrap;margin-bottom:6px">' + escHtml(s.description) + '</div>' : '') + bgHtml +
-    '<div style="font-size:12px;color:var(--tx3)">發起：' + escHtml(s.creator_name || '—') + '　範圍：' + escHtml(plScopeText(s)) + (s.close_at ? '　截止：' + escHtml(plFmtDt(s.close_at)) : '') + '</div></div></div>';
-  html += '<div class="panel"><div class="panel-h"><span class="idx">✔</span><h2>' + (plClosed() ? '投票結果' : '請投票（單選）') + '</h2><span class="sub">' + total + ' 人已投</span></div><div class="panel-b">';
+    '<div style="font-size:12px;color:var(--tx3)">發起：' + escHtml(s.creator_name || '—') + '　範圍：' + escHtml(plScopeText(s)) + '　' + modeTag + '　' + (s.anonymous ? '匿名' : '記名') + (s.close_at ? '　截止：' + escHtml(plFmtDt(s.close_at)) : '') + '</div></div></div>';
+  html += '<div class="panel"><div class="panel-h"><span class="idx">✔</span><h2>' + (plClosed() ? '投票結果' : ('請投票（' + modeTag + '）')) + '</h2><span class="sub">' + total + ' 人已投</span></div><div class="panel-b">';
+  if (!showCounts) html += '<div class="hint" style="margin-bottom:8px">🔒 結果將於截止後才揭曉；你仍可先投票（截止前可改）。</div>';
   html += plOptions.map(o => {
     const c = cnt[o.id] || 0;
     const pct = total ? Math.round(c / total * 100) : 0;
-    const chosen = myV && myV.option_id === o.id;
-    const barW = Math.round((c / maxc) * 100);
+    const chosen = !!myChosen[o.id];
+    const win = winMax >= 0 && c === winMax && c > 0;
+    const barW = showCounts ? Math.round((c / maxc) * 100) : 0;
     const clickable = !plClosed();
-    return '<div ' + (clickable ? 'onclick="plVote(\'' + o.id + '\')"' : '') + ' style="border:1px solid ' + (chosen ? 'var(--ac)' : 'var(--br)') + ';border-radius:9px;padding:10px 12px;margin-bottom:8px;background:var(--s2);' + (clickable ? 'cursor:pointer' : '') + ';position:relative;overflow:hidden">' +
+    const nameList = (!s.anonymous && showCounts && (voters[o.id] || []).length) ? '<div style="font-size:11px;color:var(--tx3);margin-top:5px;padding-left:28px">' + (voters[o.id] || []).map(escHtml).join('、') + '</div>' : '';
+    return '<div ' + (clickable ? 'onclick="plVote(\'' + o.id + '\')"' : '') + ' style="border:1px solid ' + (win ? 'var(--grn,#4caf50)' : (chosen ? 'var(--ac)' : 'var(--br)')) + ';border-radius:9px;padding:10px 12px;margin-bottom:8px;background:var(--s2);' + (clickable ? 'cursor:pointer' : '') + ';position:relative;overflow:hidden">' +
       '<div style="position:absolute;left:0;top:0;bottom:0;width:' + barW + '%;background:' + (chosen ? 'rgba(45,127,249,.20)' : 'rgba(255,255,255,.05)') + ';transition:width .4s"></div>' +
       '<div style="position:relative;display:flex;align-items:center;gap:10px">' +
-      '<div style="width:18px;flex-shrink:0">' + (chosen ? '●' : '○') + '</div>' +
+      '<div style="width:18px;flex-shrink:0">' + (chosen ? (s.multi ? '☑' : '●') : (s.multi ? '☐' : '○')) + '</div>' +
       (o.image_url ? '<img src="' + escHtml(o.image_url) + '" onclick="event.stopPropagation();window.open(this.src)" style="width:44px;height:44px;object-fit:cover;border-radius:6px;border:1px solid var(--br);flex-shrink:0;cursor:zoom-in">' : '') +
-      '<div style="flex:1;min-width:0;font-size:14px">' + escHtml(o.label || '') + '</div>' +
-      '<div style="flex-shrink:0;font-size:13px;color:var(--tx3);white-space:nowrap">' + c + ' 票 · ' + pct + '%</div>' +
-      '</div></div>';
+      '<div style="flex:1;min-width:0;font-size:14px">' + escHtml(o.label || '') + (win ? ' <span style="color:var(--grn,#4caf50);font-weight:700">🏆 勝出</span>' : '') + '</div>' +
+      (showCounts ? '<div style="flex-shrink:0;font-size:13px;color:var(--tx3);white-space:nowrap">' + c + ' 票 · ' + pct + '%</div>' : '') +
+      '</div>' + nameList + '</div>';
   }).join('');
-  html += (plClosed() ? '' : '<div class="hint" style="margin-top:4px">點選項即投票；再點一次可取消。截止前可改。</div>') + '</div></div>';
+  html += (plClosed() ? '' : '<div class="hint" style="margin-top:4px">' + (s.multi ? ('點選項可多選' + (s.multi_cap ? '（最多 ' + s.multi_cap + ' 項）' : '') + '，再點一次取消。') : '點選項即投票；再點一次可取消。') + '截止前可改。</div>') + '</div></div>';
   document.getElementById('pl-room-body').innerHTML = html;
 }
 function plPollStart() { plPollStop(); plPollTimer = setInterval(plPollTick, 7000); }

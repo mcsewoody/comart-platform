@@ -5,7 +5,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#080C14">
-<title>COMART · 公告與紀錄 v1.59</title>
+<title>COMART · 公告與紀錄 v1.60</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -222,7 +222,7 @@ select,select option,option{background:var(--s2);color:var(--tx)}
     <a class="logo" href="javascript:void(0)">
       <div class="logo-mark">告</div>
       <div class="logo-text" data-i18n="app_title">公告與紀錄</div>
-      <span class="logo-ver">v1.59</span>
+      <span class="logo-ver">v1.60</span>
     </a>
     <div class="topbar-right">
       <div id="langChips" style="display:flex;gap:4px"></div>
@@ -811,6 +811,9 @@ const B_I18N = {
   pm_you_voted:'你已投 {n}／{cap} 票', pm_ai_cluster:'🤖 AI 分群',
   pm_ai_cluster_hint:'把相似的{item}自動歸類成主題（可再按重跑）',
   pm_vote_cap_hint:'（每人最多 {cap} 票）。', pm_by_votes:'（依票數）',
+  pm_vote_progress:'投票進度：{done}／{total} 人已投完',
+  pm_vote_auto_hint:'全員投完後會自動進入「{next}」。',
+  pm_auto_advance:'全員已投完，自動進入「{next}」',
   pm_mit_sub:'{measure}／負責人／期限', pm_ai_summary:'AI 評論與總結',
   pm_sum_sub:'補發想 · 補{mit} · 會議結論', pm_chair_editing:'主席修訂中',
   pm_regen:'↻ 重新生成', pm_edit:'✎ 編輯', pm_owner:'負責人', pm_due:'期限',
@@ -961,6 +964,9 @@ const B_I18N = {
   pm_you_voted:'你已投 {n}／{cap} 票', pm_ai_cluster:'🤖 AI 分群',
   pm_ai_cluster_hint:'把相似的{item}自动归类成主题（可再按重跑）',
   pm_vote_cap_hint:'（每人最多 {cap} 票）。', pm_by_votes:'（依票数）',
+  pm_vote_progress:'投票进度：{done}／{total} 人已投完',
+  pm_vote_auto_hint:'全员投完后会自动进入「{next}」。',
+  pm_auto_advance:'全员已投完，自动进入「{next}」',
   pm_mit_sub:'{measure}／负责人／期限', pm_ai_summary:'AI 评论与总结',
   pm_sum_sub:'补发想 · 补{mit} · 会议结论', pm_chair_editing:'主席修订中',
   pm_regen:'↻ 重新生成', pm_edit:'✎ 编辑', pm_owner:'负责人', pm_due:'期限',
@@ -1111,6 +1117,9 @@ const B_I18N = {
   pm_you_voted:'You have used {n}/{cap} votes', pm_ai_cluster:'🤖 AI clustering',
   pm_ai_cluster_hint:'Group similar {item} into themes (press again to re-run)',
   pm_vote_cap_hint:' (up to {cap} votes each).', pm_by_votes:' (by votes)',
+  pm_vote_progress:'Voting progress: {done}/{total} people finished',
+  pm_vote_auto_hint:'Moves on to “{next}” automatically once everyone has voted.',
+  pm_auto_advance:'Everyone has voted — moving on to “{next}”',
   pm_mit_sub:'{measure} / owner / due date', pm_ai_summary:'AI review & conclusion',
   pm_sum_sub:'Added ideas · added {mit} · conclusion', pm_chair_editing:'Chair is editing',
   pm_regen:'↻ Regenerate', pm_edit:'✎ Edit', pm_owner:'Owner', pm_due:'Due',
@@ -1261,6 +1270,9 @@ const B_I18N = {
   pm_you_voted:'Bạn đã dùng {n}/{cap} phiếu', pm_ai_cluster:'🤖 Phân nhóm bằng AI',
   pm_ai_cluster_hint:'Tự gom các {item} tương tự thành chủ đề (bấm lại để chạy lại)',
   pm_vote_cap_hint:' (tối đa {cap} phiếu mỗi người).', pm_by_votes:' (theo số phiếu)',
+  pm_vote_progress:'Tiến độ bỏ phiếu: {done}/{total} người đã xong',
+  pm_vote_auto_hint:'Sẽ tự động chuyển sang “{next}” khi mọi người bỏ phiếu xong.',
+  pm_auto_advance:'Mọi người đã bỏ phiếu xong — tự động chuyển sang “{next}”',
   pm_mit_sub:'{measure} / người phụ trách / hạn', pm_ai_summary:'Nhận xét & kết luận của AI',
   pm_sum_sub:'Bổ sung ý tưởng · bổ sung {mit} · kết luận', pm_chair_editing:'Chủ tọa đang sửa',
   pm_regen:'↻ Tạo lại', pm_edit:'✎ Sửa', pm_owner:'Người phụ trách', pm_due:'Hạn',
@@ -1411,6 +1423,9 @@ const B_I18N = {
   pm_you_voted:'{n}／{cap} 票を使用', pm_ai_cluster:'🤖 AI 分類',
   pm_ai_cluster_hint:'似た{item}を自動でテーマに分類します（再度押すと再実行）',
   pm_vote_cap_hint:'（1人最大 {cap} 票）。', pm_by_votes:'（得票順）',
+  pm_vote_progress:'投票状況：{done}／{total} 名が投票完了',
+  pm_vote_auto_hint:'全員の投票が終わると自動的に「{next}」へ進みます。',
+  pm_auto_advance:'全員の投票が完了しました。「{next}」へ進みます',
   pm_mit_sub:'{measure}／担当者／期限', pm_ai_summary:'AI 講評と総括',
   pm_sum_sub:'発想の補完 · {mit}の補強 · 会議結論', pm_chair_editing:'司会が修正中',
   pm_regen:'↻ 再生成', pm_edit:'✎ 編集', pm_owner:'担当者', pm_due:'期限',
@@ -3737,6 +3752,7 @@ let pmPollTimer = null;
 let pmDraft = '';          // 填寫中的草稿（輪詢重繪時保留）
 let pmSrcLang = '';        // 填寫者選的來源語言（重繪時保留）
 let pmRetrying = false;    // 背景補翻防重入
+let pmAutoAdvanced = false; // 本場已自動推進過排序→對策（見 pmMaybeAutoAdvance），退回排序時解除
 let pmIntroLang = '';      // 說明頁顯示語言
 let pmMitigations = [];    // 目前 session 的對策清單
 let pmCreating = false;    // 建會防重入：建立要等翻譯，連按會建出多場空會議
@@ -4364,6 +4380,7 @@ async function pmOpen(id) {
   pmBiDraft = { desc:{ a:null, b:null }, scenario:{ a:null, b:null } };
   pmSumEditing = false; pmSumDraft = { a: null, b: null };
   pmMeetEditing = false; pmMeetDraft = { at: null, loc: null, att: null };
+  pmAutoAdvanced = false; pmPendingRender = false; pmInputSnap = null;
   pmSrcLang = pmPortalLang();
   await pmFetchEntries();
   await pmFetchMitigations();
@@ -4396,7 +4413,7 @@ async function pmPollTick() {
   const shell = document.getElementById('pm-shell');
   if (!pmSession || !shell || !shell.parentNode || !shell.parentNode.classList.contains('on')) return;
   if (pmSumGenerating || pmSumEditing || pmMeetEditing) return;   // 產生中／編輯中不輪詢：免得蓋回 null 或把主席打的字弄掉
-  const before = pmSig();
+  const before = pmSig(), phBefore = pmSession.phase;
   // 取整列（select=*）而不逐一列欄位：欄位一多就容易漏，且 migration 尚未跑完時不會整個 poll 掛掉
   const rows = await SB.get('premortem_sessions', '?id=eq.' + encodeURIComponent(pmSession.id) + '&select=*');
   if (rows && rows[0]) {
@@ -4408,7 +4425,9 @@ async function pmPollTick() {
   }
   await pmFetchEntries();
   await pmFetchMitigations();
-  if (pmSig() !== before) { pmSaveDraft(); pmRenderRoom(); pmRestoreDraft(); }
+  // 階段換了一定要立刻重畫（畫面內容整個不同），其餘變動則讓 pmRerender 判斷是否該讓路給正在打字的人
+  if (pmSig() !== before) pmRerender(pmSession.phase !== phBefore);
+  pmMaybeAutoAdvance();
   pmRetryTranslations();
 }
 // 主席端背景補翻：把翻譯失敗（text_a/text_b 空）的條目與標頭補上並寫回；失敗達3次就停
@@ -4426,11 +4445,74 @@ async function pmRetryTranslations() {
         catch (err) { e._trFails = (e._trFails || 0) + 1; }
       }
     }
-    if (changed) pmRenderRoom();
+    if (changed) pmRerender(false);
   } finally { pmRetrying = false; }
 }
 function pmSaveDraft() { const el = document.getElementById('pm-writebox'); if (el) pmDraft = el.value; }
 function pmRestoreDraft() { const el = document.getElementById('pm-writebox'); if (el && pmDraft) el.value = pmDraft; }
+
+// ── 重繪時不要把正在打字的人踢出輸入框（v1.60）──
+// 會議室是整塊 innerHTML 重畫的：別人一送出內容／一則譯文補完，輪詢就把 DOM 換掉，
+// 正在打對策或填寫框的人游標會彈掉、中文輸入法組字到一半會被砍斷。兩道防線：
+//   ① 正在輸入文字時直接延後重繪（pmRerender），等他離開輸入框再畫；
+//   ② 非延後不可的重繪（階段變更）則先快照所有欄位值＋焦點＋游標位置，畫完立刻還原。
+let pmInputSnap = null, pmPendingRender = false;
+function pmTypingEl() {
+  const a = document.activeElement, body = document.getElementById('pm-room-body');
+  if (!a || !body || !body.contains(a)) return null;
+  if (a.tagName === 'TEXTAREA') return a;
+  if (a.tagName === 'INPUT' && ['text','search','url','email','number',''].indexOf(a.type || '') >= 0) return a;
+  return null;
+}
+function pmRerender(force) {
+  const typing = force ? null : pmTypingEl();
+  if (typing) {
+    pmPendingRender = true;
+    // 一次性 blur：離開輸入框就把積欠的重繪補上（元素會被下次重繪換掉，once 不會殘留）
+    if (!typing._pmBlurHook) {
+      typing._pmBlurHook = 1;
+      typing.addEventListener('blur', function () { if (pmPendingRender) pmRerender(false); }, { once: true });
+    }
+    return;
+  }
+  pmPendingRender = false;
+  pmSnapInputs();
+  pmRenderRoom();   // 尾端會呼叫 pmApplyInputSnap() 還原
+}
+function pmSnapInputs() {
+  const body = document.getElementById('pm-room-body');
+  if (!body) { pmInputSnap = null; return; }
+  const snap = { vals: {}, focus: null, sel: null, y: window.scrollY };
+  body.querySelectorAll('input[id],textarea[id],select[id]').forEach(n => {
+    if (n.type === 'file' || n.type === 'checkbox' || n.type === 'radio') return;
+    snap.vals[n.id] = n.value;
+  });
+  const a = document.activeElement;
+  if (a && a.id && Object.prototype.hasOwnProperty.call(snap.vals, a.id)) {
+    snap.focus = a.id;
+    if (typeof a.selectionStart === 'number') { try { snap.sel = [a.selectionStart, a.selectionEnd]; } catch (e) {} }
+  }
+  pmInputSnap = snap;
+}
+function pmApplyInputSnap() {
+  const snap = pmInputSnap; pmInputSnap = null;
+  if (!snap) return;
+  Object.keys(snap.vals).forEach(id => {
+    const n = document.getElementById(id), v = snap.vals[id];
+    if (!n || v === '' || v == null) return;   // 空值不覆寫：免得蓋掉重繪後才算出來的預設值（如對策期限）
+    if (n.tagName === 'SELECT') { if (Array.prototype.some.call(n.options, o => o.value === v)) n.value = v; }
+    else if (n.value !== v) n.value = v;
+  });
+  if (snap.vals['pm-mit-risk-sel']) { try { pmMitRiskChanged(); } catch (e) {} }
+  if (snap.focus) {
+    const n = document.getElementById(snap.focus);
+    if (n) {
+      try { n.focus({ preventScroll: true }); } catch (e) { try { n.focus(); } catch (x) {} }
+      if (snap.sel && typeof n.setSelectionRange === 'function') { try { n.setSelectionRange(snap.sel[0], snap.sel[1]); } catch (e) {} }
+    }
+  }
+  if (typeof snap.y === 'number' && Math.abs(window.scrollY - snap.y) > 1) window.scrollTo(0, snap.y);
+}
 
 // ── 主席階段控制列 ──
 function pmRenderPhasebar() {
@@ -4469,6 +4551,8 @@ async function pmSetPhase(p) {
   pmSession.phase = p; pmRenderRoom();
   try { await SB.patch('premortem_sessions', 'id=eq.' + encodeURIComponent(pmSession.id), { phase: p, updated_at: new Date().toISOString() }); }
   catch (e) { pmSession.phase = prev; pmRenderRoom(); boardToast(BT('pm_phase_fail') + (e.message || e)); return; }
+  // 手動退回排序階段（讓晚到的人補投）時重新武裝自動推進；自動推進本身走的是 p='mitigation'，不會誤觸
+  if (p === 'ranking') pmAutoAdvanced = false;
   // 定稿：先鎖定（快、確定成功），再背景產生 AI 結論——AI 失敗也不會讓定稿卡住
   if (p === 'locked' && !pmSession.ai_summary) pmGenSummary(false);
 }
@@ -4557,8 +4641,12 @@ function pmRenderRoom() {
       '<div class="panel-b">' + (pmEntries.length ? pmEntries.map(e => pmEntryHtml(e, false, true, 0)).join('') : '<div class="empty-note">' + escHtml(BT('pm_no_content')) + '</div>') +
       '<div class="hint" style="margin-top:8px">' + escHtml(BT('pm_reveal_hint', { ranking: pmPhaseLabel('ranking') })) + '</div></div></div>';
   } else if (s.phase === 'ranking') {
-    const mine = pmMyVoteCount();
-    html += '<div class="panel"><div class="panel-h"><span class="idx">▤</span><h2>' + escHtml(pmPhaseLabel('ranking')) + '</h2><span class="sub">' + escHtml(BT('pm_you_voted', { n: mine, cap: pmVoteCap() })) + '</span></div><div class="panel-b">' +
+    const mine = pmMyVoteCount(), vp = pmVoteProgress();
+    // 投票進度只給數字、不給名字（畫面上從不顯示投票人）。全員投滿時主席端會自動推進到下一階段。
+    const prog = vp.total ? '<div style="background:var(--s1);border:1px solid var(--br);border-radius:8px;padding:8px 10px;margin-bottom:10px;font-size:12px;line-height:1.7">' +
+      escHtml(BT('pm_vote_progress', { done: vp.done, total: vp.total })) +
+      '<div style="color:var(--tx3);font-size:11px">' + escHtml(BT('pm_vote_auto_hint', { next: pmPhaseLabel('mitigation') })) + '</div></div>' : '';
+    html += '<div class="panel"><div class="panel-h"><span class="idx">▤</span><h2>' + escHtml(pmPhaseLabel('ranking')) + '</h2><span class="sub">' + escHtml(BT('pm_you_voted', { n: mine, cap: pmVoteCap() })) + '</span></div><div class="panel-b">' + prog +
       (chair ? '<div style="margin-bottom:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center"><button class="btn sm" onclick="pmAiCluster()">' + escHtml(BT('pm_ai_cluster')) + '</button><span style="font-size:11px;color:var(--tx3)">' + escHtml(BT('pm_ai_cluster_hint', { item: T.item })) + '</span></div>' : '') +
       '<div class="hint" style="margin-bottom:8px">' + escHtml(T.voteHint + BT('pm_vote_cap_hint', { cap: pmVoteCap() })) + '</div>' +
       (pmEntries.length ? pmGroupedHtml(1) : '<div class="empty-note">' + escHtml(BT('pm_no_content')) + '</div>') + '</div></div>';
@@ -4584,6 +4672,7 @@ function pmRenderRoom() {
   }
   body.innerHTML = html;
   pmRestoreDraft();
+  pmApplyInputSnap();   // 還原重繪前的欄位值／焦點／游標（只有 pmRerender 走過快照時才有東西可還原）
 }
 
 function pmLangCellHtml(label, txt, pending) {
@@ -4718,7 +4807,43 @@ async function pmToggleVote(id) {
   voters = has ? voters.filter(x => x !== me) : voters.concat([me]);
   e.voters = voters; pmRenderRoom();
   try { await SB.patch('premortem_entries', 'id=eq.' + encodeURIComponent(id), { voters, updated_at: new Date().toISOString() }); }
-  catch (err) { boardToast(BT('pm_vote_failed') + (err.message || err)); }
+  catch (err) { boardToast(BT('pm_vote_failed') + (err.message || err)); return; }
+  pmMaybeAutoAdvance();   // 自己這一票可能就是最後一票
+}
+
+// ── 全員投滿自動進入下一階段（v1.60）──
+// 每個人都把票投完了還要等主席按鍵，是白等：票數已成定局，再等只是延遲會議。
+// 🔴 只有主席的瀏覽器能真的推進階段 —— sb-proxy 的欄位守衛規定 PATCH phase 必須是該場主席本人，
+//    其他人送出去只會拿到 403。所以判斷雖然人人都算得出來（用來顯示進度），動作只由主席端發出。
+function pmVotesUsedBy(id) { return pmEntries.filter(e => Array.isArray(e.voters) && e.voters.indexOf(id) >= 0).length; }
+// 應投票的人：指定人員場次用名單；全公司／中心無法列舉，改以「實際有填寫內容的人」為準（＝真正到場的人）。
+// 主席一律計入（範圍內所有人含主席都可填寫、也都可投票）。
+function pmVoterRoster() {
+  const s = pmSession; if (!s) return [];
+  const ids = [], push = id => { if (id && ids.indexOf(id) < 0) ids.push(id); };
+  if (s.scope_type === 'list') (s.scope_members || []).forEach(push);
+  else pmEntries.forEach(e => push(e.author_emp_id));
+  push(s.chair_emp_id);
+  return ids;
+}
+// 條目數比票數上限少時沒人投得滿，實際上限以條目數為準（3 票上限但只有 2 則 → 投 2 則就算投完）
+function pmEffVoteCap() { return Math.min(pmVoteCap(), pmEntries.length); }
+function pmVoteProgress() {
+  const roster = pmVoterRoster(), cap = pmEffVoteCap();
+  return { done: cap > 0 ? roster.filter(id => pmVotesUsedBy(id) >= cap).length : 0, total: roster.length, cap };
+}
+function pmAllVotesIn() {
+  const p = pmVoteProgress();
+  return p.cap > 0 && p.total > 0 && p.done >= p.total;
+}
+async function pmMaybeAutoAdvance() {
+  if (!pmSession || pmSession.phase !== 'ranking' || !pmIsChair(pmSession)) return;
+  if (pmAutoAdvanced || !pmAllVotesIn()) return;
+  // 旗標先立起來：失敗也不重試（否則每 7 秒跳一次失敗提示），主席仍可自己按階段鈕。
+  // 主席若手動退回排序階段（要讓晚到的人補投），pmSetPhase 會把旗標重新解除。
+  pmAutoAdvanced = true;
+  boardToast(BT('pm_auto_advance', { next: pmPhaseLabel('mitigation') }));
+  await pmSetPhase('mitigation');
 }
 
 // ── AI 分群（主席，排序階段）──

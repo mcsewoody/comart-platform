@@ -263,6 +263,21 @@ The portal supports EN, 繁中, 简中, VI, 日 via `setLang(lang)`. Each langua
     必須是該場主席本人（比對簽章 empId 與 `chair_emp_id`）；`chair_emp_id`／`created_by` 完全禁改；
     取不到 `?id=eq.<id>` 一律拒絕（不猜其他 filter 的語意），查詢失敗也拒絕（fail-closed）
 - 多人同步靠輪詢：`pmPollStart()` 每 7 秒抓一次 phase 與 entries；離開頁籤即 `pmPollStop()`
+  - 🔴 **輪詢重繪一律走 `pmRerender(force)`，不要直接呼叫 `pmRenderRoom()`**（v1.60）。
+    會議室是整塊 `innerHTML` 重畫的，別人一送出內容、一則譯文補完就重畫，正在打字的人游標會彈掉、
+    **中文輸入法組字到一半會被砍斷**。兩道防線：① 使用者焦點在 textarea／文字 input 時直接延後重繪
+    （`pmPendingRender`，掛一次性 `blur` 補畫）；② 非畫不可時（階段變更 `force=true`）先 `pmSnapInputs()`
+    快照所有欄位值＋焦點＋游標＋捲動位置，`pmRenderRoom()` 尾端 `pmApplyInputSnap()` 還原。
+    快照**空值不覆寫**，否則會蓋掉重繪後才算出來的預設值（對策期限）
+- **排序階段全員投滿票會自動進入對策階段**（v1.60，`pmMaybeAutoAdvance`）：票數已成定局，再等主席按鍵只是延遲會議
+  - 🔴 **動作只由主席端發出** —— sb-proxy 欄位守衛規定 PATCH `phase` 必須是該場主席本人，別人送出去只會 403。
+    判斷邏輯人人都算得出來（用來顯示進度條），但 `pmSetPhase` 只有主席會呼叫
+  - 應投票的人（`pmVoterRoster`）：`scope_type='list'` 用 `scope_members`；全公司／中心無法列舉，
+    改以**實際有填寫內容的人**為準（＝真正到場的人）。主席一律計入
+  - 實際票數上限取 `min(voteCap, pmEntries.length)`：只有 2 則條目時沒人投得滿 3 票，否則永遠不會觸發
+  - `pmAutoAdvanced` 旗標一場只自動推進一次（失敗也不重試，免得每 7 秒跳一次失敗提示）；
+    主席手動退回排序階段（讓晚到的人補投）時 `pmSetPhase` 會重新武裝
+  - 進度條 `pm_vote_progress` **只給數字不給名字**，維持「畫面上從不顯示投票人」
 - 定稿可輸出四種格式（PDF／PNG／Excel／Email），皆為雙語版面
 
 新增 `premortem_*` 之類的新表時，記得同步加進 sb-proxy 的 `ALLOWED_TABLES` 白名單，否則前端一律 403。

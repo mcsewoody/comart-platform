@@ -5,7 +5,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#080C14">
-<title>COMART · 公告與紀錄 v1.56</title>
+<title>COMART · 公告與紀錄 v1.57</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -222,7 +222,7 @@ select,select option,option{background:var(--s2);color:var(--tx)}
     <a class="logo" href="javascript:void(0)">
       <div class="logo-mark">告</div>
       <div class="logo-text" data-i18n="app_title">公告與紀錄</div>
-      <span class="logo-ver">v1.56</span>
+      <span class="logo-ver">v1.57</span>
     </a>
     <div class="topbar-right">
       <div id="langChips" style="display:flex;gap:4px"></div>
@@ -1877,6 +1877,28 @@ async function notifyRecipients(recipients, fromName, title, body) {
 }
 
 // ═══════════════════════════════════════════════
+// 離開網頁前，未存檔提醒（週會紀錄／業務會議記錄／Woody 週報）
+// 只要三個編輯器內有「尚未按儲存」的變更，關閉分頁或重新整理時
+// 觸發瀏覽器原生「離開網站？」確認；按儲存或返回列表即解除。
+// ═══════════════════════════════════════════════
+let _boardDirty = false;
+function boardMarkDirty() { _boardDirty = true; }
+function boardClearDirty() { _boardDirty = false; }
+window.addEventListener('beforeunload', function (e) {
+  if (!_boardDirty) return;
+  e.preventDefault();
+  e.returnValue = '';   // 觸發原生確認對話框（各瀏覽器不允許自訂文字）
+  return '';
+});
+// 三個編輯器容器內任何輸入／變更即視為「未存檔」（view-main 為業務會議編輯器）
+['wm-editor-view', 'wr-editor-view', 'view-main'].forEach(function (id) {
+  const box = document.getElementById(id);
+  if (!box) return;
+  box.addEventListener('input', boardMarkDirty, true);
+  box.addEventListener('change', boardMarkDirty, true);
+});
+
+// ═══════════════════════════════════════════════
 // 分頁切換
 // ═══════════════════════════════════════════════
 let _bizInited = false;
@@ -2144,11 +2166,13 @@ function wmOpenEditor() {
   document.getElementById('wm-list-view').style.display = 'none';
   document.getElementById('wm-editor-view').style.display = '';
   wmFillForm();
+  boardClearDirty();   // 剛進編輯器（新開或載入現有），尚無未存變更
 }
 
 function wmBackToList() {
   document.getElementById('wm-editor-view').style.display = 'none';
   document.getElementById('wm-list-view').style.display = '';
+  boardClearDirty();   // 已儲存或已確認放棄，解除未存檔提醒
   wmLoadList();
 }
 // 取消（比照業務會議記錄）：確認後返回列表，未按「儲存」的變更不保留
@@ -3124,6 +3148,8 @@ function bizMeetingInit(){
     $("view-main").style.display=isMain?"":"none";
     $("view-saved").style.display=isMain?"none":"";
     if(v==="saved") buildSaved();
+    // 進編輯器＝尚無未存變更；回列表＝已存或已確認放棄，兩者都解除未存檔提醒
+    boardClearDirty();
   }
   function setFilter(f){ _bmFilter=f; buildSaved(); }
   $("btnBackList").onclick=function(){ switchView("saved"); };
@@ -3271,10 +3297,12 @@ function wrOpenEditor(){
   document.getElementById('wr-list-view').style.display = 'none';
   document.getElementById('wr-editor-view').style.display = '';
   wrFillForm();
+  boardClearDirty();   // 剛進編輯器，尚無未存變更
 }
 function wrBackToList(){
   document.getElementById('wr-editor-view').style.display = 'none';
   document.getElementById('wr-list-view').style.display = '';
+  boardClearDirty();   // 已儲存或已確認放棄，解除未存檔提醒
   wrLoadList();
 }
 function wrCancel(){ if(confirm(BT('bm_cancel_confirm'))) wrBackToList(); }

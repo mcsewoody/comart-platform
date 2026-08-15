@@ -5,7 +5,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#080C14">
-<title>COMART · 公告與紀錄 v1.57</title>
+<title>COMART · 公告與紀錄 v1.58</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -222,7 +222,7 @@ select,select option,option{background:var(--s2);color:var(--tx)}
     <a class="logo" href="javascript:void(0)">
       <div class="logo-mark">告</div>
       <div class="logo-text" data-i18n="app_title">公告與紀錄</div>
-      <span class="logo-ver">v1.57</span>
+      <span class="logo-ver">v1.58</span>
     </a>
     <div class="topbar-right">
       <div id="langChips" style="display:flex;gap:4px"></div>
@@ -623,8 +623,18 @@ select,select option,option{background:var(--s2);color:var(--tx)}
             <div class="field"><label data-i18n="pl_l_bg">背景附圖（可多張，決策參考用）</label>
               <div id="pl-c-bg-thumbs" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px"></div>
               <input id="pl-c-bg-file" type="file" accept="image/*" multiple onchange="plBgAdd(this)" style="font-size:12px;color:var(--tx3)"></div>
-            <div class="field"><label data-i18n="pl_l_options">選項（每項可按 🖼 配一張圖）</label><div id="pl-c-options" style="display:flex;flex-direction:column;gap:6px"></div>
+            <div class="field"><label data-i18n="pl_l_optmode">選項呈現方式</label>
+              <select id="pl-c-optmode" onchange="plOptModeChanged()">
+                <option value="each" data-i18n="pl_optmode_each">每個選項各自配圖</option>
+                <option value="letters" data-i18n="pl_optmode_letters">一張總圖＋字母代號（A B C…）</option>
+                <option value="numbers" data-i18n="pl_optmode_numbers">一張總圖＋數字代號（1 2 3…）</option>
+              </select>
+              <div class="hint" id="pl-c-optmode-hint" style="margin-top:6px;display:none" data-i18n="pl_optmode_hint">把各方案合成「一張總圖」用上方「背景附圖」上傳；投票者看圖後選代號。</div></div>
+            <div class="field" id="pl-c-opts-each"><label data-i18n="pl_l_options">選項（每項可按 🖼 配一張圖）</label><div id="pl-c-options" style="display:flex;flex-direction:column;gap:6px"></div>
               <button class="btn ghost sm" style="align-self:flex-start;margin-top:6px" onclick="plAddOptionRow()" data-i18n="pl_add_option">＋ 新增選項</button></div>
+            <div class="field" id="pl-c-opts-code" style="display:none"><label data-i18n="pl_l_optcount">代號選項數量（2–26）</label>
+              <input id="pl-c-optcount" type="number" min="2" max="26" value="4" oninput="plOptCodePreview()" style="max-width:140px">
+              <div class="hint" id="pl-c-optcode-preview" style="margin-top:6px"></div></div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
               <div class="field"><label data-i18n="pl_l_mode">投票方式</label>
                 <select id="pl-c-multi" onchange="document.getElementById('pl-c-cap-wrap').style.display=this.value==='1'?'':'none'">
@@ -1464,6 +1474,8 @@ const PL_I18N = {
   pl_l_desc:'背景說明（可留空）', pl_ph_desc:'說明投票的背景、目的…',
   pl_l_bg:'背景附圖（可多張，決策參考用）',
   pl_l_options:'選項（每項可按 🖼 配一張圖）', pl_add_option:'＋ 新增選項', pl_ph_option:'選項…',
+  pl_l_optmode:'選項呈現方式', pl_optmode_each:'每個選項各自配圖', pl_optmode_letters:'一張總圖＋字母代號（A B C…）', pl_optmode_numbers:'一張總圖＋數字代號（1 2 3…）',
+  pl_optmode_hint:'把各方案合成「一張總圖」用上方「背景附圖」上傳；投票者看圖後選代號。', pl_l_optcount:'代號選項數量（2–26）', pl_code_preview:'選項將為：', pl_code_none:'（尚未上傳總圖，請用上方「背景附圖」上傳一張總圖）',
   pl_l_mode:'投票方式', pl_single:'單選', pl_multi:'複選',
   pl_l_cap:'複選上限（留空＝不限）', pl_ph_cap:'例如 3',
   pl_l_anon:'記名方式', pl_named_opt:'記名（顯示誰投哪項）', pl_anon_opt:'匿名（只計票數）',
@@ -1513,6 +1525,8 @@ const PL_I18N = {
   pl_l_desc:'背景说明（可留空）', pl_ph_desc:'说明投票的背景、目的…',
   pl_l_bg:'背景附图（可多张，决策参考用）',
   pl_l_options:'选项（每项可按 🖼 配一张图）', pl_add_option:'＋ 新增选项', pl_ph_option:'选项…',
+  pl_l_optmode:'选项呈现方式', pl_optmode_each:'每个选项各自配图', pl_optmode_letters:'一张总图＋字母代号（A B C…）', pl_optmode_numbers:'一张总图＋数字代号（1 2 3…）',
+  pl_optmode_hint:'把各方案合成「一张总图」用上方「背景附图」上传；投票者看图后选代号。', pl_l_optcount:'代号选项数量（2–26）', pl_code_preview:'选项将为：', pl_code_none:'（尚未上传总图，请用上方「背景附图」上传一张总图）',
   pl_l_mode:'投票方式', pl_single:'单选', pl_multi:'复选',
   pl_l_cap:'复选上限（留空＝不限）', pl_ph_cap:'例如 3',
   pl_l_anon:'记名方式', pl_named_opt:'记名（显示谁投哪项）', pl_anon_opt:'匿名（只计票数）',
@@ -1562,6 +1576,8 @@ const PL_I18N = {
   pl_l_desc:'Background (optional)', pl_ph_desc:'Explain the context and purpose…',
   pl_l_bg:'Background images (multiple, for reference)',
   pl_l_options:'Options (tap 🖼 to add an image to each)', pl_add_option:'＋ Add option', pl_ph_option:'Option…',
+  pl_l_optmode:'Option display', pl_optmode_each:'An image per option', pl_optmode_letters:'One master image + letter codes (A B C…)', pl_optmode_numbers:'One master image + number codes (1 2 3…)',
+  pl_optmode_hint:'Combine all choices into one master image and upload it above under “Background images”; voters view it and pick a code.', pl_l_optcount:'Number of code options (2–26)', pl_code_preview:'Options will be: ', pl_code_none:'(No master image yet — upload one above under “Background images”.)',
   pl_l_mode:'Voting', pl_single:'Single', pl_multi:'Multiple',
   pl_l_cap:'Max choices (blank = unlimited)', pl_ph_cap:'e.g. 3',
   pl_l_anon:'Attribution', pl_named_opt:'Named (show who chose what)', pl_anon_opt:'Anonymous (counts only)',
@@ -1611,6 +1627,8 @@ const PL_I18N = {
   pl_l_desc:'Bối cảnh (không bắt buộc)', pl_ph_desc:'Giải thích bối cảnh, mục đích…',
   pl_l_bg:'Ảnh bối cảnh (nhiều ảnh, để tham khảo)',
   pl_l_options:'Lựa chọn (bấm 🖼 để thêm ảnh cho mỗi mục)', pl_add_option:'＋ Thêm lựa chọn', pl_ph_option:'Lựa chọn…',
+  pl_l_optmode:'Cách hiển thị lựa chọn', pl_optmode_each:'Mỗi lựa chọn một ảnh riêng', pl_optmode_letters:'Một ảnh tổng + mã chữ (A B C…)', pl_optmode_numbers:'Một ảnh tổng + mã số (1 2 3…)',
+  pl_optmode_hint:'Gộp các phương án vào «một ảnh tổng» rồi tải lên ở mục «Ảnh nền» phía trên; người bình chọn xem ảnh rồi chọn mã.', pl_l_optcount:'Số lựa chọn mã (2–26)', pl_code_preview:'Các lựa chọn sẽ là: ', pl_code_none:'(Chưa có ảnh tổng — hãy tải lên ở mục «Ảnh nền» phía trên.)',
   pl_l_mode:'Cách bình chọn', pl_single:'Chọn một', pl_multi:'Chọn nhiều',
   pl_l_cap:'Số lựa chọn tối đa (để trống = không giới hạn)', pl_ph_cap:'VD: 3',
   pl_l_anon:'Danh tính', pl_named_opt:'Ghi tên (hiện ai chọn gì)', pl_anon_opt:'Ẩn danh (chỉ đếm phiếu)',
@@ -1660,6 +1678,8 @@ const PL_I18N = {
   pl_l_desc:'背景説明（任意）', pl_ph_desc:'投票の背景・目的を記入…',
   pl_l_bg:'背景画像（複数可、判断の参考）',
   pl_l_options:'選択肢（🖼 で各項目に画像を追加）', pl_add_option:'＋ 選択肢を追加', pl_ph_option:'選択肢…',
+  pl_l_optmode:'選択肢の表示方法', pl_optmode_each:'選択肢ごとに画像', pl_optmode_letters:'総合画像1枚＋記号（A B C…）', pl_optmode_numbers:'総合画像1枚＋数字（1 2 3…）',
+  pl_optmode_hint:'各案を「1枚の総合画像」にまとめ、上の「背景画像」からアップロード。投票者は画像を見て記号を選びます。', pl_l_optcount:'記号選択肢の数（2–26）', pl_code_preview:'選択肢は次のとおり：', pl_code_none:'（総合画像が未登録です。上の「背景画像」からアップロードしてください。）',
   pl_l_mode:'投票方式', pl_single:'単一選択', pl_multi:'複数選択',
   pl_l_cap:'複数選択の上限（空欄＝無制限）', pl_ph_cap:'例：3',
   pl_l_anon:'記名方式', pl_named_opt:'記名（誰が何を選んだか表示）', pl_anon_opt:'匿名（票数のみ）',
@@ -5110,6 +5130,24 @@ function plRenderBgThumbs() {
 }
 function plBgRemove(i) { plBgImages.splice(i, 1); plRenderBgThumbs(); }
 
+// 選項呈現方式：each＝每項配圖（現況）；letters/numbers＝一張總圖＋代號
+function plOptMode() { const el = document.getElementById('pl-c-optmode'); return el ? el.value : 'each'; }
+function plCodeLabel(mode, i) { return mode === 'numbers' ? String(i + 1) : String.fromCharCode(65 + i); } // A,B,C… / 1,2,3…
+function plOptModeChanged() {
+  const mode = plOptMode(), code = mode !== 'each';
+  document.getElementById('pl-c-opts-each').style.display = code ? 'none' : '';
+  document.getElementById('pl-c-opts-code').style.display = code ? '' : 'none';
+  document.getElementById('pl-c-optmode-hint').style.display = code ? '' : 'none';
+  if (code) plOptCodePreview();
+}
+function plOptCodePreview() {
+  const mode = plOptMode(); if (mode === 'each') return;
+  let n = parseInt(document.getElementById('pl-c-optcount').value, 10);
+  if (!(n >= 2)) n = 2; if (n > 26) n = 26;
+  const codes = []; for (let i = 0; i < n; i++) codes.push(plCodeLabel(mode, i));
+  document.getElementById('pl-c-optcode-preview').textContent = BT('pl_code_preview') + codes.join('、');
+}
+
 function plIsCreator(s) { return !!(s && PORTAL_SESSION && (s.creator_emp_id === PORTAL_SESSION.empId || isAdmin())); }
 function plInScope(s) {
   if (!PORTAL_SESSION) return false;
@@ -5180,6 +5218,9 @@ function plNewSession() {
   document.getElementById('pl-c-close').value = '';
   document.getElementById('pl-c-options').innerHTML = '';
   plAddOptionRow(); plAddOptionRow();
+  document.getElementById('pl-c-optmode').value = 'each';
+  document.getElementById('pl-c-optcount').value = '4';
+  plOptModeChanged();
   plBgImages = []; plRenderBgThumbs();
   document.getElementById('pl-c-multi').value = '0';
   document.getElementById('pl-c-cap').value = '';
@@ -5226,7 +5267,16 @@ async function plCreateSubmit() {
   if (!PORTAL_SESSION) { boardToast(BT('pl_t_not_login')); return; }
   const title = document.getElementById('pl-c-title').value.trim();
   if (!title) { boardToast(BT('pl_t_need_title')); return; }
-  const opts = Array.from(document.querySelectorAll('#pl-c-options > div')).map(r => ({ label: (r.querySelector('.pl-opt').value || '').trim(), image: (r.querySelector('.pl-opt-img').value || '') || null })).filter(o => o.label);
+  const optMode = plOptMode();
+  let opts;
+  if (optMode === 'each') {
+    opts = Array.from(document.querySelectorAll('#pl-c-options > div')).map(r => ({ label: (r.querySelector('.pl-opt').value || '').trim(), image: (r.querySelector('.pl-opt-img').value || '') || null })).filter(o => o.label);
+  } else {
+    // 代號模式：選項＝ A/B/C… 或 1/2/3…（純代號、不配圖，總圖走 bg_images）
+    let n = parseInt(document.getElementById('pl-c-optcount').value, 10);
+    if (!(n >= 2)) n = 2; if (n > 26) n = 26;
+    opts = []; for (let i = 0; i < n; i++) opts.push({ label: plCodeLabel(optMode, i), image: null });
+  }
   if (opts.length < 2) { boardToast(BT('pl_t_need_2opts')); return; }
   const scope = document.getElementById('pl-c-scope').value;
   const members = scope === 'list' ? Array.from(document.querySelectorAll('#pl-c-members .pl-mem:checked')).map(c => c.value) : [];
@@ -5248,6 +5298,7 @@ async function plCreateSubmit() {
     lang_a: document.getElementById('pl-c-langa').value,
     lang_b: document.getElementById('pl-c-langb').value,
     persist: !document.getElementById('pl-c-nopersist').checked,
+    option_mode: optMode,
     scope_type: scope,
     scope_site: scope === 'site' ? document.getElementById('pl-c-site').value : null,
     scope_members: members,
@@ -5266,7 +5317,8 @@ async function plCreateSubmit() {
       const jobs = [];
       jobs.push(pmTranslate(srow.title, srow.lang_a, srow.lang_b, src).then(t => { srow.title_a = t.a; srow.title_b = t.b; }).catch(() => {}));
       if (srow.description) jobs.push(pmTranslate(srow.description, srow.lang_a, srow.lang_b, src).then(t => { srow.desc_a = t.a; srow.desc_b = t.b; }).catch(() => {}));
-      orows.forEach(o => jobs.push(pmTranslate(o.label, srow.lang_a, srow.lang_b, src).then(t => { o.label_a = t.a; o.label_b = t.b; }).catch(() => {})));
+      // 代號模式的選項是 A/B/C… 純代號，各語言相同，不需翻譯
+      if (optMode === 'each') orows.forEach(o => jobs.push(pmTranslate(o.label, srow.lang_a, srow.lang_b, src).then(t => { o.label_a = t.a; o.label_b = t.b; }).catch(() => {})));
       await Promise.all(jobs);
     } catch (e) {}
   }
@@ -5380,8 +5432,12 @@ function plRenderRoom() {
   const maxc = Math.max(1, ...plOptions.map(o => cnt[o.id] || 0));
   const showCounts = !(s.reveal === 'closed' && !plClosed());
   const winMax = (s.decision_mode && plClosed()) ? Math.max(0, ...plOptions.map(o => cnt[o.id] || 0)) : -1;
+  const codeMode = s.option_mode === 'letters' || s.option_mode === 'numbers';
   const bg = Array.isArray(s.bg_images) ? s.bg_images : [];
-  const bgHtml = bg.length ? '<div style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0">' + bg.map(u => '<a href="' + escHtml(u) + '" target="_blank" rel="noopener"><img src="' + escHtml(u) + '" style="max-width:180px;max-height:140px;border-radius:8px;border:1px solid var(--br);object-fit:cover"></a>').join('') + '</div>' : '';
+  // 代號模式：bg_images 是「總圖」，放大顯示（完整看得清各方案）；否則沿用小縮圖
+  const bgHtml = bg.length
+    ? '<div style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0">' + bg.map(u => '<a href="' + escHtml(u) + '" target="_blank" rel="noopener"><img src="' + escHtml(u) + '" style="' + (codeMode ? 'max-width:100%;width:480px;border-radius:10px;border:1px solid var(--br);object-fit:contain' : 'max-width:180px;max-height:140px;border-radius:8px;border:1px solid var(--br);object-fit:cover') + '"></a>').join('') + '</div>'
+    : (codeMode ? '<div class="hint" style="margin:8px 0">' + BT('pl_code_none') + '</div>' : '');
   const modeTag = qty ? BT('pl_mode_qty') : (s.multi ? (s.multi_cap ? BT('pl_mode_multi_cap', { n: s.multi_cap }) : BT('pl_mode_multi')) : BT('pl_mode_single'));
   let html = '<div class="panel"><div class="panel-h"><span class="idx">🗳</span><h2>' + plBiLine(s.title || '(未命名)', s.title_a, s.title_b, s) + '</h2></div><div class="panel-b">' +
     (s.description ? '<div style="font-size:13.5px;white-space:pre-wrap;margin-bottom:6px">' + plBiLine(s.description, s.desc_a, s.desc_b, s) + '</div>' : '') + bgHtml +
@@ -5414,7 +5470,9 @@ function plRenderRoom() {
       '<div style="position:relative;display:flex;align-items:center;gap:10px">' +
       (qty ? '' : '<div style="width:18px;flex-shrink:0">' + (chosen ? (s.multi ? '☑' : '●') : (s.multi ? '☐' : '○')) + '</div>') +
       (o.image_url ? '<img src="' + escHtml(o.image_url) + '" onclick="event.stopPropagation();window.open(this.src)" style="width:44px;height:44px;object-fit:cover;border-radius:6px;border:1px solid var(--br);flex-shrink:0;cursor:zoom-in">' : '') +
-      '<div style="flex:1;min-width:0;font-size:14px">' + plBiLine(o.label, o.label_a, o.label_b, s) + (win ? ' <span style="color:var(--grn,#4caf50);font-weight:700">' + BT('pl_win') + '</span>' : '') + '</div>' +
+      (codeMode
+        ? '<div style="flex:1;min-width:0;font-size:19px;font-weight:700;letter-spacing:.03em">' + escHtml(o.label || '') + (win ? ' <span style="color:var(--grn,#4caf50);font-weight:700;font-size:14px">' + BT('pl_win') + '</span>' : '') + '</div>'
+        : '<div style="flex:1;min-width:0;font-size:14px">' + plBiLine(o.label, o.label_a, o.label_b, s) + (win ? ' <span style="color:var(--grn,#4caf50);font-weight:700">' + BT('pl_win') + '</span>' : '') + '</div>') +
       (showCounts ? '<div style="flex-shrink:0;font-size:13px;color:var(--tx3);white-space:nowrap">' + c + ' ' + unit + ' · ' + pct + '%</div>' : '') +
       stepper +
       '</div>' + nameList + '</div>';

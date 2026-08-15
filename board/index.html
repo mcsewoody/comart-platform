@@ -5,7 +5,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#080C14">
-<title>COMART · 公告與紀錄 v1.58</title>
+<title>COMART · 公告與紀錄 v1.59</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -222,7 +222,7 @@ select,select option,option{background:var(--s2);color:var(--tx)}
     <a class="logo" href="javascript:void(0)">
       <div class="logo-mark">告</div>
       <div class="logo-text" data-i18n="app_title">公告與紀錄</div>
-      <span class="logo-ver">v1.58</span>
+      <span class="logo-ver">v1.59</span>
     </a>
     <div class="topbar-right">
       <div id="langChips" style="display:flex;gap:4px"></div>
@@ -5529,11 +5529,29 @@ function plReportData() {
   const winMax = s.decision_mode ? Math.max(0, ...plOptions.map(o => cnt[o.id] || 0)) : -1;
   return { cnt, voters, total, grand, winMax, unit: qty ? '份' : '票' };
 }
-function plReportHtml() {
+// 匯出用：把公開圖片抓成 data URI（避免 PNG 匯出時 canvas 被跨網域污染）；附帶原始尺寸供版面計算
+async function plImgToDataUrl(url) {
+  const r = await fetch(url); if (!r.ok) throw new Error('img'); const b = await r.blob();
+  const dataUrl = await new Promise((res, rej) => { const fr = new FileReader(); fr.onload = () => res(fr.result); fr.onerror = rej; fr.readAsDataURL(b); });
+  const dim = await new Promise(res => { const im = new Image(); im.onload = () => res({ w: im.naturalWidth, h: im.naturalHeight }); im.onerror = () => res({ w: 0, h: 0 }); im.src = dataUrl; });
+  return { src: dataUrl, w: dim.w, h: dim.h };
+}
+// 圖片區塊 HTML；imgs=[{src,w,h}]，w/h 給了就設成屬性讓版面在圖片解碼前就確定（PNG 量高度才準）
+function plReportImgHtml(imgs) {
+  if (!imgs || !imgs.length) return '';
+  const MAXW = 480;
+  return '<div style="margin:10px 0;display:flex;flex-direction:column;gap:8px">' + imgs.map(im => {
+    let w = im.w || 0, h = im.h || 0; if (w > MAXW) { if (h) h = Math.round(h * MAXW / w); w = MAXW; }
+    return '<img src="' + im.src + '"' + (w ? ' width="' + w + '"' : '') + (h ? ' height="' + h + '"' : '') + ' style="max-width:' + MAXW + 'px;border:1px solid #ddd;border-radius:6px">';
+  }).join('') + '</div>';
+}
+function plReportHtml(imgs) {
   const s = plSession, d = plReportData(), esc = escHtml;
   let h = '<h1>' + esc(plBiPlain(s.title || '(未命名)', s.title_a, s.title_b, s)) + '</h1>';
   h += '<div style="color:#666;font-size:12px">投票結果　發起：' + esc(s.creator_name || '—') + '　' + d.total + ' 人 · ' + d.grand + ' ' + d.unit + '</div>';
   if (s.description) h += '<div style="margin:8px 0;white-space:pre-wrap">' + esc(plBiPlain(s.description, s.desc_a, s.desc_b, s)) + '</div>';
+  // 總圖／背景附圖：未提供 imgs（如 PDF）就直接用公開網址；提供了（PNG）則用 data URI
+  h += plReportImgHtml(imgs || ((Array.isArray(s.bg_images) ? s.bg_images : []).map(u => ({ src: u }))));
   h += '<table style="width:100%;border-collapse:collapse;margin-top:10px"><tr><th style="text-align:left;border-bottom:2px solid #333;padding:5px">選項</th><th style="text-align:right;border-bottom:2px solid #333;padding:5px">' + d.unit + '</th><th style="text-align:right;border-bottom:2px solid #333;padding:5px">%</th></tr>';
   plOptions.forEach(o => {
     const c = d.cnt[o.id] || 0, pct = d.grand ? Math.round(c / d.grand * 100) : 0, win = d.winMax >= 0 && c === d.winMax && c > 0;
@@ -5546,14 +5564,24 @@ function plReportHtml() {
   }
   return h;
 }
-function plExportPDF() {
+// 取總圖／背景附圖供匯出。allowUrlFallback=true（PDF）時，抓不成 data URI 就退回原網址；
+// PNG 不可退回網址（外部圖會污染 canvas 導致匯出失敗），抓不到就略過。
+async function plExportImgs(allowUrlFallback) {
+  const bg = Array.isArray(plSession.bg_images) ? plSession.bg_images : [];
+  const out = [];
+  for (const u of bg) { try { out.push(await plImgToDataUrl(u)); } catch (e) { if (allowUrlFallback) out.push({ src: u }); } }
+  return out;
+}
+async function plExportPDF() {
+  let imgs = []; try { imgs = await plExportImgs(true); } catch (e) {}
   const w = window.open('', '_blank'); if (!w) { boardToast(BT('pl_t_popup_pdf')); return; }
-  w.document.write('<!doctype html><html><head><meta charset="utf-8"><title>' + wmXesc(plFileBase()) + '</title><style>body{font-family:"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;color:#1a1a1a;margin:28px;font-size:13px;line-height:1.5}h1{font-size:20px;margin:0 0 4px}table{border-collapse:collapse}@media print{@page{margin:14mm}}</style></head><body>' + plReportHtml() + '</body></html>');
+  w.document.write('<!doctype html><html><head><meta charset="utf-8"><title>' + wmXesc(plFileBase()) + '</title><style>body{font-family:"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;color:#1a1a1a;margin:28px;font-size:13px;line-height:1.5}h1{font-size:20px;margin:0 0 4px}table{border-collapse:collapse}img{max-width:480px}@media print{@page{margin:14mm}}</style></head><body>' + plReportHtml(imgs) + '</body></html>');
   w.document.close(); w.onload = function () { try { w.focus(); w.print(); } catch (e) {} };
 }
-function plExportPNG() {
+async function plExportPNG() {
   try {
-    const width = 760, frag = plReportHtml();
+    let imgs = []; try { imgs = await plExportImgs(false); } catch (e) {}
+    const width = 760, frag = plReportHtml(imgs);
     const holder = document.createElement('div'); holder.style.cssText = 'position:fixed;left:-9999px;top:0;width:' + width + 'px;background:#fff;color:#1a1a1a;padding:24px;font-family:sans-serif;font-size:14px;line-height:1.5'; holder.innerHTML = frag; document.body.appendChild(holder);
     const h = holder.scrollHeight + 48; document.body.removeChild(holder);
     const xhtml = '<div xmlns="http://www.w3.org/1999/xhtml" style="width:' + width + 'px;background:#fff;color:#1a1a1a;padding:24px;font-family:sans-serif;font-size:14px;line-height:1.5">' + frag + '</div>';
@@ -5566,6 +5594,10 @@ function plExportPNG() {
 function plBuildXlsx() {
   const s = plSession, d = plReportData(), rows = [];
   rows.push(['投票結果：' + (s.title || ''), '', '']);
+  // 總圖／附圖：xlsx 內嵌圖片成本高，改放公開網址（Excel 會自動轉超連結）供點開
+  const _bg = Array.isArray(s.bg_images) ? s.bg_images : [];
+  const _il = (s.option_mode === 'letters' || s.option_mode === 'numbers') ? '總圖' : '附圖';
+  _bg.forEach(u => rows.push([_il, u, '']));
   rows.push(['選項', d.unit, '%']);
   plOptions.forEach(o => { const c = d.cnt[o.id] || 0, pct = d.grand ? Math.round(c / d.grand * 100) : 0; rows.push([plBiPlain(o.label, o.label_a, o.label_b, s) + (!s.anonymous && (d.voters[o.id] || []).length ? '（' + (d.voters[o.id] || []).join('、') + '）' : ''), String(c), pct + '%']); });
   if (s.allow_comment) plComments.forEach(c => rows.push(['意見', (c.text || '') + (!s.anonymous && c.voter_name ? '（' + c.voter_name + '）' : ''), '']));
@@ -5584,6 +5616,8 @@ function plSendMail() {
   const s = plSession, d = plReportData(), L = [];
   L.push('投票結果：' + (s.title || '')); L.push(s.total + '人');
   L.push('（' + d.total + ' 人 · ' + d.grand + ' ' + d.unit + '）'); L.push('');
+  const _bg = Array.isArray(s.bg_images) ? s.bg_images : [];
+  if (_bg.length) { const _il = (s.option_mode === 'letters' || s.option_mode === 'numbers') ? '總圖' : '附圖'; _bg.forEach(u => L.push('【' + _il + '】' + u)); L.push(''); }
   plOptions.forEach(o => { const c = d.cnt[o.id] || 0, pct = d.grand ? Math.round(c / d.grand * 100) : 0, win = d.winMax >= 0 && c === d.winMax && c > 0; L.push('• ' + plBiPlain(o.label, o.label_a, o.label_b, s) + '：' + c + ' ' + d.unit + ' (' + pct + '%)' + (win ? ' 🏆' : '')); });
   if (s.allow_comment && plComments.length) { L.push(''); L.push('【意見】'); plComments.forEach(c => L.push('• ' + (c.text || '') + (!s.anonymous && c.voter_name ? '（' + c.voter_name + '）' : ''))); }
   L.push(''); L.push('');

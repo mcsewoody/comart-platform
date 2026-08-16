@@ -419,6 +419,13 @@ The portal supports EN, 繁中, 简中, VI, 日 via `setLang(lang)`. Each langua
   「客服團隊」「XX 廠商」這類清單外的對象。`pmTargetMap()` 同名同姓時補工號，
   否則兩個人共用同一個顯示字串會解析到同一個 `emp_id`。
   🔴 **從清單挑到的人名不送翻譯**（人名翻譯只會製造出同一個人的兩種寫法），自由文字才翻。
+  - 🔴 **v1.66 起改成自己畫的下拉面板（`pmTgt*`），不要退回 `<datalist>`**：
+    iOS Safari 不畫任何可下拉的提示、桌機 Chrome 的小箭頭也只在特定狀態出現，
+    使用者根本不知道能挑。現在右側永遠有一顆 SVG 箭頭鈕，手機與桌機行為一致。
+    三個必須保留的行為：① 手機按箭頭時先 `blur()` 收鍵盤（否則清單被鍵盤蓋住）
+    ② 觸控裝置**不要**一聚焦就彈清單（`pmTgtFocus` 用 `pointer: coarse` 判斷）
+    ③ 下拉開著時 `pmRerender` 要延後重繪，收起時（`pmTgtClose`）再補上 ——
+    否則 7 秒的輪詢會讓正在挑人的清單憑空消失。下方空間不足時 `pmTgtPlace` 會翻到輸入框上方。
 - **展示階段的播放模式**（`play_idx`）：主席按「▶ 播放」逐則放大呈現，**全場畫面同步** ——
   索引寫進 `premortem_sessions.play_idx`，其他人靠既有 7 秒輪詢跟著跳。
   🔴 `play_idx` 在 sb-proxy 的 `PM_PROTECTED`（只有該場主席改得動），否則任何與會者都能把

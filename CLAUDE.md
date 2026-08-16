@@ -154,6 +154,34 @@ The portal supports EN, 繁中, 简中, VI, 日 via `setLang(lang)`. Each langua
 - 每次修改後自動 commit 並 `git push`，不需等候使用者指示
 - **每次修改完畢，回覆結尾必須告知目前各檔案最新版本號**（例如：`kms v2.06`、`admin v1.57`）
 
+## 用戶狀態：在職／停用／離職（2026-08-16，migration 202608160002）
+
+`users.status`（`'active'` / `'disabled'` / `'resigned'`）是**狀態的唯一事實來源**，
+`users.role` 回歸純角色（`admin` / `dcc` / `user`）。另有 `users.resigned_at`（date，可留白）。
+
+- 🔴 **舊做法已廢除**：以前「停用」是把 `'inactive'` 寫進 `role` 欄位，代價是一停用就永遠失去
+  「這個人本來是 admin 還是 user」。**不要再把狀態值寫進 `role`。**
+- 🔴 **`active` 布林保留，由 DB trigger（`users_sync_status_active`）自動同步** ——
+  `active = (status = 'active')`。這是整個設計的關鍵：五個系統約 30 處人員查詢都寫著
+  `active=eq.true`，只要 active 跟著 status 走，**那些查詢一行都不用改**，離職者就自動
+  從所有會議、投票、抽籤、通訊錄的選單消失。
+  同步放在 trigger 而不是前端，是因為任何一條沒改到的寫入路徑都不能讓兩個欄位不一致。
+  trigger 是雙向的：只改 `active`（舊程式路徑）也會推回 `status`，不會被還原成看似「按了沒反應」。
+  `status <> 'resigned'` 時 `resigned_at` 一律清成 null（復職不該留下矛盾紀錄）。
+- 🔴 **新增任何「列出人給人挑」的查詢時，一定要帶 `active=eq.true`**，不要自己撈全表。
+- 🔴 **Portal 前端另有一個坑**：`ALL_USERS` 平常來自 `active=eq.true` 的查詢，但 admin 開過
+  「用戶管理」後 `loadUsers()` 會把它整份覆寫成**含停用與離職的全表**（要看得到才能復職）。
+  所以 Portal 裡任何列人的地方都必須經 **`umActiveUsers()`**（通訊錄、排行榜、出差人員下拉已改），
+  不可直接用 `ALL_USERS`。
+- `auth-verify` 對離職回 `reason:'resigned'`（與 `'inactive'` 分開，前端訊息不同）；
+  `status='resigned'`、`active=false`、舊資料的 `role='inactive'` 三者都擋登入。
+- sb-proxy 不必改：`users` 本來就是 `ADMIN_WRITE_TABLES`，且 `SELF_PATCH_FIELDS` 不含
+  `status`／`resigned_at`，一般使用者改不到自己的狀態。
+- **歷史紀錄一律保留不動**（已預約的會議室／公務車、借閱中的書、進行中的會議名單、報價單上的姓名）：
+  那是歷史事實，不追溯修改。離職只影響「以後還會不會出現在可選清單裡」。
+- ⚠️ `admin/lottery.html` 是**未被任何系統連結、也未納入 git** 的獨立草稿頁，名單是寫死的 22 個人名，
+  不吃這套狀態。真正在用的抽籤是 `admin/index.html` 的 lottery 模塊（`lottoInit`，已過濾）。
+
 ## Admin 重要細節
 
 - `cancelCarBk(id)` 公務車取消，`cancelBk(id)` 會議室取消，**不可混用**

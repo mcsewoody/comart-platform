@@ -23,7 +23,7 @@ const LEGACY_ADMIN_TOKEN = "COMART-ADMIN-2026"
 const SESSION_TTL_MS = 8 * 60 * 60 * 1000 // 8h，比照前端既有 SESSION_TTL
 
 const USER_FIELDS =
-  "id,emp_id,name_en,name_zh,role,dept,site,email,mobile,ext,title_en,title_zh,active,must_change_pwd"
+  "id,emp_id,name_en,name_zh,role,dept,site,email,mobile,ext,title_en,title_zh,active,status,must_change_pwd"
 
 function json(obj: unknown, status = 200) {
   return new Response(JSON.stringify(obj), { status, headers: { ...CORS, "Content-Type": "application/json" } })
@@ -51,7 +51,9 @@ serve(async (req) => {
       if (error) return json({ ok: false, reason: "server_error" }, 500)
       const row = rows?.[0]
       if (!row) return json({ ok: false, reason: "not_found" })
-      // role='inactive' 與 active=false 一視同仁擋登入（歷史資料兩種標法並存）
+      // 離職與停用都擋登入，但回不同的 reason —— 前端要能對當事人講清楚是哪一種
+      // （status 是新的事實來源；active=false 與舊資料的 role='inactive' 仍一併擋，向下相容）
+      if (String(row.status || "") === "resigned") return json({ ok: false, reason: "resigned" })
       if (row.active === false || String(row.role || "") === "inactive") return json({ ok: false, reason: "inactive" })
 
       const valid = await verifyPassword(password, row.pwd_hash || "", LEGACY_SALT)

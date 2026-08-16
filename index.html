@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>COMART Platform v1.72</title>
+<title>COMART Platform v1.73</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script defer src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.js"></script>
 <style>
@@ -304,7 +304,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     <div class="login-logo">
       <div class="login-mark" style="background:transparent"><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="44" height="23"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></div>
       <div class="login-name">COMART Platform</div>
-      <div class="login-sub">Internal Portal · v1.72</div>
+      <div class="login-sub">Internal Portal · v1.73</div>
     </div>
     <form id="loginForm" onsubmit="doLogin();return false;" autocomplete="on">
     <div class="field">
@@ -360,7 +360,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   <div class="topbar">
     <div class="topbar-logo" onclick="switchView('home')">
       <div class="topbar-mark" style="background:transparent"><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="26" height="14"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></div>
-      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.72</span></div>
+      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.73</span></div>
     </div>
     <div class="topbar-right">
       <div class="lang-switcher">
@@ -811,7 +811,12 @@ input[type="date"]::-webkit-calendar-picker-indicator {
                   <option value="admin">Admin</option>
                   <option value="dcc">DCC</option>
                   <option value="user">User</option>
-                  <option value="inactive">Inactive</option>
+                </select>
+                <select id="usr-filter-status" onchange="renderUsersTable()" style="padding:6px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;">
+                  <option value="active" id="um-f-st-active">在職 Active</option>
+                  <option value="disabled" id="um-f-st-disabled">停用 Disabled</option>
+                  <option value="resigned" id="um-f-st-resigned">離職 Resigned</option>
+                  <option value="" id="um-f-st-all">— 全部狀態 —</option>
                 </select>
                 <button id="usr-filter-reset-btn" onclick="resetUsersFilter()" style="padding:6px 12px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx2);cursor:pointer;font-size:12px;">✕ 清除</button>
                 <span id="usr-filter-count" style="font-size:11px;color:var(--tx3);margin-left:4px;"></span>
@@ -933,8 +938,21 @@ input[type="date"]::-webkit-calendar-picker-indicator {
           <option value="user" id="um-opt-user">User — 一般員工</option>
           <option value="dcc" id="um-opt-dcc">DCC — 文件控管</option>
           <option value="admin" id="um-opt-admin">Admin — 系統管理員</option>
-          <option value="inactive" id="um-opt-inactive">Inactive — 停用</option>
         </select>
+      </div>
+      <!-- 狀態與角色分開存（migration 202608160002）：離職不再把 role 蓋成 inactive，
+           復職時原本的角色還在。DB trigger 會讓 active 布林跟著 status 走，
+           所以五個系統既有的 active=eq.true 查詢自動把離職者濾掉。 -->
+      <div class="field"><label id="um-lbl-status">Status</label>
+        <select id="u-status" onchange="umStatusChanged()">
+          <option value="active" id="um-opt-st-active">Active — 在職</option>
+          <option value="disabled" id="um-opt-st-disabled">Disabled — 停用</option>
+          <option value="resigned" id="um-opt-st-resigned">Resigned — 離職</option>
+        </select>
+      </div>
+      <div class="field" id="u-resigned-wrap" style="display:none"><label id="um-lbl-resigned">Resignation Date</label>
+        <input id="u-resigned" type="date">
+        <div class="hint" id="um-hint-resigned">離職後不再出現在任何會議、投票、抽籤與通訊錄的選單；歷史紀錄保留不動。</div>
       </div>
       <div class="field um-full"><label id="u-pwd-label">Initial Password</label><form onsubmit="return false;" style="margin:0;padding:0;display:contents;">
         <input type="text" name="username" style="display:none;" aria-hidden="true" tabindex="-1">
@@ -1146,6 +1164,7 @@ async function doLogin() {
     if (!resp.ok) {
       if (resp.reason === 'not_found')      { showErr('Account not found.'); return; }
       if (resp.reason === 'bad_password')   { showErr('Incorrect password.'); return; }
+      if (resp.reason === 'resigned')       { showErr(t('login_err_resigned')); return; }
       if (resp.reason === 'inactive')       { showErr('This account has been deactivated.'); return; }
       showErr('Login failed — check your connection and try again.');
       return;
@@ -1750,7 +1769,7 @@ async function loadRanking(siteFilter) {
   } catch(e) {
     console.warn('loadRanking error:', e.message || e);
     if (ALL_USERS && ALL_USERS.length > 0) {
-      var items = ALL_USERS.filter(function(u) { return u.role !== 'inactive'; });
+      var items = umActiveUsers();
       var medals2 = ['🥇','🥈','🥉'];
       listEl.innerHTML = items.map(function(u, i) {
         var av = safeUrl(u.photoURL)
@@ -1799,7 +1818,7 @@ async function loadDirectory() {
 function renderDirectory() {
   var q = (document.getElementById('dirSearch') ? document.getElementById('dirSearch').value : '').toLowerCase();
   var grid = document.getElementById('dirGrid');
-  var users = ALL_USERS.slice();
+  var users = umActiveUsers();
   if (q) users = users.filter(function(u) {
     return (u.nameEn||'').toLowerCase().includes(q) ||
            (u.nameZh||'').toLowerCase().includes(q) ||
@@ -1976,6 +1995,8 @@ function resetUsersFilter() {
   ['usr-filter-site','usr-filter-dept','usr-filter-role'].forEach(function(id) {
     var el = document.getElementById(id); if (el) el.value = '';
   });
+  // 狀態回到預設的「在職」而不是「全部」：清除是回到初始畫面，不是把離職者叫出來
+  var st = document.getElementById('usr-filter-status'); if (st) st.value = 'active';
   renderUsersTable();
 }
 
@@ -2004,7 +2025,7 @@ async function loadUsers() {
   // 主要：Supabase
   try {
     const res = await fetch(
-      `${SB_WORKER}/supabase/rest/v1/users?select=emp_id,name_en,name_zh,role,dept,site,email,mobile,ext,title_en,title_zh,avatar_url,active,bio_zh,bio_en,expertise_zh,expertise_en&order=emp_id`,
+      `${SB_WORKER}/supabase/rest/v1/users?select=emp_id,name_en,name_zh,role,dept,site,email,mobile,ext,title_en,title_zh,avatar_url,active,status,resigned_at,bio_zh,bio_en,expertise_zh,expertise_en&order=emp_id`,
       { headers: sbHdrs() }
     );
     if (res.ok) {
@@ -2022,7 +2043,10 @@ async function loadUsers() {
           titleZh:     u.title_zh   || '',
           site:        u.site       || 'TW',
           dept:        u.dept       || '',
-          role:        u.active === false ? 'inactive' : (u.role || 'user'),
+          // role 回歸純角色；停用／離職改看 status（migration 202608160002）
+          role:         u.role || 'user',
+          status:       u.status || (u.active === false ? 'disabled' : 'active'),
+          resignedAt:   u.resigned_at || '',
           photoURL:     u.avatar_url   || '',
           active:       u.active !== false,
           bioZh:        u.bio_zh      || '',
@@ -2048,25 +2072,34 @@ function renderUsersTable() {
   const fSite = (document.getElementById('usr-filter-site')?.value||'').trim();
   const fDept = (document.getElementById('usr-filter-dept')?.value||'').trim();
   const fRole = (document.getElementById('usr-filter-role')?.value||'').trim();
+  // 狀態篩選預設「在職」：離職者不該混在日常操作的視野裡，但 admin 隨時切得到
+  const fStatEl = document.getElementById('usr-filter-status');
+  const fStat = fStatEl ? fStatEl.value : 'active';
   let filtered = ALL_USERS.filter(u => {
     if (fSite && u.site !== fSite) return false;
     if (fDept && u.dept !== fDept) return false;
     if (fRole && u.role !== fRole) return false;
+    if (fStat && (u.status || 'active') !== fStat) return false;
     return true;
   });
   const countEl = document.getElementById('usr-filter-count');
-  if (countEl) countEl.textContent = (fSite||fDept||fRole) ? `顯示 ${filtered.length} / ${ALL_USERS.length} 人` : `共 ${ALL_USERS.length} 人`;
+  if (countEl) countEl.textContent = (fSite||fDept||fRole||fStat) ? `顯示 ${filtered.length} / ${ALL_USERS.length} 人` : `共 ${ALL_USERS.length} 人`;
   if (!filtered.length) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--tx3);padding:20px;">No users found.</td></tr>'; return; }
   const siteLabel = { TW:'Taiwan', CN:'Dongguan', VN:'Vietnam', HK:'Hong Kong' };
   tbody.innerHTML = filtered.sort((a,b)=>(a.empId||'').localeCompare(b.empId||'')).map(u => {
-    const roleClass = { admin:'role-admin', dcc:'role-dcc', user:'role-user', inactive:'role-inactive' }[u.role] || 'role-user';
+    const roleClass = { admin:'role-admin', dcc:'role-dcc', user:'role-user' }[u.role] || 'role-user';
     const siteLbl = ALL_SITES.length ? (ALL_SITES.find(s=>s.key===u.site)?.en||u.site||'—') : (siteLabel[u.site]||u.site||'—');
     const deptLbl = ALL_DEPTS.length ? (ALL_DEPTS.find(d=>d.key===u.dept)?.en||u.dept||'—') : (u.dept||'—');
-    return `<tr>
+    // 非在職者整列淡出＋狀態標籤：一眼看得出哪些人已經不在名單裡了
+    const st = u.status || 'active';
+    const stBadge = st === 'active' ? '' :
+      `<span class="role-badge role-inactive" style="margin-left:5px">${UM_STATUS_LBL[st] || st}${st==='resigned'&&u.resignedAt?' '+escHtml(u.resignedAt):''}</span>`;
+    const rowStyle = st === 'active' ? '' : ' style="opacity:.55"';
+    return `<tr${rowStyle}>
       <td style="font-weight:700;color:var(--ac);font-family:var(--fm)">${escHtml(u.empId)}</td>
       <td>${escHtml(u.nameEn||'')}${u.nameZh?' / '+escHtml(u.nameZh):''}</td>
       <td style="font-size:11px;color:var(--tx2)">${escHtml(u.email||u.login||'')}</td>
-      <td><span class="role-badge ${roleClass}">${u.role.toUpperCase()}</span></td>
+      <td><span class="role-badge ${roleClass}">${u.role.toUpperCase()}</span>${stBadge}</td>
       <td style="font-size:11px;color:var(--tx2)">${escHtml(siteLbl)}</td>
       <td style="font-size:11px;color:var(--tx2)">${escHtml(deptLbl)}</td>
       <td><button class="edit-btn" onclick="openUserModal('${escHtml(u.empId)}')">Edit</button></td>
@@ -2075,6 +2108,31 @@ function renderUsersTable() {
 }
 
 // User Modal
+// 用戶狀態（migration 202608160002）：在職／停用／離職。
+// 🔴 離職者「不出現在任何選單」不是靠前端逐處過濾，而是靠 DB trigger 把 active 設成 false ——
+//    五個系統約 30 處人員查詢本來就寫著 active=eq.true，一行都不用改就全部生效。
+//    要新增人員選單時記得沿用那個過濾條件，不要自己另外撈全表。
+const UM_STATUS_LBL = { active:'在職', disabled:'停用', resigned:'離職' };
+// 🔴 ALL_USERS 平常來自 active=eq.true 的查詢，但 admin 開過「用戶管理」後會被整份覆寫成
+//    「含停用與離職」的全表（loadUsers 需要看得到他們才能復職）。所以任何「列出人給人挑」的地方
+//    都必須經過這個過濾器，不能直接用 ALL_USERS —— 否則 admin 逛過用戶管理，通訊錄與出差人員
+//    下拉就會冒出離職的人。
+function umActiveUsers() {
+  return (ALL_USERS || []).filter(u => (u.status ? u.status === 'active' : u.active !== false));
+}
+function umStatusChanged() {
+  const st = (document.getElementById('u-status') || {}).value || 'active';
+  const wrap = document.getElementById('u-resigned-wrap');
+  const dt = document.getElementById('u-resigned');
+  if (!wrap || !dt) return;
+  wrap.style.display = st === 'resigned' ? '' : 'none';
+  // 選到離職時預設帶入今天（當地時間，不用 toISOString——那是 UTC，台灣凌晨會少一天）
+  if (st === 'resigned' && !dt.value) {
+    const d = new Date(), p = n => String(n).padStart(2, '0');
+    dt.value = d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate());
+  }
+}
+
 let _editEmpId = null;
 function openUserModal(empId) {
   _editEmpId = empId;
@@ -2083,6 +2141,9 @@ function openUserModal(empId) {
   document.getElementById('u-empId').value = u?.empId || '';
   document.getElementById('u-empId').disabled = !!u;
   document.getElementById('u-role').value = u?.role || 'user';
+  document.getElementById('u-status').value = u?.status || 'active';
+  document.getElementById('u-resigned').value = u?.resignedAt || '';
+  umStatusChanged();
   document.getElementById('u-nameEn').value = u?.nameEn || '';
   document.getElementById('u-nameZh').value = u?.nameZh || '';
   document.getElementById('u-email').value = u?.email || u?.login || '';
@@ -2217,9 +2278,11 @@ async function sbSyncUser(user, isDelete, isNew) {
         bio_en:        user.bioEn        || '',
         expertise_zh:  user.expertiseZh  || [],
         expertise_en:  user.expertiseEn  || [],
-        // 停用（role=inactive）必須真的把 active 設 false：auth-verify 擋登入、
-        // 各子系統的 active=eq.true 過濾才會生效（2026-07-20 前此處硬編 true，停用形同虛設）
-        active:        (user.role || 'user') !== 'inactive',
+        // status 是狀態的唯一事實來源（在職／停用／離職）。
+        // active 布林不在這裡算——DB trigger 會依 status 推導，
+        // 這樣任何一條沒改到的寫入路徑都不會讓兩個欄位不一致（migration 202608160002）。
+        status:        user.status || 'active',
+        resigned_at:   user.resignedAt || null,
       }),
     });
   }
@@ -2240,6 +2303,9 @@ async function saveUser() {
   const titleZh = document.getElementById('u-title-zh').value.trim();
   const site   = document.getElementById('u-site').value;
   const role        = document.getElementById('u-role').value;
+  const status      = document.getElementById('u-status').value;
+  // 離職日期只在離職時送出；DB trigger 也會在非離職狀態下把它清成 null
+  const resignedAt  = status === 'resigned' ? (document.getElementById('u-resigned').value || null) : null;
   const dept        = document.getElementById('u-dept').value;
   const bioZh       = document.getElementById('u-bioZh').value.trim();
   const bioEn       = document.getElementById('u-bioEn').value.trim();
@@ -2258,7 +2324,7 @@ async function saveUser() {
 
   const user = {
     empId, nameEn, nameZh, email, login: email,
-    ext, mobile, titleEn, titleZh, site, dept, role,
+    ext, mobile, titleEn, titleZh, site, dept, role, status, resignedAt,
     photoURL: window._umAvatarDataUrl || (existing?.photoURL || ''),
     bioZh, bioEn, expertiseZh, expertiseEn,
     createdAt: existing?.createdAt || Date.now(),
@@ -2573,6 +2639,7 @@ const I18N = {
     um_err_name:'English name required', um_err_email:'Email required',
     um_err_pwd_required:'Initial password required', um_err_pwd_short:'Password min 8 characters',
     um_save_failed:'Save failed: ', um_updated:'User updated', um_created:'User created',
+    login_err_resigned:'This employee has left the company. Contact HR if this is a mistake.',
     um_err_self_delete:'Cannot delete yourself', um_confirm_delete:'Delete user %s? This cannot be undone.',
     um_delete_failed:'Delete failed: ', um_deleted:'User deleted',
     // ai tab
@@ -2641,6 +2708,7 @@ const I18N = {
     um_err_name:'請輸入英文姓名', um_err_email:'請輸入電子郵件',
     um_err_pwd_required:'請輸入初始密碼', um_err_pwd_short:'密碼最少 8 個字元',
     um_save_failed:'儲存失敗：', um_updated:'用戶已更新', um_created:'用戶已建立',
+    login_err_resigned:'此員工已離職，帳號無法登入。如有疑問請聯絡人資。',
     um_err_self_delete:'無法刪除自己的帳號', um_confirm_delete:'確定刪除用戶 %s？此操作無法復原。',
     um_delete_failed:'刪除失敗：', um_deleted:'用戶已刪除',
     ai_tab_translate:'翻譯', ai_tab_chat:'對話', ai_tab_skills:'技能',
@@ -2701,6 +2769,7 @@ const I18N = {
     um_err_name:'请输入英文姓名', um_err_email:'请输入电子邮件',
     um_err_pwd_required:'请输入初始密码', um_err_pwd_short:'密码最少 8 个字符',
     um_save_failed:'保存失败：', um_updated:'用户已更新', um_created:'用户已创建',
+    login_err_resigned:'此员工已离职，账号无法登录。如有疑问请联系人资。',
     um_err_self_delete:'无法删除自己的账号', um_confirm_delete:'确定删除用户 %s？此操作无法撤销。',
     um_delete_failed:'删除失败：', um_deleted:'用户已删除',
     ai_tab_translate:'翻译', ai_tab_chat:'对话', ai_tab_skills:'技能',
@@ -2761,6 +2830,7 @@ const I18N = {
     um_err_name:'Vui lòng nhập tên tiếng Anh', um_err_email:'Vui lòng nhập email',
     um_err_pwd_required:'Vui lòng nhập mật khẩu ban đầu', um_err_pwd_short:'Mật khẩu tối thiểu 8 ký tự',
     um_save_failed:'Lưu thất bại: ', um_updated:'Đã cập nhật người dùng', um_created:'Đã tạo người dùng',
+    login_err_resigned:'Nhân viên này đã nghỉ việc, tài khoản không thể đăng nhập. Vui lòng liên hệ bộ phận nhân sự.',
     um_err_self_delete:'Không thể xóa tài khoản của chính mình', um_confirm_delete:'Xóa người dùng %s? Không thể hoàn tác.',
     um_delete_failed:'Xóa thất bại: ', um_deleted:'Đã xóa người dùng',
     ai_tab_translate:'Dịch thuật', ai_tab_chat:'Trò chuyện', ai_tab_skills:'Kỹ năng',
@@ -2821,6 +2891,7 @@ const I18N = {
     um_err_name:'英語名を入力してください', um_err_email:'メールアドレスを入力してください',
     um_err_pwd_required:'初期パスワードを入力してください', um_err_pwd_short:'パスワードは8文字以上必要です',
     um_save_failed:'保存失敗：', um_updated:'ユーザーを更新しました', um_created:'ユーザーを作成しました',
+    login_err_resigned:'この従業員は退職済みのため、ログインできません。ご不明な点は人事までお問い合わせください。',
     um_err_self_delete:'自分自身のアカウントは削除できません', um_confirm_delete:'ユーザー %s を削除しますか？元に戻せません。',
     um_delete_failed:'削除失敗：', um_deleted:'ユーザーを削除しました',
     ai_tab_translate:'翻訳', ai_tab_chat:'チャット', ai_tab_skills:'スキル',
@@ -3063,7 +3134,16 @@ function applyI18nAll() {
     'um-opt-user':        {en:'User — General Staff','zh-TW':'User — 一般員工','zh-CN':'User — 普通员工',vi:'User — Nhân viên',ja:'User — 一般スタッフ'},
     'um-opt-dcc':         {en:'DCC — Document Control','zh-TW':'DCC — 文件控管','zh-CN':'DCC — 文件管控',vi:'DCC — Kiểm soát tài liệu',ja:'DCC — 文書管理'},
     'um-opt-admin':       {en:'Admin — System Admin','zh-TW':'Admin — 系統管理員','zh-CN':'Admin — 系统管理员',vi:'Admin — Quản trị hệ thống',ja:'Admin — システム管理者'},
-    'um-opt-inactive':    {en:'Inactive — Disabled','zh-TW':'Inactive — 停用','zh-CN':'Inactive — 停用',vi:'Inactive — Vô hiệu hóa',ja:'Inactive — 無効'},
+    'um-lbl-status':      {en:'Status','zh-TW':'狀態','zh-CN':'状态',vi:'Trạng thái',ja:'ステータス'},
+    'um-opt-st-active':   {en:'Active — 在職','zh-TW':'Active — 在職','zh-CN':'Active — 在职',vi:'Active — Đang làm việc',ja:'Active — 在職'},
+    'um-opt-st-disabled': {en:'Disabled — 停用','zh-TW':'Disabled — 停用','zh-CN':'Disabled — 停用',vi:'Disabled — Vô hiệu hóa',ja:'Disabled — 無効'},
+    'um-opt-st-resigned': {en:'Resigned — 離職','zh-TW':'Resigned — 離職','zh-CN':'Resigned — 离职',vi:'Resigned — Đã nghỉ việc',ja:'Resigned — 退職'},
+    'um-lbl-resigned':    {en:'Resignation Date','zh-TW':'離職日期','zh-CN':'离职日期',vi:'Ngày nghỉ việc',ja:'退職日'},
+    'um-hint-resigned':   {en:'Once resigned, the person no longer appears in any meeting, poll, lottery or directory list. Historical records are kept as they are.','zh-TW':'離職後不再出現在任何會議、投票、抽籤與通訊錄的選單；歷史紀錄保留不動。','zh-CN':'离职后不再出现在任何会议、投票、抽签与通讯录的选单；历史纪录保留不动。',vi:'Sau khi nghỉ việc, người này không còn xuất hiện trong bất kỳ danh sách họp, bỏ phiếu, bốc thăm hay danh bạ nào. Hồ sơ lịch sử được giữ nguyên.',ja:'退職後は会議・投票・抽選・社員名簿のいずれの選択肢にも表示されません。過去の記録はそのまま保持されます。'},
+    'um-f-st-active':     {en:'Active','zh-TW':'在職 Active','zh-CN':'在职 Active',vi:'Đang làm việc',ja:'在職'},
+    'um-f-st-disabled':   {en:'Disabled','zh-TW':'停用 Disabled','zh-CN':'停用 Disabled',vi:'Vô hiệu hóa',ja:'無効'},
+    'um-f-st-resigned':   {en:'Resigned','zh-TW':'離職 Resigned','zh-CN':'离职 Resigned',vi:'Đã nghỉ việc',ja:'退職'},
+    'um-f-st-all':        {en:'— All Statuses —','zh-TW':'— 全部狀態 —','zh-CN':'— 全部状态 —',vi:'— Tất cả trạng thái —',ja:'— すべての状態 —'},
     'um-lbl-name-en':     {en:t('um_name_en'),'zh-TW':t('um_name_en'),'zh-CN':t('um_name_en'),vi:t('um_name_en'),ja:t('um_name_en')},
     'um-lbl-name-zh':     {en:'Chinese Name','zh-TW':'中文姓名','zh-CN':'中文姓名',vi:'Tên tiếng Trung',ja:'中国語名'},
     'um-lbl-email':       {en:t('um_email'),'zh-TW':t('um_email'),'zh-CN':t('um_email'),vi:t('um_email'),ja:t('um_email')},
@@ -3485,7 +3565,7 @@ function openTripModal(id) {
     var staffSel = document.getElementById('trip-staff');
     if (staffSel) {
       staffSel.innerHTML = '<option value="">' + t('trip_select_staff') + '</option>'
-        + ALL_USERS.slice().sort(function(a,b) {
+        + umActiveUsers().sort(function(a,b) {
             return (a.nameEn||a.nameZh||a.empId||'').localeCompare(b.nameEn||b.nameZh||b.empId||'');
           }).map(function(u) {
             return '<option value="' + escHtml(u.empId) + '">' + escHtml(u.nameEn||u.nameZh||u.empId) + ' (' + escHtml(u.empId) + ')</option>';

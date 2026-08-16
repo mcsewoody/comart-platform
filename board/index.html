@@ -5,7 +5,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#080C14">
-<title>COMART · 公告與紀錄 v1.60</title>
+<title>COMART · 公告與紀錄 v1.61</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -222,7 +222,7 @@ select,select option,option{background:var(--s2);color:var(--tx)}
     <a class="logo" href="javascript:void(0)">
       <div class="logo-mark">告</div>
       <div class="logo-text" data-i18n="app_title">公告與紀錄</div>
-      <span class="logo-ver">v1.60</span>
+      <span class="logo-ver">v1.61</span>
     </a>
     <div class="topbar-right">
       <div id="langChips" style="display:flex;gap:4px"></div>
@@ -236,6 +236,7 @@ select,select option,option{background:var(--s2);color:var(--tx)}
     <button class="maintab" data-tab="woody" onclick="switchTab('woody')">📝 <span data-i18n="nav_woody">Woody 週報</span></button>
     <button class="maintab" data-tab="premortem" onclick="switchTab('premortem')">🩺 <span data-i18n="nav_premortem">事前驗屍</span></button>
     <button class="maintab" data-tab="brainstorm" onclick="switchTab('brainstorm')">💡 <span data-i18n="nav_brainstorm">腦力激盪</span></button>
+    <button class="maintab" data-tab="collect" onclick="switchTab('collect')">💬 <span data-i18n="nav_collect">意見徵集</span></button>
     <button class="maintab" data-tab="poll" onclick="switchTab('poll')">🗳 <span data-i18n="pl_nav">投票</span></button>
   </div>
 </div>
@@ -549,6 +550,45 @@ select,select option,option{background:var(--s2);color:var(--tx)}
         <div class="panel-h"><span class="idx">＋</span><h2 id="pm-c-h2">新增會議</h2></div>
         <div class="panel-b">
           <div style="display:flex;flex-direction:column;gap:12px">
+            <!-- 範本與行為設定：只有「意見徵集」看得到（PM_KINDS.collect.configurable）。
+                 驗屍與腦力激盪的旗標是方法論承諾，整區由 pmApplyKindLabels() 隱藏。 -->
+            <div id="pm-c-tpl-wrap" style="display:none">
+              <div class="field"><label data-i18n="pm_c_tpl">選擇範本</label>
+                <div id="pm-c-tpl" class="chiprow" style="margin:0;padding:0"></div>
+                <div id="pm-c-tpl-desc" class="hint" style="margin-top:6px"></div>
+              </div>
+            </div>
+            <div id="pm-c-opt-wrap" style="display:none">
+              <div class="field"><label data-i18n="pm_c_opts">這場會議的規則（建立後不可更改）</label>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                  <div class="field" style="margin:0"><label style="font-size:11px" data-i18n="pm_c_o_anon">留言署名</label>
+                    <select id="pm-c-anon">
+                      <option value="0" data-i18n="pm_c_o_named">具名（顯示是誰寫的）</option>
+                      <option value="1" data-i18n="pm_c_o_anon_v">匿名（不顯示填寫者）</option>
+                    </select>
+                  </div>
+                  <div class="field" style="margin:0"><label style="font-size:11px" data-i18n="pm_c_o_live">填寫時的可見性</label>
+                    <select id="pm-c-live">
+                      <option value="0" data-i18n="pm_c_o_live_n">寫完才一起揭露</option>
+                      <option value="1" data-i18n="pm_c_o_live_y">即時互相看得到</option>
+                    </select>
+                  </div>
+                  <div class="field" style="margin:0"><label style="font-size:11px" data-i18n="pm_c_o_cap">每人則數上限</label>
+                    <select id="pm-c-cap">
+                      <option value="0" data-i18n="pm_c_o_cap_0">不限</option>
+                      <option value="1">1</option><option value="3">3</option><option value="5">5</option><option value="10">10</option>
+                    </select>
+                  </div>
+                  <div class="field" style="margin:0"><label style="font-size:11px" data-i18n="pm_c_o_vote">投票階段</label>
+                    <select id="pm-c-vote">
+                      <option value="0" data-i18n="pm_c_o_vote_n">不投票（展示完直接定稿）</option>
+                      <option value="1" data-i18n="pm_c_o_vote_y">展示後開放投票</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="hint" style="margin-top:6px" data-i18n="pm_c_opts_hint">這四項在建立後就鎖住不可更改 —— 大家是在哪一種規則下寫的，就一直是那一種。</div>
+              </div>
+            </div>
             <div class="field"><label data-i18n="pm_c_title">專案 / 主題名稱</label><input id="pm-c-title" placeholder="例如：新品 X 上市專案"></div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
               <div class="field"><label data-i18n="pm_c_meetat">會議日期 / 時間</label><input id="pm-c-meetat" type="datetime-local" class="pm-dt"></div>
@@ -593,8 +633,9 @@ select,select option,option{background:var(--s2);color:var(--tx)}
    </div>
   </div>
 
-  <!-- 腦力激盪：切到這個頁籤時 #pm-shell 會被搬進來（見 pmMountShell） -->
+  <!-- 腦力激盪、意見徵集：切到這些頁籤時 #pm-shell 會被搬進來（見 pmMountShell） -->
   <div class="tabpanel" id="tabpanel-brainstorm"></div>
+  <div class="tabpanel" id="tabpanel-collect"></div>
 
   <!-- ══════════════ TAB 7：投票 Poll ══════════════ -->
   <div class="tabpanel" id="tabpanel-poll">
@@ -811,6 +852,21 @@ const B_I18N = {
   pm_you_voted:'你已投 {n}／{cap} 票', pm_ai_cluster:'🤖 AI 分群',
   pm_ai_cluster_hint:'把相似的{item}自動歸類成主題（可再按重跑）',
   pm_vote_cap_hint:'（每人最多 {cap} 票）。', pm_by_votes:'（依票數）',
+  nav_collect:'意見徵集',
+  pm_c_tpl:'選擇範本', pm_c_opts:'這場會議的規則（建立後不可更改）',
+  pm_c_o_anon:'留言署名', pm_c_o_named:'具名（顯示是誰寫的）', pm_c_o_anon_v:'匿名（不顯示填寫者）',
+  pm_c_o_live:'填寫時的可見性', pm_c_o_live_n:'寫完才一起揭露', pm_c_o_live_y:'即時互相看得到',
+  pm_c_o_cap:'每人則數上限', pm_c_o_cap_0:'不限',
+  pm_c_o_vote:'投票階段', pm_c_o_vote_n:'不投票（展示完直接定稿）', pm_c_o_vote_y:'展示後開放投票',
+  pm_c_opts_hint:'這四項在建立後就鎖住不可更改 —— 大家是在哪一種規則下寫的，就一直是那一種。',
+  pm_cap_used:'已寫 {n}／{cap} 則', pm_cap_reached:'你已達到本場上限（每人 {cap} 則）。',
+  pmt_gratitude_name:'感恩留言', pmt_retro_name:'專案回顧', pmt_general_name:'意見徵集',
+  pmt_gratitude_desc:'寫下想感謝的人與一件具體的事。預設具名、寫完才一起揭露、不投票。',
+  pmt_retro_desc:'回顧一段期間哪些好、哪些要改。預設匿名（講真話比較安全）、開放投票收斂重點。',
+  pmt_general_desc:'一般的意見收集。預設具名、填寫時即時互相看得到、不投票。',
+  pmt_gratitude_scen:'請寫下你想感謝的人，以及一件具體的事。越具體越好 ——「上週三他留下來陪我把報告趕完」比「他人很好」有力得多。想感謝第二個、第三個人，就再送一則。',
+  pmt_retro_scen:'回顧這段期間：哪些做得好、值得繼續？哪些不順、下次要改？請具體到「哪一件事、發生了什麼、影響是什麼」，一則一件。',
+  pmt_general_scen:'請針對上面的題目寫下你的意見，一則一個重點，具體越好。',
   pm_vote_progress:'投票進度：{done}／{total} 人已投完',
   pm_vote_auto_hint:'全員投完後會自動進入「{next}」。',
   pm_auto_advance:'全員已投完，自動進入「{next}」',
@@ -964,6 +1020,21 @@ const B_I18N = {
   pm_you_voted:'你已投 {n}／{cap} 票', pm_ai_cluster:'🤖 AI 分群',
   pm_ai_cluster_hint:'把相似的{item}自动归类成主题（可再按重跑）',
   pm_vote_cap_hint:'（每人最多 {cap} 票）。', pm_by_votes:'（依票数）',
+  nav_collect:'意见征集',
+  pm_c_tpl:'选择范本', pm_c_opts:'这场会议的规则（建立后不可更改）',
+  pm_c_o_anon:'留言署名', pm_c_o_named:'具名（显示是谁写的）', pm_c_o_anon_v:'匿名（不显示填写者）',
+  pm_c_o_live:'填写时的可见性', pm_c_o_live_n:'写完才一起揭示', pm_c_o_live_y:'即时互相看得到',
+  pm_c_o_cap:'每人则数上限', pm_c_o_cap_0:'不限',
+  pm_c_o_vote:'投票阶段', pm_c_o_vote_n:'不投票（展示完直接定稿）', pm_c_o_vote_y:'展示后开放投票',
+  pm_c_opts_hint:'这四项在建立后就锁住不可更改 —— 大家是在哪一种规则下写的，就一直是那一种。',
+  pm_cap_used:'已写 {n}／{cap} 则', pm_cap_reached:'你已达到本场上限（每人 {cap} 则）。',
+  pmt_gratitude_name:'感恩留言', pmt_retro_name:'项目回顾', pmt_general_name:'意见征集',
+  pmt_gratitude_desc:'写下想感谢的人与一件具体的事。默认具名、写完才一起揭示、不投票。',
+  pmt_retro_desc:'回顾一段期间哪些好、哪些要改。默认匿名（讲真话比较安全）、开放投票收敛重点。',
+  pmt_general_desc:'一般的意见收集。默认具名、填写时即时互相看得到、不投票。',
+  pmt_gratitude_scen:'请写下你想感谢的人，以及一件具体的事。越具体越好 ——“上周三他留下来陪我把报告赶完”比“他人很好”有力得多。想感谢第二个、第三个人，就再送一则。',
+  pmt_retro_scen:'回顾这段期间：哪些做得好、值得继续？哪些不顺、下次要改？请具体到“哪一件事、发生了什么、影响是什么”，一则一件。',
+  pmt_general_scen:'请针对上面的题目写下你的意见，一则一个重点，具体越好。',
   pm_vote_progress:'投票进度：{done}／{total} 人已投完',
   pm_vote_auto_hint:'全员投完后会自动进入「{next}」。',
   pm_auto_advance:'全员已投完，自动进入「{next}」',
@@ -1117,6 +1188,21 @@ const B_I18N = {
   pm_you_voted:'You have used {n}/{cap} votes', pm_ai_cluster:'🤖 AI clustering',
   pm_ai_cluster_hint:'Group similar {item} into themes (press again to re-run)',
   pm_vote_cap_hint:' (up to {cap} votes each).', pm_by_votes:' (by votes)',
+  nav_collect:'Idea Collection',
+  pm_c_tpl:'Choose a template', pm_c_opts:'Rules for this session (locked once created)',
+  pm_c_o_anon:'Attribution', pm_c_o_named:'Named (show who wrote it)', pm_c_o_anon_v:'Anonymous (hide the author)',
+  pm_c_o_live:'Visibility while writing', pm_c_o_live_n:'Revealed together at the end', pm_c_o_live_y:'Visible to each other in real time',
+  pm_c_o_cap:'Entries per person', pm_c_o_cap_0:'Unlimited',
+  pm_c_o_vote:'Vote phase', pm_c_o_vote_n:'No vote (finalize after presentation)', pm_c_o_vote_y:'Open voting after presentation',
+  pm_c_opts_hint:'These four are locked once the session is created — the terms people wrote under stay the terms.',
+  pm_cap_used:'{n}/{cap} written', pm_cap_reached:'You have reached this session\u2019s limit ({cap} per person).',
+  pmt_gratitude_name:'Gratitude', pmt_retro_name:'Retrospective', pmt_general_name:'Idea Collection',
+  pmt_gratitude_desc:'Name someone and one specific thing they did. Defaults: named, revealed together, no vote.',
+  pmt_retro_desc:'Look back at what went well and what to change. Defaults: anonymous (safer for honesty), voting enabled.',
+  pmt_general_desc:'General-purpose collection. Defaults: named, visible in real time, no vote.',
+  pmt_gratitude_scen:'Write down someone you want to thank and one specific thing they did. The more specific the better \u2014 \u201Che stayed late last Wednesday to help me finish the report\u201D carries far more weight than \u201Che is a nice person\u201D. To thank a second or third person, submit another entry.',
+  pmt_retro_scen:'Looking back over this period: what went well and is worth keeping? What did not, and should change next time? Be specific about what happened and what it affected \u2014 one thing per entry.',
+  pmt_general_scen:'Write your responses to the question above \u2014 one point per entry, the more specific the better.',
   pm_vote_progress:'Voting progress: {done}/{total} people finished',
   pm_vote_auto_hint:'Moves on to “{next}” automatically once everyone has voted.',
   pm_auto_advance:'Everyone has voted — moving on to “{next}”',
@@ -1270,6 +1356,21 @@ const B_I18N = {
   pm_you_voted:'Bạn đã dùng {n}/{cap} phiếu', pm_ai_cluster:'🤖 Phân nhóm bằng AI',
   pm_ai_cluster_hint:'Tự gom các {item} tương tự thành chủ đề (bấm lại để chạy lại)',
   pm_vote_cap_hint:' (tối đa {cap} phiếu mỗi người).', pm_by_votes:' (theo số phiếu)',
+  nav_collect:'Thu thập ý kiến',
+  pm_c_tpl:'Chọn mẫu', pm_c_opts:'Quy tắc của buổi này (khóa sau khi tạo)',
+  pm_c_o_anon:'Ghi tên', pm_c_o_named:'Ghi tên (hiển thị người viết)', pm_c_o_anon_v:'Ẩn danh (không hiển thị người viết)',
+  pm_c_o_live:'Khả năng nhìn thấy khi viết', pm_c_o_live_n:'Viết xong mới cùng công bố', pm_c_o_live_y:'Thấy nhau theo thời gian thực',
+  pm_c_o_cap:'Số mục tối đa mỗi người', pm_c_o_cap_0:'Không giới hạn',
+  pm_c_o_vote:'Giai đoạn bỏ phiếu', pm_c_o_vote_n:'Không bỏ phiếu (trình bày xong là chốt)', pm_c_o_vote_y:'Mở bỏ phiếu sau khi trình bày',
+  pm_c_opts_hint:'Bốn mục này bị khóa ngay khi tạo — mọi người viết với quy tắc nào thì giữ nguyên quy tắc đó.',
+  pm_cap_used:'Đã viết {n}/{cap}', pm_cap_reached:'Bạn đã đạt giới hạn của buổi này ({cap} mục mỗi người).',
+  pmt_gratitude_name:'Lời cảm ơn', pmt_retro_name:'Nhìn lại dự án', pmt_general_name:'Thu thập ý kiến',
+  pmt_gratitude_desc:'Viết người bạn muốn cảm ơn và một việc cụ thể. Mặc định: ghi tên, công bố cùng lúc, không bỏ phiếu.',
+  pmt_retro_desc:'Nhìn lại điều gì tốt, điều gì cần đổi. Mặc định: ẩn danh (nói thật an toàn hơn), có bỏ phiếu.',
+  pmt_general_desc:'Thu thập ý kiến thông thường. Mặc định: ghi tên, thấy nhau theo thời gian thực, không bỏ phiếu.',
+  pmt_gratitude_scen:'Hãy viết người bạn muốn cảm ơn và một việc cụ thể. Càng cụ thể càng tốt — “thứ Tư tuần trước anh ấy ở lại giúp tôi làm xong báo cáo” có sức nặng hơn nhiều so với “anh ấy là người tốt”. Muốn cảm ơn người thứ hai, thứ ba thì gửi thêm mục mới.',
+  pmt_retro_scen:'Nhìn lại giai đoạn này: điều gì làm tốt và đáng tiếp tục? Điều gì chưa suôn sẻ và lần sau cần thay đổi? Hãy cụ thể về việc gì đã xảy ra và ảnh hưởng ra sao — mỗi mục một việc.',
+  pmt_general_scen:'Hãy viết ý kiến của bạn về đề bài phía trên — mỗi mục một trọng điểm, càng cụ thể càng tốt.',
   pm_vote_progress:'Tiến độ bỏ phiếu: {done}/{total} người đã xong',
   pm_vote_auto_hint:'Sẽ tự động chuyển sang “{next}” khi mọi người bỏ phiếu xong.',
   pm_auto_advance:'Mọi người đã bỏ phiếu xong — tự động chuyển sang “{next}”',
@@ -1423,6 +1524,21 @@ const B_I18N = {
   pm_you_voted:'{n}／{cap} 票を使用', pm_ai_cluster:'🤖 AI 分類',
   pm_ai_cluster_hint:'似た{item}を自動でテーマに分類します（再度押すと再実行）',
   pm_vote_cap_hint:'（1人最大 {cap} 票）。', pm_by_votes:'（得票順）',
+  nav_collect:'意見収集',
+  pm_c_tpl:'テンプレートを選択', pm_c_opts:'この会議のルール（作成後は変更不可）',
+  pm_c_o_anon:'記名設定', pm_c_o_named:'記名（書いた人を表示）', pm_c_o_anon_v:'匿名（記入者を表示しない）',
+  pm_c_o_live:'記入中の可視性', pm_c_o_live_n:'書き終えてから一斉公開', pm_c_o_live_y:'リアルタイムで互いに見える',
+  pm_c_o_cap:'1人あたりの上限件数', pm_c_o_cap_0:'無制限',
+  pm_c_o_vote:'投票フェーズ', pm_c_o_vote_n:'投票なし（提示後そのまま確定）', pm_c_o_vote_y:'提示後に投票を実施',
+  pm_c_opts_hint:'この4項目は作成した時点でロックされます —— どのルールで書いたかは最後まで変わりません。',
+  pm_cap_used:'{n}／{cap} 件記入済み', pm_cap_reached:'この会議の上限に達しました（1人 {cap} 件）。',
+  pmt_gratitude_name:'感謝メッセージ', pmt_retro_name:'プロジェクト振り返り', pmt_general_name:'意見収集',
+  pmt_gratitude_desc:'感謝したい人と具体的な出来事を1件。既定：記名・一斉公開・投票なし。',
+  pmt_retro_desc:'この期間の良かった点・変えるべき点を振り返る。既定：匿名（本音が出やすい）・投票あり。',
+  pmt_general_desc:'一般的な意見収集。既定：記名・リアルタイムで見える・投票なし。',
+  pmt_gratitude_scen:'感謝したい人と、具体的な出来事を書いてください。具体的なほど良いです ——「先週の水曜、残って報告書を仕上げるのを手伝ってくれた」は「良い人です」よりずっと重みがあります。2人目、3人目を感謝したい場合は、もう1件送ってください。',
+  pmt_retro_scen:'この期間を振り返って：うまくいって続けたいことは？うまくいかず次は変えたいことは？「何が起きて、何に影響したか」まで具体的に、1件につき1つ。',
+  pmt_general_scen:'上のお題について、あなたの意見を書いてください。1件につき1つの要点、具体的なほど良いです。',
   pm_vote_progress:'投票状況：{done}／{total} 名が投票完了',
   pm_vote_auto_hint:'全員の投票が終わると自動的に「{next}」へ進みます。',
   pm_auto_advance:'全員の投票が完了しました。「{next}」へ進みます',
@@ -1782,7 +1898,7 @@ function bRerenderAll() {
   try { wmRenderList(); if (wmState) wmFillForm(); } catch (e) {}
   try { if (window.MeetingMinutes && window.MeetingMinutes.relabel) window.MeetingMinutes.relabel(); } catch (e) {}
   try { wrRenderList(); if (wrState) wrFillForm(); } catch (e) {}
-  try { pmApplyKindLabels(); if (pmSession) pmRenderRoom(); else pmRenderList(); } catch (e) {}
+  try { pmApplyKindLabels(); pmRenderTplChips(); if (pmSession) pmRenderRoom(); else pmRenderList(); } catch (e) {}
   try { if (plSession) plRenderRoom(); else plRenderList(); } catch (e) {}
 }
 
@@ -1948,8 +2064,8 @@ function switchTab(name) {
     else if (window.MeetingMinutes && window.MeetingMinutes.refreshList) window.MeetingMinutes.refreshList();
   }
   if (name === 'woody') wrLoadList();
-  // 事前驗屍與腦力激盪共用 #pm-shell：先把它搬到目前的頁籤，再依 kind 載入清單
-  if (name === 'premortem' || name === 'brainstorm') { pmMountShell(name); pmLoadList(); }
+  // 三種 pm* 會議共用 #pm-shell：先把它搬到目前的頁籤，再依 kind 載入清單
+  if (PM_KINDS[name]) { pmMountShell(name); pmLoadList(); }
   else pmPollStop();
   if (name === 'poll') plLoadList(); else plPollStop();
 }
@@ -3445,6 +3561,10 @@ function wrPrint(){
 // ═══════════════════════════════════════════════
 const PM_LANGS = [['zh-TW','繁體中文'],['zh-CN','简体中文'],['vi','Tiếng Việt'],['en','English'],['ja','日本語']];
 const PM_LANG_SHORT = { 'zh-TW':'繁中','zh-CN':'简中','vi':'越南語','en':'English','ja':'日本語' };
+// 階段清單改為「每種會議自己一份」（v1.61）：意見徵集沒有「對策」，投票也是可選的。
+// PM_PHASES 保留為驗屍／腦力激盪的完整版；實際取用一律經 pmPhases()，那裡才看得到
+// 「這一場有沒有開投票」。所有比較階段先後的地方（pmPhaseIdx／pmCanGoPhase／pmSetPhase）
+// 都吃 pmPhases() 的結果，所以少一個階段時「往前只能走一步」自動就跳過它。
 const PM_PHASES = ['intro','setup','writing','reveal','ranking','mitigation','locked'];
 
 // 說明頁 i18n（概念／規則／時間分配／操作）── 事前驗屍版
@@ -3597,6 +3717,118 @@ const PM_SUM_PARTS_BS = [
       '- 明確建議下一步：先做哪一個、如何驗證、哪些點子建議先放掉以及為什麼。不要停在描述層。' },
 ];
 
+// ── 說明頁 i18n ── 意見徵集版（中性；範本專屬的說法由 PM_TEMPLATES 的引導語補足）
+const PM_INTRO_CL = {
+  'zh-TW': { title:'意見徵集 · 說明',
+    concept:'意見徵集是「大家各自寫、然後一起看」的通用會議。研究上這叫名義小組法（Nominal Group Technique）：先讓每個人獨立把想法寫下來，再一起揭露，比一開始就開放討論收集到更多也更平均的意見 —— 因為聲音大的人不會先把方向定死，內向的人也不必搶著發言。本程式的「感恩留言／專案回顧／意見徵集」三種範本都建立在這個流程上。',
+    rulesT:'規則', rules:['先寫再看：填寫階段的可見性由主席建會時決定，預設是寫完才一起揭露。','具體優先：寫「上週三他留下來陪我把報告趕完」，不要寫「他人很好」。具體的內容才有重量、也才翻譯得準。','一則一件事：想寫第二件、第三件就再送一則，不要擠在同一則裡。','匿名與否由主席在建會時決定，且建立後不可更改 —— 大家是在哪一種前提下寫的，就一直是那一種。'],
+    timeT:'時間分配（約 15–25 分鐘）', time:['說明與主題設定：2–3 分鐘','各自填寫：5–8 分鐘','展示與逐則說明：約 10 分鐘','（若有開投票）票選：約 5 分鐘'],
+    howtoT:'本程式操作', howto:['主席用上方階段列控制流程：說明 → 主題設定 → 開放填寫 → 展示 → （投票）→ 定稿。階段必須依序進行，可以退回但不能跳過。','用你自己的語言填寫，系統自動翻成會議設定的兩種語言並排顯示。','「展示」階段主席可按「▶ 播放」逐則放大呈現，全場畫面會跟著跳到同一則，適合投影。','「投票」階段是可選的，由主席建會時決定要不要開。','「定稿」後鎖定，並自動產生 AI 的彙整與會議結論。'] },
+  'zh-CN': { title:'意见征集 · 说明',
+    concept:'意见征集是“大家各自写、然后一起看”的通用会议。研究上这叫名义小组法（Nominal Group Technique）：先让每个人独立把想法写下来，再一起揭示，比一开始就开放讨论收集到更多也更平均的意见 —— 因为声音大的人不会先把方向定死，内向的人也不必抢着发言。本程序的“感恩留言／项目回顾／意见征集”三种范本都建立在这个流程上。',
+    rulesT:'规则', rules:['先写再看：填写阶段的可见性由主席建会时决定，默认是写完才一起揭示。','具体优先：写“上周三他留下来陪我把报告赶完”，不要写“他人很好”。具体的内容才有重量、也才翻译得准。','一则一件事：想写第二件、第三件就再送一则，不要挤在同一则里。','匿名与否由主席在建会时决定，且建立后不可更改 —— 大家是在哪一种前提下写的，就一直是那一种。'],
+    timeT:'时间分配（约 15–25 分钟）', time:['说明与主题设定：2–3 分钟','各自填写：5–8 分钟','展示与逐则说明：约 10 分钟','（若有开投票）票选：约 5 分钟'],
+    howtoT:'本程序操作', howto:['主席用上方阶段栏控制流程：说明 → 主题设定 → 开放填写 → 展示 →（投票）→ 定稿。阶段必须依序进行，可以退回但不能跳过。','用你自己的语言填写，系统自动翻成会议设定的两种语言并排显示。','“展示”阶段主席可按“▶ 播放”逐则放大呈现，全场画面会跟着跳到同一则，适合投影。','“投票”阶段是可选的，由主席建会时决定要不要开。','“定稿”后锁定，并自动产生 AI 的汇整与会议结论。'] },
+  'en': { title:'Idea Collection · Guide',
+    concept:'Idea Collection is a general-purpose session where everyone writes on their own first and the group reads them together afterwards. In the literature this is the Nominal Group Technique: having each person record their thoughts independently before any discussion yields more ideas, and a more even spread of them, than opening the floor straight away — the loudest voice does not set the direction first, and quieter people do not have to compete for airtime. All three templates here (Gratitude, Retrospective, Idea Collection) are built on this flow.',
+    rulesT:'Rules', rules:['Write first, read later: visibility during the writing phase is set by the chair at creation. The default is that everything is revealed together at the end.','Be specific: "he stayed late last Wednesday to help me finish the report" beats "he is a nice person". Specifics carry weight — and translate accurately.','One thing per entry: to add a second or third, submit another entry rather than cramming them together.','Anonymity is chosen by the chair at creation and cannot be changed afterwards — the terms people wrote under stay the terms.'],
+    timeT:'Time allocation (about 15–25 min)', time:['Guide and framing: 2–3 min','Write individually: 5–8 min','Present and walk through: about 10 min','Vote (if enabled): about 5 min'],
+    howtoT:'Using this tool', howto:['The chair drives the flow with the phase bar above: Guide → Framing → Writing → Presentation → (Vote) → Finalize. Phases run in order — you can go back but not skip ahead.','Write in your own language; the system auto-translates into the two meeting languages, shown side by side.','In Presentation the chair can hit "▶ Play" to show entries one at a time, enlarged. Everyone\'s screen follows to the same entry — made for projecting.','The Vote phase is optional and is enabled by the chair at creation.','After Finalize the record is locked and AI writes a summary plus the meeting conclusion.'] },
+  'vi': { title:'Thu thập ý kiến · Hướng dẫn',
+    concept:'Thu thập ý kiến là cuộc họp đa dụng theo kiểu "mỗi người tự viết trước, sau đó cùng xem". Trong nghiên cứu, đây gọi là Kỹ thuật Nhóm Danh nghĩa (Nominal Group Technique): để mỗi người ghi lại suy nghĩ một cách độc lập trước khi thảo luận sẽ thu được nhiều ý kiến hơn và phân bố đều hơn — người nói to không định sẵn hướng đi, người hướng nội cũng không phải tranh lượt phát biểu. Cả ba mẫu ở đây (Lời cảm ơn / Nhìn lại dự án / Thu thập ý kiến) đều dựa trên quy trình này.',
+    rulesT:'Quy tắc', rules:['Viết trước, xem sau: khả năng nhìn thấy trong giai đoạn viết do chủ tọa quyết định khi tạo cuộc họp. Mặc định là viết xong mới cùng công bố.','Ưu tiên cụ thể: hãy viết "thứ Tư tuần trước anh ấy ở lại giúp tôi làm xong báo cáo", đừng viết "anh ấy là người tốt". Nội dung cụ thể mới có sức nặng và mới dịch chính xác.','Mỗi mục một việc: muốn viết việc thứ hai, thứ ba thì gửi thêm mục mới, đừng dồn vào một mục.','Ẩn danh hay ghi tên do chủ tọa quyết định khi tạo và không thể thay đổi sau đó — mọi người viết với điều kiện nào thì giữ nguyên điều kiện đó.'],
+    timeT:'Phân bổ thời gian (khoảng 15–25 phút)', time:['Hướng dẫn và xác định chủ đề: 2–3 phút','Tự viết: 5–8 phút','Trình bày và đi qua từng mục: khoảng 10 phút','Bỏ phiếu (nếu có bật): khoảng 5 phút'],
+    howtoT:'Sử dụng công cụ này', howto:['Chủ tọa điều khiển quy trình bằng thanh giai đoạn phía trên: Hướng dẫn → Chủ đề → Viết → Trình bày → (Bỏ phiếu) → Chốt. Các giai đoạn diễn ra tuần tự — có thể quay lại nhưng không thể bỏ qua.','Viết bằng ngôn ngữ của bạn; hệ thống tự dịch sang hai ngôn ngữ của cuộc họp, hiển thị song song.','Ở giai đoạn Trình bày, chủ tọa có thể bấm "▶ Phát" để hiển thị phóng to từng mục. Màn hình của mọi người sẽ nhảy theo cùng một mục — rất hợp để trình chiếu.','Giai đoạn Bỏ phiếu là tùy chọn, do chủ tọa bật khi tạo cuộc họp.','Sau khi Chốt, hồ sơ bị khóa và AI tự động viết phần tổng hợp cùng kết luận cuộc họp.'] },
+  'ja': { title:'意見収集 · 説明',
+    concept:'意見収集は「各自で書いてから、みんなで見る」汎用の会議です。研究上はノミナル・グループ法（Nominal Group Technique）と呼ばれ、議論の前に各自が独立して考えを書き留めるほうが、最初から自由討論するよりも多く、かつ偏りの少ない意見が集まります —— 声の大きい人が先に方向を決めてしまわず、内向的な人も発言を奪い合う必要がないからです。本ツールの3つのテンプレート（感謝メッセージ／プロジェクト振り返り／意見収集）はいずれもこの流れに基づいています。',
+    rulesT:'ルール', rules:['先に書き、後で見る：記入中の可視性は司会が会議作成時に決めます。既定は全員が書き終えてから一斉公開です。','具体的に：「先週の水曜、残って報告書を仕上げるのを手伝ってくれた」と書き、「良い人です」とは書かない。具体的な内容にこそ重みがあり、翻訳も正確になります。','1件につき1つ：2つ目、3つ目を書きたければ別の1件として送ってください。','記名か匿名かは作成時に司会が決め、その後は変更できません —— どちらの前提で書いたかは最後まで変わりません。'],
+    timeT:'時間配分（約15〜25分）', time:['説明とお題の設定：2〜3分','各自で記入：5〜8分','提示と1件ずつの共有：約10分','投票（有効時）：約5分'],
+    howtoT:'このツールの操作', howto:['司会は上部のフェーズバーで進行を操作：説明 → お題 → 記入 → 提示 →（投票）→ 確定。フェーズは順番に進みます（戻れますが飛ばせません）。','自分の言語で記入すると、会議で設定した2言語へ自動翻訳し並べて表示します。','「提示」では司会が「▶ 再生」を押すと1件ずつ拡大表示され、全員の画面が同じ1件に追随します。投影に最適です。','「投票」フェーズは任意で、作成時に司会が有効にします。','「確定」後はロックされ、AI が要約と会議結論を自動生成します。'] },
+};
+
+// ── AI 三段分析：意見徵集版 ──
+// 🔴 語氣是三種會議最大的差異。驗屍全程嚴厲、腦力激盪前兩段建設性；意見徵集**全程溫暖具體**。
+//    這裡收到的常常是同事對同事的感謝、或是團隊對一段經歷的真心話 —— 用審查顧問的語氣去評分，
+//    等於當眾評比誰的感謝比較有價值，會直接毀掉這場會議的意義。批判性判斷只保留給「流程」，不給「人」。
+const PM_SUM_SYS_CL =
+  '你是一位資深的組織發展顧問與會議引導者，擅長從一群人各自寫下的內容裡，看見他們自己沒說出口的共同樣貌。' +
+  '你正在總結一場「意見徵集」會議（可能是感恩留言、專案回顧或一般意見收集），' +
+  '你寫出的內容會成為這場會議的正式結論並永久存檔。\n\n' +
+  '寫作要求：\n' +
+  '- 溫暖但不空洞：這些內容是同仁認真寫下的，請認真對待。不要用「大家都很棒」這種沒有資訊量的話帶過，' +
+  '要具體指出「誰做了什麼、為什麼那件事重要」。溫暖來自看得夠仔細，不是來自形容詞。\n' +
+  '- 引用原話：講到某一則時，把關鍵的原句摘出來，讓讀的人認得出那是誰寫的哪一件事。\n' +
+  '- 看見模式：指出反覆出現的主題、被多人提到的同一件事、以及集中在哪些人或哪些環節。' +
+  '這些模式往往揭示了組織裡真正在運作的協作關係，而那是任何組織圖都畫不出來的。\n' +
+  '- 🔴 絕對不要評分、排名、比較誰寫得好或誰被提到得多而誰沒有。' +
+  '沒有被提到不代表沒有貢獻，只代表這一次沒有人想起來 —— 這一點必要時要寫出來提醒讀者。\n' +
+  '- 需要下判斷時，只針對流程與做法（例如「這件事一直靠同一個人補位，那是結構問題不是熱心問題」），' +
+  '絕不評論個人的能力或性格。\n' + PM_SUM_TAIL;
+
+const PM_SUM_PARTS_CL = [
+  { key: 'p1', title: '【第一部分】這場會議說了什麼（彙整與重點摘錄）',
+    disp: { 'zh-TW':'【第一部分】這場會議說了什麼', 'zh-CN':'【第一部分】这场会议说了什么',
+      vi:'【Phần 1】Cuộc họp này đã nói gì', en:'[Part 1] What this session said',
+      ja:'【第1部】この会議で語られたこと' },
+    ask: '把全部內容彙整成一份讀得下去的摘要。\n' +
+      '- 依主題歸類，每一類寫出它涵蓋了哪些內容、被幾則提到。\n' +
+      '- 每一類至少摘錄一句原話（可精簡但不要改寫語氣），讓讀的人回想得起現場。\n' +
+      '- 若有明確的對象（某個人、某個團隊、某個部門），整理出「誰因為什麼事被提到」，' +
+      '按被提到的內容分組，不要按次數排名。\n' +
+      '- 這一段只做整理與呈現，不要評價、不要下判斷。' },
+  { key: 'p2', title: '【第二部分】從這些內容看見的模式',
+    disp: { 'zh-TW':'【第二部分】從這些內容看見的模式', 'zh-CN':'【第二部分】从这些内容看见的模式',
+      vi:'【Phần 2】Những mô thức nhìn thấy từ nội dung này', en:'[Part 2] Patterns visible in the responses',
+      ja:'【第2部】ここから見える傾向' },
+    ask: '指出與會者各自寫、但合起來才看得出來的東西。\n' +
+      '- 哪些主題反覆出現？同一件事被幾個不同的人從不同角度提到？那通常代表它真的重要。\n' +
+      '- 協作的真實樣貌：哪些跨部門、跨中心的連結被提到了？哪些連結明顯不存在？\n' +
+      '- 哪些是結構性的訊號：例如某個環節一直靠特定人補位、某段流程反覆被提起、' +
+      '某種協助總是發生在下班後。點出「這是結構問題，不是個人熱心與否的問題」。\n' +
+      '- 也要指出這批內容的盲點：有哪一整片區域、哪一群人、哪一種工作沒有出現在任何一則裡。\n' +
+      '- 🔴 不要排名、不要比較誰被提到得多。沒被提到只代表這次沒被想起來。' },
+  { key: 'p3', title: '【第三部分】AI 會議結論',
+    disp: { 'zh-TW':'【第三部分】AI 會議結論', 'zh-CN':'【第三部分】AI 会议结论',
+      vi:'【Phần 3】Kết luận cuộc họp của AI', en:'[Part 3] AI meeting conclusion',
+      ja:'【第3部】AI による会議結論' },
+    ask: '彙整整場會議，寫出結論。\n' +
+      '- 這場會議最值得留下來的是什麼？如果半年後只有一個人會重讀這份紀錄，你希望他看到哪一段？\n' +
+      '- 這些內容告訴我們這個團隊目前真正的樣子（不是它宣稱的樣子）。\n' +
+      '- 若內容裡浮現了可以行動的事（某個流程該調整、某種協助該制度化、某個盲點該補），' +
+      '明確寫出來，並說明第一步是什麼。沒有就說沒有，不要硬湊行動項。\n' +
+      '- 結語要收得住：用一句話講完這場會議的意義，不要用勵志口號收尾。' },
+];
+
+// ═══════════ 填寫範本 PM_TEMPLATES ═══════════
+// 🔴 範本只屬於「意見徵集（collect）」這個類型 —— 驗屍與腦力激盪的行為是方法論承諾，不走範本。
+//    範本負責兩件事：① 預填主席建會表單裡那四個可設定旗標 ② 決定填寫欄位是一欄還是兩欄。
+//    選完範本後主席仍可逐項調整，所以這裡的 defaults 是「建議值」不是「規則」。
+//    畫面文案走 i18n key（`pmt_<key>_*`，五語）；z 是繁中固定詞彙，給 AI 提示詞與四種輸出用。
+const PM_TEMPLATES = {
+  gratitude: {
+    key: 'gratitude', icon: '🙏', fields: 2,
+    // 具名：感謝寫給誰、誰寫的，看得到才有溫度，也才追得下去。想匿名的場次主席自己改。
+    // 不即時可見：避免「看到別人感謝誰就跟著感謝誰」，也讓展示階段保有驚喜。
+    defaults: { anonymous: false, liveVisible: false, vote: false, entryCap: 0 },
+    z: { name:'感恩留言', item:'感恩留言', f1:'感謝對象', f2:'具體事實',
+         scen:'請寫下你想感謝的人，以及一件具體的事。越具體越好 ——「上週三他留下來陪我把報告趕完」比「他人很好」有力得多。想感謝第二個、第三個人，就再送一則。' },
+  },
+  retro: {
+    key: 'retro', icon: '🔄', fields: 1,
+    // 回顧要講真話，匿名比較安全；預設開投票，讓大家收斂出最該處理的幾項。
+    defaults: { anonymous: true, liveVisible: false, vote: true, entryCap: 0 },
+    z: { name:'專案回顧', item:'回顧意見', f1:'', f2:'',
+         scen:'回顧這段期間：哪些做得好、值得繼續？哪些不順、下次要改？請具體到「哪一件事、發生了什麼、影響是什麼」，一則一件。' },
+  },
+  general: {
+    key: 'general', icon: '💬', fields: 1,
+    defaults: { anonymous: false, liveVisible: true, vote: false, entryCap: 0 },
+    z: { name:'意見徵集', item:'意見', f1:'', f2:'',
+         scen:'請針對上面的題目寫下你的意見，一則一個重點，具體越好。' },
+  },
+};
+const PM_TEMPLATE_ORDER = ['gratitude', 'retro', 'general'];
+
 // ═══════════ 會議類型設定表 PM_KINDS ═══════════
 // 🔴 事前驗屍與腦力激盪是**同一套程式**：階段機、雙語翻譯、投票、AI 分群、AI 三段分析、
 //    四種輸出、主席控制、寫入防護全部共用，資料也在同一組 premortem_* 表（以 kind 欄位區分）。
@@ -3638,6 +3870,32 @@ const PM_KINDS = {
       titlePh: '例如：2027 年新事業方向', descPh: '簡述這次發想的背景、既有限制與希望達成的目標…',
       writeTitle: '寫下你的點子（越多越好，先不用管可行性）', writePh: '一則一個點子，天馬行空也沒關係…',
       voteHint: '為你認為最值得做的點子投票',
+    },
+  },
+  // ── 意見徵集：唯一可由主席設定行為的類型 ──
+  // 🔴 上面兩種的旗標是**方法論承諾**，不放進 configurable：驗屍的「全程匿名」一旦變成主席可以
+  //    關掉的選項，與會者每次寫之前都得先確認這場是開還是關，那份安全感就沒了；腦力激盪的
+  //    「即時可見」同理，那是 Osborn 的 hitchhiking 而不是排版偏好。configurable 是空的＝寫死。
+  collect: {
+    label: '意見徵集', icon: '💬', tab: 'collect',
+    // 這裡的三個旗標只是「沒有範本、沒有設定時」的保底值，實際一律經 pmOpt() 讀 session 的 opt_*
+    anonymous: false, liveVisible: false, voteCap: 5,
+    configurable: ['anonymous', 'liveVisible', 'vote', 'entryCap'],
+    templates: PM_TEMPLATE_ORDER,
+    // 沒有「對策」階段；ranking 是否出現由 opt_vote 決定（見 pmPhases）
+    phases: ['intro','setup','writing','reveal','ranking','locked'],
+    phaseLabel: { intro:'說明', setup:'主題設定', writing:'開放填寫', reveal:'展示', ranking:'投票', mitigation:'行動', locked:'定稿' },
+    defaultScenario: '請針對上面的題目寫下你的意見，一則一個重點，具體越好。',
+    intro: PM_INTRO_CL, sumSys: PM_SUM_SYS_CL, sumParts: PM_SUM_PARTS_CL,
+    cluster: { sys: 'You cluster short written responses into a few concise themes. Output ONLY a minified JSON object.',
+               usr: 'Group the following responses into 3 to 6 concise themes.' },
+    t: {
+      meet: '意見徵集', item: '意見', target: '意見', mit: '行動項', measure: '行動內容',
+      desc: '背景說明', scen: '題目／引導語', fileTag: 'Collect',
+      titlePh: '例如：2026 Q3 感恩留言',
+      descPh: '簡述這次徵集的背景與希望收到什麼樣的內容…（可留白）',
+      writeTitle: '寫下你的意見', writePh: '一則一個重點，越具體越好…',
+      voteHint: '為你最有共鳴的內容投票',
     },
   },
 };
@@ -3699,6 +3957,32 @@ const PM_KIND_I18N = {
           desc:'テーマの背景', scen:'お題', titlePh:'例：2027年の新規事業の方向性', descPh:'今回の発想の背景・既存の制約・達成したい目標を簡潔に…',
           writeTitle:'あなたのアイデアを書いてください（多いほど良い。実現性はいったん脇へ）', writePh:'1件につき1つ。突飛でも構いません…', voteHint:'最もやる価値があると思うアイデアに投票してください' } },
   },
+  collect: {
+    'zh-CN': { label:'意见征集',
+      phaseLabel:{ intro:'说明', setup:'主题设定', writing:'开放填写', reveal:'展示', ranking:'投票', mitigation:'行动', locked:'定稿' },
+      defaultScenario:'请针对上面的题目写下你的意见，一则一个重点，具体越好。',
+      t:{ meet:'意见征集', item:'意见', target:'意见', mit:'行动项', measure:'行动内容',
+          desc:'背景说明', scen:'题目／引导语', titlePh:'例如：2026 Q3 感恩留言', descPh:'简述这次征集的背景与希望收到什么样的内容…（可留白）',
+          writeTitle:'写下你的意见', writePh:'一则一个重点，越具体越好…', voteHint:'为你最有共鸣的内容投票' } },
+    'en': { label:'Idea Collection',
+      phaseLabel:{ intro:'Guide', setup:'Framing', writing:'Writing', reveal:'Presentation', ranking:'Vote', mitigation:'Actions', locked:'Finalize' },
+      defaultScenario:'Write your responses to the question above — one point per entry, the more specific the better.',
+      t:{ meet:'idea collection session', item:'entry', target:'entry', mit:'action item', measure:'action',
+          desc:'Background', scen:'Question / prompt', titlePh:'e.g. 2026 Q3 gratitude wall', descPh:'Briefly describe the background and what kind of responses you are hoping for… (optional)',
+          writeTitle:'Write your entry', writePh:'One point per entry, the more specific the better…', voteHint:'Vote for the entries that resonate most with you' } },
+    'vi': { label:'Thu thập ý kiến',
+      phaseLabel:{ intro:'Hướng dẫn', setup:'Chủ đề', writing:'Viết', reveal:'Trình bày', ranking:'Bỏ phiếu', mitigation:'Hành động', locked:'Chốt' },
+      defaultScenario:'Hãy viết ý kiến của bạn về đề bài phía trên — mỗi mục một trọng điểm, càng cụ thể càng tốt.',
+      t:{ meet:'buổi thu thập ý kiến', item:'ý kiến', target:'ý kiến', mit:'hạng mục hành động', measure:'nội dung hành động',
+          desc:'Bối cảnh', scen:'Đề bài / lời dẫn', titlePh:'VD: Lời cảm ơn Q3/2026', descPh:'Mô tả ngắn gọn bối cảnh và loại nội dung bạn mong nhận được… (có thể bỏ trống)',
+          writeTitle:'Viết ý kiến của bạn', writePh:'Mỗi mục một trọng điểm, càng cụ thể càng tốt…', voteHint:'Bỏ phiếu cho nội dung khiến bạn đồng cảm nhất' } },
+    'ja': { label:'意見収集',
+      phaseLabel:{ intro:'説明', setup:'お題', writing:'記入', reveal:'提示', ranking:'投票', mitigation:'アクション', locked:'確定' },
+      defaultScenario:'上のお題について、あなたの意見を書いてください。1件につき1つの要点、具体的なほど良いです。',
+      t:{ meet:'意見収集', item:'意見', target:'意見', mit:'アクション項目', measure:'行動内容',
+          desc:'背景説明', scen:'お題／導入文', titlePh:'例：2026 Q3 感謝メッセージ', descPh:'今回の収集の背景と、どんな内容を期待しているかを簡潔に…（省略可）',
+          writeTitle:'あなたの意見を書いてください', writePh:'1件につき1つの要点。具体的なほど良いです…', voteHint:'最も共感した内容に投票してください' } },
+  },
 };
 let pmKind = 'premortem';           // 目前所在頁籤的會議類型（清單／建會用）
 function pmCurKind() { return (pmSession && pmSession.kind) || pmKind; }
@@ -3722,9 +4006,44 @@ function pmPhaseLabelOf(kind, p) {
   return ((ov && ov.phaseLabel && ov.phaseLabel[p]) || base.phaseLabel[p] || p);
 }
 function pmVoteCap() { return PMK().voteCap; }
-// 兩個頁籤共用同一份 DOM：把 #pm-shell 搬到目前頁籤底下（只有一份，id 不會重複）
+
+// ── 行為旗標的唯一取用點 pmOpt()（v1.61）──
+// 🔴 三種會議的旗標來源不同，但讀取端只准有這一個入口：
+//    驗屍／腦力激盪 → 一律讀 PM_KINDS（寫死，configurable 是空的，session 的 opt_* 再怎麼被塞值都無效）
+//    意見徵集       → 讀該場 session 的 opt_*；沒設過（null／undefined）才退回 PM_KINDS 的保底值
+//    這個「只有 configurable 列出來的旗標才吃 session 值」的判斷是整個設計的安全閥，不要繞過它。
+function pmOptOf(s, name) {
+  const kind = (s && s.kind) || pmKind, K = PM_KINDS[kind] || PM_KINDS.premortem;
+  const conf = K.configurable || [];
+  if (s && conf.indexOf(name) >= 0) {
+    const col = { anonymous:'opt_anonymous', liveVisible:'opt_live_visible', vote:'opt_vote', entryCap:'opt_entry_cap' }[name];
+    const v = s[col];
+    if (v !== null && v !== undefined) return v;
+  }
+  if (name === 'vote') return true;        // 沒有 opt_vote 的類型（驗屍／腦力激盪）本來就有投票階段
+  if (name === 'entryCap') return 0;       // 0 = 不限
+  return K[name];
+}
+function pmOpt(name) { return pmOptOf(pmSession, name); }
+// 範本：只有意見徵集有。取不到就給 general（一欄自由文字），不會壞
+function pmTplOf(s) { return PM_TEMPLATES[(s && s.template) || ''] || null; }
+function pmTpl() { return pmTplOf(pmSession); }
+function pmFieldCount() { const t = pmTpl(); return t ? t.fields : 1; }
+
+// ── 這一場實際有哪些階段（v1.61）──
+// 沒宣告 phases 的類型（驗屍／腦力激盪）用完整版；意見徵集沒有「對策」，
+// 且 ranking 只有在主席建會時勾了「要投票」才會出現。所有比較階段先後的邏輯都吃這個結果，
+// 所以少一個階段時「往前只能走一步」會自動跳過它，不必另外寫特例。
+function pmPhasesOf(s) {
+  const kind = (s && s.kind) || pmKind, K = PM_KINDS[kind] || PM_KINDS.premortem;
+  const list = K.phases || PM_PHASES;
+  return pmOptOf(s, 'vote') ? list : list.filter(p => p !== 'ranking');
+}
+function pmPhases() { return pmPhasesOf(pmSession); }
+
+// 三個頁籤共用同一份 DOM：把 #pm-shell 搬到目前頁籤底下（只有一份，id 不會重複）
 function pmMountShell(kind) {
-  pmKind = (kind === 'brainstorm') ? 'brainstorm' : 'premortem';
+  pmKind = PM_KINDS[kind] ? kind : 'premortem';
   const host = document.getElementById('tabpanel-' + pmKind), shell = document.getElementById('pm-shell');
   if (host && shell && shell.parentNode !== host) host.appendChild(shell);
 }
@@ -4192,7 +4511,8 @@ async function pmLoadList() {
   pmSession = null;          // 回到清單就沒有「目前會議」，PMK() 才會跟著頁籤（pmKind）走
   pmShowView('list');
   pmApplyKindLabels();
-  const rows = await SB.get('premortem_sessions', '?select=id,kind,title,phase,scope_type,scope_site,scope_members,chair_emp_id,chair_name,created_by,updated_at,meet_at,meet_location&order=updated_at.desc&limit=200');
+  // template／opt_* 也要撈：清單列要標出這場的規則（匿名？投票？），而 pmPhaseLabelOf 也需要它們
+  const rows = await SB.get('premortem_sessions', '?select=id,kind,title,phase,scope_type,scope_site,scope_members,chair_emp_id,chair_name,created_by,updated_at,meet_at,meet_location,template,opt_anonymous,opt_live_visible,opt_vote,opt_entry_cap&order=updated_at.desc&limit=200');
   // kind 是 migration 033 才加的欄位；舊資料一律視為 premortem
   pmAllSessions = (rows || []).filter(x => (x.kind || 'premortem') === pmKind).filter(pmCanSee);
   pmRenderList();
@@ -4208,6 +4528,40 @@ function pmApplyKindLabels() {
   set('pm-c-scen-lb', T.scen + BT('pm_scen_suffix'));
   ph('pm-c-title', T.titlePh);
   ph('pm-c-desc', T.descPh);
+  // 範本與規則設定只有「可設定的類型」（目前只有意見徵集）看得到
+  const conf = (PM_KINDS[pmKind] || {}).configurable || [];
+  const tw = document.getElementById('pm-c-tpl-wrap'), ow = document.getElementById('pm-c-opt-wrap');
+  if (tw) tw.style.display = (PM_KINDS[pmKind] || {}).templates ? '' : 'none';
+  if (ow) ow.style.display = conf.length ? '' : 'none';
+}
+
+// ── 範本（只有意見徵集有）──
+// 選範本＝一次把四個旗標、引導語與欄位結構都帶好；主席選完仍可逐項改（除了欄位結構，那由範本決定）。
+let pmCTpl = 'gratitude';
+function pmRenderTplChips() {
+  const box = document.getElementById('pm-c-tpl'); if (!box) return;
+  const list = (PM_KINDS[pmKind] || {}).templates || [];
+  box.innerHTML = list.map(k => {
+    const t = PM_TEMPLATES[k];
+    return '<button class="chip-f' + (pmCTpl === k ? ' on' : '') + '" onclick="pmPickTpl(\'' + k + '\')">' +
+      t.icon + ' ' + escHtml(BT('pmt_' + k + '_name')) + '</button>';
+  }).join('');
+  const d = document.getElementById('pm-c-tpl-desc');
+  if (d) d.textContent = BT('pmt_' + pmCTpl + '_desc');
+}
+function pmPickTpl(k, keepText) {
+  if (!PM_TEMPLATES[k]) return;
+  pmCTpl = k;
+  const t = PM_TEMPLATES[k], d = t.defaults;
+  const set = (id, v) => { const e = document.getElementById(id); if (e) e.value = v; };
+  set('pm-c-anon', d.anonymous ? '1' : '0');
+  set('pm-c-live', d.liveVisible ? '1' : '0');
+  set('pm-c-vote', d.vote ? '1' : '0');
+  set('pm-c-cap', String(d.entryCap || 0));
+  // 引導語跟著範本換；主席已經動過筆就不覆蓋（keepText）
+  const sc = document.getElementById('pm-c-scenario');
+  if (sc && !keepText) sc.value = BT('pmt_' + k + '_scen');
+  pmRenderTplChips();
 }
 
 function pmRenderList() {
@@ -4271,6 +4625,9 @@ function pmNewSession() {
   document.getElementById('pm-c-desc').value = '';
   document.getElementById('pm-c-scenario').value = PMK().defaultScenario;
   document.getElementById('pm-c-scope').value = 'all';
+  // 意見徵集：預設挑第一個範本（會一併帶入引導語與四個旗標）
+  const tpls = (PM_KINDS[pmKind] || {}).templates;
+  if (tpls && tpls.length) { pmCTpl = tpls[0]; pmPickTpl(tpls[0]); }
   // 會議日期／時間自動帶入「現在」（當地時間，主席仍可改）；主席自動帶入登入者
   document.getElementById('pm-c-meetat').value = pmNowLocal();
   document.getElementById('pm-c-place').value = '';
@@ -4338,6 +4695,17 @@ async function pmCreateSubmit() {
     created_by: PORTAL_SESSION.empId,
     created_at: new Date().toISOString(), updated_at: new Date().toISOString(),
   };
+  // 可設定的類型（意見徵集）才寫 template／opt_*。其餘類型一律留 null，
+  // 讓 pmOptOf() 走 PM_KINDS 那條路——即使有人手動塞了值，configurable 是空的也讀不到。
+  const K = PM_KINDS[pmKind] || {};
+  if ((K.configurable || []).length) {
+    const val = id => (document.getElementById(id) || {}).value;
+    row.template = pmCTpl;
+    row.opt_anonymous = val('pm-c-anon') === '1';
+    row.opt_live_visible = val('pm-c-live') === '1';
+    row.opt_vote = val('pm-c-vote') === '1';
+    row.opt_entry_cap = parseInt(val('pm-c-cap') || '0', 10) || 0;
+  }
   pmCreating = true;
   const btn = document.getElementById('pm-c-submit');
   if (btn) { btn.disabled = true; btn.style.opacity = '.55'; }
@@ -4451,7 +4819,7 @@ async function pmRetryTranslations() {
 function pmSaveDraft() { const el = document.getElementById('pm-writebox'); if (el) pmDraft = el.value; }
 function pmRestoreDraft() { const el = document.getElementById('pm-writebox'); if (el && pmDraft) el.value = pmDraft; }
 
-// ── 重繪時不要把正在打字的人踢出輸入框（v1.60）──
+// ── 重繪時不要把正在打字的人踢出輸入框（v1.61）──
 // 會議室是整塊 innerHTML 重畫的：別人一送出內容／一則譯文補完，輪詢就把 DOM 換掉，
 // 正在打對策或填寫框的人游標會彈掉、中文輸入法組字到一半會被砍斷。兩道防線：
 //   ① 正在輸入文字時直接延後重繪（pmRerender），等他離開輸入框再畫；
@@ -4519,7 +4887,7 @@ function pmRenderPhasebar() {
   const bar = document.getElementById('pm-phasebar');
   if (!pmSession) { bar.innerHTML = ''; return; }
   if (pmIsChair(pmSession)) {
-    bar.innerHTML = '<span style="font-size:12px;color:var(--tx3);margin-right:2px">' + escHtml(BT('pm_phase')) + '</span>' + PM_PHASES.map(p => {
+    bar.innerHTML = '<span style="font-size:12px;color:var(--tx3);margin-right:2px">' + escHtml(BT('pm_phase')) + '</span>' + pmPhases().map(p => {
       const on = pmSession.phase === p, ok = on || pmCanGoPhase(p);
       return '<button class="chip-f' + (on ? ' on' : '') + '"' +
         (ok ? '' : ' disabled title="' + escHtml(BT('pm_phase_seq_tip')) + '"') +
@@ -4531,7 +4899,7 @@ function pmRenderPhasebar() {
       '<span style="font-size:11px;color:var(--tx3)">' + escHtml(BT('pm_rhythm', { name: pmSession.chair_name || '—' })) + '</span>';
   }
 }
-function pmPhaseIdx(p) { return PM_PHASES.indexOf(p); }
+function pmPhaseIdx(p) { return pmPhases().indexOf(p); }
 // 會議必須依序進行：往前只能走一步（不能開場直接按定稿，那會產生一場沒有內容的紀錄），
 // 但往回不限——主席發現前一階段還沒收完、要退回去補，是合理且常見的
 function pmCanGoPhase(to) {
@@ -4543,7 +4911,7 @@ async function pmSetPhase(p) {
   if (!pmIsChair(pmSession)) { boardToast(BT('pm_only_chair_phase')); return; }
   if (p === pmSession.phase) return;
   if (!pmCanGoPhase(p)) {
-    const nxt = PM_PHASES[pmPhaseIdx(pmSession.phase) + 1];
+    const nxt = pmPhases()[pmPhaseIdx(pmSession.phase) + 1];
     boardToast(BT('pm_seq_next', { next: nxt ? pmPhaseLabel(nxt) : '—' }));
     return;
   }
@@ -4612,16 +4980,18 @@ function pmRenderRoom() {
       '<div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap"><label style="font-size:12px;color:var(--tx3)">' + escHtml(BT('pm_my_lang')) + '</label>' +
       '<select id="pm-src-lang" onchange="pmSrcLang=this.value" style="width:auto;padding:5px 8px;font-size:13px;background:var(--s2);border:1px solid var(--br);border-radius:6px;color:var(--tx)">' + langOpts + '</select>' +
       '<span style="font-size:11px;color:var(--tx3)">' + escHtml(BT('pm_auto_trans', { a: pmLangShort(s.lang_a), b: pmLangShort(s.lang_b) })) + '</span></div>' +
-      '<textarea id="pm-writebox" rows="3" placeholder="' + escHtml(T.writePh) + '" style="width:100%;font-family:inherit;font-size:14px;background:var(--s2);border:1px solid var(--br);border-radius:8px;padding:9px 11px;color:var(--tx)" oninput="pmDraft=this.value"></textarea>' +
-      '<div style="margin-top:8px"><button id="pm-submit-btn" class="btn primary sm" onclick="pmSubmitEntry()">' + escHtml(BT('pm_submit_entry')) + '</button></div>' +
-      '<div class="hint" style="margin-top:6px">' + escHtml(K.liveVisible
+      '<textarea id="pm-writebox" rows="3" placeholder="' + escHtml(T.writePh) + '" style="width:100%;font-family:inherit;font-size:14px;background:var(--s2);border:1px solid var(--br);border-radius:8px;padding:9px 11px;color:var(--tx)" oninput="pmDraft=this.value"' + (pmCapReached() ? ' disabled' : '') + '></textarea>' +
+      '<div style="margin-top:8px"><button id="pm-submit-btn" class="btn primary sm" onclick="pmSubmitEntry()"' + (pmCapReached() ? ' disabled style="opacity:.5"' : '') + '>' + escHtml(BT('pm_submit_entry')) + '</button>' +
+      (pmEntryCap() ? '<span style="font-size:11px;color:var(--tx3);margin-left:8px">' + escHtml(BT('pm_cap_used', { n: myEntries.length, cap: pmEntryCap() })) + '</span>' : '') + '</div>' +
+      (pmCapReached() ? '<div class="hint" style="margin-top:6px;color:var(--ac)">' + escHtml(BT('pm_cap_reached', { cap: pmEntryCap() })) + '</div>' : '') +
+      '<div class="hint" style="margin-top:6px">' + escHtml(pmOpt('liveVisible')
         ? BT('pm_live_hint', { item: T.item })
         : BT('pm_private_hint', { reveal: pmPhaseLabel('reveal') })) + '</div>' +
       '<div style="margin-top:12px">' + (myEntries.length ? '<div style="font-size:12px;color:var(--tx3);margin-bottom:6px">' + escHtml(BT('pm_you_wrote', { n: myEntries.length })) + '</div>' + myEntries.map(e => pmEntryHtml(e, true, false)).join('') : '') + '</div>' +
       '</div></div>';
     // 🔴 liveVisible：腦力激盪要「看得到別人的」才長得出新點子（Osborn 的 hitchhiking）；
     //    事前驗屍相反，寫的時候彼此看不到才不會被錨定、不會從眾。這是兩者最關鍵的行為差異。
-    if (K.liveVisible) {
+    if (pmOpt('liveVisible')) {
       html += '<div class="panel"><div class="panel-h"><span class="idx">▤</span><h2>' + escHtml(BT('pm_collected', { item: T.item })) + '</h2>' +
         '<span class="sub">' + escHtml(BT('pm_count_n', { n: pmEntries.length })) + '</span></div><div class="panel-b">' +
         (pmEntries.length ? pmEntries.map(e => pmEntryHtml(e, false, true)).join('') : '<div class="empty-note">' + escHtml(BT('pm_nobody_yet')) + '</div>') +
@@ -4630,7 +5000,7 @@ function pmRenderRoom() {
     if (chair) {
       html += '<div class="panel"><div class="panel-h"><span class="idx">▤</span><h2>' + escHtml(BT('pm_chair_live')) + '</h2><span class="sub">' + escHtml(BT('pm_received_n', { n: pmEntries.length })) + '</span></div>' +
         '<div class="panel-b">' + pmSubmittedHtml(s) +
-        (K.liveVisible
+        (pmOpt('liveVisible')
           ? '<div class="hint">' + escHtml(BT('pm_live_public')) + '</div>'
           : (pmEntries.length ? pmEntries.map(e => pmEntryHtml(e, false, true)).join('') : '<div class="empty-note">' + escHtml(BT('pm_none_written')) + '</div>') +
             '<div class="hint" style="margin-top:8px">' + escHtml(BT('pm_writing_private', { reveal: pmPhaseLabel('reveal') })) + '</div>') +
@@ -4668,7 +5038,9 @@ function pmRenderRoom() {
       '</div><div class="panel-b">' + pmSummaryHtml(chair) + '</div></div>';
     html += '<div class="panel"><div class="panel-h"><span class="idx">▤</span><h2>' + escHtml(T.item + BT('pm_by_votes')) + '</h2><span class="sub">' + escHtml(BT('pm_count_n', { n: pmEntries.length })) + '</span></div><div class="panel-b">' +
       (pmEntries.length ? pmGroupedHtml(2) : '<div class="empty-note">' + escHtml(BT('pm_no_content')) + '</div>') + '</div></div>';
-    html += '<div class="panel"><div class="panel-h"><span class="idx">✔</span><h2>' + escHtml(T.mit) + '</h2></div><div class="panel-b">' + pmMitigationsHtml(false) + '</div></div>';
+    // 沒有「對策／行動」階段的類型（意見徵集）定稿後也不該出現這塊空面板
+    if (pmPhases().indexOf('mitigation') >= 0)
+      html += '<div class="panel"><div class="panel-h"><span class="idx">✔</span><h2>' + escHtml(T.mit) + '</h2></div><div class="panel-b">' + pmMitigationsHtml(false) + '</div></div>';
   }
   body.innerHTML = html;
   pmRestoreDraft();
@@ -4748,7 +5120,7 @@ function pmSubmittedHtml(s) {
   }) : null;
   const box = 'background:var(--s1);border:1px solid var(--br);border-radius:8px;padding:8px 10px;margin-bottom:10px;font-size:12px;line-height:1.7';
   let h = '<div style="' + box + '">';
-  if (PMK().anonymous && done.length < 3) {
+  if (pmOptOf(s, 'anonymous') && done.length < 3) {
     // 未達 3 人：只給數字。此時內容與人的對應太容易被推出來
     h += '<span style="color:var(--tx3)">' + escHtml(BT('pm_submitted_n', { n: done.length })) + '</span>' +
       (pending ? '<span style="color:var(--tx3)">　' + escHtml(BT('pm_pending_n', { n: pending.length })) + '</span>' : '') +
@@ -4773,7 +5145,7 @@ function pmEntryHtml(e, allowDelete, bilingual, voteMode) {
   if (voteMode === 1) voteUi = '<button class="btn ghost sm' + (pmIVoted(e) ? ' primary' : '') + '" style="padding:2px 9px" onclick="pmToggleVote(\'' + e.id + '\')">👍 ' + vc + '</button>';
   else if (voteMode === 2) voteUi = '<span style="font-size:12px;color:var(--tx3);white-space:nowrap">👍 ' + vc + '</span>';
   const theme = e.theme ? '<span class="site-badge" style="background:var(--s3);color:var(--tx3);margin-bottom:5px;display:inline-block">' + escHtml(e.theme) + '</span> ' : '';
-  const who = (!PMK().anonymous && e.author_name)
+  const who = (!pmOpt('anonymous') && e.author_name)
     ? '<span class="site-badge" style="background:var(--ac2);color:var(--ac);margin-bottom:5px;display:inline-block">' + escHtml(e.author_name) + '</span> ' : '';
   let content;
   if (bilingual) {
@@ -4811,7 +5183,7 @@ async function pmToggleVote(id) {
   pmMaybeAutoAdvance();   // 自己這一票可能就是最後一票
 }
 
-// ── 全員投滿自動進入下一階段（v1.60）──
+// ── 全員投滿自動進入下一階段（v1.61）──
 // 每個人都把票投完了還要等主席按鍵，是白等：票數已成定局，再等只是延遲會議。
 // 🔴 只有主席的瀏覽器能真的推進階段 —— sb-proxy 的欄位守衛規定 PATCH phase 必須是該場主席本人，
 //    其他人送出去只會拿到 403。所以判斷雖然人人都算得出來（用來顯示進度），動作只由主席端發出。
@@ -4839,11 +5211,14 @@ function pmAllVotesIn() {
 async function pmMaybeAutoAdvance() {
   if (!pmSession || pmSession.phase !== 'ranking' || !pmIsChair(pmSession)) return;
   if (pmAutoAdvanced || !pmAllVotesIn()) return;
+  // 下一階段不寫死 'mitigation'：意見徵集沒有對策階段，投票完的下一步是定稿
+  const next = pmPhases()[pmPhaseIdx('ranking') + 1];
+  if (!next) return;
   // 旗標先立起來：失敗也不重試（否則每 7 秒跳一次失敗提示），主席仍可自己按階段鈕。
   // 主席若手動退回排序階段（要讓晚到的人補投），pmSetPhase 會把旗標重新解除。
   pmAutoAdvanced = true;
-  boardToast(BT('pm_auto_advance', { next: pmPhaseLabel('mitigation') }));
-  await pmSetPhase('mitigation');
+  boardToast(BT('pm_auto_advance', { next: pmPhaseLabel(next) }));
+  await pmSetPhase(next);
 }
 
 // ── AI 分群（主席，排序階段）──
@@ -5158,8 +5533,18 @@ function pmSendMail() {
   try { window.location.href = url; boardToast(BT('bm_mail_ok')); } catch (e) { boardToast(BT('t_mail_fail')); }
 }
 
+// 每人則數上限（0 = 不限）。只有意見徵集會設；驗屍／腦力激盪的 pmOpt('entryCap') 一律回 0
+function pmEntryCap() { return parseInt(pmOpt('entryCap') || 0, 10) || 0; }
+function pmMyEntryCount() {
+  const me = PORTAL_SESSION && PORTAL_SESSION.empId;
+  return pmEntries.filter(e => e.author_emp_id === me).length;
+}
+function pmCapReached() { const c = pmEntryCap(); return c > 0 && pmMyEntryCount() >= c; }
+
 async function pmSubmitEntry() {
   if (!pmSession || !PORTAL_SESSION) return;
+  // 上限在送出前再擋一次：畫面上的 disabled 只是提示，別人同時送出時本地計數可能還沒更新
+  if (pmCapReached()) { boardToast(BT('pm_cap_reached', { cap: pmEntryCap() })); return; }
   const el = document.getElementById('pm-writebox');
   const text = (el.value || '').trim();
   if (!text) { boardToast(BT('pm_need_input')); return; }

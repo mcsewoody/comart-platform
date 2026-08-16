@@ -60,10 +60,19 @@ const ALLOWED_TABLES = new Set([
 const PM_PROTECTED = new Set([
   "ai_summary", "ai_summary_a", "ai_summary_b", "summary_at",
   "summary_edited_at", "summary_edited_by", "phase",
+  // play_idx 是展示階段的播放位置：主席按「下一則」，全場畫面跟著跳。
+  // 不擋的話任何與會者都能把別人的畫面拉走，等於搶走主席的簡報器。
+  "play_idx",
 ])
 // chair_emp_id 完全禁止改：沒有任何正當情境要換主席，改了等於接管整場會議
 // kind 同理：一場已定稿的驗屍紀錄若能被改成腦力激盪，等於竄改正式紀錄的性質
-const PM_IMMUTABLE = new Set(["chair_emp_id", "created_by", "kind"])
+// opt_*／template 是意見徵集在建會時定下的規則，建立後一律不可改：
+// 🔴 opt_anonymous 尤其重要 —— 大家是在「這場匿名」的前提下寫的，事後翻成具名
+//    等於承諾到期（CLAUDE.md 已否決「中途解匿」）。其餘三項一併鎖住，規則中途改變同樣不誠實。
+const PM_IMMUTABLE = new Set([
+  "chair_emp_id", "created_by", "kind",
+  "template", "opt_anonymous", "opt_live_visible", "opt_vote", "opt_entry_cap",
+])
 
 function json(obj: unknown, status = 200) {
   return new Response(JSON.stringify(obj), { status, headers: { ...CORS, "Content-Type": "application/json" } })

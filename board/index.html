@@ -5,7 +5,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#080C14">
-<title>COMART · 公告與紀錄 v1.61</title>
+<title>COMART · 公告與紀錄 v1.62</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -222,7 +222,7 @@ select,select option,option{background:var(--s2);color:var(--tx)}
     <a class="logo" href="javascript:void(0)">
       <div class="logo-mark">告</div>
       <div class="logo-text" data-i18n="app_title">公告與紀錄</div>
-      <span class="logo-ver">v1.61</span>
+      <span class="logo-ver">v1.62</span>
     </a>
     <div class="topbar-right">
       <div id="langChips" style="display:flex;gap:4px"></div>
@@ -867,6 +867,12 @@ const B_I18N = {
   pmt_gratitude_scen:'請寫下你想感謝的人，以及一件具體的事。越具體越好 ——「上週三他留下來陪我把報告趕完」比「他人很好」有力得多。想感謝第二個、第三個人，就再送一則。',
   pmt_retro_scen:'回顧這段期間：哪些做得好、值得繼續？哪些不順、下次要改？請具體到「哪一件事、發生了什麼、影響是什麼」，一則一件。',
   pmt_general_scen:'請針對上面的題目寫下你的意見，一則一個重點，具體越好。',
+  pm_target_ph:'打字會跳出同仁名單，也可以自己打（團隊、廠商、客戶…）',
+  pm_target_hint:'挑清單裡的同仁可留下對應紀錄；清單裡沒有的對象直接打字即可。',
+  pm_target_to:'給',
+  pm_need_target_f:'請先填「{f}」',
+  pmt_gratitude_f1:'感謝對象', pmt_gratitude_f2:'具體事實',
+  pmt_gratitude_f2ph:'他做了什麼？越具體越好，例如「上週三留下來陪我把報告趕完」…',
   pm_vote_progress:'投票進度：{done}／{total} 人已投完',
   pm_vote_auto_hint:'全員投完後會自動進入「{next}」。',
   pm_auto_advance:'全員已投完，自動進入「{next}」',
@@ -1035,6 +1041,12 @@ const B_I18N = {
   pmt_gratitude_scen:'请写下你想感谢的人，以及一件具体的事。越具体越好 ——“上周三他留下来陪我把报告赶完”比“他人很好”有力得多。想感谢第二个、第三个人，就再送一则。',
   pmt_retro_scen:'回顾这段期间：哪些做得好、值得继续？哪些不顺、下次要改？请具体到“哪一件事、发生了什么、影响是什么”，一则一件。',
   pmt_general_scen:'请针对上面的题目写下你的意见，一则一个重点，具体越好。',
+  pm_target_ph:'打字会跳出同仁名单，也可以自己打（团队、厂商、客户…）',
+  pm_target_hint:'挑清单里的同仁可留下对应纪录；清单里没有的对象直接打字即可。',
+  pm_target_to:'给',
+  pm_need_target_f:'请先填“{f}”',
+  pmt_gratitude_f1:'感谢对象', pmt_gratitude_f2:'具体事实',
+  pmt_gratitude_f2ph:'他做了什么？越具体越好，例如“上周三留下来陪我把报告赶完”…',
   pm_vote_progress:'投票进度：{done}／{total} 人已投完',
   pm_vote_auto_hint:'全员投完后会自动进入「{next}」。',
   pm_auto_advance:'全员已投完，自动进入「{next}」',
@@ -1203,6 +1215,12 @@ const B_I18N = {
   pmt_gratitude_scen:'Write down someone you want to thank and one specific thing they did. The more specific the better \u2014 \u201Che stayed late last Wednesday to help me finish the report\u201D carries far more weight than \u201Che is a nice person\u201D. To thank a second or third person, submit another entry.',
   pmt_retro_scen:'Looking back over this period: what went well and is worth keeping? What did not, and should change next time? Be specific about what happened and what it affected \u2014 one thing per entry.',
   pmt_general_scen:'Write your responses to the question above \u2014 one point per entry, the more specific the better.',
+  pm_target_ph:'Start typing for colleague suggestions, or type anything (team, vendor, customer…)',
+  pm_target_hint:'Picking a colleague from the list keeps a linked record; anyone not on the list can just be typed in.',
+  pm_target_to:'To',
+  pm_need_target_f:'Please fill in \u201C{f}\u201D first',
+  pmt_gratitude_f1:'Who you are thanking', pmt_gratitude_f2:'What they specifically did',
+  pmt_gratitude_f2ph:'What did they do? The more specific the better, e.g. \u201Cstayed late last Wednesday to help me finish the report\u201D…',
   pm_vote_progress:'Voting progress: {done}/{total} people finished',
   pm_vote_auto_hint:'Moves on to “{next}” automatically once everyone has voted.',
   pm_auto_advance:'Everyone has voted — moving on to “{next}”',
@@ -1371,6 +1389,12 @@ const B_I18N = {
   pmt_gratitude_scen:'Hãy viết người bạn muốn cảm ơn và một việc cụ thể. Càng cụ thể càng tốt — “thứ Tư tuần trước anh ấy ở lại giúp tôi làm xong báo cáo” có sức nặng hơn nhiều so với “anh ấy là người tốt”. Muốn cảm ơn người thứ hai, thứ ba thì gửi thêm mục mới.',
   pmt_retro_scen:'Nhìn lại giai đoạn này: điều gì làm tốt và đáng tiếp tục? Điều gì chưa suôn sẻ và lần sau cần thay đổi? Hãy cụ thể về việc gì đã xảy ra và ảnh hưởng ra sao — mỗi mục một việc.',
   pmt_general_scen:'Hãy viết ý kiến của bạn về đề bài phía trên — mỗi mục một trọng điểm, càng cụ thể càng tốt.',
+  pm_target_ph:'Gõ để hiện gợi ý đồng nghiệp, hoặc tự nhập (nhóm, nhà cung cấp, khách hàng…)',
+  pm_target_hint:'Chọn đồng nghiệp từ danh sách sẽ lưu liên kết tương ứng; đối tượng không có trong danh sách thì cứ gõ trực tiếp.',
+  pm_target_to:'Gửi',
+  pm_need_target_f:'Vui lòng điền “{f}” trước',
+  pmt_gratitude_f1:'Người bạn muốn cảm ơn', pmt_gratitude_f2:'Việc cụ thể họ đã làm',
+  pmt_gratitude_f2ph:'Họ đã làm gì? Càng cụ thể càng tốt, VD “thứ Tư tuần trước ở lại giúp tôi làm xong báo cáo”…',
   pm_vote_progress:'Tiến độ bỏ phiếu: {done}/{total} người đã xong',
   pm_vote_auto_hint:'Sẽ tự động chuyển sang “{next}” khi mọi người bỏ phiếu xong.',
   pm_auto_advance:'Mọi người đã bỏ phiếu xong — tự động chuyển sang “{next}”',
@@ -1539,6 +1563,12 @@ const B_I18N = {
   pmt_gratitude_scen:'感謝したい人と、具体的な出来事を書いてください。具体的なほど良いです ——「先週の水曜、残って報告書を仕上げるのを手伝ってくれた」は「良い人です」よりずっと重みがあります。2人目、3人目を感謝したい場合は、もう1件送ってください。',
   pmt_retro_scen:'この期間を振り返って：うまくいって続けたいことは？うまくいかず次は変えたいことは？「何が起きて、何に影響したか」まで具体的に、1件につき1つ。',
   pmt_general_scen:'上のお題について、あなたの意見を書いてください。1件につき1つの要点、具体的なほど良いです。',
+  pm_target_ph:'入力すると社員候補が表示されます。自由入力も可（チーム、取引先、顧客…）',
+  pm_target_hint:'一覧から社員を選ぶと対応する記録が残ります。一覧にない相手はそのまま入力してください。',
+  pm_target_to:'宛先',
+  pm_need_target_f:'まず「{f}」を入力してください',
+  pmt_gratitude_f1:'感謝したい相手', pmt_gratitude_f2:'具体的にしてくれたこと',
+  pmt_gratitude_f2ph:'何をしてくれましたか？具体的なほど良いです。例：「先週の水曜、残って報告書を仕上げるのを手伝ってくれた」…',
   pm_vote_progress:'投票状況：{done}／{total} 名が投票完了',
   pm_vote_auto_hint:'全員の投票が終わると自動的に「{next}」へ進みます。',
   pm_auto_advance:'全員の投票が完了しました。「{next}」へ進みます',
@@ -3561,7 +3591,7 @@ function wrPrint(){
 // ═══════════════════════════════════════════════
 const PM_LANGS = [['zh-TW','繁體中文'],['zh-CN','简体中文'],['vi','Tiếng Việt'],['en','English'],['ja','日本語']];
 const PM_LANG_SHORT = { 'zh-TW':'繁中','zh-CN':'简中','vi':'越南語','en':'English','ja':'日本語' };
-// 階段清單改為「每種會議自己一份」（v1.61）：意見徵集沒有「對策」，投票也是可選的。
+// 階段清單改為「每種會議自己一份」（v1.62）：意見徵集沒有「對策」，投票也是可選的。
 // PM_PHASES 保留為驗屍／腦力激盪的完整版；實際取用一律經 pmPhases()，那裡才看得到
 // 「這一場有沒有開投票」。所有比較階段先後的地方（pmPhaseIdx／pmCanGoPhase／pmSetPhase）
 // 都吃 pmPhases() 的結果，所以少一個階段時「往前只能走一步」自動就跳過它。
@@ -4007,7 +4037,7 @@ function pmPhaseLabelOf(kind, p) {
 }
 function pmVoteCap() { return PMK().voteCap; }
 
-// ── 行為旗標的唯一取用點 pmOpt()（v1.61）──
+// ── 行為旗標的唯一取用點 pmOpt()（v1.62）──
 // 🔴 三種會議的旗標來源不同，但讀取端只准有這一個入口：
 //    驗屍／腦力激盪 → 一律讀 PM_KINDS（寫死，configurable 是空的，session 的 opt_* 再怎麼被塞值都無效）
 //    意見徵集       → 讀該場 session 的 opt_*；沒設過（null／undefined）才退回 PM_KINDS 的保底值
@@ -4030,7 +4060,7 @@ function pmTplOf(s) { return PM_TEMPLATES[(s && s.template) || ''] || null; }
 function pmTpl() { return pmTplOf(pmSession); }
 function pmFieldCount() { const t = pmTpl(); return t ? t.fields : 1; }
 
-// ── 這一場實際有哪些階段（v1.61）──
+// ── 這一場實際有哪些階段（v1.62）──
 // 沒宣告 phases 的類型（驗屍／腦力激盪）用完整版；意見徵集沒有「對策」，
 // 且 ranking 只有在主席建會時勾了「要投票」才會出現。所有比較階段先後的邏輯都吃這個結果，
 // 所以少一個階段時「往前只能走一步」會自動跳過它，不必另外寫特例。
@@ -4819,7 +4849,7 @@ async function pmRetryTranslations() {
 function pmSaveDraft() { const el = document.getElementById('pm-writebox'); if (el) pmDraft = el.value; }
 function pmRestoreDraft() { const el = document.getElementById('pm-writebox'); if (el && pmDraft) el.value = pmDraft; }
 
-// ── 重繪時不要把正在打字的人踢出輸入框（v1.61）──
+// ── 重繪時不要把正在打字的人踢出輸入框（v1.62）──
 // 會議室是整塊 innerHTML 重畫的：別人一送出內容／一則譯文補完，輪詢就把 DOM 換掉，
 // 正在打對策或填寫框的人游標會彈掉、中文輸入法組字到一半會被砍斷。兩道防線：
 //   ① 正在輸入文字時直接延後重繪（pmRerender），等他離開輸入框再畫；
@@ -4980,7 +5010,8 @@ function pmRenderRoom() {
       '<div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap"><label style="font-size:12px;color:var(--tx3)">' + escHtml(BT('pm_my_lang')) + '</label>' +
       '<select id="pm-src-lang" onchange="pmSrcLang=this.value" style="width:auto;padding:5px 8px;font-size:13px;background:var(--s2);border:1px solid var(--br);border-radius:6px;color:var(--tx)">' + langOpts + '</select>' +
       '<span style="font-size:11px;color:var(--tx3)">' + escHtml(BT('pm_auto_trans', { a: pmLangShort(s.lang_a), b: pmLangShort(s.lang_b) })) + '</span></div>' +
-      '<textarea id="pm-writebox" rows="3" placeholder="' + escHtml(T.writePh) + '" style="width:100%;font-family:inherit;font-size:14px;background:var(--s2);border:1px solid var(--br);border-radius:8px;padding:9px 11px;color:var(--tx)" oninput="pmDraft=this.value"' + (pmCapReached() ? ' disabled' : '') + '></textarea>' +
+      pmTargetFieldHtml() +
+      '<textarea id="pm-writebox" rows="3" placeholder="' + escHtml(pmWritePh()) + '" style="width:100%;font-family:inherit;font-size:14px;background:var(--s2);border:1px solid var(--br);border-radius:8px;padding:9px 11px;color:var(--tx)" oninput="pmDraft=this.value"' + (pmCapReached() ? ' disabled' : '') + '></textarea>' +
       '<div style="margin-top:8px"><button id="pm-submit-btn" class="btn primary sm" onclick="pmSubmitEntry()"' + (pmCapReached() ? ' disabled style="opacity:.5"' : '') + '>' + escHtml(BT('pm_submit_entry')) + '</button>' +
       (pmEntryCap() ? '<span style="font-size:11px;color:var(--tx3);margin-left:8px">' + escHtml(BT('pm_cap_used', { n: myEntries.length, cap: pmEntryCap() })) + '</span>' : '') + '</div>' +
       (pmCapReached() ? '<div class="hint" style="margin-top:6px;color:var(--ac)">' + escHtml(BT('pm_cap_reached', { cap: pmEntryCap() })) + '</div>' : '') +
@@ -5155,7 +5186,18 @@ function pmEntryHtml(e, allowDelete, bilingual, voteMode) {
     content = '<div style="white-space:pre-wrap;font-size:14px">' + escHtml(e.text_src || '') + '</div>';
   }
   return '<div style="border:1px solid var(--br);border-radius:8px;padding:10px 12px;background:var(--s2);margin-bottom:8px;display:flex;gap:10px;align-items:flex-start">' +
-    '<div style="flex:1;min-width:0">' + who + theme + content + '</div><div style="display:flex;gap:4px;flex-shrink:0;align-items:center">' + voteUi + editT + del + '</div></div>';
+    '<div style="flex:1;min-width:0">' + who + theme + pmTargetLineHtml(e, bilingual) + content + '</div><div style="display:flex;gap:4px;flex-shrink:0;align-items:center">' + voteUi + editT + del + '</div></div>';
+}
+// 兩欄範本的對象列：放在具體事實上方，用強調色與較大字級 —— 這一則是「寫給誰的」，
+// 那是讀者第一眼要抓到的資訊。從員工清單挑到的人名不並陳雙語（人名不翻），自由文字才並陳。
+function pmTargetLineHtml(e, bilingual) {
+  if (!e.target_name) return '';
+  const arrow = '<span style="color:var(--tx3);font-size:12px;margin-right:5px">' + escHtml(BT('pm_target_to')) + '</span>';
+  const same = e.target_emp_id || !e.target_a || !e.target_b || e.target_a === e.target_b;
+  const body = (bilingual && !same)
+    ? '<span style="font-weight:700;color:var(--ac);font-size:14.5px">' + escHtml(e.target_a) + '　/　' + escHtml(e.target_b) + '</span>'
+    : '<span style="font-weight:700;color:var(--ac);font-size:14.5px">' + escHtml(e.target_name) + '</span>';
+  return '<div style="margin-bottom:6px">' + arrow + body + '</div>';
 }
 async function pmEditTrans(id) {
   const e = pmEntries.find(x => x.id === id); if (!e || !pmIsChair(pmSession)) return;
@@ -5183,7 +5225,7 @@ async function pmToggleVote(id) {
   pmMaybeAutoAdvance();   // 自己這一票可能就是最後一票
 }
 
-// ── 全員投滿自動進入下一階段（v1.61）──
+// ── 全員投滿自動進入下一階段（v1.62）──
 // 每個人都把票投完了還要等主席按鍵，是白等：票數已成定局，再等只是延遲會議。
 // 🔴 只有主席的瀏覽器能真的推進階段 —— sb-proxy 的欄位守衛規定 PATCH phase 必須是該場主席本人，
 //    其他人送出去只會拿到 403。所以判斷雖然人人都算得出來（用來顯示進度），動作只由主席端發出。
@@ -5533,6 +5575,43 @@ function pmSendMail() {
   try { window.location.href = url; boardToast(BT('bm_mail_ok')); } catch (e) { boardToast(BT('t_mail_fail')); }
 }
 
+// ═══════ 兩欄範本（感恩留言）的「對象」欄位 ═══════
+// 🔴 用 <input list=…> ＋ <datalist>，而不是 <select>：使用者的決定是「兩者皆可」——
+//    打字時會跳出員工建議清單（挑到就存 emp_id，日後統計得出「誰因為什麼事被提到」），
+//    但也可以直接打「客服團隊」「XX 廠商」這類清單裡沒有的對象。<select> 做不到後者，
+//    「另一個欄位＋切換鈕」則多一次操作，在感恩這種要低摩擦的場景不划算。
+function pmTargetMap() {
+  const map = {};   // 顯示字串 → empId
+  (ALL_USERS || []).forEach(u => {
+    const base = u.nameZh || u.nameEn || u.empId;
+    // 同名同姓時後來的那個補上工號，否則兩個人會共用同一個顯示字串、解析到同一個 emp_id
+    const key = Object.prototype.hasOwnProperty.call(map, base) ? base + '（' + u.empId + '）' : base;
+    map[key] = u.empId;
+  });
+  return map;
+}
+function pmTargetFieldHtml() {
+  if (pmFieldCount() < 2) return '';
+  const opts = Object.keys(pmTargetMap()).map(n => '<option value="' + escHtml(n) + '"></option>').join('');
+  return '<div style="margin-bottom:8px">' +
+    '<label style="font-size:12px;color:var(--tx3);display:block;margin-bottom:4px">' + escHtml(pmFieldLabel(1)) + '</label>' +
+    '<input id="pm-target" list="pm-target-list" placeholder="' + escHtml(BT('pm_target_ph')) + '"' +
+    (pmCapReached() ? ' disabled' : '') +
+    ' style="width:100%;font-family:inherit;font-size:14px;background:var(--s2);border:1px solid var(--br);border-radius:8px;padding:9px 11px;color:var(--tx)">' +
+    '<datalist id="pm-target-list">' + opts + '</datalist>' +
+    '<div style="font-size:11px;color:var(--tx3);margin-top:3px">' + escHtml(BT('pm_target_hint')) + '</div></div>';
+}
+// 兩欄範本的欄位標題／提示字都走範本（i18n key `pmt_<tpl>_f1`／`_f2`／`_ph`）；
+// 一欄的類型維持 PM_KINDS 的 writeTitle／writePh 不變
+function pmFieldLabel(n) {
+  const t = pmTpl();
+  return t ? BT('pmt_' + t.key + '_f' + n) : PMT().writeTitle;
+}
+function pmWritePh() {
+  const t = pmTpl();
+  return (t && t.fields >= 2) ? BT('pmt_' + t.key + '_f2ph') : PMT().writePh;
+}
+
 // 每人則數上限（0 = 不限）。只有意見徵集會設；驗屍／腦力激盪的 pmOpt('entryCap') 一律回 0
 function pmEntryCap() { return parseInt(pmOpt('entryCap') || 0, 10) || 0; }
 function pmMyEntryCount() {
@@ -5548,6 +5627,10 @@ async function pmSubmitEntry() {
   const el = document.getElementById('pm-writebox');
   const text = (el.value || '').trim();
   if (!text) { boardToast(BT('pm_need_input')); return; }
+  // 兩欄範本（感恩）必須有對象——沒有對象的感謝不知道要給誰，存了也沒用
+  const tEl = document.getElementById('pm-target');
+  const targetTxt = tEl ? (tEl.value || '').trim() : '';
+  if (pmFieldCount() >= 2 && !targetTxt) { boardToast(BT('pm_need_target_f', { f: pmFieldLabel(1) })); if (tEl) tEl.focus(); return; }
   const selEl = document.getElementById('pm-src-lang');
   const src = (selEl && selEl.value) || pmSrcLang || pmPortalLang();
   pmSrcLang = src;
@@ -5560,11 +5643,23 @@ async function pmSubmitEntry() {
     src_lang: src, text_src: text,
     created_at: new Date().toISOString(), updated_at: new Date().toISOString(),
   };
+  if (targetTxt) {
+    const empId = pmTargetMap()[targetTxt] || null;
+    row.target_emp_id = empId; row.target_name = targetTxt;
+    // 從員工清單挑到的人名不送翻譯：人名翻譯只會製造出同一個人的兩種寫法。
+    // 自由文字（「客服團隊」「XX 廠商」）才翻，那是真的需要兩種語言讀得懂的詞。
+    if (empId) { row.target_a = targetTxt; row.target_b = targetTxt; }
+    else {
+      try { const tt = await pmTranslate(targetTxt, pmSession.lang_a, pmSession.lang_b, src); row.target_a = tt.a; row.target_b = tt.b; }
+      catch (e) { row.target_a = targetTxt; row.target_b = targetTxt; }
+    }
+  }
   try { const tr = await pmTranslate(text, pmSession.lang_a, pmSession.lang_b, src); row.text_a = tr.a; row.text_b = tr.b; }
   catch (e) { /* 翻譯失敗留空，主席端會背景補翻 */ }
   try {
     await SB.post('premortem_entries', row);
     if (el) el.value = ''; pmDraft = '';
+    if (tEl) tEl.value = '';
     await pmFetchEntries(); pmRenderRoom();
     boardToast(row.text_a ? BT('pm_sent') : BT('pm_sent_pending'));
   } catch (e2) { if (btn) btn.disabled = false; boardToast(BT('pm_send_failed') + (e2.message || e2)); }

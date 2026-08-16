@@ -173,7 +173,7 @@ The portal supports EN, 繁中, 简中, VI, 日 via `setLang(lang)`. Each langua
 
 ## Board 重要細節
 
-`board/index.html`（公告與紀錄，v1.47）六個頁籤，各自一組前綴命名的函式與 Supabase 表：
+`board/index.html`（公告與紀錄，v1.64）八個頁籤，各自一組前綴命名的函式與 Supabase 表：
 
 | 頁籤 | 前綴 | 主要資料表 |
 |------|------|-----------|
@@ -183,6 +183,8 @@ The portal supports EN, 繁中, 简中, VI, 日 via `setLang(lang)`. Each langua
 | Woody 週報 | `wr*` | `woody_reports` |
 | 事前驗屍 | `pm*` | `premortem_sessions`、`premortem_entries`、`premortem_mitigations`（`kind='premortem'`） |
 | 腦力激盪 | `pm*`（同一套） | 同上三張表（`kind='brainstorm'`） |
+| 意見徵集 | `pm*`（同一套） | 同上三張表（`kind='collect'`） |
+| 投票 | `pl*` | `poll_sessions`、`poll_options`、`poll_votes`、`poll_comments` |
 
 **事前驗屍 Premortem**（Gary Klein 方法，v1.21 起分階段開發，v1.46 完成）：
 - 階段機（`PM_PHASES`）：`intro` 說明 → `setup` 情境設定 → `writing` 開放填寫 →
@@ -322,6 +324,51 @@ The portal supports EN, 繁中, 简中, VI, 日 via `setLang(lang)`. Each langua
 - `anonymous:false` 時 `pmSubmittedHtml()` 的 3 人門檻自動停用（名單本來就看得到人名，門檻沒有意義）
 - `kind` 在 sb-proxy 的 `PM_IMMUTABLE`：建立後不可更改（把一場已定稿的驗屍紀錄改成腦力激盪
   等於竄改正式紀錄的性質）
+
+### 意見徵集 Collect（v1.61–v1.64，migration 202608160001）
+
+**第三種 `kind`，同一套程式**（`kind='collect'`）。與前兩者最大的不同：**它的行為由主席建會時決定**，
+而不是寫死在 `PM_KINDS`。用途是「大家各自寫、然後一起看」的通用場景 —— 感恩留言、專案回顧、意見徵集。
+
+- 🔴 **只有 `collect` 可設定；`premortem` / `brainstorm` 的旗標維持寫死，不要開放**。
+  `PM_KINDS[kind].configurable` 宣告「這個類型允許主席決定哪些旗標」，驗屍與腦力激盪是空清單。
+  驗屍的「全程匿名」一旦變成主席可以關掉的選項，與會者每次寫之前都要先確認這場是開還是關，
+  那份安全感就沒了；腦力激盪的「即時可見」同理，那是 Osborn 的 hitchhiking 不是排版偏好。
+- 🔴 **行為旗標的唯一取用點是 `pmOpt(name)` / `pmOptOf(s, name)`**，階段清單是 `pmPhases()`。
+  `pmOptOf` 裡「只有 configurable 列出來的旗標才吃 session 的 `opt_*`」那道判斷是整個設計的安全閥，
+  不要繞過去直接讀 `PMK().anonymous` 或 `s.opt_anonymous`。
+- 四個可設定旗標（DB 欄位 `opt_anonymous` / `opt_live_visible` / `opt_vote` / `opt_entry_cap`，
+  **NULL ＝ 照 `PM_KINDS` 預設**，所以既有資料不必回填）：匿名／具名、填寫時可見性、
+  要不要投票、每人則數上限（0＝不限）。
+  **四者與 `template` 都在 sb-proxy 的 `PM_IMMUTABLE`：建立後一律不可改** ——
+  尤其匿名不可中途翻盤（「中途解匿」CLAUDE.md 早已否決）。
+- **階段**：`intro → setup → writing → reveal →〔ranking，opt_vote 決定〕→ locked`。**沒有 `mitigation`**。
+  `PM_PHASES` 仍是驗屍／腦力激盪的完整版；`pmPhases()` 才是實際清單，
+  所有比較階段先後的邏輯（`pmPhaseIdx` / `pmCanGoPhase` / `pmSetPhase` / `pmMaybeAutoAdvance`）都吃它，
+  少一個階段時「往前只能走一步」自動跳過，不必寫特例。**自動推進的目標不可寫死 `'mitigation'`。**
+- **範本 `PM_TEMPLATES`**（`gratitude` / `retro` / `general`）：只屬於 collect。負責兩件事 ——
+  ① 預填那四個旗標與引導語 ② 決定填寫欄位是一欄還是兩欄（`fields`）。選完主席仍可逐項改。
+  畫面文案走 i18n key `pmt_<key>_*`（五語），`z` 是繁中固定詞彙給 AI 提示詞與四種輸出用。
+- **感恩範本的「對象」欄位**（`fields:2`，DB `premortem_entries.target_emp_id/target_name/target_a/target_b`）：
+  用 `<input list=…>` ＋ `<datalist>` 而不是 `<select>` —— 使用者要的是「兩者皆可」：
+  打字跳出同仁建議（挑到存 `emp_id`，日後統計得出誰因為什麼事被提到），也可直接打
+  「客服團隊」「XX 廠商」這類清單外的對象。`pmTargetMap()` 同名同姓時補工號，
+  否則兩個人共用同一個顯示字串會解析到同一個 `emp_id`。
+  🔴 **從清單挑到的人名不送翻譯**（人名翻譯只會製造出同一個人的兩種寫法），自由文字才翻。
+- **展示階段的播放模式**（`play_idx`）：主席按「▶ 播放」逐則放大呈現，**全場畫面同步** ——
+  索引寫進 `premortem_sessions.play_idx`，其他人靠既有 7 秒輪詢跟著跳。
+  🔴 `play_idx` 在 sb-proxy 的 `PM_PROTECTED`（只有該場主席改得動），否則任何與會者都能把
+  全場畫面拉走＝搶走主席的簡報器。主席另有鍵盤 ← → Esc；走到最後一則**不繞回**
+  （多按一次又跳回第一則會讓全場以為漏看）。離開展示階段自動關閉播放。
+- 🔴 **AI 三段分析的語氣是第三種**：`PM_SUM_SYS_CL` **全程溫暖具體**，三段為
+  彙整 → 模式 → 結論。這裡收到的常是同事對同事的感謝，用審查顧問的語氣去評分等於當眾評比
+  誰的感謝比較有價值。提示詞裡明令**不排名、不比較誰被提到得多**（沒被提到只代表這次沒被想起來），
+  要下判斷只准針對流程不准針對人。
+- **沒開投票的場次**：`pmSummaryContext` 與四種輸出都不印票數、不寫「（依票數）」；
+  AI 分群按鈕改掛在展示階段（否則永遠沒有主題可分群，總結與輸出就少了依主題歸類這一層）。
+- **不發通知**（使用者決定）：被感謝的人不會收到站內通知，靠現場與事後匯出知道。
+- ⚠️ **「人的投票表決」請走 🗳 投票頁籤（`pl*`）**，不要把 `pm*` 撐成表決工具。
+  兩套系統形狀不同：`pl*` 是「主席出選項 → 大家投」，`pm*` 是「大家各自寫 → 一起看 → 收斂」。
 
 ## Development Workflow
 

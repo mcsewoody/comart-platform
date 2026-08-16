@@ -182,6 +182,42 @@ The portal supports EN, 繁中, 简中, VI, 日 via `setLang(lang)`. Each langua
 - ⚠️ `admin/lottery.html` 是**未被任何系統連結、也未納入 git** 的獨立草稿頁，名單是寫死的 22 個人名，
   不吃這套狀態。真正在用的抽籤是 `admin/index.html` 的 lottery 模塊（`lottoInit`，已過濾）。
 
+## 地點：三個營運中心 ＋ 集團 GRP（2026-08-17，migration 202608170001）
+
+`sites` 有四列：`TW` 台灣、`CN` 東莞廠、`VN` 越南廠、**`GRP` 集團**。
+
+- 🔴 **`GRP` 原本叫 `'N/A'`（不適用），語意正好相反**：`'N/A'` 讀起來像「不屬於任何中心」，
+  但這個層級的實際定義是「**屬於每一個中心**」—— 集團成員參與每個營運中心的工作。
+  鍵值已改為 `'GRP'`（只影響 `users` 3 筆、`kms_users` 3 筆，其餘 9 張帶 site 的表都是 0 筆）。
+- 🔴 **判斷「某人算不算某中心的人」一律走 `inSite(userSite, targetSite)`，不要再寫 `u.site === X`。**
+  四個系統各有一份同名 helper（board / admin 定義完整，Portal / KMS 只需標籤）：
+  ```js
+  const SITE_GROUP = 'GRP';
+  function isGroupSite(s) { return s === SITE_GROUP || s === 'N/A'; }   // 相容舊 session 快取
+  function inSite(userSite, targetSite) { return userSite === targetSite || isGroupSite(userSite); }
+  function iAmGroup() { return isGroupSite(PORTAL_SESSION?.site || ''); }
+  ```
+  相容 `'N/A'` 是必要的：那 3 位使用者瀏覽器裡的 session 快取還帶著舊值，**要等他們重新登入才會更新**。
+- **已套用「集團屬於每個中心」的地方**：
+  | 位置 | 函式 | 效果 |
+  |---|---|---|
+  | board 事前驗屍／腦力激盪／意見徵集 | `pmInScope` | 範圍＝單一中心時集團成員也在範圍內 |
+  | board 投票 | `plInScope` | 同上 |
+  | board 週會出席名單、中心公告收件人 | `usersBySite` | 每個中心的名單都含集團成員 |
+  | board 中心公告發布 | `bbSetupCompose` / `bbPublish` | 集團成員可發任一中心的公告 |
+  | board 週會／業務會議編輯權 | `canEditSite` / `bizCanEdit` | 集團成員編得動任一中心的紀錄 |
+  | admin 抽籤 | `lottoInit` / `lottoFilterSite` | 選 TW 時集團成員也在抽籤池裡 |
+  | admin 會議室邀請人員 | `_invSiteUsers` | 集團的人看得到全部；一般人看自己中心＋集團 |
+  | Portal 行事曆預設分類 | `siteMap` | 集團預設顯示三國假日 |
+- **刻意不併入集團的地方**（這些是「他屬於哪個單位」的統計，不是「誰能參加」）：
+  board 投票的分中心統計（`plCenterFilter`，集團自成一格 —— 灌進每個中心會變成重複計算）、
+  Portal／KMS 的貢獻排行榜 site 篩選。
+- **`GRP` 不是可選的「範圍」**：`pm-c-site` / `pl-c-site` 的下拉維持 TW/CN/VN 三個。
+  只給集團的會議請用「指定人員」。同理 `wmNewRecord` / `bizMeetingInit` 的預設中心遇到 `GRP`
+  會退回 `TW`（紀錄的 site 必須是真的營運中心）。
+- board 的介面標籤是 `site_GRP`（五語），文件用固定繁中的 `SITE_LABEL_ZH.GRP = '集團'`；
+  badge class `.site-GRP`。Portal／KMS 的 `SITE_FLAG` 用 🏢。
+
 ## Admin 重要細節
 
 - `cancelCarBk(id)` 公務車取消，`cancelBk(id)` 會議室取消，**不可混用**

@@ -5,7 +5,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#080C14">
-<title>COMART · 公告與紀錄 v1.64</title>
+<title>COMART · 公告與紀錄 v1.65</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -72,6 +72,7 @@ h1,h2,h3,p{margin:0}
 .site-CN{background:rgba(242,92,92,.15);color:var(--red)}
 .site-VN{background:rgba(240,164,41,.15);color:var(--amb)}
 .site-group{background:var(--ac2);color:var(--ac)}
+.site-GRP{background:var(--ac2);color:var(--ac)}
 
 /* ── PANEL / FORM SYSTEM (shared by all 3 tabs) ─────────────── */
 .panel{background:var(--s1);border:1px solid var(--br);border-radius:var(--rl);box-shadow:var(--shadow)}
@@ -222,7 +223,7 @@ select,select option,option{background:var(--s2);color:var(--tx)}
     <a class="logo" href="javascript:void(0)">
       <div class="logo-mark">告</div>
       <div class="logo-text" data-i18n="app_title">公告與紀錄</div>
-      <span class="logo-ver">v1.64</span>
+      <span class="logo-ver">v1.65</span>
     </a>
     <div class="topbar-right">
       <div id="langChips" style="display:flex;gap:4px"></div>
@@ -753,7 +754,7 @@ const B_I18N = {
   nav_bulletin:'公告', nav_weekly:'週會紀錄', nav_biz:'業務會議記錄', nav_woody:'Woody 週報',
   nav_premortem:'事前驗屍', nav_brainstorm:'腦力激盪',
   not_logged_in:'未登入',
-  site_TW:'台灣', site_CN:'東莞廠', site_VN:'越南廠', site_group:'集團', scope_all_group:'全集團',
+  site_TW:'台灣', site_CN:'東莞廠', site_VN:'越南廠', site_GRP:'集團', site_group:'集團', scope_all_group:'全集團',
   f_all:'全部', loading:'載入中…', unit_person:'人',
   btn_save:'✓ 儲存', btn_cancel:'✕ 取消', btn_back_list:'← 返回列表', btn_send:'✉️ 寄送',
   btn_edit:'編輯', btn_view:'查看', btn_delete:'刪除', btn_add_item:'＋ 新增項目',
@@ -933,7 +934,7 @@ const B_I18N = {
   nav_bulletin:'公告', nav_weekly:'周会记录', nav_biz:'业务会议记录', nav_woody:'Woody 周报',
   nav_premortem:'事前验尸', nav_brainstorm:'头脑风暴',
   not_logged_in:'未登录',
-  site_TW:'台湾', site_CN:'东莞厂', site_VN:'越南厂', site_group:'集团', scope_all_group:'全集团',
+  site_TW:'台湾', site_CN:'东莞厂', site_VN:'越南厂', site_GRP:'集团', site_group:'集团', scope_all_group:'全集团',
   f_all:'全部', loading:'加载中…', unit_person:'人',
   btn_save:'✓ 保存', btn_cancel:'✕ 取消', btn_back_list:'← 返回列表', btn_send:'✉️ 寄送',
   btn_edit:'编辑', btn_view:'查看', btn_delete:'删除', btn_add_item:'＋ 新增项目',
@@ -1113,7 +1114,7 @@ const B_I18N = {
   nav_bulletin:'Bulletin', nav_weekly:'Weekly Minutes', nav_biz:'Sales Meeting Minutes', nav_woody:'Woody Report',
   nav_premortem:'Premortem', nav_brainstorm:'Brainstorm',
   not_logged_in:'Not signed in',
-  site_TW:'Taiwan', site_CN:'Dongguan', site_VN:'Vietnam', site_group:'Group', scope_all_group:'Whole group',
+  site_TW:'Taiwan', site_CN:'Dongguan', site_VN:'Vietnam', site_GRP:'Group', site_group:'Group', scope_all_group:'Whole group',
   f_all:'All', loading:'Loading…', unit_person:'',
   btn_save:'✓ Save', btn_cancel:'✕ Cancel', btn_back_list:'← Back to list', btn_send:'✉️ Send',
   btn_edit:'Edit', btn_view:'View', btn_delete:'Delete', btn_add_item:'＋ Add item',
@@ -1293,7 +1294,7 @@ const B_I18N = {
   nav_bulletin:'Thông báo', nav_weekly:'Biên bản họp tuần', nav_biz:'Biên bản họp kinh doanh', nav_woody:'Báo cáo Woody',
   nav_premortem:'Premortem', nav_brainstorm:'Brainstorming',
   not_logged_in:'Chưa đăng nhập',
-  site_TW:'Đài Loan', site_CN:'Nhà máy Đông Quản', site_VN:'Nhà máy Việt Nam', site_group:'Tập đoàn', scope_all_group:'Toàn tập đoàn',
+  site_TW:'Đài Loan', site_CN:'Nhà máy Đông Quản', site_VN:'Nhà máy Việt Nam', site_GRP:'Tập đoàn', site_group:'Tập đoàn', scope_all_group:'Toàn tập đoàn',
   f_all:'Tất cả', loading:'Đang tải…', unit_person:' người',
   btn_save:'✓ Lưu', btn_cancel:'✕ Hủy', btn_back_list:'← Về danh sách', btn_send:'✉️ Gửi',
   btn_edit:'Sửa', btn_view:'Xem', btn_delete:'Xóa', btn_add_item:'＋ Thêm mục',
@@ -1473,7 +1474,7 @@ const B_I18N = {
   nav_bulletin:'お知らせ', nav_weekly:'週会議事録', nav_biz:'営業会議議事録', nav_woody:'Woody 週報',
   nav_premortem:'プレモータム', nav_brainstorm:'ブレスト',
   not_logged_in:'未ログイン',
-  site_TW:'台湾', site_CN:'東莞工場', site_VN:'ベトナム工場', site_group:'グループ', scope_all_group:'グループ全体',
+  site_TW:'台湾', site_CN:'東莞工場', site_VN:'ベトナム工場', site_GRP:'グループ', site_group:'グループ', scope_all_group:'グループ全体',
   f_all:'すべて', loading:'読み込み中…', unit_person:'名',
   btn_save:'✓ 保存', btn_cancel:'✕ キャンセル', btn_back_list:'← 一覧へ戻る', btn_send:'✉️ 送信',
   btn_edit:'編集', btn_view:'表示', btn_delete:'削除', btn_add_item:'＋ 項目を追加',
@@ -2051,8 +2052,19 @@ function sbNoteAuth(status) {
 function siteLabel(s) { return s ? BT('site_' + s) : '—'; }
 // 文件用（固定繁中）：紀錄標題、Email 主旨與內文、逐人通知 —— 這些是存檔或寄出去的東西，
 // 不該因為按下匯出鍵的人剛好把介面切成越南文就換一種寫法
-const SITE_LABEL_ZH = { TW:'台灣', CN:'東莞廠', VN:'越南廠' };
+const SITE_LABEL_ZH = { TW:'台灣', CN:'東莞廠', VN:'越南廠', GRP:'集團' };
 function siteLabelZ(s) { return SITE_LABEL_ZH[s] || s || '—'; }
+
+// ═══════ 集團 GRP：屬於每一個營運中心 ═══════
+// 🔴 舊的 'N/A' 讀起來像「不屬於任何中心」，實際語意正好相反 —— 集團成員參與**每一個**
+//    營運中心的工作（投票、抽籤、留言、週會、公告）。migration 202608170001 已改鍵值為 'GRP'。
+//    相容 'N/A'：那 3 位使用者瀏覽器裡的 session 快取還帶著舊值，要等重新登入才會更新。
+// 🔴 判斷「某人算不算某中心的人」一律走 inSite()，不要再寫 `u.site === X`。
+const SITE_GROUP = 'GRP';
+function isGroupSite(s) { return s === SITE_GROUP || s === 'N/A'; }
+function inSite(userSite, targetSite) { return userSite === targetSite || isGroupSite(userSite); }
+// 我自己是不是集團的人（是的話，每個中心的事我都有份）
+function iAmGroup() { return !!(PORTAL_SESSION && isGroupSite(PORTAL_SESSION.site)); }
 function siteBadgeHtml(scope, site) {
   if (scope === 'group') return `<span class="site-badge site-group">${escHtml(BT('site_group'))}</span>`;
   return `<span class="site-badge site-${site}">${escHtml(siteLabel(site))}</span>`;
@@ -2060,9 +2072,12 @@ function siteBadgeHtml(scope, site) {
 function isAdmin() { return PORTAL_SESSION?.role === 'admin'; }
 function isDcc() { return PORTAL_SESSION?.role === 'dcc'; }
 function canPostBulletin() { return isAdmin() || isDcc(); }
-function canEditSite(site) { return isAdmin() || (PORTAL_SESSION && PORTAL_SESSION.site === site); }
+// 集團成員參與每一個中心的工作，該中心的週會／業務會議紀錄也編得動（否則會出現
+// 「名字在出席名單上、卻打不開表單」的半套狀態）
+function canEditSite(site) { return isAdmin() || iAmGroup() || (PORTAL_SESSION && PORTAL_SESSION.site === site); }
 
-function usersBySite(site) { return ALL_USERS.filter(u => u.site === site); }
+// 集團成員屬於每一個中心：週會出席名單、中心公告的收件人都要含他們（見 inSite）
+function usersBySite(site) { return ALL_USERS.filter(u => inSite(u.site, site)); }
 function userName(u) { return (u && (u.nameZh || u.nameEn || u.empId)) || ''; }
 
 async function syncUsers() {
@@ -2153,7 +2168,7 @@ function bbSetupCompose() {
     sel.innerHTML = `<option value="group">${escHtml(BT('bb_scope_group'))}</option>` +
       ['TW','CN','VN'].map(siteOpt).join('');
   } else {
-    sel.innerHTML = siteOpt(PORTAL_SESSION.site);
+    sel.innerHTML = iAmGroup() ? ['TW','CN','VN'].map(siteOpt).join('') : siteOpt(PORTAL_SESSION.site);
   }
   if (cur) sel.value = cur;   // 切換語言重建選項時保留主席已選的範圍
 }
@@ -2207,7 +2222,8 @@ async function bbSubmitPost() {
   const pinned = document.getElementById('bb-pin').checked;
   const scope = scopeVal === 'group' ? 'group' : 'site';
   const site = scope === 'site' ? scopeVal.split(':')[1] : null;
-  if (scope === 'site' && !isAdmin() && site !== PORTAL_SESSION.site) { boardToast(BT('bb_only_own_site')); return; }
+  // 集團成員參與每一個中心，發哪一個中心的公告都合理；一般人仍限自己那一個
+  if (scope === 'site' && !isAdmin() && !iAmGroup() && site !== PORTAL_SESSION.site) { boardToast(BT('bb_only_own_site')); return; }
 
   const post = {
     id: uid(), body, pinned: pinned ? 1 : 0,
@@ -2346,7 +2362,9 @@ function wmFreshState(site) {
 
 function wmNewRecord() {
   _wmEditId = null;
-  const site = (_wmFilter && ['TW','CN','VN'].includes(_wmFilter)) ? _wmFilter : (PORTAL_SESSION.site || 'TW');
+  // 集團不是營運中心，不能當成紀錄的 site：沒指定篩選時退回台灣，主席可在表單裡改
+  const my = PORTAL_SESSION.site || 'TW';
+  const site = (_wmFilter && ['TW','CN','VN'].includes(_wmFilter)) ? _wmFilter : (['TW','CN','VN'].includes(my) ? my : 'TW');
   wmState = wmFreshState(site);
   wmOpenEditor();
 }
@@ -2860,10 +2878,11 @@ function bizSalesUsers(scope){
 function bizScopeLabel(scope){ return scope==='ALL' ? BT('scope_all_group') : siteLabel(scope); }       // 介面
 function bizScopeLabelZ(scope){ return scope==='ALL' ? '全集團' : siteLabelZ(scope); }                  // 文件（固定繁中）
 // 修改／刪除權限：admin、全集團會議（任何人）、或該中心成員
-function bizCanEdit(scope){ return isAdmin() || scope==='ALL' || (PORTAL_SESSION && PORTAL_SESSION.site===scope); }
+function bizCanEdit(scope){ return isAdmin() || iAmGroup() || scope==='ALL' || (PORTAL_SESSION && PORTAL_SESSION.site===scope); }
 
 function bizMeetingInit(){
-  var CUR_SCOPE = PORTAL_SESSION ? (PORTAL_SESSION.site || 'TW') : 'TW';
+  // 集團成員沒有自己的營運中心，預設落在台灣（可在畫面上切換）
+  var CUR_SCOPE = PORTAL_SESSION ? (['TW','CN','VN'].indexOf(PORTAL_SESSION.site)>=0 ? PORTAL_SESSION.site : 'TW') : 'TW';
 (function(){
   "use strict";
   var CN=["一","二","三","四","五","六","七","八","九","十","十一","十二"];
@@ -3621,7 +3640,7 @@ function wrPrint(){
 // ═══════════════════════════════════════════════
 const PM_LANGS = [['zh-TW','繁體中文'],['zh-CN','简体中文'],['vi','Tiếng Việt'],['en','English'],['ja','日本語']];
 const PM_LANG_SHORT = { 'zh-TW':'繁中','zh-CN':'简中','vi':'越南語','en':'English','ja':'日本語' };
-// 階段清單改為「每種會議自己一份」（v1.64）：意見徵集沒有「對策」，投票也是可選的。
+// 階段清單改為「每種會議自己一份」（v1.65）：意見徵集沒有「對策」，投票也是可選的。
 // PM_PHASES 保留為驗屍／腦力激盪的完整版；實際取用一律經 pmPhases()，那裡才看得到
 // 「這一場有沒有開投票」。所有比較階段先後的地方（pmPhaseIdx／pmCanGoPhase／pmSetPhase）
 // 都吃 pmPhases() 的結果，所以少一個階段時「往前只能走一步」自動就跳過它。
@@ -4067,7 +4086,7 @@ function pmPhaseLabelOf(kind, p) {
 }
 function pmVoteCap() { return PMK().voteCap; }
 
-// ── 行為旗標的唯一取用點 pmOpt()（v1.64）──
+// ── 行為旗標的唯一取用點 pmOpt()（v1.65）──
 // 🔴 三種會議的旗標來源不同，但讀取端只准有這一個入口：
 //    驗屍／腦力激盪 → 一律讀 PM_KINDS（寫死，configurable 是空的，session 的 opt_* 再怎麼被塞值都無效）
 //    意見徵集       → 讀該場 session 的 opt_*；沒設過（null／undefined）才退回 PM_KINDS 的保底值
@@ -4090,7 +4109,7 @@ function pmTplOf(s) { return PM_TEMPLATES[(s && s.template) || ''] || null; }
 function pmTpl() { return pmTplOf(pmSession); }
 function pmFieldCount() { const t = pmTpl(); return t ? t.fields : 1; }
 
-// ── 這一場實際有哪些階段（v1.64）──
+// ── 這一場實際有哪些階段（v1.65）──
 // 沒宣告 phases 的類型（驗屍／腦力激盪）用完整版；意見徵集沒有「對策」，
 // 且 ranking 只有在主席建會時勾了「要投票」才會出現。所有比較階段先後的邏輯都吃這個結果，
 // 所以少一個階段時「往前只能走一步」會自動跳過它，不必另外寫特例。
@@ -4551,7 +4570,7 @@ function pmIsChair(s) { return !!(s && PORTAL_SESSION && s.chair_emp_id === PORT
 function pmInScope(s) {
   if (!PORTAL_SESSION) return false;
   if (s.scope_type === 'all') return true;
-  if (s.scope_type === 'site') return s.scope_site === PORTAL_SESSION.site;
+  if (s.scope_type === 'site') return inSite(PORTAL_SESSION.site, s.scope_site);
   if (s.scope_type === 'list') return (s.scope_members || []).indexOf(PORTAL_SESSION.empId) >= 0;
   return false;
 }
@@ -4887,7 +4906,7 @@ async function pmRetryTranslations() {
 function pmSaveDraft() { const el = document.getElementById('pm-writebox'); if (el) pmDraft = el.value; }
 function pmRestoreDraft() { const el = document.getElementById('pm-writebox'); if (el && pmDraft) el.value = pmDraft; }
 
-// ── 重繪時不要把正在打字的人踢出輸入框（v1.64）──
+// ── 重繪時不要把正在打字的人踢出輸入框（v1.65）──
 // 會議室是整塊 innerHTML 重畫的：別人一送出內容／一則譯文補完，輪詢就把 DOM 換掉，
 // 正在打對策或填寫框的人游標會彈掉、中文輸入法組字到一半會被砍斷。兩道防線：
 //   ① 正在輸入文字時直接延後重繪（pmRerender），等他離開輸入框再畫；
@@ -5277,7 +5296,7 @@ async function pmToggleVote(id) {
   pmMaybeAutoAdvance();   // 自己這一票可能就是最後一票
 }
 
-// ── 全員投滿自動進入下一階段（v1.64）──
+// ── 全員投滿自動進入下一階段（v1.65）──
 // 每個人都把票投完了還要等主席按鍵，是白等：票數已成定局，再等只是延遲會議。
 // 🔴 只有主席的瀏覽器能真的推進階段 —— sb-proxy 的欄位守衛規定 PATCH phase 必須是該場主席本人，
 //    其他人送出去只會拿到 403。所以判斷雖然人人都算得出來（用來顯示進度），動作只由主席端發出。
@@ -5642,7 +5661,7 @@ function pmSendMail() {
   try { window.location.href = url; boardToast(BT('bm_mail_ok')); } catch (e) { boardToast(BT('t_mail_fail')); }
 }
 
-// ═══════ 展示階段的播放模式（v1.64）═══════
+// ═══════ 展示階段的播放模式（v1.65）═══════
 // 「讓所有留言展現在螢幕上，讓大家逐一看過」——一次一則、大字、雙語並陳，適合會議室投影。
 // 🔴 全場同步：主席按下一則時把索引寫進 premortem_sessions.play_idx，其他人靠既有的 7 秒輪詢
 //    跳到同一則。play_idx 在 sb-proxy 的 PM_PROTECTED 裡，只有該場主席改得動 ——
@@ -5897,7 +5916,7 @@ function plIsCreator(s) { return !!(s && PORTAL_SESSION && (s.creator_emp_id ===
 function plInScope(s) {
   if (!PORTAL_SESSION) return false;
   if (s.scope_type === 'all') return true;
-  if (s.scope_type === 'site') return s.scope_site === PORTAL_SESSION.site;
+  if (s.scope_type === 'site') return inSite(PORTAL_SESSION.site, s.scope_site);
   if (s.scope_type === 'list') return (s.scope_members || []).indexOf(PORTAL_SESSION.empId) >= 0;
   return false;
 }
@@ -6191,7 +6210,8 @@ function plRenderRoom() {
   html += '<div class="panel"><div class="panel-h"><span class="idx">✔</span><h2>' + (plClosed() ? BT('pl_result_head') : BT('pl_vote_head', { mode: modeTag })) + '</h2><span class="sub">' + total + ' ' + BT('pl_people') + ' · ' + grand + ' ' + unit + '</span></div><div class="panel-b">';
   if (!showCounts) html += '<div class="hint" style="margin-bottom:8px">' + BT('pl_reveal_note') + '</div>';
   // 分中心篩選
-  if (showCounts) html += '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">' + ['', 'TW', 'CN', 'VN'].map(st => '<button class="chip-f' + (plCenterFilter === st ? ' on' : '') + '" onclick="plSetCenter(\'' + st + '\')">' + (st ? escHtml(siteLabel(st)) : BT('pl_all')) + '</button>').join('') + '</div>';
+  // 集團自成一格，不併進各中心：他確實只投了一票，灌進每個中心會變成重複計算
+  if (showCounts) html += '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">' + ['', 'TW', 'CN', 'VN', SITE_GROUP].map(st => '<button class="chip-f' + (plCenterFilter === st ? ' on' : '') + '" onclick="plSetCenter(\'' + st + '\')">' + (st ? escHtml(siteLabel(st)) : BT('pl_all')) + '</button>').join('') + '</div>';
   if (showCounts) html += '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px"><button class="btn sm" onclick="plSendMail()">' + BT('pl_exp_send') + '</button><button class="btn sm" onclick="plExportXlsx()">Excel</button><button class="btn sm" onclick="plExportPNG()">PNG</button><button class="btn sm" onclick="plExportPDF()">PDF</button></div>';
   // 圓餅圖
   if (showCounts && grand > 0) {

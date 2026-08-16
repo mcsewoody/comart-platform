@@ -5,7 +5,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#080C14">
-<title>COMART · 公告與紀錄 v1.62</title>
+<title>COMART · 公告與紀錄 v1.63</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -222,7 +222,7 @@ select,select option,option{background:var(--s2);color:var(--tx)}
     <a class="logo" href="javascript:void(0)">
       <div class="logo-mark">告</div>
       <div class="logo-text" data-i18n="app_title">公告與紀錄</div>
-      <span class="logo-ver">v1.62</span>
+      <span class="logo-ver">v1.63</span>
     </a>
     <div class="topbar-right">
       <div id="langChips" style="display:flex;gap:4px"></div>
@@ -873,6 +873,11 @@ const B_I18N = {
   pm_need_target_f:'請先填「{f}」',
   pmt_gratitude_f1:'感謝對象', pmt_gratitude_f2:'具體事實',
   pmt_gratitude_f2ph:'他做了什麼？越具體越好，例如「上週三留下來陪我把報告趕完」…',
+  pm_play_title:'逐則展示', pm_play_start:'▶ 播放', pm_play_stop:'✕ 結束播放',
+  pm_play_prev:'上一則', pm_play_next:'下一則', pm_play_pos:'第 {i}／{n} 則',
+  pm_play_keys:'鍵盤：← → 換頁、Esc 結束播放', pm_play_follow:'主席（{name}）控制播放，你的畫面會跟著走。',
+  pm_play_hint:'按「▶ 播放」可逐則放大呈現，全場畫面會跟著跳到同一則，適合投影。',
+  pm_play_fail:'播放同步失敗：',
   pm_vote_progress:'投票進度：{done}／{total} 人已投完',
   pm_vote_auto_hint:'全員投完後會自動進入「{next}」。',
   pm_auto_advance:'全員已投完，自動進入「{next}」',
@@ -1047,6 +1052,11 @@ const B_I18N = {
   pm_need_target_f:'请先填“{f}”',
   pmt_gratitude_f1:'感谢对象', pmt_gratitude_f2:'具体事实',
   pmt_gratitude_f2ph:'他做了什么？越具体越好，例如“上周三留下来陪我把报告赶完”…',
+  pm_play_title:'逐则展示', pm_play_start:'▶ 播放', pm_play_stop:'✕ 结束播放',
+  pm_play_prev:'上一则', pm_play_next:'下一则', pm_play_pos:'第 {i}／{n} 则',
+  pm_play_keys:'键盘：← → 换页、Esc 结束播放', pm_play_follow:'主席（{name}）控制播放，你的画面会跟着走。',
+  pm_play_hint:'按“▶ 播放”可逐则放大呈现，全场画面会跟着跳到同一则，适合投影。',
+  pm_play_fail:'播放同步失败：',
   pm_vote_progress:'投票进度：{done}／{total} 人已投完',
   pm_vote_auto_hint:'全员投完后会自动进入「{next}」。',
   pm_auto_advance:'全员已投完，自动进入「{next}」',
@@ -1221,6 +1231,11 @@ const B_I18N = {
   pm_need_target_f:'Please fill in \u201C{f}\u201D first',
   pmt_gratitude_f1:'Who you are thanking', pmt_gratitude_f2:'What they specifically did',
   pmt_gratitude_f2ph:'What did they do? The more specific the better, e.g. \u201Cstayed late last Wednesday to help me finish the report\u201D…',
+  pm_play_title:'Walkthrough', pm_play_start:'▶ Play', pm_play_stop:'✕ Stop',
+  pm_play_prev:'Previous', pm_play_next:'Next', pm_play_pos:'{i} of {n}',
+  pm_play_keys:'Keyboard: ← → to move, Esc to stop', pm_play_follow:'The chair ({name}) is driving; your screen follows.',
+  pm_play_hint:'Hit "▶ Play" to show entries one at a time, enlarged. Everyone\u2019s screen follows to the same entry — made for projecting.',
+  pm_play_fail:'Playback sync failed: ',
   pm_vote_progress:'Voting progress: {done}/{total} people finished',
   pm_vote_auto_hint:'Moves on to “{next}” automatically once everyone has voted.',
   pm_auto_advance:'Everyone has voted — moving on to “{next}”',
@@ -1395,6 +1410,11 @@ const B_I18N = {
   pm_need_target_f:'Vui lòng điền “{f}” trước',
   pmt_gratitude_f1:'Người bạn muốn cảm ơn', pmt_gratitude_f2:'Việc cụ thể họ đã làm',
   pmt_gratitude_f2ph:'Họ đã làm gì? Càng cụ thể càng tốt, VD “thứ Tư tuần trước ở lại giúp tôi làm xong báo cáo”…',
+  pm_play_title:'Trình bày từng mục', pm_play_start:'▶ Phát', pm_play_stop:'✕ Dừng',
+  pm_play_prev:'Trước', pm_play_next:'Tiếp', pm_play_pos:'Mục {i}/{n}',
+  pm_play_keys:'Bàn phím: ← → chuyển, Esc dừng', pm_play_follow:'Chủ tọa ({name}) đang điều khiển; màn hình của bạn sẽ đi theo.',
+  pm_play_hint:'Bấm “▶ Phát” để hiển thị phóng to từng mục. Màn hình của mọi người sẽ nhảy theo cùng một mục — rất hợp để trình chiếu.',
+  pm_play_fail:'Đồng bộ trình chiếu thất bại: ',
   pm_vote_progress:'Tiến độ bỏ phiếu: {done}/{total} người đã xong',
   pm_vote_auto_hint:'Sẽ tự động chuyển sang “{next}” khi mọi người bỏ phiếu xong.',
   pm_auto_advance:'Mọi người đã bỏ phiếu xong — tự động chuyển sang “{next}”',
@@ -1569,6 +1589,11 @@ const B_I18N = {
   pm_need_target_f:'まず「{f}」を入力してください',
   pmt_gratitude_f1:'感謝したい相手', pmt_gratitude_f2:'具体的にしてくれたこと',
   pmt_gratitude_f2ph:'何をしてくれましたか？具体的なほど良いです。例：「先週の水曜、残って報告書を仕上げるのを手伝ってくれた」…',
+  pm_play_title:'1件ずつ提示', pm_play_start:'▶ 再生', pm_play_stop:'✕ 終了',
+  pm_play_prev:'前へ', pm_play_next:'次へ', pm_play_pos:'{n} 件中 {i} 件目',
+  pm_play_keys:'キーボード：← → で移動、Esc で終了', pm_play_follow:'司会（{name}）が操作しています。画面は自動で追随します。',
+  pm_play_hint:'「▶ 再生」を押すと1件ずつ拡大表示され、全員の画面が同じ1件に追随します。投影に最適です。',
+  pm_play_fail:'再生の同期に失敗しました：',
   pm_vote_progress:'投票状況：{done}／{total} 名が投票完了',
   pm_vote_auto_hint:'全員の投票が終わると自動的に「{next}」へ進みます。',
   pm_auto_advance:'全員の投票が完了しました。「{next}」へ進みます',
@@ -3591,7 +3616,7 @@ function wrPrint(){
 // ═══════════════════════════════════════════════
 const PM_LANGS = [['zh-TW','繁體中文'],['zh-CN','简体中文'],['vi','Tiếng Việt'],['en','English'],['ja','日本語']];
 const PM_LANG_SHORT = { 'zh-TW':'繁中','zh-CN':'简中','vi':'越南語','en':'English','ja':'日本語' };
-// 階段清單改為「每種會議自己一份」（v1.62）：意見徵集沒有「對策」，投票也是可選的。
+// 階段清單改為「每種會議自己一份」（v1.63）：意見徵集沒有「對策」，投票也是可選的。
 // PM_PHASES 保留為驗屍／腦力激盪的完整版；實際取用一律經 pmPhases()，那裡才看得到
 // 「這一場有沒有開投票」。所有比較階段先後的地方（pmPhaseIdx／pmCanGoPhase／pmSetPhase）
 // 都吃 pmPhases() 的結果，所以少一個階段時「往前只能走一步」自動就跳過它。
@@ -4037,7 +4062,7 @@ function pmPhaseLabelOf(kind, p) {
 }
 function pmVoteCap() { return PMK().voteCap; }
 
-// ── 行為旗標的唯一取用點 pmOpt()（v1.62）──
+// ── 行為旗標的唯一取用點 pmOpt()（v1.63）──
 // 🔴 三種會議的旗標來源不同，但讀取端只准有這一個入口：
 //    驗屍／腦力激盪 → 一律讀 PM_KINDS（寫死，configurable 是空的，session 的 opt_* 再怎麼被塞值都無效）
 //    意見徵集       → 讀該場 session 的 opt_*；沒設過（null／undefined）才退回 PM_KINDS 的保底值
@@ -4060,7 +4085,7 @@ function pmTplOf(s) { return PM_TEMPLATES[(s && s.template) || ''] || null; }
 function pmTpl() { return pmTplOf(pmSession); }
 function pmFieldCount() { const t = pmTpl(); return t ? t.fields : 1; }
 
-// ── 這一場實際有哪些階段（v1.62）──
+// ── 這一場實際有哪些階段（v1.63）──
 // 沒宣告 phases 的類型（驗屍／腦力激盪）用完整版；意見徵集沒有「對策」，
 // 且 ranking 只有在主席建會時勾了「要投票」才會出現。所有比較階段先後的邏輯都吃這個結果，
 // 所以少一個階段時「往前只能走一步」會自動跳過它，不必另外寫特例。
@@ -4800,7 +4825,7 @@ function pmPollStart() { pmPollStop(); pmPollTimer = setInterval(pmPollTick, 700
 function pmPollStop() { if (pmPollTimer) { clearInterval(pmPollTimer); pmPollTimer = null; } }
 function pmSig() {
   // 情境／專案描述比對「內容」而非只比有無譯文，主席改字後其他人才會即時更新
-  const sp = pmSession ? [pmSession.phase, pmSession.project_desc, pmSession.desc_a, pmSession.desc_b,
+  const sp = pmSession ? [pmSession.phase, pmSession.play_idx, pmSession.project_desc, pmSession.desc_a, pmSession.desc_b,
     pmSession.scenario, pmSession.scenario_a, pmSession.scenario_b, pmSession.summary_at,
     pmSession.ai_summary_a, pmSession.ai_summary_b, pmSession.summary_edited_at, pmSession.meet_at, pmSession.meet_location, pmSession.attendees].join('¦') : '';
   const es = pmEntries.map(e => e.id + ':' + (e.updated_at || '') + ':' + (e.text_a ? 1 : 0) + (e.text_b ? 1 : 0) + ':' + pmVoteCount(e) + ':' + (e.theme || '')).join(',');
@@ -4819,7 +4844,7 @@ async function pmPollTick() {
     // 保留本地正在產生中的狀態，其餘欄位以伺服器為準
     ['phase','roster_locked','project_desc','desc_a','desc_b','scenario','scenario_a','scenario_b',
      'ai_summary','ai_summary_a','ai_summary_b','summary_at','summary_edited_at','summary_edited_by',
-     'meet_at','meet_location','attendees'].forEach(k => { pmSession[k] = r[k]; });
+     'meet_at','meet_location','attendees','play_idx'].forEach(k => { pmSession[k] = r[k]; });
   }
   await pmFetchEntries();
   await pmFetchMitigations();
@@ -4849,7 +4874,7 @@ async function pmRetryTranslations() {
 function pmSaveDraft() { const el = document.getElementById('pm-writebox'); if (el) pmDraft = el.value; }
 function pmRestoreDraft() { const el = document.getElementById('pm-writebox'); if (el && pmDraft) el.value = pmDraft; }
 
-// ── 重繪時不要把正在打字的人踢出輸入框（v1.62）──
+// ── 重繪時不要把正在打字的人踢出輸入框（v1.63）──
 // 會議室是整塊 innerHTML 重畫的：別人一送出內容／一則譯文補完，輪詢就把 DOM 換掉，
 // 正在打對策或填寫框的人游標會彈掉、中文輸入法組字到一半會被砍斷。兩道防線：
 //   ① 正在輸入文字時直接延後重繪（pmRerender），等他離開輸入框再畫；
@@ -4947,7 +4972,10 @@ async function pmSetPhase(p) {
   }
   const prev = pmSession.phase;
   pmSession.phase = p; pmRenderRoom();
-  try { await SB.patch('premortem_sessions', 'id=eq.' + encodeURIComponent(pmSession.id), { phase: p, updated_at: new Date().toISOString() }); }
+  // 離開展示階段就關掉播放：留著索引的話下次回到展示階段會從半路開始
+  const patch = { phase: p, updated_at: new Date().toISOString() };
+  if (p !== 'reveal' && pmPlayIdx() >= 0) { patch.play_idx = null; pmSession.play_idx = null; }
+  try { await SB.patch('premortem_sessions', 'id=eq.' + encodeURIComponent(pmSession.id), patch); }
   catch (e) { pmSession.phase = prev; pmRenderRoom(); boardToast(BT('pm_phase_fail') + (e.message || e)); return; }
   // 手動退回排序階段（讓晚到的人補投）時重新武裝自動推進；自動推進本身走的是 p='mitigation'，不會誤觸
   if (p === 'ranking') pmAutoAdvanced = false;
@@ -5038,9 +5066,16 @@ function pmRenderRoom() {
         '</div></div>';
     }
   } else if (s.phase === 'reveal') {
-    html += '<div class="panel"><div class="panel-h"><span class="idx">▤</span><h2>' + escHtml(BT('pm_all_items', { item: T.item })) + '</h2><span class="sub">' + escHtml(BT('pm_count_n', { n: pmEntries.length })) + '</span></div>' +
-      '<div class="panel-b">' + (pmEntries.length ? pmEntries.map(e => pmEntryHtml(e, false, true, 0)).join('') : '<div class="empty-note">' + escHtml(BT('pm_no_content')) + '</div>') +
-      '<div class="hint" style="margin-top:8px">' + escHtml(BT('pm_reveal_hint', { ranking: pmPhaseLabel('ranking') })) + '</div></div></div>';
+    // 播放中：全場（含非主席）都只看放大的那一則，畫面靠 play_idx 輪詢同步
+    if (pmPlaying()) { html += pmPlaySlideHtml(chair); }
+    else {
+      const playBtn = (chair && pmEntries.length)
+        ? '<button class="btn primary sm" style="margin-left:auto" onclick="pmPlayStart()">' + escHtml(BT('pm_play_start')) + '</button>' : '';
+      html += '<div class="panel"><div class="panel-h"><span class="idx">▤</span><h2>' + escHtml(BT('pm_all_items', { item: T.item })) + '</h2><span class="sub">' + escHtml(BT('pm_count_n', { n: pmEntries.length })) + '</span>' + playBtn + '</div>' +
+        '<div class="panel-b">' + (pmEntries.length ? pmEntries.map(e => pmEntryHtml(e, false, true, 0)).join('') : '<div class="empty-note">' + escHtml(BT('pm_no_content')) + '</div>') +
+        (chair && pmEntries.length ? '<div class="hint" style="margin-top:8px">' + escHtml(BT('pm_play_hint')) + '</div>' : '') +
+        '<div class="hint" style="margin-top:8px">' + escHtml(BT('pm_reveal_hint', { ranking: pmPhaseLabel(pmPhases()[pmPhaseIdx('reveal') + 1] || 'locked') })) + '</div></div></div>';
+    }
   } else if (s.phase === 'ranking') {
     const mine = pmMyVoteCount(), vp = pmVoteProgress();
     // 投票進度只給數字、不給名字（畫面上從不顯示投票人）。全員投滿時主席端會自動推進到下一階段。
@@ -5225,7 +5260,7 @@ async function pmToggleVote(id) {
   pmMaybeAutoAdvance();   // 自己這一票可能就是最後一票
 }
 
-// ── 全員投滿自動進入下一階段（v1.62）──
+// ── 全員投滿自動進入下一階段（v1.63）──
 // 每個人都把票投完了還要等主席按鍵，是白等：票數已成定局，再等只是延遲會議。
 // 🔴 只有主席的瀏覽器能真的推進階段 —— sb-proxy 的欄位守衛規定 PATCH phase 必須是該場主席本人，
 //    其他人送出去只會拿到 403。所以判斷雖然人人都算得出來（用來顯示進度），動作只由主席端發出。
@@ -5574,6 +5609,79 @@ function pmSendMail() {
   const url = 'mailto:' + encodeURIComponent(to) + '?subject=' + encodeURIComponent(T.meet + '紀錄 ' + (s.title || '')) + '&body=' + encodeURIComponent(L.join('\n'));
   try { window.location.href = url; boardToast(BT('bm_mail_ok')); } catch (e) { boardToast(BT('t_mail_fail')); }
 }
+
+// ═══════ 展示階段的播放模式（v1.63）═══════
+// 「讓所有留言展現在螢幕上，讓大家逐一看過」——一次一則、大字、雙語並陳，適合會議室投影。
+// 🔴 全場同步：主席按下一則時把索引寫進 premortem_sessions.play_idx，其他人靠既有的 7 秒輪詢
+//    跳到同一則。play_idx 在 sb-proxy 的 PM_PROTECTED 裡，只有該場主席改得動 ——
+//    否則任何與會者都能把全場的畫面拉走，等於搶走主席的簡報器。
+// 非主席看不到任何控制鈕，只跟著走；主席另有鍵盤 ← → Esc。
+function pmPlayIdx() {
+  const v = pmSession && pmSession.play_idx;
+  return (v === null || v === undefined) ? -1 : parseInt(v, 10);
+}
+function pmPlaying() { const i = pmPlayIdx(); return i >= 0 && pmEntries.length > 0; }
+async function pmPlaySet(idx) {
+  if (!pmIsChair(pmSession)) return;
+  const prev = pmSession.play_idx;
+  pmSession.play_idx = idx;
+  pmRenderRoom();
+  try { await SB.patch('premortem_sessions', 'id=eq.' + encodeURIComponent(pmSession.id), { play_idx: idx, updated_at: new Date().toISOString() }); }
+  catch (e) { pmSession.play_idx = prev; pmRenderRoom(); boardToast(BT('pm_play_fail') + (e.message || e)); }
+}
+function pmPlayStart() { if (pmEntries.length) pmPlaySet(0); }
+function pmPlayStop() { pmPlaySet(null); }
+function pmPlayGo(d) {
+  const n = pmEntries.length; if (!n) return;
+  // 不繞回：走到最後一則就停在那裡，免得主席多按一次又跳回第一則、讓全場以為漏看了
+  const i = Math.max(0, Math.min(n - 1, pmPlayIdx() + d));
+  if (i !== pmPlayIdx()) pmPlaySet(i);
+}
+function pmPlaySlideHtml(chair) {
+  const n = pmEntries.length, i = Math.max(0, Math.min(n - 1, pmPlayIdx()));
+  const e = pmEntries[i], s = pmSession;
+  // 放大版：字級與行距都比清單大一階，投影時後排看得到
+  const cell = (label, txt, pending) =>
+    '<div class="pm-lc"><div class="lbl">' + escHtml(label + (pending ? BT('pm_pending_suffix') : '')) + '</div>' +
+    '<div class="txt" style="font-size:19px;line-height:1.75">' + escHtml(txt || '') + '</div></div>';
+  let body;
+  if (e.text_a || e.text_b) body = '<div class="pm-bi">' + cell(pmLangShort(s.lang_a), e.text_a || e.text_src, !e.text_a) + cell(pmLangShort(s.lang_b), e.text_b || e.text_src, !e.text_b) + '</div>';
+  else body = '<div style="white-space:pre-wrap;font-size:19px;line-height:1.75">' + escHtml(e.text_src || '') + '</div>';
+  // 對象（感恩範本）放最上面且再大一級——投影時這是第一眼要看到的
+  let head = '';
+  if (e.target_name) {
+    const same = e.target_emp_id || !e.target_a || !e.target_b || e.target_a === e.target_b;
+    head = '<div style="font-size:14px;color:var(--tx3);margin-bottom:4px">' + escHtml(BT('pm_target_to')) + '</div>' +
+      '<div style="font-size:26px;font-weight:700;color:var(--ac);line-height:1.35;margin-bottom:16px">' +
+      escHtml(same ? e.target_name : (e.target_a + '　/　' + e.target_b)) + '</div>';
+  }
+  // 匿名場次不顯示提出者（與清單一致）
+  const who = (!pmOpt('anonymous') && e.author_name)
+    ? '<div style="margin-top:18px;font-size:14px;color:var(--tx3);text-align:right">— ' + escHtml(e.author_name) + '</div>' : '';
+  const ctrl = chair
+    ? '<div style="display:flex;gap:8px;align-items:center;justify-content:center;margin-top:18px;flex-wrap:wrap">' +
+      '<button class="btn sm" onclick="pmPlayGo(-1)"' + (i <= 0 ? ' disabled style="opacity:.4"' : '') + '>◀ ' + escHtml(BT('pm_play_prev')) + '</button>' +
+      '<button class="btn primary sm" onclick="pmPlayGo(1)"' + (i >= n - 1 ? ' disabled style="opacity:.4"' : '') + '>' + escHtml(BT('pm_play_next')) + ' ▶</button>' +
+      '<button class="btn ghost sm" onclick="pmPlayStop()">' + escHtml(BT('pm_play_stop')) + '</button>' +
+      '</div><div style="text-align:center;font-size:11px;color:var(--tx3);margin-top:8px">' + escHtml(BT('pm_play_keys')) + '</div>'
+    : '<div style="text-align:center;font-size:11px;color:var(--tx3);margin-top:18px">' + escHtml(BT('pm_play_follow', { name: pmSession.chair_name || '—' })) + '</div>';
+  // 進度點：一眼看得出走到哪、還剩幾則
+  const dots = '<div style="display:flex;gap:4px;justify-content:center;flex-wrap:wrap;margin-top:14px">' +
+    pmEntries.map((x, k) => '<span style="width:7px;height:7px;border-radius:50%;background:' + (k === i ? 'var(--ac)' : 'var(--br)') + '"></span>').join('') + '</div>';
+  return '<div class="panel" style="border-color:var(--ac)">' +
+    '<div class="panel-h"><span class="idx">▶</span><h2>' + escHtml(BT('pm_play_title')) + '</h2>' +
+    '<span class="sub">' + escHtml(BT('pm_play_pos', { i: i + 1, n: n })) + '</span></div>' +
+    '<div class="panel-b" style="padding:26px 22px">' + head + body + who + dots + ctrl + '</div></div>';
+}
+// 主席的鍵盤簡報器：← → 換頁、Esc 結束。在輸入框裡打字時不攔（展示階段沒有輸入框，但別的階段有）
+document.addEventListener('keydown', function (ev) {
+  if (!pmSession || !pmPlaying() || !pmIsChair(pmSession)) return;
+  const a = document.activeElement;
+  if (a && (a.tagName === 'INPUT' || a.tagName === 'TEXTAREA' || a.isContentEditable)) return;
+  if (ev.key === 'ArrowRight' || ev.key === 'PageDown') { ev.preventDefault(); pmPlayGo(1); }
+  else if (ev.key === 'ArrowLeft' || ev.key === 'PageUp') { ev.preventDefault(); pmPlayGo(-1); }
+  else if (ev.key === 'Escape') { ev.preventDefault(); pmPlayStop(); }
+});
 
 // ═══════ 兩欄範本（感恩留言）的「對象」欄位 ═══════
 // 🔴 用 <input list=…> ＋ <datalist>，而不是 <select>：使用者的決定是「兩者皆可」——

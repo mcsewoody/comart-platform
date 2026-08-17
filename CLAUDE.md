@@ -452,6 +452,8 @@ The portal supports EN, 繁中, 简中, VI, 日 via `setLang(lang)`. Each langua
     播放時另外收掉三處上緣留白：`.wrap` 的 padding-top、`.pm-roombar` 的 margin-bottom、
     `.pm-slide-in` 的 padding-top。會議室頂端那一列的樣式已從 inline style 抽成
     `.pm-roombar` / `#pm-phasebar` 兩個規則 —— inline 樣式沒有 `!important` 是蓋不過去的。
+    v1.71 把 `.pm-slide-in` 的上內距補回約一行（`clamp(18px,2.2vw,44px)`）：
+    完全貼齊分隔線會太擠。**這個值是使用者來回調過兩輪的結果（先太空、再太擠），不要再自行加減。**
 - 🔴 **AI 三段分析的語氣是第三種**：`PM_SUM_SYS_CL` **全程溫暖具體**，三段為
   彙整 → 模式 → 結論。這裡收到的常是同事對同事的感謝，用審查顧問的語氣去評分等於當眾評比
   誰的感謝比較有價值。提示詞裡明令**不排名、不比較誰被提到得多**（沒被提到只代表這次沒被想起來），

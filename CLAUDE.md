@@ -354,7 +354,9 @@ The portal supports EN, 繁中, 简中, VI, 日 via `setLang(lang)`. Each langua
     週會紀錄的 PNG 一直正常，就是因為它一開始就直接畫 canvas。
     版面由 `pmPngBlocks()` 拆成可量可畫的區塊，刻意與 PDF（`pmReportHtml`）逐項對齊。
     中文沒有空格，斷行一律走逐字的 `pmPngWrap()`，不可用 `split(' ')`。
-    ⚠️ **投票頁籤的 `plExportPNG` 仍是舊做法，同一個 bug 尚未修**（它的報表含圖片，要非同步載入）。
+    ⚠️ **投票頁籤的 PNG 匯出已直接移除**（v1.74）：同一個 foreignObject bug，
+    但使用者決定投票只需要 PDF，故不重寫成 canvas 版（它的報表含選項圖與總圖，要非同步載入才畫得出來）。
+    投票的匯出剩 寄送／Excel／PDF。**要恢復請寫 canvas 版，不要把 foreignObject 那段搬回來。**
   - **與會人員（`pmAttendeesZ`）**：`attendees` 欄位要手動打字、實務上幾乎都是空的，
     所以匯出時沒填就用「實際有送出內容的人」補上。
     🔴 **匿名場次絕對不可列名單** —— 那等於指出「這些人之中有人寫了那些內容」，範圍一小就是點名；

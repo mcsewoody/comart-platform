@@ -5,7 +5,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#080C14">
-<title>COMART · 公告與紀錄 v1.77</title>
+<title>COMART · 公告與紀錄 v1.78</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -339,7 +339,7 @@ body.pm-playing #pm-phasebar{padding:0}
     <a class="logo" href="javascript:void(0)">
       <div class="logo-mark">告</div>
       <div class="logo-text" data-i18n="app_title">公告與紀錄</div>
-      <span class="logo-ver">v1.77</span>
+      <span class="logo-ver">v1.78</span>
     </a>
     <div class="topbar-right">
       <div id="langChips" style="display:flex;gap:4px"></div>
@@ -4313,7 +4313,16 @@ let pmSumSaving = false;      // 編輯存檔中，防重入
 // ── 翻譯（claude-proxy，帶 x-session；一次回兩種目標語言）──
 const PM_LANG_NAME = { 'zh-TW':'Traditional Chinese', 'zh-CN':'Simplified Chinese', 'vi':'Vietnamese', 'en':'English', 'ja':'Japanese' };
 const PM_SB_BASE = 'https://tcvlnpgpuphdalzvmoyo.supabase.co';
+// 語言標籤有兩種寫法，用途不同（v1.78）：
+//   pmLangShort()  ＝ 固定繁中（繁中／简中／越南語…），給 PDF／PNG／Excel／Email 四種輸出用。
+//                     那是公司的存檔格式，不該因為誰按了匯出鍵而長得不一樣（同 siteLabelZ 的道理）。
+//   pmLangShortU() ＝ 每個語言用「它自己的寫法」（Tiếng Việt／日本語／繁體中文…），給畫面用。
+//                     不做 5×5 對照表是刻意的：語言標籤要讓「看得懂那個語言的人」認得出來，
+//                     而不是讓當下的介面語言決定 —— 越南同仁看到的必須是 Tiếng Việt，
+//                     不能是「越南語」三個他讀不出來的漢字（瀏覽器與作業系統的語言清單也都這樣做）。
+const PM_LANG_SHORT_UI = Object.fromEntries(PM_LANGS);
 function pmLangShort(c) { return PM_LANG_SHORT[c] || c; }
+function pmLangShortU(c) { return PM_LANG_SHORT_UI[c] || PM_LANG_SHORT[c] || c; }
 // 使用者當下的介面語言＝填寫／翻譯的來源語言預設值（BLANG 已由 bInitLang 決定，含依 site 的退回）
 function pmPortalLang() { return PM_LANG_SHORT[BLANG] ? BLANG : 'zh-TW'; }
 // 翻譯／分群用 haiku（快、便宜）；會議結論總結改用 claude-opus-5（見 pmGenSummary）
@@ -4575,7 +4584,7 @@ function pmSumEditToggle(on) {
   pmRenderRoom();
 }
 function pmSumEditorHtml(s) {
-  const la = pmLangShort(s.lang_a), lb = pmLangShort(s.lang_b);
+  const la = pmLangShortU(s.lang_a), lb = pmLangShortU(s.lang_b);
   const va = pmSumDraft.a !== null ? pmSumDraft.a : (s.ai_summary_a || s.ai_summary || '');
   const vb = pmSumDraft.b !== null ? pmSumDraft.b : (s.ai_summary_b || s.ai_summary || '');
   const ta = 'width:100%;font-family:inherit;font-size:13px;line-height:1.6;background:var(--s2);border:1px solid var(--br);border-radius:8px;padding:10px 12px;color:var(--tx);resize:vertical';
@@ -4646,8 +4655,8 @@ function pmSumSections(text) {
 // 整份文稿：每個語言一個區塊並標明語言（長文並排不好讀，改為上下堆疊）
 function pmSumDocHtml(s) {
   const a = s.ai_summary_a || s.ai_summary || '', b = s.ai_summary_b || '';
-  const blocks = [{ lang: pmLangShort(s.lang_a), txt: a }];
-  if (b && b !== a && s.lang_a !== s.lang_b) blocks.push({ lang: pmLangShort(s.lang_b), txt: b });
+  const blocks = [{ lang: pmLangShortU(s.lang_a), txt: a }];
+  if (b && b !== a && s.lang_a !== s.lang_b) blocks.push({ lang: pmLangShortU(s.lang_b), txt: b });
   return blocks.filter(x => x.txt.trim()).map((bl, i) =>
     '<div style="' + (i ? 'border-top:2px solid var(--br);margin-top:22px;padding-top:16px' : '') + '">' +
     '<span class="site-badge" style="background:var(--ac2);color:var(--ac);margin-bottom:10px;display:inline-block">' + escHtml(bl.lang) + '</span>' +
@@ -5272,7 +5281,7 @@ function pmRenderRoom() {
     html += '<div class="panel"' + (editing ? ' style="border-color:var(--ac)"' : '') + '><div class="panel-h"><span class="idx">✎</span><h2>' +
       escHtml(editing ? BT('pm_editing_h', { item: T.item }) : T.writeTitle) + '</h2></div><div class="panel-b">' +
       '<div style="margin-bottom:8px;font-size:11px;color:var(--tx3)">' +
-      escHtml(BT('pm_auto_detect', { a: pmLangShort(s.lang_a), b: pmLangShort(s.lang_b) })) + '</div>' +
+      escHtml(BT('pm_auto_detect', { a: pmLangShortU(s.lang_a), b: pmLangShortU(s.lang_b) })) + '</div>' +
       pmTargetFieldHtml() +
       '<textarea id="pm-writebox" rows="3" placeholder="' + escHtml(pmWritePh()) + '" style="width:100%;font-family:inherit;font-size:14px;background:var(--s2);border:1px solid var(--br);border-radius:8px;padding:9px 11px;color:var(--tx)" oninput="pmDraft=this.value"' + (capLock ? ' disabled' : '') + '></textarea>' +
       '<div style="margin-top:8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">' +
@@ -5360,7 +5369,7 @@ function pmLangCellHtml(label, txt, pending) {
 }
 function pmHeaderField(origin, a, b, muted) {
   if (pmSession && (a || b)) {
-    return '<div class="pm-bi">' + pmLangCellHtml(pmLangShort(pmSession.lang_a), a || origin, !a) + pmLangCellHtml(pmLangShort(pmSession.lang_b), b || origin, !b) + '</div>';
+    return '<div class="pm-bi">' + pmLangCellHtml(pmLangShortU(pmSession.lang_a), a || origin, !a) + pmLangCellHtml(pmLangShortU(pmSession.lang_b), b || origin, !b) + '</div>';
   }
   return '<div style="white-space:pre-wrap;font-size:' + (muted ? '13px;color:var(--tx2)' : '13.5px') + '">' + escHtml(origin || '') + '</div>';
 }
@@ -5368,7 +5377,7 @@ function pmHeaderField(origin, a, b, muted) {
 // ── 專案描述／情境設定：雙語可編輯（改哪一邊，另一邊就自動翻譯）──
 function pmBiEditorHtml(s, key) {
   const F = PM_BI_FIELDS[key], d = pmBiDraft[key];
-  const la = pmLangShort(s.lang_a), lb = pmLangShort(s.lang_b);
+  const la = pmLangShortU(s.lang_a), lb = pmLangShortU(s.lang_b);
   const va = d.a !== null ? d.a : (s[F.a] || s[F.src] || '');
   const vb = d.b !== null ? d.b : (s[F.b] || s[F.src] || '');
   const ta = 'width:100%;font-family:inherit;font-size:13.5px;background:var(--s2);border:1px solid var(--br);border-radius:8px;padding:9px 11px;color:var(--tx);resize:vertical';
@@ -5406,7 +5415,7 @@ async function pmSaveBiField(key, side) {
     pmBiDraft[key] = { a: null, b: null };
     pmRenderRoom();   // 重繪後 btn 已失效，故只在失敗時還原按鈕
     const FL = pmBiLabel(F);
-    boardToast(text ? BT('pm_field_updated', { f: FL, lang: pmLangShort(side === 'a' ? s.lang_b : s.lang_a) }) : BT('pm_field_cleared', { f: FL }));
+    boardToast(text ? BT('pm_field_updated', { f: FL, lang: pmLangShortU(side === 'a' ? s.lang_b : s.lang_a) }) : BT('pm_field_cleared', { f: FL }));
   } catch (e) {
     if (btn) { btn.disabled = false; btn.textContent = label; }
     boardToast(BT('t_save_failed') + '：' + (e.message || e));
@@ -5459,7 +5468,7 @@ function pmEntryHtml(e, allowDelete, bilingual, voteMode) {
     ? '<span class="site-badge" style="background:var(--ac2);color:var(--ac);margin-bottom:5px;display:inline-block">' + escHtml(e.author_name) + '</span> ' : '';
   let content;
   if (bilingual) {
-    if (e.text_a || e.text_b) content = '<div class="pm-bi">' + pmLangCellHtml(pmLangShort(pmSession.lang_a), e.text_a || e.text_src, !e.text_a) + pmLangCellHtml(pmLangShort(pmSession.lang_b), e.text_b || e.text_src, !e.text_b) + '</div>';
+    if (e.text_a || e.text_b) content = '<div class="pm-bi">' + pmLangCellHtml(pmLangShortU(pmSession.lang_a), e.text_a || e.text_src, !e.text_a) + pmLangCellHtml(pmLangShortU(pmSession.lang_b), e.text_b || e.text_src, !e.text_b) + '</div>';
     else content = '<div style="white-space:pre-wrap;font-size:14px">' + escHtml(e.text_src || '') + '</div><div style="font-size:11px;color:var(--tx3);margin-top:3px">' + escHtml(BT('pm_trans_pending')) + '</div>';
   } else {
     content = '<div style="white-space:pre-wrap;font-size:14px">' + escHtml(e.text_src || '') + '</div>';
@@ -5480,8 +5489,8 @@ function pmTargetLineHtml(e, bilingual) {
 }
 async function pmEditTrans(id) {
   const e = pmEntries.find(x => x.id === id); if (!e || !pmIsChair(pmSession)) return;
-  const a = prompt(BT('pm_trans_of', { lang: pmLangShort(pmSession.lang_a) }), e.text_a || ''); if (a === null) return;
-  const b = prompt(BT('pm_trans_of', { lang: pmLangShort(pmSession.lang_b) }), e.text_b || ''); if (b === null) return;
+  const a = prompt(BT('pm_trans_of', { lang: pmLangShortU(pmSession.lang_a) }), e.text_a || ''); if (a === null) return;
+  const b = prompt(BT('pm_trans_of', { lang: pmLangShortU(pmSession.lang_b) }), e.text_b || ''); if (b === null) return;
   try { await SB.patch('premortem_entries', 'id=eq.' + encodeURIComponent(id), { text_a: a, text_b: b, updated_at: new Date().toISOString() }); e.text_a = a; e.text_b = b; pmRenderRoom(); boardToast(BT('pm_trans_updated')); }
   catch (err) { boardToast(BT('pm_update_failed') + (err.message || err)); }
 }
@@ -5632,10 +5641,10 @@ async function pmDeleteMitigation(id) {
 function pmBiOrdered(origin, a, b) {
   const s = pmSession || {};
   const ta = (a || origin || '').trim(), tb = (b || origin || '').trim();
-  let first = ta, second = tb, fl = pmLangShort(s.lang_a), sl = pmLangShort(s.lang_b);
+  let first = ta, second = tb, fl = pmLangShortU(s.lang_a), sl = pmLangShortU(s.lang_b);
   // 中文優先放左欄：若語言 B 才是中文就對調
   if (!String(s.lang_a || '').startsWith('zh') && String(s.lang_b || '').startsWith('zh')) {
-    first = tb; second = ta; fl = pmLangShort(s.lang_b); sl = pmLangShort(s.lang_a);
+    first = tb; second = ta; fl = pmLangShortU(s.lang_b); sl = pmLangShortU(s.lang_a);
   }
   if (!second || first === second) {
     return '<div style="white-space:pre-wrap;font-size:13.5px;line-height:1.7">' + escHtml(first) + '</div>';
@@ -6054,7 +6063,7 @@ function pmPlaySlideHtml(chair) {
     '<div class="pm-lc"><div class="lbl">' + escHtml(label + (pending ? BT('pm_pending_suffix') : '')) + '</div>' +
     '<div class="txt pm-slide-txt">' + escHtml(txt || '') + '</div></div>';
   let body;
-  if (e.text_a || e.text_b) body = '<div class="pm-bi">' + cell(pmLangShort(s.lang_a), e.text_a || e.text_src, !e.text_a) + cell(pmLangShort(s.lang_b), e.text_b || e.text_src, !e.text_b) + '</div>';
+  if (e.text_a || e.text_b) body = '<div class="pm-bi">' + cell(pmLangShortU(s.lang_a), e.text_a || e.text_src, !e.text_a) + cell(pmLangShortU(s.lang_b), e.text_b || e.text_src, !e.text_b) + '</div>';
   else body = '<div class="pm-slide-txt" style="white-space:pre-wrap">' + escHtml(e.text_src || '') + '</div>';
   // 人名之一：對象（感恩範本）。放最上面、最大 —— 投影時這是第一眼要看到的
   let head = '';

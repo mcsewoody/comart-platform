@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>COMART Platform v1.75</title>
+<title>COMART Platform v1.76</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script defer src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.js"></script>
 <style>
@@ -306,7 +306,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     <div class="login-logo">
       <div class="login-mark" style="background:transparent"><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="44" height="23"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></div>
       <div class="login-name">COMART Platform</div>
-      <div class="login-sub">Internal Portal · v1.75</div>
+      <div class="login-sub">Internal Portal · v1.76</div>
     </div>
     <form id="loginForm" onsubmit="doLogin();return false;" autocomplete="on">
     <div class="field">
@@ -362,7 +362,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   <div class="topbar">
     <div class="topbar-logo" onclick="switchView('home')">
       <div class="topbar-mark" style="background:transparent"><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="26" height="14"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></div>
-      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.75</span></div>
+      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.76</span></div>
     </div>
     <div class="topbar-right">
       <div class="lang-switcher">
@@ -1259,6 +1259,14 @@ function doLogout() {
 // PORTAL ENTRY
 // ═══════════════════════════════════════════════
 function enterPortal() {
+  // 深層連結：登入完成就直接轉去目標子系統，不必先畫 Portal 首頁（也避免閃一下）。
+  // 放在這裡而不是 DOMContentLoaded，是為了讓「已登入直接進來」與「剛登入」「剛改完
+  // 強制密碼」三條路徑共用同一個出口 —— 強制改密碼因此繞不過。
+  try {
+    var _nx = safeNext(new URLSearchParams(window.location.search).get('next'));
+    if (_nx) { goNext(_nx); return; }
+  } catch(_) {}
+
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('shell').classList.add('show');
 
@@ -1436,18 +1444,66 @@ function renderAppGrid() {
   }).join('');
 }
 
+// 把 Portal Session 打包成 ?_ps= 的 base64。優先讀 localStorage，
+// 但寫入曾因共用配額爆滿而靜默失敗 → fallback 到記憶體 SESSION，
+// 否則子系統會拿不到 session 被踢回登入頁
+function sessToken() {
+  var sess = readSession() || SESSION;
+  if (!sess) return '';
+  try { return btoa(unescape(encodeURIComponent(JSON.stringify(sess)))); } catch(_) { return ''; }
+}
+
 function openApp(id) {
   const app = APPS.find(a => a.id === id);
   if (!app || !app.path) return;
-  // 把 Portal Session 帶給子系統。優先讀 localStorage，
-  // 但寫入曾因共用配額爆滿而靜默失敗 → fallback 到記憶體 SESSION，
-  // 否則子系統會拿不到 session 被踢回登入頁
-  var sess = readSession() || SESSION;
-  var token = '';
-  if (sess) {
-    try { token = btoa(unescape(encodeURIComponent(JSON.stringify(sess)))); } catch(_) {}
-  }
+  var token = sessToken();
   window.location.href = app.path + '?_portal=1' + (token ? '&_ps=' + encodeURIComponent(token) : '');
+}
+
+// ═══════════════════════════════════════════════
+// 深層連結：?next=<子系統相對路徑>（v1.76）
+// ═══════════════════════════════════════════════
+// 用途：把「某一場投票／某一份紀錄」的網址直接發給同事。子系統發現自己沒有 session 時，
+// 會把人導到 index.html?next=…；登入後由 enterPortal() 自動轉回那個目標。
+// 收到連結的人因此不必先知道「要去 Portal 登入」。
+//
+// 🔴 next 一定要驗證成「同源相對路徑 ＋ 子系統白名單」。不驗證就是典型的 open redirect：
+//    有人發 index.html?next=https://evil.com，Portal 就會把 base64 的 session token
+//    當作參數送到別人的網站上去。所以下面採白名單而非黑名單 —— 只有列出來的才放行。
+// 🔴 這段刻意放在 enterPortal() 裡，而不是 DOMContentLoaded：強制改密碼那一關在
+//    enterPortal() 之前，深層連結因此繞不過它。
+const NEXT_PATHS  = ['board/index.html', 'admin/index.html', 'kms/index.html', 'quotation/index.html'];
+const NEXT_PARAMS = ['tab', 'id'];   // 只讓認得的參數通過，其餘一律丟掉
+
+function safeNext(raw) {
+  if (!raw) return '';
+  var v;
+  try { v = decodeURIComponent(String(raw)); } catch(_) { return ''; }
+  v = v.replace(/^\.\//, '');
+  // 有 scheme（http:、javascript:、data:…）、協定相對（//host）、絕對路徑、上層目錄一律拒絕
+  if (/^[a-zA-Z][a-zA-Z0-9+.\-]*:/.test(v)) return '';
+  if (v.charAt(0) === '/' || v.indexOf('..') >= 0 || v.indexOf('\\') >= 0) return '';
+  var qi   = v.indexOf('?');
+  var path = qi < 0 ? v : v.slice(0, qi);
+  path = path.split('#')[0];
+  if (NEXT_PATHS.indexOf(path) < 0) return '';
+  // 參數逐一過濾：只留白名單的鍵，值限定 [A-Za-z0-9_-]
+  var keep = [];
+  if (qi >= 0) {
+    new URLSearchParams(v.slice(qi + 1)).forEach(function(val, key) {
+      if (NEXT_PARAMS.indexOf(key) < 0) return;
+      var clean = String(val).replace(/[^A-Za-z0-9_\-]/g, '').slice(0, 64);
+      if (clean) keep.push(key + '=' + clean);
+    });
+  }
+  return path + (keep.length ? '?' + keep.join('&') : '');
+}
+
+function goNext(nx) {
+  var token = sessToken();
+  var sep = nx.indexOf('?') >= 0 ? '&' : '?';
+  // replace 而非 assign：別讓 ?next= 那一頁留在上一頁，否則按返回會再導一次
+  window.location.replace('./' + nx + sep + '_portal=1' + (token ? '&_ps=' + encodeURIComponent(token) : ''));
 }
 
 // ═══════════════════════════════════════════════

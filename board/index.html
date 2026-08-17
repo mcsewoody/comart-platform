@@ -5,7 +5,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#080C14">
-<title>COMART · 公告與紀錄 v1.78</title>
+<title>COMART · 公告與紀錄 v1.79</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -339,7 +339,7 @@ body.pm-playing #pm-phasebar{padding:0}
     <a class="logo" href="javascript:void(0)">
       <div class="logo-mark">告</div>
       <div class="logo-text" data-i18n="app_title">公告與紀錄</div>
-      <span class="logo-ver">v1.78</span>
+      <span class="logo-ver">v1.79</span>
     </a>
     <div class="topbar-right">
       <div id="langChips" style="display:flex;gap:4px"></div>
@@ -870,6 +870,8 @@ const B_I18N = {
   nav_bulletin:'公告', nav_weekly:'週會紀錄', nav_biz:'業務會議記錄', nav_woody:'Woody 週報',
   nav_premortem:'事前驗屍', nav_brainstorm:'腦力激盪',
   not_logged_in:'未登入',
+  b_copy_link:'複製連結', b_link_copied:'連結已複製，貼給同事即可',
+  b_link_copy_manual:'請手動複製這個連結：', b_link_open_failed:'打不開這個連結指向的紀錄',
   site_TW:'台灣', site_CN:'東莞廠', site_VN:'越南廠', site_GRP:'集團', site_group:'集團', scope_all_group:'全集團',
   f_all:'全部', loading:'載入中…', unit_person:'人',
   btn_save:'✓ 儲存', btn_cancel:'✕ 取消', btn_back_list:'← 返回列表', btn_send:'✉️ 寄送',
@@ -1052,6 +1054,8 @@ const B_I18N = {
   nav_bulletin:'公告', nav_weekly:'周会记录', nav_biz:'业务会议记录', nav_woody:'Woody 周报',
   nav_premortem:'事前验尸', nav_brainstorm:'头脑风暴',
   not_logged_in:'未登录',
+  b_copy_link:'复制链接', b_link_copied:'链接已复制，贴给同事即可',
+  b_link_copy_manual:'请手动复制这个链接：', b_link_open_failed:'打不开这个链接指向的记录',
   site_TW:'台湾', site_CN:'东莞厂', site_VN:'越南厂', site_GRP:'集团', site_group:'集团', scope_all_group:'全集团',
   f_all:'全部', loading:'加载中…', unit_person:'人',
   btn_save:'✓ 保存', btn_cancel:'✕ 取消', btn_back_list:'← 返回列表', btn_send:'✉️ 寄送',
@@ -1234,6 +1238,8 @@ const B_I18N = {
   nav_bulletin:'Bulletin', nav_weekly:'Weekly Minutes', nav_biz:'Sales Meeting Minutes', nav_woody:'Woody Report',
   nav_premortem:'Premortem', nav_brainstorm:'Brainstorm',
   not_logged_in:'Not signed in',
+  b_copy_link:'Copy link', b_link_copied:'Link copied — paste it to your colleagues',
+  b_link_copy_manual:'Copy this link manually:', b_link_open_failed:'Could not open the record this link points to',
   site_TW:'Taiwan', site_CN:'Dongguan', site_VN:'Vietnam', site_GRP:'Group', site_group:'Group', scope_all_group:'Whole group',
   f_all:'All', loading:'Loading…', unit_person:'',
   btn_save:'✓ Save', btn_cancel:'✕ Cancel', btn_back_list:'← Back to list', btn_send:'✉️ Send',
@@ -1416,6 +1422,8 @@ const B_I18N = {
   nav_bulletin:'Thông báo', nav_weekly:'Biên bản họp tuần', nav_biz:'Biên bản họp kinh doanh', nav_woody:'Báo cáo Woody',
   nav_premortem:'Premortem', nav_brainstorm:'Brainstorming',
   not_logged_in:'Chưa đăng nhập',
+  b_copy_link:'Sao chép liên kết', b_link_copied:'Đã sao chép liên kết — gửi cho đồng nghiệp là được',
+  b_link_copy_manual:'Vui lòng tự sao chép liên kết này:', b_link_open_failed:'Không mở được nội dung mà liên kết này trỏ tới',
   site_TW:'Đài Loan', site_CN:'Nhà máy Đông Quản', site_VN:'Nhà máy Việt Nam', site_GRP:'Tập đoàn', site_group:'Tập đoàn', scope_all_group:'Toàn tập đoàn',
   f_all:'Tất cả', loading:'Đang tải…', unit_person:' người',
   btn_save:'✓ Lưu', btn_cancel:'✕ Hủy', btn_back_list:'← Về danh sách', btn_send:'✉️ Gửi',
@@ -1598,6 +1606,8 @@ const B_I18N = {
   nav_bulletin:'お知らせ', nav_weekly:'週会議事録', nav_biz:'営業会議議事録', nav_woody:'Woody 週報',
   nav_premortem:'プレモータム', nav_brainstorm:'ブレスト',
   not_logged_in:'未ログイン',
+  b_copy_link:'リンクをコピー', b_link_copied:'リンクをコピーしました。同僚に貼り付けてください',
+  b_link_copy_manual:'このリンクを手動でコピーしてください：', b_link_open_failed:'このリンク先の記録を開けませんでした',
   site_TW:'台湾', site_CN:'東莞工場', site_VN:'ベトナム工場', site_GRP:'グループ', site_group:'グループ', scope_all_group:'グループ全体',
   f_all:'すべて', loading:'読み込み中…', unit_person:'名',
   btn_save:'✓ 保存', btn_cancel:'✕ キャンセル', btn_back_list:'← 一覧へ戻る', btn_send:'✉️ 送信',
@@ -2139,6 +2149,51 @@ const SB = {
     return true;
   },
 };
+
+// ── 深層連結：?tab=poll&id=<投票 id>（v1.79）──
+// 🔴 必須在 readPortalSession() 執行「之前」就把參數讀走：那裡成功取得 session 後會
+//    replaceState 把網址上的參數整組清掉（避免 base64 的 session token 留在網址列被複製出去），
+//    晚一步就什麼都讀不到了。所以這裡用 IIFE，在 script 解析當下先存起來。
+const BOARD_TABS = ['bulletin', 'weekly', 'biz', 'woody', 'premortem', 'brainstorm', 'collect', 'poll'];
+const BOARD_DEEP = (function () {
+  try {
+    const q = new URLSearchParams(window.location.search);
+    const tab = String(q.get('tab') || '').replace(/[^a-z]/g, '');
+    const id  = String(q.get('id')  || '').replace(/[^A-Za-z0-9_\-]/g, '').slice(0, 64);
+    return BOARD_TABS.indexOf(tab) >= 0 ? { tab: tab, id: id } : null;
+  } catch (_) { return null; }
+})();
+
+// 沒有 session 時把人送去 Portal 登入，登入後由 Portal 的 ?next= 轉回來。
+// 以前這裡是死路：頁面打得開、右上寫「尚未登入」、所有請求 401，收到連結的人
+// 看到的是一片空白，連「請先登入」都不會說。
+function boardGoLogin() {
+  let target = 'board/index.html';
+  if (BOARD_DEEP) {
+    target += '?tab=' + encodeURIComponent(BOARD_DEEP.tab) + (BOARD_DEEP.id ? '&id=' + encodeURIComponent(BOARD_DEEP.id) : '');
+  }
+  window.location.replace('../index.html?next=' + encodeURIComponent(target));
+}
+
+// 產生可分享的連結（🔗 複製連結）。網址裡只有頁籤與該場的 id，沒有任何 session 資訊。
+function boardShareUrl(tab, id) {
+  const base = window.location.origin + window.location.pathname;
+  return base + '?tab=' + encodeURIComponent(tab) + (id ? '&id=' + encodeURIComponent(id) : '');
+}
+async function boardCopy(text, okKey) {
+  try {
+    if (navigator.clipboard && window.isSecureContext) await navigator.clipboard.writeText(text);
+    else {
+      // http 或舊瀏覽器沒有 clipboard API，退回 execCommand
+      const ta = document.createElement('textarea');
+      ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
+    }
+    boardToast(BT(okKey || 'b_link_copied'));
+  } catch (e) {
+    window.prompt(BT('b_link_copy_manual'), text);   // 複製失敗就讓使用者自己選取
+  }
+}
 
 function readPortalSession() {
   try {
@@ -6635,6 +6690,7 @@ async function plFetch() {
   plOptions = o || []; plVotes = v || []; plComments = c || [];
 }
 function plBackToList() { plPollStop(); plSession = null; plOptions = []; plVotes = []; plComments = []; plCenterFilter = ''; plLoadList(); }
+function plCopyLink() { if (plSession) boardCopy(boardShareUrl('poll', plSession.id)); }
 function plClosed() { return plSession && plSession.status === 'closed'; }
 function plMyVote() { const me = PORTAL_SESSION && PORTAL_SESSION.empId; return plVotes.find(v => v.voter_emp_id === me); }
 async function plMaybeAutoClose() {
@@ -6696,6 +6752,9 @@ function plRenderRoom() {
   const s = plSession; if (!s) return;
   const acts = document.getElementById('pl-room-actions');
   let a = '<span class="site-badge" style="background:' + (plClosed() ? 'var(--s3);color:var(--tx3)' : 'var(--ac2);color:var(--ac)') + '">' + (plClosed() ? BT('pl_f_closed') : BT('pl_f_open')) + '</span>';
+  // 🔗 複製連結：把這一場投票的網址發給同事，對方點了就直接落在這個房間。
+  // 給所有人（不限發起人）—— 網址裡沒有任何 session 資訊，轉發不會外洩身分。
+  a += '<button class="btn ghost sm" onclick="plCopyLink()" title="' + escHtml(BT('b_copy_link')) + '">🔗 ' + BT('b_copy_link') + '</button>';
   if (plIsCreator(s)) a += plClosed() ? '<button class="btn sm" onclick="plReopenSession()">' + BT('pl_reopen') + '</button>' : '<button class="btn sm" onclick="plCloseSession()">' + BT('pl_close') + '</button>';
   acts.innerHTML = a;
 
@@ -6916,6 +6975,9 @@ async function plPollTick() {
 
 async function initBoard() {
   PORTAL_SESSION = readPortalSession();
+  // 沒有 session 就去 Portal 登入再回來（帶不帶深層連結都一樣）。
+  // 這裡直接 return，後面的 syncUsers() 等請求不必送出去挨 401。
+  if (!PORTAL_SESSION) { boardGoLogin(); return; }
   bInitLang();          // 必須在任何 BT() 之前：語言預設值會用到 PORTAL_SESSION.site
   bApplyI18n();
   if (PORTAL_SESSION) {
@@ -6965,7 +7027,25 @@ async function initBoard() {
     },
   };
 
-  bbLoad();
+  // 深層連結：直接開到指定頁籤／指定那一場；沒有就照預設進公告
+  if (BOARD_DEEP) await boardOpenDeep();
+  else bbLoad();
+}
+
+// 深層連結的落點。
+// switchTab() 會 fire 該頁籤自己的清單載入而且不 await，但那些函式都是
+// 「一開頭就 showView('list')、之後才 await 取資料」，所以接著呼叫的
+// plOpen/pmOpen 把畫面切到房間之後，不會再被慢一步回來的清單蓋回去。
+async function boardOpenDeep() {
+  const d = BOARD_DEEP;
+  switchTab(d.tab);
+  if (!d.id) return;
+  try {
+    if (d.tab === 'poll') await plOpen(d.id);
+    else if (PM_KINDS[d.tab]) await pmOpen(d.id);
+  } catch (e) {
+    boardToast(BT('b_link_open_failed'));
+  }
 }
 
 // 業務會議記錄列表篩選（chip 點擊 → 委派給 IIFE 的 setFilter）

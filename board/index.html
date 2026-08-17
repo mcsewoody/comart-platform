@@ -5,7 +5,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#080C14">
-<title>COMART · 公告與紀錄 v1.79</title>
+<title>COMART · 公告與紀錄 v1.80</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -339,7 +339,7 @@ body.pm-playing #pm-phasebar{padding:0}
     <a class="logo" href="javascript:void(0)">
       <div class="logo-mark">告</div>
       <div class="logo-text" data-i18n="app_title">公告與紀錄</div>
-      <span class="logo-ver">v1.79</span>
+      <span class="logo-ver">v1.80</span>
     </a>
     <div class="topbar-right">
       <div id="langChips" style="display:flex;gap:4px"></div>
@@ -6812,7 +6812,9 @@ function plRenderRoom() {
       '<div style="position:absolute;left:0;top:0;bottom:0;width:' + barW + '%;background:' + (chosen ? 'rgba(45,127,249,.20)' : 'rgba(255,255,255,.05)') + ';transition:width .4s"></div>' +
       '<div style="position:relative;display:flex;align-items:center;gap:10px">' +
       (qty ? '' : '<div style="width:18px;flex-shrink:0">' + (chosen ? (s.multi ? '☑' : '●') : (s.multi ? '☐' : '○')) + '</div>') +
-      (o.image_url ? '<img src="' + escHtml(o.image_url) + '" onclick="event.stopPropagation();window.open(this.src)" style="width:44px;height:44px;object-fit:cover;border-radius:6px;border:1px solid var(--br);flex-shrink:0;cursor:zoom-in">' : '') +
+      // 選項配圖 132px（v1.80，原本 44px 長寬各三倍）：色票、設計稿這類選項，
+      // 縮圖太小就等於沒有 —— 看不清楚的東西沒辦法拿來投票。點圖仍可開原圖。
+      (o.image_url ? '<img src="' + escHtml(o.image_url) + '" onclick="event.stopPropagation();window.open(this.src)" style="width:132px;height:132px;object-fit:cover;border-radius:8px;border:1px solid var(--br);flex-shrink:0;cursor:zoom-in">' : '') +
       (codeMode
         ? '<div style="flex:1;min-width:0;font-size:19px;font-weight:700;letter-spacing:.03em">' + escHtml(o.label || '') + (win ? ' <span style="color:var(--grn,#4caf50);font-weight:700;font-size:14px">' + BT('pl_win') + '</span>' : '') + '</div>'
         : '<div style="flex:1;min-width:0;font-size:14px">' + plBiLine(o.label, o.label_a, o.label_b, s) + (win ? ' <span style="color:var(--grn,#4caf50);font-weight:700">' + BT('pl_win') + '</span>' : '') + '</div>') +

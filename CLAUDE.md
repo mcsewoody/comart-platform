@@ -284,6 +284,17 @@ The portal supports EN, 繁中, 简中, VI, 日 via `setLang(lang)`. Each langua
   - 「✎譯」按鈕原本綁在 `showAuthor` 上，已改綁 `bilingual && pmIsChair()`；**動這裡要順便確認它還在**
 - 投票只顯示票數，畫面上從不顯示投票人；PDF／PNG／Excel／Email 四種輸出都不含姓名
 - 填寫階段**範圍內所有人（含主席）都可填寫**（v1.23 決定，別再改回只有成員可填）
+- **送出後可修改自己那一則**（v1.76，`pmEditEntry` / `pmEditCancel`）：
+  - 🔴 **與刪除同條件：自己的、且還在 `writing` 階段**。揭露之後全體都讀過了，
+    再改就是偷偷換掉別人看過的內容（`pm_no_edit_after`）。
+  - 🔴 **沿用同一組表單欄位（`pm-writebox` / `pm-target`），不要再畫第二份**：
+    對象下拉的 `pmTgt*` 綁死 `pm-target` / `pm-tgt-wrap` / `pm-tgt-menu` 這幾個 id，畫兩份會直接撞 id。
+    進入修改模式時面板標題、按鈕文字與外框都跟著換（`pmEditId`）。
+  - 修改既有那一則**不算新增**，不受 `opt_entry_cap` 上限鎖住。
+  - 內容或對象沒動就不重送翻譯（省一次 API，也不會把主席修過的譯文洗掉）；
+    有動才重翻，翻譯失敗就把 `text_a`/`text_b` 清成 null 讓主席端背景補翻 ——
+    **不可留著舊譯文**，那會變成譯文與原文不一致。
+  - `pmEditId` 在推進階段、換會議、回清單、刪掉正在修改的那一則時都會清掉。
 - 投票上限 `PM_VOTE_CAP = 3`（排序階段）
 - 雙語：每則失敗原因寫入後自動經 `claude-proxy` 翻成會議設定的兩種語言，存 `text_a`/`text_b`
   （情境與專案說明同理存 `desc_a`/`desc_b`、`scenario_a`/`scenario_b`）。**已翻譯過的不重翻**

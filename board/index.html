@@ -5,7 +5,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#080C14">
-<title>COMART · 公告與紀錄 v1.75</title>
+<title>COMART · 公告與紀錄 v1.76</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -36,7 +36,7 @@ h1,h2,h3,p{margin:0}
 .topbar-main{display:flex;align-items:center;gap:10px;padding:10px 16px;max-width:1180px;margin:0 auto}
 .logo{display:flex;align-items:center;gap:9px;text-decoration:none;color:inherit}
 .logo-mark{width:30px;height:30px;background:var(--ac);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-style:italic;font-size:15px;color:#fff;font-weight:400;flex-shrink:0}
-/* 🔴 white-space:nowrap 是必要的（v1.75）：topbar-main 是一列 flex，窄螢幕塞不下時
+/* 🔴 white-space:nowrap 是必要的（v1.76）：topbar-main 是一列 flex，窄螢幕塞不下時
    標題會被壓到只剩一個字的寬度，然後逐字換行變成直排，五個字吃掉半個手機畫面。 */
 .logo-text{font-family:var(--fd);font-style:italic;font-size:16px;color:var(--tx);letter-spacing:-.01em;white-space:nowrap}
 .logo-ver{font-family:var(--fm);font-size:10px;color:var(--tx3);margin-left:6px;white-space:nowrap}
@@ -45,8 +45,8 @@ h1,h2,h3,p{margin:0}
 .topbar-right{display:flex;gap:8px;margin-left:auto;align-items:center;font-size:12px;color:var(--tx3)}
 .who-badge{display:flex;align-items:center;gap:6px;padding:5px 10px;border:1px solid var(--br);border-radius:20px;font-size:12px;color:var(--tx2);white-space:nowrap}
 
-/* ── 手機版 topbar（v1.75）──
-   窄螢幕一列放不下「← Portal ＋ 告 ＋ 公告與紀錄 ＋ v1.75 ＋ 五顆語言鈕 ＋ 姓名」。
+/* ── 手機版 topbar（v1.76）──
+   窄螢幕一列放不下「← Portal ＋ 告 ＋ 公告與紀錄 ＋ v1.76 ＋ 五顆語言鈕 ＋ 姓名」。
    原本的下場：標題被壓成一個字寬、逐字換行變直排（整列高度暴增到 ~150px），日本語鈕被切掉。
    ① nowrap（見上）先把「直排」這個失效模式徹底擋掉，高度立刻回到一列
    ② 右側改成可橫向捲動 —— 語言鈕與姓名都不再被裁掉，跟下方頁籤同一套操作手感
@@ -193,13 +193,13 @@ select,select option,option{background:var(--s2);color:var(--tx)}
 .pm-roombar{max-width:none;padding:0;margin-bottom:16px;border-bottom:1px solid var(--br)}
 #pm-phasebar{margin-left:auto;display:flex;gap:6px;align-items:center;padding:6px 0;flex-wrap:wrap}
 
-/* 播放模式的投影版面（v1.75）
+/* 播放模式的投影版面（v1.76）
    只有人名與內容，所以字級與留白都要放到「這一則就是整個畫面」的尺度 —— 內容少的時候
    原本的 21px 會讓整片畫面看起來是空的。
    🔴 字級一律用 clamp(最小, 視窗比例, 最大)：同一份程式要同時應付手機、筆電與會議室
    投影幕（1920px 以上），寫死 px 在任一端都會不對。vw 讓它跟著螢幕長大，
    兩端的夾值則保證手機不會小到看不清、4K 不會大到一行只放三個字。 */
-/* 播放時把內容上方的空白全部收掉（v1.75）：
+/* 播放時把內容上方的空白全部收掉（v1.76）：
    ① .wrap 的上緣留白 ② 頂端那一列的下緣留白 ③ 投影片自己的上內距。
    🔴 並且改成靠上對齊 —— 原本 justify-content:center 會把內容推到框正中間，
    內容一短上方就空出一大片。要填滿畫面靠的是把字放大（clamp／lg／xl），不是靠置中推開。 */
@@ -209,7 +209,7 @@ body.pm-playing #pm-phasebar{padding:0}
 .pm-slide{display:flex;flex-direction:column;min-height:calc(100vh - 154px)}
 /* dvh 在手機 Safari 才是真正的可視高度（100vh 不含伸縮的網址欄，會多出一段捲動） */
 @supports (height:100dvh){ .pm-slide{min-height:calc(100dvh - 154px)} }
-/* 上方留約一行的呼吸空間（v1.75）：完全貼齊分隔線會太擠。
+/* 上方留約一行的呼吸空間（v1.76）：完全貼齊分隔線會太擠。
    跟著字級一起用 vw 縮放，手機 18px、筆電 ~32px、投影幕 44px —— 大螢幕的一行本來就比較高。 */
 .pm-slide-in{flex:1;display:flex;flex-direction:column;justify-content:flex-start;
   padding:clamp(18px,2.2vw,44px) 2px clamp(16px,2.5vh,36px)}
@@ -217,7 +217,7 @@ body.pm-playing #pm-phasebar{padding:0}
 .pm-slide-name{font-size:clamp(30px,5.4vw,72px);font-weight:700;color:var(--ac);
   line-height:1.2;margin-bottom:clamp(20px,3.4vw,44px);letter-spacing:-.015em}
 /* 🔴 權重必須壓過 .pm-lc .txt（0,2,0）—— 只寫 .pm-slide-txt（0,1,0）會被它蓋掉，
-   v1.75 的內文其實一直是 13.5px，這才是「畫面太空」的真正原因。 */
+   v1.76 的內文其實一直是 13.5px，這才是「畫面太空」的真正原因。 */
 .pm-slide .pm-lc .txt,.pm-slide .pm-slide-txt{font-size:clamp(19px,2.5vw,36px);line-height:1.72}
 /* 內容短的時候要放得更大，否則一句話擺在整個投影幕上只會顯得空（sz 由 pmPlaySlideHtml 算） */
 .pm-slide.lg .pm-lc .txt,.pm-slide.lg .pm-slide-txt{font-size:clamp(21px,3.1vw,46px);line-height:1.62}
@@ -239,7 +239,7 @@ body.pm-playing #pm-phasebar{padding:0}
 }
 @supports (height:100dvh){ @media (max-width:640px){ .pm-slide{min-height:calc(100dvh - 144px)} } }
 
-/* 感恩對象的下拉挑選（v1.75）
+/* 感恩對象的下拉挑選（v1.76）
    原本用 <input list> + <datalist>：iOS Safari 完全不顯示任何可下拉的提示，
    桌機 Chrome 也只在特定狀態才閃一個很小的箭頭 —— 使用者根本不知道可以挑。
    改成自己畫的面板，手機與桌機長得一模一樣，箭頭永遠看得見。
@@ -339,7 +339,7 @@ body.pm-playing #pm-phasebar{padding:0}
     <a class="logo" href="javascript:void(0)">
       <div class="logo-mark">告</div>
       <div class="logo-text" data-i18n="app_title">公告與紀錄</div>
-      <span class="logo-ver">v1.75</span>
+      <span class="logo-ver">v1.76</span>
     </a>
     <div class="topbar-right">
       <div id="langChips" style="display:flex;gap:4px"></div>
@@ -986,7 +986,9 @@ const B_I18N = {
   pmt_general_scen:'請針對上面的題目寫下你的意見，一則一個重點，具體越好。',
   pm_target_ph:'點右邊 ▾ 挑同仁，或直接打字（團隊、廠商、客戶…）',
   pm_target_hint:'挑清單裡的同仁可留下對應紀錄；清單裡沒有的對象直接打字即可。',
-  pm_target_pick:'挑選對象', pm_target_nomatch:'沒有符合的同仁。直接打字也可以，清單外的對象（團隊、廠商、客戶）一樣送得出去。',
+  pm_target_pick:'挑選對象',
+  pm_edit_mine:'修改這一則', pm_editing_h:'修改你的{item}', pm_save_edit:'✓ 儲存修改',
+  pm_edit_saved:'已更新', pm_no_edit_after:'{reveal}後不可修改', pm_target_nomatch:'沒有符合的同仁。直接打字也可以，清單外的對象（團隊、廠商、客戶）一樣送得出去。',
   pm_target_to:'給',
   pm_need_target_f:'請先填「{f}」',
   pmt_gratitude_f1:'感謝對象', pmt_gratitude_f2:'具體事實',
@@ -1166,7 +1168,9 @@ const B_I18N = {
   pmt_general_scen:'请针对上面的题目写下你的意见，一则一个重点，具体越好。',
   pm_target_ph:'点右边 ▾ 挑同仁，或直接打字（团队、厂商、客户…）',
   pm_target_hint:'挑清单里的同仁可留下对应纪录；清单里没有的对象直接打字即可。',
-  pm_target_pick:'挑选对象', pm_target_nomatch:'没有符合的同仁。直接打字也可以，清单外的对象（团队、厂商、客户）一样送得出去。',
+  pm_target_pick:'挑选对象',
+  pm_edit_mine:'修改这一则', pm_editing_h:'修改你的{item}', pm_save_edit:'✓ 保存修改',
+  pm_edit_saved:'已更新', pm_no_edit_after:'{reveal}后不可修改', pm_target_nomatch:'没有符合的同仁。直接打字也可以，清单外的对象（团队、厂商、客户）一样送得出去。',
   pm_target_to:'给',
   pm_need_target_f:'请先填“{f}”',
   pmt_gratitude_f1:'感谢对象', pmt_gratitude_f2:'具体事实',
@@ -1346,7 +1350,9 @@ const B_I18N = {
   pmt_general_scen:'Write your responses to the question above \u2014 one point per entry, the more specific the better.',
   pm_target_ph:'Tap ▾ to pick a colleague, or just type (team, vendor, customer…)',
   pm_target_hint:'Picking a colleague from the list keeps a linked record; anyone not on the list can just be typed in.',
-  pm_target_pick:'Pick a person', pm_target_nomatch:'No matching colleague. You can still type it in — people outside the list (a team, a vendor, a customer) submit just fine.',
+  pm_target_pick:'Pick a person',
+  pm_edit_mine:'Edit this entry', pm_editing_h:'Edit your {item}', pm_save_edit:'✓ Save changes',
+  pm_edit_saved:'Updated', pm_no_edit_after:'Cannot edit after {reveal}', pm_target_nomatch:'No matching colleague. You can still type it in — people outside the list (a team, a vendor, a customer) submit just fine.',
   pm_target_to:'To',
   pm_need_target_f:'Please fill in \u201C{f}\u201D first',
   pmt_gratitude_f1:'Who you are thanking', pmt_gratitude_f2:'What they specifically did',
@@ -1526,7 +1532,9 @@ const B_I18N = {
   pmt_general_scen:'Hãy viết ý kiến của bạn về đề bài phía trên — mỗi mục một trọng điểm, càng cụ thể càng tốt.',
   pm_target_ph:'Bấm ▾ để chọn đồng nghiệp, hoặc tự nhập (nhóm, nhà cung cấp, khách hàng…)',
   pm_target_hint:'Chọn đồng nghiệp từ danh sách sẽ lưu liên kết tương ứng; đối tượng không có trong danh sách thì cứ gõ trực tiếp.',
-  pm_target_pick:'Chọn đối tượng', pm_target_nomatch:'Không có đồng nghiệp phù hợp. Bạn vẫn có thể tự gõ — đối tượng ngoài danh sách (nhóm, nhà cung cấp, khách hàng) vẫn gửi được bình thường.',
+  pm_target_pick:'Chọn đối tượng',
+  pm_edit_mine:'Sửa mục này', pm_editing_h:'Sửa {item} của bạn', pm_save_edit:'✓ Lưu thay đổi',
+  pm_edit_saved:'Đã cập nhật', pm_no_edit_after:'Không thể sửa sau {reveal}', pm_target_nomatch:'Không có đồng nghiệp phù hợp. Bạn vẫn có thể tự gõ — đối tượng ngoài danh sách (nhóm, nhà cung cấp, khách hàng) vẫn gửi được bình thường.',
   pm_target_to:'Gửi',
   pm_need_target_f:'Vui lòng điền “{f}” trước',
   pmt_gratitude_f1:'Người bạn muốn cảm ơn', pmt_gratitude_f2:'Việc cụ thể họ đã làm',
@@ -1706,7 +1714,9 @@ const B_I18N = {
   pmt_general_scen:'上のお題について、あなたの意見を書いてください。1件につき1つの要点、具体的なほど良いです。',
   pm_target_ph:'右の ▾ で社員を選択、または直接入力（チーム、取引先、顧客…）',
   pm_target_hint:'一覧から社員を選ぶと対応する記録が残ります。一覧にない相手はそのまま入力してください。',
-  pm_target_pick:'相手を選ぶ', pm_target_nomatch:'該当する社員がいません。そのまま入力しても構いません（チーム・取引先・顧客など一覧にない相手も送信できます）。',
+  pm_target_pick:'相手を選ぶ',
+  pm_edit_mine:'この1件を編集', pm_editing_h:'{item}を編集', pm_save_edit:'✓ 変更を保存',
+  pm_edit_saved:'更新しました', pm_no_edit_after:'{reveal}後は編集できません', pm_target_nomatch:'該当する社員がいません。そのまま入力しても構いません（チーム・取引先・顧客など一覧にない相手も送信できます）。',
   pm_target_to:'宛先',
   pm_need_target_f:'まず「{f}」を入力してください',
   pmt_gratitude_f1:'感謝したい相手', pmt_gratitude_f2:'具体的にしてくれたこと',
@@ -3760,7 +3770,7 @@ function wrPrint(){
 // ═══════════════════════════════════════════════
 const PM_LANGS = [['zh-TW','繁體中文'],['zh-CN','简体中文'],['vi','Tiếng Việt'],['en','English'],['ja','日本語']];
 const PM_LANG_SHORT = { 'zh-TW':'繁中','zh-CN':'简中','vi':'越南語','en':'English','ja':'日本語' };
-// 階段清單改為「每種會議自己一份」（v1.75）：意見徵集沒有「對策」，投票也是可選的。
+// 階段清單改為「每種會議自己一份」（v1.76）：意見徵集沒有「對策」，投票也是可選的。
 // PM_PHASES 保留為驗屍／腦力激盪的完整版；實際取用一律經 pmPhases()，那裡才看得到
 // 「這一場有沒有開投票」。所有比較階段先後的地方（pmPhaseIdx／pmCanGoPhase／pmSetPhase）
 // 都吃 pmPhases() 的結果，所以少一個階段時「往前只能走一步」自動就跳過它。
@@ -4206,7 +4216,7 @@ function pmPhaseLabelOf(kind, p) {
 }
 function pmVoteCap() { return PMK().voteCap; }
 
-// ── 行為旗標的唯一取用點 pmOpt()（v1.75）──
+// ── 行為旗標的唯一取用點 pmOpt()（v1.76）──
 // 🔴 三種會議的旗標來源不同，但讀取端只准有這一個入口：
 //    驗屍／腦力激盪 → 一律讀 PM_KINDS（寫死，configurable 是空的，session 的 opt_* 再怎麼被塞值都無效）
 //    意見徵集       → 讀該場 session 的 opt_*；沒設過（null／undefined）才退回 PM_KINDS 的保底值
@@ -4229,7 +4239,7 @@ function pmTplOf(s) { return PM_TEMPLATES[(s && s.template) || ''] || null; }
 function pmTpl() { return pmTplOf(pmSession); }
 function pmFieldCount() { const t = pmTpl(); return t ? t.fields : 1; }
 
-// ── 這一場實際有哪些階段（v1.75）──
+// ── 這一場實際有哪些階段（v1.76）──
 // 沒宣告 phases 的類型（驗屍／腦力激盪）用完整版；意見徵集沒有「對策」，
 // 且 ranking 只有在主席建會時勾了「要投票」才會出現。所有比較階段先後的邏輯都吃這個結果，
 // 所以少一個階段時「往前只能走一步」會自動跳過它，不必另外寫特例。
@@ -4271,6 +4281,9 @@ let pmDraft = '';          // 填寫中的草稿（輪詢重繪時保留）
 let pmSrcLang = '';        // 填寫者選的來源語言（重繪時保留）
 let pmRetrying = false;    // 背景補翻防重入
 let pmAutoAdvanced = false; // 本場已自動推進過排序→對策（見 pmMaybeAutoAdvance），退回排序時解除
+let pmEditId = null;       // 正在修改的條目 id（null = 新增模式）。
+                           // 🔴 修改沿用同一組表單欄位（pm-writebox／pm-target），不另開第二份 ——
+                           //    對象下拉的 pmTgt* 綁死那組 id，畫兩份會撞 id。
 let pmIntroLang = '';      // 說明頁顯示語言
 let pmMitigations = [];    // 目前 session 的對策清單
 let pmCreating = false;    // 建會防重入：建立要等翻譯，連按會建出多場空會議
@@ -4958,7 +4971,7 @@ async function pmOpen(id) {
   pmBiDraft = { desc:{ a:null, b:null }, scenario:{ a:null, b:null } };
   pmSumEditing = false; pmSumDraft = { a: null, b: null };
   pmMeetEditing = false; pmMeetDraft = { at: null, loc: null, att: null };
-  pmAutoAdvanced = false; pmPendingRender = false; pmInputSnap = null;
+  pmAutoAdvanced = false; pmPendingRender = false; pmInputSnap = null; pmEditId = null;
   pmSrcLang = pmPortalLang();
   await pmFetchEntries();
   await pmFetchMitigations();
@@ -4972,6 +4985,7 @@ async function pmFetchEntries() {
   pmEntries = rows || [];
 }
 function pmBackToList() { document.body.classList.remove('pm-playing');
+  pmEditId = null;
   pmPollStop(); pmSession = null; pmEntries = []; pmMitigations = []; pmBiDraft = { desc:{ a:null, b:null }, scenario:{ a:null, b:null } };
   pmSumEditing = false; pmSumDraft = { a: null, b: null };
   pmMeetEditing = false; pmMeetDraft = { at: null, loc: null, att: null }; pmLoadList(); }
@@ -5030,7 +5044,7 @@ async function pmRetryTranslations() {
 function pmSaveDraft() { const el = document.getElementById('pm-writebox'); if (el) pmDraft = el.value; }
 function pmRestoreDraft() { const el = document.getElementById('pm-writebox'); if (el && pmDraft) el.value = pmDraft; }
 
-// ── 重繪時不要把正在打字的人踢出輸入框（v1.75）──
+// ── 重繪時不要把正在打字的人踢出輸入框（v1.76）──
 // 會議室是整塊 innerHTML 重畫的：別人一送出內容／一則譯文補完，輪詢就把 DOM 換掉，
 // 正在打對策或填寫框的人游標會彈掉、中文輸入法組字到一半會被砍斷。兩道防線：
 //   ① 正在輸入文字時直接延後重繪（pmRerender），等他離開輸入框再畫；
@@ -5153,7 +5167,7 @@ function pmRenderRoom() {
   const body = document.getElementById('pm-room-body');
   if (!pmSession) { body.innerHTML = ''; return; }
   const s = pmSession, chair = pmIsChair(s), K = PMK(), T = K.t;
-  // ── 播放模式接管整個畫面（v1.75）──
+  // ── 播放模式接管整個畫面（v1.76）──
   // 🔴 這個 early return 是刻意的：投影時只該看到人名與內容，
   //    會議資訊卡、專案描述／情境、匯出工具列全部不畫。要加新面板前先想清楚它該不該上投影幕。
   if (pmPlaying()) {
@@ -5162,6 +5176,7 @@ function pmRenderRoom() {
     return;
   }
   if (pmMeetEditing && s.phase !== 'intro' && s.phase !== 'locked') pmMeetEditing = false;  // 卡片不顯示的階段不留編輯模式
+  if (pmEditId && s.phase !== 'writing') { pmEditId = null; pmDraft = ''; }               // 主席推進階段就結束修改
   let html = '';
   // 專案／情境卡（雙語並陳）
   const cardBody = [];
@@ -5177,7 +5192,7 @@ function pmRenderRoom() {
     (cardBody.length ? '<div class="panel-b">' + cardBody.join('') + '</div>' : '') + '</div>';
 
   // 輸出工具列（揭露後才顯示）
-  // 🔴 **只有定稿（locked）之後才給匯出**（v1.75）。未定稿的紀錄匯出去是半成品，
+  // 🔴 **只有定稿（locked）之後才給匯出**（v1.76）。未定稿的紀錄匯出去是半成品，
   //    收件人沒辦法分辨它是不是最終版本 —— 這跟「AI 總結被修訂過要留下軌跡」是同一類考量。
   //    這樣「匯出的一定是正式版本」才真正成立。
   if (s.phase === 'locked') {
@@ -5209,15 +5224,20 @@ function pmRenderRoom() {
   } else if (s.phase === 'writing') {
     // 填寫階段：所有在範圍內的人（含主席）都有填寫框
     const langOpts = PM_LANGS.map(l => '<option value="' + l[0] + '"' + (l[0] === (pmSrcLang || pmPortalLang()) ? ' selected' : '') + '>' + l[1] + '</option>').join('');
-    html += '<div class="panel"><div class="panel-h"><span class="idx">✎</span><h2>' + escHtml(T.writeTitle) + '</h2></div><div class="panel-b">' +
+    const editing = !!pmEditId, capLock = !editing && pmCapReached();
+    html += '<div class="panel"' + (editing ? ' style="border-color:var(--ac)"' : '') + '><div class="panel-h"><span class="idx">✎</span><h2>' +
+      escHtml(editing ? BT('pm_editing_h', { item: T.item }) : T.writeTitle) + '</h2></div><div class="panel-b">' +
       '<div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap"><label style="font-size:12px;color:var(--tx3)">' + escHtml(BT('pm_my_lang')) + '</label>' +
       '<select id="pm-src-lang" onchange="pmSrcLang=this.value" style="width:auto;padding:5px 8px;font-size:13px;background:var(--s2);border:1px solid var(--br);border-radius:6px;color:var(--tx)">' + langOpts + '</select>' +
       '<span style="font-size:11px;color:var(--tx3)">' + escHtml(BT('pm_auto_trans', { a: pmLangShort(s.lang_a), b: pmLangShort(s.lang_b) })) + '</span></div>' +
       pmTargetFieldHtml() +
-      '<textarea id="pm-writebox" rows="3" placeholder="' + escHtml(pmWritePh()) + '" style="width:100%;font-family:inherit;font-size:14px;background:var(--s2);border:1px solid var(--br);border-radius:8px;padding:9px 11px;color:var(--tx)" oninput="pmDraft=this.value"' + (pmCapReached() ? ' disabled' : '') + '></textarea>' +
-      '<div style="margin-top:8px"><button id="pm-submit-btn" class="btn primary sm" onclick="pmSubmitEntry()"' + (pmCapReached() ? ' disabled style="opacity:.5"' : '') + '>' + escHtml(BT('pm_submit_entry')) + '</button>' +
-      (pmEntryCap() ? '<span style="font-size:11px;color:var(--tx3);margin-left:8px">' + escHtml(BT('pm_cap_used', { n: myEntries.length, cap: pmEntryCap() })) + '</span>' : '') + '</div>' +
-      (pmCapReached() ? '<div class="hint" style="margin-top:6px;color:var(--ac)">' + escHtml(BT('pm_cap_reached', { cap: pmEntryCap() })) + '</div>' : '') +
+      '<textarea id="pm-writebox" rows="3" placeholder="' + escHtml(pmWritePh()) + '" style="width:100%;font-family:inherit;font-size:14px;background:var(--s2);border:1px solid var(--br);border-radius:8px;padding:9px 11px;color:var(--tx)" oninput="pmDraft=this.value"' + (capLock ? ' disabled' : '') + '></textarea>' +
+      '<div style="margin-top:8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">' +
+      '<button id="pm-submit-btn" class="btn primary sm" onclick="pmSubmitEntry()"' + (capLock ? ' disabled style="opacity:.5"' : '') + '>' +
+        escHtml(editing ? BT('pm_save_edit') : BT('pm_submit_entry')) + '</button>' +
+      (editing ? '<button class="btn ghost sm" onclick="pmEditCancel()">' + escHtml(BT('btn_cancel')) + '</button>' : '') +
+      (pmEntryCap() && !editing ? '<span style="font-size:11px;color:var(--tx3)">' + escHtml(BT('pm_cap_used', { n: myEntries.length, cap: pmEntryCap() })) + '</span>' : '') + '</div>' +
+      (capLock ? '<div class="hint" style="margin-top:6px;color:var(--ac)">' + escHtml(BT('pm_cap_reached', { cap: pmEntryCap() })) + '</div>' : '') +
       '<div class="hint" style="margin-top:6px">' + escHtml(pmOpt('liveVisible')
         ? BT('pm_live_hint', { item: T.item })
         : BT('pm_private_hint', { reveal: pmPhaseLabel('reveal') })) + '</div>' +
@@ -5383,6 +5403,8 @@ function pmSubmittedHtml(s) {
 // 方便後續認領與追問，而且發想點子沒有「講錯話」的風險。
 function pmEntryHtml(e, allowDelete, bilingual, voteMode) {
   const del = allowDelete ? '<button class="btn ghost sm danger" style="padding:2px 8px" onclick="pmDeleteMyEntry(\'' + e.id + '\')">✕</button>' : '';
+  // 修改與刪除同條件（自己的、且還在填寫階段）：揭露之後大家都讀過了，再改就是偷偷換掉別人看過的東西
+  const mine = allowDelete ? '<button class="btn ghost sm" style="padding:2px 8px" title="' + escHtml(BT('pm_edit_mine')) + '" onclick="pmEditEntry(\'' + e.id + '\')">✎</button>' : '';
   // ✎譯 原本綁在 showAuthor 上，拿掉姓名後必須改綁 bilingual，否則主席的修正譯文按鈕會跟著消失
   const editT = (bilingual && pmIsChair(pmSession)) ? '<button class="btn ghost sm" style="padding:2px 8px" title="' + escHtml(BT('pm_fix_trans')) + '" onclick="pmEditTrans(\'' + e.id + '\')">✎</button>' : '';
   const vc = pmVoteCount(e);
@@ -5400,7 +5422,7 @@ function pmEntryHtml(e, allowDelete, bilingual, voteMode) {
     content = '<div style="white-space:pre-wrap;font-size:14px">' + escHtml(e.text_src || '') + '</div>';
   }
   return '<div style="border:1px solid var(--br);border-radius:8px;padding:10px 12px;background:var(--s2);margin-bottom:8px;display:flex;gap:10px;align-items:flex-start">' +
-    '<div style="flex:1;min-width:0">' + who + theme + pmTargetLineHtml(e, bilingual) + content + '</div><div style="display:flex;gap:4px;flex-shrink:0;align-items:center">' + voteUi + editT + del + '</div></div>';
+    '<div style="flex:1;min-width:0">' + who + theme + pmTargetLineHtml(e, bilingual) + content + '</div><div style="display:flex;gap:4px;flex-shrink:0;align-items:center">' + voteUi + editT + mine + del + '</div></div>';
 }
 // 兩欄範本的對象列：放在具體事實上方，用強調色與較大字級 —— 這一則是「寫給誰的」，
 // 那是讀者第一眼要抓到的資訊。從員工清單挑到的人名不並陳雙語（人名不翻），自由文字才並陳。
@@ -5439,7 +5461,7 @@ async function pmToggleVote(id) {
   pmMaybeAutoAdvance();   // 自己這一票可能就是最後一票
 }
 
-// ── 全員投滿自動進入下一階段（v1.75）──
+// ── 全員投滿自動進入下一階段（v1.76）──
 // 每個人都把票投完了還要等主席按鍵，是白等：票數已成定局，再等只是延遲會議。
 // 🔴 只有主席的瀏覽器能真的推進階段 —— sb-proxy 的欄位守衛規定 PATCH phase 必須是該場主席本人，
 //    其他人送出去只會拿到 403。所以判斷雖然人人都算得出來（用來顯示進度），動作只由主席端發出。
@@ -5683,7 +5705,7 @@ function pmReportHtml() {
       .map(r => '<tr><td style="width:110px;padding:3px 8px;border:1px solid #ddd;background:#f5f5f5;color:#555">' + escHtml(r[0]) +
         '</td><td style="padding:3px 8px;border:1px solid #ddd;white-space:pre-wrap">' + escHtml(r[1]) + '</td></tr>').join('') +
     '</table>';
-  // 🔴 四種輸出的區塊順序（v1.75）：背景說明 → 引導語 → AI 總結 → 個人意見。
+  // 🔴 四種輸出的區塊順序（v1.76）：背景說明 → 引導語 → AI 總結 → 個人意見。
   //    匯出的是給人冷讀的文件，先交代「這場在問什麼」，讀者才看得懂後面的總結與內容；
   //    畫面上 AI 結論擺最前面（那是會議當下要先看到結論），兩者刻意不同。
   if (s.project_desc) h += '<h2>' + escHtml(T.desc) + '</h2>' + bi(s.project_desc, s.desc_a, s.desc_b);
@@ -5729,7 +5751,7 @@ function pmExportPDF() {
   w.onload = function () { try { w.focus(); w.print(); } catch (e) {} };
 }
 // ═══════ PNG 匯出：直接畫在 canvas 上 ═══════
-// 🔴 **不要退回「SVG foreignObject → <img> → canvas」那條路**（v1.75 改掉的舊做法）：
+// 🔴 **不要退回「SVG foreignObject → <img> → canvas」那條路**（v1.76 改掉的舊做法）：
 //    WebKit（Safari／iOS）根本不會光柵化 <img> 裡的 foreignObject，在 Mac 與 iPhone 上必定失敗
 //    （Chrome 可以，所以很容易誤以為沒問題）。週會紀錄的 PNG 一直正常，就是因為它直接畫 canvas。
 // 版面刻意與 PDF（pmReportHtml）對齊：白底黑字、同樣的區塊順序、同樣的雙語兩欄。
@@ -5907,7 +5929,7 @@ function pmSendMail() {
   L.push('與會人員：' + pmAttendeesZ(s));
   L.push('');
   // 順序同 PDF：背景說明 → 引導語 → AI 總結 → 個人意見。
-  // 背景說明原本整段漏掉（只有另外三種輸出有），v1.75 補上。
+  // 背景說明原本整段漏掉（只有另外三種輸出有），v1.76 補上。
   if (s.project_desc) {
     L.push(DIV); L.push('【' + T.desc + '】');
     L.push('[' + la + '] ' + (s.desc_a || s.project_desc));
@@ -5949,7 +5971,7 @@ function pmSendMail() {
   try { window.location.href = url; boardToast(BT('bm_mail_ok')); } catch (e) { boardToast(BT('t_mail_fail')); }
 }
 
-// ═══════ 展示階段的播放模式（v1.75）═══════
+// ═══════ 展示階段的播放模式（v1.76）═══════
 // 「讓所有留言展現在螢幕上，讓大家逐一看過」——一次一則、大字、雙語並陳，適合會議室投影。
 // 🔴 全場同步：主席按下一則時把索引寫進 premortem_sessions.play_idx，其他人靠既有的 7 秒輪詢
 //    跳到同一則。play_idx 在 sb-proxy 的 PM_PROTECTED 裡，只有該場主席改得動 ——
@@ -5976,7 +5998,7 @@ function pmPlayGo(d) {
   const i = Math.max(0, Math.min(n - 1, pmPlayIdx() + d));
   if (i !== pmPlayIdx()) pmPlaySet(i);
 }
-// 🔴 投影片上只有「人名＋內容」（v1.75）。
+// 🔴 投影片上只有「人名＋內容」（v1.76）。
 //    面板標題、「第 X／N 則」、進度點、跟隨提示全部拿掉了 —— 那些是操作資訊，不是會議內容，
 //    投在牆上只會分散注意力。主席的控制列與計數獨立成一條浮在底部的操作列，
 //    **只有主席看得到**；與會者的畫面上完全沒有任何多餘元素。
@@ -6044,11 +6066,13 @@ function pmTargetMap() {
 }
 function pmTargetFieldHtml() {
   if (pmFieldCount() < 2) return '';
-  const dis = pmCapReached() ? ' disabled' : '';
+  // 修改模式不受則數上限鎖住（本來就是既有的那一則，沒有多寫一則）
+  const dis = (!pmEditId && pmCapReached()) ? ' disabled' : '';
+  const cur = pmEditId ? ((pmEntries.find(x => x.id === pmEditId) || {}).target_name || '') : '';
   return '<div style="margin-bottom:8px">' +
     '<label style="font-size:12px;color:var(--tx3);display:block;margin-bottom:4px">' + escHtml(pmFieldLabel(1)) + '</label>' +
     '<div class="pm-tgt" id="pm-tgt-wrap">' +
-      '<input id="pm-target" type="text" autocomplete="off" placeholder="' + escHtml(BT('pm_target_ph')) + '"' + dis +
+      '<input id="pm-target" type="text" autocomplete="off" value="' + escHtml(cur) + '" placeholder="' + escHtml(BT('pm_target_ph')) + '"' + dis +
         ' oninput="pmTgtInput()" onfocus="pmTgtFocus()" onkeydown="pmTgtKey(event)">' +
       // 箭頭用 SVG 而不是「▾」字元：字元在不同平台的字型下大小與基線差很多，SVG 到處長一樣
       '<button type="button" class="pm-tgt-btn" id="pm-tgt-btn"' + dis +
@@ -6061,7 +6085,7 @@ function pmTargetFieldHtml() {
     '<div style="font-size:11px;color:var(--tx3);margin-top:3px">' + escHtml(BT('pm_target_hint')) + '</div></div>';
 }
 
-// ── 感恩對象的下拉挑選（v1.75）──
+// ── 感恩對象的下拉挑選（v1.76）──
 // 🔴 不要退回 <datalist>：iOS Safari 不畫任何可下拉的提示，桌機 Chrome 的小箭頭也只在
 //    特定狀態出現，使用者根本不知道能挑。這裡自己畫面板，手機與桌機行為一致。
 //    仍保留自由輸入（清單外的對象：團隊、廠商、客戶）。
@@ -6180,10 +6204,36 @@ function pmMyEntryCount() {
 }
 function pmCapReached() { const c = pmEntryCap(); return c > 0 && pmMyEntryCount() >= c; }
 
+// ── 送出後修改自己那一則（v1.76）──
+// 🔴 沿用同一組表單欄位而不是再畫一份：對象下拉的 pmTgt* 綁死 pm-target／pm-tgt-wrap／
+//    pm-tgt-menu 這幾個 id，畫第二份會直接撞 id。
+// 🔴 修改與刪除同條件（自己的、且還在「填寫」階段）：揭露之後全體都讀過了，
+//    再改就是偷偷換掉別人看過的內容。
+function pmEditEntry(id) {
+  const e = pmEntries.find(x => x.id === id);
+  if (!e || !PORTAL_SESSION || e.author_emp_id !== PORTAL_SESSION.empId) return;
+  if (pmSession.phase !== 'writing') { boardToast(BT('pm_no_edit_after', { reveal: pmPhaseLabel('reveal') })); return; }
+  pmEditId = id;
+  pmDraft = e.text_src || '';
+  if (e.src_lang) pmSrcLang = e.src_lang;
+  pmTgtClose();
+  pmRenderRoom();          // 表單會依 pmEditId 帶入原本的內容與對象
+  const el = document.getElementById('pm-writebox');
+  if (el) { try { el.scrollIntoView({ block: 'center' }); } catch (x) {} el.focus(); }
+}
+function pmEditCancel() {
+  pmEditId = null; pmDraft = '';
+  pmTgtClose();
+  pmRenderRoom();
+}
+
 async function pmSubmitEntry() {
   if (!pmSession || !PORTAL_SESSION) return;
-  // 上限在送出前再擋一次：畫面上的 disabled 只是提示，別人同時送出時本地計數可能還沒更新
-  if (pmCapReached()) { boardToast(BT('pm_cap_reached', { cap: pmEntryCap() })); return; }
+  const editing = pmEditId ? pmEntries.find(x => x.id === pmEditId) : null;
+  if (pmEditId && !editing) { pmEditId = null; }        // 被別人刪掉了：退回新增模式
+  // 上限在送出前再擋一次：畫面上的 disabled 只是提示，別人同時送出時本地計數可能還沒更新。
+  // 修改既有那一則不算新增，不受上限影響。
+  if (!editing && pmCapReached()) { boardToast(BT('pm_cap_reached', { cap: pmEntryCap() })); return; }
   const el = document.getElementById('pm-writebox');
   const text = (el.value || '').trim();
   if (!text) { boardToast(BT('pm_need_input')); return; }
@@ -6195,15 +6245,27 @@ async function pmSubmitEntry() {
   const src = (selEl && selEl.value) || pmSrcLang || pmPortalLang();
   pmSrcLang = src;
   const btn = document.getElementById('pm-submit-btn'); if (btn) btn.disabled = true;
-  boardToast(BT('pm_sending'));
-  const row = {
-    id: uid(), session_id: pmSession.id,
-    author_emp_id: PORTAL_SESSION.empId,
-    author_name: PORTAL_SESSION.nameZh || PORTAL_SESSION.nameEn || PORTAL_SESSION.empId,
-    src_lang: src, text_src: text,
-    created_at: new Date().toISOString(), updated_at: new Date().toISOString(),
-  };
-  if (targetTxt) {
+  boardToast(BT(editing ? 'pm_saving' : 'pm_sending'));
+  // 內容與對象都沒動就不重送翻譯（省一次 API，也不會把主席修過的譯文洗掉）
+  const sameText = !!editing && text === (editing.text_src || '');
+  const sameTarget = !!editing && targetTxt === (editing.target_name || '');
+  const row = editing
+    ? { src_lang: src, text_src: text, updated_at: new Date().toISOString() }
+    : {
+        id: uid(), session_id: pmSession.id,
+        author_emp_id: PORTAL_SESSION.empId,
+        author_name: PORTAL_SESSION.nameZh || PORTAL_SESSION.nameEn || PORTAL_SESSION.empId,
+        src_lang: src, text_src: text,
+        created_at: new Date().toISOString(), updated_at: new Date().toISOString(),
+      };
+  if (editing && sameText) { row.text_a = editing.text_a; row.text_b = editing.text_b; }
+  if (editing && sameTarget) {
+    row.target_emp_id = editing.target_emp_id; row.target_name = editing.target_name;
+    row.target_a = editing.target_a; row.target_b = editing.target_b;
+  } else if (editing && !targetTxt) {
+    row.target_emp_id = null; row.target_name = null; row.target_a = null; row.target_b = null;
+  }
+  if (targetTxt && !(editing && sameTarget)) {
     const empId = pmTargetMap()[targetTxt] || null;
     row.target_emp_id = empId; row.target_name = targetTxt;
     // 從員工清單挑到的人名不送翻譯：人名翻譯只會製造出同一個人的兩種寫法。
@@ -6214,17 +6276,22 @@ async function pmSubmitEntry() {
       catch (e) { row.target_a = targetTxt; row.target_b = targetTxt; }
     }
   }
-  try { const tr = await pmTranslate(text, pmSession.lang_a, pmSession.lang_b, src); row.text_a = tr.a; row.text_b = tr.b; }
-  catch (e) { /* 翻譯失敗留空，主席端會背景補翻 */ }
+  if (!sameText) {
+    try { const tr = await pmTranslate(text, pmSession.lang_a, pmSession.lang_b, src); row.text_a = tr.a; row.text_b = tr.b; }
+    catch (e) { row.text_a = null; row.text_b = null; }   // 留空，主席端輪詢時會背景補翻
+  }
   try {
-    await SB.post('premortem_entries', row);
+    if (editing) await SB.patch('premortem_entries', 'id=eq.' + encodeURIComponent(pmEditId), row);
+    else await SB.post('premortem_entries', row);
+    pmEditId = null;
     if (el) el.value = ''; pmDraft = '';
     if (tEl) tEl.value = '';
     await pmFetchEntries(); pmRenderRoom();
-    boardToast(row.text_a ? BT('pm_sent') : BT('pm_sent_pending'));
+    boardToast(editing ? BT('pm_edit_saved') : (row.text_a ? BT('pm_sent') : BT('pm_sent_pending')));
   } catch (e2) { if (btn) btn.disabled = false; boardToast(BT('pm_send_failed') + (e2.message || e2)); }
 }
 async function pmDeleteMyEntry(id) {
+  if (pmEditId === id) { pmEditId = null; pmDraft = ''; }   // 刪掉正在修改的那一則就退回新增模式
   const e = pmEntries.find(x => x.id === id);
   if (!e || !PORTAL_SESSION || e.author_emp_id !== PORTAL_SESSION.empId) return;
   if (pmSession.phase !== 'writing') { boardToast(BT('pm_no_del_after', { reveal: pmPhaseLabel('reveal') })); return; }
@@ -6744,7 +6811,7 @@ async function plExportPDF() {
   w.document.write('<!doctype html><html><head><meta charset="utf-8"><title>' + wmXesc(plFileBase()) + '</title><style>body{font-family:"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;color:#1a1a1a;margin:28px;font-size:13px;line-height:1.5}h1{font-size:20px;margin:0 0 4px}table{border-collapse:collapse}img{max-width:480px}@media print{@page{margin:14mm}}</style></head><body>' + plReportHtml(imgs) + '</body></html>');
   w.document.close(); w.onload = function () { try { w.focus(); w.print(); } catch (e) {} };
 }
-// 🔴 投票的 PNG 匯出已移除（v1.75）：它走的是「SVG foreignObject → <img> → canvas」，
+// 🔴 投票的 PNG 匯出已移除（v1.76）：它走的是「SVG foreignObject → <img> → canvas」，
 //    而 WebKit（Safari／iOS）根本不會光柵化 <img> 裡的 foreignObject —— 在 Mac 與 iPhone 上必定失敗。
 //    使用者決定投票只需要 PDF，故不重寫成 canvas 版（報表含選項圖與總圖，要非同步載入才畫得出來）。
 //    要恢復請寫 canvas 版（比照 pmRenderPngCanvas），不要把 foreignObject 那段搬回來。

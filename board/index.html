@@ -5,7 +5,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#080C14">
-<title>COMART · 公告與紀錄 v1.72</title>
+<title>COMART · 公告與紀錄 v1.73</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -36,7 +36,7 @@ h1,h2,h3,p{margin:0}
 .topbar-main{display:flex;align-items:center;gap:10px;padding:10px 16px;max-width:1180px;margin:0 auto}
 .logo{display:flex;align-items:center;gap:9px;text-decoration:none;color:inherit}
 .logo-mark{width:30px;height:30px;background:var(--ac);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-style:italic;font-size:15px;color:#fff;font-weight:400;flex-shrink:0}
-/* 🔴 white-space:nowrap 是必要的（v1.72）：topbar-main 是一列 flex，窄螢幕塞不下時
+/* 🔴 white-space:nowrap 是必要的（v1.73）：topbar-main 是一列 flex，窄螢幕塞不下時
    標題會被壓到只剩一個字的寬度，然後逐字換行變成直排，五個字吃掉半個手機畫面。 */
 .logo-text{font-family:var(--fd);font-style:italic;font-size:16px;color:var(--tx);letter-spacing:-.01em;white-space:nowrap}
 .logo-ver{font-family:var(--fm);font-size:10px;color:var(--tx3);margin-left:6px;white-space:nowrap}
@@ -45,8 +45,8 @@ h1,h2,h3,p{margin:0}
 .topbar-right{display:flex;gap:8px;margin-left:auto;align-items:center;font-size:12px;color:var(--tx3)}
 .who-badge{display:flex;align-items:center;gap:6px;padding:5px 10px;border:1px solid var(--br);border-radius:20px;font-size:12px;color:var(--tx2);white-space:nowrap}
 
-/* ── 手機版 topbar（v1.72）──
-   窄螢幕一列放不下「← Portal ＋ 告 ＋ 公告與紀錄 ＋ v1.72 ＋ 五顆語言鈕 ＋ 姓名」。
+/* ── 手機版 topbar（v1.73）──
+   窄螢幕一列放不下「← Portal ＋ 告 ＋ 公告與紀錄 ＋ v1.73 ＋ 五顆語言鈕 ＋ 姓名」。
    原本的下場：標題被壓成一個字寬、逐字換行變直排（整列高度暴增到 ~150px），日本語鈕被切掉。
    ① nowrap（見上）先把「直排」這個失效模式徹底擋掉，高度立刻回到一列
    ② 右側改成可橫向捲動 —— 語言鈕與姓名都不再被裁掉，跟下方頁籤同一套操作手感
@@ -193,13 +193,13 @@ select,select option,option{background:var(--s2);color:var(--tx)}
 .pm-roombar{max-width:none;padding:0;margin-bottom:16px;border-bottom:1px solid var(--br)}
 #pm-phasebar{margin-left:auto;display:flex;gap:6px;align-items:center;padding:6px 0;flex-wrap:wrap}
 
-/* 播放模式的投影版面（v1.72）
+/* 播放模式的投影版面（v1.73）
    只有人名與內容，所以字級與留白都要放到「這一則就是整個畫面」的尺度 —— 內容少的時候
    原本的 21px 會讓整片畫面看起來是空的。
    🔴 字級一律用 clamp(最小, 視窗比例, 最大)：同一份程式要同時應付手機、筆電與會議室
    投影幕（1920px 以上），寫死 px 在任一端都會不對。vw 讓它跟著螢幕長大，
    兩端的夾值則保證手機不會小到看不清、4K 不會大到一行只放三個字。 */
-/* 播放時把內容上方的空白全部收掉（v1.72）：
+/* 播放時把內容上方的空白全部收掉（v1.73）：
    ① .wrap 的上緣留白 ② 頂端那一列的下緣留白 ③ 投影片自己的上內距。
    🔴 並且改成靠上對齊 —— 原本 justify-content:center 會把內容推到框正中間，
    內容一短上方就空出一大片。要填滿畫面靠的是把字放大（clamp／lg／xl），不是靠置中推開。 */
@@ -209,7 +209,7 @@ body.pm-playing #pm-phasebar{padding:0}
 .pm-slide{display:flex;flex-direction:column;min-height:calc(100vh - 154px)}
 /* dvh 在手機 Safari 才是真正的可視高度（100vh 不含伸縮的網址欄，會多出一段捲動） */
 @supports (height:100dvh){ .pm-slide{min-height:calc(100dvh - 154px)} }
-/* 上方留約一行的呼吸空間（v1.72）：完全貼齊分隔線會太擠。
+/* 上方留約一行的呼吸空間（v1.73）：完全貼齊分隔線會太擠。
    跟著字級一起用 vw 縮放，手機 18px、筆電 ~32px、投影幕 44px —— 大螢幕的一行本來就比較高。 */
 .pm-slide-in{flex:1;display:flex;flex-direction:column;justify-content:flex-start;
   padding:clamp(18px,2.2vw,44px) 2px clamp(16px,2.5vh,36px)}
@@ -217,7 +217,7 @@ body.pm-playing #pm-phasebar{padding:0}
 .pm-slide-name{font-size:clamp(30px,5.4vw,72px);font-weight:700;color:var(--ac);
   line-height:1.2;margin-bottom:clamp(20px,3.4vw,44px);letter-spacing:-.015em}
 /* 🔴 權重必須壓過 .pm-lc .txt（0,2,0）—— 只寫 .pm-slide-txt（0,1,0）會被它蓋掉，
-   v1.72 的內文其實一直是 13.5px，這才是「畫面太空」的真正原因。 */
+   v1.73 的內文其實一直是 13.5px，這才是「畫面太空」的真正原因。 */
 .pm-slide .pm-lc .txt,.pm-slide .pm-slide-txt{font-size:clamp(19px,2.5vw,36px);line-height:1.72}
 /* 內容短的時候要放得更大，否則一句話擺在整個投影幕上只會顯得空（sz 由 pmPlaySlideHtml 算） */
 .pm-slide.lg .pm-lc .txt,.pm-slide.lg .pm-slide-txt{font-size:clamp(21px,3.1vw,46px);line-height:1.62}
@@ -239,7 +239,7 @@ body.pm-playing #pm-phasebar{padding:0}
 }
 @supports (height:100dvh){ @media (max-width:640px){ .pm-slide{min-height:calc(100dvh - 144px)} } }
 
-/* 感恩對象的下拉挑選（v1.72）
+/* 感恩對象的下拉挑選（v1.73）
    原本用 <input list> + <datalist>：iOS Safari 完全不顯示任何可下拉的提示，
    桌機 Chrome 也只在特定狀態才閃一個很小的箭頭 —— 使用者根本不知道可以挑。
    改成自己畫的面板，手機與桌機長得一模一樣，箭頭永遠看得見。
@@ -339,7 +339,7 @@ body.pm-playing #pm-phasebar{padding:0}
     <a class="logo" href="javascript:void(0)">
       <div class="logo-mark">告</div>
       <div class="logo-text" data-i18n="app_title">公告與紀錄</div>
-      <span class="logo-ver">v1.72</span>
+      <span class="logo-ver">v1.73</span>
     </a>
     <div class="topbar-right">
       <div id="langChips" style="display:flex;gap:4px"></div>
@@ -3760,7 +3760,7 @@ function wrPrint(){
 // ═══════════════════════════════════════════════
 const PM_LANGS = [['zh-TW','繁體中文'],['zh-CN','简体中文'],['vi','Tiếng Việt'],['en','English'],['ja','日本語']];
 const PM_LANG_SHORT = { 'zh-TW':'繁中','zh-CN':'简中','vi':'越南語','en':'English','ja':'日本語' };
-// 階段清單改為「每種會議自己一份」（v1.72）：意見徵集沒有「對策」，投票也是可選的。
+// 階段清單改為「每種會議自己一份」（v1.73）：意見徵集沒有「對策」，投票也是可選的。
 // PM_PHASES 保留為驗屍／腦力激盪的完整版；實際取用一律經 pmPhases()，那裡才看得到
 // 「這一場有沒有開投票」。所有比較階段先後的地方（pmPhaseIdx／pmCanGoPhase／pmSetPhase）
 // 都吃 pmPhases() 的結果，所以少一個階段時「往前只能走一步」自動就跳過它。
@@ -4206,7 +4206,7 @@ function pmPhaseLabelOf(kind, p) {
 }
 function pmVoteCap() { return PMK().voteCap; }
 
-// ── 行為旗標的唯一取用點 pmOpt()（v1.72）──
+// ── 行為旗標的唯一取用點 pmOpt()（v1.73）──
 // 🔴 三種會議的旗標來源不同，但讀取端只准有這一個入口：
 //    驗屍／腦力激盪 → 一律讀 PM_KINDS（寫死，configurable 是空的，session 的 opt_* 再怎麼被塞值都無效）
 //    意見徵集       → 讀該場 session 的 opt_*；沒設過（null／undefined）才退回 PM_KINDS 的保底值
@@ -4229,7 +4229,7 @@ function pmTplOf(s) { return PM_TEMPLATES[(s && s.template) || ''] || null; }
 function pmTpl() { return pmTplOf(pmSession); }
 function pmFieldCount() { const t = pmTpl(); return t ? t.fields : 1; }
 
-// ── 這一場實際有哪些階段（v1.72）──
+// ── 這一場實際有哪些階段（v1.73）──
 // 沒宣告 phases 的類型（驗屍／腦力激盪）用完整版；意見徵集沒有「對策」，
 // 且 ranking 只有在主席建會時勾了「要投票」才會出現。所有比較階段先後的邏輯都吃這個結果，
 // 所以少一個階段時「往前只能走一步」會自動跳過它，不必另外寫特例。
@@ -5030,7 +5030,7 @@ async function pmRetryTranslations() {
 function pmSaveDraft() { const el = document.getElementById('pm-writebox'); if (el) pmDraft = el.value; }
 function pmRestoreDraft() { const el = document.getElementById('pm-writebox'); if (el && pmDraft) el.value = pmDraft; }
 
-// ── 重繪時不要把正在打字的人踢出輸入框（v1.72）──
+// ── 重繪時不要把正在打字的人踢出輸入框（v1.73）──
 // 會議室是整塊 innerHTML 重畫的：別人一送出內容／一則譯文補完，輪詢就把 DOM 換掉，
 // 正在打對策或填寫框的人游標會彈掉、中文輸入法組字到一半會被砍斷。兩道防線：
 //   ① 正在輸入文字時直接延後重繪（pmRerender），等他離開輸入框再畫；
@@ -5153,7 +5153,7 @@ function pmRenderRoom() {
   const body = document.getElementById('pm-room-body');
   if (!pmSession) { body.innerHTML = ''; return; }
   const s = pmSession, chair = pmIsChair(s), K = PMK(), T = K.t;
-  // ── 播放模式接管整個畫面（v1.72）──
+  // ── 播放模式接管整個畫面（v1.73）──
   // 🔴 這個 early return 是刻意的：投影時只該看到人名與內容，
   //    會議資訊卡、專案描述／情境、匯出工具列全部不畫。要加新面板前先想清楚它該不該上投影幕。
   if (pmPlaying()) {
@@ -5177,10 +5177,10 @@ function pmRenderRoom() {
     (cardBody.length ? '<div class="panel-b">' + cardBody.join('') + '</div>' : '') + '</div>';
 
   // 輸出工具列（揭露後才顯示）
-  // 🔴 展示（reveal）階段不給匯出（v1.72）。那是全體一起看內容、主席準備播放的階段，
-  //    四顆匯出鈕擺在最上面純粹是干擾；而且這時候的紀錄還沒定稿，匯出去的是半成品，
-  //    寄出後很容易被當成正式版本。要匯出等收斂完（投票／對策／定稿）再說。
-  if (['ranking', 'mitigation', 'locked'].indexOf(s.phase) >= 0) {
+  // 🔴 **只有定稿（locked）之後才給匯出**（v1.73）。未定稿的紀錄匯出去是半成品，
+  //    收件人沒辦法分辨它是不是最終版本 —— 這跟「AI 總結被修訂過要留下軌跡」是同一類考量。
+  //    這樣「匯出的一定是正式版本」才真正成立。
+  if (s.phase === 'locked') {
     html += '<div style="display:flex;gap:6px;flex-wrap:wrap;margin:14px 0 12px">' +
       '<button class="btn sm" onclick="pmSendMail()">' + escHtml(BT('btn_send')) + '</button>' +
       '<button class="btn sm" onclick="pmExportXlsx()">Excel</button>' +
@@ -5439,7 +5439,7 @@ async function pmToggleVote(id) {
   pmMaybeAutoAdvance();   // 自己這一票可能就是最後一票
 }
 
-// ── 全員投滿自動進入下一階段（v1.72）──
+// ── 全員投滿自動進入下一階段（v1.73）──
 // 每個人都把票投完了還要等主席按鍵，是白等：票數已成定局，再等只是延遲會議。
 // 🔴 只有主席的瀏覽器能真的推進階段 —— sb-proxy 的欄位守衛規定 PATCH phase 必須是該場主席本人，
 //    其他人送出去只會拿到 403。所以判斷雖然人人都算得出來（用來顯示進度），動作只由主席端發出。
@@ -5648,6 +5648,26 @@ function pmGroupsSorted() {
   const sv = arr => arr.reduce((x, e) => x + pmVoteCount(e), 0);
   return Object.keys(groups).sort((a, b) => sv(groups[b]) - sv(groups[a])).map(name => ({ name, items: groups[name].slice().sort((a, b) => pmVoteCount(b) - pmVoteCount(a)) }));
 }
+// 與會人員（正式紀錄用，固定繁中）。主席填的自由文字優先；沒填就用實際有送出內容的人補上 ——
+// 那個欄位要手動打字，實務上幾乎都是空的，但系統本來就知道誰真的參與了。
+// 🔴 匿名場次絕對不可列名單：那等於指出「這些人之中有人寫了那些內容」，範圍一小就是點名。
+//    匿名場次只給人數。
+function pmAttendeesZ(s) {
+  const manual = (s.attendees || '').trim();
+  if (manual) return manual;
+  const ids = [], nameOf = {};
+  pmEntries.forEach(e => {
+    const id = e.author_emp_id; if (!id || ids.indexOf(id) >= 0) return;
+    ids.push(id); nameOf[id] = e.author_name || id;
+  });
+  if (!ids.length) return '—';
+  if (pmOptOf(s, 'anonymous')) return '共 ' + ids.length + ' 人參與（匿名場次不列名單）';
+  const names = ids.map(id => nameOf[id]);
+  const chair = s.chair_name || '';
+  if (chair && names.indexOf(chair) < 0) names.unshift(chair);
+  return names.join('、');
+}
+
 function pmReportHtml() {
   const s = pmSession, T = PMTZ(), la = escHtml(pmLangShort(s.lang_a)), lb = escHtml(pmLangShort(s.lang_b));
   // white-space:pre-wrap 是必要的：AI 評論與總結是分段長文，少了它換行會全部塌成一團
@@ -5659,7 +5679,7 @@ function pmReportHtml() {
   h += '<div style="color:#666;font-size:12px">' + escHtml(T.meet + '紀錄') + '</div>';
   h += '<table style="width:100%;border-collapse:collapse;margin:8px 0;font-size:11.5px">' +
     [['會議日期／時間', s.meet_at || '—'], ['會議地點', s.meet_location || '—'],
-     ['主席', s.chair_name || '—'], ['與會人員', s.attendees || '—']]
+     ['主席', s.chair_name || '—'], ['與會人員', pmAttendeesZ(s)]]
       .map(r => '<tr><td style="width:110px;padding:3px 8px;border:1px solid #ddd;background:#f5f5f5;color:#555">' + escHtml(r[0]) +
         '</td><td style="padding:3px 8px;border:1px solid #ddd;white-space:pre-wrap">' + escHtml(r[1]) + '</td></tr>').join('') +
     '</table>';
@@ -5705,26 +5725,139 @@ function pmExportPDF() {
   w.document.write(doc); w.document.close();
   w.onload = function () { try { w.focus(); w.print(); } catch (e) {} };
 }
+// ═══════ PNG 匯出：直接畫在 canvas 上 ═══════
+// 🔴 **不要退回「SVG foreignObject → <img> → canvas」那條路**（v1.73 改掉的舊做法）：
+//    WebKit（Safari／iOS）根本不會光柵化 <img> 裡的 foreignObject，在 Mac 與 iPhone 上必定失敗
+//    （Chrome 可以，所以很容易誤以為沒問題）。週會紀錄的 PNG 一直正常，就是因為它直接畫 canvas。
+// 版面刻意與 PDF（pmReportHtml）對齊：白底黑字、同樣的區塊順序、同樣的雙語兩欄。
+const PM_PNG_FONT = WM_PNG_FONT;
+const PM_PNG_W = 900, PM_PNG_PAD = 30;
+
+// 逐字斷行：中文沒有空格，用 split(' ') 會整段不斷行而爆出畫布外
+function pmPngWrap(ctx, text, maxW) {
+  const out = [];
+  String(text == null ? '' : text).split('\n').forEach(para => {
+    if (!para) { out.push(''); return; }
+    let line = '';
+    for (const ch of Array.from(para)) {
+      if (line && ctx.measureText(line + ch).width > maxW) { out.push(line); line = ch; }
+      else line += ch;
+    }
+    out.push(line);
+  });
+  return out;
+}
+// 把報表拆成一串可量可畫的區塊。PDF 有什麼，這裡就有什麼。
+function pmPngBlocks() {
+  const s = pmSession, T = PMTZ(), B = [];
+  const la = pmLangShort(s.lang_a), lb = pmLangShort(s.lang_b);
+  B.push({ t: 'h1', text: s.title || '(未命名)' });
+  B.push({ t: 'sub', text: T.meet + '紀錄' });
+  [['會議日期／時間', s.meet_at || '—'], ['會議地點', s.meet_location || '—'],
+   ['主席', s.chair_name || '—'], ['與會人員', pmAttendeesZ(s)]]
+    .forEach(r => B.push({ t: 'kv', k: r[0], v: r[1] }));
+  const bi = (o, a, b) => ({ t: 'bi', la: la, lb: lb, a: a || o || '', b: b || o || '' });
+  if (s.ai_summary_a || s.ai_summary) {
+    B.push({ t: 'h2', text: 'AI 評論與總結' });
+    B.push({ t: 'sub', text: 'AI 產生：' + pmTs(s.summary_at) + '（' + PM_SUM_MODEL + '）' +
+      (s.summary_edited_at ? '　│　已由主席' + (s.summary_edited_by ? '（' + s.summary_edited_by + '）' : '') + '修訂：' + pmTs(s.summary_edited_at) : '') });
+    B.push(bi(s.ai_summary, s.ai_summary_a, s.ai_summary_b));
+  }
+  if (s.project_desc) { B.push({ t: 'h2', text: T.desc }); B.push(bi(s.project_desc, s.desc_a, s.desc_b)); }
+  B.push({ t: 'h2', text: T.scen }); B.push(bi(s.scenario, s.scenario_a, s.scenario_b));
+  const voted = pmOptOf(s, 'vote');
+  B.push({ t: 'h2', text: T.item + (voted ? '（依票數）' : '') });
+  if (!pmEntries.length) B.push({ t: 'sub', text: '（無）' });
+  const hasTheme = pmEntries.some(e => e.theme);
+  pmGroupsSorted().forEach(g => {
+    if (hasTheme) B.push({ t: 'tag', text: '▸ ' + g.name, color: '#333' });
+    g.items.forEach(e => {
+      if (voted) B.push({ t: 'tag', text: '👍 ' + pmVoteCount(e), color: '#c00' });
+      if (e.target_name) B.push({ t: 'tag', text: '給：' + e.target_name, color: '#333' });
+      B.push(bi(e.text_src, e.text_a, e.text_b));
+    });
+  });
+  if (pmMitigations.length) {
+    B.push({ t: 'h2', text: T.mit });
+    pmMitigations.forEach(m => {
+      if (m.risk_summary) B.push({ t: 'tag', text: T.target + '：' + m.risk_summary, color: '#666' });
+      B.push(bi(m.measure, m.measure_a, m.measure_b));
+      const meta = []; if (m.owner_name) meta.push('負責人：' + m.owner_name); if (m.due_date) meta.push('期限：' + m.due_date);
+      if (meta.length) B.push({ t: 'sub', text: meta.join('　') });
+    });
+  }
+  return B;
+}
+function pmRenderPngCanvas(scale) {
+  const W = PM_PNG_W, PAD = PM_PNG_PAD, CW = W - PAD * 2;
+  const meas = document.createElement('canvas').getContext('2d');
+  const F = (px, bold) => (bold ? 'bold ' : '') + px + 'px ' + PM_PNG_FONT;
+  const KW = 118, GAP = 12, COL = Math.floor((CW - GAP) / 2), CPAD = 8;
+  const blocks = pmPngBlocks();
+  // ── 第一輪：量高度 ──
+  blocks.forEach(b => {
+    if (b.t === 'h1') { meas.font = F(24, true); b.lines = pmPngWrap(meas, b.text, CW); b.h = b.lines.length * 34 + 8; }
+    else if (b.t === 'h2') { meas.font = F(16, true); b.lines = pmPngWrap(meas, b.text, CW); b.h = b.lines.length * 24 + 22; }
+    else if (b.t === 'sub') { meas.font = F(12); b.lines = pmPngWrap(meas, b.text, CW); b.h = b.lines.length * 18 + 4; }
+    else if (b.t === 'tag') { meas.font = F(13, true); b.lines = pmPngWrap(meas, b.text, CW); b.h = b.lines.length * 20 + 8; }
+    else if (b.t === 'kv') {
+      meas.font = F(12.5); b.lines = pmPngWrap(meas, b.v, CW - KW - CPAD * 2);
+      b.h = Math.max(26, b.lines.length * 19 + 10);
+    } else if (b.t === 'bi') {
+      meas.font = F(13.5);
+      b.al = pmPngWrap(meas, b.a, COL - CPAD * 2);
+      b.bl = pmPngWrap(meas, b.b, COL - CPAD * 2);
+      b.h = Math.max(b.al.length, b.bl.length) * 21 + 16 + 20;   // 20 = 語言標籤那一行
+    }
+  });
+  const total = PAD * 2 + blocks.reduce((a, b) => a + b.h, 0);
+  const cv = document.createElement('canvas');
+  cv.width = Math.round(W * scale); cv.height = Math.round(total * scale);
+  const ctx = cv.getContext('2d');
+  ctx.scale(scale, scale);
+  ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, W, total);
+  ctx.textBaseline = 'top';
+  // ── 第二輪：畫 ──
+  let y = PAD;
+  blocks.forEach(b => {
+    if (b.t === 'h1') { ctx.font = F(24, true); ctx.fillStyle = '#1a1a1a'; b.lines.forEach((l, i) => ctx.fillText(l, PAD, y + i * 34)); y += b.h; }
+    else if (b.t === 'h2') {
+      y += 12; ctx.font = F(16, true); ctx.fillStyle = '#1a1a1a';
+      b.lines.forEach((l, i) => ctx.fillText(l, PAD, y + i * 24));
+      const by = y + b.lines.length * 24 + 3;
+      ctx.strokeStyle = '#333'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(PAD, by); ctx.lineTo(W - PAD, by); ctx.stroke();
+      y += b.h - 12;
+    }
+    else if (b.t === 'sub') { ctx.font = F(12); ctx.fillStyle = '#888'; b.lines.forEach((l, i) => ctx.fillText(l, PAD, y + i * 18)); y += b.h; }
+    else if (b.t === 'tag') { ctx.font = F(13, true); ctx.fillStyle = b.color || '#333'; b.lines.forEach((l, i) => ctx.fillText(l, PAD, y + i * 20)); y += b.h; }
+    else if (b.t === 'kv') {
+      ctx.fillStyle = '#f5f5f5'; ctx.fillRect(PAD, y, KW, b.h);
+      ctx.strokeStyle = '#ddd'; ctx.lineWidth = 1;
+      ctx.strokeRect(PAD + .5, y + .5, KW, b.h); ctx.strokeRect(PAD + KW + .5, y + .5, CW - KW, b.h);
+      ctx.font = F(12.5); ctx.fillStyle = '#555'; ctx.fillText(b.k, PAD + CPAD, y + 6);
+      ctx.fillStyle = '#1a1a1a'; b.lines.forEach((l, i) => ctx.fillText(l, PAD + KW + CPAD, y + 6 + i * 19));
+      y += b.h;
+    }
+    else if (b.t === 'bi') {
+      const boxH = b.h - 6;
+      [[PAD, b.la, b.al], [PAD + COL + GAP, b.lb, b.bl]].forEach(c => {
+        ctx.strokeStyle = '#ddd'; ctx.lineWidth = 1; ctx.strokeRect(c[0] + .5, y + .5, COL, boxH);
+        ctx.font = F(10); ctx.fillStyle = '#999'; ctx.fillText(c[1], c[0] + CPAD, y + 6);
+        ctx.font = F(13.5); ctx.fillStyle = '#1a1a1a';
+        c[2].forEach((l, i) => ctx.fillText(l, c[0] + CPAD, y + 24 + i * 21));
+      });
+      y += b.h;
+    }
+  });
+  return cv;
+}
 function pmExportPNG() {
   try {
-    const width = 820, frag = pmReportHtml();
-    const holder = document.createElement('div');
-    holder.style.cssText = 'position:fixed;left:-9999px;top:0;width:' + width + 'px;background:#fff;color:#1a1a1a;padding:24px;font-family:sans-serif;font-size:14px;line-height:1.5';
-    holder.innerHTML = frag; document.body.appendChild(holder);
-    const h = holder.scrollHeight + 48; document.body.removeChild(holder);
-    const xhtml = '<div xmlns="http://www.w3.org/1999/xhtml" style="width:' + width + 'px;background:#fff;color:#1a1a1a;padding:24px;font-family:sans-serif;font-size:14px;line-height:1.5">' + frag + '</div>';
-    const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + width + '" height="' + h + '"><foreignObject width="100%" height="100%">' + xhtml + '</foreignObject></svg>';
-    const url = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml;charset=utf-8' }));
-    const img = new Image();
-    img.onload = function () {
-      const scale = 2, canvas = document.createElement('canvas'); canvas.width = width * scale; canvas.height = h * scale;
-      const ctx = canvas.getContext('2d'); ctx.setTransform(scale, 0, 0, scale, 0, 0); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, width, h); ctx.drawImage(img, 0, 0);
-      URL.revokeObjectURL(url);
-      canvas.toBlob(function (blob) { if (!blob) { boardToast(BT('t_png_fail')); return; } wmDownload(blob, pmFileBase() + '.png'); boardToast(BT('t_png_ok')); }, 'image/png');
-    };
-    img.onerror = function () { URL.revokeObjectURL(url); boardToast(BT('t_png_fail')); };
-    img.src = url;
-  } catch (e) { boardToast(BT('t_png_fail')); }
+    pmRenderPngCanvas(2).toBlob(function (blob) {
+      if (!blob) { boardToast(BT('t_png_fail')); return; }
+      wmDownload(blob, pmFileBase() + '.png'); boardToast(BT('t_png_ok'));
+    }, 'image/png');
+  } catch (e) { boardToast(BT('t_png_fail') + '：' + (e.message || e)); }
 }
 function pmBuildXlsx() {
   const s = pmSession, T = PMTZ(), la = pmLangShort(s.lang_a), lb = pmLangShort(s.lang_b), data = [];
@@ -5733,7 +5866,7 @@ function pmBuildXlsx() {
   data.push(['會議日期／時間', s.meet_at || '', '', '']);
   data.push(['會議地點', s.meet_location || '', '', '']);
   data.push(['主席', s.chair_name || '', '', '']);
-  data.push(['與會人員', s.attendees || '', '', '']);
+  data.push(['與會人員', pmAttendeesZ(s), '', '']);
   if (s.ai_summary_a || s.ai_summary) data.push(['AI 評論與總結', s.ai_summary_a || s.ai_summary, s.ai_summary_b || s.ai_summary, PM_SUM_MODEL + (s.summary_edited_at ? '／已由主席' + (s.summary_edited_by || '') + '修訂 ' + pmTs(s.summary_edited_at) : '')]);
   if (s.project_desc) data.push([T.desc, s.desc_a || s.project_desc, s.desc_b || s.project_desc, '']);
   data.push([T.scen, s.scenario_a || s.scenario || '', s.scenario_b || s.scenario || '', '']);
@@ -5766,7 +5899,7 @@ function pmSendMail() {
   if (s.meet_at) L.push('會議日期／時間：' + s.meet_at);
   if (s.meet_location) L.push('會議地點：' + s.meet_location);
   L.push('主席：' + (s.chair_name || '—'));
-  if (s.attendees) L.push('與會人員：' + s.attendees);
+  L.push('與會人員：' + pmAttendeesZ(s));
   L.push('');
   if (s.ai_summary_a || s.ai_summary) {
     L.push(DIV); L.push('【AI 評論與總結】' + (s.summary_edited_at ? '（已由主席' + (s.summary_edited_by || '') + '修訂 ' + pmTs(s.summary_edited_at) + '）' : ''));
@@ -5804,7 +5937,7 @@ function pmSendMail() {
   try { window.location.href = url; boardToast(BT('bm_mail_ok')); } catch (e) { boardToast(BT('t_mail_fail')); }
 }
 
-// ═══════ 展示階段的播放模式（v1.72）═══════
+// ═══════ 展示階段的播放模式（v1.73）═══════
 // 「讓所有留言展現在螢幕上，讓大家逐一看過」——一次一則、大字、雙語並陳，適合會議室投影。
 // 🔴 全場同步：主席按下一則時把索引寫進 premortem_sessions.play_idx，其他人靠既有的 7 秒輪詢
 //    跳到同一則。play_idx 在 sb-proxy 的 PM_PROTECTED 裡，只有該場主席改得動 ——
@@ -5831,7 +5964,7 @@ function pmPlayGo(d) {
   const i = Math.max(0, Math.min(n - 1, pmPlayIdx() + d));
   if (i !== pmPlayIdx()) pmPlaySet(i);
 }
-// 🔴 投影片上只有「人名＋內容」（v1.72）。
+// 🔴 投影片上只有「人名＋內容」（v1.73）。
 //    面板標題、「第 X／N 則」、進度點、跟隨提示全部拿掉了 —— 那些是操作資訊，不是會議內容，
 //    投在牆上只會分散注意力。主席的控制列與計數獨立成一條浮在底部的操作列，
 //    **只有主席看得到**；與會者的畫面上完全沒有任何多餘元素。
@@ -5916,7 +6049,7 @@ function pmTargetFieldHtml() {
     '<div style="font-size:11px;color:var(--tx3);margin-top:3px">' + escHtml(BT('pm_target_hint')) + '</div></div>';
 }
 
-// ── 感恩對象的下拉挑選（v1.72）──
+// ── 感恩對象的下拉挑選（v1.73）──
 // 🔴 不要退回 <datalist>：iOS Safari 不畫任何可下拉的提示，桌機 Chrome 的小箭頭也只在
 //    特定狀態出現，使用者根本不知道能挑。這裡自己畫面板，手機與桌機行為一致。
 //    仍保留自由輸入（清單外的對象：團隊、廠商、客戶）。

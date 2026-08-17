@@ -345,9 +345,20 @@ The portal supports EN, 繁中, 简中, VI, 日 via `setLang(lang)`. Each langua
     主席手動退回排序階段（讓晚到的人補投）時 `pmSetPhase` 會重新武裝
   - 進度條 `pm_vote_progress` **只給數字不給名字**，維持「畫面上從不顯示投票人」
 - 定稿可輸出四種格式（PDF／PNG／Excel／Email），皆為雙語版面
-  - 🔴 **展示（`reveal`）階段不給匯出**（v1.72）：那是全體一起看內容、主席準備播放的階段，
-    四顆匯出鈕擺在最上面純粹是干擾；而且這時候的紀錄還沒定稿，匯出去的是半成品，
-    寄出後很容易被當成正式版本。匯出列只出現在 `ranking` / `mitigation` / `locked`。
+  - 🔴 **只有定稿（`locked`）之後才給匯出**（v1.73）：未定稿的紀錄匯出去是半成品，
+    收件人沒辦法分辨它是不是最終版本 —— 這跟「AI 總結被修訂過要留下軌跡」是同一類考量。
+    這樣「匯出的一定是正式版本」才真正成立。
+  - 🔴 **PNG 匯出直接畫 canvas（`pmRenderPngCanvas`），不要退回「SVG `foreignObject` → `<img>`
+    → canvas」那條路**（v1.73 改掉的舊做法）：**WebKit（Safari／iOS）根本不會光柵化
+    `<img>` 裡的 `foreignObject`**，在 Mac 與 iPhone 上必定失敗；Chrome 可以，所以很容易誤以為沒問題。
+    週會紀錄的 PNG 一直正常，就是因為它一開始就直接畫 canvas。
+    版面由 `pmPngBlocks()` 拆成可量可畫的區塊，刻意與 PDF（`pmReportHtml`）逐項對齊。
+    中文沒有空格，斷行一律走逐字的 `pmPngWrap()`，不可用 `split(' ')`。
+    ⚠️ **投票頁籤的 `plExportPNG` 仍是舊做法，同一個 bug 尚未修**（它的報表含圖片，要非同步載入）。
+  - **與會人員（`pmAttendeesZ`）**：`attendees` 欄位要手動打字、實務上幾乎都是空的，
+    所以匯出時沒填就用「實際有送出內容的人」補上。
+    🔴 **匿名場次絕對不可列名單** —— 那等於指出「這些人之中有人寫了那些內容」，範圍一小就是點名；
+    匿名場次只輸出人數。四種輸出（PDF／PNG／Excel／Email）共用這一個函式。
 
 新增 `premortem_*` 之類的新表時，記得同步加進 sb-proxy 的 `ALLOWED_TABLES` 白名單，否則前端一律 403。
 

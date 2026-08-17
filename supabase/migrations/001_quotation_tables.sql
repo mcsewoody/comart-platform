@@ -105,7 +105,7 @@ CREATE TABLE IF NOT EXISTS suppliers (
 CREATE TABLE IF NOT EXISTS categories (
   id         TEXT PRIMARY KEY,
   code       TEXT,
-  desc       TEXT,
+  "desc"     TEXT,
   createdAt  BIGINT,
   updatedAt  BIGINT
 );

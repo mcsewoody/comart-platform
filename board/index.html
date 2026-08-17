@@ -5,7 +5,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#080C14">
-<title>COMART · 公告與紀錄 v1.80</title>
+<title>COMART · 公告與紀錄 v1.81</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -339,7 +339,7 @@ body.pm-playing #pm-phasebar{padding:0}
     <a class="logo" href="javascript:void(0)">
       <div class="logo-mark">告</div>
       <div class="logo-text" data-i18n="app_title">公告與紀錄</div>
-      <span class="logo-ver">v1.80</span>
+      <span class="logo-ver">v1.81</span>
     </a>
     <div class="topbar-right">
       <div id="langChips" style="display:flex;gap:4px"></div>
@@ -870,6 +870,10 @@ const B_I18N = {
   nav_bulletin:'公告', nav_weekly:'週會紀錄', nav_biz:'業務會議記錄', nav_woody:'Woody 週報',
   nav_premortem:'事前驗屍', nav_brainstorm:'腦力激盪',
   not_logged_in:'未登入',
+  pm_retrans_btn:'重新翻譯', pm_retrans_hint:'用目前的翻譯模型與規則把全場譯文重做一次（不含 AI 總結）',
+  pm_retrans_confirm:'要用目前的翻譯模型重新翻譯這場會議嗎？共 {n} 項，現有譯文會被覆蓋。',
+  pm_retrans_prog:'翻譯中 {i}／{n}', pm_retrans_done:'已重新翻譯 {n} 項',
+  pm_retrans_partial:'完成 {n} 項，{f} 項失敗（可再按一次重試）', pm_retrans_nothing:'沒有需要翻譯的內容',
   b_copy_link:'複製連結', b_link_copied:'連結已複製，貼給同事即可',
   b_link_copy_manual:'請手動複製這個連結：', b_link_open_failed:'打不開這個連結指向的紀錄',
   site_TW:'台灣', site_CN:'東莞廠', site_VN:'越南廠', site_GRP:'集團', site_group:'集團', scope_all_group:'全集團',
@@ -1054,6 +1058,10 @@ const B_I18N = {
   nav_bulletin:'公告', nav_weekly:'周会记录', nav_biz:'业务会议记录', nav_woody:'Woody 周报',
   nav_premortem:'事前验尸', nav_brainstorm:'头脑风暴',
   not_logged_in:'未登录',
+  pm_retrans_btn:'重新翻译', pm_retrans_hint:'用目前的翻译模型与规则把全场译文重做一次（不含 AI 总结）',
+  pm_retrans_confirm:'要用目前的翻译模型重新翻译这场会议吗？共 {n} 项，现有译文会被覆盖。',
+  pm_retrans_prog:'翻译中 {i}／{n}', pm_retrans_done:'已重新翻译 {n} 项',
+  pm_retrans_partial:'完成 {n} 项，{f} 项失败（可再按一次重试）', pm_retrans_nothing:'没有需要翻译的内容',
   b_copy_link:'复制链接', b_link_copied:'链接已复制，贴给同事即可',
   b_link_copy_manual:'请手动复制这个链接：', b_link_open_failed:'打不开这个链接指向的记录',
   site_TW:'台湾', site_CN:'东莞厂', site_VN:'越南厂', site_GRP:'集团', site_group:'集团', scope_all_group:'全集团',
@@ -1238,6 +1246,10 @@ const B_I18N = {
   nav_bulletin:'Bulletin', nav_weekly:'Weekly Minutes', nav_biz:'Sales Meeting Minutes', nav_woody:'Woody Report',
   nav_premortem:'Premortem', nav_brainstorm:'Brainstorm',
   not_logged_in:'Not signed in',
+  pm_retrans_btn:'Re-translate', pm_retrans_hint:'Redo every translation with the current model and rules (AI summary not included)',
+  pm_retrans_confirm:'Re-translate this session with the current translation model? {n} items — existing translations will be overwritten.',
+  pm_retrans_prog:'Translating {i}/{n}', pm_retrans_done:'Re-translated {n} items',
+  pm_retrans_partial:'{n} done, {f} failed (press again to retry)', pm_retrans_nothing:'Nothing to translate',
   b_copy_link:'Copy link', b_link_copied:'Link copied — paste it to your colleagues',
   b_link_copy_manual:'Copy this link manually:', b_link_open_failed:'Could not open the record this link points to',
   site_TW:'Taiwan', site_CN:'Dongguan', site_VN:'Vietnam', site_GRP:'Group', site_group:'Group', scope_all_group:'Whole group',
@@ -1422,6 +1434,10 @@ const B_I18N = {
   nav_bulletin:'Thông báo', nav_weekly:'Biên bản họp tuần', nav_biz:'Biên bản họp kinh doanh', nav_woody:'Báo cáo Woody',
   nav_premortem:'Premortem', nav_brainstorm:'Brainstorming',
   not_logged_in:'Chưa đăng nhập',
+  pm_retrans_btn:'Dịch lại', pm_retrans_hint:'Dịch lại toàn bộ bằng mô hình và quy tắc hiện tại (không gồm tổng kết AI)',
+  pm_retrans_confirm:'Dịch lại phiên này bằng mô hình dịch hiện tại? Tổng {n} mục, bản dịch cũ sẽ bị ghi đè.',
+  pm_retrans_prog:'Đang dịch {i}/{n}', pm_retrans_done:'Đã dịch lại {n} mục',
+  pm_retrans_partial:'Xong {n} mục, {f} mục lỗi (bấm lại để thử tiếp)', pm_retrans_nothing:'Không có nội dung cần dịch',
   b_copy_link:'Sao chép liên kết', b_link_copied:'Đã sao chép liên kết — gửi cho đồng nghiệp là được',
   b_link_copy_manual:'Vui lòng tự sao chép liên kết này:', b_link_open_failed:'Không mở được nội dung mà liên kết này trỏ tới',
   site_TW:'Đài Loan', site_CN:'Nhà máy Đông Quản', site_VN:'Nhà máy Việt Nam', site_GRP:'Tập đoàn', site_group:'Tập đoàn', scope_all_group:'Toàn tập đoàn',
@@ -1606,6 +1622,10 @@ const B_I18N = {
   nav_bulletin:'お知らせ', nav_weekly:'週会議事録', nav_biz:'営業会議議事録', nav_woody:'Woody 週報',
   nav_premortem:'プレモータム', nav_brainstorm:'ブレスト',
   not_logged_in:'未ログイン',
+  pm_retrans_btn:'翻訳し直す', pm_retrans_hint:'現在の翻訳モデルとルールで全体を訳し直します（AI 総括は対象外）',
+  pm_retrans_confirm:'現在の翻訳モデルでこの会議を訳し直しますか？計 {n} 件、既存の訳文は上書きされます。',
+  pm_retrans_prog:'翻訳中 {i}／{n}', pm_retrans_done:'{n} 件を訳し直しました',
+  pm_retrans_partial:'{n} 件完了、{f} 件失敗（再度押すと再試行）', pm_retrans_nothing:'翻訳が必要な内容はありません',
   b_copy_link:'リンクをコピー', b_link_copied:'リンクをコピーしました。同僚に貼り付けてください',
   b_link_copy_manual:'このリンクを手動でコピーしてください：', b_link_open_failed:'このリンク先の記録を開けませんでした',
   site_TW:'台湾', site_CN:'東莞工場', site_VN:'ベトナム工場', site_GRP:'グループ', site_group:'グループ', scope_all_group:'グループ全体',
@@ -4441,10 +4461,11 @@ const PM_TR_MODEL = 'claude-opus-5';
 //    越南語卻**必須**選一個（bạn／anh／chị／em／ông／bà）—— 譯者不選就是亂選，
 //    一篇之內前後不一致，讀起來就會「怪」。這正是「不精準」最可能的來源，
 //    也是換廠商解決不了的部分：DeepL 之類的翻譯引擎無法被下指令。
-const PM_TR_SYS =
-  'You are a professional translator working on internal corporate records (meeting minutes, ' +
-  'risk assessments, brainstorm notes, and messages of appreciation between colleagues).\n\n' +
-  'Requirements:\n' +
+// 條目翻譯（pmTranslate）與長文翻譯（pmTranslateLong）共用的規則。
+// 🔴 抽出來共用是必要的，不是整理癖（v1.81）：人稱與語域那一條以前只有條目翻譯有，
+//    AI 總結的越南文版沒有 —— 同一份紀錄裡因此有兩套人稱標準，讀起來就是不一致。
+//    以後改規則只改這一份，兩邊一起生效。
+const PM_TR_RULES =
   '- Faithful, not literal. Produce what a fluent native speaker would actually write, ' +
   'not a word-by-word rendering. Never omit or add content.\n' +
   '- Preserve tone strength exactly. Do not soften criticism, and do not inflate warmth or ' +
@@ -4458,7 +4479,12 @@ const PM_TR_SYS =
   'addressed as you; use anh/chi only when the source clearly implies a senior colleague; ' +
   'use the person\'s own name where the source names them. Never invent honorifics the source ' +
   'does not imply, and never mix registers within one text.\n' +
-  '- When translating INTO Chinese, do not add honorifics or pleasantries the source lacks.\n\n' +
+  '- When translating INTO Chinese, do not add honorifics or pleasantries the source lacks.\n';
+
+const PM_TR_SYS =
+  'You are a professional translator working on internal corporate records (meeting minutes, ' +
+  'risk assessments, brainstorm notes, and messages of appreciation between colleagues).\n\n' +
+  'Requirements:\n' + PM_TR_RULES + '\n' +
   'Output ONLY a minified JSON object and nothing else.';
 
 // srcLang 可省略（傳 null／''）：省略時由模型自行辨識來源語言並回傳偵測結果。
@@ -4527,10 +4553,14 @@ function pmSummaryContext() {
 // 但仍用 opus-5——這是要存檔的正式結論，譯文品質不能將就。
 async function pmTranslateLong(text, toLang) {
   const t = (text || '').trim(); if (!t) return '';
-  const sys = '你是專業的企業會議紀錄譯者。忠實翻譯，**保留原文的語氣強度與段落結構**——' +
-    '這是一份要永久存檔的會議正式結論，絕對不要把原文的判斷翻得比原文客氣、也不要加上原文沒有的緩衝語。' +
-    '專有名詞、產品名、型號、數字、日期一律保持原樣。' +
-    '只輸出譯文本身，不要任何前言、說明或標記。不要在回覆中包含任何內部或系統 XML 標籤。';
+  // 規則與條目翻譯共用（PM_TR_RULES）：以前這裡是另一段自己寫的中文提示詞，缺了人稱與語域那一條，
+  // 於是同一份紀錄的條目用一種人稱標準、AI 總結用另一種。差別只在輸出格式（這裡不要 JSON）。
+  const sys = 'You are a professional translator working on internal corporate records. ' +
+    'This is the official, permanently archived conclusion of a meeting.\n\n' +
+    'Requirements:\n' + PM_TR_RULES +
+    '- Preserve the section headings and the paragraph structure exactly.\n\n' +
+    'Output ONLY the translation itself: no preamble, no notes, no markup, ' +
+    'and no internal or system XML tags.';
   const usr = '請把以下內容翻譯成 ' + (PM_LANG_NAME[toLang] || toLang) + '：\n\n"""\n' + t + '\n"""';
   const out = await pmClaudeStream(sys, usr, 8000, PM_SUM_MODEL, null, { output_config: { effort: 'low' } });
   return out.trim();
@@ -5148,6 +5178,78 @@ async function pmRetryTranslations() {
     if (changed) pmRerender(false);
   } finally { pmRetrying = false; }
 }
+// ── 重新翻譯整場（v1.81）──
+// 翻譯模型與提示詞會改版（v1.77 從 haiku 換成 opus-5 並補上人稱與語域規則），
+// 但既有會議的譯文仍是當初那個版本產出的。這顆鈕讓主席用「現在的」模型與規則重翻一次。
+// 🔴 只重翻機器翻過的東西：
+//    ① 從員工清單挑到的對象（target_emp_id 有值）不翻 —— 人名翻譯只會製造同一個人的兩種寫法
+//    ② AI 總結不在這裡重翻：它有自己的「↻ 重新生成」，而且主席可能已經修訂過
+//       （summary_edited_at），在這裡一併洗掉會把修訂軌跡也弄不見
+// 🔴 逐則序列進行，不要 Promise.all：39 則同時打進 claude-proxy 會撞上 edge function 的併發上限
+// 🔴 每則各自寫回：中途失敗時前面已完成的都保得住，重按一次只會再翻失敗的那幾則
+let pmRetransBusy = false;
+async function pmRetranslateAll() {
+  const s = pmSession;
+  if (!s || !pmIsChair(s) || pmRetransBusy) return;
+  if (s.lang_a === s.lang_b) return;
+  const la = s.lang_a, lb = s.lang_b;
+
+  const ents = pmEntries.filter(e => e.text_src);
+  const tgts = pmEntries.filter(e => e.target_name && !e.target_emp_id);
+  const total = ents.length + tgts.length + (s.project_desc ? 1 : 0) + (s.scenario ? 1 : 0);
+  if (!total) { boardToast(BT('pm_retrans_nothing')); return; }
+  if (!window.confirm(BT('pm_retrans_confirm', { n: total }))) return;
+
+  pmRetransBusy = true;
+  pmPollStop();                 // 重翻期間停止輪詢：否則剛寫回的譯文會被舊資料蓋回去
+  const btn = document.getElementById('pm-retrans-btn');
+  let done = 0, fail = 0;
+  const tick = () => { if (btn) { btn.disabled = true; btn.textContent = '↻ ' + BT('pm_retrans_prog', { i: done, n: total }); } };
+  tick();
+
+  try {
+    if (s.project_desc) {
+      try { const d = await pmTranslate(s.project_desc, la, lb);
+        await SB.patch('premortem_sessions', 'id=eq.' + encodeURIComponent(s.id), { desc_a: d.a, desc_b: d.b });
+        s.desc_a = d.a; s.desc_b = d.b;
+      } catch (e) { fail++; }
+      done++; tick();
+    }
+    if (s.scenario) {
+      try { const d = await pmTranslate(s.scenario, la, lb);
+        await SB.patch('premortem_sessions', 'id=eq.' + encodeURIComponent(s.id), { scenario_a: d.a, scenario_b: d.b });
+        s.scenario_a = d.a; s.scenario_b = d.b;
+      } catch (e) { fail++; }
+      done++; tick();
+    }
+    for (const e of ents) {
+      // srcLang 刻意不傳：舊資料的 src_lang 是當初用「介面語言」猜的，可能根本不對，
+      // 讓模型自己辨識才是這次要修的重點之一
+      try {
+        const tr = await pmTranslate(e.text_src, la, lb);
+        const patch = { text_a: tr.a, text_b: tr.b, updated_at: new Date().toISOString() };
+        if (tr.src) patch.src_lang = tr.src;
+        await SB.patch('premortem_entries', 'id=eq.' + encodeURIComponent(e.id), patch);
+        e.text_a = tr.a; e.text_b = tr.b; if (tr.src) e.src_lang = tr.src;
+      } catch (err) { fail++; }
+      done++; tick();
+    }
+    for (const e of tgts) {
+      try {
+        const tt = await pmTranslate(e.target_name, la, lb);
+        await SB.patch('premortem_entries', 'id=eq.' + encodeURIComponent(e.id), { target_a: tt.a, target_b: tt.b });
+        e.target_a = tt.a; e.target_b = tt.b;
+      } catch (err) { fail++; }
+      done++; tick();
+    }
+    boardToast(fail ? BT('pm_retrans_partial', { n: total - fail, f: fail }) : BT('pm_retrans_done', { n: total }));
+  } finally {
+    pmRetransBusy = false;
+    pmRerender(true);
+    pmPollStart();
+  }
+}
+
 function pmSaveDraft() { const el = document.getElementById('pm-writebox'); if (el) pmDraft = el.value; }
 function pmRestoreDraft() { const el = document.getElementById('pm-writebox'); if (el && pmDraft) el.value = pmDraft; }
 
@@ -5308,6 +5410,13 @@ function pmRenderRoom() {
       '<button class="btn sm" onclick="pmExportXlsx()">Excel</button>' +
       '<button class="btn sm" onclick="pmExportPNG()">PNG</button>' +
       '<button class="btn sm" onclick="pmExportPDF()">PDF</button></div>';
+  }
+
+  // 主席維護：用現在的模型與提示詞把整場重翻一次（揭露之後才有意義 —— 在那之前內容還在陸續進來）
+  if (chair && s.lang_a !== s.lang_b && ['reveal', 'ranking', 'mitigation', 'locked'].indexOf(s.phase) >= 0) {
+    html += '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:0 0 12px">' +
+      '<button class="btn ghost sm" id="pm-retrans-btn" onclick="pmRetranslateAll()">↻ ' + escHtml(BT('pm_retrans_btn')) + '</button>' +
+      '<span class="hint" style="margin:0">' + escHtml(BT('pm_retrans_hint')) + '</span></div>';
   }
 
   const myEntries = pmEntries.filter(e => e.author_emp_id === (PORTAL_SESSION && PORTAL_SESSION.empId));

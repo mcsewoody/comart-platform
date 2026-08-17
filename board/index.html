@@ -5,7 +5,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#080C14">
-<title>COMART · 公告與紀錄 v1.68</title>
+<title>COMART · 公告與紀錄 v1.69</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -36,7 +36,7 @@ h1,h2,h3,p{margin:0}
 .topbar-main{display:flex;align-items:center;gap:10px;padding:10px 16px;max-width:1180px;margin:0 auto}
 .logo{display:flex;align-items:center;gap:9px;text-decoration:none;color:inherit}
 .logo-mark{width:30px;height:30px;background:var(--ac);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-style:italic;font-size:15px;color:#fff;font-weight:400;flex-shrink:0}
-/* 🔴 white-space:nowrap 是必要的（v1.68）：topbar-main 是一列 flex，窄螢幕塞不下時
+/* 🔴 white-space:nowrap 是必要的（v1.69）：topbar-main 是一列 flex，窄螢幕塞不下時
    標題會被壓到只剩一個字的寬度，然後逐字換行變成直排，五個字吃掉半個手機畫面。 */
 .logo-text{font-family:var(--fd);font-style:italic;font-size:16px;color:var(--tx);letter-spacing:-.01em;white-space:nowrap}
 .logo-ver{font-family:var(--fm);font-size:10px;color:var(--tx3);margin-left:6px;white-space:nowrap}
@@ -45,8 +45,8 @@ h1,h2,h3,p{margin:0}
 .topbar-right{display:flex;gap:8px;margin-left:auto;align-items:center;font-size:12px;color:var(--tx3)}
 .who-badge{display:flex;align-items:center;gap:6px;padding:5px 10px;border:1px solid var(--br);border-radius:20px;font-size:12px;color:var(--tx2);white-space:nowrap}
 
-/* ── 手機版 topbar（v1.68）──
-   窄螢幕一列放不下「← Portal ＋ 告 ＋ 公告與紀錄 ＋ v1.68 ＋ 五顆語言鈕 ＋ 姓名」。
+/* ── 手機版 topbar（v1.69）──
+   窄螢幕一列放不下「← Portal ＋ 告 ＋ 公告與紀錄 ＋ v1.69 ＋ 五顆語言鈕 ＋ 姓名」。
    原本的下場：標題被壓成一個字寬、逐字換行變直排（整列高度暴增到 ~150px），日本語鈕被切掉。
    ① nowrap（見上）先把「直排」這個失效模式徹底擋掉，高度立刻回到一列
    ② 右側改成可橫向捲動 —— 語言鈕與姓名都不再被裁掉，跟下方頁籤同一套操作手感
@@ -188,26 +188,45 @@ select,select option,option{background:var(--s2);color:var(--tx)}
 .pm-lc .lbl{font-size:10px;color:var(--tx3);letter-spacing:.03em;margin-bottom:2px}
 .pm-lc .txt{white-space:pre-wrap;font-size:13.5px;line-height:1.7}
 
-/* 播放模式的投影版面（v1.68）
-   只有人名與內容。內容垂直置中並撐滿可視高度，投影時不會縮在畫面上緣一小塊。
-   主席的操作列固定在底部（sticky），換頁時位置不會跟著內容長短跳來跳去。 */
-.pm-slide{display:flex;flex-direction:column;min-height:calc(100vh - 190px)}
-.pm-slide-in{flex:1;display:flex;flex-direction:column;justify-content:center;padding:8px 4px 20px}
-.pm-slide-to{font-size:15px;color:var(--tx3);margin-bottom:5px}
-.pm-slide-name{font-size:32px;font-weight:700;color:var(--ac);line-height:1.3;margin-bottom:22px;letter-spacing:-.01em}
-.pm-slide-txt{font-size:21px;line-height:1.8}
-.pm-slide-by{margin-top:24px;font-size:15px;color:var(--tx3);text-align:right}
+/* 播放模式的投影版面（v1.69）
+   只有人名與內容，所以字級與留白都要放到「這一則就是整個畫面」的尺度 —— 內容少的時候
+   原本的 21px 會讓整片畫面看起來是空的。
+   🔴 字級一律用 clamp(最小, 視窗比例, 最大)：同一份程式要同時應付手機、筆電與會議室
+   投影幕（1920px 以上），寫死 px 在任一端都會不對。vw 讓它跟著螢幕長大，
+   兩端的夾值則保證手機不會小到看不清、4K 不會大到一行只放三個字。 */
+body.pm-playing .wrap{max-width:1560px;padding:10px 16px 16px}
+.pm-slide{display:flex;flex-direction:column;min-height:calc(100vh - 180px)}
+/* dvh 在手機 Safari 才是真正的可視高度（100vh 不含伸縮的網址欄，會多出一段捲動） */
+@supports (height:100dvh){ .pm-slide{min-height:calc(100dvh - 180px)} }
+.pm-slide-in{flex:1;display:flex;flex-direction:column;justify-content:center;
+  padding:clamp(10px,2.5vh,40px) 2px clamp(18px,3vh,44px)}
+.pm-slide-to{font-size:clamp(14px,1.45vw,22px);color:var(--tx3);margin-bottom:clamp(6px,.8vw,12px);letter-spacing:.05em}
+.pm-slide-name{font-size:clamp(30px,5.4vw,72px);font-weight:700;color:var(--ac);
+  line-height:1.2;margin-bottom:clamp(20px,3.4vw,44px);letter-spacing:-.015em}
+/* 🔴 權重必須壓過 .pm-lc .txt（0,2,0）—— 只寫 .pm-slide-txt（0,1,0）會被它蓋掉，
+   v1.69 的內文其實一直是 13.5px，這才是「畫面太空」的真正原因。 */
+.pm-slide .pm-lc .txt,.pm-slide .pm-slide-txt{font-size:clamp(19px,2.5vw,36px);line-height:1.72}
+/* 內容短的時候要放得更大，否則一句話擺在整個投影幕上只會顯得空（sz 由 pmPlaySlideHtml 算） */
+.pm-slide.lg .pm-lc .txt,.pm-slide.lg .pm-slide-txt{font-size:clamp(21px,3.1vw,46px);line-height:1.62}
+.pm-slide.xl .pm-lc .txt,.pm-slide.xl .pm-slide-txt{font-size:clamp(24px,3.8vw,58px);line-height:1.5}
+.pm-slide-by{margin-top:clamp(22px,3vw,44px);font-size:clamp(14px,1.5vw,23px);color:var(--tx3);text-align:right}
+/* 雙語兩欄在投影時要有足夠的欄距與更明顯的分隔線，否則大字擠在一起分不出是哪一邊 */
+.pm-slide .pm-bi{gap:clamp(16px,2.8vw,48px)}
+.pm-slide .pm-lc{border-left-width:3px;padding-left:clamp(12px,1.3vw,22px)}
+.pm-slide .pm-lc .lbl{font-size:clamp(11px,1.05vw,16px);margin-bottom:clamp(6px,.8vw,12px);letter-spacing:.07em}
 .pm-slide-ctrl{position:sticky;bottom:0;display:flex;gap:10px;align-items:center;justify-content:center;
   flex-wrap:wrap;padding:12px 0 4px;background:linear-gradient(to top,var(--bg) 62%,transparent)}
 .pm-slide-ctrl .pos{font-family:var(--fm);font-size:12px;color:var(--tx3);min-width:56px;text-align:center}
+/* 字一放大，兩欄就擠了：投影片的雙語比一般清單更早改成上下堆疊 */
+@media (max-width:900px){ .pm-slide .pm-bi{grid-template-columns:1fr} }
 @media (max-width:640px){
-  .pm-slide{min-height:calc(100vh - 170px)}
-  .pm-slide-name{font-size:26px;margin-bottom:16px}
-  .pm-slide-txt{font-size:18px;line-height:1.75}
+  body.pm-playing .wrap{padding:8px 12px 12px}
+  .pm-slide{min-height:calc(100vh - 158px)}
   .pm-slide-ctrl{gap:6px}
 }
+@supports (height:100dvh){ @media (max-width:640px){ .pm-slide{min-height:calc(100dvh - 158px)} } }
 
-/* 感恩對象的下拉挑選（v1.68）
+/* 感恩對象的下拉挑選（v1.69）
    原本用 <input list> + <datalist>：iOS Safari 完全不顯示任何可下拉的提示，
    桌機 Chrome 也只在特定狀態才閃一個很小的箭頭 —— 使用者根本不知道可以挑。
    改成自己畫的面板，手機與桌機長得一模一樣，箭頭永遠看得見。
@@ -307,7 +326,7 @@ select,select option,option{background:var(--s2);color:var(--tx)}
     <a class="logo" href="javascript:void(0)">
       <div class="logo-mark">告</div>
       <div class="logo-text" data-i18n="app_title">公告與紀錄</div>
-      <span class="logo-ver">v1.68</span>
+      <span class="logo-ver">v1.69</span>
     </a>
     <div class="topbar-right">
       <div id="langChips" style="display:flex;gap:4px"></div>
@@ -2229,7 +2248,7 @@ function switchTab(name) {
   if (name === 'woody') wrLoadList();
   // 三種 pm* 會議共用 #pm-shell：先把它搬到目前的頁籤，再依 kind 載入清單
   if (PM_KINDS[name]) { pmMountShell(name); pmLoadList(); }
-  else pmPollStop();
+  else { pmPollStop(); document.body.classList.remove('pm-playing'); }
   if (name === 'poll') plLoadList(); else plPollStop();
 }
 
@@ -3728,7 +3747,7 @@ function wrPrint(){
 // ═══════════════════════════════════════════════
 const PM_LANGS = [['zh-TW','繁體中文'],['zh-CN','简体中文'],['vi','Tiếng Việt'],['en','English'],['ja','日本語']];
 const PM_LANG_SHORT = { 'zh-TW':'繁中','zh-CN':'简中','vi':'越南語','en':'English','ja':'日本語' };
-// 階段清單改為「每種會議自己一份」（v1.68）：意見徵集沒有「對策」，投票也是可選的。
+// 階段清單改為「每種會議自己一份」（v1.69）：意見徵集沒有「對策」，投票也是可選的。
 // PM_PHASES 保留為驗屍／腦力激盪的完整版；實際取用一律經 pmPhases()，那裡才看得到
 // 「這一場有沒有開投票」。所有比較階段先後的地方（pmPhaseIdx／pmCanGoPhase／pmSetPhase）
 // 都吃 pmPhases() 的結果，所以少一個階段時「往前只能走一步」自動就跳過它。
@@ -4174,7 +4193,7 @@ function pmPhaseLabelOf(kind, p) {
 }
 function pmVoteCap() { return PMK().voteCap; }
 
-// ── 行為旗標的唯一取用點 pmOpt()（v1.68）──
+// ── 行為旗標的唯一取用點 pmOpt()（v1.69）──
 // 🔴 三種會議的旗標來源不同，但讀取端只准有這一個入口：
 //    驗屍／腦力激盪 → 一律讀 PM_KINDS（寫死，configurable 是空的，session 的 opt_* 再怎麼被塞值都無效）
 //    意見徵集       → 讀該場 session 的 opt_*；沒設過（null／undefined）才退回 PM_KINDS 的保底值
@@ -4197,7 +4216,7 @@ function pmTplOf(s) { return PM_TEMPLATES[(s && s.template) || ''] || null; }
 function pmTpl() { return pmTplOf(pmSession); }
 function pmFieldCount() { const t = pmTpl(); return t ? t.fields : 1; }
 
-// ── 這一場實際有哪些階段（v1.68）──
+// ── 這一場實際有哪些階段（v1.69）──
 // 沒宣告 phases 的類型（驗屍／腦力激盪）用完整版；意見徵集沒有「對策」，
 // 且 ranking 只有在主席建會時勾了「要投票」才會出現。所有比較階段先後的邏輯都吃這個結果，
 // 所以少一個階段時「往前只能走一步」會自動跳過它，不必另外寫特例。
@@ -4673,6 +4692,9 @@ function pmShowView(which) {
   document.getElementById('pm-list-view').style.display   = which === 'list'   ? '' : 'none';
   document.getElementById('pm-create-view').style.display = which === 'create' ? '' : 'none';
   document.getElementById('pm-room-view').style.display   = which === 'room'   ? '' : 'none';
+  // 只有會議室裡的播放才需要放寬版面：離開會議室（回清單／建會）一律收回，
+  // 否則別的頁籤會繼承 1560px 的內容欄
+  if (which !== 'room') document.body.classList.remove('pm-playing');
 }
 
 function pmSetFilter(f) {
@@ -4936,7 +4958,8 @@ async function pmFetchEntries() {
   const rows = await SB.get('premortem_entries', '?session_id=eq.' + encodeURIComponent(pmSession.id) + '&order=created_at.asc');
   pmEntries = rows || [];
 }
-function pmBackToList() { pmPollStop(); pmSession = null; pmEntries = []; pmMitigations = []; pmBiDraft = { desc:{ a:null, b:null }, scenario:{ a:null, b:null } };
+function pmBackToList() { document.body.classList.remove('pm-playing');
+  pmPollStop(); pmSession = null; pmEntries = []; pmMitigations = []; pmBiDraft = { desc:{ a:null, b:null }, scenario:{ a:null, b:null } };
   pmSumEditing = false; pmSumDraft = { a: null, b: null };
   pmMeetEditing = false; pmMeetDraft = { at: null, loc: null, att: null }; pmLoadList(); }
 
@@ -4994,7 +5017,7 @@ async function pmRetryTranslations() {
 function pmSaveDraft() { const el = document.getElementById('pm-writebox'); if (el) pmDraft = el.value; }
 function pmRestoreDraft() { const el = document.getElementById('pm-writebox'); if (el && pmDraft) el.value = pmDraft; }
 
-// ── 重繪時不要把正在打字的人踢出輸入框（v1.68）──
+// ── 重繪時不要把正在打字的人踢出輸入框（v1.69）──
 // 會議室是整塊 innerHTML 重畫的：別人一送出內容／一則譯文補完，輪詢就把 DOM 換掉，
 // 正在打對策或填寫框的人游標會彈掉、中文輸入法組字到一半會被砍斷。兩道防線：
 //   ① 正在輸入文字時直接延後重繪（pmRerender），等他離開輸入框再畫；
@@ -5111,10 +5134,13 @@ async function pmSetPhase(p) {
 // ── 會議室主體（依角色＋階段）──
 function pmRenderRoom() {
   pmRenderPhasebar();
+  // 播放中把內容欄放寬（見 body.pm-playing .wrap）。放在最前面且吃 pmPlaying() 的即時結果，
+  // 所以停止播放、離開會議、session 變 null 都會自動收回去。
+  document.body.classList.toggle('pm-playing', pmPlaying());
   const body = document.getElementById('pm-room-body');
   if (!pmSession) { body.innerHTML = ''; return; }
   const s = pmSession, chair = pmIsChair(s), K = PMK(), T = K.t;
-  // ── 播放模式接管整個畫面（v1.68）──
+  // ── 播放模式接管整個畫面（v1.69）──
   // 🔴 這個 early return 是刻意的：投影時只該看到人名與內容，
   //    會議資訊卡、專案描述／情境、匯出工具列全部不畫。要加新面板前先想清楚它該不該上投影幕。
   if (pmPlaying()) {
@@ -5397,7 +5423,7 @@ async function pmToggleVote(id) {
   pmMaybeAutoAdvance();   // 自己這一票可能就是最後一票
 }
 
-// ── 全員投滿自動進入下一階段（v1.68）──
+// ── 全員投滿自動進入下一階段（v1.69）──
 // 每個人都把票投完了還要等主席按鍵，是白等：票數已成定局，再等只是延遲會議。
 // 🔴 只有主席的瀏覽器能真的推進階段 —— sb-proxy 的欄位守衛規定 PATCH phase 必須是該場主席本人，
 //    其他人送出去只會拿到 403。所以判斷雖然人人都算得出來（用來顯示進度），動作只由主席端發出。
@@ -5762,7 +5788,7 @@ function pmSendMail() {
   try { window.location.href = url; boardToast(BT('bm_mail_ok')); } catch (e) { boardToast(BT('t_mail_fail')); }
 }
 
-// ═══════ 展示階段的播放模式（v1.68）═══════
+// ═══════ 展示階段的播放模式（v1.69）═══════
 // 「讓所有留言展現在螢幕上，讓大家逐一看過」——一次一則、大字、雙語並陳，適合會議室投影。
 // 🔴 全場同步：主席按下一則時把索引寫進 premortem_sessions.play_idx，其他人靠既有的 7 秒輪詢
 //    跳到同一則。play_idx 在 sb-proxy 的 PM_PROTECTED 裡，只有該場主席改得動 ——
@@ -5789,7 +5815,7 @@ function pmPlayGo(d) {
   const i = Math.max(0, Math.min(n - 1, pmPlayIdx() + d));
   if (i !== pmPlayIdx()) pmPlaySet(i);
 }
-// 🔴 投影片上只有「人名＋內容」（v1.68）。
+// 🔴 投影片上只有「人名＋內容」（v1.69）。
 //    面板標題、「第 X／N 則」、進度點、跟隨提示全部拿掉了 —— 那些是操作資訊，不是會議內容，
 //    投在牆上只會分散注意力。主席的控制列與計數獨立成一條浮在底部的操作列，
 //    **只有主席看得到**；與會者的畫面上完全沒有任何多餘元素。
@@ -5823,7 +5849,11 @@ function pmPlaySlideHtml(chair) {
       '<button class="btn ghost sm" onclick="pmPlayStop()">' + escHtml(BT('pm_play_stop')) + '</button>' +
       '</div>'
     : '';
-  return '<div class="pm-slide">' +
+  // 內容越短、字就放越大 —— 一句話擺在整個投影幕上，用一般字級會空掉一大半。
+  // 取兩種語言中較長的那一邊為準（雙語並排時是它決定會不會爆版）。
+  const len = Math.max((e.text_a || e.text_src || '').length, (e.text_b || e.text_src || '').length);
+  const sz = len <= 42 ? ' xl' : (len <= 120 ? ' lg' : '');
+  return '<div class="pm-slide' + sz + '">' +
     '<div class="pm-slide-in">' + head + body + who + '</div>' + ctrl + '</div>';
 }
 // 主席的鍵盤簡報器：← → 換頁、Esc 結束。在輸入框裡打字時不攔（展示階段沒有輸入框，但別的階段有）
@@ -5870,7 +5900,7 @@ function pmTargetFieldHtml() {
     '<div style="font-size:11px;color:var(--tx3);margin-top:3px">' + escHtml(BT('pm_target_hint')) + '</div></div>';
 }
 
-// ── 感恩對象的下拉挑選（v1.68）──
+// ── 感恩對象的下拉挑選（v1.69）──
 // 🔴 不要退回 <datalist>：iOS Safari 不畫任何可下拉的提示，桌機 Chrome 的小箭頭也只在
 //    特定狀態出現，使用者根本不知道能挑。這裡自己畫面板，手機與桌機行為一致。
 //    仍保留自由輸入（清單外的對象：團隊、廠商、客戶）。

@@ -5,7 +5,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#080C14">
-<title>COMART · 公告與紀錄 v1.66</title>
+<title>COMART · 公告與紀錄 v1.67</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -36,12 +36,36 @@ h1,h2,h3,p{margin:0}
 .topbar-main{display:flex;align-items:center;gap:10px;padding:10px 16px;max-width:1180px;margin:0 auto}
 .logo{display:flex;align-items:center;gap:9px;text-decoration:none;color:inherit}
 .logo-mark{width:30px;height:30px;background:var(--ac);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-style:italic;font-size:15px;color:#fff;font-weight:400;flex-shrink:0}
-.logo-text{font-family:var(--fd);font-style:italic;font-size:16px;color:var(--tx);letter-spacing:-.01em}
-.logo-ver{font-family:var(--fm);font-size:10px;color:var(--tx3);margin-left:6px}
+/* 🔴 white-space:nowrap 是必要的（v1.67）：topbar-main 是一列 flex，窄螢幕塞不下時
+   標題會被壓到只剩一個字的寬度，然後逐字換行變成直排，五個字吃掉半個手機畫面。 */
+.logo-text{font-family:var(--fd);font-style:italic;font-size:16px;color:var(--tx);letter-spacing:-.01em;white-space:nowrap}
+.logo-ver{font-family:var(--fm);font-size:10px;color:var(--tx3);margin-left:6px;white-space:nowrap}
 #portal-back-btn{padding:5px 11px;border:1px solid var(--br);border-radius:var(--r);font-size:12px;color:var(--tx2);text-decoration:none;background:transparent;transition:all .15s;white-space:nowrap;margin-right:6px}
 #portal-back-btn:hover{background:var(--s2);color:var(--tx)}
 .topbar-right{display:flex;gap:8px;margin-left:auto;align-items:center;font-size:12px;color:var(--tx3)}
-.who-badge{display:flex;align-items:center;gap:6px;padding:5px 10px;border:1px solid var(--br);border-radius:20px;font-size:12px;color:var(--tx2)}
+.who-badge{display:flex;align-items:center;gap:6px;padding:5px 10px;border:1px solid var(--br);border-radius:20px;font-size:12px;color:var(--tx2);white-space:nowrap}
+
+/* ── 手機版 topbar（v1.67）──
+   窄螢幕一列放不下「← Portal ＋ 告 ＋ 公告與紀錄 ＋ v1.67 ＋ 五顆語言鈕 ＋ 姓名」。
+   原本的下場：標題被壓成一個字寬、逐字換行變直排（整列高度暴增到 ~150px），日本語鈕被切掉。
+   ① nowrap（見上）先把「直排」這個失效模式徹底擋掉，高度立刻回到一列
+   ② 右側改成可橫向捲動 —— 語言鈕與姓名都不再被裁掉，跟下方頁籤同一套操作手感
+   ③ 標題縮小；真的很窄的機型（≤420px，如 iPhone 15 Pro 的 393px）直接藏掉，
+      告 標記與下方頁籤已經足夠識別，這五個字是整列裡最可省的 */
+@media (max-width:640px){
+  .topbar-main{gap:8px;padding:8px 12px}
+  #portal-back-btn{margin-right:0;flex-shrink:0}
+  .logo{gap:7px;flex-shrink:0}
+  .logo-text{font-size:14px}
+  .logo-ver{margin-left:3px}
+  .topbar-right{gap:6px;min-width:0;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .topbar-right::-webkit-scrollbar{display:none}
+  #langChips{flex-shrink:0}
+  .who-badge{flex-shrink:0;padding:4px 9px;font-size:11px}
+}
+@media (max-width:420px){
+  .logo-text{display:none}
+}
 
 /* ── TABS ─────────────── */
 .tabbar{display:flex;gap:2px;max-width:1180px;margin:0 auto;padding:0 16px;border-bottom:1px solid var(--br);overflow-x:auto}
@@ -164,7 +188,7 @@ select,select option,option{background:var(--s2);color:var(--tx)}
 .pm-lc .lbl{font-size:10px;color:var(--tx3);letter-spacing:.03em;margin-bottom:2px}
 .pm-lc .txt{white-space:pre-wrap;font-size:13.5px;line-height:1.7}
 
-/* 感恩對象的下拉挑選（v1.66）
+/* 感恩對象的下拉挑選（v1.67）
    原本用 <input list> + <datalist>：iOS Safari 完全不顯示任何可下拉的提示，
    桌機 Chrome 也只在特定狀態才閃一個很小的箭頭 —— 使用者根本不知道可以挑。
    改成自己畫的面板，手機與桌機長得一模一樣，箭頭永遠看得見。
@@ -264,7 +288,7 @@ select,select option,option{background:var(--s2);color:var(--tx)}
     <a class="logo" href="javascript:void(0)">
       <div class="logo-mark">告</div>
       <div class="logo-text" data-i18n="app_title">公告與紀錄</div>
-      <span class="logo-ver">v1.66</span>
+      <span class="logo-ver">v1.67</span>
     </a>
     <div class="topbar-right">
       <div id="langChips" style="display:flex;gap:4px"></div>
@@ -1987,6 +2011,10 @@ function bRenderLangChips() {
   const box = document.getElementById('langChips'); if (!box) return;
   box.innerHTML = B_LANGS.map(l =>
     '<button class="lchip' + (l[0] === BLANG ? ' on' : '') + '" data-l="' + l[0] + '" onclick="bSetLang(\'' + l[0] + '\')">' + l[1] + '</button>').join('');
+  // 手機版 topbar 右側是橫向捲動的：把目前語言捲進視野，否則選了日本語之後
+  // 下次進來會看到一排都沒亮的鈕（亮的那顆在捲動範圍外）
+  const on = box.querySelector('.lchip.on');
+  if (on) { try { on.scrollIntoView({ block: 'nearest', inline: 'nearest' }); } catch (e) {} }
 }
 // 靜態 HTML：data-i18n（文字）／data-i18n-ph（placeholder）／data-i18n-title（title）
 function bApplyI18n(root) {
@@ -3686,7 +3714,7 @@ function wrPrint(){
 // ═══════════════════════════════════════════════
 const PM_LANGS = [['zh-TW','繁體中文'],['zh-CN','简体中文'],['vi','Tiếng Việt'],['en','English'],['ja','日本語']];
 const PM_LANG_SHORT = { 'zh-TW':'繁中','zh-CN':'简中','vi':'越南語','en':'English','ja':'日本語' };
-// 階段清單改為「每種會議自己一份」（v1.66）：意見徵集沒有「對策」，投票也是可選的。
+// 階段清單改為「每種會議自己一份」（v1.67）：意見徵集沒有「對策」，投票也是可選的。
 // PM_PHASES 保留為驗屍／腦力激盪的完整版；實際取用一律經 pmPhases()，那裡才看得到
 // 「這一場有沒有開投票」。所有比較階段先後的地方（pmPhaseIdx／pmCanGoPhase／pmSetPhase）
 // 都吃 pmPhases() 的結果，所以少一個階段時「往前只能走一步」自動就跳過它。
@@ -4132,7 +4160,7 @@ function pmPhaseLabelOf(kind, p) {
 }
 function pmVoteCap() { return PMK().voteCap; }
 
-// ── 行為旗標的唯一取用點 pmOpt()（v1.66）──
+// ── 行為旗標的唯一取用點 pmOpt()（v1.67）──
 // 🔴 三種會議的旗標來源不同，但讀取端只准有這一個入口：
 //    驗屍／腦力激盪 → 一律讀 PM_KINDS（寫死，configurable 是空的，session 的 opt_* 再怎麼被塞值都無效）
 //    意見徵集       → 讀該場 session 的 opt_*；沒設過（null／undefined）才退回 PM_KINDS 的保底值
@@ -4155,7 +4183,7 @@ function pmTplOf(s) { return PM_TEMPLATES[(s && s.template) || ''] || null; }
 function pmTpl() { return pmTplOf(pmSession); }
 function pmFieldCount() { const t = pmTpl(); return t ? t.fields : 1; }
 
-// ── 這一場實際有哪些階段（v1.66）──
+// ── 這一場實際有哪些階段（v1.67）──
 // 沒宣告 phases 的類型（驗屍／腦力激盪）用完整版；意見徵集沒有「對策」，
 // 且 ranking 只有在主席建會時勾了「要投票」才會出現。所有比較階段先後的邏輯都吃這個結果，
 // 所以少一個階段時「往前只能走一步」會自動跳過它，不必另外寫特例。
@@ -4952,7 +4980,7 @@ async function pmRetryTranslations() {
 function pmSaveDraft() { const el = document.getElementById('pm-writebox'); if (el) pmDraft = el.value; }
 function pmRestoreDraft() { const el = document.getElementById('pm-writebox'); if (el && pmDraft) el.value = pmDraft; }
 
-// ── 重繪時不要把正在打字的人踢出輸入框（v1.66）──
+// ── 重繪時不要把正在打字的人踢出輸入框（v1.67）──
 // 會議室是整塊 innerHTML 重畫的：別人一送出內容／一則譯文補完，輪詢就把 DOM 換掉，
 // 正在打對策或填寫框的人游標會彈掉、中文輸入法組字到一半會被砍斷。兩道防線：
 //   ① 正在輸入文字時直接延後重繪（pmRerender），等他離開輸入框再畫；
@@ -5345,7 +5373,7 @@ async function pmToggleVote(id) {
   pmMaybeAutoAdvance();   // 自己這一票可能就是最後一票
 }
 
-// ── 全員投滿自動進入下一階段（v1.66）──
+// ── 全員投滿自動進入下一階段（v1.67）──
 // 每個人都把票投完了還要等主席按鍵，是白等：票數已成定局，再等只是延遲會議。
 // 🔴 只有主席的瀏覽器能真的推進階段 —— sb-proxy 的欄位守衛規定 PATCH phase 必須是該場主席本人，
 //    其他人送出去只會拿到 403。所以判斷雖然人人都算得出來（用來顯示進度），動作只由主席端發出。
@@ -5710,7 +5738,7 @@ function pmSendMail() {
   try { window.location.href = url; boardToast(BT('bm_mail_ok')); } catch (e) { boardToast(BT('t_mail_fail')); }
 }
 
-// ═══════ 展示階段的播放模式（v1.66）═══════
+// ═══════ 展示階段的播放模式（v1.67）═══════
 // 「讓所有留言展現在螢幕上，讓大家逐一看過」——一次一則、大字、雙語並陳，適合會議室投影。
 // 🔴 全場同步：主席按下一則時把索引寫進 premortem_sessions.play_idx，其他人靠既有的 7 秒輪詢
 //    跳到同一則。play_idx 在 sb-proxy 的 PM_PROTECTED 裡，只有該場主席改得動 ——
@@ -5817,7 +5845,7 @@ function pmTargetFieldHtml() {
     '<div style="font-size:11px;color:var(--tx3);margin-top:3px">' + escHtml(BT('pm_target_hint')) + '</div></div>';
 }
 
-// ── 感恩對象的下拉挑選（v1.66）──
+// ── 感恩對象的下拉挑選（v1.67）──
 // 🔴 不要退回 <datalist>：iOS Safari 不畫任何可下拉的提示，桌機 Chrome 的小箭頭也只在
 //    特定狀態出現，使用者根本不知道能挑。這裡自己畫面板，手機與桌機行為一致。
 //    仍保留自由輸入（清單外的對象：團隊、廠商、客戶）。

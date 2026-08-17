@@ -5,7 +5,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#080C14">
-<title>COMART · 公告與紀錄 v1.67</title>
+<title>COMART · 公告與紀錄 v1.68</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -36,7 +36,7 @@ h1,h2,h3,p{margin:0}
 .topbar-main{display:flex;align-items:center;gap:10px;padding:10px 16px;max-width:1180px;margin:0 auto}
 .logo{display:flex;align-items:center;gap:9px;text-decoration:none;color:inherit}
 .logo-mark{width:30px;height:30px;background:var(--ac);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-style:italic;font-size:15px;color:#fff;font-weight:400;flex-shrink:0}
-/* 🔴 white-space:nowrap 是必要的（v1.67）：topbar-main 是一列 flex，窄螢幕塞不下時
+/* 🔴 white-space:nowrap 是必要的（v1.68）：topbar-main 是一列 flex，窄螢幕塞不下時
    標題會被壓到只剩一個字的寬度，然後逐字換行變成直排，五個字吃掉半個手機畫面。 */
 .logo-text{font-family:var(--fd);font-style:italic;font-size:16px;color:var(--tx);letter-spacing:-.01em;white-space:nowrap}
 .logo-ver{font-family:var(--fm);font-size:10px;color:var(--tx3);margin-left:6px;white-space:nowrap}
@@ -45,8 +45,8 @@ h1,h2,h3,p{margin:0}
 .topbar-right{display:flex;gap:8px;margin-left:auto;align-items:center;font-size:12px;color:var(--tx3)}
 .who-badge{display:flex;align-items:center;gap:6px;padding:5px 10px;border:1px solid var(--br);border-radius:20px;font-size:12px;color:var(--tx2);white-space:nowrap}
 
-/* ── 手機版 topbar（v1.67）──
-   窄螢幕一列放不下「← Portal ＋ 告 ＋ 公告與紀錄 ＋ v1.67 ＋ 五顆語言鈕 ＋ 姓名」。
+/* ── 手機版 topbar（v1.68）──
+   窄螢幕一列放不下「← Portal ＋ 告 ＋ 公告與紀錄 ＋ v1.68 ＋ 五顆語言鈕 ＋ 姓名」。
    原本的下場：標題被壓成一個字寬、逐字換行變直排（整列高度暴增到 ~150px），日本語鈕被切掉。
    ① nowrap（見上）先把「直排」這個失效模式徹底擋掉，高度立刻回到一列
    ② 右側改成可橫向捲動 —— 語言鈕與姓名都不再被裁掉，跟下方頁籤同一套操作手感
@@ -188,7 +188,26 @@ select,select option,option{background:var(--s2);color:var(--tx)}
 .pm-lc .lbl{font-size:10px;color:var(--tx3);letter-spacing:.03em;margin-bottom:2px}
 .pm-lc .txt{white-space:pre-wrap;font-size:13.5px;line-height:1.7}
 
-/* 感恩對象的下拉挑選（v1.67）
+/* 播放模式的投影版面（v1.68）
+   只有人名與內容。內容垂直置中並撐滿可視高度，投影時不會縮在畫面上緣一小塊。
+   主席的操作列固定在底部（sticky），換頁時位置不會跟著內容長短跳來跳去。 */
+.pm-slide{display:flex;flex-direction:column;min-height:calc(100vh - 190px)}
+.pm-slide-in{flex:1;display:flex;flex-direction:column;justify-content:center;padding:8px 4px 20px}
+.pm-slide-to{font-size:15px;color:var(--tx3);margin-bottom:5px}
+.pm-slide-name{font-size:32px;font-weight:700;color:var(--ac);line-height:1.3;margin-bottom:22px;letter-spacing:-.01em}
+.pm-slide-txt{font-size:21px;line-height:1.8}
+.pm-slide-by{margin-top:24px;font-size:15px;color:var(--tx3);text-align:right}
+.pm-slide-ctrl{position:sticky;bottom:0;display:flex;gap:10px;align-items:center;justify-content:center;
+  flex-wrap:wrap;padding:12px 0 4px;background:linear-gradient(to top,var(--bg) 62%,transparent)}
+.pm-slide-ctrl .pos{font-family:var(--fm);font-size:12px;color:var(--tx3);min-width:56px;text-align:center}
+@media (max-width:640px){
+  .pm-slide{min-height:calc(100vh - 170px)}
+  .pm-slide-name{font-size:26px;margin-bottom:16px}
+  .pm-slide-txt{font-size:18px;line-height:1.75}
+  .pm-slide-ctrl{gap:6px}
+}
+
+/* 感恩對象的下拉挑選（v1.68）
    原本用 <input list> + <datalist>：iOS Safari 完全不顯示任何可下拉的提示，
    桌機 Chrome 也只在特定狀態才閃一個很小的箭頭 —— 使用者根本不知道可以挑。
    改成自己畫的面板，手機與桌機長得一模一樣，箭頭永遠看得見。
@@ -288,7 +307,7 @@ select,select option,option{background:var(--s2);color:var(--tx)}
     <a class="logo" href="javascript:void(0)">
       <div class="logo-mark">告</div>
       <div class="logo-text" data-i18n="app_title">公告與紀錄</div>
-      <span class="logo-ver">v1.67</span>
+      <span class="logo-ver">v1.68</span>
     </a>
     <div class="topbar-right">
       <div id="langChips" style="display:flex;gap:4px"></div>
@@ -940,9 +959,8 @@ const B_I18N = {
   pm_need_target_f:'請先填「{f}」',
   pmt_gratitude_f1:'感謝對象', pmt_gratitude_f2:'具體事實',
   pmt_gratitude_f2ph:'他做了什麼？越具體越好，例如「上週三留下來陪我把報告趕完」…',
-  pm_play_title:'逐則展示', pm_play_start:'▶ 播放', pm_play_stop:'✕ 結束播放',
+  pm_play_start:'▶ 播放', pm_play_stop:'✕ 結束播放',
   pm_play_prev:'上一則', pm_play_next:'下一則', pm_play_pos:'第 {i}／{n} 則',
-  pm_play_keys:'鍵盤：← → 換頁、Esc 結束播放', pm_play_follow:'主席（{name}）控制播放，你的畫面會跟著走。',
   pm_play_hint:'按「▶ 播放」可逐則放大呈現，全場畫面會跟著跳到同一則，適合投影。',
   pm_play_fail:'播放同步失敗：',
   pm_sum_sub_cl:'彙整 · 模式 · 會議結論',
@@ -1121,9 +1139,8 @@ const B_I18N = {
   pm_need_target_f:'请先填“{f}”',
   pmt_gratitude_f1:'感谢对象', pmt_gratitude_f2:'具体事实',
   pmt_gratitude_f2ph:'他做了什么？越具体越好，例如“上周三留下来陪我把报告赶完”…',
-  pm_play_title:'逐则展示', pm_play_start:'▶ 播放', pm_play_stop:'✕ 结束播放',
+  pm_play_start:'▶ 播放', pm_play_stop:'✕ 结束播放',
   pm_play_prev:'上一则', pm_play_next:'下一则', pm_play_pos:'第 {i}／{n} 则',
-  pm_play_keys:'键盘：← → 换页、Esc 结束播放', pm_play_follow:'主席（{name}）控制播放，你的画面会跟着走。',
   pm_play_hint:'按“▶ 播放”可逐则放大呈现，全场画面会跟着跳到同一则，适合投影。',
   pm_play_fail:'播放同步失败：',
   pm_sum_sub_cl:'汇整 · 模式 · 会议结论',
@@ -1302,9 +1319,8 @@ const B_I18N = {
   pm_need_target_f:'Please fill in \u201C{f}\u201D first',
   pmt_gratitude_f1:'Who you are thanking', pmt_gratitude_f2:'What they specifically did',
   pmt_gratitude_f2ph:'What did they do? The more specific the better, e.g. \u201Cstayed late last Wednesday to help me finish the report\u201D…',
-  pm_play_title:'Walkthrough', pm_play_start:'▶ Play', pm_play_stop:'✕ Stop',
+  pm_play_start:'▶ Play', pm_play_stop:'✕ Stop',
   pm_play_prev:'Previous', pm_play_next:'Next', pm_play_pos:'{i} of {n}',
-  pm_play_keys:'Keyboard: ← → to move, Esc to stop', pm_play_follow:'The chair ({name}) is driving; your screen follows.',
   pm_play_hint:'Hit "▶ Play" to show entries one at a time, enlarged. Everyone\u2019s screen follows to the same entry — made for projecting.',
   pm_play_fail:'Playback sync failed: ',
   pm_sum_sub_cl:'Summary · Patterns · Conclusion',
@@ -1483,9 +1499,8 @@ const B_I18N = {
   pm_need_target_f:'Vui lòng điền “{f}” trước',
   pmt_gratitude_f1:'Người bạn muốn cảm ơn', pmt_gratitude_f2:'Việc cụ thể họ đã làm',
   pmt_gratitude_f2ph:'Họ đã làm gì? Càng cụ thể càng tốt, VD “thứ Tư tuần trước ở lại giúp tôi làm xong báo cáo”…',
-  pm_play_title:'Trình bày từng mục', pm_play_start:'▶ Phát', pm_play_stop:'✕ Dừng',
+  pm_play_start:'▶ Phát', pm_play_stop:'✕ Dừng',
   pm_play_prev:'Trước', pm_play_next:'Tiếp', pm_play_pos:'Mục {i}/{n}',
-  pm_play_keys:'Bàn phím: ← → chuyển, Esc dừng', pm_play_follow:'Chủ tọa ({name}) đang điều khiển; màn hình của bạn sẽ đi theo.',
   pm_play_hint:'Bấm “▶ Phát” để hiển thị phóng to từng mục. Màn hình của mọi người sẽ nhảy theo cùng một mục — rất hợp để trình chiếu.',
   pm_play_fail:'Đồng bộ trình chiếu thất bại: ',
   pm_sum_sub_cl:'Tổng hợp · Mô thức · Kết luận',
@@ -1664,9 +1679,8 @@ const B_I18N = {
   pm_need_target_f:'まず「{f}」を入力してください',
   pmt_gratitude_f1:'感謝したい相手', pmt_gratitude_f2:'具体的にしてくれたこと',
   pmt_gratitude_f2ph:'何をしてくれましたか？具体的なほど良いです。例：「先週の水曜、残って報告書を仕上げるのを手伝ってくれた」…',
-  pm_play_title:'1件ずつ提示', pm_play_start:'▶ 再生', pm_play_stop:'✕ 終了',
+  pm_play_start:'▶ 再生', pm_play_stop:'✕ 終了',
   pm_play_prev:'前へ', pm_play_next:'次へ', pm_play_pos:'{n} 件中 {i} 件目',
-  pm_play_keys:'キーボード：← → で移動、Esc で終了', pm_play_follow:'司会（{name}）が操作しています。画面は自動で追随します。',
   pm_play_hint:'「▶ 再生」を押すと1件ずつ拡大表示され、全員の画面が同じ1件に追随します。投影に最適です。',
   pm_play_fail:'再生の同期に失敗しました：',
   pm_sum_sub_cl:'要約 · 傾向 · 会議結論',
@@ -3714,7 +3728,7 @@ function wrPrint(){
 // ═══════════════════════════════════════════════
 const PM_LANGS = [['zh-TW','繁體中文'],['zh-CN','简体中文'],['vi','Tiếng Việt'],['en','English'],['ja','日本語']];
 const PM_LANG_SHORT = { 'zh-TW':'繁中','zh-CN':'简中','vi':'越南語','en':'English','ja':'日本語' };
-// 階段清單改為「每種會議自己一份」（v1.67）：意見徵集沒有「對策」，投票也是可選的。
+// 階段清單改為「每種會議自己一份」（v1.68）：意見徵集沒有「對策」，投票也是可選的。
 // PM_PHASES 保留為驗屍／腦力激盪的完整版；實際取用一律經 pmPhases()，那裡才看得到
 // 「這一場有沒有開投票」。所有比較階段先後的地方（pmPhaseIdx／pmCanGoPhase／pmSetPhase）
 // 都吃 pmPhases() 的結果，所以少一個階段時「往前只能走一步」自動就跳過它。
@@ -4160,7 +4174,7 @@ function pmPhaseLabelOf(kind, p) {
 }
 function pmVoteCap() { return PMK().voteCap; }
 
-// ── 行為旗標的唯一取用點 pmOpt()（v1.67）──
+// ── 行為旗標的唯一取用點 pmOpt()（v1.68）──
 // 🔴 三種會議的旗標來源不同，但讀取端只准有這一個入口：
 //    驗屍／腦力激盪 → 一律讀 PM_KINDS（寫死，configurable 是空的，session 的 opt_* 再怎麼被塞值都無效）
 //    意見徵集       → 讀該場 session 的 opt_*；沒設過（null／undefined）才退回 PM_KINDS 的保底值
@@ -4183,7 +4197,7 @@ function pmTplOf(s) { return PM_TEMPLATES[(s && s.template) || ''] || null; }
 function pmTpl() { return pmTplOf(pmSession); }
 function pmFieldCount() { const t = pmTpl(); return t ? t.fields : 1; }
 
-// ── 這一場實際有哪些階段（v1.67）──
+// ── 這一場實際有哪些階段（v1.68）──
 // 沒宣告 phases 的類型（驗屍／腦力激盪）用完整版；意見徵集沒有「對策」，
 // 且 ranking 只有在主席建會時勾了「要投票」才會出現。所有比較階段先後的邏輯都吃這個結果，
 // 所以少一個階段時「往前只能走一步」會自動跳過它，不必另外寫特例。
@@ -4980,7 +4994,7 @@ async function pmRetryTranslations() {
 function pmSaveDraft() { const el = document.getElementById('pm-writebox'); if (el) pmDraft = el.value; }
 function pmRestoreDraft() { const el = document.getElementById('pm-writebox'); if (el && pmDraft) el.value = pmDraft; }
 
-// ── 重繪時不要把正在打字的人踢出輸入框（v1.67）──
+// ── 重繪時不要把正在打字的人踢出輸入框（v1.68）──
 // 會議室是整塊 innerHTML 重畫的：別人一送出內容／一則譯文補完，輪詢就把 DOM 換掉，
 // 正在打對策或填寫框的人游標會彈掉、中文輸入法組字到一半會被砍斷。兩道防線：
 //   ① 正在輸入文字時直接延後重繪（pmRerender），等他離開輸入框再畫；
@@ -5050,6 +5064,8 @@ function pmApplyInputSnap() {
 function pmRenderPhasebar() {
   const bar = document.getElementById('pm-phasebar');
   if (!pmSession) { bar.innerHTML = ''; return; }
+  // 播放中整條清空：投影出去的畫面只該有人名與內容，不該出現階段鈕或「目前階段」badge
+  if (pmPlaying()) { bar.innerHTML = ''; return; }
   if (pmIsChair(pmSession)) {
     bar.innerHTML = '<span style="font-size:12px;color:var(--tx3);margin-right:2px">' + escHtml(BT('pm_phase')) + '</span>' + pmPhases().map(p => {
       const on = pmSession.phase === p, ok = on || pmCanGoPhase(p);
@@ -5098,6 +5114,14 @@ function pmRenderRoom() {
   const body = document.getElementById('pm-room-body');
   if (!pmSession) { body.innerHTML = ''; return; }
   const s = pmSession, chair = pmIsChair(s), K = PMK(), T = K.t;
+  // ── 播放模式接管整個畫面（v1.68）──
+  // 🔴 這個 early return 是刻意的：投影時只該看到人名與內容，
+  //    會議資訊卡、專案描述／情境、匯出工具列全部不畫。要加新面板前先想清楚它該不該上投影幕。
+  if (pmPlaying()) {
+    body.innerHTML = pmPlaySlideHtml(chair);
+    pmRestoreDraft(); pmApplyInputSnap();
+    return;
+  }
   if (pmMeetEditing && s.phase !== 'intro' && s.phase !== 'locked') pmMeetEditing = false;  // 卡片不顯示的階段不留編輯模式
   let html = '';
   // 專案／情境卡（雙語並陳）
@@ -5373,7 +5397,7 @@ async function pmToggleVote(id) {
   pmMaybeAutoAdvance();   // 自己這一票可能就是最後一票
 }
 
-// ── 全員投滿自動進入下一階段（v1.67）──
+// ── 全員投滿自動進入下一階段（v1.68）──
 // 每個人都把票投完了還要等主席按鍵，是白等：票數已成定局，再等只是延遲會議。
 // 🔴 只有主席的瀏覽器能真的推進階段 —— sb-proxy 的欄位守衛規定 PATCH phase 必須是該場主席本人，
 //    其他人送出去只會拿到 403。所以判斷雖然人人都算得出來（用來顯示進度），動作只由主席端發出。
@@ -5738,7 +5762,7 @@ function pmSendMail() {
   try { window.location.href = url; boardToast(BT('bm_mail_ok')); } catch (e) { boardToast(BT('t_mail_fail')); }
 }
 
-// ═══════ 展示階段的播放模式（v1.67）═══════
+// ═══════ 展示階段的播放模式（v1.68）═══════
 // 「讓所有留言展現在螢幕上，讓大家逐一看過」——一次一則、大字、雙語並陳，適合會議室投影。
 // 🔴 全場同步：主席按下一則時把索引寫進 premortem_sessions.play_idx，其他人靠既有的 7 秒輪詢
 //    跳到同一則。play_idx 在 sb-proxy 的 PM_PROTECTED 裡，只有該場主席改得動 ——
@@ -5765,41 +5789,42 @@ function pmPlayGo(d) {
   const i = Math.max(0, Math.min(n - 1, pmPlayIdx() + d));
   if (i !== pmPlayIdx()) pmPlaySet(i);
 }
+// 🔴 投影片上只有「人名＋內容」（v1.68）。
+//    面板標題、「第 X／N 則」、進度點、跟隨提示全部拿掉了 —— 那些是操作資訊，不是會議內容，
+//    投在牆上只會分散注意力。主席的控制列與計數獨立成一條浮在底部的操作列，
+//    **只有主席看得到**；與會者的畫面上完全沒有任何多餘元素。
+//    要往這裡加東西之前，先問：它該不該出現在投影幕上？
 function pmPlaySlideHtml(chair) {
   const n = pmEntries.length, i = Math.max(0, Math.min(n - 1, pmPlayIdx()));
   const e = pmEntries[i], s = pmSession;
-  // 放大版：字級與行距都比清單大一階，投影時後排看得到
+  // 投影用字級：比清單大一階，後排才看得到
   const cell = (label, txt, pending) =>
     '<div class="pm-lc"><div class="lbl">' + escHtml(label + (pending ? BT('pm_pending_suffix') : '')) + '</div>' +
-    '<div class="txt" style="font-size:19px;line-height:1.75">' + escHtml(txt || '') + '</div></div>';
+    '<div class="txt pm-slide-txt">' + escHtml(txt || '') + '</div></div>';
   let body;
   if (e.text_a || e.text_b) body = '<div class="pm-bi">' + cell(pmLangShort(s.lang_a), e.text_a || e.text_src, !e.text_a) + cell(pmLangShort(s.lang_b), e.text_b || e.text_src, !e.text_b) + '</div>';
-  else body = '<div style="white-space:pre-wrap;font-size:19px;line-height:1.75">' + escHtml(e.text_src || '') + '</div>';
-  // 對象（感恩範本）放最上面且再大一級——投影時這是第一眼要看到的
+  else body = '<div class="pm-slide-txt" style="white-space:pre-wrap">' + escHtml(e.text_src || '') + '</div>';
+  // 人名之一：對象（感恩範本）。放最上面、最大 —— 投影時這是第一眼要看到的
   let head = '';
   if (e.target_name) {
     const same = e.target_emp_id || !e.target_a || !e.target_b || e.target_a === e.target_b;
-    head = '<div style="font-size:14px;color:var(--tx3);margin-bottom:4px">' + escHtml(BT('pm_target_to')) + '</div>' +
-      '<div style="font-size:26px;font-weight:700;color:var(--ac);line-height:1.35;margin-bottom:16px">' +
-      escHtml(same ? e.target_name : (e.target_a + '　/　' + e.target_b)) + '</div>';
+    head = '<div class="pm-slide-to">' + escHtml(BT('pm_target_to')) + '</div>' +
+      '<div class="pm-slide-name">' + escHtml(same ? e.target_name : (e.target_a + '　/　' + e.target_b)) + '</div>';
   }
-  // 匿名場次不顯示提出者（與清單一致）
+  // 人名之二：提出者。匿名場次一律不顯示（與清單一致）
   const who = (!pmOpt('anonymous') && e.author_name)
-    ? '<div style="margin-top:18px;font-size:14px;color:var(--tx3);text-align:right">— ' + escHtml(e.author_name) + '</div>' : '';
+    ? '<div class="pm-slide-by">— ' + escHtml(e.author_name) + '</div>' : '';
+  // 操作列只給主席；非主席的畫面到 who 為止就結束，沒有任何多餘資訊
   const ctrl = chair
-    ? '<div style="display:flex;gap:8px;align-items:center;justify-content:center;margin-top:18px;flex-wrap:wrap">' +
+    ? '<div class="pm-slide-ctrl">' +
       '<button class="btn sm" onclick="pmPlayGo(-1)"' + (i <= 0 ? ' disabled style="opacity:.4"' : '') + '>◀ ' + escHtml(BT('pm_play_prev')) + '</button>' +
+      '<span class="pos">' + escHtml(BT('pm_play_pos', { i: i + 1, n: n })) + '</span>' +
       '<button class="btn primary sm" onclick="pmPlayGo(1)"' + (i >= n - 1 ? ' disabled style="opacity:.4"' : '') + '>' + escHtml(BT('pm_play_next')) + ' ▶</button>' +
       '<button class="btn ghost sm" onclick="pmPlayStop()">' + escHtml(BT('pm_play_stop')) + '</button>' +
-      '</div><div style="text-align:center;font-size:11px;color:var(--tx3);margin-top:8px">' + escHtml(BT('pm_play_keys')) + '</div>'
-    : '<div style="text-align:center;font-size:11px;color:var(--tx3);margin-top:18px">' + escHtml(BT('pm_play_follow', { name: pmSession.chair_name || '—' })) + '</div>';
-  // 進度點：一眼看得出走到哪、還剩幾則
-  const dots = '<div style="display:flex;gap:4px;justify-content:center;flex-wrap:wrap;margin-top:14px">' +
-    pmEntries.map((x, k) => '<span style="width:7px;height:7px;border-radius:50%;background:' + (k === i ? 'var(--ac)' : 'var(--br)') + '"></span>').join('') + '</div>';
-  return '<div class="panel" style="border-color:var(--ac)">' +
-    '<div class="panel-h"><span class="idx">▶</span><h2>' + escHtml(BT('pm_play_title')) + '</h2>' +
-    '<span class="sub">' + escHtml(BT('pm_play_pos', { i: i + 1, n: n })) + '</span></div>' +
-    '<div class="panel-b" style="padding:26px 22px">' + head + body + who + dots + ctrl + '</div></div>';
+      '</div>'
+    : '';
+  return '<div class="pm-slide">' +
+    '<div class="pm-slide-in">' + head + body + who + '</div>' + ctrl + '</div>';
 }
 // 主席的鍵盤簡報器：← → 換頁、Esc 結束。在輸入框裡打字時不攔（展示階段沒有輸入框，但別的階段有）
 document.addEventListener('keydown', function (ev) {
@@ -5845,7 +5870,7 @@ function pmTargetFieldHtml() {
     '<div style="font-size:11px;color:var(--tx3);margin-top:3px">' + escHtml(BT('pm_target_hint')) + '</div></div>';
 }
 
-// ── 感恩對象的下拉挑選（v1.67）──
+// ── 感恩對象的下拉挑選（v1.68）──
 // 🔴 不要退回 <datalist>：iOS Safari 不畫任何可下拉的提示，桌機 Chrome 的小箭頭也只在
 //    特定狀態出現，使用者根本不知道能挑。這裡自己畫面板，手機與桌機行為一致。
 //    仍保留自由輸入（清單外的對象：團隊、廠商、客戶）。

@@ -38,6 +38,33 @@ Numbered backup files (`index112.html`, `index328.html`, etc.) are iteration sna
 
 **Within `board/index.html`**: `switchTab(name)` activates 主頁籤 — `'bulletin'`、`'weekly'`、`'biz'`、`'woody'`、`'premortem'`、`'brainstorm'`。後兩者共用同一份 DOM（`#pm-shell`）與同一套 `pm*` 函式，切換時由 `pmMountShell()` 把 shell 搬進當前 tabpanel。Portal 端由 `index.html` 的 app 清單項目 `id:'bulletin'`（`path:'./board/index.html'`）進入。
 
+**可分享的深層連結**（Portal v1.76 / Board v1.79，2026-08-17）：把某一場投票或紀錄的網址直接發給同事。
+
+```
+https://platform.comart.com.tw/board/index.html?tab=poll&id=<場次 id>
+```
+
+- **Board 端**：`BOARD_DEEP`（IIFE）**必須在 `readPortalSession()` 之前**把 `tab`／`id` 讀走 ——
+  那裡成功取得 session 後會 `replaceState` 把網址參數整組清掉（避免 base64 session token
+  留在網址列被複製出去），晚一步就什麼都讀不到。落點是 `boardOpenDeep()`：
+  `switchTab()` 之後 poll 走 `plOpen(id)`、三種 `pm*` 會議走 `pmOpen(id)`
+  （那些清單載入函式都是「先 `showView('list')`、之後才 await」，所以不會把房間蓋回去）。
+- **沒有 session 不再是死路**：以前頁面打得開、右上寫「尚未登入」、所有請求 401，
+  收到連結的人看到一片空白，連「請先登入」都不會說。現在 `boardGoLogin()` 導向
+  `index.html?next=…`，登入後自動轉回來。
+- **Portal 端**：`safeNext()` 驗證 → `goNext()` 帶 `_ps` 轉址；出口放在 **`enterPortal()`**，
+  所以「已登入直接進來」「剛登入」「剛改完強制密碼」三條路徑共用同一個出口，
+  **強制改密碼那一關繞不過**。
+- 🔴 **`next` 一定要白名單驗證，這是 open redirect**：不驗證的話，
+  `index.html?next=https://evil.com` 會讓 Portal 把 **base64 的 session token 當參數送到別人的網站**。
+  `safeNext()` 只放行 `NEXT_PATHS` 四個子系統路徑，參數只留 `NEXT_PARAMS`（`tab`／`id`）
+  且值限定 `[A-Za-z0-9_-]`；有 scheme、`//`、開頭 `/`、`..`、`\` 一律丟掉。
+  **新增可深層連結的子系統時，加進 `NEXT_PATHS`，不要改成黑名單。**
+- 分享網址本身**不含任何 session 資訊**（只有頁籤與場次 id），所以轉發不會外洩身分；
+  🔗 複製連結因此開放給所有人，不限發起人。權限仍由 `plCanSee()`／`pmCanSee()` 判斷。
+- Board 與 Portal **同源共用 `localStorage['comart-portal-session']`**，所以 Portal 只要在登入狀態，
+  貼裸連結進 board 就直接能用。
+
 ### Backend Stack
 
 **Supabase** (PostgreSQL + pgvector) at `https://tcvlnpgpuphdalzvmoyo.supabase.co`:

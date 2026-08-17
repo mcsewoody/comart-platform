@@ -447,6 +447,11 @@ The portal supports EN, 繁中, 简中, VI, 日 via `setLang(lang)`. Each langua
     v1.68 的投影內文其實一直是 13.5px。改這一段時務必確認權重仍然壓得過去。
   - 內容越短字放越大（`pmPlaySlideHtml` 依較長那一語言的字數決定 `lg`／`xl` class）：
     一句話擺在整個投影幕上，用一般字級會空掉一大半。
+  - 🔴 **投影片一律靠上對齊，不要用 `justify-content:center`**（v1.70）：置中會把內容推到
+    框正中間，內容一短上方就空出一大片。**要填滿畫面靠的是把字放大，不是靠置中推開。**
+    播放時另外收掉三處上緣留白：`.wrap` 的 padding-top、`.pm-roombar` 的 margin-bottom、
+    `.pm-slide-in` 的 padding-top。會議室頂端那一列的樣式已從 inline style 抽成
+    `.pm-roombar` / `#pm-phasebar` 兩個規則 —— inline 樣式沒有 `!important` 是蓋不過去的。
 - 🔴 **AI 三段分析的語氣是第三種**：`PM_SUM_SYS_CL` **全程溫暖具體**，三段為
   彙整 → 模式 → 結論。這裡收到的常是同事對同事的感謝，用審查顧問的語氣去評分等於當眾評比
   誰的感謝比較有價值。提示詞裡明令**不排名、不比較誰被提到得多**（沒被提到只代表這次沒被想起來），

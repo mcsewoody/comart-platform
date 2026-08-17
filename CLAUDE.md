@@ -296,6 +296,18 @@ The portal supports EN, 繁中, 简中, VI, 日 via `setLang(lang)`. Each langua
     **不可留著舊譯文**，那會變成譯文與原文不一致。
   - `pmEditId` 在推進階段、換會議、回清單、刪掉正在修改的那一則時都會清掉。
 - 投票上限 `PM_VOTE_CAP = 3`（排序階段）
+- 🔴 **來源語言由系統辨識，不要再加「我用的語言」下拉**（v1.77）：`pmTranslate(text, langA, langB, srcLang)`
+  的 `srcLang` **可省略**，省略時由模型自行辨識並回傳 `{a, b, src}`，偵測結果寫回 `src_lang`。
+  只有 `pmSaveBiField`（主席明確打在「語言 A」或「語言 B」那個框裡）才傳明確的 `srcLang`。
+  另外：偵測到的來源語言等於某個目標語言時，**原文一字不動放回去**（不靠模型「照抄」，`pmTranslate` 自己保證）。
+- 🔴 **翻譯用 `claude-opus-5`（`PM_TR_MODEL`），不要退回 haiku**（v1.77）：越南同仁反映中文→越南文
+  不精準，根因是這裡一直用最低階模型配兩句話的提示詞。一整場會議的翻譯量連 opus 都不到 US$0.5。
+  `output_config.effort='low'`＋`max_tokens:4000`：opus-5 預設開 thinking，**不可關掉**
+  （關掉會讓 `<thinking>` 標籤漏進回覆，而我們要從回覆裡抓 JSON），且 max_tokens 同時涵蓋 thinking＋回覆。
+- 🔴 **`PM_TR_SYS` 的重點是人稱與語域，不是詞彙**：中文的「你／他」不帶年齡與位階資訊，越南語卻**必須**
+  選一個（bạn／anh／chị／em），譯者不選就是亂選，一篇之內不一致讀起來就會「怪」。
+  提示詞明令：整篇固定一種語域、同輩預設 `bạn`、原文有指名就用名字、不得自行加敬語。
+  **這是換翻譯廠商（DeepL 等）解決不了的部分 —— 那些引擎無法被下指令。**
 - 雙語：每則失敗原因寫入後自動經 `claude-proxy` 翻成會議設定的兩種語言，存 `text_a`/`text_b`
   （情境與專案說明同理存 `desc_a`/`desc_b`、`scenario_a`/`scenario_b`）。**已翻譯過的不重翻**
 - `setup` 階段主席可雙語編輯專案描述與情境（`PM_BI_FIELDS` + `pmBiEditorHtml`/`pmSaveBiField`，v1.29–v1.30）：

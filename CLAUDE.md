@@ -345,6 +345,9 @@ The portal supports EN, 繁中, 简中, VI, 日 via `setLang(lang)`. Each langua
     主席手動退回排序階段（讓晚到的人補投）時 `pmSetPhase` 會重新武裝
   - 進度條 `pm_vote_progress` **只給數字不給名字**，維持「畫面上從不顯示投票人」
 - 定稿可輸出四種格式（PDF／PNG／Excel／Email），皆為雙語版面
+  - 🔴 **展示（`reveal`）階段不給匯出**（v1.72）：那是全體一起看內容、主席準備播放的階段，
+    四顆匯出鈕擺在最上面純粹是干擾；而且這時候的紀錄還沒定稿，匯出去的是半成品，
+    寄出後很容易被當成正式版本。匯出列只出現在 `ranking` / `mitigation` / `locked`。
 
 新增 `premortem_*` 之類的新表時，記得同步加進 sb-proxy 的 `ALLOWED_TABLES` 白名單，否則前端一律 403。
 

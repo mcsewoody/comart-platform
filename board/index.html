@@ -5,7 +5,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#080C14">
-<title>COMART · 公告與紀錄 v1.81</title>
+<title>COMART · 公告與紀錄 v1.82</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -339,7 +339,7 @@ body.pm-playing #pm-phasebar{padding:0}
     <a class="logo" href="javascript:void(0)">
       <div class="logo-mark">告</div>
       <div class="logo-text" data-i18n="app_title">公告與紀錄</div>
-      <span class="logo-ver">v1.81</span>
+      <span class="logo-ver">v1.82</span>
     </a>
     <div class="topbar-right">
       <div id="langChips" style="display:flex;gap:4px"></div>
@@ -870,6 +870,11 @@ const B_I18N = {
   nav_bulletin:'公告', nav_weekly:'週會紀錄', nav_biz:'業務會議記錄', nav_woody:'Woody 週報',
   nav_premortem:'事前驗屍', nav_brainstorm:'腦力激盪',
   not_logged_in:'未登入',
+  pm_sumtr_btn:'重譯結論', pm_sumtr_title:'分析內容不變，只把另一種語言的譯文用現在的規則重做',
+  pm_sumtr_confirm:'要重新翻譯 AI 結論嗎？分析內容不變，只換譯文。',
+  pm_sumtr_confirm_edited:'這份結論你修訂過。重譯會保留你修訂的原文那一份，但會覆蓋另一種語言的譯文。要繼續嗎？',
+  pm_sumtr_prog:'重譯中 {i}／{n}', pm_sumtr_done:'AI 結論已重新翻譯', pm_sumtr_failed:'重譯失敗',
+  pm_sumtr_none:'還沒有 AI 結論可以重譯',
   pm_retrans_btn:'重新翻譯', pm_retrans_hint:'用目前的翻譯模型與規則把全場譯文重做一次（不含 AI 總結）',
   pm_retrans_confirm:'要用目前的翻譯模型重新翻譯這場會議嗎？共 {n} 項，現有譯文會被覆蓋。',
   pm_retrans_prog:'翻譯中 {i}／{n}', pm_retrans_done:'已重新翻譯 {n} 項',
@@ -1058,6 +1063,11 @@ const B_I18N = {
   nav_bulletin:'公告', nav_weekly:'周会记录', nav_biz:'业务会议记录', nav_woody:'Woody 周报',
   nav_premortem:'事前验尸', nav_brainstorm:'头脑风暴',
   not_logged_in:'未登录',
+  pm_sumtr_btn:'重译结论', pm_sumtr_title:'分析内容不变，只把另一种语言的译文用现在的规则重做',
+  pm_sumtr_confirm:'要重新翻译 AI 结论吗？分析内容不变，只换译文。',
+  pm_sumtr_confirm_edited:'这份结论你修订过。重译会保留你修订的原文那一份，但会覆盖另一种语言的译文。要继续吗？',
+  pm_sumtr_prog:'重译中 {i}／{n}', pm_sumtr_done:'AI 结论已重新翻译', pm_sumtr_failed:'重译失败',
+  pm_sumtr_none:'还没有 AI 结论可以重译',
   pm_retrans_btn:'重新翻译', pm_retrans_hint:'用目前的翻译模型与规则把全场译文重做一次（不含 AI 总结）',
   pm_retrans_confirm:'要用目前的翻译模型重新翻译这场会议吗？共 {n} 项，现有译文会被覆盖。',
   pm_retrans_prog:'翻译中 {i}／{n}', pm_retrans_done:'已重新翻译 {n} 项',
@@ -1246,6 +1256,11 @@ const B_I18N = {
   nav_bulletin:'Bulletin', nav_weekly:'Weekly Minutes', nav_biz:'Sales Meeting Minutes', nav_woody:'Woody Report',
   nav_premortem:'Premortem', nav_brainstorm:'Brainstorm',
   not_logged_in:'Not signed in',
+  pm_sumtr_btn:'Re-translate conclusion', pm_sumtr_title:'Keeps the analysis unchanged — only redoes the other language with the current rules',
+  pm_sumtr_confirm:'Re-translate the AI conclusion? The analysis stays the same; only the translation is redone.',
+  pm_sumtr_confirm_edited:'You have edited this conclusion. Re-translating keeps your edited original, but overwrites the other language. Continue?',
+  pm_sumtr_prog:'Re-translating {i}/{n}', pm_sumtr_done:'AI conclusion re-translated', pm_sumtr_failed:'Re-translation failed',
+  pm_sumtr_none:'There is no AI conclusion to re-translate yet',
   pm_retrans_btn:'Re-translate', pm_retrans_hint:'Redo every translation with the current model and rules (AI summary not included)',
   pm_retrans_confirm:'Re-translate this session with the current translation model? {n} items — existing translations will be overwritten.',
   pm_retrans_prog:'Translating {i}/{n}', pm_retrans_done:'Re-translated {n} items',
@@ -1434,6 +1449,11 @@ const B_I18N = {
   nav_bulletin:'Thông báo', nav_weekly:'Biên bản họp tuần', nav_biz:'Biên bản họp kinh doanh', nav_woody:'Báo cáo Woody',
   nav_premortem:'Premortem', nav_brainstorm:'Brainstorming',
   not_logged_in:'Chưa đăng nhập',
+  pm_sumtr_btn:'Dịch lại kết luận', pm_sumtr_title:'Giữ nguyên nội dung phân tích, chỉ dịch lại ngôn ngữ còn lại theo quy tắc hiện tại',
+  pm_sumtr_confirm:'Dịch lại kết luận AI? Nội dung phân tích giữ nguyên, chỉ thay bản dịch.',
+  pm_sumtr_confirm_edited:'Bạn đã chỉnh sửa kết luận này. Dịch lại sẽ giữ bản gốc bạn đã sửa nhưng ghi đè ngôn ngữ còn lại. Tiếp tục?',
+  pm_sumtr_prog:'Đang dịch lại {i}/{n}', pm_sumtr_done:'Đã dịch lại kết luận AI', pm_sumtr_failed:'Dịch lại thất bại',
+  pm_sumtr_none:'Chưa có kết luận AI để dịch lại',
   pm_retrans_btn:'Dịch lại', pm_retrans_hint:'Dịch lại toàn bộ bằng mô hình và quy tắc hiện tại (không gồm tổng kết AI)',
   pm_retrans_confirm:'Dịch lại phiên này bằng mô hình dịch hiện tại? Tổng {n} mục, bản dịch cũ sẽ bị ghi đè.',
   pm_retrans_prog:'Đang dịch {i}/{n}', pm_retrans_done:'Đã dịch lại {n} mục',
@@ -1622,6 +1642,11 @@ const B_I18N = {
   nav_bulletin:'お知らせ', nav_weekly:'週会議事録', nav_biz:'営業会議議事録', nav_woody:'Woody 週報',
   nav_premortem:'プレモータム', nav_brainstorm:'ブレスト',
   not_logged_in:'未ログイン',
+  pm_sumtr_btn:'結論を訳し直す', pm_sumtr_title:'分析内容はそのまま、もう一方の言語の訳文だけ現在のルールで作り直します',
+  pm_sumtr_confirm:'AI 結論を訳し直しますか？分析内容は変わらず、訳文のみ差し替えます。',
+  pm_sumtr_confirm_edited:'この結論は修正済みです。訳し直すと修正した原文は保持されますが、もう一方の言語は上書きされます。続けますか？',
+  pm_sumtr_prog:'訳し直し中 {i}／{n}', pm_sumtr_done:'AI 結論を訳し直しました', pm_sumtr_failed:'訳し直しに失敗しました',
+  pm_sumtr_none:'訳し直せる AI 結論がありません',
   pm_retrans_btn:'翻訳し直す', pm_retrans_hint:'現在の翻訳モデルとルールで全体を訳し直します（AI 総括は対象外）',
   pm_retrans_confirm:'現在の翻訳モデルでこの会議を訳し直しますか？計 {n} 件、既存の訳文は上書きされます。',
   pm_retrans_prog:'翻訳中 {i}／{n}', pm_retrans_done:'{n} 件を訳し直しました',
@@ -4722,7 +4747,8 @@ function pmSumTitles() {
   return out;
 }
 // 依標題切段並排版；主席若把標題改掉或整段重寫，就退化成單一區塊（不會壞）
-function pmSumSections(text) {
+// 依標題把長文切回段落（資料版）。排版與重譯都吃這一份，切法只有一種。
+function pmSumSplit(text) {
   const titles = pmSumTitles(), secs = [];
   let cur = null;
   String(text || '').split('\n').forEach(ln => {
@@ -4730,7 +4756,10 @@ function pmSumSections(text) {
     if (t && titles.indexOf(t) >= 0) { cur = { t: t, b: [] }; secs.push(cur); }
     else { if (!cur) { cur = { t: '', b: [] }; secs.push(cur); } cur.b.push(ln); }
   });
-  const keep = secs.filter(x => x.t || x.b.join('\n').trim());
+  return secs.filter(x => x.t || x.b.join('\n').trim());
+}
+function pmSumSections(text) {
+  const keep = pmSumSplit(text);
   if (!keep.length) return '';
   return keep.map((x, i) =>
     '<div style="' + (i ? 'border-top:1px dashed var(--br);margin-top:18px;padding-top:14px' : '') + '">' +
@@ -5250,6 +5279,63 @@ async function pmRetranslateAll() {
   }
 }
 
+// ── 只重譯 AI 總結的語言 B（v1.82）──
+// 🔴 這跟「↻ 重新生成」是兩件不同的事，不要合併：
+//    重新生成 ＝ 重跑分析 → **會得出不同的風險、不同的結論**。同一場會議不該有兩種結論
+//                （CLAUDE.md 已記載：v1.36 就是為了這個把「兩語言各自發想」改回「翻譯」）。
+//    重譯     ＝ 分析內容一字不動，只把語言 B 那一份用現在的規則重翻。
+//    所以「AI 生成的內容想換更好的譯文」要走這一顆，不是那一顆。
+// 逐段翻譯而非整篇一次：三段各 350–500 字，整篇丟進去會逼近 max_tokens（opus-5 的
+// max_tokens 同時涵蓋 thinking＋回覆），而且一段失敗不必整份重來。
+let pmSumTransBusy = false;
+async function pmRetranslateSummary() {
+  const s = pmSession;
+  if (!s || !pmIsChair(s) || pmSumTransBusy || pmSumGenerating) return;
+  if (s.lang_a === s.lang_b) return;
+  const src = s.ai_summary_a || s.ai_summary || '';
+  if (!src.trim()) { boardToast(BT('pm_sumtr_none')); return; }
+  // 主席修訂過就要講清楚：語言 A 保留不動，但他手改的語言 B 會被覆蓋
+  const msg = s.summary_edited_at ? BT('pm_sumtr_confirm_edited') : BT('pm_sumtr_confirm');
+  if (!window.confirm(msg)) return;
+
+  pmSumTransBusy = true;
+  pmPollStop();                 // 與 pmGenSummary 同理：翻譯期間別讓輪詢把剛寫回的內容蓋掉
+  const btn = document.getElementById('pm-sumtr-btn');
+  const secs = pmSumSplit(src);
+  const parts = PMKZ().sumParts;
+  let done = 0;
+  const tick = () => { if (btn) { btn.disabled = true; btn.textContent = '↻ ' + BT('pm_sumtr_prog', { i: done, n: secs.length }); } };
+  tick();
+
+  try {
+    const out = [];
+    for (const sec of secs) {
+      // 標題不送翻譯：三段小標本來就有五語對照表，翻出來反而會跟系統其他地方不一致。
+      // 對不上表的（主席自己改過標題）就連標題一起交給模型翻。
+      const p = sec.t ? parts.find(x => x.title === sec.t || (x.disp && Object.keys(x.disp).some(k => x.disp[k] === sec.t))) : null;
+      const head = p ? ((p.disp && (p.disp[s.lang_b] || p.disp['zh-TW'])) || p.title) : '';
+      const body = (p || !sec.t) ? sec.b.join('\n').trim() : (sec.t + '\n' + sec.b.join('\n')).trim();
+      if (!body) { done++; tick(); continue; }
+      let tr;
+      try { tr = await pmTranslateLong(body, s.lang_b); }
+      catch (e) { tr = body; }        // 單段失敗就退回原文，不讓整份掉失（與 pmGenSummary 一致）
+      out.push((head ? head + '\n' : '') + tr);
+      done++; tick();
+    }
+    const nb = out.join('\n\n').trim();
+    if (!nb) throw new Error('empty');
+    await SB.patch('premortem_sessions', 'id=eq.' + encodeURIComponent(s.id), { ai_summary_b: nb });
+    s.ai_summary_b = nb;
+    boardToast(BT('pm_sumtr_done'));
+  } catch (e) {
+    boardToast(BT('pm_sumtr_failed') + '：' + (e.message || e));
+  } finally {
+    pmSumTransBusy = false;
+    pmRerender(true);
+    pmPollStart();
+  }
+}
+
 function pmSaveDraft() { const el = document.getElementById('pm-writebox'); if (el) pmDraft = el.value; }
 function pmRestoreDraft() { const el = document.getElementById('pm-writebox'); if (el && pmDraft) el.value = pmDraft; }
 
@@ -5511,6 +5597,9 @@ function pmRenderRoom() {
     if (chair && !pmSumGenerating && !pmSumEditing) {
       sumOps = '<span style="margin-left:auto;display:flex;gap:6px">' +
         (hasSum ? '<button class="btn sm" onclick="pmSumEditToggle(true)">' + escHtml(BT('pm_edit')) + '</button>' : '') +
+        // ↻ 重譯：分析內容不動，只換語言 B 的譯文。跟「重新生成」（會產生不同結論）是兩回事
+        (hasSum && s.lang_a !== s.lang_b
+          ? '<button class="btn sm" id="pm-sumtr-btn" onclick="pmRetranslateSummary()" title="' + escHtml(BT('pm_sumtr_title')) + '">↻ ' + escHtml(BT('pm_sumtr_btn')) + '</button>' : '') +
         '<button class="btn sm" onclick="pmGenSummary(false)">' + escHtml(BT('pm_regen')) + '</button></span>';
     }
     html += '<div class="panel" style="border-color:var(--ac)"><div class="panel-h"><span class="idx">✦</span><h2>' + escHtml(BT('pm_ai_summary')) + '</h2>' +

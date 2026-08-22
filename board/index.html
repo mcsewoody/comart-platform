@@ -5,7 +5,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#080C14">
-<title>COMART · 公告與紀錄 v1.84</title>
+<title>COMART · 公告與紀錄 v1.85</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -339,7 +339,7 @@ body.pm-playing #pm-phasebar{padding:0}
     <a class="logo" href="javascript:void(0)">
       <div class="logo-mark">告</div>
       <div class="logo-text" data-i18n="app_title">公告與紀錄</div>
-      <span class="logo-ver">v1.84</span>
+      <span class="logo-ver">v1.85</span>
     </a>
     <div class="topbar-right">
       <div id="langChips" style="display:flex;gap:4px"></div>
@@ -404,7 +404,7 @@ body.pm-playing #pm-phasebar{padding:0}
 
     <div id="wm-editor-view" style="display:none">
       <div class="tabbar" style="max-width:none;padding:0;margin-bottom:16px;border-bottom:1px solid var(--br)">
-        <button class="btn ghost sm" onclick="wmBackToList()" data-i18n="btn_back_list">← 返回列表</button>
+        <button class="btn ghost sm" onclick="wmLeaveEditor()" data-i18n="btn_back_list">← 返回列表</button>
         <div style="margin-left:auto;display:flex;gap:6px;align-items:center;padding:6px 0;flex-wrap:wrap">
           <button class="btn sm" onclick="wmCancel()" data-i18n="btn_cancel">✕ 取消</button>
           <button class="btn primary sm" onclick="wmSave()" data-i18n="btn_save">✓ 儲存</button>
@@ -594,7 +594,7 @@ body.pm-playing #pm-phasebar{padding:0}
     <!-- EDITOR -->
     <div id="wr-editor-view" style="display:none">
       <div class="tabbar" style="max-width:none;padding:0;margin-bottom:16px;border-bottom:1px solid var(--br)">
-        <button class="btn ghost sm" onclick="wrBackToList()" data-i18n="btn_back_list">← 返回列表</button>
+        <button class="btn ghost sm" onclick="wrLeaveEditor()" data-i18n="btn_back_list">← 返回列表</button>
         <div style="margin-left:auto;display:flex;gap:6px;align-items:center;padding:6px 0;flex-wrap:wrap">
           <button class="btn sm danger" id="wr-del-btn" style="display:none" onclick="wrDeleteCurrent()" data-i18n="wr_del">🗑 刪除</button>
           <button class="btn sm" onclick="wrMail()" data-i18n="btn_send">✉️ 寄送</button>
@@ -918,6 +918,7 @@ const B_I18N = {
   wm_ag_supp:'補充事項', wm_ag_end:'散會', wm_ph_none:'無。', wm_who_work:'同仁',
   wm_hint_roster:'出席名單依上方「營運中心」自動帶入該中心全體同仁，主持人可直接標記缺席／遲到／非出席。列席人員（其他中心）可用下方下拉加入，不計入「應到人數」但會列入「實到人數」。',
   wm_cancel_confirm:'取消並返回列表？未按「儲存」的變更不會保留。',
+  board_unsaved_leave:'此次編輯尚未存檔。請按「儲存」後再離開；若確定要放棄這些變更，請按確定。',
   wm_no_perm:'無權限修改其他中心的紀錄', wm_need_date:'請填寫會議日期',
   wm_mail_ok:'已開啟郵件草稿（收件人＝{site}全體同仁）',
   bm_new:'＋ 新增業務會議記錄',
@@ -1111,6 +1112,7 @@ const B_I18N = {
   wm_ag_supp:'补充事项', wm_ag_end:'散会', wm_ph_none:'无。', wm_who_work:'同事',
   wm_hint_roster:'出席名单依上方“运营中心”自动带入该中心全体同事，主持人可直接标记缺席／迟到／非出席。列席人员（其他中心）可用下方下拉加入，不计入“应到人数”但会计入“实到人数”。',
   wm_cancel_confirm:'取消并返回列表？未按“保存”的变更不会保留。',
+  board_unsaved_leave:'此次编辑尚未保存。请按“保存”后再离开；若确定要放弃这些变更，请按确定。',
   wm_no_perm:'无权限修改其他中心的记录', wm_need_date:'请填写会议日期',
   wm_mail_ok:'已打开邮件草稿（收件人＝{site}全体同事）',
   bm_new:'＋ 新增业务会议记录',
@@ -1304,6 +1306,7 @@ const B_I18N = {
   wm_ag_supp:'Additional items', wm_ag_end:'Adjournment', wm_ph_none:'None.', wm_who_work:'Colleague',
   wm_hint_roster:'The attendee list is filled from the operating centre selected above. The chair can mark absent / late / not required. Guests from other centres can be added below — they do not count toward “expected” but do count toward “present”.',
   wm_cancel_confirm:'Cancel and go back? Unsaved changes will be lost.',
+  board_unsaved_leave:'This edit has not been saved. Please press Save before leaving. Press OK only if you want to discard these changes.',
   wm_no_perm:'You cannot edit another centre’s records', wm_need_date:'Please enter the meeting date',
   wm_mail_ok:'Mail draft opened (recipients: everyone at {site})',
   bm_new:'＋ New sales meeting minutes',
@@ -1497,6 +1500,7 @@ const B_I18N = {
   wm_ag_supp:'Nội dung bổ sung', wm_ag_end:'Bế mạc', wm_ph_none:'Không có.', wm_who_work:'Đồng nghiệp',
   wm_hint_roster:'Danh sách tham dự được lấy tự động theo “Trung tâm” ở trên. Chủ tọa có thể đánh dấu vắng / đi trễ / không tham dự. Người dự thính (trung tâm khác) thêm ở ô bên dưới — không tính vào “phải có mặt” nhưng tính vào “có mặt”.',
   wm_cancel_confirm:'Hủy và quay lại danh sách? Các thay đổi chưa lưu sẽ mất.',
+  board_unsaved_leave:'Nội dung này chưa được lưu. Vui lòng bấm Lưu trước khi rời đi. Chỉ bấm OK nếu bạn muốn bỏ các thay đổi này.',
   wm_no_perm:'Không có quyền sửa biên bản của trung tâm khác', wm_need_date:'Vui lòng nhập ngày họp',
   wm_mail_ok:'Đã mở thư nháp (người nhận: toàn thể {site})',
   bm_new:'＋ Thêm biên bản họp kinh doanh',
@@ -1690,6 +1694,7 @@ const B_I18N = {
   wm_ag_supp:'補足事項', wm_ag_end:'閉会', wm_ph_none:'なし。', wm_who_work:'担当者',
   wm_hint_roster:'出席者は上の「拠点」から自動で読み込まれます。司会は欠席／遅刻／対象外を直接記入できます。他拠点の陪席者は下のプルダウンから追加でき、「出席予定」には含まれませんが「実出席」には含まれます。',
   wm_cancel_confirm:'キャンセルして一覧に戻りますか？「保存」していない変更は失われます。',
+  board_unsaved_leave:'この編集はまだ保存されていません。離れる前に「保存」を押してください。変更を破棄する場合のみOKを押してください。',
   wm_no_perm:'他拠点の記録は編集できません', wm_need_date:'開催日を入力してください',
   wm_mail_ok:'メール下書きを開きました（宛先：{site}全社員）',
   bm_new:'＋ 営業会議議事録を追加',
@@ -2333,17 +2338,43 @@ async function notifyRecipients(recipients, fromName, title, body) {
 }
 
 // ═══════════════════════════════════════════════
-// 離開網頁前，未存檔提醒（週會紀錄／業務會議記錄／Woody 週報）
-// 只要三個編輯器內有「尚未按儲存」的變更，關閉分頁或重新整理時
-// 觸發瀏覽器原生「離開網站？」確認；按儲存或返回列表即解除。
+// 未存檔提醒（週會紀錄／業務會議記錄／Woody 週報）
+//
+// 這三個編輯器只在按下「儲存」時才寫進資料庫，所以任何其他離開方式都會
+// 丟掉編輯內容。有兩條離開路徑，能做到的事情不一樣：
+//
+//   ① app 內部離開（返回列表、切換主頁籤）→ boardLeaveGuard() 自己問，
+//      文字是我們寫的，講得出「請按儲存後再離開」。
+//      🔴 這一條原本完全沒有提醒：「返回列表」是直接呼叫 wmBackToList()／
+//      wrBackToList()，一聲不響就把未存檔的編輯丟掉——比關分頁更危險，
+//      關分頁至少瀏覽器會攔一下。
+//
+//   ② 關閉分頁／重新整理 → 只能用 beforeunload，而**對話框文字無法自訂**
+//      （各瀏覽器 2011–2017 年間陸續移除自訂文字，因為被詐騙頁面濫用）。
+//      那一關永遠是瀏覽器的制式問法，不要再嘗試把訊息塞進去。
+//
+// 「自動存檔」已評估後否決（2026-08-11，Woody 決定）：離開欄位就寫進資料庫
+// 會讓「取消」失去意義（改到一半反悔也收不回來），且新紀錄一打字就建立一筆，
+// 列表開始堆廢棄草稿。改為把提醒做確實。
 // ═══════════════════════════════════════════════
 let _boardDirty = false;
-function boardMarkDirty() { _boardDirty = true; }
-function boardClearDirty() { _boardDirty = false; }
+// 使用者已經對「要離開嗎」按過確定：抑制接下來的重複詢問，直到又動了內容。
+// 每次切頁籤都重問會把人訓練成無腦點掉，反而讓提醒失效。
+let _boardLeaveAcked = false;
+function boardMarkDirty() { _boardDirty = true; _boardLeaveAcked = false; }
+function boardClearDirty() { _boardDirty = false; _boardLeaveAcked = false; }
+/* 回傳 true＝可以離開。呼叫端在 false 時必須「什麼都不做」，
+   不可以先改了畫面狀態再問。 */
+function boardLeaveGuard() {
+  if (!_boardDirty || _boardLeaveAcked) return true;
+  if (!confirm(BT('board_unsaved_leave'))) return false;
+  _boardLeaveAcked = true;   // 內容仍未存檔，_boardDirty 刻意保留，beforeunload 還是要攔
+  return true;
+}
 window.addEventListener('beforeunload', function (e) {
   if (!_boardDirty) return;
   e.preventDefault();
-  e.returnValue = '';   // 觸發原生確認對話框（各瀏覽器不允許自訂文字）
+  e.returnValue = '';   // 觸發原生確認對話框（文字由瀏覽器決定，無法自訂）
   return '';
 });
 // 三個編輯器容器內任何輸入／變更即視為「未存檔」（view-main 為業務會議編輯器）
@@ -2353,12 +2384,19 @@ window.addEventListener('beforeunload', function (e) {
   box.addEventListener('input', boardMarkDirty, true);
   box.addEventListener('change', boardMarkDirty, true);
 });
+/* 「返回列表」的入口。BackToList 本身不加守衛：wmSave／wrSave／刪除成功後
+   都會呼叫它，那時候問「尚未存檔」是錯的。 */
+function wmLeaveEditor() { if (boardLeaveGuard()) wmBackToList(); }
+function wrLeaveEditor() { if (boardLeaveGuard()) wrBackToList(); }
 
 // ═══════════════════════════════════════════════
 // 分頁切換
 // ═══════════════════════════════════════════════
 let _bizInited = false;
 function switchTab(name) {
+  /* 先問再動。這一行以下全是畫面狀態的改動，先 toggle 再問的話，使用者按
+     「取消」時頁籤已經跳過去了，回不去原本那一個。 */
+  if (!boardLeaveGuard()) return;
   document.querySelectorAll('.maintab[data-tab]').forEach(b => b.classList.toggle('on', b.dataset.tab === name));
   document.querySelectorAll('.tabpanel').forEach(p => p.classList.remove('on'));
   document.getElementById('tabpanel-' + name).classList.add('on');
@@ -3612,7 +3650,7 @@ function bizMeetingInit(){
     boardClearDirty();
   }
   function setFilter(f){ _bmFilter=f; buildSaved(); }
-  $("btnBackList").onclick=function(){ switchView("saved"); };
+  $("btnBackList").onclick=function(){ if(boardLeaveGuard()) switchView("saved"); };
   $("btnCancel").onclick=function(){ if(confirm(BT("bm_cancel_confirm"))){ switchView("saved"); } };
 
   $("btnAllPresent").onclick=function(){ attendees().forEach(function(p){ p.a.status="present"; p.a.reason=""; }); save(); buildRoster(); renderCounts(); renderPreview(); toast(BT("t_all_present")); };

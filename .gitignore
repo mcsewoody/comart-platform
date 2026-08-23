@@ -17,3 +17,54 @@ backup.sql
 # ⚠️ git 歷史裡仍留有這兩個檔案，這裡只是停止繼續發佈。
 migrate-firebase-to-supabase.html
 platform 100.html
+
+# ═══════════════════════════════════════════════════════════
+# 2026-08-23 全面清查未追蹤檔案後補上。本 repo 是 public 並透過
+# GitHub Pages 發佈，所以「未追蹤」只代表還沒外洩，一次 `git add .`
+# 就會全部公開 —— 這次對話裡 migrate-firebase-to-supabase.html
+# 就是這樣被推上去、線上實測回 200 的。
+#
+# 下列每一項都查證過：沒有被任何已版控檔案引用，線上也都是 404，
+# 都是本機工作素材，不是網站在用的資源。
+# ═══════════════════════════════════════════════════════════
+
+# 🔴 含真實 API 金鑰。這個檔案有 supabaseKey、claudeKey、openAiKey 三把，
+#    檔案自己就寫著「請妥善保管此檔案，不要分享給他人」。
+#    查證過從未進入版控，所以金鑰沒有外洩過。用萬用字元擋掉同型的匯出檔。
+kms/comart-kms-config-*.json
+*-kms-config-*.json
+
+# AI 工作規則：AGENTS.md 是 CLAUDE.md 的 Codex 版，同內容、同機密等級。
+# CLAUDE.md 已在上面被 .claude/ 那段擋掉，這兩個要一起擋，只擋一份等於沒擋。
+AGENTS.md
+.codex/
+
+# 舊版備份草稿。命名慣例是「主檔名 + 數字」或「拷貝」，都是迭代快照。
+# 其中 platform_index.html／index112.html／index拷貝.html／kms/kms_index.html／
+# kms/index149.html 含 Firebase SDK 與專案設定（Firebase 已於 2026-08-23 全面
+# 脫鉤，這些是歷史殘留）。
+index[0-9]*.html
+index*拷貝*.html
+platform_index.html
+admin/index[0-9]*.html
+admin/index?[0-9].html
+kms/index[0-9]*.html
+kms/kms_index.html
+# 未被任何系統連結、也未納入版控的獨立抽籤草稿（CLAUDE.md 有記載）。
+# 真正在用的抽籤是 admin/index.html 的 lottery 模塊。
+admin/lottery.html
+
+# 舊的 Cloudflare Worker 原始碼。該 Worker 已於 2026-07-08 停用
+# （中國被 GFW 封鎖 ＋ 用前端可見的 x-admin-token 就取得 service-role 全權）。
+# 查證過檔內金鑰全走 env、沒有寫死憑證，但這不是網站內容。
+quotation/code/
+
+# 資料夾名稱叫 key，內容是截圖。無論內容為何，這種名字的東西不該進公開 repo。
+quotation/key/
+
+# 工作用圖片素材與架構圖（截圖、logo 原始檔、系統架構 PDF/SVG）。
+# 網站實際使用的圖片在各系統自己的目錄或 Supabase Storage。
+pic/
+COMART-Logo.svg
+comart_network_architecture.pdf
+kms/comart_kms_system_architecture.svg

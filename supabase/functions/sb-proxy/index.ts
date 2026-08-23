@@ -19,15 +19,10 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { verifySession } from "../_shared/session.ts"
 import { elevatedApiHeaders, namedSecretKey } from "../_shared/api-keys.ts"
 
-// 過渡旗標：true = 新舊憑證並收（部署新前端期間避免中斷），false = 只收 x-session。
-// 前端（GitHub Pages）確認上線後改為 false 再部署一次。
-const GRACE = false
-const LEGACY_TOKEN = "COMART-ADMIN-2026"
-
 const CORS = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, POST, PATCH, PUT, DELETE, OPTIONS",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-admin-token, x-session, prefer, range, x-upsert",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-session, prefer, range, x-upsert",
   "Access-Control-Expose-Headers": "content-range, range-unit",
 }
 
@@ -87,9 +82,8 @@ serve(async (req) => {
 
   // ── 身分驗證：x-session（HMAC 簽章，登入時由 auth-verify 簽發）──
   const sess = await verifySession(req.headers.get("x-session") || "")
-  const legacyOk = GRACE && req.headers.get("x-admin-token") === LEGACY_TOKEN
-  if (!sess && !legacyOk) return json({ error: "unauthorized", hint: "missing/invalid x-session" }, 401)
-  const role = sess?.role || (legacyOk ? "admin" : "")
+  if (!sess) return json({ error: "unauthorized", hint: "missing/invalid x-session" }, 401)
+  const role = sess?.role || ""
   const sessEmpId = String(sess?.empId || "")
 
   const url = new URL(req.url)

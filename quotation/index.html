@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#080C14">
-<title>COMART · Quotation System v3.55</title>
+<title>COMART · Quotation System v3.56</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -259,7 +259,7 @@ img{display:block}
       <div class="logo-mark" style="background:transparent"><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="24" height="13"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></div>
       <div>
         <div class="logo-text">COMART</div>
-        <div id="appVersionDiv" style="font-size:10px;color:var(--ac);font-weight:600;letter-spacing:.04em;line-height:1.3">v3.55</div>
+        <div id="appVersionDiv" style="font-size:10px;color:var(--ac);font-weight:600;letter-spacing:.04em;line-height:1.3">v3.56</div>
       </div>
     </div>
     <div class="topbar-right">
@@ -1737,9 +1737,8 @@ async function deleteImgFromStorage(prodId) {
    對每一個檔案都直接 return：刪除鈕移除了資料庫紀錄，實體檔案卻永遠留在
    Storage 上。改成用 bucket 判斷，並且明確跳過 Firebase 的舊檔（那是另一個
    服務，這裡刪不到，靜靜跳過而不是假裝刪了）。 */
-async function _deleteStorageFile(storagePath, bucket, legacyUrl) {
+async function _deleteStorageFile(storagePath, bucket) {
   if (!storagePath) return;
-  if (legacyUrl && /firebasestorage\.googleapis\.com/.test(legacyUrl)) return;
   const bkt = bucket || SB_STORAGE_BUCKET;
   try {
     await fetch(
@@ -4178,7 +4177,6 @@ async function downloadXLSX(id) {
     // ── Product rows ─────────────────────────────────
     const rowHeights = [103.2, 126.0];
     const COL_PIC_PX = Math.round(27.44 * 7.5);
-    const COL_A_PX = Math.round(14 * 7.5); // Item Code col
 
     for (let pi = 0; pi < q.products.length; pi++) {
       const pid = q.products[pi];
@@ -6908,7 +6906,7 @@ async function deleteBomFile(index){
   const p=PRODUCTS.find(x=>x.id===editProdId);if(!p)return;
   const doc=p.bomFiles?.[index];if(!doc)return;
   if(!confirm('Delete "'+doc.name+'"?'))return;
-  await _deleteStorageFile(doc.storagePath, doc.bucket, doc.url);
+  await _deleteStorageFile(doc.storagePath, doc.bucket);
   const bomFiles=(p.bomFiles||[]).filter((_,i)=>i!==index);
   const updated={...p,bomFiles};
   const idx=PRODUCTS.findIndex(x=>x.id===editProdId);
@@ -6975,7 +6973,7 @@ async function deleteDoc(index){
   const p=PRODUCTS.find(x=>x.id===editProdId);if(!p)return;
   const doc=p.docs?.[index];if(!doc)return;
   if(!confirm('Delete "'+doc.name+'"?'))return;
-  await _deleteStorageFile(doc.storagePath, doc.bucket, doc.url);
+  await _deleteStorageFile(doc.storagePath, doc.bucket);
   const docs=(p.docs||[]).filter((_,i)=>i!==index);
   const updated={...p,docs};
   const idx=PRODUCTS.findIndex(x=>x.id===editProdId);

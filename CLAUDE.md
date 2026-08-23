@@ -97,6 +97,12 @@ https://platform.comart.com.tw/board/index.html?tab=poll&id=<場次 id>
 而 Firebase 是 Google 網域、**在中國被 GFW 封鎖**，所以東莞廠原本有 91% 的產品圖是破的，
 只有 PDF／Excel 匯出正常（那條路徑走 `?imgproxy=` 由伺服器代抓）。搬到 Supabase 後一併解決。
 
+⚠️ **這個 Supabase 專案由 platform 與公司官網共用。** `supabase functions list` 會看到三個
+本 repo 沒有的 function —— **`enquiry`／`translate`／`admin-users` 屬於官網**
+（`www.comart.com.tw`／`comartgroup.github.io`，允許來源清單裡沒有 platform.comart.com.tw），
+原始碼在官網的 repo。**不要把它們 download 進本 repo 版控**：那會製造出第二份會分岔的副本
+（2026-08-23 差點做了）。改動它們要去官網那邊。
+
 **Supabase Edge Functions** (Deno, in `supabase/functions/`)：
 - **所有 functions 一律以 `--no-verify-jwt` 部署**（config.toml 已全數固化 `verify_jwt = false`；
   漏帶旗標會造成全站 401，2026-07-20 曾發生）

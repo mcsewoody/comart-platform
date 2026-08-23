@@ -178,6 +178,27 @@ The portal supports EN, 繁中, 简中, VI, 日 via `setLang(lang)`. Each langua
 - Supabase 資料庫（專案 ID: `tcvlnpgpuphdalzvmoyo`）+ Edge Functions（資料代理、密碼驗證、機密文件、RAG）
 - Supabase anon key: `sb_publishable_rAVwVeUMWD-m_VTFIenMhg_Fcg6ocYJ`
 - 資料代理：`sb-proxy` edge function（`.../functions/v1/sb-proxy`）。~~Cloudflare Worker `comart.mcsewoody.workers.dev`~~ 已停用（中國被封 + 安全後門，2026-07-08 淘汰）
+### 成本檔案（BOM 表）：私有 bucket ＋ sb-proxy 角色守衛（2026-08-23）
+
+`products.bomFiles` / `products.docs` 的檔案存 **`product-private`**（`public=false`），路徑
+`products/<pid>/bom/<timestamp>.<ext>`。存取一律經 sb-proxy 換 10 分鐘簽章網址（`openStoredFile()`）。
+
+- 🔴 **bucket 設成 private 只擋外部匿名者，擋不住已登入的內部人**。sb-proxy 的 storage 轉發段用
+  service_role **無條件轉發任何 `/storage/v1/` 路徑**，所以任何持有有效 session 的人（含 `role='user'`）
+  都能直接要走私有檔案。守衛在 sb-proxy 的 `RESTRICTED_BUCKETS`：受限 bucket 的名字出現在路徑任何一段
+  就重新查資料庫當下的 role，只放行 `admin`/`dcc`（`COST_ROLES`），停用／離職者一律拒絕。
+  **兩層都要有，少一層等於沒做。**
+- 🔴 **角色重新查資料庫，不讀簽章裡的 role**（同 `kms-secure-docs`）：簽章是登入當時簽發的，
+  降權後舊 token 還在有效期內。角色分界比照報價系統既有規則（產品編輯器不開給 `user`），沒有另外發明。
+- 🔴 **Supabase Storage 的物件鍵不接受非 ASCII**（實測：空白可以、`+` 可以、**中文不行**，回 400 InvalidKey）。
+  原本上傳路徑是 `'…/bom/'+Date.now()+'_'+file.name`，而 BOM 檔名幾乎全是中文——**所以中文檔名的上傳一直
+  在失敗**。物件鍵一律經 `_safeStorageKey()`（只有時間戳＋副檔名），顯示名稱存在 JSON 的 `name` 欄位。
+- 🔴 **`_deleteStorageFile()` 原本永遠不刪**：守衛是 `if (!storagePath.includes('supabase')) return;`，
+  而 Supabase 的 storagePath 長得像 `products/A/bom/123.xls`，不含 'supabase' —— 刪除鈕移除了資料庫紀錄，
+  實體檔案卻永遠留在 Storage 上。已改為用 bucket 判斷，Firebase 舊檔明確跳過。
+- 新程式碼**同時吃舊格式**（`url` 是完整 http 網址就直接開），所以前端可以先上線、資料庫後改，
+  中間沒有任何時間點是壞的。加新的受限 bucket 時記得加進 `RESTRICTED_BUCKETS`。
+
 - Firebase：已移除，不再使用。產品圖存 Supabase Storage 的 **`product-assets`** bucket，
   路徑 `products/<產品id>.<jpg|png|webp>`，`products.img`／`img2`／`img3` 存的是**公開網址字串**（不是圖片內容）。
   `sb-proxy` 的 `IMG_HOSTS` 白名單只剩 `tcvlnpgpuphdalzvmoyo.supabase.co`；

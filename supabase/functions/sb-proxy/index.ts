@@ -144,9 +144,45 @@ serve(async (req) => {
   }
 
   // ── Storage 路徑（quotation 產品圖/檔案上傳）：二進位安全轉發，不做 JSON 處理 ──
+  //
+  // 🔴 這一段用 service_role 無條件轉發任何 /storage/v1/ 路徑。對公開圖片沒問題，
+  //    但成本資料（BOM 表）放進來就不行了：bucket 設成 private 只擋得住外部匿名者，
+  //    擋不住已登入的內部人——任何持有有效 session 的人（含 role='user'）都能
+  //    直接向這個端點要 product-private 的檔案，service_role 會照給。
+  //    所以私有 bucket 必須在這裡再擋一層。
+  //
+  //    角色**重新查資料庫**而不是讀簽章裡的 role，理由與 kms-secure-docs 相同：
+  //    簽章是登入當時簽發的，權限異動後舊 token 還在有效期內。查當下的值，
+  //    降權才會立即生效。
+  const RESTRICTED_BUCKETS = new Set(["product-private"])
+  // 誰看得到成本資料：比照報價系統既有的分界（產品編輯器只開給 admin/dcc，
+  // role='user' 進不去），不另外發明一套規則。
+  const COST_ROLES = new Set(["admin", "dcc"])
   const stIdx = url.pathname.indexOf("/storage/v1/")
   if (stIdx !== -1) {
     const stPath = url.pathname.slice(stIdx + "/storage/v1/".length) + url.search
+    /* 受限 bucket 的偵測刻意不去解析 Storage API 的路徑形狀。那些形狀有一堆
+       （object/、object/sign/、object/list/、object/info/、object/authenticated/、
+       object/upload/sign/、render/image/authenticated/…），而 Supabase 之後還可能
+       再加。只要「受限 bucket 的名字出現在路徑的任何一段」就套守衛：
+       誤擋一個名字剛好相同的路徑，代價是一次 403；漏放一次，代價是成本資料外流。 */
+    const segs = stPath.split("?")[0].split("/").filter(Boolean)
+    if (segs.some((x) => RESTRICTED_BUCKETS.has(x))) {
+      let liveRole = ""
+      try {
+        const ur = await fetch(
+          `${SUPABASE_URL}/rest/v1/users?emp_id=eq.${encodeURIComponent(sessEmpId)}&select=role,active,status`,
+          { headers: elevatedApiHeaders(SERVICE_KEY) },
+        )
+        const rows = ur.ok ? await ur.json() : []
+        const u = Array.isArray(rows) && rows[0] ? rows[0] : null
+        // 停用／離職者一律不給，即使 role 還是 admin
+        if (u && u.active !== false && u.status !== "disabled" && u.status !== "resigned") liveRole = String(u.role || "")
+      } catch { liveRole = "" }
+      if (!COST_ROLES.has(liveRole)) {
+        return json({ error: "forbidden", hint: "cost files require admin or dcc" }, 403)
+      }
+    }
     const stHeaders: Record<string, string> = elevatedApiHeaders(SERVICE_KEY)
     const ct = req.headers.get("content-type"); if (ct) stHeaders["Content-Type"] = ct
     const xup = req.headers.get("x-upsert"); if (xup) stHeaders["x-upsert"] = xup

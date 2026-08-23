@@ -94,14 +94,20 @@ serve(async (req) => {
 
   const url = new URL(req.url)
 
-  // ── 圖片代理（?imgproxy=<url>）：PDF/Excel 匯出需要把產品圖轉 base64，但圖床
-  //    （Firebase Storage）沒有 CORS 標頭、瀏覽器讀不到；由伺服器端代抓再回傳
-  //    （順帶解決 Firebase 是 Google 網域在中國被封的問題）。限白名單圖床防 SSRF。──
+  // ── 圖片代理（?imgproxy=<url>）：PDF/Excel 匯出需要把產品圖轉 base64，而
+  //    canvas 讀跨網域圖片會被 CORS 擋住，所以由伺服器端代抓再回傳。
+  //    限白名單圖床防 SSRF。
+  //    🔴 firebasestorage.googleapis.com 已於 2026-08-23 移除：289 筆產品圖
+  //    （全部剩餘的 Firebase 圖）已搬到 product-assets bucket，資料庫裡的
+  //    Firebase 網址歸零。順帶解決一個一直存在的問題——Firebase 是 Google 網域、
+  //    在中國被 GFW 封鎖，而畫面上的產品圖是直接 <img src>（不走這個代理），
+  //    所以東莞廠原本有 91% 的產品圖是破的，只有匯出正常。
+  //    要再加圖床請確認它不是 Google 網域，否則等於把同一個坑挖回來。──
   const imgTarget = url.searchParams.get("imgproxy")
   if (imgTarget) {
     let host = ""
     try { host = new URL(imgTarget).hostname } catch { return json({ error: "bad imgproxy url" }, 400) }
-    const IMG_HOSTS = ["firebasestorage.googleapis.com", "tcvlnpgpuphdalzvmoyo.supabase.co", "storage.googleapis.com"]
+    const IMG_HOSTS = ["tcvlnpgpuphdalzvmoyo.supabase.co"]
     if (!IMG_HOSTS.includes(host)) return json({ error: "img host not allowed", host }, 403)
     try {
       const imgRes = await fetch(imgTarget)

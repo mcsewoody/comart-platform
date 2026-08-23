@@ -85,7 +85,17 @@ https://platform.comart.com.tw/board/index.html?tab=poll&id=<場次 id>
   個人資料欄位（`SELF_PATCH_FIELDS` 白名單）。**舊的固定 `x-admin-token`（COMART-ADMIN-2026）已全面廢除，
   不要在任何新程式碼使用**。前端 helper：Portal `sbHdrs()`、admin `sbHdrs()`、kms `kmsSig()`、quotation `qtHdrs()`/`qtSig()`、board `sbHdrs()`（配 `SB.get/post/patch/del` 包裝）。
 
-**Firebase**: 已完全移除（2026-07 確認四個 HTML 皆無 firebase 引用）。通知與站內訊息走 Supabase 輪詢（通知 60 秒、訊息 10 秒增量）。
+**Firebase**: 已完全移除（**2026-08-23 起真的完全移除**）。通知與站內訊息走 Supabase 輪詢（通知 60 秒、訊息 10 秒增量）。
+
+🔴 **這裡曾經寫錯，值得記住為什麼**：2026-07 的結論是「四個 HTML 皆無 firebase 引用」——那句話對**程式碼**是對的，
+但 Firebase 的依賴不在程式碼裡，在**資料**裡。`products.img` 有 **289 筆（全部 319 筆的 91%）**指向
+`comart-quotation.firebasestorage.app`，直到 2026-08-23 才搬完。
+**「grep 不到引用」不等於「沒有依賴」** —— 存在資料庫欄位裡的網址是 grep 不到的。
+下次宣告某個外部服務已移除前，要一起查資料表裡的網址欄位。
+
+順帶暴露一個一直存在的使用者問題：報價系統畫面上的產品圖是 `<img src="${p.img}">` **直連圖床**（不走 sb-proxy），
+而 Firebase 是 Google 網域、**在中國被 GFW 封鎖**，所以東莞廠原本有 91% 的產品圖是破的，
+只有 PDF／Excel 匯出正常（那條路徑走 `?imgproxy=` 由伺服器代抓）。搬到 Supabase 後一併解決。
 
 **Supabase Edge Functions** (Deno, in `supabase/functions/`)：
 - **所有 functions 一律以 `--no-verify-jwt` 部署**（config.toml 已全數固化 `verify_jwt = false`；
@@ -168,7 +178,10 @@ The portal supports EN, 繁中, 简中, VI, 日 via `setLang(lang)`. Each langua
 - Supabase 資料庫（專案 ID: `tcvlnpgpuphdalzvmoyo`）+ Edge Functions（資料代理、密碼驗證、機密文件、RAG）
 - Supabase anon key: `sb_publishable_rAVwVeUMWD-m_VTFIenMhg_Fcg6ocYJ`
 - 資料代理：`sb-proxy` edge function（`.../functions/v1/sb-proxy`）。~~Cloudflare Worker `comart.mcsewoody.workers.dev`~~ 已停用（中國被封 + 安全後門，2026-07-08 淘汰）
-- Firebase：已移除，不再使用
+- Firebase：已移除，不再使用。產品圖存 Supabase Storage 的 **`product-assets`** bucket，
+  路徑 `products/<產品id>.<jpg|png|webp>`，`products.img`／`img2`／`img3` 存的是**公開網址字串**（不是圖片內容）。
+  `sb-proxy` 的 `IMG_HOSTS` 白名單只剩 `tcvlnpgpuphdalzvmoyo.supabase.co`；
+  **要再加圖床請確認它不是 Google 網域**，否則等於把中國封鎖那個坑挖回來
 - 部署: GitHub Pages → platform.comart.com.tw
 
 ## 版本規則

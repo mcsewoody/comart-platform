@@ -228,6 +228,18 @@ The portal supports EN, 繁中, 简中, VI, 日 via `setLang(lang)`. Each langua
 - **admin 豁免是必要的**：有 4 位 admin 不在業務部（3 位 `management`、1 位空白部門 A00001）。
   系統管理者進不了自己管的系統通常是錯的。**`dcc` 不豁免** —— 那是文件管制角色，跟報價業務無關
   （因此有 2 位 dcc 被擋：`management` 與 `rd` 各一）。
+- 🔴 **`writeSession()` 是逐欄位重建 SESSION 的，新增 session 欄位一定要加進去**（2026-08-25 踩過）。
+  第一版把 `depts` 判斷加在 `canOpenApp()`，但 `writeSession()` 沒有 `dept` —— 登入時撈回來的
+  `user` 物件有，寫進 localStorage 的那一份沒有。結果**全部 19 位業務部同事的卡片都消失**，
+  只有 admin 看得到（admin 豁免在 dept 檢查之前，所以最容易察覺的人剛好不會察覺）。
+  **「登入時那個變數有這個欄位」不等於「它活到 localStorage」。**
+- 🔴 **舊 session 缺 dept 要放行，不是擋**：那是資訊缺失不是「不屬於任何部門」，
+  當成拒絕理由會把全公司鎖到每個人重新登入為止。判斷用 `('dept' in s)`（有沒有這個鍵），
+  不是判斷值真不真 —— 真的沒有部門的人是 `''`，那該擋，跟舊 session 是兩件事。
+  `backfillSessionDept()` 在進 Portal 時即時補查，把空窗從「8 小時 session 壽命」縮到一次請求。
+- 🔴 **報價系統有三條建立 `currentUser` 的路徑，三條都要擋**：portal session、`restoreSession`（F5）、
+  `?_ps=`（從 Portal 進來，最常走的一條）。第一版只擋了第一條，所以「直接打網址進不去」
+  對重新整理與從 Portal 點進來都不成立。
 - **兩處都要改，規則必須一致**：Portal 的 `canOpenApp()`（`APPS` 條目加 `depts:['sales']`）
   與報價系統的 `_qtDeptAllowed()`。Portal 隱藏卡片，報價系統擋直接輸入網址的人。
 - 🔴 **Portal 有三個入口，全部都要擋**：卡片（`renderAppGrid`）、`openApp()`（畫面可能是舊的，

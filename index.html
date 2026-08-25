@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>COMART Platform v1.77</title>
+<title>COMART Platform v1.78</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script defer src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.js"></script>
 <style>
@@ -306,7 +306,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     <div class="login-logo">
       <div class="login-mark" style="background:transparent"><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="44" height="23"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></div>
       <div class="login-name">COMART Platform</div>
-      <div class="login-sub">Internal Portal · v1.77</div>
+      <div class="login-sub">Internal Portal · v1.78</div>
     </div>
     <form id="loginForm" onsubmit="doLogin();return false;" autocomplete="on">
     <div class="field">
@@ -362,7 +362,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   <div class="topbar">
     <div class="topbar-logo" onclick="switchView('home')">
       <div class="topbar-mark" style="background:transparent"><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="26" height="14"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></div>
-      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.77</span></div>
+      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.78</span></div>
     </div>
     <div class="topbar-right">
       <div class="lang-switcher">
@@ -1074,6 +1074,13 @@ function writeSession(user, sig) {
     empId: user.empId, nameEn: user.nameEn||'', nameZh: user.nameZh||'',
     role: user.role, email: user.email||'', mobile: user.mobile||'',
     ext: user.ext||'', site: user.site||'TW',
+    /* 🔴 dept 原本漏在這裡（2026-08-25 修）。登入時撈回來的 user 物件有 dept，
+       但這個函式是逐欄位重建 SESSION 的，沒列到的欄位就消失 —— 於是
+       canOpenApp() 讀到 undefined，全部 19 位業務部同事的報價系統卡片都不見了，
+       只有 admin 看得到（因為 admin 的豁免在 dept 檢查之前）。
+       教訓：「登入時那個變數有這個欄位」不等於「它活到 localStorage」。
+       新增任何要跨子系統使用的 session 欄位時，這裡也要加。 */
+    dept: user.dept||'',
     titleEn: user.titleEn||'', titleZh: user.titleZh||'',
     ts: Date.now(), expires: Date.now() + SESSION_TTL,
     // sig：伺服器簽章的 session token（HMAC，密鑰只存在 Supabase Secrets）。
@@ -1269,6 +1276,7 @@ function enterPortal() {
 
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('shell').classList.add('show');
+  backfillSessionDept();   // 舊 session 缺 dept 時即時補上（不 await，不擋畫面）
 
   const s = SESSION;
   const initial = (s.nameEn || s.empId || '?')[0].toUpperCase();
@@ -1433,8 +1441,28 @@ function canOpenApp(app) {
   const s = SESSION || {};
   if (app.adminOnly && s.role !== 'admin') return false;
   if (app.roles && app.roles.length && !app.roles.includes(s.role)) return false;
-  if (app.depts && app.depts.length && s.role !== 'admin' && !app.depts.includes(s.dept || '')) return false;
+  /* 舊 session（2026-08-25 修好之前寫入的）沒有 dept 這個鍵。那是資訊缺失，
+     不是「不屬於任何部門」—— 拿它當拒絕的理由會把全公司鎖在外面，直到每個人
+     重新登入。所以缺鍵就放行，並由 backfillSessionDept() 立刻補查補上，
+     把空窗從「最長 8 小時的 session 壽命」縮到「一次請求」。
+     注意是判斷「有沒有這個鍵」而不是值真不真 —— 真的沒有部門的人是 ''，
+     那應該被擋，跟舊 session 是兩件事。 */
+  if (app.depts && app.depts.length && s.role !== 'admin' && ('dept' in s)
+      && !app.depts.includes(s.dept || '')) return false;
   return true;
+}
+
+/* 補上舊 session 缺少的 dept。只在鍵不存在時才查，所以正常登入不會多一次請求。
+   查到之後寫回 SESSION 與 localStorage 並重畫卡片 —— 使用者會看到卡片在載入後
+   短暫出現或消失，那比「要重新登入才正常」好。 */
+async function backfillSessionDept() {
+  try {
+    if (!SESSION || !SESSION.empId || ('dept' in SESSION)) return;
+    const rows = await SB.get('users', 'emp_id=eq.' + encodeURIComponent(SESSION.empId) + '&select=dept&limit=1');
+    SESSION.dept = (rows && rows[0] && rows[0].dept) || '';
+    localStorage.setItem(SESSION_KEY, JSON.stringify(SESSION));
+    renderAppGrid();
+  } catch (e) { console.warn('backfillSessionDept:', e); }
 }
 
 function renderAppGrid() {

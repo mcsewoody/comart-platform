@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#080C14">
-<title>COMART · Quotation System v3.56</title>
+<title>COMART · Quotation System v3.58</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -259,7 +259,7 @@ img{display:block}
       <div class="logo-mark" style="background:transparent"><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="24" height="13"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></div>
       <div>
         <div class="logo-text">COMART</div>
-        <div id="appVersionDiv" style="font-size:10px;color:var(--ac);font-weight:600;letter-spacing:.04em;line-height:1.3">v3.56</div>
+        <div id="appVersionDiv" style="font-size:10px;color:var(--ac);font-weight:600;letter-spacing:.04em;line-height:1.3">v3.58</div>
       </div>
     </div>
     <div class="topbar-right">
@@ -464,7 +464,16 @@ img{display:block}
   <div class="sec-title" id="fs-client">Client</div>
   <div class="form-card">
     <div class="field-grid">
-      <div class="field"><label id="fl-company">Company *</label><input id="f-company" autocomplete="off"></div>
+      <div class="field"><label id="fl-company">Company *</label>
+        <input id="f-company" autocomplete="off">
+        <!-- 從 CRM 帶入（2026-08-25）。用 select 而不是 datalist：datalist 在
+             iOS Safari 不畫任何可下拉的提示，桌機 Chrome 的小箭頭也只在特定
+             狀態出現，使用者根本不知道能挑（board 的指定人員欄位踩過同一個坑）。 -->
+        <select id="f-crm-pick" onchange="fillFromCRM(this.value)"
+          style="margin-top:5px;width:100%;padding:7px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx2);font-size:12px">
+          <option value="">— 從 CRM 帶入客戶 / Fill from CRM —</option>
+        </select>
+      </div>
       <div class="field"><label id="fl-attn">Contact</label><input id="f-attn" autocomplete="off"></div>
     </div>
     <div class="field-grid">
@@ -637,6 +646,10 @@ img{display:block}
   <div id="stab-content-iface" style="display:none">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
       <div class="sec-title" style="margin-bottom:0">Interface</div>
+      <!-- renderInterfaceList() 一直在找這顆按鈕（getElementById('ifaceAddBtn')）
+           並依角色控制顯示，但 HTML 從來沒有它 —— 所以介面只能編輯既有的、
+           無法新增。2026-08-25 補上。 -->
+      <button class="btn btn-sm" id="ifaceAddBtn" onclick="openIfaceModal(null)" style="font-size:12px;padding:6px 14px">+ Add Interface</button>
     </div>
     <!-- UI Language -->
     <div style="margin-bottom:20px">
@@ -736,7 +749,7 @@ img{display:block}
     <div style="display:flex;align-items:flex-start;gap:14px;margin-bottom:14px">
       <div style="position:sticky;top:0;z-index:10;background:var(--s1);padding-top:2px;box-shadow:0 4px 12px var(--s1)">
         <div style="font-size:13px;color:var(--tx2);margin-bottom:6px;font-weight:700;letter-spacing:.02em">📷 Product Image</div>
-        <div class="img-upload-zone" id="imgZone" onclick="document.getElementById('imgFileInput').click()">
+        <div class="img-upload-zone" id="imgZone" onclick="window._lastImgSlot=1;document.getElementById('imgFileInput').click()">
           <div class="ph" id="imgPh">📷</div>
           <div class="ph-lbl" id="imgLbl">Tap to upload</div>
         </div>
@@ -744,14 +757,14 @@ img{display:block}
         <button class="btn btn-xs btn-outline" style="margin-top:6px;width:100%" onclick="clearImg()">Remove</button>
         <!-- Photo 2 -->
         <div style="margin-top:8px;font-size:10px;color:var(--tx3);font-weight:600;margin-bottom:3px">Photo 2</div>
-        <div class="img-upload-zone" id="imgZone2" onclick="document.getElementById('imgFileInput2').click()" style="height:70px">
+        <div class="img-upload-zone" id="imgZone2" onclick="window._lastImgSlot=2;document.getElementById('imgFileInput2').click()" style="height:70px">
           <div class="ph" id="imgPh2" style="font-size:18px">📷</div>
         </div>
         <input type="file" id="imgFileInput2" accept="image/*" style="display:none" onchange="handleImgUpload2(event)">
         <button class="btn btn-xs btn-outline" style="margin-top:4px;width:100%" onclick="clearImg2()">Remove</button>
         <!-- Photo 3 -->
         <div style="margin-top:8px;font-size:10px;color:var(--tx3);font-weight:600;margin-bottom:3px">Photo 3</div>
-        <div class="img-upload-zone" id="imgZone3" onclick="document.getElementById('imgFileInput3').click()" style="height:70px">
+        <div class="img-upload-zone" id="imgZone3" onclick="window._lastImgSlot=3;document.getElementById('imgFileInput3').click()" style="height:70px">
           <div class="ph" id="imgPh3" style="font-size:18px">📷</div>
         </div>
         <input type="file" id="imgFileInput3" accept="image/*" style="display:none" onchange="handleImgUpload3(event)">
@@ -793,7 +806,7 @@ img{display:block}
         <div style="display:grid;grid-template-columns:140px 1fr;gap:8px;margin-bottom:9px">
           <div class="field"><label id="pm-price-lbl">1K USD (Base Price)</label><input id="pm-price" type="number" min="0" step="0.01" placeholder="0.00" autocomplete="off" style="padding:8px 6px;font-size:13px;width:100%"></div>
           <div class="field"><label id="pm-remark-lbl">Remark</label>
-            <textarea id="pm-remark" placeholder="e.g. Price excl. packaging." autocomplete="off" rows="2"
+            <textarea id="pm-remark" placeholder="Price do not include packaging." autocomplete="off" rows="2"
               style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px;resize:vertical;font-family:inherit;box-sizing:border-box;outline:none;min-height:42px"></textarea>
           </div>
         </div>
@@ -1317,6 +1330,11 @@ let QUOTES = [];
 let PRODUCTS = [];
 let SUPPLIERS = [];
 let PRICE_HISTORY = [];
+/* 🔴 這個字面值是「第一次使用時的種子」，不是資料的來源。
+   2026-08-25 之前它是唯一的來源：INTERFACES 從不從資料庫載入、saveIface() 也
+   只改記憶體，所以新增的介面重新載入就消失 —— 使用者看到的症狀是「無法增加」。
+   現在真正的儲存位置是 SETTINGS.interfaces，跟著 quotation_settings 一起存。
+   種子留著，讓全新環境不是一片空白。 */
 let INTERFACES = [{"id": "001", "name": "3T Joint", "compatible": ["3T Slot"]}, {"id": "002", "name": "3T Slot", "compatible": ["3T Joint"]}, {"id": "003", "name": "Camera Adapter", "compatible": []}, {"id": "004", "name": "GoPro Adapter", "compatible": []}, {"id": "005", "name": "10mm Ball Socket", "compatible": []}, {"id": "006", "name": "15mm Ball Socket", "compatible": []}, {"id": "007", "name": "17mm Ball Head", "compatible": ["17mm Ball Socket"]}, {"id": "008", "name": "17mm Ball Socket", "compatible": ["17mm Ball Head"]}, {"id": "009", "name": "25mm Ball Head", "compatible": ["25mm Ball Socket"]}, {"id": "010", "name": "25mm Ball Socket", "compatible": ["25mm Ball Head"]}, {"id": "011", "name": "QI", "compatible": []}, {"id": "012", "name": "Ring", "compatible": ["17/25mm Ball Head"]}, {"id": "013", "name": "T Joint", "compatible": ["T Slot", "3T Slot"]}, {"id": "014", "name": "T Slot", "compatible": ["T Joint"]}];
 let SETTINGS = {
   lead:'45-60 days', valid:'30 days', inco:'EXW', pay:'T/T 30%+70%',
@@ -1325,6 +1343,13 @@ let SETTINGS = {
 };
 
 const PRESET_MOQS = [1,500,1000,3000,5000,10000];
+
+/* 產品 Remark 的統一預設（2026-08-25，Woody 指定）。
+   這是「新產品的預設值」，不是唯讀的固定字串 —— 存進 products.remark，
+   使用者可以逐項改掉。原本這句只是 placeholder（提示字，不會被存下來），
+   所以每一筆產品的 remark 其實都是空的。
+   既有產品不回填：那會覆寫別人特意留白或已經寫過別的內容的欄位。 */
+const DEFAULT_PROD_REMARK = 'Price do not include packaging.';
 
 // ── Supabase Storage ──
 const SB_STORAGE_BUCKET = 'product-assets';
@@ -1356,6 +1381,38 @@ function readPortalSession() {
     }
     return s;
   } catch(e) { return null; }
+}
+
+/* 誰進得來：業務部全體 ＋ 所有 admin。與 Portal 端 canOpenApp() 的規則一致，
+   兩邊都改才有意義 —— Portal 隱藏卡片，這裡擋直接輸入網址的人。 */
+const QT_ALLOWED_DEPTS = ['sales'];
+function _qtDeptAllowed(u) {
+  if (!u) return false;
+  if (u.role === 'admin') return true;
+  return QT_ALLOWED_DEPTS.indexOf(u.dept || '') !== -1;
+}
+
+/* 擋下時給一個說得清楚的畫面，而不是空白頁或無聲跳轉：使用者要知道
+   「不是壞了，是沒有權限」，以及下一步能去哪裡。 */
+function _qtShowDeptBlock() {
+  const M = {
+    'zh-TW': ['僅限業務部', '報價管理系統只開放給業務部使用。如果你認為這是設定錯誤，請聯絡系統管理者。', '回到入口網站'],
+    'zh-CN': ['仅限业务部', '报价管理系统只开放给业务部使用。如果你认为这是设置错误，请联系系统管理者。', '回到入口网站'],
+    en:      ['Sales department only', 'The Quotation System is limited to the Sales department. If you think this is a misconfiguration, contact your system administrator.', 'Back to Portal'],
+    vi:      ['Chỉ dành cho bộ phận Kinh doanh', 'Hệ thống Báo giá chỉ dành cho bộ phận Kinh doanh. Nếu bạn cho rằng đây là lỗi cấu hình, hãy liên hệ quản trị viên hệ thống.', 'Về trang Portal'],
+    ja:      ['営業部限定', '見積管理システムは営業部のみ利用できます。設定の誤りだと思われる場合は、システム管理者にご連絡ください。', 'ポータルへ戻る'],
+  };
+  const m = M[lang] || M.en;
+  document.body.innerHTML =
+    '<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;'
+    + 'background:#0b1220;color:#e6edf6;font-family:system-ui,-apple-system,\'Noto Sans TC\',sans-serif">'
+    + '<div style="max-width:460px;text-align:center">'
+    + '<div style="font-size:44px;margin-bottom:14px">🔒</div>'
+    + '<h1 style="font-size:1.25rem;margin:0 0 10px">' + escHtml(m[0]) + '</h1>'
+    + '<p style="color:#93a4bb;line-height:1.7;margin:0 0 22px;font-size:.92rem">' + escHtml(m[1]) + '</p>'
+    + '<a href="../index.html" style="display:inline-block;padding:10px 20px;border-radius:8px;'
+    + 'background:#2D7FF9;color:#fff;text-decoration:none;font-weight:600;font-size:.9rem">' + escHtml(m[2]) + '</a>'
+    + '</div></div>';
 }
 
 // CRM in-memory caches
@@ -1470,6 +1527,7 @@ async function _reloadAfterLogin(){
     CATEGORIES    = cData    || [];
     PRICE_HISTORY = phData   || [];
     if(sData?.[0]?.data) SETTINGS = {...SETTINGS, ...sData[0].data};
+    if (Array.isArray(SETTINGS.interfaces)) INTERFACES = SETTINGS.interfaces;
     _lastFullLoadTs = Date.now();
     _seedPollSig('quotes', QUOTES); _seedPollSig('products', PRODUCTS); _seedPollSig('categories', CATEGORIES); _seedPollSig('price_history', PRICE_HISTORY);
     lsSet('qi-q-cache', QUOTES);
@@ -1547,6 +1605,7 @@ async function loadAll() {
     CATEGORIES    = cData    || [];
     PRICE_HISTORY = phData   || [];
     if (sData?.[0]?.data) SETTINGS = {...SETTINGS, ...sData[0].data};
+    if (Array.isArray(SETTINGS.interfaces)) INTERFACES = SETTINGS.interfaces;
     _lastFullLoadTs = Date.now();
     _seedPollSig('quotes', QUOTES); _seedPollSig('products', PRODUCTS); _seedPollSig('categories', CATEGORIES); _seedPollSig('price_history', PRICE_HISTORY);
     lsSet('qi-q-cache', QUOTES);
@@ -1587,9 +1646,21 @@ async function loadAll() {
             role:    u.active === false ? 'inactive' : (u.role || 'user'),
             photoURL:u.avatar_url||'',
             site:    u.site || 'TW',
+            dept:    u.dept || '',
           };
         }
       } catch(e) { console.warn('[Portal auth SB]', e); }
+      /* 部門限制（2026-08-25，Woody 定案）：這個系統只給業務部，admin 不受限。
+         判斷用的是上面剛從資料庫撈回來的 dept，不是 localStorage 裡那份 —— 改
+         localStorage 偽造不了，調部門也立即生效。dcc 不豁免：那是文件管制角色，
+         跟報價業務無關。
+         🔴 這仍是前端守衛。擋的是「不小心進錯地方」與「同事互相轉貼網址」，
+            改前端程式碼可以繞過。真正的牆要在 sb-proxy 依部門擋 quotes/crm_*，
+            那一層 Woody 評估後暫不做。 */
+      if (freshUser && freshUser.role !== 'inactive' && !_qtDeptAllowed(freshUser)) {
+        _qtShowDeptBlock();
+        return;
+      }
       if (freshUser && freshUser.role !== 'inactive') {
         currentUser = { ...freshUser };
         if (!localStorage.getItem('qi-lang-v2')) {
@@ -1824,6 +1895,62 @@ async function deleteOneP(id) {
     console.error('deleteOneP:', e);
     toast('⚠️ Delete failed — please retry');
   }
+}
+
+
+/* ───────── 從 CRM 帶入客戶（2026-08-25）─────────
+   crm_accounts 只有公司層級的欄位（company / country / …），聯絡人的 email 與
+   phone 在 crm_contacts。所以帶入是兩段：公司名取自 account，收件人／Email／
+   Tel 取自該 account 底下的聯絡人。
+
+   挑聯絡人的順序：role 標示為 primary 的優先，否則取最早建立的那一位。
+   沒有聯絡人時只帶公司名，其餘欄位不動 —— 清空使用者已經打好的字比留著更糟。
+
+   刻意「不覆蓋已填的欄位」：只有空欄位才填。使用者可能先手打了聯絡人才想起來
+   可以從 CRM 帶公司資料，這時把他打的字洗掉是最惱人的行為。 */
+function _crmPrimaryContact(accountId) {
+  const list = CRM_CONTACTS.filter(c => c.accountId === accountId);
+  if (!list.length) return null;
+  const primary = list.find(c => /primary|主要/i.test(String(c.role || '')));
+  if (primary) return primary;
+  return list.slice().sort((a, b) =>
+    String(a.createdAt || '').localeCompare(String(b.createdAt || '')))[0];
+}
+
+function populateCRMPicker() {
+  const sel = document.getElementById('f-crm-pick');
+  if (!sel) return;
+  // canViewCRM：業務只看得到自己的客戶，admin/dcc 看全部。沿用 CRM 分頁的同一條規則
+  const accts = CRM_ACCOUNTS.filter(a => canViewCRM(a))
+    .slice().sort((a, b) => String(a.company || '').localeCompare(String(b.company || '')));
+  const first = sel.options[0] ? sel.options[0].outerHTML
+    : '<option value="">— 從 CRM 帶入客戶 / Fill from CRM —</option>';
+  sel.innerHTML = first + accts.map(a =>
+    '<option value="' + escHtml(a.id) + '">' + escHtml(a.company || '(no name)')
+    + (a.country ? ' · ' + escHtml(a.country) : '') + '</option>').join('');
+  sel.value = '';
+}
+
+function fillFromCRM(accountId) {
+  if (!accountId) return;
+  const a = CRM_ACCOUNTS.find(x => x.id === accountId);
+  if (!a) return;
+  const set = (id, v) => {
+    const el = document.getElementById(id);
+    if (el && v && !el.value.trim()) el.value = v;   // 只填空欄位
+  };
+  const setForce = (id, v) => { const el = document.getElementById(id); if (el && v) el.value = v; };
+  // 公司名是使用者明確挑的，覆蓋它才符合預期
+  setForce('f-company', a.company || '');
+  const c = _crmPrimaryContact(accountId);
+  if (c) {
+    set('f-attn',  c.name || '');
+    set('f-email', c.email || '');
+    set('f-tel',   c.phone || '');
+  }
+  const filled = c ? 'Filled from CRM: ' + (a.company || '') : 'Company filled (no contact on this account)';
+  toast(filled);
+  document.getElementById('f-crm-pick').value = '';
 }
 
 // ── Save settings ──────────────────────
@@ -2607,7 +2734,8 @@ function openProdModal(id){
   document.getElementById('pm-weight').value=p?.weight||'';
   document.getElementById('pm-pkgdim').value=p?.pkgdim||'';
   document.getElementById('pm-pkgweight').value=p?.pkgweight||'';
-  document.getElementById('pm-remark').value=p?.remark||'';
+  // 新產品帶預設；既有產品照原值（包含刻意留白的，不要幫它填回去）
+  document.getElementById('pm-remark').value = p ? (p.remark||'') : DEFAULT_PROD_REMARK;
   const _crEl=document.getElementById('pm-cost-ref'); if(_crEl) _crEl.value=p?.costRef||'';
   populateSupplierDropdowns();
   document.getElementById('pm-sup1').value=p?.supplier1||'';
@@ -2954,6 +3082,7 @@ function buildUnifiedML(nameVals, featVals) {
       + ' placeholder="' + LANG_LABELS[l] + ' description…">' + val + '</textarea>'
       + '</div>';
   }).join('');
+  bindDescAutoNumber();
 
   // Wait for browser to parse innerHTML before binding events
   setTimeout(bindTranslateEvents, 0);
@@ -2977,6 +3106,105 @@ function getMLValues(fieldsId) {
   });
   return r;
 }
+
+/* ───────── Description 自動編號（2026-08-25）─────────
+   在 Description 輸入框裡：欄位為空時打第一個字自動補「1. 」，之後每按 Enter
+   自動接下一號。
+
+   刻意只在「上一行本來就有編號」時才續號 —— 使用者如果自己刪掉編號改寫散文，
+   工具就該讓開，而不是硬把格式塞回去。
+   也刻意不做重新編號：中間插入一行時不去改寫後面的號碼，因為那會在使用者
+   正在打字時大幅改動整個欄位的內容，游標位置與復原紀錄都會亂掉。 */
+const _LIST_RE = /^(\s*)(\d+)\.\s/;
+
+function _autoNumberKeydown(e) {
+  if (e.key !== 'Enter' || e.shiftKey || e.isComposing) return;
+  const ta = e.target;
+  const pos = ta.selectionStart;
+  if (pos !== ta.selectionEnd) return;               // 有選取範圍就不插手
+  const before = ta.value.slice(0, pos);
+  const line = before.slice(before.lastIndexOf('\n') + 1);
+  const m = line.match(_LIST_RE);
+  if (!m) return;                                    // 這一行沒有編號 → 不續號
+  // 「3. 」後面沒有內容就按 Enter：視為結束清單，把空的編號清掉
+  if (line.replace(_LIST_RE, '').trim() === '') {
+    e.preventDefault();
+    const lineStart = before.lastIndexOf('\n') + 1;
+    ta.value = ta.value.slice(0, lineStart) + ta.value.slice(pos);
+    ta.selectionStart = ta.selectionEnd = lineStart;
+    ta.dispatchEvent(new Event('input', { bubbles: true }));
+    return;
+  }
+  e.preventDefault();
+  const next = (m[1] || '') + (parseInt(m[2], 10) + 1) + '. ';
+  ta.value = before + '\n' + next + ta.value.slice(pos);
+  ta.selectionStart = ta.selectionEnd = pos + 1 + next.length;
+  ta.dispatchEvent(new Event('input', { bubbles: true }));
+}
+
+function _autoNumberFirst(e) {
+  const ta = e.target;
+  // 只有「原本整個欄位是空的、而且剛打進第一個可見字元」才補 1.
+  if (ta.dataset.autonumSeeded === '1') return;
+  const v = ta.value;
+  if (!v.trim()) return;
+  if (_LIST_RE.test(v)) { ta.dataset.autonumSeeded = '1'; return; }
+  if (v.indexOf('\n') !== -1) { ta.dataset.autonumSeeded = '1'; return; }
+  if (v.trim().length !== 1) { ta.dataset.autonumSeeded = '1'; return; }
+  const pos = ta.selectionStart;
+  ta.value = '1. ' + v;
+  ta.selectionStart = ta.selectionEnd = pos + 3;
+  ta.dataset.autonumSeeded = '1';
+}
+
+/* 綁在 featFields 的每一個語言 textarea 上。renderMultiLang 每次重畫都會產生
+   新的 textarea，所以每次重畫後都要重新綁一次。 */
+function bindDescAutoNumber() {
+  document.querySelectorAll('[data-field="featFields"]').forEach(function (ta) {
+    if (ta.dataset.autonumBound === '1') return;
+    ta.dataset.autonumBound = '1';
+    if (ta.value.trim()) ta.dataset.autonumSeeded = '1';
+    ta.addEventListener('keydown', _autoNumberKeydown);
+    ta.addEventListener('input', _autoNumberFirst);
+  });
+}
+
+/* ───────── 貼上圖片（2026-08-25）─────────
+   原本只能按「上傳」開檔案對話框。截圖或從網頁複製的圖片並不存在於檔案系統裡，
+   要先另存成檔案才能上傳 —— 這一步是多餘的，剪貼簿裡已經有圖片資料了。
+
+   落在 document 上而不是各個 zone 上：貼上時焦點通常不在那三個小方框裡（它們
+   不是可聚焦元素），綁在 zone 上等於永遠收不到事件。改為「產品編輯視窗打開時
+   才處理」，並且只在焦點不在文字輸入框裡時才吃掉貼上 —— 否則會把使用者在
+   Description 裡貼文字的動作誤判成貼圖。 */
+function _pasteTargetSlot() {
+  // 最近點過的圖片框優先；沒點過就給主圖
+  return window._lastImgSlot || 1;
+}
+function _handleImagePaste(e) {
+  /* 產品編輯器是一個 .page（#pageProdForm），不是 overlay —— 第一版寫成
+     prodOverlay 是錯的，那個 id 不存在。用 offsetParent 判斷可見性，就不必
+     知道路由用的是 display、class 還是其他機制。 */
+  const form = document.getElementById('pageProdForm');
+  if (!form || form.offsetParent === null) return;
+  const ae = document.activeElement;
+  if (ae && /^(INPUT|TEXTAREA|SELECT)$/.test(ae.tagName)) return;
+  const items = (e.clipboardData && e.clipboardData.items) || [];
+  let file = null;
+  for (let i = 0; i < items.length; i++) {
+    if (items[i].kind === 'file' && items[i].type.indexOf('image/') === 0) { file = items[i].getAsFile(); break; }
+  }
+  if (!file) return;
+  e.preventDefault();
+  const slot = _pasteTargetSlot();
+  const fake = { target: { files: [file] } };
+  if (slot === 2) handleImgUpload2(fake);
+  else if (slot === 3) handleImgUpload3(fake);
+  else handleImgUpload(fake);
+  toast(slot === 1 ? 'Image pasted' : 'Image pasted to Photo ' + slot);
+}
+document.addEventListener('paste', _handleImagePaste);
+
 function handleImgUpload(e){
   const file=e.target.files[0];if(!file)return;
   const reader=new FileReader();
@@ -3283,6 +3511,7 @@ function openQuoteForm(id){
     'VALIDITY OF THE QUOTATION IS ' + (SETTINGS.valid||'30 days') + '\n' +
     'PRICE SUBJECT TO CHANGE WITHOUT NOTICE';
   document.getElementById('f-notes').value = q?.notes !== undefined ? q.notes : defaultRemark;
+  populateCRMPicker();
   document.getElementById('delQBtn').style.display=(q&&currentUser?.role==='admin')?'inline-flex':'none';
   renderMoqChips();renderProdPicker();renderPriceTbl();
   applyLang();
@@ -5633,6 +5862,9 @@ function saveIface() {
   populateIfaceDropdowns();
   closeIfaceModal();
   renderInterfaceList();
+  // 沒有這一行，新增的介面重新載入就不見了 —— 這是「無法增加」的真正原因
+  SETTINGS.interfaces = INTERFACES;
+  saveS();
   toast('Saved');
 }
 
@@ -5643,6 +5875,8 @@ function deleteIface() {
     INTERFACES = INTERFACES.filter(x=>x.id!==editIfaceId);
     closeIfaceModal();
     renderInterfaceList();
+    SETTINGS.interfaces = INTERFACES;
+    await saveS();
     toast('Deleted');
   });
 }

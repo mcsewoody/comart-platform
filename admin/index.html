@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART 行政管理平台 v2.35</title>
+<title>COMART 行政管理平台 v2.36</title>
 <style>
 :root{
   /* KMS-aligned dark theme */
@@ -664,7 +664,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="logo">
     <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
     <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
-    <span><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="38" height="20" style="display:inline-block;vertical-align:middle;margin-top:-2px"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v2.35</span>
+    <span><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="38" height="20" style="display:inline-block;vertical-align:middle;margin-top:-2px"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v2.36</span>
   </div>
   <div class="trr">
     <div id="global-site-bar" style="display:flex;align-items:center;gap:4px"><span style="font-size:13px;color:var(--text-3);white-space:nowrap;font-weight:500">單位：</span>
@@ -3448,7 +3448,16 @@ async function renderCarDash(){
   document.getElementById('cd-td').innerHTML=tdBks.length?tdBks.map(b=>{const v=gVeh(b.vh_id),u=gUsr(b.u_id);return`<tr><td>${VICO[v?.type]||'🚗'} ${v?.name||'—'}</td><td>${u?.name||'—'}</td><td class="tdm">${b.start.slice(11,16)}–${b.end.slice(11,16)}</td><td class="tdm">${b.purpose||'—'}</td><td>${bkBadge(b)}</td></tr>`}).join(''):`<tr><td colspan="5" class="tdm" style="text-align:center;padding:14px">${t('car.no_bk_today')}</td></tr>`;
   const rems=[];vehs.forEach(v=>{if(v.next_maint_km&&v.km>=(v.next_maint_km-cfg.maint_km))rems.push({v,item:t('car.nav.maint'),diff:v.next_maint_km-v.km,type:'km'});if(v.next_insp&&dDiff(v.next_insp)<=cfg.insp_days)rems.push({v,item:t('car.nav.insp'),diff:dDiff(v.next_insp),date:v.next_insp,type:'dt'});});
   document.getElementById('cd-rm').innerHTML=rems.length?rems.map(r=>`<tr><td>${VICO[r.v.type]||'🚗'} ${r.v.name}</td><td>${r.item}</td><td class="tdm">${r.type==='dt'?fmtD(r.date):`${r.v.next_maint_km}km`}</td><td>${r.type==='dt'?`<span class="badge ${r.diff<=7?'br':r.diff<=30?'by':'bo'}">${r.diff}d</span>`:`<span class="badge bo">-${r.diff}km</span>`}</td></tr>`).join(''):`<tr><td colspan="4" class="tdm" style="text-align:center;padding:14px">${t('lib.no_overdue')}</td></tr>`;
-  document.getElementById('cd-cards').innerHTML=vehs.map(v=>{const st=vStBadge(v),pk=gPk(v.pk_id),pendBk=pendBkOf(v.id,bks),actBk=actBkOf(v.id,bks),curU=actBk?gUsr(actBk.u_id):null;const doneBks=bks.filter(b=>b.vh_id===v.id&&(b.st||b.status)==='done').map(b=>({b,t:b.actual_end||b.end||''})).filter(x=>x.t).sort((a,z)=>z.t.localeCompare(a.t));const lastBk=doneBks[0];const lastRet=lastBk?lastBk.t.slice(0,10):'—';const cardStyle=st.inuse?'border-left:3px solid var(--tl);background:linear-gradient(135deg,rgba(20,184,166,.08) 0%,transparent 50%)':'';const badgeStyle=st.inuse?'margin-left:auto;font-size:13px;padding:4px 12px;font-weight:700;letter-spacing:.3px':'margin-left:auto';return`<div class="ccard" style="${cardStyle}"><div class="cch"><div class="ccico">${VICO[v.type]||'🚗'}</div><div><div class="ccn">${v.name}</div><div class="ccp">${v.plate}</div></div><span class="badge ${st.cls}" style="${badgeStyle}">${st.lbl}</span></div><div class="ccb"><div class="ccr"><span class="ccl">${t('car.card.type_lbl')}</span><span class="ccv">${t('car.veh.type.'+v.type)||v.type}·${t('car.fuel.'+v.fuel)||v.fuel}</span></div><div class="ccr"><span class="ccl">${t('car.card.km_lbl')}</span><span class="ccv">${v.km.toLocaleString()}km</span></div><div class="ccr"><span class="ccl">${t('car.card.fuel_lbl')}</span><span class="ccv">${FUEL_LBL[v.fuel_lvl??4]}</span></div>${fuelBar(v.fuel_lvl??4)}<div class="ccr"><span class="ccl">${t('car.card.park_lbl')}</span><span class="ccv">${v.pk_id||'—'}</span></div><div class="ccr"><span class="ccl">${t('car.card.last_use_lbl')}</span><span class="ccv">${lastRet}${lastBk&&gUsr(lastBk.b.u_id)?` · ${gUsr(lastBk.b.u_id).name}`:''}</span></div>${curU?`<div class="ccr"><span class="ccl">${t('car.card.driver_lbl')}</span><span class="ccv" style="color:var(--tl)">${curU.name}</span></div><div class="ccr"><span class="ccl">${t('car.card.using_bk_lbl')}</span><span class="ccv tdm" style="font-size:11px">${bkWhoWhen(actBk)}</span></div>`:''}${pendBk?`<div class="ccr"><span class="ccl">${t('car.card.next_bk_lbl')}</span><span class="ccv tdm" style="font-size:11px">${bkWhoWhen(pendBk)}</span></div>`:''}</div><div class="ccf" style="flex-wrap:wrap;gap:6px"> ${pendBk?`<button class=\"btn bsm\" style=\"background:var(--acd);color:var(--ac)\" onclick=\"startUse('${pendBk.id}')\">${t('car.mo.depart')}</button> `:''} ${actBk?`<button class=\"btn bg2 bsm\" onclick=\"endUse('${actBk.id}')\">${t('car.mo.end_use')}</button>`:''} ${!actBk&&!pendBk&&!st.suspended&&!st.maintenance&&!st.retired?`<button class=\"btn bsm\" style=\"background:var(--acd);color:var(--ac)\" onclick=\"startBk('${v.id}')\">${t('car.btn.add_bk')}</button>`:''} <button class=\"btn bg2 bsm\" onclick=\"openParkUpdModal('${v.id}')\">${t('car.btn.upd_park')}</button></div></div>`}).join('');
+  document.getElementById('cd-cards').innerHTML=vehs.map(v=>{const st=vStBadge(v),pk=gPk(v.pk_id),pendBk=pendBkOf(v.id,bks),actBk=actBkOf(v.id,bks),curU=actBk?gUsr(actBk.u_id):null;const doneBks=bks.filter(b=>b.vh_id===v.id&&(b.st||b.status)==='done').map(b=>({b,t:b.actual_end||b.end||''})).filter(x=>x.t).sort((a,z)=>z.t.localeCompare(a.t));const lastBk=doneBks[0];const lastRet=lastBk?lastBk.t.slice(0,10):'—';// 🔴 預約鈕不再因為「現在有人用／已有待出發預約」而消失（v2.36）：
+// 車子今天有人開，不代表下週不能預約 —— 真正的時段衝突由 doBooking() 送出時擋下，
+// 看板這裡不該替使用者先決定。只有車輛本身停用／保養中／已報廢才真的不能預約，
+// 故改用「車輛自身狀態」判斷（vStBadge 在 inuse 時會提早回傳，讀不到那三個旗標）。
+const vRaw=v.st||v.status||'available';
+const bookable=vRaw!=='suspended'&&vRaw!=='maintenance'&&vRaw!=='retired';
+// 預填起始日：這台車最後一筆未結束預約的隔天（都還沒被預約就用今天），
+// 免得一按下去就撞到現有預約、跳一個必然出現的紅色警告
+const nextFree=nextFreeDay(v.id,bks);
+const cardStyle=st.inuse?'border-left:3px solid var(--tl);background:linear-gradient(135deg,rgba(20,184,166,.08) 0%,transparent 50%)':'';const badgeStyle=st.inuse?'margin-left:auto;font-size:13px;padding:4px 12px;font-weight:700;letter-spacing:.3px':'margin-left:auto';return`<div class="ccard" style="${cardStyle}"><div class="cch"><div class="ccico">${VICO[v.type]||'🚗'}</div><div><div class="ccn">${v.name}</div><div class="ccp">${v.plate}</div></div><span class="badge ${st.cls}" style="${badgeStyle}">${st.lbl}</span></div><div class="ccb"><div class="ccr"><span class="ccl">${t('car.card.type_lbl')}</span><span class="ccv">${t('car.veh.type.'+v.type)||v.type}·${t('car.fuel.'+v.fuel)||v.fuel}</span></div><div class="ccr"><span class="ccl">${t('car.card.km_lbl')}</span><span class="ccv">${v.km.toLocaleString()}km</span></div><div class="ccr"><span class="ccl">${t('car.card.fuel_lbl')}</span><span class="ccv">${FUEL_LBL[v.fuel_lvl??4]}</span></div>${fuelBar(v.fuel_lvl??4)}<div class="ccr"><span class="ccl">${t('car.card.park_lbl')}</span><span class="ccv">${v.pk_id||'—'}</span></div><div class="ccr"><span class="ccl">${t('car.card.last_use_lbl')}</span><span class="ccv">${lastRet}${lastBk&&gUsr(lastBk.b.u_id)?` · ${gUsr(lastBk.b.u_id).name}`:''}</span></div>${curU?`<div class="ccr"><span class="ccl">${t('car.card.driver_lbl')}</span><span class="ccv" style="color:var(--tl)">${curU.name}</span></div><div class="ccr"><span class="ccl">${t('car.card.using_bk_lbl')}</span><span class="ccv tdm" style="font-size:11px">${bkWhoWhen(actBk)}</span></div>`:''}${pendBk?`<div class="ccr"><span class="ccl">${t('car.card.next_bk_lbl')}</span><span class="ccv tdm" style="font-size:11px">${bkWhoWhen(pendBk)}</span></div>`:''}</div><div class="ccf" style="flex-wrap:wrap;gap:6px"> ${pendBk?`<button class=\"btn bsm\" style=\"background:var(--acd);color:var(--ac)\" onclick=\"startUse('${pendBk.id}')\">${t('car.mo.depart')}</button> `:''} ${actBk?`<button class=\"btn bg2 bsm\" onclick=\"endUse('${actBk.id}')\">${t('car.mo.end_use')}</button>`:''} ${bookable?`<button class=\"btn bsm\" style=\"background:var(--acd);color:var(--ac)\" onclick=\"startBk('${v.id}','${nextFree}')\">${t('car.btn.add_bk')}</button>`:''} <button class=\"btn bg2 bsm\" onclick=\"openParkUpdModal('${v.id}')\">${t('car.btn.upd_park')}</button></div></div>`}).join('');
 }
 
 let editVid=null;
@@ -3564,8 +3573,21 @@ async function initCarBkForm(){
   }
   if(titleEl)titleEl.textContent=t('car.page.bk');
   if(btnEl)btnEl.textContent=t('car.btn.confirm_bk');
+  // 🔴 從看板「預約」進來的預填在這裡套用，不要放在 startBk 的 setTimeout 裡（v2.36）：
+  //    這個函式是 async（中間 await loadCarFromSB()），而且上面會**無條件**把日期設成今天，
+  //    誰先跑完是不確定的 —— 舊寫法的 if(!sdEl.value) 因此等於永遠不生效。
+  if(_bkPrefill){
+    const pf=_bkPrefill; _bkPrefill=null;
+    const vSel=document.getElementById('bkv');
+    if(vSel&&pf.vid){vSel.value=pf.vid;vSel.dispatchEvent(new Event('change'));}
+    if(pf.from){
+      if(sdEl)sdEl.value=pf.from;
+      if(edEl)edEl.value=pf.from;
+    }
+    chkConflict();
+  }
 }
-function cancelBkForm(){editCarBkId=null;navCar('car-dash');}
+function cancelBkForm(){editCarBkId=null;_bkPrefill=null;navCar('car-dash');}
 function editCarBk(id){
   const bk=ld(K.bks).find(b=>b.id===id);
   if(!bk)return toast('找不到預約','error');
@@ -3583,23 +3605,25 @@ function chkConflict(){
   if(cf){const u=gUsr(cf.u_id);el.style.display='';el.textContent=`⚠️ 與${u?.name||'其他人'}衝突（${cf.start.replace('T',' ')} — ${cf.end.replace('T',' ')}）`;}else el.style.display='none';
 }
 
-// 從看板直接預約（預填車輛）
-function startBk(vid){
+// 這台車「下一個沒有被佔用的日子」：取所有未結束預約中最晚的結束日，隔一天。
+// 都沒有預約就是今天。日期一律走 ymdL（裝置當地時間），不可用 toISOString()。
+function nextFreeDay(vid,bks){
+  const today=tds();
+  const live=(bks||ld(K.bks)).filter(b=>b.vh_id===vid&&b.st!=='done'&&b.st!=='cancelled');
+  if(!live.length)return today;
+  const last=live.map(b=>dtn(b.end||'').slice(0,10)).filter(Boolean).sort().pop();
+  if(!last||last<today)return today;
+  const d=new Date(last+'T12:00');      // 中午避開日光節約時間的邊界
+  d.setDate(d.getDate()+1);
+  return ymdL(d);
+}
+
+// 從看板直接預約：把要預填的車輛與起始日交給 renderCarBkForm 收尾時套用
+let _bkPrefill=null;
+function startBk(vid,from){
+  editCarBkId=null;                      // 保險：不要沿用上一次的修改模式
+  _bkPrefill={vid:vid,from:from||nextFreeDay(vid)};
   navCar('car-bk');
-  setTimeout(async()=>{
-    // 帶入車輛
-    const sel=document.getElementById('bkv');
-    if(sel){sel.value=vid;sel.dispatchEvent(new Event('change'));}
-    // 預設日期為今天
-    const today=tds();
-    const sdEl=document.getElementById('bksd');
-    const edEl=document.getElementById('bked');
-    if(sdEl&&!sdEl.value)sdEl.value=today;
-    if(edEl&&!edEl.value)edEl.value=today;
-    // 預設出發地點
-    const frEl=document.getElementById('bkfr');
-    if(frEl&&!frEl.value)frEl.value='公司';
-  },80);
 }
 
 async function doBooking(){

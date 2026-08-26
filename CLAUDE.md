@@ -19,7 +19,7 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 | File | Version | Purpose | ~Lines |
 |------|---------|---------|--------|
 | `index.html` | v1.67 | Main portal — login, home, directory, bulletin, calendar, AI tools | 4,394 |
-| `admin/index.html` | v2.30 | Admin System — room booking, fleet, visitor, library, lottery | 5,650 |
+| `admin/index.html` | v2.37 | Admin System — room booking, fleet, visitor, library, lottery | 5,650 |
 | `kms/index.html` | v2.33 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
 | `quotation/index.html` | v3.54 | Quotation & CRM system | 7,332 |
 | `board/index.html` | v1.48 | 公告與紀錄 Bulletin & Records — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍、腦力激盪 | 4,600 |
@@ -347,6 +347,40 @@ The portal supports EN, 繁中, 简中, VI, 日 via `setLang(lang)`. Each langua
   用車記錄表格每列也有自己的出發／歸還鈕，那才是使用者該走的路徑
 - 時間字串比較一律經 `dtn()`：DB 回 `'YYYY-MM-DD HH:mm'`（空白）而 `datetime-local`
   是 `'…THH:mm'`，直接比大小會在第 11 個字元分岔（`' '` < `'T'`）
+
+### 寫入必須先成功才可以改快取（v2.37，2026-08-26）
+
+🔴 **關鍵寫入一律 `SB.write()`（回 `{ok,status,data,err}`）→ 檢查 `ok` → 才改 localStorage → 才 toast 成功。**
+`SB.get/post/patch/del/upsert` 這一層**每個方法都吞掉錯誤回傳 null**。對「載入」那是對的（網路差一次
+不該讓畫面空掉，用快取撐著比較好），但「寫入」共用同一套語意就是災難。
+
+實際發生過（公務車，2026-08-26）：使用者按了歸還，畫面顯示「已登記歸還」，資料庫其實還是 `active`
+—— 下次 `loadCarFromSB()` 就把那台車打回「使用中」，接著下一位同事出發，**同一台車出現兩筆同時使用中**。
+三個錯誤疊在一起：
+1. `doReturn()` 先改 localStorage、再送 DB、**不看結果**、無條件 toast 成功；
+2. `SB.upsert` 把「PATCH 真的失敗（401）」與「PATCH 成功但沒有符合的列」都當成後者而改送 POST，
+   於是 401 之後又補一個 409 duplicate key，**兩個錯誤都被吞掉**；
+3. session 過期後這個頁面**照樣操作得動** —— `readPortalSession()` 只在載入時檢查一次，
+   分頁開過夜之後每個寫入都被 sb-proxy 回 401，而畫面完全看不出來。
+
+已做的四道防線：
+- `SB.write()`（新）＋ `sbErrMsg()`：401/403 直接講「登入已逾期，剛才的操作沒有存檔」，不要只講「失敗」。
+- `sbAuthLost()`：任何 401/403 就在 topbar 下方掛一條紅色橫幅（`#sb-authbar`），**橫幅不會自己消失** ——
+  從那一刻起這個分頁什麼都存不進去，那是要一直看得到的事實。toast 只跳一次，否則會變連環彈窗。
+- `startUse()`：**一輛車同時只能有一筆 `active`**（硬擋，並指名是哪一筆要先歸還）。
+  這條是「歸還沒存檔」的下游防線 —— 上游修好了也要留著，否則任何漏網的寫入失敗都會再長出同一種爛資料。
+- 車輛卡片：同一台車 >1 筆 `active` 時直接印警告（`car.multi_active`），叫人去用車記錄逐筆歸還。
+  ⚠️ 這是**顯示層的偵測**，不是資料層的唯一約束；真正的牆要在 DB 加 partial unique index，尚未做。
+
+⚠️ **同型風險仍存在於 admin 其他模塊**（會議室、圖書館、客戶到訪、抽籤的寫入都還是「改快取 → 送 DB → 不看結果」）。
+401 橫幅是全域的，所以「什麼都存不進去」現在看得到了；但個別寫入失敗（400／衝突）仍會安靜。
+改到那些模塊時順手改成 `SB.write()` 的形狀，不要再新增「改完快取就 toast 成功」的程式。
+
+- 🔴 **`car_bookings.actual_start` / `actual_end` 是 2026-08-26 才補上的**（migration 202608260001）。
+  前端從 v2.31 就在寫這兩個值，但欄位不存在、`sbSaveCarBk()` 的映射也沒送 ——
+  「實際歸還時間」一直只活在 localStorage，下次載入就消失，看板「最後歸還」只能退回顯示預約結束時間。
+  `_carBkHasActualTs` 旗標讓「欄位還沒建立就先上線」也不會壞（撞到 PGRST204 就降級重試）。
+  **這是「grep 不到引用不等於沒有依賴」的鏡像版本：程式碼裡寫得好好的欄位，資料庫裡可能根本不存在。**
 
 ## Board 重要細節
 

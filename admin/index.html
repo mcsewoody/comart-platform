@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART 行政管理平台 v2.36</title>
+<title>COMART 行政管理平台 v2.37</title>
 <style>
 :root{
   /* KMS-aligned dark theme */
@@ -664,7 +664,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="logo">
     <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
     <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
-    <span><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="38" height="20" style="display:inline-block;vertical-align:middle;margin-top:-2px"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v2.36</span>
+    <span><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="38" height="20" style="display:inline-block;vertical-align:middle;margin-top:-2px"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v2.37</span>
   </div>
   <div class="trr">
     <div id="global-site-bar" style="display:flex;align-items:center;gap:4px"><span style="font-size:13px;color:var(--text-3);white-space:nowrap;font-weight:500">單位：</span>
@@ -688,6 +688,11 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
     </div>
   </div>
 </div>
+
+<!-- 登入逾期／寫入失敗橫幅（v2.37）：session 過期後這個頁面照樣操作得動，
+     但每一個寫入都會被 sb-proxy 回 401，而 SB 那一層會靜默吞掉 —— 使用者按了歸還、
+     看到「已登記歸還」，資料庫卻還是「使用中」。橫幅出現＝從現在起什麼都存不進去。 -->
+<div id="sb-authbar" style="display:none;background:var(--red-bg);color:var(--red);border-bottom:1px solid var(--red);padding:8px 14px;font-size:13px;font-weight:600;text-align:center;line-height:1.5"></div>
 
 <!-- ── 主功能列（sticky，緊接 #tabs）── -->
 <div id="mod-nav">
@@ -1560,73 +1565,100 @@ function sbHdrs(extra) {
 const K={bk:'lib_bk',ln:'lib_ln',us:'lib_us',ct:'lib_ct',rv:'lib_rv',lcfg:'lib_cfg',vh:'car_vh',bks:'car_bks',fl:'car_fl',mt:'car_mt',isp:'car_isp',pk:'car_pk',ccfg:'car_cfg',rcfg:'room_cfg',cu:'cur_u'};
 
 // ── SUPABASE ADAPTER ───────────────────────────────
-// 所有 CRUD 透過 Cloudflare Worker（service_role），前端只存快取
+// 所有 CRUD 透過 sb-proxy edge function（service_role），前端只存快取。
+//
+// 🔴 這一層每個方法都「吞掉錯誤、回傳 null」。對「載入」而言那是對的 ——
+//    網路差一次不該讓整個畫面空掉，用快取撐著比較好。
+//    但「寫入」共用同一套語意就是災難：呼叫端拿到 null 也照樣 toast 成功，
+//    使用者以為存檔了，資料庫其實還是舊值，下次 loadCarFromSB() 就把畫面打回原形。
+//    公務車「填了歸還卻沒生效、一台車兩筆同時使用中」就是這樣來的（v2.37）。
+//
+//    ⚠️ 關鍵寫入（狀態變更、歸還、出發…）一律用 `SB.write()`，
+//       它回傳 {ok, status, data, err}，呼叫端**必須**檢查 ok 才可以宣告成功。
 const SB = {
-  // GET: SELECT
-  async get(table, params='') {
+  lastStatus: 0,
+  // 單一出入口：永不丟例外，一律回 {ok, status, data, err}
+  async _req(method, path, body, prefer) {
     try {
-      const res = await fetch(
-        `${ADMIN_CFG.workerUrl}/supabase/rest/v1/${table}${params}`,
-        { headers: sbHdrs() }
-      );
-      if (!res.ok) throw new Error(`${res.status}`);
-      return await res.json();
+      const opt = { method, headers: sbHdrs(prefer ? { 'Prefer': prefer } : null) };
+      if (body !== undefined) opt.body = JSON.stringify(body);
+      const res = await fetch(`${ADMIN_CFG.workerUrl}/supabase/rest/v1/${path}`, opt);
+      // return=minimal 與 DELETE 的 body 是空的，不可無條件 res.json()
+      // （舊版 sbSaveVehicle 就是這樣每次都丟 SyntaxError，成功也被當成失敗記進 console）
+      const txt = await res.text();
+      let data = null;
+      if (txt) { try { data = JSON.parse(txt); } catch(e) { data = null; } }
+      SB.lastStatus = res.status;
+      if (!res.ok) {
+        if (res.status === 401 || res.status === 403) sbAuthLost();
+        return { ok:false, status:res.status, data:null, err:`${res.status} ${txt.slice(0,200)}` };
+      }
+      return { ok:true, status:res.status, data, err:'' };
     } catch(e) {
-      console.warn(`SB.get(${table}) failed:`, e.message);
-      return null;
+      SB.lastStatus = 0;
+      return { ok:false, status:0, data:null, err:e.message || 'network' };
     }
+  },
+  // GET: SELECT（失敗回 null；呼叫端一律 if(rows) 守著，讓快取繼續撐）
+  async get(table, params='') {
+    const r = await this._req('GET', `${table}${params}`);
+    if (!r.ok) { console.warn(`SB.get(${table}) failed:`, r.err); return null; }
+    return r.data;
   },
   // POST: INSERT
   async post(table, data, prefer='return=representation') {
-    try {
-      const res = await fetch(
-        `${ADMIN_CFG.workerUrl}/supabase/rest/v1/${table}`,
-        { method:'POST', headers: sbHdrs({ 'Prefer': prefer }), body:JSON.stringify(data) }
-      );
-      if (!res.ok) { const e=await res.text(); throw new Error(e); }
-      return await res.json();
-    } catch(e) {
-      console.warn(`SB.post(${table}) failed:`, e.message);
-      return null;
-    }
+    const r = await this._req('POST', table, data, prefer);
+    if (!r.ok) { console.warn(`SB.post(${table}) failed:`, r.err); return null; }
+    return r.data;
   },
   // PATCH: UPDATE
   async patch(table, filter, data) {
-    try {
-      const res = await fetch(
-        `${ADMIN_CFG.workerUrl}/supabase/rest/v1/${table}?${filter}`,
-        { method:'PATCH', headers: sbHdrs({ 'Prefer': 'return=representation' }), body:JSON.stringify(data) }
-      );
-      if (!res.ok) throw new Error(`${res.status}`);
-      return await res.json();
-    } catch(e) {
-      console.warn(`SB.patch(${table}) failed:`, e.message);
-      return null;
-    }
-  },
-  // UPSERT: PATCH existing row, POST if none matched（註：實測 Worker 會轉發 Prefer，POST+merge-duplicates 對完整物件亦可用）
-  async upsert(table, data, pkField = 'id') {
-    const pkVal = data[pkField];
-    if (!pkVal) return this.post(table, data);
-    const patched = await this.patch(table, `${pkField}=eq.${encodeURIComponent(pkVal)}`, data);
-    if (patched && patched.length > 0) return patched;
-    return this.post(table, data);
+    const r = await this._req('PATCH', `${table}?${filter}`, data, 'return=representation');
+    if (!r.ok) { console.warn(`SB.patch(${table}) failed:`, r.err); return null; }
+    return r.data;
   },
   // DELETE
   async del(table, filter) {
-    try {
-      const res = await fetch(
-        `${ADMIN_CFG.workerUrl}/supabase/rest/v1/${table}?${filter}`,
-        { method:'DELETE', headers: sbHdrs() }
-      );
-      if (!res.ok) throw new Error(`${res.status}`);
-      return true;
-    } catch(e) {
-      console.warn(`SB.del(${table}) failed:`, e.message);
-      return false;
-    }
+    const r = await this._req('DELETE', `${table}?${filter}`);
+    if (!r.ok) { console.warn(`SB.del(${table}) failed:`, r.err); return false; }
+    return true;
+  },
+  // UPSERT（舊介面，回 data 或 null）
+  async upsert(table, data, pkField = 'id') {
+    const r = await this.write(table, data, pkField);
+    return r.ok ? r.data : null;
+  },
+  // 🔴 關鍵寫入：PATCH 既有列，真的沒有那一列才 POST。
+  //    「PATCH 失敗」與「PATCH 成功但沒有符合的列」必須分開 —— 舊版 upsert 兩者都
+  //    當成「沒有這一列」而改送 POST，於是 401 之後又補一個 409 duplicate key，
+  //    兩個錯誤都被吞掉，呼叫端什麼都不知道。
+  async write(table, data, pkField = 'id') {
+    const pkVal = data[pkField];
+    if (!pkVal) return await this._req('POST', table, data, 'return=representation');
+    const p = await this._req('PATCH', `${table}?${pkField}=eq.${encodeURIComponent(pkVal)}`, data, 'return=representation');
+    if (!p.ok) return p;
+    if (Array.isArray(p.data) && p.data.length > 0) return p;
+    return await this._req('POST', table, data, 'return=representation');
   },
 };
+
+// 寫入失敗時給使用者看的那一句話。401/403 幾乎一定是 session 過期，
+// 講「失敗」沒有用，要講「沒有存檔」＋「該做什麼」。
+function sbErrMsg(r) {
+  if (r && (r.status === 401 || r.status === 403)) return t('sb.err_auth');
+  return t('sb.err_write') + ((r && r.err) || '').slice(0, 120);
+}
+// session 失效：toast 只跳一次（每個寫入都失敗會變成連環彈窗），
+// 但橫幅留在畫面上 —— 從這一刻起這個分頁什麼都存不進去，那是要一直看得到的事實。
+let _sbAuthLostShown = false;
+function sbAuthLost() {
+  if (_sbAuthLostShown) return;
+  _sbAuthLostShown = true;
+  const msg = t('sb.err_auth');
+  try { toast(msg, 'error'); } catch(e) {}
+  const bar = document.getElementById('sb-authbar');
+  if (bar) { bar.textContent = '⚠️ ' + msg; bar.style.display = ''; }
+}
 
 // ── PORTAL SESSION ─────────────────────────────────
 let PORTAL_SESSION = null;
@@ -1914,9 +1946,9 @@ async function sbDelCat(id) {
 }
 
 // ── 公務車寫入 SB ────────────────────────────────
+// 回傳 {ok,status,err}：呼叫端要能分辨「里程／油量真的寫進去了」還是只改了快取。
 async function sbSaveVehicle(vh) {
-  try {
-    await SB.post('car_vehicles', {
+  const r = await SB._req('POST', 'car_vehicles', {
       id:vh.id, name:vh.name||'', plate:vh.plate||'',
       type:vh.type||'sedan', fuel:vh.fuel||'gas',
       km:vh.km||0, next_maint_km:vh.next_maint_km||null,
@@ -1925,15 +1957,21 @@ async function sbSaveVehicle(vh) {
       parking_id:vh.pk_id||vh.parking_id||null,
       notes:vh.notes||'', status:vh.st||vh.status||'available',
       site:vh.site||'TW', fuel_lvl:vh.fuel_lvl??4,
-    }, 'resolution=merge-duplicates,return=minimal');
-  } catch(e) { console.warn('sbSaveVehicle fail:', e.message); }
+  }, 'resolution=merge-duplicates,return=minimal');
+  if (!r.ok) console.warn('sbSaveVehicle fail:', r.err);
+  return r;
 }
 async function sbDelVehicle(id) {
   try { await SB.del('car_vehicles', `id=eq.${id}`); }
   catch(e) { console.warn('sbDelVehicle fail:', e.message); }
 }
+// 🔴 DB 原本沒有 actual_start / actual_end 兩個欄位（car_bookings 不是由 migration 建的），
+//    而前端從 v2.31 起就在寫它們 —— 於是「實際出發／歸還時間」一直只活在 localStorage，
+//    下次從 Supabase 載入就消失，看板的「最後歸還」只能退回顯示預約結束時間。
+//    migration 202608260001 補上了欄位；這個旗標是為了「欄位還沒建立就先上線」也不會壞：
+//    第一次撞到 PGRST204/42703 就降級並記住，不讓新映射反而把全部出發／歸還都寫不進去。
+let _carBkHasActualTs = true;
 async function sbSaveCarBk(bk) {
-  try {
     const row = {
       id:bk.id,
       vehicle_id:bk.vh_id||bk.vId||bk.vehicle_id,
@@ -1950,8 +1988,23 @@ async function sbSaveCarBk(bk) {
       actual_km:bk.actual_km??bk.actualKm??null,
       checked_in:bk.checkedIn||false,
     };
-    await SB.upsert('car_bookings', row);
-  } catch(e) { console.warn('sbSaveCarBk fail:', e.message); }
+    // start_dt/end_dt 是 timestamptz 且既有資料一律以「當地時間的字面值」存放，
+    // 實際時間欄位沿用同一套寫法（tdm() 回 'YYYY-MM-DDTHH:mm'）才不會兩種格式並存
+    if (_carBkHasActualTs) {
+      const _as = bk.actual_start || bk.actualStart || null;
+      const _ae = bk.actual_end   || bk.actualEnd   || null;
+      row.actual_start = _as ? String(_as).replace('T',' ') : null;
+      row.actual_end   = _ae ? String(_ae).replace('T',' ') : null;
+    }
+    let r = await SB.write('car_bookings', row);
+    if (!r.ok && _carBkHasActualTs && /actual_(start|end)|PGRST204|42703/.test(r.err||'')) {
+      _carBkHasActualTs = false;
+      delete row.actual_start; delete row.actual_end;
+      console.warn('car_bookings 沒有 actual_start/actual_end 欄位，降級後重試（請套用 migration 202608260001）');
+      r = await SB.write('car_bookings', row);
+    }
+    if (!r.ok) console.warn('sbSaveCarBk fail:', r.err);
+    return r;
 }
 async function sbDelCarBk(id) {
   try { await SB.del('car_bookings', `id=eq.${id}`); }
@@ -2234,6 +2287,7 @@ const ADMIN_I18N = {
     'lib.btn.return':'Return','lib.all_cats2':'All Categories',
     'lib.btn.update':'Update','lib.stat.borrow_cnt':'%d times',
     'car.card.type_lbl':'Type','car.card.km_lbl':'Mileage','car.card.fuel_lbl':'Fuel Lvl','car.card.park_lbl':'Parking','car.card.driver_lbl':'Driver','car.card.last_use_lbl':'Last Return','car.del_admin_only':'Admin only','car.del_only_cancelled':'Only cancelled bookings can be deleted','car.del_confirm':'Delete this cancelled booking permanently? This cannot be undone.','car.del_failed':'Delete failed: ','car.card.using_bk_lbl':'Current booking','car.card.next_bk_lbl':'Next booking','car.bk_not_found':'Booking not found','car.warn_not_today':'This booking does NOT start today. Departing with it will mark THIS booking as in use. If you meant your own booking, find it in Usage Records and press Depart there.',
+    'sb.err_auth':'Your session has expired — the last action was NOT saved. Please go back to the Portal, sign in again, then retry.','sb.err_write':'Could not write to the database. This action was NOT saved: ','car.only_pending_depart':'This booking is no longer Pending — someone may have already departed with it. Please refresh and check.','car.already_active':'This vehicle already has a booking In Use:\n%s\n\nReturn that one first, then depart the next.\nIf it was in fact returned, its return never reached the database — find it in Usage Records and press Return again.','car.multi_active':'%d bookings are marked In Use at the same time — a return most likely failed to save. Go to Usage Records and return the ones that are already finished.','car.veh_sync_fail':'Returned, but the vehicle mileage/fuel could not be saved. Sign in again and correct it under Vehicles.',
     'cal.month_fmt':'%Y/%m','cal.expand':'Expand ▾','cal.collapse':'Collapse ▲',
     'err.time_order':'End time must be after start time',
     'g.lbl.day_n':'Day %d','g.toast.csv_done':'CSV exported','g.toast.no_data':'No data',
@@ -2372,6 +2426,7 @@ const ADMIN_I18N = {
     'lib.btn.return':'還書','lib.all_cats2':'所有分類',
     'lib.btn.update':'更新','lib.stat.borrow_cnt':'%d 次',
     'car.card.type_lbl':'車型','car.card.km_lbl':'里程','car.card.fuel_lbl':'油量','car.card.park_lbl':'停車位','car.card.driver_lbl':'用車人','car.card.last_use_lbl':'最後歸還','car.del_admin_only':'僅管理者可刪除','car.del_only_cancelled':'只有已取消的預約可以刪除','car.del_confirm':'確定永久刪除這筆已取消的預約？此動作無法復原。','car.del_failed':'刪除失敗：','car.card.using_bk_lbl':'目前預約','car.card.next_bk_lbl':'下一筆預約','car.bk_not_found':'找不到預約','car.warn_not_today':'這筆預約的出發日不是今天。用它出發會把「這一筆」標記為使用中。若你要出發的是自己的預約，請到「用車記錄」找到自己那一筆再按出發。',
+    'sb.err_auth':'登入已逾期，剛才的操作沒有存檔。請回到 Portal 重新登入後再操作一次。','sb.err_write':'寫入資料庫失敗，這筆操作沒有存檔：','car.only_pending_depart':'這筆預約已經不是「待出發」了（可能別人已按過出發）。請重新整理後再確認。','car.already_active':'這輛車已經有一筆「使用中」的預約：\n%s\n\n請先把那一筆歸還，再讓下一筆出發。\n若那一筆其實早就還車了，就是它的歸還沒有寫進資料庫 —— 請到「用車記錄」找到它，重新按一次歸還。','car.multi_active':'這輛車有 %d 筆同時「使用中」，最可能的原因是前一筆的歸還沒有存檔。請到「用車記錄」把已經結束的那幾筆逐一歸還。','car.veh_sync_fail':'預約已歸還，但車輛里程／油量沒寫進資料庫。請重新登入後到「車輛管理」補正。',
     'cal.month_fmt':'%Y年%m月','cal.expand':'展開 ▾','cal.collapse':'收合 ▲',
     'err.time_order':'結束時間不可早於開始時間',
     'g.lbl.day_n':'第 %d 天','g.toast.csv_done':'CSV 匯出完成','g.toast.no_data':'無資料可操作',
@@ -2510,6 +2565,7 @@ const ADMIN_I18N = {
     'lib.btn.return':'还书','lib.all_cats2':'所有分类',
     'lib.btn.update':'更新','lib.stat.borrow_cnt':'%d 次',
     'car.card.type_lbl':'车型','car.card.km_lbl':'里程','car.card.fuel_lbl':'油量','car.card.park_lbl':'停车位','car.card.driver_lbl':'用车人','car.card.last_use_lbl':'最后归还','car.del_admin_only':'仅管理者可删除','car.del_only_cancelled':'只有已取消的预约可以删除','car.del_confirm':'确定永久删除这笔已取消的预约？此动作无法复原。','car.del_failed':'删除失败：','car.card.using_bk_lbl':'目前预约','car.card.next_bk_lbl':'下一笔预约','car.bk_not_found':'找不到预约','car.warn_not_today':'这笔预约的出发日不是今天。用它出发会把「这一笔」标记为使用中。若你要出发的是自己的预约，请到「用车记录」找到自己那一笔再按出发。',
+    'sb.err_auth':'登录已过期，刚才的操作没有存档。请回到 Portal 重新登录后再操作一次。','sb.err_write':'写入数据库失败，这笔操作没有存档：','car.only_pending_depart':'这笔预约已经不是「待出发」了（可能别人已按过出发）。请刷新后再确认。','car.already_active':'这辆车已经有一笔「使用中」的预约：\n%s\n\n请先把那一笔归还，再让下一笔出发。\n若那一笔其实早就还车了，就是它的归还没有写进数据库 —— 请到「用车记录」找到它，重新按一次归还。','car.multi_active':'这辆车有 %d 笔同时「使用中」，最可能的原因是前一笔的归还没有存档。请到「用车记录」把已经结束的那几笔逐一归还。','car.veh_sync_fail':'预约已归还，但车辆里程／油量没写进数据库。请重新登录后到「车辆管理」补正。',
     'cal.month_fmt':'%Y年%m月','cal.expand':'展开 ▾','cal.collapse':'收合 ▲',
     'err.time_order':'结束时间不可早于开始时间',
     'g.lbl.day_n':'第 %d 天','g.toast.csv_done':'CSV 导出完成','g.toast.no_data':'无数据可操作',
@@ -2648,6 +2704,7 @@ const ADMIN_I18N = {
     'lib.btn.return':'Trả sách','lib.all_cats2':'Tất cả danh mục',
     'lib.btn.update':'Cập nhật','lib.stat.borrow_cnt':'%d lượt',
     'car.card.type_lbl':'Loại xe','car.card.km_lbl':'Số km','car.card.fuel_lbl':'Nhiên liệu','car.card.park_lbl':'Bãi đỗ','car.card.driver_lbl':'Người dùng','car.card.last_use_lbl':'Trả gần nhất','car.del_admin_only':'Chỉ quản trị viên mới xoá được','car.del_only_cancelled':'Chỉ xoá được đặt xe đã huỷ','car.del_confirm':'Xoá vĩnh viễn đặt xe đã huỷ này? Không thể hoàn tác.','car.del_failed':'Xoá thất bại: ','car.card.using_bk_lbl':'Đặt xe hiện tại','car.card.next_bk_lbl':'Đặt xe kế tiếp','car.bk_not_found':'Không tìm thấy đặt xe','car.warn_not_today':'Đặt xe này KHÔNG khởi hành hôm nay. Xuất phát bằng nó sẽ đánh dấu CHÍNH đặt xe này là đang dùng. Nếu bạn muốn đi theo đặt xe của mình, hãy vào Lịch sử sử dụng và bấm Xuất phát ở dòng của bạn.',
+    'sb.err_auth':'Phiên đăng nhập đã hết hạn — thao tác vừa rồi CHƯA được lưu. Vui lòng về Portal, đăng nhập lại rồi thực hiện lại.','sb.err_write':'Không ghi được vào cơ sở dữ liệu, thao tác này CHƯA được lưu: ','car.only_pending_depart':'Đặt xe này không còn ở trạng thái Chờ xuất phát (có thể người khác đã bấm xuất phát). Vui lòng tải lại và kiểm tra.','car.already_active':'Xe này đã có một lượt đặt đang sử dụng:\n%s\n\nHãy trả lượt đó trước, rồi mới xuất phát lượt tiếp theo.\nNếu xe thực ra đã được trả, nghĩa là lần trả đó chưa ghi được vào cơ sở dữ liệu — vào Lịch sử sử dụng, tìm lượt đó và bấm Trả xe một lần nữa.','car.multi_active':'Xe này có %d lượt cùng ở trạng thái đang sử dụng — rất có thể một lần trả xe đã không được lưu. Vào Lịch sử sử dụng và trả những lượt đã kết thúc.','car.veh_sync_fail':'Đã trả xe, nhưng số km / mức nhiên liệu của xe chưa ghi được. Hãy đăng nhập lại và sửa trong phần Quản lý xe.',
     'cal.month_fmt':'Tháng %m/%Y','cal.expand':'Mở rộng ▾','cal.collapse':'Thu gọn ▲',
     'err.time_order':'Giờ kết thúc phải sau giờ bắt đầu',
     'g.lbl.day_n':'Ngày %d','g.toast.csv_done':'Đã xuất CSV','g.toast.no_data':'Không có dữ liệu',
@@ -2786,6 +2843,7 @@ const ADMIN_I18N = {
     'lib.btn.return':'返却','lib.all_cats2':'全カテゴリ',
     'lib.btn.update':'更新','lib.stat.borrow_cnt':'%d回',
     'car.card.type_lbl':'車種','car.card.km_lbl':'走行距離','car.card.fuel_lbl':'燃料','car.card.park_lbl':'駐車場','car.card.driver_lbl':'利用者','car.card.last_use_lbl':'最終返却','car.del_admin_only':'管理者のみ削除できます','car.del_only_cancelled':'キャンセル済みの予約のみ削除できます','car.del_confirm':'このキャンセル済み予約を完全に削除しますか？元に戻せません。','car.del_failed':'削除に失敗しました：','car.card.using_bk_lbl':'現在の予約','car.card.next_bk_lbl':'次の予約','car.bk_not_found':'予約が見つかりません','car.warn_not_today':'この予約の出発日は今日ではありません。これで出発すると「この予約」が使用中になります。自分の予約で出発する場合は、利用記録から自分の行の出発を押してください。',
+    'sb.err_auth':'ログインの有効期限が切れました。直前の操作は保存されていません。Portal に戻って再度ログインしてから操作し直してください。','sb.err_write':'データベースへの書き込みに失敗しました。この操作は保存されていません：','car.only_pending_depart':'この予約はすでに「出発待ち」ではありません（他の人が出発を押した可能性があります）。再読み込みして確認してください。','car.already_active':'この車両にはすでに「使用中」の予約があります：\n%s\n\nまずその予約を返却してから、次の予約で出発してください。\nすでに返却済みのはずなら、その返却がデータベースに保存されていません。「利用記録」から該当の行を探して、もう一度返却を押してください。','car.multi_active':'この車両は %d 件が同時に「使用中」になっています。前の返却が保存されなかった可能性が高いです。「利用記録」で終了済みの予約を返却してください。','car.veh_sync_fail':'返却は登録されましたが、車両の走行距離／燃料が保存できませんでした。再ログイン後、「車両管理」で修正してください。',
     'cal.month_fmt':'%Y年%m月','cal.expand':'展開 ▾','cal.collapse':'閉じる ▲',
     'err.time_order':'終了時刻は開始時刻より後にしてください',
     'g.lbl.day_n':'第%d日','g.toast.csv_done':'CSVエクスポート完了','g.toast.no_data':'データなし',
@@ -3448,7 +3506,7 @@ async function renderCarDash(){
   document.getElementById('cd-td').innerHTML=tdBks.length?tdBks.map(b=>{const v=gVeh(b.vh_id),u=gUsr(b.u_id);return`<tr><td>${VICO[v?.type]||'🚗'} ${v?.name||'—'}</td><td>${u?.name||'—'}</td><td class="tdm">${b.start.slice(11,16)}–${b.end.slice(11,16)}</td><td class="tdm">${b.purpose||'—'}</td><td>${bkBadge(b)}</td></tr>`}).join(''):`<tr><td colspan="5" class="tdm" style="text-align:center;padding:14px">${t('car.no_bk_today')}</td></tr>`;
   const rems=[];vehs.forEach(v=>{if(v.next_maint_km&&v.km>=(v.next_maint_km-cfg.maint_km))rems.push({v,item:t('car.nav.maint'),diff:v.next_maint_km-v.km,type:'km'});if(v.next_insp&&dDiff(v.next_insp)<=cfg.insp_days)rems.push({v,item:t('car.nav.insp'),diff:dDiff(v.next_insp),date:v.next_insp,type:'dt'});});
   document.getElementById('cd-rm').innerHTML=rems.length?rems.map(r=>`<tr><td>${VICO[r.v.type]||'🚗'} ${r.v.name}</td><td>${r.item}</td><td class="tdm">${r.type==='dt'?fmtD(r.date):`${r.v.next_maint_km}km`}</td><td>${r.type==='dt'?`<span class="badge ${r.diff<=7?'br':r.diff<=30?'by':'bo'}">${r.diff}d</span>`:`<span class="badge bo">-${r.diff}km</span>`}</td></tr>`).join(''):`<tr><td colspan="4" class="tdm" style="text-align:center;padding:14px">${t('lib.no_overdue')}</td></tr>`;
-  document.getElementById('cd-cards').innerHTML=vehs.map(v=>{const st=vStBadge(v),pk=gPk(v.pk_id),pendBk=pendBkOf(v.id,bks),actBk=actBkOf(v.id,bks),curU=actBk?gUsr(actBk.u_id):null;const doneBks=bks.filter(b=>b.vh_id===v.id&&(b.st||b.status)==='done').map(b=>({b,t:b.actual_end||b.end||''})).filter(x=>x.t).sort((a,z)=>z.t.localeCompare(a.t));const lastBk=doneBks[0];const lastRet=lastBk?lastBk.t.slice(0,10):'—';// 🔴 預約鈕不再因為「現在有人用／已有待出發預約」而消失（v2.36）：
+  document.getElementById('cd-cards').innerHTML=vehs.map(v=>{const st=vStBadge(v),pk=gPk(v.pk_id),pendBk=pendBkOf(v.id,bks),actBk=actBkOf(v.id,bks),curU=actBk?gUsr(actBk.u_id):null;const actAll=bks.filter(b=>b.vh_id===v.id&&(b.st||b.status)==='active');const doneBks=bks.filter(b=>b.vh_id===v.id&&(b.st||b.status)==='done').map(b=>({b,t:b.actual_end||b.end||''})).filter(x=>x.t).sort((a,z)=>z.t.localeCompare(a.t));const lastBk=doneBks[0];const lastRet=lastBk?lastBk.t.slice(0,10):'—';// 🔴 預約鈕不再因為「現在有人用／已有待出發預約」而消失（v2.36）：
 // 車子今天有人開，不代表下週不能預約 —— 真正的時段衝突由 doBooking() 送出時擋下，
 // 看板這裡不該替使用者先決定。只有車輛本身停用／保養中／已報廢才真的不能預約，
 // 故改用「車輛自身狀態」判斷（vStBadge 在 inuse 時會提早回傳，讀不到那三個旗標）。
@@ -3457,7 +3515,7 @@ const bookable=vRaw!=='suspended'&&vRaw!=='maintenance'&&vRaw!=='retired';
 // 預填起始日：這台車最後一筆未結束預約的隔天（都還沒被預約就用今天），
 // 免得一按下去就撞到現有預約、跳一個必然出現的紅色警告
 const nextFree=nextFreeDay(v.id,bks);
-const cardStyle=st.inuse?'border-left:3px solid var(--tl);background:linear-gradient(135deg,rgba(20,184,166,.08) 0%,transparent 50%)':'';const badgeStyle=st.inuse?'margin-left:auto;font-size:13px;padding:4px 12px;font-weight:700;letter-spacing:.3px':'margin-left:auto';return`<div class="ccard" style="${cardStyle}"><div class="cch"><div class="ccico">${VICO[v.type]||'🚗'}</div><div><div class="ccn">${v.name}</div><div class="ccp">${v.plate}</div></div><span class="badge ${st.cls}" style="${badgeStyle}">${st.lbl}</span></div><div class="ccb"><div class="ccr"><span class="ccl">${t('car.card.type_lbl')}</span><span class="ccv">${t('car.veh.type.'+v.type)||v.type}·${t('car.fuel.'+v.fuel)||v.fuel}</span></div><div class="ccr"><span class="ccl">${t('car.card.km_lbl')}</span><span class="ccv">${v.km.toLocaleString()}km</span></div><div class="ccr"><span class="ccl">${t('car.card.fuel_lbl')}</span><span class="ccv">${FUEL_LBL[v.fuel_lvl??4]}</span></div>${fuelBar(v.fuel_lvl??4)}<div class="ccr"><span class="ccl">${t('car.card.park_lbl')}</span><span class="ccv">${v.pk_id||'—'}</span></div><div class="ccr"><span class="ccl">${t('car.card.last_use_lbl')}</span><span class="ccv">${lastRet}${lastBk&&gUsr(lastBk.b.u_id)?` · ${gUsr(lastBk.b.u_id).name}`:''}</span></div>${curU?`<div class="ccr"><span class="ccl">${t('car.card.driver_lbl')}</span><span class="ccv" style="color:var(--tl)">${curU.name}</span></div><div class="ccr"><span class="ccl">${t('car.card.using_bk_lbl')}</span><span class="ccv tdm" style="font-size:11px">${bkWhoWhen(actBk)}</span></div>`:''}${pendBk?`<div class="ccr"><span class="ccl">${t('car.card.next_bk_lbl')}</span><span class="ccv tdm" style="font-size:11px">${bkWhoWhen(pendBk)}</span></div>`:''}</div><div class="ccf" style="flex-wrap:wrap;gap:6px"> ${pendBk?`<button class=\"btn bsm\" style=\"background:var(--acd);color:var(--ac)\" onclick=\"startUse('${pendBk.id}')\">${t('car.mo.depart')}</button> `:''} ${actBk?`<button class=\"btn bg2 bsm\" onclick=\"endUse('${actBk.id}')\">${t('car.mo.end_use')}</button>`:''} ${bookable?`<button class=\"btn bsm\" style=\"background:var(--acd);color:var(--ac)\" onclick=\"startBk('${v.id}','${nextFree}')\">${t('car.btn.add_bk')}</button>`:''} <button class=\"btn bg2 bsm\" onclick=\"openParkUpdModal('${v.id}')\">${t('car.btn.upd_park')}</button></div></div>`}).join('');
+const cardStyle=st.inuse?'border-left:3px solid var(--tl);background:linear-gradient(135deg,rgba(20,184,166,.08) 0%,transparent 50%)':'';const badgeStyle=st.inuse?'margin-left:auto;font-size:13px;padding:4px 12px;font-weight:700;letter-spacing:.3px':'margin-left:auto';return`<div class="ccard" style="${cardStyle}"><div class="cch"><div class="ccico">${VICO[v.type]||'🚗'}</div><div><div class="ccn">${v.name}</div><div class="ccp">${v.plate}</div></div><span class="badge ${st.cls}" style="${badgeStyle}">${st.lbl}</span></div><div class="ccb"><div class="ccr"><span class="ccl">${t('car.card.type_lbl')}</span><span class="ccv">${t('car.veh.type.'+v.type)||v.type}·${t('car.fuel.'+v.fuel)||v.fuel}</span></div><div class="ccr"><span class="ccl">${t('car.card.km_lbl')}</span><span class="ccv">${v.km.toLocaleString()}km</span></div><div class="ccr"><span class="ccl">${t('car.card.fuel_lbl')}</span><span class="ccv">${FUEL_LBL[v.fuel_lvl??4]}</span></div>${fuelBar(v.fuel_lvl??4)}<div class="ccr"><span class="ccl">${t('car.card.park_lbl')}</span><span class="ccv">${v.pk_id||'—'}</span></div><div class="ccr"><span class="ccl">${t('car.card.last_use_lbl')}</span><span class="ccv">${lastRet}${lastBk&&gUsr(lastBk.b.u_id)?` · ${gUsr(lastBk.b.u_id).name}`:''}</span></div>${curU?`<div class="ccr"><span class="ccl">${t('car.card.driver_lbl')}</span><span class="ccv" style="color:var(--tl)">${curU.name}</span></div><div class="ccr"><span class="ccl">${t('car.card.using_bk_lbl')}</span><span class="ccv tdm" style="font-size:11px">${bkWhoWhen(actBk)}</span></div>`:''}${actAll.length>1?`<div class="ccr" style="background:var(--red-bg);border-radius:6px;padding:6px 8px;margin-top:4px;display:block"><span style="color:var(--red);font-size:11px;line-height:1.55;display:block">⚠️ ${t('car.multi_active').replace('%d',actAll.length)}</span></div>`:''}${pendBk?`<div class="ccr"><span class="ccl">${t('car.card.next_bk_lbl')}</span><span class="ccv tdm" style="font-size:11px">${bkWhoWhen(pendBk)}</span></div>`:''}</div><div class="ccf" style="flex-wrap:wrap;gap:6px"> ${pendBk?`<button class=\"btn bsm\" style=\"background:var(--acd);color:var(--ac)\" onclick=\"startUse('${pendBk.id}')\">${t('car.mo.depart')}</button> `:''} ${actBk?`<button class=\"btn bg2 bsm\" onclick=\"endUse('${actBk.id}')\">${t('car.mo.end_use')}</button>`:''} ${bookable?`<button class=\"btn bsm\" style=\"background:var(--acd);color:var(--ac)\" onclick=\"startBk('${v.id}','${nextFree}')\">${t('car.btn.add_bk')}</button>`:''} <button class=\"btn bg2 bsm\" onclick=\"openParkUpdModal('${v.id}')\">${t('car.btn.upd_park')}</button></div></div>`}).join('');
 }
 
 let editVid=null;
@@ -3518,7 +3576,19 @@ function renderWkCal(bks,mts,isps,vf){
   days.forEach(d=>{const ds=ymdL(d),isT=ds===today;h+=`<div><div class="wth" style="${isT?'color:var(--tl)':''}">${['日','一','二','三','四','五','六'][d.getDay()]} ${d.getDate()}</div>`;hrs.forEach(hr=>{const ss=`${ds}T${String(hr).padStart(2,'0')}:00`,se=`${ds}T${String(hr+1).padStart(2,'0')}:00`;const hbks=bks.filter(b=>b.start<se&&b.end>ss&&b.start.slice(0,10)<=ds&&b.end.slice(0,10)>=ds);h+=`<div class="wcell">`;hbks.forEach(b=>{const v=gVeh(b.vh_id);h+=`<div class="wev ev-${b.st}" onclick="viewBk('${b.id}')" title="${escapeHtml(v?.name||'')}: ${escapeHtml(b.purpose||'')}">${v?.plate?.slice(-4)||b.purpose||'預約'}</div>`;});h+=`</div>`;});h+=`</div>`;});
   h+='</div>';document.getElementById('cal-body').innerHTML=h;
 }
-function viewBk(id){const b=ld(K.bks).find(x=>x.id===id);if(!b)return;const v=gVeh(b.vh_id),u=gUsr(b.u_id);if(confirm(`車輛：${v?.name||'—'}\n使用人：${u?.name||'—'}\n時間：${b.start.replace('T',' ')} — ${b.end.replace('T',' ')}\n目的：${b.purpose||'—'}\n狀態：${b.st}\n\n點確定標記為已完成（歸還）`)){const bks=ld(K.bks),i=bks.findIndex(x=>x.id===id);if(i>=0){bks[i].st='done';bks[i].status='done';sv(K.bks,bks);sbSaveCarBk(bks[i]);}renderCal();renderCarDash();toast('已標記完成','success');}}
+// 行事曆上的「標記為已完成」：同 doReturn，先寫資料庫、成功才改快取（v2.37）。
+// 原本 sbSaveCarBk 連 await 都沒有，寫入結果根本不看。
+async function viewBk(id){
+  const b=ld(K.bks).find(x=>x.id===id);if(!b)return;
+  const v=gVeh(b.vh_id),u=gUsr(b.u_id);
+  if(!confirm(`車輛：${v?.name||'—'}\n使用人：${u?.name||'—'}\n時間：${b.start.replace('T',' ')} — ${b.end.replace('T',' ')}\n目的：${b.purpose||'—'}\n狀態：${b.st}\n\n點確定標記為已完成（歸還）`))return;
+  const upd={...b,st:'done',status:'done',actual_end:b.actual_end||tdm()};
+  const r=await sbSaveCarBk(upd);
+  if(!r.ok){toast(sbErrMsg(r),'error');return;}
+  const bks=ld(K.bks),i=bks.findIndex(x=>x.id===id);
+  if(i>=0){bks[i]=upd;sv(K.bks,bks);}
+  renderCal();renderCarDash();renderUse();toast('已標記完成','success');
+}
 
 async function initCarBkForm(){
   // 先填充（用快取），再從 SB 更新後再填一次
@@ -3658,12 +3728,26 @@ async function startUse(id){
   const bks=ld(K.bks),i=bks.findIndex(b=>b.id===id);
   if(i<0){toast(t('car.bk_not_found'),'error');return;}
   const b=bks[i],v=gVeh(b.vh_id),u=gUsr(b.u_id);
+  // 連按兩次、或畫面是舊的（別人已經出發過）都會走到這裡
+  if((b.st||b.status)!=='pending'){toast(t('car.only_pending_depart'),'error');return;}
+  // 🔴 一輛車同時只能有一筆「使用中」（v2.37）：前一筆還掛在使用中就讓下一筆出發，
+  //    看板的用車人、目前預約、歸還鈕全部會對到錯的那一筆，里程也會接在錯的地方。
+  //    這裡硬擋並指名是哪一筆要先歸還 —— 若那一筆其實早就還車了，
+  //    真正的問題是它的歸還沒有寫進資料庫（見 doReturn 的說明），到用車記錄補按一次即可。
+  const busy=actBkOf(b.vh_id,bks);
+  if(busy&&busy.id!==id){alert(t('car.already_active').replace('%s',bkWhoWhen(busy)));return;}
   // 一輛車常有多筆待出發預約，出發前一定要讓人看清楚動到的是哪一筆
   let msg=`${t('car.mo.depart')}\n\n${v?.name||''} ${v?.plate||''}\n${t('car.tbl.driver')}：${u?.name||'—'}\n${(b.start||'').replace('T',' ')} — ${(b.end||'').replace('T',' ')}\n${t('car.tbl.purpose')}：${b.purpose||'—'}`;
   if((b.start||'').slice(0,10)!==tds())msg+=`\n\n⚠️ ${t('car.warn_not_today')}`;
   if(!confirm(msg))return;
-  bks[i].st='active';bks[i].status='active';bks[i].actual_start=tdm();
-  sv(K.bks,bks);await sbSaveCarBk(bks[i]);
+  // 🔴 先寫資料庫、成功才改本地快取（v2.37）。反過來做的話，寫入失敗時畫面顯示已出發、
+  //    DB 還是待出發，下一次 loadCarFromSB() 就把它打回原形。
+  const upd={...b,st:'active',status:'active',actual_start:tdm()};
+  const r=await sbSaveCarBk(upd);
+  if(!r.ok){toast(sbErrMsg(r),'error');return;}
+  const cur=ld(K.bks),ci=cur.findIndex(x=>x.id===id);   // await 期間快取可能已被重新載入，重讀再改
+  if(ci>=0)cur[ci]=upd;else cur.push(upd);
+  sv(K.bks,cur);
   renderUse();renderCarDash();toast('已標記出發','success');
 }
 function endUse(id){
@@ -3694,10 +3778,30 @@ async function doReturn(){
     return;
   }
   const fuelLvl=parseInt(document.getElementById('ret-fuel-lvl').value)||0;
-  bks[i].st='done';bks[i].status='done';bks[i].actual_end=tdm();bks[i].actual_km=kmVal;
-  sv(K.bks,bks);await sbSaveCarBk(bks[i]);
-  if(vi>=0){vehs[vi].km=kmVal;vehs[vi].pk_id=pkVal;vehs[vi].parking_id=pkVal||null;vehs[vi].st='available';vehs[vi].status='available';vehs[vi].fuel_lvl=fuelLvl;sv(K.vh,vehs);await sbSaveVehicle(vehs[vi]);}
-  closeMo('mo-ret');renderCarDash();toast('已登記歸還','success');
+  // 🔴 先寫資料庫、成功才改本地快取與關視窗（v2.37）。
+  //    這裡原本是「改 localStorage → 送 DB（結果不看）→ 無條件 toast 已登記歸還」，
+  //    所以寫入失敗（最常見是分頁開太久、session 過期回 401）完全不會被察覺：
+  //    畫面顯示已歸還、資料庫還是使用中，下次載入就被打回原形，那台車就一直掛在「使用中」，
+  //    接著下一位同事出發，同一台車就出現兩筆同時使用中。
+  const errEl=document.getElementById('ret-err');
+  const btn=document.querySelector('#mo-ret button.btl');
+  if(btn){if(btn.disabled)return;btn.disabled=true;}
+  const upd={...bk,st:'done',status:'done',actual_end:tdm(),actual_km:kmVal};
+  const r=await sbSaveCarBk(upd);
+  if(btn)btn.disabled=false;
+  if(!r.ok){errEl.textContent=sbErrMsg(r);errEl.style.display='';return;}
+  const cur=ld(K.bks),ci=cur.findIndex(b=>b.id===id);
+  if(ci>=0){cur[ci]=upd;sv(K.bks,cur);}
+  if(vi>=0){
+    // 同樣是「DB 成功才寫快取」：只改快取的話，里程在這台機器上看起來更新了，
+    // 別人的畫面與下次載入卻還是舊值。預約已經歸還成功，車輛主檔失敗不該讓歸還退回去，
+    // 但一定要說出來（歸還里程本身已隨預約寫進 actual_km，沒有遺失）。
+    const nv={...vehs[vi],km:kmVal,pk_id:pkVal,parking_id:pkVal||null,st:'available',status:'available',fuel_lvl:fuelLvl};
+    const rv=await sbSaveVehicle(nv);
+    if(rv.ok){vehs[vi]=nv;sv(K.vh,vehs);}
+    else toast(t('car.veh_sync_fail'),'error');
+  }
+  closeMo('mo-ret');renderUse();renderCarDash();toast('已登記歸還','success');
 }
 // 只刪「已取消」的預約，且僅 admin。已完成的用車紀錄是里程與使用歷程的來源，不開放刪除；
 // 待出發／使用中的請先取消再刪，免得刪掉別人正在用的那筆。

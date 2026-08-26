@@ -19,7 +19,7 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 | File | Version | Purpose | ~Lines |
 |------|---------|---------|--------|
 | `index.html` | v1.67 | Main portal — login, home, directory, bulletin, calendar, AI tools | 4,394 |
-| `admin/index.html` | v2.37 | Admin System — room booking, fleet, visitor, library, lottery | 5,650 |
+| `admin/index.html` | v2.38 | Admin System — room booking, fleet, visitor, library, lottery | 5,650 |
 | `kms/index.html` | v2.33 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
 | `quotation/index.html` | v3.54 | Quotation & CRM system | 7,332 |
 | `board/index.html` | v1.48 | 公告與紀錄 Bulletin & Records — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍、腦力激盪 | 4,600 |
@@ -370,11 +370,34 @@ The portal supports EN, 繁中, 简中, VI, 日 via `setLang(lang)`. Each langua
 - `startUse()`：**一輛車同時只能有一筆 `active`**（硬擋，並指名是哪一筆要先歸還）。
   這條是「歸還沒存檔」的下游防線 —— 上游修好了也要留著，否則任何漏網的寫入失敗都會再長出同一種爛資料。
 - 車輛卡片：同一台車 >1 筆 `active` 時直接印警告（`car.multi_active`），叫人去用車記錄逐筆歸還。
-  ⚠️ 這是**顯示層的偵測**，不是資料層的唯一約束；真正的牆要在 DB 加 partial unique index，尚未做。
+- **資料層的牆**（migration 202608260002，v2.38）：`car_bookings_one_active_per_vehicle`
+  ＝ `unique (vehicle_id) where status='active'`。**`service_role` 繞得過 RLS，但繞不過 constraint** ——
+  這才是改前端程式碼也繞不過的一層，前端 `startUse()` 的硬擋只是為了給出好訊息。
+  `sbErrMsg()` 會把 `23505` 認出來翻成 `car.db_one_active`，不讓使用者看到 Postgres 原文。
+  🔴 **migration 開頭那段 `do $$` 是刻意的**：有既存重複時 index 會建不起來，而原生錯誤看不出是哪一台車，
+  所以先把衝突車輛的**名稱與車牌**列出來再 `raise exception`。加同類約束時照這個寫法。
+  ⚠️ **會議室的「同時段不可重複」不能用同一招** —— 那是時段重疊，要 `btree_gist` 的 exclusion
+  constraint，是另一件事，不要順手併進來。
 
-⚠️ **同型風險仍存在於 admin 其他模塊**（會議室、圖書館、客戶到訪、抽籤的寫入都還是「改快取 → 送 DB → 不看結果」）。
-401 橫幅是全域的，所以「什麼都存不進去」現在看得到了；但個別寫入失敗（400／衝突）仍會安靜。
-改到那些模塊時順手改成 `SB.write()` 的形狀，不要再新增「改完快取就 toast 成功」的程式。
+### 哪些寫入要改成 DB-first，哪些刻意不改（v2.38）
+
+分界線是**「遺失一筆寫入會不會產生別人照著行動的假狀態」**，不是「重不重要」：
+
+| 已改（狀態轉換） | 遺失寫入的後果 |
+|---|---|
+| 公務車 出發／歸還／標記完成（v2.37） | 車子掛在使用中 → 下一位出發 → 一台車兩筆同時使用中 |
+| 圖書館 借出／還書／預約 | 書在架上卻顯示借閱中 → 沒人去借；預約沒存 → 那個人永遠等不到 |
+| 會議室 預約／取消／簽到 | 取消沒存 → 房間看起來被佔用；預約沒存 → 兩組人撞同一時段 |
+| 客戶到訪 建立／刪除／任務勾選／廣播 | 行程沒進資料庫 → 櫃檯與陪同人員不知道有客人要來 |
+
+**刻意不改**（仍是「改快取 → 送 DB → 不看結果」）：新增／編輯車輛、保養、驗車、加油、書目、分類、訪客名冊。
+那些失敗的後果是「東西不見了」—— 使用者看得到、會重做，不會有第三個人照著假資料行動。
+為這些改動翻遍 45 個呼叫點的回歸風險大於收益，而 401 橫幅已經接住最主要的失效模式。
+
+**兩個刻意的例外**：
+- 會議室**自動釋出**（`checkAutoReleaseWithToast`）維持先改快取：那不是使用者按出來的動作、沒人在等回饋，
+  而且它是自癒的 —— 寫入失敗時下次載入把 `confirmed` 拉回來、再釋出一次。
+- 圖書館 `chkOv()` 把逾期狀態只寫進快取：`overdue` 是從 `due_date` 推導出來的衍生狀態，不是事實來源。
 
 - 🔴 **`car_bookings.actual_start` / `actual_end` 是 2026-08-26 才補上的**（migration 202608260001）。
   前端從 v2.31 就在寫這兩個值，但欄位不存在、`sbSaveCarBk()` 的映射也沒送 ——

@@ -19,7 +19,7 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 | File | Version | Purpose | ~Lines |
 |------|---------|---------|--------|
 | `index.html` | v1.67 | Main portal — login, home, directory, bulletin, calendar, AI tools | 4,394 |
-| `admin/index.html` | v2.38 | Admin System — room booking, fleet, visitor, library, lottery | 5,650 |
+| `admin/index.html` | v2.39 | Admin System — room booking, fleet, visitor, library, lottery | 5,650 |
 | `kms/index.html` | v2.33 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
 | `quotation/index.html` | v3.54 | Quotation & CRM system | 7,332 |
 | `board/index.html` | v1.48 | 公告與紀錄 Bulletin & Records — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍、腦力激盪 | 4,600 |
@@ -376,8 +376,17 @@ The portal supports EN, 繁中, 简中, VI, 日 via `setLang(lang)`. Each langua
   `sbErrMsg()` 會把 `23505` 認出來翻成 `car.db_one_active`，不讓使用者看到 Postgres 原文。
   🔴 **migration 開頭那段 `do $$` 是刻意的**：有既存重複時 index 會建不起來，而原生錯誤看不出是哪一台車，
   所以先把衝突車輛的**名稱與車牌**列出來再 `raise exception`。加同類約束時照這個寫法。
-  ⚠️ **會議室的「同時段不可重複」不能用同一招** —— 那是時段重疊，要 `btree_gist` 的 exclusion
-  constraint，是另一件事，不要順手併進來。
+- **會議室同時段不可重複**（migration 202608260003，v2.39）：`room_bookings_no_overlap`
+  ＝ `exclude using gist (room_id with =, tsrange(book_date + start_time, book_date + end_time, '[)') with &&)
+  where (coalesce(status,'confirmed') <> 'cancelled' and end_time > start_time)`。
+  需要 `btree_gist`（`room_id` 的 `=` 比較）。公務車用 unique 是因為那是等值重複；
+  會議室是**時段重疊**，只有 `EXCLUDE USING gist` 的 `&&` 做得到。
+  🔴 **邊界一定要 `'[)'`**，才會與前端 `timeToMin(a.start) < timeToMin(b.end) && timeToMin(a.end) > timeToMin(b.start)`
+  的語意一致（10:00–11:00 與 11:00–12:00 可以並存）。兩邊不一致會造出「前端說可以、資料庫說不行」的死路。
+  🔴 **它擋的是前端擋不到的東西**：前端比對的是**瀏覽器快取**，兩個人同時挑同一個時段時兩邊都會通過。
+  那個競態只有資料庫擋得住。撞到時 `sbIsRoomOverlap()` 會把快取拉新並退回選時段那一步 ——
+  只 toast 不刷新的話，使用者再按一次還是同一個錯。
+  `end_time > start_time` 寫進 WHERE 是為了讓跨夜／壞資料不會讓整個約束建不起來（代價是那種列不受約束）。
 
 ### 哪些寫入要改成 DB-first，哪些刻意不改（v2.38）
 

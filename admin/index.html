@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART 行政管理平台 v2.38</title>
+<title>COMART 行政管理平台 v2.39</title>
 <style>
 :root{
   /* KMS-aligned dark theme */
@@ -664,7 +664,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="logo">
     <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
     <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
-    <span><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="38" height="20" style="display:inline-block;vertical-align:middle;margin-top:-2px"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v2.38</span>
+    <span><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="38" height="20" style="display:inline-block;vertical-align:middle;margin-top:-2px"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v2.39</span>
   </div>
   <div class="trr">
     <div id="global-site-bar" style="display:flex;align-items:center;gap:4px"><span style="font-size:13px;color:var(--text-3);white-space:nowrap;font-weight:500">單位：</span>
@@ -1651,7 +1651,15 @@ function sbErrMsg(r) {
   // 前端 startUse() 已經先擋一次，走到這裡表示是繞過 UI 的路徑或畫面是舊的 ——
   // 使用者不該看到 Postgres 的 23505 duplicate key 原文。
   if (raw.includes('car_bookings_one_active_per_vehicle')) return t('car.db_one_active');
+  // 會議室時段重疊（migration 202608260003）。前端 bkConfirm 已經先比對過一次，
+  // 走到這裡幾乎一定是「別人在這幾秒內搶下同一個時段」—— 那是前端比對快取擋不住的競態，
+  // 所以訊息要講「剛剛被別人預約」，不是「你選錯了」。
+  if (raw.includes('room_bookings_no_overlap')) return t('room.err_overlap');
   return t('sb.err_write') + raw.slice(0, 120);
+}
+// 時段衝突要特別處理：使用者盯著的畫面是舊的，不把快取拉新就再按一次還是同一個錯
+function sbIsRoomOverlap(r) {
+  return !!(r && r.err && r.err.includes('room_bookings_no_overlap'));
 }
 // session 失效：toast 只跳一次（每個寫入都失敗會變成連環彈窗），
 // 但橫幅留在畫面上 —— 從這一刻起這個分頁什麼都存不進去，那是要一直看得到的事實。
@@ -2304,7 +2312,7 @@ const ADMIN_I18N = {
     'lib.btn.return':'Return','lib.all_cats2':'All Categories',
     'lib.btn.update':'Update','lib.stat.borrow_cnt':'%d times',
     'car.card.type_lbl':'Type','car.card.km_lbl':'Mileage','car.card.fuel_lbl':'Fuel Lvl','car.card.park_lbl':'Parking','car.card.driver_lbl':'Driver','car.card.last_use_lbl':'Last Return','car.del_admin_only':'Admin only','car.del_only_cancelled':'Only cancelled bookings can be deleted','car.del_confirm':'Delete this cancelled booking permanently? This cannot be undone.','car.del_failed':'Delete failed: ','car.card.using_bk_lbl':'Current booking','car.card.next_bk_lbl':'Next booking','car.bk_not_found':'Booking not found','car.warn_not_today':'This booking does NOT start today. Departing with it will mark THIS booking as in use. If you meant your own booking, find it in Usage Records and press Depart there.',
-    'sb.err_auth':'Your session has expired — the last action was NOT saved. Please go back to the Portal, sign in again, then retry.','sb.err_write':'Could not write to the database. This action was NOT saved: ','car.only_pending_depart':'This booking is no longer Pending — someone may have already departed with it. Please refresh and check.','car.already_active':'This vehicle already has a booking In Use:\n%s\n\nReturn that one first, then depart the next.\nIf it was in fact returned, its return never reached the database — find it in Usage Records and press Return again.','car.multi_active':'%d bookings are marked In Use at the same time — a return most likely failed to save. Go to Usage Records and return the ones that are already finished.','car.veh_sync_fail':'Returned, but the vehicle mileage/fuel could not be saved. Sign in again and correct it under Vehicles.','car.db_one_active':'This vehicle already has a booking In Use, so this one cannot depart. Return the one in use first — see Usage Records, filtered by In Use.',
+    'sb.err_auth':'Your session has expired — the last action was NOT saved. Please go back to the Portal, sign in again, then retry.','sb.err_write':'Could not write to the database. This action was NOT saved: ','car.only_pending_depart':'This booking is no longer Pending — someone may have already departed with it. Please refresh and check.','car.already_active':'This vehicle already has a booking In Use:\n%s\n\nReturn that one first, then depart the next.\nIf it was in fact returned, its return never reached the database — find it in Usage Records and press Return again.','car.multi_active':'%d bookings are marked In Use at the same time — a return most likely failed to save. Go to Usage Records and return the ones that are already finished.','car.veh_sync_fail':'Returned, but the vehicle mileage/fuel could not be saved. Sign in again and correct it under Vehicles.','car.db_one_active':'This vehicle already has a booking In Use, so this one cannot depart. Return the one in use first — see Usage Records, filtered by In Use.','room.err_overlap':'That time slot was just booked by someone else while you were filling this in. The list has been refreshed — please pick another slot.',
     'cal.month_fmt':'%Y/%m','cal.expand':'Expand ▾','cal.collapse':'Collapse ▲',
     'err.time_order':'End time must be after start time',
     'g.lbl.day_n':'Day %d','g.toast.csv_done':'CSV exported','g.toast.no_data':'No data',
@@ -2443,7 +2451,7 @@ const ADMIN_I18N = {
     'lib.btn.return':'還書','lib.all_cats2':'所有分類',
     'lib.btn.update':'更新','lib.stat.borrow_cnt':'%d 次',
     'car.card.type_lbl':'車型','car.card.km_lbl':'里程','car.card.fuel_lbl':'油量','car.card.park_lbl':'停車位','car.card.driver_lbl':'用車人','car.card.last_use_lbl':'最後歸還','car.del_admin_only':'僅管理者可刪除','car.del_only_cancelled':'只有已取消的預約可以刪除','car.del_confirm':'確定永久刪除這筆已取消的預約？此動作無法復原。','car.del_failed':'刪除失敗：','car.card.using_bk_lbl':'目前預約','car.card.next_bk_lbl':'下一筆預約','car.bk_not_found':'找不到預約','car.warn_not_today':'這筆預約的出發日不是今天。用它出發會把「這一筆」標記為使用中。若你要出發的是自己的預約，請到「用車記錄」找到自己那一筆再按出發。',
-    'sb.err_auth':'登入已逾期，剛才的操作沒有存檔。請回到 Portal 重新登入後再操作一次。','sb.err_write':'寫入資料庫失敗，這筆操作沒有存檔：','car.only_pending_depart':'這筆預約已經不是「待出發」了（可能別人已按過出發）。請重新整理後再確認。','car.already_active':'這輛車已經有一筆「使用中」的預約：\n%s\n\n請先把那一筆歸還，再讓下一筆出發。\n若那一筆其實早就還車了，就是它的歸還沒有寫進資料庫 —— 請到「用車記錄」找到它，重新按一次歸還。','car.multi_active':'這輛車有 %d 筆同時「使用中」，最可能的原因是前一筆的歸還沒有存檔。請到「用車記錄」把已經結束的那幾筆逐一歸還。','car.veh_sync_fail':'預約已歸還，但車輛里程／油量沒寫進資料庫。請重新登入後到「車輛管理」補正。','car.db_one_active':'這輛車已經有一筆「使用中」的預約，所以這一筆不能出發。請先把使用中的那一筆歸還 —— 在「用車記錄」把狀態篩成「使用中」就看得到。',
+    'sb.err_auth':'登入已逾期，剛才的操作沒有存檔。請回到 Portal 重新登入後再操作一次。','sb.err_write':'寫入資料庫失敗，這筆操作沒有存檔：','car.only_pending_depart':'這筆預約已經不是「待出發」了（可能別人已按過出發）。請重新整理後再確認。','car.already_active':'這輛車已經有一筆「使用中」的預約：\n%s\n\n請先把那一筆歸還，再讓下一筆出發。\n若那一筆其實早就還車了，就是它的歸還沒有寫進資料庫 —— 請到「用車記錄」找到它，重新按一次歸還。','car.multi_active':'這輛車有 %d 筆同時「使用中」，最可能的原因是前一筆的歸還沒有存檔。請到「用車記錄」把已經結束的那幾筆逐一歸還。','car.veh_sync_fail':'預約已歸還，但車輛里程／油量沒寫進資料庫。請重新登入後到「車輛管理」補正。','car.db_one_active':'這輛車已經有一筆「使用中」的預約，所以這一筆不能出發。請先把使用中的那一筆歸還 —— 在「用車記錄」把狀態篩成「使用中」就看得到。','room.err_overlap':'這個時段在你填寫的這段時間裡剛剛被別人預約了。清單已重新載入，請改選其他時段。',
     'cal.month_fmt':'%Y年%m月','cal.expand':'展開 ▾','cal.collapse':'收合 ▲',
     'err.time_order':'結束時間不可早於開始時間',
     'g.lbl.day_n':'第 %d 天','g.toast.csv_done':'CSV 匯出完成','g.toast.no_data':'無資料可操作',
@@ -2582,7 +2590,7 @@ const ADMIN_I18N = {
     'lib.btn.return':'还书','lib.all_cats2':'所有分类',
     'lib.btn.update':'更新','lib.stat.borrow_cnt':'%d 次',
     'car.card.type_lbl':'车型','car.card.km_lbl':'里程','car.card.fuel_lbl':'油量','car.card.park_lbl':'停车位','car.card.driver_lbl':'用车人','car.card.last_use_lbl':'最后归还','car.del_admin_only':'仅管理者可删除','car.del_only_cancelled':'只有已取消的预约可以删除','car.del_confirm':'确定永久删除这笔已取消的预约？此动作无法复原。','car.del_failed':'删除失败：','car.card.using_bk_lbl':'目前预约','car.card.next_bk_lbl':'下一笔预约','car.bk_not_found':'找不到预约','car.warn_not_today':'这笔预约的出发日不是今天。用它出发会把「这一笔」标记为使用中。若你要出发的是自己的预约，请到「用车记录」找到自己那一笔再按出发。',
-    'sb.err_auth':'登录已过期，刚才的操作没有存档。请回到 Portal 重新登录后再操作一次。','sb.err_write':'写入数据库失败，这笔操作没有存档：','car.only_pending_depart':'这笔预约已经不是「待出发」了（可能别人已按过出发）。请刷新后再确认。','car.already_active':'这辆车已经有一笔「使用中」的预约：\n%s\n\n请先把那一笔归还，再让下一笔出发。\n若那一笔其实早就还车了，就是它的归还没有写进数据库 —— 请到「用车记录」找到它，重新按一次归还。','car.multi_active':'这辆车有 %d 笔同时「使用中」，最可能的原因是前一笔的归还没有存档。请到「用车记录」把已经结束的那几笔逐一归还。','car.veh_sync_fail':'预约已归还，但车辆里程／油量没写进数据库。请重新登录后到「车辆管理」补正。','car.db_one_active':'这辆车已经有一笔「使用中」的预约，所以这一笔不能出发。请先把使用中的那一笔归还 —— 在「用车记录」把状态筛成「使用中」就看得到。',
+    'sb.err_auth':'登录已过期，刚才的操作没有存档。请回到 Portal 重新登录后再操作一次。','sb.err_write':'写入数据库失败，这笔操作没有存档：','car.only_pending_depart':'这笔预约已经不是「待出发」了（可能别人已按过出发）。请刷新后再确认。','car.already_active':'这辆车已经有一笔「使用中」的预约：\n%s\n\n请先把那一笔归还，再让下一笔出发。\n若那一笔其实早就还车了，就是它的归还没有写进数据库 —— 请到「用车记录」找到它，重新按一次归还。','car.multi_active':'这辆车有 %d 笔同时「使用中」，最可能的原因是前一笔的归还没有存档。请到「用车记录」把已经结束的那几笔逐一归还。','car.veh_sync_fail':'预约已归还，但车辆里程／油量没写进数据库。请重新登录后到「车辆管理」补正。','car.db_one_active':'这辆车已经有一笔「使用中」的预约，所以这一笔不能出发。请先把使用中的那一笔归还 —— 在「用车记录」把状态筛成「使用中」就看得到。','room.err_overlap':'这个时段在你填写的这段时间里刚刚被别人预约了。清单已重新载入，请改选其他时段。',
     'cal.month_fmt':'%Y年%m月','cal.expand':'展开 ▾','cal.collapse':'收合 ▲',
     'err.time_order':'结束时间不可早于开始时间',
     'g.lbl.day_n':'第 %d 天','g.toast.csv_done':'CSV 导出完成','g.toast.no_data':'无数据可操作',
@@ -2721,7 +2729,7 @@ const ADMIN_I18N = {
     'lib.btn.return':'Trả sách','lib.all_cats2':'Tất cả danh mục',
     'lib.btn.update':'Cập nhật','lib.stat.borrow_cnt':'%d lượt',
     'car.card.type_lbl':'Loại xe','car.card.km_lbl':'Số km','car.card.fuel_lbl':'Nhiên liệu','car.card.park_lbl':'Bãi đỗ','car.card.driver_lbl':'Người dùng','car.card.last_use_lbl':'Trả gần nhất','car.del_admin_only':'Chỉ quản trị viên mới xoá được','car.del_only_cancelled':'Chỉ xoá được đặt xe đã huỷ','car.del_confirm':'Xoá vĩnh viễn đặt xe đã huỷ này? Không thể hoàn tác.','car.del_failed':'Xoá thất bại: ','car.card.using_bk_lbl':'Đặt xe hiện tại','car.card.next_bk_lbl':'Đặt xe kế tiếp','car.bk_not_found':'Không tìm thấy đặt xe','car.warn_not_today':'Đặt xe này KHÔNG khởi hành hôm nay. Xuất phát bằng nó sẽ đánh dấu CHÍNH đặt xe này là đang dùng. Nếu bạn muốn đi theo đặt xe của mình, hãy vào Lịch sử sử dụng và bấm Xuất phát ở dòng của bạn.',
-    'sb.err_auth':'Phiên đăng nhập đã hết hạn — thao tác vừa rồi CHƯA được lưu. Vui lòng về Portal, đăng nhập lại rồi thực hiện lại.','sb.err_write':'Không ghi được vào cơ sở dữ liệu, thao tác này CHƯA được lưu: ','car.only_pending_depart':'Đặt xe này không còn ở trạng thái Chờ xuất phát (có thể người khác đã bấm xuất phát). Vui lòng tải lại và kiểm tra.','car.already_active':'Xe này đã có một lượt đặt đang sử dụng:\n%s\n\nHãy trả lượt đó trước, rồi mới xuất phát lượt tiếp theo.\nNếu xe thực ra đã được trả, nghĩa là lần trả đó chưa ghi được vào cơ sở dữ liệu — vào Lịch sử sử dụng, tìm lượt đó và bấm Trả xe một lần nữa.','car.multi_active':'Xe này có %d lượt cùng ở trạng thái đang sử dụng — rất có thể một lần trả xe đã không được lưu. Vào Lịch sử sử dụng và trả những lượt đã kết thúc.','car.veh_sync_fail':'Đã trả xe, nhưng số km / mức nhiên liệu của xe chưa ghi được. Hãy đăng nhập lại và sửa trong phần Quản lý xe.','car.db_one_active':'Xe này đã có một lượt đặt đang sử dụng nên lượt này không thể xuất phát. Hãy trả lượt đang dùng trước — vào Lịch sử sử dụng và lọc theo trạng thái đang sử dụng.',
+    'sb.err_auth':'Phiên đăng nhập đã hết hạn — thao tác vừa rồi CHƯA được lưu. Vui lòng về Portal, đăng nhập lại rồi thực hiện lại.','sb.err_write':'Không ghi được vào cơ sở dữ liệu, thao tác này CHƯA được lưu: ','car.only_pending_depart':'Đặt xe này không còn ở trạng thái Chờ xuất phát (có thể người khác đã bấm xuất phát). Vui lòng tải lại và kiểm tra.','car.already_active':'Xe này đã có một lượt đặt đang sử dụng:\n%s\n\nHãy trả lượt đó trước, rồi mới xuất phát lượt tiếp theo.\nNếu xe thực ra đã được trả, nghĩa là lần trả đó chưa ghi được vào cơ sở dữ liệu — vào Lịch sử sử dụng, tìm lượt đó và bấm Trả xe một lần nữa.','car.multi_active':'Xe này có %d lượt cùng ở trạng thái đang sử dụng — rất có thể một lần trả xe đã không được lưu. Vào Lịch sử sử dụng và trả những lượt đã kết thúc.','car.veh_sync_fail':'Đã trả xe, nhưng số km / mức nhiên liệu của xe chưa ghi được. Hãy đăng nhập lại và sửa trong phần Quản lý xe.','car.db_one_active':'Xe này đã có một lượt đặt đang sử dụng nên lượt này không thể xuất phát. Hãy trả lượt đang dùng trước — vào Lịch sử sử dụng và lọc theo trạng thái đang sử dụng.','room.err_overlap':'Khung giờ này vừa được người khác đặt trong lúc bạn đang điền. Danh sách đã được tải lại, vui lòng chọn khung giờ khác.',
     'cal.month_fmt':'Tháng %m/%Y','cal.expand':'Mở rộng ▾','cal.collapse':'Thu gọn ▲',
     'err.time_order':'Giờ kết thúc phải sau giờ bắt đầu',
     'g.lbl.day_n':'Ngày %d','g.toast.csv_done':'Đã xuất CSV','g.toast.no_data':'Không có dữ liệu',
@@ -2860,7 +2868,7 @@ const ADMIN_I18N = {
     'lib.btn.return':'返却','lib.all_cats2':'全カテゴリ',
     'lib.btn.update':'更新','lib.stat.borrow_cnt':'%d回',
     'car.card.type_lbl':'車種','car.card.km_lbl':'走行距離','car.card.fuel_lbl':'燃料','car.card.park_lbl':'駐車場','car.card.driver_lbl':'利用者','car.card.last_use_lbl':'最終返却','car.del_admin_only':'管理者のみ削除できます','car.del_only_cancelled':'キャンセル済みの予約のみ削除できます','car.del_confirm':'このキャンセル済み予約を完全に削除しますか？元に戻せません。','car.del_failed':'削除に失敗しました：','car.card.using_bk_lbl':'現在の予約','car.card.next_bk_lbl':'次の予約','car.bk_not_found':'予約が見つかりません','car.warn_not_today':'この予約の出発日は今日ではありません。これで出発すると「この予約」が使用中になります。自分の予約で出発する場合は、利用記録から自分の行の出発を押してください。',
-    'sb.err_auth':'ログインの有効期限が切れました。直前の操作は保存されていません。Portal に戻って再度ログインしてから操作し直してください。','sb.err_write':'データベースへの書き込みに失敗しました。この操作は保存されていません：','car.only_pending_depart':'この予約はすでに「出発待ち」ではありません（他の人が出発を押した可能性があります）。再読み込みして確認してください。','car.already_active':'この車両にはすでに「使用中」の予約があります：\n%s\n\nまずその予約を返却してから、次の予約で出発してください。\nすでに返却済みのはずなら、その返却がデータベースに保存されていません。「利用記録」から該当の行を探して、もう一度返却を押してください。','car.multi_active':'この車両は %d 件が同時に「使用中」になっています。前の返却が保存されなかった可能性が高いです。「利用記録」で終了済みの予約を返却してください。','car.veh_sync_fail':'返却は登録されましたが、車両の走行距離／燃料が保存できませんでした。再ログイン後、「車両管理」で修正してください。','car.db_one_active':'この車両にはすでに「使用中」の予約があるため、この予約では出発できません。まず使用中の予約を返却してください（「利用記録」で状態を「使用中」に絞り込むと確認できます）。',
+    'sb.err_auth':'ログインの有効期限が切れました。直前の操作は保存されていません。Portal に戻って再度ログインしてから操作し直してください。','sb.err_write':'データベースへの書き込みに失敗しました。この操作は保存されていません：','car.only_pending_depart':'この予約はすでに「出発待ち」ではありません（他の人が出発を押した可能性があります）。再読み込みして確認してください。','car.already_active':'この車両にはすでに「使用中」の予約があります：\n%s\n\nまずその予約を返却してから、次の予約で出発してください。\nすでに返却済みのはずなら、その返却がデータベースに保存されていません。「利用記録」から該当の行を探して、もう一度返却を押してください。','car.multi_active':'この車両は %d 件が同時に「使用中」になっています。前の返却が保存されなかった可能性が高いです。「利用記録」で終了済みの予約を返却してください。','car.veh_sync_fail':'返却は登録されましたが、車両の走行距離／燃料が保存できませんでした。再ログイン後、「車両管理」で修正してください。','car.db_one_active':'この車両にはすでに「使用中」の予約があるため、この予約では出発できません。まず使用中の予約を返却してください（「利用記録」で状態を「使用中」に絞り込むと確認できます）。','room.err_overlap':'この時間帯は入力中に他の方が予約しました。一覧を再読み込みしましたので、別の時間帯を選んでください。',
     'cal.month_fmt':'%Y年%m月','cal.expand':'展開 ▾','cal.collapse':'閉じる ▲',
     'err.time_order':'終了時刻は開始時刻より後にしてください',
     'g.lbl.day_n':'第%d日','g.toast.csv_done':'CSVエクスポート完了','g.toast.no_data':'データなし',
@@ -4499,7 +4507,11 @@ async function iBkSave(){
     toast('⚠ 時段衝突，請重新選擇','error');iBkGoStep(2);iRenderRoomRecommend();return;
   }
   const rbk=await saveRoomBooking(bk);   // 成功才進快取（v2.38）
-  if(!rbk.ok){toast(sbErrMsg(rbk),'error');return;}
+  if(!rbk.ok){
+    toast(sbErrMsg(rbk),'error');
+    if(sbIsRoomOverlap(rbk)){await getRoomBookings();iBkGoStep(2);iRenderRoomRecommend();}
+    return;
+  }
   await getRoomBookings(); // 從 SB 重新拉取確保快取一致
   const roomName=ROOMS.find(r=>r.id===iBkSelectedRoom)?.name||'—';
   toast(`✓ 已預約${roomName} ${bk.start}–${bk.end}「${title}」`,'success');
@@ -4674,7 +4686,11 @@ async function bkSave(){
     toast('⚠ 時段衝突，請重新選擇','error');bkGoStep(2);renderRoomRecommend();return;
   }
   const rbk=await saveRoomBooking(bk);   // 成功才進快取（v2.38）
-  if(!rbk.ok){toast(sbErrMsg(rbk),'error');return;}
+  if(!rbk.ok){
+    toast(sbErrMsg(rbk),'error');
+    if(sbIsRoomOverlap(rbk)){await getRoomBookings();bkGoStep(2);renderRoomRecommend();}
+    return;
+  }
   // 從 SB 重新拉取確保快取一致
   await getRoomBookings();
   const roomName=ROOMS.find(r=>r.id===bkSelectedRoom)?.name||'—';

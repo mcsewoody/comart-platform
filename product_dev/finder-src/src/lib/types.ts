@@ -306,6 +306,7 @@ export interface PdUploadInit {
   duplicate: boolean;
   documentId?: string;
   title?: string;
+  storageExists?: boolean;
   storagePath?: string;
   signedUrl?: string;
 }

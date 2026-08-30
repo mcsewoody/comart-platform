@@ -57,16 +57,19 @@ export function PilotUploadPage() {
           duplicates += 1;
           updateStatus(index, "內容重複，已略過");
         } else {
-          if (!init.signedUrl || !init.storagePath) throw new Error("未取得上傳位置");
-          const form = new FormData();
-          form.append("cacheControl", "3600");
-          form.append("", item.file);
-          updateStatus(index, "上傳中…");
-          const response = await fetch(init.signedUrl, { method: "PUT", headers: { "x-upsert": "false" }, body: form });
-          const responseText = response.ok ? "" : await response.text();
-          const alreadyStored = !response.ok && /resource already exists/i.test(responseText);
-          if (!response.ok && !alreadyStored) throw new Error(`Storage 上傳失敗 (${response.status})`);
-          if (alreadyStored) updateStatus(index, "原檔已存在，補建索引…");
+          if (!init.storagePath) throw new Error("未取得上傳位置");
+          if (init.storageExists) {
+            updateStatus(index, "原檔已存在，補建索引…");
+          } else {
+            if (!init.signedUrl) throw new Error("未取得 signed upload URL");
+            const form = new FormData();
+            form.append("cacheControl", "3600");
+            form.append("", item.file);
+            updateStatus(index, "上傳中…");
+            const response = await fetch(init.signedUrl, { method: "PUT", headers: { "x-upsert": "false" }, body: form });
+            const responseText = response.ok ? "" : await response.text();
+            if (!response.ok && !/resource already exists/i.test(responseText)) throw new Error(`Storage 上傳失敗 (${response.status})`);
+          }
           await api.completePdUpload({ dataset: item.dataset, relativePath: item.relativePath, byteSize: item.file.size, mimeType: item.file.type || "application/octet-stream", sha256, storagePath: init.storagePath, lastModified: item.file.lastModified });
           completed += 1;
           updateStatus(index, "已建立文件索引");

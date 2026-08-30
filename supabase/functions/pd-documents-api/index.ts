@@ -266,6 +266,9 @@ serve(async (req) => {
     if (existing) return json({ duplicate: true, documentId: existing.id, title: existing.title })
     const storagePath = `${sha256.slice(0, 2)}/${sha256}/source.${extension}`
     const { data, error } = await sb.storage.from(bucketFor(dataset, "source")).createSignedUploadUrl(storagePath)
+    if (error && /resource already exists/i.test(error.message)) {
+      return json({ duplicate: false, storageExists: true, storagePath })
+    }
     if (error) return json({ error: error.message }, 400)
     return json({ duplicate: false, storagePath, signedUrl: data.signedUrl })
   }
@@ -278,6 +281,12 @@ serve(async (req) => {
     const extension = extensionOf(name)
     const sha256 = String(body.sha256 || "").toLowerCase()
     const storagePath = String(body.storagePath || "")
+    const byteSize = Number(body.byteSize || 0)
+    const expectedStoragePath = `${sha256.slice(0, 2)}/${sha256}/source.${extension}`
+    if (!ALLOWED_EXTENSIONS.has(extension) || !/^[a-f0-9]{64}$/.test(sha256) ||
+        byteSize <= 0 || byteSize > 524288000 || storagePath !== expectedStoragePath) {
+      return json({ error: "invalid_upload_completion" }, 400)
+    }
     const classified = classify(dataset, relativePath, extension)
     const analysisStatus = DEEP_EXTENSIONS.has(extension) ? "queued" : "metadata_only"
     const payload = {
@@ -285,7 +294,7 @@ serve(async (req) => {
       relative_path: relativePath,
       extension,
       mime_type: String(body.mimeType || "application/octet-stream"),
-      byte_size: Number(body.byteSize || 0),
+      byte_size: byteSize,
       sha256,
       storage_path: storagePath,
       source_modified_at: body.lastModified ? new Date(Number(body.lastModified)).toISOString() : null,

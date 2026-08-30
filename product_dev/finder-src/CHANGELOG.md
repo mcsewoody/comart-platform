@@ -1,5 +1,10 @@
 # COMART Product Finder 版本紀錄
 
+## v2.04 — 2026-08-30
+
+- 修正 Supabase 在建立 signed upload URL 階段就回傳 `The resource already exists` 的恢復路徑。
+- API 明確回傳 `storageExists`，前端直接補建資料庫索引，不要求 signed URL、也不覆寫既有原檔。
+
 ## v2.03 — 2026-08-30
 
 - 修復原檔已成功進入 Storage、但資料庫索引尚未建立時，重試被 `The resource already exists` 阻擋的問題。

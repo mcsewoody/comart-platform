@@ -30,7 +30,7 @@ export function PilotUploadPage() {
       const relativePath = (file.webkitRelativePath || file.name).replaceAll("\\", "/");
       const dataset = relativePath.includes("/OwnProduct/") || relativePath.startsWith("OwnProduct/") ? "mfg" : relativePath.includes("/Outsourcing/") || relativePath.startsWith("Outsourcing/") ? "buy" : null;
       const extension = file.name.toLowerCase().split(".").pop() || "";
-      if (!dataset || !ALLOWED.has(extension) || file.size <= 0 || file.size > MAX_PILOT_BYTES || file.name === ".DS_Store" || /\.log(?:\.\d+)?$|\.bak$/i.test(file.name)) return [];
+      if (!dataset || !ALLOWED.has(extension) || file.size <= 0 || file.size > MAX_PILOT_BYTES || file.name === ".DS_Store" || /\.log(?:\.\d+)?$|\.bak$|名片|business\s*card/i.test(file.name)) return [];
       return [{ file, dataset, relativePath, status: "待上傳" } satisfies PilotFile];
     });
     const next = [...selectPilot(candidates.filter((item) => item.dataset === "mfg"), "mfg"), ...selectPilot(candidates.filter((item) => item.dataset === "buy"), "buy")];
@@ -106,7 +106,8 @@ function selectPilot(files: PilotFile[], dataset: PdDataset) {
     chosen.push(...matches);
     matches.forEach((match) => remaining.splice(remaining.indexOf(match), 1));
   });
-  chosen.push(...takeDiverse(remaining, Math.max(0, 20 - chosen.length), dataset));
+  const fallback = [...remaining].sort((a, b) => fallbackPriority(b) - fallbackPriority(a));
+  chosen.push(...takeDiverse(fallback, Math.max(0, 20 - chosen.length), dataset));
   return chosen.slice(0, 20);
 }
 
@@ -132,6 +133,10 @@ function diversityKey(relativePath: string, dataset: PdDataset) {
   const parts = relativePath.split("/").filter(Boolean);
   if (dataset === "buy") return parts.slice(0, Math.min(parts.length - 1, 4)).join("/") || relativePath;
   return parts.slice(0, Math.min(parts.length - 1, 5)).join("/") || relativePath;
+}
+
+function fallbackPriority(item: PilotFile) {
+  return ["jpg", "jpeg", "png"].includes(ext(item.file.name)) ? 0 : 1;
 }
 
 function quality(item: PilotFile) {

@@ -1,4 +1,4 @@
-import { CheckCircle2, FolderOpen, LoaderCircle, RefreshCw, UploadCloud } from "lucide-react";
+import { CheckCircle2, FilePlus2, FolderOpen, LoaderCircle, RefreshCw, UploadCloud, Zap } from "lucide-react";
 import { useMemo, useRef, useState } from "react";
 import { useAuth } from "../auth/AuthProvider";
 import { Badge, Button, Card, PageHeader } from "../components/ui";
@@ -6,7 +6,11 @@ import { api } from "../lib/api";
 import {
   dedupeByDatasetHash,
   importFileKey,
+  manifestFileKey,
+  quickUploadRelativePath,
+  reusableManifestHash,
   selectIncrementalBatch,
+  type ImportManifestEntry,
 } from "../lib/incremental-import";
 import type { PdDataset } from "../lib/types";
 
@@ -25,6 +29,7 @@ type Inventory = {
   pending: number;
   folderDuplicates: number;
   unsupported: number;
+  reusedHashes: number;
 };
 
 type Phase = "idle" | "inventory" | "ready" | "uploading" | "finished";
@@ -36,19 +41,28 @@ const ALLOWED = new Set([
 const MAX_FILE_BYTES = 100 * 1024 * 1024;
 const BATCH_SIZE = 200;
 const HASH_QUERY_SIZE = 100;
+const QUICK_UPLOAD_LIMIT = 10;
+const MANIFEST_STORAGE_KEY = "pd-document-import-manifest-v1";
 
 export function IncrementalUploadPage() {
   const { profile } = useAuth();
   const inputRef = useRef<HTMLInputElement>(null);
+  const quickInputRef = useRef<HTMLInputElement>(null);
   const [files, setFiles] = useState<ImportFile[]>([]);
   const [pendingFiles, setPendingFiles] = useState<ImportFile[]>([]);
   const [inventory, setInventory] = useState<Inventory | null>(null);
   const [phase, setPhase] = useState<Phase>("idle");
   const [progress, setProgress] = useState(0);
   const [message, setMessage] = useState("");
+  const [quickDataset, setQuickDataset] = useState<PdDataset>("mfg");
+  const [quickPath, setQuickPath] = useState("");
+  const [quickFiles, setQuickFiles] = useState<File[]>([]);
+  const [quickStatuses, setQuickStatuses] = useState<string[]>([]);
+  const [quickRunning, setQuickRunning] = useState(false);
+  const [quickMessage, setQuickMessage] = useState("");
   const mfg = useMemo(() => files.filter((item) => item.dataset === "mfg"), [files]);
   const buy = useMemo(() => files.filter((item) => item.dataset === "buy"), [files]);
-  const running = phase === "inventory" || phase === "uploading";
+  const running = phase === "inventory" || phase === "uploading" || quickRunning;
 
   if (profile?.role === "viewer") {
     return <Card className="p-8 text-center"><p className="font-black text-white">此功能僅供編輯者與管理員使用</p></Card>;
@@ -73,12 +87,25 @@ export function IncrementalUploadPage() {
 
     try {
       const hashed: ImportFile[] = [];
+      const manifest = loadManifest();
+      const nextManifest: Record<string, ImportManifestEntry> = {};
+      let reusedHashes = 0;
       for (let index = 0; index < candidates.length; index += 1) {
         const item = candidates[index];
-        setMessage(`正在盤點檔案內容 ${index + 1} / ${candidates.length}…`);
-        hashed.push({ ...item, sha256: await hashFile(item.file) });
+        const cacheKey = manifestFileKey(item);
+        const cachedHash = reusableManifestHash(manifest[cacheKey], item.file);
+        const sha256 = cachedHash || await hashFile(item.file);
+        if (cachedHash) reusedHashes += 1;
+        setMessage(`正在掃描變更 ${index + 1} / ${candidates.length}；沿用 ${reusedHashes} 份快取…`);
+        hashed.push({ ...item, sha256 });
+        nextManifest[cacheKey] = {
+          byteSize: item.file.size,
+          lastModified: item.file.lastModified,
+          sha256,
+        };
         setProgress(Math.round(((index + 1) / Math.max(candidates.length, 1)) * 75));
       }
+      saveManifest(nextManifest);
 
       const deduped = dedupeByDatasetHash(hashed);
       const existing = await findExistingHashes(deduped.unique, (checked, total) => {
@@ -95,14 +122,15 @@ export function IncrementalUploadPage() {
         pending: pending.length,
         folderDuplicates: deduped.duplicates,
         unsupported: selectedFiles.length - candidates.length,
+        reusedHashes,
       });
       setPendingFiles(pending);
       setFiles(batch);
       setProgress(0);
       setPhase(batch.length ? "ready" : "finished");
       setMessage(batch.length
-        ? `盤點完成。本批準備 ${batch.length} 份；匯入後不會自動執行 AI。`
-        : "盤點完成：目前沒有待匯入的新文件。");
+        ? `盤點完成，沿用 ${reusedHashes} 份快取。本批準備 ${batch.length} 份；匯入後不會自動執行 AI。`
+        : `盤點完成，沿用 ${reusedHashes} 份快取；目前沒有待匯入的新文件。`);
     } catch (reason) {
       setPhase("idle");
       setProgress(0);
@@ -123,53 +151,13 @@ export function IncrementalUploadPage() {
       const item = files[index];
       updateStatus(index, "準備上傳…");
       try {
-        const init = await api.initPdUpload({
-          dataset: item.dataset,
-          relativePath: item.relativePath,
-          byteSize: item.file.size,
-          sha256: item.sha256,
-        });
-        if (init.duplicate) {
+        const outcome = await uploadOne(item, (status) => updateStatus(index, status));
+        processed.add(importFileKey(item));
+        if (outcome === "duplicate") {
           duplicates += 1;
-          processed.add(importFileKey(item));
           updateStatus(index, "內容重複，已略過");
         } else {
-          if (!init.storagePath) throw new Error("未取得上傳位置");
-          if (init.storageExists) {
-            updateStatus(index, "原檔已存在，補建索引…");
-          } else {
-            if (!init.signedUrl) throw new Error("未取得 signed upload URL");
-            const form = new FormData();
-            form.append("cacheControl", "3600");
-            form.append("", item.file);
-            updateStatus(index, "上傳中…");
-            const response = await fetch(init.signedUrl, {
-              method: "PUT",
-              headers: { "x-upsert": "false" },
-              body: form,
-            });
-            const responseText = response.ok ? "" : await response.text();
-            if (!response.ok && !/resource already exists/i.test(responseText)) {
-              throw new Error(`Storage 上傳失敗 (${response.status})`);
-            }
-          }
-          const result = await api.completePdUpload({
-            dataset: item.dataset,
-            relativePath: item.relativePath,
-            byteSize: item.file.size,
-            mimeType: item.file.type || "application/octet-stream",
-            sha256: item.sha256,
-            storagePath: init.storagePath,
-            lastModified: item.file.lastModified,
-          });
-          processed.add(importFileKey(item));
-          if (result.duplicate) {
-            duplicates += 1;
-            updateStatus(index, "內容重複，已略過");
-          } else {
-            completed += 1;
-            updateStatus(index, result.analysisStatus === "metadata_only" ? "已建立 metadata 索引" : "已建立文件索引");
-          }
+          completed += 1;
         }
       } catch (reason) {
         failed += 1;
@@ -187,6 +175,62 @@ export function IncrementalUploadPage() {
     } : current);
     setMessage(`本批完成：新增 ${completed}、重複略過 ${duplicates}、失敗 ${failed}；尚待匯入 ${remaining.length}。`);
     setPhase("finished");
+  }
+
+  function chooseQuick(selected: FileList | null) {
+    if (!selected || quickRunning) return;
+    const next = Array.from(selected)
+      .filter((file) => ALLOWED.has(ext(file.name)) && file.size > 0 && file.size <= MAX_FILE_BYTES && !excludedName(file.name))
+      .slice(0, QUICK_UPLOAD_LIMIT);
+    setQuickFiles(next);
+    setQuickStatuses(next.map(() => "待上傳"));
+    setQuickMessage(next.length
+      ? `已選擇 ${next.length} 份；請確認資料庫與分類路徑。`
+      : "沒有可上傳的檔案；請檢查格式或檔案大小。" );
+  }
+
+  async function quickUpload() {
+    if (!quickFiles.length || quickRunning || running) return;
+    try {
+      quickUploadRelativePath(quickDataset, quickPath, quickFiles[0].name);
+    } catch (reason) {
+      setQuickMessage(reason instanceof Error ? reason.message : "分類路徑無效");
+      return;
+    }
+
+    setQuickRunning(true);
+    let completed = 0;
+    let duplicates = 0;
+    let failed = 0;
+    for (let index = 0; index < quickFiles.length; index += 1) {
+      const file = quickFiles[index];
+      updateQuickStatus(index, "計算雜湊…");
+      try {
+        const item: ImportFile = {
+          file,
+          dataset: quickDataset,
+          relativePath: quickUploadRelativePath(quickDataset, quickPath, file.name),
+          sha256: await hashFile(file),
+          status: "準備上傳…",
+        };
+        const outcome = await uploadOne(item, (status) => updateQuickStatus(index, status));
+        if (outcome === "duplicate") {
+          duplicates += 1;
+          updateQuickStatus(index, "內容重複，已略過");
+        } else {
+          completed += 1;
+        }
+      } catch (reason) {
+        failed += 1;
+        updateQuickStatus(index, `失敗：${reason instanceof Error ? reason.message : "未知錯誤"}`);
+      }
+    }
+    setQuickMessage(`快速上傳完成：新增 ${completed}、重複略過 ${duplicates}、失敗 ${failed}；不會自動執行 AI。`);
+    setQuickRunning(false);
+  }
+
+  function updateQuickStatus(index: number, status: string) {
+    setQuickStatuses((current) => current.map((item, itemIndex) => itemIndex === index ? status : item));
   }
 
   function prepareNext() {
@@ -210,10 +254,14 @@ export function IncrementalUploadPage() {
   return <>
     <PageHeader
       eyebrow="INCREMENTAL IMPORT"
-      title="增量批次匯入"
-      description="選擇 products 資料夾後，先以 SHA-256 盤點全部檔案，再匯入下一批最多 200 份；不覆寫既有文件，也不會自動啟動 AI。"
+      title="文件匯入"
+      description="大量新增使用資料夾快速掃描；只有 1～10 份時可直接快速上傳。兩種方式都不覆寫既有文件，也不會自動啟動 AI。"
     />
     <Card className="p-5 md:p-6">
+      <div className="mb-5 flex items-start gap-3">
+        <span className="rounded-xl bg-cyan-950/50 p-3 text-cyan-300"><RefreshCw size={22} /></span>
+        <div><h2 className="text-lg font-black text-white">A. 資料夾快速掃描</h2><p className="mt-1 text-sm leading-6 text-slate-500">建議日常使用。沿用上次 SHA-256 快取，只重新讀取新增或內容變更的檔案。</p></div>
+      </div>
       <button
         type="button"
         disabled={running}
@@ -272,6 +320,52 @@ export function IncrementalUploadPage() {
         )}
       </div>
     </Card>
+
+    <Card className="mt-6 p-5 md:p-6">
+      <div className="flex items-start gap-3">
+        <span className="rounded-xl bg-amber-950/50 p-3 text-amber-300"><Zap size={22} /></span>
+        <div><h2 className="text-lg font-black text-white">B. 少量快速上傳</h2><p className="mt-1 text-sm leading-6 text-slate-500">適合臨時新增 1～10 份。請填寫原本應放入的相對資料夾，確保廠商與產品分類不遺失。</p></div>
+      </div>
+      <div className="mt-5 grid gap-4 lg:grid-cols-[180px_minmax(260px,1fr)_auto] lg:items-end">
+        <label className="text-sm font-bold text-slate-300">文件資料庫
+          <select value={quickDataset} onChange={(event) => setQuickDataset(event.target.value as PdDataset)} disabled={quickRunning} className="mt-2 h-12 w-full rounded-xl border border-slate-700 bg-slate-950 px-3 text-slate-100 outline-none focus:border-cyan-500">
+            <option value="mfg">自製品</option>
+            <option value="buy">外購品</option>
+          </select>
+        </label>
+        <label className="text-sm font-bold text-slate-300">分類路徑（不含 OwnProduct／Outsourcing）
+          <input
+            value={quickPath}
+            onChange={(event) => setQuickPath(event.target.value)}
+            disabled={quickRunning}
+            placeholder={quickDataset === "mfg" ? "例如：素亦/手機指環架" : "例如：供應商名稱/三合一充電"}
+            className="mt-2 h-12 w-full rounded-xl border border-slate-700 bg-slate-950 px-4 text-slate-100 outline-none placeholder:text-slate-600 focus:border-cyan-500"
+          />
+        </label>
+        <Button variant="secondary" disabled={quickRunning} onClick={() => {
+          if (!quickInputRef.current) return;
+          quickInputRef.current.value = "";
+          quickInputRef.current.click();
+        }}><FilePlus2 size={18} />選擇 1～10 份</Button>
+        <input ref={quickInputRef} type="file" multiple className="hidden" onChange={(event) => chooseQuick(event.target.files)} />
+      </div>
+
+      {quickFiles.length > 0 && <div className="mt-5 overflow-hidden rounded-xl border border-slate-700">
+        {quickFiles.map((file, index) => <div key={`${file.name}-${file.size}-${file.lastModified}`} className="grid gap-2 border-b border-slate-800 px-4 py-3 text-sm last:border-0 md:grid-cols-[minmax(0,1fr)_120px_190px]">
+          <span className="truncate text-slate-200" title={file.name}>{file.name}</span>
+          <span className="text-xs text-slate-500">{formatBytes(file.size)}</span>
+          <span className="text-xs text-slate-500">{quickStatuses[index]}</span>
+        </div>)}
+      </div>}
+
+      <div className="mt-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <p role="status" className="min-w-0 flex-1 text-sm leading-6 text-slate-400">{quickMessage || "檔案會進入所選邏輯資料庫；外購品分類路徑第一層請填廠商名稱。"}</p>
+        <Button disabled={!quickFiles.length || !quickPath.trim() || quickRunning || running} onClick={() => void quickUpload()}>
+          {quickRunning ? <LoaderCircle className="animate-spin" size={18} /> : <UploadCloud size={18} />}
+          {quickRunning ? "上傳中…" : quickFiles.length ? `快速上傳 ${quickFiles.length} 份` : "請先選擇檔案"}
+        </Button>
+      </div>
+    </Card>
   </>;
 }
 
@@ -283,6 +377,49 @@ function Metric({ label, value, tone = "slate" }: { label: string; value: number
     amber: "border-amber-900 bg-amber-950/30 text-amber-200",
   };
   return <div className={`rounded-xl border p-4 ${colors[tone]}`}><p className="text-xs font-semibold text-slate-500">{label}</p><p className="mt-1 text-2xl font-black tabular-nums">{value}</p></div>;
+}
+
+async function uploadOne(item: ImportFile, onStatus: (status: string) => void): Promise<"completed" | "duplicate"> {
+  const init = await api.initPdUpload({
+    dataset: item.dataset,
+    relativePath: item.relativePath,
+    byteSize: item.file.size,
+    sha256: item.sha256,
+  });
+  if (init.duplicate) return "duplicate";
+  if (!init.storagePath) throw new Error("未取得上傳位置");
+
+  if (init.storageExists) {
+    onStatus("原檔已存在，補建索引…");
+  } else {
+    if (!init.signedUrl) throw new Error("未取得 signed upload URL");
+    const form = new FormData();
+    form.append("cacheControl", "3600");
+    form.append("", item.file);
+    onStatus("上傳中…");
+    const response = await fetch(init.signedUrl, {
+      method: "PUT",
+      headers: { "x-upsert": "false" },
+      body: form,
+    });
+    const responseText = response.ok ? "" : await response.text();
+    if (!response.ok && !/resource already exists/i.test(responseText)) {
+      throw new Error(`Storage 上傳失敗 (${response.status})`);
+    }
+  }
+
+  const result = await api.completePdUpload({
+    dataset: item.dataset,
+    relativePath: item.relativePath,
+    byteSize: item.file.size,
+    mimeType: item.file.type || "application/octet-stream",
+    sha256: item.sha256,
+    storagePath: init.storagePath,
+    lastModified: item.file.lastModified,
+  });
+  if (result.duplicate) return "duplicate";
+  onStatus(result.analysisStatus === "metadata_only" ? "已建立 metadata 索引" : "已建立文件索引");
+  return "completed";
 }
 
 function prepareBatch(files: ImportFile[]) {
@@ -303,6 +440,23 @@ async function findExistingHashes(files: ImportFile[], onProgress: (checked: num
     }
   }
   return existing;
+}
+
+function loadManifest(): Record<string, ImportManifestEntry> {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(MANIFEST_STORAGE_KEY) || "{}") as Record<string, ImportManifestEntry>;
+    return parsed && typeof parsed === "object" ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
+function saveManifest(manifest: Record<string, ImportManifestEntry>) {
+  try {
+    localStorage.setItem(MANIFEST_STORAGE_KEY, JSON.stringify(manifest));
+  } catch {
+    // Storage may be unavailable or full; the next scan safely falls back to hashing all files.
+  }
 }
 
 function datasetFor(relativePath: string): PdDataset | null {

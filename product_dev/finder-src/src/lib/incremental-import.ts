@@ -6,6 +6,12 @@ export type IncrementalFile = {
   sha256: string;
 };
 
+export type ImportManifestEntry = {
+  byteSize: number;
+  lastModified: number;
+  sha256: string;
+};
+
 export function dedupeByDatasetHash<T extends IncrementalFile>(files: T[]) {
   const seen = new Set<string>();
   const unique: T[] = [];
@@ -45,4 +51,26 @@ export function selectIncrementalBatch<T extends IncrementalFile>(files: T[], li
 
 export function importFileKey(file: Pick<IncrementalFile, "dataset" | "sha256">) {
   return `${file.dataset}:${file.sha256}`;
+}
+
+export function manifestFileKey(file: Pick<IncrementalFile, "dataset" | "relativePath">) {
+  return `${file.dataset}:${file.relativePath}`;
+}
+
+export function reusableManifestHash(
+  entry: ImportManifestEntry | undefined,
+  file: { size: number; lastModified: number },
+) {
+  if (!entry || entry.byteSize !== file.size || entry.lastModified !== file.lastModified) return null;
+  return /^[a-f0-9]{64}$/.test(entry.sha256) ? entry.sha256 : null;
+}
+
+export function quickUploadRelativePath(dataset: PdDataset, subpath: string, fileName: string) {
+  const parts = subpath.replaceAll("\\", "/").split("/").map((part) => part.trim()).filter(Boolean);
+  if (!parts.length || parts.some((part) => part === "." || part === ".." || part.includes("\0"))) {
+    throw new Error("請填寫有效的分類路徑");
+  }
+  const safeName = fileName.replaceAll("\\", "/").split("/").at(-1)?.trim() || "";
+  if (!safeName || safeName === "." || safeName === "..") throw new Error("檔名無效");
+  return `${dataset === "mfg" ? "OwnProduct" : "Outsourcing"}/${parts.join("/")}/${safeName}`;
 }

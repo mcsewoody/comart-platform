@@ -1,5 +1,10 @@
 # COMART Product Finder 版本紀錄
 
+## v2.05 — 2026-08-30
+
+- 自製品路徑中的報價、估價與成本文件統一歸入 `BOM／成本`，不再寫入只屬於外購品的 `quotation` 類型。
+- 修復兩份已進入 Storage 的自製品商業文件無法補建索引的資料表 constraint 錯誤。
+
 ## v2.04 — 2026-08-30
 
 - 修正 Supabase 在建立 signed upload URL 階段就回傳 `The resource already exists` 的恢復路徑。

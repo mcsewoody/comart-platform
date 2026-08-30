@@ -92,7 +92,7 @@ function classify(dataset: Dataset, relativePath: string, extension: string) {
   if (CAD_EXTENSIONS.has(extension)) documentKind = "cad"
   else if (IMAGE_EXTENSIONS.has(extension)) documentKind = "image"
   else if (/\bbom\b|物料|成本|cost/i.test(lower)) documentKind = dataset === "mfg" ? "bom" : "quotation"
-  else if (/報價|报价|quotation|quote|估價|估价/i.test(lower)) documentKind = "quotation"
+  else if (/報價|报价|quotation|quote|估價|估价/i.test(lower)) documentKind = dataset === "mfg" ? "bom" : "quotation"
   else if (/型錄|型录|catalog|catalogue/i.test(lower)) documentKind = "catalog"
   else if (["ppt", "pptx"].includes(extension)) documentKind = "presentation"
   else if (["pdf", "ai"].includes(extension) && dataset === "mfg") documentKind = "design_drawing"

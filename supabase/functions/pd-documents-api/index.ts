@@ -248,6 +248,21 @@ serve(async (req) => {
     return json({ item: { ...summary(row, dataset, thumbnail.get(row.thumbnail_path) || null), sourceUrl, previewUrl, extractedText: row.extracted_text || "" } })
   }
 
+  if (action === "checkHashes") {
+    if (!canEdit(sess)) return json({ error: "forbidden" }, 403)
+    const hashes = [...new Set(
+      (Array.isArray(body.hashes) ? body.hashes : [])
+        .map((value: unknown) => String(value).toLowerCase())
+        .filter((value: string) => /^[a-f0-9]{64}$/.test(value)),
+    )]
+    if (!hashes.length || hashes.length > 100) {
+      return json({ error: "invalid_hash_batch" }, 400)
+    }
+    const { data, error } = await sb.from(table).select("sha256").in("sha256", hashes)
+    if (error) return json({ error: error.message }, 500)
+    return json({ existing: (data || []).map((row: any) => row.sha256) })
+  }
+
   if (action === "initUpload") {
     if (!canEdit(sess)) return json({ error: "forbidden" }, 403)
     const relativePath = normalizeRelativePath(String(body.relativePath || ""))

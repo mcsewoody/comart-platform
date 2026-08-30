@@ -9,7 +9,7 @@ import { Button } from "./ui";
 const navigation = [
   { to: "/", label: "自製品文件", icon: Factory, end: true },
   { to: "/buy", label: "外購品文件", icon: ShoppingBag },
-  { to: "/upload", label: "測試匯入", icon: FolderUp, editorOnly: true },
+  { to: "/upload", label: "批次匯入", icon: FolderUp, editorOnly: true },
 ];
 
 export function AppShell() {

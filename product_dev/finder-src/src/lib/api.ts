@@ -144,6 +144,10 @@ export const api = {
     return platformCall<PdUploadInit>("initUpload", payload);
   },
 
+  async checkPdHashes(dataset: PdDataset, hashes: string[]) {
+    return platformCall<{ existing: string[] }>("checkHashes", { dataset, hashes });
+  },
+
   async completePdUpload(payload: {
     dataset: PdDataset;
     relativePath: string;

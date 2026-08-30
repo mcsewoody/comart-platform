@@ -26,6 +26,11 @@ import type {
   SearchResponse,
   SupplierOption,
   TrashItem,
+  PdDataset,
+  PdDocumentDetail,
+  PdDocumentSummary,
+  PdSearchParams,
+  PdUploadInit,
 } from "./types";
 
 function normalize(value: string) {
@@ -114,6 +119,45 @@ async function platformCall<T>(
 }
 
 export const api = {
+  async searchPdDocuments(params: PdSearchParams) {
+    return platformCall<{ items: PdDocumentSummary[]; total: number; elapsedMs: number }>(
+      "search",
+      { ...params },
+    );
+  },
+
+  async getPdDocument(dataset: PdDataset, id: string) {
+    return (
+      await platformCall<{ item: PdDocumentDetail | null }>("document", {
+        dataset,
+        id,
+      })
+    ).item;
+  },
+
+  async initPdUpload(payload: {
+    dataset: PdDataset;
+    relativePath: string;
+    byteSize: number;
+    sha256: string;
+  }) {
+    return platformCall<PdUploadInit>("initUpload", payload);
+  },
+
+  async completePdUpload(payload: {
+    dataset: PdDataset;
+    relativePath: string;
+    byteSize: number;
+    mimeType: string;
+    sha256: string;
+    storagePath: string;
+    lastModified: number;
+  }) {
+    return platformCall<{ duplicate: boolean; documentId: string; analysisStatus?: string }>(
+      "completeUpload",
+      payload,
+    );
+  },
   async getProfiles(): Promise<Profile[]> {
     if (appConfig.demoMode) {
       return [

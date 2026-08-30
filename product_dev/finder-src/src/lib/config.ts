@@ -7,7 +7,7 @@ export const appConfig = {
   supabaseUrl,
   supabaseAnonKey,
   platformMode: import.meta.env.VITE_PLATFORM_MODE === "true",
-  platformApiUrl: `${supabaseUrl}/functions/v1/cpf-platform-api`,
+  platformApiUrl: `${supabaseUrl}/functions/v1/pd-documents-api`,
   demoMode:
     import.meta.env.VITE_DEMO_MODE === "true" ||
     (!supabaseAnonKey && import.meta.env.VITE_PLATFORM_MODE !== "true"),

@@ -5,7 +5,7 @@ import App from "./App";
 import { AuthProvider } from "./auth/AuthProvider";
 
 describe("App", () => {
-  it("renders the product search experience in demo mode", async () => {
+  it("renders the self-made document library", async () => {
     render(
       <MemoryRouter>
         <AuthProvider>
@@ -15,9 +15,9 @@ describe("App", () => {
     );
     expect(
       await screen.findByRole("heading", {
-        name: "先精準找到，再擴大關聯",
+        name: "自製品文件搜尋",
       }),
     ).toBeInTheDocument();
-    expect(screen.getByRole("textbox", { name: "搜尋產品" })).toBeVisible();
+    expect(screen.getByRole("textbox", { name: "搜尋關鍵字" })).toBeVisible();
   });
 });

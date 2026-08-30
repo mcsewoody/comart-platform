@@ -258,3 +258,54 @@ export interface TrashItem {
   title: string;
   deletedAt: string;
 }
+
+export type PdDataset = "mfg" | "buy";
+export type PdAnalysisStatus =
+  | "metadata_only"
+  | "queued"
+  | "processing"
+  | "completed"
+  | "failed";
+
+export interface PdDocumentSummary {
+  id: string;
+  dataset: PdDataset;
+  title: string;
+  relativePath: string;
+  sourceFactory: string | null;
+  supplierName: string | null;
+  pathLabels: string[];
+  documentKind: string;
+  extension: string;
+  byteSize: number;
+  keywords: string[];
+  summary: string;
+  isReference: boolean;
+  analysisStatus: PdAnalysisStatus;
+  thumbnailUrl: string | null;
+  updatedAt: string;
+  score?: number;
+  matchReason?: string;
+}
+
+export interface PdDocumentDetail extends PdDocumentSummary {
+  sourceUrl: string | null;
+  previewUrl: string | null;
+  extractedText: string;
+}
+
+export interface PdSearchParams {
+  dataset: PdDataset;
+  query: string;
+  supplier?: string;
+  kind?: string;
+  includeReference?: boolean;
+}
+
+export interface PdUploadInit {
+  duplicate: boolean;
+  documentId?: string;
+  title?: string;
+  storagePath?: string;
+  signedUrl?: string;
+}

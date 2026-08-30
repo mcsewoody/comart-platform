@@ -65,6 +65,10 @@ export function reusableManifestHash(
   return /^[a-f0-9]{64}$/.test(entry.sha256) ? entry.sha256 : null;
 }
 
+export function isTransientUploadStatus(status: number) {
+  return status === 408 || status === 425 || status === 429 || status >= 500;
+}
+
 export function quickUploadRelativePath(dataset: PdDataset, subpath: string, fileName: string) {
   const parts = subpath.replaceAll("\\", "/").split("/").map((part) => part.trim()).filter(Boolean);
   if (!parts.length || parts.some((part) => part === "." || part === ".." || part.includes("\0"))) {

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   dedupeByDatasetHash,
+  isTransientUploadStatus,
   quickUploadRelativePath,
   reusableManifestHash,
   selectIncrementalBatch,
@@ -60,5 +61,11 @@ describe("incremental import", () => {
     expect(quickUploadRelativePath("buy", "供應商A/三合一", "quote.xlsx"))
       .toBe("Outsourcing/供應商A/三合一/quote.xlsx");
     expect(() => quickUploadRelativePath("buy", "../供應商A", "quote.xlsx")).toThrow();
+  });
+
+  it("retries temporary Storage and proxy failures", () => {
+    expect(isTransientUploadStatus(520)).toBe(true);
+    expect(isTransientUploadStatus(429)).toBe(true);
+    expect(isTransientUploadStatus(400)).toBe(false);
   });
 });

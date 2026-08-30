@@ -6,6 +6,7 @@ import { api } from "../lib/api";
 import {
   dedupeByDatasetHash,
   importFileKey,
+  isTransientUploadStatus,
   manifestFileKey,
   quickUploadRelativePath,
   reusableManifestHash,
@@ -380,33 +381,57 @@ function Metric({ label, value, tone = "slate" }: { label: string; value: number
 }
 
 async function uploadOne(item: ImportFile, onStatus: (status: string) => void): Promise<"completed" | "duplicate"> {
-  const init = await api.initPdUpload({
-    dataset: item.dataset,
-    relativePath: item.relativePath,
-    byteSize: item.file.size,
-    sha256: item.sha256,
-  });
-  if (init.duplicate) return "duplicate";
-  if (!init.storagePath) throw new Error("未取得上傳位置");
+  let storagePath: string | null = null;
+  let lastError: Error | null = null;
 
-  if (init.storageExists) {
-    onStatus("原檔已存在，補建索引…");
-  } else {
+  for (let attempt = 1; attempt <= 3; attempt += 1) {
+    const init = await api.initPdUpload({
+      dataset: item.dataset,
+      relativePath: item.relativePath,
+      byteSize: item.file.size,
+      sha256: item.sha256,
+    });
+    if (init.duplicate) return "duplicate";
+    if (!init.storagePath) throw new Error("未取得上傳位置");
+    storagePath = init.storagePath;
+
+    if (init.storageExists) {
+      onStatus("原檔已存在，補建索引…");
+      break;
+    }
     if (!init.signedUrl) throw new Error("未取得 signed upload URL");
+
     const form = new FormData();
     form.append("cacheControl", "3600");
     form.append("", item.file);
-    onStatus("上傳中…");
-    const response = await fetch(init.signedUrl, {
-      method: "PUT",
-      headers: { "x-upsert": "false" },
-      body: form,
-    });
-    const responseText = response.ok ? "" : await response.text();
-    if (!response.ok && !/resource already exists/i.test(responseText)) {
-      throw new Error(`Storage 上傳失敗 (${response.status})`);
+    onStatus(attempt === 1 ? "上傳中…" : `第 ${attempt} 次重試上傳…`);
+
+    let response: Response;
+    try {
+      response = await fetch(init.signedUrl, {
+        method: "PUT",
+        headers: { "x-upsert": "false" },
+        body: form,
+      });
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error("Storage 上傳失敗");
+      if (attempt === 3) throw lastError;
+      onStatus(`Storage 連線暫時失敗，第 ${attempt + 1} 次重試…`);
+      await delay(700 * attempt);
+      continue;
     }
+
+    const responseText = response.ok ? "" : await response.text();
+    if (response.ok || /resource already exists/i.test(responseText)) break;
+
+    lastError = new Error(`Storage 上傳失敗 (${response.status})`);
+    if (!isTransientUploadStatus(response.status) || attempt === 3) throw lastError;
+
+    onStatus(`Storage 暫時失敗，第 ${attempt + 1} 次重試…`);
+    await delay(700 * attempt);
   }
+
+  if (!storagePath) throw lastError || new Error("Storage 上傳失敗");
 
   const result = await api.completePdUpload({
     dataset: item.dataset,
@@ -414,12 +439,16 @@ async function uploadOne(item: ImportFile, onStatus: (status: string) => void): 
     byteSize: item.file.size,
     mimeType: item.file.type || "application/octet-stream",
     sha256: item.sha256,
-    storagePath: init.storagePath,
+    storagePath,
     lastModified: item.file.lastModified,
   });
   if (result.duplicate) return "duplicate";
   onStatus(result.analysisStatus === "metadata_only" ? "已建立 metadata 索引" : "已建立文件索引");
   return "completed";
+}
+
+function delay(milliseconds: number) {
+  return new Promise((resolve) => window.setTimeout(resolve, milliseconds));
 }
 
 function prepareBatch(files: ImportFile[]) {

@@ -32,6 +32,26 @@ function canEdit(sess: Session) {
   return sess.role === "admin" || sess.role === "dcc"
 }
 
+async function analysisLibraryStatus(sb: any, dataset: Dataset) {
+  const table = jobTableFor(dataset)
+  const [queued, processing, retryableFailed, blockedFailed, completed] = await Promise.all([
+    sb.from(table).select("id", { count: "exact", head: true }).eq("status", "queued"),
+    sb.from(table).select("id", { count: "exact", head: true }).eq("status", "processing"),
+    sb.from(table).select("id", { count: "exact", head: true }).eq("status", "failed").lt("attempts", 3),
+    sb.from(table).select("id", { count: "exact", head: true }).eq("status", "failed").gte("attempts", 3),
+    sb.from(table).select("id", { count: "exact", head: true }).eq("status", "completed"),
+  ])
+  const error = [queued, processing, retryableFailed, blockedFailed, completed].find((result) => result.error)?.error
+  if (error) throw error
+  return {
+    queued: queued.count || 0,
+    processing: processing.count || 0,
+    retryableFailed: retryableFailed.count || 0,
+    blockedFailed: blockedFailed.count || 0,
+    completed: completed.count || 0,
+  }
+}
+
 function tableFor(dataset: Dataset) {
   return dataset === "mfg" ? "pd_mfg_documents" : "pd_buy_documents"
 }
@@ -193,6 +213,56 @@ serve(async (req) => {
       counts: { mfg: mfg.count || 0, buy: buy.count || 0 },
       suppliers: [...new Set((suppliers.data || []).map((item: any) => item.supplier_name).filter(Boolean))],
     })
+  }
+
+  if (action === "analysisStatus") {
+    if (!canEdit(sess)) return json({ error: "forbidden" }, 403)
+    try {
+      const [mfg, buy] = await Promise.all([
+        analysisLibraryStatus(sb, "mfg"),
+        analysisLibraryStatus(sb, "buy"),
+      ])
+      return json({ configured: Boolean(Deno.env.get("PD_GITHUB_TOKEN")), mfg, buy })
+    } catch (error) {
+      return json({ error: error instanceof Error ? error.message : "analysis_status_failed" }, 500)
+    }
+  }
+
+  if (action === "startAnalysis") {
+    if (!canEdit(sess)) return json({ error: "forbidden" }, 403)
+    const requestedDataset = String(body.dataset || "")
+    const limit = Number(body.limit)
+    if (!["mfg", "buy", "both"].includes(requestedDataset) || !Number.isInteger(limit) || limit < 1 || limit > 50) {
+      return json({ error: "invalid_analysis_request" }, 400)
+    }
+    const token = Deno.env.get("PD_GITHUB_TOKEN") || ""
+    if (!token) return json({ error: "AI 啟動尚未完成一次性後端授權" }, 503)
+    const owner = Deno.env.get("PD_GITHUB_OWNER") || "mcsewoody"
+    const repository = Deno.env.get("PD_GITHUB_REPOSITORY") || "comart-platform"
+    const workflow = Deno.env.get("PD_GITHUB_WORKFLOW") || "pd-document-worker.yml"
+    const response = await fetch(
+      `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repository)}/actions/workflows/${encodeURIComponent(workflow)}/dispatches`,
+      {
+        method: "POST",
+        headers: {
+          "Accept": "application/vnd.github+json",
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+          "User-Agent": "comart-product-finder",
+          "X-GitHub-Api-Version": "2022-11-28",
+        },
+        body: JSON.stringify({
+          ref: "main",
+          inputs: { dataset: requestedDataset, limit: String(limit) },
+        }),
+      },
+    )
+    if (!response.ok) {
+      const detail = await response.text()
+      console.error("GitHub workflow dispatch failed", response.status, detail.slice(0, 1000))
+      return json({ error: `AI 工作器啟動失敗 (${response.status})` }, 502)
+    }
+    return json({ accepted: true, dataset: requestedDataset, limit }, 202)
   }
 
   const dataset: Dataset = body.dataset === "buy" ? "buy" : "mfg"

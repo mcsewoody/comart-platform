@@ -31,6 +31,7 @@ import type {
   PdDocumentSummary,
   PdSearchParams,
   PdUploadInit,
+  PdAnalysisQueueStatus,
 } from "./types";
 
 function normalize(value: string) {
@@ -160,6 +161,17 @@ export const api = {
     return platformCall<{ duplicate: boolean; documentId: string; analysisStatus?: string }>(
       "completeUpload",
       payload,
+    );
+  },
+
+  async getPdAnalysisStatus() {
+    return platformCall<PdAnalysisQueueStatus>("analysisStatus");
+  },
+
+  async startPdAnalysis(dataset: PdDataset | "both", limit: number) {
+    return platformCall<{ accepted: boolean; dataset: PdDataset | "both"; limit: number }>(
+      "startAnalysis",
+      { dataset, limit },
     );
   },
   async getProfiles(): Promise<Profile[]> {

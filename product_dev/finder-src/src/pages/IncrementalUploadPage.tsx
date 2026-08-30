@@ -1,5 +1,5 @@
-import { CheckCircle2, FilePlus2, FolderOpen, LoaderCircle, RefreshCw, UploadCloud, Zap } from "lucide-react";
-import { useMemo, useRef, useState } from "react";
+import { BrainCircuit, CheckCircle2, FilePlus2, FolderOpen, LoaderCircle, Play, RefreshCw, UploadCloud, Zap } from "lucide-react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAuth } from "../auth/AuthProvider";
 import { Badge, Button, Card, PageHeader } from "../components/ui";
 import { api } from "../lib/api";
@@ -13,7 +13,7 @@ import {
   selectIncrementalBatch,
   type ImportManifestEntry,
 } from "../lib/incremental-import";
-import type { PdDataset } from "../lib/types";
+import type { PdAnalysisLibraryStatus, PdAnalysisQueueStatus, PdDataset } from "../lib/types";
 
 type ImportFile = {
   file: File;
@@ -61,9 +61,29 @@ export function IncrementalUploadPage() {
   const [quickStatuses, setQuickStatuses] = useState<string[]>([]);
   const [quickRunning, setQuickRunning] = useState(false);
   const [quickMessage, setQuickMessage] = useState("");
+  const [analysisStatus, setAnalysisStatus] = useState<PdAnalysisQueueStatus | null>(null);
+  const [analysisDataset, setAnalysisDataset] = useState<PdDataset | "both">("both");
+  const [analysisLimit, setAnalysisLimit] = useState(20);
+  const [analysisRunning, setAnalysisRunning] = useState(false);
+  const [analysisMessage, setAnalysisMessage] = useState("");
   const mfg = useMemo(() => files.filter((item) => item.dataset === "mfg"), [files]);
   const buy = useMemo(() => files.filter((item) => item.dataset === "buy"), [files]);
-  const running = phase === "inventory" || phase === "uploading" || quickRunning;
+  const running = phase === "inventory" || phase === "uploading" || quickRunning || analysisRunning;
+
+  const refreshAnalysisStatus = useCallback(async (silent = false) => {
+    try {
+      setAnalysisStatus(await api.getPdAnalysisStatus());
+    } catch (reason) {
+      if (!silent) setAnalysisMessage(`無法取得 AI 佇列：${reason instanceof Error ? reason.message : "未知錯誤"}`);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (profile?.role === "viewer") return;
+    void refreshAnalysisStatus();
+    const timer = window.setInterval(() => void refreshAnalysisStatus(true), 15_000);
+    return () => window.clearInterval(timer);
+  }, [profile?.role, refreshAnalysisStatus]);
 
   if (profile?.role === "viewer") {
     return <Card className="p-8 text-center"><p className="font-black text-white">此功能僅供編輯者與管理員使用</p></Card>;
@@ -176,6 +196,7 @@ export function IncrementalUploadPage() {
     } : current);
     setMessage(`本批完成：新增 ${completed}、重複略過 ${duplicates}、失敗 ${failed}；尚待匯入 ${remaining.length}。`);
     setPhase("finished");
+    void refreshAnalysisStatus(true);
   }
 
   function chooseQuick(selected: FileList | null) {
@@ -228,6 +249,22 @@ export function IncrementalUploadPage() {
     }
     setQuickMessage(`快速上傳完成：新增 ${completed}、重複略過 ${duplicates}、失敗 ${failed}；不會自動執行 AI。`);
     setQuickRunning(false);
+    void refreshAnalysisStatus(true);
+  }
+
+  async function startAnalysis() {
+    if (!analysisStatus?.configured || analysisRunning) return;
+    setAnalysisRunning(true);
+    setAnalysisMessage("正在啟動 AI 分析…");
+    try {
+      await api.startPdAnalysis(analysisDataset, analysisLimit);
+      setAnalysisMessage(`已啟動 ${analysisDataset === "both" ? "自製品／外購品" : analysisDataset === "mfg" ? "自製品" : "外購品"} AI 分析；每個資料庫本次最多 ${analysisLimit} 份。`);
+      window.setTimeout(() => void refreshAnalysisStatus(true), 3_000);
+    } catch (reason) {
+      setAnalysisMessage(`啟動失敗：${reason instanceof Error ? reason.message : "未知錯誤"}`);
+    } finally {
+      setAnalysisRunning(false);
+    }
   }
 
   function updateQuickStatus(index: number, status: string) {
@@ -367,7 +404,122 @@ export function IncrementalUploadPage() {
         </Button>
       </div>
     </Card>
+
+    <AnalysisControl
+      status={analysisStatus}
+      dataset={analysisDataset}
+      limit={analysisLimit}
+      running={analysisRunning}
+      message={analysisMessage}
+      pageBusy={running}
+      onDatasetChange={setAnalysisDataset}
+      onLimitChange={setAnalysisLimit}
+      onRefresh={() => void refreshAnalysisStatus()}
+      onStart={() => void startAnalysis()}
+    />
   </>;
+}
+
+function AnalysisControl({
+  status,
+  dataset,
+  limit,
+  running,
+  message,
+  pageBusy,
+  onDatasetChange,
+  onLimitChange,
+  onRefresh,
+  onStart,
+}: {
+  status: PdAnalysisQueueStatus | null;
+  dataset: PdDataset | "both";
+  limit: number;
+  running: boolean;
+  message: string;
+  pageBusy: boolean;
+  onDatasetChange: (dataset: PdDataset | "both") => void;
+  onLimitChange: (limit: number) => void;
+  onRefresh: () => void;
+  onStart: () => void;
+}) {
+  const selected = status ? selectedAnalysisStatus(status, dataset) : emptyAnalysisStatus();
+  const ready = selected.queued + selected.retryableFailed;
+  const disabled = !status?.configured || ready === 0 || selected.processing > 0 || running || pageBusy;
+  return <Card className="mt-6 overflow-hidden border-cyan-900/70 bg-gradient-to-br from-slate-900 to-cyan-950/20 p-0">
+    <div className="border-b border-slate-800 p-5 md:p-6">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+        <div className="flex items-start gap-3">
+          <span className="rounded-xl bg-cyan-950/70 p-3 text-cyan-300"><BrainCircuit size={22} /></span>
+          <div><h2 className="text-lg font-black text-white">C. AI 文件分析</h2><p className="mt-1 max-w-3xl text-sm leading-6 text-slate-400">由這裡啟動後端 worker，擷取 PDF、Office 與圖片的全文、摘要、關鍵字及縮圖。不會分析 CAD 或影片內容。</p></div>
+        </div>
+        <Button variant="ghost" disabled={running} onClick={onRefresh}><RefreshCw size={17} />更新狀態</Button>
+      </div>
+    </div>
+
+    <div className="grid gap-4 p-5 md:grid-cols-2 md:p-6">
+      <AnalysisLibraryCard title="自製品" status={status?.mfg || emptyAnalysisStatus()} tone="cyan" />
+      <AnalysisLibraryCard title="外購品" status={status?.buy || emptyAnalysisStatus()} tone="amber" />
+    </div>
+
+    <div className="border-t border-slate-800 bg-slate-950/30 p-5 md:p-6">
+      <div className="grid gap-4 lg:grid-cols-[220px_180px_minmax(0,1fr)_auto] lg:items-end">
+        <label className="text-sm font-bold text-slate-300">分析資料庫
+          <select value={dataset} onChange={(event) => onDatasetChange(event.target.value as PdDataset | "both")} disabled={running} className="mt-2 h-12 w-full rounded-xl border border-slate-700 bg-slate-950 px-3 text-slate-100 outline-none focus:border-cyan-500">
+            <option value="both">自製品／外購品</option>
+            <option value="mfg">只有自製品</option>
+            <option value="buy">只有外購品</option>
+          </select>
+        </label>
+        <label className="text-sm font-bold text-slate-300">每個資料庫本次份數
+          <input type="number" min={1} max={50} value={limit} onChange={(event) => onLimitChange(Math.min(50, Math.max(1, Number(event.target.value) || 1)))} disabled={running} className="mt-2 h-12 w-full rounded-xl border border-slate-700 bg-slate-950 px-4 text-slate-100 outline-none focus:border-cyan-500" />
+        </label>
+        <div className="rounded-xl border border-slate-800 bg-slate-950/60 px-4 py-3 text-sm leading-6 text-slate-400">
+          <span className="font-black text-white">選取範圍待處理 {ready} 份</span>
+          <span className="mx-2 text-slate-700">|</span>處理中 {selected.processing} 份
+        </div>
+        <Button disabled={disabled} onClick={onStart} className="h-12 px-6">
+          {running ? <LoaderCircle className="animate-spin" size={18} /> : <Play size={18} />}
+          {running ? "啟動中…" : selected.processing > 0 ? "AI 分析中" : ready > 0 ? `開始分析 ${Math.min(ready, limit * (dataset === "both" ? 2 : 1))} 份` : "沒有待分析文件"}
+        </Button>
+      </div>
+      <p role="status" className={`mt-3 text-sm leading-6 ${status && !status.configured ? "text-amber-300" : "text-slate-400"}`}>
+        {status && !status.configured ? "尚差一次性的後端授權設定；設定後不再需要進入 GitHub。" : message || "建議先以每庫 20 份驗證搜尋品質，確認後再處理下一批。"}
+      </p>
+    </div>
+  </Card>;
+}
+
+function AnalysisLibraryCard({ title, status, tone }: { title: string; status: PdAnalysisLibraryStatus; tone: "cyan" | "amber" }) {
+  return <div className="rounded-2xl border border-slate-800 bg-slate-950/55 p-4">
+    <div className="flex items-center justify-between gap-3"><h3 className="font-black text-white">{title}</h3><span className={tone === "cyan" ? "text-cyan-300" : "text-amber-300"}>{status.queued + status.retryableFailed} 待處理</span></div>
+    <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <AnalysisMetric label="排隊" value={status.queued} />
+      <AnalysisMetric label="處理中" value={status.processing} />
+      <AnalysisMetric label="可重試" value={status.retryableFailed} />
+      <AnalysisMetric label="已完成" value={status.completed} />
+    </div>
+    {status.blockedFailed > 0 && <p className="mt-3 text-xs font-semibold text-rose-300">{status.blockedFailed} 份已失敗三次，需要管理員檢查。</p>}
+  </div>;
+}
+
+function AnalysisMetric({ label, value }: { label: string; value: number }) {
+  return <div><p className="text-[11px] font-semibold text-slate-500">{label}</p><p className="mt-1 text-xl font-black tabular-nums text-slate-200">{value}</p></div>;
+}
+
+function emptyAnalysisStatus(): PdAnalysisLibraryStatus {
+  return { queued: 0, processing: 0, retryableFailed: 0, blockedFailed: 0, completed: 0 };
+}
+
+function selectedAnalysisStatus(status: PdAnalysisQueueStatus, dataset: PdDataset | "both"): PdAnalysisLibraryStatus {
+  if (dataset !== "both") return status[dataset];
+  return {
+    queued: status.mfg.queued + status.buy.queued,
+    processing: status.mfg.processing + status.buy.processing,
+    retryableFailed: status.mfg.retryableFailed + status.buy.retryableFailed,
+    blockedFailed: status.mfg.blockedFailed + status.buy.blockedFailed,
+    completed: status.mfg.completed + status.buy.completed,
+  };
 }
 
 function Metric({ label, value, tone = "slate" }: { label: string; value: number; tone?: "slate" | "cyan" | "green" | "amber" }) {

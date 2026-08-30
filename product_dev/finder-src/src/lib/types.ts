@@ -260,6 +260,20 @@ export interface TrashItem {
 }
 
 export type PdDataset = "mfg" | "buy";
+
+export interface PdAnalysisLibraryStatus {
+  queued: number;
+  processing: number;
+  retryableFailed: number;
+  blockedFailed: number;
+  completed: number;
+}
+
+export interface PdAnalysisQueueStatus {
+  configured: boolean;
+  mfg: PdAnalysisLibraryStatus;
+  buy: PdAnalysisLibraryStatus;
+}
 export type PdAnalysisStatus =
   | "metadata_only"
   | "queued"

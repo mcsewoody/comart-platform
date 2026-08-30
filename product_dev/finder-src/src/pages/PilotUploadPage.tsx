@@ -101,12 +101,37 @@ function selectPilot(files: PilotFile[], dataset: PdDataset) {
   const chosen: PilotFile[] = [];
   const remaining = [...files].sort((a, b) => quality(b) - quality(a) || a.relativePath.localeCompare(b.relativePath));
   groups.forEach((extensions, groupIndex) => {
-    const matches = remaining.filter((item) => extensions.includes(ext(item.file.name))).slice(0, quota[groupIndex]);
+    const pool = remaining.filter((item) => extensions.includes(ext(item.file.name)));
+    const matches = takeDiverse(pool, quota[groupIndex], dataset);
     chosen.push(...matches);
     matches.forEach((match) => remaining.splice(remaining.indexOf(match), 1));
   });
-  chosen.push(...remaining.slice(0, Math.max(0, 20 - chosen.length)));
+  chosen.push(...takeDiverse(remaining, Math.max(0, 20 - chosen.length), dataset));
   return chosen.slice(0, 20);
+}
+
+function takeDiverse(files: PilotFile[], limit: number, dataset: PdDataset) {
+  const selected: PilotFile[] = [];
+  const seen = new Set<string>();
+  for (const item of files) {
+    const key = diversityKey(item.relativePath, dataset);
+    if (!seen.has(key)) {
+      selected.push(item);
+      seen.add(key);
+    }
+    if (selected.length === limit) return selected;
+  }
+  for (const item of files) {
+    if (!selected.includes(item)) selected.push(item);
+    if (selected.length === limit) break;
+  }
+  return selected;
+}
+
+function diversityKey(relativePath: string, dataset: PdDataset) {
+  const parts = relativePath.split("/").filter(Boolean);
+  if (dataset === "buy") return parts.slice(0, Math.min(parts.length - 1, 4)).join("/") || relativePath;
+  return parts.slice(0, Math.min(parts.length - 1, 5)).join("/") || relativePath;
 }
 
 function quality(item: PilotFile) {

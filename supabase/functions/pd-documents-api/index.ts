@@ -111,8 +111,8 @@ function classify(dataset: Dataset, relativePath: string, extension: string) {
       search_text: [title, relativePath, sourceFactory, ...categoryPath, ...keywords].filter(Boolean).join(" "),
     }
   }
-  const supplierName = parts[1] || "待確認廠商"
-  const productPath = parts.slice(2, -1)
+  const supplierName = parts.length >= 3 ? parts[1] : "待確認廠商"
+  const productPath = parts.length >= 3 ? parts.slice(2, -1) : []
   return {
     title, document_kind: documentKind, supplier_name: supplierName,
     product_path: productPath, keywords,

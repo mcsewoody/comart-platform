@@ -63,7 +63,10 @@ export function PilotUploadPage() {
           form.append("", item.file);
           updateStatus(index, "上傳中…");
           const response = await fetch(init.signedUrl, { method: "PUT", headers: { "x-upsert": "false" }, body: form });
-          if (!response.ok) throw new Error(`Storage 上傳失敗 (${response.status})`);
+          const responseText = response.ok ? "" : await response.text();
+          const alreadyStored = !response.ok && /resource already exists/i.test(responseText);
+          if (!response.ok && !alreadyStored) throw new Error(`Storage 上傳失敗 (${response.status})`);
+          if (alreadyStored) updateStatus(index, "原檔已存在，補建索引…");
           await api.completePdUpload({ dataset: item.dataset, relativePath: item.relativePath, byteSize: item.file.size, mimeType: item.file.type || "application/octet-stream", sha256, storagePath: init.storagePath, lastModified: item.file.lastModified });
           completed += 1;
           updateStatus(index, "已建立文件索引");

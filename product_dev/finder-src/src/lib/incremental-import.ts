@@ -84,3 +84,20 @@ export function quickUploadRelativePath(dataset: PdDataset, subpath: string, fil
   if (!safeName || safeName === "." || safeName === "..") throw new Error("檔名無效");
   return `${dataset === "mfg" ? "OwnProduct" : "Outsourcing"}/${parts.join("/")}/${safeName}`;
 }
+
+export function compareSyncManifest<T extends IncrementalFile & { id?: string; byteSize?: number }>(
+  local: IncrementalFile[],
+  remote: T[],
+) {
+  const localByPath = new Map(local.map((item) => [`${item.dataset}:${item.relativePath}`, item]));
+  const serverOnly: T[] = [];
+  const conflicts: T[] = [];
+  let current = 0;
+  for (const item of remote) {
+    const localItem = localByPath.get(`${item.dataset}:${item.relativePath}`);
+    if (!localItem) serverOnly.push(item);
+    else if (localItem.sha256 !== item.sha256) conflicts.push(item);
+    else current += 1;
+  }
+  return { serverOnly, conflicts, current };
+}

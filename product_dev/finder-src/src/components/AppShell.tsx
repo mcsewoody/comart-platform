@@ -49,7 +49,7 @@ export function AppShell() {
 function Navigation({ onNavigate }: { onNavigate?: () => void }) {
   const { profile } = useAuth();
   return <nav aria-label="主要導覽" className="space-y-1">{navigation.map((item) => {
-    if (item.editorOnly && profile?.role === "viewer") return null;
+    if (item.editorOnly && !profile?.canUpload) return null;
     const Icon = item.icon;
     return <NavLink key={item.to} to={item.to} end={item.end} onClick={onNavigate} className={({ isActive }) => cn("flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition", isActive ? "bg-cyan-400 text-slate-950" : "text-slate-400 hover:bg-slate-800 hover:text-white")}><Icon size={18} />{item.label}</NavLink>;
   })}</nav>;

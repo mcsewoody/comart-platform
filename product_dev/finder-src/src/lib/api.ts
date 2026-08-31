@@ -32,6 +32,9 @@ import type {
   PdSearchParams,
   PdUploadInit,
   PdAnalysisQueueStatus,
+  PdSyncDocument,
+  PdSyncDownload,
+  PdUploader,
 } from "./types";
 
 function normalize(value: string) {
@@ -173,6 +176,22 @@ export const api = {
       "startAnalysis",
       { dataset, limit },
     );
+  },
+
+  async getPdSyncManifest() {
+    return platformCall<{ items: PdSyncDocument[] }>("syncManifest");
+  },
+
+  async getPdSyncUrls(items: Array<{ dataset: PdDataset; id: string }>) {
+    return platformCall<{ items: PdSyncDownload[] }>("syncUrls", { items });
+  },
+
+  async getPdUploaders() {
+    return platformCall<{ items: PdUploader[] }>("uploaders");
+  },
+
+  async setPdUploader(empId: string, allowed: boolean) {
+    return platformCall<{ ok: boolean }>("setUploader", { empId, allowed });
   },
   async getProfiles(): Promise<Profile[]> {
     if (appConfig.demoMode) {

@@ -27,6 +27,7 @@ export interface Profile {
   displayName: string;
   role: UserRole;
   active: boolean;
+  canUpload?: boolean;
 }
 
 export interface Category {
@@ -324,4 +325,24 @@ export interface PdUploadInit {
   storagePath?: string;
   signedUrl?: string;
   signedToken?: string;
+}
+
+export interface PdSyncDocument {
+  id: string;
+  dataset: PdDataset;
+  relativePath: string;
+  sha256: string;
+  byteSize: number;
+}
+
+export interface PdSyncDownload extends PdSyncDocument {
+  url: string;
+}
+
+export interface PdUploader {
+  id: string;
+  email: string;
+  displayName: string;
+  platformRole: string;
+  allowed: boolean;
 }

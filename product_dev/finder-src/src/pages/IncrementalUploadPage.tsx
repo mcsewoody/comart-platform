@@ -1,4 +1,4 @@
-import { BrainCircuit, CheckCircle2, FilePlus2, FolderOpen, LoaderCircle, Play, RefreshCw, UploadCloud, Zap } from "lucide-react";
+import { BrainCircuit, CheckCircle2, Download, FilePlus2, FolderOpen, LoaderCircle, Play, RefreshCw, ShieldCheck, UploadCloud, Zap } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Upload } from "tus-js-client";
 import { useAuth } from "../auth/AuthProvider";
@@ -7,6 +7,7 @@ import { api } from "../lib/api";
 import { appConfig } from "../lib/config";
 import {
   dedupeByDatasetHash,
+  compareSyncManifest,
   importFileKey,
   isTransientUploadStatus,
   manifestFileKey,
@@ -16,7 +17,16 @@ import {
   shouldUseResumableUpload,
   type ImportManifestEntry,
 } from "../lib/incremental-import";
-import type { PdAnalysisLibraryStatus, PdAnalysisQueueStatus, PdDataset } from "../lib/types";
+import {
+  filesFromDirectory,
+  loadDirectoryHandle,
+  pickDefaultDirectory,
+  requestDirectoryPermission,
+  supportsDirectoryAccess,
+  writeFileWithoutOverwrite,
+  type StoredDirectoryHandle,
+} from "../lib/directory-access";
+import type { PdAnalysisLibraryStatus, PdAnalysisQueueStatus, PdDataset, PdSyncDocument, PdUploader } from "../lib/types";
 
 type ImportFile = {
   file: File;
@@ -69,9 +79,20 @@ export function IncrementalUploadPage() {
   const [analysisLimit, setAnalysisLimit] = useState(20);
   const [analysisRunning, setAnalysisRunning] = useState(false);
   const [analysisMessage, setAnalysisMessage] = useState("");
+  const [directoryHandle, setDirectoryHandle] = useState<StoredDirectoryHandle | null>(null);
+  const [localFiles, setLocalFiles] = useState<ImportFile[]>([]);
+  const [serverOnly, setServerOnly] = useState<PdSyncDocument[]>([]);
+  const [syncConflicts, setSyncConflicts] = useState<PdSyncDocument[]>([]);
+  const [syncCurrent, setSyncCurrent] = useState(0);
+  const [syncRunning, setSyncRunning] = useState(false);
+  const [syncMessage, setSyncMessage] = useState("");
   const mfg = useMemo(() => files.filter((item) => item.dataset === "mfg"), [files]);
   const buy = useMemo(() => files.filter((item) => item.dataset === "buy"), [files]);
-  const running = phase === "inventory" || phase === "uploading" || quickRunning || analysisRunning;
+  const running = phase === "inventory" || phase === "uploading" || quickRunning || analysisRunning || syncRunning;
+
+  useEffect(() => {
+    void loadDirectoryHandle().then(setDirectoryHandle).catch(() => setDirectoryHandle(null));
+  }, []);
 
   const refreshAnalysisStatus = useCallback(async (silent = false) => {
     try {
@@ -82,17 +103,17 @@ export function IncrementalUploadPage() {
   }, []);
 
   useEffect(() => {
-    if (profile?.role === "viewer") return;
+    if (!profile?.canUpload) return;
     void refreshAnalysisStatus();
     const timer = window.setInterval(() => void refreshAnalysisStatus(true), 15_000);
     return () => window.clearInterval(timer);
-  }, [profile?.role, refreshAnalysisStatus]);
+  }, [profile?.canUpload, refreshAnalysisStatus]);
 
-  if (profile?.role === "viewer") {
-    return <Card className="p-8 text-center"><p className="font-black text-white">此功能僅供編輯者與管理員使用</p></Card>;
+  if (!profile?.canUpload) {
+    return <Card className="p-8 text-center"><p className="font-black text-white">你尚未列入 Product Finder 上傳者名單</p></Card>;
   }
 
-  async function choose(selected: FileList | null) {
+  async function choose(selected: FileList | File[] | null) {
     if (!selected?.length || running) return;
     setPhase("inventory");
     setFiles([]);
@@ -132,6 +153,8 @@ export function IncrementalUploadPage() {
       saveManifest(nextManifest);
 
       const deduped = dedupeByDatasetHash(hashed);
+      setLocalFiles(deduped.unique);
+      await refreshSync(deduped.unique);
       const existing = await findExistingHashes(deduped.unique, (checked, total) => {
         setMessage(`正在比對資料庫 ${checked} / ${total}…`);
         setProgress(75 + Math.round((checked / Math.max(total, 1)) * 25));
@@ -159,6 +182,69 @@ export function IncrementalUploadPage() {
       setPhase("idle");
       setProgress(0);
       setMessage(`盤點失敗：${reason instanceof Error ? reason.message : "未知錯誤"}`);
+    }
+  }
+
+  async function setOrScanDefaultDirectory(change = false) {
+    if (running) return;
+    try {
+      const handle = change || !directoryHandle ? await pickDefaultDirectory() : directoryHandle;
+      if (!await requestDirectoryPermission(handle)) throw new Error("未取得資料夾讀寫權限");
+      setDirectoryHandle(handle);
+      setMessage(`正在讀取預設目錄 ${handle.name}…`);
+      await choose(await filesFromDirectory(handle));
+    } catch (reason) {
+      if (reason instanceof DOMException && reason.name === "AbortError") return;
+      setMessage(`資料夾讀取失敗：${reason instanceof Error ? reason.message : "未知錯誤"}`);
+    }
+  }
+
+  async function refreshSync(local = localFiles) {
+    try {
+      const remote = await api.getPdSyncManifest();
+      const compared = compareSyncManifest(local, remote.items);
+      setServerOnly(compared.serverOnly);
+      setSyncConflicts(compared.conflicts);
+      setSyncCurrent(compared.current);
+      setSyncMessage(compared.serverOnly.length
+        ? `Supabase 有 ${compared.serverOnly.length} 份本機尚未保存，可安全補回。`
+        : "Supabase 沒有本機缺少的文件。");
+    } catch (reason) {
+      setSyncMessage(`同步盤點失敗：${reason instanceof Error ? reason.message : "未知錯誤"}`);
+    }
+  }
+
+  async function downloadServerOnly() {
+    if (!directoryHandle || !serverOnly.length || syncRunning) return;
+    setSyncRunning(true);
+    let downloaded = 0;
+    let conflicts = 0;
+    let failed = 0;
+    try {
+      if (!await requestDirectoryPermission(directoryHandle)) throw new Error("未取得資料夾寫入權限");
+      for (let index = 0; index < serverOnly.length; index += 50) {
+        const batch = serverOnly.slice(index, index + 50);
+        const result = await api.getPdSyncUrls(batch.map((item) => ({ dataset: item.dataset, id: item.id })));
+        for (const item of result.items) {
+          setSyncMessage(`正在補回 ${downloaded + conflicts + failed + 1} / ${serverOnly.length}：${item.relativePath}`);
+          try {
+            const response = await fetch(item.url);
+            if (!response.ok) throw new Error(`下載失敗 (${response.status})`);
+            const outcome = await writeFileWithoutOverwrite(directoryHandle, item.relativePath, await response.blob());
+            if (outcome === "written") downloaded += 1;
+            else conflicts += 1;
+          } catch {
+            failed += 1;
+          }
+        }
+      }
+      setSyncMessage(`本機補檔完成：新增 ${downloaded}、未覆寫衝突 ${conflicts}、失敗 ${failed}。`);
+      setSyncRunning(false);
+      await choose(await filesFromDirectory(directoryHandle));
+    } catch (reason) {
+      setSyncMessage(`補檔失敗：${reason instanceof Error ? reason.message : "未知錯誤"}`);
+    } finally {
+      setSyncRunning(false);
     }
   }
 
@@ -306,13 +392,14 @@ export function IncrementalUploadPage() {
       <button
         type="button"
         disabled={running}
-        onClick={openFolderPicker}
+        onClick={() => supportsDirectoryAccess() ? void setOrScanDefaultDirectory() : openFolderPicker()}
         className="flex min-h-52 w-full flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-700 bg-slate-950/30 p-8 text-center transition hover:border-cyan-600 hover:bg-cyan-950/10 disabled:cursor-wait disabled:opacity-60"
       >
         <span className="rounded-2xl bg-slate-800 p-4 text-cyan-300">{phase === "inventory" ? <LoaderCircle className="animate-spin" size={30} /> : <FolderOpen size={30} />}</span>
-        <span className="mt-4 text-lg font-black text-white">選擇 `/Users/woody/Documents/OpenAI/products/`</span>
-        <span className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">瀏覽器只讀取你主動選擇的資料夾；OwnProduct 與 Outsourcing 分開比對、分開儲存。</span>
+        <span className="mt-4 text-lg font-black text-white">{directoryHandle ? `掃描預設目錄：${directoryHandle.name}` : "設定預設 products 目錄"}</span>
+        <span className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">第一次授權後會記住目錄；瀏覽器仍會在需要時請你確認讀寫權限。</span>
       </button>
+      {directoryHandle && supportsDirectoryAccess() && <div className="mt-3 text-right"><Button variant="ghost" disabled={running} onClick={() => void setOrScanDefaultDirectory(true)}><FolderOpen size={17} />更換預設目錄</Button></div>}
       <input
         ref={(node) => { inputRef.current = node; node?.setAttribute("webkitdirectory", ""); }}
         type="file"
@@ -408,6 +495,32 @@ export function IncrementalUploadPage() {
       </div>
     </Card>
 
+    <Card className="mt-6 p-5 md:p-6">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+        <div className="flex items-start gap-3">
+          <span className="rounded-xl bg-emerald-950/50 p-3 text-emerald-300"><Download size={22} /></span>
+          <div><h2 className="text-lg font-black text-white">C. Supabase → 預設目錄補檔</h2><p className="mt-1 text-sm leading-6 text-slate-500">讓同事上傳、但你本機沒有的文件回到相同分類路徑。同路徑已有檔案時絕不覆寫。</p></div>
+        </div>
+        <Button variant="secondary" disabled={!localFiles.length || syncRunning} onClick={() => void refreshSync()}><RefreshCw size={17} />重新盤點</Button>
+      </div>
+      <div className="mt-5 grid gap-3 sm:grid-cols-3">
+        <Metric label="本機與雲端一致" value={syncCurrent} tone="green" />
+        <Metric label="雲端有／本機缺少" value={serverOnly.length} tone="cyan" />
+        <Metric label="同路徑不同內容" value={syncConflicts.length} tone="amber" />
+      </div>
+      {syncConflicts.length > 0 && <div className="mt-4 max-h-40 overflow-auto rounded-xl border border-amber-900/70 bg-amber-950/20 p-3 text-xs leading-6 text-amber-200">
+        <p className="mb-1 font-black">以下衝突不會自動下載或覆寫：</p>
+        {syncConflicts.map((item) => <p key={`${item.dataset}-${item.id}`} className="truncate" title={item.relativePath}>{item.relativePath}</p>)}
+      </div>}
+      <div className="mt-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <p role="status" className="min-w-0 flex-1 text-sm leading-6 text-slate-400">{syncMessage || (directoryHandle ? "掃描預設目錄後即可比對雲端差異。" : "請先在 A 區設定預設目錄。")}</p>
+        <Button disabled={!directoryHandle || !serverOnly.length || syncRunning} onClick={() => void downloadServerOnly()}>
+          {syncRunning ? <LoaderCircle className="animate-spin" size={18} /> : <Download size={18} />}
+          {syncRunning ? "補檔中…" : `安全補回 ${serverOnly.length} 份`}
+        </Button>
+      </div>
+    </Card>
+
     <AnalysisControl
       status={analysisStatus}
       dataset={analysisDataset}
@@ -420,7 +533,53 @@ export function IncrementalUploadPage() {
       onRefresh={() => void refreshAnalysisStatus()}
       onStart={() => void startAnalysis()}
     />
+    {profile.role === "admin" && <UploaderAccessControl />}
   </>;
+}
+
+function UploaderAccessControl() {
+  const [items, setItems] = useState<PdUploader[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [message, setMessage] = useState("");
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    try {
+      setItems((await api.getPdUploaders()).items);
+    } catch (reason) {
+      setMessage(`無法取得名單：${reason instanceof Error ? reason.message : "未知錯誤"}`);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { void load(); }, [load]);
+
+  async function toggle(item: PdUploader) {
+    setMessage(`正在更新 ${item.displayName}…`);
+    try {
+      await api.setPdUploader(item.id, !item.allowed);
+      setItems((current) => current.map((value) => value.id === item.id ? { ...value, allowed: !value.allowed } : value));
+      setMessage(`${item.displayName} 的 Product Finder 上傳權限已更新。`);
+    } catch (reason) {
+      setMessage(`更新失敗：${reason instanceof Error ? reason.message : "未知錯誤"}`);
+    }
+  }
+
+  return <Card className="mt-6 p-5 md:p-6">
+    <div className="flex items-start gap-3">
+      <span className="rounded-xl bg-violet-950/50 p-3 text-violet-300"><ShieldCheck size={22} /></span>
+      <div><h2 className="text-lg font-black text-white">E. Product Finder 上傳者</h2><p className="mt-1 text-sm leading-6 text-slate-500">這是本系統專用白名單，不會改變同事在 KMS 或其他 Platform 子系統的角色。</p></div>
+    </div>
+    <div className="mt-5 overflow-hidden rounded-xl border border-slate-700">
+      {loading ? <p className="p-4 text-sm text-slate-400">讀取名單中…</p> : items.map((item) => <label key={item.id} className="flex cursor-pointer items-center gap-3 border-b border-slate-800 px-4 py-3 last:border-0 hover:bg-slate-800/50">
+        <input type="checkbox" checked={item.allowed} disabled={item.platformRole === "admin"} onChange={() => void toggle(item)} className="h-4 w-4 accent-cyan-400" />
+        <span className="min-w-0 flex-1"><span className="block truncate text-sm font-bold text-slate-200">{item.displayName}</span><span className="block truncate text-xs text-slate-500">{item.email} · {item.id}</span></span>
+        <Badge tone={item.allowed ? "success" : "neutral"}>{item.allowed ? "可上傳／補檔" : "只能搜尋"}</Badge>
+      </label>)}
+    </div>
+    {message && <p role="status" className="mt-3 text-sm text-slate-400">{message}</p>}
+  </Card>;
 }
 
 function AnalysisControl({
@@ -454,7 +613,7 @@ function AnalysisControl({
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div className="flex items-start gap-3">
           <span className="rounded-xl bg-cyan-950/70 p-3 text-cyan-300"><BrainCircuit size={22} /></span>
-          <div><h2 className="text-lg font-black text-white">C. AI 文件分析</h2><p className="mt-1 max-w-3xl text-sm leading-6 text-slate-400">由這裡啟動後端 worker，擷取 PDF、Office 與圖片的全文、摘要、關鍵字及縮圖。不會分析 CAD 或影片內容。</p></div>
+          <div><h2 className="text-lg font-black text-white">D. AI 文件分析</h2><p className="mt-1 max-w-3xl text-sm leading-6 text-slate-400">由這裡啟動後端 worker，擷取 PDF、Office 與圖片的全文、摘要、關鍵字及縮圖。不會分析 CAD 或影片內容。</p></div>
         </div>
         <Button variant="ghost" disabled={running} onClick={onRefresh}><RefreshCw size={17} />更新狀態</Button>
       </div>

@@ -29,8 +29,25 @@ function json(value: unknown, status = 200) {
   })
 }
 
-function canEdit(sess: Session) {
-  return sess.role === "admin" || sess.role === "dcc"
+async function canUpload(sb: any, sess: Session) {
+  if (sess.role === "admin") return true
+  const { data, error } = await sb.from("pd_uploaders")
+    .select("emp_id").eq("emp_id", sess.empId).eq("active", true).maybeSingle()
+  if (error) throw error
+  return Boolean(data)
+}
+
+async function fetchSyncRows(sb: any, dataset: Dataset) {
+  const rows: any[] = []
+  for (let from = 0; ; from += 1000) {
+    const { data, error } = await sb.from(tableFor(dataset))
+      .select("id,relative_path,sha256,byte_size,storage_path")
+      .order("relative_path").range(from, from + 999)
+    if (error) throw error
+    rows.push(...(data || []))
+    if ((data || []).length < 1000) break
+  }
+  return rows
 }
 
 async function analysisLibraryStatus(sb: any, dataset: Dataset) {
@@ -197,6 +214,14 @@ serve(async (req) => {
     return json({ error: "account_inactive" }, 403)
   }
 
+  let uploadAllowed = false
+  try {
+    uploadAllowed = await canUpload(sb, sess)
+  } catch (error) {
+    console.error("Product Finder uploader lookup failed", error)
+    return json({ error: "uploader_access_unavailable" }, 500)
+  }
+
   if (action === "bootstrap") {
     const [mfg, buy, suppliers] = await Promise.all([
       sb.from("pd_mfg_documents").select("id", { count: "exact", head: true }),
@@ -210,6 +235,7 @@ serve(async (req) => {
         displayName: user.name_zh || user.name_en || user.emp_id,
         role: sess.role === "admin" ? "admin" : sess.role === "dcc" ? "editor" : "viewer",
         active: true,
+        canUpload: uploadAllowed,
       },
       counts: { mfg: mfg.count || 0, buy: buy.count || 0 },
       suppliers: [...new Set((suppliers.data || []).map((item: any) => item.supplier_name).filter(Boolean))],
@@ -217,7 +243,7 @@ serve(async (req) => {
   }
 
   if (action === "analysisStatus") {
-    if (!canEdit(sess)) return json({ error: "forbidden" }, 403)
+    if (!uploadAllowed) return json({ error: "forbidden" }, 403)
     try {
       const [mfg, buy] = await Promise.all([
         analysisLibraryStatus(sb, "mfg"),
@@ -230,7 +256,7 @@ serve(async (req) => {
   }
 
   if (action === "startAnalysis") {
-    if (!canEdit(sess)) return json({ error: "forbidden" }, 403)
+    if (!uploadAllowed) return json({ error: "forbidden" }, 403)
     const requestedDataset = String(body.dataset || "")
     const limit = Number(body.limit)
     if (!["mfg", "buy", "both"].includes(requestedDataset) || !Number.isInteger(limit) || limit < 1 || limit > 50) {
@@ -264,6 +290,74 @@ serve(async (req) => {
       return json({ error: `AI 工作器啟動失敗 (${response.status})` }, 502)
     }
     return json({ accepted: true, dataset: requestedDataset, limit }, 202)
+  }
+
+  if (action === "uploaders") {
+    if (sess.role !== "admin") return json({ error: "forbidden" }, 403)
+    const [users, allowed] = await Promise.all([
+      sb.from("users").select("emp_id,name_en,name_zh,email,role,active").neq("role", "inactive").order("emp_id"),
+      sb.from("pd_uploaders").select("emp_id,active"),
+    ])
+    if (users.error || allowed.error) return json({ error: (users.error || allowed.error).message }, 500)
+    const access = new Map((allowed.data || []).map((item: any) => [item.emp_id, Boolean(item.active)]))
+    return json({ items: (users.data || []).filter((item: any) => item.active !== false).map((item: any) => ({
+      id: item.emp_id,
+      email: item.email || `${item.emp_id}@comart.com.tw`,
+      displayName: item.name_zh || item.name_en || item.emp_id,
+      platformRole: item.role,
+      allowed: item.role === "admin" || access.get(item.emp_id) === true,
+    })) })
+  }
+
+  if (action === "setUploader") {
+    if (sess.role !== "admin") return json({ error: "forbidden" }, 403)
+    const empId = String(body.empId || "").trim()
+    const allowed = Boolean(body.allowed)
+    const { data: target } = await sb.from("users").select("emp_id,role,active").eq("emp_id", empId).maybeSingle()
+    if (!target || target.active === false || target.role === "inactive") return json({ error: "invalid_uploader" }, 400)
+    if (target.role === "admin" && !allowed) return json({ error: "admin_upload_access_required" }, 400)
+    const { error } = await sb.from("pd_uploaders").upsert({
+      emp_id: empId, active: allowed, granted_by: sess.empId, updated_at: new Date().toISOString(),
+    }, { onConflict: "emp_id" })
+    if (error) return json({ error: error.message }, 500)
+    return json({ ok: true })
+  }
+
+  if (action === "syncManifest") {
+    if (!uploadAllowed) return json({ error: "forbidden" }, 403)
+    try {
+      const [mfg, buy] = await Promise.all([fetchSyncRows(sb, "mfg"), fetchSyncRows(sb, "buy")])
+      return json({ items: [
+        ...mfg.map((row: any) => ({ id: row.id, dataset: "mfg", relativePath: row.relative_path, sha256: row.sha256, byteSize: Number(row.byte_size || 0) })),
+        ...buy.map((row: any) => ({ id: row.id, dataset: "buy", relativePath: row.relative_path, sha256: row.sha256, byteSize: Number(row.byte_size || 0) })),
+      ] })
+    } catch (error) {
+      return json({ error: error instanceof Error ? error.message : "sync_manifest_failed" }, 500)
+    }
+  }
+
+  if (action === "syncUrls") {
+    if (!uploadAllowed) return json({ error: "forbidden" }, 403)
+    const requested = Array.isArray(body.items) ? body.items : []
+    if (!requested.length || requested.length > 50) return json({ error: "invalid_sync_batch" }, 400)
+    const items: any[] = []
+    for (const targetDataset of ["mfg", "buy"] as Dataset[]) {
+      const ids = [...new Set(requested.filter((item: any) => item?.dataset === targetDataset).map((item: any) => String(item.id || "")).filter(Boolean))]
+      if (!ids.length) continue
+      const { data, error } = await sb.from(tableFor(targetDataset))
+        .select("id,relative_path,sha256,byte_size,storage_path").in("id", ids)
+      if (error) return json({ error: error.message }, 500)
+      const urls = await signPaths(sb, bucketFor(targetDataset, "source"), (data || []).map((row: any) => row.storage_path))
+      for (const row of data || []) {
+        const url = urls.get(row.storage_path)
+        if (url) items.push({ id: row.id, dataset: targetDataset, relativePath: row.relative_path, sha256: row.sha256, byteSize: Number(row.byte_size || 0), url })
+      }
+    }
+    if (items.length) await sb.from("pd_transfer_audit").insert(items.map((item: any) => ({
+      emp_id: sess.empId, action: "download_request", dataset: item.dataset,
+      document_id: item.id, relative_path: item.relativePath, sha256: item.sha256,
+    })))
+    return json({ items })
   }
 
   const dataset: Dataset = body.dataset === "buy" ? "buy" : "mfg"
@@ -340,7 +434,7 @@ serve(async (req) => {
   }
 
   if (action === "checkHashes") {
-    if (!canEdit(sess)) return json({ error: "forbidden" }, 403)
+    if (!uploadAllowed) return json({ error: "forbidden" }, 403)
     const hashes = [...new Set(
       (Array.isArray(body.hashes) ? body.hashes : [])
         .map((value: unknown) => String(value).toLowerCase())
@@ -355,7 +449,7 @@ serve(async (req) => {
   }
 
   if (action === "initUpload") {
-    if (!canEdit(sess)) return json({ error: "forbidden" }, 403)
+    if (!uploadAllowed) return json({ error: "forbidden" }, 403)
     const relativePath = normalizeRelativePath(String(body.relativePath || ""))
     const actualDataset = datasetFromPath(relativePath)
     const name = pathParts(relativePath).at(-1) || ""
@@ -385,7 +479,7 @@ serve(async (req) => {
   }
 
   if (action === "completeUpload") {
-    if (!canEdit(sess)) return json({ error: "forbidden" }, 403)
+    if (!uploadAllowed) return json({ error: "forbidden" }, 403)
     const relativePath = normalizeRelativePath(String(body.relativePath || ""))
     if (datasetFromPath(relativePath) !== dataset) return json({ error: "bad_dataset_path" }, 400)
     const name = pathParts(relativePath).at(-1) || ""
@@ -410,6 +504,8 @@ serve(async (req) => {
       storage_path: storagePath,
       source_modified_at: body.lastModified ? new Date(Number(body.lastModified)).toISOString() : null,
       analysis_status: analysisStatus,
+      uploaded_by: sess.empId,
+      uploaded_by_name: user.name_zh || user.name_en || user.emp_id,
     }
     const { data: row, error } = await sb.from(table).insert(payload).select("id").single()
     if (error) {
@@ -422,6 +518,10 @@ serve(async (req) => {
     if (analysisStatus === "queued") {
       await sb.from(jobTableFor(dataset)).insert({ document_id: row.id })
     }
+    await sb.from("pd_transfer_audit").insert({
+      emp_id: sess.empId, action: "upload", dataset, document_id: row.id,
+      relative_path: relativePath, sha256,
+    })
     return json({ duplicate: false, documentId: row.id, analysisStatus })
   }
 

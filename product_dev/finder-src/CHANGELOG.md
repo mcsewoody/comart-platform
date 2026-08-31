@@ -1,5 +1,14 @@
 # COMART Product Finder 版本紀錄
 
+## v2.12 — 2026-08-31
+
+- 第一次選擇 `products` 後，將目錄控制代碼保存在瀏覽器 IndexedDB；日後直接掃描預設目錄，也可手動更換。
+- 新增 Supabase → 本機安全補檔：只下載雲端有、本機沒有的文件，沿用 OwnProduct／Outsourcing 相對路徑，絕不覆寫同路徑檔案。
+- 同路徑不同 SHA-256 明確列為衝突，留待人工判斷；所有補檔連結短效化並留下下載請求稽核。
+- 上傳權限改為 Product Finder 專用白名單；管理員可在匯入頁直接勾選同事，不改變 KMS 或其他 Platform 權限。
+- 文件索引新增上傳者與顯示名稱，並記錄上傳稽核；管理員永久保留上傳權限。
+- 驗證：12 個單元測試、ESLint、TypeScript 與正式 Vite build 全數通過。
+
 ## v2.11 — 2026-08-31
 
 - 超過 6 MB 的原始檔案自動改用 Supabase TUS 續傳上傳，並固定使用 6 MB chunk。

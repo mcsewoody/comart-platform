@@ -6,6 +6,7 @@ import {
   reusableManifestHash,
   selectIncrementalBatch,
   shouldUseResumableUpload,
+  compareSyncManifest,
 } from "./incremental-import";
 
 function item(dataset: "mfg" | "buy", index: number, sha256 = `${index}`.padStart(64, "0")) {
@@ -73,5 +74,21 @@ describe("incremental import", () => {
   it("uses resumable upload for files larger than the recommended 6 MB boundary", () => {
     expect(shouldUseResumableUpload(6 * 1024 * 1024)).toBe(false);
     expect(shouldUseResumableUpload(6 * 1024 * 1024 + 1)).toBe(true);
+  });
+
+  it("separates missing local files from same-path content conflicts", () => {
+    const local = [
+      { dataset: "mfg" as const, relativePath: "OwnProduct/A/current.pdf", sha256: "a".repeat(64) },
+      { dataset: "buy" as const, relativePath: "Outsourcing/B/conflict.pdf", sha256: "b".repeat(64) },
+    ];
+    const remote = [
+      { ...local[0], id: "1", byteSize: 1 },
+      { dataset: "buy" as const, relativePath: local[1].relativePath, sha256: "c".repeat(64), id: "2", byteSize: 2 },
+      { dataset: "mfg" as const, relativePath: "OwnProduct/A/missing.pdf", sha256: "d".repeat(64), id: "3", byteSize: 3 },
+    ];
+    const result = compareSyncManifest(local, remote);
+    expect(result.current).toBe(1);
+    expect(result.conflicts.map((item) => item.id)).toEqual(["2"]);
+    expect(result.serverOnly.map((item) => item.id)).toEqual(["3"]);
   });
 });

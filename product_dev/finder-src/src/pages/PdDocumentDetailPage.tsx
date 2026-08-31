@@ -21,7 +21,7 @@ export function PdDocumentDetailPage() {
   const [item, setItem] = useState<PdDocumentDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [editing, setEditing] = useState(false);
+  const [activeEditor, setActiveEditor] = useState<"info" | "keywords" | null>(null);
   const [saving, setSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState("");
   const [form, setForm] = useState<EditState | null>(null);
@@ -45,7 +45,7 @@ export function PdDocumentDetailPage() {
 
   function cancelEdit() {
     if (item) setForm(editStateFrom(item));
-    setEditing(false);
+    setActiveEditor(null);
     setSaveMessage("");
   }
 
@@ -64,8 +64,9 @@ export function PdDocumentDetailPage() {
     try {
       await api.updatePdDocument(dataset, params.id, patch);
       await loadItem();
-      setEditing(false);
-      setSaveMessage("文件資訊已更新，搜尋索引已立即生效。");
+      const editedKeywords = activeEditor === "keywords";
+      setActiveEditor(null);
+      setSaveMessage(editedKeywords ? "搜尋關鍵字已更新，搜尋索引已立即生效。" : "文件資訊已更新，搜尋索引已立即生效。");
     } catch (reason) {
       setSaveMessage(`儲存失敗：${reason instanceof Error ? reason.message : "未知錯誤"}`);
     } finally {
@@ -90,13 +91,12 @@ export function PdDocumentDetailPage() {
       </Card>
       <aside className="space-y-4">
         <Card className="p-5">
-          <div className="flex items-center justify-between gap-3"><h2 className="font-black text-white">文件資訊</h2>{profile?.canUpload && !editing && <Button variant="ghost" className="min-h-9 px-3 py-1.5" onClick={() => { setEditing(true); setSaveMessage(""); }}><Pencil size={15} />編輯</Button>}</div>
-          {editing ? <form className="mt-4 space-y-4" onSubmit={(event) => void save(event)}>
+          <div className="flex items-center justify-between gap-3"><h2 className="font-black text-white">文件資訊</h2>{profile?.canUpload && !activeEditor && <Button variant="ghost" className="min-h-9 px-3 py-1.5" onClick={() => { setActiveEditor("info"); setSaveMessage(""); }}><Pencil size={15} />編輯</Button>}</div>
+          {activeEditor === "info" ? <form className="mt-4 space-y-4" onSubmit={(event) => void save(event)}>
             <Field label="顯示名稱"><input value={form.title} maxLength={300} onChange={(event) => setForm({ ...form, title: event.target.value })} className={inputClass} /></Field>
             <Field label="文件類型"><select value={form.documentKind} onChange={(event) => setForm({ ...form, documentKind: event.target.value })} className={inputClass}>{KIND_OPTIONS[dataset].map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></Field>
             <Field label={dataset === "mfg" ? "來源工廠" : "廠商名稱"}><input value={form.sourceParty} maxLength={200} onChange={(event) => setForm({ ...form, sourceParty: event.target.value })} className={inputClass} /></Field>
             <Field label="分類路徑"><textarea value={form.pathLabels} rows={2} onChange={(event) => setForm({ ...form, pathLabels: event.target.value })} placeholder="以頓號、逗號或換行分隔" className={textareaClass} /></Field>
-            <Field label="搜尋關鍵字"><textarea value={form.keywords} rows={3} onChange={(event) => setForm({ ...form, keywords: event.target.value })} placeholder="例如：Qi、三合一、Watch" className={textareaClass} /></Field>
             <Field label="文件摘要"><textarea value={form.summary} maxLength={2000} rows={4} onChange={(event) => setForm({ ...form, summary: event.target.value })} className={textareaClass} /></Field>
             <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-slate-700 bg-slate-950/60 px-3 py-2.5 text-sm text-slate-300"><input type="checkbox" checked={form.isReference} onChange={(event) => setForm({ ...form, isReference: event.target.checked })} className="h-4 w-4 accent-cyan-400" />標記為參考資料</label>
             <p className="text-xs leading-5 text-slate-500">原始檔路徑、檔案大小與 SHA-256 不會被修改。</p>
@@ -107,7 +107,20 @@ export function PdDocumentDetailPage() {
             {saveMessage && <p role="status" className="mt-4 rounded-xl border border-emerald-900 bg-emerald-950/30 px-3 py-2 text-sm text-emerald-200">{saveMessage}</p>}
           </>}
         </Card>
-        <Card className="p-5"><div className="flex items-center gap-2 font-black text-white"><Folder size={18} className="text-cyan-300" />搜尋關鍵字</div><div className="mt-3 flex flex-wrap gap-2">{item.keywords.length ? item.keywords.slice(0, 30).map((keyword) => <Badge key={keyword}>{keyword}</Badge>) : <span className="text-sm text-slate-500">尚未設定</span>}</div></Card>
+        <Card className="p-5">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2 font-black text-white"><Folder size={18} className="text-cyan-300" />搜尋關鍵字</div>
+            {profile?.canUpload && !activeEditor && <Button variant="ghost" className="min-h-9 px-3 py-1.5" onClick={() => { setActiveEditor("keywords"); setSaveMessage(""); }}><Pencil size={15} />編輯關鍵字</Button>}
+          </div>
+          {activeEditor === "keywords" ? <form className="mt-4 space-y-3" onSubmit={(event) => void save(event)}>
+            <Field label="以頓號、逗號或換行分隔，最多 30 個"><textarea autoFocus value={form.keywords} rows={5} onChange={(event) => setForm({ ...form, keywords: event.target.value })} placeholder="例如：Qi、三合一、Watch" className={textareaClass} /></Field>
+            {saveMessage && <p role="status" className="text-sm leading-5 text-cyan-200">{saveMessage}</p>}
+            <div className="flex gap-2"><Button type="submit" disabled={saving}>{saving ? <LoaderCircle className="animate-spin" size={16} /> : <Save size={16} />}{saving ? "儲存中…" : "儲存關鍵字"}</Button><Button type="button" variant="secondary" disabled={saving} onClick={cancelEdit}><X size={16} />取消</Button></div>
+          </form> : <>
+            <div className="mt-3 flex flex-wrap gap-2">{item.keywords.length ? item.keywords.slice(0, 30).map((keyword) => <Badge key={keyword}>{keyword}</Badge>) : <span className="text-sm text-slate-500">尚未設定</span>}</div>
+            {saveMessage.startsWith("搜尋關鍵字") && <p role="status" className="mt-3 rounded-xl border border-emerald-900 bg-emerald-950/30 px-3 py-2 text-sm text-emerald-200">{saveMessage}</p>}
+          </>}
+        </Card>
       </aside>
     </div>
   </>;

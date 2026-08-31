@@ -21,6 +21,10 @@ const ALLOWED_EXTENSIONS = new Set([
 ])
 const CAD_EXTENSIONS = new Set(["stp", "step", "dwg", "dxf", "iges", "igs"])
 const IMAGE_EXTENSIONS = new Set(["jpg", "jpeg", "png"])
+const DOCUMENT_KINDS: Record<Dataset, Set<string>> = {
+  mfg: new Set(["design_drawing", "bom", "cad", "image", "presentation", "document", "other"]),
+  buy: new Set(["catalog", "quotation", "image", "presentation", "document", "cad", "other"]),
+}
 
 function json(value: unknown, status = 200) {
   return new Response(JSON.stringify(value), {
@@ -100,6 +104,20 @@ function extensionOf(name: string) {
 
 function pathParts(relativePath: string) {
   return relativePath.split("/").filter(Boolean)
+}
+
+function cleanTextList(value: unknown, limit: number, itemLimit = 100) {
+  if (!Array.isArray(value)) return null
+  const result: string[] = []
+  const seen = new Set<string>()
+  for (const raw of value) {
+    const item = String(raw || "").trim()
+    if (!item || item.length > itemLimit || seen.has(item)) continue
+    seen.add(item)
+    result.push(item)
+    if (result.length >= limit) break
+  }
+  return result
 }
 
 function meaningfulKeywords(relativePath: string) {
@@ -431,6 +449,65 @@ serve(async (req) => {
       ? preview.get(row.preview_path) || null
       : (IMAGE_EXTENSIONS.has(row.extension) || row.extension === "pdf") ? sourceUrl : null
     return json({ item: { ...summary(row, dataset, thumbnail.get(row.thumbnail_path) || null), sourceUrl, previewUrl, extractedText: row.extracted_text || "" } })
+  }
+
+  if (action === "updateDocument") {
+    if (!uploadAllowed) return json({ error: "forbidden" }, 403)
+    const id = String(body.id || "")
+    const patch = body.patch && typeof body.patch === "object" ? body.patch : {}
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id)) {
+      return json({ error: "invalid_document_id" }, 400)
+    }
+    const title = String(patch.title || "").trim()
+    const documentKind = String(patch.documentKind || "").trim()
+    const sourceParty = String(patch.sourceParty || "").trim()
+    const pathLabels = cleanTextList(patch.pathLabels, 20)
+    const keywords = cleanTextList(patch.keywords, 30, 80)
+    const summaryText = String(patch.summary || "").trim()
+    if (!title || title.length > 300 || !DOCUMENT_KINDS[dataset].has(documentKind) ||
+        sourceParty.length > 200 || pathLabels === null || keywords === null || summaryText.length > 2000) {
+      return json({ error: "invalid_document_patch" }, 400)
+    }
+    const { data: current, error: readError } = await sb.from(table).select("*").eq("id", id).maybeSingle()
+    if (readError) return json({ error: readError.message }, 500)
+    if (!current) return json({ error: "document_not_found" }, 404)
+    const update: Record<string, unknown> = {
+      title,
+      document_kind: documentKind,
+      keywords,
+      summary_zh_tw: summaryText,
+      is_reference: Boolean(patch.isReference),
+      updated_at: new Date().toISOString(),
+      search_text: [
+        title, current.relative_path, sourceParty, ...pathLabels, ...keywords,
+        summaryText, String(current.extracted_text || "").slice(0, 300000),
+      ].filter(Boolean).join(" "),
+    }
+    if (dataset === "mfg") {
+      update.source_factory = sourceParty || null
+      update.category_path = pathLabels
+    } else {
+      if (!sourceParty) return json({ error: "supplier_required" }, 400)
+      update.supplier_name = sourceParty
+      update.product_path = pathLabels
+    }
+    const beforeData = {
+      title: current.title,
+      documentKind: current.document_kind,
+      sourceParty: current.source_factory || current.supplier_name || "",
+      pathLabels: current.category_path || current.product_path || [],
+      keywords: current.keywords || [],
+      summary: current.summary_zh_tw || "",
+      isReference: Boolean(current.is_reference),
+    }
+    const afterData = { title, documentKind, sourceParty, pathLabels, keywords, summary: summaryText, isReference: Boolean(patch.isReference) }
+    const { error: updateError } = await sb.from(table).update(update).eq("id", id)
+    if (updateError) return json({ error: updateError.message }, 500)
+    const { error: auditError } = await sb.from("pd_document_edits").insert({
+      dataset, document_id: id, edited_by: sess.empId, before_data: beforeData, after_data: afterData,
+    })
+    if (auditError) console.error("Document edit audit failed", auditError)
+    return json({ ok: true })
   }
 
   if (action === "checkHashes") {

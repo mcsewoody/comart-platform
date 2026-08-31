@@ -35,6 +35,7 @@ import type {
   PdSyncDocument,
   PdSyncDownload,
   PdUploader,
+  PdDocumentEdit,
 } from "./types";
 
 function normalize(value: string) {
@@ -137,6 +138,10 @@ export const api = {
         id,
       })
     ).item;
+  },
+
+  async updatePdDocument(dataset: PdDataset, id: string, patch: PdDocumentEdit) {
+    return platformCall<{ ok: boolean }>("updateDocument", { dataset, id, patch });
   },
 
   async initPdUpload(payload: {

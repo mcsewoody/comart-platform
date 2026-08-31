@@ -309,6 +309,16 @@ export interface PdDocumentDetail extends PdDocumentSummary {
   extractedText: string;
 }
 
+export interface PdDocumentEdit {
+  title: string;
+  documentKind: string;
+  sourceParty: string;
+  pathLabels: string[];
+  keywords: string[];
+  summary: string;
+  isReference: boolean;
+}
+
 export interface PdSearchParams {
   dataset: PdDataset;
   query: string;

@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.224.0/http/server.ts"
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
 import { verifySession } from "../_shared/session.ts"
 import { namedSecretKey } from "../_shared/api-keys.ts"
+import { expandSearchQueries } from "./search-aliases.js"
 
 const CORS = {
   "Access-Control-Allow-Origin": "*",
@@ -271,18 +272,38 @@ serve(async (req) => {
   if (action === "search") {
     const started = performance.now()
     const query = String(body.query || "").trim()
+    const expandedQueries = expandSearchQueries(query, 12)
     const kind = String(body.kind || "")
     const includeReference = Boolean(body.includeReference)
     const rpc = dataset === "mfg" ? "pd_mfg_search_documents" : "pd_buy_search_documents"
-    const args = dataset === "mfg"
-      ? { p_query: query, p_kind: kind, p_include_reference: includeReference, p_limit: 100 }
-      : {
-          p_query: query, p_supplier: String(body.supplier || ""), p_kind: kind,
-          p_include_reference: includeReference, p_limit: 100,
-        }
-    const { data: ranked, error: rankError } = await sb.rpc(rpc, args)
+    const searches = await Promise.all(expandedQueries.map(async (expandedQuery: string, index: number) => {
+      const args = dataset === "mfg"
+        ? { p_query: expandedQuery, p_kind: kind, p_include_reference: includeReference, p_limit: 100 }
+        : {
+            p_query: expandedQuery, p_supplier: String(body.supplier || ""), p_kind: kind,
+            p_include_reference: includeReference, p_limit: 100,
+          }
+      const result = await sb.rpc(rpc, args)
+      return { ...result, expandedQuery, index }
+    }))
+    const rankError = searches.find((result) => result.error)?.error
     if (rankError) return json({ error: rankError.message }, 500)
-    const ids = (ranked || []).map((item: any) => item.document_id)
+    const merged = new Map<string, any>()
+    for (const search of searches) {
+      for (const item of search.data || []) {
+        const weightedScore = Number(item.score) * (search.index === 0 ? 1 : 0.94)
+        const previous = merged.get(item.document_id)
+        if (!previous || weightedScore > previous.score) {
+          merged.set(item.document_id, {
+            ...item,
+            score: weightedScore,
+            match_reason: search.index === 0 ? item.match_reason : "cross_language",
+          })
+        }
+      }
+    }
+    const ranked = [...merged.values()].sort((a, b) => b.score - a.score).slice(0, 100)
+    const ids = ranked.map((item: any) => item.document_id)
     if (!ids.length) return json({ items: [], total: 0, elapsedMs: Math.round(performance.now() - started) })
     const { data: rows, error } = await sb.from(table).select("*").in("id", ids)
     if (error) return json({ error: error.message }, 500)
@@ -293,7 +314,7 @@ serve(async (req) => {
       signPaths(sb, bucketFor(dataset, "thumbnail"), thumbPaths),
       signPaths(sb, bucketFor(dataset, "source"), imagePaths),
     ])
-    const items = (ranked || []).flatMap((rank: any) => {
+    const items = ranked.flatMap((rank: any) => {
       const row: any = byId.get(rank.document_id)
       if (!row) return []
       const thumbnail = row.thumbnail_path ? thumbs.get(row.thumbnail_path) : images.get(row.storage_path)

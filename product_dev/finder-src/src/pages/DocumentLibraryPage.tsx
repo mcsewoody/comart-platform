@@ -27,6 +27,7 @@ const matchLabels: Record<string, string> = {
   product_path: "產品目錄命中",
   path: "路徑命中",
   content: "文件內容命中",
+  cross_language: "中英同義詞命中",
   recent: "最近更新",
 };
 
@@ -91,7 +92,7 @@ export function DocumentLibraryPage({ dataset }: { dataset: PdDataset }) {
         <label className="relative block">
           <span className="sr-only">搜尋關鍵字</span>
           <Search className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={19} />
-          <input value={query} onChange={(event) => setQuery(event.target.value)} className="h-12 w-full rounded-xl border pl-11 pr-4 text-sm" placeholder={isMfg ? "例如：Watch、三合一、Qi2、X9" : "例如：Watch、三合一、Qi 充電"} />
+          <input value={query} onChange={(event) => setQuery(event.target.value)} className="h-12 w-full rounded-xl border pl-11 pr-4 text-sm" placeholder={isMfg ? "例如：Watch、3 in 1、三合一、Qi2、X9" : "例如：Watch、3 in 1、三合一、Qi 充電"} />
         </label>
         {isMfg ? <div className="hidden xl:block" /> : <input value={supplier} onChange={(event) => setSupplier(event.target.value)} className="h-12 rounded-xl border px-4 text-sm" placeholder="廠商名稱" />}
         <select value={kind} onChange={(event) => setKind(event.target.value)} className="h-12 rounded-xl border px-4 text-sm" aria-label="文件類型">

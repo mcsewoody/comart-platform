@@ -5,6 +5,7 @@ import {
   quickUploadRelativePath,
   reusableManifestHash,
   selectIncrementalBatch,
+  shouldUseResumableUpload,
 } from "./incremental-import";
 
 function item(dataset: "mfg" | "buy", index: number, sha256 = `${index}`.padStart(64, "0")) {
@@ -67,5 +68,10 @@ describe("incremental import", () => {
     expect(isTransientUploadStatus(520)).toBe(true);
     expect(isTransientUploadStatus(429)).toBe(true);
     expect(isTransientUploadStatus(400)).toBe(false);
+  });
+
+  it("uses resumable upload for files larger than the recommended 6 MB boundary", () => {
+    expect(shouldUseResumableUpload(6 * 1024 * 1024)).toBe(false);
+    expect(shouldUseResumableUpload(6 * 1024 * 1024 + 1)).toBe(true);
   });
 });

@@ -1,1 +1,1 @@
-export const CPF_VERSION = "2.10";
+export const CPF_VERSION = "2.11";

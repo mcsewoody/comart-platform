@@ -12,6 +12,12 @@ export type ImportManifestEntry = {
   sha256: string;
 };
 
+export const RESUMABLE_UPLOAD_THRESHOLD = 6 * 1024 * 1024;
+
+export function shouldUseResumableUpload(byteSize: number) {
+  return byteSize > RESUMABLE_UPLOAD_THRESHOLD;
+}
+
 export function dedupeByDatasetHash<T extends IncrementalFile>(files: T[]) {
   const seen = new Set<string>();
   const unique: T[] = [];

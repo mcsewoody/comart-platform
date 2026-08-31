@@ -376,7 +376,12 @@ serve(async (req) => {
       return json({ duplicate: false, storageExists: true, storagePath })
     }
     if (error) return json({ error: error.message }, 400)
-    return json({ duplicate: false, storagePath, signedUrl: data.signedUrl })
+    return json({
+      duplicate: false,
+      storagePath,
+      signedUrl: data.signedUrl,
+      signedToken: data.token,
+    })
   }
 
   if (action === "completeUpload") {

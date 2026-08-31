@@ -323,4 +323,5 @@ export interface PdUploadInit {
   storageExists?: boolean;
   storagePath?: string;
   signedUrl?: string;
+  signedToken?: string;
 }

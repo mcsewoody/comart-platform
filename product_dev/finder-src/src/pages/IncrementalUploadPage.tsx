@@ -1,8 +1,10 @@
 import { BrainCircuit, CheckCircle2, FilePlus2, FolderOpen, LoaderCircle, Play, RefreshCw, UploadCloud, Zap } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Upload } from "tus-js-client";
 import { useAuth } from "../auth/AuthProvider";
 import { Badge, Button, Card, PageHeader } from "../components/ui";
 import { api } from "../lib/api";
+import { appConfig } from "../lib/config";
 import {
   dedupeByDatasetHash,
   importFileKey,
@@ -11,6 +13,7 @@ import {
   quickUploadRelativePath,
   reusableManifestHash,
   selectIncrementalBatch,
+  shouldUseResumableUpload,
   type ImportManifestEntry,
 } from "../lib/incremental-import";
 import type { PdAnalysisLibraryStatus, PdAnalysisQueueStatus, PdDataset } from "../lib/types";
@@ -553,6 +556,13 @@ async function uploadOne(item: ImportFile, onStatus: (status: string) => void): 
     }
     if (!init.signedUrl) throw new Error("未取得 signed upload URL");
 
+    if (shouldUseResumableUpload(item.file.size)) {
+      if (!init.signedToken) throw new Error("未取得大檔續傳授權");
+      onStatus("大檔續傳準備中…");
+      await uploadResumable(item, storagePath, init.signedToken, onStatus);
+      break;
+    }
+
     const form = new FormData();
     form.append("cacheControl", "3600");
     form.append("", item.file);
@@ -597,6 +607,49 @@ async function uploadOne(item: ImportFile, onStatus: (status: string) => void): 
   if (result.duplicate) return "duplicate";
   onStatus(result.analysisStatus === "metadata_only" ? "已建立 metadata 索引" : "已建立文件索引");
   return "completed";
+}
+
+function uploadResumable(
+  item: ImportFile,
+  storagePath: string,
+  signedToken: string,
+  onStatus: (status: string) => void,
+) {
+  const projectId = new URL(appConfig.supabaseUrl).hostname.split(".")[0];
+  const bucketName = item.dataset === "mfg" ? "pd_mfg_source" : "pd_buy_source";
+
+  return new Promise<void>((resolve, reject) => {
+    const upload = new Upload(item.file, {
+      endpoint: `https://${projectId}.storage.supabase.co/storage/v1/upload/resumable`,
+      retryDelays: [0, 3000, 5000, 10000, 20000],
+      headers: {
+        "x-signature": signedToken,
+        "x-upsert": "false",
+      },
+      uploadDataDuringCreation: true,
+      removeFingerprintOnSuccess: true,
+      metadata: {
+        bucketName,
+        objectName: storagePath,
+        contentType: item.file.type || "application/octet-stream",
+        cacheControl: "3600",
+      },
+      chunkSize: 6 * 1024 * 1024,
+      onError: (error) => reject(error),
+      onProgress: (uploaded, total) => {
+        const percentage = total > 0 ? Math.floor((uploaded / total) * 100) : 0;
+        onStatus(`大檔續傳 ${percentage}%`);
+      },
+      onSuccess: () => resolve(),
+    });
+
+    upload.findPreviousUploads()
+      .then((previousUploads) => {
+        if (previousUploads.length > 0) upload.resumeFromPreviousUpload(previousUploads[0]);
+        upload.start();
+      })
+      .catch(reject);
+  });
 }
 
 function delay(milliseconds: number) {

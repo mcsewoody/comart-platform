@@ -1,20 +1,19 @@
-import { Factory, FolderUp, LogOut, Menu, PackageSearch, ShoppingBag, X } from "lucide-react";
+import { Factory, FolderUp, Menu, PackageSearch, ShoppingBag, X } from "lucide-react";
 import { useState } from "react";
 import { NavLink, Outlet } from "react-router-dom";
 import { useAuth } from "../auth/AuthProvider";
 import { cn } from "../lib/utils";
 import { CPF_VERSION } from "../version";
-import { Button } from "./ui";
 
 const navigation = [
   { to: "/", label: "自製品文件", icon: Factory, end: true },
   { to: "/buy", label: "外購品文件", icon: ShoppingBag },
-  { to: "/upload", label: "批次匯入", icon: FolderUp, editorOnly: true },
+  { to: "/upload", label: "文件工具", icon: FolderUp, editorOnly: true },
 ];
 
 export function AppShell() {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const { profile, signOut } = useAuth();
+  const { profile } = useAuth();
   const portalHref = typeof window !== "undefined" && window.location.protocol === "file:" ? "../../index.html" : "/";
 
   return (
@@ -37,7 +36,7 @@ export function AppShell() {
       <div className="mx-auto grid max-w-[1600px] lg:grid-cols-[236px_minmax(0,1fr)]">
         <aside className="sticky top-[72px] hidden h-[calc(100vh-72px)] border-r border-slate-800 bg-[#0a111b] p-4 lg:flex lg:flex-col">
           <Navigation />
-          <div className="mt-auto border-t border-slate-800 pt-4"><p className="mb-3 px-3 text-xs leading-5 text-slate-500">一個結果代表一份原始文件。自製品與外購品完全分開搜尋。</p><Button variant="ghost" className="w-full justify-start" onClick={() => void signOut()}><LogOut size={17} />返回 Platform</Button></div>
+          <div className="mt-auto border-t border-slate-800 pt-4"><p className="px-3 text-xs leading-5 text-slate-500">一個結果代表一份原始文件。自製品與外購品完全分開搜尋。</p></div>
         </aside>
         <main id="main-content" className="min-w-0 px-4 py-7 md:px-7 lg:px-9"><Outlet /></main>
       </div>

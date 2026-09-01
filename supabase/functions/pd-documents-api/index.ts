@@ -390,10 +390,10 @@ serve(async (req) => {
     const rpc = dataset === "mfg" ? "pd_mfg_search_documents" : "pd_buy_search_documents"
     const searches = await Promise.all(expandedQueries.map(async (expandedQuery: string, index: number) => {
       const args = dataset === "mfg"
-        ? { p_query: expandedQuery, p_kind: kind, p_include_reference: includeReference, p_limit: 100 }
+        ? { p_query: expandedQuery, p_kind: kind, p_include_reference: includeReference, p_limit: 20 }
         : {
             p_query: expandedQuery, p_supplier: String(body.supplier || ""), p_kind: kind,
-            p_include_reference: includeReference, p_limit: 100,
+            p_include_reference: includeReference, p_limit: 20,
           }
       const result = await sb.rpc(rpc, args)
       return { ...result, expandedQuery, index }
@@ -414,7 +414,7 @@ serve(async (req) => {
         }
       }
     }
-    const ranked = [...merged.values()].sort((a, b) => b.score - a.score).slice(0, 100)
+    const ranked = [...merged.values()].sort((a, b) => b.score - a.score).slice(0, 20)
     const ids = ranked.map((item: any) => item.document_id)
     if (!ids.length) return json({ items: [], total: 0, elapsedMs: Math.round(performance.now() - started) })
     const { data: rows, error } = await sb.from(table).select("*").in("id", ids)

@@ -1,5 +1,6 @@
 import { BrainCircuit, CheckCircle2, Download, FilePlus2, FolderOpen, LoaderCircle, Play, RefreshCw, ShieldCheck, UploadCloud, Zap } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import { Upload } from "tus-js-client";
 import { useAuth } from "../auth/AuthProvider";
 import { Badge, Button, Card, PageHeader } from "../components/ui";
@@ -58,7 +59,9 @@ const HASH_QUERY_SIZE = 100;
 const QUICK_UPLOAD_LIMIT = 10;
 const MANIFEST_STORAGE_KEY = "pd-document-import-manifest-v1";
 
-export function IncrementalUploadPage() {
+export type ImportToolMode = "batch" | "quick" | "sync" | "analysis";
+
+export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
   const { profile } = useAuth();
   const inputRef = useRef<HTMLInputElement>(null);
   const quickInputRef = useRef<HTMLInputElement>(null);
@@ -103,11 +106,11 @@ export function IncrementalUploadPage() {
   }, []);
 
   useEffect(() => {
-    if (!profile?.canUpload) return;
+    if (mode !== "analysis" || !profile?.canUpload) return;
     void refreshAnalysisStatus();
     const timer = window.setInterval(() => void refreshAnalysisStatus(true), 15_000);
     return () => window.clearInterval(timer);
-  }, [profile?.canUpload, refreshAnalysisStatus]);
+  }, [mode, profile?.canUpload, refreshAnalysisStatus]);
 
   if (!profile?.canUpload) {
     return <Card className="p-8 text-center"><p className="font-black text-white">你尚未列入 Product Finder 上傳者名單</p></Card>;
@@ -154,7 +157,7 @@ export function IncrementalUploadPage() {
 
       const deduped = dedupeByDatasetHash(hashed);
       setLocalFiles(deduped.unique);
-      await refreshSync(deduped.unique);
+      if (mode === "sync") await refreshSync(deduped.unique);
       const existing = await findExistingHashes(deduped.unique, (checked, total) => {
         setMessage(`正在比對資料庫 ${checked} / ${total}…`);
         setProgress(75 + Math.round((checked / Math.max(total, 1)) * 25));
@@ -285,7 +288,6 @@ export function IncrementalUploadPage() {
     } : current);
     setMessage(`本批完成：新增 ${completed}、重複略過 ${duplicates}、失敗 ${failed}；尚待匯入 ${remaining.length}。`);
     setPhase("finished");
-    void refreshAnalysisStatus(true);
   }
 
   function chooseQuick(selected: FileList | null) {
@@ -338,7 +340,6 @@ export function IncrementalUploadPage() {
     }
     setQuickMessage(`快速上傳完成：新增 ${completed}、重複略過 ${duplicates}、失敗 ${failed}；不會自動執行 AI。`);
     setQuickRunning(false);
-    void refreshAnalysisStatus(true);
   }
 
   async function startAnalysis() {
@@ -378,16 +379,31 @@ export function IncrementalUploadPage() {
     setFiles((current) => current.map((item, itemIndex) => itemIndex === index ? { ...item, status } : item));
   }
 
+  const pageCopy = {
+    batch: { eyebrow: "BATCH IMPORT", title: "批次匯入", description: "掃描預設 products 目錄，以 SHA-256 找出新增或內容變更的文件並分批匯入。" },
+    quick: { eyebrow: "QUICK UPLOAD", title: "少量上傳", description: "臨時新增 1～10 份文件，指定資料庫與分類路徑後直接上傳。" },
+    sync: { eyebrow: "DIRECTORY SYNC", title: "預設目錄補檔", description: "比對 Supabase 與預設 products 目錄，安全補回本機缺少的文件，絕不覆寫同路徑檔案。" },
+    analysis: { eyebrow: "AI ANALYSIS", title: "文件分析", description: "查看待處理佇列並手動啟動 PDF、Office 與圖片的 AI 分析。" },
+  }[mode];
+
   return <>
     <PageHeader
-      eyebrow="INCREMENTAL IMPORT"
-      title="文件匯入"
-      description="大量新增使用資料夾快速掃描；只有 1～10 份時可直接快速上傳。兩種方式都不覆寫既有文件，也不會自動啟動 AI。"
+      eyebrow={pageCopy.eyebrow}
+      title={pageCopy.title}
+      description={pageCopy.description}
     />
-    <Card className="p-5 md:p-6">
+    <Link to="/upload" className="mb-5 inline-flex rounded-lg px-1 py-1 text-sm font-bold text-slate-400 hover:text-cyan-300">← 回到文件工具</Link>
+    <input
+      ref={(node) => { inputRef.current = node; node?.setAttribute("webkitdirectory", ""); }}
+      type="file"
+      multiple
+      className="hidden"
+      onChange={(event) => void choose(event.target.files)}
+    />
+    {mode === "batch" && <Card className="p-5 md:p-6">
       <div className="mb-5 flex items-start gap-3">
         <span className="rounded-xl bg-cyan-950/50 p-3 text-cyan-300"><RefreshCw size={22} /></span>
-        <div><h2 className="text-lg font-black text-white">A. 資料夾快速掃描</h2><p className="mt-1 text-sm leading-6 text-slate-500">建議日常使用。沿用上次 SHA-256 快取，只重新讀取新增或內容變更的檔案。</p></div>
+        <div><h2 className="text-lg font-black text-white">資料夾快速掃描</h2><p className="mt-1 text-sm leading-6 text-slate-500">建議日常使用。沿用上次 SHA-256 快取，只重新讀取新增或內容變更的檔案。</p></div>
       </div>
       <button
         type="button"
@@ -400,14 +416,6 @@ export function IncrementalUploadPage() {
         <span className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">第一次授權後會記住目錄；瀏覽器仍會在需要時請你確認讀寫權限。</span>
       </button>
       {directoryHandle && supportsDirectoryAccess() && <div className="mt-3 text-right"><Button variant="ghost" disabled={running} onClick={() => void setOrScanDefaultDirectory(true)}><FolderOpen size={17} />更換預設目錄</Button></div>}
-      <input
-        ref={(node) => { inputRef.current = node; node?.setAttribute("webkitdirectory", ""); }}
-        type="file"
-        multiple
-        className="hidden"
-        onChange={(event) => void choose(event.target.files)}
-      />
-
       {inventory && <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-6" aria-label="資料夾盤點結果">
         <Metric label="資料夾檔案" value={inventory.total} />
         <Metric label="可用檔案" value={inventory.eligible} tone="cyan" />
@@ -447,12 +455,12 @@ export function IncrementalUploadPage() {
           </Button>
         )}
       </div>
-    </Card>
+    </Card>}
 
-    <Card className="mt-6 p-5 md:p-6">
+    {mode === "quick" && <Card className="p-5 md:p-6">
       <div className="flex items-start gap-3">
         <span className="rounded-xl bg-amber-950/50 p-3 text-amber-300"><Zap size={22} /></span>
-        <div><h2 className="text-lg font-black text-white">B. 少量快速上傳</h2><p className="mt-1 text-sm leading-6 text-slate-500">適合臨時新增 1～10 份。請填寫原本應放入的相對資料夾，確保廠商與產品分類不遺失。</p></div>
+        <div><h2 className="text-lg font-black text-white">少量快速上傳</h2><p className="mt-1 text-sm leading-6 text-slate-500">適合臨時新增 1～10 份。請填寫原本應放入的相對資料夾，確保廠商與產品分類不遺失。</p></div>
       </div>
       <div className="mt-5 grid gap-4 lg:grid-cols-[180px_minmax(260px,1fr)_auto] lg:items-end">
         <label className="text-sm font-bold text-slate-300">文件資料庫
@@ -493,13 +501,26 @@ export function IncrementalUploadPage() {
           {quickRunning ? "上傳中…" : quickFiles.length ? `快速上傳 ${quickFiles.length} 份` : "請先選擇檔案"}
         </Button>
       </div>
-    </Card>
+    </Card>}
 
+    {mode === "sync" && <>
+    <Card className="p-5 md:p-6">
+      <div className="mb-5 flex items-start gap-3">
+        <span className="rounded-xl bg-cyan-950/50 p-3 text-cyan-300"><FolderOpen size={22} /></span>
+        <div><h2 className="text-lg font-black text-white">預設 products 目錄</h2><p className="mt-1 text-sm leading-6 text-slate-500">先授權並掃描預設目錄，系統才會比對雲端與本機差異。</p></div>
+      </div>
+      <Button disabled={running} onClick={() => supportsDirectoryAccess() ? void setOrScanDefaultDirectory() : openFolderPicker()}>
+        {phase === "inventory" ? <LoaderCircle className="animate-spin" size={18} /> : <FolderOpen size={18} />}
+        {directoryHandle ? `掃描預設目錄：${directoryHandle.name}` : "設定預設 products 目錄"}
+      </Button>
+      {directoryHandle && supportsDirectoryAccess() && <Button className="ml-3" variant="ghost" disabled={running} onClick={() => void setOrScanDefaultDirectory(true)}>更換目錄</Button>}
+      {message && <p role="status" className="mt-3 text-sm leading-6 text-slate-400">{message}</p>}
+    </Card>
     <Card className="mt-6 p-5 md:p-6">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div className="flex items-start gap-3">
           <span className="rounded-xl bg-emerald-950/50 p-3 text-emerald-300"><Download size={22} /></span>
-          <div><h2 className="text-lg font-black text-white">C. Supabase → 預設目錄補檔</h2><p className="mt-1 text-sm leading-6 text-slate-500">讓同事上傳、但你本機沒有的文件回到相同分類路徑。同路徑已有檔案時絕不覆寫。</p></div>
+          <div><h2 className="text-lg font-black text-white">Supabase → 預設目錄補檔</h2><p className="mt-1 text-sm leading-6 text-slate-500">讓同事上傳、但你本機沒有的文件回到相同分類路徑。同路徑已有檔案時絕不覆寫。</p></div>
         </div>
         <Button variant="secondary" disabled={!localFiles.length || syncRunning} onClick={() => void refreshSync()}><RefreshCw size={17} />重新盤點</Button>
       </div>
@@ -513,15 +534,15 @@ export function IncrementalUploadPage() {
         {syncConflicts.map((item) => <p key={`${item.dataset}-${item.id}`} className="truncate" title={item.relativePath}>{item.relativePath}</p>)}
       </div>}
       <div className="mt-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <p role="status" className="min-w-0 flex-1 text-sm leading-6 text-slate-400">{syncMessage || (directoryHandle ? "掃描預設目錄後即可比對雲端差異。" : "請先在 A 區設定預設目錄。")}</p>
+        <p role="status" className="min-w-0 flex-1 text-sm leading-6 text-slate-400">{syncMessage || (directoryHandle ? "掃描預設目錄後即可比對雲端差異。" : "請先設定預設目錄。")}</p>
         <Button disabled={!directoryHandle || !serverOnly.length || syncRunning} onClick={() => void downloadServerOnly()}>
           {syncRunning ? <LoaderCircle className="animate-spin" size={18} /> : <Download size={18} />}
           {syncRunning ? "補檔中…" : `安全補回 ${serverOnly.length} 份`}
         </Button>
       </div>
-    </Card>
+    </Card></>}
 
-    <AnalysisControl
+    {mode === "analysis" && <AnalysisControl
       status={analysisStatus}
       dataset={analysisDataset}
       limit={analysisLimit}
@@ -532,12 +553,12 @@ export function IncrementalUploadPage() {
       onLimitChange={setAnalysisLimit}
       onRefresh={() => void refreshAnalysisStatus()}
       onStart={() => void startAnalysis()}
-    />
-    {profile.role === "admin" && <UploaderAccessControl />}
+    />}
   </>;
 }
 
-function UploaderAccessControl() {
+export function UploaderAccessPage() {
+  const { profile } = useAuth();
   const [items, setItems] = useState<PdUploader[]>([]);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
@@ -553,7 +574,7 @@ function UploaderAccessControl() {
     }
   }, []);
 
-  useEffect(() => { void load(); }, [load]);
+  useEffect(() => { if (profile?.role === "admin") void load(); }, [load, profile?.role]);
 
   async function toggle(item: PdUploader) {
     setMessage(`正在更新 ${item.displayName}…`);
@@ -566,10 +587,17 @@ function UploaderAccessControl() {
     }
   }
 
-  return <Card className="mt-6 p-5 md:p-6">
+  if (profile?.role !== "admin") {
+    return <Card className="p-8 text-center"><p className="font-black text-white">只有管理員可以管理 Users</p></Card>;
+  }
+
+  return <>
+    <PageHeader eyebrow="USERS" title="Users" description="管理 Product Finder 的上傳、批次匯入與補檔權限；不改變其他 Platform 子系統角色。" />
+    <Link to="/upload" className="mb-5 inline-flex rounded-lg px-1 py-1 text-sm font-bold text-slate-400 hover:text-cyan-300">← 回到文件工具</Link>
+    <Card className="p-5 md:p-6">
     <div className="flex items-start gap-3">
       <span className="rounded-xl bg-violet-950/50 p-3 text-violet-300"><ShieldCheck size={22} /></span>
-      <div><h2 className="text-lg font-black text-white">E. Product Finder 上傳者</h2><p className="mt-1 text-sm leading-6 text-slate-500">這是本系統專用白名單，不會改變同事在 KMS 或其他 Platform 子系統的角色。</p></div>
+      <div><h2 className="text-lg font-black text-white">Users</h2><p className="mt-1 text-sm leading-6 text-slate-500">這是本系統專用白名單，不會改變同事在 KMS 或其他 Platform 子系統的角色。</p></div>
     </div>
     <div className="mt-5 overflow-hidden rounded-xl border border-slate-700">
       {loading ? <p className="p-4 text-sm text-slate-400">讀取名單中…</p> : items.map((item) => <label key={item.id} className="flex cursor-pointer items-center gap-3 border-b border-slate-800 px-4 py-3 last:border-0 hover:bg-slate-800/50">
@@ -579,7 +607,7 @@ function UploaderAccessControl() {
       </label>)}
     </div>
     {message && <p role="status" className="mt-3 text-sm text-slate-400">{message}</p>}
-  </Card>;
+  </Card></>;
 }
 
 function AnalysisControl({
@@ -613,7 +641,7 @@ function AnalysisControl({
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div className="flex items-start gap-3">
           <span className="rounded-xl bg-cyan-950/70 p-3 text-cyan-300"><BrainCircuit size={22} /></span>
-          <div><h2 className="text-lg font-black text-white">D. AI 文件分析</h2><p className="mt-1 max-w-3xl text-sm leading-6 text-slate-400">由這裡啟動後端 worker，擷取 PDF、Office 與圖片的全文、摘要、關鍵字及縮圖。不會分析 CAD 或影片內容。</p></div>
+          <div><h2 className="text-lg font-black text-white">AI 文件分析</h2><p className="mt-1 max-w-3xl text-sm leading-6 text-slate-400">由這裡啟動後端 worker，擷取 PDF、Office 與圖片的全文、摘要、關鍵字及縮圖。不會分析 CAD 或影片內容。</p></div>
         </div>
         <Button variant="ghost" disabled={running} onClick={onRefresh}><RefreshCw size={17} />更新狀態</Button>
       </div>

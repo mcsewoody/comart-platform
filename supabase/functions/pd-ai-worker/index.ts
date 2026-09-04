@@ -10,25 +10,10 @@ function json(value: unknown, status = 200) {
 function outputText(response: Record<string, any>) {
   for (const item of response.output || []) {
     for (const content of item.content || []) {
-      if (content.type === "output_text" && typeof content.text === "string") {
-        return content.text
-      }
+      if (content.type === "output_text" && typeof content.text === "string") return content.text
     }
   }
   return ""
-}
-
-function jwtRole(authorization: string) {
-  try {
-    const token = authorization.replace(/^Bearer\s+/i, "")
-    const payload = token.split(".")[1]
-    if (!payload) return ""
-    const normalized = payload.replace(/-/g, "+").replace(/_/g, "/")
-      .padEnd(Math.ceil(payload.length / 4) * 4, "=")
-    return String(JSON.parse(atob(normalized)).role || "")
-  } catch {
-    return ""
-  }
 }
 
 function namedSecretKey(name: string) {
@@ -44,23 +29,9 @@ serve(async (req) => {
   if (req.method !== "POST") return json({ error: "method_not_allowed" }, 405)
 
   const currentSecretKey = namedSecretKey("cpf_worker")
-  const legacyServiceKeys = [
-    Deno.env.get("SB_SERVICE_ROLE_KEY"),
-    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY"),
-  ].filter((value): value is string => Boolean(value))
   const suppliedApiKey = req.headers.get("apikey") || ""
-  const suppliedAuthorization = req.headers.get("authorization") || ""
-  const exactCurrentKey = Boolean(currentSecretKey) && suppliedApiKey === currentSecretKey
-  const exactLegacyKey = legacyServiceKeys.some((key) =>
-    suppliedApiKey === key || suppliedAuthorization === `Bearer ${key}`
-  )
-  if (
-    !exactCurrentKey &&
-    !exactLegacyKey &&
-    jwtRole(suppliedAuthorization) !== "service_role"
-  ) {
-    return json({ error: "unauthorized" }, 401)
-  }
+  if (!currentSecretKey) return json({ error: "worker_key_not_configured" }, 500)
+  if (suppliedApiKey !== currentSecretKey) return json({ error: "unauthorized" }, 401)
 
   const openaiKey = Deno.env.get("OPENAI_API_KEY") || ""
   if (!openaiKey) return json({ error: "openai_not_configured" }, 500)
@@ -85,7 +56,7 @@ serve(async (req) => {
           text: {
             format: {
               type: "json_schema",
-              name: "cpf_document_extraction",
+              name: "pd_document_extraction",
               strict: true,
               schema: body.schema,
             },
@@ -93,7 +64,7 @@ serve(async (req) => {
           reasoning: { effort: "low" },
           max_output_tokens: 24000,
           store: false,
-          safety_identifier: "cpf-internal-worker",
+          safety_identifier: "pd-internal-worker",
         }),
       })
       const result = await response.json()

@@ -1,5 +1,13 @@
 # COMART Product Finder 版本紀錄
 
+## v2.16 — 2026-09-04
+
+- 永久移除舊版 CPF 的 28 個 `cpf_` 資料表、2 個 views、33 個 functions、9 個 enum types，以及所有舊 Storage policies。
+- 清空並刪除 `cpf_source`、`cpf_preview`、`cpf_thumbnail` 三個私有 buckets；共移除 2,051 個物件，約 2.40 GB。
+- 退役舊 `cpf-platform-api`、`cpf-ai-worker` Edge Functions 與舊版排程 workflow，避免再次寫入已退役資料結構。
+- 現行 v2 文件分析端點更名為 `pd-ai-worker`，只接受指定的 `cpf_worker` Supabase Secret Key；不再接受 legacy service-role fallback，也不信任未驗證的 JWT payload。
+- 清除後確認 `cpf_` relations、functions、types、policies、Storage buckets 與 objects 均為 0；`pd_*`、KMS 與 Quotation 資料未受影響。
+
 ## v2.15 — 2026-09-01
 
 - 移除左側欄底部重複的「返回 Platform」，統一使用左上角「Portal」。

@@ -1,9 +1,9 @@
 # COMART Product Finder
 
-COMART 內部產品／文件搜尋系統，現已整合於 COMART Platform 的
+COMART 內部文件搜尋系統，現已整合於 COMART Platform 的
 `/product_dev/finder/`。前端是 React + TypeScript + Vite + Tailwind；
 登入沿用 Platform 簽發的 HMAC session，資料、RLS、Storage 與 RPC 使用既有 Supabase Project；
-文件解析與 AI 抽取由 GitHub Actions 每 5 分鐘執行。
+自製品與外購品分別使用 `pd_mfg_`／`pd_buy_` 資料結構，文件解析與 AI 抽取由管理者在前台手動啟動 GitHub Actions。
 
 目前可在無憑證的 Demo Mode 完整瀏覽介面。正式連線、migration、匯入與部署
 需要下方列出的帳號／密鑰；這些值不得提交到 Git。
@@ -34,13 +34,12 @@ COMART 內部產品／文件搜尋系統，現已整合於 COMART Platform 的
 flowchart LR
   U["COMART 使用者"] --> P["COMART Platform<br/>Product Dev"]
   P --> A["HMAC signed session"]
-  A --> E["cpf-platform-api"]
-  E --> S["cpf_ 資料表 / RPC"]
-  E --> B["cpf_ private Storage"]
-  E --> O["OpenAI query embedding"]
+  A --> E["pd-documents-api"]
+  E --> S["pd_mfg_ / pd_buy_ 資料表與 RPC"]
+  E --> B["pd-mfg-source / pd-buy-source private Storage"]
   G["GitHub Actions worker"] --> S
   G --> B
-  G --> O2["Responses API<br/>Luna → Terra"]
+  G --> O2["pd-ai-worker<br/>OpenAI Responses API"]
   D["Products / Web Upload"] --> B
   W["Weekly backup"] --> OD["OneDrive 專用備份資料夾"]
 ```

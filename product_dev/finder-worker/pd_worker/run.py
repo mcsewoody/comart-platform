@@ -151,7 +151,7 @@ def main() -> int:
     args = parser.parse_args()
     url = required("SUPABASE_URL")
     key = required("SUPABASE_SERVICE_ROLE_KEY")
-    proxy_url = os.getenv("PD_AI_PROXY_URL") or f"{url}/functions/v1/cpf-ai-worker"
+    proxy_url = os.getenv("PD_AI_PROXY_URL") or f"{url}/functions/v1/pd-ai-worker"
     client = create_client(url, key)
     worker_id = f"pd-github-{socket.gethostname()}-{os.getpid()}"
     failures = 0

@@ -341,8 +341,27 @@ Portal AI 功能區的第二個頁籤（`💬 線上對話`，在翻譯旁邊）
   現在 **瀏覽器只跟 Supabase 說話**，音訊由 `transcribe` function 從機房發給 OpenAI ——
   **GFW 完全不相干**。這是這個改動最重要的一點，**不要退回 Web Speech**。
 - 🔴 **Claude 不吃音訊輸入**（只有文字／圖片／PDF），所以這條路不能走 claude-proxy。
-  `transcribe` 是 platform 端唯一呼叫 OpenAI 的 function（`gpt-4o-transcribe`），
+  `transcribe` 是 platform 端唯一呼叫 OpenAI 的 function，
   金鑰用既有的 `OPENAI_API_KEY` secret。驗證與 claude-proxy 同一套 `x-session`。
+- 🔴 **模型必須是 `whisper-1`，不要換成 `gpt-4o-transcribe`**（v1.87 改回）。
+  使用者回報「語音輸入不完整，只擷取最後一段文字」，根因是
+  **`gpt-4o-transcribe` 依賴音檔 metadata 判斷時長，`whisper-1` 不依賴** ——
+  而 MediaRecorder 產出的是**串流式 webm**（邊錄邊寫），**header 裡沒有時長**
+  （錄的時候還不知道會錄多久，寫不進去）。模型讀不到正確時長就只處理一小段。
+  OpenAI 社群另有大量該模型截斷的回報（停頓處就斷、8–9 分鐘後截斷），不是個案。
+  一般情境 `gpt-4o-transcribe` 準確度較高，但**缺頭的逐字稿是沒有用的**，
+  正確性優先。要改回去之前，先確認前端能產出帶正確時長的音檔。
+  順帶：`whisper-1` 的 `prompt` 是「文字前綴提示」（上限約 224 token），
+  逗號分隔的專有名詞表正是官方建議的偏置方式，比 `gpt-4o-transcribe`
+  把 prompt 當指令的行為更可預測。
+- 🔴 **錄音用 `lcMR.start(2000)` 分塊收，每一塊都要留（含第一塊）**：
+  **webm 的容器 header 在第一塊裡**，少了它解碼器只能從後面的 cluster 開始，
+  那正是「只擷取最後一段」的另一個典型成因。
+  `stop()` 之後還會再吐最後一塊，所以 blob 要在 `onstop` 裡才組。
+- **診斷資訊是刻意留的**：前端 console 印 `[lc] audio {sec,chunks,bytes,mime}`
+  與 `[lc] transcribe {sentBytes,gotBytes,model,chars}`，伺服器回傳 `bytes`／`chars`。
+  下次再有人說「不完整」，比對這兩個數字就能分辨是**上傳的音訊不全**（前端）
+  還是**音訊完整但文字短**（模型截斷）。v1.86 就是缺這個判據，只能靠猜。
 - 🔴 **詞彙提示（`VOCAB`）正是瀏覽器引擎做不到、而使用者抱怨「效果不佳」的部分。**
   只列**會被聽錯的專有名詞**（COMART／TIPTOP／Qi2／東莞廠／打樣／開模／櫃號…），
   不要塞一般詞彙 —— 提示過長反而會讓模型把提示裡的詞硬套進不相關的句子。

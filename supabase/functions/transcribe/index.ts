@@ -55,6 +55,18 @@ const VOCAB = [
 
 const LANGS = new Set(["zh", "en", "vi", "ja"])
 
+/* 🔴 **模型必須是 whisper-1，不要換成 gpt-4o-transcribe**（v1.87 改回）。
+   使用者回報「語音輸入不完整，只擷取最後一段文字」，根因是：
+   **gpt-4o-transcribe 依賴音檔 metadata 判斷時長，whisper-1 不依賴** ——
+   而 MediaRecorder 產出的是「串流式 webm」，是邊錄邊寫的，
+   **header 裡沒有時長資訊**（錄的時候還不知道會錄多久，寫不進去）。
+   模型讀不到正確時長就只處理到一小段，於是回來的文字缺頭。
+   OpenAI 社群另有大量「gpt-4o-transcribe 截斷」的回報（停頓處就斷、
+   8–9 分鐘後截斷），不是我們這邊的個案。
+   一般情境下 gpt-4o-transcribe 的準確度較高，但**缺頭的逐字稿是沒有用的**，
+   正確性優先於準確度。要改回去之前，先確認前端能產出帶正確時長的音檔。 */
+const MODEL = "whisper-1"
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: CORS })
   if (req.method !== "POST") return json({ error: "method not allowed" }, 405)
@@ -77,8 +89,12 @@ serve(async (req) => {
 
     const fd = new FormData()
     fd.append("file", new File([buf], `audio.${ext}`, { type: mime }))
-    fd.append("model", "gpt-4o-transcribe")
+    fd.append("model", MODEL)
+    // whisper-1 的 prompt 是「文字前綴提示」（上限約 224 token），
+    // 逗號分隔的專有名詞表正是官方建議的偏置方式 —— 比 gpt-4o-transcribe
+    // 把 prompt 當指令的行為更可預測。
     fd.append("prompt", VOCAB)
+    fd.append("temperature", "0")
     // 語言留空 = 由模型自行判斷（使用者要的「AI 辨識」）。
     // 帶了就當提示用，能明顯提升同音字的準確度。
     const lang = (req.headers.get("x-audio-lang") || "").trim()
@@ -98,7 +114,12 @@ serve(async (req) => {
     }
 
     const data = await res.json()
-    return json({ text: String(data.text || "").trim() })
+    const text = String(data.text || "").trim()
+    /* 🔴 回傳 bytes／mime／chars 是刻意的診斷資訊：
+       下次再有人說「不完整」，比對前端的 blob 大小與這裡的 bytes 就能分辨是
+       「上傳的音訊本身不全」（前端問題）還是「音訊完整但文字短」（模型截斷）。
+       上一輪就是缺這個判據，只能靠猜。 */
+    return json({ text, bytes: buf.length, mime, model: MODEL, chars: text.length })
   } catch (e) {
     console.error("[transcribe]", e)
     return json({ error: "exception", message: String((e as Error)?.message || e) }, 500)

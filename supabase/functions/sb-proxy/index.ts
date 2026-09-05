@@ -55,6 +55,8 @@ const ALLOWED_TABLES = new Set([
 // status/keep/title 決定這場對話的性質與去留，同 premortem 的 phase。
 // last_at 刻意不在這裡：每個人發言都要更新它，那是正常的協作寫入。
 const CHAT_HOST_ONLY = new Set(["status", "keep", "title"])
+// 線上對話可以刪除整場的角色：開啟者本人，或 admin
+const CHAT_DELETE_ROLES = new Set(["admin"])
 // 開啟者是整套權限的根，建立後不可改（改掉就等於把別人開的場次搶過來）
 const CHAT_IMMUTABLE = new Set(["host_emp_id", "id"])
 
@@ -77,6 +79,23 @@ const PM_IMMUTABLE = new Set([
   "chair_emp_id", "created_by", "kind",
   "template", "opt_anonymous", "opt_live_visible", "opt_vote", "opt_entry_cap",
 ])
+
+// 🔴 角色一律重新查資料庫，不讀簽章裡的 role：簽章是登入當時簽發的，
+//    降權之後舊 token 在有效期內還是帶著舊角色。停用／離職者一律不算。
+//    查詢失敗回空字串（fail-closed，呼叫端一律當成「沒有角色」）。
+async function liveRoleOf(SUPABASE_URL: string, SERVICE_KEY: string, empId: string): Promise<string> {
+  if (!empId) return ""
+  try {
+    const ur = await fetch(
+      `${SUPABASE_URL}/rest/v1/users?emp_id=eq.${encodeURIComponent(empId)}&select=role,active,status`,
+      { headers: elevatedApiHeaders(SERVICE_KEY) },
+    )
+    const rows = ur.ok ? await ur.json() : []
+    const u = Array.isArray(rows) && rows[0] ? rows[0] : null
+    if (u && u.active !== false && u.status !== "disabled" && u.status !== "resigned") return String(u.role || "")
+  } catch { /* fall through */ }
+  return ""
+}
 
 function json(obj: unknown, status = 200) {
   return new Response(JSON.stringify(obj), { status, headers: { ...CORS, "Content-Type": "application/json" } })
@@ -171,17 +190,8 @@ serve(async (req) => {
        誤擋一個名字剛好相同的路徑，代價是一次 403；漏放一次，代價是成本資料外流。 */
     const segs = stPath.split("?")[0].split("/").filter(Boolean)
     if (segs.some((x) => RESTRICTED_BUCKETS.has(x))) {
-      let liveRole = ""
-      try {
-        const ur = await fetch(
-          `${SUPABASE_URL}/rest/v1/users?emp_id=eq.${encodeURIComponent(sessEmpId)}&select=role,active,status`,
-          { headers: elevatedApiHeaders(SERVICE_KEY) },
-        )
-        const rows = ur.ok ? await ur.json() : []
-        const u = Array.isArray(rows) && rows[0] ? rows[0] : null
-        // 停用／離職者一律不給，即使 role 還是 admin
-        if (u && u.active !== false && u.status !== "disabled" && u.status !== "resigned") liveRole = String(u.role || "")
-      } catch { liveRole = "" }
+      // 停用／離職者一律不給，即使 role 還是 admin（判斷在 liveRoleOf 裡）
+      const liveRole = await liveRoleOf(SUPABASE_URL, SERVICE_KEY, sessEmpId)
       if (!COST_ROLES.has(liveRole)) {
         return json({ error: "forbidden", hint: "cost files require admin or dcc" }, 403)
       }
@@ -255,7 +265,11 @@ serve(async (req) => {
       hostId = Array.isArray(rows) && rows[0] ? String(rows[0].host_emp_id || "") : ""
     } catch { hostId = "" }
     if (!hostId || hostId !== sessEmpId) {
-      return json({ error: "forbidden", hint: "only the host of this chat may delete it" }, 403)
+      // 開啟者以外，只有「當下真的是 admin」的人刪得掉（使用者 2026-09-05 指定）
+      const liveRole = await liveRoleOf(SUPABASE_URL, SERVICE_KEY, sessEmpId)
+      if (!CHAT_DELETE_ROLES.has(liveRole)) {
+        return json({ error: "forbidden", hint: "only the host or an admin may delete this chat" }, 403)
+      }
     }
   }
 

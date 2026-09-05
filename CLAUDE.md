@@ -22,7 +22,9 @@ COMART Platform is an internal corporate portal for COMART Corporation, deployed
   生效的那一份**。使用者 2026-09-05 明確要求「以後我的系統的語音輸入全部用同一個」。
 - 🔴 **改 `shared/voice.js` 時，所有載入它的 HTML 的 `?v=` 都要 +1。**
   GitHub Pages 的 Cache-Control 是 4 小時，不 bump 的話使用者拿到舊版**而且看不出來**。
-  目前載入者：`index.html`（Portal，兩處使用：線上對話與翻譯頁籤）。
+  目前載入者：`index.html`（Portal：線上對話、翻譯頁籤）與 `board/index.html`
+  （週報六欄、週會議程三欄、事前驗屍／腦力激盪／意見徵集的填寫框）。
+  **admin／kms／quotation 刻意沒有語音**（使用者 2026-09-05 決定「只做 board」）。
 - **載入用相對路徑**（Portal `./shared/voice.js`、子系統 `../shared/voice.js`），
   不要用絕對路徑 —— 那會讓 `file://` 開檔的開發方式失效。
 - **呼叫端只負責「哪顆按鈕、寫到哪個欄位、用哪個語言、用哪個 callClaude」**，
@@ -671,6 +673,31 @@ Portal AI 功能區的第二個頁籤（`💬 線上對話`，在翻譯旁邊）
   「實際歸還時間」一直只活在 localStorage，下次載入就消失，看板「最後歸還」只能退回顯示預約結束時間。
   `_carBkHasActualTs` 旗標讓「欄位還沒建立就先上線」也不會壞（撞到 PGRST204 就降級重試）。
   **這是「grep 不到引用不等於沒有依賴」的鏡像版本：程式碼裡寫得好好的欄位，資料庫裡可能根本不存在。**
+
+### 語音輸入（board v1.86，`bv*`）
+
+九個欄位有 🎙 鈕：Woody 週報六欄、週會議程三欄（`BV_TARGETS`），
+加上事前驗屍／腦力激盪／意見徵集的填寫框（`pm-writebox`）。引擎在 `shared/voice.js`。
+
+- 🔴 **按鈕是 `bvAttachAll()` 程式掛上去的，不是寫在 HTML 裡**：九個欄位手寫九次會漏、
+  會不一致，以後加欄位只要改 `BV_TARGETS` 一行。掛在 `.field > label` 或
+  `.sec > .sec-h` 那一列的右側。`initBoard()` 與 `bRerenderAll()` 各呼叫一次
+  （後者只在切語言時跑，初次載入不會經過，兩處都要）。
+- 🔴 **`pm-writebox` 不在 `BV_TARGETS`**：它是 `pmRenderRoom` 整塊 innerHTML 重繪出來的，
+  自動掛的按鈕會被洗掉。它的按鈕直接寫在那段 HTML 裡（`pm-mic-btn`，inline onclick）。
+- 🔴 **錄音或轉寫中 `pmRerender` 一律延後，連 `force` 也擋**：整塊重畫會把 `pm-mic-btn`
+  換成新節點，`bvPaint` 就找不到它 —— 畫面停在「錄音中」但按鈕已是另一顆，
+  使用者按不停、也看不到秒數。轉寫完成後 `bvPaint` 進 idle 時補上積欠的重繪。
+- 🔴 **寫入文字後一定要 `dispatchEvent(new Event('input'))`**：週報與週會編輯器的
+  「未存檔提醒」是靠容器上的 `input` 監聽器（`boardMarkDirty`）判斷的，
+  直接改 `value` 不會觸發。**少了這行，語音打完一大段內容、關掉分頁時瀏覽器不會攔，
+  全部丟失** —— 而語音正是最容易一口氣輸入大量內容的方式。
+- **一次只能錄一個欄位**（`bvBtnId`）：麥克風是獨佔資源，而且兩段語音同時進來會寫錯欄位。
+  按別的欄位會提示 `bv_busy`，按同一顆是停止。
+- `bvClaude()` 把 `pmClaude(system, user, …)` 轉成共用模組要的
+  `callClaude(messages, system, …)` —— **參數順序不同，不要直接傳**。
+  刻意重用 `pmClaude` 而不是自己 fetch：它已處理好 401 橫幅（`sbNoteAuth`）、
+  refusal、空回覆。
 
 ## Board 重要細節
 

@@ -5,7 +5,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#080C14">
-<title>COMART · 公告與紀錄 v1.85</title>
+<title>COMART · 公告與紀錄 v1.86</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -169,6 +169,13 @@ select,select option,option{background:var(--s2);color:var(--tx)}
 
 .sec{border:1px solid var(--br);border-radius:9px;background:var(--s2);padding:12px;margin-bottom:12px}
 .sec-h{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+/* 語音輸入的麥克風鈕：掛在欄位標題那一列的右側 */
+.bv-head{display:flex;align-items:center;gap:8px}
+.bv-mic{margin-left:auto;flex:none;padding:3px 9px;border-radius:7px;border:1px solid var(--br);background:var(--s2);color:var(--tx3);font-size:12px;line-height:1.5;cursor:pointer;font-family:inherit}
+.bv-mic:hover{border-color:var(--ac);color:var(--ac)}
+.bv-mic.on{background:#e05260;border-color:#e05260;color:#fff;animation:bvPulse 1.2s ease-in-out infinite}
+.bv-mic:disabled{opacity:.65;cursor:default}
+@keyframes bvPulse{0%,100%{opacity:1}50%{opacity:.55}}
 .sec-h .num{width:24px;height:24px;flex:none;border-radius:6px;background:var(--ac2);color:var(--ac);font-weight:700;font-size:12px;display:grid;place-items:center}
 .sec-h .ttl{flex:1;font-weight:700;font-size:14px}
 .item{display:grid;grid-template-columns:140px 1fr auto;gap:8px;align-items:start;margin-bottom:8px}
@@ -339,7 +346,7 @@ body.pm-playing #pm-phasebar{padding:0}
     <a class="logo" href="javascript:void(0)">
       <div class="logo-mark">告</div>
       <div class="logo-text" data-i18n="app_title">公告與紀錄</div>
-      <span class="logo-ver">v1.85</span>
+      <span class="logo-ver">v1.86</span>
     </a>
     <div class="topbar-right">
       <div id="langChips" style="display:flex;gap:4px"></div>
@@ -850,6 +857,10 @@ body.pm-playing #pm-phasebar{padding:0}
 
 <div class="toast" id="boardToast"></div>
 
+<!-- 共用語音輸入（shared/voice.js，五個子系統同一份）。
+     🔴 改那個檔案時這裡的 ?v= 要 +1 —— GitHub Pages 快取 4 小時，
+     不 bump 的話使用者拿到舊版而且看不出來。 -->
+<script src="../shared/voice.js?v=1"></script>
 <script>
 "use strict";
 // ═══════════════════════════════════════════════
@@ -919,6 +930,11 @@ const B_I18N = {
   wm_hint_roster:'出席名單依上方「營運中心」自動帶入該中心全體同仁，主持人可直接標記缺席／遲到／非出席。列席人員（其他中心）可用下方下拉加入，不計入「應到人數」但會列入「實到人數」。',
   wm_cancel_confirm:'取消並返回列表？未按「儲存」的變更不會保留。',
   board_unsaved_leave:'此次編輯尚未存檔。請按「儲存」後再離開；若確定要放棄這些變更，請按確定。',
+    bv_start:'Voice input', bv_stop:'Stop recording',
+    bv_working:'Transcribing...', bv_polishing:'Tidying up the text...',
+    bv_unsupported:'This browser cannot record audio. Chrome, Edge or Safari are required.', bv_denied:'Microphone access was denied. Please allow it in your browser settings.',
+    bv_empty:'No speech was picked up. Please try again.', bv_expired:'Your session has expired. Please sign in again.',
+    bv_failed:'Transcription failed. Please try again, or type instead.', bv_busy:'Another field is still recording. Please finish that one first.',
   wm_no_perm:'無權限修改其他中心的紀錄', wm_need_date:'請填寫會議日期',
   wm_mail_ok:'已開啟郵件草稿（收件人＝{site}全體同仁）',
   bm_new:'＋ 新增業務會議記錄',
@@ -1113,6 +1129,11 @@ const B_I18N = {
   wm_hint_roster:'出席名单依上方“运营中心”自动带入该中心全体同事，主持人可直接标记缺席／迟到／非出席。列席人员（其他中心）可用下方下拉加入，不计入“应到人数”但会计入“实到人数”。',
   wm_cancel_confirm:'取消并返回列表？未按“保存”的变更不会保留。',
   board_unsaved_leave:'此次编辑尚未保存。请按“保存”后再离开；若确定要放弃这些变更，请按确定。',
+    bv_start:'語音輸入', bv_stop:'停止錄音',
+    bv_working:'辨識中…', bv_polishing:'AI 整理中…',
+    bv_unsupported:'這個瀏覽器無法錄音，請使用 Chrome、Edge 或 Safari。', bv_denied:'麥克風權限被拒絕，請在瀏覽器設定中允許。',
+    bv_empty:'沒有收到語音，請再試一次。', bv_expired:'登入已逾期，請重新登入。',
+    bv_failed:'語音辨識失敗，請再試一次，或改用打字。', bv_busy:'另一個欄位還在錄音，請先結束那一個。',
   wm_no_perm:'无权限修改其他中心的记录', wm_need_date:'请填写会议日期',
   wm_mail_ok:'已打开邮件草稿（收件人＝{site}全体同事）',
   bm_new:'＋ 新增业务会议记录',
@@ -1307,6 +1328,11 @@ const B_I18N = {
   wm_hint_roster:'The attendee list is filled from the operating centre selected above. The chair can mark absent / late / not required. Guests from other centres can be added below — they do not count toward “expected” but do count toward “present”.',
   wm_cancel_confirm:'Cancel and go back? Unsaved changes will be lost.',
   board_unsaved_leave:'This edit has not been saved. Please press Save before leaving. Press OK only if you want to discard these changes.',
+    bv_start:'语音输入', bv_stop:'停止录音',
+    bv_working:'识别中…', bv_polishing:'AI 整理中…',
+    bv_unsupported:'这个浏览器无法录音，请使用 Chrome、Edge 或 Safari。', bv_denied:'麦克风权限被拒绝，请在浏览器设置中允许。',
+    bv_empty:'没有收到语音，请再试一次。', bv_expired:'登录已过期，请重新登录。',
+    bv_failed:'语音识别失败，请再试一次，或改用打字。', bv_busy:'另一个栏位还在录音，请先结束那一个。',
   wm_no_perm:'You cannot edit another centre’s records', wm_need_date:'Please enter the meeting date',
   wm_mail_ok:'Mail draft opened (recipients: everyone at {site})',
   bm_new:'＋ New sales meeting minutes',
@@ -1501,6 +1527,11 @@ const B_I18N = {
   wm_hint_roster:'Danh sách tham dự được lấy tự động theo “Trung tâm” ở trên. Chủ tọa có thể đánh dấu vắng / đi trễ / không tham dự. Người dự thính (trung tâm khác) thêm ở ô bên dưới — không tính vào “phải có mặt” nhưng tính vào “có mặt”.',
   wm_cancel_confirm:'Hủy và quay lại danh sách? Các thay đổi chưa lưu sẽ mất.',
   board_unsaved_leave:'Nội dung này chưa được lưu. Vui lòng bấm Lưu trước khi rời đi. Chỉ bấm OK nếu bạn muốn bỏ các thay đổi này.',
+    bv_start:'Nhập bằng giọng nói', bv_stop:'Dừng ghi âm',
+    bv_working:'Đang nhận dạng…', bv_polishing:'Đang chỉnh lại văn bản…',
+    bv_unsupported:'Trình duyệt này không ghi âm được. Vui lòng dùng Chrome, Edge hoặc Safari.', bv_denied:'Quyền truy cập micro đã bị từ chối. Vui lòng cho phép trong cài đặt trình duyệt.',
+    bv_empty:'Không thu được giọng nói. Vui lòng thử lại.', bv_expired:'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.',
+    bv_failed:'Nhận dạng giọng nói không thành công. Vui lòng thử lại hoặc nhập bằng bàn phím.', bv_busy:'Một ô khác đang ghi âm. Vui lòng kết thúc ô đó trước.',
   wm_no_perm:'Không có quyền sửa biên bản của trung tâm khác', wm_need_date:'Vui lòng nhập ngày họp',
   wm_mail_ok:'Đã mở thư nháp (người nhận: toàn thể {site})',
   bm_new:'＋ Thêm biên bản họp kinh doanh',
@@ -1695,6 +1726,11 @@ const B_I18N = {
   wm_hint_roster:'出席者は上の「拠点」から自動で読み込まれます。司会は欠席／遅刻／対象外を直接記入できます。他拠点の陪席者は下のプルダウンから追加でき、「出席予定」には含まれませんが「実出席」には含まれます。',
   wm_cancel_confirm:'キャンセルして一覧に戻りますか？「保存」していない変更は失われます。',
   board_unsaved_leave:'この編集はまだ保存されていません。離れる前に「保存」を押してください。変更を破棄する場合のみOKを押してください。',
+    bv_start:'音声入力', bv_stop:'録音を停止',
+    bv_working:'認識中…', bv_polishing:'AI が整えています…',
+    bv_unsupported:'このブラウザは録音に対応していません。Chrome、Edge、Safari をご利用ください。', bv_denied:'マイクへのアクセスが拒否されました。ブラウザの設定で許可してください。',
+    bv_empty:'音声を取得できませんでした。もう一度お試しください。', bv_expired:'セッションの有効期限が切れました。再度ログインしてください。',
+    bv_failed:'音声認識に失敗しました。もう一度お試しか、キーボードで入力してください。', bv_busy:'別の項目が録音中です。先にそちらを終了してください。',
   wm_no_perm:'他拠点の記録は編集できません', wm_need_date:'開催日を入力してください',
   wm_mail_ok:'メール下書きを開きました（宛先：{site}全社員）',
   bm_new:'＋ 営業会議議事録を追加',
@@ -2145,6 +2181,7 @@ function bApplyI18n(root) {
 // 切換語言後把目前畫面重畫。各頁籤的 render 都是純函式，重跑即可；
 // 未初始化的頁籤（例如還沒點過業務會議）會丟例外，各自 try 包起來即可，不要讓一個壞的擋住其他四個。
 function bRerenderAll() {
+  try { bvAttachAll(); bvRelabel(); } catch (e) {}
   try { bbSetupCompose(); bbRender(); } catch (e) {}
   try { wmRenderList(); if (wmState) wmFillForm(); } catch (e) {}
   try { if (window.MeetingMinutes && window.MeetingMinutes.relabel) window.MeetingMinutes.relabel(); } catch (e) {}
@@ -4477,6 +4514,115 @@ async function pmClaude(system, user, maxTokens, model, extra) {
   if (!txt) throw new Error('AI 回覆為空' + (data && data.stop_reason ? '（stop_reason: ' + data.stop_reason + '）' : ''));
   return txt;
 }
+// ═══════════════════════════════════════════════════════════════════════
+// 語音輸入（bv*）— 呼叫共用模組 shared/voice.js
+//
+// 🔴 引擎不在這裡，在 shared/voice.js（五個子系統共用同一份）。
+//    這裡只負責「哪幾個欄位有麥克風、按鈕長什麼樣、文字寫到哪」。
+//    **不要把錄音／上傳／整理的程式複製進來。**
+//
+// 🔴 按鈕是**程式自動掛上去的**（bvAttachAll），不是寫在 HTML 裡：
+//    九個欄位手寫九次會漏、會不一致，而且以後加欄位只要改 BV_TARGETS 一行。
+// ═══════════════════════════════════════════════════════════════════════
+
+// 掛麥克風的欄位。pm-writebox 不在這裡 —— 它是 pmRenderRoom 整塊重繪出來的，
+// 按鈕直接寫在那段 HTML 裡（見 pmRenderRoom 的 pm-mic-btn）。
+const BV_TARGETS = [
+  'wr-reflections', 'wr-intel', 'wr-feedback', 'wr-work', 'wr-plan', 'wr-other',  // Woody 週報
+  'wm-ag-chair', 'wm-ag-newprod', 'wm-ag-supp',                                   // 週會議程
+];
+
+var bvBtnId = null;   // 目前正在錄音／處理的那一顆按鈕
+
+function bvOK() { return !!(window.ComartVoice && ComartVoice.supported()); }
+
+/* board 的 pmClaude 是 (system, user, maxTokens, model)，
+   共用模組要的是 (messages, system, maxTokens, model) —— 這裡轉一次。
+   刻意重用 pmClaude 而不是自己 fetch：它已經處理好 401 橫幅（sbNoteAuth）、
+   refusal、空回覆這幾種情況。 */
+function bvClaude(messages, system, maxTokens, model) {
+  return pmClaude(system, messages[0].content, maxTokens, model);
+}
+
+function bvPaint(state, sec) {
+  const b = bvBtnId && document.getElementById(bvBtnId);
+  if (!b) return;
+  b.classList.toggle('on', state === 'recording');
+  b.disabled = (state === 'uploading' || state === 'polishing');
+  if (state === 'recording')      { b.textContent = '⏹ ' + sec + 's'; b.title = BT('bv_stop'); }
+  else if (state === 'uploading') { b.textContent = '⋯';  b.title = BT('bv_working'); }
+  else if (state === 'polishing') { b.textContent = '✨'; b.title = BT('bv_polishing'); }
+  else {
+    b.textContent = '🎙'; b.title = BT('bv_start'); bvBtnId = null;
+    // 錄音期間積欠的重繪在這裡補上（見 pmRerender 的說明）
+    if (typeof pmPendingRender !== 'undefined' && pmPendingRender) pmRerender(false);
+  }
+}
+
+function bvToggle(targetId, btnId) {
+  if (!bvOK()) { boardToast(BT('bv_unsupported')); return; }
+  // 一次只能錄一個欄位：麥克風是獨佔資源，而且兩段語音同時進來會寫錯欄位
+  if (ComartVoice.active() || ComartVoice.busy()) {
+    if (bvBtnId === btnId) ComartVoice.stop();
+    else boardToast(BT('bv_busy'));
+    return;
+  }
+  bvBtnId = btnId;
+  ComartVoice.toggle({
+    sbUrl: PM_SB_BASE,
+    sig: function () { return sbHdrs()['x-session'] || ''; },
+    lang: '',                       // 自動判斷語言（越南／中文同仁不必先選）
+    callClaude: bvClaude,
+    onState: bvPaint,
+    onError: function (code) {
+      boardToast(BT({ unsupported: 'bv_unsupported', denied: 'bv_denied',
+                      empty: 'bv_empty', expired: 'bv_expired' }[code] || 'bv_failed'));
+      bvPaint('idle', 0);
+    },
+    onText: function (txt) {
+      const el = document.getElementById(targetId);
+      if (!el) return;
+      el.value = el.value ? (el.value.replace(/\s+$/, '') + ' ' + txt) : txt;
+      el.focus();
+      /* 🔴 一定要派發 input 事件：週報與週會編輯器的「未存檔提醒」是靠
+         容器上的 input 監聽器（boardMarkDirty）判斷的，直接改 value 不會觸發。
+         少了這行，語音打完一大段內容、關掉分頁時瀏覽器不會攔 —— 全部丟失。 */
+      try { el.dispatchEvent(new Event('input', { bubbles: true })); } catch (e) {}
+    },
+  });
+}
+
+// 把麥克風鈕掛到 BV_TARGETS 的每個欄位上（標題列右側）
+function bvAttachAll() {
+  if (!bvOK()) return;
+  BV_TARGETS.forEach(function (id) {
+    const ta = document.getElementById(id);
+    if (!ta || document.getElementById('bv-b-' + id)) return;   // 已掛過就跳過
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.id = 'bv-b-' + id;
+    btn.className = 'bv-mic';
+    btn.textContent = '🎙';
+    btn.title = BT('bv_start');
+    btn.onclick = function () { bvToggle(id, btn.id); };
+    // 週報是 .field > label，週會議程是 .sec > .sec-h（flex）——兩種容器都掛在標題那一列
+    const host = ta.closest('.field') || ta.closest('.sec');
+    const head = host && (host.querySelector(':scope > label') || host.querySelector(':scope > .sec-h'));
+    if (head) { head.classList.add('bv-head'); head.appendChild(btn); }
+    else ta.parentNode.insertBefore(btn, ta);
+  });
+}
+
+// 語言切換時按鈕的 title 要跟著換
+function bvRelabel() {
+  BV_TARGETS.forEach(function (id) {
+    const b = document.getElementById('bv-b-' + id);
+    if (b && b.id !== bvBtnId) b.title = BT('bv_start');
+  });
+  const p = document.getElementById('pm-mic-btn');
+  if (p && p.id !== bvBtnId) p.title = BT('bv_start');
+}
+
 // 串流版：長輸出必須走這條。非串流時 claude-proxy 要等 Anthropic 全部產完才回應，
 // opus-5 + thinking 的長分析會讓 edge function 逾時回 504（2026-08-08 實際踩到）。
 // onDelta(累積文字) 可即時把內容顯示出來。
@@ -5394,6 +5540,13 @@ function pmRerender(force) {
   // 對象下拉開著時也算「使用者正在操作」：輪詢一重繪，正在挑人的清單會憑空消失。
   // 收起下拉時（pmTgtClose）會把積欠的重繪補上。
   if (!force && pmTgtIsOpen()) { pmPendingRender = true; return; }
+  /* 🔴 錄音或轉寫中一律延後重繪（連 force 也擋）：整塊 innerHTML 重畫會把
+     pm-mic-btn 換成新節點，bvPaint 就找不到它 —— 畫面停在「錄音中」但按鈕
+     已經是另一顆，使用者按不停、也看不到秒數。轉寫完成後 bvPaint 進 idle
+     時會把積欠的重繪補上。 */
+  if (window.ComartVoice && (ComartVoice.active() || ComartVoice.busy())) {
+    pmPendingRender = true; return;
+  }
   const typing = force ? null : pmTypingEl();
   if (typing) {
     pmPendingRender = true;
@@ -5573,6 +5726,9 @@ function pmRenderRoom() {
       pmTargetFieldHtml() +
       '<textarea id="pm-writebox" rows="3" placeholder="' + escHtml(pmWritePh()) + '" style="width:100%;font-family:inherit;font-size:14px;background:var(--s2);border:1px solid var(--br);border-radius:8px;padding:9px 11px;color:var(--tx)" oninput="pmDraft=this.value"' + (capLock ? ' disabled' : '') + '></textarea>' +
       '<div style="margin-top:8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">' +
+      (bvOK() ? '<button type="button" id="pm-mic-btn" class="bv-mic" style="margin-left:0"' +
+                ' title="' + escHtml(BT('bv_start')) + '"' +
+                ' onclick="bvToggle(\'pm-writebox\',\'pm-mic-btn\')">🎙</button>' : '') +
       '<button id="pm-submit-btn" class="btn primary sm" onclick="pmSubmitEntry()"' + (capLock ? ' disabled style="opacity:.5"' : '') + '>' +
         escHtml(editing ? BT('pm_save_edit') : BT('pm_submit_entry')) + '</button>' +
       (editing ? '<button class="btn ghost sm" onclick="pmEditCancel()">' + escHtml(BT('btn_cancel')) + '</button>' : '') +
@@ -7241,6 +7397,9 @@ async function initBoard() {
   if (!PORTAL_SESSION) { boardGoLogin(); return; }
   bInitLang();          // 必須在任何 BT() 之前：語言預設值會用到 PORTAL_SESSION.site
   bApplyI18n();
+  // 麥克風鈕要在這裡掛（bRerenderAll 只有切語言時才跑，初次載入不會經過）。
+  // 週報與週會的 textarea 都是靜態 DOM，所以掛一次就夠。
+  bvAttachAll();
   if (PORTAL_SESSION) {
     document.getElementById('whoBadge').innerHTML =
       escHtml(PORTAL_SESSION.nameZh || PORTAL_SESSION.nameEn || PORTAL_SESSION.empId) + ' ' + siteBadgeHtml('site', PORTAL_SESSION.site);

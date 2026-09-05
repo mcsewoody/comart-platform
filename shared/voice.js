@@ -24,7 +24,7 @@
 (function (global) {
   'use strict';
 
-  var V = { VERSION: '2.0' };
+  var V = { VERSION: '2.1' };
 
   var MAX_SEC   = 120;      // 忘記按停止時自己收（成本與等待時間都會失控）
   var MIN_BYTES = 1200;     // 比這還小就是誤觸，不值得送一次 API
@@ -202,15 +202,24 @@
     var blob = n ? new Blob(chunks, { type: mime }) : null;
     chunks = [];
     release();
-    console.log('[voice] audio', { sec: sec, chunks: n, bytes: blob ? blob.size : 0, mime: mime });
+    /* 🔴 診斷 log 一律攤平成單行字串，不要傳物件。
+       Chrome 的 console 會把物件收成「Object」，要點開才看得到值 ——
+       而這幾行存在的唯一目的就是「請使用者把數字貼給我」。
+       物件版實際造成使用者貼過來一串沒有資訊的 Object（2026-09-06）。 */
+    console.log('[voice] audio  sec=' + sec + ' chunks=' + n +
+                ' bytes=' + (blob ? blob.size : 0) + ' mime=' + mime);
     if (!blob || blob.size < MIN_BYTES) { paint(); fail('empty'); return; }
 
     uploading = true; paint();
 
     // 轉 16 kHz 單聲道 WAV（見 toWavBlob 的說明），順便量音量
     var prep = await toWavBlob(blob);
-    console.log('[voice] wav', { bytes: prep.blob.size, mime: prep.mime,
-                                 rms: prep.rms, peak: prep.peak, seconds: prep.seconds });
+    console.log('[voice] wav    bytes=' + prep.blob.size + ' mime=' + prep.mime +
+                ' sec=' + (prep.seconds == null ? '?' : prep.seconds.toFixed(2)) +
+                ' rms=' + (prep.rms == null ? '(未解碼)' : prep.rms.toFixed(4)) +
+                ' peak=' + (prep.peak == null ? '?' : prep.peak.toFixed(3)) +
+                // rms 是判斷「麥克風到底有沒有收到聲音」的關鍵數字，直接寫出結論
+                (prep.rms == null ? '' : (prep.rms < SILENCE_RMS ? '  ← 幾乎無聲' : '  ← 有收到聲音')));
     /* 🔴 幾乎全靜音就不要送 —— Whisper 會回訓練資料裡的 YouTube 樣板文字
        （「以上是本期視頻的全部內容，感謝大家收看」／"Thank you for watching!"）。
        告訴使用者「沒收到語音」遠好過把那句話塞進他的週報。 */
@@ -242,8 +251,11 @@
         console.warn('[voice] 伺服器判定為 Whisper 幻覺輸出，已丟棄');
         uploading = false; paint(); fail('silent'); return;
       }
-      console.log('[voice] transcribe', { sentBytes: blob.size, gotBytes: data && data.bytes,
-                                          model: data && data.model, chars: raw.length });
+      console.log('[voice] transcribe  sent=' + blob.size +
+                  ' got=' + ((data && data.bytes) || '?') +
+                  ' model=' + ((data && data.model) || '?') +
+                  ' chars=' + raw.length +
+                  ((data && data.hallucination) ? '  ← 樣板幻覺，已丟棄' : ''));
       // 上傳與伺服器收到的位元數不一致 ＝ 上傳被截斷，那是完全不同的問題
       if (data && data.bytes && data.bytes !== blob.size) {
         console.warn('[voice] byte mismatch — 上傳的音訊不完整', blob.size, '→', data.bytes);

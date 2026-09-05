@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>COMART Platform v1.83</title>
+<title>COMART Platform v1.84</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script defer src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.js"></script>
 <style>
@@ -291,7 +291,14 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:
 .lc-fail { font-size:11.5px; color:#F5A623; }
 .lc-retry { margin-left:5px; padding:2px 7px; border-radius:5px; border:1px solid var(--br); background:var(--s2); color:var(--tx3); font-size:10.5px; cursor:pointer; font-family:var(--ff); }
 .lc-composer { display:flex; gap:8px; align-items:flex-end; padding:10px 14px; border-top:1px solid var(--br); background:var(--s1); flex-shrink:0; padding-bottom:calc(10px + env(safe-area-inset-bottom)); }
-.lc-composer textarea { flex:1; resize:none; max-height:132px; padding:9px 11px; border-radius:10px; border:1px solid var(--br); background:var(--bg); color:var(--tx); font-size:14px; font-family:var(--ff); line-height:1.5; }
+.lc-cbtns { display:flex; flex-direction:column; gap:6px; align-items:stretch; flex:0 0 auto; }
+.lc-mic-wrap { display:flex; gap:4px; align-items:center; }
+.lc-mic { flex:1; padding:7px 10px; border-radius:9px; border:1px solid var(--br); background:var(--s2); color:var(--tx2); font-size:14px; line-height:1; cursor:pointer; font-family:var(--ff); }
+.lc-mic:hover { border-color:#7c3aed; }
+.lc-mic.on { background:#e05260; border-color:#e05260; color:#fff; animation:lcPulse 1.2s ease-in-out infinite; }
+@keyframes lcPulse { 0%,100%{opacity:1} 50%{opacity:.55} }
+.lc-mic-lang { padding:6px 4px; border-radius:9px; border:1px solid var(--br); background:var(--s2); color:var(--tx3); font-size:11px; font-family:var(--ff); cursor:pointer; max-width:74px; }
+.lc-composer textarea { flex:1; resize:none; min-height:72px; max-height:220px; padding:9px 11px; border-radius:10px; border:1px solid var(--br); background:var(--bg); color:var(--tx); font-size:14px; font-family:var(--ff); line-height:1.5; }
 .lc-join { flex:0 0 auto; font-size:11px; font-weight:700; padding:5px 12px; border-radius:20px; background:#7c3aed; border:1px solid #7c3aed; color:#fff; white-space:nowrap; }
 .lc-row:hover .lc-join { background:#8b5cf6; }
 .lc-img { display:block; max-width:min(100%,380px); max-height:300px; width:auto; height:auto; border-radius:9px; border:1px solid var(--br2); margin:2px 0 7px; cursor:zoom-in; background:var(--s2); object-fit:contain; }
@@ -349,7 +356,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     <div class="login-logo">
       <div class="login-mark" style="background:transparent"><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="44" height="23"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></div>
       <div class="login-name">COMART Platform</div>
-      <div class="login-sub">Internal Portal · v1.83</div>
+      <div class="login-sub">Internal Portal · v1.84</div>
     </div>
     <form id="loginForm" onsubmit="doLogin();return false;" autocomplete="on">
     <div class="field">
@@ -409,7 +416,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   <div class="topbar">
     <div class="topbar-logo" onclick="switchView('home')">
       <div class="topbar-mark" style="background:transparent"><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="26" height="14"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></div>
-      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.83</span></div>
+      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.84</span></div>
     </div>
     <div class="topbar-right">
       <div class="lang-switcher">
@@ -628,10 +635,16 @@ input[type="date"]::-webkit-calendar-picker-indicator {
               <input type="file" id="lc-file" accept="image/jpeg,image/png,image/gif,image/webp"
                      multiple style="display:none;" onchange="lcFileChosen(event)">
               <button class="lc-attach" id="lc-attach-btn" onclick="lcPickImage()" title="圖片">📎</button>
-              <textarea id="lc-input" rows="1" onkeydown="lcKeydown(event)" onpaste="lcPaste(event)"
-                oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,132)+'px';"
+              <textarea id="lc-input" rows="3" onkeydown="lcKeydown(event)" onpaste="lcPaste(event)"
+                oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,LC_INPUT_MAX)+'px';"
                 placeholder="用你自己的語言輸入…"></textarea>
-              <button class="lc-send" id="lc-send-btn" onclick="lcSend()">送出</button>
+              <div class="lc-cbtns">
+                <span id="lc-mic-wrap" class="lc-mic-wrap" style="display:none;">
+                  <button class="lc-mic" id="lc-mic-btn" onclick="lcRecToggle()">🎙</button>
+                  <select class="lc-mic-lang" id="lc-mic-lang" onchange="lcSpeechLangSet(this.value)"></select>
+                </span>
+                <button class="lc-send" id="lc-send-btn" onclick="lcSend()">送出</button>
+              </div>
             </div>
           </div>
         </div>
@@ -2870,6 +2883,9 @@ const I18N = {
     // ai tab
     ai_tab_translate:'Translate', ai_tab_chat:'Chat', ai_tab_skills:'Skills',
     ai_tab_live:'Live Chat', lc_new:'New chat',
+    lc_tz_note:'Times in {tz}', lc_mic_start:'Voice input',
+    lc_mic_stop:'Stop recording', lc_mic_unsupported:'This browser does not support voice input. Chrome, Edge or Safari are required.',
+    lc_mic_denied:'Microphone access was denied. Please allow it in your browser settings.', lc_mic_failed:'Voice recognition is unavailable right now. Please type instead.',
     lc_join:'Join', lc_image:'Image',
     lc_img_too_big:'That image is too large. Maximum 10 MB.', lc_img_bad_type:'Only JPG, PNG, GIF and WebP images can be sent.',
     lc_img_uploading:'Uploading image...', lc_img_failed:'Image upload failed. Please try again.',
@@ -2965,6 +2981,9 @@ const I18N = {
     um_delete_failed:'刪除失敗：', um_deleted:'用戶已刪除',
     ai_tab_translate:'翻譯', ai_tab_chat:'對話', ai_tab_skills:'技能',
     ai_tab_live:'線上對話', lc_new:'開新對話',
+    lc_tz_note:'時間為 {tz}', lc_mic_start:'語音輸入',
+    lc_mic_stop:'停止錄音', lc_mic_unsupported:'這個瀏覽器不支援語音輸入，請使用 Chrome、Edge 或 Safari。',
+    lc_mic_denied:'麥克風權限被拒絕，請在瀏覽器設定中允許。', lc_mic_failed:'語音辨識目前無法使用，請改用打字。',
     lc_join:'加入對話', lc_image:'圖片',
     lc_img_too_big:'圖片太大了，上限 10 MB。', lc_img_bad_type:'只能傳送 JPG、PNG、GIF、WebP 圖片。',
     lc_img_uploading:'圖片上傳中…', lc_img_failed:'圖片上傳失敗，請再試一次。',
@@ -3053,6 +3072,9 @@ const I18N = {
     um_delete_failed:'删除失败：', um_deleted:'用户已删除',
     ai_tab_translate:'翻译', ai_tab_chat:'对话', ai_tab_skills:'技能',
     ai_tab_live:'在线对话', lc_new:'开新对话',
+    lc_tz_note:'时间为 {tz}', lc_mic_start:'语音输入',
+    lc_mic_stop:'停止录音', lc_mic_unsupported:'这个浏览器不支持语音输入，请使用 Chrome、Edge 或 Safari。',
+    lc_mic_denied:'麦克风权限被拒绝，请在浏览器设置中允许。', lc_mic_failed:'语音识别目前无法使用，请改用打字。',
     lc_join:'加入对话', lc_image:'图片',
     lc_img_too_big:'图片太大了，上限 10 MB。', lc_img_bad_type:'只能发送 JPG、PNG、GIF、WebP 图片。',
     lc_img_uploading:'图片上传中…', lc_img_failed:'图片上传失败，请再试一次。',
@@ -3141,6 +3163,9 @@ const I18N = {
     um_delete_failed:'Xóa thất bại: ', um_deleted:'Đã xóa người dùng',
     ai_tab_translate:'Dịch thuật', ai_tab_chat:'Trò chuyện', ai_tab_skills:'Kỹ năng',
     ai_tab_live:'Trò chuyện trực tiếp', lc_new:'Cuộc trò chuyện mới',
+    lc_tz_note:'Giờ theo {tz}', lc_mic_start:'Nhập bằng giọng nói',
+    lc_mic_stop:'Dừng ghi âm', lc_mic_unsupported:'Trình duyệt này không hỗ trợ nhập bằng giọng nói. Vui lòng dùng Chrome, Edge hoặc Safari.',
+    lc_mic_denied:'Quyền truy cập micro đã bị từ chối. Vui lòng cho phép trong cài đặt trình duyệt.', lc_mic_failed:'Hiện không dùng được nhận dạng giọng nói. Vui lòng nhập bằng bàn phím.',
     lc_join:'Tham gia', lc_image:'Hình ảnh',
     lc_img_too_big:'Hình ảnh quá lớn. Tối đa 10 MB.', lc_img_bad_type:'Chỉ có thể gửi hình JPG, PNG, GIF và WebP.',
     lc_img_uploading:'Đang tải hình lên…', lc_img_failed:'Tải hình lên không thành công. Vui lòng thử lại.',
@@ -3229,6 +3254,9 @@ const I18N = {
     um_delete_failed:'削除失敗：', um_deleted:'ユーザーを削除しました',
     ai_tab_translate:'翻訳', ai_tab_chat:'チャット', ai_tab_skills:'スキル',
     ai_tab_live:'オンライン会話', lc_new:'新しい会話',
+    lc_tz_note:'時刻は {tz}', lc_mic_start:'音声入力',
+    lc_mic_stop:'録音を停止', lc_mic_unsupported:'このブラウザは音声入力に対応していません。Chrome、Edge、Safari をご利用ください。',
+    lc_mic_denied:'マイクへのアクセスが拒否されました。ブラウザの設定で許可してください。', lc_mic_failed:'音声認識は現在利用できません。キーボードで入力してください。',
     lc_join:'参加する', lc_image:'画像',
     lc_img_too_big:'画像が大きすぎます。上限は 10 MB です。', lc_img_bad_type:'送信できるのは JPG・PNG・GIF・WebP のみです。',
     lc_img_uploading:'画像をアップロード中…', lc_img_failed:'画像のアップロードに失敗しました。もう一度お試しください。',
@@ -3810,6 +3838,8 @@ const LC_MSG_LIMIT = 200;
 // 超過這個時間還沒有譯文，就當送出者已經離線，由開啟者接手補翻。
 // 60 秒是「三次重試加上退避（約 4 秒）」的數倍，正常流程絕對來不及變成孤兒。
 const LC_ORPHAN_MS = 60000;
+// 輸入框自動長高的上限（v1.83 前是 132px，太小）
+const LC_INPUT_MAX = 220;
 
 // 🔴 模型抽成常數：越南同仁反映品質不夠時改這一行就好，不必動任何邏輯。
 //    這裡刻意用 sonnet 而非 board 的 opus —— 聊天是短句、當場看得到對不對，
@@ -4090,7 +4120,9 @@ function lcShowRoom() {
   if (ttl) ttl.textContent = (lcSession && lcSession.title) || '';
   var meta = document.getElementById('lc-room-meta');
   if (meta) meta.textContent = t('lc_host') + '：' + ((lcSession && (lcSession.host_name || lcSession.host_emp_id)) || '')
-    + (live ? '' : '　·　' + t('lc_ended'));
+    + (live ? '' : '　·　' + t('lc_ended'))
+    // 訊息時間是每位觀看者自己的當地時間，不標時區會讓跨廠的人以為資料錯了
+    + '　·　' + t('lc_tz_note').replace('{tz}', lcTzLabel());
   var comp = document.getElementById('lc-composer');
   if (comp) comp.style.display = live ? 'flex' : 'none';
   var endBtn = document.getElementById('lc-end-btn');
@@ -4359,7 +4391,10 @@ async function lcExportPDF() {
     + (lcSession.ended_at ? '　—　' + escHtml(lcDay(lcSession.ended_at)) + ' ' + lcTime(lcSession.ended_at) : '')
     + '</div>'
     + '<div class="meta">參與者（' + names.length + '）：' + escHtml(names.join('、')) + '</div>'
-    + '<div class="meta">共 ' + lcMsgs.length + ' 則訊息</div><hr>';
+    + '<div class="meta">共 ' + lcMsgs.length + ' 則訊息</div>'
+    // 時區固定繁中（同 siteLabelZ 的道理：存檔格式不隨介面語言改變）。
+    // 標的是**匯出這份 PDF 的人**所在的時區 —— 時間全部以他的當地時間呈現。
+    + '<div class="meta">所有時間為當地時間 ' + escHtml(lcTzLabel()) + '</div><hr>';
   lcMsgs.forEach(function(m) {
     body += '<div class="m"><div class="mh">' + escHtml(m.author_name || m.emp_id)
       + '　<span class="mt">' + escHtml(lcDay(m.created_at)) + ' ' + lcTime(m.created_at) + '</span>'
@@ -4391,6 +4426,10 @@ async function lcExportPDF() {
     + '.mimiss{font-size:11.5px;color:#999;margin:3px 0}'
     + '.mlab{flex:0 0 34px;color:#888;font-size:10.5px;padding-top:2px}'
     + '@media print{@page{margin:14mm}}';
+  // 🔴 必須先 document.open() 才寫最終內容：前面寫過「正在準備文件…」的佔位文字
+  //    而文件還沒 close，這時直接 write 是**附加**在後面，那行字就留在 PDF 上了。
+  //    document.open() 會把整份文件清空重來。
+  try { w.document.open(); } catch (e) {}
   w.document.write('<!doctype html><html><head><meta charset="utf-8"><title>'
     + escHtml(lcSession.title || '線上對話') + '</title><style>' + css + '</style></head><body>'
     + body + '</body></html>');
@@ -4627,6 +4666,134 @@ function lcImgHtml(m) {
     + ' onclick="lcOpenImage(\'' + escHtml(m.img_path) + '\')">';
 }
 
+// ═══════════════════════════════════════════════════════════════════════
+// 語音輸入（Web Speech API）
+//
+// 🔴 **這裡用瀏覽器內建的辨識，不是我們的 Claude API。**
+//    Claude 不吃音訊輸入（只有文字／圖片／PDF），所以 claude-proxy 做不到轉寫；
+//    要走 API 就得引進第二家廠商（Whisper 之類）＋ 新的 edge function ＋ 新的金鑰。
+//    Web Speech API 零成本、零後端、今天就能用，先上這個。
+//
+// ⚠️ **東莞廠要注意**：Chrome 的語音辨識是把音訊送到 Google 的伺服器，
+//    而 Google 網域在中國被 GFW 封鎖 —— 這正是 Firebase 那個坑的同一種形狀。
+//    Safari（macOS／iOS）走 Apple 的服務，在中國可用。
+//    所以按鈕在不支援或失敗時必須**安靜地退場**，不能讓人以為程式壞了。
+//
+// 🔴 辨識**必須指定語言**，這是 Web Speech API 的規格，不能自動判斷。
+//    預設帶入介面語言，但另給一個下拉可改 —— CLAUDE.md 已記過「越南同仁把介面
+//    切成中文卻用中文打字」，介面語言不等於說話的語言。選擇記在 localStorage。
+// ═══════════════════════════════════════════════════════════════════════
+
+const LC_SPEECH_LANGS = [
+  ['zh-TW', '繁中'], ['zh-CN', '简中'], ['en-US', 'EN'], ['vi-VN', 'VI'], ['ja-JP', '日本語'],
+];
+const LC_SPEECH_KEY = 'comart-lc-speech-lang';
+const LC_SR = (typeof window !== 'undefined') &&
+              (window.SpeechRecognition || window.webkitSpeechRecognition);
+
+var lcRec     = null;
+var lcRecOn   = false;
+var lcRecBase = '';    // 開始錄音時輸入框裡已有的字，辨識結果接在後面
+
+function lcSpeechLang() {
+  var saved = '';
+  try { saved = localStorage.getItem(LC_SPEECH_KEY) || ''; } catch (e) {}
+  if (saved && LC_SPEECH_LANGS.some(function(l){ return l[0] === saved; })) return saved;
+  // 沒選過就用介面語言推一個預設
+  var map = { 'zh-TW':'zh-TW', 'zh-CN':'zh-CN', 'en':'en-US', 'vi':'vi-VN', 'ja':'ja-JP' };
+  return map[LANG] || 'en-US';
+}
+function lcSpeechLangSet(v) {
+  try { localStorage.setItem(LC_SPEECH_KEY, v); } catch (e) {}
+  if (lcRecOn) lcRecStop();   // 錄音中換語言要重開才生效
+}
+
+function lcRecInit() {
+  // 不支援就把整組控制項藏起來（Firefox、舊 Safari、非 https）
+  var wrap = document.getElementById('lc-mic-wrap');
+  if (wrap) wrap.style.display = LC_SR ? 'flex' : 'none';
+  var sel = document.getElementById('lc-mic-lang');
+  if (sel && !sel.options.length) {
+    sel.innerHTML = LC_SPEECH_LANGS.map(function(l) {
+      return '<option value="' + l[0] + '">' + escHtml(l[1]) + '</option>';
+    }).join('');
+  }
+  if (sel) sel.value = lcSpeechLang();
+}
+
+function lcRecToggle() {
+  if (!LC_SR) { toast(t('lc_mic_unsupported'), 'err'); return; }
+  if (lcRecOn) { lcRecStop(); return; }
+  var el = document.getElementById('lc-input');
+  if (!el) return;
+  lcRecBase = el.value || '';
+  try {
+    lcRec = new LC_SR();
+  } catch (e) {
+    toast(t('lc_mic_unsupported'), 'err'); return;
+  }
+  lcRec.lang = lcSpeechLang();
+  lcRec.continuous = true;
+  lcRec.interimResults = true;   // 邊說邊出字，使用者才知道有在收音
+
+  lcRec.onresult = function(ev) {
+    var fin = '', itm = '';
+    for (var i = ev.resultIndex; i < ev.results.length; i++) {
+      var tx = ev.results[i][0].transcript;
+      if (ev.results[i].isFinal) fin += tx; else itm += tx;
+    }
+    if (fin) lcRecBase = (lcRecBase ? lcRecBase + fin : fin);
+    var box = document.getElementById('lc-input');
+    if (box) {
+      // 每次都由 base + 暫時結果重組，不用 += ：暫時結果會被後續事件取代
+      box.value = lcRecBase + itm;
+      box.style.height = 'auto';
+      box.style.height = Math.min(box.scrollHeight, LC_INPUT_MAX) + 'px';
+    }
+  };
+  lcRec.onerror = function(ev) {
+    // no-speech 是「沒聽到聲音」，不是錯誤，不要嚇使用者
+    if (ev.error === 'no-speech' || ev.error === 'aborted') return;
+    console.warn('[lc] speech', ev.error);
+    toast(t(ev.error === 'not-allowed' ? 'lc_mic_denied' : 'lc_mic_failed'), 'err');
+  };
+  lcRec.onend = function() { lcRecOn = false; lcRecPaint(); };
+
+  try { lcRec.start(); } catch (e) { toast(t('lc_mic_failed'), 'err'); return; }
+  lcRecOn = true; lcRecPaint();
+}
+
+function lcRecStop() {
+  lcRecOn = false;
+  if (lcRec) { try { lcRec.stop(); } catch (e) {} }
+  lcRecPaint();
+}
+
+function lcRecPaint() {
+  var b = document.getElementById('lc-mic-btn');
+  if (!b) return;
+  b.classList.toggle('on', lcRecOn);
+  b.textContent = lcRecOn ? '⏹' : '🎙';
+  b.title = t(lcRecOn ? 'lc_mic_stop' : 'lc_mic_start');
+}
+
+// ─── 時區標註 ───
+// 🔴 訊息時間是用**每個觀看者自己的當地時間**顯示的，所以越南同事（UTC+7）與
+//    台灣同事（UTC+8）看同一則訊息會看到差一小時的時間。那本來就是對的，
+//    但不標時區的話讀起來像資料錯誤 —— 匯出的 PDF 更是把匯出者的時區烙進檔案裡。
+function lcTzLabel() {
+  var off = -(new Date().getTimezoneOffset());     // 分鐘，東為正
+  var sg = off < 0 ? '-' : '+';
+  var hh = String(Math.floor(Math.abs(off) / 60)).padStart(2, '0');
+  var mm = String(Math.abs(off) % 60).padStart(2, '0');
+  var s = 'UTC' + sg + hh + ':' + mm;
+  try {
+    var z = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    if (z) s += ' (' + z + ')';
+  } catch (e) {}
+  return s;
+}
+
 // 線上對話：靜態文字套 i18n。
 // 🔴 不在這裡無條件呼叫 lcLoadList()：applyI18nAll() 每次 switchView 都會跑，
 //    那會變成每切一次頁面就打一次資料庫。只在「線上對話頁籤真的開著」時才重畫。
@@ -4639,6 +4806,7 @@ function lcApplyI18n() {
   txt('lc-endbar-q','lc_end_q');  txt('lc-end-btn','lc_end');
   txt('lc-send-btn','lc_send');   ph('lc-input','lc_input_ph');
   var at = document.getElementById('lc-attach-btn'); if (at) at.title = t('lc_image');
+  lcRecInit(); lcRecPaint();
   var b  = document.getElementById('lc-back-btn'); if (b)  b.textContent  = '\u2039 ' + t('lc_back');
   var pd = document.getElementById('lc-pdf-btn');  if (pd) pd.textContent = '\ud83d\udcc4 ' + t('lc_pdf');
   var con = document.getElementById('ptab-content-live');

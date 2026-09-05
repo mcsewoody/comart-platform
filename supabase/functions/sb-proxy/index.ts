@@ -54,7 +54,9 @@ const ALLOWED_TABLES = new Set([
 // 「不保留」是整場 cascade 刪除（連同所有人的發言），比覆寫嚴重；
 // status/keep/title 決定這場對話的性質與去留，同 premortem 的 phase。
 // last_at 刻意不在這裡：每個人發言都要更新它，那是正常的協作寫入。
-const CHAT_HOST_ONLY = new Set(["status", "keep", "title"])
+// members 也只有開啟者改得動：那份清單決定誰讀得到這場對話的內容，
+// 任何參與者都能自行加人的話，「只有參與人可以開啟」就沒有意義了。
+const CHAT_HOST_ONLY = new Set(["status", "keep", "title", "members"])
 // 線上對話可以刪除整場的角色：開啟者本人，或 admin
 const CHAT_DELETE_ROLES = new Set(["admin"])
 // 開啟者是整套權限的根，建立後不可改（改掉就等於把別人開的場次搶過來）

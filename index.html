@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>COMART Platform v1.84</title>
+<title>COMART Platform v1.85</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script defer src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.js"></script>
 <style>
@@ -299,6 +299,20 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:
 @keyframes lcPulse { 0%,100%{opacity:1} 50%{opacity:.55} }
 .lc-mic-lang { padding:6px 4px; border-radius:9px; border:1px solid var(--br); background:var(--s2); color:var(--tx3); font-size:11px; font-family:var(--ff); cursor:pointer; max-width:74px; }
 .lc-composer textarea { flex:1; resize:none; min-height:72px; max-height:220px; padding:9px 11px; border-radius:10px; border:1px solid var(--br); background:var(--bg); color:var(--tx); font-size:14px; font-family:var(--ff); line-height:1.5; }
+.lc-ov { display:none; position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:2000; align-items:center; justify-content:center; padding:16px; }
+.lc-ov.show { display:flex; }
+.lc-ov-box { background:var(--s1); border:1px solid var(--br); border-radius:14px; width:100%; max-width:440px; max-height:80vh; display:flex; flex-direction:column; overflow:hidden; }
+.lc-ov-head { display:flex; align-items:center; gap:8px; padding:13px 15px; border-bottom:1px solid var(--br); }
+.lc-ov-tools { display:flex; gap:6px; padding:9px 15px; border-bottom:1px solid var(--br); }
+.lc-pick-list { flex:1; overflow-y:auto; padding:8px 15px; }
+.lc-pick { display:flex; align-items:center; gap:9px; padding:8px 9px; border-radius:8px; cursor:pointer; font-size:13px; color:var(--tx2); }
+.lc-pick:hover { background:var(--s2); }
+.lc-pick.on { background:rgba(124,58,237,.12); color:var(--tx); }
+.lc-pick input { accent-color:#7c3aed; width:15px; height:15px; cursor:pointer; }
+.lc-pick i { margin-left:auto; font-style:normal; font-size:11px; color:var(--tx3); font-family:var(--fm); }
+.lc-ov-foot { display:flex; gap:8px; justify-content:flex-end; padding:11px 15px; border-top:1px solid var(--br); }
+.lc-row.locked { cursor:not-allowed; opacity:.62; }
+.lc-row.locked:hover { border-color:var(--br); }
 .lc-join { flex:0 0 auto; font-size:11px; font-weight:700; padding:5px 12px; border-radius:20px; background:#7c3aed; border:1px solid #7c3aed; color:#fff; white-space:nowrap; }
 .lc-row:hover .lc-join { background:#8b5cf6; }
 .lc-img { display:block; max-width:min(100%,380px); max-height:300px; width:auto; height:auto; border-radius:9px; border:1px solid var(--br2); margin:2px 0 7px; cursor:zoom-in; background:var(--s2); object-fit:contain; }
@@ -356,7 +370,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     <div class="login-logo">
       <div class="login-mark" style="background:transparent"><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="44" height="23"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></div>
       <div class="login-name">COMART Platform</div>
-      <div class="login-sub">Internal Portal · v1.84</div>
+      <div class="login-sub">Internal Portal · v1.85</div>
     </div>
     <form id="loginForm" onsubmit="doLogin();return false;" autocomplete="on">
     <div class="field">
@@ -416,7 +430,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   <div class="topbar">
     <div class="topbar-logo" onclick="switchView('home')">
       <div class="topbar-mark" style="background:transparent"><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="26" height="14"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></div>
-      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.84</span></div>
+      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.85</span></div>
     </div>
     <div class="topbar-right">
       <div class="lang-switcher">
@@ -603,10 +617,12 @@ input[type="date"]::-webkit-calendar-picker-indicator {
                 <input id="lc-new-title" maxlength="80" placeholder="對話主題"
                   onkeydown="if(event.key==='Enter')event.preventDefault();"
                   style="flex:1;min-width:180px;padding:9px 11px;border-radius:9px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:13px;font-family:var(--ff);">
+                <button class="lc-btn" id="lc-pick-btn" onclick="lcPickOpen('new')">＋ 參與人</button>
                 <button id="lc-new-btn" onclick="lcCreate()"
                   style="padding:9px 16px;border-radius:9px;background:#7c3aed;color:#fff;border:none;cursor:pointer;font-size:12px;font-weight:700;">開新對話</button>
               </div>
-              <div id="lc-new-hint" style="font-size:11px;color:var(--tx3);margin-top:7px;line-height:1.55;"></div>
+              <div id="lc-new-picked" style="font-size:11px;color:#a78bfa;margin-top:7px;font-weight:700;"></div>
+              <div id="lc-new-hint" style="font-size:11px;color:var(--tx3);margin-top:4px;line-height:1.55;"></div>
             </div>
             <div id="lc-list"></div>
           </div>
@@ -619,6 +635,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
                 <div id="lc-room-title" style="font-size:14px;font-weight:700;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
                 <div id="lc-room-meta" style="font-size:11px;color:var(--tx3);margin-top:1px;"></div>
               </div>
+              <button class="lc-btn" id="lc-invite-btn" onclick="lcPickOpen('invite')" style="display:none;">＋ 邀請</button>
               <button class="lc-btn" id="lc-pdf-btn" onclick="lcExportPDF().catch(function(e){console.warn(e);})" style="display:none;">📄 PDF</button>
               <button class="lc-btn danger" id="lc-end-btn" onclick="lcEndAsk()" style="display:none;">結束對話</button>
               <button class="lc-btn danger" id="lc-del-btn" onclick="lcDelete(lcSession&&lcSession.id,event)" style="display:none;">🗑</button>
@@ -645,6 +662,25 @@ input[type="date"]::-webkit-calendar-picker-indicator {
                 </span>
                 <button class="lc-send" id="lc-send-btn" onclick="lcSend()">送出</button>
               </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 參與人挑選（建立與邀請共用） -->
+        <div class="lc-ov" id="lc-pick-overlay" onclick="lcPickClose(event)">
+          <div class="lc-ov-box" onclick="event.stopPropagation()">
+            <div class="lc-ov-head">
+              <span id="lc-pick-title" style="font-size:14px;font-weight:700;color:var(--tx);"></span>
+              <span id="lc-pick-count" style="margin-left:auto;font-size:11px;color:#a78bfa;font-weight:700;"></span>
+            </div>
+            <div class="lc-ov-tools">
+              <button class="lc-btn" id="lc-pick-all" onclick="lcPickAll(true)">全選</button>
+              <button class="lc-btn" id="lc-pick-none" onclick="lcPickAll(false)">全部清除</button>
+            </div>
+            <div id="lc-pick-list" class="lc-pick-list"></div>
+            <div class="lc-ov-foot">
+              <button class="lc-btn" id="lc-pick-cancel" onclick="lcPickClose()">取消</button>
+              <button class="lc-send" id="lc-pick-ok" onclick="lcPickConfirm()">確定</button>
             </div>
           </div>
         </div>
@@ -2883,6 +2919,14 @@ const I18N = {
     // ai tab
     ai_tab_translate:'Translate', ai_tab_chat:'Chat', ai_tab_skills:'Skills',
     ai_tab_live:'Live Chat', lc_new:'New chat',
+    lc_pick_title:'Who is in this conversation?', lc_invite:'Invite people',
+    lc_picked:'{n} selected', lc_people:'{n} people',
+    lc_locked:'Not a participant', lc_not_member:'Only participants can open this conversation.',
+    lc_no_users:'No colleagues to choose from.', lc_pick_all:'Select all',
+    lc_pick_none:'Clear all', lc_invite_saved:'Participants updated',
+    lc_invite_failed:'Could not update the participants. Please try again.', lc_cancel:'Cancel',
+    lc_ok:'OK', lc_pick_btn:'+ Participants',
+    lc_mic_network:'Voice recognition could not reach its service. In China this is usually because Chrome sends audio to Google servers - please use Safari instead, or type.',
     lc_tz_note:'Times in {tz}', lc_mic_start:'Voice input',
     lc_mic_stop:'Stop recording', lc_mic_unsupported:'This browser does not support voice input. Chrome, Edge or Safari are required.',
     lc_mic_denied:'Microphone access was denied. Please allow it in your browser settings.', lc_mic_failed:'Voice recognition is unavailable right now. Please type instead.',
@@ -2981,6 +3025,14 @@ const I18N = {
     um_delete_failed:'刪除失敗：', um_deleted:'用戶已刪除',
     ai_tab_translate:'翻譯', ai_tab_chat:'對話', ai_tab_skills:'技能',
     ai_tab_live:'線上對話', lc_new:'開新對話',
+    lc_pick_title:'這場對話有誰？', lc_invite:'邀請參與人',
+    lc_picked:'已選 {n} 人', lc_people:'{n} 人',
+    lc_locked:'非參與人', lc_not_member:'只有參與人可以開啟這場對話。',
+    lc_no_users:'沒有可選的同事。', lc_pick_all:'全選',
+    lc_pick_none:'全部清除', lc_invite_saved:'參與人已更新',
+    lc_invite_failed:'參與人更新失敗，請再試一次。', lc_cancel:'取消',
+    lc_ok:'確定', lc_pick_btn:'＋ 參與人',
+    lc_mic_network:'語音辨識連不上服務。在中國通常是因為 Chrome 會把音訊送到 Google 的伺服器，請改用 Safari，或改用打字。',
     lc_tz_note:'時間為 {tz}', lc_mic_start:'語音輸入',
     lc_mic_stop:'停止錄音', lc_mic_unsupported:'這個瀏覽器不支援語音輸入，請使用 Chrome、Edge 或 Safari。',
     lc_mic_denied:'麥克風權限被拒絕，請在瀏覽器設定中允許。', lc_mic_failed:'語音辨識目前無法使用，請改用打字。',
@@ -3072,6 +3124,14 @@ const I18N = {
     um_delete_failed:'删除失败：', um_deleted:'用户已删除',
     ai_tab_translate:'翻译', ai_tab_chat:'对话', ai_tab_skills:'技能',
     ai_tab_live:'在线对话', lc_new:'开新对话',
+    lc_pick_title:'这场对话有谁？', lc_invite:'邀请参与人',
+    lc_picked:'已选 {n} 人', lc_people:'{n} 人',
+    lc_locked:'非参与人', lc_not_member:'只有参与人可以打开这场对话。',
+    lc_no_users:'没有可选的同事。', lc_pick_all:'全选',
+    lc_pick_none:'全部清除', lc_invite_saved:'参与人已更新',
+    lc_invite_failed:'参与人更新失败，请再试一次。', lc_cancel:'取消',
+    lc_ok:'确定', lc_pick_btn:'＋ 参与人',
+    lc_mic_network:'语音识别连不上服务。在中国通常是因为 Chrome 会把音频送到 Google 的服务器，请改用 Safari，或改用打字。',
     lc_tz_note:'时间为 {tz}', lc_mic_start:'语音输入',
     lc_mic_stop:'停止录音', lc_mic_unsupported:'这个浏览器不支持语音输入，请使用 Chrome、Edge 或 Safari。',
     lc_mic_denied:'麦克风权限被拒绝，请在浏览器设置中允许。', lc_mic_failed:'语音识别目前无法使用，请改用打字。',
@@ -3163,6 +3223,14 @@ const I18N = {
     um_delete_failed:'Xóa thất bại: ', um_deleted:'Đã xóa người dùng',
     ai_tab_translate:'Dịch thuật', ai_tab_chat:'Trò chuyện', ai_tab_skills:'Kỹ năng',
     ai_tab_live:'Trò chuyện trực tiếp', lc_new:'Cuộc trò chuyện mới',
+    lc_pick_title:'Ai tham gia cuộc trò chuyện này?', lc_invite:'Mời người tham gia',
+    lc_picked:'Đã chọn {n} người', lc_people:'{n} người',
+    lc_locked:'Không phải người tham gia', lc_not_member:'Chỉ người tham gia mới có thể mở cuộc trò chuyện này.',
+    lc_no_users:'Không có đồng nghiệp nào để chọn.', lc_pick_all:'Chọn tất cả',
+    lc_pick_none:'Bỏ chọn tất cả', lc_invite_saved:'Đã cập nhật người tham gia',
+    lc_invite_failed:'Không cập nhật được người tham gia. Vui lòng thử lại.', lc_cancel:'Hủy',
+    lc_ok:'Xác nhận', lc_pick_btn:'＋ Người tham gia',
+    lc_mic_network:'Nhận dạng giọng nói không kết nối được. Ở Trung Quốc thường là do Chrome gửi âm thanh đến máy chủ Google - vui lòng dùng Safari hoặc nhập bằng bàn phím.',
     lc_tz_note:'Giờ theo {tz}', lc_mic_start:'Nhập bằng giọng nói',
     lc_mic_stop:'Dừng ghi âm', lc_mic_unsupported:'Trình duyệt này không hỗ trợ nhập bằng giọng nói. Vui lòng dùng Chrome, Edge hoặc Safari.',
     lc_mic_denied:'Quyền truy cập micro đã bị từ chối. Vui lòng cho phép trong cài đặt trình duyệt.', lc_mic_failed:'Hiện không dùng được nhận dạng giọng nói. Vui lòng nhập bằng bàn phím.',
@@ -3254,6 +3322,14 @@ const I18N = {
     um_delete_failed:'削除失敗：', um_deleted:'ユーザーを削除しました',
     ai_tab_translate:'翻訳', ai_tab_chat:'チャット', ai_tab_skills:'スキル',
     ai_tab_live:'オンライン会話', lc_new:'新しい会話',
+    lc_pick_title:'この会話の参加者', lc_invite:'参加者を招待',
+    lc_picked:'{n} 名を選択', lc_people:'{n} 名',
+    lc_locked:'参加者ではありません', lc_not_member:'この会話を開けるのは参加者のみです。',
+    lc_no_users:'選択できる同僚がいません。', lc_pick_all:'すべて選択',
+    lc_pick_none:'すべて解除', lc_invite_saved:'参加者を更新しました',
+    lc_invite_failed:'参加者を更新できませんでした。もう一度お試しください。', lc_cancel:'キャンセル',
+    lc_ok:'確定', lc_pick_btn:'＋ 参加者',
+    lc_mic_network:'音声認識がサービスに接続できませんでした。中国では Chrome が音声を Google のサーバーに送るためです。Safari をご利用いただくか、キーボードで入力してください。',
     lc_tz_note:'時刻は {tz}', lc_mic_start:'音声入力',
     lc_mic_stop:'録音を停止', lc_mic_unsupported:'このブラウザは音声入力に対応していません。Chrome、Edge、Safari をご利用ください。',
     lc_mic_denied:'マイクへのアクセスが拒否されました。ブラウザの設定で許可してください。', lc_mic_failed:'音声認識は現在利用できません。キーボードで入力してください。',
@@ -4045,20 +4121,40 @@ async function lcTranslateAndSave(msg) {
 async function lcLoadList() {
   var box = document.getElementById('lc-list');
   if (!box) return;
-  var open  = await SB.get('chat_sessions', 'status=eq.open&order=last_at.desc&limit=50');
-  var saved = await SB.get('chat_sessions', 'status=eq.ended&keep=eq.true&order=ended_at.desc&limit=50');
+  /* 🔴 一般使用者在**資料庫端**就過濾掉別人的對話 —— 不是撈全部再前端隱藏。
+        後者會把全公司的對話標題送進每個人的瀏覽器。
+        用兩個查詢再合併，而不是 PostgREST 的 or=(...)：or 裡面要包 cs.{...}
+        的大括號與引號，跨版本的轉義行為不一致，兩個查詢單純可靠。
+        admin 撈全部：他要看得到標題才能判斷哪一場該刪（但點不開，見 lcCanSee）。 */
+  var me = encodeURIComponent(lcMe());
+  var arr = encodeURIComponent('{' + lcMe() + '}');
+  async function fetchSet(statusQs, orderQs) {
+    if (lcIsAdmin()) return (await SB.get('chat_sessions', statusQs + '&' + orderQs + '&limit=50')) || [];
+    var a = (await SB.get('chat_sessions', statusQs + '&host_emp_id=eq.' + me + '&' + orderQs + '&limit=50')) || [];
+    var b = (await SB.get('chat_sessions', statusQs + '&members=cs.' + arr + '&' + orderQs + '&limit=50')) || [];
+    var seen = {}, out = [];
+    a.concat(b).forEach(function(x) { if (!seen[x.id]) { seen[x.id] = 1; out.push(x); } });
+    return out;
+  }
+  var open  = await fetchSet('status=eq.open', 'order=last_at.desc');
+  var saved = await fetchSet('status=eq.ended&keep=eq.true', 'order=ended_at.desc');
   lcListLoaded = true;
   function row(s, ended) {
-    return '<div class="lc-row" style="border-left:3px solid ' + lcHue(s.host_emp_id) + '"'
+    // admin 看得到別人的場次（才能判斷哪一場該刪），但點不開 —— 標上鎖頭說明原因
+    var seen = lcCanSee(s);
+    var n = 1 + lcMembersOf(s).length;
+    return '<div class="lc-row' + (seen ? '' : ' locked') + '" style="border-left:3px solid ' + lcHue(s.host_emp_id) + '"'
       + ' onclick="lcOpen(\'' + escHtml(s.id) + '\')">'
       + '<div style="flex:1;min-width:0;">'
-      +   '<div class="lc-row-t">' + escHtml(s.title || '—') + '</div>'
+      +   '<div class="lc-row-t">' + (seen ? '' : '🔒 ') + escHtml(s.title || '—') + '</div>'
       +   '<div class="lc-row-m">' + escHtml(s.host_name || s.host_emp_id)
+      +     ' · ' + escHtml(t('lc_people').replace('{n}', String(n)))
       +     ' · ' + escHtml(lcDay(ended ? (s.ended_at||s.created_at) : s.last_at))
       +     ' ' + lcTime(ended ? (s.ended_at||s.created_at) : s.last_at) + '</div>'
       + '</div>'
-      + (ended ? '<span class="lc-pill">' + escHtml(t('lc_ended')) + '</span>'
-               : '<span class="lc-join">' + escHtml(t('lc_join')) + '</span>')
+      + (!seen ? '<span class="lc-pill">' + escHtml(t('lc_locked')) + '</span>'
+              : ended ? '<span class="lc-pill">' + escHtml(t('lc_ended')) + '</span>'
+                      : '<span class="lc-join">' + escHtml(t('lc_join')) + '</span>')
       + (lcCanDelete(s) ? '<button class="lc-del" title="' + escHtml(t('lc_delete')) + '"'
           + ' onclick="lcDelete(\'' + escHtml(s.id) + '\',event)">🗑</button>' : '')
       + '</div>';
@@ -4079,12 +4175,16 @@ async function lcCreate() {
   var s = {
     id: uid(), title: title,
     host_emp_id: lcMe(), host_name: lcMyName(),
+    // 🔴 members 不含開啟者本人（身分已在 host_emp_id）—— 存兩份就會有
+    //    「從 members 移除自己」這種矛盾狀態要處理
+    members: Object.keys(lcPickSel),
     status: 'open', keep: false,
     created_at: new Date().toISOString(), last_at: new Date().toISOString(),
   };
   try { await SB.post('chat_sessions', s); }
   catch (e) { toast(t('lc_create_failed'), 'err'); return; }
   if (el) el.value = '';
+  lcPickSel = {}; lcPickBadge();      // 選擇已用掉，避免下一場沿用上一場的名單
   lcSession = s; lcMsgs = []; lcColorReset();
   lcShowRoom(); lcRenderStream(); lcPollStart();
 }
@@ -4093,6 +4193,8 @@ async function lcCreate() {
 async function lcOpen(id) {
   var rows = await SB.get('chat_sessions', 'id=eq.' + encodeURIComponent(id) + '&limit=1');
   if (!rows || !rows.length) { toast(t('lc_gone'), 'err'); lcLoadList(); return; }
+  // 🔴 直接打網址、從 console 呼叫、或清單畫面是舊的（別人剛把你移出名單）都走這裡
+  if (!lcCanSee(rows[0])) { toast(t('lc_not_member'), 'err'); lcLoadList(); return; }
   lcSession = rows[0];
   lcColorReset();                     // 顏色是「本場次」的，換場次要重配
   var msgs = await SB.get('chat_messages',
@@ -4133,6 +4235,9 @@ function lcShowRoom() {
   if (pdfBtn) pdfBtn.style.display = live ? 'none' : 'inline-block';
   // 房間裡的刪除鈕刻意不對「開啟者 × 進行中」顯示：那條路是「結束對話 → 不保留」，
   // 同一件事給兩個入口只會讓人猜哪一個才對
+  // 邀請只有開啟者、且對話還在進行中才有意義（結束後加人只會讓他看到已封存的紀錄）
+  var invBtn = document.getElementById('lc-invite-btn');
+  if (invBtn) invBtn.style.display = (live && lcIsHost()) ? 'inline-block' : 'none';
   var delBtn = document.getElementById('lc-del-btn');
   if (delBtn) delBtn.style.display = (lcCanDelete(lcSession) && !(live && lcIsHost())) ? 'inline-block' : 'none';
   var endBar = document.getElementById('lc-endbar');
@@ -4253,6 +4358,9 @@ function lcPollStart() {
 }
 function lcPollStop() {
   if (lcPollTimer) { clearInterval(lcPollTimer); lcPollTimer = null; }
+  // 離開房間或頁籤時把錄音一起停掉：麥克風指示燈亮著卻沒人在收，
+  // 而且自動接回會讓它一直開著
+  if (lcRecOn || lcRecWant) lcRecStop();
 }
 
 async function lcPoll() {
@@ -4667,6 +4775,129 @@ function lcImgHtml(m) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════
+// 參與人：只有開啟者與被列入 members 的人能開啟這場對話
+//
+// 🔴 admin **不在**可開啟之列 —— 這是刻意的，與刪除權限不同：
+//    admin 可以刪除任何一場（清掉沒人收的房間），但**讀不到內容**。
+//    admin 在清單上只看得到標題、開啟者、時間這些中介資料（不然無從判斷該不該刪），
+//    點下去會被擋。使用者 2026-09-05 指定：刪除給 admin，開啟只給參與人。
+//
+// 🔴 這是 UI 層與載入層的守衛，不是資料層的牆（同 premortem 的既有取捨）：
+//    一般使用者的清單查詢在資料庫端就已經過濾（別人的對話不會進到他的瀏覽器），
+//    但改前端程式碼的人仍可自己查。擋的是「不小心看到」與「同事互相轉貼」。
+// ═══════════════════════════════════════════════════════════════════════
+
+function lcMembersOf(s) {
+  var m = s && s.members;
+  return Array.isArray(m) ? m : [];
+}
+function lcCanSee(s) {
+  if (!s) return false;
+  var me = lcMe();
+  if (!me) return false;
+  return s.host_emp_id === me || lcMembersOf(s).indexOf(me) >= 0;
+}
+
+// ─── 參與人挑選（建立時與事後邀請共用同一份 DOM）───
+var lcPickSel = {};      // empId → true
+var lcPickMode = '';     // 'new'（建立中）或 'invite'（房間裡邀請）
+
+function lcPickUsers() {
+  // 🔴 一律經 umActiveUsers()：admin 逛過用戶管理之後 ALL_USERS 會被換成
+  //    含停用與離職的全表（CLAUDE.md 記過這個坑）
+  return umActiveUsers().filter(function(u) { return u.empId !== lcMe(); })
+    .sort(function(a, b) {
+      return (a.nameZh || a.nameEn || a.empId || '').localeCompare(b.nameZh || b.nameEn || b.empId || '', 'zh-Hant');
+    });
+}
+
+function lcPickRender() {
+  var box = document.getElementById('lc-pick-list');
+  if (!box) return;
+  var us = lcPickUsers();
+  if (!us.length) { box.innerHTML = '<div class="lc-empty">' + escHtml(t('lc_no_users')) + '</div>'; return; }
+  box.innerHTML = us.map(function(u) {
+    var on = !!lcPickSel[u.empId];
+    return '<label class="lc-pick' + (on ? ' on' : '') + '">'
+      + '<input type="checkbox" ' + (on ? 'checked' : '')
+      + ' onchange="lcPickToggle(\'' + escHtml(u.empId) + '\',this.checked)">'
+      + '<span>' + escHtml(u.nameZh || u.nameEn || u.empId) + '</span>'
+      + '<i>' + escHtml(u.empId) + '</i></label>';
+  }).join('');
+  var n = document.getElementById('lc-pick-count');
+  if (n) n.textContent = t('lc_picked').replace('{n}', String(Object.keys(lcPickSel).length));
+}
+
+function lcPickToggle(empId, on) {
+  if (on) lcPickSel[empId] = true; else delete lcPickSel[empId];
+  lcPickRender();
+}
+function lcPickAll(on) {
+  lcPickSel = {};
+  if (on) lcPickUsers().forEach(function(u) { lcPickSel[u.empId] = true; });
+  lcPickRender();
+}
+
+// ALL_USERS 可能還沒載入（沒去過通訊錄／用戶管理時就是空的）
+function lcWithUsers(fn) {
+  if (ALL_USERS.length > 0) { fn(); return; }
+  fetch(SB_WORKER + '/supabase/rest/v1/users?select=emp_id,name_en,name_zh,role,dept,site,email,ext,active'
+        + '&order=emp_id&active=eq.true', { headers: sbHdrs() })
+    .then(function(r) { return r.json(); })
+    .then(function(rows) {
+      if (Array.isArray(rows) && rows.length) {
+        ALL_USERS = rows.map(function(u) {
+          return { empId:u.emp_id, nameEn:u.name_en||'', nameZh:u.name_zh||'', role:u.role||'user',
+                   dept:u.dept||'', site:u.site||'TW', email:u.email||'', ext:u.ext||'' };
+        });
+      }
+    }).catch(function(){}).finally(fn);
+}
+
+function lcPickOpen(mode) {
+  lcPickMode = mode;
+  lcPickSel = {};
+  if (mode === 'invite' && lcSession) {
+    lcMembersOf(lcSession).forEach(function(e) { if (e !== lcMe()) lcPickSel[e] = true; });
+  }
+  var ov = document.getElementById('lc-pick-overlay');
+  if (ov) ov.classList.add('show');
+  var ttl = document.getElementById('lc-pick-title');
+  if (ttl) ttl.textContent = t(mode === 'invite' ? 'lc_invite' : 'lc_pick_title');
+  lcWithUsers(lcPickRender);
+}
+
+function lcPickClose(ev) {
+  if (ev && ev.target !== document.getElementById('lc-pick-overlay')) return;
+  var ov = document.getElementById('lc-pick-overlay');
+  if (ov) ov.classList.remove('show');
+}
+
+// 確定：建立中只是記下選擇（真正建立在 lcCreate）；房間裡則直接寫回 members
+async function lcPickConfirm() {
+  if (lcPickMode === 'invite') {
+    if (!lcSession || !lcIsHost()) { lcPickClose(); return; }
+    var mem = Object.keys(lcPickSel);
+    try {
+      await SB.patch('chat_sessions', 'id=eq.' + encodeURIComponent(lcSession.id), { members: mem });
+    } catch (e) {
+      toast(t('lc_invite_failed'), 'err');   // 寫入沒成功就不要改畫面
+      return;
+    }
+    lcSession.members = mem;
+    toast(t('lc_invite_saved'), 'ok');
+  }
+  lcPickClose();
+  lcPickBadge();
+}
+
+// 建立表單上顯示「已選 N 人」
+function lcPickBadge() {
+  var n = document.getElementById('lc-new-picked');
+  if (n) n.textContent = t('lc_picked').replace('{n}', String(Object.keys(lcPickSel).length));
+}
+
+// ═══════════════════════════════════════════════════════════════════════
 // 語音輸入（Web Speech API）
 //
 // 🔴 **這裡用瀏覽器內建的辨識，不是我們的 Claude API。**
@@ -4694,6 +4925,15 @@ const LC_SR = (typeof window !== 'undefined') &&
 var lcRec     = null;
 var lcRecOn   = false;
 var lcRecBase = '';    // 開始錄音時輸入框裡已有的字，辨識結果接在後面
+/* 🔴 「常常無法辨識」的最大單一原因：**Chrome 的 continuous 模式會在說話停頓後
+      自己 end**，而使用者以為還在錄，繼續講的內容全部掉失。
+      規格上 continuous 只保證「不會在第一句就停」，不保證持續到你按停止。
+      所以要自己接回去：lcRecWant 記錄「使用者還想不想錄」，onend 時若是 true 就重啟。
+      lcRecFast 防無限迴圈 —— 引擎真的壞掉時 start/end 會瞬間反覆，
+      連續 5 次在 400ms 內結束就放棄並告知，不要無聲地空轉。 */
+var lcRecWant  = false;
+var lcRecFast  = 0;
+var lcRecStamp = 0;
 
 function lcSpeechLang() {
   var saved = '';
@@ -4752,18 +4992,43 @@ function lcRecToggle() {
     }
   };
   lcRec.onerror = function(ev) {
-    // no-speech 是「沒聽到聲音」，不是錯誤，不要嚇使用者
+    // no-speech 是「沒聽到聲音」、aborted 是使用者自己停掉，兩者都不是錯誤。
+    // no-speech 之後 Chrome 會接著 end，由 onend 自動接回，使用者不會察覺中斷。
     if (ev.error === 'no-speech' || ev.error === 'aborted') return;
     console.warn('[lc] speech', ev.error);
-    toast(t(ev.error === 'not-allowed' ? 'lc_mic_denied' : 'lc_mic_failed'), 'err');
+    if (ev.error === 'not-allowed' || ev.error === 'service-not-allowed') {
+      lcRecWant = false;                       // 權限問題重試也沒用，別無限接回
+      toast(t('lc_mic_denied'), 'err');
+    } else if (ev.error === 'network') {
+      // 東莞廠最可能落在這裡：Chrome 把音訊送到 Google，而 Google 被 GFW 封鎖
+      lcRecWant = false;
+      toast(t('lc_mic_network'), 'err');
+    } else {
+      toast(t('lc_mic_failed'), 'err');
+    }
   };
-  lcRec.onend = function() { lcRecOn = false; lcRecPaint(); };
 
-  try { lcRec.start(); } catch (e) { toast(t('lc_mic_failed'), 'err'); return; }
+  lcRec.onend = function() {
+    if (lcRecWant) {
+      var now = Date.now();
+      lcRecFast = (now - lcRecStamp < 400) ? (lcRecFast + 1) : 0;
+      if (lcRecFast <= 5) {
+        try { lcRecStamp = Date.now(); lcRec.start(); return; } catch (e) { /* 落到下面收尾 */ }
+      } else {
+        toast(t('lc_mic_failed'), 'err');
+      }
+    }
+    lcRecWant = false; lcRecOn = false; lcRecPaint();
+  };
+
+  lcRecWant = true; lcRecFast = 0; lcRecStamp = Date.now();
+  try { lcRec.start(); } catch (e) { lcRecWant = false; toast(t('lc_mic_failed'), 'err'); return; }
   lcRecOn = true; lcRecPaint();
 }
 
 function lcRecStop() {
+  // 🔴 先關掉 lcRecWant 再 stop()，否則 onend 會把它自動接回去
+  lcRecWant = false;
   lcRecOn = false;
   if (lcRec) { try { lcRec.stop(); } catch (e) {} }
   lcRecPaint();
@@ -4807,6 +5072,10 @@ function lcApplyI18n() {
   txt('lc-send-btn','lc_send');   ph('lc-input','lc_input_ph');
   var at = document.getElementById('lc-attach-btn'); if (at) at.title = t('lc_image');
   lcRecInit(); lcRecPaint();
+  txt('lc-pick-btn','lc_pick_btn');   txt('lc-invite-btn','lc_invite');
+  txt('lc-pick-all','lc_pick_all');   txt('lc-pick-none','lc_pick_none');
+  txt('lc-pick-cancel','lc_cancel');  txt('lc-pick-ok','lc_ok');
+  lcPickBadge();
   var b  = document.getElementById('lc-back-btn'); if (b)  b.textContent  = '\u2039 ' + t('lc_back');
   var pd = document.getElementById('lc-pdf-btn');  if (pd) pd.textContent = '\ud83d\udcc4 ' + t('lc_pdf');
   var con = document.getElementById('ptab-content-live');

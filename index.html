@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>COMART Platform v1.79</title>
+<title>COMART Platform v1.80</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script defer src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.js"></script>
 <style>
@@ -257,6 +257,40 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:
 .ai-chip:hover { border-color:#7c3aed; color:#7c3aed; }
 .ai-tab-content { display:none; flex:1; flex-direction:column; overflow:hidden; }
 .ai-tab-content.on { display:flex; }
+/* ── 線上對話 Live Chat ── */
+.lc-sec { font-size:11px; font-weight:700; color:var(--tx3); letter-spacing:.06em; margin-bottom:7px; }
+.lc-row { display:flex; align-items:center; gap:10px; padding:11px 13px; background:var(--s1); border:1px solid var(--br); border-radius:10px; margin-bottom:7px; cursor:pointer; transition:border-color .15s; }
+.lc-row:hover { border-color:#7c3aed; }
+.lc-row-t { font-size:13.5px; font-weight:600; color:var(--tx); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.lc-row-m { font-size:11px; color:var(--tx3); margin-top:2px; }
+.lc-pill { flex:0 0 auto; font-size:10.5px; padding:3px 9px; border-radius:20px; border:1px solid var(--br); color:var(--tx3); }
+.lc-pill.on { background:rgba(124,58,237,.14); border-color:#7c3aed; color:#a78bfa; }
+.lc-empty { font-size:12.5px; color:var(--tx3); padding:14px 2px; }
+.lc-roombar { display:flex; align-items:center; gap:9px; padding:10px 14px; border-bottom:1px solid var(--br); background:var(--s1); flex-shrink:0; }
+.lc-btn { padding:6px 12px; border-radius:8px; border:1px solid var(--br); background:var(--s2); color:var(--tx2); font-size:11.5px; cursor:pointer; font-family:var(--ff); white-space:nowrap; }
+.lc-btn:hover { border-color:#7c3aed; color:#a78bfa; }
+.lc-btn.danger:hover { border-color:#e05260; color:#e05260; }
+.lc-endbar { display:flex; align-items:center; gap:8px; flex-wrap:wrap; padding:10px 14px; background:rgba(224,82,96,.08); border-bottom:1px solid var(--br); font-size:12px; color:var(--tx2); flex-shrink:0; }
+.lc-stream { flex:1; overflow-y:auto; padding:14px 16px; display:flex; flex-direction:column; }
+.lc-day { align-self:center; font-size:10.5px; color:var(--tx3); background:var(--s2); border-radius:20px; padding:2px 11px; margin:8px 0 12px; }
+.lc-msg { background:var(--s1); border:1px solid var(--br); border-radius:11px; padding:10px 12px; margin-bottom:9px; max-width:640px; width:100%; }
+.lc-msg.mine { border-left:3px solid #7c3aed; align-self:flex-end; }
+.lc-msg-head { display:flex; align-items:center; gap:7px; margin-bottom:5px; flex-wrap:wrap; }
+.lc-msg-head b { font-size:12.5px; color:var(--tx); font-weight:700; }
+.lc-msg-time { font-size:10.5px; color:var(--tx3); }
+.lc-src { font-size:10px; color:#a78bfa; background:rgba(124,58,237,.13); border-radius:4px; padding:1px 6px; }
+.lc-otext { font-size:14px; color:var(--tx); line-height:1.6; white-space:pre-wrap; word-break:break-word; }
+.lc-tr { margin-top:8px; padding-top:8px; border-top:1px dashed var(--br2); display:flex; flex-direction:column; gap:4px; }
+.lc-line { display:flex; gap:8px; align-items:baseline; }
+.lc-lab { flex:0 0 30px; font-size:10px; color:var(--tx3); padding-top:2px; }
+.lc-ltext { flex:1; font-size:13px; color:var(--tx2); line-height:1.55; white-space:pre-wrap; word-break:break-word; }
+.lc-pending { font-size:11.5px; color:var(--tx3); font-style:italic; }
+.lc-fail { font-size:11.5px; color:#F5A623; }
+.lc-retry { margin-left:5px; padding:2px 7px; border-radius:5px; border:1px solid var(--br); background:var(--s2); color:var(--tx3); font-size:10.5px; cursor:pointer; font-family:var(--ff); }
+.lc-composer { display:flex; gap:8px; align-items:flex-end; padding:10px 14px; border-top:1px solid var(--br); background:var(--s1); flex-shrink:0; padding-bottom:calc(10px + env(safe-area-inset-bottom)); }
+.lc-composer textarea { flex:1; resize:none; max-height:132px; padding:9px 11px; border-radius:10px; border:1px solid var(--br); background:var(--bg); color:var(--tx); font-size:14px; font-family:var(--ff); line-height:1.5; }
+.lc-send { padding:9px 16px; border-radius:10px; background:#7c3aed; color:#fff; border:none; cursor:pointer; font-size:12px; font-weight:700; font-family:var(--ff); white-space:nowrap; }
+@media (max-width:768px) { .lc-msg { max-width:100%; } .lc-otext { font-size:13.5px; } .lc-ltext { font-size:12.5px; } }
 /* ─── Trip Calendar ─── */
 .trip-cal-wrap { background:var(--s1); border:1px solid var(--br); border-radius:12px; overflow:hidden; margin-bottom:16px; }
 .trip-cal-header { display:grid; grid-template-columns:repeat(7,1fr); background:var(--s2); border-bottom:1px solid var(--br); }
@@ -306,7 +340,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     <div class="login-logo">
       <div class="login-mark" style="background:transparent"><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="44" height="23"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></div>
       <div class="login-name">COMART Platform</div>
-      <div class="login-sub">Internal Portal · v1.79</div>
+      <div class="login-sub">Internal Portal · v1.80</div>
     </div>
     <form id="loginForm" onsubmit="doLogin();return false;" autocomplete="on">
     <div class="field">
@@ -366,7 +400,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   <div class="topbar">
     <div class="topbar-logo" onclick="switchView('home')">
       <div class="topbar-mark" style="background:transparent"><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="26" height="14"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></div>
-      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.79</span></div>
+      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.80</span></div>
     </div>
     <div class="topbar-right">
       <div class="lang-switcher">
@@ -503,6 +537,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
         <div class="ai-tab-bar">
           <div style="font-size:14px;font-weight:700;color:#a78bfa;margin-right:6px;">🤖 AI</div>
           <button class="ai-chip on" id="ptab-translate" onclick="switchAITab('translate')">🌐 翻譯</button>
+          <button class="ai-chip" id="ptab-live" onclick="switchAITab('live')">💬 線上對話</button>
           <button class="ai-chip" id="ptab-chat" onclick="switchAITab('chat')">✦ Chat</button>
           <button class="ai-chip" id="ptab-skills" onclick="switchAITab('skills')">🛠 Skills</button>
         </div>
@@ -536,6 +571,53 @@ input[type="date"]::-webkit-calendar-picker-indicator {
               <div id="p-xlat-direct" style="display:flex;flex-direction:column;gap:6px;margin-bottom:16px;"></div>
               <div id="ai-business-lbl" style="font-size:11px;font-weight:700;color:#a78bfa;letter-spacing:.06em;margin-bottom:8px;">BUSINESS VERSION · 商業用語版本</div>
               <div id="p-xlat-biz" style="display:flex;flex-direction:column;gap:6px;"></div>
+            </div>
+          </div>
+        </div>
+
+
+        <!-- Live Chat Tab · 線上對話 -->
+        <div class="ai-tab-content" id="ptab-content-live" style="flex-direction:column;min-height:0;">
+
+          <!-- 清單 -->
+          <div id="lc-listview" style="flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;max-width:820px;width:100%;margin:0 auto;">
+            <div style="background:var(--s1);border:1px solid var(--br);border-radius:12px;padding:13px 14px;margin-bottom:16px;">
+              <div id="lc-new-lbl" style="font-size:11px;font-weight:700;color:#a78bfa;letter-spacing:.06em;margin-bottom:8px;">START A CONVERSATION</div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <input id="lc-new-title" maxlength="80" placeholder="對話主題"
+                  onkeydown="if(event.key==='Enter'){event.preventDefault();lcCreate();}"
+                  style="flex:1;min-width:180px;padding:9px 11px;border-radius:9px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:13px;font-family:var(--ff);">
+                <button id="lc-new-btn" onclick="lcCreate()"
+                  style="padding:9px 16px;border-radius:9px;background:#7c3aed;color:#fff;border:none;cursor:pointer;font-size:12px;font-weight:700;">開新對話</button>
+              </div>
+              <div id="lc-new-hint" style="font-size:11px;color:var(--tx3);margin-top:7px;line-height:1.55;"></div>
+            </div>
+            <div id="lc-list"></div>
+          </div>
+
+          <!-- 房間 -->
+          <div id="lc-room" style="display:none;flex:1;flex-direction:column;min-height:0;">
+            <div class="lc-roombar">
+              <button class="lc-btn" onclick="lcBackToList()" id="lc-back-btn">‹ 返回</button>
+              <div style="flex:1;min-width:0;">
+                <div id="lc-room-title" style="font-size:14px;font-weight:700;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
+                <div id="lc-room-meta" style="font-size:11px;color:var(--tx3);margin-top:1px;"></div>
+              </div>
+              <button class="lc-btn" id="lc-pdf-btn" onclick="lcExportPDF()" style="display:none;">📄 PDF</button>
+              <button class="lc-btn danger" id="lc-end-btn" onclick="lcEndAsk()" style="display:none;">結束對話</button>
+            </div>
+            <div id="lc-endbar" class="lc-endbar" style="display:none;">
+              <span id="lc-endbar-q" style="flex:1;min-width:160px;"></span>
+              <button class="lc-btn" onclick="lcEnd(true)" id="lc-keep-btn">保留</button>
+              <button class="lc-btn danger" onclick="lcEnd(false)" id="lc-discard-btn">不保留</button>
+            </div>
+            <div id="lc-stream" class="lc-stream"></div>
+            <!-- 🔴 composer 在 #lc-stream 外面：輪詢只重繪 stream，永遠不動輸入框 -->
+            <div id="lc-composer" class="lc-composer">
+              <textarea id="lc-input" rows="1" onkeydown="lcKeydown(event)"
+                oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,132)+'px';"
+                placeholder="用你自己的語言輸入…"></textarea>
+              <button class="lc-send" id="lc-send-btn" onclick="lcSend()">送出</button>
             </div>
           </div>
         </div>
@@ -1579,6 +1661,9 @@ function switchView(name) {
   if (sn) sn.classList.add('active');
   var bn = document.getElementById('bn-' + name);
   if (bn) bn.classList.add('active');
+
+  // 離開 AI 頁面就停掉線上對話的輪詢（同 board 的 pmPollStop）
+  if (name !== 'ai') lcPollStop();
 
   if (name === 'directory') loadDirectory();
   if (name === 'users')     loadUsers();
@@ -2770,6 +2855,24 @@ const I18N = {
     um_delete_failed:'Delete failed: ', um_deleted:'User deleted',
     // ai tab
     ai_tab_translate:'Translate', ai_tab_chat:'Chat', ai_tab_skills:'Skills',
+    ai_tab_live:'Live Chat', lc_new:'New chat',
+    lc_new_lbl:'START A CONVERSATION', lc_title_ph:'Topic of the conversation',
+    lc_new_hint:'Everyone types in their own language. Each message appears in Traditional Chinese, Simplified Chinese, English and Vietnamese.', lc_ongoing:'Ongoing',
+    lc_saved:'Saved', lc_none_ongoing:'No conversation is open right now.',
+    lc_none_saved:'No saved conversations yet.', lc_host:'Host',
+    lc_back:'Back', lc_end:'End chat',
+    lc_end_q:'End this conversation. Keep the record?', lc_keep:'Keep',
+    lc_discard:'Do not keep', lc_confirm_discard:'Not keeping it deletes the whole conversation and every message in it. This cannot be undone. Are you sure?',
+    lc_kept:'Conversation ended and saved', lc_discarded:'Conversation deleted',
+    lc_end_failed:'Could not end the conversation - nothing was saved. Please try again.', lc_ended:'Ended',
+    lc_host_ended:'The host has ended this conversation.', lc_gone:'This conversation no longer exists.',
+    lc_empty_room:'No messages yet.', lc_translating:'Translating...',
+    lc_tr_failed:'Translation failed', lc_retry:'Retry',
+    lc_orig:'original', lc_send:'Send',
+    lc_send_failed:'Message not sent - your text is still in the box. Please try again.', lc_input_ph:'Type in your own language...',
+    lc_title_required:'Please enter a topic', lc_create_failed:'Could not create the conversation. Please try again.',
+    lc_only_host_end:'Only the host can end this conversation.', lc_popup:'Your browser blocked the new window. Please allow pop-ups and try again.',
+    lc_pdf:'PDF',
     // notifications
     notif_title:'Notifications', notif_mark_all:'Mark all read', notif_empty:'No notifications',
     notif_view_read:'View read', notif_back_unread:'Back to unread', notif_empty_read:'No read notifications',
@@ -2841,6 +2944,24 @@ const I18N = {
     um_err_self_delete:'無法刪除自己的帳號', um_confirm_delete:'確定刪除用戶 %s？此操作無法復原。',
     um_delete_failed:'刪除失敗：', um_deleted:'用戶已刪除',
     ai_tab_translate:'翻譯', ai_tab_chat:'對話', ai_tab_skills:'技能',
+    ai_tab_live:'線上對話', lc_new:'開新對話',
+    lc_new_lbl:'開一場對話', lc_title_ph:'對話主題',
+    lc_new_hint:'每個人用自己的語言打字，每一則訊息會同時顯示繁體中文、簡體中文、英文與越南文。', lc_ongoing:'進行中',
+    lc_saved:'已保留', lc_none_ongoing:'目前沒有進行中的對話。',
+    lc_none_saved:'還沒有保留的對話紀錄。', lc_host:'開啟者',
+    lc_back:'返回', lc_end:'結束對話',
+    lc_end_q:'結束這場對話。要保留紀錄嗎？', lc_keep:'保留',
+    lc_discard:'不保留', lc_confirm_discard:'不保留會把整場對話與所有訊息一起刪除，無法復原。確定嗎？',
+    lc_kept:'對話已結束並保留', lc_discarded:'對話已刪除',
+    lc_end_failed:'結束失敗，剛才的操作沒有存檔，請再試一次。', lc_ended:'已結束',
+    lc_host_ended:'開啟者已結束這場對話。', lc_gone:'這場對話已經不存在了。',
+    lc_empty_room:'還沒有人發言。', lc_translating:'翻譯中…',
+    lc_tr_failed:'翻譯失敗', lc_retry:'重試',
+    lc_orig:'原文', lc_send:'送出',
+    lc_send_failed:'訊息沒有送出，你打的字還在輸入框裡，請再試一次。', lc_input_ph:'用你自己的語言輸入…',
+    lc_title_required:'請輸入對話主題', lc_create_failed:'建立對話失敗，請再試一次。',
+    lc_only_host_end:'只有開啟者可以結束這場對話。', lc_popup:'瀏覽器阻擋了新視窗，請允許彈出視窗後再試。',
+    lc_pdf:'PDF',
     notif_title:'通知', notif_mark_all:'全部已讀', notif_empty:'目前沒有通知',
     notif_view_read:'查看已讀', notif_back_unread:'回未讀', notif_empty_read:'沒有已讀的通知',
     notif_hint_n:'你有 {n} 則新通知', notif_hint_view:'查看', notif_marked_n:'已將 {n} 則通知標為已讀', notif_mark_failed:'標記已讀失敗：', notif_load_failed:'載入失敗：',
@@ -2905,6 +3026,24 @@ const I18N = {
     um_err_self_delete:'无法删除自己的账号', um_confirm_delete:'确定删除用户 %s？此操作无法撤销。',
     um_delete_failed:'删除失败：', um_deleted:'用户已删除',
     ai_tab_translate:'翻译', ai_tab_chat:'对话', ai_tab_skills:'技能',
+    ai_tab_live:'在线对话', lc_new:'开新对话',
+    lc_new_lbl:'开一场对话', lc_title_ph:'对话主题',
+    lc_new_hint:'每个人用自己的语言打字，每一条消息会同时显示繁体中文、简体中文、英文与越南文。', lc_ongoing:'进行中',
+    lc_saved:'已保留', lc_none_ongoing:'目前没有进行中的对话。',
+    lc_none_saved:'还没有保留的对话记录。', lc_host:'开启者',
+    lc_back:'返回', lc_end:'结束对话',
+    lc_end_q:'结束这场对话。要保留记录吗？', lc_keep:'保留',
+    lc_discard:'不保留', lc_confirm_discard:'不保留会把整场对话与所有消息一起删除，无法恢复。确定吗？',
+    lc_kept:'对话已结束并保留', lc_discarded:'对话已删除',
+    lc_end_failed:'结束失败，刚才的操作没有存档，请再试一次。', lc_ended:'已结束',
+    lc_host_ended:'开启者已结束这场对话。', lc_gone:'这场对话已经不存在了。',
+    lc_empty_room:'还没有人发言。', lc_translating:'翻译中…',
+    lc_tr_failed:'翻译失败', lc_retry:'重试',
+    lc_orig:'原文', lc_send:'发送',
+    lc_send_failed:'消息没有发送，你打的字还在输入框里，请再试一次。', lc_input_ph:'用你自己的语言输入…',
+    lc_title_required:'请输入对话主题', lc_create_failed:'创建对话失败，请再试一次。',
+    lc_only_host_end:'只有开启者可以结束这场对话。', lc_popup:'浏览器拦截了新窗口，请允许弹出窗口后再试。',
+    lc_pdf:'PDF',
     notif_title:'通知', notif_mark_all:'全部已读', notif_empty:'暂无通知',
     notif_view_read:'查看已读', notif_back_unread:'回未读', notif_empty_read:'没有已读的通知',
     notif_hint_n:'你有 {n} 条新通知', notif_hint_view:'查看', notif_marked_n:'已将 {n} 条通知标为已读', notif_mark_failed:'标记已读失败：', notif_load_failed:'加载失败：',
@@ -2969,6 +3108,24 @@ const I18N = {
     um_err_self_delete:'Không thể xóa tài khoản của chính mình', um_confirm_delete:'Xóa người dùng %s? Không thể hoàn tác.',
     um_delete_failed:'Xóa thất bại: ', um_deleted:'Đã xóa người dùng',
     ai_tab_translate:'Dịch thuật', ai_tab_chat:'Trò chuyện', ai_tab_skills:'Kỹ năng',
+    ai_tab_live:'Trò chuyện trực tiếp', lc_new:'Cuộc trò chuyện mới',
+    lc_new_lbl:'MỞ MỘT CUỘC TRÒ CHUYỆN', lc_title_ph:'Chủ đề cuộc trò chuyện',
+    lc_new_hint:'Mỗi người nhập bằng ngôn ngữ của mình. Mỗi tin nhắn sẽ hiện đồng thời bằng tiếng Trung phồn thể, Trung giản thể, tiếng Anh và tiếng Việt.', lc_ongoing:'Đang diễn ra',
+    lc_saved:'Đã lưu', lc_none_ongoing:'Hiện không có cuộc trò chuyện nào đang mở.',
+    lc_none_saved:'Chưa có cuộc trò chuyện nào được lưu.', lc_host:'Người mở',
+    lc_back:'Quay lại', lc_end:'Kết thúc',
+    lc_end_q:'Kết thúc cuộc trò chuyện này. Có lưu lại không?', lc_keep:'Lưu lại',
+    lc_discard:'Không lưu', lc_confirm_discard:'Không lưu sẽ xóa toàn bộ cuộc trò chuyện và tất cả tin nhắn trong đó. Không thể hoàn tác. Bạn có chắc không?',
+    lc_kept:'Đã kết thúc và lưu lại', lc_discarded:'Đã xóa cuộc trò chuyện',
+    lc_end_failed:'Không kết thúc được, thao tác vừa rồi chưa được lưu. Vui lòng thử lại.', lc_ended:'Đã kết thúc',
+    lc_host_ended:'Người mở đã kết thúc cuộc trò chuyện này.', lc_gone:'Cuộc trò chuyện này không còn tồn tại.',
+    lc_empty_room:'Chưa có tin nhắn nào.', lc_translating:'Đang dịch…',
+    lc_tr_failed:'Dịch không thành công', lc_retry:'Thử lại',
+    lc_orig:'bản gốc', lc_send:'Gửi',
+    lc_send_failed:'Tin nhắn chưa được gửi, nội dung bạn nhập vẫn còn trong khung. Vui lòng thử lại.', lc_input_ph:'Nhập bằng ngôn ngữ của bạn…',
+    lc_title_required:'Vui lòng nhập chủ đề', lc_create_failed:'Không tạo được cuộc trò chuyện. Vui lòng thử lại.',
+    lc_only_host_end:'Chỉ người mở mới có thể kết thúc cuộc trò chuyện này.', lc_popup:'Trình duyệt đã chặn cửa sổ mới. Vui lòng cho phép pop-up rồi thử lại.',
+    lc_pdf:'PDF',
     notif_title:'Thông báo', notif_mark_all:'Đánh dấu đã đọc', notif_empty:'Không có thông báo',
     notif_view_read:'Xem đã đọc', notif_back_unread:'Về chưa đọc', notif_empty_read:'Không có thông báo đã đọc',
     notif_hint_n:'Bạn có {n} thông báo mới', notif_hint_view:'Xem', notif_marked_n:'Đã đánh dấu {n} thông báo là đã đọc', notif_mark_failed:'Không đánh dấu được: ', notif_load_failed:'Tải thất bại: ',
@@ -3033,6 +3190,24 @@ const I18N = {
     um_err_self_delete:'自分自身のアカウントは削除できません', um_confirm_delete:'ユーザー %s を削除しますか？元に戻せません。',
     um_delete_failed:'削除失敗：', um_deleted:'ユーザーを削除しました',
     ai_tab_translate:'翻訳', ai_tab_chat:'チャット', ai_tab_skills:'スキル',
+    ai_tab_live:'オンライン会話', lc_new:'新しい会話',
+    lc_new_lbl:'会話を開く', lc_title_ph:'会話のテーマ',
+    lc_new_hint:'各自が自分の言語で入力します。各メッセージは繁体字中国語・簡体字中国語・英語・ベトナム語で同時に表示されます。', lc_ongoing:'進行中',
+    lc_saved:'保存済み', lc_none_ongoing:'現在進行中の会話はありません。',
+    lc_none_saved:'保存された会話はまだありません。', lc_host:'開始者',
+    lc_back:'戻る', lc_end:'会話を終了',
+    lc_end_q:'この会話を終了します。記録を保存しますか？', lc_keep:'保存する',
+    lc_discard:'保存しない', lc_confirm_discard:'保存しない場合、会話とすべてのメッセージが削除されます。元に戻せません。よろしいですか？',
+    lc_kept:'会話を終了し保存しました', lc_discarded:'会話を削除しました',
+    lc_end_failed:'終了できませんでした。先ほどの操作は保存されていません。もう一度お試しください。', lc_ended:'終了',
+    lc_host_ended:'開始者がこの会話を終了しました。', lc_gone:'この会話はすでに存在しません。',
+    lc_empty_room:'まだ発言がありません。', lc_translating:'翻訳中…',
+    lc_tr_failed:'翻訳に失敗しました', lc_retry:'再試行',
+    lc_orig:'原文', lc_send:'送信',
+    lc_send_failed:'メッセージは送信されていません。入力内容は残っています。もう一度お試しください。', lc_input_ph:'自分の言語で入力してください…',
+    lc_title_required:'テーマを入力してください', lc_create_failed:'会話を作成できませんでした。もう一度お試しください。',
+    lc_only_host_end:'この会話を終了できるのは開始者のみです。', lc_popup:'ブラウザが新しいウィンドウをブロックしました。ポップアップを許可してから再度お試しください。',
+    lc_pdf:'PDF',
     notif_title:'通知', notif_mark_all:'すべて既読', notif_empty:'通知はありません',
     notif_view_read:'既読を見る', notif_back_unread:'未読に戻る', notif_empty_read:'既読の通知はありません',
     notif_hint_n:'新しい通知が {n} 件あります', notif_hint_view:'表示', notif_marked_n:'{n} 件を既読にしました', notif_mark_failed:'既読にできませんでした：', notif_load_failed:'読み込みに失敗しました：',
@@ -3212,6 +3387,9 @@ function applyI18nAll() {
   // AI tabs
   var tabTr = document.getElementById('ptab-translate');
   if (tabTr) tabTr.innerHTML = '🌐 ' + t('ai_tab_translate');
+  var tabLv = document.getElementById('ptab-live');
+  if (tabLv) tabLv.innerHTML = '💬 ' + t('ai_tab_live');
+  lcApplyI18n();
   var tabCh = document.getElementById('ptab-chat');
   if (tabCh) tabCh.innerHTML = '✦ ' + t('ai_tab_chat');
   var tabSk = document.getElementById('ptab-skills');
@@ -3465,16 +3643,29 @@ function escHtml(s) {
 }
 
 function switchAITab(tab) {
-  ['translate','chat','skills'].forEach(function(t) {
+  // 離開線上對話就停輪詢：分頁在背景每 3 秒打一次請求是白費的
+  if (tab !== 'live') lcPollStop();
+  ['translate','live','chat','skills'].forEach(function(t) {
     var btn = document.getElementById('ptab-' + t);
     var con = document.getElementById('ptab-content-' + t);
     if (btn) btn.classList.toggle('on', t === tab);
     if (con) con.classList.toggle('on', t === tab);
   });
+  // 進來時載清單；已經開在某個房間裡就把輪詢接回去
+  if (tab === 'live') {
+    if (lcSession && lcSession.status === 'open') lcPollStart();
+    else if (!lcSession) { lcShowRoom_hide(); lcLoadList(); }
+  }
+}
+// 從別的頁籤回來、或第一次進來：確保顯示的是清單而不是空房間
+function lcShowRoom_hide() {
+  var r = document.getElementById('lc-room'), l = document.getElementById('lc-listview');
+  if (r) r.style.display = 'none';
+  if (l) l.style.display = 'flex';
 }
 
 // ─── Claude API call via proxy ───
-async function pCallClaude(messages, system, maxTokens) {
+async function pCallClaude(messages, system, maxTokens, model) {
   maxTokens = maxTokens || 2000;
   // Try Supabase Edge Function first
   var proxyUrl = SB_URL + '/functions/v1/claude-proxy';
@@ -3485,7 +3676,9 @@ async function pCallClaude(messages, system, maxTokens) {
     'x-session': (SESSION && SESSION.sig) || (readSession() || {}).sig || ''
   };
   var body = {
-    model: 'claude-haiku-4-5-20251001',
+    // 預設 haiku（現有 5 個呼叫端都不傳 model，行為不變）；
+    // 線上對話的翻譯傳 LC_TR_MODEL
+    model: model || 'claude-haiku-4-5-20251001',
     max_tokens: maxTokens,
     messages: messages
   };
@@ -3550,6 +3743,463 @@ async function pRunTranslate() {
   } catch(e) {
     if (loadEl) loadEl.style.display = 'none';
     toast('Translation error: ' + e.message);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// 線上對話 LIVE CHAT（lc*）— Portal v1.80
+//
+// 不同事業單位的同事各自用自己的語言打字，每一則訊息即時翻成四語同時顯示。
+// 「場次」模型：開一場 → 談 → 開啟者結束 → 決定保留或丟棄。
+//
+// 🔴 重繪只動 #lc-stream，**永遠不重繪輸入框**。board 的事前驗屍是整塊
+//    innerHTML 重畫，所以必須做 pmSnapInputs/pmApplyInputSnap 那一整套快照還原
+//    （別人一發言就把正在打字的人的游標彈掉、中文輸入法組字被砍斷）。
+//    這裡把 composer 放在被重繪的容器外面，那個問題從結構上就不存在。
+// ═══════════════════════════════════════════════════════════════════════
+
+const LC_LANGS  = [['zh-TW','繁中'], ['zh-CN','简中'], ['en','EN'], ['vi','VI']];
+const LC_COL    = { 'zh-TW':'text_zhtw', 'zh-CN':'text_zhcn', 'en':'text_en', 'vi':'text_vi' };
+const LC_LABEL  = { 'zh-TW':'繁中', 'zh-CN':'简中', 'en':'EN', 'vi':'VI' };
+const LC_POLL_MS   = 3000;
+const LC_MSG_LIMIT = 200;
+
+// 🔴 模型抽成常數：越南同仁反映品質不夠時改這一行就好，不必動任何邏輯。
+//    這裡刻意用 sonnet 而非 board 的 opus —— 聊天是短句、當場看得到對不對，
+//    而「快」本身就是這個功能的規格。opus 預設開 thinking，一則要 3–8 秒。
+const LC_TR_MODEL = 'claude-sonnet-5';
+
+/* 🔴 這一份規則是 board/index.html 的 PM_TR_RULES 的**副本**。
+   兩個檔案沒有模組系統（i18n 字典也是各自一份），無法共用。
+   **改翻譯規則時兩份都要改**，否則同一家公司的兩個系統會有兩套人稱標準。
+   最重要的是越南語人稱那一條：中文與英文的「你」不帶年齡與位階資訊，
+   越南語卻必須選一個（bạn／anh／chị／em），譯者不選就是亂選。 */
+const LC_TR_RULES =
+  '- Faithful, not literal. Produce what a fluent native speaker would actually write, ' +
+  'not a word-by-word rendering. Never omit or add content.\n' +
+  '- Preserve tone strength exactly. Do not soften criticism, and do not inflate warmth or ' +
+  'add pleasantries the original does not contain.\n' +
+  '- Keep unchanged: personal names, company and product names, model numbers, employee IDs, ' +
+  'system names (TIPTOP, PLM, ERP...), English acronyms, numbers, dates and units.\n' +
+  '- Preserve the original line breaks.\n' +
+  '- Person reference: Chinese and English do not encode the age/seniority information that ' +
+  'Vietnamese pronouns require. When translating INTO Vietnamese, pick one consistent register ' +
+  'and stay with it. Default to the neutral collegial "ban" (bạn) for a peer addressed as you; ' +
+  'use anh/chi only when the source clearly implies a senior colleague; use the person\'s own ' +
+  'name where the source names them. Never invent honorifics the source does not imply.\n' +
+  '- When translating INTO Chinese, do not add honorifics or pleasantries the source lacks.\n';
+
+const LC_TR_SYS =
+  'You are a professional translator for a real-time internal chat between colleagues at a ' +
+  'manufacturer with sites in Taiwan, Dongguan (China) and Vietnam. Messages are short, ' +
+  'work-related and often about orders, shipping, tooling, quality and schedules.\n\n' +
+  'Requirements:\n' + LC_TR_RULES +
+  '- Chat register: keep it as short and plain as the original. A one-line question stays a ' +
+  'one-line question. Do not turn casual typing into formal prose.\n' +
+  '- Do not answer, explain or comment on the message. Translate only.\n\n' +
+  'Output ONLY a minified JSON object and nothing else.';
+
+var lcSession   = null;   // 目前開著的場次
+var lcMsgs      = [];     // 目前場次的訊息（依 created_at 遞增）
+var lcPollTimer = null;
+var lcBusy      = false;  // 送出中，防連點
+var lcListLoaded = false;
+
+function lcMe()      { return (SESSION && SESSION.empId) || ''; }
+function lcMyName()  { return (SESSION && (SESSION.nameZh || SESSION.nameEn || SESSION.empId)) || ''; }
+function lcIsHost()  { return !!lcSession && lcSession.host_emp_id === lcMe(); }
+
+function lcTime(iso) {
+  if (!iso) return '';
+  var d = new Date(iso); if (isNaN(d)) return '';
+  return String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+}
+function lcDay(iso) {
+  var d = new Date(iso); if (isNaN(d)) return '';
+  // 🔴 當地時間，不用 toISOString()（那是 UTC，台灣 00:00–08:00 會少算一天）
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+// ─── 翻譯：一次呼叫產出四語 ───
+// srcLang 由模型自己辨識（board v1.77 的決定：不做「我用的語言」下拉）。
+async function lcTranslate(text) {
+  var usr =
+    'Detect the source language of the message yourself. It is one of: zh-TW (Traditional ' +
+    'Chinese), zh-CN (Simplified Chinese), en (English), vi (Vietnamese).\n' +
+    'Then give the message in all four.\n\nMessage:\n' + text + '\n\n' +
+    'Reply with ONLY this JSON, no markdown fence:\n' +
+    '{"src":"zh-TW|zh-CN|en|vi","zh-TW":"...","zh-CN":"...","en":"...","vi":"..."}';
+  var raw = await pCallClaude([{ role:'user', content: usr }], LC_TR_SYS, 1500, LC_TR_MODEL);
+  var m = String(raw||'').match(/\{[\s\S]*\}/);
+  if (!m) throw new Error('no json in reply');
+  var o = JSON.parse(m[0]);
+  var src = String(o.src||'').trim();
+  if (!LC_COL[src]) src = '';
+  var out = { src: src };
+  LC_LANGS.forEach(function(l) { out[l[0]] = String(o[l[0]] || '').trim(); });
+  // 🔴 來源語言那一欄放回原文，一字不動 —— 不靠模型「照抄」（同 board 的 pmTranslate）。
+  //    模型偶爾會把原文「潤飾」一下，那會讓發話者看到自己沒打過的句子。
+  if (src) out[src] = text;
+  return out;
+}
+
+async function lcTranslateAndSave(msg) {
+  try {
+    var r = await lcTranslate(msg.text);
+    var patch = {
+      src_lang: r.src,
+      text_zhtw: r['zh-TW'], text_zhcn: r['zh-CN'], text_en: r.en, text_vi: r.vi,
+      tr_at: new Date().toISOString(),
+    };
+    await SB.patch('chat_messages', 'id=eq.' + encodeURIComponent(msg.id), patch);
+    var local = lcMsgs.find(function(x){ return x.id === msg.id; });
+    if (local) { Object.assign(local, patch); delete local._trFailed; lcRenderStream(); }
+  } catch (e) {
+    console.warn('[lc] translate failed', e);
+    var l2 = lcMsgs.find(function(x){ return x.id === msg.id; });
+    if (l2) { l2._trFailed = true; lcRenderStream(); }
+  }
+}
+
+// ─── 清單 ───
+async function lcLoadList() {
+  var box = document.getElementById('lc-list');
+  if (!box) return;
+  var open  = await SB.get('chat_sessions', 'status=eq.open&order=last_at.desc&limit=50');
+  var saved = await SB.get('chat_sessions', 'status=eq.ended&keep=eq.true&order=ended_at.desc&limit=50');
+  lcListLoaded = true;
+  function row(s, ended) {
+    return '<div class="lc-row" onclick="lcOpen(\'' + escHtml(s.id) + '\')">'
+      + '<div style="flex:1;min-width:0;">'
+      +   '<div class="lc-row-t">' + escHtml(s.title || '—') + '</div>'
+      +   '<div class="lc-row-m">' + escHtml(s.host_name || s.host_emp_id)
+      +     ' · ' + escHtml(lcDay(ended ? (s.ended_at||s.created_at) : s.last_at))
+      +     ' ' + lcTime(ended ? (s.ended_at||s.created_at) : s.last_at) + '</div>'
+      + '</div>'
+      + (ended ? '<span class="lc-pill">' + escHtml(t('lc_saved')) + '</span>'
+               : '<span class="lc-pill on">' + escHtml(t('lc_ongoing')) + '</span>')
+      + '</div>';
+  }
+  var h = '<div class="lc-sec">' + escHtml(t('lc_ongoing')) + '</div>';
+  h += (open && open.length) ? open.map(function(s){ return row(s, false); }).join('')
+                             : '<div class="lc-empty">' + escHtml(t('lc_none_ongoing')) + '</div>';
+  h += '<div class="lc-sec" style="margin-top:18px;">' + escHtml(t('lc_saved')) + '</div>';
+  h += (saved && saved.length) ? saved.map(function(s){ return row(s, true); }).join('')
+                               : '<div class="lc-empty">' + escHtml(t('lc_none_saved')) + '</div>';
+  box.innerHTML = h;
+}
+
+async function lcCreate() {
+  var el = document.getElementById('lc-new-title');
+  var title = ((el && el.value) || '').trim();
+  if (!title) { toast(t('lc_title_required'), 'err'); if (el) el.focus(); return; }
+  var s = {
+    id: uid(), title: title,
+    host_emp_id: lcMe(), host_name: lcMyName(),
+    status: 'open', keep: false,
+    created_at: new Date().toISOString(), last_at: new Date().toISOString(),
+  };
+  try { await SB.post('chat_sessions', s); }
+  catch (e) { toast(t('lc_create_failed'), 'err'); return; }
+  if (el) el.value = '';
+  lcSession = s; lcMsgs = [];
+  lcShowRoom(); lcRenderStream(); lcPollStart();
+}
+
+// ─── 房間 ───
+async function lcOpen(id) {
+  var rows = await SB.get('chat_sessions', 'id=eq.' + encodeURIComponent(id) + '&limit=1');
+  if (!rows || !rows.length) { toast(t('lc_gone'), 'err'); lcLoadList(); return; }
+  lcSession = rows[0];
+  var msgs = await SB.get('chat_messages',
+    'session_id=eq.' + encodeURIComponent(id) + '&order=created_at.desc&limit=' + LC_MSG_LIMIT);
+  lcMsgs = (msgs || []).slice().reverse();
+  lcShowRoom(); lcRenderStream(); lcScrollBottom(true);
+  if (lcSession.status === 'open') lcPollStart();
+}
+
+function lcBackToList() {
+  lcPollStop();
+  lcSession = null; lcMsgs = [];
+  var r = document.getElementById('lc-room'), l = document.getElementById('lc-listview');
+  if (r) r.style.display = 'none';
+  if (l) l.style.display = 'flex';
+  lcLoadList();
+}
+
+function lcShowRoom() {
+  var r = document.getElementById('lc-room'), l = document.getElementById('lc-listview');
+  if (l) l.style.display = 'none';
+  if (r) r.style.display = 'flex';
+  var live = !!lcSession && lcSession.status === 'open';
+  var ttl = document.getElementById('lc-room-title');
+  if (ttl) ttl.textContent = (lcSession && lcSession.title) || '';
+  var meta = document.getElementById('lc-room-meta');
+  if (meta) meta.textContent = t('lc_host') + '：' + ((lcSession && (lcSession.host_name || lcSession.host_emp_id)) || '')
+    + (live ? '' : '　·　' + t('lc_ended'));
+  var comp = document.getElementById('lc-composer');
+  if (comp) comp.style.display = live ? 'flex' : 'none';
+  var endBtn = document.getElementById('lc-end-btn');
+  if (endBtn) endBtn.style.display = (live && lcIsHost()) ? 'inline-block' : 'none';
+  // 🔴 只有結束並保留之後才給輸出 PDF：沒結束的紀錄匯出去是半成品，
+  //    收件人分不出它是不是最終版本（同 board 的「只有定稿才給匯出」）。
+  var pdfBtn = document.getElementById('lc-pdf-btn');
+  if (pdfBtn) pdfBtn.style.display = live ? 'none' : 'inline-block';
+  var endBar = document.getElementById('lc-endbar');
+  if (endBar) endBar.style.display = 'none';
+}
+
+function lcRenderStream() {
+  var box = document.getElementById('lc-stream');
+  if (!box) return;
+  if (!lcMsgs.length) { box.innerHTML = '<div class="lc-empty">' + escHtml(t('lc_empty_room')) + '</div>'; return; }
+  var lastDay = '';
+  var h = '';
+  lcMsgs.forEach(function(m) {
+    var day = lcDay(m.created_at);
+    if (day && day !== lastDay) { lastDay = day; h += '<div class="lc-day">' + escHtml(day) + '</div>'; }
+    h += lcMsgHtml(m);
+  });
+  box.innerHTML = h;
+}
+
+function lcMsgHtml(m) {
+  var mine = m.emp_id === lcMe();
+  var srcLab = m.src_lang ? (LC_LABEL[m.src_lang] || m.src_lang) : '';
+  var h = '<div class="lc-msg' + (mine ? ' mine' : '') + '">'
+    + '<div class="lc-msg-head"><b>' + escHtml(m.author_name || m.emp_id) + '</b>'
+    +   '<span class="lc-msg-time">' + lcTime(m.created_at) + '</span>'
+    +   (srcLab ? '<span class="lc-src">' + escHtml(srcLab + ' ' + t('lc_orig')) + '</span>' : '')
+    + '</div>'
+    + '<div class="lc-otext">' + escHtml(m.text) + '</div>';
+
+  if (m.tr_at) {
+    // 原文那一欄不重複印一次；其餘三語依固定順序（順序固定才讀得快）
+    var lines = LC_LANGS.filter(function(l) { return l[0] !== m.src_lang; }).map(function(l) {
+      var v = m[LC_COL[l[0]]] || '';
+      if (!v) return '';
+      return '<div class="lc-line"><span class="lc-lab">' + escHtml(LC_LABEL[l[0]]) + '</span>'
+        + '<span class="lc-ltext">' + escHtml(v) + '</span></div>';
+    }).join('');
+    if (lines) h += '<div class="lc-tr">' + lines + '</div>';
+  } else if (m._trFailed) {
+    h += '<div class="lc-tr"><div class="lc-fail">⚠ ' + escHtml(t('lc_tr_failed'))
+      + (mine ? ' <button class="lc-retry" onclick="lcRetry(\'' + escHtml(m.id) + '\')">↻ '
+                + escHtml(t('lc_retry')) + '</button>' : '') + '</div></div>';
+  } else {
+    h += '<div class="lc-tr"><div class="lc-pending">' + escHtml(t('lc_translating')) + '</div></div>';
+  }
+  return h + '</div>';
+}
+
+function lcRetry(id) {
+  var m = lcMsgs.find(function(x){ return x.id === id; });
+  if (!m) return;
+  delete m._trFailed; lcRenderStream();
+  lcTranslateAndSave(m);
+}
+
+function lcNearBottom() {
+  var box = document.getElementById('lc-stream');
+  if (!box) return true;
+  return (box.scrollHeight - box.scrollTop - box.clientHeight) < 80;
+}
+function lcScrollBottom(force) {
+  var box = document.getElementById('lc-stream');
+  if (box && (force || true)) box.scrollTop = box.scrollHeight;
+}
+
+// ─── 送出 ───
+function lcKeydown(ev) {
+  // Enter 送出、Shift+Enter 換行。輸入法組字中的 Enter 不能當送出
+  // （isComposing 為 true 時那是「確認選字」，不是「送出」）
+  if (ev.key === 'Enter' && !ev.shiftKey && !ev.isComposing) { ev.preventDefault(); lcSend(); }
+}
+
+async function lcSend() {
+  if (!lcSession || lcSession.status !== 'open' || lcBusy) return;
+  var el = document.getElementById('lc-input');
+  var text = ((el && el.value) || '').trim();
+  if (!text) return;
+  lcBusy = true;
+  var msg = {
+    id: uid(), session_id: lcSession.id,
+    emp_id: lcMe(), author_name: lcMyName(),
+    src_lang: '', text: text,
+    text_zhtw: null, text_zhcn: null, text_en: null, text_vi: null, tr_at: null,
+    created_at: new Date().toISOString(),
+  };
+  try {
+    await SB.post('chat_messages', msg);
+  } catch (e) {
+    // 🔴 寫入失敗一定要說，而且不能清掉輸入框 —— 使用者剛打的字還在裡面，
+    //    清掉等於連重送的機會都沒有（admin v2.37 的教訓：寫入先成功才可以動畫面）
+    lcBusy = false;
+    toast(t('lc_send_failed'), 'err');
+    return;
+  }
+  if (el) { el.value = ''; el.style.height = 'auto'; }
+  lcMsgs.push(msg);
+  if (lcMsgs.length > LC_MSG_LIMIT) lcMsgs = lcMsgs.slice(-LC_MSG_LIMIT);
+  lcRenderStream(); lcScrollBottom(true);
+  lcBusy = false;
+  lcTranslateAndSave(msg);                                    // 背景翻譯，不擋畫面
+  SB.patch('chat_sessions', 'id=eq.' + encodeURIComponent(lcSession.id),
+           { last_at: msg.created_at }).catch(function(){});   // 只影響清單排序，失敗無妨
+}
+
+// ─── 輪詢 ───
+function lcPollStart() {
+  lcPollStop();
+  lcPollTimer = setInterval(lcPoll, LC_POLL_MS);
+}
+function lcPollStop() {
+  if (lcPollTimer) { clearInterval(lcPollTimer); lcPollTimer = null; }
+}
+
+async function lcPoll() {
+  if (!lcSession) { lcPollStop(); return; }
+  var sid = lcSession.id;
+  try {
+    var stick = lcNearBottom();
+    var changed = false;
+
+    // 1) 開啟者結束了這場？（結束後就不該再收發）
+    var srow = await SB.get('chat_sessions', 'id=eq.' + encodeURIComponent(sid) + '&select=status,keep,title&limit=1');
+    if (srow && srow.length && srow[0].status !== 'open') {
+      lcSession.status = srow[0].status; lcSession.keep = srow[0].keep;
+      lcPollStop(); lcShowRoom(); toast(t('lc_host_ended'));
+      return;
+    }
+    if (!srow || !srow.length) {   // 整場被開啟者刪掉了（選了「不保留」）
+      lcPollStop(); toast(t('lc_gone')); lcBackToList(); return;
+    }
+
+    // 2) 新訊息（比目前最後一則新的）
+    var lastTs = lcMsgs.length ? lcMsgs[lcMsgs.length-1].created_at : '1970-01-01T00:00:00Z';
+    var fresh = await SB.get('chat_messages',
+      'session_id=eq.' + encodeURIComponent(sid) +
+      '&created_at=gt.' + encodeURIComponent(lastTs) + '&order=created_at&limit=100');
+    if (fresh && fresh.length) {
+      var seen = {}; lcMsgs.forEach(function(m){ seen[m.id] = 1; });
+      fresh.forEach(function(m) { if (!seen[m.id]) { lcMsgs.push(m); changed = true; } });
+      if (lcMsgs.length > LC_MSG_LIMIT) lcMsgs = lcMsgs.slice(-LC_MSG_LIMIT);
+    }
+
+    // 3) 別人的訊息剛才還沒翻完 —— 補抓那幾則的譯文
+    //    （自己的那幾則由 lcTranslateAndSave 直接寫回本地，不必重抓）
+    var pending = lcMsgs.filter(function(m) { return !m.tr_at && m.emp_id !== lcMe(); })
+                        .map(function(m) { return m.id; }).slice(-20);
+    if (pending.length) {
+      var got = await SB.get('chat_messages',
+        'id=in.(' + pending.map(encodeURIComponent).join(',') + ')&select=id,src_lang,text_zhtw,text_zhcn,text_en,text_vi,tr_at');
+      (got || []).forEach(function(g) {
+        if (!g.tr_at) return;
+        var m = lcMsgs.find(function(x){ return x.id === g.id; });
+        if (m) { Object.assign(m, g); changed = true; }
+      });
+    }
+
+    if (changed) { lcRenderStream(); if (stick) lcScrollBottom(true); }
+  } catch (e) {
+    console.warn('[lc] poll', e);
+  }
+}
+
+// ─── 結束對話（只有開啟者）───
+function lcEndAsk() {
+  if (!lcIsHost()) { toast(t('lc_only_host_end'), 'err'); return; }
+  var bar = document.getElementById('lc-endbar');
+  if (bar) bar.style.display = bar.style.display === 'flex' ? 'none' : 'flex';
+}
+
+async function lcEnd(keep) {
+  if (!lcSession || !lcIsHost()) return;
+  if (!keep && !confirm(t('lc_confirm_discard'))) return;
+  var id = lcSession.id;
+  try {
+    if (keep) {
+      await SB.patch('chat_sessions', 'id=eq.' + encodeURIComponent(id),
+                     { status: 'ended', keep: true, ended_at: new Date().toISOString() });
+      lcSession.status = 'ended'; lcSession.keep = true;
+      lcPollStop(); lcShowRoom(); toast(t('lc_kept'), 'ok');
+    } else {
+      await SB.delete('chat_sessions', 'id=eq.' + encodeURIComponent(id));  // cascade 帶走訊息
+      lcPollStop(); toast(t('lc_discarded'), 'ok'); lcBackToList();
+    }
+  } catch (e) {
+    // 寫入沒成功就不要改畫面（admin v2.37）—— 說「已結束」但資料庫還是 open 的話，
+    // 別人會繼續在裡面發言，而開啟者以為已經收掉了
+    toast(t('lc_end_failed'), 'err');
+  }
+}
+
+// ─── 輸出 PDF ───
+// 🔴 版面固定繁中，不隨介面語言改變（同 board 的 siteLabelZ／pmLangShort 的道理）：
+//    存檔格式不該因為誰按了匯出鍵、介面剛好切成哪一國語言就長得不一樣。
+function lcExportPDF() {
+  if (!lcSession) return;
+  var w = window.open('', '_blank');
+  if (!w) { toast(t('lc_popup')); return; }
+  var names = [];
+  lcMsgs.forEach(function(m) {
+    var n = m.author_name || m.emp_id;
+    if (names.indexOf(n) < 0) names.push(n);
+  });
+  var body = '<h1>' + escHtml(lcSession.title || '線上對話') + '</h1>'
+    + '<div class="meta">開啟者：' + escHtml(lcSession.host_name || lcSession.host_emp_id)
+    + '　·　' + escHtml(lcDay(lcSession.created_at)) + ' ' + lcTime(lcSession.created_at)
+    + (lcSession.ended_at ? '　—　' + escHtml(lcDay(lcSession.ended_at)) + ' ' + lcTime(lcSession.ended_at) : '')
+    + '</div>'
+    + '<div class="meta">參與者（' + names.length + '）：' + escHtml(names.join('、')) + '</div>'
+    + '<div class="meta">共 ' + lcMsgs.length + ' 則訊息</div><hr>';
+  lcMsgs.forEach(function(m) {
+    body += '<div class="m"><div class="mh">' + escHtml(m.author_name || m.emp_id)
+      + '　<span class="mt">' + escHtml(lcDay(m.created_at)) + ' ' + lcTime(m.created_at) + '</span>'
+      + (m.src_lang ? '　<span class="ms">' + escHtml((LC_LABEL[m.src_lang]||m.src_lang) + ' 原文') + '</span>' : '')
+      + '</div><div class="mo">' + escHtml(m.text) + '</div>';
+    if (m.tr_at) {
+      LC_LANGS.filter(function(l){ return l[0] !== m.src_lang; }).forEach(function(l) {
+        var v = m[LC_COL[l[0]]] || '';
+        if (v) body += '<div class="ml"><span class="mlab">' + escHtml(LC_LABEL[l[0]]) + '</span>' + escHtml(v) + '</div>';
+      });
+    }
+    body += '</div>';
+  });
+  var css = 'body{font-family:"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;color:#1a1a1a;'
+    + 'margin:26px;font-size:12.5px;line-height:1.55}h1{font-size:19px;margin:0 0 6px}'
+    + '.meta{font-size:11.5px;color:#555;margin:2px 0}hr{border:none;border-top:2px solid #333;margin:14px 0}'
+    + '.m{margin:0 0 13px;padding-bottom:11px;border-bottom:1px dashed #ccc;page-break-inside:avoid}'
+    + '.mh{font-weight:700;font-size:12.5px;margin-bottom:3px}.mt{font-weight:400;color:#777;font-size:11px}'
+    + '.ms{font-weight:400;color:#777;font-size:11px}'
+    + '.mo{white-space:pre-wrap;margin-bottom:5px}'
+    + '.ml{display:flex;gap:8px;font-size:12px;color:#333;margin:2px 0}'
+    + '.mlab{flex:0 0 34px;color:#888;font-size:10.5px;padding-top:2px}'
+    + '@media print{@page{margin:14mm}}';
+  w.document.write('<!doctype html><html><head><meta charset="utf-8"><title>'
+    + escHtml(lcSession.title || '線上對話') + '</title><style>' + css + '</style></head><body>'
+    + body + '</body></html>');
+  w.document.close();
+  w.onload = function () { try { w.focus(); w.print(); } catch (e) {} };
+}
+
+// 線上對話：靜態文字套 i18n。
+// 🔴 不在這裡無條件呼叫 lcLoadList()：applyI18nAll() 每次 switchView 都會跑，
+//    那會變成每切一次頁面就打一次資料庫。只在「線上對話頁籤真的開著」時才重畫。
+function lcApplyI18n() {
+  function txt(id, key) { var e = document.getElementById(id); if (e) e.textContent = t(key); }
+  function ph(id, key)  { var e = document.getElementById(id); if (e) e.placeholder = t(key); }
+  txt('lc-new-lbl','lc_new_lbl'); ph('lc-new-title','lc_title_ph');
+  txt('lc-new-btn','lc_new');     txt('lc-new-hint','lc_new_hint');
+  txt('lc-keep-btn','lc_keep');   txt('lc-discard-btn','lc_discard');
+  txt('lc-endbar-q','lc_end_q');  txt('lc-end-btn','lc_end');
+  txt('lc-send-btn','lc_send');   ph('lc-input','lc_input_ph');
+  var b  = document.getElementById('lc-back-btn'); if (b)  b.textContent  = '\u2039 ' + t('lc_back');
+  var pd = document.getElementById('lc-pdf-btn');  if (pd) pd.textContent = '\ud83d\udcc4 ' + t('lc_pdf');
+  var con = document.getElementById('ptab-content-live');
+  if (con && con.classList.contains('on')) {
+    if (lcSession) { lcShowRoom(); lcRenderStream(); }
+    else if (lcListLoaded) lcLoadList();
   }
 }
 

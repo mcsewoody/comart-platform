@@ -47,7 +47,16 @@ const ALLOWED_TABLES = new Set([
   // 注意：premortem_summary_log（AI 結論的版本歷史）**刻意不列入**——
   // 稽核紀錄不該能被應用程式讀取或刪除，只能從 Supabase 後台查。
   "poll_sessions","poll_options","poll_votes","poll_comments",
+  "chat_sessions","chat_messages",
 ])
+
+// ── 線上對話：只有開啟者本人能結束或刪除自己開的那一場 ──
+// 「不保留」是整場 cascade 刪除（連同所有人的發言），比覆寫嚴重；
+// status/keep/title 決定這場對話的性質與去留，同 premortem 的 phase。
+// last_at 刻意不在這裡：每個人發言都要更新它，那是正常的協作寫入。
+const CHAT_HOST_ONLY = new Set(["status", "keep", "title"])
+// 開啟者是整套權限的根，建立後不可改（改掉就等於把別人開的場次搶過來）
+const CHAT_IMMUTABLE = new Set(["host_emp_id", "id"])
 
 // ── 事前驗屍：受保護欄位 ──
 // AI 評論與總結是永久存檔的會議正式結論；phase 決定會議進程；chair_emp_id 是整套權限的根。
@@ -231,6 +240,25 @@ serve(async (req) => {
     }
   }
 
+  // ── 線上對話：DELETE chat_sessions 必須是開啟者本人（cascade 會帶走所有訊息）──
+  if (req.method === "DELETE" && table === "chat_sessions") {
+    const idFilter = url.searchParams.get("id") || ""
+    const sid = idFilter.startsWith("eq.") ? idFilter.slice(3) : ""
+    if (!sid) return json({ error: "forbidden", hint: "delete requires ?id=eq.<session_id>" }, 403)
+    let hostId = ""
+    try {
+      const chk = await fetch(
+        `${SUPABASE_URL}/rest/v1/chat_sessions?id=eq.${encodeURIComponent(sid)}&select=host_emp_id`,
+        { headers: elevatedApiHeaders(SERVICE_KEY) },
+      )
+      const rows = chk.ok ? await chk.json() : []
+      hostId = Array.isArray(rows) && rows[0] ? String(rows[0].host_emp_id || "") : ""
+    } catch { hostId = "" }
+    if (!hostId || hostId !== sessEmpId) {
+      return json({ error: "forbidden", hint: "only the host of this chat may delete it" }, 403)
+    }
+  }
+
   // 寫入 users 時剝除 pwd_hash（密碼只能經 auth-verify；防止有人用本代理改密碼雜湊）；
   // 自助 PATCH 再套欄位白名單（不得改 role/active/emp_id 等）
   let body: string | undefined = undefined
@@ -271,6 +299,32 @@ serve(async (req) => {
         } catch { chairId = "" }
         if (!chairId || chairId !== sessEmpId) {
           return json({ error: "forbidden", hint: "only the chair of this session may change it" }, 403)
+        }
+      }
+      body = rawText
+    } else if (table === "chat_sessions" && req.method === "PATCH" && rawText) {
+      // ── 線上對話：status/keep/title 只有開啟者改得動 ──
+      let parsed: Record<string, unknown>
+      try { parsed = JSON.parse(rawText) } catch { return json({ error: "bad_json" }, 400) }
+      const keys = Object.keys(parsed || {})
+      if (keys.some((k) => CHAT_IMMUTABLE.has(k))) {
+        return json({ error: "forbidden", hint: "host_emp_id/id are immutable" }, 403)
+      }
+      if (keys.some((k) => CHAT_HOST_ONLY.has(k))) {
+        const idFilter = url.searchParams.get("id") || ""
+        const sid = idFilter.startsWith("eq.") ? idFilter.slice(3) : ""
+        if (!sid) return json({ error: "forbidden", hint: "protected fields require ?id=eq.<session_id>" }, 403)
+        let hostId = ""
+        try {
+          const chk = await fetch(
+            `${SUPABASE_URL}/rest/v1/chat_sessions?id=eq.${encodeURIComponent(sid)}&select=host_emp_id`,
+            { headers: elevatedApiHeaders(SERVICE_KEY) },
+          )
+          const rows = chk.ok ? await chk.json() : []
+          hostId = Array.isArray(rows) && rows[0] ? String(rows[0].host_emp_id || "") : ""
+        } catch { hostId = "" }
+        if (!hostId || hostId !== sessEmpId) {
+          return json({ error: "forbidden", hint: "only the host of this chat may change it" }, 403)
         }
       }
       body = rawText

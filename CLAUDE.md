@@ -276,6 +276,48 @@ The portal supports EN, 繁中, 简中, VI, 日 via `setLang(lang)`. Each langua
   強制改密碼畫面的說明段落現在直接寫出「不可使用常見密碼（公司名＋年份、自己的工號）」，
   讓使用者在打字之前就知道，而不是靠錯誤訊息事後補救。
 
+## 線上對話 Live Chat（Portal v1.80，2026-09-05，migration 202609050001）
+
+Portal AI 功能區的第二個頁籤（`💬 線上對話`，在翻譯旁邊）。不同事業單位的同事各自用自己的
+語言打字，每一則訊息即時翻成**四語同時顯示**（繁中／簡中／英／越）。函式前綴 `lc*`，
+資料表 `chat_sessions`／`chat_messages`（已加進 sb-proxy 的 `ALLOWED_TABLES`）。
+
+- **「場次」模型**（形狀刻意與 `premortem_sessions` 相同）：開一場 → 談 → **開啟者**結束 →
+  自己決定保留或丟棄。保留的進「已保留」清單、日後可讀、可輸出 PDF；不保留的整場刪掉
+  （`on delete cascade` 帶走訊息）。**不分事業單位、不做成員權限**：任何在職同事都能進任何一場
+  （Woody 2026-09-05 定案，理由是跨廠對話正是這個功能的目的）。
+- 🔴 **輪詢重繪只動 `#lc-stream`，composer 在它外面。** board 的 `pm*` 是整塊 `innerHTML`
+  重畫，所以必須做 `pmSnapInputs`／`pmApplyInputSnap` 那一整套快照還原（別人一發言就把正在
+  打字的人的游標彈掉、**中文輸入法組字被砍斷**）。這裡把輸入框放在被重繪的容器外面，
+  那個問題從結構上就不存在。**不要為了排版把 composer 搬進 `#lc-stream`。**
+- 🔴 **`lcKeydown` 必須檢查 `ev.isComposing`**：組字中的 Enter 是「確認選字」不是「送出」。
+  漏掉的話中文與日文使用者每選一次字就送出一次半截的句子。
+- 🔴 **翻譯用 `claude-sonnet-5`（`LC_TR_MODEL`），這與 board 用 opus 不衝突。**
+  board 的 `PM_TR_MODEL` 是永久存檔的會議紀錄（長、有語氣強度、譯壞了要等人反映）；
+  聊天是短句、當場看得到對不對，而**「快」本身就是這個功能的規格**。opus 預設開 thinking，
+  一則要 3–8 秒，sonnet 約 1.5–3 秒。模型抽成常數，品質不夠時改一行即可。
+- 🔴 **`LC_TR_RULES` 是 board `PM_TR_RULES` 的副本，改翻譯規則時兩份都要改。**
+  兩個 HTML 沒有模組系統（i18n 字典也是各自一份），無法共用。最重要的是越南語人稱那一條
+  （`bạn`／`anh`／`chị`／`em` 必須選一個，整段固定一種語域）——兩邊分岔就會讓同一家公司的
+  兩個系統有兩套人稱標準。
+- 🔴 **來源語言那一欄放回原文，一字不動**（同 `pmTranslate`）：`lcTranslate` 自己保證，
+  不靠模型「照抄」。模型偶爾會把原文順手潤飾一下，那會讓發話者看到自己沒打過的句子。
+  來源語言由模型自行辨識（board v1.77 的決定：**不做「我用的語言」下拉**），
+  辨識結果不在 `LC_LANGS` 內就清成空字串，不寫進資料庫。
+- **四語各一個欄位**（`text_zhtw`／`text_zhcn`／`text_en`／`text_vi`）而不是 translations 子表：
+  每 3 秒輪詢一次，join 子表等於把每次輪詢的成本乘上訊息數。語言集合是寫死的四種
+  （產品決策，不是資料驅動）。
+- ⚠️ **日文介面看得到、但訊息不會翻成日文**：`LC_LANGS` 只有四種。要加日文得同時改
+  `LC_LANGS`／`LC_COL`／`LC_LABEL` 與一個 migration（`text_ja`），並注意每則訊息會變成五行。
+- **寫入防護**（sb-proxy）：`CHAT_HOST_ONLY`（`status`／`keep`／`title`）與 `DELETE chat_sessions`
+  都要比對 `host_emp_id` 與簽章 empId；`host_emp_id`／`id` 在 `CHAT_IMMUTABLE` 完全禁改。
+  `last_at` **刻意不保護**——每個人發言都要更新它，那是正常的協作寫入。
+  讀取層仍是前端判斷（同 premortem，這是已接受的取捨）。
+- **只有結束後才給輸出 PDF**（同 board「只有定稿才給匯出」）：沒結束的紀錄匯出去是半成品，
+  收件人分不出是不是最終版本。PDF 版面**固定繁中**（同 `siteLabelZ`／`pmLangShort` 的道理）。
+- 送出失敗時**不清空輸入框**（admin v2.37 的教訓）：使用者剛打的字還在裡面，清掉等於連重送的
+  機會都沒有。結束對話同理——寫入沒成功就不改畫面，否則開啟者以為收掉了、別人還在裡面發言。
+
 ## 用戶狀態：在職／停用／離職（2026-08-16，migration 202608160002）
 
 `users.status`（`'active'` / `'disabled'` / `'resigned'`）是**狀態的唯一事實來源**，

@@ -12,6 +12,24 @@ COMART Platform is an internal corporate portal for COMART Corporation, deployed
 
 ## Architecture
 
+### 🔴 唯一的跨子系統共用檔：`shared/voice.js`（v1.89 起）
+
+**單一檔案原則有一個刻意的例外。** `shared/voice.js` 是語音輸入的完整引擎
+（錄音 → `transcribe` edge function → AI 整理），五個子系統共用同一份。
+
+- **為什麼破例**：其他共用邏輯（i18n 字典、`PM_TR_RULES`／`LC_TR_RULES` 的翻譯規則）
+  都是各檔一份副本，CLAUDE.md 已記載那必然分岔、**而分岔之後寬鬆的那一份就是實際
+  生效的那一份**。使用者 2026-09-05 明確要求「以後我的系統的語音輸入全部用同一個」。
+- 🔴 **改 `shared/voice.js` 時，所有載入它的 HTML 的 `?v=` 都要 +1。**
+  GitHub Pages 的 Cache-Control 是 4 小時，不 bump 的話使用者拿到舊版**而且看不出來**。
+  目前載入者：`index.html`（Portal，兩處使用：線上對話與翻譯頁籤）。
+- **載入用相對路徑**（Portal `./shared/voice.js`、子系統 `../shared/voice.js`），
+  不要用絕對路徑 —— 那會讓 `file://` 開檔的開發方式失效。
+- **呼叫端只負責「哪顆按鈕、寫到哪個欄位、用哪個語言、用哪個 callClaude」**，
+  引擎不要複製回各檔。API：`ComartVoice.toggle({sbUrl, sig, lang, callClaude,
+  onState, onText, onError})`，或用便利函式 `ComartVoice.bind({btn, target, …})`。
+  `ComartVoice.clean(text, callClaude)` 可單獨用來整理現有文字（翻譯頁籤的 ✨ 鈕）。
+
 ### Single-File Application Pattern
 
 Each sub-application is one self-contained HTML file with all CSS, JS, and HTML inlined. Files grow large (~5,000–8,000 lines). There is no bundler, no module system, and no package.json.

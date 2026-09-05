@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>COMART Platform v1.88</title>
+<title>COMART Platform v1.89</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script defer src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.js"></script>
 <style>
@@ -370,7 +370,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     <div class="login-logo">
       <div class="login-mark" style="background:transparent"><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="44" height="23"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></div>
       <div class="login-name">COMART Platform</div>
-      <div class="login-sub">Internal Portal · v1.88</div>
+      <div class="login-sub">Internal Portal · v1.89</div>
     </div>
     <form id="loginForm" onsubmit="doLogin();return false;" autocomplete="on">
     <div class="field">
@@ -430,7 +430,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   <div class="topbar">
     <div class="topbar-logo" onclick="switchView('home')">
       <div class="topbar-mark" style="background:transparent"><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="26" height="14"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></div>
-      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.88</span></div>
+      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.89</span></div>
     </div>
     <div class="topbar-right">
       <div class="lang-switcher">
@@ -585,9 +585,9 @@ input[type="date"]::-webkit-calendar-picker-indicator {
                     style="padding:9px 14px;border-radius:9px;background:#7c3aed;color:#fff;border:none;cursor:pointer;font-size:12px;font-weight:700;">Translate ↓</button>
                   <button onclick="navigator.clipboard.readText().then(function(t){document.getElementById('p-xlat-input').value=t;})" title="Paste"
                     style="padding:9px 14px;border-radius:9px;border:1px solid var(--br);background:var(--s2);color:var(--tx2);cursor:pointer;font-size:14px;">📋</button>
-                  <button onclick="pStartVoice()" id="p-voice-btn" title="Voice input"
+                  <button onclick="pStartVoice()" id="p-voice-btn" title="Voice"
                     style="padding:9px 14px;border-radius:9px;border:1px solid var(--br);background:var(--s2);color:var(--tx2);cursor:pointer;font-size:18px;">🎙</button>
-                  <button onclick="pCleanText()" title="AI 整理：加標點符號、潤稿"
+                  <button onclick="pCleanText()" id="p-clean-btn" title="AI"
                     style="padding:9px 14px;border-radius:9px;border:1px solid var(--br);background:var(--s2);color:var(--tx2);cursor:pointer;font-size:16px;">✨</button>
                 </div>
               </div>
@@ -1205,6 +1205,10 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   <span id="msgPopup-view-btn" class="msg-popup-view" onclick="closeMsgPopup();openProfile(_msgPopupEmpId)">查看完整留言板 →</span>
 </div>
 
+<!-- 共用語音輸入（shared/voice.js）。
+     🔴 改那個檔案時這裡的 ?v= 要 +1 —— GitHub Pages 快取 4 小時，
+     不 bump 的話使用者拿到舊版而且看不出來。 -->
+<script src="./shared/voice.js?v=1"></script>
 <script>
 const SESSION_KEY = 'comart-portal-session';
 const SESSION_TTL = 8 * 60 * 60 * 1000; // 8h
@@ -2919,6 +2923,7 @@ const I18N = {
     // ai tab
     ai_tab_translate:'Translate', ai_tab_chat:'Chat', ai_tab_skills:'Skills',
     ai_tab_live:'Live Chat', lc_new:'New chat',
+    p_clean_done:'Text tidied up',
     lc_mic_polishing:'Tidying up the text...',
     lc_mic_auto:'Auto', lc_mic_working:'Transcribing...',
     lc_mic_empty:'No speech was picked up. Please try again.', lc_mic_expired:'Your session has expired. Please sign in again.',
@@ -3027,6 +3032,7 @@ const I18N = {
     um_delete_failed:'刪除失敗：', um_deleted:'用戶已刪除',
     ai_tab_translate:'翻譯', ai_tab_chat:'對話', ai_tab_skills:'技能',
     ai_tab_live:'線上對話', lc_new:'開新對話',
+    p_clean_done:'整理完成',
     lc_mic_polishing:'AI 整理中…',
     lc_mic_auto:'自動', lc_mic_working:'辨識中…',
     lc_mic_empty:'沒有收到語音，請再試一次。', lc_mic_expired:'登入已逾期，請重新登入。',
@@ -3128,6 +3134,7 @@ const I18N = {
     um_delete_failed:'删除失败：', um_deleted:'用户已删除',
     ai_tab_translate:'翻译', ai_tab_chat:'对话', ai_tab_skills:'技能',
     ai_tab_live:'在线对话', lc_new:'开新对话',
+    p_clean_done:'整理完成',
     lc_mic_polishing:'AI 整理中…',
     lc_mic_auto:'自动', lc_mic_working:'识别中…',
     lc_mic_empty:'没有收到语音，请再试一次。', lc_mic_expired:'登录已过期，请重新登录。',
@@ -3229,6 +3236,7 @@ const I18N = {
     um_delete_failed:'Xóa thất bại: ', um_deleted:'Đã xóa người dùng',
     ai_tab_translate:'Dịch thuật', ai_tab_chat:'Trò chuyện', ai_tab_skills:'Kỹ năng',
     ai_tab_live:'Trò chuyện trực tiếp', lc_new:'Cuộc trò chuyện mới',
+    p_clean_done:'Đã chỉnh lại văn bản',
     lc_mic_polishing:'Đang chỉnh lại văn bản…',
     lc_mic_auto:'Tự động', lc_mic_working:'Đang nhận dạng…',
     lc_mic_empty:'Không thu được giọng nói. Vui lòng thử lại.', lc_mic_expired:'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.',
@@ -3330,6 +3338,7 @@ const I18N = {
     um_delete_failed:'削除失敗：', um_deleted:'ユーザーを削除しました',
     ai_tab_translate:'翻訳', ai_tab_chat:'チャット', ai_tab_skills:'スキル',
     ai_tab_live:'オンライン会話', lc_new:'新しい会話',
+    p_clean_done:'整えました',
     lc_mic_polishing:'AI が整えています…',
     lc_mic_auto:'自動', lc_mic_working:'認識中…',
     lc_mic_empty:'音声を取得できませんでした。もう一度お試しください。', lc_mic_expired:'セッションの有効期限が切れました。再度ログインしてください。',
@@ -4369,7 +4378,7 @@ function lcPollStart() {
 function lcPollStop() {
   if (lcPollTimer) { clearInterval(lcPollTimer); lcPollTimer = null; }
   // 離開房間或頁籤時把錄音一起停掉：否則麥克風指示燈會一直亮著
-  if (lcRecOn) lcRecStop();
+  if (window.ComartVoice && ComartVoice.active()) lcRecStop();
 }
 
 async function lcPoll() {
@@ -4907,63 +4916,38 @@ function lcPickBadge() {
 }
 
 // ═══════════════════════════════════════════════════════════════════════
-// 語音輸入 — 錄音 ＋ 伺服器端轉寫（v1.86 起）
+// 語音輸入 — 呼叫共用模組 shared/voice.js
 //
-// 🔴 **v1.85 之前用的是瀏覽器內建的 Web Speech API，已整段換掉。** 兩個原因：
-//    ① 品質改不了 —— 引擎是瀏覽器給的，無法提供詞彙表，產品型號、TIPTOP、
-//       工號一律辨識不出來，而且 continuous 模式會自己中斷。
-//    ② **Chrome 的 Web Speech 把音訊送到 Google 的伺服器，Google 被 GFW 封鎖**，
-//       東莞廠根本用不了。
-//    現在 **瀏覽器只跟 Supabase 說話**，音訊由 transcribe function 從機房發給 OpenAI
-//    —— GFW 完全不相干。這是這個改動最重要的一點，不要退回 Web Speech。
-//
-// 🔴 Claude 不吃音訊輸入，所以這條路不能走 claude-proxy。
-//
-// UX 上與 Web Speech 的差別：**沒有即時逐字稿**。錄音 → 停止 → 等一兩秒 → 出文字。
-//    所以錄音中要顯示秒數，讓使用者知道還在收音。
+// 🔴 錄音、上傳、AI 整理的引擎已全部搬到 shared/voice.js（v1.89），
+//    這裡只剩「哪顆按鈕、寫到哪個欄位、用哪個語言」這種本地設定。
+//    **不要把引擎複製回來** —— 五個子系統要共用同一份，那是這次重構的目的。
 // ═══════════════════════════════════════════════════════════════════════
 
-// 語言提示：空字串 = 由模型自行判斷（使用者要的「AI 辨識」）。
-// 帶了就當提示，能明顯提升同音字的準確度。
+// 語言提示：空字串 = 由模型自行判斷（使用者要的「AI 辨識」）
 const LC_SPEECH_LANGS = [
   ['', 'AUTO'], ['zh', '中文'], ['en', 'EN'], ['vi', 'VI'], ['ja', '日本語'],
 ];
 const LC_SPEECH_KEY = 'comart-lc-speech-lang';
-const LC_REC_MAX    = 120;   // 秒。聊天室的一段話不該超過兩分鐘，也順便擋掉忘記按停止
-
-var lcMR      = null;    // MediaRecorder
-var lcStream  = null;    // MediaStream（結束一定要關掉，否則麥克風指示燈一直亮）
-var lcChunks  = [];
-var lcRecOn   = false;
-var lcRecBusy = false;   // 轉寫中
-var lcRecPolish = false; // AI 整理中（分開一個旗標，按鈕才能顯示不同階段）
-var lcRecSec  = 0;
-var lcRecTick = null;
-
-function lcRecSupported() {
-  return typeof navigator !== 'undefined' && navigator.mediaDevices &&
-         navigator.mediaDevices.getUserMedia && typeof MediaRecorder !== 'undefined';
-}
 
 function lcSpeechLang() {
   var saved = null;
   try { saved = localStorage.getItem(LC_SPEECH_KEY); } catch (e) {}
-  // 🔴 v1.85 存的是 BCP-47（'zh-TW'／'vi-VN'），新格式是 ISO-639-1（'zh'／'vi'）。
-  //    舊值一律視為無效退回「自動」—— 直接送給 API 會被拒絕。
-  if (saved !== null && LC_SPEECH_LANGS.some(function(l){ return l[0] === saved; })) return saved;
+  // v1.85 存的是 BCP-47（'zh-TW'／'vi-VN'），新格式是 ISO-639-1。
+  // 舊值一律視為無效退回「自動」—— 直接送給 API 會被拒絕。
+  if (saved !== null && LC_SPEECH_LANGS.some(function (l) { return l[0] === saved; })) return saved;
   return '';
 }
-function lcSpeechLangSet(v) {
-  try { localStorage.setItem(LC_SPEECH_KEY, v); } catch (e) {}
-}
+function lcSpeechLangSet(v) { try { localStorage.setItem(LC_SPEECH_KEY, v); } catch (e) {} }
+
+function lcVoiceOK() { return !!(window.ComartVoice && ComartVoice.supported()); }
 
 function lcRecInit() {
   var wrap = document.getElementById('lc-mic-wrap');
-  if (wrap) wrap.style.display = lcRecSupported() ? 'flex' : 'none';
+  if (wrap) wrap.style.display = lcVoiceOK() ? 'flex' : 'none';
   var sel = document.getElementById('lc-mic-lang');
   if (sel) {
     if (!sel.options.length) {
-      sel.innerHTML = LC_SPEECH_LANGS.map(function(l) {
+      sel.innerHTML = LC_SPEECH_LANGS.map(function (l) {
         return '<option value="' + l[0] + '">' + escHtml(l[1] === 'AUTO' ? t('lc_mic_auto') : l[1]) + '</option>';
       }).join('');
     }
@@ -4971,195 +4955,45 @@ function lcRecInit() {
   }
 }
 
-// MediaRecorder 的容器依瀏覽器而異：Chrome/Edge 給 webm(opus)、Safari 給 mp4(aac)。
-// 兩者 OpenAI 都吃，但**副檔名要對**（伺服器端靠 x-audio-type 決定），所以這裡明確挑一個。
-function lcRecMime() {
-  var cands = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/ogg'];
-  for (var i = 0; i < cands.length; i++) {
-    try { if (MediaRecorder.isTypeSupported(cands[i])) return cands[i]; } catch (e) {}
-  }
-  return '';   // 交給瀏覽器決定，之後從 lcMR.mimeType 讀回來
-}
-
-async function lcRecToggle() {
-  if (lcRecBusy) return;
-  if (lcRecOn) { lcRecStop(); return; }
-  if (!lcRecSupported()) { toast(t('lc_mic_unsupported'), 'err'); return; }
-  try {
-    lcStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-  } catch (e) {
-    toast(t('lc_mic_denied'), 'err'); return;
-  }
-  var mt = lcRecMime();
-  try {
-    lcMR = mt ? new MediaRecorder(lcStream, { mimeType: mt }) : new MediaRecorder(lcStream);
-  } catch (e) {
-    try { lcMR = new MediaRecorder(lcStream); }
-    catch (e2) { lcRecRelease(); toast(t('lc_mic_unsupported'), 'err'); return; }
-  }
-  lcChunks = [];
-  lcMR.ondataavailable = function(ev) { if (ev.data && ev.data.size) lcChunks.push(ev.data); };
-  lcMR.onstop = lcRecFinish;
-  /* 🔴 用 timeslice 分塊收，而不是「不給參數、最後一次拿完整檔」：
-     ① 長錄音時瀏覽器不必把整段留在記憶體裡才吐出來
-     ② 每一塊都進 lcChunks（**含第一塊**），依序串回去就是原始串流 ——
-        webm 的容器 header 在第一塊裡，少了它解碼器只能從後面的 cluster 開始，
-        那正是「只擷取最後一段」的典型成因，所以第一塊絕對不能漏。
-     ③ 塊數可以印出來當診斷依據 */
-  try { lcMR.start(2000); }
-  catch (e) { lcRecRelease(); toast(t('lc_mic_failed'), 'err'); return; }
-
-  lcRecOn = true; lcRecSec = 0; lcRecPaint();
-  lcRecTick = setInterval(function() {
-    lcRecSec++;
-    lcRecPaint();
-    if (lcRecSec >= LC_REC_MAX) lcRecStop();   // 忘記按停止時自己收
-  }, 1000);
-}
-
-function lcRecStop() {
-  if (lcRecTick) { clearInterval(lcRecTick); lcRecTick = null; }
-  lcRecOn = false;
-  // onstop 會接著跑 lcRecFinish；若 MediaRecorder 已不在錄音狀態就直接收尾
-  if (lcMR && lcMR.state !== 'inactive') { try { lcMR.stop(); } catch (e) { lcRecRelease(); } }
-  else { lcRecRelease(); }
-  lcRecPaint();
-}
-
-// 🔴 一定要把 track 停掉：不停的話瀏覽器分頁的麥克風指示燈會一直亮著，
-//    使用者會（合理地）以為我們在偷錄音。
-function lcRecRelease() {
-  if (lcStream) {
-    try { lcStream.getTracks().forEach(function(tr) { tr.stop(); }); } catch (e) {}
-    lcStream = null;
-  }
-  lcMR = null;
-}
-
-async function lcRecFinish() {
-  var mime = (lcMR && lcMR.mimeType) || 'audio/webm';
-  var nChunks = lcChunks.length;
-  var blob = nChunks ? new Blob(lcChunks, { type: mime }) : null;
-  lcChunks = [];
-  lcRecRelease();
-  // 診斷：秒數／塊數／位元數。使用者回報「不完整」時，這三個數字加上伺服器
-  // 回傳的 bytes 就能分辨是錄音端漏了、上傳漏了，還是模型截斷
-  console.log('[lc] audio', { sec: lcRecSec, chunks: nChunks, bytes: blob ? blob.size : 0, mime: mime });
-  if (!blob || blob.size < 1200) { lcRecPaint(); toast(t('lc_mic_empty')); return; }
-
-  lcRecBusy = true; lcRecPaint();
-  try {
-    var res = await fetch(SB_URL + '/functions/v1/transcribe', {
-      method: 'POST',
-      headers: {
-        'x-session': (SESSION && SESSION.sig) || '',
-        'x-audio-type': mime,
-        'x-audio-lang': lcSpeechLang(),
-      },
-      body: blob,
-    });
-    if (!res.ok) {
-      var why = await res.text().catch(function(){ return ''; });
-      console.warn('[lc] transcribe', res.status, why.slice(0, 200));
-      toast(t(res.status === 401 ? 'lc_mic_expired' : 'lc_mic_failed'), 'err');
-      return;
-    }
-    var data = await res.json();
-    var txt = String((data && data.text) || '').trim();
-    console.log('[lc] transcribe', { sentBytes: blob.size, gotBytes: data && data.bytes,
-                                     model: data && data.model, chars: txt.length });
-    // 上傳的位元數與伺服器收到的不一致 = 上傳被截斷，那是完全不同的問題，要講清楚
-    if (data && data.bytes && data.bytes !== blob.size) {
-      console.warn('[lc] byte mismatch — 上傳的音訊不完整', blob.size, '→', data.bytes);
-    }
-    if (!txt) { toast(t('lc_mic_empty')); return; }
-
-    // AI 整理：標點、口語填充、同音字。失敗就用原始逐字稿（見 lcCleanTranscript）
-    lcRecPolish = true; lcRecPaint();
-    var clean = await lcCleanTranscript(txt);
-    lcRecPolish = false;
-    console.log('[lc] cleanup', { raw: txt.length, clean: clean.length,
-                                  changed: clean !== txt });
-    txt = clean;
-
-    var el = document.getElementById('lc-input');
-    if (el) {
-      // 接在既有內容後面（可能是打了一半的字，或前一段語音）
+function lcRecToggle() {
+  if (!lcVoiceOK()) { toast(t('lc_mic_unsupported'), 'err'); return; }
+  ComartVoice.toggle({
+    sbUrl: SB_URL,
+    sig: function () { return (SESSION && SESSION.sig) || ''; },
+    lang: lcSpeechLang,
+    callClaude: pCallClaude,          // AI 整理走 Portal 既有的 claude-proxy 包裝
+    onState: lcRecPaint,
+    onError: function (code) {
+      toast(t({ unsupported: 'lc_mic_unsupported', denied: 'lc_mic_denied',
+                empty: 'lc_mic_empty', expired: 'lc_mic_expired' }[code] || 'lc_mic_failed'), 'err');
+      lcRecPaint('idle', 0);
+    },
+    onText: function (txt) {
+      var el = document.getElementById('lc-input');
+      if (!el) return;
       el.value = el.value ? (el.value.replace(/\s+$/, '') + ' ' + txt) : txt;
       el.style.height = 'auto';
       el.style.height = Math.min(el.scrollHeight, LC_INPUT_MAX) + 'px';
       el.focus();
-    }
-  } catch (e) {
-    console.warn('[lc] transcribe', e);
-    toast(t('lc_mic_failed'), 'err');
-  } finally {
-    lcRecBusy = false; lcRecPolish = false; lcRecPaint();
-  }
+    },
+  });
 }
 
-function lcRecPaint() {
+function lcRecStop() { if (window.ComartVoice) ComartVoice.stop(); }
+
+function lcRecPaint(state, sec) {
   var b = document.getElementById('lc-mic-btn');
   if (!b) return;
-  b.classList.toggle('on', lcRecOn);
-  b.classList.toggle('busy', lcRecBusy);
-  b.disabled = lcRecBusy;
-  if (lcRecPolish)    { b.textContent = '✨'; b.title = t('lc_mic_polishing'); }
-  else if (lcRecBusy) { b.textContent = '⋯'; b.title = t('lc_mic_working'); }
-  else if (lcRecOn)   { b.textContent = '⏹ ' + lcRecSec + 's'; b.title = t('lc_mic_stop'); }
-  else                { b.textContent = '🎙'; b.title = t('lc_mic_start'); }
+  var st = state || (window.ComartVoice ? ComartVoice.state() : 'idle');
+  var s  = (sec == null) ? (window.ComartVoice ? ComartVoice.seconds() : 0) : sec;
+  b.classList.toggle('on', st === 'recording');
+  b.disabled = (st === 'uploading' || st === 'polishing');
+  if (st === 'recording')      { b.textContent = '⏹ ' + s + 's'; b.title = t('lc_mic_stop'); }
+  else if (st === 'uploading') { b.textContent = '⋯';            b.title = t('lc_mic_working'); }
+  else if (st === 'polishing') { b.textContent = '✨';           b.title = t('lc_mic_polishing'); }
+  else                         { b.textContent = '🎙';           b.title = t('lc_mic_start'); }
   var sel = document.getElementById('lc-mic-lang');
-  if (sel) sel.disabled = lcRecOn || lcRecBusy;
-}
-
-// ─── AI 整理逐字稿 ───
-// 🔴 這一步是**翻譯頁籤的語音輸入之所以「效果好」的真正原因**（pCleanText），
-//    不是它的辨識比較準 —— 那邊用的是同一套 Web Speech API，而且 lang 寫死 'zh-TW'。
-//    使用者感覺到的「自動調教、標點自動調整」全部來自辨識**之後**送給 Claude 整理。
-//    whisper 的輸出雖然已有標點，但不會去掉「嗯」「那個」這類口語填充、也不會修順語句。
-const LC_CLEAN_MODEL = 'claude-sonnet-5';
-
-// 🔴 這裡最大的風險是「整理」變成「改寫」。線上對話的內容接著會被翻成四語、
-//    存進資料庫、匯出成 PDF —— 動到語意就是竄改別人的發言。
-//    所以規則寫得比翻譯頁籤那句嚴格得多：同語言、不增刪、不回答、不翻譯。
-const LC_CLEAN_SYS =
-  'You clean up raw speech-to-text output from an internal work chat at a manufacturer ' +
-  '(Taiwan / Dongguan / Vietnam sites).\n\n' +
-  'Rules:\n' +
-  '- Output the SAME language as the input. Never translate.\n' +
-  '- Add correct punctuation and sentence breaks.\n' +
-  '- Remove speech disfluencies only (um, uh, 嗯, 那個, repeated false starts).\n' +
-  '- Fix obvious speech-recognition errors, especially homophones, using the work context.\n' +
-  '- Do NOT add, remove or reinterpret any content. Do NOT answer, explain or comment.\n' +
-  '- Do NOT make it more formal or polite than the speaker was.\n' +
-  '- Keep unchanged: names, product and system names (COMART, TIPTOP, PLM, Qi2), ' +
-  'model numbers, employee IDs, numbers, dates and units.\n\n' +
-  'Reply with ONLY the cleaned text wrapped in <clean></clean> and nothing else.';
-
-async function lcCleanTranscript(raw) {
-  var txt = String(raw || '').trim();
-  if (txt.length < 4) return txt;          // 太短沒什麼可整理，省一次呼叫
-  try {
-    var budget = Math.min(4000, Math.max(600, txt.length * 3 + 200));
-    var out = await pCallClaude(
-      [{ role: 'user', content: '<raw>' + txt + '</raw>' }],
-      LC_CLEAN_SYS, budget, LC_CLEAN_MODEL);
-    // 用標籤取值，避免模型加上「以下是整理後的文字：」之類的前言
-    // （同 lcTranslate 改用標籤的理由）
-    var m = String(out || '').match(/<clean>([\s\S]*?)<\/clean>/i);
-    var got = m ? m[1].trim() : String(out || '').trim();
-    /* 🔴 整理失敗或結果可疑時一律退回原文，**絕不能讓使用者的話消失**。
-       長度掉到不足六成 = 模型很可能自己摘要或截斷了，那比沒整理更糟。 */
-    if (!got) return txt;
-    if (got.length < txt.length * 0.6) {
-      console.warn('[lc] cleanup 結果過短，退回原文', txt.length, '→', got.length);
-      return txt;
-    }
-    return got;
-  } catch (e) {
-    console.warn('[lc] cleanup failed', e);
-    return txt;                            // 整理只是加分項，失敗不該讓語音輸入整個失效
-  }
+  if (sel) sel.disabled = (st !== 'idle');
 }
 
 // ─── 時區標註 ───
@@ -5191,6 +5025,10 @@ function lcApplyI18n() {
   txt('lc-send-btn','lc_send');   ph('lc-input','lc_input_ph');
   var at = document.getElementById('lc-attach-btn'); if (at) at.title = t('lc_image');
   lcRecInit(); lcRecPaint();
+  // 翻譯頁籤的語音與整理鈕（原本 title 寫死中文）
+  var pv = document.getElementById('p-voice-btn'); if (pv) pv.title = t('lc_mic_start');
+  var pc = document.getElementById('p-clean-btn'); if (pc) pc.title = t('lc_mic_polishing');
+  if (!pVoiceOK() && pv) pv.style.display = 'none';
   txt('lc-pick-btn','lc_pick_btn');   txt('lc-invite-btn','lc_invite');
   txt('lc-pick-all','lc_pick_all');   txt('lc-pick-none','lc_pick_none');
   txt('lc-pick-cancel','lc_cancel');  txt('lc-pick-ok','lc_ok');
@@ -6135,121 +5973,80 @@ async function deleteCalEvent() {
 // (the original switchView calls loadTrips, now use initCalendar)
 
 // ═══════════════════════════════════════════════
-// VOICE INPUT + AI CLEANUP
+// 翻譯頁籤的語音輸入 — 呼叫共用模組 shared/voice.js
+//
+// 🔴 v1.88 之前這裡是自己一套 Web Speech API，有三個問題：
+//    ① **`lang` 寫死 `'zh-TW'`** —— 越南與日本同事用了全錯，而這個工具的用途
+//       恰好就是跨語言溝通。
+//    ② **音訊送到 Google 的伺服器，Google 被 GFW 封鎖** —— 東莞廠完全不能用，
+//       而錯誤訊息還寫死中文「請改用 Chrome（桌面或 Android）」，那個建議在東莞是錯的。
+//    ③ 辨識品質改不了（無法提供詞彙表，產品型號一律聽錯）。
+//    使用者原本覺得「這個效果好」，好的其實是辨識**之後**那一步 AI 整理（pCleanText）——
+//    現在整理已內建在共用模組裡，辨識也換成 whisper，兩邊一起變好。
 // ═══════════════════════════════════════════════
-var _pVoiceActive = false;
-var _pVoiceSR     = null;
+
+function pVoiceOK() { return !!(window.ComartVoice && ComartVoice.supported()); }
 
 function pStartVoice() {
-  var btn      = document.getElementById('p-voice-btn');
-  var statusEl = document.getElementById('p-voice-status');
-  var input    = document.getElementById('p-xlat-input');
-
-  // ── 停止錄音 ──
-  if (_pVoiceActive && _pVoiceSR) {
-    _pVoiceActive = false;
-    try { _pVoiceSR.stop(); } catch(_) {}
-    if (btn)      { btn.style.background = 'var(--s2)'; btn.style.color = ''; }
-    if (statusEl) statusEl.style.display = 'none';
-    return;
-  }
-
-  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) {
-    toast('⚠️ 此瀏覽器不支援語音輸入，請改用 Chrome（桌面或 Android）');
-    return;
-  }
-
-  // ── 先取得 getUserMedia 權限，避免 service-not-allowed ──
-  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-    _pDoStartSR(SR, btn, statusEl, input);
-    return;
-  }
-
-  navigator.mediaDevices.getUserMedia({ audio: true })
-    .then(function(stream) {
-      stream.getTracks().forEach(function(t) { t.stop(); }); // 馬上釋放，SR 自己會重新取
-      _pDoStartSR(SR, btn, statusEl, input);
-    })
-    .catch(function(err) {
-      toast('⚠️ 麥克風權限被拒。請點網址列左側的鎖頭圖示 → 允許麥克風，再重試');
-    });
+  if (!pVoiceOK()) { toast(t('lc_mic_unsupported'), 'err'); return; }
+  ComartVoice.toggle({
+    sbUrl: SB_URL,
+    sig: function () { return (SESSION && SESSION.sig) || ''; },
+    lang: '',                       // 自動判斷語言（原本寫死 zh-TW，非中文使用者全錯）
+    callClaude: pCallClaude,
+    onState: pVoicePaint,
+    onError: function (code) {
+      toast(t({ unsupported: 'lc_mic_unsupported', denied: 'lc_mic_denied',
+                empty: 'lc_mic_empty', expired: 'lc_mic_expired' }[code] || 'lc_mic_failed'), 'err');
+      pVoicePaint('idle', 0);
+    },
+    onText: function (txt) {
+      var el = document.getElementById('p-xlat-input');
+      if (!el) return;
+      el.value = el.value ? (el.value.replace(/\s+$/, '') + ' ' + txt) : txt;
+      el.focus();
+    },
+  });
 }
 
-function _pDoStartSR(SR, btn, statusEl, input) {
-  var sr;
-  try { sr = new SR(); } catch(e) { toast('語音初始化失敗：' + e.message); return; }
-
-  sr.continuous      = true;   // continuous 模式更穩定，避免過早結束
-  sr.interimResults  = false;
-  sr.maxAlternatives = 1;
-  sr.lang            = 'zh-TW';
-  _pVoiceSR = sr;
-
-  var finalTranscript = '';
-
-  sr.onresult = function(e) {
-    for (var i = e.resultIndex; i < e.results.length; i++) {
-      if (e.results[i].isFinal) finalTranscript += e.results[i][0].transcript;
+function pVoicePaint(state, sec) {
+  var btn = document.getElementById('p-voice-btn');
+  var st  = document.getElementById('p-voice-status');
+  var s   = (state === 'recording');
+  if (btn) {
+    btn.style.background = s ? '#7c3aed' : 'var(--s2)';
+    btn.style.color      = s ? '#fff' : '';
+    btn.disabled         = (state === 'uploading' || state === 'polishing');
+    btn.textContent = state === 'recording' ? '⏹'
+                    : state === 'uploading' ? '⋯'
+                    : state === 'polishing' ? '✨' : '🎙';
+  }
+  if (st) {
+    if (state === 'idle') st.style.display = 'none';
+    else {
+      st.style.display = 'block';
+      st.textContent = state === 'recording' ? ('● ' + t('lc_mic_stop') + ' — ' + sec + 's')
+                     : state === 'uploading' ? t('lc_mic_working')
+                     : t('lc_mic_polishing');
     }
-    if (input) input.value = (input.value ? input.value + ' ' : '') + finalTranscript;
-    finalTranscript = ''; // reset per-chunk
-  };
-
-  sr.onend = function() {
-    _pVoiceActive = false;
-    if (btn)      { btn.style.background = 'var(--s2)'; btn.style.color = ''; }
-    if (statusEl) statusEl.style.display = 'none';
-    var txt = input ? input.value.trim() : '';
-    if (txt) { toast('錄音完成，AI 整理中…'); pCleanText(); }
-  };
-
-  sr.onerror = function(e) {
-    _pVoiceActive = false;
-    if (btn)      { btn.style.background = 'var(--s2)'; btn.style.color = ''; }
-    if (statusEl) statusEl.style.display = 'none';
-    var msg = e.error;
-    if (msg === 'not-allowed' || msg === 'service-not-allowed') {
-      toast('⚠️ 麥克風權限被拒。請點網址列鎖頭 → 允許麥克風後重試');
-    } else if (msg === 'no-speech') {
-      toast('沒有偵測到語音，請再試一次');
-    } else if (msg === 'network') {
-      toast('語音辨識需要網路連線');
-    } else {
-      toast('語音錯誤：' + msg);
-    }
-  };
-
-  try {
-    sr.start();
-    _pVoiceActive = true;
-    if (btn)      { btn.style.background = '#7c3aed'; btn.style.color = '#fff'; }
-    if (statusEl) { statusEl.style.display = 'block'; statusEl.textContent = '● 錄音中… (再按一次停止)'; }
-  } catch(e) {
-    toast('無法啟動語音：' + e.message);
   }
 }
 
+// ✨ 鈕：對輸入框裡現有的文字做 AI 整理（不錄音）。沿用共用模組的同一套規則，
+// 免得「語音整理」與「按鈕整理」兩種結果不一致。
 async function pCleanText() {
   var input = document.getElementById('p-xlat-input');
   var text  = input ? input.value.trim() : '';
-  if (!text) { toast('Please enter text first'); return; }
-
-  var btn = document.getElementById('p-voice-btn');
-  toast('✨ AI 整理中…');
-
+  if (!text) { toast(t('lc_mic_empty')); return; }
+  if (!window.ComartVoice) { toast(t('lc_mic_failed'), 'err'); return; }
+  toast(t('lc_mic_polishing'));
   try {
-    var prompt = '請將以下文字整理好，加上正確的標點符號，修正語句讓它更通順自然，保持原意。只輸出整理後的文字，不要加說明。\n\n' + text;
-    var result = await pCallClaude([{ role: 'user', content: prompt }], null, 1000);
-    if (input && result) {
-      input.value = result.trim();
-      toast('✨ 整理完成');
-    }
-  } catch(e) {
-    toast('Cleanup failed: ' + e.message);
+    var out = await ComartVoice.clean(text, pCallClaude);
+    if (input && out) { input.value = out; toast(t('p_clean_done'), 'ok'); }
+  } catch (e) {
+    toast(t('lc_mic_failed'), 'err');
   }
 }
-
 
 function toggleAddMenu() {
   var dd = document.getElementById('addMenuDropdown');

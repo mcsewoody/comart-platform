@@ -24,7 +24,7 @@
 (function (global) {
   'use strict';
 
-  var V = { VERSION: '1.0' };
+  var V = { VERSION: '2.0' };
 
   var MAX_SEC   = 120;      // 忘記按停止時自己收（成本與等待時間都會失控）
   var MIN_BYTES = 1200;     // 比這還小就是誤觸，不值得送一次 API
@@ -35,6 +35,88 @@
   var mr = null, stream = null, chunks = [];
   var active = false, uploading = false, polishing = false;
   var sec = 0, tick = null, cfg = null;
+
+  /* ═══════════════════════════════════════════════════════════════════
+     🔴 錄好的音訊一律先轉成 **16 kHz 單聲道 WAV** 才上傳（v2.0 起）。
+     為什麼不直接傳 MediaRecorder 的原始檔：
+       ① MediaRecorder 產出的是**串流式容器**（webm/mp4），是邊錄邊寫的，
+          header 裡沒有時長。已經因此踩過一次坑（gpt-4o-transcribe 依賴
+          metadata 判斷時長，只轉了一小段）。WAV 的 header 帶完整長度。
+       ② 各瀏覽器容器不同（Chrome webm/opus、Safari mp4/aac），
+          轉成 WAV 之後伺服器端只需處理一種格式。
+       ③ 16 kHz 單聲道正是 Whisper 內部的取樣率，多餘的取樣率與聲道只是浪費上傳。
+          48 kHz 立體聲 → 16 kHz 單聲道，體積只有六分之一。
+       ④ **解碼之後才能算音量**，才有辦法在送出前判斷「這段根本沒有人聲」——
+          見 SILENCE 的說明，那是這次幻覺問題的關鍵。
+     解碼失敗（瀏覽器不認自己錄的容器，理論上不該發生）就退回傳原始 blob。
+     ═══════════════════════════════════════════════════════════════════ */
+  var WAV_RATE = 16000;
+
+  /* 🔴 **無聲就不要送給 Whisper。**
+     Whisper 是用 YouTube 影片與字幕訓練的，收到近似無聲的音訊時會「填入」
+     訓練資料裡的樣板文字 —— 中文最常見的就是
+     「以上是本期視頻的全部內容，感謝大家收看，我們下次再見。」
+     英文是 "Thank you for watching!"。使用者明明講了一堆卻只拿到這句，
+     就是音訊沒有被正確錄到／解碼到。
+     這裡的門檻刻意訂得很寬鬆（只擋掉「幾乎全靜音」），不要為了保險而
+     誤殺講話小聲的人 —— 誤殺的代價是「我明明講了卻說沒收到」。 */
+  var SILENCE_RMS  = 0.0015;   // 整段的均方根振幅
+  var SILENCE_PEAK = 0.01;     // 整段的最大振幅
+
+  function toWav(samples, rate) {
+    var n = samples.length, buf = new ArrayBuffer(44 + n * 2), v = new DataView(buf);
+    function str(off, s) { for (var i = 0; i < s.length; i++) v.setUint8(off + i, s.charCodeAt(i)); }
+    str(0, 'RIFF');  v.setUint32(4, 36 + n * 2, true);  str(8, 'WAVE');
+    str(12, 'fmt '); v.setUint32(16, 16, true); v.setUint16(20, 1, true);
+    v.setUint16(22, 1, true);                       // 單聲道
+    v.setUint32(24, rate, true);
+    v.setUint32(28, rate * 2, true);                // byte rate
+    v.setUint16(32, 2, true);                       // block align
+    v.setUint16(34, 16, true);                      // 16-bit
+    str(36, 'data'); v.setUint32(40, n * 2, true);
+    for (var i = 0; i < n; i++) {
+      var x = Math.max(-1, Math.min(1, samples[i]));
+      v.setInt16(44 + i * 2, x < 0 ? x * 0x8000 : x * 0x7FFF, true);
+    }
+    return new Blob([buf], { type: 'audio/wav' });
+  }
+
+  // 回 { blob, mime, rms, peak, seconds } —— 解碼不了就回原 blob 並把 rms 設為 null
+  async function toWavBlob(src) {
+    var AC = global.AudioContext || global.webkitAudioContext;
+    if (!AC) return { blob: src, mime: src.type || 'audio/webm', rms: null };
+    var ctx = null;
+    try {
+      var bytes = await src.arrayBuffer();
+      ctx = new AC();
+      var audio = await ctx.decodeAudioData(bytes);
+      // 多聲道混成單聲道（會議室常見的雙麥克風輸入）
+      var chs = audio.numberOfChannels, len = audio.length;
+      var mono = new Float32Array(len);
+      for (var c = 0; c < chs; c++) {
+        var d = audio.getChannelData(c);
+        for (var i = 0; i < len; i++) mono[i] += d[i] / chs;
+      }
+      // 線性重取樣到 16 kHz（語音不需要更講究的濾波器）
+      var ratio = audio.sampleRate / WAV_RATE;
+      var outLen = Math.max(1, Math.floor(len / ratio));
+      var out = new Float32Array(outLen);
+      for (var j = 0; j < outLen; j++) {
+        var pos = j * ratio, i0 = Math.floor(pos), i1 = Math.min(len - 1, i0 + 1), f = pos - i0;
+        out[j] = mono[i0] * (1 - f) + mono[i1] * f;
+      }
+      var sum = 0, peak = 0;
+      for (var k = 0; k < outLen; k++) { sum += out[k] * out[k]; var a = Math.abs(out[k]); if (a > peak) peak = a; }
+      var rms = Math.sqrt(sum / outLen);
+      try { ctx.close(); } catch (e) {}
+      return { blob: toWav(out, WAV_RATE), mime: 'audio/wav', rms: rms, peak: peak,
+               seconds: outLen / WAV_RATE };
+    } catch (e) {
+      console.warn('[voice] WAV 轉檔失敗，改傳原始格式', e && e.message);
+      if (ctx) { try { ctx.close(); } catch (e2) {} }
+      return { blob: src, mime: src.type || 'audio/webm', rms: null };
+    }
+  }
 
   V.supported = function () {
     return !!(global.navigator && global.navigator.mediaDevices &&
@@ -124,6 +206,20 @@
     if (!blob || blob.size < MIN_BYTES) { paint(); fail('empty'); return; }
 
     uploading = true; paint();
+
+    // 轉 16 kHz 單聲道 WAV（見 toWavBlob 的說明），順便量音量
+    var prep = await toWavBlob(blob);
+    console.log('[voice] wav', { bytes: prep.blob.size, mime: prep.mime,
+                                 rms: prep.rms, peak: prep.peak, seconds: prep.seconds });
+    /* 🔴 幾乎全靜音就不要送 —— Whisper 會回訓練資料裡的 YouTube 樣板文字
+       （「以上是本期視頻的全部內容，感謝大家收看」／"Thank you for watching!"）。
+       告訴使用者「沒收到語音」遠好過把那句話塞進他的週報。 */
+    if (prep.rms !== null && (prep.rms < SILENCE_RMS || prep.peak < SILENCE_PEAK)) {
+      console.warn('[voice] 音量過低，判定為無聲，不送出', prep.rms, prep.peak);
+      uploading = false; paint(); fail('silent'); return;
+    }
+    blob = prep.blob; mime = prep.mime;
+
     var raw = '';
     try {
       var sig  = typeof cfg.sig  === 'function' ? cfg.sig()  : (cfg.sig  || '');
@@ -141,6 +237,11 @@
       }
       var data = await res.json();
       raw = String((data && data.text) || '').trim();
+      // 伺服器端認出是 Whisper 的樣板幻覺（見 transcribe 的 HALLUCINATIONS）
+      if (data && data.hallucination) {
+        console.warn('[voice] 伺服器判定為 Whisper 幻覺輸出，已丟棄');
+        uploading = false; paint(); fail('silent'); return;
+      }
       console.log('[voice] transcribe', { sentBytes: blob.size, gotBytes: data && data.bytes,
                                           model: data && data.model, chars: raw.length });
       // 上傳與伺服器收到的位元數不一致 ＝ 上傳被截斷，那是完全不同的問題
@@ -253,6 +354,7 @@
             unsupported: tt('voice_unsupported', '這個瀏覽器無法錄音，請使用 Chrome、Edge 或 Safari。'),
             denied:      tt('voice_denied',      '麥克風權限被拒絕，請在瀏覽器設定中允許。'),
             empty:       tt('voice_empty',       '沒有收到語音，請再試一次。'),
+            silent:      tt('voice_silent',      '這段錄音幾乎沒有聲音。請確認麥克風有收到音，再試一次。'),
             expired:     tt('voice_expired',     '登入已逾期，請重新登入。'),
             failed:      tt('voice_failed',      '語音辨識失敗，請再試一次，或改用打字。'),
           }[code] || code;

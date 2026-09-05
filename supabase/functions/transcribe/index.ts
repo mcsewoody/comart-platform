@@ -44,16 +44,56 @@ const EXT: Record<string, string> = {
   "audio/x-m4a": "m4a",
 }
 
-// 🔴 詞彙提示：這正是瀏覽器內建引擎做不到、而使用者抱怨「辨識效果不佳」的部分。
-//    只列**會被聽錯的專有名詞**，不要塞一般詞彙 —— 提示過長反而會讓模型
-//    把提示裡的詞硬套進不相關的句子。
-const VOCAB = [
-  "COMART", "TIPTOP", "PLM", "ERP", "Qi2", "MagSafe",
-  "東莞廠", "越南廠", "台灣營運中心",
-  "報價單", "出貨", "打樣", "開模", "驗貨", "櫃號", "工單", "料號",
-].join("、")
+/* 🔴 **prompt 必須是「有標點的完整句子」，不能是逗號串起來的詞彙表。**
+   whisper-1 的 prompt 不是指令，是「前一段逐字稿」——模型會**模仿它的風格**，
+   包含標點習慣。v1 版的 prompt 是 `COMART、TIPTOP、PLM、…` 這種沒有句號的
+   詞彙串，於是輸出也跟著幾乎不標點，這就是使用者說「標點符號不太行」的原因。
+   同時它完全沒有把模型帶離 YouTube 字幕的語境，而 Whisper 是用 YouTube 影片
+   訓練的 —— 音訊一有問題就會冒出「感謝大家收看」那類樣板句。
+   現在這段本身就是標點齊全的中文句子，同時交代了場景與可能出現的術語。 */
+const VOCAB =
+  "以下是台灣、東莞廠與越南廠同事的內部工作錄音，內容多與訂單、出貨、" +
+  "打樣、開模、驗貨、櫃號、工單與料號有關。可能會提到 COMART、TIPTOP、PLM、" +
+  "ERP、Qi2、MagSafe 等名稱。請逐字記錄，並加上正確的標點符號。"
 
 const LANGS = new Set(["zh", "en", "vi", "ja"])
+
+/* 🔴 Whisper 的樣板幻覺。它是用 YouTube 影片與字幕訓練的，收到近似無聲或
+   無法解碼的音訊時會「填入」訓練資料裡最常見的句子。實際踩到的是
+   「以上是本期視頻的全部內容，感謝大家收看，我們下次再見。」——
+   使用者講了一整段，拿到的卻只有這句。
+   前端已先用音量擋掉全靜音（shared/voice.js 的 SILENCE_RMS），這裡是第二道：
+   **整段輸出幾乎只有樣板句時就當成沒收到**，回 hallucination:true 讓前端
+   顯示「這段錄音幾乎沒有聲音」，而不是把這句話塞進使用者的週報。
+   ⚠️ 只比對「整段幾乎等於樣板」，不做關鍵字包含判斷 —— 有人真的講
+   「感謝大家收看」時不該被吞掉。 */
+const HALLUCINATIONS = [
+  "以上是本期視頻的全部內容感謝大家收看我們下次再見",
+  "以上就是本期視頻的全部內容感謝大家收看我們下次再見",
+  "感謝大家收看我們下次再見",
+  "謝謝大家收看下次再見",
+  "字幕由amaraorg社群提供",
+  "字幕志願者",
+  "請不吝點贊訂閱轉發打賞支持明鏡與點點欄目",
+  "thankyouforwatching",
+  "thanksforwatching",
+  "thankyouforwatchingandseeyouinthenextvideo",
+  "pleasesubscribetomychannel",
+  "subtitlesbytheamaraorgcommunity",
+]
+
+// 去掉標點、空白與大小寫差異之後再比，才不會被「，」「。」的有無騙過
+function normalizeForHalluc(t: string): string {
+  return t.toLowerCase().replace(/[\s\p{P}\p{S}]/gu, "")
+}
+
+function looksHallucinated(text: string): boolean {
+  const n = normalizeForHalluc(text)
+  if (!n) return false
+  // 只有「整段就是樣板」才算。長一點的內容裡剛好包含這句話是正常發言。
+  if (n.length > 60) return false
+  return HALLUCINATIONS.some((h) => n === h || (h.length >= 10 && n.startsWith(h) && n.length < h.length * 1.3))
+}
 
 /* 🔴 **模型必須是 whisper-1，不要換成 gpt-4o-transcribe**（v1.87 改回）。
    使用者回報「語音輸入不完整，只擷取最後一段文字」，根因是：
@@ -115,6 +155,10 @@ serve(async (req) => {
 
     const data = await res.json()
     const text = String(data.text || "").trim()
+    if (looksHallucinated(text)) {
+      console.warn("[transcribe] 樣板幻覺，已丟棄:", text.slice(0, 80))
+      return json({ text: "", hallucination: true, bytes: buf.length, mime, model: MODEL, chars: 0 })
+    }
     /* 🔴 回傳 bytes／mime／chars 是刻意的診斷資訊：
        下次再有人說「不完整」，比對前端的 blob 大小與這裡的 bytes 就能分辨是
        「上傳的音訊本身不全」（前端問題）還是「音訊完整但文字短」（模型截斷）。

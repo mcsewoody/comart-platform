@@ -20,6 +20,40 @@ COMART Platform is an internal corporate portal for COMART Corporation, deployed
 - **為什麼破例**：其他共用邏輯（i18n 字典、`PM_TR_RULES`／`LC_TR_RULES` 的翻譯規則）
   都是各檔一份副本，CLAUDE.md 已記載那必然分岔、**而分岔之後寬鬆的那一份就是實際
   生效的那一份**。使用者 2026-09-05 明確要求「以後我的系統的語音輸入全部用同一個」。
+### 🔴 Whisper 幻覺與標點：兩個必須一起看的坑（voice.js v2.0，2026-09-06）
+
+使用者講了一整段，拿到的只有「以上是本期視頻的全部內容，感謝大家收看，我們下次再見。」
+那是 **Whisper 的樣板幻覺**：它用 YouTube 影片與字幕訓練，收到近似無聲或無法解碼的
+音訊時會填入訓練資料裡最常見的句子（英文是 "Thank you for watching!"）。
+
+- 🔴 **錄好的音訊一律先轉 16 kHz 單聲道 WAV 才上傳**（`toWavBlob`）。
+  MediaRecorder 產出的是**串流式容器**（webm/mp4），邊錄邊寫、header 裡沒有時長 ——
+  已經因此踩過一次坑（gpt-4o-transcribe 只轉了一小段）。WAV 的 header 帶完整長度，
+  且各瀏覽器的容器差異在前端就收斂掉。順帶：16 kHz 單聲道正是 Whisper 內部的取樣率，
+  48 kHz 立體聲轉過去體積只有六分之一。**解碼失敗才退回傳原始格式。**
+- 🔴 **解碼之後要量音量，近乎靜音就不要送**（`SILENCE_RMS` / `SILENCE_PEAK`）。
+  這是擋幻覺最有效的一層 —— 業界標準做法是上 VAD，這裡用整段 RMS 與峰值就夠。
+  門檻刻意訂得很寬鬆，**不要為了保險而誤殺講話小聲的人**：誤殺的代價是
+  「我明明講了卻說沒收到」。
+- 🔴 **伺服器端第二道：`looksHallucinated()`**（`transcribe`）。
+  只比對「**整段幾乎等於樣板句**」，去標點去空白後比對，且 60 字以上一律不判。
+  **不做關鍵字包含判斷** —— 有人真的講「感謝大家收看」時不該被吞掉
+  （測試裡就有這一項）。命中時回 `hallucination:true`，前端當成 `silent`，
+  **絕不把那句話寫進使用者的欄位**。
+- 🔴 **`transcribe` 的 `prompt` 必須是「有標點的完整句子」，不能是逗號串起來的詞彙表。**
+  whisper-1 的 prompt 不是指令，是「前一段逐字稿」——**模型會模仿它的風格，包含標點習慣**。
+  v1 的 prompt 是 `COMART、TIPTOP、PLM、…` 這種沒有句號的詞彙串，於是輸出也幾乎不標點，
+  這就是使用者說「標點符號不太行」的直接原因；而且它完全沒有把模型帶離 YouTube 的語境。
+  現在那段本身就是標點齊全的中文句子，同時交代場景與可能出現的術語。
+
+### 東莞廠與越南廠可用性
+
+**可以用。** 瀏覽器只跟 `tcvlnpgpuphdalzvmoyo.supabase.co` 說話（整個平台本來就靠它），
+音訊由 edge function 從 Supabase 機房發給 OpenAI —— **GFW 與 OpenAI 的地區限制都不相干**。
+這正是不用瀏覽器內建 Web Speech API 的主要理由（那個會把音訊送到 Google，中國封鎖）。
+唯一的環境要求是 **HTTPS**（麥克風權限需要 secure context）與瀏覽器支援 MediaRecorder
+（Chrome／Edge／Safari 14.3+ 都可以，Firefox 不支援錄音格式偵測會自動隱藏按鈕）。
+
 - 🔴 **改 `shared/voice.js` 時，所有載入它的 HTML 的 `?v=` 都要 +1。**
   GitHub Pages 的 Cache-Control 是 4 小時，不 bump 的話使用者拿到舊版**而且看不出來**。
   目前載入者：`index.html`（Portal：線上對話、翻譯頁籤）與 `board/index.html`

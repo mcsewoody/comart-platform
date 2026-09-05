@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>COMART Platform v1.81</title>
+<title>COMART Platform v1.82</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script defer src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.js"></script>
 <style>
@@ -291,6 +291,12 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:
 .lc-retry { margin-left:5px; padding:2px 7px; border-radius:5px; border:1px solid var(--br); background:var(--s2); color:var(--tx3); font-size:10.5px; cursor:pointer; font-family:var(--ff); }
 .lc-composer { display:flex; gap:8px; align-items:flex-end; padding:10px 14px; border-top:1px solid var(--br); background:var(--s1); flex-shrink:0; padding-bottom:calc(10px + env(safe-area-inset-bottom)); }
 .lc-composer textarea { flex:1; resize:none; max-height:132px; padding:9px 11px; border-radius:10px; border:1px solid var(--br); background:var(--bg); color:var(--tx); font-size:14px; font-family:var(--ff); line-height:1.5; }
+.lc-join { flex:0 0 auto; font-size:11px; font-weight:700; padding:5px 12px; border-radius:20px; background:#7c3aed; border:1px solid #7c3aed; color:#fff; white-space:nowrap; }
+.lc-row:hover .lc-join { background:#8b5cf6; }
+.lc-img { display:block; max-width:min(100%,380px); max-height:300px; width:auto; height:auto; border-radius:9px; border:1px solid var(--br2); margin:2px 0 7px; cursor:zoom-in; background:var(--s2); object-fit:contain; }
+.lc-attach { flex:0 0 auto; padding:8px 10px; border-radius:10px; border:1px solid var(--br); background:var(--s2); color:var(--tx2); font-size:15px; line-height:1; cursor:pointer; font-family:var(--ff); }
+.lc-attach:hover { border-color:#7c3aed; }
+.lc-composer.drag { background:rgba(124,58,237,.12); }
 .lc-send { padding:9px 16px; border-radius:10px; background:#7c3aed; color:#fff; border:none; cursor:pointer; font-size:12px; font-weight:700; font-family:var(--ff); white-space:nowrap; }
 @media (max-width:768px) { .lc-msg { max-width:100%; } .lc-otext { font-size:13.5px; } .lc-ltext { font-size:12.5px; } }
 /* ─── Trip Calendar ─── */
@@ -342,7 +348,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     <div class="login-logo">
       <div class="login-mark" style="background:transparent"><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="44" height="23"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></div>
       <div class="login-name">COMART Platform</div>
-      <div class="login-sub">Internal Portal · v1.81</div>
+      <div class="login-sub">Internal Portal · v1.82</div>
     </div>
     <form id="loginForm" onsubmit="doLogin();return false;" autocomplete="on">
     <div class="field">
@@ -402,7 +408,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   <div class="topbar">
     <div class="topbar-logo" onclick="switchView('home')">
       <div class="topbar-mark" style="background:transparent"><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="26" height="14"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></div>
-      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.81</span></div>
+      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.82</span></div>
     </div>
     <div class="topbar-right">
       <div class="lang-switcher">
@@ -605,7 +611,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
                 <div id="lc-room-title" style="font-size:14px;font-weight:700;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
                 <div id="lc-room-meta" style="font-size:11px;color:var(--tx3);margin-top:1px;"></div>
               </div>
-              <button class="lc-btn" id="lc-pdf-btn" onclick="lcExportPDF()" style="display:none;">📄 PDF</button>
+              <button class="lc-btn" id="lc-pdf-btn" onclick="lcExportPDF().catch(function(e){console.warn(e);})" style="display:none;">📄 PDF</button>
               <button class="lc-btn danger" id="lc-end-btn" onclick="lcEndAsk()" style="display:none;">結束對話</button>
               <button class="lc-btn danger" id="lc-del-btn" onclick="lcDelete(lcSession&&lcSession.id,event)" style="display:none;">🗑</button>
             </div>
@@ -616,8 +622,12 @@ input[type="date"]::-webkit-calendar-picker-indicator {
             </div>
             <div id="lc-stream" class="lc-stream"></div>
             <!-- 🔴 composer 在 #lc-stream 外面：輪詢只重繪 stream，永遠不動輸入框 -->
-            <div id="lc-composer" class="lc-composer">
-              <textarea id="lc-input" rows="1" onkeydown="lcKeydown(event)"
+            <div id="lc-composer" class="lc-composer"
+                 ondragover="lcDragOver(event)" ondragleave="lcDragLeave()" ondrop="lcDrop(event)">
+              <input type="file" id="lc-file" accept="image/jpeg,image/png,image/gif,image/webp"
+                     multiple style="display:none;" onchange="lcFileChosen(event)">
+              <button class="lc-attach" id="lc-attach-btn" onclick="lcPickImage()" title="圖片">📎</button>
+              <textarea id="lc-input" rows="1" onkeydown="lcKeydown(event)" onpaste="lcPaste(event)"
                 oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,132)+'px';"
                 placeholder="用你自己的語言輸入…"></textarea>
               <button class="lc-send" id="lc-send-btn" onclick="lcSend()">送出</button>
@@ -2859,6 +2869,10 @@ const I18N = {
     // ai tab
     ai_tab_translate:'Translate', ai_tab_chat:'Chat', ai_tab_skills:'Skills',
     ai_tab_live:'Live Chat', lc_new:'New chat',
+    lc_join:'Join', lc_image:'Image',
+    lc_img_too_big:'That image is too large. Maximum 10 MB.', lc_img_bad_type:'Only JPG, PNG, GIF and WebP images can be sent.',
+    lc_img_uploading:'Uploading image...', lc_img_failed:'Image upload failed. Please try again.',
+    lc_pdf_building:'Preparing the document...',
     lc_delete:'Delete', lc_deleted:'Conversation deleted',
     lc_delete_failed:'Could not delete - nothing was changed. Please try again.', lc_confirm_delete:'This deletes the whole conversation and every message in it. It cannot be undone. Are you sure?',
     lc_new_lbl:'START A CONVERSATION', lc_title_ph:'Topic of the conversation',
@@ -2950,6 +2964,10 @@ const I18N = {
     um_delete_failed:'刪除失敗：', um_deleted:'用戶已刪除',
     ai_tab_translate:'翻譯', ai_tab_chat:'對話', ai_tab_skills:'技能',
     ai_tab_live:'線上對話', lc_new:'開新對話',
+    lc_join:'加入對話', lc_image:'圖片',
+    lc_img_too_big:'圖片太大了，上限 10 MB。', lc_img_bad_type:'只能傳送 JPG、PNG、GIF、WebP 圖片。',
+    lc_img_uploading:'圖片上傳中…', lc_img_failed:'圖片上傳失敗，請再試一次。',
+    lc_pdf_building:'正在準備文件…',
     lc_delete:'刪除', lc_deleted:'對話已刪除',
     lc_delete_failed:'刪除失敗，剛才的操作沒有生效，請再試一次。', lc_confirm_delete:'這會把整場對話與所有訊息一起刪除，無法復原。確定嗎？',
     lc_new_lbl:'開一場對話', lc_title_ph:'對話主題',
@@ -3034,6 +3052,10 @@ const I18N = {
     um_delete_failed:'删除失败：', um_deleted:'用户已删除',
     ai_tab_translate:'翻译', ai_tab_chat:'对话', ai_tab_skills:'技能',
     ai_tab_live:'在线对话', lc_new:'开新对话',
+    lc_join:'加入对话', lc_image:'图片',
+    lc_img_too_big:'图片太大了，上限 10 MB。', lc_img_bad_type:'只能发送 JPG、PNG、GIF、WebP 图片。',
+    lc_img_uploading:'图片上传中…', lc_img_failed:'图片上传失败，请再试一次。',
+    lc_pdf_building:'正在准备文件…',
     lc_delete:'删除', lc_deleted:'对话已删除',
     lc_delete_failed:'删除失败，刚才的操作没有生效，请再试一次。', lc_confirm_delete:'这会把整场对话与所有消息一起删除，无法恢复。确定吗？',
     lc_new_lbl:'开一场对话', lc_title_ph:'对话主题',
@@ -3118,6 +3140,10 @@ const I18N = {
     um_delete_failed:'Xóa thất bại: ', um_deleted:'Đã xóa người dùng',
     ai_tab_translate:'Dịch thuật', ai_tab_chat:'Trò chuyện', ai_tab_skills:'Kỹ năng',
     ai_tab_live:'Trò chuyện trực tiếp', lc_new:'Cuộc trò chuyện mới',
+    lc_join:'Tham gia', lc_image:'Hình ảnh',
+    lc_img_too_big:'Hình ảnh quá lớn. Tối đa 10 MB.', lc_img_bad_type:'Chỉ có thể gửi hình JPG, PNG, GIF và WebP.',
+    lc_img_uploading:'Đang tải hình lên…', lc_img_failed:'Tải hình lên không thành công. Vui lòng thử lại.',
+    lc_pdf_building:'Đang chuẩn bị tài liệu…',
     lc_delete:'Xóa', lc_deleted:'Đã xóa cuộc trò chuyện',
     lc_delete_failed:'Xóa không thành công, thao tác vừa rồi chưa có hiệu lực. Vui lòng thử lại.', lc_confirm_delete:'Việc này sẽ xóa toàn bộ cuộc trò chuyện và tất cả tin nhắn trong đó. Không thể hoàn tác. Bạn có chắc không?',
     lc_new_lbl:'MỞ MỘT CUỘC TRÒ CHUYỆN', lc_title_ph:'Chủ đề cuộc trò chuyện',
@@ -3202,6 +3228,10 @@ const I18N = {
     um_delete_failed:'削除失敗：', um_deleted:'ユーザーを削除しました',
     ai_tab_translate:'翻訳', ai_tab_chat:'チャット', ai_tab_skills:'スキル',
     ai_tab_live:'オンライン会話', lc_new:'新しい会話',
+    lc_join:'参加する', lc_image:'画像',
+    lc_img_too_big:'画像が大きすぎます。上限は 10 MB です。', lc_img_bad_type:'送信できるのは JPG・PNG・GIF・WebP のみです。',
+    lc_img_uploading:'画像をアップロード中…', lc_img_failed:'画像のアップロードに失敗しました。もう一度お試しください。',
+    lc_pdf_building:'ドキュメントを準備しています…',
     lc_delete:'削除', lc_deleted:'会話を削除しました',
     lc_delete_failed:'削除できませんでした。先ほどの操作は反映されていません。もう一度お試しください。', lc_confirm_delete:'会話とすべてのメッセージが削除されます。元に戻せません。よろしいですか？',
     lc_new_lbl:'会話を開く', lc_title_ph:'会話のテーマ',
@@ -3914,7 +3944,7 @@ async function lcLoadList() {
       +     ' ' + lcTime(ended ? (s.ended_at||s.created_at) : s.last_at) + '</div>'
       + '</div>'
       + (ended ? '<span class="lc-pill">' + escHtml(t('lc_ended')) + '</span>'
-               : '<span class="lc-pill on">' + escHtml(t('lc_ongoing')) + '</span>')
+               : '<span class="lc-join">' + escHtml(t('lc_join')) + '</span>')
       + (lcCanDelete(s) ? '<button class="lc-del" title="' + escHtml(t('lc_delete')) + '"'
           + ' onclick="lcDelete(\'' + escHtml(s.id) + '\',event)">🗑</button>' : '')
       + '</div>';
@@ -4004,6 +4034,7 @@ function lcRenderStream() {
     h += lcMsgHtml(m);
   });
   box.innerHTML = h;
+  lcHydrateImages();
 }
 
 function lcMsgHtml(m) {
@@ -4014,7 +4045,11 @@ function lcMsgHtml(m) {
     +   '<span class="lc-msg-time">' + lcTime(m.created_at) + '</span>'
     +   (srcLab ? '<span class="lc-src">' + escHtml(srcLab + ' ' + t('lc_orig')) + '</span>' : '')
     + '</div>'
-    + '<div class="lc-otext">' + escHtml(m.text) + '</div>';
+    + lcImgHtml(m)
+    + (m.text ? '<div class="lc-otext">' + escHtml(m.text) + '</div>' : '');
+
+  // 只貼圖不打字：沒有東西要翻，也不該顯示「翻譯中…」
+  if (!m.text) return h + '</div>';
 
   if (m.tr_at) {
     // 原文那一欄不重複印一次；其餘三語依固定順序（順序固定才讀得快）
@@ -4181,10 +4216,35 @@ async function lcEnd(keep) {
 // ─── 輸出 PDF ───
 // 🔴 版面固定繁中，不隨介面語言改變（同 board 的 siteLabelZ／pmLangShort 的道理）：
 //    存檔格式不該因為誰按了匯出鍵、介面剛好切成哪一國語言就長得不一樣。
-function lcExportPDF() {
+async function lcExportPDF() {
   if (!lcSession) return;
+  // 🔴 先開視窗再 await：await 之後就脫離使用者手勢，window.open 會被封鎖器擋掉
   var w = window.open('', '_blank');
   if (!w) { toast(t('lc_popup')); return; }
+  w.document.write('<!doctype html><meta charset="utf-8"><body style="font-family:sans-serif;padding:24px;color:#333">'
+    + escHtml(t('lc_pdf_building')) + '</body>');
+  // 圖片轉 data URL 內嵌：列印視窗載入外部圖片會與 print() 競速，
+  // 常常印出一半是空白框
+  var imgData = {};
+  for (var qi = 0; qi < lcMsgs.length; qi++) {
+    var mm = lcMsgs[qi];
+    if (!mm.img_path || imgData[mm.img_path]) continue;
+    try {
+      var su = await lcSignedUrl(mm.img_path);
+      var rb = await fetch(su);
+      if (!rb.ok) throw new Error('HTTP ' + rb.status);
+      var bl = await rb.blob();
+      imgData[mm.img_path] = await new Promise(function(res, rej) {
+        var fr = new FileReader();
+        fr.onload = function(){ res(fr.result); };
+        fr.onerror = function(){ rej(new Error('read')); };
+        fr.readAsDataURL(bl);
+      });
+    } catch (e) {
+      console.warn('[lc] pdf image', mm.img_path, e.message);
+      imgData[mm.img_path] = '';   // 抓不到就略過那一張，不讓整份匯出失敗
+    }
+  }
   var names = [];
   lcMsgs.forEach(function(m) {
     var n = m.author_name || m.emp_id;
@@ -4201,8 +4261,14 @@ function lcExportPDF() {
     body += '<div class="m"><div class="mh">' + escHtml(m.author_name || m.emp_id)
       + '　<span class="mt">' + escHtml(lcDay(m.created_at)) + ' ' + lcTime(m.created_at) + '</span>'
       + (m.src_lang ? '　<span class="ms">' + escHtml((LC_LABEL[m.src_lang]||m.src_lang) + ' 原文') + '</span>' : '')
-      + '</div><div class="mo">' + escHtml(m.text) + '</div>';
-    if (m.tr_at) {
+      + '</div>';
+    if (m.img_path) {
+      body += imgData[m.img_path]
+        ? '<div class="mi"><img src="' + imgData[m.img_path] + '"></div>'
+        : '<div class="mimiss">［' + escHtml(t('lc_image')) + '：' + escHtml(m.img_name || '') + '］</div>';
+    }
+    if (m.text) body += '<div class="mo">' + escHtml(m.text) + '</div>';
+    if (m.text && m.tr_at) {
       LC_LANGS.filter(function(l){ return l[0] !== m.src_lang; }).forEach(function(l) {
         var v = m[LC_COL[l[0]]] || '';
         if (v) body += '<div class="ml"><span class="mlab">' + escHtml(LC_LABEL[l[0]]) + '</span>' + escHtml(v) + '</div>';
@@ -4218,6 +4284,8 @@ function lcExportPDF() {
     + '.ms{font-weight:400;color:#777;font-size:11px}'
     + '.mo{white-space:pre-wrap;margin-bottom:5px}'
     + '.ml{display:flex;gap:8px;font-size:12px;color:#333;margin:2px 0}'
+    + '.mi{margin:4px 0 6px}.mi img{max-width:320px;max-height:260px;border:1px solid #ccc;border-radius:5px}'
+    + '.mimiss{font-size:11.5px;color:#999;margin:3px 0}'
     + '.mlab{flex:0 0 34px;color:#888;font-size:10.5px;padding-top:2px}'
     + '@media print{@page{margin:14mm}}';
   w.document.write('<!doctype html><html><head><meta charset="utf-8"><title>'
@@ -4225,6 +4293,235 @@ function lcExportPDF() {
     + body + '</body></html>');
   w.document.close();
   w.onload = function () { try { w.focus(); w.print(); } catch (e) {} };
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// 線上對話：圖片附件
+//
+// 🔴 bucket 是私有的，所以 <img src> 不能直接指過去 —— 要先向 sb-proxy 換簽章網址。
+//    簽章網址快取在 lcImgUrl，過期前 5 分鐘才重換：聊天室每 3 秒重繪一次，
+//    每次都重簽等於每 3 秒對每張圖打一次請求。
+// 🔴 物件鍵一律純 ASCII（`chat/<場次>/<uid>.<ext>`）：Supabase Storage 的物件鍵
+//    不接受中文（實測回 400 InvalidKey），而截圖檔名幾乎都是中文。
+//    原始檔名存在 img_name 欄位，只用於顯示。
+// ═══════════════════════════════════════════════════════════════════════
+
+const LC_IMG_TYPES  = { 'image/jpeg':'jpg', 'image/png':'png', 'image/gif':'gif', 'image/webp':'webp' };
+const LC_IMG_MAX    = 10 * 1024 * 1024;   // 與 bucket 的 file_size_limit 一致
+const LC_IMG_BUCKET = 'chat-images';
+const LC_IMG_DIM    = 1800;               // 超過就縮，聊天室不需要原始解析度
+const LC_IMG_ASIS   = 1.5 * 1024 * 1024;  // 小圖原檔上傳，不重新編碼
+
+var lcImgUrl = {};        // path → { url, exp }
+var lcImgHydrating = {};  // path → true（避免同一張圖同時發多個簽章請求）
+
+// 縮圖規則：
+// - GIF 一律原檔上傳（重新編碼會把動畫壓成一張靜態圖）
+// - 小圖且尺寸不大的原檔上傳（PNG 截圖轉 JPEG 會讓文字邊緣起毛邊，
+//   而聊天室裡最常貼的就是文字截圖）
+// - 其餘縮到長邊 1800 並轉 JPEG
+async function lcPrepImage(file) {
+  var ext = LC_IMG_TYPES[file.type];
+  if (!ext) throw new Error('type');
+  if (file.size > LC_IMG_MAX) throw new Error('size');
+  var dim = await lcImgDim(file).catch(function(){ return null; });
+  var big = !dim || Math.max(dim.w, dim.h) > LC_IMG_DIM;
+  if (ext === 'gif' || (!big && file.size <= LC_IMG_ASIS)) {
+    return { blob: file, mime: file.type, ext: ext, w: dim && dim.w, h: dim && dim.h };
+  }
+  var out = await lcShrink(file, LC_IMG_DIM, 0.85);
+  return { blob: out.blob, mime: 'image/jpeg', ext: 'jpg', w: out.w, h: out.h };
+}
+
+function lcImgDim(file) {
+  return new Promise(function(res, rej) {
+    var im = new Image();
+    im.onload  = function() { res({ w: im.naturalWidth, h: im.naturalHeight }); };
+    im.onerror = function() { rej(new Error('decode')); };
+    var rd = new FileReader();
+    rd.onload  = function() { im.src = rd.result; };
+    rd.onerror = function() { rej(new Error('read')); };
+    rd.readAsDataURL(file);
+  });
+}
+
+function lcShrink(file, maxDim, q) {
+  return new Promise(function(res, rej) {
+    var im = new Image();
+    im.onload = function() {
+      var w = im.naturalWidth, h = im.naturalHeight;
+      var sc = Math.min(1, maxDim / Math.max(w, h));
+      w = Math.max(1, Math.round(w * sc)); h = Math.max(1, Math.round(h * sc));
+      var cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+      var cx = cv.getContext('2d');
+      // 透明底轉 JPEG 會變黑，先鋪白底（截圖多半本來就是白底，視覺上無差別）
+      cx.fillStyle = '#fff'; cx.fillRect(0, 0, w, h);
+      cx.drawImage(im, 0, 0, w, h);
+      cv.toBlob(function(b) { b ? res({ blob: b, w: w, h: h }) : rej(new Error('encode')); }, 'image/jpeg', q);
+    };
+    im.onerror = function() { rej(new Error('decode')); };
+    var rd = new FileReader();
+    rd.onload = function() { im.src = rd.result; };
+    rd.onerror = function() { rej(new Error('read')); };
+    rd.readAsDataURL(file);
+  });
+}
+
+// ─── 上傳並送出 ───
+async function lcSendImage(file) {
+  if (!lcSession || lcSession.status !== 'open' || lcBusy) return;
+  var prep;
+  try {
+    prep = await lcPrepImage(file);
+  } catch (e) {
+    toast(t(e.message === 'size' ? 'lc_img_too_big' : 'lc_img_bad_type'), 'err');
+    return;
+  }
+  lcBusy = true;
+  var el = document.getElementById('lc-input');
+  var caption = ((el && el.value) || '').trim();   // 打了字就當圖說，同一則訊息送出
+  var path = 'chat/' + lcSession.id + '/' + uid() + '.' + prep.ext;
+  toast(t('lc_img_uploading'));
+  try {
+    var up = await fetch(SB_WORKER + '/supabase/storage/v1/object/' + LC_IMG_BUCKET + '/' + path, {
+      method: 'POST',
+      headers: sbHdrs({ 'Content-Type': prep.mime, 'x-upsert': 'true' }),
+      body: prep.blob,
+    });
+    if (!up.ok) throw new Error('HTTP ' + up.status);
+  } catch (e) {
+    lcBusy = false;
+    toast(t('lc_img_failed'), 'err');
+    return;
+  }
+  var msg = {
+    id: uid(), session_id: lcSession.id,
+    emp_id: lcMe(), author_name: lcMyName(),
+    src_lang: '', text: caption,
+    text_zhtw: null, text_zhcn: null, text_en: null, text_vi: null, tr_at: null,
+    img_path: path, img_name: file.name || '', img_mime: prep.mime,
+    img_w: prep.w || null, img_h: prep.h || null,
+    created_at: new Date().toISOString(),
+  };
+  try {
+    await SB.post('chat_messages', msg);
+  } catch (e) {
+    // 圖已經在 storage 上了，但訊息沒進資料庫 —— 對使用者而言就是「沒送出」。
+    // 不刪那個孤兒物件：刪除也可能失敗，而留著只是佔一點空間，
+    // 不會有任何人看到它（bucket 是私有的，且沒有任何一筆訊息指向它）。
+    lcBusy = false;
+    toast(t('lc_send_failed'), 'err');
+    return;
+  }
+  if (el) { el.value = ''; el.style.height = 'auto'; }
+  lcMsgs.push(msg);
+  if (lcMsgs.length > LC_MSG_LIMIT) lcMsgs = lcMsgs.slice(-LC_MSG_LIMIT);
+  lcRenderStream(); lcScrollBottom(true);
+  lcBusy = false;
+  if (caption) lcTranslateAndSave(msg);   // 只貼圖不打字就沒有東西要翻
+  SB.patch('chat_sessions', 'id=eq.' + encodeURIComponent(lcSession.id),
+           { last_at: msg.created_at }).catch(function(){});
+}
+
+async function lcSendImages(files) {
+  // 一張圖一則訊息（一次貼多張截圖是常見的），依序送出以維持時間順序
+  for (var i = 0; i < files.length; i++) {
+    if (LC_IMG_TYPES[files[i].type]) await lcSendImage(files[i]);
+  }
+}
+
+function lcPickImage() {
+  var inp = document.getElementById('lc-file');
+  if (inp) { inp.value = ''; inp.click(); }
+}
+function lcFileChosen(ev) {
+  var fs = ev.target.files;
+  if (fs && fs.length) lcSendImages(Array.prototype.slice.call(fs));
+}
+function lcPaste(ev) {
+  var items = (ev.clipboardData && ev.clipboardData.items) || [];
+  var imgs = [];
+  for (var i = 0; i < items.length; i++) {
+    if (items[i].kind === 'file') {
+      var f = items[i].getAsFile();
+      if (f && LC_IMG_TYPES[f.type]) imgs.push(f);
+    }
+  }
+  // 只有真的抓到圖片才攔下事件，否則會把「貼上文字」也一起吃掉
+  if (imgs.length) { ev.preventDefault(); lcSendImages(imgs); }
+}
+function lcDrop(ev) {
+  ev.preventDefault();
+  var box = document.getElementById('lc-composer');
+  if (box) box.classList.remove('drag');
+  var fs = (ev.dataTransfer && ev.dataTransfer.files) || [];
+  var imgs = Array.prototype.slice.call(fs).filter(function(f){ return LC_IMG_TYPES[f.type]; });
+  if (imgs.length) lcSendImages(imgs);
+}
+function lcDragOver(ev) {
+  ev.preventDefault();
+  var box = document.getElementById('lc-composer');
+  if (box) box.classList.add('drag');
+}
+function lcDragLeave() {
+  var box = document.getElementById('lc-composer');
+  if (box) box.classList.remove('drag');
+}
+
+// ─── 私有 bucket → 簽章網址（快取）───
+async function lcSignedUrl(path) {
+  var c = lcImgUrl[path];
+  // 過期前 5 分鐘就換新的，免得使用者正在看的時候圖突然變破圖
+  if (c && c.exp - Date.now() > 5 * 60 * 1000) return c.url;
+  var res = await fetch(SB_WORKER + '/supabase/storage/v1/object/sign/' + LC_IMG_BUCKET + '/' + path, {
+    method: 'POST', headers: sbHdrs(), body: JSON.stringify({ expiresIn: 3600 }),
+  });
+  if (!res.ok) throw new Error('sign HTTP ' + res.status);
+  var j = await res.json();
+  var rel = j.signedURL || j.signedUrl;
+  if (!rel) throw new Error('no signed url');
+  var url = SB_URL + '/storage/v1' + rel;
+  lcImgUrl[path] = { url: url, exp: Date.now() + 3600 * 1000 };
+  return url;
+}
+
+// 重繪後把還沒有 src 的圖片補上（已在快取裡的會在 lcMsgHtml 直接帶上 src，不閃）
+function lcHydrateImages() {
+  var box = document.getElementById('lc-stream');
+  if (!box) return;
+  var imgs = box.querySelectorAll('img.lc-img[data-p]:not([src])');
+  Array.prototype.forEach.call(imgs, function(im) {
+    var path = im.getAttribute('data-p');
+    if (!path || lcImgHydrating[path]) return;
+    lcImgHydrating[path] = true;
+    lcSignedUrl(path).then(function(u) {
+      delete lcImgHydrating[path];
+      // 重繪可能已經把這個節點換掉了，所以整條 stream 裡同 path 的都設上
+      var all = box.querySelectorAll('img.lc-img[data-p="' + path + '"]');
+      Array.prototype.forEach.call(all, function(x) { if (!x.getAttribute('src')) x.src = u; });
+    }).catch(function(e) {
+      delete lcImgHydrating[path];
+      console.warn('[lc] sign', path, e.message);
+    });
+  });
+}
+
+async function lcOpenImage(path) {
+  try { window.open(await lcSignedUrl(path), '_blank'); }
+  catch (e) { toast(t('lc_img_failed'), 'err'); }
+}
+
+function lcImgHtml(m) {
+  if (!m.img_path) return '';
+  var cached = lcImgUrl[m.img_path];
+  var fresh  = cached && cached.exp - Date.now() > 5 * 60 * 1000;
+  // 寬高寫進 style 的 aspect-ratio：圖片載入前就把版面空間留好，
+  // 否則自動捲到底之後圖片撐開高度，正在讀的人畫面會跳
+  var ar = (m.img_w && m.img_h) ? ('aspect-ratio:' + m.img_w + '/' + m.img_h + ';') : '';
+  return '<img class="lc-img" data-p="' + escHtml(m.img_path) + '"'
+    + (fresh ? ' src="' + escHtml(cached.url) + '"' : '')
+    + ' alt="' + escHtml(m.img_name || '') + '" style="' + ar + '"'
+    + ' onclick="lcOpenImage(\'' + escHtml(m.img_path) + '\')">';
 }
 
 // 線上對話：靜態文字套 i18n。
@@ -4238,6 +4535,7 @@ function lcApplyI18n() {
   txt('lc-keep-btn','lc_keep');   txt('lc-discard-btn','lc_discard');
   txt('lc-endbar-q','lc_end_q');  txt('lc-end-btn','lc_end');
   txt('lc-send-btn','lc_send');   ph('lc-input','lc_input_ph');
+  var at = document.getElementById('lc-attach-btn'); if (at) at.title = t('lc_image');
   var b  = document.getElementById('lc-back-btn'); if (b)  b.textContent  = '\u2039 ' + t('lc_back');
   var pd = document.getElementById('lc-pdf-btn');  if (pd) pd.textContent = '\ud83d\udcc4 ' + t('lc_pdf');
   var con = document.getElementById('ptab-content-live');

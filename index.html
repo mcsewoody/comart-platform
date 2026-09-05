@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>COMART Platform v1.82</title>
+<title>COMART Platform v1.83</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script defer src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.js"></script>
 <style>
@@ -275,10 +275,11 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:
 .lc-endbar { display:flex; align-items:center; gap:8px; flex-wrap:wrap; padding:10px 14px; background:rgba(224,82,96,.08); border-bottom:1px solid var(--br); font-size:12px; color:var(--tx2); flex-shrink:0; }
 .lc-stream { flex:1; overflow-y:auto; padding:14px 16px; display:flex; flex-direction:column; }
 .lc-day { align-self:center; font-size:10.5px; color:var(--tx3); background:var(--s2); border-radius:20px; padding:2px 11px; margin:8px 0 12px; }
-.lc-msg { background:var(--s1); border:1px solid var(--br); border-radius:11px; padding:10px 12px; margin-bottom:9px; max-width:640px; width:100%; }
-.lc-msg.mine { border-left:3px solid #7c3aed; align-self:flex-end; }
+.lc-msg { background:var(--s1); border:1px solid var(--br); border-left:3px solid var(--br2); border-radius:11px; padding:10px 12px; margin-bottom:9px; max-width:640px; width:100%; }
+/* 自己的訊息靠右；顏色仍用自己那一個（inline style 指定），不另外拿紫色蓋掉 */
+.lc-msg.mine { align-self:flex-end; }
 .lc-msg-head { display:flex; align-items:center; gap:7px; margin-bottom:5px; flex-wrap:wrap; }
-.lc-msg-head b { font-size:12.5px; color:var(--tx); font-weight:700; }
+.lc-msg-head b { font-size:12.5px; font-weight:700; }
 .lc-msg-time { font-size:10.5px; color:var(--tx3); }
 .lc-src { font-size:10px; color:#a78bfa; background:rgba(124,58,237,.13); border-radius:4px; padding:1px 6px; }
 .lc-otext { font-size:14px; color:var(--tx); line-height:1.6; white-space:pre-wrap; word-break:break-word; }
@@ -348,7 +349,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     <div class="login-logo">
       <div class="login-mark" style="background:transparent"><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="44" height="23"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></div>
       <div class="login-name">COMART Platform</div>
-      <div class="login-sub">Internal Portal · v1.82</div>
+      <div class="login-sub">Internal Portal · v1.83</div>
     </div>
     <form id="loginForm" onsubmit="doLogin();return false;" autocomplete="on">
     <div class="field">
@@ -408,7 +409,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   <div class="topbar">
     <div class="topbar-logo" onclick="switchView('home')">
       <div class="topbar-mark" style="background:transparent"><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="26" height="14"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></div>
-      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.82</span></div>
+      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.83</span></div>
     </div>
     <div class="topbar-right">
       <div class="lang-switcher">
@@ -593,7 +594,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
               <div id="lc-new-lbl" style="font-size:11px;font-weight:700;color:#a78bfa;letter-spacing:.06em;margin-bottom:8px;">START A CONVERSATION</div>
               <div style="display:flex;gap:8px;flex-wrap:wrap;">
                 <input id="lc-new-title" maxlength="80" placeholder="對話主題"
-                  onkeydown="if(event.key==='Enter'){event.preventDefault();lcCreate();}"
+                  onkeydown="if(event.key==='Enter')event.preventDefault();"
                   style="flex:1;min-width:180px;padding:9px 11px;border-radius:9px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:13px;font-family:var(--ff);">
                 <button id="lc-new-btn" onclick="lcCreate()"
                   style="padding:9px 16px;border-radius:9px;background:#7c3aed;color:#fff;border:none;cursor:pointer;font-size:12px;font-weight:700;">開新對話</button>
@@ -3806,6 +3807,9 @@ const LC_COL    = { 'zh-TW':'text_zhtw', 'zh-CN':'text_zhcn', 'en':'text_en', 'v
 const LC_LABEL  = { 'zh-TW':'繁中', 'zh-CN':'简中', 'en':'EN', 'vi':'VI' };
 const LC_POLL_MS   = 3000;
 const LC_MSG_LIMIT = 200;
+// 超過這個時間還沒有譯文，就當送出者已經離線，由開啟者接手補翻。
+// 60 秒是「三次重試加上退避（約 4 秒）」的數倍，正常流程絕對來不及變成孤兒。
+const LC_ORPHAN_MS = 60000;
 
 // 🔴 模型抽成常數：越南同仁反映品質不夠時改這一行就好，不必動任何邏輯。
 //    這裡刻意用 sonnet 而非 board 的 opus —— 聊天是短句、當場看得到對不對，
@@ -3851,6 +3855,43 @@ var lcListLoaded = false;
 function lcMe()      { return (SESSION && SESSION.empId) || ''; }
 function lcMyName()  { return (SESSION && (SESSION.nameZh || SESSION.nameEn || SESSION.empId)) || ''; }
 function lcIsHost()  { return !!lcSession && lcSession.host_emp_id === lcMe(); }
+
+// ─── 每位發言者一個顏色 ───
+// 12 色，深色底上都讀得清楚，色相彼此拉開。
+const LC_HUES = [
+  '#7c9cff', '#4ade80', '#fbbf24', '#f87171', '#22d3ee', '#f472b6',
+  '#a78bfa', '#a3e635', '#fb923c', '#2dd4bf', '#e879f9', '#94a3b8',
+];
+
+/* 🔴 房間裡用「本場次首次發言順序」配色，不用工號雜湊。
+   雜湊的問題不是函式選得不好，是方法本身：12 色配 4 個人，
+   任兩人同色的機率是 1 − 12·11·10·9/12⁴ ≈ 43% —— 那是**完美雜湊的理論下限**，
+   換 fnv1a、加 finalizer 都改變不了（實測 51 個真實工號，djb2 已達 43.3%）。
+   而「不同人不同色」正是這個功能唯一的要求。
+   依首次發言順序配色則保證前 12 位各不相同。
+   配好就快取（lcColorMap）：新人加入只會拿下一個顏色，**既有的人不會換色** ——
+   若改成「依工號排序取位置」，每來一個新人就會把排在他後面的人整批位移。 */
+var lcColorMap = {};
+var lcColorNext = 0;
+function lcColorReset() { lcColorMap = {}; lcColorNext = 0; }
+function lcColor(empId) {
+  var k = String(empId || '');
+  if (!lcColorMap[k]) { lcColorMap[k] = LC_HUES[lcColorNext % LC_HUES.length]; lcColorNext++; }
+  return lcColorMap[k];
+}
+
+/* 清單頁另用工號雜湊：那裡同時列出很多場次的開啟者，沒有「這一場的發言順序」
+   這個上下文可用，而清單只是輔助辨識、不要求兩兩不同色。 */
+var lcHueCache = {};
+function lcHue(empId) {
+  var k = String(empId || '');
+  if (lcHueCache[k]) return lcHueCache[k];
+  var h = 5381;
+  for (var i = 0; i < k.length; i++) h = ((h * 33) ^ k.charCodeAt(i)) >>> 0;
+  var c = LC_HUES[h % LC_HUES.length];
+  lcHueCache[k] = c;
+  return c;
+}
 function lcIsAdmin() { return !!SESSION && SESSION.role === 'admin'; }
 // 🔴 admin 在這裡有例外（使用者 2026-09-05 指定），與事前驗屍相反 ——
 //    驗屍是「一場會議只有主席刪得掉，admin 沒有例外」，那是因為匿名承諾要靠它撐住；
@@ -3889,42 +3930,84 @@ function lcDay(iso) {
 
 // ─── 翻譯：一次呼叫產出四語 ───
 // srcLang 由模型自己辨識（board v1.77 的決定：不做「我用的語言」下拉）。
+// 🔴 輸出用 XML 標籤而不是 JSON（v1.83 改）。JSON 在這裡有一個必然會發生的失敗模式：
+//    多行訊息的換行必須轉義成 \n，而模型常常直接輸出實體換行 —— JSON.parse 就丟錯，
+//    整則訊息的翻譯全部掉失。標籤格式對換行、引號、反斜線一律免疫。
+//    Portal 自己的「翻譯」工具（pRunTranslate）本來就是用標籤，同一個理由。
+const LC_TR_TAGS = { 'zh-TW':'zhtw', 'zh-CN':'zhcn', 'en':'en', 'vi':'vi' };
+
+function lcTag(raw, tag) {
+  var m = String(raw || '').match(new RegExp('<' + tag + '>([\\s\\S]*?)<\\/' + tag + '>', 'i'));
+  return m ? m[1].trim() : '';
+}
+
 async function lcTranslate(text) {
   var usr =
     'Detect the source language of the message yourself. It is one of: zh-TW (Traditional ' +
     'Chinese), zh-CN (Simplified Chinese), en (English), vi (Vietnamese).\n' +
     'Then give the message in all four.\n\nMessage:\n' + text + '\n\n' +
-    'Reply with ONLY this JSON, no markdown fence:\n' +
-    '{"src":"zh-TW|zh-CN|en|vi","zh-TW":"...","zh-CN":"...","en":"...","vi":"..."}';
-  var raw = await pCallClaude([{ role:'user', content: usr }], LC_TR_SYS, 1500, LC_TR_MODEL);
-  var m = String(raw||'').match(/\{[\s\S]*\}/);
-  if (!m) throw new Error('no json in reply');
-  var o = JSON.parse(m[0]);
-  var src = String(o.src||'').trim();
+    'Reply with ONLY these five tags and nothing else. Keep line breaks inside the tags as-is:\n' +
+    '<src>zh-TW or zh-CN or en or vi</src>\n<zhtw>...</zhtw>\n<zhcn>...</zhcn>\n<en>...</en>\n<vi>...</vi>';
+  // 🔴 max_tokens 必須隨訊息長度成長：輸出是原文的**四份**。
+  //    寫死 1500 的話，300 字的中文訊息就已經在邊緣，500 字必定被截斷 ——
+  //    截斷的回覆缺尾巴的標籤，於是永遠解析失敗。這是「偶而翻譯失敗」的主因。
+  var budget = Math.min(16000, Math.max(1200, text.length * 8 + 400));
+  var raw = await pCallClaude([{ role:'user', content: usr }], LC_TR_SYS, budget, LC_TR_MODEL);
+
+  var src = lcTag(raw, 'src').trim();
   if (!LC_COL[src]) src = '';
   var out = { src: src };
-  LC_LANGS.forEach(function(l) { out[l[0]] = String(o[l[0]] || '').trim(); });
+  LC_LANGS.forEach(function(l) { out[l[0]] = lcTag(raw, LC_TR_TAGS[l[0]]); });
   // 🔴 來源語言那一欄放回原文，一字不動 —— 不靠模型「照抄」（同 board 的 pmTranslate）。
   //    模型偶爾會把原文「潤飾」一下，那會讓發話者看到自己沒打過的句子。
   if (src) out[src] = text;
+  // 畫面上顯示的是「除了原文以外的三語」，所以那三個都要有東西才算成功；
+  // 缺一個就當失敗讓它重試（截斷的回覆正是缺尾巴那一兩個）
+  var missing = LC_LANGS.filter(function(l) { return l[0] !== src && !out[l[0]]; });
+  if (missing.length) {
+    throw new Error('incomplete: missing ' + missing.map(function(l){ return l[0]; }).join(',')
+      + ' (reply ' + String(raw||'').length + ' chars, budget ' + budget + ')');
+  }
   return out;
 }
 
+// 重試次數與間隔：claude-proxy 冷啟、edge function 併發上限、429 都是一次就會失敗
+// 但隔一下就過的暫時性錯誤（同 SB.get 的重試理由）。
+const LC_TR_TRIES  = 3;
+const LC_TR_BACKOFF = [900, 2500];   // 第 1、2 次失敗後各等多久
+
+var lcTrBusy = {};   // msgId → true，同一則不同時翻兩次（重試與孤兒補翻可能撞到）
+
 async function lcTranslateAndSave(msg) {
+  if (lcTrBusy[msg.id]) return;
+  lcTrBusy[msg.id] = true;
+  var lastErr = null;
   try {
-    var r = await lcTranslate(msg.text);
-    var patch = {
-      src_lang: r.src,
-      text_zhtw: r['zh-TW'], text_zhcn: r['zh-CN'], text_en: r.en, text_vi: r.vi,
-      tr_at: new Date().toISOString(),
-    };
-    await SB.patch('chat_messages', 'id=eq.' + encodeURIComponent(msg.id), patch);
-    var local = lcMsgs.find(function(x){ return x.id === msg.id; });
-    if (local) { Object.assign(local, patch); delete local._trFailed; lcRenderStream(); }
-  } catch (e) {
-    console.warn('[lc] translate failed', e);
+    for (var attempt = 0; attempt < LC_TR_TRIES; attempt++) {
+      try {
+        var r = await lcTranslate(msg.text);
+        var patch = {
+          src_lang: r.src,
+          text_zhtw: r['zh-TW'], text_zhcn: r['zh-CN'], text_en: r.en, text_vi: r.vi,
+          tr_at: new Date().toISOString(),
+        };
+        await SB.patch('chat_messages', 'id=eq.' + encodeURIComponent(msg.id), patch);
+        var local = lcMsgs.find(function(x){ return x.id === msg.id; });
+        if (local) { Object.assign(local, patch); delete local._trFailed; lcRenderStream(); }
+        return;
+      } catch (e) {
+        lastErr = e;
+        console.warn('[lc] translate attempt ' + (attempt+1) + '/' + LC_TR_TRIES, msg.id, e.message);
+        if (attempt < LC_TR_TRIES - 1) {
+          await new Promise(function(res){ setTimeout(res, LC_TR_BACKOFF[attempt] || 2500); });
+        }
+      }
+    }
+    console.warn('[lc] translate gave up', msg.id, lastErr && lastErr.message);
     var l2 = lcMsgs.find(function(x){ return x.id === msg.id; });
     if (l2) { l2._trFailed = true; lcRenderStream(); }
+  } finally {
+    delete lcTrBusy[msg.id];
   }
 }
 
@@ -3936,7 +4019,8 @@ async function lcLoadList() {
   var saved = await SB.get('chat_sessions', 'status=eq.ended&keep=eq.true&order=ended_at.desc&limit=50');
   lcListLoaded = true;
   function row(s, ended) {
-    return '<div class="lc-row" onclick="lcOpen(\'' + escHtml(s.id) + '\')">'
+    return '<div class="lc-row" style="border-left:3px solid ' + lcHue(s.host_emp_id) + '"'
+      + ' onclick="lcOpen(\'' + escHtml(s.id) + '\')">'
       + '<div style="flex:1;min-width:0;">'
       +   '<div class="lc-row-t">' + escHtml(s.title || '—') + '</div>'
       +   '<div class="lc-row-m">' + escHtml(s.host_name || s.host_emp_id)
@@ -3971,7 +4055,7 @@ async function lcCreate() {
   try { await SB.post('chat_sessions', s); }
   catch (e) { toast(t('lc_create_failed'), 'err'); return; }
   if (el) el.value = '';
-  lcSession = s; lcMsgs = [];
+  lcSession = s; lcMsgs = []; lcColorReset();
   lcShowRoom(); lcRenderStream(); lcPollStart();
 }
 
@@ -3980,6 +4064,7 @@ async function lcOpen(id) {
   var rows = await SB.get('chat_sessions', 'id=eq.' + encodeURIComponent(id) + '&limit=1');
   if (!rows || !rows.length) { toast(t('lc_gone'), 'err'); lcLoadList(); return; }
   lcSession = rows[0];
+  lcColorReset();                     // 顏色是「本場次」的，換場次要重配
   var msgs = await SB.get('chat_messages',
     'session_id=eq.' + encodeURIComponent(id) + '&order=created_at.desc&limit=' + LC_MSG_LIMIT);
   lcMsgs = (msgs || []).slice().reverse();
@@ -3989,7 +4074,7 @@ async function lcOpen(id) {
 
 function lcBackToList() {
   lcPollStop();
-  lcSession = null; lcMsgs = [];
+  lcSession = null; lcMsgs = []; lcColorReset();
   var r = document.getElementById('lc-room'), l = document.getElementById('lc-listview');
   if (r) r.style.display = 'none';
   if (l) l.style.display = 'flex';
@@ -4026,6 +4111,8 @@ function lcRenderStream() {
   var box = document.getElementById('lc-stream');
   if (!box) return;
   if (!lcMsgs.length) { box.innerHTML = '<div class="lc-empty">' + escHtml(t('lc_empty_room')) + '</div>'; return; }
+  // 先依時間順序把顏色配完，配色順序才等於發言順序（lcMsgs 已是遞增排序）
+  lcMsgs.forEach(function(m) { lcColor(m.emp_id); });
   var lastDay = '';
   var h = '';
   lcMsgs.forEach(function(m) {
@@ -4040,8 +4127,9 @@ function lcRenderStream() {
 function lcMsgHtml(m) {
   var mine = m.emp_id === lcMe();
   var srcLab = m.src_lang ? (LC_LABEL[m.src_lang] || m.src_lang) : '';
-  var h = '<div class="lc-msg' + (mine ? ' mine' : '') + '">'
-    + '<div class="lc-msg-head"><b>' + escHtml(m.author_name || m.emp_id) + '</b>'
+  var col = lcColor(m.emp_id);
+  var h = '<div class="lc-msg' + (mine ? ' mine' : '') + '" style="border-left-color:' + col + '">'
+    + '<div class="lc-msg-head"><b style="color:' + col + '">' + escHtml(m.author_name || m.emp_id) + '</b>'
     +   '<span class="lc-msg-time">' + lcTime(m.created_at) + '</span>'
     +   (srcLab ? '<span class="lc-src">' + escHtml(srcLab + ' ' + t('lc_orig')) + '</span>' : '')
     + '</div>'
@@ -4072,7 +4160,7 @@ function lcMsgHtml(m) {
 
 function lcRetry(id) {
   var m = lcMsgs.find(function(x){ return x.id === id; });
-  if (!m) return;
+  if (!m || lcTrBusy[id]) return;
   delete m._trFailed; lcRenderStream();
   lcTranslateAndSave(m);
 }
@@ -4179,6 +4267,21 @@ async function lcPoll() {
     }
 
     if (changed) { lcRenderStream(); if (stick) lcScrollBottom(true); }
+
+    // 🔴 孤兒訊息補翻：翻譯是由**送出者的瀏覽器**發動的，所以他一送出就關掉分頁
+    //    （或斷網、或當掉）的話，那一則永遠不會有譯文，其他人只看得到原文。
+    //    由**開啟者**負責補翻，而不是「誰看到誰補」—— 後者會讓房裡 5 個人同時
+    //    對同一則發 5 次 API 請求。開啟者不在場時就維持原樣，作者回來仍可手動重試。
+    if (lcIsHost()) {
+      var now = Date.now();
+      var orphan = lcMsgs.find(function(m) {
+        return m.text && !m.tr_at && !m._trFailed && !lcTrBusy[m.id] &&
+               m.emp_id !== lcMe() &&                       // 自己的那幾則本來就在翻
+               (now - new Date(m.created_at).getTime()) > LC_ORPHAN_MS;
+      });
+      // 一次只補一則：一輪輪詢就把 20 則丟進去會直接撞上 edge function 併發上限
+      if (orphan) lcTranslateAndSave(orphan);
+    }
   } catch (e) {
     console.warn('[lc] poll', e);
   }

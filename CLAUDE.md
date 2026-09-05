@@ -328,32 +328,38 @@ Portal AI 功能區的第二個頁籤（`💬 線上對話`，在翻譯旁邊）
   可用，而清單只是輔助辨識、不要求兩兩不同色。
 - 自己的訊息用**自己的顏色**（仍靠右對齊），不再拿統一的紫色蓋掉。
 
-### 語音輸入（v1.84）
+### 語音輸入：錄音 ＋ 伺服器端轉寫（v1.86，edge function `transcribe`）
 
-輸入區有 🎙 鈕與一個語言下拉（繁中／簡中／英／越／日），選擇記在
-`localStorage['comart-lc-speech-lang']`。
+輸入區有 🎙 鈕與語言提示下拉（自動／中文／EN／VI／日本語，預設**自動**），
+選擇記在 `localStorage['comart-lc-speech-lang']`。按下錄音、再按停止 → 上傳 → 出文字。
 
-- 🔴 **用的是瀏覽器內建的 Web Speech API，不是我們的 Claude API。**
-  **Claude 不吃音訊輸入**（只有文字／圖片／PDF），claude-proxy 做不到轉寫。
-  要走 API 就得引進第二家廠商（Whisper 之類）＋ 新 edge function ＋ 新金鑰 ＋ 新的成本。
-  Web Speech API 零成本、零後端。**不要以為現在的語音是 Claude 在辨識。**
-- ⚠️ 🔴 **東莞廠的 Chrome 可能不能用**：Chrome 的語音辨識把音訊送到 **Google 的伺服器**，
-  而 Google 網域在中國被 GFW 封鎖 —— 這是 Firebase 那個坑的同一種形狀。
-  Safari（macOS／iOS）走 Apple 的服務，在中國可用。所以按鈕在不支援或失敗時
-  **必須安靜退場**（`lcRecInit` 直接把整組控制項 `display:none`），不能讓人以為程式壞了。
-- 🔴 **辨識必須指定語言，這是 API 規格，無法自動判斷** —— 與訊息翻譯的「來源語言由模型
-  自行辨識」不同，不要想把兩者統一。預設帶入介面語言，但**一定要留下拉可改**：
-  CLAUDE.md 早就記過「越南同仁把介面切成中文卻用中文打字」，介面語言不等於說話的語言。
-- 🔴 **`onend` 必須自動接回（v1.85）**：**Chrome 的 `continuous` 模式會在說話停頓後自己 end**，
-  而使用者以為還在錄、繼續講的內容全部掉失 —— 這是「常常無法辨識」的最大單一原因。
-  規格上 `continuous` 只保證「不會在第一句就停」，不保證持續到你按停止。
-  `lcRecWant` 記錄「使用者還想不想錄」，`onend` 時若為 true 就重啟；
-  `lcRecFast` 防無限迴圈（連續 5 次在 400ms 內結束就放棄並告知，不要無聲空轉）。
-  🔴 **`lcRecStop()` 要先關掉 `lcRecWant` 再 `stop()`**，否則 `onend` 會把它自動接回去。
-  `not-allowed`／`service-not-allowed`／`network` 一律不重試（重試也沒用）。
-- `interimResults` 每次都由 `lcRecBase + 暫時結果` 重組，**不可用 `+=`**：
-  暫時結果會被後續事件取代，累加會變成「暫時、暫時的、暫時的完整句」。
-- `no-speech` 與 `aborted` **不跳提示**：那是「沒聽到聲音」與「使用者自己停掉」，不是錯誤。
+- 🔴 **v1.85 之前用的是瀏覽器內建的 Web Speech API，已整段換掉。** 兩個原因：
+  ① 品質改不了 —— 引擎是瀏覽器給的，無法提供詞彙表，產品型號、TIPTOP、工號一律
+  辨識不出來，而且 `continuous` 模式會在停頓後自己中斷（使用者回報「常常無法辨識」）。
+  ② **Chrome 的 Web Speech 把音訊送到 Google 的伺服器，而 Google 被 GFW 封鎖**，
+  東莞廠根本用不了。
+  現在 **瀏覽器只跟 Supabase 說話**，音訊由 `transcribe` function 從機房發給 OpenAI ——
+  **GFW 完全不相干**。這是這個改動最重要的一點，**不要退回 Web Speech**。
+- 🔴 **Claude 不吃音訊輸入**（只有文字／圖片／PDF），所以這條路不能走 claude-proxy。
+  `transcribe` 是 platform 端唯一呼叫 OpenAI 的 function（`gpt-4o-transcribe`），
+  金鑰用既有的 `OPENAI_API_KEY` secret。驗證與 claude-proxy 同一套 `x-session`。
+- 🔴 **詞彙提示（`VOCAB`）正是瀏覽器引擎做不到、而使用者抱怨「效果不佳」的部分。**
+  只列**會被聽錯的專有名詞**（COMART／TIPTOP／Qi2／東莞廠／打樣／開模／櫃號…），
+  不要塞一般詞彙 —— 提示過長反而會讓模型把提示裡的詞硬套進不相關的句子。
+- 🔴 **MediaRecorder 的容器依瀏覽器而異**：Chrome/Edge 給 webm(opus)、Safari 給 mp4(aac)。
+  兩者 OpenAI 都吃，但**它靠副檔名判斷格式**，所以前端要送 `x-audio-type`，
+  伺服器端用 `EXT` 對照表決定檔名，不可一律寫 `.webm`。
+- 🔴 **結束時一定要 `stream.getTracks().forEach(stop)`**（`lcRecRelease`）：
+  不停的話分頁的麥克風指示燈會一直亮著，使用者會（合理地）以為我們在偷錄音。
+- **`LC_REC_MAX = 120` 秒自動停止**：擋掉忘記按停止的情況（成本與等待時間都會失控）。
+- **語言留空 = 由模型自行判斷**（使用者要的「AI 辨識」）。舊版存的 BCP-47 值
+  （`zh-TW`／`vi-VN`）在新格式（ISO-639-1）下一律視為無效退回「自動」——
+  直接送給 API 會被拒絕。
+- UX 差別：**沒有即時逐字稿**（錄音 → 停止 → 等一兩秒）。所以錄音中按鈕要顯示秒數，
+  轉寫中要顯示 `⋯` 並 disable，讓使用者知道還在跑。
+- ⚠️ **Portal 的 AI Chat 頁籤另有一套舊的 Web Speech 語音輸入**（`_pVoiceSR`，約 6038 行），
+  它有一模一樣的問題（Google 伺服器、中國不可用、寫死中文提示）。
+  這次**沒有動它**（不同功能、使用者沒提）。要修的話直接改呼叫 `transcribe` 即可。
 
 ### 時區標註（v1.84）
 

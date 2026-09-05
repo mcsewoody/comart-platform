@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>COMART Platform v1.85</title>
+<title>COMART Platform v1.86</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script defer src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.js"></script>
 <style>
@@ -370,7 +370,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     <div class="login-logo">
       <div class="login-mark" style="background:transparent"><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="44" height="23"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></div>
       <div class="login-name">COMART Platform</div>
-      <div class="login-sub">Internal Portal · v1.85</div>
+      <div class="login-sub">Internal Portal · v1.86</div>
     </div>
     <form id="loginForm" onsubmit="doLogin();return false;" autocomplete="on">
     <div class="field">
@@ -430,7 +430,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   <div class="topbar">
     <div class="topbar-logo" onclick="switchView('home')">
       <div class="topbar-mark" style="background:transparent"><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="26" height="14"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></div>
-      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.85</span></div>
+      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.86</span></div>
     </div>
     <div class="topbar-right">
       <div class="lang-switcher">
@@ -2919,6 +2919,8 @@ const I18N = {
     // ai tab
     ai_tab_translate:'Translate', ai_tab_chat:'Chat', ai_tab_skills:'Skills',
     ai_tab_live:'Live Chat', lc_new:'New chat',
+    lc_mic_auto:'Auto', lc_mic_working:'Transcribing...',
+    lc_mic_empty:'No speech was picked up. Please try again.', lc_mic_expired:'Your session has expired. Please sign in again.',
     lc_pick_title:'Who is in this conversation?', lc_invite:'Invite people',
     lc_picked:'{n} selected', lc_people:'{n} people',
     lc_locked:'Not a participant', lc_not_member:'Only participants can open this conversation.',
@@ -2926,10 +2928,9 @@ const I18N = {
     lc_pick_none:'Clear all', lc_invite_saved:'Participants updated',
     lc_invite_failed:'Could not update the participants. Please try again.', lc_cancel:'Cancel',
     lc_ok:'OK', lc_pick_btn:'+ Participants',
-    lc_mic_network:'Voice recognition could not reach its service. In China this is usually because Chrome sends audio to Google servers - please use Safari instead, or type.',
     lc_tz_note:'Times in {tz}', lc_mic_start:'Voice input',
-    lc_mic_stop:'Stop recording', lc_mic_unsupported:'This browser does not support voice input. Chrome, Edge or Safari are required.',
-    lc_mic_denied:'Microphone access was denied. Please allow it in your browser settings.', lc_mic_failed:'Voice recognition is unavailable right now. Please type instead.',
+    lc_mic_stop:'Stop recording', lc_mic_unsupported:'This browser cannot record audio. Chrome, Edge or Safari are required.',
+    lc_mic_denied:'Microphone access was denied. Please allow it in your browser settings.', lc_mic_failed:'Transcription failed. Please try again, or type instead.',
     lc_join:'Join', lc_image:'Image',
     lc_img_too_big:'That image is too large. Maximum 10 MB.', lc_img_bad_type:'Only JPG, PNG, GIF and WebP images can be sent.',
     lc_img_uploading:'Uploading image...', lc_img_failed:'Image upload failed. Please try again.',
@@ -3025,6 +3026,8 @@ const I18N = {
     um_delete_failed:'刪除失敗：', um_deleted:'用戶已刪除',
     ai_tab_translate:'翻譯', ai_tab_chat:'對話', ai_tab_skills:'技能',
     ai_tab_live:'線上對話', lc_new:'開新對話',
+    lc_mic_auto:'自動', lc_mic_working:'辨識中…',
+    lc_mic_empty:'沒有收到語音，請再試一次。', lc_mic_expired:'登入已逾期，請重新登入。',
     lc_pick_title:'這場對話有誰？', lc_invite:'邀請參與人',
     lc_picked:'已選 {n} 人', lc_people:'{n} 人',
     lc_locked:'非參與人', lc_not_member:'只有參與人可以開啟這場對話。',
@@ -3032,10 +3035,9 @@ const I18N = {
     lc_pick_none:'全部清除', lc_invite_saved:'參與人已更新',
     lc_invite_failed:'參與人更新失敗，請再試一次。', lc_cancel:'取消',
     lc_ok:'確定', lc_pick_btn:'＋ 參與人',
-    lc_mic_network:'語音辨識連不上服務。在中國通常是因為 Chrome 會把音訊送到 Google 的伺服器，請改用 Safari，或改用打字。',
     lc_tz_note:'時間為 {tz}', lc_mic_start:'語音輸入',
-    lc_mic_stop:'停止錄音', lc_mic_unsupported:'這個瀏覽器不支援語音輸入，請使用 Chrome、Edge 或 Safari。',
-    lc_mic_denied:'麥克風權限被拒絕，請在瀏覽器設定中允許。', lc_mic_failed:'語音辨識目前無法使用，請改用打字。',
+    lc_mic_stop:'停止錄音', lc_mic_unsupported:'這個瀏覽器無法錄音，請使用 Chrome、Edge 或 Safari。',
+    lc_mic_denied:'麥克風權限被拒絕，請在瀏覽器設定中允許。', lc_mic_failed:'語音辨識失敗，請再試一次，或改用打字。',
     lc_join:'加入對話', lc_image:'圖片',
     lc_img_too_big:'圖片太大了，上限 10 MB。', lc_img_bad_type:'只能傳送 JPG、PNG、GIF、WebP 圖片。',
     lc_img_uploading:'圖片上傳中…', lc_img_failed:'圖片上傳失敗，請再試一次。',
@@ -3124,6 +3126,8 @@ const I18N = {
     um_delete_failed:'删除失败：', um_deleted:'用户已删除',
     ai_tab_translate:'翻译', ai_tab_chat:'对话', ai_tab_skills:'技能',
     ai_tab_live:'在线对话', lc_new:'开新对话',
+    lc_mic_auto:'自动', lc_mic_working:'识别中…',
+    lc_mic_empty:'没有收到语音，请再试一次。', lc_mic_expired:'登录已过期，请重新登录。',
     lc_pick_title:'这场对话有谁？', lc_invite:'邀请参与人',
     lc_picked:'已选 {n} 人', lc_people:'{n} 人',
     lc_locked:'非参与人', lc_not_member:'只有参与人可以打开这场对话。',
@@ -3131,10 +3135,9 @@ const I18N = {
     lc_pick_none:'全部清除', lc_invite_saved:'参与人已更新',
     lc_invite_failed:'参与人更新失败，请再试一次。', lc_cancel:'取消',
     lc_ok:'确定', lc_pick_btn:'＋ 参与人',
-    lc_mic_network:'语音识别连不上服务。在中国通常是因为 Chrome 会把音频送到 Google 的服务器，请改用 Safari，或改用打字。',
     lc_tz_note:'时间为 {tz}', lc_mic_start:'语音输入',
-    lc_mic_stop:'停止录音', lc_mic_unsupported:'这个浏览器不支持语音输入，请使用 Chrome、Edge 或 Safari。',
-    lc_mic_denied:'麦克风权限被拒绝，请在浏览器设置中允许。', lc_mic_failed:'语音识别目前无法使用，请改用打字。',
+    lc_mic_stop:'停止录音', lc_mic_unsupported:'这个浏览器无法录音，请使用 Chrome、Edge 或 Safari。',
+    lc_mic_denied:'麦克风权限被拒绝，请在浏览器设置中允许。', lc_mic_failed:'语音识别失败，请再试一次，或改用打字。',
     lc_join:'加入对话', lc_image:'图片',
     lc_img_too_big:'图片太大了，上限 10 MB。', lc_img_bad_type:'只能发送 JPG、PNG、GIF、WebP 图片。',
     lc_img_uploading:'图片上传中…', lc_img_failed:'图片上传失败，请再试一次。',
@@ -3223,6 +3226,8 @@ const I18N = {
     um_delete_failed:'Xóa thất bại: ', um_deleted:'Đã xóa người dùng',
     ai_tab_translate:'Dịch thuật', ai_tab_chat:'Trò chuyện', ai_tab_skills:'Kỹ năng',
     ai_tab_live:'Trò chuyện trực tiếp', lc_new:'Cuộc trò chuyện mới',
+    lc_mic_auto:'Tự động', lc_mic_working:'Đang nhận dạng…',
+    lc_mic_empty:'Không thu được giọng nói. Vui lòng thử lại.', lc_mic_expired:'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.',
     lc_pick_title:'Ai tham gia cuộc trò chuyện này?', lc_invite:'Mời người tham gia',
     lc_picked:'Đã chọn {n} người', lc_people:'{n} người',
     lc_locked:'Không phải người tham gia', lc_not_member:'Chỉ người tham gia mới có thể mở cuộc trò chuyện này.',
@@ -3230,10 +3235,9 @@ const I18N = {
     lc_pick_none:'Bỏ chọn tất cả', lc_invite_saved:'Đã cập nhật người tham gia',
     lc_invite_failed:'Không cập nhật được người tham gia. Vui lòng thử lại.', lc_cancel:'Hủy',
     lc_ok:'Xác nhận', lc_pick_btn:'＋ Người tham gia',
-    lc_mic_network:'Nhận dạng giọng nói không kết nối được. Ở Trung Quốc thường là do Chrome gửi âm thanh đến máy chủ Google - vui lòng dùng Safari hoặc nhập bằng bàn phím.',
     lc_tz_note:'Giờ theo {tz}', lc_mic_start:'Nhập bằng giọng nói',
-    lc_mic_stop:'Dừng ghi âm', lc_mic_unsupported:'Trình duyệt này không hỗ trợ nhập bằng giọng nói. Vui lòng dùng Chrome, Edge hoặc Safari.',
-    lc_mic_denied:'Quyền truy cập micro đã bị từ chối. Vui lòng cho phép trong cài đặt trình duyệt.', lc_mic_failed:'Hiện không dùng được nhận dạng giọng nói. Vui lòng nhập bằng bàn phím.',
+    lc_mic_stop:'Dừng ghi âm', lc_mic_unsupported:'Trình duyệt này không ghi âm được. Vui lòng dùng Chrome, Edge hoặc Safari.',
+    lc_mic_denied:'Quyền truy cập micro đã bị từ chối. Vui lòng cho phép trong cài đặt trình duyệt.', lc_mic_failed:'Nhận dạng giọng nói không thành công. Vui lòng thử lại hoặc nhập bằng bàn phím.',
     lc_join:'Tham gia', lc_image:'Hình ảnh',
     lc_img_too_big:'Hình ảnh quá lớn. Tối đa 10 MB.', lc_img_bad_type:'Chỉ có thể gửi hình JPG, PNG, GIF và WebP.',
     lc_img_uploading:'Đang tải hình lên…', lc_img_failed:'Tải hình lên không thành công. Vui lòng thử lại.',
@@ -3322,6 +3326,8 @@ const I18N = {
     um_delete_failed:'削除失敗：', um_deleted:'ユーザーを削除しました',
     ai_tab_translate:'翻訳', ai_tab_chat:'チャット', ai_tab_skills:'スキル',
     ai_tab_live:'オンライン会話', lc_new:'新しい会話',
+    lc_mic_auto:'自動', lc_mic_working:'認識中…',
+    lc_mic_empty:'音声を取得できませんでした。もう一度お試しください。', lc_mic_expired:'セッションの有効期限が切れました。再度ログインしてください。',
     lc_pick_title:'この会話の参加者', lc_invite:'参加者を招待',
     lc_picked:'{n} 名を選択', lc_people:'{n} 名',
     lc_locked:'参加者ではありません', lc_not_member:'この会話を開けるのは参加者のみです。',
@@ -3329,10 +3335,9 @@ const I18N = {
     lc_pick_none:'すべて解除', lc_invite_saved:'参加者を更新しました',
     lc_invite_failed:'参加者を更新できませんでした。もう一度お試しください。', lc_cancel:'キャンセル',
     lc_ok:'確定', lc_pick_btn:'＋ 参加者',
-    lc_mic_network:'音声認識がサービスに接続できませんでした。中国では Chrome が音声を Google のサーバーに送るためです。Safari をご利用いただくか、キーボードで入力してください。',
     lc_tz_note:'時刻は {tz}', lc_mic_start:'音声入力',
-    lc_mic_stop:'録音を停止', lc_mic_unsupported:'このブラウザは音声入力に対応していません。Chrome、Edge、Safari をご利用ください。',
-    lc_mic_denied:'マイクへのアクセスが拒否されました。ブラウザの設定で許可してください。', lc_mic_failed:'音声認識は現在利用できません。キーボードで入力してください。',
+    lc_mic_stop:'録音を停止', lc_mic_unsupported:'このブラウザは録音に対応していません。Chrome、Edge、Safari をご利用ください。',
+    lc_mic_denied:'マイクへのアクセスが拒否されました。ブラウザの設定で許可してください。', lc_mic_failed:'音声認識に失敗しました。もう一度お試しか、キーボードで入力してください。',
     lc_join:'参加する', lc_image:'画像',
     lc_img_too_big:'画像が大きすぎます。上限は 10 MB です。', lc_img_bad_type:'送信できるのは JPG・PNG・GIF・WebP のみです。',
     lc_img_uploading:'画像をアップロード中…', lc_img_failed:'画像のアップロードに失敗しました。もう一度お試しください。',
@@ -4358,9 +4363,8 @@ function lcPollStart() {
 }
 function lcPollStop() {
   if (lcPollTimer) { clearInterval(lcPollTimer); lcPollTimer = null; }
-  // 離開房間或頁籤時把錄音一起停掉：麥克風指示燈亮著卻沒人在收，
-  // 而且自動接回會讓它一直開著
-  if (lcRecOn || lcRecWant) lcRecStop();
+  // 離開房間或頁籤時把錄音一起停掉：否則麥克風指示燈會一直亮著
+  if (lcRecOn) lcRecStop();
 }
 
 async function lcPoll() {
@@ -4898,148 +4902,182 @@ function lcPickBadge() {
 }
 
 // ═══════════════════════════════════════════════════════════════════════
-// 語音輸入（Web Speech API）
+// 語音輸入 — 錄音 ＋ 伺服器端轉寫（v1.86 起）
 //
-// 🔴 **這裡用瀏覽器內建的辨識，不是我們的 Claude API。**
-//    Claude 不吃音訊輸入（只有文字／圖片／PDF），所以 claude-proxy 做不到轉寫；
-//    要走 API 就得引進第二家廠商（Whisper 之類）＋ 新的 edge function ＋ 新的金鑰。
-//    Web Speech API 零成本、零後端、今天就能用，先上這個。
+// 🔴 **v1.85 之前用的是瀏覽器內建的 Web Speech API，已整段換掉。** 兩個原因：
+//    ① 品質改不了 —— 引擎是瀏覽器給的，無法提供詞彙表，產品型號、TIPTOP、
+//       工號一律辨識不出來，而且 continuous 模式會自己中斷。
+//    ② **Chrome 的 Web Speech 把音訊送到 Google 的伺服器，Google 被 GFW 封鎖**，
+//       東莞廠根本用不了。
+//    現在 **瀏覽器只跟 Supabase 說話**，音訊由 transcribe function 從機房發給 OpenAI
+//    —— GFW 完全不相干。這是這個改動最重要的一點，不要退回 Web Speech。
 //
-// ⚠️ **東莞廠要注意**：Chrome 的語音辨識是把音訊送到 Google 的伺服器，
-//    而 Google 網域在中國被 GFW 封鎖 —— 這正是 Firebase 那個坑的同一種形狀。
-//    Safari（macOS／iOS）走 Apple 的服務，在中國可用。
-//    所以按鈕在不支援或失敗時必須**安靜地退場**，不能讓人以為程式壞了。
+// 🔴 Claude 不吃音訊輸入，所以這條路不能走 claude-proxy。
 //
-// 🔴 辨識**必須指定語言**，這是 Web Speech API 的規格，不能自動判斷。
-//    預設帶入介面語言，但另給一個下拉可改 —— CLAUDE.md 已記過「越南同仁把介面
-//    切成中文卻用中文打字」，介面語言不等於說話的語言。選擇記在 localStorage。
+// UX 上與 Web Speech 的差別：**沒有即時逐字稿**。錄音 → 停止 → 等一兩秒 → 出文字。
+//    所以錄音中要顯示秒數，讓使用者知道還在收音。
 // ═══════════════════════════════════════════════════════════════════════
 
+// 語言提示：空字串 = 由模型自行判斷（使用者要的「AI 辨識」）。
+// 帶了就當提示，能明顯提升同音字的準確度。
 const LC_SPEECH_LANGS = [
-  ['zh-TW', '繁中'], ['zh-CN', '简中'], ['en-US', 'EN'], ['vi-VN', 'VI'], ['ja-JP', '日本語'],
+  ['', 'AUTO'], ['zh', '中文'], ['en', 'EN'], ['vi', 'VI'], ['ja', '日本語'],
 ];
 const LC_SPEECH_KEY = 'comart-lc-speech-lang';
-const LC_SR = (typeof window !== 'undefined') &&
-              (window.SpeechRecognition || window.webkitSpeechRecognition);
+const LC_REC_MAX    = 120;   // 秒。聊天室的一段話不該超過兩分鐘，也順便擋掉忘記按停止
 
-var lcRec     = null;
+var lcMR      = null;    // MediaRecorder
+var lcStream  = null;    // MediaStream（結束一定要關掉，否則麥克風指示燈一直亮）
+var lcChunks  = [];
 var lcRecOn   = false;
-var lcRecBase = '';    // 開始錄音時輸入框裡已有的字，辨識結果接在後面
-/* 🔴 「常常無法辨識」的最大單一原因：**Chrome 的 continuous 模式會在說話停頓後
-      自己 end**，而使用者以為還在錄，繼續講的內容全部掉失。
-      規格上 continuous 只保證「不會在第一句就停」，不保證持續到你按停止。
-      所以要自己接回去：lcRecWant 記錄「使用者還想不想錄」，onend 時若是 true 就重啟。
-      lcRecFast 防無限迴圈 —— 引擎真的壞掉時 start/end 會瞬間反覆，
-      連續 5 次在 400ms 內結束就放棄並告知，不要無聲地空轉。 */
-var lcRecWant  = false;
-var lcRecFast  = 0;
-var lcRecStamp = 0;
+var lcRecBusy = false;   // 轉寫中
+var lcRecSec  = 0;
+var lcRecTick = null;
+
+function lcRecSupported() {
+  return typeof navigator !== 'undefined' && navigator.mediaDevices &&
+         navigator.mediaDevices.getUserMedia && typeof MediaRecorder !== 'undefined';
+}
 
 function lcSpeechLang() {
-  var saved = '';
-  try { saved = localStorage.getItem(LC_SPEECH_KEY) || ''; } catch (e) {}
-  if (saved && LC_SPEECH_LANGS.some(function(l){ return l[0] === saved; })) return saved;
-  // 沒選過就用介面語言推一個預設
-  var map = { 'zh-TW':'zh-TW', 'zh-CN':'zh-CN', 'en':'en-US', 'vi':'vi-VN', 'ja':'ja-JP' };
-  return map[LANG] || 'en-US';
+  var saved = null;
+  try { saved = localStorage.getItem(LC_SPEECH_KEY); } catch (e) {}
+  // 🔴 v1.85 存的是 BCP-47（'zh-TW'／'vi-VN'），新格式是 ISO-639-1（'zh'／'vi'）。
+  //    舊值一律視為無效退回「自動」—— 直接送給 API 會被拒絕。
+  if (saved !== null && LC_SPEECH_LANGS.some(function(l){ return l[0] === saved; })) return saved;
+  return '';
 }
 function lcSpeechLangSet(v) {
   try { localStorage.setItem(LC_SPEECH_KEY, v); } catch (e) {}
-  if (lcRecOn) lcRecStop();   // 錄音中換語言要重開才生效
 }
 
 function lcRecInit() {
-  // 不支援就把整組控制項藏起來（Firefox、舊 Safari、非 https）
   var wrap = document.getElementById('lc-mic-wrap');
-  if (wrap) wrap.style.display = LC_SR ? 'flex' : 'none';
+  if (wrap) wrap.style.display = lcRecSupported() ? 'flex' : 'none';
   var sel = document.getElementById('lc-mic-lang');
-  if (sel && !sel.options.length) {
-    sel.innerHTML = LC_SPEECH_LANGS.map(function(l) {
-      return '<option value="' + l[0] + '">' + escHtml(l[1]) + '</option>';
-    }).join('');
+  if (sel) {
+    if (!sel.options.length) {
+      sel.innerHTML = LC_SPEECH_LANGS.map(function(l) {
+        return '<option value="' + l[0] + '">' + escHtml(l[1] === 'AUTO' ? t('lc_mic_auto') : l[1]) + '</option>';
+      }).join('');
+    }
+    sel.value = lcSpeechLang();
   }
-  if (sel) sel.value = lcSpeechLang();
 }
 
-function lcRecToggle() {
-  if (!LC_SR) { toast(t('lc_mic_unsupported'), 'err'); return; }
-  if (lcRecOn) { lcRecStop(); return; }
-  var el = document.getElementById('lc-input');
-  if (!el) return;
-  lcRecBase = el.value || '';
-  try {
-    lcRec = new LC_SR();
-  } catch (e) {
-    toast(t('lc_mic_unsupported'), 'err'); return;
+// MediaRecorder 的容器依瀏覽器而異：Chrome/Edge 給 webm(opus)、Safari 給 mp4(aac)。
+// 兩者 OpenAI 都吃，但**副檔名要對**（伺服器端靠 x-audio-type 決定），所以這裡明確挑一個。
+function lcRecMime() {
+  var cands = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/ogg'];
+  for (var i = 0; i < cands.length; i++) {
+    try { if (MediaRecorder.isTypeSupported(cands[i])) return cands[i]; } catch (e) {}
   }
-  lcRec.lang = lcSpeechLang();
-  lcRec.continuous = true;
-  lcRec.interimResults = true;   // 邊說邊出字，使用者才知道有在收音
+  return '';   // 交給瀏覽器決定，之後從 lcMR.mimeType 讀回來
+}
 
-  lcRec.onresult = function(ev) {
-    var fin = '', itm = '';
-    for (var i = ev.resultIndex; i < ev.results.length; i++) {
-      var tx = ev.results[i][0].transcript;
-      if (ev.results[i].isFinal) fin += tx; else itm += tx;
-    }
-    if (fin) lcRecBase = (lcRecBase ? lcRecBase + fin : fin);
-    var box = document.getElementById('lc-input');
-    if (box) {
-      // 每次都由 base + 暫時結果重組，不用 += ：暫時結果會被後續事件取代
-      box.value = lcRecBase + itm;
-      box.style.height = 'auto';
-      box.style.height = Math.min(box.scrollHeight, LC_INPUT_MAX) + 'px';
-    }
-  };
-  lcRec.onerror = function(ev) {
-    // no-speech 是「沒聽到聲音」、aborted 是使用者自己停掉，兩者都不是錯誤。
-    // no-speech 之後 Chrome 會接著 end，由 onend 自動接回，使用者不會察覺中斷。
-    if (ev.error === 'no-speech' || ev.error === 'aborted') return;
-    console.warn('[lc] speech', ev.error);
-    if (ev.error === 'not-allowed' || ev.error === 'service-not-allowed') {
-      lcRecWant = false;                       // 權限問題重試也沒用，別無限接回
-      toast(t('lc_mic_denied'), 'err');
-    } else if (ev.error === 'network') {
-      // 東莞廠最可能落在這裡：Chrome 把音訊送到 Google，而 Google 被 GFW 封鎖
-      lcRecWant = false;
-      toast(t('lc_mic_network'), 'err');
-    } else {
-      toast(t('lc_mic_failed'), 'err');
-    }
-  };
+async function lcRecToggle() {
+  if (lcRecBusy) return;
+  if (lcRecOn) { lcRecStop(); return; }
+  if (!lcRecSupported()) { toast(t('lc_mic_unsupported'), 'err'); return; }
+  try {
+    lcStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  } catch (e) {
+    toast(t('lc_mic_denied'), 'err'); return;
+  }
+  var mt = lcRecMime();
+  try {
+    lcMR = mt ? new MediaRecorder(lcStream, { mimeType: mt }) : new MediaRecorder(lcStream);
+  } catch (e) {
+    try { lcMR = new MediaRecorder(lcStream); }
+    catch (e2) { lcRecRelease(); toast(t('lc_mic_unsupported'), 'err'); return; }
+  }
+  lcChunks = [];
+  lcMR.ondataavailable = function(ev) { if (ev.data && ev.data.size) lcChunks.push(ev.data); };
+  lcMR.onstop = lcRecFinish;
+  try { lcMR.start(); }
+  catch (e) { lcRecRelease(); toast(t('lc_mic_failed'), 'err'); return; }
 
-  lcRec.onend = function() {
-    if (lcRecWant) {
-      var now = Date.now();
-      lcRecFast = (now - lcRecStamp < 400) ? (lcRecFast + 1) : 0;
-      if (lcRecFast <= 5) {
-        try { lcRecStamp = Date.now(); lcRec.start(); return; } catch (e) { /* 落到下面收尾 */ }
-      } else {
-        toast(t('lc_mic_failed'), 'err');
-      }
-    }
-    lcRecWant = false; lcRecOn = false; lcRecPaint();
-  };
-
-  lcRecWant = true; lcRecFast = 0; lcRecStamp = Date.now();
-  try { lcRec.start(); } catch (e) { lcRecWant = false; toast(t('lc_mic_failed'), 'err'); return; }
-  lcRecOn = true; lcRecPaint();
+  lcRecOn = true; lcRecSec = 0; lcRecPaint();
+  lcRecTick = setInterval(function() {
+    lcRecSec++;
+    lcRecPaint();
+    if (lcRecSec >= LC_REC_MAX) lcRecStop();   // 忘記按停止時自己收
+  }, 1000);
 }
 
 function lcRecStop() {
-  // 🔴 先關掉 lcRecWant 再 stop()，否則 onend 會把它自動接回去
-  lcRecWant = false;
+  if (lcRecTick) { clearInterval(lcRecTick); lcRecTick = null; }
   lcRecOn = false;
-  if (lcRec) { try { lcRec.stop(); } catch (e) {} }
+  // onstop 會接著跑 lcRecFinish；若 MediaRecorder 已不在錄音狀態就直接收尾
+  if (lcMR && lcMR.state !== 'inactive') { try { lcMR.stop(); } catch (e) { lcRecRelease(); } }
+  else { lcRecRelease(); }
   lcRecPaint();
+}
+
+// 🔴 一定要把 track 停掉：不停的話瀏覽器分頁的麥克風指示燈會一直亮著，
+//    使用者會（合理地）以為我們在偷錄音。
+function lcRecRelease() {
+  if (lcStream) {
+    try { lcStream.getTracks().forEach(function(tr) { tr.stop(); }); } catch (e) {}
+    lcStream = null;
+  }
+  lcMR = null;
+}
+
+async function lcRecFinish() {
+  var mime = (lcMR && lcMR.mimeType) || 'audio/webm';
+  var blob = lcChunks.length ? new Blob(lcChunks, { type: mime }) : null;
+  lcChunks = [];
+  lcRecRelease();
+  if (!blob || blob.size < 1200) { lcRecPaint(); toast(t('lc_mic_empty')); return; }
+
+  lcRecBusy = true; lcRecPaint();
+  try {
+    var res = await fetch(SB_URL + '/functions/v1/transcribe', {
+      method: 'POST',
+      headers: {
+        'x-session': (SESSION && SESSION.sig) || '',
+        'x-audio-type': mime,
+        'x-audio-lang': lcSpeechLang(),
+      },
+      body: blob,
+    });
+    if (!res.ok) {
+      var why = await res.text().catch(function(){ return ''; });
+      console.warn('[lc] transcribe', res.status, why.slice(0, 200));
+      toast(t(res.status === 401 ? 'lc_mic_expired' : 'lc_mic_failed'), 'err');
+      return;
+    }
+    var data = await res.json();
+    var txt = String((data && data.text) || '').trim();
+    if (!txt) { toast(t('lc_mic_empty')); return; }
+    var el = document.getElementById('lc-input');
+    if (el) {
+      // 接在既有內容後面（可能是打了一半的字，或前一段語音）
+      el.value = el.value ? (el.value.replace(/\s+$/, '') + ' ' + txt) : txt;
+      el.style.height = 'auto';
+      el.style.height = Math.min(el.scrollHeight, LC_INPUT_MAX) + 'px';
+      el.focus();
+    }
+  } catch (e) {
+    console.warn('[lc] transcribe', e);
+    toast(t('lc_mic_failed'), 'err');
+  } finally {
+    lcRecBusy = false; lcRecPaint();
+  }
 }
 
 function lcRecPaint() {
   var b = document.getElementById('lc-mic-btn');
   if (!b) return;
   b.classList.toggle('on', lcRecOn);
-  b.textContent = lcRecOn ? '⏹' : '🎙';
-  b.title = t(lcRecOn ? 'lc_mic_stop' : 'lc_mic_start');
+  b.classList.toggle('busy', lcRecBusy);
+  b.disabled = lcRecBusy;
+  if (lcRecBusy)      { b.textContent = '⋯'; b.title = t('lc_mic_working'); }
+  else if (lcRecOn)   { b.textContent = '⏹ ' + lcRecSec + 's'; b.title = t('lc_mic_stop'); }
+  else                { b.textContent = '🎙'; b.title = t('lc_mic_start'); }
+  var sel = document.getElementById('lc-mic-lang');
+  if (sel) sel.disabled = lcRecOn || lcRecBusy;
 }
 
 // ─── 時區標註 ───
@@ -5047,7 +5085,7 @@ function lcRecPaint() {
 //    台灣同事（UTC+8）看同一則訊息會看到差一小時的時間。那本來就是對的，
 //    但不標時區的話讀起來像資料錯誤 —— 匯出的 PDF 更是把匯出者的時區烙進檔案裡。
 function lcTzLabel() {
-  var off = -(new Date().getTimezoneOffset());     // 分鐘，東為正
+  var off = -(new Date().getTimezoneOffset());
   var sg = off < 0 ? '-' : '+';
   var hh = String(Math.floor(Math.abs(off) / 60)).padStart(2, '0');
   var mm = String(Math.abs(off) % 60).padStart(2, '0');
@@ -5058,7 +5096,6 @@ function lcTzLabel() {
   } catch (e) {}
   return s;
 }
-
 // 線上對話：靜態文字套 i18n。
 // 🔴 不在這裡無條件呼叫 lcLoadList()：applyI18nAll() 每次 switchView 都會跑，
 //    那會變成每切一次頁面就打一次資料庫。只在「線上對話頁籤真的開著」時才重畫。

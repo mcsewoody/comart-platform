@@ -12,10 +12,31 @@ COMART Platform is an internal corporate portal for COMART Corporation, deployed
 
 ## Architecture
 
-### 🔴 唯一的跨子系統共用檔：`shared/voice.js`（v1.89 起）
+### 🔴 跨子系統共用檔：`shared/`（v1.89 起）
 
-**單一檔案原則有一個刻意的例外。** `shared/voice.js` 是語音輸入的完整引擎
-（錄音 → `transcribe` edge function → AI 整理），五個子系統共用同一份。
+**單一檔案原則有兩個刻意的例外**，都放在 `shared/`：
+
+| 檔案 | 內容 | 載入者 |
+|---|---|---|
+| `shared/voice.js` | 語音輸入完整引擎（錄音 → `transcribe` → AI 整理） | Portal、Board |
+| `shared/translate.js` | **翻譯規則正文**（`ComartTranslate.RULES`） | Portal、Board |
+
+🔴 **`shared/translate.js` 的存在是被實證推出來的，不是預先設計。**
+2026-09-05 把 Board 的 `PM_TR_RULES` 複製到 Portal 成為 `LC_TR_RULES`，
+**一天之內就分岔了** —— Portal 那份掉了兩處：
+「pick one consistent register **for the whole text**」的 for the whole text，
+以及「**and never mix registers within one text**」整句。
+而那正是越南同仁最初反映「譯文怪」的根因（一篇之內人稱不一致）。
+**弱掉的那一份就是實際生效的那一份**，完全應驗本檔案早先寫下的預測。
+- **只有 RULES 共用**，前後文（場景描述、輸出格式：JSON／XML 標籤／純譯文）刻意留給呼叫端 ——
+  那些本來就該不同。組裝可用 `ComartTranslate.sys(intro, extra, output)`。
+- 🔴 **取值一律用 `ComartTranslate.requireRules()`，不要用 `|| ''` 之類的預設值。**
+  少了規則的翻譯**仍然跑得動**，只是人稱與語氣會失控 —— 那種壞法沒有人會注意到，
+  比整個壞掉更糟。所以載入失敗時它會丟例外，**大聲失敗優於無聲降級**。
+- **不要在任何 HTML 裡復原一份副本。** 兩處原本的 `PM_TR_RULES`／`LC_TR_RULES` 已全部移除。
+
+**`shared/voice.js`** 是語音輸入的完整引擎
+（錄音 → `transcribe` edge function → AI 整理），子系統共用同一份。
 
 - **為什麼破例**：其他共用邏輯（i18n 字典、`PM_TR_RULES`／`LC_TR_RULES` 的翻譯規則）
   都是各檔一份副本，CLAUDE.md 已記載那必然分岔、**而分岔之後寬鬆的那一份就是實際
@@ -85,7 +106,7 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 | `admin/index.html` | v2.39 | Admin System — room booking, fleet, visitor, library, lottery | 5,650 |
 | `kms/index.html` | v2.33 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
 | `quotation/index.html` | v3.54 | Quotation & CRM system | 7,332 |
-| `board/index.html` | v1.48 | 公告與紀錄 Bulletin & Records — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍、腦力激盪 | 4,600 |
+| `board/index.html` | v1.89 | 公告與會議 Bulletin & Meetings — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍、腦力激盪 | 4,600 |
 
 `admin/lottery.html` is a standalone lottery page (separate from the lottery module inside `admin/index.html`).
 
@@ -239,7 +260,12 @@ The portal supports EN, 繁中, 简中, VI, 日 via `setLang(lang)`. Each langua
 - **Admin** (`/admin`) — 行政管理平台
 - **KMS** (`/kms`) — 知識管理系統
 - **Quotation** (`/quotation`) — 報價系統
-- **Board** (`/board`) — 公告與紀錄（2026-07 由 Portal 公告欄獨立出來，Portal v1.65 changelog 有記載）
+- **Board** (`/board`) — **公告與會議**（2026-07 由 Portal 公告欄獨立出來，Portal v1.65 changelog 有記載）
+  - 🔴 **2026-09-06 由「公告與紀錄」改名為「公告與會議」**：`紀錄` 低估了這個系統 ——
+    事前驗屍／腦力激盪／意見徵集有階段機、7 秒輪詢、全場同步的投影模式，那是**現場工具**不是檔案櫃。
+    **已知且已接受的不精確**：Woody 週報（單人、非會議）與投票（表決工具）不算會議，
+    但名字的作用是指路（「要開會、要記錄會議、要跑工作坊 → 來這裡」），不需要涵蓋附屬工具。
+    Portal changelog 裡 v1.65 那一筆**刻意保留舊名**，那是歷史紀錄。
 
 ## 技術棧
 
@@ -744,7 +770,7 @@ Portal AI 功能區的第二個頁籤（`💬 線上對話`，在翻譯旁邊）
 
 ## Board 重要細節
 
-`board/index.html`（公告與紀錄，v1.64）八個頁籤，各自一組前綴命名的函式與 Supabase 表：
+`board/index.html`（公告與會議，v1.89）八個頁籤，各自一組前綴命名的函式與 Supabase 表：
 
 | 頁籤 | 前綴 | 主要資料表 |
 |------|------|-----------|
@@ -1073,6 +1099,25 @@ Portal AI 功能區的第二個頁籤（`💬 線上對話`，在翻譯旁邊）
 - **沒開投票的場次**：`pmSummaryContext` 與四種輸出都不印票數、不寫「（依票數）」；
   AI 分群按鈕改掛在展示階段（否則永遠沒有主題可分群，總結與輸出就少了依主題歸類這一層）。
 - **不發通知**（使用者決定）：被感謝的人不會收到站內通知，靠現場與事後匯出知道。
+
+### 🔴 線上對話留在 Portal，不搬到 Board（2026-09-06 討論後定案）
+
+改名成「公告與會議」時評估過把線上對話搬進 board，**結論是不搬**。理由記在這裡，
+以免日後有人看到「兩者都是場次模型」就順手合併：
+- **時間性相反**：board 的東西是「**產生**正式紀錄」；線上對話是「談完就算，除非選擇保留」。
+  放進「會議」會讓人以為每一場都該留檔。
+- **鄰居關係是對的**：它的價值是 AI 翻譯。「我要跟越南講話」與「我要翻譯一段文字」
+  是同一類需求，擺在 🌐 翻譯 旁邊有意義。
+- **發現性**：Portal 的 AI 區在首頁；board 要先知道去哪。快速交談的工具藏起來就沒人用。
+- **搬家成本**：1088 行 JS ＋ 60 條 CSS ＋ 70 個 i18n key × 5 語 ＋ 37 個 DOM id
+  ＋ 私有 bucket 簽章邏輯，而它兩天內從 v1.80 迭代到 v1.92 才穩定。
+- 唯一成立的搬家理由（消除翻譯規則重複）**已用 `shared/translate.js` 解決**，
+  不需要靠搬家。資料模型刻意照 `premortem_sessions` 的形狀做，但**形狀相似不等於該住在一起**。
+
+**清單頁上有一塊常駐的「這裡的規則」**（`lc-rules`，五語）：全員可參與／只有參與人可開啟
+（含「系統管理者也讀不到」）／發起人結束並決定保留／發起人或管理者可刪除。
+🔴 **那四條是規則本身，不是文案** —— 尤其第二條是使用者要不要在裡面講真話的依據，
+必須寫在看得到的地方，不能只存在 CLAUDE.md 裡。改權限時這四條要跟著改。
 - ⚠️ **「人的投票表決」請走 🗳 投票頁籤（`pl*`）**，不要把 `pm*` 撐成表決工具。
   兩套系統形狀不同：`pl*` 是「主席出選項 → 大家投」，`pm*` 是「大家各自寫 → 一起看 → 收斂」。
 

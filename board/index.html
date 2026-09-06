@@ -5,7 +5,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#080C14">
-<title>COMART · 公告與紀錄 v1.88</title>
+<title>COMART · 公告與會議 v1.89</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -46,7 +46,7 @@ h1,h2,h3,p{margin:0}
 .who-badge{display:flex;align-items:center;gap:6px;padding:5px 10px;border:1px solid var(--br);border-radius:20px;font-size:12px;color:var(--tx2);white-space:nowrap}
 
 /* ── 手機版 topbar（v1.77）──
-   窄螢幕一列放不下「← Portal ＋ 告 ＋ 公告與紀錄 ＋ v1.77 ＋ 五顆語言鈕 ＋ 姓名」。
+   窄螢幕一列放不下「← Portal ＋ 告 ＋ 公告與會議 ＋ 版本 ＋ 五顆語言鈕 ＋ 姓名」。
    原本的下場：標題被壓成一個字寬、逐字換行變直排（整列高度暴增到 ~150px），日本語鈕被切掉。
    ① nowrap（見上）先把「直排」這個失效模式徹底擋掉，高度立刻回到一列
    ② 右側改成可橫向捲動 —— 語言鈕與姓名都不再被裁掉，跟下方頁籤同一套操作手感
@@ -345,8 +345,8 @@ body.pm-playing #pm-phasebar{padding:0}
     <a href="/" id="portal-back-btn">← Portal</a>
     <a class="logo" href="javascript:void(0)">
       <div class="logo-mark">告</div>
-      <div class="logo-text" data-i18n="app_title">公告與紀錄</div>
-      <span class="logo-ver">v1.88</span>
+      <div class="logo-text" data-i18n="app_title">公告與會議</div>
+      <span class="logo-ver">v1.89</span>
     </a>
     <div class="topbar-right">
       <div id="langChips" style="display:flex;gap:4px"></div>
@@ -861,6 +861,9 @@ body.pm-playing #pm-phasebar{padding:0}
      🔴 改那個檔案時這裡的 ?v= 要 +1 —— GitHub Pages 快取 4 小時，
      不 bump 的話使用者拿到舊版而且看不出來。 -->
 <script src="../shared/voice.js?v=3"></script>
+<!-- 共用翻譯規則（shared/translate.js）。Portal 與 Board 同一份 ——
+     各存一份已被證實一天內就會分岔（見該檔案檔頭）。改它時 ?v= 要 +1。 -->
+<script src="../shared/translate.js?v=1"></script>
 <script>
 "use strict";
 // ═══════════════════════════════════════════════
@@ -877,7 +880,7 @@ const B_LANGS = [['zh-TW','繁中'],['zh-CN','简中'],['en','EN'],['vi','VI'],[
 let BLANG = 'zh-TW';
 const B_I18N = {
 'zh-TW': {
-  app_title:'公告與紀錄',
+  app_title:'公告與會議',
   nav_bulletin:'公告', nav_weekly:'週會紀錄', nav_biz:'業務會議記錄', nav_woody:'Woody 週報',
   nav_premortem:'Premortem', nav_brainstorm:'腦力激盪',
   not_logged_in:'未登入',
@@ -1041,7 +1044,7 @@ const B_I18N = {
   pm_in_progress:'🟢 會議進行中，請點選加入本次會議！',
   pm_list_empty_open:'目前沒有進行中的{meet}，點右上角「＋ 新增{meet}」開一場。',
   pm_list_empty_locked:'尚無已定稿的{meet}。',
-  pm_login_expired:'🔑 登入已過期或尚未登入。<br>請回入口網站（platform.comart.com.tw）重新登入，再從 App 磁磚點進「公告與紀錄」。',
+  pm_login_expired:'🔑 登入已過期或尚未登入。<br>請回入口網站（platform.comart.com.tw）重新登入，再從 App 磁磚點進「公告與會議」。',
   pm_only_chair_del:'只有該場主席能刪除這場會議',
   pm_confirm_del_session:'確定刪除這場{meet}？所有填寫內容都會一併刪除，無法復原。',
   pm_creating:'建立中（翻譯情境）…', pm_created:'已建立{meet}', pm_create_failed:'建立失敗：',
@@ -1077,7 +1080,7 @@ const B_I18N = {
   pm_sum_partial:'（已完成段落已存檔，按重新生成可續做）',
 },
 'zh-CN': {
-  app_title:'公告与记录',
+  app_title:'公告与会议',
   nav_bulletin:'公告', nav_weekly:'周会记录', nav_biz:'业务会议记录', nav_woody:'Woody 周报',
   nav_premortem:'Premortem', nav_brainstorm:'头脑风暴',
   not_logged_in:'未登录',
@@ -1241,7 +1244,7 @@ const B_I18N = {
   pm_in_progress:'🟢 会议进行中，请点选加入本次会议！',
   pm_list_empty_open:'目前没有进行中的{meet}，点右上角“＋ 新增{meet}”开一场。',
   pm_list_empty_locked:'尚无已定稿的{meet}。',
-  pm_login_expired:'🔑 登录已过期或尚未登录。<br>请回门户网站（platform.comart.com.tw）重新登录，再从 App 磁贴点进“公告与记录”。',
+  pm_login_expired:'🔑 登录已过期或尚未登录。<br>请回门户网站（platform.comart.com.tw）重新登录，再从 App 磁贴点进“公告与会议”。',
   pm_only_chair_del:'只有该场主席能删除这场会议',
   pm_confirm_del_session:'确定删除这场{meet}？所有填写内容都会一并删除，无法恢复。',
   pm_creating:'建立中（翻译情境）…', pm_created:'已建立{meet}', pm_create_failed:'建立失败：',
@@ -1277,7 +1280,7 @@ const B_I18N = {
   pm_sum_partial:'（已完成段落已存档，按重新生成可续做）',
 },
 'en': {
-  app_title:'Bulletin & Records',
+  app_title:'Bulletin & Meetings',
   nav_bulletin:'Bulletin', nav_weekly:'Weekly Minutes', nav_biz:'Sales Meeting Minutes', nav_woody:'Woody Report',
   nav_premortem:'Premortem', nav_brainstorm:'Brainstorm',
   not_logged_in:'Not signed in',
@@ -1441,7 +1444,7 @@ const B_I18N = {
   pm_in_progress:'🟢 A session is running — tap to join!',
   pm_list_empty_open:'No {meet} in progress. Use “＋ New {meet}” at the top right to start one.',
   pm_list_empty_locked:'No finalized {meet} yet.',
-  pm_login_expired:'🔑 Not signed in, or the session expired.<br>Please sign in again at platform.comart.com.tw and open “Bulletin & Records” from the app grid.',
+  pm_login_expired:'🔑 Not signed in, or the session expired.<br>Please sign in again at platform.comart.com.tw and open “Bulletin & Meetings” from the app grid.',
   pm_only_chair_del:'Only the chair of that session can delete it',
   pm_confirm_del_session:'Delete this {meet}? Every entry will be deleted with it and cannot be recovered.',
   pm_creating:'Creating (translating the scenario)…', pm_created:'{meet} created', pm_create_failed:'Could not create: ',
@@ -1477,7 +1480,7 @@ const B_I18N = {
   pm_sum_partial:' (finished parts are saved — press Regenerate to continue)',
 },
 'vi': {
-  app_title:'Thông báo & Biên bản',
+  app_title:'Thông báo & Họp',
   nav_bulletin:'Thông báo', nav_weekly:'Biên bản họp tuần', nav_biz:'Biên bản họp kinh doanh', nav_woody:'Báo cáo Woody',
   nav_premortem:'Premortem', nav_brainstorm:'Brainstorming',
   not_logged_in:'Chưa đăng nhập',
@@ -1677,7 +1680,7 @@ const B_I18N = {
   pm_sum_partial:' (các phần đã xong đã được lưu, bấm Tạo lại để viết tiếp)',
 },
 'ja': {
-  app_title:'お知らせと記録',
+  app_title:'お知らせと会議',
   nav_bulletin:'お知らせ', nav_weekly:'週会議事録', nav_biz:'営業会議議事録', nav_woody:'Woody 週報',
   nav_premortem:'Premortem', nav_brainstorm:'ブレスト',
   not_logged_in:'未ログイン',
@@ -4680,26 +4683,15 @@ const PM_TR_MODEL = 'claude-opus-5';
 // 🔴 抽出來共用是必要的，不是整理癖（v1.81）：人稱與語域那一條以前只有條目翻譯有，
 //    AI 總結的越南文版沒有 —— 同一份紀錄裡因此有兩套人稱標準，讀起來就是不一致。
 //    以後改規則只改這一份，兩邊一起生效。
-const PM_TR_RULES =
-  '- Faithful, not literal. Produce what a fluent native speaker would actually write, ' +
-  'not a word-by-word rendering. Never omit or add content.\n' +
-  '- Preserve tone strength exactly. Do not soften criticism, and do not inflate warmth or ' +
-  'add pleasantries the original does not contain.\n' +
-  '- Keep unchanged: personal names, company and product names, model numbers, employee IDs, ' +
-  'system names (TIPTOP, PLM, ERP...), English acronyms, numbers, dates and units.\n' +
-  '- Preserve the original line breaks and paragraph structure.\n' +
-  '- Person reference: Chinese and English do not encode the age/seniority information that ' +
-  'Vietnamese pronouns require. When translating INTO Vietnamese, pick one consistent register ' +
-  'for the whole text and stay with it. Default to the neutral collegial "ban" (bạn) for a peer ' +
-  'addressed as you; use anh/chi only when the source clearly implies a senior colleague; ' +
-  'use the person\'s own name where the source names them. Never invent honorifics the source ' +
-  'does not imply, and never mix registers within one text.\n' +
-  '- When translating INTO Chinese, do not add honorifics or pleasantries the source lacks.\n';
-
+/* 🔴 翻譯規則已抽到 shared/translate.js（Portal 與 Board 共用一份）。
+   **不要在這裡復原一份副本** —— 2026-09-05 複製到 Portal 之後一天內就分岔了，
+   而弱掉的那一份（少了「整篇固定一種語域」與「不得混用語域」）正是實際生效的。
+   requireRules() 在載入失敗時會丟例外：少了規則的翻譯仍然跑得動，只是人稱與
+   語氣會失控 —— 那種壞法沒有人會注意到，比整個壞掉更糟，所以刻意大聲失敗。 */
 const PM_TR_SYS =
   'You are a professional translator working on internal corporate records (meeting minutes, ' +
   'risk assessments, brainstorm notes, and messages of appreciation between colleagues).\n\n' +
-  'Requirements:\n' + PM_TR_RULES + '\n' +
+  'Requirements:\n' + ComartTranslate.requireRules() + '\n' +
   'Output ONLY a minified JSON object and nothing else.';
 
 // srcLang 可省略（傳 null／''）：省略時由模型自行辨識來源語言並回傳偵測結果。
@@ -4768,11 +4760,11 @@ function pmSummaryContext() {
 // 但仍用 opus-5——這是要存檔的正式結論，譯文品質不能將就。
 async function pmTranslateLong(text, toLang) {
   const t = (text || '').trim(); if (!t) return '';
-  // 規則與條目翻譯共用（PM_TR_RULES）：以前這裡是另一段自己寫的中文提示詞，缺了人稱與語域那一條，
+  // 規則與條目翻譯共用（ComartTranslate.requireRules()）：以前這裡是另一段自己寫的中文提示詞，缺了人稱與語域那一條，
   // 於是同一份紀錄的條目用一種人稱標準、AI 總結用另一種。差別只在輸出格式（這裡不要 JSON）。
   const sys = 'You are a professional translator working on internal corporate records. ' +
     'This is the official, permanently archived conclusion of a meeting.\n\n' +
-    'Requirements:\n' + PM_TR_RULES +
+    'Requirements:\n' + ComartTranslate.requireRules() +
     '- Preserve the section headings and the paragraph structure exactly.\n\n' +
     'Output ONLY the translation itself: no preamble, no notes, no markup, ' +
     'and no internal or system XML tags.';

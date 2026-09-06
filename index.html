@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>COMART Platform v1.92</title>
+<title>COMART Platform v1.93</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script defer src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.js"></script>
 <style>
@@ -259,6 +259,11 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:
 .ai-tab-content.on { display:flex; }
 /* ── 線上對話 Live Chat ── */
 .lc-sec { font-size:11px; font-weight:700; color:var(--tx3); letter-spacing:.06em; margin-bottom:7px; }
+.lc-rules { background:var(--s1); border:1px solid var(--br); border-left:3px solid #7c3aed; border-radius:10px; padding:11px 14px; margin-bottom:16px; }
+.lc-rules-h { font-size:11px; font-weight:700; color:#a78bfa; letter-spacing:.06em; margin-bottom:7px; }
+.lc-rules ul { margin:0; padding-left:16px; }
+.lc-rules li { font-size:12px; color:var(--tx3); line-height:1.65; margin-bottom:2px; }
+.lc-rules li b { color:var(--tx2); font-weight:600; }
 .lc-row { display:flex; align-items:center; gap:10px; padding:11px 13px; background:var(--s1); border:1px solid var(--br); border-radius:10px; margin-bottom:7px; cursor:pointer; transition:border-color .15s; }
 .lc-row:hover { border-color:#7c3aed; }
 .lc-row-t { font-size:13.5px; font-weight:600; color:var(--tx); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
@@ -370,7 +375,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     <div class="login-logo">
       <div class="login-mark" style="background:transparent"><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="44" height="23"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></div>
       <div class="login-name">COMART Platform</div>
-      <div class="login-sub">Internal Portal · v1.92</div>
+      <div class="login-sub">Internal Portal · v1.93</div>
     </div>
     <form id="loginForm" onsubmit="doLogin();return false;" autocomplete="on">
     <div class="field">
@@ -438,7 +443,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   <div class="topbar">
     <div class="topbar-logo" onclick="switchView('home')">
       <div class="topbar-mark" style="background:transparent"><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="26" height="14"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></div>
-      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.92</span></div>
+      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.93</span></div>
     </div>
     <div class="topbar-right">
       <div class="lang-switcher">
@@ -631,6 +636,15 @@ input[type="date"]::-webkit-calendar-picker-indicator {
               </div>
               <div id="lc-new-picked" style="font-size:11px;color:#a78bfa;margin-top:7px;font-weight:700;"></div>
               <div id="lc-new-hint" style="font-size:11px;color:var(--tx3);margin-top:4px;line-height:1.55;"></div>
+            </div>
+            <div class="lc-rules" id="lc-rules">
+              <div class="lc-rules-h" id="lc-rules-h"></div>
+              <ul>
+                <li><b id="lc-rule1-t"></b><span id="lc-rule1-d"></span></li>
+                <li><b id="lc-rule2-t"></b><span id="lc-rule2-d"></span></li>
+                <li><b id="lc-rule3-t"></b><span id="lc-rule3-d"></span></li>
+                <li><b id="lc-rule4-t"></b><span id="lc-rule4-d"></span></li>
+              </ul>
             </div>
             <div id="lc-list"></div>
           </div>
@@ -1217,6 +1231,9 @@ input[type="date"]::-webkit-calendar-picker-indicator {
      🔴 改那個檔案時這裡的 ?v= 要 +1 —— GitHub Pages 快取 4 小時，
      不 bump 的話使用者拿到舊版而且看不出來。 -->
 <script src="./shared/voice.js?v=3"></script>
+<!-- 共用翻譯規則（shared/translate.js）。Portal 與 Board 同一份 ——
+     各存一份已被證實一天內就會分岔（見該檔案檔頭）。改它時 ?v= 要 +1。 -->
+<script src="./shared/translate.js?v=1"></script>
 <script>
 const SESSION_KEY = 'comart-portal-session';
 const SESSION_TTL = 8 * 60 * 60 * 1000; // 8h
@@ -1591,7 +1608,7 @@ const APPS = [
   { id:'ai',         label:'AI',             labelZh:'AI',           desc:'AI translation, chat & business tools', icon:'🤖', bg:'#130A2A', internal:true,  roles:[] },
   { id:'directory',  label:'Hall of Fame',   labelZh:'名人榜',       desc:'Employee directory, contacts & discussions', icon:'👤', bg:'#0A1A2E', internal:true, roles:[] },
   { id:'kms',        label:'KMS',            labelZh:'知識管理',     desc:'Knowledge Management — AI Q&A, document library', icon:'🧠', bg:'#0A2A1A', internal:false, path:'./kms/index.html', roles:[] },
-  { id:'bulletin',   label:'Bulletin Board', labelZh:'公告與紀錄',   desc:'Announcements, weekly minutes & meeting records', icon:'📢', bg:'#1A1A08', internal:false, path:'./board/index.html', roles:[] },
+  { id:'bulletin',   label:'Bulletin Board', labelZh:'公告與會議',   desc:'Announcements, meeting minutes & workshops', icon:'📢', bg:'#1A1A08', internal:false, path:'./board/index.html', roles:[] },
   { id:'calendar',   label:'Calendar',       labelZh:'集團行事曆',   desc:'Business trip management & flight tracking', icon:'📅', bg:'#0A1A1A', internal:true,  roles:[] },
   { id:'admin-sys',  label:'Admin System',   labelZh:'行政管理系統', desc:'Library · Fleet · Meetings · Visits', icon:'🏛', bg:'#1A0A1A', internal:false, path:'./admin/index.html', roles:[] },
   { id:'quotation',  label:'Quotation',      labelZh:'報價管理系統', desc:'Product quotations, CRM & AI tools', icon:'💼', bg:'#0F2A4A', internal:false, depts:['sales'], path:'https://platform.comart.com.tw/quotation/index.html', roles:[] },
@@ -2890,7 +2907,7 @@ const I18N = {
     card_ai_name:'AI Tools', card_ai_desc:'AI translation, chat & business tools',
     card_directory_name:'Hall of Fame', card_directory_desc:'Employee directory, contacts & discussions',
     card_kms_name:'KMS', card_kms_desc:'Knowledge Management — AI Q&A, document library',
-    card_bulletin_name:'Board', card_bulletin_desc:'Announcements, weekly minutes & meeting records',
+    card_bulletin_name:'Bulletin & Meetings', card_bulletin_desc:'Announcements, meeting minutes & workshops',
     card_calendar_name:'Calendar', card_calendar_desc:'Business trip management & flight tracking',
     card_admin_sys_name:'Admin System', card_admin_sys_desc:'Library · Fleet · Meetings · Visits',
     card_quotation_name:'Quotation', card_quotation_desc:'Product quotations, CRM & AI tools',
@@ -2936,6 +2953,11 @@ const I18N = {
     // ai tab
     ai_tab_translate:'Translate', ai_tab_chat:'Claude Chat', ai_tab_skills:'Skills',
     ai_tab_live:'Live Chat', lc_new:'New chat',
+    lc_rules_h:'HOW THIS WORKS', lc_rule1_t:'Anyone can take part — ',
+    lc_rule1_d:'no department or site restriction. Any active colleague can be added as a participant.', lc_rule2_t:'Only participants can open it — ',
+    lc_rule2_d:'nobody else can read the messages, system administrators included.', lc_rule3_t:'The host ends it and decides whether to keep it — ',
+    lc_rule3_d:'kept conversations stay readable and can be exported as PDF.', lc_rule4_t:'The host or a system administrator can delete it — ',
+    lc_rule4_d:'that removes every message with it and cannot be undone.',
     pwd_user_lbl:'Employee ID',
     lc_mic_silent:'That recording had almost no sound. Please check your microphone is picking you up, then try again.',
     p_clean_done:'Text tidied up',
@@ -3005,12 +3027,12 @@ const I18N = {
     // general
     },
   'zh-TW': {
-    home:'首頁', directory:'名人榜', bulletin:'公告與紀錄', calendar:'集團行事曆',
+    home:'首頁', directory:'名人榜', bulletin:'公告與會議', calendar:'集團行事曆',
     ai:'AI 工具', users:'用戶管理', signout:'登出', signout_confirm:'確定登出？',
     card_ai_name:'AI 工具', card_ai_desc:'AI 翻譯、對話與商業工具',
     card_directory_name:'名人榜', card_directory_desc:'員工通訊錄、聯絡方式與留言',
     card_kms_name:'知識管理', card_kms_desc:'KMS — AI 問答、文件庫',
-    card_bulletin_name:'公告與紀錄', card_bulletin_desc:'公告、週會紀錄與業務會議記錄',
+    card_bulletin_name:'公告與會議', card_bulletin_desc:'公告、會議紀錄與工作坊',
     card_calendar_name:'集團行事曆', card_calendar_desc:'商務差旅管理與航班追蹤',
     card_admin_sys_name:'行政管理系統', card_admin_sys_desc:'圖書館 · 公務車 · 會議室 · 客戶到訪',
     card_quotation_name:'報價管理系統', card_quotation_desc:'產品報價、CRM 與 AI 工具',
@@ -3047,6 +3069,11 @@ const I18N = {
     um_delete_failed:'刪除失敗：', um_deleted:'用戶已刪除',
     ai_tab_translate:'翻譯', ai_tab_chat:'Claude Chat', ai_tab_skills:'技能',
     ai_tab_live:'線上對話', lc_new:'開新對話',
+    lc_rules_h:'這裡的規則', lc_rule1_t:'全員可參與 — ',
+    lc_rule1_d:'不分部門與營運中心，任何在職同事都可以被列為參與人。', lc_rule2_t:'只有參與人可開啟 — ',
+    lc_rule2_d:'其他人看不到內容，系統管理者也讀不到。', lc_rule3_t:'由發起人結束並決定是否保留 — ',
+    lc_rule3_d:'保留的日後可再閱讀，也可輸出 PDF。', lc_rule4_t:'發起人或系統管理者可刪除 — ',
+    lc_rule4_d:'刪除會連同所有訊息一起移除，無法復原。',
     pwd_user_lbl:'員工編號',
     lc_mic_silent:'這段錄音幾乎沒有聲音。請確認麥克風有收到音，再試一次。',
     p_clean_done:'整理完成',
@@ -3109,12 +3136,12 @@ const I18N = {
     cal_sidebar_title:'日曆', cal_max_cats:'最多同時顯示 4 個日曆（已達上限）'
   },
   'zh-CN': {
-    home:'首页', directory:'员工通讯录', bulletin:'公告与记录', calendar:'集团行程',
+    home:'首页', directory:'员工通讯录', bulletin:'公告与会议', calendar:'集团行程',
     ai:'AI 工具', users:'用户管理', signout:'退出', signout_confirm:'确定退出？',
     card_ai_name:'AI 工具', card_ai_desc:'AI 翻译、对话与商业工具',
     card_directory_name:'员工通讯录', card_directory_desc:'员工目录、联系方式与留言',
     card_kms_name:'知识管理', card_kms_desc:'KMS — AI 问答、文件库',
-    card_bulletin_name:'公告与记录', card_bulletin_desc:'公告、周会记录与业务会议记录',
+    card_bulletin_name:'公告与会议', card_bulletin_desc:'公告、会议记录与工作坊',
     card_calendar_name:'集团行程', card_calendar_desc:'商务差旅管理与航班追踪',
     card_admin_sys_name:'行政管理系统', card_admin_sys_desc:'图书馆 · 公务车 · 会议室 · 客户来访',
     card_quotation_name:'报价管理系统', card_quotation_desc:'产品报价、CRM 与 AI 工具',
@@ -3151,6 +3178,11 @@ const I18N = {
     um_delete_failed:'删除失败：', um_deleted:'用户已删除',
     ai_tab_translate:'翻译', ai_tab_chat:'Claude Chat', ai_tab_skills:'技能',
     ai_tab_live:'在线对话', lc_new:'开新对话',
+    lc_rules_h:'这里的规则', lc_rule1_t:'全员可参与 — ',
+    lc_rule1_d:'不分部门与运营中心，任何在职同事都可以被列为参与人。', lc_rule2_t:'只有参与人可打开 — ',
+    lc_rule2_d:'其他人看不到内容，系统管理者也读不到。', lc_rule3_t:'由发起人结束并决定是否保留 — ',
+    lc_rule3_d:'保留的日后可再阅读，也可输出 PDF。', lc_rule4_t:'发起人或系统管理者可删除 — ',
+    lc_rule4_d:'删除会连同所有消息一起移除，无法恢复。',
     pwd_user_lbl:'员工编号',
     lc_mic_silent:'这段录音几乎没有声音。请确认麦克风有收到音，再试一次。',
     p_clean_done:'整理完成',
@@ -3218,7 +3250,7 @@ const I18N = {
     card_ai_name:'Công cụ AI', card_ai_desc:'Dịch thuật AI, trò chuyện & công cụ kinh doanh',
     card_directory_name:'Danh bạ', card_directory_desc:'Danh bạ nhân viên, liên lạc & thảo luận',
     card_kms_name:'KMS', card_kms_desc:'Quản lý tri thức — AI Q&A, thư viện tài liệu',
-    card_bulletin_name:'Bảng tin', card_bulletin_desc:'Thông báo, biên bản họp tuần & họp kinh doanh',
+    card_bulletin_name:'Thông báo & Họp', card_bulletin_desc:'Thông báo, biên bản họp & workshop',
     card_calendar_name:'Lịch', card_calendar_desc:'Quản lý công tác & theo dõi chuyến bay',
     card_admin_sys_name:'Hệ thống HC', card_admin_sys_desc:'Thư viện · Xe công · Phòng họp · Khách thăm',
     card_quotation_name:'Báo giá', card_quotation_desc:'Báo giá sản phẩm, CRM & AI',
@@ -3255,6 +3287,11 @@ const I18N = {
     um_delete_failed:'Xóa thất bại: ', um_deleted:'Đã xóa người dùng',
     ai_tab_translate:'Dịch thuật', ai_tab_chat:'Claude Chat', ai_tab_skills:'Kỹ năng',
     ai_tab_live:'Trò chuyện trực tiếp', lc_new:'Cuộc trò chuyện mới',
+    lc_rules_h:'QUY TẮC Ở ĐÂY', lc_rule1_t:'Ai cũng có thể tham gia — ',
+    lc_rule1_d:'không giới hạn bộ phận hay nhà máy. Bất kỳ đồng nghiệp đang làm việc đều có thể được thêm làm người tham gia.', lc_rule2_t:'Chỉ người tham gia mới mở được — ',
+    lc_rule2_d:'người khác không đọc được nội dung, kể cả người quản trị hệ thống.', lc_rule3_t:'Người mở kết thúc và quyết định có lưu hay không — ',
+    lc_rule3_d:'cuộc trò chuyện được lưu vẫn đọc được về sau và xuất được PDF.', lc_rule4_t:'Người mở hoặc người quản trị hệ thống có thể xóa — ',
+    lc_rule4_d:'việc này xóa toàn bộ tin nhắn và không thể hoàn tác.',
     pwd_user_lbl:'Mã nhân viên',
     lc_mic_silent:'Bản ghi này gần như không có âm thanh. Vui lòng kiểm tra micro có thu được tiếng của bạn, rồi thử lại.',
     p_clean_done:'Đã chỉnh lại văn bản',
@@ -3322,7 +3359,7 @@ const I18N = {
     card_ai_name:'AI ツール', card_ai_desc:'AI翻訳・チャット・ビジネスツール',
     card_directory_name:'社員名鑑', card_directory_desc:'社員ディレクトリ・連絡先・コメント',
     card_kms_name:'KMS', card_kms_desc:'ナレッジ管理 — AI Q&A・ドキュメント',
-    card_bulletin_name:'掲示板・議事録', card_bulletin_desc:'お知らせ・週会議事録・業務会議記録',
+    card_bulletin_name:'お知らせと会議', card_bulletin_desc:'お知らせ・議事録・ワークショップ',
     card_calendar_name:'行程管理', card_calendar_desc:'出張管理・フライト追跡',
     card_admin_sys_name:'総務管理', card_admin_sys_desc:'図書・車両・会議室・来客',
     card_quotation_name:'見積', card_quotation_desc:'製品見積・CRM・AIツール',
@@ -3359,6 +3396,11 @@ const I18N = {
     um_delete_failed:'削除失敗：', um_deleted:'ユーザーを削除しました',
     ai_tab_translate:'翻訳', ai_tab_chat:'Claude Chat', ai_tab_skills:'スキル',
     ai_tab_live:'オンライン会話', lc_new:'新しい会話',
+    lc_rules_h:'ここでのルール', lc_rule1_t:'誰でも参加できます — ',
+    lc_rule1_d:'部門や拠点による制限はありません。在職中の同僚は誰でも参加者に追加できます。', lc_rule2_t:'開けるのは参加者のみ — ',
+    lc_rule2_d:'他の人は内容を読めません。システム管理者も読めません。', lc_rule3_t:'開始者が終了し、保存するかを決めます — ',
+    lc_rule3_d:'保存した会話は後から読めて、PDF に出力できます。', lc_rule4_t:'開始者またはシステム管理者が削除できます — ',
+    lc_rule4_d:'すべてのメッセージも一緒に削除され、元に戻せません。',
     pwd_user_lbl:'従業員ID',
     lc_mic_silent:'この録音はほとんど音が入っていません。マイクが音を拾っているか確認して、もう一度お試しください。',
     p_clean_done:'整えました',
@@ -3447,7 +3489,7 @@ function applyI18nAll() {
     'sn-ai':        { en:'AI',           'zh-TW':'AI',        'zh-CN':'AI',        vi:'AI',             ja:'AI' },
     'sn-directory': { en:'Hall of Fame', 'zh-TW':'名人榜',    'zh-CN':'员工通讯录', vi:'Danh bạ',        ja:'社員名鑑' },
     'sn-kms':       { en:'KMS',          'zh-TW':'知識管理',  'zh-CN':'知识管理',  vi:'KMS',            ja:'KMS' },
-    'sn-bulletin':  { en:'Board','zh-TW':'公告與紀錄',   'zh-CN':'公告与记录',    vi:'Bảng tin',      ja:'掲示板・議事録' },
+    'sn-bulletin':  { en:'Board','zh-TW':'公告與會議',   'zh-CN':'公告与会议',    vi:'Thông báo & Họp', ja:'お知らせと会議' },
     'sn-calendar':  { en:'Calendar',     'zh-TW':'集團行事曆','zh-CN':'集团行程',  vi:'Lịch',           ja:'行程管理' },
     'sn-admin':     { en:'Admin System', 'zh-TW':'行政管理系統','zh-CN':'行政管理系统',vi:'Hệ thống HC',  ja:'総務管理' },
     'sn-quotation': { en:'Quotation',    'zh-TW':'報價系統',  'zh-CN':'报价系统',  vi:'Báo giá',        ja:'見積' },
@@ -3964,31 +4006,18 @@ const LC_INPUT_MAX = 220;
 //    而「快」本身就是這個功能的規格。opus 預設開 thinking，一則要 3–8 秒。
 const LC_TR_MODEL = 'claude-sonnet-5';
 
-/* 🔴 這一份規則是 board/index.html 的 PM_TR_RULES 的**副本**。
-   兩個檔案沒有模組系統（i18n 字典也是各自一份），無法共用。
-   **改翻譯規則時兩份都要改**，否則同一家公司的兩個系統會有兩套人稱標準。
-   最重要的是越南語人稱那一條：中文與英文的「你」不帶年齡與位階資訊，
-   越南語卻必須選一個（bạn／anh／chị／em），譯者不選就是亂選。 */
-const LC_TR_RULES =
-  '- Faithful, not literal. Produce what a fluent native speaker would actually write, ' +
-  'not a word-by-word rendering. Never omit or add content.\n' +
-  '- Preserve tone strength exactly. Do not soften criticism, and do not inflate warmth or ' +
-  'add pleasantries the original does not contain.\n' +
-  '- Keep unchanged: personal names, company and product names, model numbers, employee IDs, ' +
-  'system names (TIPTOP, PLM, ERP...), English acronyms, numbers, dates and units.\n' +
-  '- Preserve the original line breaks.\n' +
-  '- Person reference: Chinese and English do not encode the age/seniority information that ' +
-  'Vietnamese pronouns require. When translating INTO Vietnamese, pick one consistent register ' +
-  'and stay with it. Default to the neutral collegial "ban" (bạn) for a peer addressed as you; ' +
-  'use anh/chi only when the source clearly implies a senior colleague; use the person\'s own ' +
-  'name where the source names them. Never invent honorifics the source does not imply.\n' +
-  '- When translating INTO Chinese, do not add honorifics or pleasantries the source lacks.\n';
+/* 🔴 翻譯規則已抽到 shared/translate.js（Portal 與 Board 共用一份）。
+   **不要在這裡復原一份副本** —— 2026-09-05 從 board 複製過來之後，一天之內
+   這份就掉了兩處：「pick one consistent register **for the whole text**」的
+   for the whole text，以及「**and never mix registers within one text**」整句。
+   那正是越南同仁最初反映「譯文怪」的根因（一篇之內人稱不一致），
+   也就是 CLAUDE.md 那句「分岔之後寬鬆的那一份就是實際生效的那一份」。 */
 
 const LC_TR_SYS =
   'You are a professional translator for a real-time internal chat between colleagues at a ' +
   'manufacturer with sites in Taiwan, Dongguan (China) and Vietnam. Messages are short, ' +
   'work-related and often about orders, shipping, tooling, quality and schedules.\n\n' +
-  'Requirements:\n' + LC_TR_RULES +
+  'Requirements:\n' + ComartTranslate.requireRules() +
   '- Chat register: keep it as short and plain as the original. A one-line question stays a ' +
   'one-line question. Do not turn casual typing into formal prose.\n' +
   '- Do not answer, explain or comment on the message. Translate only.\n\n' +
@@ -5043,6 +5072,11 @@ function lcApplyI18n() {
   function txt(id, key) { var e = document.getElementById(id); if (e) e.textContent = t(key); }
   function ph(id, key)  { var e = document.getElementById(id); if (e) e.placeholder = t(key); }
   txt('lc-new-lbl','lc_new_lbl'); ph('lc-new-title','lc_title_ph');
+  txt('lc-rules-h','lc_rules_h');
+  for (var ri = 1; ri <= 4; ri++) {
+    txt('lc-rule' + ri + '-t', 'lc_rule' + ri + '_t');
+    txt('lc-rule' + ri + '-d', 'lc_rule' + ri + '_d');
+  }
   txt('lc-new-btn','lc_new');     txt('lc-new-hint','lc_new_hint');
   txt('lc-keep-btn','lc_keep');   txt('lc-discard-btn','lc_discard');
   txt('lc-endbar-q','lc_end_q');  txt('lc-end-btn','lc_end');

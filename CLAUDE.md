@@ -102,7 +102,7 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 
 | File | Version | Purpose | ~Lines |
 |------|---------|---------|--------|
-| `index.html` | v1.67 | Main portal — login, home, directory, bulletin, calendar, AI tools | 4,394 |
+| `index.html` | v1.94 | Main portal — login, home, directory, bulletin, calendar, AI tools | 4,394 |
 | `admin/index.html` | v2.39 | Admin System — room booking, fleet, visitor, library, lottery | 5,650 |
 | `kms/index.html` | v2.33 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
 | `quotation/index.html` | v3.54 | Quotation & CRM system | 7,332 |
@@ -532,6 +532,38 @@ Portal AI 功能區的第二個頁籤（`💬 線上對話`，在翻譯旁邊）
   兩處問的是同一個問題，各留一份必然分岔）。
 - **前端刪除鈕刻意不對「開啟者 × 進行中」顯示**：那條路是「結束對話 → 不保留」，
   同一件事給兩個入口只會讓人猜哪一個才對。admin 看別人的進行中場次則有刪除鈕。
+### 邀請通知：大卡片 ＋ 點進去就是房間（v1.94，無 migration）
+
+被邀請的人一進 Portal 就會在畫面正上方看到一張**大卡片**（💬 ＋ 邀請人 ＋ 主題 ＋「進入對話室 ›」），
+點了直接進房間。鈴鐺裡那一則點下去也走同一條路。`lcNotifyInvited` / `lcCheckInvites` /
+`lcInviteRender` / `lcInviteEnter` / `lcInviteDismiss` / `lcGoto`。
+
+- 🔴 **「看過了沒有」的事實來源就是 `notifications.is_read`，不另外存旗標。**
+  存在瀏覽器就會換一台裝置又被吵一次；存成新欄位則要多一個 migration，而且與鈴鐺的已讀狀態
+  必然分岔。兩者共用同一列資料，所以在鈴鐺點掉、或在卡片上按 ✕，另一邊都會跟著消失。
+  ✕ 也算「看過了」（會寫 `is_read`）—— 卡片本身就是通知，收掉它不該讓同一則明天再跳一次。
+- 🔴 **`link` 寫成 `'#lc/<場次id>'`，`openNotif` 有專屬分支攔下來走站內導覽**（`lcGoto`），
+  不是 `window.open` —— 把 hash 當網址開新分頁只會開出一個空白頁。
+  那個分支**必須放在既有的 http(s)／相對路徑白名單判斷之前**。
+  順帶：`#` 開頭本來就不符合那個白名單，所以萬一分支被移走也只是沒反應，不會開出奇怪的東西。
+- 🔴 **只通知「這次新加的人」**（`added = mem − before`）：`lcPickOpen` 進 invite 模式時會把
+  既有成員先勾起來，拿整份 `members` 去發通知等於每按一次「確定」就把所有人再吵一次。
+  舊名單一定要在 `SB.patch` **之前**用 `lcMembersOf()` 留一份。
+- 🔴 **`notifications.to_user` 不受 sb-proxy 保護，任何人都能寫一列進來**，
+  所以通知 id 與場次 id 進 `onclick` 之前一律經 `_lcSafeId()` 過白名單
+  （`[A-Za-z0-9_-]{1,64}`，涵蓋 `uid()` 的 base36 與 uuid 的連字號），
+  `title`／`body` 一律 `escHtml`。這與鈴鐺清單的儲存型 XSS 防護是同一個理由。
+- **卡片掛在 `updateNotifBadge()` 尾端，不自己開計時器** —— 就自動沿用它既有的三個觸發點：
+  登入後 3 秒、每 60 秒、以及**回到前景時補查**。所以「我邀請你了 → 對方切到 Portal 分頁」
+  是立即出現的；完全不動分頁的情況最多等 60 秒。要更即時就得加一個計時器，
+  而 CLAUDE.md 已記載 sb-proxy 併發上限的坑，目前刻意不加。
+- **通知寫入失敗要說出來**（`lc_invite_notif_failed`）：房間已經建好、名單也已經寫進去了，
+  通知沒送出不該讓建立看起來失敗 —— 但開啟者會以為對方已經被叫進來，而其實沒有人知道這場存在。
+- `.lc-inv-stack` 是 `position:fixed` 且 **`pointer-events:none`**（只有卡片自己收點擊），
+  否則那條看不見的容器會擋住底下的操作。同時最多顯示 3 張（`LC_INV_SHOW`），其餘只報數。
+- ⚠️ **卡片只在 Portal 出現**：admin／kms／quotation／board 是各自獨立的頁面，
+  有自己的（或沒有）通知程式。這是已接受的範圍，不是漏做。
+
 ### 參與人：只有參與人能開啟（v1.85，migration 202609050003）
 
 `chat_sessions.members`（`text[]`）。建立時挑人，開啟者事後可「＋ 邀請」加人。

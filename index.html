@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>COMART Platform v1.95</title>
+<title>COMART Platform v1.96</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script defer src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.js"></script>
 <style>
@@ -375,7 +375,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     <div class="login-logo">
       <div class="login-mark" style="background:transparent"><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="44" height="23"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></div>
       <div class="login-name">COMART Platform</div>
-      <div class="login-sub">Internal Portal · v1.95</div>
+      <div class="login-sub">Internal Portal · v1.96</div>
     </div>
     <form id="loginForm" onsubmit="doLogin();return false;" autocomplete="on">
     <div class="field">
@@ -443,7 +443,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   <div class="topbar">
     <div class="topbar-logo" onclick="switchView('home')">
       <div class="topbar-mark" style="background:transparent"><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="26" height="14"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></div>
-      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.95</span></div>
+      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.96</span></div>
     </div>
     <div class="topbar-right">
       <div class="lang-switcher">
@@ -5592,7 +5592,10 @@ var CAL_CATEGORIES = [
 ];
 
 // State
-var calActiveCats  = ['group'];  // default: only COMART Group Events  // default: 3 on
+// 同時最多顯示幾個日曆。改這個值時不必再找其他地方：計數與 toggleCatFilter 都讀它，
+// 五語的 cal_max_cats 訊息裡的數字要一起改。
+var CAL_MAX_CATS   = 4;
+var calActiveCats  = ['group'];  // 預設只開「集團活動」；initCalendar 會依 site 覆寫
 var CAL_EVENTS     = {};  // { catId: [ {id, title, date, dateTo, notes, creator} ] }
 var CAL_HOLIDAYS   = {};  // { 'TW-2026': [...], 'CN-2026': [...] }
 var calEventEditId = null;
@@ -5613,9 +5616,12 @@ function initCalendar() {
     'CN':    ['group', 'cn-hol', 'cn-cal'],
     'VN':    ['group', 'vn-hol', 'vn-cal'],
     'Other': ['group'],
-    // 集團的人跨三個中心工作，三國假日一起顯示（自己仍可在側欄關掉）
-    'GRP':   ['group', 'tw-hol', 'tw-cal', 'cn-hol', 'cn-cal', 'vn-hol', 'vn-cal'],
-    'N/A':   ['group', 'tw-hol', 'tw-cal', 'cn-hol', 'cn-cal', 'vn-hol', 'vn-cal'],
+    // 🔴 集團的人跨三個中心工作，所以「三國假日」一起顯示 —— 但只有假日，剛好 4 個
+    //    ＝ CAL_MAX_CATS 的上限。原本這裡列了 7 個（連三個中心的行事曆一起開），
+    //    結果側欄計數顯示「7/3」，而且因為已經超過上限，關掉一個之後就再也開不回來
+    //    （toggleCatFilter 一律拒絕）。三個中心的行事曆改由使用者自己按需要開。
+    'GRP':   ['group', 'tw-hol', 'cn-hol', 'vn-hol'],
+    'N/A':   ['group', 'tw-hol', 'cn-hol', 'vn-hol'],   // 相容還沒重新登入的舊 session
   };
   calActiveCats = siteMap[site] || ['group', 'tw-hol', 'tw-cal'];
 
@@ -5663,10 +5669,12 @@ function renderCatSidebar() {
   }).join('');
 
   // Count label
+  // 上限是 4（toggleCatFilter 的判斷、cal_max_cats 的五語訊息、HTML 初始值都是 4），
+  // 這兩行原本寫死 '/3' —— 三個地方三個答案，集團的人看到的是「7/3」
   var countEl = document.getElementById('cal-active-count');
-  if (countEl) countEl.textContent = calActiveCats.length + '/3';
+  if (countEl) countEl.textContent = calActiveCats.length + '/' + CAL_MAX_CATS;
   var countBtnEl = document.getElementById('cal-active-count-btn');
-  if (countBtnEl) countBtnEl.textContent = calActiveCats.length + '/3';
+  if (countBtnEl) countBtnEl.textContent = calActiveCats.length + '/' + CAL_MAX_CATS;
 }
 
 function toggleCatFilter(catId) {
@@ -5674,7 +5682,7 @@ function toggleCatFilter(catId) {
   if (idx >= 0) {
     calActiveCats.splice(idx, 1);
   } else {
-    if (calActiveCats.length >= 4) {
+    if (calActiveCats.length >= CAL_MAX_CATS) {
       toast(t('cal_max_cats'), '');
       return;
     }

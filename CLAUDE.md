@@ -103,7 +103,7 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 
 | File | Version | Purpose | ~Lines |
 |------|---------|---------|--------|
-| `index.html` | v1.95 | Main portal — login, home, directory, bulletin, calendar, AI tools | 4,394 |
+| `index.html` | v1.96 | Main portal — login, home, directory, bulletin, calendar, AI tools | 4,394 |
 | `admin/index.html` | v2.40 | Admin System — room booking, fleet, visitor, library, lottery | 5,650 |
 | `kms/index.html` | v2.36 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
 | `quotation/index.html` | v3.60 | Quotation & CRM system | 7,332 |
@@ -254,6 +254,35 @@ The portal supports EN, 繁中, 简中, VI, 日 via `setLang(lang)`. Each langua
   與 `sumSys`／`sumParts`／`cluster`／`intro` 一律只從 `PM_KINDS` 取，不進 `PM_KIND_I18N`** ——
   那是行為與 AI 語氣，不是文案。加第三種會議時兩張表都要加（缺語言會自動退回繁中，不會壞）。
 - migration 缺欄位的錯誤訊息（`migration 029/030/031`）刻意留繁中：那是給管理者看的，不是一般使用者路徑。
+
+## Portal 行事曆
+
+- 🔴 **同時顯示的日曆上限只有一個事實來源：`CAL_MAX_CATS`（＝4）。**
+  v1.96 之前有三個答案：`toggleCatFilter` 判斷 4、五語的 `cal_max_cats` 訊息寫 4、
+  HTML 初始值寫 `1/4`，而 `renderCatSidebar` **寫死 `'/3'`** ——
+  集團帳號因此看到「7/3」。改上限時記得五語訊息裡的數字要一起改（那是文案，抽不進常數）。
+- 🔴 **`initCalendar` 給集團（GRP）的預設是「集團活動 ＋ 三國假日」＝ 剛好 4 個。**
+  原本列了 7 個（連三個中心的行事曆一起開），**超過上限的後果不是「多顯示」而是「鎖死」**：
+  `toggleCatFilter` 在 `length >= CAL_MAX_CATS` 時一律拒絕，所以關掉一個之後再也開不回來。
+  三個中心的行事曆改由使用者按需要自己開。`'N/A'` 那一列要留著（還沒重新登入的舊 session）。
+- 🔴 **Nager.Date（`holidays-proxy` 的上游）根本沒有台灣。**
+  它支援 204 個國家，有 CN／VN／HK／JP／SG，就是沒有 TW ——
+  所以 `loadHolidays` 對 `TW` **直接走 `getBuiltinHolidays()`**，不去打 API（那是刻意的，不是漏寫）。
+  代價：**台灣的假日永遠是「寫死的固定假日 ＋ lunar-javascript 推算的農曆假日」**，
+  標注就是 `Estimated dates · verify with official government sources` ——
+  **人事行政總處公告的補假與彈性放假不會反映出來**。
+  要精確就得換上游或自己維護一份台灣假日表，目前刻意不做。
+  CN／VN 則是 API 優先、失敗才退回 builtin。
+- **農曆日期與農曆假日都依賴 `lunar-javascript`**（`<script defer>` 從 jsdelivr 載入）。
+  `getBuiltinHolidays` 用 `if (window.Lunar && window.LunarYear)` 守著 —— 那個 UMD 的
+  browser 分支是 `for (var i in o) root[i] = o[i]`，所以兩個全域都會有。
+  載不到的話**只剩固定假日**（台灣就只有 5 天，而且九月份會完全空白），
+  這種壞法畫面上看不出來，查的時候先確認這個。
+- ⚠️ **`cal_events`（集團活動與三個中心的行事曆）目前是空的** —— 2026-09-07 查證：
+  九個欄位（`id`／`category`／`title`／`dateFrom`／`dateTo`／`notes`／`creator`／`updatedAt`／`createdAt`）
+  都存在，表也在 sb-proxy 白名單裡，`saveCalEvent()` 的寫入會丟例外並在 toast 顯示錯誤
+  （**不是**「改快取就報成功」那一型），所以那是「還沒有人建過活動」，不是壞掉。
+  **只有 `admin` 與 `dcc` 建得了活動**（`openCalEventModal` 的 `canEdit`）。
 
 ## 系統架構
 

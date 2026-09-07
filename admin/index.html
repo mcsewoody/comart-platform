@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART 行政管理平台 v2.39</title>
+<title>COMART 行政管理平台 v2.40</title>
 <style>
 :root{
   /* KMS-aligned dark theme */
@@ -664,7 +664,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="logo">
     <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
     <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
-    <span><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="38" height="20" style="display:inline-block;vertical-align:middle;margin-top:-2px"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v2.39</span>
+    <span><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="38" height="20" style="display:inline-block;vertical-align:middle;margin-top:-2px"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v2.40</span>
   </div>
   <div class="trr">
     <div id="global-site-bar" style="display:flex;align-items:center;gap:4px"><span style="font-size:13px;color:var(--text-3);white-space:nowrap;font-weight:500">單位：</span>
@@ -1550,6 +1550,10 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
 
 <div class="mo" id="mo-ret"><div class="md" style="max-width:420px"><div class="mh"><div class="mt2" data-i18n="car.mo.return">🔑 車輛歸還</div><button class="mc2" onclick="closeMo('mo-ret')">✕</button></div><input type="hidden" id="ret-bk-id"><div id="ret-bk-info" style="font-size:12px;line-height:1.7;background:var(--bg-2,rgba(255,255,255,.04));border:1px solid var(--border,#2a2f3a);border-radius:var(--radius);padding:8px 10px;margin-bottom:12px"></div><div class="fg" style="margin-bottom:12px"><div class="fl" data-i18n="car.mo.return_km_lbl">歸還里程數（km）*</div><input type="number" id="ret-km" min="0" placeholder="請輸入歸還時里程數"><div style="font-size:11px;color:var(--text-3);margin-top:4px" id="ret-km-hint"></div></div><div class="fg" style="margin-bottom:12px"><div class="fl" data-i18n="car.mo.return_park_lbl">停車位</div><input type="text" id="ret-pk" placeholder="例：B1-001（選填）"><div style="font-size:11px;color:var(--text-3);margin-top:4px" data-i18n="car.mo.ret_park_hint">歸還後車輛停放位置</div></div><div class="fg" style="margin-bottom:12px"><div class="fl" data-i18n="car.mo.return_fuel_lbl">⛽ 目前油量 *</div><div style="display:flex;gap:4px;margin-top:4px" id="ret-fuel-btns"><button class="fuel-lvl-btn" data-fv="0" onclick="setRetFuel(0)">E</button><button class="fuel-lvl-btn" data-fv="1" onclick="setRetFuel(1)">1/8</button><button class="fuel-lvl-btn" data-fv="2" onclick="setRetFuel(2)">1/4</button><button class="fuel-lvl-btn" data-fv="3" onclick="setRetFuel(3)">3/8</button><button class="fuel-lvl-btn" data-fv="4" onclick="setRetFuel(4)">1/2</button><button class="fuel-lvl-btn" data-fv="5" onclick="setRetFuel(5)">5/8</button><button class="fuel-lvl-btn" data-fv="6" onclick="setRetFuel(6)">3/4</button><button class="fuel-lvl-btn" data-fv="7" onclick="setRetFuel(7)">F</button></div><input type="hidden" id="ret-fuel-lvl" value="4"></div><div id="ret-err" style="display:none;color:var(--red);font-size:12px;margin-bottom:8px;padding:8px;background:var(--red-bg);border-radius:var(--radius)"></div><div style="display:flex;gap:10px;margin-top:16px"><button class="btn bg2" style="flex:1" onclick="closeMo('mo-ret')" data-i18n="g.btn.cancel">取消</button><button class="btn btl" style="flex:2" onclick="doReturn()" data-i18n="car.mo.do_return">✓ 確認歸還</button></div></div></div>
 <div id="toastc"></div>
+<!-- 共用邀請卡（shared/invite.js，五個子系統同一份）：被邀請進線上對話時，
+     人在這個子系統裡也看得到，點了會導回 Portal 的對話室。
+     改 shared/invite.js 時，五個 HTML 的 ?v= 都要 +1。 -->
+<script src="../shared/invite.js?v=1"></script>
 <script>
 // ── ADMIN CONFIG ──────────────────────────────────
 const ADMIN_CFG = {
@@ -2940,6 +2944,9 @@ async function init(){
   // 1. 讀取 Portal session
   const sess = readPortalSession();
   applyPortalSession(sess);
+  // 邀請卡（shared/invite.js）：session 已就緒才啟動 —— 這個子系統沒有登入畫面，
+  // 讀到 session 就代表人已經在裡面了
+  if (window.ComartInvite) ComartInvite.start();
 
   // 2. 先同步 users（await，確保人員資料在 seed 前到位）
   // 2+3. users 與公務車並行載入（原本串行多等一輪 RTT）；圖書館背景載

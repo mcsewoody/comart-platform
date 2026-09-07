@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>COMART Platform v1.94</title>
+<title>COMART Platform v1.95</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script defer src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.js"></script>
 <style>
@@ -207,25 +207,6 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:
 .notif-body{font-size:11px;color:var(--tx3);line-height:1.4;}
 .notif-time{font-size:10px;color:var(--tx3);margin-top:3px;}
 
-/* ── 線上對話邀請卡（v1.94）──
-   刻意比 .notif-hint 大得多：鈴鐺的小紅點是「有事情待處理」，
-   這張卡是「有人現在正等你進去講話」—— 錯過的成本不一樣，所以擺在畫面正上方、
-   字級放大、直接給一個進入的動作。stack 本身 pointer-events:none，
-   只有卡片自己收點擊，否則那條看不見的容器會擋住底下的操作。 */
-.lc-inv-stack{position:fixed;top:72px;left:50%;transform:translateX(-50%);z-index:1200;display:flex;flex-direction:column;gap:10px;width:min(520px,calc(100vw - 24px));pointer-events:none;}
-.lc-inv{pointer-events:auto;display:flex;align-items:flex-start;gap:14px;padding:16px 18px;background:var(--s1);border:1px solid var(--ac);border-left:5px solid var(--ac);border-radius:14px;box-shadow:0 14px 40px rgba(0,0,0,.45);cursor:pointer;animation:lcInvIn .28s ease;}
-.lc-inv:hover{background:var(--s2);}
-.lc-inv-ico{font-size:30px;line-height:1.1;flex-shrink:0;}
-.lc-inv-tx{flex:1;min-width:0;}
-.lc-inv-who{font-size:14px;font-weight:500;color:var(--tx2);margin-bottom:4px;}
-.lc-inv-title{font-size:18px;font-weight:700;color:var(--tx);line-height:1.35;word-break:break-word;}
-.lc-inv-cta{font-size:13px;font-weight:600;color:var(--ac);margin-top:8px;}
-.lc-inv-x{flex-shrink:0;background:transparent;border:none;color:var(--tx3);font-size:15px;cursor:pointer;padding:2px 4px;line-height:1;}
-.lc-inv-x:hover{color:var(--tx);}
-.lc-inv-more{pointer-events:auto;text-align:center;font-size:12px;color:var(--tx3);}
-@keyframes lcInvIn{from{opacity:0;transform:translateY(-10px);}to{opacity:1;transform:translateY(0);}}
-@media(max-width:768px){.lc-inv-stack{top:calc(env(safe-area-inset-top) + 62px);width:calc(100vw - 20px);}.lc-inv{padding:14px;border-radius:12px;}.lc-inv-title{font-size:16px;}.lc-inv-ico{font-size:26px;}}
-
 /* Desktop sidebar */
 .sidebar{display:none;width:220px;border-right:1px solid var(--br);flex-direction:column;flex-shrink:0;background:var(--s1);padding:12px;}
 .sidebar-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:var(--r);cursor:pointer;color:var(--tx2);font-size:13px;border:none;background:transparent;width:100%;text-align:left;}
@@ -388,18 +369,13 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 </head>
 <body>
 
-<!-- 線上對話的邀請卡（v1.94）：被邀請的人一進 Portal 就看得到，點了直接進房間。
-     內容由 lcCheckInvites() 依「未讀的 chat_invite 通知」填入，位置是 fixed，
-     所以擺在這裡與版面無關。 -->
-<div id="lcInviteStack" class="lc-inv-stack"></div>
-
 <!-- ═══ LOGIN ═══ -->
 <div class="login-screen" id="loginScreen">
   <div class="login-box">
     <div class="login-logo">
       <div class="login-mark" style="background:transparent"><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="44" height="23"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></div>
       <div class="login-name">COMART Platform</div>
-      <div class="login-sub">Internal Portal · v1.94</div>
+      <div class="login-sub">Internal Portal · v1.95</div>
     </div>
     <form id="loginForm" onsubmit="doLogin();return false;" autocomplete="on">
     <div class="field">
@@ -467,7 +443,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   <div class="topbar">
     <div class="topbar-logo" onclick="switchView('home')">
       <div class="topbar-mark" style="background:transparent"><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="26" height="14"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></div>
-      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.94</span></div>
+      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.95</span></div>
     </div>
     <div class="topbar-right">
       <div class="lang-switcher">
@@ -1258,6 +1234,12 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 <!-- 共用翻譯規則（shared/translate.js）。Portal 與 Board 同一份 ——
      各存一份已被證實一天內就會分岔（見該檔案檔頭）。改它時 ?v= 要 +1。 -->
 <script src="./shared/translate.js?v=1"></script>
+<!-- 共用邀請卡（shared/invite.js，五個子系統同一份）。
+     🔴 v1.94 這張卡只做在 Portal，但同事被邀請時人常常在 KMS 或報價系統裡，
+        那邊什麼都不會出現。抽成共用檔而不是複製四份：CLAUDE.md 已記載
+        「各存一份必然分岔，而分岔之後弱掉的那一份就是實際生效的那一份」。
+     改 shared/invite.js 時，五個 HTML 的 ?v= 都要 +1。 -->
+<script src="./shared/invite.js?v=1"></script>
 <script>
 const SESSION_KEY = 'comart-portal-session';
 const SESSION_TTL = 8 * 60 * 60 * 1000; // 8h
@@ -1494,6 +1476,20 @@ function enterPortal() {
   document.getElementById('topAvatar').textContent = initial;
   document.getElementById('topName').textContent = s.nameEn || s.nameZh || s.empId;
   document.getElementById('topRole').textContent = {admin:'Administrator',dcc:'DCC',user:'Staff'}[s.role] || s.role;
+
+  // 邀請卡：擺在 enterPortal 而不是自動啟動，因為「畫面已經真的進到系統裡」只有這裡知道 ——
+  // 強制改密碼那一關還沒過就冒出可點進聊天室的卡片，等於把那一關繞過去
+  if (window.ComartInvite) ComartInvite.start();
+
+  // 從別的子系統點邀請卡回來：?lc=<場次id> → 直接開那間房間。
+  // 讀完就把參數清掉，免得重新整理又被強制拉進去一次。
+  try {
+    var _lcQ = _lcSafeId(new URLSearchParams(window.location.search).get('lc') || '');
+    if (_lcQ) {
+      history.replaceState({}, '', window.location.pathname);
+      setTimeout(function() { lcGoto(_lcQ); }, 0);
+    }
+  } catch(_) {}
 
   const hour = new Date().getHours();
   const greet = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
@@ -1923,9 +1919,9 @@ async function openNotif(notifId, link) {
     if (notifId) {
       try { await SB.patch('notifications', 'id=eq.' + encodeURIComponent(notifId), { is_read: true }); }
       catch(e) { console.warn('markRead fail:', e.message); }
-      _lcInvSeen[notifId] = true;
     }
     await updateNotifBadge(false);
+    if (window.ComartInvite) ComartInvite.check(true);
     lcGoto(_lcSid);
     return;
   }
@@ -1982,9 +1978,9 @@ async function updateNotifBadge(autoOpen) {
     // 改成一則可點的提醒，要看內容自己點進去（點鈴鐺也一樣）
     if (autoOpen && cnt > 0) notifHint(cnt);
   } catch(e) {}
-  // 線上對話的邀請卡（v1.94）：掛在這裡而不是自己開一個計時器，
-  // 就自動沿用「登入後 3 秒／每 60 秒／回到前景補查」這三個既有觸發點
-  lcCheckInvites();
+  // 邀請卡由 shared/invite.js 自己輪詢（五個子系統同一份），這裡只是順手補查一次：
+  // 鈴鐺剛把某則標成已讀時，那張卡片要跟著消失
+  if (window.ComartInvite) ComartInvite.check(false);
 }
 
 // 登入後的新通知提醒：右上角一則可點的橫幅，8 秒自動收起；點了才展開面板
@@ -3011,7 +3007,7 @@ const I18N = {
     lc_locked:'Not a participant', lc_not_member:'Only participants can open this conversation.',
     lc_no_users:'No colleagues to choose from.', lc_pick_all:'Select all',
     lc_pick_none:'Clear all', lc_invite_saved:'Participants updated',
-    lc_notif_title:'{who} invited you to a live chat', lc_invite_cta:'Enter the chat room', lc_invite_later:'Later', lc_invite_more:'{n} more invitation(s)', lc_invite_sent:'Invited and notified {n} participant(s)', lc_invite_notif_failed:'Added to the list, but the invitation notice was NOT sent',
+    lc_notif_title:'{who} invited you to a live chat', lc_invite_sent:'Invited and notified {n} participant(s)', lc_invite_notif_failed:'Added to the list, but the invitation notice was NOT sent',
     lc_invite_failed:'Could not update the participants. Please try again.', lc_cancel:'Cancel',
     lc_ok:'OK', lc_pick_btn:'+ Participants',
     lc_tz_note:'Times in {tz}', lc_mic_start:'Voice input',
@@ -3128,7 +3124,7 @@ const I18N = {
     lc_locked:'非參與人', lc_not_member:'只有參與人可以開啟這場對話。',
     lc_no_users:'沒有可選的同事。', lc_pick_all:'全選',
     lc_pick_none:'全部清除', lc_invite_saved:'參與人已更新',
-    lc_notif_title:'{who} 邀請你加入線上對話', lc_invite_cta:'進入對話室', lc_invite_later:'稍後再說', lc_invite_more:'還有 {n} 則邀請', lc_invite_sent:'已邀請並通知 {n} 位參與人', lc_invite_notif_failed:'已加入名單，但邀請通知沒有送出',
+    lc_notif_title:'{who} 邀請你加入線上對話', lc_invite_sent:'已邀請並通知 {n} 位參與人', lc_invite_notif_failed:'已加入名單，但邀請通知沒有送出',
     lc_invite_failed:'參與人更新失敗，請再試一次。', lc_cancel:'取消',
     lc_ok:'確定', lc_pick_btn:'＋ 參與人',
     lc_tz_note:'時間為 {tz}', lc_mic_start:'語音輸入',
@@ -3238,7 +3234,7 @@ const I18N = {
     lc_locked:'非参与人', lc_not_member:'只有参与人可以打开这场对话。',
     lc_no_users:'没有可选的同事。', lc_pick_all:'全选',
     lc_pick_none:'全部清除', lc_invite_saved:'参与人已更新',
-    lc_notif_title:'{who} 邀请你加入线上对话', lc_invite_cta:'进入对话室', lc_invite_later:'稍后再说', lc_invite_more:'还有 {n} 则邀请', lc_invite_sent:'已邀请并通知 {n} 位参与人', lc_invite_notif_failed:'已加入名单，但邀请通知没有送出',
+    lc_notif_title:'{who} 邀请你加入线上对话', lc_invite_sent:'已邀请并通知 {n} 位参与人', lc_invite_notif_failed:'已加入名单，但邀请通知没有送出',
     lc_invite_failed:'参与人更新失败，请再试一次。', lc_cancel:'取消',
     lc_ok:'确定', lc_pick_btn:'＋ 参与人',
     lc_tz_note:'时间为 {tz}', lc_mic_start:'语音输入',
@@ -3348,7 +3344,7 @@ const I18N = {
     lc_locked:'Không phải người tham gia', lc_not_member:'Chỉ người tham gia mới có thể mở cuộc trò chuyện này.',
     lc_no_users:'Không có đồng nghiệp nào để chọn.', lc_pick_all:'Chọn tất cả',
     lc_pick_none:'Bỏ chọn tất cả', lc_invite_saved:'Đã cập nhật người tham gia',
-    lc_notif_title:'{who} đã mời bạn vào cuộc trò chuyện', lc_invite_cta:'Vào phòng trò chuyện', lc_invite_later:'Để sau', lc_invite_more:'Còn {n} lời mời nữa', lc_invite_sent:'Đã mời và thông báo cho {n} người tham gia', lc_invite_notif_failed:'Đã thêm vào danh sách, nhưng thông báo mời CHƯA được gửi',
+    lc_notif_title:'{who} đã mời bạn vào cuộc trò chuyện', lc_invite_sent:'Đã mời và thông báo cho {n} người tham gia', lc_invite_notif_failed:'Đã thêm vào danh sách, nhưng thông báo mời CHƯA được gửi',
     lc_invite_failed:'Không cập nhật được người tham gia. Vui lòng thử lại.', lc_cancel:'Hủy',
     lc_ok:'Xác nhận', lc_pick_btn:'＋ Người tham gia',
     lc_tz_note:'Giờ theo {tz}', lc_mic_start:'Nhập bằng giọng nói',
@@ -3458,7 +3454,7 @@ const I18N = {
     lc_locked:'参加者ではありません', lc_not_member:'この会話を開けるのは参加者のみです。',
     lc_no_users:'選択できる同僚がいません。', lc_pick_all:'すべて選択',
     lc_pick_none:'すべて解除', lc_invite_saved:'参加者を更新しました',
-    lc_notif_title:'{who} さんがオンライン会話に招待しました', lc_invite_cta:'会話ルームに入る', lc_invite_later:'あとで', lc_invite_more:'ほかに {n} 件の招待', lc_invite_sent:'{n} 名の参加者を招待し、通知しました', lc_invite_notif_failed:'名簿には追加しましたが、招待通知は送信されませんでした',
+    lc_notif_title:'{who} さんがオンライン会話に招待しました', lc_invite_sent:'{n} 名の参加者を招待し、通知しました', lc_invite_notif_failed:'名簿には追加しましたが、招待通知は送信されませんでした',
     lc_invite_failed:'参加者を更新できませんでした。もう一度お試しください。', lc_cancel:'キャンセル',
     lc_ok:'確定', lc_pick_btn:'＋ 参加者',
     lc_tz_note:'時刻は {tz}', lc_mic_start:'音声入力',
@@ -5041,16 +5037,18 @@ async function lcPickConfirm() {
 //    順帶：'#' 開頭本來就不符合 openNotif 的 http(s)／相對路徑白名單，
 //    所以就算漏了那個分支也只會沒反應，不會開出奇怪的東西。
 // ═══════════════════════════════════════════════════════════════════════
-var LC_INV_SHOW = 3;      // 同時最多三張，其餘只報數（別把整個畫面蓋掉）
-var _lcInvSeen  = {};     // 這次載入按過 ✕ 的，避免下一輪輪詢又冒出來
-
-// notifications 的 to_user 不受 sb-proxy 保護，任何人都能寫一列進來，
-// 所以 id 與場次 id 進 onclick 之前一律過白名單（uid() 是 base36、uuid 有連字號）
-function _lcSafeId(v) {
-  return /^[A-Za-z0-9_-]{1,64}$/.test(String(v || '')) ? String(v) : '';
-}
-
-// 每位新加入的參與人寫一列通知。回 {ok, sent}，呼叫端要能分辨通知有沒有真的送出。
+// ═══════════════════════════════════════════════════════════════════════
+// 邀請通知的寫入端（v1.94）
+//
+// 只有 Portal 會建立對話與邀請人，所以「發通知」留在這裡；
+// 「收通知並顯示卡片」則在 shared/invite.js（五個子系統共用）——
+// 同事被邀請的時候人可能在 KMS 或報價系統裡。
+//
+// 🔴 link 寫成 '#lc/<場次id>'：Portal 的 openNotif 與共用模組都認這個前綴。
+//    在 Portal 是站內導覽（lcGoto），在其他子系統是導回 ../index.html?lc=<id>。
+//    順帶：'#' 開頭本來就不符合 openNotif 的 http(s)／相對路徑白名單，
+//    所以萬一那個分支被移走，也只是沒反應，不會 window.open 出一個空白頁。
+// ═══════════════════════════════════════════════════════════════════════
 async function lcNotifyInvited(sess, empIds) {
   if (!empIds || !empIds.length) return { ok: true, sent: 0 };
   var from = lcMyName();
@@ -5069,67 +5067,14 @@ async function lcNotifyInvited(sess, empIds) {
   catch (e) { console.warn('lcNotifyInvited:', e.message); return { ok: false, sent: 0 }; }
 }
 
-// 未讀的邀請 → 畫成卡片。掛在 updateNotifBadge 尾端，所以自動沿用它既有的
-// 三個觸發點（登入後 3 秒、每 60 秒、回到前景）。
-async function lcCheckInvites() {
-  var sess = readSession();
-  if (!sess) return;
-  var rows = await SB.get('notifications',
-    encodeURI(_notifFilter(sess)) + '&type=eq.chat_invite&is_read=eq.false' +
-    '&order=created_at.desc&limit=10');
-  if (!rows) return;        // 讀失敗保持現狀，不要把已經畫出來的卡片清掉
-  lcInviteRender(rows.filter(function(n) { return !_lcInvSeen[n.id]; }));
+// notifications 的 to_user 不受 sb-proxy 保護，任何人都能寫一列進來，
+// 所以場次 id 進 lcGoto 之前一律過白名單（uid() 是 base36、uuid 有連字號）
+function _lcSafeId(v) {
+  return /^[A-Za-z0-9_-]{1,64}$/.test(String(v || '')) ? String(v) : '';
 }
 
-function lcInviteRender(list) {
-  var box = document.getElementById('lcInviteStack');
-  if (!box) return;
-  if (!list || !list.length) { box.innerHTML = ''; return; }
-  var show = list.slice(0, LC_INV_SHOW);
-  var html = show.map(function(n) {
-    var nid = _lcSafeId(n.id);
-    var lk  = String(n.link || '');
-    var sid = lk.indexOf('#lc/') === 0 ? _lcSafeId(lk.slice(4)) : '';
-    // title/body 是別人打的字，一律跳脫（同鈴鐺清單的儲存型 XSS 防護）
-    return '<div class="lc-inv" onclick="lcInviteEnter(\'' + nid + '\',\'' + sid + '\')">'
-      + '<div class="lc-inv-ico">💬</div>'
-      + '<div class="lc-inv-tx">'
-      +   '<div class="lc-inv-who">' + escHtml(t('lc_notif_title').replace('{who}', n.from_user || '')) + '</div>'
-      +   '<div class="lc-inv-title">' + escHtml(n.body || '') + '</div>'
-      +   '<div class="lc-inv-cta">' + escHtml(t('lc_invite_cta')) + ' ›</div>'
-      + '</div>'
-      + '<button class="lc-inv-x" title="' + escHtml(t('lc_invite_later'))
-      +   '" onclick="event.stopPropagation();lcInviteDismiss(\'' + nid + '\')">✕</button>'
-      + '</div>';
-  }).join('');
-  if (list.length > show.length)
-    html += '<div class="lc-inv-more">'
-          + escHtml(t('lc_invite_more').replace('{n}', String(list.length - show.length)))
-          + '</div>';
-  box.innerHTML = html;
-}
-
-async function lcInviteEnter(notifId, sessionId) {
-  if (notifId) _lcInvSeen[notifId] = true;
-  lcInviteRender([]);       // 先收掉，連點兩下不會開兩次
-  if (notifId) {
-    try { await SB.patch('notifications', 'id=eq.' + encodeURIComponent(notifId), { is_read: true }); }
-    catch (e) { console.warn('lcInviteEnter markRead:', e.message); }
-  }
-  updateNotifBadge(false);
-  if (sessionId) lcGoto(sessionId);
-}
-
-// ✕ 也算「看過了」：這張卡片本身就是通知，收掉它不該讓同一則明天再跳一次。
-// 內容仍在鈴鐺的「查看已讀」裡找得到。
-async function lcInviteDismiss(notifId) {
-  if (!notifId) return;
-  _lcInvSeen[notifId] = true;
-  try { await SB.patch('notifications', 'id=eq.' + encodeURIComponent(notifId), { is_read: true }); }
-  catch (e) { console.warn('lcInviteDismiss:', e.message); }
-  lcCheckInvites();
-  updateNotifBadge(false);
-}
+// 「看過了沒有」的事實來源是 notifications.is_read，兩邊共用同一列資料 ——
+// 在鈴鐺點掉、或在卡片上按 ✕，另一邊都會跟著消失。
 
 // 站內導覽到某一場對話：AI 頁面 → 💬 頁籤 → 開房間。
 // lcOpen 自己會擋「不是參與人」（例如邀請後又被移出名單），所以這裡不重複判斷。

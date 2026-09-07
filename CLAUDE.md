@@ -20,6 +20,7 @@ COMART Platform is an internal corporate portal for COMART Corporation, deployed
 |---|---|---|
 | `shared/voice.js` | 語音輸入完整引擎（錄音 → `transcribe` → AI 整理） | Portal、Board |
 | `shared/translate.js` | **翻譯規則正文**（`ComartTranslate.RULES`） | Portal、Board |
+| `shared/invite.js` | 線上對話的**邀請卡**（輪詢、卡片、點進去導回 Portal） | **五個系統全部** |
 
 🔴 **`shared/translate.js` 的存在是被實證推出來的，不是預先設計。**
 2026-09-05 把 Board 的 `PM_TR_RULES` 複製到 Portal 成為 `LC_TR_RULES`，
@@ -102,11 +103,11 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 
 | File | Version | Purpose | ~Lines |
 |------|---------|---------|--------|
-| `index.html` | v1.94 | Main portal — login, home, directory, bulletin, calendar, AI tools | 4,394 |
-| `admin/index.html` | v2.39 | Admin System — room booking, fleet, visitor, library, lottery | 5,650 |
-| `kms/index.html` | v2.33 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
-| `quotation/index.html` | v3.54 | Quotation & CRM system | 7,332 |
-| `board/index.html` | v1.89 | 公告與會議 Bulletin & Meetings — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍、腦力激盪 | 4,600 |
+| `index.html` | v1.95 | Main portal — login, home, directory, bulletin, calendar, AI tools | 4,394 |
+| `admin/index.html` | v2.40 | Admin System — room booking, fleet, visitor, library, lottery | 5,650 |
+| `kms/index.html` | v2.36 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
+| `quotation/index.html` | v3.60 | Quotation & CRM system | 7,332 |
+| `board/index.html` | v1.90 | 公告與會議 Bulletin & Meetings — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍、腦力激盪 | 4,600 |
 
 `admin/lottery.html` is a standalone lottery page (separate from the lottery module inside `admin/index.html`).
 
@@ -561,8 +562,38 @@ Portal AI 功能區的第二個頁籤（`💬 線上對話`，在翻譯旁邊）
   通知沒送出不該讓建立看起來失敗 —— 但開啟者會以為對方已經被叫進來，而其實沒有人知道這場存在。
 - `.lc-inv-stack` 是 `position:fixed` 且 **`pointer-events:none`**（只有卡片自己收點擊），
   否則那條看不見的容器會擋住底下的操作。同時最多顯示 3 張（`LC_INV_SHOW`），其餘只報數。
-- ⚠️ **卡片只在 Portal 出現**：admin／kms／quotation／board 是各自獨立的頁面，
-  有自己的（或沒有）通知程式。這是已接受的範圍，不是漏做。
+
+#### 卡片抽成 `shared/invite.js`（v1.95，五個系統全部看得到）
+
+v1.94 只做在 Portal，但**同事被邀請的時候人常常在 KMS 或報價系統裡**，那邊什麼都不會出現 ——
+而「有人正等你進去講話」錯過就沒有意義了。第三個 `shared/` 例外由此而來。
+
+- 🔴 **這個模組刻意「幾乎不需要參數」**：五個系統同源、共用
+  `localStorage['comart-portal-session']`（含 `sig`）與同一個 sb-proxy，所以它自己讀得到身分，
+  語言也自己從 `localStorage['comart-lang']` 讀。宿主只要呼叫一次 `ComartInvite.start()`。
+- 🔴 **不做自動啟動（DOMContentLoaded）**：Portal 有**強制改密碼**那一關，
+  在那個畫面上冒出可點進聊天室的卡片等於把那一關繞過去。「什麼時候算已經進來了」只有宿主知道。
+  五個落點：Portal `enterPortal()`、admin `applyPortalSession()` 之後、kms `portalUser = sess` 之後、
+  board `initBoard()` 取得 session 之後、quotation **`hideLoginPage()`** ——
+  最後那個是刻意的：兩條進入路徑（`?_ps=` 與 F5 的 `restoreSession`）都會經過它，
+  而被部門限制擋下的那條會提前 return。同 Portal 把深層連結放在 `enterPortal` 的道理。
+- 🔴 **卡片自帶配色，不使用宿主的 CSS 變數。** Portal／Quotation／Board 是 `--ac`／`--s1`／`--tx`，
+  Admin／KMS 是 `--blue`／`--surface-2`／`--text-3` —— 共用元件一旦引用宿主的 token 名稱，
+  就會在另外兩個系統裡變成透明或看不見。五個系統都是深色底，所以模組寫死一組在
+  `#080C14` 與 `#0f1117` 上都讀得清楚的顏色，class 前綴 `cmi-`（避免撞到任何宿主樣式）。
+- 🔴 **點擊行為兩種，靠「宿主有沒有 `lcGoto`」分流**：Portal 有 → 站內導覽；
+  其他子系統 → `location.href = '../index.html?lc=<場次id>'`。
+  相對路徑由 `location.pathname` 的深度算出來（不寫絕對路徑，那會讓 `file://` 開檔失效）。
+  **同源共用 session，所以不必帶 `_ps`。**
+- **Portal 端的 `?lc=` 落點在 `enterPortal()`**，讀完立刻 `history.replaceState` 清掉參數 ——
+  否則重新整理又被強制拉進同一間房。⚠️ 與 board 的 `BOARD_DEEP` 不同，
+  Portal **不會**在取得 session 後清掉網址參數，所以這裡不需要「必須在 readPortalSession 之前讀」那道限制。
+- **寫入端（`lcNotifyInvited`）留在 Portal**：只有 Portal 會建立對話與邀請人。
+  收通知顯示卡片才是共用的那一半。
+- 模組自己跑 60 秒輪詢 ＋ `visibilitychange` 補查；`check(force)` 有 20 秒節流，
+  因為 Portal 的 `updateNotifBadge()` 也會呼叫它（鈴鐺剛標成已讀時要讓卡片跟著消失）。
+- 🔴 **改 `shared/invite.js` 時，五個 HTML 的 `?v=` 都要 +1**（同 voice.js 的理由：
+  GitHub Pages 的 Cache-Control 是 4 小時，不 bump 的話使用者拿到舊版**而且看不出來**）。
 
 ### 參與人：只有參與人能開啟（v1.85，migration 202609050003）
 

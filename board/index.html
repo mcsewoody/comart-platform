@@ -5,7 +5,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#080C14">
-<title>COMART · 公告與會議 v1.89</title>
+<title>COMART · 公告與會議 v1.90</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -346,7 +346,7 @@ body.pm-playing #pm-phasebar{padding:0}
     <a class="logo" href="javascript:void(0)">
       <div class="logo-mark">告</div>
       <div class="logo-text" data-i18n="app_title">公告與會議</div>
-      <span class="logo-ver">v1.89</span>
+      <span class="logo-ver">v1.90</span>
     </a>
     <div class="topbar-right">
       <div id="langChips" style="display:flex;gap:4px"></div>
@@ -860,6 +860,10 @@ body.pm-playing #pm-phasebar{padding:0}
 <!-- 共用語音輸入（shared/voice.js，五個子系統同一份）。
      🔴 改那個檔案時這裡的 ?v= 要 +1 —— GitHub Pages 快取 4 小時，
      不 bump 的話使用者拿到舊版而且看不出來。 -->
+<!-- 共用邀請卡（shared/invite.js，五個子系統同一份）：被邀請進線上對話時，
+     人在這個子系統裡也看得到，點了會導回 Portal 的對話室。
+     改 shared/invite.js 時，五個 HTML 的 ?v= 都要 +1。 -->
+<script src="../shared/invite.js?v=1"></script>
 <script src="../shared/voice.js?v=3"></script>
 <!-- 共用翻譯規則（shared/translate.js）。Portal 與 Board 同一份 ——
      各存一份已被證實一天內就會分岔（見該檔案檔頭）。改它時 ?v= 要 +1。 -->
@@ -7393,6 +7397,9 @@ async function initBoard() {
   // 沒有 session 就去 Portal 登入再回來（帶不帶深層連結都一樣）。
   // 這裡直接 return，後面的 syncUsers() 等請求不必送出去挨 401。
   if (!PORTAL_SESSION) { boardGoLogin(); return; }
+  // 邀請卡（shared/invite.js）：session 已就緒才啟動 —— 這個子系統沒有登入畫面，
+  // 讀到 session 就代表人已經在裡面了
+  if (window.ComartInvite) ComartInvite.start();
   bInitLang();          // 必須在任何 BT() 之前：語言預設值會用到 PORTAL_SESSION.site
   bApplyI18n();
   // 麥克風鈕要在這裡掛（bRerenderAll 只有切語言時才跑，初次載入不會經過）。

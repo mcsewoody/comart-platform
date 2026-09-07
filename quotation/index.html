@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#080C14">
-<title>COMART · Quotation System v3.59</title>
+<title>COMART · Quotation System v3.60</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -259,7 +259,7 @@ img{display:block}
       <div class="logo-mark" style="background:transparent"><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="24" height="13"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></div>
       <div>
         <div class="logo-text">COMART</div>
-        <div id="appVersionDiv" style="font-size:10px;color:var(--ac);font-weight:600;letter-spacing:.04em;line-height:1.3">v3.59</div>
+        <div id="appVersionDiv" style="font-size:10px;color:var(--ac);font-weight:600;letter-spacing:.04em;line-height:1.3">v3.60</div>
       </div>
     </div>
     <div class="topbar-right">
@@ -1046,6 +1046,10 @@ img{display:block}
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<!-- 共用邀請卡（shared/invite.js，五個子系統同一份）：被邀請進線上對話時，
+     人在這個子系統裡也看得到，點了會導回 Portal 的對話室。
+     改 shared/invite.js 時，五個 HTML 的 ?v= 都要 +1。 -->
+<script src="../shared/invite.js?v=1"></script>
 <script>
 
 // ═══════════════════════════════════════
@@ -5627,6 +5631,10 @@ function hideLoginPage() {
   // Login page removed — ensure UI is visible
   document.querySelector('.topbar') && (document.querySelector('.topbar').style.display = '');
   document.getElementById('navPills') && (document.getElementById('navPills').style.display = '');
+  // 邀請卡（shared/invite.js）：掛在這裡是因為兩條進入路徑（?_ps= 的 portal session
+  // 與 F5 的 restoreSession）都會經過它，而被部門限制擋下的那條會提前 return ——
+  // 同 Portal 把深層連結放在 enterPortal 的道理，共用同一個出口就不會漏。
+  if (window.ComartInvite) ComartInvite.start();
 }
 
 // ── Login ──

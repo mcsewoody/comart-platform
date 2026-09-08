@@ -103,7 +103,7 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 
 | File | Version | Purpose | ~Lines |
 |------|---------|---------|--------|
-| `index.html` | v1.98 | Main portal — login, home, directory, bulletin, calendar, AI tools | 4,394 |
+| `index.html` | v1.99 | Main portal — login, home, directory, bulletin, calendar, AI tools | 4,394 |
 | `admin/index.html` | v2.40 | Admin System — room booking, fleet, visitor, library, lottery | 5,650 |
 | `kms/index.html` | v2.36 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
 | `quotation/index.html` | v3.60 | Quotation & CRM system | 7,332 |
@@ -283,6 +283,35 @@ The portal supports EN, 繁中, 简中, VI, 日 via `setLang(lang)`. Each langua
   都存在，表也在 sb-proxy 白名單裡，`saveCalEvent()` 的寫入會丟例外並在 toast 顯示錯誤
   （**不是**「改快取就報成功」那一型），所以那是「還沒有人建過活動」，不是壞掉。
   **只有 `admin` 與 `dcc` 建得了活動**（`openCalEventModal` 的 `canEdit`）。
+
+## i18n：改字典一定要逐字典檢查（`scripts/i18n-audit.py`）
+
+```bash
+python3 scripts/i18n-audit.py     # Portal 專用（其他子系統的字典形狀不同）
+```
+
+檢查兩件事：**同一本字典裡有沒有重複定義**（後者會贏，前者是死的）、
+**每個 key 是不是五本都有**（缺的那一本 `t()` 會回傳 key 本身）。
+
+🔴 **2026-09-08 實際踩到，值得記住為什麼：** 我用「移除前 N 個出現處」去換掉
+`lc_rule1_t` 這幾個 key 的舊定義，但檔案順序是 `en舊, en新, 繁中舊, 繁中新, …` ——
+砍掉前 5 個等於砍掉 en 的兩份 ＋ 繁中的兩份 ＋ 簡中的舊那份。
+**全域計數 10→5 剛好通過我的檢查，但分佈是 (0,0,0,2,3)。**
+而且這個操作做了兩次（v1.97、v1.98），damage 累積。
+結果：Portal 的「這裡的規則」在英文／繁中／簡中直接顯示 `lc_rule1_tlc_rule1_d` 這種
+key 名稱 —— 使用者看到才回報。
+
+三個教訓：
+- **「總數對」不等於「分佈對」。** 改多語字典一律用**字典邊界**定位，不要用全域位置或計數。
+- **`t()` 找不到 key 時回傳 key 本身**（`return (I18N[LANG] || I18N.en)[key] || key`）——
+  那是好設計（不會整頁壞掉），但代價是**缺漏在畫面上長得像正常文字**，
+  只有真的打開那一頁看的人會發現。所以要有機器檢查。
+- **不能用 regex 找 key**：字串「值」裡面也會出現 `xxx:'` 的片段
+  （英文的 `load failed: '`、越南語的 `i:'`），那會產生一堆誤報把真的問題蓋掉。
+  稽核腳本用掃描器 —— 遇到字串常值整段跳過，只在字串外面認 key。
+- ⚠️ **組出來的 key 抓不到**：`txt('lc-rule' + ri + '-t', 'lc_rule' + ri + '_t')` 這種
+  用不到 `t('字面值')`，所以「找出所有被使用的 key」那一半永遠會漏。
+  稽核腳本因此改成「比對五本字典彼此」而不是「比對程式碼與字典」—— 前者不需要知道誰在用。
 
 ## 系統架構
 

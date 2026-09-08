@@ -103,7 +103,7 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 
 | File | Version | Purpose | ~Lines |
 |------|---------|---------|--------|
-| `index.html` | v1.99 | Main portal — login, home, directory, bulletin, calendar, AI tools | 4,394 |
+| `index.html` | v2.00 | Main portal — login, home, directory, bulletin, calendar, AI tools | 4,394 |
 | `admin/index.html` | v2.40 | Admin System — room booking, fleet, visitor, library, lottery | 5,650 |
 | `kms/index.html` | v2.36 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
 | `quotation/index.html` | v3.60 | Quotation & CRM system | 7,332 |
@@ -591,6 +591,23 @@ Portal AI 功能區的第二個頁籤（`💬 線上對話`，在翻譯旁邊）
   兩處問的是同一個問題，各留一份必然分岔）。
 - **前端刪除鈕刻意不對「開啟者 × 進行中」顯示**：那條路是「結束對話 → 不保留」，
   同一件事給兩個入口只會讓人猜哪一個才對。admin 看別人的進行中場次則有刪除鈕。
+### 線上對話是 AI 區的第一個頁籤（v2.00）
+
+頁籤順序 `live → translate → chat → skills`，初始 `on` 在 `ptab-live` 與 `ptab-content-live`。
+
+- 🔴 **`switchView('ai')` 必須呼叫 `switchAITab(pAITab)`。**
+  translate 當預設時不需要（它沒有要載的資料），但線上對話的清單得靠 `lcLoadList()`
+  才有東西 —— 只靠 HTML 的 `on` class，第一次點進 AI 會看到一個**空的清單**：
+  class 是對的，但那個函式從來沒被呼叫過。
+- **用 `pAITab` 記住當前頁籤而不是寫死 `'live'`**：切去翻譯、離開 AI、再回來，
+  不該被拉回線上對話。第一次進來（與重新載入後）的預設仍然是線上對話。
+- 🔴 **`lcApplyI18n()` 尾端重載清單的地方加了 1 秒的時間差判斷。**
+  那裡本來是為了「切語言之後列上的字要跟著換」，但 `applyI18nAll()` **也被
+  `switchView()` 呼叫**（那不是切語言）。而 `switchView('ai')` 現在會先
+  `switchAITab()` 載一次 —— 沒有這個判斷，每次點進 AI 都會載兩次清單，
+  非 admin 一次是 7 個查詢（`fetchSet` 3 個 × 2 種狀態 ＋ `lcLoadVisited`），
+  剛好撞上 CLAUDE.md 記載的 sb-proxy 併發上限。
+
 ### 兩種進入方式 ＋ 在線名單（v1.97，migration 202609080001）
 
 **進入方式由發起人建會時選**（`chat_sessions.access` = `'all'` / `'invite'`），

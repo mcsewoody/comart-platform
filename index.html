@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>COMART Platform v1.96</title>
+<title>COMART Platform v1.97</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script defer src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.js"></script>
 <style>
@@ -259,6 +259,19 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:
 .ai-tab-content.on { display:flex; }
 /* ── 線上對話 Live Chat ── */
 .lc-sec { font-size:11px; font-weight:700; color:var(--tx3); letter-spacing:.06em; margin-bottom:7px; }
+/* 進入方式的二選一 */
+.lc-acc-seg { display:inline-flex; border:1px solid var(--br); border-radius:9px; overflow:hidden; }
+.lc-acc-btn { padding:6px 12px; border:none; background:transparent; color:var(--tx3); font-size:11.5px; font-weight:600; cursor:pointer; font-family:var(--ff); white-space:nowrap; }
+.lc-acc-btn:hover { color:var(--tx2); }
+.lc-acc-btn.on { background:#7c3aed; color:#fff; }
+/* 在線名單 */
+.lc-who { border:1px solid var(--br); border-radius:10px; background:var(--s1); padding:8px 10px; margin:0 0 8px 0; max-height:200px; overflow-y:auto; }
+.lc-who-row { display:flex; align-items:center; gap:8px; padding:4px 2px; font-size:12px; }
+.lc-who-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+.lc-who-n { color:var(--tx); font-weight:600; }
+.lc-who-tag { font-size:10px; color:#a78bfa; font-weight:700; }
+.lc-who-st { margin-left:auto; font-size:10.5px; color:var(--tx3); white-space:nowrap; }
+.lc-who-h { font-size:10px; font-weight:700; color:var(--tx3); letter-spacing:.06em; margin:4px 2px 2px; }
 .lc-rules { background:var(--s1); border:1px solid var(--br); border-left:3px solid #7c3aed; border-radius:10px; padding:11px 14px; margin-bottom:16px; }
 .lc-rules-h { font-size:11px; font-weight:700; color:#a78bfa; letter-spacing:.06em; margin-bottom:7px; }
 .lc-rules ul { margin:0; padding-left:16px; }
@@ -375,7 +388,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     <div class="login-logo">
       <div class="login-mark" style="background:transparent"><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="44" height="23"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></div>
       <div class="login-name">COMART Platform</div>
-      <div class="login-sub">Internal Portal · v1.96</div>
+      <div class="login-sub">Internal Portal · v1.97</div>
     </div>
     <form id="loginForm" onsubmit="doLogin();return false;" autocomplete="on">
     <div class="field">
@@ -443,7 +456,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   <div class="topbar">
     <div class="topbar-logo" onclick="switchView('home')">
       <div class="topbar-mark" style="background:transparent"><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="26" height="14"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></div>
-      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.96</span></div>
+      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v1.97</span></div>
     </div>
     <div class="topbar-right">
       <div class="lang-switcher">
@@ -634,6 +647,15 @@ input[type="date"]::-webkit-calendar-picker-indicator {
                 <button id="lc-new-btn" onclick="lcCreate()"
                   style="padding:9px 16px;border-radius:9px;background:#7c3aed;color:#fff;border:none;cursor:pointer;font-size:12px;font-weight:700;">開新對話</button>
               </div>
+              <!-- 進入方式：建立後不可更改（見 migration 202609080001），所以擺在建立表單而不是房間裡 -->
+              <div style="display:flex;align-items:center;gap:8px;margin-top:9px;flex-wrap:wrap;">
+                <span id="lc-acc-lbl" style="font-size:11px;color:var(--tx3);font-weight:600;"></span>
+                <div class="lc-acc-seg">
+                  <button type="button" class="lc-acc-btn on" id="lc-acc-invite" onclick="lcAccessSet('invite')"></button>
+                  <button type="button" class="lc-acc-btn"    id="lc-acc-all"    onclick="lcAccessSet('all')"></button>
+                </div>
+              </div>
+              <div id="lc-acc-hint" style="font-size:11px;color:var(--tx3);margin-top:5px;line-height:1.55;"></div>
               <div id="lc-new-picked" style="font-size:11px;color:#a78bfa;margin-top:7px;font-weight:700;"></div>
               <div id="lc-new-hint" style="font-size:11px;color:var(--tx3);margin-top:4px;line-height:1.55;"></div>
             </div>
@@ -657,11 +679,15 @@ input[type="date"]::-webkit-calendar-picker-indicator {
                 <div id="lc-room-title" style="font-size:14px;font-weight:700;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
                 <div id="lc-room-meta" style="font-size:11px;color:var(--tx3);margin-top:1px;"></div>
               </div>
+              <button class="lc-btn" id="lc-who-btn" onclick="lcWhoToggle()"></button>
               <button class="lc-btn" id="lc-invite-btn" onclick="lcPickOpen('invite')" style="display:none;">＋ 邀請</button>
               <button class="lc-btn" id="lc-pdf-btn" onclick="lcExportPDF().catch(function(e){console.warn(e);})" style="display:none;">📄 PDF</button>
               <button class="lc-btn danger" id="lc-end-btn" onclick="lcEndAsk()" style="display:none;">結束對話</button>
               <button class="lc-btn danger" id="lc-del-btn" onclick="lcDelete(lcSession&&lcSession.id,event)" style="display:none;">🗑</button>
             </div>
+            <!-- 在線名單（lcWho*）：誰真的在這個房間裡。公開場次的「可進入名單」是全公司，
+                 所以有意義的問題是「誰在裡面」而不是「誰進得來」。 -->
+            <div id="lc-who" class="lc-who" style="display:none;"></div>
             <div id="lc-endbar" class="lc-endbar" style="display:none;">
               <span id="lc-endbar-q" style="flex:1;min-width:160px;"></span>
               <button class="lc-btn" onclick="lcEnd(true)" id="lc-keep-btn">保留</button>
@@ -2991,9 +3017,9 @@ const I18N = {
     // ai tab
     ai_tab_translate:'Translate', ai_tab_chat:'Claude Chat', ai_tab_skills:'Skills',
     ai_tab_live:'Live Chat', lc_new:'New chat',
-    lc_rules_h:'HOW THIS WORKS', lc_rule1_t:'Anyone can take part — ',
-    lc_rule1_d:'no department or site restriction. Any active colleague can be added as a participant.', lc_rule2_t:'Only participants can open it — ',
-    lc_rule2_d:'nobody else can read the messages, system administrators included.', lc_rule3_t:'The host ends it and decides whether to keep it — ',
+    lc_rules_h:'HOW THIS WORKS', 
+    
+    lc_rule3_t:'The host ends it and decides whether to keep it — ',
     lc_rule3_d:'kept conversations stay readable and can be exported as PDF.', lc_rule4_t:'The host or a system administrator can delete it — ',
     lc_rule4_d:'that removes every message with it and cannot be undone.',
     pwd_user_lbl:'Employee ID',
@@ -3007,6 +3033,7 @@ const I18N = {
     lc_locked:'Not a participant', lc_not_member:'Only participants can open this conversation.',
     lc_no_users:'No colleagues to choose from.', lc_pick_all:'Select all',
     lc_pick_none:'Clear all', lc_invite_saved:'Participants updated',
+    lc_acc_lbl:'Who can join', lc_acc_invite:'Invited only', lc_acc_all:'Everyone', lc_acc_invite_tag:'Invited only', lc_acc_all_tag:'Open to all', lc_acc_invite_hint:'Only you and the people you pick can open this chat. Not even an administrator can read it.', lc_acc_all_hint:'Any active colleague can find and open this chat. Picking participants still sends them an invitation — it just no longer decides who may enter.', lc_who_in:'In the room ({n})', lc_who_left:'Recently left', lc_who_not_yet:'Invited, not here yet', lc_who_online:'here now', lc_who_ago:'{n} min ago', lc_who_pending:'never joined', lc_who_me:'you', lc_who_empty:'No one has joined yet', 
     lc_notif_title:'{who} invited you to a live chat', lc_invite_sent:'Invited and notified {n} participant(s)', lc_invite_notif_failed:'Added to the list, but the invitation notice was NOT sent',
     lc_invite_failed:'Could not update the participants. Please try again.', lc_cancel:'Cancel',
     lc_ok:'OK', lc_pick_btn:'+ Participants',
@@ -3108,9 +3135,9 @@ const I18N = {
     um_delete_failed:'刪除失敗：', um_deleted:'用戶已刪除',
     ai_tab_translate:'翻譯', ai_tab_chat:'Claude Chat', ai_tab_skills:'技能',
     ai_tab_live:'線上對話', lc_new:'開新對話',
-    lc_rules_h:'這裡的規則', lc_rule1_t:'全員可參與 — ',
-    lc_rule1_d:'不分部門與營運中心，任何在職同事都可以被列為參與人。', lc_rule2_t:'只有參與人可開啟 — ',
-    lc_rule2_d:'其他人看不到內容，系統管理者也讀不到。', lc_rule3_t:'由發起人結束並決定是否保留 — ',
+    lc_rules_h:'這裡的規則', 
+    
+    lc_rule3_t:'由發起人結束並決定是否保留 — ',
     lc_rule3_d:'保留的日後可再閱讀，也可輸出 PDF。', lc_rule4_t:'發起人或系統管理者可刪除 — ',
     lc_rule4_d:'刪除會連同所有訊息一起移除，無法復原。',
     pwd_user_lbl:'員工編號',
@@ -3124,6 +3151,7 @@ const I18N = {
     lc_locked:'非參與人', lc_not_member:'只有參與人可以開啟這場對話。',
     lc_no_users:'沒有可選的同事。', lc_pick_all:'全選',
     lc_pick_none:'全部清除', lc_invite_saved:'參與人已更新',
+    lc_acc_lbl:'誰可以進入', lc_acc_invite:'僅限受邀請的人', lc_acc_all:'所有人都可進入', lc_acc_invite_tag:'僅限受邀', lc_acc_all_tag:'公開', lc_acc_invite_hint:'只有你和你挑選的人打得開這場對話，系統管理者也讀不到。', lc_acc_all_hint:'任何在職同事都找得到、也進得來。挑選參與人仍然會發出邀請通知（把人叫進來），只是不再決定誰進得去。', lc_who_in:'在房間裡（{n} 人）', lc_who_left:'剛剛離開', lc_who_not_yet:'已邀請，還沒進來', lc_who_online:'在線', lc_who_ago:'{n} 分鐘前', lc_who_pending:'尚未進入', lc_who_me:'你', lc_who_empty:'還沒有人進來', 
     lc_notif_title:'{who} 邀請你加入線上對話', lc_invite_sent:'已邀請並通知 {n} 位參與人', lc_invite_notif_failed:'已加入名單，但邀請通知沒有送出',
     lc_invite_failed:'參與人更新失敗，請再試一次。', lc_cancel:'取消',
     lc_ok:'確定', lc_pick_btn:'＋ 參與人',
@@ -3218,9 +3246,9 @@ const I18N = {
     um_delete_failed:'删除失败：', um_deleted:'用户已删除',
     ai_tab_translate:'翻译', ai_tab_chat:'Claude Chat', ai_tab_skills:'技能',
     ai_tab_live:'在线对话', lc_new:'开新对话',
-    lc_rules_h:'这里的规则', lc_rule1_t:'全员可参与 — ',
-    lc_rule1_d:'不分部门与运营中心，任何在职同事都可以被列为参与人。', lc_rule2_t:'只有参与人可打开 — ',
-    lc_rule2_d:'其他人看不到内容，系统管理者也读不到。', lc_rule3_t:'由发起人结束并决定是否保留 — ',
+    lc_rules_h:'这里的规则', 
+    
+    lc_rule3_t:'由发起人结束并决定是否保留 — ',
     lc_rule3_d:'保留的日后可再阅读，也可输出 PDF。', lc_rule4_t:'发起人或系统管理者可删除 — ',
     lc_rule4_d:'删除会连同所有消息一起移除，无法恢复。',
     pwd_user_lbl:'员工编号',
@@ -3234,6 +3262,7 @@ const I18N = {
     lc_locked:'非参与人', lc_not_member:'只有参与人可以打开这场对话。',
     lc_no_users:'没有可选的同事。', lc_pick_all:'全选',
     lc_pick_none:'全部清除', lc_invite_saved:'参与人已更新',
+    lc_acc_lbl:'谁可以进入', lc_acc_invite:'仅限受邀请的人', lc_acc_all:'所有人都可进入', lc_acc_invite_tag:'仅限受邀', lc_acc_all_tag:'公开', lc_acc_invite_hint:'只有你和你挑选的人打得开这场对话，系统管理者也读不到。', lc_acc_all_hint:'任何在职同事都找得到、也进得来。挑选参与人仍然会发出邀请通知（把人叫进来），只是不再决定谁进得去。', lc_who_in:'在房间里（{n} 人）', lc_who_left:'刚刚离开', lc_who_not_yet:'已邀请，还没进来', lc_who_online:'在线', lc_who_ago:'{n} 分钟前', lc_who_pending:'尚未进入', lc_who_me:'你', lc_who_empty:'还没有人进来', lc_rule1_t:'开启对话有两种途径 — ', lc_rule1_d:'由发起人选择：所有人都可进入，或仅限受邀请的人。这个选择在建立后不可更改。', lc_rule2_t:'邀请制的对话是私下的 — ', lc_rule2_d:'参与人以外看不到内容，系统管理者也读不到。',
     lc_notif_title:'{who} 邀请你加入线上对话', lc_invite_sent:'已邀请并通知 {n} 位参与人', lc_invite_notif_failed:'已加入名单，但邀请通知没有送出',
     lc_invite_failed:'参与人更新失败，请再试一次。', lc_cancel:'取消',
     lc_ok:'确定', lc_pick_btn:'＋ 参与人',
@@ -3344,6 +3373,7 @@ const I18N = {
     lc_locked:'Không phải người tham gia', lc_not_member:'Chỉ người tham gia mới có thể mở cuộc trò chuyện này.',
     lc_no_users:'Không có đồng nghiệp nào để chọn.', lc_pick_all:'Chọn tất cả',
     lc_pick_none:'Bỏ chọn tất cả', lc_invite_saved:'Đã cập nhật người tham gia',
+    lc_acc_lbl:'Ai có thể vào', lc_acc_invite:'Chỉ người được mời', lc_acc_all:'Mọi người đều vào được', lc_acc_invite_tag:'Chỉ người được mời', lc_acc_all_tag:'Công khai', lc_acc_invite_hint:'Chỉ bạn và những người bạn chọn mới mở được cuộc trò chuyện này; kể cả quản trị viên cũng không đọc được.', lc_acc_all_hint:'Mọi đồng nghiệp đang làm việc đều tìm thấy và vào được. Chọn người tham gia vẫn gửi lời mời (gọi họ vào), chỉ là không còn quyết định ai được vào.', lc_who_in:'Đang trong phòng ({n})', lc_who_left:'Vừa rời đi', lc_who_not_yet:'Đã mời, chưa vào', lc_who_online:'đang ở đây', lc_who_ago:'{n} phút trước', lc_who_pending:'chưa vào', lc_who_me:'bạn', lc_who_empty:'Chưa có ai vào', lc_rule1_t:'Hai cách mở cuộc trò chuyện — ', lc_rule1_d:'người khởi tạo chọn: mọi người đều vào được, hoặc chỉ người được mời. Lựa chọn này không thể đổi sau khi tạo.', lc_rule2_t:'Cuộc trò chuyện mời riêng là riêng tư — ', lc_rule2_d:'ngoài danh sách người tham gia thì không ai xem được nội dung, kể cả quản trị viên.',
     lc_notif_title:'{who} đã mời bạn vào cuộc trò chuyện', lc_invite_sent:'Đã mời và thông báo cho {n} người tham gia', lc_invite_notif_failed:'Đã thêm vào danh sách, nhưng thông báo mời CHƯA được gửi',
     lc_invite_failed:'Không cập nhật được người tham gia. Vui lòng thử lại.', lc_cancel:'Hủy',
     lc_ok:'Xác nhận', lc_pick_btn:'＋ Người tham gia',
@@ -3454,6 +3484,7 @@ const I18N = {
     lc_locked:'参加者ではありません', lc_not_member:'この会話を開けるのは参加者のみです。',
     lc_no_users:'選択できる同僚がいません。', lc_pick_all:'すべて選択',
     lc_pick_none:'すべて解除', lc_invite_saved:'参加者を更新しました',
+    lc_acc_lbl:'参加できる人', lc_acc_invite:'招待した人のみ', lc_acc_all:'全員参加可', lc_acc_invite_tag:'招待制', lc_acc_all_tag:'公開', lc_acc_invite_hint:'あなたと選んだ方だけが開けます。管理者も読めません。', lc_acc_all_hint:'在職の同僚は誰でも見つけて入れます。参加者を選ぶと招待通知は送られますが（呼び込むため）、誰が入れるかは決めません。', lc_who_in:'入室中（{n} 名）', lc_who_left:'退室しました', lc_who_not_yet:'招待済み・未入室', lc_who_online:'在室', lc_who_ago:'{n} 分前', lc_who_pending:'未入室', lc_who_me:'あなた', lc_who_empty:'まだ誰も入っていません', lc_rule1_t:'会話の開き方は 2 通り — ', lc_rule1_d:'開始した人が選びます：全員参加可、または招待した人のみ。作成後は変更できません。', lc_rule2_t:'招待制の会話は非公開 — ', lc_rule2_d:'参加者以外は内容を見られません。管理者も読めません。',
     lc_notif_title:'{who} さんがオンライン会話に招待しました', lc_invite_sent:'{n} 名の参加者を招待し、通知しました', lc_invite_notif_failed:'名簿には追加しましたが、招待通知は送信されませんでした',
     lc_invite_failed:'参加者を更新できませんでした。もう一度お試しください。', lc_cancel:'キャンセル',
     lc_ok:'確定', lc_pick_btn:'＋ 参加者',
@@ -4246,8 +4277,12 @@ async function lcLoadList() {
     if (lcIsAdmin()) return (await SB.get('chat_sessions', statusQs + '&' + orderQs + '&limit=50')) || [];
     var a = (await SB.get('chat_sessions', statusQs + '&host_emp_id=eq.' + me + '&' + orderQs + '&limit=50')) || [];
     var b = (await SB.get('chat_sessions', statusQs + '&members=cs.' + arr + '&' + orderQs + '&limit=50')) || [];
+    // 第三個查詢：公開場次（v1.97）。這一份會送到每個人的瀏覽器，
+    // 但那正是 access='all' 的定義 —— 全員都進得去，標題自然不是秘密。
+    // 邀請制的場次仍然在資料庫端就被前兩個查詢過濾掉，沒有變寬。
+    var c = (await SB.get('chat_sessions', statusQs + '&access=eq.all&' + orderQs + '&limit=50')) || [];
     var seen = {}, out = [];
-    a.concat(b).forEach(function(x) { if (!seen[x.id]) { seen[x.id] = 1; out.push(x); } });
+    a.concat(b).concat(c).forEach(function(x) { if (!seen[x.id]) { seen[x.id] = 1; out.push(x); } });
     return out;
   }
   var open  = await fetchSet('status=eq.open', 'order=last_at.desc');
@@ -4260,7 +4295,9 @@ async function lcLoadList() {
     return '<div class="lc-row' + (seen ? '' : ' locked') + '" style="border-left:3px solid ' + lcHue(s.host_emp_id) + '"'
       + ' onclick="lcOpen(\'' + escHtml(s.id) + '\')">'
       + '<div style="flex:1;min-width:0;">'
-      +   '<div class="lc-row-t">' + (seen ? '' : '🔒 ') + escHtml(s.title || '—') + '</div>'
+      +   '<div class="lc-row-t">' + (seen ? '' : '🔒 ') + escHtml(s.title || '—')
+      +     ' <span style="font-size:10px;font-weight:700;color:' + (lcAccessOf(s) === 'all' ? '#2E8B57' : '#a78bfa') + ';">'
+      +     escHtml(t(lcAccessOf(s) === 'all' ? 'lc_acc_all_tag' : 'lc_acc_invite_tag')) + '</span></div>'
       +   '<div class="lc-row-m">' + escHtml(s.host_name || s.host_emp_id)
       +     ' · ' + escHtml(t('lc_people').replace('{n}', String(n)))
       +     ' · ' + escHtml(lcDay(ended ? (s.ended_at||s.created_at) : s.last_at))
@@ -4292,6 +4329,7 @@ async function lcCreate() {
     // 🔴 members 不含開啟者本人（身分已在 host_emp_id）—— 存兩份就會有
     //    「從 members 移除自己」這種矛盾狀態要處理
     members: Object.keys(lcPickSel),
+    access: lcNewAccess,          // 'all' 或 'invite'，建立後不可更改
     status: 'open', keep: false,
     created_at: new Date().toISOString(), last_at: new Date().toISOString(),
   };
@@ -4300,7 +4338,9 @@ async function lcCreate() {
   if (el) el.value = '';
   var invited = Object.keys(lcPickSel);   // 清空之前先留一份，通知要用
   lcPickSel = {}; lcPickBadge();      // 選擇已用掉，避免下一場沿用上一場的名單
-  lcSession = s; lcMsgs = []; lcColorReset();
+  lcAccessSet('invite');              // 同理：不重置的話下一場會默默沿用「公開」，
+                                      // 而公開必須是每一次都明確選過的決定
+  lcSession = s; lcMsgs = []; lcColorReset(); lcWhoReset();
   lcShowRoom(); lcRenderStream(); lcPollStart();
   // 通知放最後：房間已經建好了，通知沒送出不該讓建立看起來失敗 —— 但一定要說，
   // 否則開啟者會以為對方已經被叫進來了，而其實沒有人知道這場存在
@@ -4319,16 +4359,18 @@ async function lcOpen(id) {
   if (!lcCanSee(rows[0])) { toast(t('lc_not_member'), 'err'); lcLoadList(); return; }
   lcSession = rows[0];
   lcColorReset();                     // 顏色是「本場次」的，換場次要重配
+  lcWhoReset();
   var msgs = await SB.get('chat_messages',
     'session_id=eq.' + encodeURIComponent(id) + '&order=created_at.desc&limit=' + LC_MSG_LIMIT);
   lcMsgs = (msgs || []).slice().reverse();
   lcShowRoom(); lcRenderStream(); lcScrollBottom(true);
-  if (lcSession.status === 'open') lcPollStart();
+  if (lcSession.status === 'open') { lcPollStart(); lcBeat(); }
+  lcWhoLoad(true);   // 已結束的場次也讀：那份名單是「當時誰在」的紀錄
 }
 
 function lcBackToList() {
   lcPollStop();
-  lcSession = null; lcMsgs = []; lcColorReset();
+  lcSession = null; lcMsgs = []; lcColorReset(); lcWhoReset();
   var r = document.getElementById('lc-room'), l = document.getElementById('lc-listview');
   if (r) r.style.display = 'none';
   if (l) l.style.display = 'flex';
@@ -4346,6 +4388,7 @@ function lcShowRoom() {
   if (meta) meta.textContent = t('lc_host') + '：' + ((lcSession && (lcSession.host_name || lcSession.host_emp_id)) || '')
     + (live ? '' : '　·　' + t('lc_ended'))
     // 訊息時間是每位觀看者自己的當地時間，不標時區會讓跨廠的人以為資料錯了
+    + '　·　' + t(lcAccessOf(lcSession) === 'all' ? 'lc_acc_all_tag' : 'lc_acc_invite_tag')
     + '　·　' + t('lc_tz_note').replace('{tz}', lcTzLabel());
   var comp = document.getElementById('lc-composer');
   if (comp) comp.style.display = live ? 'flex' : 'none';
@@ -4360,6 +4403,8 @@ function lcShowRoom() {
   // 邀請只有開啟者、且對話還在進行中才有意義（結束後加人只會讓他看到已封存的紀錄）
   var invBtn = document.getElementById('lc-invite-btn');
   if (invBtn) invBtn.style.display = (live && lcIsHost()) ? 'inline-block' : 'none';
+  var whoBtn = document.getElementById('lc-who-btn');
+  if (whoBtn) whoBtn.textContent = '👥 ' + (lcWhoLists().online.length);
   var delBtn = document.getElementById('lc-del-btn');
   if (delBtn) delBtn.style.display = (lcCanDelete(lcSession) && !(live && lcIsHost())) ? 'inline-block' : 'none';
   var endBar = document.getElementById('lc-endbar');
@@ -4487,6 +4532,9 @@ function lcPollStop() {
 async function lcPoll() {
   if (!lcSession) { lcPollStop(); return; }
   var sid = lcSession.id;
+  // 在線名單：心跳 30 秒、重讀 15 秒，兩者都自己節流（訊息輪詢是 3 秒，
+  // 跟著跑會讓房裡 5 個人每分鐘打上百次請求）
+  lcBeat(); lcWhoLoad(false);
   try {
     var stick = lcNearBottom();
     var changed = false;
@@ -4912,11 +4960,172 @@ function lcMembersOf(s) {
   var m = s && s.members;
   return Array.isArray(m) ? m : [];
 }
+// 進入方式（v1.97）。舊場次沒有這個欄位 → 一律當成 'invite'：
+// 猜錯的方向該是「看不到」，而不是「全公司突然讀得到別人的私下對話」
+// （同 members 舊資料預設 '{}' 的判斷）。
+function lcAccessOf(s) { return (s && s.access === 'all') ? 'all' : 'invite'; }
+
 function lcCanSee(s) {
   if (!s) return false;
   var me = lcMe();
   if (!me) return false;
+  if (lcAccessOf(s) === 'all') return true;      // 公開場次：任何在職同事都進得去
   return s.host_emp_id === me || lcMembersOf(s).indexOf(me) >= 0;
+}
+
+// 建立表單上選的進入方式。🔴 只在建立時決定，建立後不可更改
+// （sb-proxy 的 CHAT_IMMUTABLE 也會擋）—— 理由見 migration 202609080001：
+// 邀請制改公開＝已經私下講過的話突然全公司可讀，那是「中途解匿」的同一種背信。
+var lcNewAccess = 'invite';   // 預設邀請制：公開是明確的選擇，不該是預設
+function lcAccessSet(mode) {
+  lcNewAccess = (mode === 'all') ? 'all' : 'invite';
+  var a = document.getElementById('lc-acc-all'), i = document.getElementById('lc-acc-invite');
+  if (a) a.classList.toggle('on', lcNewAccess === 'all');
+  if (i) i.classList.toggle('on', lcNewAccess === 'invite');
+  var pk = document.getElementById('lc-pick-btn');
+  // 公開場次仍可挑人 —— 那時候「參與人」的作用是**發邀請通知**（把人叫進來），
+  // 不是決定誰進得去。提示文字要講清楚，否則會以為選了公開就不必挑人
+  if (pk) pk.style.opacity = '1';
+  var h = document.getElementById('lc-acc-hint');
+  if (h) h.textContent = t(lcNewAccess === 'all' ? 'lc_acc_all_hint' : 'lc_acc_invite_hint');
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// 在線名單（v1.97，lcWho*）— 誰真的在這個房間裡
+//
+// 🔴 沒有「離開」這個事件可以信任：關分頁、切到別的分頁、斷網、瀏覽器當掉
+//    都不會通知我們。所以在線與否**一律由 last_at 的新舊決定**，
+//    不做「離開時刪掉自己那一列」—— 那條路在最常見的情況下不會執行，
+//    結果就是名單上永遠掛著一堆早就走了的人。
+//
+// 🔴 心跳與訊息輪詢刻意用不同的頻率：訊息是 3 秒（要即時），
+//    心跳 30 秒、讀名單 15 秒。房裡 5 個人的話，3 秒心跳等於每分鐘 100 次寫入，
+//    而 CLAUDE.md 已記載 sb-proxy 併發上限那個坑。
+//    LC_ONLINE_MS 給到心跳的三倍，漏掉一次心跳不會讓人閃掉。
+// ═══════════════════════════════════════════════════════════════════════
+const LC_HB_MS      = 30000;   // 自己的心跳間隔
+const LC_WHO_MS      = 15000;  // 重讀名單的間隔
+const LC_ONLINE_MS   = 95000;  // last_at 在這個範圍內算「在線」（＝三次心跳）
+var lcWhoOpen = false;         // 面板是不是展開著
+var lcWhoRows = [];            // 最近一次讀到的 presence
+var lcHbAt    = 0;
+var lcWhoAt   = 0;
+
+// 報告自己在線。失敗完全靜默：這是輔助資訊，不該在畫面上留下錯誤，
+// 而且下一次心跳就會補上。
+async function lcBeat() {
+  if (!lcSession || lcSession.status !== 'open') return;
+  var now = Date.now();
+  if (now - lcHbAt < LC_HB_MS) return;
+  lcHbAt = now;
+  // 🔴 不能用 SB.upsert：它的第三個參數是**單一**主鍵欄位，
+  //    傳 'session_id' 會 PATCH 掉這個房間的**每一列** —— 等於把全房間的人
+  //    都改成我的名字。chat_presence 的主鍵是 (session_id, emp_id)，
+  //    所以自己走「兩個條件的 PATCH → 沒有符合的列才 POST」。
+  var f = 'session_id=eq.' + encodeURIComponent(lcSession.id)
+        + '&emp_id=eq.' + encodeURIComponent(lcMe());
+  var beat = { name: lcMyName(), last_at: new Date().toISOString() };
+  try {
+    var got = await SB.patch('chat_presence', f, beat);
+    if (!got || !got.length) {
+      await SB.post('chat_presence', Object.assign(
+        { session_id: lcSession.id, emp_id: lcMe() }, beat));
+    }
+  } catch (e) {}
+}
+
+async function lcWhoLoad(force) {
+  if (!lcSession) return;
+  var now = Date.now();
+  if (!force && now - lcWhoAt < LC_WHO_MS) return;
+  lcWhoAt = now;
+  var rows = await SB.get('chat_presence',
+    'session_id=eq.' + encodeURIComponent(lcSession.id) + '&select=emp_id,name,last_at');
+  if (!rows) return;                  // 讀失敗就保留上一次的名單，不要清空
+  lcWhoRows = rows;
+  lcWhoPaint();
+}
+
+// 名單分兩區：在裡面的（含剛剛離開的）與受邀但還沒進來的。
+// 公開場次通常沒有第二區 —— 那本來就是它的意思。
+function lcWhoLists() {
+  var now = Date.now();
+  var online = [], away = [];
+  var seen = {};
+  lcWhoRows.forEach(function(r) {
+    if (!r.emp_id || seen[r.emp_id]) return;
+    seen[r.emp_id] = 1;
+    var age = now - new Date(r.last_at).getTime();
+    var item = { empId: r.emp_id, name: r.name || r.emp_id, age: age };
+    if (age <= LC_ONLINE_MS) online.push(item); else away.push(item);
+  });
+  online.sort(function(a, z) { return a.name.localeCompare(z.name); });
+  away.sort(function(a, z) { return a.age - z.age; });
+  // 受邀但一次都沒進來過的人（公開場次的 members 是「被通知的人」，同樣適用）
+  var pend = [];
+  var mem = lcSession ? lcMembersOf(lcSession) : [];
+  var host = lcSession ? lcSession.host_emp_id : '';
+  mem.concat(host ? [host] : []).forEach(function(e) {
+    if (!e || seen[e]) return;
+    seen[e] = 1;
+    var u = (typeof umActiveUsers === 'function' ? umActiveUsers() : ALL_USERS)
+              .find(function(x) { return x.empId === e; });
+    pend.push({ empId: e, name: u ? (u.nameEn || u.nameZh || e) : e });
+  });
+  return { online: online, away: away, pend: pend };
+}
+
+function lcWhoRowHtml(it, kind) {
+  var color = kind === 'online' ? '#2E8B57' : kind === 'away' ? '#E08000' : 'var(--br2)';
+  var st = kind === 'online' ? t('lc_who_online')
+         : kind === 'away'   ? t('lc_who_ago').replace('{n}', String(Math.max(1, Math.round(it.age / 60000))))
+         : t('lc_who_pending');
+  var isHost = lcSession && it.empId === lcSession.host_emp_id;
+  return '<div class="lc-who-row">'
+    + '<span class="lc-who-dot" style="background:' + color + '"></span>'
+    + '<span class="lc-who-n">' + escHtml(it.name) + '</span>'
+    + (it.empId === lcMe() ? '<span class="lc-who-tag">' + escHtml(t('lc_who_me')) + '</span>' : '')
+    + (isHost ? '<span class="lc-who-tag">' + escHtml(t('lc_host')) + '</span>' : '')
+    + '<span class="lc-who-st">' + escHtml(st) + '</span>'
+    + '</div>';
+}
+
+function lcWhoPaint() {
+  var L = lcWhoLists();
+  // 標頭鈕永遠顯示人數，面板收起來也看得到「現在幾個人在」
+  var btn = document.getElementById('lc-who-btn');
+  if (btn) btn.textContent = '👥 ' + L.online.length;
+  var box = document.getElementById('lc-who');
+  if (!box) return;
+  box.style.display = lcWhoOpen ? 'block' : 'none';
+  if (!lcWhoOpen) return;
+  var html = '';
+  if (L.online.length) {
+    html += '<div class="lc-who-h">' + escHtml(t('lc_who_in').replace('{n}', String(L.online.length))) + '</div>';
+    html += L.online.map(function(x) { return lcWhoRowHtml(x, 'online'); }).join('');
+  }
+  if (L.away.length) {
+    html += '<div class="lc-who-h">' + escHtml(t('lc_who_left')) + '</div>';
+    html += L.away.map(function(x) { return lcWhoRowHtml(x, 'away'); }).join('');
+  }
+  if (L.pend.length) {
+    html += '<div class="lc-who-h">' + escHtml(t('lc_who_not_yet')) + '</div>';
+    html += L.pend.map(function(x) { return lcWhoRowHtml(x, 'pend'); }).join('');
+  }
+  if (!html) html = '<div class="lc-who-h">' + escHtml(t('lc_who_empty')) + '</div>';
+  box.innerHTML = html;
+}
+
+function lcWhoToggle() {
+  lcWhoOpen = !lcWhoOpen;
+  lcWhoPaint();
+  if (lcWhoOpen) lcWhoLoad(true);
+}
+
+function lcWhoReset() {
+  lcWhoRows = []; lcWhoOpen = false; lcHbAt = 0; lcWhoAt = 0;
+  var box = document.getElementById('lc-who');
+  if (box) { box.style.display = 'none'; box.innerHTML = ''; }
 }
 
 // ─── 參與人挑選（建立時與事後邀請共用同一份 DOM）───
@@ -5210,6 +5419,11 @@ function lcApplyI18n() {
   var pv = document.getElementById('p-voice-btn'); if (pv) pv.title = t('lc_mic_start');
   var pc = document.getElementById('p-clean-btn'); if (pc) pc.title = t('lc_mic_polishing');
   if (!pVoiceOK() && pv) pv.style.display = 'none';
+  // 進入方式：三個靜態文字 ＋ 依當前選擇重畫（切語言時提示文字要跟著換）
+  txt('lc-acc-lbl','lc_acc_lbl');
+  txt('lc-acc-invite','lc_acc_invite'); txt('lc-acc-all','lc_acc_all');
+  lcAccessSet(lcNewAccess);
+  lcWhoPaint();                       // 在線名單的區塊標題也要換語言
   txt('lc-pick-btn','lc_pick_btn');   txt('lc-invite-btn','lc_invite');
   txt('lc-pick-all','lc_pick_all');   txt('lc-pick-none','lc_pick_none');
   txt('lc-pick-cancel','lc_cancel');  txt('lc-pick-ok','lc_ok');

@@ -47,7 +47,7 @@ const ALLOWED_TABLES = new Set([
   // 注意：premortem_summary_log（AI 結論的版本歷史）**刻意不列入**——
   // 稽核紀錄不該能被應用程式讀取或刪除，只能從 Supabase 後台查。
   "poll_sessions","poll_options","poll_votes","poll_comments",
-  "chat_sessions","chat_messages",
+  "chat_sessions","chat_messages","chat_presence",
 ])
 
 // ── 線上對話：只有開啟者本人能結束或刪除自己開的那一場 ──
@@ -60,7 +60,7 @@ const CHAT_HOST_ONLY = new Set(["status", "keep", "title", "members"])
 // 線上對話可以刪除整場的角色：開啟者本人，或 admin
 const CHAT_DELETE_ROLES = new Set(["admin"])
 // 開啟者是整套權限的根，建立後不可改（改掉就等於把別人開的場次搶過來）
-const CHAT_IMMUTABLE = new Set(["host_emp_id", "id"])
+const CHAT_IMMUTABLE = new Set(["host_emp_id", "id", "access"])
 
 // ── 事前驗屍：受保護欄位 ──
 // AI 評論與總結是永久存檔的會議正式結論；phase 決定會議進程；chair_emp_id 是整套權限的根。
@@ -318,6 +318,17 @@ serve(async (req) => {
         }
       }
       body = rawText
+    } else if (table === "chat_presence" && rawText) {
+      // ── 在線名單：emp_id 一律改寫成簽章裡的身分 ──
+      // 這張表任何人都寫得（每個人要能報告自己在線），所以唯一需要擋的是
+      // 「幫別人報告在線」—— 那會讓房裡出現一個其實不在的人，
+      // 而在線名單存在的意義就是「誰真的在」。改寫而不是拒絕：
+      // 前端本來就只會寫自己，改寫對正常路徑沒有影響。
+      try {
+        const parsed = JSON.parse(rawText)
+        const own = (o: Record<string, unknown>) => { o.emp_id = sessEmpId; return o }
+        body = JSON.stringify(Array.isArray(parsed) ? parsed.map(own) : own(parsed))
+      } catch { return json({ error: "bad_json" }, 400) }
     } else if (table === "chat_sessions" && req.method === "PATCH" && rawText) {
       // ── 線上對話：status/keep/title 只有開啟者改得動 ──
       let parsed: Record<string, unknown>

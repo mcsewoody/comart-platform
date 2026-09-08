@@ -103,7 +103,7 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 
 | File | Version | Purpose | ~Lines |
 |------|---------|---------|--------|
-| `index.html` | v1.96 | Main portal — login, home, directory, bulletin, calendar, AI tools | 4,394 |
+| `index.html` | v1.97 | Main portal — login, home, directory, bulletin, calendar, AI tools | 4,394 |
 | `admin/index.html` | v2.40 | Admin System — room booking, fleet, visitor, library, lottery | 5,650 |
 | `kms/index.html` | v2.36 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
 | `quotation/index.html` | v3.60 | Quotation & CRM system | 7,332 |
@@ -562,6 +562,51 @@ Portal AI 功能區的第二個頁籤（`💬 線上對話`，在翻譯旁邊）
   兩處問的是同一個問題，各留一份必然分岔）。
 - **前端刪除鈕刻意不對「開啟者 × 進行中」顯示**：那條路是「結束對話 → 不保留」，
   同一件事給兩個入口只會讓人猜哪一個才對。admin 看別人的進行中場次則有刪除鈕。
+### 兩種進入方式 ＋ 在線名單（v1.97，migration 202609080001）
+
+**進入方式由發起人建會時選**（`chat_sessions.access` = `'all'` / `'invite'`），
+**房間裡看得到誰真的在**（`chat_presence`，函式前綴 `lcWho*`）。
+
+- 🔴 **`access` 建立後不可更改**（sb-proxy 的 `CHAT_IMMUTABLE`）。
+  邀請制改公開 ＝ 已經私下講過的話突然全公司可讀，那是 CLAUDE.md 早已否決的
+  「中途解匿」的同一種背信；反向（公開改邀請制）也一樣 —— 已經在裡面的人會突然被踢出去，
+  而他讀過的內容收不回來。要換就開新的一場。
+- 🔴 **舊資料與預設都是 `'invite'`**：既有場次沒有這個欄位，猜錯的方向該是「看不到」
+  而不是「全公司突然讀得到別人的私下對話」（同 `members` 舊資料預設 `'{}'` 的判斷）。
+  前端一律經 `lcAccessOf(s)`，不要直接讀 `s.access`。
+  **建立表單的預設也是邀請制** —— 公開必須是每一次都明確選過的決定，
+  所以 `lcCreate` 成功後會 `lcAccessSet('invite')` 重置（同「選擇已用掉」的道理）。
+- 🔴 **`lcLoadList` 多了第三個查詢 `access=eq.all`**。這一份會送到每個人的瀏覽器，
+  但那正是 `access='all'` 的定義。**邀請制的場次仍然在資料庫端就被前兩個查詢過濾掉**，
+  權限沒有變寬 —— 不要「順手簡化」成撈全部再前端隱藏。
+- **公開場次仍可挑參與人**：那時候「參與人」的作用是**發邀請通知**（把人叫進來），
+  不是決定誰進得去。提示文字（`lc_acc_all_hint`）必須講清楚，否則會以為選了公開就不必挑人。
+- 🔴 **「這裡的規則」那四條跟著改了**（第 1、2 條）。那不是文案，是使用者要不要在裡面
+  講真話的依據 —— 以前寫「全員可參與／只有參與人可開啟」，現在兩者都成立要看場次設定。
+
+#### 在線名單 `chat_presence`
+
+- 🔴 **一列一人，主鍵 `(session_id, emp_id)`。不要塞成 `chat_sessions` 的 jsonb map** ——
+  那會變成「讀出整份 → 改一個鍵 → 寫回整份」，房裡五個人同時心跳就互相蓋掉（lost update）。
+- 🔴 **不能用 `SB.upsert`**：它的第三個參數是**單一**主鍵欄位，傳 `'session_id'` 會
+  PATCH 掉這個房間的**每一列** —— 等於把全房間的人都改成自己的名字。
+  `lcBeat()` 自己走「兩個條件的 PATCH → 沒有符合的列才 POST」。
+- 🔴 **沒有「離開」事件可以信任**：關分頁、切分頁、斷網、瀏覽器當掉都不會通知我們。
+  所以在線與否**一律由 `last_at` 的新舊決定**（`LC_ONLINE_MS`），
+  **不做「離開時刪掉自己那一列」** —— 那條路在最常見的情況下不會執行，
+  結果是名單上永遠掛著一堆早就走了的人。
+- **三個頻率刻意不同**：訊息輪詢 3 秒（要即時）、心跳 `LC_HB_MS` 30 秒、
+  重讀名單 `LC_WHO_MS` 15 秒，後兩者在 `lcPoll` 裡各自節流。
+  房裡 5 個人若跟著 3 秒跑，等於每分鐘上百次寫入，而 sb-proxy 併發上限的坑已記載過。
+  `LC_ONLINE_MS`（95 秒）給到心跳的三倍，漏掉一次心跳不會讓人從名單上閃掉。
+- **sb-proxy 把寫入的 `emp_id` 強制改寫成簽章裡的身分**（不是拒絕）：
+  這張表任何人都要寫得（每個人得報告自己在線），唯一需要擋的是「幫別人報告在線」——
+  那會讓房裡出現一個其實不在的人，而在線名單存在的意義就是「誰真的在」。
+  `chat_presence` 刻意**不建任何 RLS policy**（存取一律經 sb-proxy），並隨場次 cascade 刪除。
+- 名單分三區：在房間裡／剛剛離開（幾分鐘前）／已邀請但還沒進來。
+  第三區的人名從 `umActiveUsers()` 補（presence 表裡沒有他們）。
+  已結束的場次也讀 —— 那份名單是「當時誰在」的紀錄。
+
 ### 邀請通知：大卡片 ＋ 點進去就是房間（v1.94，無 migration）
 
 被邀請的人一進 Portal 就會在畫面正上方看到一張**大卡片**（💬 ＋ 邀請人 ＋ 主題 ＋「進入對話室 ›」），

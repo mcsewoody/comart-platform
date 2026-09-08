@@ -103,7 +103,7 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 
 | File | Version | Purpose | ~Lines |
 |------|---------|---------|--------|
-| `index.html` | v1.97 | Main portal — login, home, directory, bulletin, calendar, AI tools | 4,394 |
+| `index.html` | v1.98 | Main portal — login, home, directory, bulletin, calendar, AI tools | 4,394 |
 | `admin/index.html` | v2.40 | Admin System — room booking, fleet, visitor, library, lottery | 5,650 |
 | `kms/index.html` | v2.36 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
 | `quotation/index.html` | v3.60 | Quotation & CRM system | 7,332 |
@@ -579,8 +579,29 @@ Portal AI 功能區的第二個頁籤（`💬 線上對話`，在翻譯旁邊）
 - 🔴 **`lcLoadList` 多了第三個查詢 `access=eq.all`**。這一份會送到每個人的瀏覽器，
   但那正是 `access='all'` 的定義。**邀請制的場次仍然在資料庫端就被前兩個查詢過濾掉**，
   權限沒有變寬 —— 不要「順手簡化」成撈全部再前端隱藏。
-- **公開場次仍可挑參與人**：那時候「參與人」的作用是**發邀請通知**（把人叫進來），
-  不是決定誰進得去。提示文字（`lc_acc_all_hint`）必須講清楚，否則會以為選了公開就不必挑人。
+- 🔴 **公開場次不挑人、不發任何通知**（使用者 2026-09-08 定案）。
+  選了公開就把「＋ 參與人」鈕收起來並清掉已選的人，`members` 一律寫 `[]` ——
+  留著一顆按不出效果的鈕，只會讓人以為「挑了就會通知」；留著半份名單則會讓
+  「日後誰讀得到」變成兩套規則。房間裡的「＋ 邀請」也換成「🔗 複製連結」。
+- 🔴 **連結不是通行證，只是直達的指標**（`lcCopyLink`，v1.98）。
+  進得去是因為場次是公開的（`lcCanSee` 判斷 `access`），不是因為手上有連結 ——
+  所以**邀請制的場次刻意不給這顆鈕**：把連結給沒受邀的人，他照樣打不開，
+  只會讓雙方都困惑。連結是 `?lc=<場次id>`，不含任何身分資訊，轉發不會外洩 session。
+  目前只給發起人（使用者指定）；要開放給房裡所有人只是改一個條件。
+- 🔴 **公開場次結束後，只有「真的進來過」的人讀得到**（使用者 2026-09-08 定案）。
+  事實來源是 `chat_presence` 裡有沒有我的列（`lcVisited` / `lcLoadVisited()`），
+  不是「當時進得去」—— 沒進來的人不該事後翻閱別人談過的內容。
+  `lcCanSee` 因此對公開場次分兩段：`status==='open'` 全員可進入；已結束則查 `lcVisited`。
+  ⚠️ **`lcOpen` 必須先 `await lcLoadVisited()`**：從 `?lc=` 深層連結進來時清單還沒載過，
+  `lcVisited` 是 `null`，已結束的公開場次會被誤判成「沒進來過」。
+- 🔴 **這條規則在查詢層落實，不是撈回來再前端隱藏**：`fetchSet` 的第三個查詢
+  對「進行中」與「已結束」刻意不同 —— 進行中用 `access=eq.all`（全員都該看得到才進得去），
+  已結束改用 `id=in.(<我進過的場次>)`。沒進來的人連標題都不會送到他的瀏覽器。
+  那串 id 上限 200：`id=in.(...)` 是塞進網址的，太長會 414 而 `SB.get` 只回 `null`，
+  使用者的「已保留」清單會整個消失。
+- ⚠️ **讀取層仍是前端判斷**（同 premortem 與 chat 既有的取捨）：直接對 sb-proxy 要
+  `chat_messages?session_id=eq.<id>` 的人，前端這道規則擋不住。要變成真正的牆得讓
+  sb-proxy 對 `chat_messages` 的讀取比對 `chat_presence`。目前刻意不做。
 - 🔴 **「這裡的規則」那四條跟著改了**（第 1、2 條）。那不是文案，是使用者要不要在裡面
   講真話的依據 —— 以前寫「全員可參與／只有參與人可開啟」，現在兩者都成立要看場次設定。
 

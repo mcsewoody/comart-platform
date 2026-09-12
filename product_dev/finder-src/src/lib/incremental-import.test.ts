@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   dedupeByDatasetHash,
+  isSignedTusAuthError,
   isTransientUploadStatus,
   quickUploadRelativePath,
   reusableManifestHash,
@@ -74,6 +75,12 @@ describe("incremental import", () => {
   it("uses resumable upload for files larger than the recommended 6 MB boundary", () => {
     expect(shouldUseResumableUpload(6 * 1024 * 1024)).toBe(false);
     expect(shouldUseResumableUpload(6 * 1024 * 1024 + 1)).toBe(true);
+  });
+
+  it("recognizes the Supabase signed TUS authorization failure for standard-upload fallback", () => {
+    expect(isSignedTusAuthError(new Error("Invalid Compact JWS"))).toBe(true);
+    expect(isSignedTusAuthError(new Error("AccessDenied: Unauthorized"))).toBe(true);
+    expect(isSignedTusAuthError(new Error("network timeout"))).toBe(false);
   });
 
   it("separates missing local files from same-path content conflicts", () => {

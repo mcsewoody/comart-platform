@@ -1,5 +1,11 @@
 # COMART Product Finder 版本紀錄
 
+## v2.17 — 2026-09-12
+
+- 修復大於 6 MB 的檔案可能因 Supabase TUS signed token 回傳 `Invalid Compact JWS` 而無法上傳。
+- TUS 遇到明確的簽章授權錯誤時，自動改用同一份短效 signed URL 進行標準安全上傳；不公開 service-role key、不覆寫既有物件，SHA-256 去重與完成後建索引流程維持不變。
+- 以 Supabase 實際端點驗證：同一短效簽章在 TUS 回傳 400／403，但標準 signed upload 成功；測試物件已立即清除。
+
 ## v2.16 — 2026-09-04
 
 - 永久移除舊版 CPF 的 28 個 `cpf_` 資料表、2 個 views、33 個 functions、9 個 enum types，以及所有舊 Storage policies。

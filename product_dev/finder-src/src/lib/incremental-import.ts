@@ -75,6 +75,12 @@ export function isTransientUploadStatus(status: number) {
   return status === 408 || status === 425 || status === 429 || status >= 500;
 }
 
+export function isSignedTusAuthError(error: unknown) {
+  const message = error instanceof Error ? error.message : String(error || "");
+  return /Invalid Compact JWS|InvalidUploadSignature/i.test(message) ||
+    (/AccessDenied/i.test(message) && /Unauthorized/i.test(message));
+}
+
 export function quickUploadRelativePath(dataset: PdDataset, subpath: string, fileName: string) {
   const parts = subpath.replaceAll("\\", "/").split("/").map((part) => part.trim()).filter(Boolean);
   if (!parts.length || parts.some((part) => part === "." || part === ".." || part.includes("\0"))) {

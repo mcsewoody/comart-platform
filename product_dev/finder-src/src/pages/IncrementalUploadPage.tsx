@@ -10,6 +10,7 @@ import {
   dedupeByDatasetHash,
   compareSyncManifest,
   importFileKey,
+  isSignedTusAuthError,
   isTransientUploadStatus,
   manifestFileKey,
   quickUploadRelativePath,
@@ -746,8 +747,13 @@ async function uploadOne(item: ImportFile, onStatus: (status: string) => void): 
     if (shouldUseResumableUpload(item.file.size)) {
       if (!init.signedToken) throw new Error("未取得大檔續傳授權");
       onStatus("大檔續傳準備中…");
-      await uploadResumable(item, storagePath, init.signedToken, onStatus);
-      break;
+      try {
+        await uploadResumable(item, storagePath, init.signedToken, onStatus);
+        break;
+      } catch (error) {
+        if (!isSignedTusAuthError(error)) throw error;
+        onStatus("續傳授權失效，改用標準安全上傳…");
+      }
     }
 
     const form = new FormData();

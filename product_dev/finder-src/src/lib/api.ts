@@ -144,6 +144,10 @@ export const api = {
     return platformCall<{ ok: boolean }>("updateDocument", { dataset, id, patch });
   },
 
+  async deletePdDocument(dataset: PdDataset, id: string) {
+    return platformCall<{ ok: boolean; relativePath: string }>("deleteDocument", { dataset, id });
+  },
+
   async initPdUpload(payload: {
     dataset: PdDataset;
     relativePath: string;

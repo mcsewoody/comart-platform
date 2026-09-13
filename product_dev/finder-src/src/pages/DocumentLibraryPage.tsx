@@ -118,7 +118,12 @@ export function DocumentLibraryPage({ dataset }: { dataset: PdDataset }) {
           <p className="mt-1 truncate text-xs text-slate-500">{item.relativePath}</p>
           <p className="mt-2 text-sm text-slate-400">{item.supplierName ? `廠商：${item.supplierName}` : item.sourceFactory ? `來源：${item.sourceFactory}` : item.pathLabels.join(" · ")}</p>
         </div>
-        <div className="text-left md:text-right"><p className="text-xs font-semibold text-cyan-300">{matchLabels[item.matchReason || ""] || "文件索引"}</p><p className="mt-2 text-xs text-slate-500">{formatBytes(item.byteSize)}</p></div>
+        <div className="text-left md:text-right">
+          <p className="text-xs font-semibold text-cyan-300">{matchLabels[item.matchReason || ""] || "文件索引"}</p>
+          <p className={`mt-2 text-xs ${["bom", "quotation"].includes(item.documentKind) ? "font-bold text-amber-300" : "text-slate-400"}`}>主要日期：{formatDocumentDate(item.primaryDocumentDate)}</p>
+          <p className="mt-1 text-xs text-slate-500">版本／版次：{item.revisionLabel || "未辨識"}</p>
+          <p className="mt-1 text-xs text-slate-500">{formatBytes(item.byteSize)}</p>
+        </div>
       </Card></Link>)}</section>}
   </>;
 }
@@ -126,4 +131,10 @@ export function DocumentLibraryPage({ dataset }: { dataset: PdDataset }) {
 function formatBytes(value: number) {
   if (value < 1024 * 1024) return `${Math.max(1, Math.round(value / 1024))} KB`;
   return `${(value / 1024 / 1024).toFixed(1)} MB`;
+}
+
+function formatDocumentDate(value: string | null) {
+  if (!value) return "待辨識";
+  const [year, month, day] = value.slice(0, 10).split("-");
+  return year && month && day ? `${year}/${month}/${day}` : value;
 }

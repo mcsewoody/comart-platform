@@ -282,6 +282,14 @@ export type PdAnalysisStatus =
   | "completed"
   | "failed";
 
+export type PdPrimaryDateType =
+  | "quotation_date"
+  | "issue_date"
+  | "revision_date"
+  | "creation_date"
+  | "filename_date"
+  | "manual";
+
 export interface PdDocumentSummary {
   id: string;
   dataset: PdDataset;
@@ -299,6 +307,13 @@ export interface PdDocumentSummary {
   analysisStatus: PdAnalysisStatus;
   thumbnailUrl: string | null;
   updatedAt: string;
+  primaryDocumentDate: string | null;
+  primaryDateType: PdPrimaryDateType | null;
+  primaryDateEvidence: string | null;
+  primaryDateLocation: string | null;
+  revisionLabel: string | null;
+  revisionEvidence: string | null;
+  revisionLocation: string | null;
   score?: number;
   matchReason?: string;
 }
@@ -317,6 +332,8 @@ export interface PdDocumentEdit {
   keywords: string[];
   summary: string;
   isReference: boolean;
+  primaryDocumentDate: string | null;
+  revisionLabel: string;
 }
 
 export interface PdSearchParams {

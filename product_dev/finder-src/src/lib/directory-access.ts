@@ -93,6 +93,24 @@ export async function writeFileWithoutOverwrite(
   return "written";
 }
 
+export async function deleteFileAtRelativePath(
+  root: StoredDirectoryHandle,
+  relativePath: string,
+): Promise<"deleted" | "missing"> {
+  const parts = safeRelativeParts(relativePath);
+  const fileName = parts.pop() as string;
+  let directory: FileSystemDirectoryHandle = root;
+  try {
+    for (const part of parts) directory = await directory.getDirectoryHandle(part);
+    await directory.getFileHandle(fileName);
+    await directory.removeEntry(fileName);
+    return "deleted";
+  } catch (error) {
+    if (error instanceof DOMException && error.name === "NotFoundError") return "missing";
+    throw error;
+  }
+}
+
 async function saveDirectoryHandle(handle: StoredDirectoryHandle) {
   await new Promise<void>((resolve, reject) => {
     const request = indexedDB.open(DATABASE, 1);

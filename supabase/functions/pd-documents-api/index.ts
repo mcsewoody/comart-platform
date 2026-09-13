@@ -205,6 +205,13 @@ function summary(row: Record<string, any>, dataset: Dataset, thumbnailUrl: strin
     analysisStatus: row.analysis_status,
     thumbnailUrl,
     updatedAt: row.updated_at,
+    primaryDocumentDate: row.primary_document_date || null,
+    primaryDateType: row.primary_date_type || null,
+    primaryDateEvidence: row.primary_date_evidence || null,
+    primaryDateLocation: row.primary_date_location || null,
+    revisionLabel: row.revision_label || null,
+    revisionEvidence: row.revision_evidence || null,
+    revisionLocation: row.revision_location || null,
   }
 }
 
@@ -451,6 +458,38 @@ serve(async (req) => {
     return json({ item: { ...summary(row, dataset, thumbnail.get(row.thumbnail_path) || null), sourceUrl, previewUrl, extractedText: row.extracted_text || "" } })
   }
 
+  if (action === "deleteDocument") {
+    if (sess.role !== "admin" || user.role !== "admin") return json({ error: "forbidden" }, 403)
+    const id = String(body.id || "")
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id)) {
+      return json({ error: "invalid_document_id" }, 400)
+    }
+    const { data: current, error: readError } = await sb.from(table).select("*").eq("id", id).maybeSingle()
+    if (readError) return json({ error: readError.message }, 500)
+    if (!current) return json({ error: "document_not_found" }, 404)
+
+    for (const [kind, path] of [
+      ["preview", current.preview_path], ["thumbnail", current.thumbnail_path], ["source", current.storage_path],
+    ] as Array<["source" | "preview" | "thumbnail", string | null]>) {
+      if (!path) continue
+      const { error } = await sb.storage.from(bucketFor(dataset, kind)).remove([path])
+      if (error) return json({ error: `storage_delete_failed:${kind}:${error.message}` }, 500)
+    }
+
+    const editDelete = await sb.from("pd_document_edits").delete().eq("dataset", dataset).eq("document_id", id)
+    if (editDelete.error) return json({ error: editDelete.error.message }, 500)
+    const transferDelete = await sb.from("pd_transfer_audit").delete().eq("dataset", dataset).eq("document_id", id)
+    if (transferDelete.error) return json({ error: transferDelete.error.message }, 500)
+    const { error: deleteError } = await sb.from(table).delete().eq("id", id)
+    if (deleteError) return json({ error: deleteError.message }, 500)
+    const { error: auditError } = await sb.from("pd_transfer_audit").insert({
+      emp_id: sess.empId, action: "delete", dataset, document_id: id,
+      relative_path: current.relative_path, sha256: current.sha256,
+    })
+    if (auditError) console.error("Document deletion audit failed", auditError)
+    return json({ ok: true, relativePath: current.relative_path })
+  }
+
   if (action === "updateDocument") {
     if (!uploadAllowed) return json({ error: "forbidden" }, 403)
     const id = String(body.id || "")
@@ -464,8 +503,11 @@ serve(async (req) => {
     const pathLabels = cleanTextList(patch.pathLabels, 20)
     const keywords = cleanTextList(patch.keywords, 30, 80)
     const summaryText = String(patch.summary || "").trim()
+    const primaryDocumentDate = patch.primaryDocumentDate ? String(patch.primaryDocumentDate) : null
+    const revisionLabel = String(patch.revisionLabel || "").trim()
     if (!title || title.length > 300 || !DOCUMENT_KINDS[dataset].has(documentKind) ||
-        sourceParty.length > 200 || pathLabels === null || keywords === null || summaryText.length > 2000) {
+        sourceParty.length > 200 || pathLabels === null || keywords === null || summaryText.length > 2000 ||
+        (primaryDocumentDate !== null && !/^\d{4}-\d{2}-\d{2}$/.test(primaryDocumentDate)) || revisionLabel.length > 100) {
       return json({ error: "invalid_document_patch" }, 400)
     }
     const { data: current, error: readError } = await sb.from(table).select("*").eq("id", id).maybeSingle()
@@ -477,10 +519,17 @@ serve(async (req) => {
       keywords,
       summary_zh_tw: summaryText,
       is_reference: Boolean(patch.isReference),
+      primary_document_date: primaryDocumentDate,
+      primary_date_type: primaryDocumentDate ? "manual" : null,
+      primary_date_evidence: primaryDocumentDate ? `人工設定：${sess.empId}` : null,
+      primary_date_location: null,
+      revision_label: revisionLabel || null,
+      revision_evidence: revisionLabel ? `人工設定：${sess.empId}` : null,
+      revision_location: null,
       updated_at: new Date().toISOString(),
       search_text: [
         title, current.relative_path, sourceParty, ...pathLabels, ...keywords,
-        summaryText, String(current.extracted_text || "").slice(0, 300000),
+        summaryText, primaryDocumentDate, revisionLabel, String(current.extracted_text || "").slice(0, 300000),
       ].filter(Boolean).join(" "),
     }
     if (dataset === "mfg") {
@@ -499,8 +548,10 @@ serve(async (req) => {
       keywords: current.keywords || [],
       summary: current.summary_zh_tw || "",
       isReference: Boolean(current.is_reference),
+      primaryDocumentDate: current.primary_document_date || null,
+      revisionLabel: current.revision_label || "",
     }
-    const afterData = { title, documentKind, sourceParty, pathLabels, keywords, summary: summaryText, isReference: Boolean(patch.isReference) }
+    const afterData = { title, documentKind, sourceParty, pathLabels, keywords, summary: summaryText, isReference: Boolean(patch.isReference), primaryDocumentDate, revisionLabel }
     const { error: updateError } = await sb.from(table).update(update).eq("id", id)
     if (updateError) return json({ error: updateError.message }, 500)
     const { error: auditError } = await sb.from("pd_document_edits").insert({

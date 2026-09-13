@@ -41,8 +41,9 @@ def analyze(proxy_url: str, key: str, dataset: str, row: dict, extracted) -> tup
     processing_date = date.today().isoformat()
     system = (
         "你是 COMART 內部文件索引員。只分析整份文件，不建立產品主檔，不拆分圖片。"
-        "根據檔名、目錄、可讀文字與頁面影像，輸出 5 到 15 個具搜尋價值的繁中或原文關鍵字、"
-        "一段 80 字內繁中摘要與文件類型。型號、品牌、廠商原名不得翻譯或猜測。"
+        "根據檔名、目錄、可讀文字與頁面影像，輸出 12 到 28 個具搜尋價值的關鍵字。"
+        "每個明確產品概念都要盡可能同時提供繁體中文、簡體中文、英文、越南文的常用搜尋名稱；"
+        "一段 80 字內繁中摘要與文件類型。型號、品牌、廠商原名只保留原文，不得翻譯或猜測。"
         "目錄是自製或外購分類的權威，不得更改來源工廠或廠商。"
         "另從文件內容選出一個主要文件日期與版本／版次，並逐項提供短證據及頁碼或工作表位置。"
         "報價單日期優先順序：報價日期、發行日期、修訂日期、製作日期；"
@@ -64,7 +65,7 @@ def analyze(proxy_url: str, key: str, dataset: str, row: dict, extracted) -> tup
         "type": "object",
         "additionalProperties": False,
         "properties": {
-            "keywords": {"type": "array", "items": {"type": "string"}, "minItems": 5, "maxItems": 15},
+            "keywords": {"type": "array", "items": {"type": "string"}, "minItems": 12, "maxItems": 28},
             "summary_zh_tw": {"type": "string"},
             "document_kind": {"type": "string", "enum": KINDS[dataset]},
             "primary_document_date": {"type": ["string", "null"]},

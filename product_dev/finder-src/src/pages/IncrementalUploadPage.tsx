@@ -373,7 +373,12 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
         updateQuickStatus(index, `失敗：${reason instanceof Error ? reason.message : "未知錯誤"}`);
       }
     }
-    setQuickMessage(`快速上傳完成：新增 ${completed}、重複略過 ${duplicates}、失敗 ${failed}；不會自動執行 AI。`);
+    setQuickMessage(`手動上傳完成：新增 ${completed}、重複略過 ${duplicates}、失敗 ${failed}；不會自動執行 AI。`);
+    if (failed === 0) {
+      setQuickFiles([]);
+      setQuickStatuses([]);
+      if (quickInputRef.current) quickInputRef.current.value = "";
+    }
     setQuickRunning(false);
   }
 

@@ -194,31 +194,32 @@ serve(async req => {
   if (action === "list") {
     const query = text(body.query, 200)
     const aliasGroups = [
-      ["蘋果手機","苹果手机","iphone","apple phone"],
-      ["手機","手机","phone","smartphone","mobile phone"],
-      ["手錶","手表","watch","smartwatch"],
-      ["耳機","耳机","earphone","earphones","earbuds","headphone","headphones"],
-      ["眼鏡","眼镜","glasses","smart glasses"],
-      ["喇叭","音箱","speaker","speakers"],
-      ["平板","平板电脑","tablet","ipad"],
-      ["筆電","笔记本","筆記型電腦","laptop","notebook"],
-      ["桌機","台式机","桌上型電腦","desktop"],
-      ["配件","附件","accessory","accessories"],
+      { code: "", terms: ["蘋果手機","苹果手机","iphone","apple phone"] },
+      { code: "P", terms: ["手機","手机","phone","smartphone","mobile phone"] },
+      { code: "W", terms: ["手錶","手表","watch","smartwatch"] },
+      { code: "E", terms: ["耳機","耳机","earphone","earphones","earbuds","headphone","headphones"] },
+      { code: "G", terms: ["眼鏡","眼镜","glasses","smart glasses"] },
+      { code: "S", terms: ["喇叭","音箱","speaker","speakers"] },
+      { code: "T", terms: ["平板","平板电脑","tablet","ipad"] },
+      { code: "N", terms: ["筆電","笔记本","筆記型電腦","laptop","notebook"] },
+      { code: "D", terms: ["桌機","台式机","桌上型電腦","desktop"] },
+      { code: "X", terms: ["配件","附件","accessory","accessories"] },
     ]
     const normalized = query.toLowerCase().trim()
-    const group = aliasGroups.find(g => g.some(x => x.toLowerCase() === normalized)) || []
-    const expanded = [...new Set([query, ...group])].filter(Boolean)
+    const group = aliasGroups.find(g => g.terms.some(x => x.toLowerCase() === normalized))
+    const expanded = [...new Set([query, ...(group?.terms || [])])].filter(Boolean)
+    const effectiveType = text(body.typeCode, 1) || group?.code || ""
     const limit = Math.min(Math.max(Number(body.limit) || 30, 1), 100)
     const offset = Math.max(Number(body.offset) || 0, 0)
     let ids: string[] = []; let total = 0
     if (expanded.length <= 1) {
-      const { data, error } = await sb.rpc("pd_device_search", { p_query: query, p_type: text(body.typeCode, 1), p_status: text(body.status, 30), p_owner: text(body.owner, 100), p_include_retired: Boolean(body.includeRetired), p_limit: limit, p_offset: offset })
+      const { data, error } = await sb.rpc("pd_device_search", { p_query: query, p_type: effectiveType, p_status: text(body.status, 30), p_owner: text(body.owner, 100), p_include_retired: Boolean(body.includeRetired), p_limit: limit, p_offset: offset })
       if (error) return json({ error: error.message }, 500)
       ids = (data || []).map((x: any) => x.asset_id); total = Number(data?.[0]?.total_count || 0)
     } else {
       const all = new Map<string, number>()
       for (const q of expanded) {
-        const { data } = await sb.rpc("pd_device_search", { p_query: q, p_type: text(body.typeCode, 1), p_status: text(body.status, 30), p_owner: text(body.owner, 100), p_include_retired: Boolean(body.includeRetired), p_limit: 100, p_offset: 0 })
+        const { data } = await sb.rpc("pd_device_search", { p_query: q, p_type: effectiveType, p_status: text(body.status, 30), p_owner: text(body.owner, 100), p_include_retired: Boolean(body.includeRetired), p_limit: 100, p_offset: 0 })
         for (const x of data || []) all.set(x.asset_id, Math.max(all.get(x.asset_id) || 0, Number(x.score || 0)))
       }
       const ranked = [...all.entries()].sort((a,b) => b[1]-a[1]); total = ranked.length; ids = ranked.slice(offset, offset+limit).map(x => x[0])

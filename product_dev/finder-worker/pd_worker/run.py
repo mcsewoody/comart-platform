@@ -5,6 +5,7 @@ import base64
 import hashlib
 import mimetypes
 import os
+import re
 import socket
 import tempfile
 import traceback
@@ -37,6 +38,7 @@ def image_content(path: str) -> dict[str, str]:
 
 
 def analyze(proxy_url: str, key: str, dataset: str, row: dict, extracted) -> tuple[dict, dict]:
+    processing_date = date.today().isoformat()
     system = (
         "你是 COMART 內部文件索引員。只分析整份文件，不建立產品主檔，不拆分圖片。"
         "根據檔名、目錄、可讀文字與頁面影像，輸出 5 到 15 個具搜尋價值的繁中或原文關鍵字、"
@@ -46,6 +48,8 @@ def analyze(proxy_url: str, key: str, dataset: str, row: dict, extracted) -> tup
         "報價單日期優先順序：報價日期、發行日期、修訂日期、製作日期；"
         "BOM 優先順序：發行日期、修訂日期、製作日期；其他文件優先選發行日期、修訂日期、製作日期。"
         "內容沒有明確日期時才可使用檔名中的日期，並標記 filename_date；不得使用檔案修改日或上傳日。"
+        f"本次處理日期是 {processing_date}；不得把本次處理日期、Office 轉檔日期、列印日期、"
+        "頁首頁尾的動態日期，或 Excel TODAY()/NOW() 公式結果當成原始文件日期。"
         "日期必須輸出 YYYY-MM-DD；沒有可靠證據時，日期、類型、版本與相應證據全部輸出 null。"
     )
     content: list[dict[str, str]] = [{
@@ -114,6 +118,50 @@ def clean_optional_text(value: object, limit: int) -> str | None:
     return cleaned[:limit] or None
 
 
+def filename_document_date(relative_path: str) -> str | None:
+    stem = Path(relative_path).stem
+    patterns = (
+        r"(?<!\d)(20\d{2})[._-](\d{1,2})[._-](\d{1,2})(?!\d)",
+        r"(?<!\d)(20\d{2})(\d{2})(\d{2})(?!\d)",
+    )
+    for pattern in patterns:
+        match = re.search(pattern, stem)
+        if not match:
+            continue
+        try:
+            return date(*(int(part) for part in match.groups())).isoformat()
+        except ValueError:
+            continue
+    return None
+
+
+def resolve_document_date(result: dict, relative_path: str, processing_date: date | None = None) -> tuple[str | None, str | None, str | None, str | None]:
+    today = (processing_date or date.today()).isoformat()
+    ai_date = normalize_document_date(result.get("primary_document_date"))
+    ai_type = result.get("primary_date_type") if ai_date else None
+    allowed_types = {"quotation_date", "issue_date", "revision_date", "creation_date", "filename_date"}
+    if ai_type not in allowed_types:
+        ai_date = None
+        ai_type = None
+
+    filename_date = filename_document_date(relative_path)
+    evidence = clean_optional_text(result.get("primary_date_evidence"), 500)
+    location = clean_optional_text(result.get("primary_date_location"), 200)
+    evidence_text = f"{evidence or ''} {location or ''}".lower()
+    dynamic_markers = (
+        "today()", "now()", "current date", "processing date", "print date", "printed",
+        "轉檔", "转换", "生成日期", "列印日期", "打印日期", "本次處理", "當前日期", "当前日期",
+    )
+    dynamic_date = any(marker in evidence_text for marker in dynamic_markers)
+    conflicts_with_processing_date = bool(filename_date and filename_date != today and ai_date == today)
+
+    if ai_date and not dynamic_date and not conflicts_with_processing_date:
+        return ai_date, ai_type, evidence, location
+    if filename_date:
+        return filename_date, "filename_date", f"檔名日期：{Path(relative_path).name}", "檔名"
+    return None, None, None, None
+
+
 def upload_artifact(client, bucket: str, object_path: str, local_path: str, content_type: str) -> None:
     with Path(local_path).open("rb") as handle:
         client.storage.from_(bucket).upload(
@@ -146,13 +194,9 @@ def process(client, dataset: str, job: dict, worker_id: str, proxy_url: str, key
                 upload_artifact(client, f"{prefix}_thumbnail", thumbnail_path, extracted.thumbnail, "image/jpeg")
 
             result, usage = analyze(proxy_url, key, dataset, row, extracted)
-            primary_date = normalize_document_date(result.get("primary_document_date"))
-            primary_date_type = result.get("primary_date_type") if primary_date else None
-            if primary_date_type not in {
-                "quotation_date", "issue_date", "revision_date", "creation_date", "filename_date"
-            }:
-                primary_date_type = None
-                primary_date = None
+            primary_date, primary_date_type, primary_date_evidence, primary_date_location = resolve_document_date(
+                result, row["relative_path"]
+            )
             path_context = " ".join([
                 row["title"], row["relative_path"], row.get("source_factory") or "",
                 row.get("supplier_name") or "", " ".join(row.get("category_path") or []),
@@ -168,8 +212,8 @@ def process(client, dataset: str, job: dict, worker_id: str, proxy_url: str, key
                 "document_kind": result["document_kind"],
                 "primary_document_date": primary_date,
                 "primary_date_type": primary_date_type,
-                "primary_date_evidence": clean_optional_text(result.get("primary_date_evidence"), 500) if primary_date else None,
-                "primary_date_location": clean_optional_text(result.get("primary_date_location"), 200) if primary_date else None,
+                "primary_date_evidence": primary_date_evidence,
+                "primary_date_location": primary_date_location,
                 "revision_label": clean_optional_text(result.get("revision_label"), 100),
                 "revision_evidence": clean_optional_text(result.get("revision_evidence"), 500),
                 "revision_location": clean_optional_text(result.get("revision_location"), 200),

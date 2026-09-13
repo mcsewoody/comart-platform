@@ -41,11 +41,20 @@ type ImportFile = {
 type Inventory = {
   total: number;
   eligible: number;
+  unique: number;
   indexed: number;
   pending: number;
   folderDuplicates: number;
-  unsupported: number;
+  skipped: SkippedFile[];
   reusedHashes: number;
+};
+
+type SkipReason = "outside_dataset" | "empty" | "excluded" | "oversized" | "archive" | "unsupported";
+
+type SkippedFile = {
+  relativePath: string;
+  byteSize: number;
+  reason: SkipReason;
 };
 
 type Phase = "idle" | "inventory" | "ready" | "uploading" | "finished";
@@ -54,7 +63,16 @@ const ALLOWED = new Set([
   "jpg", "jpeg", "png", "pdf", "ppt", "pptx", "xls", "xlsx", "doc", "docx",
   "stp", "step", "dwg", "dxf", "iges", "igs", "mp4", "mov",
 ]);
-const MAX_FILE_BYTES = 100 * 1024 * 1024;
+const MAX_FILE_BYTES = 50 * 1024 * 1024;
+const ARCHIVE_EXTENSIONS = new Set(["zip", "7z", "rar"]);
+const SKIP_REASON_LABELS: Record<SkipReason, string> = {
+  outside_dataset: "非產品目錄",
+  empty: "空檔案",
+  excluded: "系統／排除檔",
+  oversized: "超過 50 MB",
+  archive: "壓縮檔",
+  unsupported: "不支援格式",
+};
 const BATCH_SIZE = 200;
 const HASH_QUERY_SIZE = 100;
 const QUICK_UPLOAD_LIMIT = 10;
@@ -126,11 +144,17 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
     setProgress(0);
 
     const selectedFiles = Array.from(selected);
+    const skipped: SkippedFile[] = [];
     const candidates = selectedFiles.flatMap((file) => {
       const relativePath = (file.webkitRelativePath || file.name).replaceAll("\\", "/");
       const dataset = datasetFor(relativePath);
       const extension = ext(file.name);
-      if (!dataset || !ALLOWED.has(extension) || file.size <= 0 || file.size > MAX_FILE_BYTES || excludedName(file.name)) return [];
+      const reason = skippedReason(file, dataset, extension);
+      if (reason) {
+        skipped.push({ relativePath, byteSize: file.size, reason });
+        return [];
+      }
+      if (!dataset) return [];
       return [{ file, dataset, relativePath, sha256: "", status: "待上傳" } satisfies ImportFile];
     }).sort((a, b) => a.relativePath.localeCompare(b.relativePath));
 
@@ -169,10 +193,11 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
       setInventory({
         total: selectedFiles.length,
         eligible: hashed.length,
+        unique: deduped.unique.length,
         indexed: existing.size,
         pending: pending.length,
         folderDuplicates: deduped.duplicates,
-        unsupported: selectedFiles.length - candidates.length,
+        skipped,
         reusedHashes,
       });
       setPendingFiles(pending);
@@ -376,6 +401,21 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
     inputRef.current.click();
   }
 
+  function downloadSkippedReport() {
+    if (!inventory?.skipped.length) return;
+    const rows = [
+      ["略過原因", "檔案大小", "相對路徑"],
+      ...inventory.skipped.map((item) => [SKIP_REASON_LABELS[item.reason], formatBytes(item.byteSize), item.relativePath]),
+    ];
+    const csv = `\uFEFF${rows.map((row) => row.map(csvCell).join(",")).join("\r\n")}`;
+    const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = `product-finder-skipped-${new Date().toISOString().slice(0, 10)}.csv`;
+    anchor.click();
+    URL.revokeObjectURL(url);
+  }
+
   function updateStatus(index: number, status: string) {
     setFiles((current) => current.map((item, itemIndex) => itemIndex === index ? { ...item, status } : item));
   }
@@ -419,11 +459,22 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
       {directoryHandle && supportsDirectoryAccess() && <div className="mt-3 text-right"><Button variant="ghost" disabled={running} onClick={() => void setOrScanDefaultDirectory(true)}><FolderOpen size={17} />更換預設目錄</Button></div>}
       {inventory && <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-6" aria-label="資料夾盤點結果">
         <Metric label="資料夾檔案" value={inventory.total} />
-        <Metric label="可用檔案" value={inventory.eligible} tone="cyan" />
-        <Metric label="已匯入" value={inventory.indexed} tone="green" />
+        <Metric label="符合格式" value={inventory.eligible} tone="cyan" />
+        <Metric label="唯一檔案" value={inventory.unique} tone="cyan" />
+        <Metric label="雲端已有相同內容" value={inventory.indexed} tone="green" />
         <Metric label="待匯入" value={inventory.pending} tone="amber" />
         <Metric label="資料夾內重複" value={inventory.folderDuplicates} />
-        <Metric label="不支援／過大" value={inventory.unsupported} />
+      </div>}
+      {inventory && inventory.skipped.length > 0 && <div className="mt-3 rounded-xl border border-slate-700 bg-slate-950/35 p-4" aria-label="未納入匯入明細">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-sm font-black text-slate-200">未納入匯入 {inventory.skipped.length} 份</p>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {skipReasonSummary(inventory.skipped).map(([reason, count]) => <Badge key={reason}>{SKIP_REASON_LABELS[reason]} {count}</Badge>)}
+            </div>
+          </div>
+          <Button variant="ghost" onClick={downloadSkippedReport}><Download size={17} />下載略過清單</Button>
+        </div>
       </div>}
 
       {files.length > 0 && <>
@@ -779,7 +830,7 @@ async function uploadOne(item: ImportFile, onStatus: (status: string) => void): 
     const responseText = response.ok ? "" : await response.text();
     if (response.ok || /resource already exists/i.test(responseText)) break;
 
-    lastError = new Error(`Storage 上傳失敗 (${response.status})`);
+    lastError = storageUploadError(item.file, response.status, responseText);
     if (!isTransientUploadStatus(response.status) || attempt === 3) throw lastError;
 
     onStatus(`Storage 暫時失敗，第 ${attempt + 1} 次重試…`);
@@ -894,6 +945,48 @@ function datasetFor(relativePath: string): PdDataset | null {
 
 function excludedName(name: string) {
   return name === ".DS_Store" || /\.log(?:\.\d+)?$|\.bak$|名片|business\s*card/i.test(name);
+}
+
+function skippedReason(file: File, dataset: PdDataset | null, extension: string): SkipReason | null {
+  if (!dataset) return "outside_dataset";
+  if (file.size <= 0) return "empty";
+  if (excludedName(file.name)) return "excluded";
+  if (file.size > MAX_FILE_BYTES) return "oversized";
+  if (ARCHIVE_EXTENSIONS.has(extension)) return "archive";
+  if (!ALLOWED.has(extension)) return "unsupported";
+  return null;
+}
+
+function skipReasonSummary(files: SkippedFile[]) {
+  const counts = new Map<SkipReason, number>();
+  files.forEach((file) => counts.set(file.reason, (counts.get(file.reason) || 0) + 1));
+  return [...counts.entries()];
+}
+
+function storageUploadError(file: File, status: number, responseText: string) {
+  const detail = storageErrorDetail(responseText);
+  if (status === 413 || /EntityTooLarge|maximum allowed size|exceeded.*size/i.test(responseText)) {
+    return new Error(`檔案 ${formatBytes(file.size)} 超過 Product Finder 的 50 MB 上傳上限。`);
+  }
+  return new Error(`Storage 上傳失敗 (${status})${detail ? `：${detail}` : ""}`);
+}
+
+function storageErrorDetail(responseText: string) {
+  let value: unknown = responseText;
+  for (let depth = 0; depth < 3; depth += 1) {
+    if (typeof value !== "string") break;
+    try { value = JSON.parse(value); } catch { break; }
+  }
+  if (value && typeof value === "object") {
+    const record = value as Record<string, unknown>;
+    const message = record.message || record.error || record.code;
+    if (typeof message === "string") return message.slice(0, 240);
+  }
+  return typeof value === "string" ? value.replace(/\s+/g, " ").slice(0, 240) : "";
+}
+
+function csvCell(value: string) {
+  return `"${value.replaceAll('"', '""')}"`;
 }
 
 function ext(name: string) { return name.toLowerCase().split(".").pop() || ""; }

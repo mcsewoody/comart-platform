@@ -536,7 +536,7 @@ serve(async (req) => {
     if (actualDataset !== dataset || !ALLOWED_EXTENSIONS.has(extension)) {
       return json({ error: "unsupported_path_or_file" }, 400)
     }
-    if (byteSize <= 0 || byteSize > 524288000 || !/^[a-f0-9]{64}$/.test(sha256)) {
+    if (byteSize <= 0 || byteSize > 52428800 || !/^[a-f0-9]{64}$/.test(sha256)) {
       return json({ error: "invalid_file_metadata" }, 400)
     }
     const { data: existing } = await sb.from(table).select("id,title").eq("sha256", sha256).maybeSingle()
@@ -566,7 +566,7 @@ serve(async (req) => {
     const byteSize = Number(body.byteSize || 0)
     const expectedStoragePath = `${sha256.slice(0, 2)}/${sha256}/source.${extension}`
     if (!ALLOWED_EXTENSIONS.has(extension) || !/^[a-f0-9]{64}$/.test(sha256) ||
-        byteSize <= 0 || byteSize > 524288000 || storagePath !== expectedStoragePath) {
+        byteSize <= 0 || byteSize > 52428800 || storagePath !== expectedStoragePath) {
       return json({ error: "invalid_upload_completion" }, 400)
     }
     const classified = classify(dataset, relativePath, extension)

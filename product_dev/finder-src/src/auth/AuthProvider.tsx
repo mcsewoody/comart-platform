@@ -32,6 +32,7 @@ const demoProfile: Profile = {
   role: "admin",
   active: true,
   canUpload: true,
+  canSync: true,
 };
 
 export function AuthProvider({ children }: { children: ReactNode }) {

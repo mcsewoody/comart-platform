@@ -4,6 +4,7 @@ import { verifySession } from "../_shared/session.ts"
 import { namedSecretKey } from "../_shared/api-keys.ts"
 import { expandSearchQueries } from "./search-aliases.js"
 import { compareSearchResults } from "./search-ranking.js"
+import { resolveProductFinderAccess } from "./access-control.js"
 
 const CORS = {
   "Access-Control-Allow-Origin": "*",
@@ -34,12 +35,11 @@ function json(value: unknown, status = 200) {
   })
 }
 
-async function canUpload(sb: any, sess: Session) {
-  if (sess.role === "admin") return true
+async function productFinderAccess(sb: any, sess: Session) {
   const { data, error } = await sb.from("pd_uploaders")
-    .select("emp_id").eq("emp_id", sess.empId).eq("active", true).maybeSingle()
+    .select("emp_id,active,can_sync").eq("emp_id", sess.empId).maybeSingle()
   if (error) throw error
-  return Boolean(data)
+  return resolveProductFinderAccess(sess.role, data)
 }
 
 async function fetchSyncRows(sb: any, dataset: Dataset) {
@@ -242,8 +242,11 @@ serve(async (req) => {
   }
 
   let uploadAllowed = false
+  let syncAllowed = false
   try {
-    uploadAllowed = await canUpload(sb, sess)
+    const access = await productFinderAccess(sb, sess)
+    uploadAllowed = access.canUpload
+    syncAllowed = access.canSync
   } catch (error) {
     console.error("Product Finder uploader lookup failed", error)
     return json({ error: "uploader_access_unavailable" }, 500)
@@ -263,6 +266,7 @@ serve(async (req) => {
         role: sess.role === "admin" ? "admin" : sess.role === "dcc" ? "editor" : "viewer",
         active: true,
         canUpload: uploadAllowed,
+        canSync: syncAllowed,
       },
       counts: { mfg: mfg.count || 0, buy: buy.count || 0 },
       suppliers: [...new Set((suppliers.data || []).map((item: any) => item.supplier_name).filter(Boolean))],
@@ -323,35 +327,45 @@ serve(async (req) => {
     if (sess.role !== "admin") return json({ error: "forbidden" }, 403)
     const [users, allowed] = await Promise.all([
       sb.from("users").select("emp_id,name_en,name_zh,email,role,active").neq("role", "inactive").order("emp_id"),
-      sb.from("pd_uploaders").select("emp_id,active"),
+      sb.from("pd_uploaders").select("emp_id,active,can_sync"),
     ])
     if (users.error || allowed.error) return json({ error: (users.error || allowed.error).message }, 500)
-    const access = new Map((allowed.data || []).map((item: any) => [item.emp_id, Boolean(item.active)]))
+    const access = new Map((allowed.data || []).map((item: any) => [item.emp_id, item]))
     return json({ items: (users.data || []).filter((item: any) => item.active !== false).map((item: any) => ({
       id: item.emp_id,
       email: item.email || `${item.emp_id}@comart.com.tw`,
       displayName: item.name_zh || item.name_en || item.emp_id,
       platformRole: item.role,
-      allowed: item.role === "admin" || access.get(item.emp_id) === true,
+      uploadAllowed: item.role === "admin" || access.get(item.emp_id)?.active === true,
+      syncAllowed: access.get(item.emp_id)?.can_sync === true,
     })) })
   }
 
   if (action === "setUploader") {
     if (sess.role !== "admin") return json({ error: "forbidden" }, 403)
     const empId = String(body.empId || "").trim()
+    const permission = String(body.permission || "")
     const allowed = Boolean(body.allowed)
+    if (!new Set(["upload", "sync"]).has(permission)) return json({ error: "invalid_permission" }, 400)
     const { data: target } = await sb.from("users").select("emp_id,role,active").eq("emp_id", empId).maybeSingle()
     if (!target || target.active === false || target.role === "inactive") return json({ error: "invalid_uploader" }, 400)
-    if (target.role === "admin" && !allowed) return json({ error: "admin_upload_access_required" }, 400)
+    if (permission === "upload" && target.role === "admin" && !allowed) return json({ error: "admin_upload_access_required" }, 400)
+    const { data: current, error: accessError } = await sb.from("pd_uploaders")
+      .select("active,can_sync").eq("emp_id", empId).maybeSingle()
+    if (accessError) return json({ error: accessError.message }, 500)
     const { error } = await sb.from("pd_uploaders").upsert({
-      emp_id: empId, active: allowed, granted_by: sess.empId, updated_at: new Date().toISOString(),
+      emp_id: empId,
+      active: target.role === "admin" ? true : permission === "upload" ? allowed : current?.active === true,
+      can_sync: permission === "sync" ? allowed : current?.can_sync === true,
+      granted_by: sess.empId,
+      updated_at: new Date().toISOString(),
     }, { onConflict: "emp_id" })
     if (error) return json({ error: error.message }, 500)
     return json({ ok: true })
   }
 
   if (action === "syncManifest") {
-    if (!uploadAllowed) return json({ error: "forbidden" }, 403)
+    if (!syncAllowed) return json({ error: "sync_forbidden" }, 403)
     try {
       const [mfg, buy] = await Promise.all([fetchSyncRows(sb, "mfg"), fetchSyncRows(sb, "buy")])
       return json({ items: [
@@ -364,7 +378,7 @@ serve(async (req) => {
   }
 
   if (action === "syncUrls") {
-    if (!uploadAllowed) return json({ error: "forbidden" }, 403)
+    if (!syncAllowed) return json({ error: "sync_forbidden" }, 403)
     const requested = Array.isArray(body.items) ? body.items : []
     if (!requested.length || requested.length > 50) return json({ error: "invalid_sync_batch" }, 400)
     const items: any[] = []
@@ -572,7 +586,7 @@ serve(async (req) => {
   }
 
   if (action === "checkHashes") {
-    if (!uploadAllowed) return json({ error: "forbidden" }, 403)
+    if (!uploadAllowed && !syncAllowed) return json({ error: "forbidden" }, 403)
     const hashes = [...new Set(
       (Array.isArray(body.hashes) ? body.hashes : [])
         .map((value: unknown) => String(value).toLowerCase())

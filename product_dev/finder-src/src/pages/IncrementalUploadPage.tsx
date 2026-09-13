@@ -131,8 +131,9 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
     return () => window.clearInterval(timer);
   }, [mode, profile?.canUpload, refreshAnalysisStatus]);
 
-  if (!profile?.canUpload) {
-    return <Card className="p-8 text-center"><p className="font-black text-white">你尚未列入 Product Finder 上傳者名單</p></Card>;
+  const hasModeAccess = mode === "sync" ? profile?.canSync : profile?.canUpload;
+  if (!hasModeAccess) {
+    return <Card className="p-8 text-center"><p className="font-black text-white">{mode === "sync" ? "你尚未取得全庫補檔／下載權限" : "你尚未列入 Product Finder 上傳者名單"}</p></Card>;
   }
 
   async function choose(selected: FileList | File[] | null) {
@@ -628,12 +629,16 @@ export function UploaderAccessPage() {
 
   useEffect(() => { if (profile?.role === "admin") void load(); }, [load, profile?.role]);
 
-  async function toggle(item: PdUploader) {
+  async function toggle(item: PdUploader, permission: "upload" | "sync") {
+    const currentAllowed = permission === "upload" ? item.uploadAllowed : item.syncAllowed;
     setMessage(`正在更新 ${item.displayName}…`);
     try {
-      await api.setPdUploader(item.id, !item.allowed);
-      setItems((current) => current.map((value) => value.id === item.id ? { ...value, allowed: !value.allowed } : value));
-      setMessage(`${item.displayName} 的 Product Finder 上傳權限已更新。`);
+      await api.setPdUploader(item.id, permission, !currentAllowed);
+      setItems((current) => current.map((value) => value.id === item.id ? {
+        ...value,
+        [permission === "upload" ? "uploadAllowed" : "syncAllowed"]: !currentAllowed,
+      } : value));
+      setMessage(`${item.displayName} 的 ${permission === "upload" ? "上傳" : "全庫補檔／下載"} 權限已更新。`);
     } catch (reason) {
       setMessage(`更新失敗：${reason instanceof Error ? reason.message : "未知錯誤"}`);
     }
@@ -644,19 +649,19 @@ export function UploaderAccessPage() {
   }
 
   return <>
-    <PageHeader eyebrow="USERS" title="Users" description="管理 Product Finder 的上傳、批次匯入與補檔權限；不改變其他 Platform 子系統角色。" />
+    <PageHeader eyebrow="USERS" title="Users" description="上傳與全庫補檔／下載分開授權；不改變其他 Platform 子系統角色。" />
     <Link to="/upload" className="mb-5 inline-flex rounded-lg px-1 py-1 text-sm font-bold text-slate-400 hover:text-cyan-300">← 回到文件工具</Link>
     <Card className="p-5 md:p-6">
     <div className="flex items-start gap-3">
       <span className="rounded-xl bg-violet-950/50 p-3 text-violet-300"><ShieldCheck size={22} /></span>
-      <div><h2 className="text-lg font-black text-white">Users</h2><p className="mt-1 text-sm leading-6 text-slate-500">這是本系統專用白名單，不會改變同事在 KMS 或其他 Platform 子系統的角色。</p></div>
+      <div><h2 className="text-lg font-black text-white">Users</h2><p className="mt-1 text-sm leading-6 text-slate-500">「全庫補檔」可下載自製品與外購品全部原檔，請只授權給確實需要的同事。</p></div>
     </div>
     <div className="mt-5 overflow-hidden rounded-xl border border-slate-700">
-      {loading ? <p className="p-4 text-sm text-slate-400">讀取名單中…</p> : items.map((item) => <label key={item.id} className="flex cursor-pointer items-center gap-3 border-b border-slate-800 px-4 py-3 last:border-0 hover:bg-slate-800/50">
-        <input type="checkbox" checked={item.allowed} disabled={item.platformRole === "admin"} onChange={() => void toggle(item)} className="h-4 w-4 accent-cyan-400" />
-        <span className="min-w-0 flex-1"><span className="block truncate text-sm font-bold text-slate-200">{item.displayName}</span><span className="block truncate text-xs text-slate-500">{item.email} · {item.id}</span></span>
-        <Badge tone={item.allowed ? "success" : "neutral"}>{item.allowed ? "可上傳／補檔" : "只能搜尋"}</Badge>
-      </label>)}
+      {loading ? <p className="p-4 text-sm text-slate-400">讀取名單中…</p> : items.map((item) => <div key={item.id} className="grid gap-3 border-b border-slate-800 px-4 py-3 last:border-0 hover:bg-slate-800/50 md:grid-cols-[minmax(0,1fr)_150px_190px] md:items-center">
+        <span className="min-w-0"><span className="block truncate text-sm font-bold text-slate-200">{item.displayName}</span><span className="block truncate text-xs text-slate-500">{item.email} · {item.id}</span></span>
+        <label className="flex cursor-pointer items-center gap-2 text-sm font-semibold text-slate-300"><input type="checkbox" checked={item.uploadAllowed} disabled={item.platformRole === "admin"} onChange={() => void toggle(item, "upload")} className="h-4 w-4 accent-cyan-400" />上傳</label>
+        <label className="flex cursor-pointer items-center gap-2 text-sm font-semibold text-amber-300"><input type="checkbox" checked={item.syncAllowed} onChange={() => void toggle(item, "sync")} className="h-4 w-4 accent-amber-400" />全庫補檔／下載</label>
+      </div>)}
     </div>
     {message && <p role="status" className="mt-3 text-sm text-slate-400">{message}</p>}
   </Card></>;

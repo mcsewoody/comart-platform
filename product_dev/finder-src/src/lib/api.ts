@@ -199,8 +199,8 @@ export const api = {
     return platformCall<{ items: PdUploader[] }>("uploaders");
   },
 
-  async setPdUploader(empId: string, allowed: boolean) {
-    return platformCall<{ ok: boolean }>("setUploader", { empId, allowed });
+  async setPdUploader(empId: string, permission: "upload" | "sync", allowed: boolean) {
+    return platformCall<{ ok: boolean }>("setUploader", { empId, permission, allowed });
   },
   async getProfiles(): Promise<Profile[]> {
     if (appConfig.demoMode) {

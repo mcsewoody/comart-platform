@@ -28,6 +28,7 @@ export interface Profile {
   role: UserRole;
   active: boolean;
   canUpload?: boolean;
+  canSync?: boolean;
 }
 
 export interface Category {
@@ -372,5 +373,6 @@ export interface PdUploader {
   email: string;
   displayName: string;
   platformRole: string;
-  allowed: boolean;
+  uploadAllowed: boolean;
+  syncAllowed: boolean;
 }

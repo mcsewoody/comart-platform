@@ -307,6 +307,7 @@ export interface PdDocumentSummary {
   analysisStatus: PdAnalysisStatus;
   thumbnailUrl: string | null;
   updatedAt: string;
+  sourceModifiedAt: string | null;
   primaryDocumentDate: string | null;
   primaryDateType: PdPrimaryDateType | null;
   primaryDateEvidence: string | null;

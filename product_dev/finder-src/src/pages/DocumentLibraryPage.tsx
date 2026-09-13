@@ -28,7 +28,7 @@ const matchLabels: Record<string, string> = {
   path: "路徑命中",
   content: "文件內容命中",
   cross_language: "中英同義詞命中",
-  recent: "最近更新",
+  recent: "版本日期排序",
 };
 
 export function DocumentLibraryPage({ dataset }: { dataset: PdDataset }) {

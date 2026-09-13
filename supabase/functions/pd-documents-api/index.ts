@@ -3,6 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
 import { verifySession } from "../_shared/session.ts"
 import { namedSecretKey } from "../_shared/api-keys.ts"
 import { expandSearchQueries } from "./search-aliases.js"
+import { compareSearchResults } from "./search-ranking.js"
 
 const CORS = {
   "Access-Control-Allow-Origin": "*",
@@ -205,6 +206,7 @@ function summary(row: Record<string, any>, dataset: Dataset, thumbnailUrl: strin
     analysisStatus: row.analysis_status,
     thumbnailUrl,
     updatedAt: row.updated_at,
+    sourceModifiedAt: row.source_modified_at || null,
     primaryDocumentDate: row.primary_document_date || null,
     primaryDateType: row.primary_date_type || null,
     primaryDateEvidence: row.primary_date_evidence || null,
@@ -421,14 +423,22 @@ serve(async (req) => {
         }
       }
     }
-    const ranked = [...merged.values()].sort((a, b) => b.score - a.score).slice(0, 20)
-    const ids = ranked.map((item: any) => item.document_id)
+    const candidates = [...merged.values()]
+    const ids = candidates.map((item: any) => item.document_id)
     if (!ids.length) return json({ items: [], total: 0, elapsedMs: Math.round(performance.now() - started) })
     const { data: rows, error } = await sb.from(table).select("*").in("id", ids)
     if (error) return json({ error: error.message }, 500)
     const byId = new Map((rows || []).map((row: any) => [row.id, row]))
-    const thumbPaths = (rows || []).filter((row: any) => row.thumbnail_path).map((row: any) => row.thumbnail_path)
-    const imagePaths = (rows || []).filter((row: any) => IMAGE_EXTENSIONS.has(row.extension)).map((row: any) => row.storage_path)
+    const ranked = candidates.flatMap((rank: any) => {
+      const row: any = byId.get(rank.document_id)
+      return row ? [{ ...rank, primary_document_date: row.primary_document_date, source_modified_at: row.source_modified_at }] : []
+    }).sort(compareSearchResults).slice(0, 20)
+    const rankedRows = ranked.flatMap((rank: any) => {
+      const row = byId.get(rank.document_id)
+      return row ? [row] : []
+    })
+    const thumbPaths = rankedRows.filter((row: any) => row.thumbnail_path).map((row: any) => row.thumbnail_path)
+    const imagePaths = rankedRows.filter((row: any) => IMAGE_EXTENSIONS.has(row.extension)).map((row: any) => row.storage_path)
     const [thumbs, images] = await Promise.all([
       signPaths(sb, bucketFor(dataset, "thumbnail"), thumbPaths),
       signPaths(sb, bucketFor(dataset, "source"), imagePaths),

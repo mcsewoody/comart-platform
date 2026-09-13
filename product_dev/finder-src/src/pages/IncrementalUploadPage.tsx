@@ -90,7 +90,6 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
   const [progress, setProgress] = useState(0);
   const [message, setMessage] = useState("");
   const [quickDataset, setQuickDataset] = useState<PdDataset>("mfg");
-  const [quickPath, setQuickPath] = useState("");
   const [quickFiles, setQuickFiles] = useState<File[]>([]);
   const [quickStatuses, setQuickStatuses] = useState<string[]>([]);
   const [quickRunning, setQuickRunning] = useState(false);
@@ -335,15 +334,15 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
     }
     setQuickFiles([file]);
     setQuickStatuses(["待上傳"]);
-    setQuickMessage("已選擇 1 份；請確認自製品／外購品與分類路徑。");
+    setQuickMessage("已選擇 1 份；請確認要放入自製品或外購品。");
   }
 
   async function quickUpload() {
     if (!quickFiles.length || quickRunning || running) return;
     try {
-      quickUploadRelativePath(quickDataset, quickPath, quickFiles[0].name);
+      quickUploadRelativePath(quickDataset, "", quickFiles[0].name);
     } catch (reason) {
-      setQuickMessage(reason instanceof Error ? reason.message : "分類路徑無效");
+      setQuickMessage(reason instanceof Error ? reason.message : "檔名無效");
       return;
     }
 
@@ -358,7 +357,7 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
         const item: ImportFile = {
           file,
           dataset: quickDataset,
-          relativePath: quickUploadRelativePath(quickDataset, quickPath, file.name),
+          relativePath: quickUploadRelativePath(quickDataset, "", file.name),
           sha256: await hashFile(file),
           status: "準備上傳…",
         };
@@ -432,7 +431,7 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
 
   const pageCopy = {
     batch: { eyebrow: "BATCH IMPORT", title: "批次匯入", description: "掃描預設 products 目錄，以 SHA-256 找出新增或內容變更的文件並分批匯入。" },
-    quick: { eyebrow: "MANUAL UPLOAD", title: "手動上傳", description: "每次上傳一個檔案；先選擇自製品或外購品，再填寫正確分類路徑。" },
+    quick: { eyebrow: "MANUAL UPLOAD", title: "手動上傳", description: "每次上傳一個檔案；選擇自製品或外購品後，直接拖放或從資料夾選取。" },
     sync: { eyebrow: "DIRECTORY SYNC", title: "預設目錄補檔", description: "比對 Supabase 與預設 products 目錄，安全補回本機缺少的文件，絕不覆寫同路徑檔案。" },
     analysis: { eyebrow: "AI ANALYSIS", title: "文件分析", description: "查看待處理佇列並手動啟動 PDF、Office 與圖片的 AI 分析。" },
   }[mode];
@@ -522,7 +521,7 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
     {mode === "quick" && <Card className="p-5 md:p-6">
       <div className="flex items-start gap-3">
         <span className="rounded-xl bg-amber-950/50 p-3 text-amber-300"><Zap size={22} /></span>
-        <div><h2 className="text-lg font-black text-white">手動上傳</h2><p className="mt-1 text-sm leading-6 text-slate-500">適合臨時新增單一文件。檔案可拖放，也可從電腦資料夾中選擇。</p></div>
+        <div><h2 className="text-lg font-black text-white">手動上傳</h2><p className="mt-1 text-sm leading-6 text-slate-500">適合臨時新增單一文件。選取後會直接放入自製品或外購品資料庫。</p></div>
       </div>
       <fieldset className="mt-6">
         <legend className="text-sm font-bold text-slate-300">1. 選擇文件資料庫</legend>
@@ -542,19 +541,6 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
         <input ref={quickInputRef} type="file" className="hidden" onChange={(event) => chooseQuick(event.target.files)} />
       </div>
 
-      <div className="mt-6">
-        <p className="text-sm font-bold text-slate-300">3. 填寫分類路徑</p>
-        <label className="text-sm font-bold text-slate-300">分類路徑（不含 OwnProduct／Outsourcing）
-          <input
-            value={quickPath}
-            onChange={(event) => setQuickPath(event.target.value)}
-            disabled={quickRunning}
-            placeholder={quickDataset === "mfg" ? "例如：素亦/手機指環架" : "例如：供應商名稱/三合一充電"}
-            className="mt-2 h-12 w-full rounded-xl border border-slate-700 bg-slate-950 px-4 text-slate-100 outline-none placeholder:text-slate-600 focus:border-cyan-500"
-          />
-        </label>
-      </div>
-
       {quickFiles.length > 0 && <div className="mt-5 overflow-hidden rounded-xl border border-slate-700">
         {quickFiles.map((file, index) => <div key={`${file.name}-${file.size}-${file.lastModified}`} className="grid gap-2 border-b border-slate-800 px-4 py-3 text-sm last:border-0 md:grid-cols-[minmax(0,1fr)_120px_190px]">
           <span className="truncate text-slate-200" title={file.name}>{file.name}</span>
@@ -564,8 +550,8 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
       </div>}
 
       <div className="mt-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <p role="status" className="min-w-0 flex-1 text-sm leading-6 text-slate-400">{quickMessage || "檔案會進入所選邏輯資料庫；外購品分類路徑第一層請填廠商名稱。"}</p>
-        <Button disabled={!quickFiles.length || !quickPath.trim() || quickRunning || running} onClick={() => void quickUpload()}>
+        <p role="status" className="min-w-0 flex-1 text-sm leading-6 text-slate-400">{quickMessage || "檔案會直接進入所選的自製品或外購品資料庫。"}</p>
+        <Button disabled={!quickFiles.length || quickRunning || running} onClick={() => void quickUpload()}>
           {quickRunning ? <LoaderCircle className="animate-spin" size={18} /> : <UploadCloud size={18} />}
           {quickRunning ? "上傳中…" : quickFiles.length ? "上傳這個檔案" : "請先選擇檔案"}
         </Button>

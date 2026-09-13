@@ -59,6 +59,10 @@ describe("incremental import", () => {
   });
 
   it("builds quick-upload paths inside the selected logical library", () => {
+    expect(quickUploadRelativePath("mfg", "", "X1.pdf"))
+      .toBe("OwnProduct/X1.pdf");
+    expect(quickUploadRelativePath("buy", "", "quote.xlsx"))
+      .toBe("Outsourcing/quote.xlsx");
     expect(quickUploadRelativePath("mfg", "素亦/手機指環架", "X1.pdf"))
       .toBe("OwnProduct/素亦/手機指環架/X1.pdf");
     expect(quickUploadRelativePath("buy", "供應商A/三合一", "quote.xlsx"))

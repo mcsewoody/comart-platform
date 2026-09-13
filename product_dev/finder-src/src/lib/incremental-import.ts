@@ -83,12 +83,13 @@ export function isSignedTusAuthError(error: unknown) {
 
 export function quickUploadRelativePath(dataset: PdDataset, subpath: string, fileName: string) {
   const parts = subpath.replaceAll("\\", "/").split("/").map((part) => part.trim()).filter(Boolean);
-  if (!parts.length || parts.some((part) => part === "." || part === ".." || part.includes("\0"))) {
-    throw new Error("請填寫有效的分類路徑");
+  if (parts.some((part) => part === "." || part === ".." || part.includes("\0"))) {
+    throw new Error("分類路徑無效");
   }
   const safeName = fileName.replaceAll("\\", "/").split("/").at(-1)?.trim() || "";
   if (!safeName || safeName === "." || safeName === "..") throw new Error("檔名無效");
-  return `${dataset === "mfg" ? "OwnProduct" : "Outsourcing"}/${parts.join("/")}/${safeName}`;
+  const library = dataset === "mfg" ? "OwnProduct" : "Outsourcing";
+  return parts.length ? `${library}/${parts.join("/")}/${safeName}` : `${library}/${safeName}`;
 }
 
 export function compareSyncManifest<T extends IncrementalFile & { id?: string; byteSize?: number }>(

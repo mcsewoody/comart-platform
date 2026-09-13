@@ -32,6 +32,7 @@ describe("App", () => {
     expect(await screen.findByRole("heading", { name: "手動上傳", level: 1 })).toBeVisible();
     expect(screen.getByRole("radio", { name: /OwnProduct/ })).toHaveAttribute("aria-checked", "true");
     expect(screen.getByRole("radio", { name: /Outsourcing/ })).toHaveAttribute("aria-checked", "false");
+    expect(screen.queryByRole("textbox", { name: /分類路徑/ })).not.toBeInTheDocument();
 
     const manualInput = container.querySelector<HTMLInputElement>('input[type="file"]:not([multiple])');
     expect(manualInput).not.toBeNull();
@@ -39,5 +40,10 @@ describe("App", () => {
       target: { files: [new File(["one"], "one.pdf"), new File(["two"], "two.pdf")] },
     });
     expect(screen.getByText("每次只能上傳一個檔案，請重新選擇。")).toBeVisible();
+
+    fireEvent.change(manualInput!, {
+      target: { files: [new File(["one"], "one.pdf")] },
+    });
+    expect(screen.getByRole("button", { name: "上傳這個檔案" })).toBeEnabled();
   });
 });

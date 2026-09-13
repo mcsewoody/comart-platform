@@ -326,18 +326,20 @@ serve(async (req) => {
   if (action === "uploaders") {
     if (sess.role !== "admin") return json({ error: "forbidden" }, 403)
     const [users, allowed] = await Promise.all([
-      sb.from("users").select("emp_id,name_en,name_zh,email,role,active").neq("role", "inactive").order("emp_id"),
+      sb.from("users").select("emp_id,name_en,name_zh,email,role,active,status").order("emp_id"),
       sb.from("pd_uploaders").select("emp_id,active,can_sync"),
     ])
     if (users.error || allowed.error) return json({ error: (users.error || allowed.error).message }, 500)
     const access = new Map((allowed.data || []).map((item: any) => [item.emp_id, item]))
-    return json({ items: (users.data || []).filter((item: any) => item.active !== false).map((item: any) => ({
+    return json({ items: (users.data || []).map((item: any) => ({
       id: item.emp_id,
       email: item.email || `${item.emp_id}@comart.com.tw`,
       displayName: item.name_zh || item.name_en || item.emp_id,
       platformRole: item.role,
-      uploadAllowed: item.role === "admin" || access.get(item.emp_id)?.active === true,
-      syncAllowed: access.get(item.emp_id)?.can_sync === true,
+      platformActive: item.active !== false && item.role !== "inactive",
+      platformStatus: item.status || null,
+      uploadAllowed: item.active !== false && item.role !== "inactive" && (item.role === "admin" || access.get(item.emp_id)?.active === true),
+      syncAllowed: item.active !== false && item.role !== "inactive" && access.get(item.emp_id)?.can_sync === true,
     })) })
   }
 

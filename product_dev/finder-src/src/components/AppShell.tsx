@@ -1,4 +1,4 @@
-import { Factory, FolderUp, Menu, PackageSearch, ShoppingBag, X } from "lucide-react";
+import { Factory, FolderUp, Menu, PackageSearch, ShoppingBag, UploadCloud, X } from "lucide-react";
 import { useState } from "react";
 import { NavLink, Outlet } from "react-router-dom";
 import { useAuth } from "../auth/AuthProvider";
@@ -8,6 +8,7 @@ import { CPF_VERSION } from "../version";
 const navigation = [
   { to: "/", label: "自製品文件", icon: Factory, end: true },
   { to: "/buy", label: "外購品文件", icon: ShoppingBag },
+  { to: "/manual-upload", label: "手動上傳", icon: UploadCloud, uploadOnly: true },
   { to: "/upload", label: "文件工具", icon: FolderUp, toolAccessOnly: true },
 ];
 
@@ -48,6 +49,7 @@ export function AppShell() {
 function Navigation({ onNavigate }: { onNavigate?: () => void }) {
   const { profile } = useAuth();
   return <nav aria-label="主要導覽" className="space-y-1">{navigation.map((item) => {
+    if (item.uploadOnly && !profile?.canUpload) return null;
     if (item.toolAccessOnly && !profile?.canUpload && !profile?.canSync) return null;
     const Icon = item.icon;
     return <NavLink key={item.to} to={item.to} end={item.end} onClick={onNavigate} className={({ isActive }) => cn("flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition", isActive ? "bg-cyan-400 text-slate-950" : "text-slate-400 hover:bg-slate-800 hover:text-white")}><Icon size={18} />{item.label}</NavLink>;

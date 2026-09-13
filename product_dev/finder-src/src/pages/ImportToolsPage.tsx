@@ -1,4 +1,4 @@
-import { ArrowRight, BrainCircuit, Download, FolderUp, ShieldCheck, Zap } from "lucide-react";
+import { ArrowRight, BrainCircuit, Download, FolderUp, ShieldCheck } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../auth/AuthProvider";
@@ -6,7 +6,6 @@ import { Card, PageHeader } from "../components/ui";
 
 const tools: Array<{ to: string; title: string; description: string; icon: LucideIcon; tone: string; permission: "upload" | "sync" }> = [
   { to: "/upload/batch", title: "批次匯入", description: "掃描預設 products 目錄，分批匯入大量新增或變更文件。", icon: FolderUp, tone: "text-cyan-300 bg-cyan-950/60", permission: "upload" },
-  { to: "/upload/quick", title: "少量上傳", description: "臨時上傳 1～10 份文件，並指定自製品／外購品與分類路徑。", icon: Zap, tone: "text-amber-300 bg-amber-950/60", permission: "upload" },
   { to: "/upload/sync", title: "預設目錄補檔（全庫下載）", description: "可取得自製品與外購品全庫原檔，只補回本機缺少的文件。", icon: Download, tone: "text-emerald-300 bg-emerald-950/60", permission: "sync" },
   { to: "/upload/analysis", title: "文件分析", description: "查看 AI 佇列狀態並手動啟動 PDF、Office 與圖片分析。", icon: BrainCircuit, tone: "text-violet-300 bg-violet-950/60", permission: "upload" },
 ];

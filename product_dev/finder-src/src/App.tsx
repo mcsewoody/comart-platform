@@ -29,9 +29,10 @@ export default function App() {
         <Route index element={<DocumentLibraryPage dataset="mfg" />} />
         <Route path="buy" element={<DocumentLibraryPage dataset="buy" />} />
         <Route path="documents/:dataset/:id" element={<PdDocumentDetailPage />} />
+        <Route path="manual-upload" element={<IncrementalUploadPage mode="quick" />} />
         <Route path="upload" element={<ImportToolsPage />} />
         <Route path="upload/batch" element={<IncrementalUploadPage mode="batch" />} />
-        <Route path="upload/quick" element={<IncrementalUploadPage mode="quick" />} />
+        <Route path="upload/quick" element={<Navigate to="/manual-upload" replace />} />
         <Route path="upload/sync" element={<IncrementalUploadPage mode="sync" />} />
         <Route path="upload/analysis" element={<IncrementalUploadPage mode="analysis" />} />
         <Route path="users" element={<UploaderAccessPage />} />

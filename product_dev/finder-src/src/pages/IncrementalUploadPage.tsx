@@ -1,4 +1,4 @@
-import { BrainCircuit, CheckCircle2, Download, FilePlus2, FolderOpen, LoaderCircle, Play, RefreshCw, ShieldCheck, UploadCloud, Zap } from "lucide-react";
+import { BrainCircuit, CheckCircle2, Download, Factory, FolderOpen, LoaderCircle, Play, RefreshCw, ShieldCheck, ShoppingBag, UploadCloud, Zap } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { Upload } from "tus-js-client";
@@ -75,7 +75,6 @@ const SKIP_REASON_LABELS: Record<SkipReason, string> = {
 };
 const BATCH_SIZE = 200;
 const HASH_QUERY_SIZE = 100;
-const QUICK_UPLOAD_LIMIT = 10;
 const MANIFEST_STORAGE_KEY = "pd-document-import-manifest-v1";
 
 export type ImportToolMode = "batch" | "quick" | "sync" | "analysis";
@@ -96,6 +95,7 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
   const [quickStatuses, setQuickStatuses] = useState<string[]>([]);
   const [quickRunning, setQuickRunning] = useState(false);
   const [quickMessage, setQuickMessage] = useState("");
+  const [quickDragActive, setQuickDragActive] = useState(false);
   const [analysisStatus, setAnalysisStatus] = useState<PdAnalysisQueueStatus | null>(null);
   const [analysisDataset, setAnalysisDataset] = useState<PdDataset | "both">("both");
   const [analysisLimit, setAnalysisLimit] = useState(20);
@@ -317,16 +317,25 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
     setPhase("finished");
   }
 
-  function chooseQuick(selected: FileList | null) {
+  function chooseQuick(selected: FileList | File[] | null) {
     if (!selected || quickRunning) return;
-    const next = Array.from(selected)
-      .filter((file) => ALLOWED.has(ext(file.name)) && file.size > 0 && file.size <= MAX_FILE_BYTES && !excludedName(file.name))
-      .slice(0, QUICK_UPLOAD_LIMIT);
-    setQuickFiles(next);
-    setQuickStatuses(next.map(() => "待上傳"));
-    setQuickMessage(next.length
-      ? `已選擇 ${next.length} 份；請確認資料庫與分類路徑。`
-      : "沒有可上傳的檔案；請檢查格式或檔案大小。" );
+    const selectedFiles = Array.from(selected);
+    if (selectedFiles.length !== 1) {
+      setQuickFiles([]);
+      setQuickStatuses([]);
+      setQuickMessage("每次只能上傳一個檔案，請重新選擇。");
+      return;
+    }
+    const file = selectedFiles[0];
+    if (!ALLOWED.has(ext(file.name)) || file.size <= 0 || file.size > MAX_FILE_BYTES || excludedName(file.name)) {
+      setQuickFiles([]);
+      setQuickStatuses([]);
+      setQuickMessage("檔案不符合規則：請檢查格式、檔名及 50 MB 大小上限。");
+      return;
+    }
+    setQuickFiles([file]);
+    setQuickStatuses(["待上傳"]);
+    setQuickMessage("已選擇 1 份；請確認自製品／外購品與分類路徑。");
   }
 
   async function quickUpload() {
@@ -423,7 +432,7 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
 
   const pageCopy = {
     batch: { eyebrow: "BATCH IMPORT", title: "批次匯入", description: "掃描預設 products 目錄，以 SHA-256 找出新增或內容變更的文件並分批匯入。" },
-    quick: { eyebrow: "QUICK UPLOAD", title: "少量上傳", description: "臨時新增 1～10 份文件，指定資料庫與分類路徑後直接上傳。" },
+    quick: { eyebrow: "MANUAL UPLOAD", title: "手動上傳", description: "每次上傳一個檔案；先選擇自製品或外購品，再填寫正確分類路徑。" },
     sync: { eyebrow: "DIRECTORY SYNC", title: "預設目錄補檔", description: "比對 Supabase 與預設 products 目錄，安全補回本機缺少的文件，絕不覆寫同路徑檔案。" },
     analysis: { eyebrow: "AI ANALYSIS", title: "文件分析", description: "查看待處理佇列並手動啟動 PDF、Office 與圖片的 AI 分析。" },
   }[mode];
@@ -434,7 +443,7 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
       title={pageCopy.title}
       description={pageCopy.description}
     />
-    <Link to="/upload" className="mb-5 inline-flex rounded-lg px-1 py-1 text-sm font-bold text-slate-400 hover:text-cyan-300">← 回到文件工具</Link>
+    <Link to={mode === "quick" ? "/" : "/upload"} className="mb-5 inline-flex rounded-lg px-1 py-1 text-sm font-bold text-slate-400 hover:text-cyan-300">← {mode === "quick" ? "回到文件搜尋" : "回到文件工具"}</Link>
     <input
       ref={(node) => { inputRef.current = node; node?.setAttribute("webkitdirectory", ""); }}
       type="file"
@@ -513,15 +522,28 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
     {mode === "quick" && <Card className="p-5 md:p-6">
       <div className="flex items-start gap-3">
         <span className="rounded-xl bg-amber-950/50 p-3 text-amber-300"><Zap size={22} /></span>
-        <div><h2 className="text-lg font-black text-white">少量快速上傳</h2><p className="mt-1 text-sm leading-6 text-slate-500">適合臨時新增 1～10 份。請填寫原本應放入的相對資料夾，確保廠商與產品分類不遺失。</p></div>
+        <div><h2 className="text-lg font-black text-white">手動上傳</h2><p className="mt-1 text-sm leading-6 text-slate-500">適合臨時新增單一文件。檔案可拖放，也可從電腦資料夾中選擇。</p></div>
       </div>
-      <div className="mt-5 grid gap-4 lg:grid-cols-[180px_minmax(260px,1fr)_auto] lg:items-end">
-        <label className="text-sm font-bold text-slate-300">文件資料庫
-          <select value={quickDataset} onChange={(event) => setQuickDataset(event.target.value as PdDataset)} disabled={quickRunning} className="mt-2 h-12 w-full rounded-xl border border-slate-700 bg-slate-950 px-3 text-slate-100 outline-none focus:border-cyan-500">
-            <option value="mfg">自製品</option>
-            <option value="buy">外購品</option>
-          </select>
-        </label>
+      <fieldset className="mt-6">
+        <legend className="text-sm font-bold text-slate-300">1. 選擇文件資料庫</legend>
+        <div className="mt-3 grid gap-3 sm:grid-cols-2" role="radiogroup" aria-label="文件資料庫">
+          <button type="button" role="radio" aria-checked={quickDataset === "mfg"} disabled={quickRunning} onClick={() => setQuickDataset("mfg")} className={`flex min-h-20 items-center gap-4 rounded-2xl border-2 px-5 text-left transition focus:outline-none focus:ring-2 focus:ring-cyan-400 ${quickDataset === "mfg" ? "border-cyan-400 bg-cyan-950/50 text-white" : "border-slate-700 bg-slate-950/50 text-slate-400 hover:border-slate-500"}`}><Factory size={27} className={quickDataset === "mfg" ? "text-cyan-300" : "text-slate-500"} /><span><span className="block text-lg font-black">自製品</span><span className="mt-1 block text-xs">OwnProduct</span></span>{quickDataset === "mfg" && <CheckCircle2 className="ml-auto text-cyan-300" size={22} />}</button>
+          <button type="button" role="radio" aria-checked={quickDataset === "buy"} disabled={quickRunning} onClick={() => setQuickDataset("buy")} className={`flex min-h-20 items-center gap-4 rounded-2xl border-2 px-5 text-left transition focus:outline-none focus:ring-2 focus:ring-amber-400 ${quickDataset === "buy" ? "border-amber-400 bg-amber-950/40 text-white" : "border-slate-700 bg-slate-950/50 text-slate-400 hover:border-slate-500"}`}><ShoppingBag size={27} className={quickDataset === "buy" ? "text-amber-300" : "text-slate-500"} /><span><span className="block text-lg font-black">外購品</span><span className="mt-1 block text-xs">Outsourcing</span></span>{quickDataset === "buy" && <CheckCircle2 className="ml-auto text-amber-300" size={22} />}</button>
+        </div>
+      </fieldset>
+
+      <div className="mt-6">
+        <p className="text-sm font-bold text-slate-300">2. 拖放或選擇一個檔案</p>
+        <button type="button" disabled={quickRunning} onDragEnter={(event) => { event.preventDefault(); setQuickDragActive(true); }} onDragOver={(event) => { event.preventDefault(); setQuickDragActive(true); }} onDragLeave={() => setQuickDragActive(false)} onDrop={(event) => { event.preventDefault(); setQuickDragActive(false); chooseQuick(event.dataTransfer.files); }} onClick={() => { if (!quickInputRef.current) return; quickInputRef.current.value = ""; quickInputRef.current.click(); }} className={`mt-3 flex min-h-44 w-full flex-col items-center justify-center rounded-2xl border-2 border-dashed p-6 text-center transition focus:outline-none focus:ring-2 focus:ring-cyan-400 ${quickDragActive ? "border-cyan-300 bg-cyan-950/50" : "border-slate-700 bg-slate-950/50 hover:border-cyan-700 hover:bg-cyan-950/20"}`}>
+          <UploadCloud size={34} className={quickDragActive ? "text-cyan-200" : "text-cyan-400"} />
+          <span className="mt-3 text-base font-black text-white">{quickDragActive ? "放開以選擇這個檔案" : "將一個檔案拖到這裡"}</span>
+          <span className="mt-1 text-sm text-slate-500">或點擊後從電腦資料夾選擇一個檔案</span>
+        </button>
+        <input ref={quickInputRef} type="file" className="hidden" onChange={(event) => chooseQuick(event.target.files)} />
+      </div>
+
+      <div className="mt-6">
+        <p className="text-sm font-bold text-slate-300">3. 填寫分類路徑</p>
         <label className="text-sm font-bold text-slate-300">分類路徑（不含 OwnProduct／Outsourcing）
           <input
             value={quickPath}
@@ -531,12 +553,6 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
             className="mt-2 h-12 w-full rounded-xl border border-slate-700 bg-slate-950 px-4 text-slate-100 outline-none placeholder:text-slate-600 focus:border-cyan-500"
           />
         </label>
-        <Button variant="secondary" disabled={quickRunning} onClick={() => {
-          if (!quickInputRef.current) return;
-          quickInputRef.current.value = "";
-          quickInputRef.current.click();
-        }}><FilePlus2 size={18} />選擇 1～10 份</Button>
-        <input ref={quickInputRef} type="file" multiple className="hidden" onChange={(event) => chooseQuick(event.target.files)} />
       </div>
 
       {quickFiles.length > 0 && <div className="mt-5 overflow-hidden rounded-xl border border-slate-700">
@@ -551,7 +567,7 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
         <p role="status" className="min-w-0 flex-1 text-sm leading-6 text-slate-400">{quickMessage || "檔案會進入所選邏輯資料庫；外購品分類路徑第一層請填廠商名稱。"}</p>
         <Button disabled={!quickFiles.length || !quickPath.trim() || quickRunning || running} onClick={() => void quickUpload()}>
           {quickRunning ? <LoaderCircle className="animate-spin" size={18} /> : <UploadCloud size={18} />}
-          {quickRunning ? "上傳中…" : quickFiles.length ? `快速上傳 ${quickFiles.length} 份` : "請先選擇檔案"}
+          {quickRunning ? "上傳中…" : quickFiles.length ? "上傳這個檔案" : "請先選擇檔案"}
         </Button>
       </div>
     </Card>}
@@ -619,7 +635,9 @@ export function UploaderAccessPage() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      setItems((await api.getPdUploaders()).items);
+      const result = await api.getPdUploaders();
+      setItems(result.items);
+      setMessage(`已同步 Platform users 主表，共 ${result.items.length} 人。`);
     } catch (reason) {
       setMessage(`無法取得名單：${reason instanceof Error ? reason.message : "未知錯誤"}`);
     } finally {
@@ -649,7 +667,7 @@ export function UploaderAccessPage() {
   }
 
   return <>
-    <PageHeader eyebrow="USERS" title="Users" description="上傳與全庫補檔／下載分開授權；不改變其他 Platform 子系統角色。" />
+    <PageHeader eyebrow="USERS" title="Users" description="名單即時讀取 Platform users 主表；上傳與全庫補檔／下載分開授權。" action={<Button variant="secondary" disabled={loading} onClick={() => void load()}>{loading ? <LoaderCircle className="animate-spin" size={17} /> : <RefreshCw size={17} />}重新同步</Button>} />
     <Link to="/upload" className="mb-5 inline-flex rounded-lg px-1 py-1 text-sm font-bold text-slate-400 hover:text-cyan-300">← 回到文件工具</Link>
     <Card className="p-5 md:p-6">
     <div className="flex items-start gap-3">
@@ -658,9 +676,9 @@ export function UploaderAccessPage() {
     </div>
     <div className="mt-5 overflow-hidden rounded-xl border border-slate-700">
       {loading ? <p className="p-4 text-sm text-slate-400">讀取名單中…</p> : items.map((item) => <div key={item.id} className="grid gap-3 border-b border-slate-800 px-4 py-3 last:border-0 hover:bg-slate-800/50 md:grid-cols-[minmax(0,1fr)_150px_190px] md:items-center">
-        <span className="min-w-0"><span className="block truncate text-sm font-bold text-slate-200">{item.displayName}</span><span className="block truncate text-xs text-slate-500">{item.email} · {item.id}</span></span>
-        <label className="flex cursor-pointer items-center gap-2 text-sm font-semibold text-slate-300"><input type="checkbox" checked={item.uploadAllowed} disabled={item.platformRole === "admin"} onChange={() => void toggle(item, "upload")} className="h-4 w-4 accent-cyan-400" />上傳</label>
-        <label className="flex cursor-pointer items-center gap-2 text-sm font-semibold text-amber-300"><input type="checkbox" checked={item.syncAllowed} onChange={() => void toggle(item, "sync")} className="h-4 w-4 accent-amber-400" />全庫補檔／下載</label>
+        <span className="min-w-0"><span className="flex items-center gap-2"><span className="truncate text-sm font-bold text-slate-200">{item.displayName}</span><Badge tone={item.platformActive ? "success" : "neutral"}>{item.platformActive ? "Platform 啟用" : "Platform 停用"}</Badge></span><span className="block truncate text-xs text-slate-500">{item.email} · {item.id}{item.platformStatus ? ` · ${item.platformStatus}` : ""}</span></span>
+        <label className={`flex items-center gap-2 text-sm font-semibold ${item.platformActive ? "cursor-pointer text-slate-300" : "cursor-not-allowed text-slate-600"}`}><input type="checkbox" checked={item.uploadAllowed} disabled={!item.platformActive || item.platformRole === "admin"} onChange={() => void toggle(item, "upload")} className="h-4 w-4 accent-cyan-400" />上傳</label>
+        <label className={`flex items-center gap-2 text-sm font-semibold ${item.platformActive ? "cursor-pointer text-amber-300" : "cursor-not-allowed text-slate-600"}`}><input type="checkbox" checked={item.syncAllowed} disabled={!item.platformActive} onChange={() => void toggle(item, "sync")} className="h-4 w-4 accent-amber-400" />全庫補檔／下載</label>
       </div>)}
     </div>
     {message && <p role="status" className="mt-3 text-sm text-slate-400">{message}</p>}

@@ -373,6 +373,8 @@ export interface PdUploader {
   email: string;
   displayName: string;
   platformRole: string;
+  platformActive: boolean;
+  platformStatus: string | null;
   uploadAllowed: boolean;
   syncAllowed: boolean;
 }

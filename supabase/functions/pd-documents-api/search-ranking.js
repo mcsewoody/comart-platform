@@ -30,3 +30,14 @@ export function compareSearchResults(left, right) {
 
   return String(left.document_id || "").localeCompare(String(right.document_id || ""))
 }
+
+/**
+ * RPC `content` results include both literal extracted-text matches (base score
+ * 220) and low-score trigram fallbacks (at most 180). Keep the former while
+ * removing fuzzy noise that becomes especially visible after alias expansion.
+ */
+export function isRelevantSearchCandidate(query, item) {
+  if (!String(query || "").trim()) return true
+  if (item?.match_reason !== "content") return true
+  return Number(item?.score || 0) >= 200
+}

@@ -3,7 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
 import { verifySession } from "../_shared/session.ts"
 import { namedSecretKey } from "../_shared/api-keys.ts"
 import { expandSearchQueries } from "./search-aliases.js"
-import { compareSearchResults } from "./search-ranking.js"
+import { compareSearchResults, isRelevantSearchCandidate } from "./search-ranking.js"
 import { resolveProductFinderAccess } from "./access-control.js"
 
 const CORS = {
@@ -428,6 +428,7 @@ serve(async (req) => {
     const merged = new Map<string, any>()
     for (const search of searches) {
       for (const item of search.data || []) {
+        if (!isRelevantSearchCandidate(query, item)) continue
         const weightedScore = Number(item.score) * (search.index === 0 ? 1 : 0.94)
         const previous = merged.get(item.document_id)
         if (!previous || weightedScore > previous.score) {

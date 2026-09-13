@@ -1,7 +1,7 @@
 import assert from "node:assert/strict"
 import test from "node:test"
 
-import { compareSearchResults } from "./search-ranking.js"
+import { compareSearchResults, isRelevantSearchCandidate } from "./search-ranking.js"
 
 test("sorts by score before any date", () => {
   const rows = [
@@ -26,4 +26,11 @@ test("places missing dates last", () => {
     { document_id: "dated", score: 90, primary_document_date: "2026-01-01", source_modified_at: null },
   ]
   assert.deepEqual(rows.sort(compareSearchResults).map((row) => row.document_id), ["dated", "missing"])
+})
+
+test("removes low-score fuzzy content noise but keeps direct matches", () => {
+  assert.equal(isRelevantSearchCandidate("3 trong 1", { match_reason: "content", score: 42 }), false)
+  assert.equal(isRelevantSearchCandidate("3 trong 1", { match_reason: "content", score: 220 }), true)
+  assert.equal(isRelevantSearchCandidate("3 trong 1", { match_reason: "keyword", score: 245 }), true)
+  assert.equal(isRelevantSearchCandidate("", { match_reason: "content", score: 0 }), true)
 })

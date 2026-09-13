@@ -193,14 +193,21 @@ serve(async req => {
 
   if (action === "list") {
     const query = text(body.query, 200)
-    const aliases: Record<string,string[]> = {
-      "蘋果手機":["iphone","apple phone","苹果手机"], "苹果手机":["iphone","apple phone","蘋果手機"],
-      "手機":["phone","smartphone","手机"], "手机":["phone","smartphone","手機"],
-      "手錶":["watch","smartwatch","手表"], "手表":["watch","smartwatch","手錶"],
-      "耳機":["earphone","earbuds","headphones","耳机"], "耳机":["earphone","earbuds","headphones","耳機"],
-      "平板":["tablet","ipad"], "筆電":["laptop","notebook","笔记本"], "配件":["accessory","附件"],
-    }
-    const expanded = [query, ...(aliases[query.toLowerCase()] || [])].filter(Boolean)
+    const aliasGroups = [
+      ["蘋果手機","苹果手机","iphone","apple phone"],
+      ["手機","手机","phone","smartphone","mobile phone"],
+      ["手錶","手表","watch","smartwatch"],
+      ["耳機","耳机","earphone","earphones","earbuds","headphone","headphones"],
+      ["眼鏡","眼镜","glasses","smart glasses"],
+      ["喇叭","音箱","speaker","speakers"],
+      ["平板","平板电脑","tablet","ipad"],
+      ["筆電","笔记本","筆記型電腦","laptop","notebook"],
+      ["桌機","台式机","桌上型電腦","desktop"],
+      ["配件","附件","accessory","accessories"],
+    ]
+    const normalized = query.toLowerCase().trim()
+    const group = aliasGroups.find(g => g.some(x => x.toLowerCase() === normalized)) || []
+    const expanded = [...new Set([query, ...group])].filter(Boolean)
     const limit = Math.min(Math.max(Number(body.limit) || 30, 1), 100)
     const offset = Math.max(Number(body.offset) || 0, 0)
     let ids: string[] = []; let total = 0

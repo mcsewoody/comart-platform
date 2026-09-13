@@ -61,6 +61,16 @@ def _modern_office_text(path: Path) -> str:
     return "\n".join(chunks)
 
 
+def _best_effort_modern_office_text(path: Path) -> str:
+    try:
+        return _modern_office_text(path)
+    except Exception:
+        # Some Excel files open successfully in LibreOffice but contain invalid
+        # OOXML styles that openpyxl rejects. The PDF conversion performed before
+        # this call remains a valid source for text, preview, and vision analysis.
+        return ""
+
+
 def _render_pdf(pdf_path: Path, output_dir: Path) -> tuple[list[str], str | None]:
     prefix = output_dir / "page"
     _run(
@@ -135,7 +145,7 @@ def extract_document(
     text = ""
     page_count: int | None = None
     if suffix in MODERN_OFFICE:
-        text = _modern_office_text(source)
+        text = _best_effort_modern_office_text(source)
     if preview and preview.exists():
         pdf_text, page_count = _pdf_text(preview)
         text = text or pdf_text

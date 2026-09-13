@@ -27,7 +27,7 @@ const matchLabels: Record<string, string> = {
   product_path: "產品目錄命中",
   path: "路徑命中",
   content: "文件內容命中",
-  cross_language: "中英同義詞命中",
+  cross_language: "多語同義詞命中",
   recent: "版本日期排序",
 };
 

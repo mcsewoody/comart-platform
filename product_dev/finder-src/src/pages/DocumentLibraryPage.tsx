@@ -1,5 +1,5 @@
 import { File, FileImage, FileSpreadsheet, LoaderCircle, Search, SlidersHorizontal } from "lucide-react";
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import { Badge, Button, Card, EmptyState, PageHeader } from "../components/ui";
 import { api } from "../lib/api";
@@ -31,28 +31,60 @@ const matchLabels: Record<string, string> = {
   recent: "版本日期排序",
 };
 
+const PAGE_SIZE = 30;
+
 export function DocumentLibraryPage({ dataset }: { dataset: PdDataset }) {
   const [query, setQuery] = useState("");
   const [supplier, setSupplier] = useState("");
   const [kind, setKind] = useState("");
   const [includeReference, setIncludeReference] = useState(false);
   const [items, setItems] = useState<PdDocumentSummary[]>([]);
+  const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState("");
   const [elapsed, setElapsed] = useState(0);
+  const activeSearch = useRef({ dataset, query: "", supplier: "", kind: "", includeReference: false });
 
   async function searchDocuments() {
     setLoading(true);
     setError("");
+    const params = { dataset, query, supplier, kind, includeReference };
+    activeSearch.current = params;
     try {
-      const result = await api.searchPdDocuments({ dataset, query, supplier, kind, includeReference });
+      const result = await api.searchPdDocuments({ ...params, limit: PAGE_SIZE, offset: 0 });
       setItems(result.items);
+      setTotal(result.total);
       setElapsed(result.elapsedMs);
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : "搜尋失敗");
       setItems([]);
+      setTotal(0);
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function loadMore() {
+    if (loadingMore || items.length >= total) return;
+    setLoadingMore(true);
+    setError("");
+    try {
+      const result = await api.searchPdDocuments({
+        ...activeSearch.current,
+        limit: PAGE_SIZE,
+        offset: items.length,
+      });
+      setItems((current) => {
+        const known = new Set(current.map((item) => item.id));
+        return [...current, ...result.items.filter((item) => !known.has(item.id))];
+      });
+      setTotal(result.total);
+      setElapsed(result.elapsedMs);
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : "載入下一批失敗");
+    } finally {
+      setLoadingMore(false);
     }
   }
 
@@ -62,9 +94,10 @@ export function DocumentLibraryPage({ dataset }: { dataset: PdDataset }) {
     setKind("");
     setIncludeReference(false);
     setLoading(true);
-    void api.searchPdDocuments({ dataset, query: "" })
-      .then((result) => { setItems(result.items); setElapsed(result.elapsedMs); setError(""); })
-      .catch((reason) => { setItems([]); setError(reason instanceof Error ? reason.message : "載入失敗"); })
+    activeSearch.current = { dataset, query: "", supplier: "", kind: "", includeReference: false };
+    void api.searchPdDocuments({ dataset, query: "", limit: PAGE_SIZE, offset: 0 })
+      .then((result) => { setItems(result.items); setTotal(result.total); setElapsed(result.elapsedMs); setError(""); })
+      .catch((reason) => { setItems([]); setTotal(0); setError(reason instanceof Error ? reason.message : "載入失敗"); })
       .finally(() => setLoading(false));
   }, [dataset]);
 
@@ -104,7 +137,7 @@ export function DocumentLibraryPage({ dataset }: { dataset: PdDataset }) {
       <label className="mt-4 inline-flex items-center gap-2 text-sm text-slate-400"><input type="checkbox" checked={includeReference} onChange={(event) => setIncludeReference(event.target.checked)} /><SlidersHorizontal size={15} />包含 History、既有設計及 Customer 等參考資料</label>
     </Card>
 
-    <div className="mt-5 flex items-center justify-between text-sm text-slate-500"><span>{loading ? "搜尋中…" : `${items.length} 份文件`}</span>{elapsed > 0 && <span>{elapsed} ms</span>}</div>
+    <div className="mt-5 flex items-center justify-between text-sm text-slate-500"><span>{loading ? "搜尋中…" : `已顯示 ${items.length}／總共 ${total} 份`}</span>{elapsed > 0 && <span>{elapsed} ms</span>}</div>
     {error && <div role="alert" className="mt-4 rounded-xl border border-red-800 bg-red-950/40 p-4 text-sm text-red-300">{error}</div>}
 
     {!loading && !error && items.length === 0 ? <div className="mt-5"><EmptyState icon={<Search />} title="沒有符合的文件" description="請先確認資料是否已匯入，或改用檔名、型號、產品分類與廠商名稱搜尋。" /></div> :
@@ -125,6 +158,13 @@ export function DocumentLibraryPage({ dataset }: { dataset: PdDataset }) {
           <p className="mt-1 text-xs text-slate-500">{formatBytes(item.byteSize)}</p>
         </div>
       </Card></Link>)}</section>}
+
+    {!loading && items.length < total && <div className="mt-6 flex flex-col items-center gap-2 border-t border-slate-800 pt-6">
+      <Button variant="secondary" className="min-w-48" onClick={() => void loadMore()} disabled={loadingMore} aria-label={`載入後續 ${Math.min(PAGE_SIZE, total - items.length)} 筆文件`}>
+        {loadingMore ? <><LoaderCircle className="animate-spin" size={18} />載入中…</> : <>Next {Math.min(PAGE_SIZE, total - items.length)} 筆</>}
+      </Button>
+      <p className="text-xs text-slate-500">已顯示 {items.length}／總共 {total} 份</p>
+    </div>}
   </>;
 }
 

@@ -3,7 +3,6 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
 import { verifySession } from "../_shared/session.ts"
 import { namedSecretKey } from "../_shared/api-keys.ts"
 import { expandSearchQueries } from "./search-aliases.js"
-import { compareSearchResults, isRelevantSearchCandidate } from "./search-ranking.js"
 import { resolveProductFinderAccess } from "./access-control.js"
 
 const CORS = {
@@ -412,45 +411,30 @@ serve(async (req) => {
     const expandedQueries = expandSearchQueries(query, 12)
     const kind = String(body.kind || "")
     const includeReference = Boolean(body.includeReference)
-    const rpc = dataset === "mfg" ? "pd_mfg_search_documents" : "pd_buy_search_documents"
-    const searches = await Promise.all(expandedQueries.map(async (expandedQuery: string, index: number) => {
-      const args = dataset === "mfg"
-        ? { p_query: expandedQuery, p_kind: kind, p_include_reference: includeReference, p_limit: 20 }
-        : {
-            p_query: expandedQuery, p_supplier: String(body.supplier || ""), p_kind: kind,
-            p_include_reference: includeReference, p_limit: 20,
-          }
-      const result = await sb.rpc(rpc, args)
-      return { ...result, expandedQuery, index }
-    }))
-    const rankError = searches.find((result) => result.error)?.error
-    if (rankError) return json({ error: rankError.message }, 500)
-    const merged = new Map<string, any>()
-    for (const search of searches) {
-      for (const item of search.data || []) {
-        if (!isRelevantSearchCandidate(query, item)) continue
-        const weightedScore = Number(item.score) * (search.index === 0 ? 1 : 0.94)
-        const previous = merged.get(item.document_id)
-        if (!previous || weightedScore > previous.score) {
-          merged.set(item.document_id, {
-            ...item,
-            score: weightedScore,
-            match_reason: search.index === 0 ? item.match_reason : "cross_language",
-          })
+    const limit = Math.min(Math.max(Number(body.limit) || 30, 1), 100)
+    const offset = Math.max(Number(body.offset) || 0, 0)
+    const rpc = dataset === "mfg"
+      ? "pd_mfg_search_documents_multilingual"
+      : "pd_buy_search_documents_multilingual"
+    const args = dataset === "mfg"
+      ? {
+          p_queries: expandedQueries, p_kind: kind, p_include_reference: includeReference,
+          p_limit: limit, p_offset: offset,
         }
-      }
-    }
-    const candidates = [...merged.values()]
-    const ids = candidates.map((item: any) => item.document_id)
-    if (!ids.length) return json({ items: [], total: 0, elapsedMs: Math.round(performance.now() - started) })
+      : {
+          p_queries: expandedQueries, p_supplier: String(body.supplier || ""), p_kind: kind,
+          p_include_reference: includeReference, p_limit: limit, p_offset: offset,
+        }
+    const { data: candidates, error: rankError } = await sb.rpc(rpc, args)
+    if (rankError) return json({ error: rankError.message }, 500)
+    const rankedCandidates = candidates || []
+    const total = Number(rankedCandidates[0]?.total_count || 0)
+    const ids = rankedCandidates.map((item: any) => item.document_id)
+    if (!ids.length) return json({ items: [], total, elapsedMs: Math.round(performance.now() - started) })
     const { data: rows, error } = await sb.from(table).select("*").in("id", ids)
     if (error) return json({ error: error.message }, 500)
     const byId = new Map((rows || []).map((row: any) => [row.id, row]))
-    const ranked = candidates.flatMap((rank: any) => {
-      const row: any = byId.get(rank.document_id)
-      return row ? [{ ...rank, primary_document_date: row.primary_document_date, source_modified_at: row.source_modified_at }] : []
-    }).sort(compareSearchResults).slice(0, 20)
-    const rankedRows = ranked.flatMap((rank: any) => {
+    const rankedRows = rankedCandidates.flatMap((rank: any) => {
       const row = byId.get(rank.document_id)
       return row ? [row] : []
     })
@@ -460,13 +444,13 @@ serve(async (req) => {
       signPaths(sb, bucketFor(dataset, "thumbnail"), thumbPaths),
       signPaths(sb, bucketFor(dataset, "source"), imagePaths),
     ])
-    const items = ranked.flatMap((rank: any) => {
+    const items = rankedCandidates.flatMap((rank: any) => {
       const row: any = byId.get(rank.document_id)
       if (!row) return []
       const thumbnail = row.thumbnail_path ? thumbs.get(row.thumbnail_path) : images.get(row.storage_path)
       return [{ ...summary(row, dataset, thumbnail || null), score: Number(rank.score), matchReason: rank.match_reason }]
     })
-    return json({ items, total: items.length, elapsedMs: Math.round(performance.now() - started) })
+    return json({ items, total, elapsedMs: Math.round(performance.now() - started) })
   }
 
   if (action === "document") {

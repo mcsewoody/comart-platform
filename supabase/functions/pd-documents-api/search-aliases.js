@@ -21,6 +21,8 @@ const ALIAS_RULES = [
     ["手機支架", "手機架"], ["手机支架", "手机架"], ["phone holder", "phone mount", "phone stand", "phone grip"], ["giá đỡ điện thoại", "gia do dien thoai"]),
   group(/(?:\bcar\s+(?:holder|mount)\b|車用支架|车用支架|車架|车架|giá\s+đỡ\s+ô\s*tô|gia\s+do\s+o\s*to)/giu,
     ["車用支架", "車架"], ["车用支架", "车架"], ["car mount", "car holder"], ["giá đỡ ô tô", "gia do o to"]),
+  group(/(?:\bcar\s+charg(?:er|ing)\b|車用充電器?|车用充电器?|車充|车充|sạc\s+(?:ô\s*tô|xe\s+hơi)|sac\s+(?:o\s*to|xe\s*hoi))/giu,
+    ["車充", "車用充電器"], ["车充", "车用充电器"], ["car charger", "car charging"], ["sạc ô tô", "sạc xe hơi", "sac o to"]),
   group(/(?:\bring\s+holder\b|手機指環架|手机指环架|指環架|指环架|vòng\s+đỡ\s+điện\s+thoại|vong\s+do\s+dien\s+thoai)/giu,
     ["手機指環架", "指環架"], ["手机指环架", "指环架"], ["ring holder", "phone ring holder"], ["vòng đỡ điện thoại", "vong do dien thoai"]),
   group(/(?:\bpower\s*bank\b|行動電源|移动电源|移動電源|充電寶|充电宝|pin\s+dự\s+phòng|pin\s+du\s+phong)/giu,

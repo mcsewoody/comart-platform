@@ -344,6 +344,8 @@ export interface PdSearchParams {
   supplier?: string;
   kind?: string;
   includeReference?: boolean;
+  limit?: number;
+  offset?: number;
 }
 
 export interface PdUploadInit {

@@ -29,6 +29,14 @@ test("normalizes Traditional and Simplified Chinese supplier and document terms"
   assert.ok(expandSearchQueries("镈锐报价单").includes("鎛銳報價單"))
 })
 
+test("connects car charger with Chinese and Vietnamese product terms", () => {
+  const english = expandSearchQueries("car charger")
+  assert.ok(english.includes("車充"))
+  assert.ok(english.includes("车充"))
+  assert.ok(english.includes("sạc ô tô"))
+  assert.ok(expandSearchQueries("車充").includes("car charger"))
+})
+
 test("keeps unrelated model numbers unchanged", () => {
   assert.deepEqual(expandSearchQueries("X8-2026"), ["X8-2026"])
 })

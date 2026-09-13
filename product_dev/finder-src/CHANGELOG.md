@@ -1,5 +1,9 @@
 # COMART Product Finder 版本紀錄
 
+## v2.26 — 2026-09-13
+
+- Document Finder 左上角返回按鈕由「Portal」改為「Product Dev」，直接回到 Product Dev 工作區首頁；桌機、手機及本機預覽使用相同導覽層級。
+
 ## v2.25 — 2026-09-13
 
 - 新增 `car charger`、車充／車用充電器、簡中車充／車用充電器及越南文 `sạc ô tô`／`sạc xe hơi` 的雙向搜尋對應。

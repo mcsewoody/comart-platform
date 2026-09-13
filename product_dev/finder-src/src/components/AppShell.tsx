@@ -15,7 +15,9 @@ const navigation = [
 export function AppShell() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { profile } = useAuth();
-  const portalHref = typeof window !== "undefined" && window.location.protocol === "file:" ? "../../index.html" : "/";
+  const productDevHref = typeof window !== "undefined" && window.location.protocol === "file:"
+    ? "../index.html"
+    : "/product_dev/index.html";
 
   return (
     <div className="min-h-screen bg-[#070b12] text-slate-100">
@@ -23,7 +25,7 @@ export function AppShell() {
       <header className="sticky top-0 z-30 border-b border-slate-800 bg-[#0a111b]/95 backdrop-blur">
         <div className="mx-auto flex h-[72px] max-w-[1600px] items-center justify-between px-4 md:px-6">
           <div className="flex items-center gap-3">
-            <a href={portalHref} className="rounded-xl border border-slate-700 px-3 py-2 text-sm font-semibold text-slate-300 hover:border-slate-500 hover:bg-slate-800">← Portal</a>
+            <a href={productDevHref} className="rounded-xl border border-slate-700 px-3 py-2 text-sm font-semibold text-slate-300 hover:border-slate-500 hover:bg-slate-800">← Product Dev</a>
             <button type="button" className="rounded-lg p-2 text-slate-300 hover:bg-slate-800 lg:hidden" onClick={() => setMobileOpen(true)} aria-label="開啟選單"><Menu size={21} /></button>
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-400 text-slate-950"><PackageSearch size={22} /></div>
             <div>

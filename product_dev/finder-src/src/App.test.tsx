@@ -19,6 +19,10 @@ describe("App", () => {
       }),
     ).toBeInTheDocument();
     expect(screen.getByRole("textbox", { name: "搜尋關鍵字" })).toBeVisible();
+    expect(screen.getByRole("link", { name: "← Product Dev" })).toHaveAttribute(
+      "href",
+      "/product_dev/index.html",
+    );
   });
 
   it("renders manual upload as a standalone tab and accepts only one file", async () => {

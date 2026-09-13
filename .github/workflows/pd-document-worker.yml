@@ -13,6 +13,10 @@ on:
         description: Maximum jobs per library
         required: false
         default: "20"
+      max_batches:
+        description: Consecutive batches for this manual run
+        required: false
+        default: "1"
 
 concurrency:
   group: pd-document-worker-v2
@@ -21,7 +25,7 @@ concurrency:
 jobs:
   process:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 240
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -32,9 +36,23 @@ jobs:
       - run: sudo apt-get update
       - run: sudo apt-get install -y libreoffice poppler-utils libmagic1
       - run: pip install -r product_dev/finder-worker/requirements.txt
-      - run: python -m pd_worker.run --dataset "${{ inputs.dataset }}" --limit "${{ inputs.limit }}"
+      - name: Process bounded batches
+        run: |
+          if ! [[ "$MAX_BATCHES" =~ ^[0-9]+$ ]] || (( MAX_BATCHES < 1 || MAX_BATCHES > 20 )); then
+            echo "max_batches must be between 1 and 20"
+            exit 1
+          fi
+          for ((batch = 1; batch <= MAX_BATCHES; batch++)); do
+            echo "Processing batch ${batch}/${MAX_BATCHES}"
+            if ! python -m pd_worker.run --dataset "$DATASET" --limit "$LIMIT"; then
+              echo "::warning::Batch ${batch} contained failed documents; continuing so later jobs are not blocked."
+            fi
+          done
         working-directory: product_dev/finder-worker
         env:
+          DATASET: ${{ inputs.dataset }}
+          LIMIT: ${{ inputs.limit }}
+          MAX_BATCHES: ${{ inputs.max_batches }}
           SUPABASE_URL: https://tcvlnpgpuphdalzvmoyo.supabase.co
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.CPF_SUPABASE_SERVICE_ROLE_KEY }}
           PD_AI_PROXY_URL: https://tcvlnpgpuphdalzvmoyo.supabase.co/functions/v1/pd-ai-worker

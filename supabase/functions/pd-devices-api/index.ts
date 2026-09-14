@@ -108,6 +108,45 @@ function presentAsset(asset: any, sess: any, files: any = {}) {
   }
 }
 
+async function signedPersonalImage(sb: any, asset: any) {
+  if (!asset.image_storage_path) return null
+  const { data } = await sb.storage.from("pd-device-files").createSignedUrl(asset.image_storage_path, 300)
+  return data?.signedUrl || null
+}
+
+function presentPersonalAsset(asset: any, sess: any, imageUrl: string | null) {
+  const owner = asset.owner || {}
+  return {
+    id: asset.id, typeCode: asset.type_code, brand: asset.brand, model: asset.model, color: asset.color,
+    ownerEmpId: asset.owner_emp_id, ownerName: displayName(owner) || asset.owner_original_name,
+    ownerDept: owner.dept || null, ownerSite: owner.site || null,
+    ownerActive: activeUser(owner), isMine: asset.owner_emp_id === sess.empId,
+    imageUrl, imageSourceUrl: asset.image_source_url, imageSourceName: asset.image_source_name,
+    imageRetrievedAt: asset.image_retrieved_at, createdAt: asset.created_at, updatedAt: asset.updated_at,
+  }
+}
+
+const PERSONAL_SEARCH_GROUPS = [
+  { code: "P", terms: ["手機","手机","phone","smartphone","mobile phone","điện thoại"] },
+  { code: "W", terms: ["手錶","手表","watch","smartwatch","đồng hồ"] },
+  { code: "E", terms: ["耳機","耳机","earphone","earphones","earbuds","headphone","headphones","tai nghe"] },
+  { code: "G", terms: ["眼鏡","眼镜","glasses","smart glasses","kính"] },
+  { code: "S", terms: ["喇叭","音箱","speaker","speakers","loa"] },
+  { code: "T", terms: ["平板","平板电脑","tablet","ipad","máy tính bảng"] },
+  { code: "N", terms: ["筆電","笔记本","筆記型電腦","laptop","notebook","máy tính xách tay"] },
+  { code: "D", terms: ["桌機","台式机","桌上型電腦","desktop","máy tính để bàn"] },
+  { code: "X", terms: ["配件","附件","accessory","accessories","phụ kiện"] },
+  { code: "", terms: ["白色","白","white","trắng"] },
+  { code: "", terms: ["黑色","黑","black","đen"] },
+  { code: "", terms: ["紅色","红色","紅","red","đỏ"] },
+  { code: "", terms: ["藍色","蓝色","藍","blue","xanh dương"] },
+  { code: "", terms: ["綠色","绿色","綠","green","xanh lá"] },
+  { code: "", terms: ["金色","金","gold","vàng"] },
+  { code: "", terms: ["銀色","银色","銀","silver","bạc"] },
+  { code: "", terms: ["紫色","紫","purple","tím"] },
+  { code: "", terms: ["灰色","灰","gray","grey","xám"] },
+]
+
 const CURATED_OFFICIAL_PAGES: Record<string,string> = {
   E01: "https://www.apple.com/newsroom/2025/09/introducing-airpods-pro-3-the-ultimate-audio-experience/",
   P01: "https://www.apple.com/newsroom/2017/09/iphone-8-and-iphone-8-plus-a-new-generation-of-iphone/",
@@ -188,6 +227,58 @@ async function findOfficialImage(sb: any, sess: any, asset: any) {
   return { found: true, officialPageUrl: match.official_page_url }
 }
 
+async function findPersonalOfficialImage(sb: any, asset: any) {
+  const openaiKey = Deno.env.get("OPENAI_API_KEY") || ""
+  if (!openaiKey || !asset.brand || !asset.model) return
+  try {
+    const response = await fetch("https://api.openai.com/v1/responses", {
+      method: "POST", headers: { Authorization: `Bearer ${openaiKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: Deno.env.get("PD_DEVICE_IMAGE_MODEL") || "gpt-5.4-mini",
+        instructions: "Find a stable page for this exact product model on the manufacturer's official domain. Prefer an exact product, launch announcement, or technical-specification page. Never use category, comparison, search, reseller, marketplace, or generic shop pages. Never guess. Return JSON only.",
+        input: `Brand: ${asset.brand}\nModel: ${asset.model}`,
+        tools: [{ type: "web_search" }], tool_choice: "auto",
+        include: ["web_search_call.action.sources"], store: false, max_output_tokens: 600,
+        text: { format: { type: "json_schema", name: "official_product_page", strict: true, schema: {
+          type: "object", additionalProperties: false,
+          properties: { found: { type: "boolean" }, official_page_url: { type: ["string","null"] }, source_name: { type: ["string","null"] }, reason: { type: "string" } },
+          required: ["found","official_page_url","source_name","reason"],
+        } } },
+        safety_identifier: `pd-personal-device-${asset.owner_emp_id}`,
+      }),
+    })
+    const result = await response.json()
+    if (!response.ok) return
+    let match: any
+    try { match = JSON.parse(outputText(result)) } catch { return }
+    if (!match?.found || !/^https:\/\//i.test(match.official_page_url || "")) return
+    const page = await fetch(match.official_page_url, { headers: { "User-Agent": "Mozilla/5.0 COMART-Product-Dev/1.0" } }).catch(() => null)
+    if (!page?.ok) return
+    const html = await page.text()
+    const newsroomProduct = html.match(/https:\/\/www\.apple\.com\/newsroom\/images\/product\/[^"'\s<>]+?\.large\.(?:jpg|png)/i)
+    const og = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i)
+      || html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i)
+    const selectedImage = newsroomProduct?.[0] || og?.[1]
+    if (!selectedImage) return
+    const imageUrl = new URL(selectedImage.replace(/&amp;/g,"&"), match.official_page_url).toString()
+    const image = await fetch(imageUrl).catch(() => null)
+    if (!image?.ok) return
+    const mime = image.headers.get("content-type") || ""
+    if (!/^image\/(jpeg|png|webp)/i.test(mime)) return
+    const bytes = new Uint8Array(await image.arrayBuffer())
+    if (bytes.length > 8 * 1024 * 1024) return
+    const ext = mime.includes("png") ? "png" : mime.includes("webp") ? "webp" : "jpg"
+    const path = `personal-images/${asset.id}/official-${Date.now()}.${ext}`
+    const { error } = await sb.storage.from("pd-device-files").upload(path, bytes, { contentType: mime, upsert: false })
+    if (error) return
+    const patch = { image_storage_path: path, image_source_url: match.official_page_url, image_source_name: match.source_name || asset.brand, image_retrieved_at: new Date().toISOString() }
+    const { error: updateError } = await sb.from("pd_personal_device_assets").update(patch).eq("id", asset.id)
+    if (updateError) await sb.storage.from("pd-device-files").remove([path])
+  } catch (error) {
+    console.error("pd personal device image lookup failed", error)
+  }
+}
+
 serve(async req => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: CORS })
   if (req.method !== "POST") return json({ error: "method_not_allowed" }, 405)
@@ -219,6 +310,95 @@ serve(async req => {
     return json({ profile: { empId: sess.empId, name: displayName(user), role: sess.role, site: user.site, dept: user.dept },
       types: types.data, users: users.data, departments: departments.data, sites: sites.data,
       badges: { pendingAssets: pending.count || 0, pendingForMe: (mine.count || 0) + (mineCustody.count || 0) } })
+  }
+
+  if (action === "personalList") {
+    const query = text(body.query, 200), normalized = query.toLowerCase().trim()
+    const group = PERSONAL_SEARCH_GROUPS.find(g => g.terms.some(x => x.toLowerCase() === normalized))
+    const expanded = [...new Set([query, ...(group?.terms || [])])].filter(Boolean)
+    const effectiveType = text(body.typeCode, 1) || group?.code || ""
+    const owner = body.mine ? sess.empId : ""
+    const includeInactive = admin && Boolean(body.includeInactive)
+    const limit = Math.min(Math.max(Number(body.limit) || 30, 1), 100), offset = Math.max(Number(body.offset) || 0, 0)
+    let ids: string[] = []; let total = 0
+    if (expanded.length <= 1) {
+      const { data, error } = await sb.rpc("pd_personal_device_search", { p_query: query, p_type: effectiveType, p_owner: owner, p_include_inactive: includeInactive, p_limit: limit, p_offset: offset })
+      if (error) return json({ error: error.message }, 500)
+      ids = (data || []).map((x: any) => x.asset_id); total = Number(data?.[0]?.total_count || 0)
+    } else {
+      const all = new Map<string, number>()
+      for (const q of expanded) {
+        const { data, error } = await sb.rpc("pd_personal_device_search", { p_query: q, p_type: effectiveType, p_owner: owner, p_include_inactive: includeInactive, p_limit: 100, p_offset: 0 })
+        if (error) return json({ error: error.message }, 500)
+        for (const x of data || []) all.set(x.asset_id, Math.max(all.get(x.asset_id) || 0, Number(x.score || 0)))
+      }
+      const ranked = [...all.entries()].sort((a,b) => b[1]-a[1]); total = ranked.length; ids = ranked.slice(offset,offset+limit).map(x => x[0])
+    }
+    if (!ids.length) return json({ items: [], total })
+    const { data: assets, error } = await sb.from("pd_personal_device_assets").select("*,owner:users!pd_personal_device_assets_owner_emp_id_fkey(emp_id,name_en,name_zh,dept,site,active,status)").in("id",ids)
+    if (error) return json({ error: error.message },500)
+    const byId = new Map((assets || []).map((a:any) => [a.id,a])), items:any[]=[]
+    for (const id of ids) { const a=byId.get(id); if(a) items.push(presentPersonalAsset(a,sess,await signedPersonalImage(sb,a))) }
+    return json({ items,total })
+  }
+
+  if (action === "personalCreate") {
+    const typeCode=text(body.typeCode,1),brand=text(body.brand,120),model=text(body.model,200),color=nullable(body.color,80)
+    if(!typeCode||!brand||!model)return json({error:"required_fields_missing"},400)
+    const{data:type}=await sb.from("pd_device_types").select("code").eq("code",typeCode).eq("active",true).maybeSingle()
+    if(!type)return json({error:"invalid_type"},400)
+    const{data:created,error}=await sb.from("pd_personal_device_assets").insert({owner_emp_id:sess.empId,owner_original_name:displayName(user),type_code:typeCode,brand,model,color}).select("*").single()
+    if(error)return json({error:error.message},500)
+    await sb.from("pd_personal_device_activity").insert({action:"created"})
+    const task=findPersonalOfficialImage(sb,created),runtime=(globalThis as any).EdgeRuntime
+    if(runtime?.waitUntil)runtime.waitUntil(task);else await task
+    return json({item:presentPersonalAsset({...created,owner:user},sess,null)},201)
+  }
+
+  if (action === "personalUpdate") {
+    const id=text(body.id,40);if(!UUID.test(id))return json({error:"invalid_id"},400)
+    const{data:before}=await sb.from("pd_personal_device_assets").select("*").eq("id",id).maybeSingle()
+    if(!before)return json({error:"not_found"},404)
+    if(before.owner_emp_id!==sess.empId)return json({error:"only_owner_can_edit"},403)
+    const typeCode=text(body.typeCode,1),brand=text(body.brand,120),model=text(body.model,200),color=nullable(body.color,80)
+    const{data:type}=await sb.from("pd_device_types").select("code").eq("code",typeCode).eq("active",true).maybeSingle()
+    if(!type||!brand||!model)return json({error:"required_fields_missing"},400)
+    const changedModel=before.brand!==brand||before.model!==model
+    const clearOfficial=changedModel&&before.image_source_name!=="使用者上傳"
+    const patch:any={type_code:typeCode,brand,model,color}
+    if(clearOfficial)Object.assign(patch,{image_storage_path:null,image_source_url:null,image_source_name:null,image_retrieved_at:null})
+    const{data:updated,error}=await sb.from("pd_personal_device_assets").update(patch).eq("id",id).select("*").single()
+    if(error)return json({error:error.message},500)
+    if(clearOfficial&&before.image_storage_path)await sb.storage.from("pd-device-files").remove([before.image_storage_path])
+    await sb.from("pd_personal_device_activity").insert({action:"updated"})
+    if(clearOfficial){const task=findPersonalOfficialImage(sb,updated),runtime=(globalThis as any).EdgeRuntime;if(runtime?.waitUntil)runtime.waitUntil(task);else await task}
+    return json({item:presentPersonalAsset({...updated,owner:user},sess,await signedPersonalImage(sb,updated))})
+  }
+
+  if (action === "personalUploadImage") {
+    const id=text(body.id,40),name=text(body.name,160),mime=text(body.mime,80),base64=String(body.base64||"")
+    const{data:asset}=await sb.from("pd_personal_device_assets").select("*").eq("id",id).maybeSingle()
+    if(!asset||asset.owner_emp_id!==sess.empId)return json({error:"only_owner_can_replace_image"},403)
+    if(!/^image\/(jpeg|png|webp)$/.test(mime))return json({error:"unsupported_file"},400)
+    let bytes:Uint8Array;try{const bin=atob(base64);bytes=Uint8Array.from(bin,c=>c.charCodeAt(0))}catch{return json({error:"invalid_file"},400)}
+    if(bytes.length>8*1024*1024)return json({error:"file_too_large"},413)
+    const ext=name.split(".").pop()?.replace(/[^a-z0-9]/gi,"").toLowerCase()||(mime.includes("png")?"png":mime.includes("webp")?"webp":"jpg")
+    const path=`personal-images/${id}/upload-${crypto.randomUUID()}.${ext}`
+    const{error}=await sb.storage.from("pd-device-files").upload(path,bytes,{contentType:mime,upsert:false});if(error)return json({error:error.message},500)
+    const{error:updateError}=await sb.from("pd_personal_device_assets").update({image_storage_path:path,image_source_url:null,image_source_name:"使用者上傳",image_retrieved_at:new Date().toISOString()}).eq("id",id)
+    if(updateError){await sb.storage.from("pd-device-files").remove([path]);return json({error:updateError.message},500)}
+    if(asset.image_storage_path)await sb.storage.from("pd-device-files").remove([asset.image_storage_path])
+    await sb.from("pd_personal_device_activity").insert({action:"image_uploaded"});return json({ok:true})
+  }
+
+  if (action === "personalDelete") {
+    const id=text(body.id,40);if(!UUID.test(id))return json({error:"invalid_id"},400)
+    const{data:asset}=await sb.from("pd_personal_device_assets").select("*").eq("id",id).maybeSingle()
+    if(!asset)return json({error:"not_found"},404)
+    if(asset.owner_emp_id!==sess.empId&&!admin)return json({error:"forbidden"},403)
+    if(asset.image_storage_path)await sb.storage.from("pd-device-files").remove([asset.image_storage_path])
+    const{error}=await sb.from("pd_personal_device_assets").delete().eq("id",id);if(error)return json({error:error.message},500)
+    await sb.from("pd_personal_device_activity").insert({action:"deleted"});return json({ok:true})
   }
 
   if (action === "list") {

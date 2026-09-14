@@ -535,21 +535,6 @@ serve(async req => {
     await audit(sb,sess,`${kind}_uploaded`,assetId,{[field]:old},patch);return json({ok:true})
   }
 
-  if (action === "findOfficialImage") {
-    const id=text(body.id,40);const{data:asset}=await sb.from("pd_device_assets").select("*").eq("id",id).maybeSingle()
-    if(!asset || (!admin && asset.created_by!==sess.empId))return json({error:"forbidden"},403)
-    return json(await findOfficialImage(sb,sess,asset))
-  }
-
-  if (action === "findMissingImages") {
-    if(!admin)return json({error:"forbidden"},403)
-    const limit=Math.min(Math.max(Number(body.limit)||3,1),5)
-    const{data,error}=await sb.from("pd_device_assets").select("*").is("image_storage_path",null).not("brand","is",null).not("model","is",null).order("asset_code").limit(limit)
-    if(error)return json({error:error.message},500)
-    const results=[];for(const asset of data||[])results.push({assetCode:asset.asset_code,...await findOfficialImage(sb,sess,asset)})
-    return json({items:results})
-  }
-
   if (action === "deletePending") {
     const id=text(body.id,40);const{data:asset}=await sb.from("pd_device_assets").select("*").eq("id",id).maybeSingle()
     if(!asset || !admin || asset.approval_status!=="pending" || asset.activated_at)return json({error:"only_unactivated_pending_can_be_deleted"},409)

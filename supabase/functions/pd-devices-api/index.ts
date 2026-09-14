@@ -108,14 +108,42 @@ function presentAsset(asset: any, sess: any, files: any = {}) {
   }
 }
 
+const CURATED_OFFICIAL_PAGES: Record<string,string> = {
+  E01: "https://www.apple.com/newsroom/2025/09/introducing-airpods-pro-3-the-ultimate-audio-experience/",
+  P01: "https://www.apple.com/newsroom/2017/09/iphone-8-and-iphone-8-plus-a-new-generation-of-iphone/",
+  P02: "https://www.apple.com/newsroom/2020/04/iphone-se-a-powerful-new-smartphone-in-a-popular-design/",
+  P03: "https://www.apple.com/newsroom/2017/09/the-future-is-here-iphone-x/",
+  P04: "https://www.apple.com/newsroom/2019/09/iphone-11-pro-and-iphone-11-pro-max-the-most-powerful-and-advanced-smartphones/",
+  P05: "https://www.apple.com/newsroom/2020/10/apple-introduces-iphone-12-pro-and-iphone-12-pro-max-with-5g/",
+  P06: "https://www.apple.com/newsroom/2021/09/apple-unveils-iphone-13-pro-and-iphone-13-pro-max-more-pro-than-ever-before/",
+  P07: "https://www.samsung.com/us/business/support/owners/product/galaxy-s7-unlocked/",
+  P08: "https://www.apple.com/newsroom/2022/09/apple-debuts-iphone-14-pro-and-iphone-14-pro-max/",
+  P09: "https://www.samsung.com/us/business/support/owners/product/galaxy-s6-sprint/",
+  P10: "https://www.apple.com/newsroom/2020/10/apple-introduces-iphone-12-pro-and-iphone-12-pro-max-with-5g/",
+  P11: "https://www.apple.com/newsroom/2019/09/apple-introduces-dual-camera-iphone-11/",
+  T01: "https://www.apple.com/newsroom/2020/09/apple-unveils-all-new-ipad-air-with-a14-bionic-apples-most-advanced-chip/",
+  W01: "https://www.apple.com/newsroom/2018/09/redesigned-apple-watch-series-4-revolutionizes-communication-fitness-and-health/",
+  W02: "https://www.apple.com/newsroom/2019/09/apple-unveils-apple-watch-series-5/",
+  W03: "https://www.apple.com/apple-watch-series-11/",
+  X01: "https://www.apple.com/tw/shop/product/mgd74ta/a/magsafe-%E5%85%85%E9%9B%BB%E5%99%A8-1-%E5%85%AC%E5%B0%BA",
+  X02: "https://www.apple.com/shop/buy-airtag/airtag/1-pack",
+  X03: "https://www.apple.com/shop/product/mw6a3am/a/apple-watch-magnetic-charging-cable-1m",
+  X04: "https://www.apple.com/shop/product/mwvv3am/a/20w-usb-c-power-adapter",
+}
+
 async function findOfficialImage(sb: any, sess: any, asset: any) {
   const openaiKey = Deno.env.get("OPENAI_API_KEY") || ""
-  if (!openaiKey || !asset.brand || !asset.model) return { found: false, reason: "missing_configuration_or_model" }
-  const response = await fetch("https://api.openai.com/v1/responses", {
+  if (!asset.brand || !asset.model) return { found: false, reason: "missing_model" }
+  let match: any = CURATED_OFFICIAL_PAGES[asset.asset_code]
+    ? { found: true, official_page_url: CURATED_OFFICIAL_PAGES[asset.asset_code], source_name: asset.brand, reason: "curated_exact_model" }
+    : null
+  if (!match && !openaiKey) return { found: false, reason: "missing_configuration" }
+  if (!match) {
+    const response = await fetch("https://api.openai.com/v1/responses", {
     method: "POST", headers: { Authorization: `Bearer ${openaiKey}`, "Content-Type": "application/json" },
     body: JSON.stringify({
       model: Deno.env.get("PD_DEVICE_IMAGE_MODEL") || "gpt-5.4-mini",
-      instructions: "Find the exact official manufacturer product page. Use only the manufacturer's official domain. Never guess. Return JSON only.",
+      instructions: "Find a stable page for this exact model on the manufacturer's official domain. For discontinued Apple products, prefer the exact Apple Newsroom launch announcement or exact technical-specification page. Never use category, comparison, search, or generic shop pages and never use a URL that redirects to a newer model. Never guess. Return JSON only.",
       input: `Brand: ${asset.brand}\nModel: ${asset.model}\nOfficial model code: ${asset.official_model_code || "unknown"}`,
       tools: [{ type: "web_search" }], tool_choice: "auto",
       include: ["web_search_call.action.sources"], store: false, max_output_tokens: 600,
@@ -126,19 +154,21 @@ async function findOfficialImage(sb: any, sess: any, asset: any) {
       } } },
       safety_identifier: `pd-device-${sess.empId}`,
     }),
-  })
-  const result = await response.json()
-  if (!response.ok) return { found: false, reason: result?.error?.message || "openai_error" }
-  let match: any
-  try { match = JSON.parse(outputText(result)) } catch { return { found: false, reason: "invalid_model_output" } }
+    })
+    const result = await response.json()
+    if (!response.ok) return { found: false, reason: result?.error?.message || "openai_error" }
+    try { match = JSON.parse(outputText(result)) } catch { return { found: false, reason: "invalid_model_output" } }
+  }
   if (!match?.found || !/^https:\/\//i.test(match.official_page_url || "")) return { found: false, reason: match?.reason || "not_found" }
   const page = await fetch(match.official_page_url, { headers: { "User-Agent": "Mozilla/5.0 COMART-Product-Dev/1.0" } }).catch(() => null)
   if (!page?.ok) return { found: false, reason: "official_page_unavailable", officialPageUrl: match.official_page_url }
   const html = await page.text()
+  const newsroomProduct = html.match(/https:\/\/www\.apple\.com\/newsroom\/images\/product\/[^"'\s<>]+?\.large\.(?:jpg|png)/i)
   const og = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i)
     || html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i)
-  if (!og?.[1]) return { found: false, reason: "official_page_has_no_image", officialPageUrl: match.official_page_url }
-  const imageUrl = new URL(og[1], match.official_page_url).toString()
+  const selectedImage = newsroomProduct?.[0] || og?.[1]
+  if (!selectedImage) return { found: false, reason: "official_page_has_no_image", officialPageUrl: match.official_page_url }
+  const imageUrl = new URL(selectedImage.replace(/&amp;/g,"&"), match.official_page_url).toString()
   const image = await fetch(imageUrl).catch(() => null)
   if (!image?.ok) return { found: false, reason: "official_image_unavailable", officialPageUrl: match.official_page_url }
   const mime = image.headers.get("content-type") || ""

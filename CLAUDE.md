@@ -1170,6 +1170,37 @@ v1.94 只做在 Portal，但**同事被邀請的時候人常常在 KMS 或報價
 
 新增 `premortem_*` 之類的新表時，記得同步加進 sb-proxy 的 `ALLOWED_TABLES` 白名單，否則前端一律 403。
 
+## 🔴 新表的 migration 一定要寫 `enable row level security`
+
+**這是 2026-09-16 被 Supabase Security Advisor 抓到的真實漏洞**（`chat_sessions`）。
+
+- **架構上的前提**：前端所有存取都經 sb-proxy，而 sb-proxy 用 **service_role**
+  （`elevatedApiHeaders(SERVICE_KEY)`）—— service_role **繞過 RLS**。
+  所以正確做法是「**RLS 開著 ＋ 零 policy**」：應用程式完全不受影響，
+  anon／authenticated 一律拒絕。全庫 82 張表裡有 62 張就是這個形狀。
+- 🔴 **漏寫的後果不是「少一層防禦」，是「完全沒有防禦」**：
+  anon key 是 **publishable、印在每一頁的 HTML 原始碼裡**，而 Supabase 預設
+  `grant all on <table> to anon, authenticated`。所以 RLS 一關，
+  **任何人不必登入就能對那張表 SELECT／INSERT／UPDATE／DELETE**。
+  `chat_sessions` 實測：讀得到全部對話主題、開啟者工號姓名、參與人工號清單；
+  而且**刪得掉整場** —— `chat_messages` 有 `on delete cascade`，
+  所以連訊息一起消失，**即使 chat_messages 自己的 RLS 是開著的**。
+- 🔴 **sb-proxy 的欄位守衛擋不住這條路**：`CHAT_IMMUTABLE`／`CHAT_HOST_ONLY`
+  只管「經過 sb-proxy 的請求」。繞過去直接打 REST，`access` 從 `'invite'`
+  改成 `'all'` 沒有任何東西攔得住。**「經過代理才驗」的守衛，前提是沒有別條路。**
+- **檢查指令**（新表上線後跑一次）：
+  ```sql
+  select c.relname, c.relrowsecurity from pg_class c
+    join pg_namespace n on n.oid=c.relnamespace
+   where n.nspname='public' and c.relkind='r' and not c.relrowsecurity;
+  ```
+  或直接用公開 anon key 打一次 REST，回 200 且有資料就是破的。
+- ⚠️ **view 是另一回事**：`SECURITY DEFINER` 的 view 不吃查詢者的 RLS。
+  目前 `kms_users`／`kms_popular_documents`／`kms_author_stats`／`web_products_public`
+  都讀得到（見 Security Advisor）。那幾個不在本 repo 的 migrations 裡
+  （從 Dashboard 或官網 repo 建的），`web_products_*` 是**官網**在用的，
+  **不要單方面 revoke** —— 會弄壞 www.comart.com.tw。
+
 ### 未存檔提醒：三個編輯器共用（v1.85，2026-08-11）
 
 週會紀錄／業務會議記錄／Woody 週報**只在按「儲存」時才寫進資料庫**，所以任何其他離開方式都會丟掉編輯內容。

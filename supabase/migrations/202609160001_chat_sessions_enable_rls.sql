@@ -1,0 +1,25 @@
+-- ═══════════════════════════════════════════════════════════════════════
+-- chat_sessions 補開 RLS（2026-09-16，Supabase Security Advisor 回報）
+--
+-- 🔴 **這是 202609050001_live_chat.sql 建表時漏掉的，不是刻意關的。**
+--    那份 migration 建了 chat_sessions 與 chat_messages 兩張表，兩張都沒寫
+--    enable row level security。chat_messages 後來被補上（不在任何 migration 裡，
+--    應是從 Dashboard 開的），chat_sessions 就這樣漏到現在。
+--
+-- 暴露程度（2026-09-16 實測，用公開在 HTML 原始碼裡的 anon key 直接打 REST）：
+--   · SELECT 回 200 並吐出實際資料 —— 對話主題、開啟者工號與姓名、
+--     參與人工號清單、access 設定全部可讀。
+--   · anon 另有 INSERT／UPDATE／DELETE／TRUNCATE 的 grant，所以還可以：
+--     - 刪掉整場對話 → chat_messages 有 on delete cascade，**訊息跟著被清掉**
+--       （即使 chat_messages 自己的 RLS 是開著的）
+--     - 把 access 從 'invite' 改成 'all' —— sb-proxy 的 CHAT_IMMUTABLE 只管得到
+--       「經過 sb-proxy 的請求」，繞過去就完全不受限
+--
+-- 🔴 **不建任何 policy，與其餘 81 張表一致。** 前端所有存取都經 sb-proxy，
+--    而 sb-proxy 用 service_role（`elevatedApiHeaders(SERVICE_KEY)`），
+--    service_role 本來就繞過 RLS —— 所以開了 RLS 之後應用程式行為完全不變。
+--    已確認前端沒有任何一處用 anon key 直接打這張表。
+--    RLS 開著＋零 policy ＝ anon/authenticated 一律拒絕，這正是這個架構要的。
+-- ═══════════════════════════════════════════════════════════════════════
+
+alter table public.chat_sessions enable row level security;

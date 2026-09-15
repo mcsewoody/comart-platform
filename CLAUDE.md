@@ -1195,12 +1195,35 @@ v1.94 只做在 Portal，但**同事被邀請的時候人常常在 KMS 或報價
    where n.nspname='public' and c.relkind='r' and not c.relrowsecurity;
   ```
   或直接用公開 anon key 打一次 REST，回 200 且有資料就是破的。
-- ✅ **六個 `SECURITY DEFINER` view 已於 2026-09-16 鎖上**（migration 202609160002）：
-  `security_invoker = on`（改用查詢者的權限執行，底層 RLS 就回來了，這才是 Advisor
-  那條錯誤的正解）＋ `revoke select from anon`。實測六個全部回 401。
-  動手前確認過 **www.comart.com.tw 是 Wix 架的**（wix-thunderbolt／parastorage），
-  產品來自 Wix Stores，全站對 `tcvlnpgpuphdalzvmoyo` 與 `web_products` **零引用**；
-  `comartgroup.github.io` 回 404。所以擋掉 view 不影響官網。
+- ✅ **四個 KMS view 已於 2026-09-16 鎖上**（migration 202609160002）：
+  `kms_users`／`kms_popular_documents`／`kms_author_stats`／`kms_expiring_documents`
+  設 `security_invoker = on` ＋ `revoke select from anon`，實測回 401。
+- 🔴 **`web_products_public` 是刻意公開的，不要「修」它**（202609160002 誤擋、202609160003 還原）。
+  它是**新官網的公開產品 API**：`comartgroup.github.io/www/products/` 的
+  `assets/js/products.js` 直接用 anon key 打
+  `/rest/v1/web_products_public?select=*&order=sort_order.asc,series.asc`，拿 335 筆。
+  底層 `products` 表對 anon 全關，靠這個 SECURITY DEFINER view 只吐出可公開的欄位 ——
+  **那正是這種 view 的正當用途**。Security Advisor 會一直報它，那是已知且刻意的。
+  `security_invoker` 也**不能**開：開了 view 會照 anon 的 RLS 跑而回 0 筆，
+  grant 給回去也沒用 —— 那是比 revoke 更隱蔽的壞法。
+
+## 🔴 官網有兩個，資料庫連的是**新的那個**
+
+- **舊**：`www.comart.com.tw` —— **Wix 架的**（wix-thunderbolt／parastorage），
+  產品來自 Wix Stores，**完全不碰 Supabase**。
+- **新**：`https://comartgroup.github.io/www/` —— 由另一個 agent 開發、**尚未上線**，
+  但**已經在連正式資料庫**。用 anon key 直接打 REST，目前用到三個端點：
+  | 端點 | 用途 |
+  |---|---|
+  | `web_products_public` | 產品頁（335 筆） |
+  | `web_news` | 最新消息 |
+  | `functions/v1/enquiry` | 詢價表單（官網 repo 的 function，不在本 repo） |
+- 🔴 **根路徑 `comartgroup.github.io/` 回 404，網站在 `/www/` 之下。**
+  2026-09-16 我試了根路徑拿到 404 就下結論「這個來源不存在」，
+  據此 revoke 了 `web_products_public`，**當場弄壞新官網的產品頁**。
+  **只試一條路徑就下結論，等於沒查。**
+- **改任何 `web_*` 物件的權限之前，先開 `https://comartgroup.github.io/www/products/`
+  與 `/news/` 確認還拿得到資料。**
 
 ## 🔴 anon 直接打 REST 的曝光面（2026-09-16 實測，尚未處理）
 
@@ -1221,8 +1244,10 @@ linter 分不出「刻意公開」與「設錯」。以下是用**公開在每�
   講的是「**已登入的內部使用者**用開發者工具看到別人的資料」；
   這裡是「**任何人、不必登入、從網際網路**」拿走全公司通訊錄與整個知識庫。不同量級。
 - 兩條 policy **都不在本 repo 的 migrations 裡**（從 Dashboard 或官網 repo 建的），
-  所以無法從版控看出當初為什麼建、誰在用。已知 **www.comart.com.tw 是 Wix、不碰 Supabase**，
-  本 repo 的所有子系統也都走 sb-proxy 的 service_role，都不需要這兩條 policy。
+  所以無法從版控看出當初為什麼建、誰在用。
+  已確認**不需要它們的**：本 repo 五個子系統（全走 sb-proxy 的 service_role）、
+  舊官網（Wix，不碰 Supabase）、**新官網**（掃過全部 12 個頁面與 5 個 JS，
+  只用 `web_products_public`／`web_news`／`enquiry`）。
 
 ### 未存檔提醒：三個編輯器共用（v1.85，2026-08-11）
 

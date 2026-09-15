@@ -108,6 +108,7 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 | `kms/index.html` | v2.36 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
 | `quotation/index.html` | v3.60 | Quotation & CRM system | 7,332 |
 | `board/index.html` | v1.90 | 公告與會議 Bulletin & Meetings — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍、腦力激盪 | 4,600 |
+| `product_dev/` | v2.17 | **產品開發管理 —— 第六個子系統，不遵守單一檔案原則**（見下方專節） | — |
 
 `admin/lottery.html` is a standalone lottery page (separate from the lottery module inside `admin/index.html`).
 
@@ -319,6 +320,7 @@ key 名稱 —— 使用者看到才回報。
 - **Admin** (`/admin`) — 行政管理平台
 - **KMS** (`/kms`) — 知識管理系統
 - **Quotation** (`/quotation`) — 報價系統
+- **Product Dev** (`/product_dev`) — 產品開發管理（**第六個子系統**，2026-08 起由 Codex 開發，見下方專節）
 - **Board** (`/board`) — **公告與會議**（2026-07 由 Portal 公告欄獨立出來，Portal v1.65 changelog 有記載）
   - 🔴 **2026-09-06 由「公告與紀錄」改名為「公告與會議」**：`紀錄` 低估了這個系統 ——
     事前驗屍／腦力激盪／意見徵集有階段機、7 秒輪詢、全場同步的投影模式，那是**現場工具**不是檔案櫃。
@@ -362,6 +364,7 @@ key 名稱 —— 使用者看到才回報。
 ## 版本規則
 
 - **五個系統（Portal、Admin、KMS、Quotation、Board）每次修改版本號都 +0.01**，無例外
+- ⚠️ **`product_dev` 不適用這條**：它有三個各自獨立的版本號，規則見下方專節
 - 版本號同步更新（有幾處就改幾處）：`<title>`、`.login-sub`、topbar 版本顯示
   - Portal/Admin/KMS：`<title>` + `.login-sub` + topbar `<span>`
   - Quotation：`<title>` + topbar `#appVersionDiv`（沒有自己的登入畫面／`.login-sub`）
@@ -1324,6 +1327,96 @@ v1.94 只做在 Portal，但**同事被邀請的時候人常常在 KMS 或報價
 必須寫在看得到的地方，不能只存在 CLAUDE.md 裡。改權限時這四條要跟著改。
 - ⚠️ **「人的投票表決」請走 🗳 投票頁籤（`pl*`）**，不要把 `pm*` 撐成表決工具。
   兩套系統形狀不同：`pl*` 是「主席出選項 → 大家投」，`pm*` 是「大家各自寫 → 一起看 → 收斂」。
+
+
+## Product Dev（`/product_dev`）—— 第六個子系統
+
+🔴 **這是唯一不遵守「單一 HTML 檔、無建置系統」的子系統。** 由 **Codex 開發**（2026-08 起），
+慣例與其他五個不同**是刻意的，不是壞掉**。在動它之前先讀 `product_dev/finder-src/README.md`
+與 `product_dev/DEVICE_ASSET_SPEC.md`（兩份都由 Codex 維護，比本節詳細）。
+Portal 入口：APPS 的 `id:'product-dev'`（`roles:[]`，**不限角色，全員看得到**）。
+
+### 三個部分、三個各自獨立的版本號
+
+| 部分 | 路徑 | 版本 | 形態 |
+|---|---|---|---|
+| 工作區首頁（hub） | `product_dev/index.html` | **v2.17** | 單檔，94 行，只有入口卡片 |
+| Document Finder | `product_dev/finder/`（產物）← `finder-src/`（原始碼） | **v2.26** | **React 19 + TypeScript + Vite + Tailwind 4** |
+| 手機與配件（裝置保管） | `product_dev/devices/index.html` | **v1.06** | 單檔，53KB |
+
+- 🔴 **三個版本號互不相干。** commit 訊息用的是 hub 那一個（`v2.17 - …`），
+  但同一個 commit 裡 `devices/index.html` 可能是 v1.06、finder 是 v2.26。
+  改哪一部分就 bump 哪一個，**不要以為只有一個版本號**。
+- Finder 的版本在 `finder-src/src/version.ts` 的 `CPF_VERSION`（名稱是 CPF 時代留下的），
+  異動寫進 `finder-src/CHANGELOG.md`；裝置模組的異動寫進 `DEVICE_ASSET_SPEC.md` 的版本紀錄。
+
+### 🔴 Finder 改完一定要重新建置並 rsync，否則網站上什麼都不會變
+
+```bash
+cd product_dev/finder-src
+npm run build:platform          # 帶 VITE_PLATFORM_MODE 與 Supabase URL
+rsync -a --delete dist/ ../finder/
+```
+
+- `finder-src/dist/` 與 `node_modules/` 被 `finder-src/.gitignore` 擋住，**進版控的是 `finder/`**
+  （GitHub Pages 直接服務它）。`vite.config.ts` 的 `base` 寫死 `/product_dev/finder/`。
+- **只改 `finder-src/` 而忘記這兩步，線上完全不會變**，而且 git diff 看起來「有改」。
+  這是這個子系統最容易踩的坑。
+- 驗證指令：`npm run typecheck` / `npm run lint` / `npm test`（vitest）。
+
+### 資料層：17 張 `pd_*` 表，`cpf_*` 已全數移除
+
+- **文件搜尋**：`pd_mfg_documents`（1,148 筆）／`pd_mfg_jobs`、`pd_buy_documents`（269）／`pd_buy_jobs`、
+  `pd_document_edits`、`pd_uploaders`、`pd_transfer_audit`。
+  自製品（mfg）與外購品（buy）是**兩套平行的表與 bucket**，不是同一張表加欄位。
+- **裝置保管**：`pd_device_assets`（20）／`pd_device_types`（9）／`pd_device_transfers`／`pd_device_repairs`／
+  `pd_device_audit_log`／`pd_device_inventory_checks`／`pd_device_reminder_log`／
+  `pd_device_forced_transfer_approvals`，以及與公司資產分開的 `pd_personal_device_assets`／`pd_personal_device_activity`。
+- ⚠️ **`pd_transfer_audit` 不是裝置移轉的稽核** —— 它的欄位是 `dataset`／`document_id`／`relative_path`／`sha256`，
+  那是**文件上傳與同步**的軌跡。裝置移轉看 `pd_device_transfers` 與 `pd_device_audit_log`。名字很像，別搞混。
+- **Storage bucket 命名不一致**（既成事實）：文件用底線 `pd_mfg_source`／`pd_mfg_preview`／`pd_mfg_thumbnail`／
+  `pd_buy_*`，裝置用連字號 `pd-device-files`。全部 `public=false`。
+- 🔴 **`202609040001_retire_legacy_cpf.sql` 已把所有 `cpf_*` 表移除**，但
+  `supabase/functions/cpf-ai-worker`／`cpf-platform-api` **仍留在 repo 裡而且沒有部署**
+  （`supabase functions list` 看不到它們），`config.toml` 也還留著條目。那是死程式碼。
+
+### Edge Functions：兩支給人用、兩支給機器用
+
+| Function | 驗證 | 用途 |
+|---|---|---|
+| `pd-documents-api` | `x-session` HMAC | 14 個 action：`bootstrap`／`search`／`document`／`initUpload`／`completeUpload`／`syncManifest`／`setUploader`／`startAnalysis`… |
+| `pd-devices-api` | `x-session` HMAC | 27 個 action：建立、核准、移轉、歸還、維修、退役、盤點、個人資產… |
+| `pd-ai-worker` | `apikey` 標頭 | GitHub Actions 呼叫，轉發 OpenAI Responses API |
+| `pd-device-reminders` | `apikey` 標頭 | 每日提醒，逾期／盤點，經 Resend 寄信 |
+
+- ✅ **給人用的兩支與平台其他部分同一套驗證**（`_shared/session.ts` 的 `verifySession`），
+  角色對應：平台 `admin` → `admin`、`dcc` → `editor`、其餘 → `viewer`。
+- 🔴 **給機器用的兩支比對 `apikey` 標頭與名為 `cpf_worker` 的 secret**（名稱是 CPF 時代留下的）。
+  那個值就是 service-role key，所以**拿得到它的人本來就有全權** —— 這不是額外的授權層，
+  只是「別讓路人觸發」。GitHub secret 名稱同樣是 `CPF_SUPABASE_SERVICE_ROLE_KEY`。
+
+### GitHub Actions：一支排程、一支只能手動
+
+- `pd-device-reminders.yml` —— **每天 00:15 UTC（台灣 08:15）** ＋ 可手動。
+- `pd-document-worker.yml` —— **只有 `workflow_dispatch`，沒有排程**。
+  ⚠️ README 寫「5 分鐘 worker」，那是舊的；**現在文件解析要人去按**。
+  runner 會裝 LibreOffice／Poppler／libmagic，跑 `python -m pd_worker.run`，
+  單次最多 20 batch、逾時 240 分鐘，模型 `PD_ROUTINE_MODEL=gpt-5.6-luna`。
+
+### Python worker（`finder-worker/`）
+
+- **現行入口是 `pd_worker/run.py`**；`finder-worker/run.py`（舊入口）已經沒有人呼叫。
+- ⚠️ **但 `cpf_worker/` 這個 package 不是死的**：`pd_worker/run.py` 仍
+  `from cpf_worker.extractors import extract_document`。
+  **要清 CPF 遺留時不能整個目錄刪掉** —— `extractors.py` 是現役的解析器。
+- `golden-set/` 是評測集（`evaluate_golden.py` 用退出碼強制門檻：型號 90%／類別 90%／廠商 85%／Top-5 90%）。
+
+### ⚠️ `finder-src/README.md` 的後半段已經過期
+
+前段（已實作範圍、架構圖）是現況，但**「Supabase 設定」「GitHub 設定」以下仍停留在 CPF 時代**：
+它叫你部署 `cpf-search`／`cpf-file-url`／`cpf-admin-user`（三支都不存在）、
+建 `cpf_profiles`、用 `cpf_source`／`cpf_preview`／`cpf_thumbnail` bucket（都已移除）。
+**以本節與實際資料庫為準**，不要照著那幾段跑。
 
 ## Development Workflow
 

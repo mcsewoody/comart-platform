@@ -1206,6 +1206,21 @@ v1.94 只做在 Portal，但**同事被邀請的時候人常常在 KMS 或報價
   **那正是這種 view 的正當用途**。Security Advisor 會一直報它，那是已知且刻意的。
   `security_invoker` 也**不能**開：開了 view 會照 anon 的 RLS 跑而回 0 筆，
   grant 給回去也沒用 —— 那是比 revoke 更隱蔽的壞法。
+- 🔴 **`web_products_admin` 同樣不要動，但理由不同**：它**沒有**給 anon（實測 401），
+  是授權給 **`authenticated`**（Supabase Auth 登入者）。
+  ⚠️ **這個專案真的有人在用 Supabase Auth**：`auth.users` 有 4 個帳號，
+  `ariel@comart.com.tw` 於 2026-09-15 登入過。所以有一個產品後台正在運作 ——
+  但在 `comartgroup.github.io/www/` 底下試過 8 個常見路徑（`admin/`／`cms/`／`manage/`…）
+  全是 404，**位置不明，要問 Ariel 或寫新官網的那個 agent**。
+  對它開 `security_invoker` 會讓它照那位登入者的 RLS 跑（`products` 零 policy）→ 回 0 筆 → 後台壞掉。
+- **這兩條 Advisor 錯誤是永久的基準線。** Supabase 2026-06 起可停用特定 lint 規則
+  （`0010_security_definer_view`），但那是**專案層級**開關 —— 關掉之後**以後真的誤建
+  SECURITY DEFINER view 也不會被報**。建議不要關，**把「2 個錯誤」當成新的零**；
+  變成 3 個時那第 3 個才值得看。
+- 🔴 **「照 linter 的建議修」在這裡反而更危險**：要讓它滿意得改成 `security_invoker`
+  ＋ 在 `products` 表上加 anon policy，那樣 anon 看到的就是**表**而不是**精選過的 view** ——
+  除非再逐欄撤銷授權，否則成本、BOM、供應商那些欄位會一起曝光。
+  **精選 view ＋ SECURITY DEFINER 是這個情境下比較安全的設計。**
 
 ## 🔴 官網有兩個，資料庫連的是**新的那個**
 

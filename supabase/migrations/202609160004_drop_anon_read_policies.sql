@@ -1,0 +1,32 @@
+-- ═══════════════════════════════════════════════════════════════════════
+-- 移除 users 與 kms_documents 對 anon 的讀取 policy（2026-09-16，Woody 授權）
+--
+-- 移除前的實測（公開在每一頁原始碼裡的 anon key，不必登入，直接打 /rest/v1/）：
+--   · users          → 57 人：工號、姓名、**Email、手機**、部門、職稱（pwd_hash 有擋）
+--   · kms_documents  → 1,328 筆等級 1 文件的**完整內文 body**（等級 2／3 共 9 筆有擋）
+--
+-- 🔴 **為什麼是「整條移除」而不是「限縮到 authenticated」**：
+--    這個專案的 Supabase Auth **公開註冊是開著的**（`/auth/v1/settings` 回
+--    `disable_signup: false`），所以任何人都能自己註冊取得 `authenticated` 角色。
+--    限縮到 authenticated 等於沒擋。**這件事要 Woody 去 Dashboard 關掉**，見下方註記。
+--
+-- 逐一排除過的使用者（這次有完整列舉，不是抽樣）：
+--   ✅ 本 repo 五個子系統：全部經 sb-proxy（service_role，繞過 RLS）。
+--      唯一繞過 sb-proxy 的直接 REST 呼叫是 kms/index.html 的
+--      `rpc/increment_kms_view` —— 它是 SECURITY DEFINER、owner postgres，同樣繞過 RLS。
+--      Portal 的知識貢獻排行榜看起來像直連，其實走 `SB_WORKER`（sb-proxy）＋ sbHdrs()。
+--   ✅ 新官網 comartgroup.github.io/www/：抓過全部 12 個頁面與 5 個 JS，
+--      只用 web_products_public／web_news／functions/v1/enquiry。
+--   ✅ 舊官網 www.comart.com.tw：Wix 架的，完全不碰 Supabase。
+--   ❓ Ariel（auth.users，2026-09-15 登入過）在用的產品後台：位置不明。
+--      它用的是 web_products_admin（本次未動）。若它同時讀 users／kms_documents 會壞掉 ——
+--      那就用下方的還原指令，一行復原。
+--
+-- 還原指令（若有人回報壞掉）：
+--   create policy "anon can read users" on public.users for select to public using (true);
+--   create policy "anon read level1 only" on public.kms_documents for select to public
+--     using (coalesce(conf_level, 1) <= 1);
+-- ═══════════════════════════════════════════════════════════════════════
+
+drop policy if exists "anon can read users"      on public.users;
+drop policy if exists "anon read level1 only"    on public.kms_documents;

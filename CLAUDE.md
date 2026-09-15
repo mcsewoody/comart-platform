@@ -1195,11 +1195,34 @@ v1.94 只做在 Portal，但**同事被邀請的時候人常常在 KMS 或報價
    where n.nspname='public' and c.relkind='r' and not c.relrowsecurity;
   ```
   或直接用公開 anon key 打一次 REST，回 200 且有資料就是破的。
-- ⚠️ **view 是另一回事**：`SECURITY DEFINER` 的 view 不吃查詢者的 RLS。
-  目前 `kms_users`／`kms_popular_documents`／`kms_author_stats`／`web_products_public`
-  都讀得到（見 Security Advisor）。那幾個不在本 repo 的 migrations 裡
-  （從 Dashboard 或官網 repo 建的），`web_products_*` 是**官網**在用的，
-  **不要單方面 revoke** —— 會弄壞 www.comart.com.tw。
+- ✅ **六個 `SECURITY DEFINER` view 已於 2026-09-16 鎖上**（migration 202609160002）：
+  `security_invoker = on`（改用查詢者的權限執行，底層 RLS 就回來了，這才是 Advisor
+  那條錯誤的正解）＋ `revoke select from anon`。實測六個全部回 401。
+  動手前確認過 **www.comart.com.tw 是 Wix 架的**（wix-thunderbolt／parastorage），
+  產品來自 Wix Stores，全站對 `tcvlnpgpuphdalzvmoyo` 與 `web_products` **零引用**；
+  `comartgroup.github.io` 回 404。所以擋掉 view 不影響官網。
+
+## 🔴 anon 直接打 REST 的曝光面（2026-09-16 實測，尚未處理）
+
+**Security Advisor 不會報這一類 —— 因為 RLS「有開」，只是 policy 放行 anon。**
+linter 分不出「刻意公開」與「設錯」。以下是用**公開在每一頁 HTML 原始碼裡的 anon key**、
+不必登入、直接打 `/rest/v1/` 實測的結果：
+
+| 表 | policy | anon 讀得到 |
+|---|---|---|
+| `users` | `anon can read users`（`roles={public}`） | **全部 57 人**：工號、中英文姓名、**Email、手機**、部門、職稱、據點、簡介。`pwd_hash` 有擋（欄位授權未給） |
+| `kms_documents` | `anon read level1 only`（`coalesce(conf_level,1) <= 1`） | **1,328 筆等級 1 文件的完整內文 `body`**（全庫 1,337）。等級 2／3 共 9 筆有擋住 |
+
+- 🔴 **`body` 是有授權給 anon 的。** CLAUDE.md 一直寫「sb-proxy 回應一律移除
+  `kms_documents.body`」—— 那句話只對**經過 sb-proxy 的請求**成立。
+  直接打 REST 完全繞過去，整個知識庫的內文對網際網路是開的。
+  這是「**經過代理才驗的守衛，前提是沒有別條路**」的第二個實例。
+- ⚠️ **這已經超出 CLAUDE.md 記載的既有取捨。** 那條取捨（[[feedback-security-threshold]]）
+  講的是「**已登入的內部使用者**用開發者工具看到別人的資料」；
+  這裡是「**任何人、不必登入、從網際網路**」拿走全公司通訊錄與整個知識庫。不同量級。
+- 兩條 policy **都不在本 repo 的 migrations 裡**（從 Dashboard 或官網 repo 建的），
+  所以無法從版控看出當初為什麼建、誰在用。已知 **www.comart.com.tw 是 Wix、不碰 Supabase**，
+  本 repo 的所有子系統也都走 sb-proxy 的 service_role，都不需要這兩條 policy。
 
 ### 未存檔提醒：三個編輯器共用（v1.85，2026-08-11）
 

@@ -62,6 +62,22 @@ const CHAT_DELETE_ROLES = new Set(["admin"])
 // 開啟者是整套權限的根，建立後不可改（改掉就等於把別人開的場次搶過來）
 const CHAT_IMMUTABLE = new Set(["host_emp_id", "id", "access"])
 
+// ── 線上對話：單則訊息的修改與刪除（v2.01）──
+// 三組欄位，三種授權。**分組的依據是「改壞了會怎樣」，不是欄位長得像不像**：
+//   FROZEN  身分與時間 —— 誰都不能改。改掉 emp_id 就等於把話塞到別人嘴裡。
+//   TEXT    訊息本文 —— **只有作者本人**。發起人可以刪別人的訊息，但絕不可以
+//           改別人的字：刪除是「拿掉」（看得出來），改寫是「換掉」（看不出來）。
+//   WIPE    刪除時要抹掉的內容欄位 —— 作者或該場發起人。
+//   TR      四語譯文 —— 作者或發起人（孤兒訊息由發起人補翻，見 lcPoll）。
+const CHAT_MSG_FROZEN = new Set(["id", "session_id", "emp_id", "author_name", "created_at", "updated_at"])
+const CHAT_MSG_TEXT   = new Set(["text", "edited_at"])
+const CHAT_MSG_WIPE   = new Set([
+  "deleted_at", "deleted_by", "text", "src_lang",
+  "text_zhtw", "text_zhcn", "text_en", "text_vi", "tr_at",
+  "img_path", "img_name", "img_mime", "img_w", "img_h",
+])
+const CHAT_MSG_TR = new Set(["src_lang", "text_zhtw", "text_zhcn", "text_en", "text_vi", "tr_at"])
+
 // ── 事前驗屍：受保護欄位 ──
 // AI 評論與總結是永久存檔的會議正式結論；phase 決定會議進程；chair_emp_id 是整套權限的根。
 // 這些欄位的 PATCH 必須是「該場會議的主席本人」，不能只靠前端的 pmIsChair()（那是 UI）。
@@ -252,6 +268,14 @@ serve(async (req) => {
     }
   }
 
+  // ── 線上對話：不接受硬刪除單則訊息 ──
+  // 刪除的語意是「留下一格『本訊息已刪除！』」，那要靠列還在才做得到。
+  // 前端一律走 PATCH（軟刪除 ＋ 抹掉內容）；真的要整列消失只有「整場刪除」那條路（cascade）。
+  // 🔴 不擋的話，任何持有 session 的人都能把別人的訊息整列抹掉、連痕跡都不留。
+  if (req.method === "DELETE" && table === "chat_messages") {
+    return json({ error: "forbidden", hint: "messages are soft-deleted via PATCH" }, 403)
+  }
+
   // ── 線上對話：DELETE chat_sessions 必須是開啟者本人（cascade 會帶走所有訊息）──
   if (req.method === "DELETE" && table === "chat_sessions") {
     const idFilter = url.searchParams.get("id") || ""
@@ -329,6 +353,95 @@ serve(async (req) => {
         const own = (o: Record<string, unknown>) => { o.emp_id = sessEmpId; return o }
         body = JSON.stringify(Array.isArray(parsed) ? parsed.map(own) : own(parsed))
       } catch { return json({ error: "bad_json" }, 400) }
+    } else if (table === "chat_messages" && req.method === "POST" && rawText) {
+      // ── 送出訊息：發話者一律改寫成簽章裡的身分 ──
+      // 「作者」在新的刪除／修改規則裡是權限的根（本人可改可刪），所以它不能是
+      // 前端說了算的欄位。改寫而不是拒絕：正常路徑本來就只會送自己（同 chat_presence）。
+      // 冒用時連同 author_name 一起丟掉，讓畫面退回顯示工號 —— 留著假名字
+      // 等於改寫了 emp_id 卻還是看到別人的名字。
+      try {
+        const parsed = JSON.parse(rawText)
+        const own = (o: Record<string, unknown>) => {
+          if (String(o.emp_id || "") !== sessEmpId) { o.emp_id = sessEmpId; delete o.author_name }
+          return o
+        }
+        body = JSON.stringify(Array.isArray(parsed) ? parsed.map(own) : own(parsed))
+      } catch { return json({ error: "bad_json" }, 400) }
+    } else if (table === "chat_messages" && req.method === "PATCH" && rawText) {
+      // ── 單則訊息：誰能改什麼 ──
+      let parsed: Record<string, unknown>
+      try { parsed = JSON.parse(rawText) } catch { return json({ error: "bad_json" }, 400) }
+      const keys = Object.keys(parsed || {})
+      if (keys.some((k) => CHAT_MSG_FROZEN.has(k))) {
+        return json({ error: "forbidden", hint: "id/session_id/emp_id/author_name/created_at are immutable" }, 403)
+      }
+      // 🔴 只認 ?id=eq.<訊息 id>。不限定的話，一個
+      //    PATCH chat_messages?session_id=eq.X 就能把整場的訊息一次改掉／清空。
+      const midFilter = url.searchParams.get("id") || ""
+      const mid = midFilter.startsWith("eq.") ? midFilter.slice(3) : ""
+      if (!mid) return json({ error: "forbidden", hint: "patch requires ?id=eq.<message_id>" }, 403)
+
+      // 查失敗一律拒絕（fail-closed，同 premortem 的守衛）
+      let authorId = "", msgSid = ""
+      try {
+        const chk = await fetch(
+          `${SUPABASE_URL}/rest/v1/chat_messages?id=eq.${encodeURIComponent(mid)}&select=emp_id,session_id`,
+          { headers: elevatedApiHeaders(SERVICE_KEY) },
+        )
+        const rows = chk.ok ? await chk.json() : []
+        if (Array.isArray(rows) && rows[0]) {
+          authorId = String(rows[0].emp_id || "")
+          msgSid   = String(rows[0].session_id || "")
+        }
+      } catch { authorId = "" }
+      if (!authorId) return json({ error: "forbidden", hint: "message not found" }, 403)
+
+      const isAuthor = authorId === sessEmpId
+      let isHost = false
+      if (!isAuthor && msgSid) {
+        // 只有不是作者時才多查一次：自己改自己的訊息（含譯文寫回）是最常走的路徑，
+        // 不該為了守衛多付一次查詢
+        try {
+          const chk2 = await fetch(
+            `${SUPABASE_URL}/rest/v1/chat_sessions?id=eq.${encodeURIComponent(msgSid)}&select=host_emp_id`,
+            { headers: elevatedApiHeaders(SERVICE_KEY) },
+          )
+          const rows2 = chk2.ok ? await chk2.json() : []
+          isHost = !!(Array.isArray(rows2) && rows2[0] && String(rows2[0].host_emp_id || "") === sessEmpId)
+        } catch { isHost = false }
+      }
+      if (!isAuthor && !isHost) {
+        return json({ error: "forbidden", hint: "only the author or the host of this chat may change a message" }, 403)
+      }
+
+      if ("deleted_at" in parsed) {
+        // ── 刪除 ──
+        // 🔴 deleted_at 只能設成有值，不能清成 null：痕跡是永久的。
+        //    可以「復原」的話，發起人就能把不利的內容刪掉、事後再說「沒有刪過」。
+        if (!parsed.deleted_at) {
+          return json({ error: "forbidden", hint: "deleted_at cannot be cleared" }, 403)
+        }
+        if (keys.some((k) => !CHAT_MSG_WIPE.has(k))) {
+          return json({ error: "forbidden", hint: "a delete may only wipe content fields" }, 403)
+        }
+        // 刪除者一律改寫成簽章裡的身分（同 chat_presence 的做法）：
+        // 不改寫的話可以把刪除嫁禍給別人，而 deleted_by 正是唯一的追究依據
+        parsed.deleted_by = sessEmpId
+        body = JSON.stringify(parsed)
+      } else {
+        // ── 修改 / 譯文寫回 ──
+        if (keys.some((k) => k === "deleted_by")) {
+          return json({ error: "forbidden", hint: "deleted_by is set by the server" }, 403)
+        }
+        // 🔴 本文只有作者改得動。發起人刪得掉別人的訊息，但改不動別人的字。
+        if (!isAuthor && keys.some((k) => CHAT_MSG_TEXT.has(k))) {
+          return json({ error: "forbidden", hint: "only the author may edit the text of a message" }, 403)
+        }
+        if (keys.some((k) => !CHAT_MSG_TEXT.has(k) && !CHAT_MSG_TR.has(k))) {
+          return json({ error: "forbidden", hint: "unexpected field in message patch" }, 403)
+        }
+        body = rawText
+      }
     } else if (table === "chat_sessions" && req.method === "PATCH" && rawText) {
       // ── 線上對話：status/keep/title 只有開啟者改得動 ──
       let parsed: Record<string, unknown>

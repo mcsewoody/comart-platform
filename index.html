@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>COMART Platform v2.00</title>
+<title>COMART Platform v2.01</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script defer src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.js"></script>
 <style>
@@ -338,7 +338,23 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:
 .lc-attach:hover { border-color:#7c3aed; }
 .lc-composer.drag { background:rgba(124,58,237,.12); }
 .lc-send { padding:9px 16px; border-radius:10px; background:#7c3aed; color:#fff; border:none; cursor:pointer; font-size:12px; font-weight:700; font-family:var(--ff); white-space:nowrap; }
-@media (max-width:768px) { .lc-msg { max-width:100%; } .lc-otext { font-size:13.5px; } .lc-ltext { font-size:12.5px; } }
+/* 修改與刪除（v2.01）。操作鈕平常淡、hover 才明顯：聊天室最常做的事是讀，
+   每一則都掛兩顆亮按鈕會把畫面變成工具列。手機沒有 hover，所以維持可見的淡色。 */
+.lc-macts { margin-left:auto; display:flex; gap:2px; flex:0 0 auto; }
+.lc-mact { padding:1px 5px; border-radius:5px; border:1px solid transparent; background:none; color:var(--tx3); font-size:11px; line-height:1.5; cursor:pointer; font-family:var(--ff); opacity:.5; transition:opacity .12s, border-color .12s; }
+.lc-msg:hover .lc-mact { opacity:1; }
+.lc-mact:hover { border-color:var(--br2); color:var(--tx); }
+.lc-mact.danger:hover { border-color:#e05260; color:#e05260; }
+.lc-edited { font-size:10px; color:#F5A623; background:rgba(245,166,35,.13); border-radius:4px; padding:1px 6px; }
+.lc-msg.gone { opacity:.72; border-style:dashed; }
+.lc-gone-note { font-size:12.5px; color:var(--tx3); font-style:italic; }
+.lc-gone-who { font-size:10.5px; font-style:normal; color:var(--tx3); }
+.lc-msg.editing { box-shadow:0 0 0 2px rgba(245,166,35,.55); }
+.lc-composer.editing { background:rgba(245,166,35,.07); }
+.lc-editbar { display:flex; align-items:center; gap:9px; padding:7px 14px; border-top:1px solid var(--br); background:rgba(245,166,35,.1); font-size:11.5px; color:#F5A623; flex-shrink:0; }
+.lc-editbar b { font-weight:700; }
+.lc-edit-x { margin-left:auto; padding:3px 10px; border-radius:7px; border:1px solid var(--br); background:var(--s2); color:var(--tx2); font-size:11px; cursor:pointer; font-family:var(--ff); }
+@media (max-width:768px) { .lc-msg { max-width:100%; } .lc-otext { font-size:13.5px; } .lc-ltext { font-size:12.5px; } .lc-mact { opacity:.85; } }
 /* ─── Trip Calendar ─── */
 .trip-cal-wrap { background:var(--s1); border:1px solid var(--br); border-radius:12px; overflow:hidden; margin-bottom:16px; }
 .trip-cal-header { display:grid; grid-template-columns:repeat(7,1fr); background:var(--s2); border-bottom:1px solid var(--br); }
@@ -388,7 +404,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     <div class="login-logo">
       <div class="login-mark" style="background:transparent"><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="44" height="23"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></div>
       <div class="login-name">COMART Platform</div>
-      <div class="login-sub">Internal Portal · v2.00</div>
+      <div class="login-sub">Internal Portal · v2.01</div>
     </div>
     <form id="loginForm" onsubmit="doLogin();return false;" autocomplete="on">
     <div class="field">
@@ -456,7 +472,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   <div class="topbar">
     <div class="topbar-logo" onclick="switchView('home')">
       <div class="topbar-mark" style="background:transparent"><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="26" height="14"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></div>
-      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v2.00</span></div>
+      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v2.01</span></div>
     </div>
     <div class="topbar-right">
       <div class="lang-switcher">
@@ -666,6 +682,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
                 <li><b id="lc-rule2-t"></b><span id="lc-rule2-d"></span></li>
                 <li><b id="lc-rule3-t"></b><span id="lc-rule3-d"></span></li>
                 <li><b id="lc-rule4-t"></b><span id="lc-rule4-d"></span></li>
+                <li><b id="lc-rule5-t"></b><span id="lc-rule5-d"></span></li>
               </ul>
             </div>
             <div id="lc-list"></div>
@@ -695,6 +712,12 @@ input[type="date"]::-webkit-calendar-picker-indicator {
               <button class="lc-btn danger" onclick="lcEnd(false)" id="lc-discard-btn">不保留</button>
             </div>
             <div id="lc-stream" class="lc-stream"></div>
+            <!-- 修改中的提示列：與 composer 一樣在 #lc-stream 外面，所以 3 秒一次的
+                 輪詢重繪碰不到它（正在改的字不會被洗掉） -->
+            <div id="lc-editbar" class="lc-editbar" style="display:none;">
+              <b id="lc-editbar-t"></b>
+              <button class="lc-edit-x" id="lc-edit-cancel" onclick="lcEditCancel()"></button>
+            </div>
             <!-- 🔴 composer 在 #lc-stream 外面：輪詢只重繪 stream，永遠不動輸入框 -->
             <div id="lc-composer" class="lc-composer"
                  ondragover="lcDragOver(event)" ondragleave="lcDragLeave()" ondrop="lcDrop(event)">
@@ -3028,6 +3051,18 @@ const I18N = {
     lc_rule3_t:'The host ends it and decides whether to keep it — ',
     lc_rule3_d:'kept conversations stay readable and can be exported as PDF.', lc_rule4_t:'The host or a system administrator can delete it — ',
     lc_rule4_d:'that removes every message with it and cannot be undone.',
+    lc_rule5_t:'While the chat is live, messages can be edited and deleted — ',
+    lc_rule5_d:'you can edit or delete your own; the host can delete any message. Both leave a visible mark (“This message was deleted!” / “Edited!”) — nothing disappears silently. Once the chat has ended, nothing can be changed.',
+    lc_msg_deleted:'This message was deleted!', lc_msg_edited:'Edited!', lc_del_by_host:'(deleted by the host)',
+    lc_edit:'Edit', lc_del_msg:'Delete this message',
+    lc_confirm_del_msg:'Delete this message? The text and any image are erased for everyone; a “This message was deleted!” mark stays in its place.',
+    lc_del_msg_failed:'Could not delete the message — please try again',
+    lc_editing:'Editing a message — press Save when you are done', lc_save:'Save',
+    lc_edit_failed:'The edit was not saved — please try again',
+    lc_edit_empty:'A message cannot be empty — use the bin button to remove it',
+    lc_edit_gone:'This message can no longer be edited',
+    lc_edit_no_img:'Finish or cancel the edit before attaching an image',
+    lc_rec_busy:'Recording — stop the microphone first',
     pwd_user_lbl:'Employee ID',
     lc_mic_silent:'That recording had almost no sound. Please check your microphone is picking you up, then try again.',
     p_clean_done:'Text tidied up',
@@ -3148,6 +3183,18 @@ const I18N = {
     lc_rule3_t:'由發起人結束並決定是否保留 — ',
     lc_rule3_d:'保留的日後可再閱讀，也可輸出 PDF。', lc_rule4_t:'發起人或系統管理者可刪除 — ',
     lc_rule4_d:'刪除會連同所有訊息一起移除，無法復原。',
+    lc_rule5_t:'進行中可修改、可刪除 — ',
+    lc_rule5_d:'自己的訊息可改可刪，發起人可刪除任何一則（但改不動別人的字）。兩者都會留下痕跡（「本訊息已刪除！」／「訊息已修改！」），不會無聲消失。對話結束後就不能再改。',
+    lc_msg_deleted:'本訊息已刪除！', lc_msg_edited:'訊息已修改！', lc_del_by_host:'（由發起人刪除）',
+    lc_edit:'修改', lc_del_msg:'刪除這則訊息',
+    lc_confirm_del_msg:'確定刪除這則訊息？內文與圖片會從所有人的畫面上清除，原位置留下「本訊息已刪除！」。',
+    lc_del_msg_failed:'刪除沒有成功，請再試一次',
+    lc_editing:'正在修改訊息 —— 改完請按「儲存」', lc_save:'儲存',
+    lc_edit_failed:'修改沒有存檔，請再試一次',
+    lc_edit_empty:'訊息不能是空白 —— 要整則拿掉請按垃圾桶鈕',
+    lc_edit_gone:'這則訊息已經不能修改了',
+    lc_edit_no_img:'修改中不能貼圖，請先儲存或取消',
+    lc_rec_busy:'正在錄音 —— 請先停止錄音',
     pwd_user_lbl:'員工編號',
     lc_mic_silent:'這段錄音幾乎沒有聲音。請確認麥克風有收到音，再試一次。',
     p_clean_done:'整理完成',
@@ -3261,6 +3308,18 @@ const I18N = {
     lc_rule3_t:'由发起人结束并决定是否保留 — ',
     lc_rule3_d:'保留的日后可再阅读，也可输出 PDF。', lc_rule4_t:'发起人或系统管理者可删除 — ',
     lc_rule4_d:'删除会连同所有消息一起移除，无法恢复。',
+    lc_rule5_t:'进行中可修改、可删除 — ',
+    lc_rule5_d:'自己的消息可改可删，发起人可删除任何一条（但改不了别人的字）。两者都会留下痕迹（“本消息已删除！”／“消息已修改！”），不会无声消失。对话结束后就不能再改。',
+    lc_msg_deleted:'本消息已删除！', lc_msg_edited:'消息已修改！', lc_del_by_host:'（由发起人删除）',
+    lc_edit:'修改', lc_del_msg:'删除这条消息',
+    lc_confirm_del_msg:'确定删除这条消息？内文与图片会从所有人的画面上清除，原位置留下“本消息已删除！”。',
+    lc_del_msg_failed:'删除没有成功，请再试一次',
+    lc_editing:'正在修改消息 —— 改完请按“保存”', lc_save:'保存',
+    lc_edit_failed:'修改没有保存，请再试一次',
+    lc_edit_empty:'消息不能是空白 —— 要整条拿掉请按垃圾桶键',
+    lc_edit_gone:'这条消息已经不能修改了',
+    lc_edit_no_img:'修改中不能贴图，请先保存或取消',
+    lc_rec_busy:'正在录音 —— 请先停止录音',
     pwd_user_lbl:'员工编号',
     lc_mic_silent:'这段录音几乎没有声音。请确认麦克风有收到音，再试一次。',
     p_clean_done:'整理完成',
@@ -3374,6 +3433,18 @@ const I18N = {
     lc_rule3_t:'Người mở kết thúc và quyết định có lưu hay không — ',
     lc_rule3_d:'cuộc trò chuyện được lưu vẫn đọc được về sau và xuất được PDF.', lc_rule4_t:'Người mở hoặc người quản trị hệ thống có thể xóa — ',
     lc_rule4_d:'việc này xóa toàn bộ tin nhắn và không thể hoàn tác.',
+    lc_rule5_t:'Khi cuộc trò chuyện đang diễn ra, có thể sửa và xóa tin nhắn — ',
+    lc_rule5_d:'bạn sửa hoặc xóa tin nhắn của chính bạn; người mở có thể xóa bất kỳ tin nhắn nào (nhưng không sửa được chữ của người khác). Cả hai đều để lại dấu vết («Tin nhắn này đã bị xóa!» / «Đã chỉnh sửa!»), không có gì biến mất trong im lặng. Sau khi kết thúc thì không sửa được nữa.',
+    lc_msg_deleted:'Tin nhắn này đã bị xóa!', lc_msg_edited:'Đã chỉnh sửa!', lc_del_by_host:'(do người mở xóa)',
+    lc_edit:'Sửa', lc_del_msg:'Xóa tin nhắn này',
+    lc_confirm_del_msg:'Xóa tin nhắn này? Nội dung và hình ảnh sẽ bị xóa khỏi màn hình của mọi người, chỗ đó sẽ hiện «Tin nhắn này đã bị xóa!».',
+    lc_del_msg_failed:'Không xóa được tin nhắn, vui lòng thử lại',
+    lc_editing:'Đang sửa tin nhắn — sửa xong hãy bấm «Lưu»', lc_save:'Lưu',
+    lc_edit_failed:'Chưa lưu được nội dung sửa, vui lòng thử lại',
+    lc_edit_empty:'Tin nhắn không được để trống — muốn bỏ hẳn thì bấm nút thùng rác',
+    lc_edit_gone:'Tin nhắn này không còn sửa được nữa',
+    lc_edit_no_img:'Hãy lưu hoặc hủy phần sửa trước khi gửi ảnh',
+    lc_rec_busy:'Đang ghi âm — hãy dừng micro trước',
     pwd_user_lbl:'Mã nhân viên',
     lc_mic_silent:'Bản ghi này gần như không có âm thanh. Vui lòng kiểm tra micro có thu được tiếng của bạn, rồi thử lại.',
     p_clean_done:'Đã chỉnh lại văn bản',
@@ -3483,6 +3554,18 @@ const I18N = {
     lc_rules_h:'ここでのルール',         lc_rule3_t:'開始者が終了し、保存するかを決めます — ',
     lc_rule3_d:'保存した会話は後から読めて、PDF に出力できます。', lc_rule4_t:'開始者またはシステム管理者が削除できます — ',
     lc_rule4_d:'すべてのメッセージも一緒に削除され、元に戻せません。',
+    lc_rule5_t:'進行中はメッセージの編集・削除ができます — ',
+    lc_rule5_d:'自分のメッセージは編集も削除もでき、開始者はどのメッセージでも削除できます（ただし他人の文面は編集できません）。どちらも痕跡が残り（「このメッセージは削除されました！」／「メッセージを編集しました！」）、黙って消えることはありません。終了後は変更できません。',
+    lc_msg_deleted:'このメッセージは削除されました！', lc_msg_edited:'メッセージを編集しました！', lc_del_by_host:'（開始者が削除）',
+    lc_edit:'編集', lc_del_msg:'このメッセージを削除',
+    lc_confirm_del_msg:'このメッセージを削除しますか？本文と画像は全員の画面から消去され、その位置に「このメッセージは削除されました！」が残ります。',
+    lc_del_msg_failed:'削除できませんでした。もう一度お試しください',
+    lc_editing:'メッセージを編集中 —— 完了したら「保存」を押してください', lc_save:'保存',
+    lc_edit_failed:'編集が保存されませんでした。もう一度お試しください',
+    lc_edit_empty:'メッセージを空にはできません —— 削除はごみ箱ボタンから',
+    lc_edit_gone:'このメッセージはもう編集できません',
+    lc_edit_no_img:'編集を保存または取消してから画像を送ってください',
+    lc_rec_busy:'録音中です —— 先にマイクを停止してください',
     pwd_user_lbl:'従業員ID',
     lc_mic_silent:'この録音はほとんど音が入っていません。マイクが音を拾っているか確認して、もう一度お試しください。',
     p_clean_done:'整えました',
@@ -4119,6 +4202,13 @@ var lcMsgs      = [];     // 目前場次的訊息（依 created_at 遞增）
 var lcPollTimer = null;
 var lcBusy      = false;  // 送出中，防連點
 var lcListLoaded = false;
+// 正在修改哪一則（null ＝ 一般送出模式）。🔴 修改沿用 composer 那一個輸入框，
+// 不在訊息裡畫第二個 —— #lc-stream 每 3 秒整塊重繪，畫在裡面的 textarea
+// 會在打字打到一半被換成新節點（board 的 pm* 踩過這個坑，composer 放在外面正是為此）
+var lcEditId    = null;
+// 上次同步到哪個 updated_at（輪詢用）。see lcPoll：新訊息、改過的、刪掉的、
+// 剛翻好的全部靠這一個游標，不再用 created_at
+var lcSyncAt    = '1970-01-01T00:00:00Z';
 
 function lcMe()      { return (SESSION && SESSION.empId) || ''; }
 function lcMyName()  { return (SESSION && (SESSION.nameZh || SESSION.nameEn || SESSION.empId)) || ''; }
@@ -4184,6 +4274,10 @@ async function lcDelete(id, ev) {
   if (lcSession && lcSession.id === id) { lcPollStop(); lcBackToList(); }
   else lcLoadList();
 }
+
+// 時間字串比大小一律經過這裡：PostgREST 回的是 '…+00:00'，前端自己產的是 '…Z'，
+// 直接用字串比在時區後綴那一段會分岔
+function lcTs(iso) { var v = Date.parse(iso || ''); return isNaN(v) ? 0 : v; }
 
 function lcTime(iso) {
   if (!iso) return '';
@@ -4253,7 +4347,16 @@ async function lcTranslateAndSave(msg) {
   try {
     for (var attempt = 0; attempt < LC_TR_TRIES; attempt++) {
       try {
-        var r = await lcTranslate(msg.text);
+        // 🔴 記下這一輪翻的是哪一段文字。翻譯要幾秒，而使用者可以在這中間
+        //    按 ✎ 把原文改掉 —— 寫回舊譯文的話，畫面會變成
+        //    「原文是新的、四語是舊的」，而讀譯文的人（越南／東莞同事）
+        //    完全看不出來。這種壞法沒有人會回報。
+        var src = msg.text;
+        var r = await lcTranslate(src);
+        if (msg.text !== src) {           // 翻到一半被改了 → 這一份作廢
+          console.warn('[lc] translate stale, text changed', msg.id);
+          return;
+        }
         var patch = {
           src_lang: r.src,
           text_zhtw: r['zh-TW'], text_zhcn: r['zh-CN'], text_en: r.en, text_vi: r.vi,
@@ -4276,6 +4379,8 @@ async function lcTranslateAndSave(msg) {
     if (l2) { l2._trFailed = true; lcRenderStream(); }
   } finally {
     delete lcTrBusy[msg.id];
+    // 翻譯進行中被修改：那時候不能再開一份（會互相覆蓋），改成排隊，這裡補跑
+    if (msg._trRedo) { delete msg._trRedo; lcTranslateAndSave(msg); }
   }
 }
 
@@ -4368,6 +4473,9 @@ async function lcCreate() {
   lcAccessSet('invite');              // 同理：不重置的話下一場會默默沿用「公開」，
                                       // 而公開必須是每一次都明確選過的決定
   lcSession = s; lcMsgs = []; lcColorReset(); lcWhoReset();
+  // 新的一場沒有任何訊息：同步游標歸零，不可沿用上一間房的（會漏掉前幾則）
+  lcSyncAt = '1970-01-01T00:00:00Z';
+  lcEditId = null; lcEditPaint();
   lcShowRoom(); lcRenderStream(); lcPollStart();
   // 通知放最後：房間已經建好了，通知沒送出不該讓建立看起來失敗 —— 但一定要說，
   // 否則開啟者會以為對方已經被叫進來了，而其實沒有人知道這場存在
@@ -4393,6 +4501,11 @@ async function lcOpen(id) {
   var msgs = await SB.get('chat_messages',
     'session_id=eq.' + encodeURIComponent(id) + '&order=created_at.desc&limit=' + LC_MSG_LIMIT);
   lcMsgs = (msgs || []).slice().reverse();
+  // 同步游標從「已載入的最大 updated_at」起算。從 0 起算的話，第一次輪詢會把
+  // 整場訊息再抓一次（而且 limit 100 只抓得到一部分，要兩三輪才追上）
+  lcSyncAt = '1970-01-01T00:00:00Z';
+  lcMsgs.forEach(function(m) { if (lcTs(m.updated_at) > lcTs(lcSyncAt)) lcSyncAt = m.updated_at; });
+  lcEditId = null; lcEditPaint();
   lcShowRoom(); lcRenderStream(); lcScrollBottom(true);
   if (lcSession.status === 'open') { lcPollStart(); lcBeat(); }
   lcWhoLoad(true);   // 已結束的場次也讀：那份名單是「當時誰在」的紀錄
@@ -4400,7 +4513,9 @@ async function lcOpen(id) {
 
 function lcBackToList() {
   lcPollStop();
+  lcEditId = null; lcEditPaint();
   lcSession = null; lcMsgs = []; lcColorReset(); lcWhoReset();
+  lcSyncAt = '1970-01-01T00:00:00Z';
   var r = document.getElementById('lc-room'), l = document.getElementById('lc-listview');
   if (r) r.style.display = 'none';
   if (l) l.style.display = 'flex';
@@ -4422,6 +4537,9 @@ function lcShowRoom() {
     + '　·　' + t('lc_tz_note').replace('{tz}', lcTzLabel());
   var comp = document.getElementById('lc-composer');
   if (comp) comp.style.display = live ? 'flex' : 'none';
+  // 對話在別人手上結束了：composer 整塊會被藏起來，修改模式不能就這樣留著
+  // （下次進到別的房間時「送出」鈕還會寫著「儲存」）
+  if (!live && lcEditId) lcEditCancel(); else lcEditPaint();
   var endBtn = document.getElementById('lc-end-btn');
   if (endBtn) endBtn.style.display = (live && lcIsHost()) ? 'inline-block' : 'none';
   // 🔴 只有結束並保留之後才給輸出 PDF：沒結束的紀錄匯出去是半成品，
@@ -4466,11 +4584,28 @@ function lcMsgHtml(m) {
   var mine = m.emp_id === lcMe();
   var srcLab = m.src_lang ? (LC_LABEL[m.src_lang] || m.src_lang) : '';
   var col = lcColor(m.emp_id);
-  var h = '<div class="lc-msg' + (mine ? ' mine' : '') + '" style="border-left-color:' + col + '">'
-    + '<div class="lc-msg-head"><b style="color:' + col + '">' + escHtml(m.author_name || m.emp_id) + '</b>'
-    +   '<span class="lc-msg-time">' + lcTime(m.created_at) + '</span>'
-    +   (srcLab ? '<span class="lc-src">' + escHtml(srcLab + ' ' + t('lc_orig')) + '</span>' : '')
-    + '</div>'
+  var head = '<div class="lc-msg-head"><b style="color:' + col + '">' + escHtml(m.author_name || m.emp_id) + '</b>'
+    + '<span class="lc-msg-time">' + lcTime(m.created_at) + '</span>';
+
+  // 🔴 刪掉的那一則**留在原地**，只是內容沒了。整列拿掉的話，對話中間會少一塊
+  //    而沒有人看得出來 —— 「這裡曾經有話、被刪了」本身就是讀的人該知道的事。
+  if (m.deleted_at) {
+    // 被別人（＝發起人）刪掉時要講出來，否則作者會以為是自己誤刪的
+    var byOther = m.deleted_by && m.deleted_by !== m.emp_id;
+    return '<div class="lc-msg gone' + (mine ? ' mine' : '') + '" style="border-left-color:' + col + '">'
+      + head + '</div>'
+      + '<div class="lc-gone-note">' + escHtml(t('lc_msg_deleted'))
+      +   (byOther ? ' <span class="lc-gone-who">' + escHtml(t('lc_del_by_host')) + '</span>' : '')
+      + '</div></div>';
+  }
+
+  if (m.edited_at) head += '<span class="lc-edited">' + escHtml(t('lc_msg_edited')) + '</span>';
+  if (srcLab)      head += '<span class="lc-src">' + escHtml(srcLab + ' ' + t('lc_orig')) + '</span>';
+  head += lcMsgActs(m) + '</div>';
+
+  var h = '<div class="lc-msg' + (mine ? ' mine' : '')
+    + (lcEditId === m.id ? ' editing' : '') + '" style="border-left-color:' + col + '">'
+    + head
     + lcImgHtml(m)
     + (m.text ? '<div class="lc-otext">' + escHtml(m.text) + '</div>' : '');
 
@@ -4488,7 +4623,7 @@ function lcMsgHtml(m) {
     if (lines) h += '<div class="lc-tr">' + lines + '</div>';
   } else if (m._trFailed) {
     h += '<div class="lc-tr"><div class="lc-fail">⚠ ' + escHtml(t('lc_tr_failed'))
-      + (mine ? ' <button class="lc-retry" onclick="lcRetry(\'' + escHtml(m.id) + '\')">↻ '
+      + (mine ? ' <button class="lc-retry" onclick="lcRetry(\'' + _lcSafeId(m.id) + '\')">↻ '
                 + escHtml(t('lc_retry')) + '</button>' : '') + '</div></div>';
   } else {
     h += '<div class="lc-tr"><div class="lc-pending">' + escHtml(t('lc_translating')) + '</div></div>';
@@ -4501,6 +4636,145 @@ function lcRetry(id) {
   if (!m || lcTrBusy[id]) return;
   delete m._trFailed; lcRenderStream();
   lcTranslateAndSave(m);
+}
+
+// ═════════════════════════════════════════
+// 單則訊息的修改與刪除（v2.01）
+//
+// 🔴 三條規則，刻意不對稱（使用者 2026-09-19 指定）：
+//    ① 發起人刪得掉**任何一則**（含別人的）   ② 本人刪得掉自己的
+//    ③ 只有**本人**改得動自己的字 —— 發起人也不行。
+//    刪除是「拿掉」（畫面上看得出來少了東西），改寫是「換掉」（看不出來）。
+//    讓發起人改得動別人的字，等於可以把別人說過的話變成別的意思。
+// 🔴 兩者都留痕跡，而且痕跡撤不掉（sb-proxy 不准把 deleted_at 清回 null）。
+//    可以「復原」的刪除等於沒有痕跡。
+// 🔴 只有**進行中**才給改給刪：已結束的場次是存檔（可匯出 PDF），
+//    事後修改等於竄改已經發出去的紀錄（同 board「只有定稿才給匯出」的另一面）。
+// ═════════════════════════════════════════
+function lcMsgLive()     { return !!lcSession && lcSession.status === 'open'; }
+function lcCanEditMsg(m) { return lcMsgLive() && !m.deleted_at && m.emp_id === lcMe(); }
+function lcCanDelMsg(m)  { return lcMsgLive() && !m.deleted_at && (m.emp_id === lcMe() || lcIsHost()); }
+
+// 🔴 id 進 onclick 之前一律過 _lcSafeId：訊息 id 是**前端產生後寫進資料庫的**
+//    （lcSend 的 uid()），所以它是「別人送進來的字串」。escHtml 不跳脫單引號，
+//    而這裡是 onclick="...('ID')" —— 帶單引號的 id 就跳得出字串。同鈴鐺通知那一段的理由。
+function lcMsgActs(m) {
+  var id = _lcSafeId(m.id);
+  if (!id) return '';
+  var h = '';
+  if (lcCanEditMsg(m)) h += '<button class="lc-mact" title="' + escHtml(t('lc_edit'))
+    + '" onclick="lcEditStart(\'' + id + '\')">\u270e</button>';
+  if (lcCanDelMsg(m))  h += '<button class="lc-mact danger" title="' + escHtml(t('lc_del_msg'))
+    + '" onclick="lcDelMsg(\'' + id + '\')">\ud83d\uddd1</button>';
+  return h ? '<span class="lc-macts">' + h + '</span>' : '';
+}
+
+// 刪除 ＝ 軟刪除 ＋ **真的把內容抹掉**。只加旗標而把原文留在資料庫裡，
+// 擋得住畫面、擋不住直接打 sb-proxy 的人（CLAUDE.md 記過兩次的同一個坑）。
+async function lcDelMsg(id) {
+  var m = lcMsgs.find(function(x){ return x.id === id; });
+  if (!m || !lcCanDelMsg(m)) return;
+  if (!confirm(t('lc_confirm_del_msg'))) return;
+  var patch = {
+    text: '', src_lang: '',
+    text_zhtw: null, text_zhcn: null, text_en: null, text_vi: null, tr_at: null,
+    img_path: null, img_name: null, img_mime: null, img_w: null, img_h: null,
+    deleted_at: new Date().toISOString(), deleted_by: lcMe(),
+  };
+  var oldPath = m.img_path || '';
+  try {
+    await SB.patch('chat_messages', 'id=eq.' + encodeURIComponent(id), patch);
+  } catch (e) {
+    // 寫入沒成功就不要動畫面（admin v2.37）：說「已刪除」而資料庫還在的話，
+    // 刪的人以為拿掉了，其他人卻還看得到
+    toast(t('lc_del_msg_failed'), 'err');
+    return;
+  }
+  if (lcEditId === id) lcEditCancel();
+  Object.assign(m, patch);
+  lcRenderStream();
+  if (oldPath) lcImgDrop(oldPath);
+}
+
+// 圖片實體檔盡力刪掉，失敗不回報：資料庫那一列已經沒有任何欄位指向它，
+// 私有 bucket 裡的孤兒物件沒有人找得到（同 lcSendImage 對上傳孤兒的判斷）。
+function lcImgDrop(path) {
+  delete lcImgUrl[path];
+  fetch(SB_WORKER + '/supabase/storage/v1/object/' + LC_IMG_BUCKET + '/' + path,
+        { method: 'DELETE', headers: sbHdrs() })
+    .catch(function(e){ console.warn('[lc] img drop', path, e && e.message); });
+}
+
+// ─── 修改：沿用 composer 的輸入框（不另外畫一份，理由見 lcEditId 的說明）───
+function lcEditStart(id) {
+  var m = lcMsgs.find(function(x){ return x.id === id; });
+  if (!m || !lcCanEditMsg(m)) return;
+  if (window.ComartVoice && ComartVoice.active()) { toast(t('lc_rec_busy'), 'err'); return; }
+  lcEditId = id;
+  var el = document.getElementById('lc-input');
+  if (el) {
+    el.value = m.text || '';
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, LC_INPUT_MAX) + 'px';
+    el.focus();
+    try { el.setSelectionRange(el.value.length, el.value.length); } catch (e) {}
+  }
+  lcEditPaint(); lcRenderStream();
+}
+
+function lcEditCancel() {
+  if (!lcEditId) { lcEditPaint(); return; }
+  lcEditId = null;
+  var el = document.getElementById('lc-input');
+  if (el) { el.value = ''; el.style.height = 'auto'; }
+  lcEditPaint(); lcRenderStream();
+}
+
+function lcEditPaint() {
+  var bar = document.getElementById('lc-editbar');
+  if (bar) bar.style.display = lcEditId ? 'flex' : 'none';
+  var lbl = document.getElementById('lc-editbar-t');
+  if (lbl) lbl.textContent = t('lc_editing');
+  var cn = document.getElementById('lc-edit-cancel');
+  if (cn) cn.textContent = t('lc_cancel');
+  var sb = document.getElementById('lc-send-btn');
+  if (sb) sb.textContent = t(lcEditId ? 'lc_save' : 'lc_send');
+  var comp = document.getElementById('lc-composer');
+  if (comp) comp.classList.toggle('editing', !!lcEditId);
+}
+
+async function lcEditSave() {
+  if (lcBusy) return;
+  var m = lcMsgs.find(function(x){ return x.id === lcEditId; });
+  if (!m) { lcEditCancel(); return; }
+  // 正在改的時候被發起人刪掉了、或對話剛好結束了
+  if (!lcCanEditMsg(m)) { toast(t('lc_edit_gone'), 'err'); lcEditCancel(); return; }
+  var el = document.getElementById('lc-input');
+  var text = ((el && el.value) || '').trim();
+  // 純文字訊息改成空白 ＝ 刪除，但刪除該走 🗑（會留下「本訊息已刪除！」）。
+  // 清空送出等於開了一條不留痕跡的刪除路徑。
+  if (!text && !m.img_path) { toast(t('lc_edit_empty'), 'err'); return; }
+  if (text === (m.text || '')) { lcEditCancel(); return; }   // 沒動就不重翻，省一次 API
+  lcBusy = true;
+  // 🔴 舊譯文一律清掉重翻。留著會變成「原文改了、譯文沒改」，
+  //    而讀譯文的人（越南／東莞同事）根本不會發現（同 board pmEditEntry 的判斷）
+  var patch = {
+    text: text, edited_at: new Date().toISOString(),
+    src_lang: '', text_zhtw: null, text_zhcn: null, text_en: null, text_vi: null, tr_at: null,
+  };
+  try {
+    await SB.patch('chat_messages', 'id=eq.' + encodeURIComponent(m.id), patch);
+  } catch (e) {
+    lcBusy = false;
+    toast(t('lc_edit_failed'), 'err');   // 🔴 不清輸入框：剛改好的字還在裡面
+    return;
+  }
+  Object.assign(m, patch); delete m._trFailed;
+  lcBusy = false;
+  lcEditCancel();
+  // 上一輪翻譯還在跑的話不能再開一份（lcTrBusy 會直接擋掉，結果是永遠不重翻）——
+  // 掛旗標讓它跑完自己接下去
+  if (lcTrBusy[m.id]) m._trRedo = true; else lcTranslateAndSave(m);
 }
 
 function lcNearBottom() {
@@ -4521,6 +4795,9 @@ function lcKeydown(ev) {
 }
 
 async function lcSend() {
+  // 修改模式下，同一顆鈕（與 Enter）是「儲存修改」而不是「送出新訊息」。
+  // 出口只有一個，所以鍵盤與滑鼠不會分岔（同 Portal enterPortal 的道理）
+  if (lcEditId) { return lcEditSave(); }
   if (!lcSession || lcSession.status !== 'open' || lcBusy) return;
   var el = document.getElementById('lc-input');
   var text = ((el && el.value) || '').trim();
@@ -4584,29 +4861,31 @@ async function lcPoll() {
       lcPollStop(); toast(t('lc_gone')); lcBackToList(); return;
     }
 
-    // 2) 新訊息（比目前最後一則新的）
-    var lastTs = lcMsgs.length ? lcMsgs[lcMsgs.length-1].created_at : '1970-01-01T00:00:00Z';
+    /* 2) 這一場**有任何變動**的訊息 —— 新送出的、改過的、被刪掉的、剛翻好的，
+          全部由這一個查詢帶回來。
+       🔴 游標是 updated_at 不是 created_at。舊版抓「created_at 比最後一則新」的，
+          所以**別人改字或刪訊息，其他人的畫面永遠不會變** —— 修改與刪除等於
+          只有動手的人自己看得到。updated_at 由 DB trigger 維護
+          （migration 202609190001），任何 UPDATE 都會推進它。
+       順帶把舊版的第 3 個查詢（補抓別人的譯文）併掉了：譯文寫回也是 UPDATE，
+       本來就在這一份結果裡。一輪輪詢少一個請求（sb-proxy 併發上限的坑）。 */
     var fresh = await SB.get('chat_messages',
       'session_id=eq.' + encodeURIComponent(sid) +
-      '&created_at=gt.' + encodeURIComponent(lastTs) + '&order=created_at&limit=100');
+      '&updated_at=gt.' + encodeURIComponent(lcSyncAt) + '&order=updated_at&limit=100');
     if (fresh && fresh.length) {
-      var seen = {}; lcMsgs.forEach(function(m){ seen[m.id] = 1; });
-      fresh.forEach(function(m) { if (!seen[m.id]) { lcMsgs.push(m); changed = true; } });
-      if (lcMsgs.length > LC_MSG_LIMIT) lcMsgs = lcMsgs.slice(-LC_MSG_LIMIT);
-    }
-
-    // 3) 別人的訊息剛才還沒翻完 —— 補抓那幾則的譯文
-    //    （自己的那幾則由 lcTranslateAndSave 直接寫回本地，不必重抓）
-    var pending = lcMsgs.filter(function(m) { return !m.tr_at && m.emp_id !== lcMe(); })
-                        .map(function(m) { return m.id; }).slice(-20);
-    if (pending.length) {
-      var got = await SB.get('chat_messages',
-        'id=in.(' + pending.map(encodeURIComponent).join(',') + ')&select=id,src_lang,text_zhtw,text_zhcn,text_en,text_vi,tr_at');
-      (got || []).forEach(function(g) {
-        if (!g.tr_at) return;
-        var m = lcMsgs.find(function(x){ return x.id === g.id; });
-        if (m) { Object.assign(m, g); changed = true; }
+      fresh.forEach(function(row) {
+        if (lcTs(row.updated_at) > lcTs(lcSyncAt)) lcSyncAt = row.updated_at;
+        var m = lcMsgs.find(function(x){ return x.id === row.id; });
+        if (m) { Object.assign(m, row); }
+        else   { lcMsgs.push(row); }
+        changed = true;
+        // 正在改的那一則被發起人刪掉了：不能讓使用者對著一則不存在的訊息繼續打字
+        if (lcEditId === row.id && row.deleted_at) { toast(t('lc_edit_gone'), 'err'); lcEditCancel(); }
       });
+      // 顯示順序永遠是 created_at（updated_at 只是同步游標）。改過的舊訊息
+      // 不該因為剛被改過就跳到最下面 —— 那會讓人以為有人又說了一次話。
+      lcMsgs.sort(function(a, b){ return lcTs(a.created_at) - lcTs(b.created_at); });
+      if (lcMsgs.length > LC_MSG_LIMIT) lcMsgs = lcMsgs.slice(-LC_MSG_LIMIT);
     }
 
     if (changed) { lcRenderStream(); if (stick) lcScrollBottom(true); }
@@ -4618,9 +4897,13 @@ async function lcPoll() {
     if (lcIsHost()) {
       var now = Date.now();
       var orphan = lcMsgs.find(function(m) {
+        // 刪掉的訊息 text 是空字串，這個條件本身就把它們排除了（不必另外判斷 deleted_at）
+        // 🔴 年齡從「送出」或「最後一次修改」起算（取較晚者）：剛改完的那 60 秒
+        //    是作者自己重翻的時間，開啟者這時插進來會與作者的那一份互相覆蓋
+        var age = now - Math.max(lcTs(m.created_at), lcTs(m.edited_at));
         return m.text && !m.tr_at && !m._trFailed && !lcTrBusy[m.id] &&
                m.emp_id !== lcMe() &&                       // 自己的那幾則本來就在翻
-               (now - new Date(m.created_at).getTime()) > LC_ORPHAN_MS;
+               age > LC_ORPHAN_MS;
       });
       // 一次只補一則：一輪輪詢就把 20 則丟進去會直接撞上 edge function 併發上限
       if (orphan) lcTranslateAndSave(orphan);
@@ -4709,8 +4992,17 @@ async function lcExportPDF() {
   lcMsgs.forEach(function(m) {
     body += '<div class="m"><div class="mh">' + escHtml(m.author_name || m.emp_id)
       + '　<span class="mt">' + escHtml(lcDay(m.created_at)) + ' ' + lcTime(m.created_at) + '</span>'
-      + (m.src_lang ? '　<span class="ms">' + escHtml((LC_LABEL[m.src_lang]||m.src_lang) + ' 原文') + '</span>' : '')
+      // 🔴 痕跡要一起印出去。匯出的是這場對話的存檔 ——
+      //    畫面上看得到「被刪過／被改過」，PDF 上看不到的話，那份 PDF 就不忠實
+      + (m.edited_at  ? '　<span class="ms">訊息已修改！</span>' : '')
+      + (m.deleted_at ? '' : (m.src_lang ? '　<span class="ms">' + escHtml((LC_LABEL[m.src_lang]||m.src_lang) + ' 原文') + '</span>' : ''))
       + '</div>';
+    if (m.deleted_at) {
+      body += '<div class="mgone">本訊息已刪除！'
+        + (m.deleted_by && m.deleted_by !== m.emp_id ? '（由發起人刪除）' : '')
+        + '</div></div>';
+      return;
+    }
     if (m.img_path) {
       body += imgData[m.img_path]
         ? '<div class="mi"><img src="' + imgData[m.img_path] + '"></div>'
@@ -4735,6 +5027,7 @@ async function lcExportPDF() {
     + '.ml{display:flex;gap:8px;font-size:12px;color:#333;margin:2px 0}'
     + '.mi{margin:4px 0 6px}.mi img{max-width:320px;max-height:260px;border:1px solid #ccc;border-radius:5px}'
     + '.mimiss{font-size:11.5px;color:#999;margin:3px 0}'
+    + '.mgone{font-size:12px;color:#999;font-style:italic}'
     + '.mlab{flex:0 0 34px;color:#888;font-size:10.5px;padding-top:2px}'
     + '@media print{@page{margin:14mm}}';
   // 🔴 必須先 document.open() 才寫最終內容：前面寫過「正在準備文件…」的佔位文字
@@ -4823,6 +5116,9 @@ function lcShrink(file, maxDim, q) {
 // ─── 上傳並送出 ───
 async function lcSendImage(file) {
   if (!lcSession || lcSession.status !== 'open' || lcBusy) return;
+  // 修改模式下輸入框裡是「別的東西」（正在改的那一則）。這時貼圖若當成新訊息送出，
+  // 會把正在改的內容一起送掉；當成「換圖」則語意不明（那是新的一則還是同一則？）
+  if (lcEditId) { toast(t('lc_edit_no_img'), 'err'); return; }
   var prep;
   try {
     prep = await lcPrepImage(file);
@@ -5480,14 +5776,17 @@ function lcApplyI18n() {
   function ph(id, key)  { var e = document.getElementById(id); if (e) e.placeholder = t(key); }
   txt('lc-new-lbl','lc_new_lbl'); ph('lc-new-title','lc_title_ph');
   txt('lc-rules-h','lc_rules_h');
-  for (var ri = 1; ri <= 4; ri++) {
+  for (var ri = 1; ri <= 5; ri++) {
     txt('lc-rule' + ri + '-t', 'lc_rule' + ri + '_t');
     txt('lc-rule' + ri + '-d', 'lc_rule' + ri + '_d');
   }
   txt('lc-new-btn','lc_new');     txt('lc-new-hint','lc_new_hint');
   txt('lc-keep-btn','lc_keep');   txt('lc-discard-btn','lc_discard');
   txt('lc-endbar-q','lc_end_q');  txt('lc-end-btn','lc_end');
-  txt('lc-send-btn','lc_send');   ph('lc-input','lc_input_ph');
+  ph('lc-input','lc_input_ph');
+  // 🔴 送出鈕的字不能在這裡寫死：修改模式下它是「儲存」。
+  //    lcEditPaint 是那顆鈕的唯一事實來源（切語言時也由它重上字）
+  lcEditPaint();
   var at = document.getElementById('lc-attach-btn'); if (at) at.title = t('lc_image');
   lcRecInit(); lcRecPaint();
   // 翻譯頁籤的語音與整理鈕（原本 title 寫死中文）

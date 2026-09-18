@@ -103,7 +103,7 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 
 | File | Version | Purpose | ~Lines |
 |------|---------|---------|--------|
-| `index.html` | v2.00 | Main portal — login, home, directory, bulletin, calendar, AI tools | 4,394 |
+| `index.html` | v2.01 | Main portal — login, home, directory, bulletin, calendar, AI tools | 4,700 |
 | `admin/index.html` | v2.40 | Admin System — room booking, fleet, visitor, library, lottery | 5,650 |
 | `kms/index.html` | v2.36 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
 | `quotation/index.html` | v3.60 | Quotation & CRM system | 7,332 |
@@ -676,6 +676,68 @@ Portal AI 功能區的第二個頁籤（`💬 線上對話`，在翻譯旁邊）
 - 名單分三區：在房間裡／剛剛離開（幾分鐘前）／已邀請但還沒進來。
   第三區的人名從 `umActiveUsers()` 補（presence 表裡沒有他們）。
   已結束的場次也讀 —— 那份名單是「當時誰在」的紀錄。
+
+### 訊息可修改、可刪除，兩者都留痕跡（v2.01，migration 202609190001）
+
+使用者 2026-09-19 指定：發起人可刪除任何一則（含別人的）、本人可刪除自己的、
+進行中可修改已送出的訊息 —— 三者都要留下看得見的痕跡
+（「本訊息已刪除！」／「訊息已修改！」）。函式 `lcDelMsg`／`lcEditStart`／
+`lcEditSave`／`lcEditCancel`／`lcEditPaint`／`lcMsgActs`。
+
+- 🔴 **權限刻意不對稱：發起人刪得掉別人的訊息，但改不動別人的字。**
+  刪除是「拿掉」（畫面上留一格，看得出來少了東西），改寫是「換掉」（看不出來）。
+  能改別人的字，等於可以把同事說過的話變成別的意思。
+  sb-proxy 分三組欄位落實：`CHAT_MSG_TEXT`（本文＋edited_at）**只有作者**、
+  `CHAT_MSG_WIPE`（刪除要抹掉的內容）作者或發起人、
+  `CHAT_MSG_TR`（四語譯文）作者或發起人（孤兒補翻是發起人做的）。
+  **admin 不在這裡面** —— 他本來就開不了別人的房間（CLAUDE.md 既有決定），
+  給他刪單則訊息的權力等於要他先讀得到。
+- 🔴 **刪除 ＝ 軟刪除 ＋ 真的抹掉內容**（`text`／四語／`src_lang`／`img_*` 全部清空，
+  只留 `deleted_at`＋`deleted_by`）。只加旗標而把原文留在資料庫裡，擋得住畫面、
+  擋不住直接打 sb-proxy 的人 —— 那是本檔案記過兩次的同一個坑。
+  代價：**刪掉就真的沒有了，不留稽核內容**，要追究只有 `deleted_by`。
+  這是聊天室該有的語意（不同於 `premortem_summary_log` 會保存舊版 ——
+  那是正式會議紀錄，這是談話）。
+- 🔴 **痕跡撤不掉**：sb-proxy 不准把 `deleted_at` 清回 null，也不准前端自己送
+  `deleted_by`（一律改寫成簽章身分）。可以「復原」的刪除等於沒有痕跡，
+  而能指定刪除者等於可以嫁禍。
+- 🔴 **只有進行中（`status='open'`）才給改給刪。** 已結束的場次是存檔、可匯出 PDF，
+  事後修改等於竄改已經發出去的紀錄（同 board「只有定稿才給匯出」的另一面）。
+- 🔴 **修改沿用 composer 那一個輸入框，不在訊息裡畫第二個。**
+  `#lc-stream` 每 3 秒整塊重繪，畫在裡面的 textarea 會在打字打到一半被換成新節點
+  （board 的 `pm*` 正是踩這個坑才要做 `pmSnapInputs` 那一整套）。
+  提示列 `#lc-editbar` 同樣放在 stream 外面。**不要為了「就地編輯」把它搬進去。**
+  送出鈕的文字由 `lcEditPaint()` 單一決定（修改模式寫「儲存」），
+  `lcApplyI18n` **不可**再寫死 `lc_send`。
+- 🔴 **改完一律清掉舊譯文重翻**（`text_*` 設 null、`tr_at` 設 null）。
+  留著會變成「原文改了、譯文沒改」，而讀譯文的越南／東莞同事**根本不會發現** ——
+  這種壞法沒有人會回報（同 board `pmEditEntry` 的判斷）。
+- 🔴 **翻譯與修改的競態有三個出口，三個都要**：
+  ① `lcTranslateAndSave` 在寫回前比對 `msg.text` 是不是還是當初送去翻的那一段，
+  不是就整份作廢（翻譯要幾秒，使用者可以在這中間按 ✎）；
+  ② 翻譯還在跑時按儲存 → 掛 `_trRedo` 排隊，**不能直接再呼叫一次**
+  （`lcTrBusy` 會擋掉，結果是永遠不重翻）；
+  ③ 孤兒補翻的年齡改從 `max(created_at, edited_at)` 起算 ——
+  剛改完的 60 秒留給作者自己，否則發起人會插進來與作者的那一份互相覆蓋。
+- 🔴 **輪詢游標從 `created_at` 改成 `updated_at`**（DB trigger `chat_messages_set_updated` 維護）。
+  舊版抓「比最後一則新」的訊息，所以**別人改字或刪訊息，其他人的畫面永遠不會變** ——
+  修改與刪除會變成只有動手的人自己看得到。**這個欄位是整個功能成立的前提，不是附帶的。**
+  順帶把「補抓別人譯文」那個查詢併掉了（譯文寫回也是 UPDATE，本來就在同一份結果裡），
+  一輪輪詢少一個請求。顯示順序仍然是 `created_at`：改過的舊訊息不該跳到最下面。
+  游標一定要在 `lcOpen`／`lcCreate`／`lcBackToList` 三處重設，
+  否則新開的房間會沿用上一間的游標而漏掉前幾則。
+- **送出訊息的 `emp_id` 現在由 sb-proxy 強制改寫成簽章身分**（冒用時連 `author_name`
+  一起丟掉，畫面退回顯示工號）。「作者」是新規則裡權限的根（本人可改可刪），
+  不能是前端說了算的欄位。
+- **硬刪除單則訊息一律 403**：刪除的語意是「留下一格」，那要靠列還在才做得到。
+  真的要整列消失只有「整場刪除」那條路（cascade）。
+- **訊息 id 進 `onclick` 之前一律過 `_lcSafeId()`**：那個 id 是前端 `uid()` 產生後寫進
+  資料庫的，也就是「別人送進來的字串」，而 `escHtml` 不跳脫單引號。
+  `lcRetry` 原本就少了這一道，一併補上。
+- **清單頁「這裡的規則」加了第 5 條**（五語）。那不是文案：能不能改、能不能刪、
+  刪了看不看得出來，是使用者要不要在裡面講真話的依據。
+- PDF 匯出也印痕跡（`本訊息已刪除！`／`訊息已修改！`，固定繁中）：
+  畫面上看得到而存檔看不到的話，那份存檔就不忠實。
 
 ### 邀請通知：大卡片 ＋ 點進去就是房間（v1.94，無 migration）
 

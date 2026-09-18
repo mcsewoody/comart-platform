@@ -103,7 +103,7 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 
 | File | Version | Purpose | ~Lines |
 |------|---------|---------|--------|
-| `index.html` | v2.01 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
+| `index.html` | v2.02 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
 | `admin/index.html` | v2.40 | Admin System — room booking, fleet, visitor, library, lottery | 5,650 |
 | `kms/index.html` | v2.36 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
 | `quotation/index.html` | v3.60 | Quotation & CRM system | 7,332 |
@@ -464,6 +464,47 @@ Portal AI 功能區的第二個頁籤（`💬 線上對話`，在翻譯旁邊）
   他一送出就關掉分頁的話那一則永遠不會有譯文。補翻責任給開啟者而不是「誰看到誰補」——
   後者會讓房裡 5 個人同時對同一則發 5 次請求。**一輪輪詢只補一則**（一次丟 20 則會撞併發上限）。
   `lcTrBusy` 防止重試與補翻同時對同一則動手。
+
+### 🔴 長訊息的翻譯：四個獨立的成因（v2.02，2026-09-19）
+
+使用者回報「訊息超過一個字數，整個翻譯會卡住」（畫面永遠停在「翻譯中…」）。
+**那不是一個 bug，是四個疊在一起**，其中兩個與長度無關：
+
+- 🔴 **系統提示詞與使用者訊息互相牴觸，活了兩週。** v1.83 把輸出格式從 JSON 改成
+  XML 標籤，改了使用者訊息卻**沒改 `LC_TR_SYS`** —— 系統說
+  `Output ONLY a minified JSON object`、訊息說 `Reply with ONLY these five tags`。
+  模型會依內容倒向其中一邊，倒向 JSON 那次就抓不到標籤 → 判定 incomplete →
+  重試三次 → 失敗。**長訊息只是比較容易觸發，不是原因。**
+  現在兩個提示詞由同一組 `LC_TR_INTRO`／`LC_TR_EXTRA` 經 `ComartTranslate.sys()` 組出來，
+  只有輸出格式那一段不同。**改輸出格式時 system 與 user 兩邊都要改。**
+- 🔴 **`pCallClaude` 沒有逾時，`fetch` 預設無限等待。** 上游卡住時那個 promise
+  永遠不 settle → 重試不會發生、`_trFailed` 不會被設 → 畫面永遠停在「翻譯中…」。
+  現在一律帶 `AbortController`（預設 120 秒，翻譯用 90 秒）。
+  **這是「卡住」而不是「失敗」的直接原因。**
+- 🔴 **`_trFailed` 是瀏覽器本機的旗標，房裡其他人永遠看不到失敗。**
+  翻譯由送出者的瀏覽器發動，所以失敗狀態只存在他那一台；其他人看到的是
+  `tr_at is null` ＝ 永遠的「翻譯中…」。**使用者截圖上的那一格就是這個。**
+  現在超過 `LC_TR_STALE_MS`（4 分鐘）還沒有譯文就改口說「翻譯似乎沒有完成」
+  並給重試鈕，而且**重試開放給房裡任何人**（原作者可能早就關掉分頁了）。
+- 🔴 **一個請求要四種語言 ＝ 輸出是原文的四倍。** 1,500 字的工作報告要模型
+  一口氣吐 6,000 字，而 claude-proxy 是非串流的（要等 Anthropic 全部產完才回應），
+  中途就被 gateway 判逾時 —— 與 board v1.33 踩到的 504 是同一個。
+  超過 `LC_TR_ONESHOT`（500 字）改成**一次一種語言、必要時再分段**
+  （`lcTranslateLong`／`lcChunk`／`lcTranslateTo`／`lcDetectLang`）：
+  - 每個請求的輸出只剩「一種語言、一段（≤900 字）」，時間與截斷風險都掉一個數量級；
+  - **一種語言失敗不會拖垮另外兩種**；
+  - 三種語言**併行**、同一語言的各段**依序** —— 把 3×N 個請求一起丟出去
+    會撞上 edge function 併發上限（本檔案記載過的坑）。
+  - `lcChunk` 回傳 `[[文字, 後面接的分隔字元], …]`，拼回去用那個分隔字元，
+    **不可一律用 `\n` 接** —— 那會在原本沒有換行的地方硬加一個換行。
+    已有 node 單元測試驗證「拼回去與原文逐字相同」（10 個案例含 CRLF、無標點超長行）。
+  - 長訊息要跑 30 秒到一分多鐘，所以「翻譯中…」後面會顯示 `3/6` 的進度
+    （`_trProg`）：**沒有進度的話，「還在跑」與「已經死了」在畫面上一模一樣。**
+- 門檻 500 而不是「看起來還好」的 1000：500 字就已經是 2,000 字的輸出（30–60 秒），
+  再長就逼近非串流的逾時邊緣，而那個失敗是整份作廢。
+- ⚠️ **還沒做、但下一次再卡住就該做的**：翻譯改走串流（`body.stream === true`，
+  claude-proxy 已經支援，board 的 `pmClaudeStream` 是現成範例）。
+  現在是靠「把每個請求變小」繞開逾時，不是根治。
 
 ### 每位發言者一個顏色（v1.83）
 

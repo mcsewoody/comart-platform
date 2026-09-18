@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>COMART Platform v2.01</title>
+<title>COMART Platform v2.02</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script defer src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.js"></script>
 <style>
@@ -404,7 +404,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     <div class="login-logo">
       <div class="login-mark" style="background:transparent"><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="44" height="23"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></div>
       <div class="login-name">COMART Platform</div>
-      <div class="login-sub">Internal Portal · v2.01</div>
+      <div class="login-sub">Internal Portal · v2.02</div>
     </div>
     <form id="loginForm" onsubmit="doLogin();return false;" autocomplete="on">
     <div class="field">
@@ -472,7 +472,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   <div class="topbar">
     <div class="topbar-logo" onclick="switchView('home')">
       <div class="topbar-mark" style="background:transparent"><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="26" height="14"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></div>
-      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v2.01</span></div>
+      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v2.02</span></div>
     </div>
     <div class="topbar-right">
       <div class="lang-switcher">
@@ -3100,6 +3100,7 @@ const I18N = {
     lc_host_ended:'The host has ended this conversation.', lc_gone:'This conversation no longer exists.',
     lc_empty_room:'No messages yet.', lc_translating:'Translating...',
     lc_tr_failed:'Translation failed', lc_retry:'Retry',
+    lc_tr_stuck:'Translation did not finish',
     lc_orig:'original', lc_send:'Send',
     lc_send_failed:'Message not sent - your text is still in the box. Please try again.', lc_input_ph:'Type in your own language...',
     lc_title_required:'Please enter a topic', lc_create_failed:'Could not create the conversation. Please try again.',
@@ -3232,6 +3233,7 @@ const I18N = {
     lc_host_ended:'開啟者已結束這場對話。', lc_gone:'這場對話已經不存在了。',
     lc_empty_room:'還沒有人發言。', lc_translating:'翻譯中…',
     lc_tr_failed:'翻譯失敗', lc_retry:'重試',
+    lc_tr_stuck:'翻譯似乎沒有完成',
     lc_orig:'原文', lc_send:'送出',
     lc_send_failed:'訊息沒有送出，你打的字還在輸入框裡，請再試一次。', lc_input_ph:'用你自己的語言輸入…',
     lc_title_required:'請輸入對話主題', lc_create_failed:'建立對話失敗，請再試一次。',
@@ -3357,6 +3359,7 @@ const I18N = {
     lc_host_ended:'开启者已结束这场对话。', lc_gone:'这场对话已经不存在了。',
     lc_empty_room:'还没有人发言。', lc_translating:'翻译中…',
     lc_tr_failed:'翻译失败', lc_retry:'重试',
+    lc_tr_stuck:'翻译似乎没有完成',
     lc_orig:'原文', lc_send:'发送',
     lc_send_failed:'消息没有发送，你打的字还在输入框里，请再试一次。', lc_input_ph:'用你自己的语言输入…',
     lc_title_required:'请输入对话主题', lc_create_failed:'创建对话失败，请再试一次。',
@@ -3480,6 +3483,7 @@ const I18N = {
     lc_host_ended:'Người mở đã kết thúc cuộc trò chuyện này.', lc_gone:'Cuộc trò chuyện này không còn tồn tại.',
     lc_empty_room:'Chưa có tin nhắn nào.', lc_translating:'Đang dịch…',
     lc_tr_failed:'Dịch không thành công', lc_retry:'Thử lại',
+    lc_tr_stuck:'Bản dịch chưa hoàn tất',
     lc_orig:'bản gốc', lc_send:'Gửi',
     lc_send_failed:'Tin nhắn chưa được gửi, nội dung bạn nhập vẫn còn trong khung. Vui lòng thử lại.', lc_input_ph:'Nhập bằng ngôn ngữ của bạn…',
     lc_title_required:'Vui lòng nhập chủ đề', lc_create_failed:'Không tạo được cuộc trò chuyện. Vui lòng thử lại.',
@@ -3601,6 +3605,7 @@ const I18N = {
     lc_host_ended:'開始者がこの会話を終了しました。', lc_gone:'この会話はすでに存在しません。',
     lc_empty_room:'まだ発言がありません。', lc_translating:'翻訳中…',
     lc_tr_failed:'翻訳に失敗しました', lc_retry:'再試行',
+    lc_tr_stuck:'翻訳が完了していないようです',
     lc_orig:'原文', lc_send:'送信',
     lc_send_failed:'メッセージは送信されていません。入力内容は残っています。もう一度お試しください。', lc_input_ph:'自分の言語で入力してください…',
     lc_title_required:'テーマを入力してください', lc_create_failed:'会話を作成できませんでした。もう一度お試しください。',
@@ -4071,7 +4076,7 @@ function lcShowRoom_hide() {
 }
 
 // ─── Claude API call via proxy ───
-async function pCallClaude(messages, system, maxTokens, model) {
+async function pCallClaude(messages, system, maxTokens, model, timeoutMs) {
   maxTokens = maxTokens || 2000;
   // Try Supabase Edge Function first
   var proxyUrl = SB_URL + '/functions/v1/claude-proxy';
@@ -4089,11 +4094,24 @@ async function pCallClaude(messages, system, maxTokens, model) {
     messages: messages
   };
   if (system) body.system = system;
-  var res = await fetch(proxyUrl, {
-    method: 'POST',
-    headers: headers,
-    body: JSON.stringify(body)
-  });
+  // 🔴 一定要有逾時。fetch 預設會**無限等待** —— 上游卡住時這個 promise 永遠不 settle，
+  //    於是重試不會發生、失敗狀態不會出現，畫面就永遠停在「翻譯中…」。
+  //    2026-09-19 線上對話的長訊息卡住，這是其中一個成因。
+  var ctl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+  var tmr = ctl ? setTimeout(function(){ ctl.abort(); }, timeoutMs || 120000) : null;
+  var res;
+  try {
+    res = await fetch(proxyUrl, {
+      method: 'POST',
+      headers: headers,
+      body: JSON.stringify(body),
+      signal: ctl ? ctl.signal : undefined,
+    });
+  } catch (e) {
+    if (tmr) clearTimeout(tmr);
+    throw new Error(e && e.name === 'AbortError' ? 'timeout' : ('network: ' + (e && e.message)));
+  }
+  if (tmr) clearTimeout(tmr);
   if (!res.ok) throw new Error('API error ' + res.status);
   var data = await res.json();
   if (data.error) throw new Error(JSON.stringify(data.error).slice(0, 120));
@@ -4172,6 +4190,9 @@ const LC_MSG_LIMIT = 200;
 // 超過這個時間還沒有譯文，就當送出者已經離線，由開啟者接手補翻。
 // 60 秒是「三次重試加上退避（約 4 秒）」的數倍，正常流程絕對來不及變成孤兒。
 const LC_ORPHAN_MS = 60000;
+// 超過這麼久還沒有譯文，就別再對使用者說「翻譯中」了（見 lcMsgHtml 的說明）。
+// 給到 4 分鐘：長訊息分段翻譯本來就要一兩分鐘，誤報比慢一點更糟
+const LC_TR_STALE_MS = 240000;
 // 輸入框自動長高的上限（v1.83 前是 132px，太小）
 const LC_INPUT_MAX = 220;
 
@@ -4187,15 +4208,34 @@ const LC_TR_MODEL = 'claude-sonnet-5';
    那正是越南同仁最初反映「譯文怪」的根因（一篇之內人稱不一致），
    也就是 CLAUDE.md 那句「分岔之後寬鬆的那一份就是實際生效的那一份」。 */
 
-const LC_TR_SYS =
+/* 🔴 兩個系統提示詞由同一組素材組出來（intro／extra 只有一份），
+   只有「輸出格式」那一段不同 —— 那正是 ComartTranslate.sys() 存在的理由。
+
+   🔴 這裡曾經有一個活了兩週的矛盾：v1.83 把輸出格式從 JSON 改成 XML 標籤，
+   改了使用者訊息卻**沒改系統提示詞**，於是系統說「Output ONLY a minified JSON
+   object」、使用者訊息說「Reply with ONLY these five tags」。
+   兩個互相牴觸的指令，模型會依訊息長短與內容倒向其中一邊 ——
+   倒向 JSON 那次就抓不到標籤、判定 incomplete、重試三次、最後失敗。
+   **這與訊息長度無關，只是長訊息比較容易觸發。**
+   改輸出格式時，system 與 user 兩邊都要改。 */
+const LC_TR_INTRO =
   'You are a professional translator for a real-time internal chat between colleagues at a ' +
-  'manufacturer with sites in Taiwan, Dongguan (China) and Vietnam. Messages are short, ' +
-  'work-related and often about orders, shipping, tooling, quality and schedules.\n\n' +
-  'Requirements:\n' + ComartTranslate.requireRules() +
+  'manufacturer with sites in Taiwan, Dongguan (China) and Vietnam. Messages are ' +
+  'work-related and often about orders, shipping, tooling, quality and schedules.';
+const LC_TR_EXTRA =
   '- Chat register: keep it as short and plain as the original. A one-line question stays a ' +
   'one-line question. Do not turn casual typing into formal prose.\n' +
-  '- Do not answer, explain or comment on the message. Translate only.\n\n' +
-  'Output ONLY a minified JSON object and nothing else.';
+  '- Keep the original line breaks, bullet marks, numbers, model codes and units exactly as they are.\n' +
+  '- Do not answer, explain or comment on the message. Translate only.';
+const LC_TR_SYS = ComartTranslate.sys(LC_TR_INTRO, LC_TR_EXTRA,
+  'Output ONLY the tags requested in the message. No preamble, no explanation, no JSON, no code fences.');
+// 長訊息走「一次一種語言」，輸出只有 <t>…</t>
+const LC_TR_SYS_ONE = ComartTranslate.sys(LC_TR_INTRO, LC_TR_EXTRA,
+  'Output ONLY <t>translation</t> and nothing else. No preamble, no explanation, no code fences.');
+const LC_LANG_NAME = {
+  'zh-TW': 'Traditional Chinese (Taiwan)', 'zh-CN': 'Simplified Chinese',
+  'en': 'English', 'vi': 'Vietnamese',
+};
 
 var lcSession   = null;   // 目前開著的場次
 var lcMsgs      = [];     // 目前場次的訊息（依 created_at 遞增）
@@ -4303,7 +4343,118 @@ function lcTag(raw, tag) {
   return m ? m[1].trim() : '';
 }
 
-async function lcTranslate(text) {
+/* ═══════════════════════════════════════════════════════════════════════
+   長訊息：改成「一次一種語言、必要時再分段」（v2.02）
+
+   🔴 舊版一律「一個請求要四種語言」。**輸出是原文的四倍**，所以一則 1,500 字的
+      工作報告要模型一口氣吐出約 6,000 字 —— 那要一兩分鐘，而 claude-proxy 是
+      非串流的：它得等 Anthropic 全部產完才回應，中途就被 gateway 判逾時
+      （CLAUDE.md 早就記過 board v1.33 踩到的同一個 504）。
+      而且四份之中只要缺一個結尾標籤就整份作廢重來，長訊息又特別容易缺。
+   🔴 拆開之後每個請求的輸出只剩「一種語言、一段」，時間與截斷風險都掉一個數量級，
+      而且**一種語言失敗不會拖垮另外兩種**。代價是請求數變多（3 語 × N 段 ＋ 1 次
+      語言偵測），所以只有超過 LC_TR_ONESHOT 才這樣做 —— 日常的短訊息維持
+      一個請求四語，那本來就快。
+   🔴 三種語言**併行**、同一語言的各段**依序**：併行三個是安全的，
+      但把 3×N 個請求一起丟出去會撞上 edge function 併發上限（CLAUDE.md 記載過）。
+   ═══════════════════════════════════════════════════════════════════════ */
+const LC_TR_ONESHOT = 500;     /* 這個長度以內：一個請求四語。
+   門檻訂在 500 而不是「看起來還好」的 1000：一個請求要產出四份，
+   500 字就已經是 2,000 字的輸出（約 30–60 秒）。再長下去就逼近
+   claude-proxy 非串流的逾時邊緣，而那個失敗是**整份作廢**。 */
+const LC_TR_CHUNK   = 900;     // 超過就分段，每段最多這麼長
+const LC_TR_TIMEOUT = 90000;   // 單一翻譯請求的上限
+const LC_TR_DET_TO  = 25000;   // 語言偵測（很短）的上限
+
+// 分段：優先在換行處切，單行太長才在句末標點切（中文沒有空格，不可用 split(' ')）。
+// 回傳 [[文字, 後面接的分隔字元], …]，拼回去時用那個分隔字元，
+// 才不會把原本沒有換行的地方硬加一個換行。
+function lcChunk(text, max) {
+  var out = [], buf = '', lines = String(text).split('\n');
+  function flush(sep) { if (buf.length) { out.push([buf, sep]); buf = ''; } }
+  for (var i = 0; i < lines.length; i++) {
+    var ln = lines[i];
+    while (ln.length > max) {
+      var cut = -1;
+      for (var j = Math.min(max, ln.length) - 1; j > max * 0.5; j--) {
+        if ('\u3002\uff01\uff1f\uff1b.!?;'.indexOf(ln.charAt(j)) >= 0) { cut = j + 1; break; }
+      }
+      if (cut < 0) cut = max;
+      flush('');
+      out.push([ln.slice(0, cut), '']);
+      ln = ln.slice(cut);
+    }
+    if (buf.length && buf.length + 1 + ln.length > max) flush('\n');
+    buf = buf.length ? (buf + '\n' + ln) : ln;
+  }
+  flush('');
+  return out;
+}
+
+// 語言偵測獨立一個很短的請求（用預設的 haiku，快又便宜）。
+// 偵測不出來就回空字串 —— 那只影響「原文放回哪一欄」，不影響三語譯文。
+async function lcDetectLang(text) {
+  try {
+    var raw = await pCallClaude(
+      [{ role:'user', content:'Which language is this text written in? Answer with exactly one of: '
+        + 'zh-TW, zh-CN, en, vi. No other words.\n\n' + String(text).slice(0, 400) }],
+      'You identify languages. Answer with one code and nothing else.', 16, null, LC_TR_DET_TO);
+    var code = String(raw || '').trim().replace(/[^A-Za-z-]/g, '');
+    var hit = Object.keys(LC_COL).filter(function(k){ return k.toLowerCase() === code.toLowerCase(); });
+    return hit.length ? hit[0] : '';
+  } catch (e) { console.warn('[lc] detect', e.message); return ''; }
+}
+
+// 單段、單一語言。自己重試一次：暫時性錯誤（冷啟、429）在這一層擋掉，
+// 外層的 LC_TR_TRIES 就不必為了一段失敗把整篇重翻
+async function lcTranslateTo(chunk, lang, srcLang) {
+  var usr = 'Translate the message below into ' + (LC_LANG_NAME[lang] || lang) + '.'
+    + (srcLang ? ' The message is written in ' + (LC_LANG_NAME[srcLang] || srcLang) + '.' : '')
+    + '\n\nMessage:\n' + chunk
+    + '\n\nReply with ONLY <t>your translation</t>. Keep the line breaks inside the tag as they are.';
+  var budget = Math.min(16000, Math.max(800, chunk.length * 4 + 400));
+  var lastErr = null;
+  for (var k = 0; k < 2; k++) {
+    try {
+      var raw = await pCallClaude([{ role:'user', content: usr }], LC_TR_SYS_ONE,
+                                  budget, LC_TR_MODEL, LC_TR_TIMEOUT);
+      var got = lcTag(raw, 't');
+      // 模型偶爾會忘了標籤直接給譯文：有內容就收，不要為了格式把對的東西丟掉
+      if (!got && raw && raw.indexOf('<') < 0) got = String(raw).trim();
+      if (!got) throw new Error('empty (' + String(raw||'').length + ' chars, budget ' + budget + ')');
+      return got;
+    } catch (e) {
+      lastErr = e;
+      if (k === 0) await new Promise(function(r){ setTimeout(r, 800); });
+    }
+  }
+  throw new Error('chunk ' + lang + ': ' + (lastErr && lastErr.message));
+}
+
+async function lcTranslateLong(text, onProg) {
+  var chunks = lcChunk(text, LC_TR_CHUNK);
+  var src = await lcDetectLang(text);
+  var targets = LC_LANGS.map(function(l){ return l[0]; }).filter(function(l){ return l !== src; });
+  var total = targets.length * chunks.length, done = 0;
+  function tick() { done++; if (onProg) onProg(done, total); }
+  if (onProg) onProg(0, total);
+  var out = { src: src };
+  if (src) out[src] = text;          // 原文一字不動（同短訊息那條路）
+  // 三種語言併行、每種語言內部依序
+  var results = await Promise.all(targets.map(async function(lang) {
+    var parts = [];
+    for (var i = 0; i < chunks.length; i++) {
+      parts.push(await lcTranslateTo(chunks[i][0], lang, src));
+      tick();
+    }
+    return parts.map(function(p, i){ return p + chunks[i][1]; }).join('');
+  }));
+  targets.forEach(function(lang, i) { out[lang] = results[i]; });
+  return out;
+}
+
+async function lcTranslate(text, onProg) {
+  if (String(text).length > LC_TR_ONESHOT) return lcTranslateLong(text, onProg);
   var usr =
     'Detect the source language of the message yourself. It is one of: zh-TW (Traditional ' +
     'Chinese), zh-CN (Simplified Chinese), en (English), vi (Vietnamese).\n' +
@@ -4314,7 +4465,8 @@ async function lcTranslate(text) {
   //    寫死 1500 的話，300 字的中文訊息就已經在邊緣，500 字必定被截斷 ——
   //    截斷的回覆缺尾巴的標籤，於是永遠解析失敗。這是「偶而翻譯失敗」的主因。
   var budget = Math.min(16000, Math.max(1200, text.length * 8 + 400));
-  var raw = await pCallClaude([{ role:'user', content: usr }], LC_TR_SYS, budget, LC_TR_MODEL);
+  var raw = await pCallClaude([{ role:'user', content: usr }], LC_TR_SYS, budget,
+                              LC_TR_MODEL, LC_TR_TIMEOUT);
 
   var src = lcTag(raw, 'src').trim();
   if (!LC_COL[src]) src = '';
@@ -4352,7 +4504,12 @@ async function lcTranslateAndSave(msg) {
         //    「原文是新的、四語是舊的」，而讀譯文的人（越南／東莞同事）
         //    完全看不出來。這種壞法沒有人會回報。
         var src = msg.text;
-        var r = await lcTranslate(src);
+        // 長訊息要跑三十秒到一分多鐘。沒有進度的「翻譯中…」與「已經卡死了」
+        // 在畫面上長得一模一樣 —— 使用者無從判斷該不該繼續等
+        var r = await lcTranslate(src, function (done, total) {
+          var lm = lcMsgs.find(function(x){ return x.id === msg.id; });
+          if (lm) { lm._trProg = total > 1 ? (done + '/' + total) : ''; lcRenderStream(); }
+        });
         if (msg.text !== src) {           // 翻到一半被改了 → 這一份作廢
           console.warn('[lc] translate stale, text changed', msg.id);
           return;
@@ -4364,7 +4521,7 @@ async function lcTranslateAndSave(msg) {
         };
         await SB.patch('chat_messages', 'id=eq.' + encodeURIComponent(msg.id), patch);
         var local = lcMsgs.find(function(x){ return x.id === msg.id; });
-        if (local) { Object.assign(local, patch); delete local._trFailed; lcRenderStream(); }
+        if (local) { Object.assign(local, patch); delete local._trFailed; delete local._trProg; lcRenderStream(); }
         return;
       } catch (e) {
         lastErr = e;
@@ -4376,7 +4533,7 @@ async function lcTranslateAndSave(msg) {
     }
     console.warn('[lc] translate gave up', msg.id, lastErr && lastErr.message);
     var l2 = lcMsgs.find(function(x){ return x.id === msg.id; });
-    if (l2) { l2._trFailed = true; lcRenderStream(); }
+    if (l2) { l2._trFailed = true; delete l2._trProg; lcRenderStream(); }
   } finally {
     delete lcTrBusy[msg.id];
     // 翻譯進行中被修改：那時候不能再開一份（會互相覆蓋），改成排隊，這裡補跑
@@ -4623,12 +4780,32 @@ function lcMsgHtml(m) {
     if (lines) h += '<div class="lc-tr">' + lines + '</div>';
   } else if (m._trFailed) {
     h += '<div class="lc-tr"><div class="lc-fail">⚠ ' + escHtml(t('lc_tr_failed'))
-      + (mine ? ' <button class="lc-retry" onclick="lcRetry(\'' + _lcSafeId(m.id) + '\')">↻ '
-                + escHtml(t('lc_retry')) + '</button>' : '') + '</div></div>';
+      + lcRetryBtn(m) + '</div></div>';
   } else {
-    h += '<div class="lc-tr"><div class="lc-pending">' + escHtml(t('lc_translating')) + '</div></div>';
+    /* 🔴 「翻譯中…」與「已經卡死了」在畫面上長得一模一樣，而使用者只看得到前者。
+          `_trFailed` 是**瀏覽器本機的旗標**：翻譯由送出者的瀏覽器發動，
+          所以房裡其他人的畫面上永遠不會出現失敗，只會永遠停在「翻譯中…」。
+          2026-09-19 使用者回報「整個翻譯會卡住」，看到的就是這個畫面。
+          超過 LC_TR_STALE_MS 還沒有譯文就改口說「似乎沒完成」並給重試，
+          而且**重試開放給房裡任何人** —— 成本一樣，而原作者可能早就關掉分頁了。 */
+    var trAge = Date.now() - Math.max(lcTs(m.created_at), lcTs(m.edited_at));
+    if (!m._trProg && !lcTrBusy[m.id] && trAge > LC_TR_STALE_MS) {
+      h += '<div class="lc-tr"><div class="lc-fail">⚠ ' + escHtml(t('lc_tr_stuck'))
+        + lcRetryBtn(m) + '</div></div>';
+    } else {
+      h += '<div class="lc-tr"><div class="lc-pending">' + escHtml(t('lc_translating'))
+        + (m._trProg ? ' ' + escHtml(m._trProg) : '') + '</div></div>';
+    }
   }
   return h + '</div>';
+}
+
+// 重試鈕給所有人（不再限作者）：誰的瀏覽器跑的翻譯不重要，結果是大家要看的
+function lcRetryBtn(m) {
+  var id = _lcSafeId(m.id);
+  if (!id || !lcMsgLive()) return '';
+  return ' <button class="lc-retry" onclick="lcRetry(\'' + id + '\')">↻ '
+    + escHtml(t('lc_retry')) + '</button>';
 }
 
 function lcRetry(id) {

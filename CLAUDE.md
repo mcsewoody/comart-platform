@@ -1170,168 +1170,6 @@ v1.94 只做在 Portal，但**同事被邀請的時候人常常在 KMS 或報價
 
 新增 `premortem_*` 之類的新表時，記得同步加進 sb-proxy 的 `ALLOWED_TABLES` 白名單，否則前端一律 403。
 
-## 🔴 新表的 migration 一定要寫 `enable row level security`
-
-**這是 2026-09-16 被 Supabase Security Advisor 抓到的真實漏洞**（`chat_sessions`）。
-
-- **架構上的前提**：前端所有存取都經 sb-proxy，而 sb-proxy 用 **service_role**
-  （`elevatedApiHeaders(SERVICE_KEY)`）—— service_role **繞過 RLS**。
-  所以正確做法是「**RLS 開著 ＋ 零 policy**」：應用程式完全不受影響，
-  anon／authenticated 一律拒絕。全庫 82 張表裡有 62 張就是這個形狀。
-- 🔴 **漏寫的後果不是「少一層防禦」，是「完全沒有防禦」**：
-  anon key 是 **publishable、印在每一頁的 HTML 原始碼裡**，而 Supabase 預設
-  `grant all on <table> to anon, authenticated`。所以 RLS 一關，
-  **任何人不必登入就能對那張表 SELECT／INSERT／UPDATE／DELETE**。
-  `chat_sessions` 實測：讀得到全部對話主題、開啟者工號姓名、參與人工號清單；
-  而且**刪得掉整場** —— `chat_messages` 有 `on delete cascade`，
-  所以連訊息一起消失，**即使 chat_messages 自己的 RLS 是開著的**。
-- 🔴 **sb-proxy 的欄位守衛擋不住這條路**：`CHAT_IMMUTABLE`／`CHAT_HOST_ONLY`
-  只管「經過 sb-proxy 的請求」。繞過去直接打 REST，`access` 從 `'invite'`
-  改成 `'all'` 沒有任何東西攔得住。**「經過代理才驗」的守衛，前提是沒有別條路。**
-- **檢查指令**（新表上線後跑一次）：
-  ```sql
-  select c.relname, c.relrowsecurity from pg_class c
-    join pg_namespace n on n.oid=c.relnamespace
-   where n.nspname='public' and c.relkind='r' and not c.relrowsecurity;
-  ```
-  或直接用公開 anon key 打一次 REST，回 200 且有資料就是破的。
-- ✅ **四個 KMS view 已於 2026-09-16 鎖上**（migration 202609160002）：
-  `kms_users`／`kms_popular_documents`／`kms_author_stats`／`kms_expiring_documents`
-  設 `security_invoker = on` ＋ `revoke select from anon`，實測回 401。
-- 🔴 **`web_products_public` 是刻意公開的，不要「修」它**（202609160002 誤擋、202609160003 還原）。
-  它是**新官網的公開產品 API**：`comartgroup.github.io/www/products/` 的
-  `assets/js/products.js` 直接用 anon key 打
-  `/rest/v1/web_products_public?select=*&order=sort_order.asc,series.asc`，拿 335 筆。
-  底層 `products` 表對 anon 全關，靠這個 SECURITY DEFINER view 只吐出可公開的欄位 ——
-  **那正是這種 view 的正當用途**。Security Advisor 會一直報它，那是已知且刻意的。
-  `security_invoker` 也**不能**開：開了 view 會照 anon 的 RLS 跑而回 0 筆，
-  grant 給回去也沒用 —— 那是比 revoke 更隱蔽的壞法。
-- 🔴 **`web_products_admin` 同樣不要動，但理由不同**：它**沒有**給 anon（實測 401），
-  是授權給 **`authenticated`**（Supabase Auth 登入者）。
-  ⚠️ **這個專案真的有人在用 Supabase Auth**：`auth.users` 有 4 個帳號，
-  `ariel@comart.com.tw` 於 2026-09-15 登入過。所以有一個產品後台正在運作 ——
-  但在 `comartgroup.github.io/www/` 底下試過 8 個常見路徑（`admin/`／`cms/`／`manage/`…）
-  全是 404，**位置不明，要問 Ariel 或寫新官網的那個 agent**。
-  對它開 `security_invoker` 會讓它照那位登入者的 RLS 跑（`products` 零 policy）→ 回 0 筆 → 後台壞掉。
-- **這兩條 Advisor 錯誤是永久的基準線。** Supabase 2026-06 起可停用特定 lint 規則
-  （`0010_security_definer_view`），但那是**專案層級**開關 —— 關掉之後**以後真的誤建
-  SECURITY DEFINER view 也不會被報**。建議不要關，**把「2 個錯誤」當成新的零**；
-  變成 3 個時那第 3 個才值得看。
-- 🔴 **「照 linter 的建議修」在這裡反而更危險**：要讓它滿意得改成 `security_invoker`
-  ＋ 在 `products` 表上加 anon policy，那樣 anon 看到的就是**表**而不是**精選過的 view** ——
-  除非再逐欄撤銷授權，否則成本、BOM、供應商那些欄位會一起曝光。
-  **精選 view ＋ SECURITY DEFINER 是這個情境下比較安全的設計。**
-
-## 🔴 官網有兩個，資料庫連的是**新的那個**
-
-- **舊**：`www.comart.com.tw` —— **Wix 架的**（wix-thunderbolt／parastorage），
-  產品來自 Wix Stores，**完全不碰 Supabase**。
-- **新**：`https://comartgroup.github.io/www/` —— 由另一個 agent 開發、**尚未上線**，
-  但**已經在連正式資料庫**。用 anon key 直接打 REST，目前用到三個端點：
-  | 端點 | 用途 |
-  |---|---|
-  | `web_products_public` | 產品頁（335 筆） |
-  | `web_news` | 最新消息 |
-  | `functions/v1/enquiry` | 詢價表單（官網 repo 的 function，不在本 repo） |
-- 🔴 **根路徑 `comartgroup.github.io/` 回 404，網站在 `/www/` 之下。**
-  2026-09-16 我試了根路徑拿到 404 就下結論「這個來源不存在」，
-  據此 revoke 了 `web_products_public`，**當場弄壞新官網的產品頁**。
-  **只試一條路徑就下結論，等於沒查。**
-- **改任何 `web_*` 物件的權限之前，先開 `https://comartgroup.github.io/www/products/`
-  與 `/news/` 確認還拿得到資料。**
-
-## ✅ anon 曝光面已全面清除（2026-09-16）
-
-**Supabase Security Advisor 只報了 1 張表（`chat_sessions`）。實際上有 11 個物件在漏，
-advisor 一個都沒報那 10 個** —— 因為它們的 RLS「有開」，只是 policy 放行 anon，
-linter 分不出「刻意公開」與「設錯」。
-
-用**公開在每一頁原始碼裡的 anon key**、不必登入、直接打 `/rest/v1/` 的實測結果：
-
-| 物件 | 移除前漏什麼 | 處置 |
-|---|---|---|
-| `chat_sessions` | 全部對話 ＋ **可 DELETE**（cascade 帶走訊息） | 補開 RLS（`202609160001`） |
-| `kms_snapshots` | **402 筆文件快照，含完整 `body`** | drop policy（`202609160006`） |
-| `kms_documents` | 1,328 筆等級 1 文件的完整 `body` | drop policy（`202609160004`） |
-| `users` | 57 人：工號、姓名、**Email、手機**、部門、職稱 | drop policy（`202609160004`） |
-| `room_bookings` | 會議主題、主持人、**與會者 Email 清單** | drop policy（`202609160005`） |
-| `kms_comments` / `kms_experts` | 留言內文、專家 contact | drop policy（`202609160006`） |
-| `lib_books` / `lib_categories` / `car_vehicles` | 書目、分類、車牌 | drop policy（`202609160005`） |
-| `kms_categories` / `kms_product_lines` | 分類、產品線（低敏感） | drop policy（`202609160006`） |
-| 4 個 KMS view | 57 人名冊、文件標題與作者統計 | `security_invoker` ＋ revoke（`202609160002`） |
-
-**最終狀態：anon 只讀得到 `web_products_public`（335 筆）與 `web_news`（2 筆）——
-兩個都是新官網刻意公開的。** 88 個物件逐一用 anon key 實打驗證過。
-
-- 🔴 **要證明「沒有別的洞」，靠實際打一遍比靠 SQL 條件可靠。**
-  我查「有 policy 放行 anon 的表」時條件寫成
-  `roles like '%authenticated%' or roles = '{public}'` —— **漏掉 `{anon}`**，
-  而 5 張 KMS 表的 policy 角色正是 `{anon}`。**查詢條件本身就可能有洞。**
-  最後一定要用 anon key 掃過每一張表與 view。
-- 🔴 **關了前門不等於關了所有門**：`kms_documents` 擋掉之後，同樣的文件內容
-  仍從 `kms_snapshots`（402 筆快照，含 `body`）整批流出去。
-  **問「這份資料還有沒有第二個地方存著」。**
-- ⚠️ **`web_*` 那一組刻意不動**：policy 都有 `is_web_editor()` 或 `web_editors`
-  成員檢查把關，設計是對的；`web_news_public_read`／`web_pages_public_read` 的
-  `status='live'` 與 `web_enquiries_anon_insert` 是官網要的公開行為。
-- 每個 migration 的註解裡都寫了**逐條還原指令**，有人回報壞掉時一行復原。
-
-## 🔴 Supabase Auth 的公開註冊是開著的（尚未處理，只有 Woody 能改）
-
-`/auth/v1/settings` 回 `disable_signup: false` —— **任何人都能自己註冊取得
-`authenticated` 角色**（`mailer_autoconfirm: false`，所以需要收得到信，但那只是速度限制）。
-
-- **影響**：所有給 `authenticated` 的授權都等同公開。這也是為什麼上面那批
-  policy 是**整條移除**而不是「限縮到 authenticated」—— 後者等於沒擋。
-- **目前的實際風險不大**：`web_*` 那組有 `is_web_editor()` 把關，
-  `web_products_admin` 只有 14 個產品管理欄位。但這是個會放大所有未來錯誤的前提。
-- **平台完全不用 Supabase Auth**（員工登入走自建的 `auth-verify`）。
-  `auth.users` 只有 4 個帳號，是新官網後台在用的。
-- **建議 Woody 到 Dashboard → Authentication → Sign In / Providers 關掉公開註冊**，
-  新編輯者改用邀請。**我改不了這個，它不在 SQL 層。**
-
-## 🔴 官網有兩個，資料庫連的是**新的那個**
-
-- **舊**：`www.comart.com.tw` —— **Wix 架的**（wix-thunderbolt／parastorage），
-  產品來自 Wix Stores，**完全不碰 Supabase**。
-- **新**：`https://comartgroup.github.io/www/` —— 由另一個 agent 開發、**尚未上線**，
-  但**已經在連正式資料庫**。用 anon key 直接打 REST，目前用到三個端點：
-  | 端點 | 用途 |
-  |---|---|
-  | `web_products_public` | 產品頁（335 筆） |
-  | `web_news` | 最新消息 |
-  | `functions/v1/enquiry` | 詢價表單（官網 repo 的 function，不在本 repo） |
-- 🔴 **根路徑 `comartgroup.github.io/` 回 404，網站在 `/www/` 之下。**
-  2026-09-16 我試了根路徑拿到 404 就下結論「這個來源不存在」，
-  據此 revoke 了 `web_products_public`，**當場弄壞新官網的產品頁**。
-  **只試一條路徑就下結論，等於沒查。**
-- **改任何 `web_*` 物件的權限之前，先開 `https://comartgroup.github.io/www/products/`
-  與 `/news/` 確認還拿得到資料。**
-
-## 🔴 anon 直接打 REST 的曝光面（2026-09-16 實測，尚未處理）
-
-**Security Advisor 不會報這一類 —— 因為 RLS「有開」，只是 policy 放行 anon。**
-linter 分不出「刻意公開」與「設錯」。以下是用**公開在每一頁 HTML 原始碼裡的 anon key**、
-不必登入、直接打 `/rest/v1/` 實測的結果：
-
-| 表 | policy | anon 讀得到 |
-|---|---|---|
-| `users` | `anon can read users`（`roles={public}`） | **全部 57 人**：工號、中英文姓名、**Email、手機**、部門、職稱、據點、簡介。`pwd_hash` 有擋（欄位授權未給） |
-| `kms_documents` | `anon read level1 only`（`coalesce(conf_level,1) <= 1`） | **1,328 筆等級 1 文件的完整內文 `body`**（全庫 1,337）。等級 2／3 共 9 筆有擋住 |
-
-- 🔴 **`body` 是有授權給 anon 的。** CLAUDE.md 一直寫「sb-proxy 回應一律移除
-  `kms_documents.body`」—— 那句話只對**經過 sb-proxy 的請求**成立。
-  直接打 REST 完全繞過去，整個知識庫的內文對網際網路是開的。
-  這是「**經過代理才驗的守衛，前提是沒有別條路**」的第二個實例。
-- ⚠️ **這已經超出 CLAUDE.md 記載的既有取捨。** 那條取捨（[[feedback-security-threshold]]）
-  講的是「**已登入的內部使用者**用開發者工具看到別人的資料」；
-  這裡是「**任何人、不必登入、從網際網路**」拿走全公司通訊錄與整個知識庫。不同量級。
-- 兩條 policy **都不在本 repo 的 migrations 裡**（從 Dashboard 或官網 repo 建的），
-  所以無法從版控看出當初為什麼建、誰在用。
-  已確認**不需要它們的**：本 repo 五個子系統（全走 sb-proxy 的 service_role）、
-  舊官網（Wix，不碰 Supabase）、**新官網**（掃過全部 12 個頁面與 5 個 JS，
-  只用 `web_products_public`／`web_news`／`enquiry`）。
-
 ### 未存檔提醒：三個編輯器共用（v1.85，2026-08-11）
 
 週會紀錄／業務會議記錄／Woody 週報**只在按「儲存」時才寫進資料庫**，所以任何其他離開方式都會丟掉編輯內容。
@@ -1490,6 +1328,161 @@ linter 分不出「刻意公開」與「設錯」。以下是用**公開在每�
 - ⚠️ **「人的投票表決」請走 🗳 投票頁籤（`pl*`）**，不要把 `pm*` 撐成表決工具。
   兩套系統形狀不同：`pl*` 是「主席出選項 → 大家投」，`pm*` 是「大家各自寫 → 一起看 → 收斂」。
 
+
+## 🔴 新表的 migration 一定要寫 `enable row level security`
+
+**這是 2026-09-16 被 Supabase Security Advisor 抓到的真實漏洞**（`chat_sessions`）。
+
+- **架構上的前提**：前端所有存取都經 sb-proxy，而 sb-proxy 用 **service_role**
+  （`elevatedApiHeaders(SERVICE_KEY)`）—— service_role **繞過 RLS**。
+  所以正確做法是「**RLS 開著 ＋ 零 policy**」：應用程式完全不受影響，
+  anon／authenticated 一律拒絕。全庫 82 張表裡有 62 張就是這個形狀。
+- 🔴 **漏寫的後果不是「少一層防禦」，是「完全沒有防禦」**：
+  anon key 是 **publishable、印在每一頁的 HTML 原始碼裡**，而 Supabase 預設
+  `grant all on <table> to anon, authenticated`。所以 RLS 一關，
+  **任何人不必登入就能對那張表 SELECT／INSERT／UPDATE／DELETE**。
+  `chat_sessions` 實測：讀得到全部對話主題、開啟者工號姓名、參與人工號清單；
+  而且**刪得掉整場** —— `chat_messages` 有 `on delete cascade`，
+  所以連訊息一起消失，**即使 chat_messages 自己的 RLS 是開著的**。
+- 🔴 **sb-proxy 的欄位守衛擋不住這條路**：`CHAT_IMMUTABLE`／`CHAT_HOST_ONLY`
+  只管「經過 sb-proxy 的請求」。繞過去直接打 REST，`access` 從 `'invite'`
+  改成 `'all'` 沒有任何東西攔得住。**「經過代理才驗」的守衛，前提是沒有別條路。**
+- **檢查指令**（新表上線後跑一次）：
+  ```sql
+  select c.relname, c.relrowsecurity from pg_class c
+    join pg_namespace n on n.oid=c.relnamespace
+   where n.nspname='public' and c.relkind='r' and not c.relrowsecurity;
+  ```
+  或直接用公開 anon key 打一次 REST，回 200 且有資料就是破的。
+- ✅ **四個 KMS view 已於 2026-09-16 鎖上**（migration 202609160002）：
+  `kms_users`／`kms_popular_documents`／`kms_author_stats`／`kms_expiring_documents`
+  設 `security_invoker = on` ＋ `revoke select from anon`，實測回 401。
+- 🔴 **`web_products_public` 是刻意公開的，不要「修」它**（202609160002 誤擋、202609160003 還原）。
+  它是**新官網的公開產品 API**：`comartgroup.github.io/www/products/` 的
+  `assets/js/products.js` 直接用 anon key 打
+  `/rest/v1/web_products_public?select=*&order=sort_order.asc,series.asc`，拿 335 筆。
+  底層 `products` 表對 anon 全關，靠這個 SECURITY DEFINER view 只吐出可公開的欄位 ——
+  **那正是這種 view 的正當用途**。Security Advisor 會一直報它，那是已知且刻意的。
+  `security_invoker` 也**不能**開：開了 view 會照 anon 的 RLS 跑而回 0 筆，
+  grant 給回去也沒用 —— 那是比 revoke 更隱蔽的壞法。
+- 🔴 **`web_products_admin` 同樣不要動，但理由不同**：它**沒有**給 anon（實測 401），
+  是授權給 **`authenticated`**（Supabase Auth 登入者）。
+  ⚠️ **這個專案真的有人在用 Supabase Auth**：`auth.users` 有 4 個帳號，
+  `ariel@comart.com.tw` 於 2026-09-15 登入過。所以有一個產品後台正在運作 ——
+  但在 `comartgroup.github.io/www/` 底下試過 8 個常見路徑（`admin/`／`cms/`／`manage/`…）
+  全是 404，**位置不明，要問 Ariel 或寫新官網的那個 agent**。
+  對它開 `security_invoker` 會讓它照那位登入者的 RLS 跑（`products` 零 policy）→ 回 0 筆 → 後台壞掉。
+- **這兩條 Advisor 錯誤是永久的基準線。** Supabase 2026-06 起可停用特定 lint 規則
+  （`0010_security_definer_view`），但那是**專案層級**開關 —— 關掉之後**以後真的誤建
+  SECURITY DEFINER view 也不會被報**。建議不要關，**把「2 個錯誤」當成新的零**；
+  變成 3 個時那第 3 個才值得看。
+- 🔴 **「照 linter 的建議修」在這裡反而更危險**：要讓它滿意得改成 `security_invoker`
+  ＋ 在 `products` 表上加 anon policy，那樣 anon 看到的就是**表**而不是**精選過的 view** ——
+  除非再逐欄撤銷授權，否則成本、BOM、供應商那些欄位會一起曝光。
+  **精選 view ＋ SECURITY DEFINER 是這個情境下比較安全的設計。**
+
+## 🔴 官網有兩個，資料庫連的是**新的那個**
+
+- **舊**：`www.comart.com.tw` —— **Wix 架的**（wix-thunderbolt／parastorage），
+  產品來自 Wix Stores，**完全不碰 Supabase**。
+- **新**：`https://comartgroup.github.io/www/` —— 由另一個 agent 開發、**尚未上線**，
+  但**已經在連正式資料庫**。用 anon key 直接打 REST，目前用到三個端點：
+  | 端點 | 用途 |
+  |---|---|
+  | `web_products_public` | 產品頁（335 筆） |
+  | `web_news` | 最新消息 |
+  | `functions/v1/enquiry` | 詢價表單（官網 repo 的 function，不在本 repo） |
+- 🔴 **根路徑 `comartgroup.github.io/` 回 404，網站在 `/www/` 之下。**
+  2026-09-16 我試了根路徑拿到 404 就下結論「這個來源不存在」，
+  據此 revoke 了 `web_products_public`，**當場弄壞新官網的產品頁**。
+  **只試一條路徑就下結論，等於沒查。**
+- **改任何 `web_*` 物件的權限之前，先開 `https://comartgroup.github.io/www/products/`
+  與 `/news/` 確認還拿得到資料。**
+
+## ✅ anon 曝光面已全面清除（2026-09-16）
+
+**Supabase Security Advisor 只報了 1 張表（`chat_sessions`）。實際上有 11 個物件在漏，
+advisor 一個都沒報那 10 個** —— 因為它們的 RLS「有開」，只是 policy 放行 anon，
+linter 分不出「刻意公開」與「設錯」。
+
+用**公開在每一頁原始碼裡的 anon key**、不必登入、直接打 `/rest/v1/` 的實測結果：
+
+| 物件 | 移除前漏什麼 | 處置 |
+|---|---|---|
+| `chat_sessions` | 全部對話 ＋ **可 DELETE**（cascade 帶走訊息） | 補開 RLS（`202609160001`） |
+| `kms_snapshots` | **402 筆文件快照，含完整 `body`** | drop policy（`202609160006`） |
+| `kms_documents` | 1,328 筆等級 1 文件的完整 `body` | drop policy（`202609160004`） |
+| `users` | 57 人：工號、姓名、**Email、手機**、部門、職稱 | drop policy（`202609160004`） |
+| `room_bookings` | 會議主題、主持人、**與會者 Email 清單** | drop policy（`202609160005`） |
+| `kms_comments` / `kms_experts` | 留言內文、專家 contact | drop policy（`202609160006`） |
+| `lib_books` / `lib_categories` / `car_vehicles` | 書目、分類、車牌 | drop policy（`202609160005`） |
+| `kms_categories` / `kms_product_lines` | 分類、產品線（低敏感） | drop policy（`202609160006`） |
+| 4 個 KMS view | 57 人名冊、文件標題與作者統計 | `security_invoker` ＋ revoke（`202609160002`） |
+
+**最終狀態：anon 只讀得到 `web_products_public`（335 筆）與 `web_news`（2 筆）——
+兩個都是新官網刻意公開的。** 88 個物件逐一用 anon key 實打驗證過。
+
+- 🔴 **要證明「沒有別的洞」，靠實際打一遍比靠 SQL 條件可靠。**
+  我查「有 policy 放行 anon 的表」時條件寫成
+  `roles like '%authenticated%' or roles = '{public}'` —— **漏掉 `{anon}`**，
+  而 5 張 KMS 表的 policy 角色正是 `{anon}`。**查詢條件本身就可能有洞。**
+  最後一定要用 anon key 掃過每一張表與 view。
+- 🔴 **關了前門不等於關了所有門**：`kms_documents` 擋掉之後，同樣的文件內容
+  仍從 `kms_snapshots`（402 筆快照，含 `body`）整批流出去。
+  **問「這份資料還有沒有第二個地方存著」。**
+- ⚠️ **`web_*` 那一組刻意不動**：policy 都有 `is_web_editor()` 或 `web_editors`
+  成員檢查把關，設計是對的；`web_news_public_read`／`web_pages_public_read` 的
+  `status='live'` 與 `web_enquiries_anon_insert` 是官網要的公開行為。
+- 每個 migration 的註解裡都寫了**逐條還原指令**，有人回報壞掉時一行復原。
+- 🔴 **「sb-proxy 一律移除 `kms_documents.body`」那句話只對經過 sb-proxy 的請求成立。**
+  直接打 REST 完全繞過去 —— 移除之前，整個知識庫 1,328 筆等級 1 文件的完整內文
+  對網際網路是開的。這是「**經過代理才驗的守衛，前提是沒有別條路**」的第二個實例
+  （第一個是 `chat_sessions` 的欄位守衛）。
+- ⚠️ **那批 policy 都不在本 repo 的 migrations 裡**（從 Dashboard 或官網 repo 建的），
+  所以無法從版控看出當初為什麼建、誰在用。**下次遇到「不知道誰在用」的權限，
+  判斷方式是把每一個可能的使用者實際打一遍，不是從版控推論。**
+
+## ✅ Supabase Auth 的公開註冊已關閉（2026-09-18，Woody 在 Dashboard 關的）
+
+`/auth/v1/settings` 現在回 `disable_signup: true`、`anonymous_users: false`；
+實測 `POST /auth/v1/signup` 回 **422 `signup_disabled`**。
+
+- **關掉之前**：任何人都能自己註冊取得 `authenticated` 角色，
+  所以**所有給 `authenticated` 的授權都等同公開** —— 那正是 2026-09-16 那批 policy
+  選擇**整條移除**而不是「限縮到 authenticated」的理由。
+  現在「限縮到 authenticated」才開始有意義，但**既有的移除不要回頭放寬**。
+- **平台完全不用 Supabase Auth**（員工登入走自建的 `auth-verify`），所以這個開關對平台零影響 ——
+  已實測 `auth-verify` 200、`sb-proxy` 401（正確）、新官網產品與消息 200。
+  `auth.users` 那 4 個帳號是新官網後台在用的，**既有帳號照常登入**，只是不能再有人自己註冊。
+- 🔴 **以後要加新官網的編輯者，只能從 Dashboard → Authentication → Users 建立或寄邀請。**
+  對方自己去註冊會拿到 422，**那不是壞掉**。
+- ⚠️ **這個設定不在 SQL 層、也不在版控裡**，改了不會留下任何痕跡。
+  日後有人回報「註冊不了」，先來看這一段。
+
+## ⚠️ 影像轉換額度是**整個組織共用**的（2026-09-18）
+
+Dashboard 那個紅色的 `EXCEEDING USAGE LIMITS` 就是這一項：
+**Storage Image Transformations 196 / 100**（Pro 方案每月含 100 張**原圖**，
+同一張圖縮成幾種尺寸只算一張）。其餘每一項都 <5%。
+
+| 專案 | 用量 |
+|---|---|
+| VIEMAG（**另一個專案，不在本 repo**） | 160 |
+| KMS（＝本平台的 `tcvlnpgpuphdalzvmoyo`） | 36 |
+
+- 🔴 **額度是組織層級共用的**，別的專案吃掉會連累這一個。要查得看
+  Organization → Usage 的分專案明細，只看單一專案會以為自己沒事。
+- **平台一張都沒用**（全 repo grep `render/image`／`?width=` 零筆，圖片一律原圖或簽章網址），
+  **所以這件事弄不壞平台**。那 36 張是**新官網**：
+  `comartgroup.github.io/www/assets/js/products.js` 的 `thumb()` 把 `/object/public/`
+  換成 `/render/image/public/` 再加 `?width=…&quality=75&resize=contain`。
+  那個做法本身是對的（省 97.6%、依 Accept 自動回 WebP），是額度不夠，不是寫錯。
+- 🔴 **新官網一上線就會固定超額**：335 筆產品 ＝ 每月 335 張原圖，額度只有 100。
+  金額很小（超出部分約每 1000 張原圖 US$5，一個月 1～2 美元），
+  但**spend cap 開著的時候，超額的後果是限流而不是計費**。
+  兩條路：停用 spend cap，或叫新官網改成上傳時就存好縮圖。
+- 2026-09-18 實測：轉換**仍然正常**（實打一張產品圖 `?width=200`，回 200、20KB），
+  計費週期每月 5 號重算。**「超出」目前只是警告，還沒真的被限制。**
 
 ## Product Dev（`/product_dev`）—— 第六個子系統
 

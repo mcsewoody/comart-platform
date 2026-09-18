@@ -103,7 +103,7 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 
 | File | Version | Purpose | ~Lines |
 |------|---------|---------|--------|
-| `index.html` | v2.02 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
+| `index.html` | v2.03 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
 | `admin/index.html` | v2.40 | Admin System — room booking, fleet, visitor, library, lottery | 5,650 |
 | `kms/index.html` | v2.36 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
 | `quotation/index.html` | v3.60 | Quotation & CRM system | 7,332 |
@@ -898,6 +898,25 @@ v1.94 只做在 Portal，但**同事被邀請的時候人常常在 KMS 或報價
 
 - **清單上「進行中」那一列右側是「加入對話」按鈕**（`lc_join`，v1.82），不是狀態標籤——
   那一列本來就整列可點，寫「進行中」只說明了狀態、沒告訴人可以進去。已結束的仍是狀態標籤。
+### 重新開啟 ＋ 隨時可匯出 PDF（v2.03，2026-09-19，無 migration）
+
+- **已結束的場次，發起人可以按「↻ 重新開啟」繼續談**（`lcReopen`）。
+  權限沒有放寬：`status` 本來就在 sb-proxy 的 `CHAT_HOST_ONLY` 裡，
+  這只是把既有規則接上一顆按鈕。`ended_at` 一併加進那份清單 ——
+  它與 `status` 是同一件事的兩半，少鎖一個等於沒鎖。
+  🔴 **`keep` 不動**：它記的是「結束時決定要保留」，不是「現在開著沒有」。
+  清掉的話，再次結束時就分不出這場本來是不是要留的。
+  ⚠️ **已經停在那個房間裡看紀錄的人不會自動發現它重開了**（結束的場次不輪詢），
+  要退回清單再進來。這是刻意不修的：為了已結束的場次而恢復輪詢，
+  等於全公司每個開著封存紀錄的分頁都每 3 秒打一次。
+- **PDF 改成隨時可匯出**（原本刻意只在結束後才給）。
+  🔴 **原本的顧慮沒有消失，只是改用「印在紙上」處理**：進行中匯出的版面頂端會印
+  「⚠ 對話仍在進行中 —— 這份是 X 的快照，之後可能還有新的訊息」。
+  **把判斷藏在按鈕的有無，使用者只會覺得功能壞了；印在紙上，收件人才看得到。**
+  這與 board「只有定稿才給匯出」不同調是刻意的：board 匯出的是正式會議紀錄，
+  聊天室匯出的常常是「先把現在談到的東西發給沒進來的人」。
+- 「這裡的規則」第 3 條跟著改（五語）。
+
 - 🔴 **結束（保留）後直接回清單，不留在房間裡**（v1.81）：房間裡已經沒有事情可做
   （不能發言），留在原地只會讓人以為對話還開著。清單上那一區叫**「已結束」**（`lc_ended`，
   與房間裡的狀態標籤共用同一個 key，不留兩個同義 key）。

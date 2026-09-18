@@ -56,7 +56,9 @@ const ALLOWED_TABLES = new Set([
 // last_at 刻意不在這裡：每個人發言都要更新它，那是正常的協作寫入。
 // members 也只有開啟者改得動：那份清單決定誰讀得到這場對話的內容，
 // 任何參與者都能自行加人的話，「只有參與人可以開啟」就沒有意義了。
-const CHAT_HOST_ONLY = new Set(["status", "keep", "title", "members"])
+// ended_at 與 status 是同一件事的兩半（v2.03 發起人可以重新開啟已結束的場次），
+// 少鎖一個就等於沒鎖：只改 ended_at 也會讓清單上的時間變成別人說了算
+const CHAT_HOST_ONLY = new Set(["status", "keep", "title", "members", "ended_at"])
 // 線上對話可以刪除整場的角色：開啟者本人，或 admin
 const CHAT_DELETE_ROLES = new Set(["admin"])
 // 開啟者是整套權限的根，建立後不可改（改掉就等於把別人開的場次搶過來）

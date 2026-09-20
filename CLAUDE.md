@@ -105,7 +105,7 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 |------|---------|---------|--------|
 | `index.html` | v2.03 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
 | `admin/index.html` | v2.40 | Admin System — room booking, fleet, visitor, library, lottery | 5,650 |
-| `kms/index.html` | v2.36 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
+| `kms/index.html` | v2.37 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
 | `quotation/index.html` | v3.60 | Quotation & CRM system | 7,332 |
 | `board/index.html` | v1.90 | 公告與會議 Bulletin & Meetings — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍、腦力激盪 | 4,600 |
 | `product_dev/` | v2.17 | **產品開發管理 —— 第六個子系統，不遵守單一檔案原則**（見下方專節） | — |
@@ -220,6 +220,34 @@ KMS (`kms/index.html`) implements RAG (Retrieval-Augmented Generation):
 3. Queries embedded via `embed-query` edge function → cosine similarity + keyword scoring for retrieval
 4. Retrieved context passed to Claude API via `claude-proxy` edge function for Q&A
 5. Rich text editing via TipTap (loaded dynamically from esm.sh)
+
+### 🔴 KMS 的 embedding：前後端契約從第一天起就沒對上（v2.37 修，2026-09-21）
+
+使用者存檔時 console 出現 `POST /functions/v1/embed-document 400` ＋ `Error: text required`。
+**那不是最近弄壞的 —— `git log -S` 顯示兩邊從引入 edge function 的第一個 commit 就不一致：**
+
+| | 前端 `callEmbedEdgeFn` | edge function `embed-document` |
+|---|---|---|
+| 送什麼 | `{ doc_id }` | 要 `{ text }`，沒有就回 400 |
+| 期待回什麼 | `{ success: true }` | 回 `{ embedding, doc_id }`，**沒有 `success`** |
+| 誰寫資料庫 | 以為 function 會寫 | **它完全不碰資料庫**（同 `embed-query`：算完就回） |
+
+- 🔴 **後果是 `edge-fn` 模式從來沒有寫進過任何一個向量，而它是預設模式**
+  （`CFG.embedModel: 'edge-fn'`）。文件本身存檔成功，只跳一個「embedding 失敗」的 toast ——
+  **看起來像小警告，實際上那份文件對語意搜尋是不存在的**。
+  關鍵字搜尋仍然找得到，所以這個缺陷可以撐很久沒有人發現。
+  **這是「壞得很安靜」的典型：功能沒有整個倒下，只是悄悄少做了一件事。**
+- **修法是前端配合 function，不是反過來**：`callEmbedEdgeFn(doc_id, text)` 送 `{doc_id, text}`、
+  拿 `data.embedding`、再用 `kmsWrite('update','kms_documents',{embedding},doc_id)` 寫回。
+  讓 function 自己寫資料庫要給它 service_role 與表名判斷，等於**在第四個地方複製一份寫入路徑**。
+- 🔴 **三個模式送去嵌入的文字必須完全一樣**（`title + '\n' + body`）。
+  各組一份不同的文字，搜尋結果就會因為「當初用哪個模式存的」而不同 —— 而那是沒有人查得出來的差異。
+- ⚠️ **既有文件不會自動補回來**：這次修的是「以後存的會有向量」。
+  之前用 edge-fn 存的那些仍然是 `embedding is null`，要另外做批次補齊
+  （KMS 已有「批次產生摘要」的 UI 形狀可以照抄）。**尚未做，要 Woody 決定。**
+- 診斷起點：存檔時 console 的 `[embed-document]`。空內文現在在前端就擋下來並講
+  「文件沒有可供索引的內文」—— 直接把 API 的 `text required` 丟給使用者，
+  那句話描述的是欄位不是他的處境。
 
 ### Design System
 

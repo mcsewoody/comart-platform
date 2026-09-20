@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART KMS v2.36</title>
+<title>COMART KMS v2.37</title>
 
 <!-- 以下解析庫僅上傳/預覽時使用，defer 載入避免阻塞頁面解析（gzip 共 ~477KB；呼叫處均有 window.X 檢查） -->
 <!-- Marked for Markdown → HTML preview (classic script, no module needed) -->
@@ -380,7 +380,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="38" height="20" style="display:inline-block;vertical-align:middle;margin-right:4px;margin-top:-2px"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg>COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v2.36</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v2.37</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('en')">EN</button>
@@ -2406,7 +2406,7 @@ async function generateEmbedding(text) {
   // 前端只傳 doc_id，OpenAI key 存在 Supabase Secrets，不暴露
   // 這個函數在 saveDoc 裡單獨呼叫，不在 retrieveChunks 裡呼叫
   if (mode === 'edge-fn') {
-    // embedding 由 callEmbedEdgeFn(doc_id) 觸發，這裡回傳 null 表示「交給 Edge Function 處理」
+    // embedding 由 callEmbedEdgeFn(doc_id, text) 產生並寫回，這裡回傳 null 表示「不在這裡算」
     return null;
   }
 
@@ -2436,9 +2436,27 @@ async function generateEmbedding(text) {
   throw new Error('未知的 embedding 模式：' + mode);
 }
 
-// 呼叫 Supabase Edge Function 觸發 embedding（edge-fn 模式專用）
-async function callEmbedEdgeFn(doc_id) {
+/* 呼叫 Supabase Edge Function 產生 embedding（edge-fn 模式專用）
+
+   🔴 這個函式與 `embed-document` 的契約**從第一個 commit 起就沒有對上過**
+      （2026-09-21 由使用者的 console 400 追出來）：
+        前端送 `{ doc_id }`、期待回 `{ success:true }`、並假設 function 會自己寫資料庫；
+        而那支 function 要的是 `{ text }`、回的是 `{ embedding }`、**完全不碰資料庫**
+        （與 `embed-query` 同一個形狀：算完就回傳）。
+      兩邊都「看起來很合理」，只是各自想像了不同的分工。
+   🔴 **後果是 edge-fn 模式從來沒有寫進過任何一個向量** —— 而它是預設模式
+      （`CFG.embedModel: 'edge-fn'`）。文件本身存檔成功，只是跳一個
+      「embedding 失敗」的 toast，所以看起來像小警告，實際上那份文件
+      **對語意搜尋是不存在的**（關鍵字搜尋仍找得到，這就是它能撐這麼久的原因）。
+   🔴 **算向量與寫回資料庫是分開的兩件事**，呼叫端負責寫回 ——
+      這與 `direct-openai`／`mock` 兩個模式一致（那兩個本來就是自己寫）。
+      不要改成「讓 function 自己寫」：那需要給它 service_role 與表名判斷，
+      等於在第四個地方複製一份寫入路徑。 */
+async function callEmbedEdgeFn(doc_id, text) {
   if (!CFG.supabaseUrl || !CFG.supabaseKey) throw new Error('Supabase 未設定');
+  // 🔴 空字串要在這裡擋掉並講清楚。送出去只會拿到一個 400 "text required"，
+  //    那句話對使用者沒有任何意義（它描述的是 API 的欄位，不是他的處境）
+  if (!text || !String(text).trim()) throw new Error('文件沒有可供索引的內文');
   // Supabase Edge Function URL 格式：https://xxx.supabase.co/functions/v1/fn-name
   const base = CFG.supabaseUrl.replace(/\/(rest|auth|storage)\/v\d.*$/, '');
   const url = base + '/functions/v1/embed-document';
@@ -2450,12 +2468,15 @@ async function callEmbedEdgeFn(doc_id) {
       'Content-Type': 'application/json',
       'x-session': kmsSig(),
     },
-    body: JSON.stringify({ doc_id }),
+    body: JSON.stringify({ doc_id, text: String(text) }),
   });
-  const data = await res.json();
-  if (!res.ok || !data.success) {
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || !data.embedding) {
     throw new Error(data.error || `Edge Function 錯誤 ${res.status}`);
   }
+  // 寫回向量。用 kmsWrite（同一個 saveDoc 裡截斷 body 時用的那一條路），
+  // 不要另外開一條 REST PATCH —— KMS 的寫入一律走 kms-write
+  await kmsWrite('update', 'kms_documents', { embedding: data.embedding }, doc_id);
   return data;
 }
 
@@ -2714,7 +2735,10 @@ async function saveDoc() {
               await kmsWrite('update', 'kms_documents', { body: body.slice(0, 24000) }, doc_id);
               toast(t('toast.embed_too_long'), '');
             }
-            await callEmbedEdgeFn(doc_id);
+            // 🔴 送去嵌入的文字必須與 direct-openai／mock 兩個模式**完全一樣**
+            //    （`title + '\n' + body`）。三個模式各組一份不同的文字，
+            //    搜尋結果就會因為「當初是用哪個模式存的」而不同
+            await callEmbedEdgeFn(doc_id, title + '\n' + body);
             toast(t('toast.save_embed_ok'), 'success');
           } catch(embedErr) {
             console.error('[embed-document]', embedErr);

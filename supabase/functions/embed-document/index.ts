@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { verifySession } from "../_shared/session.ts"
+import { embedText } from "../_shared/embed.ts"
 
 const CORS = {
   "Access-Control-Allow-Origin": "*",
@@ -22,19 +23,15 @@ serve(async (req) => {
     const { text, doc_id } = await req.json()
     if (!text) return new Response(JSON.stringify({ error: "text required" }), { status: 400, headers: CORS })
 
-    const res = await fetch("https://api.openai.com/v1/embeddings", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + OPENAI_KEY,
-      },
-      body: JSON.stringify({ input: text.slice(0, 8000), model: "text-embedding-3-small" }),
-    })
-
-    const data = await res.json()
-    const embedding = data.data?.[0]?.embedding
-
-    if (!embedding) return new Response(JSON.stringify({ error: "no embedding returned" }), { status: 500, headers: CORS })
+    // 🔴 不要在這裡寫 text.slice(0, 8000)：8192 是 **token** 上限不是字元上限，
+    //    中文約 1 token 一個字，8000 字的中文會被 API 直接退。
+    //    截斷與重試的邏輯統一在 _shared/embed.ts（批次補齊也用同一份）
+    let embedding: number[]
+    try {
+      embedding = await embedText(String(text), OPENAI_KEY)
+    } catch (e) {
+      return new Response(JSON.stringify({ error: (e as Error).message }), { status: 502, headers: CORS })
+    }
 
     return new Response(JSON.stringify({ embedding, doc_id }), {
       headers: { ...CORS, "Content-Type": "application/json" },

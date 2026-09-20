@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART KMS v2.39</title>
+<title>COMART KMS v2.40</title>
 
 <!-- 以下解析庫僅上傳/預覽時使用，defer 載入避免阻塞頁面解析（gzip 共 ~477KB；呼叫處均有 window.X 檢查） -->
 <!-- Marked for Markdown → HTML preview (classic script, no module needed) -->
@@ -380,7 +380,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="38" height="20" style="display:inline-block;vertical-align:middle;margin-right:4px;margin-top:-2px"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg>COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v2.39</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v2.40</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('en')">EN</button>
@@ -2456,7 +2456,16 @@ async function generateEmbedding(text) {
       },
       body: JSON.stringify({
         model: 'text-embedding-3-small',
-        input: text.slice(0, 8000),
+        /* 🔴 8192 是 **token** 上限不是字元上限，而中文大約 1 token 一個字 ——
+              寫死 slice(0, 8000) 會讓中文長文被 API 直接退
+              （2026-09-21 批次補齊時整批中文法規因此失敗）。
+              伺服器端（`_shared/embed.ts`）是「估起點 ＋ 撞到就縮短重試」的完整版；
+              這裡是 `direct-openai` 模式（要自己填 OpenAI 金鑰、非預設），
+              只照抄估算那一半，**不複製重試邏輯** —— 兩份重試必然分岔。
+              真的要用這個模式的話，請改走 edge-fn。 */
+        input: text.slice(0, /[\u3040-\u30FF\u3400-\u4DBF\u4E00-\u9FFF]/.test(text) &&
+          (text.match(/[\u3040-\u30FF\u3400-\u4DBF\u4E00-\u9FFF]/g) || []).length / Math.max(1, text.length) > 0.2
+          ? 5000 : 8000),
         dimensions: 1536,
       }),
     });

@@ -105,7 +105,7 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 |------|---------|---------|--------|
 | `index.html` | v2.03 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
 | `admin/index.html` | v2.40 | Admin System — room booking, fleet, visitor, library, lottery | 5,650 |
-| `kms/index.html` | v2.39 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
+| `kms/index.html` | v2.40 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
 | `quotation/index.html` | v3.60 | Quotation & CRM system | 7,332 |
 | `board/index.html` | v1.90 | 公告與會議 Bulletin & Meetings — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍、腦力激盪 | 4,600 |
 | `product_dev/` | v2.17 | **產品開發管理 —— 第六個子系統，不遵守單一檔案原則**（見下方專節） | — |
@@ -248,6 +248,30 @@ KMS (`kms/index.html`) implements RAG (Retrieval-Augmented Generation):
 - 診斷起點：存檔時 console 的 `[embed-document]`。空內文現在在前端就擋下來並講
   「文件沒有可供索引的內文」—— 直接把 API 的 `text required` 丟給使用者，
   那句話描述的是欄位不是他的處境。
+
+### 🔴 8192 是 **token** 上限，不是字元上限（v2.40，2026-09-21）
+
+批次補齊向量時，幾十份中文文件（法規、專利說明書、教材）全部回
+`Invalid 'input': maximum context length is 8192 tokens.`
+
+- **成因**：三處都寫著 `text.slice(0, 8000)`。對英文沒事（約 0.25 token/字元，
+  8,000 字元 ≈ 2,000 token），但**中文大約 1 token 一個字** —— 8,000 字的中文
+  直接超過上限。而其中一處就在**存檔那條路**上，所以長中文文件從一開始就嵌不進去，
+  只是以前 edge-fn 整條路都壞著（見上一節），這個坑被蓋在後面沒被看見。
+- **修法在 `supabase/functions/_shared/embed.ts`**（第四個 `_shared` 檔）：
+  `embedText()` ＝ **依 CJK 比例估一個起點（CJK 5,000 字／其餘 8,000 字元）
+  ＋ 撞到「太長」就縮短 40% 重試，最多 4 輪**。
+  🔴 **不要只是把常數調小**：那會讓英文文件白白少嵌一半內容，而估算永遠有猜錯的一天
+  （罕見漢字、日文、越南文的 token 比例都不同）。**讓 API 自己說太長，比任何估算都準。**
+  🔴 **只有「太長」才縮短重試**：金鑰錯、額度用完、服務中斷都不會因為內容變短而變好，
+  那時候重試只是把同一個錯誤再犯三次。
+- `embed-document`（存檔）與 `kms-secure-docs` 的 `embedMissing`（批次補齊）
+  **共用這一份** —— 兩邊各寫一份正是這次出事的形狀。
+  KMS 前端 `direct-openai` 模式（非預設、要自己填金鑰）只照抄估算那一半，
+  **刻意不複製重試邏輯**。
+- ⚠️ **已知且接受的限制：一份文件只有一個向量**，所以超長文件只有開頭 5,000–8,000 字
+  進得了語意搜尋。要完整覆蓋得改成分段多向量（schema 要改），目前不做 ——
+  關鍵字搜尋仍然涵蓋全文。
 
 ### Design System
 

@@ -13,6 +13,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
 import { verifySession } from "../_shared/session.ts"
 import { namedSecretKey } from "../_shared/api-keys.ts"
+import { embedText } from "../_shared/embed.ts"
 
 const CORS = {
   "Access-Control-Allow-Origin": "*",
@@ -143,16 +144,10 @@ serve(async (req) => {
         //    一直回報成功卻什麼都沒做的原因
         if (text.length < MIN_EMBED_CHARS) { skipped++; continue }
         try {
-          const r = await fetch("https://api.openai.com/v1/embeddings", {
-            method: "POST",
-            headers: { "Content-Type": "application/json", "Authorization": "Bearer " + OPENAI_KEY },
-            // 🔴 8000 字的上限與前端存檔那條路（embed-document）一致。
-            //    兩邊不同的話，同一份文件補出來的向量會與當初存檔時的不一樣
-            body: JSON.stringify({ input: text.slice(0, 8000), model: "text-embedding-3-small" }),
-          })
-          const j = await r.json()
-          const emb = j?.data?.[0]?.embedding
-          if (!emb) throw new Error(j?.error?.message || "no embedding returned")
+          // 🔴 截斷與重試走 _shared/embed.ts，與存檔那條路（embed-document）同一份。
+          //    兩邊各寫一份的下場：2026-09-21 兩邊都寫 slice(0, 8000)，
+          //    而 8192 是 **token** 上限不是字元上限 —— 幾十份中文文件一律被退
+          const emb = await embedText(text, OPENAI_KEY)
           const { error: upErr } = await sb.from("kms_documents").update({ embedding: emb }).eq("id", d.id)
           if (upErr) throw new Error(upErr.message)
           done++

@@ -105,7 +105,7 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 |------|---------|---------|--------|
 | `index.html` | v2.03 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
 | `admin/index.html` | v2.40 | Admin System — room booking, fleet, visitor, library, lottery | 5,650 |
-| `kms/index.html` | v2.37 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
+| `kms/index.html` | v2.39 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
 | `quotation/index.html` | v3.60 | Quotation & CRM system | 7,332 |
 | `board/index.html` | v1.90 | 公告與會議 Bulletin & Meetings — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍、腦力激盪 | 4,600 |
 | `product_dev/` | v2.17 | **產品開發管理 —— 第六個子系統，不遵守單一檔案原則**（見下方專節） | — |
@@ -341,6 +341,25 @@ key 名稱 —— 使用者看到才回報。
 - ⚠️ **組出來的 key 抓不到**：`txt('lc-rule' + ri + '-t', 'lc_rule' + ri + '_t')` 這種
   用不到 `t('字面值')`，所以「找出所有被使用的 key」那一半永遠會漏。
   稽核腳本因此改成「比對五本字典彼此」而不是「比對程式碼與字典」—— 前者不需要知道誰在用。
+
+### KMS 的字典是另一份形狀，另一支稽核（`scripts/kms-i18n-audit.py`）
+
+```bash
+python3 scripts/kms-i18n-audit.py     # KMS 專用（key 有引號：'btn.save':'儲存'）
+python3 scripts/i18n-audit.py         # Portal 專用（key 沒引號：btn_save:'儲存'）
+```
+
+2026-09-21 補上。實際抓到 **7 個重複定義**（五本字典 255 個 key 本身是齊的）：
+`review.title`／`comments.submit`／`btn.add_product_line` 五本都重複，
+而 zh-TW 的 `btn.cancel`／`conf.level.1~3` 是**早期的英文預設被後來的中文蓋掉** ——
+畫面上是對的（後者生效），但**去改前面那一份不會有任何效果**，那正是要清掉的理由。
+已全部移除死的那一份，並逐 key 驗證「生效值完全沒變」才提交。
+
+- 🔴 **稽核腳本第一版自己就踩了一次坑**：最後一本字典的結束位置用「檔案結尾」算，
+  於是把 I18N 後面程式碼裡的物件常值（`'x-session': …`、`'Authorization': …`、
+  甚至 CSS 字串）全都當成 key，噴出一堆誤報**把真正的問題蓋掉**。
+  結束位置一定要用**大括號配對**算（跳過字串常值）。
+  這與 Portal 那支「不能用 regex 找 key」是同一個教訓的另一面。
 
 ## 系統架構
 

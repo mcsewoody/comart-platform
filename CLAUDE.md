@@ -105,7 +105,7 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 |------|---------|---------|--------|
 | `index.html` | v2.03 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
 | `admin/index.html` | v2.40 | Admin System — room booking, fleet, visitor, library, lottery | 5,650 |
-| `kms/index.html` | v2.40 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
+| `kms/index.html` | v2.41 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
 | `quotation/index.html` | v3.60 | Quotation & CRM system | 7,332 |
 | `board/index.html` | v1.90 | 公告與會議 Bulletin & Meetings — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍、腦力激盪 | 4,600 |
 | `product_dev/` | v2.17 | **產品開發管理 —— 第六個子系統，不遵守單一檔案原則**（見下方專節） | — |
@@ -248,6 +248,20 @@ KMS (`kms/index.html`) implements RAG (Retrieval-Augmented Generation):
 - 診斷起點：存檔時 console 的 `[embed-document]`。空內文現在在前端就擋下來並講
   「文件沒有可供索引的內文」—— 直接把 API 的 `text required` 丟給使用者，
   那句話描述的是欄位不是他的處境。
+
+### 批次工具在「設定管理 → 🛠 批次工具」（v2.41，2026-09-21）
+
+原本掛在「分析報表」頁面底下（既有的「批次產生摘要」就在那裡）。
+🔴 **搬家的理由是語意：分析報表是「看數字」的地方，而那兩顆會「對全庫寫入」**
+（補摘要呼叫 Claude、補向量呼叫 OpenAI，各跑好幾分鐘）。
+放在唯讀的頁面裡，使用者按下去之前不會預期它會改資料。
+- 設定管理現在有三個頁籤：`pl`／`cat`／**`batch`**（`switchSettingTab`）。
+  加第四個記得改 `['pl','cat','batch']` 那一行 —— 不在清單裡的頁籤按鈕不會反白。
+- **兩顆按鈕的 id 與函式名沒有改**（`batch-summary-btn`／`batch-embed-btn`／
+  `batchGenerateSummaries`／`batchEmbedMissing`），只換了容器。搬家時順手重新命名，
+  會讓下一次追問題變成兩件事。
+- 非 admin／dcc 進到這個頁籤會看到按鈕變灰 ＋ 一行說明。
+  **前端只是省掉一次白按**，真正的守衛在 `kms-secure-docs` 的 `embedMissing`（實測 403）。
 
 ### 🔴 8192 是 **token** 上限，不是字元上限（v2.40，2026-09-21）
 

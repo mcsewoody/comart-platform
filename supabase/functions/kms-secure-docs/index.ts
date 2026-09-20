@@ -20,6 +20,11 @@ const CORS = {
 }
 
 const ROLE_MAX_CONF: Record<string, number> = { admin: 3, dcc: 2, user: 1 }
+// 補齊向量是「對全庫寫入」的維運動作，且會讀到每一份文件的內文（含機密等級 2/3）——
+// 所以限定 admin／dcc，與成本檔案、產品編輯器既有的分界一致，不另外發明規則。
+const MAINT_ROLES = new Set(["admin", "dcc"])
+// 太短的內容嵌出來的向量沒有檢索價值，而且會一直佔著「還沒補」的名額
+const MIN_EMBED_CHARS = 20
 
 const LIST_FIELDS =
   "id,title,category,lang,status,stars,conf_level,product_line,customer_tag,tags,author_name,view_count,file_url,file_name,file_type,file_size,summary,summary_en,summary_zh_cn,summary_vi,summary_ja,source_url,valid_until,updated_at,created_at"
@@ -45,6 +50,7 @@ serve(async (req) => {
     // ── 身分：驗證簽章拿到 empId，角色一律重查資料庫最新值 ──
     let maxConf = 1
     let viewerName: string | null = null
+    let viewerRole = ""
     const verified = session ? await verifySession(session) : null
     if (verified?.empId) {
       const { data: urows } = await sb.from("users").select("role,name_en,name_zh,active").eq("emp_id", verified.empId).limit(1)
@@ -52,6 +58,7 @@ serve(async (req) => {
       if (u && u.active !== false) {
         maxConf = ROLE_MAX_CONF[u.role] ?? 1
         viewerName = u.name_en || u.name_zh || null
+        viewerRole = String(u.role || "")
       }
     }
     const allowed = (doc: { conf_level?: number | null; author_name?: string | null }) =>
@@ -97,6 +104,63 @@ serve(async (req) => {
       if (!doc) return json({ ok: false, reason: "not_found" })
       if (!allowed(doc)) return json({ ok: false, reason: "forbidden" }, 403)
       return json({ ok: true, doc })
+    }
+
+    /* ── embedMissing：補齊沒有向量的文件（admin／dcc 專用）──
+
+       為什麼放在伺服器端而不是前端迴圈：
+       ① 前端要補一份就得「抓內文 → 算向量 → 寫回」三個往返，200 份就是 600 個請求；
+          這裡一次 call 處理一批，快一個數量級。
+       ② **機密文件的內文完全不會進到瀏覽器**。補向量不需要人看到內容，
+          那就不該送出去（同 searchVector 把過濾放在 SQL 層的理由）。
+       🔴 **游標式分批，不是「每次都撈前 N 筆還沒補的」**：內文太短的文件永遠嵌不出來，
+          用後者的話那幾筆會每一輪都被撈回來，迴圈永遠停不了。
+          `after` 是上一批處理到的最後一個 id，所以跳過的那幾筆不會再回來。 */
+    if (action === "embedMissing") {
+      if (!MAINT_ROLES.has(viewerRole)) return json({ ok: false, reason: "forbidden" }, 403)
+      const OPENAI_KEY = Deno.env.get("OPENAI_API_KEY")
+      if (!OPENAI_KEY) return json({ ok: false, reason: "server_misconfigured", message: "OPENAI_API_KEY not set" }, 500)
+
+      const limit = Math.min(Math.max(Number(body.limit) || 8, 1), 20)
+      const after = typeof body.after === "string" ? body.after : ""
+
+      // 全庫還剩幾份沒有向量（給前端畫進度用；每一批都重算，所以別人同時在存檔也算得準）
+      const { count: remaining } = await sb
+        .from("kms_documents").select("id", { count: "exact", head: true }).is("embedding", null)
+
+      let q = sb.from("kms_documents").select("id,title,body").is("embedding", null).order("id").limit(limit)
+      if (after) q = q.gt("id", after)
+      const { data: rows, error } = await q
+      if (error) return json({ ok: false, reason: "server_error", message: error.message }, 500)
+
+      let done = 0, skipped = 0
+      const failed: string[] = []
+      let lastId = after
+      for (const d of (rows || []) as Array<{ id: string; title?: string; body?: string }>) {
+        lastId = d.id
+        const text = ((d.title || "") + "\n" + (d.body || "")).trim()
+        // 🔴 跳過的要照實回報，不可以當成「已處理」——那正是批次摘要那顆按鈕
+        //    一直回報成功卻什麼都沒做的原因
+        if (text.length < MIN_EMBED_CHARS) { skipped++; continue }
+        try {
+          const r = await fetch("https://api.openai.com/v1/embeddings", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "Authorization": "Bearer " + OPENAI_KEY },
+            // 🔴 8000 字的上限與前端存檔那條路（embed-document）一致。
+            //    兩邊不同的話，同一份文件補出來的向量會與當初存檔時的不一樣
+            body: JSON.stringify({ input: text.slice(0, 8000), model: "text-embedding-3-small" }),
+          })
+          const j = await r.json()
+          const emb = j?.data?.[0]?.embedding
+          if (!emb) throw new Error(j?.error?.message || "no embedding returned")
+          const { error: upErr } = await sb.from("kms_documents").update({ embedding: emb }).eq("id", d.id)
+          if (upErr) throw new Error(upErr.message)
+          done++
+        } catch (e) {
+          failed.push(((d.title || d.id) + ": " + String((e as Error).message)).slice(0, 120))
+        }
+      }
+      return json({ ok: true, done, skipped, failed, lastId, batch: (rows || []).length, remaining: remaining ?? 0 })
     }
 
     // ── searchVector：向量搜尋，conf_level 限制在 SQL 層直接套用（避免機密內容

@@ -49,18 +49,30 @@ serve(async (req) => {
     const { action, session } = body
 
     // ── 身分：驗證簽章拿到 empId，角色一律重查資料庫最新值 ──
+    //
+    // 🔴 **驗不過一律回 401，絕不靜默降級**（2026-09-21 修）。
+    //    原本的寫法是「驗不過就維持 maxConf = 1 繼續往下跑」，於是 session 一過期，
+    //    admin 拿到的清單就悄悄少掉機密等級 2/3 的文件 —— 回應是 200、畫面照常、
+    //    沒有任何地方說得出少了東西。那種壞法不會有人回報。
+    //    同理：查不到使用者（停用／離職／查詢失敗）也要說出來，不要當成「等級 1 訪客」。
     let maxConf = 1
     let viewerName: string | null = null
     let viewerRole = ""
+    //    連「完全沒帶 session」也一併擋掉：這個 function 是用**印在網頁原始碼裡的
+    //    anon key** 呼叫的，不擋的話任何人不必登入就能把全庫 1,328 筆等級 1 文件的
+    //    標題與摘要整份撈走（實測確認過）。KMS 前端在沒有 session 時本來就會導回
+    //    Portal 登入，所以沒有任何合法的匿名呼叫者。
     const verified = session ? await verifySession(session) : null
+    if (!verified) return json({ ok: false, reason: session ? "session_expired" : "unauthorized" }, 401)
     if (verified?.empId) {
-      const { data: urows } = await sb.from("users").select("role,name_en,name_zh,active").eq("emp_id", verified.empId).limit(1)
+      const { data: urows, error: uerr } = await sb.from("users").select("role,name_en,name_zh,active").eq("emp_id", verified.empId).limit(1)
+      if (uerr) return json({ ok: false, reason: "server_error", message: uerr.message }, 500)
       const u = urows?.[0]
-      if (u && u.active !== false) {
-        maxConf = ROLE_MAX_CONF[u.role] ?? 1
-        viewerName = u.name_en || u.name_zh || null
-        viewerRole = String(u.role || "")
-      }
+      // 簽章有效但人已停用／離職／查無此人 —— 降權是對的，但要讓對方知道
+      if (!u || u.active === false) return json({ ok: false, reason: "inactive" }, 403)
+      maxConf = ROLE_MAX_CONF[u.role] ?? 1
+      viewerName = u.name_en || u.name_zh || null
+      viewerRole = String(u.role || "")
     }
     const allowed = (doc: { conf_level?: number | null; author_name?: string | null }) =>
       (doc.conf_level ?? 1) <= maxConf || (!!viewerName && doc.author_name === viewerName)

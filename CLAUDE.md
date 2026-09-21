@@ -287,6 +287,37 @@ KMS (`kms/index.html`) implements RAG (Retrieval-Augmented Generation):
   進得了語意搜尋。要完整覆蓋得改成分段多向量（schema 要改），目前不做 ——
   關鍵字搜尋仍然涵蓋全文。
 
+### 🔴 KMS 的 session 過期是**靜默**的（v2.42 修，2026-09-21）
+
+使用者貼上一整頁 `kms_comments … 401 (Unauthorized)`。那不是 `kms_comments` 的問題 ——
+**session 在 8 小時前過期了，經 sb-proxy 的每一個請求都是 401**，而畫面上完全看不出來。
+
+- 🔴 **最傷的不是 401，是 `kms-secure-docs` 不回 401。** 它原本的寫法是
+  「驗不過就維持 `maxConf = 1` 繼續往下跑」，於是 admin 的文件清單**悄悄少掉
+  機密等級 2/3 的文件**，回應 200、畫面照常、沒有一個地方說得出少了東西。
+  現在驗不過一律 `401 session_expired`；簽章有效但人已停用／離職／查無此人回
+  `403 inactive`（降權是對的，但要讓對方知道）；查 `users` 出錯回 500，不當成訪客。
+- 🔴 **連「完全沒帶 session」也擋掉了**：這支 function 是用**印在網頁原始碼裡的
+  anon key** 呼叫的。實測不必登入就能撈走全庫 **1,328 筆等級 1 文件的標題與摘要**。
+  KMS 前端沒有 session 時本來就會導回 Portal（`initPortalSession`），
+  所以沒有任何合法的匿名呼叫者。（這與 2026-09-16 那批 anon 清除是同一類問題：
+  **「經過代理才驗」的守衛，前提是沒有別條路** —— 這裡的別條路就是這支 function 自己。）
+- **前端 `#sb-authbar` 紅色橫幅**（比照 admin v2.37）：`sbFetch`／`secureDocs`／`kmsWrite`
+  收到 401/403 就掛上，**不會自己消失**，附「重新登入」鈕導向
+  `../index.html?next=kms/index.html`（`next` 已在 Portal 的 `NEXT_PATHS` 白名單裡）。
+  橫幅高度依語言與視窗寬度會換行，所以是**量出來再推版面**，不要寫死 px。
+- 🔴 **還要有本機這一道 `sbSessionAlive()`**：`readPortalSession()` 只在載入時檢查一次，
+  分頁開一整天之後 `expires` 早就過了。只等伺服器回 401 是不夠的 ——
+  `kms-secure-docs` 修好之前根本不回 401，而修好之後仍有「快取命中就不發請求」的路徑。
+- 🔴 **`loadDocs` 的 catch 原本退回 `DEMO_DOCS`** —— 後端壞掉會長得像「資料就是這些」。
+  已改成「有快取沿用快取，沒有就空清單 ＋ 明確報錯」。示範資料只在
+  **Supabase 根本沒設定**時出現。
+- **留言數改成一次撈整張 `kms_comments` 的 `doc_id`**（`sbFetchAll` 分頁），
+  不再用 `doc_id=in.(50 筆)` 分 27 批：1,328 份文件 ＝ 每次重抓打 27 個請求、
+  每個網址近 2,000 字元（CLAUDE.md 記載過 `in.(...)` 太長會 414）。
+  失敗時 `console.warn` 留下判據 —— 原本整段 `catch(e){}` 吞掉，
+  留言數一片 0 的時候分不出「真的沒留言」還是「查詢失敗」。
+
 ### Design System
 
 All apps use a dark theme with CSS custom properties. Two slightly different palettes:

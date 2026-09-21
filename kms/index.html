@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART KMS v2.41</title>
+<title>COMART KMS v2.42</title>
 
 <!-- 以下解析庫僅上傳/預覽時使用，defer 載入避免阻塞頁面解析（gzip 共 ~477KB；呼叫處均有 window.X 檢查） -->
 <!-- Marked for Markdown → HTML preview (classic script, no module needed) -->
@@ -50,6 +50,13 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
 
 /* ─── Layout ─── */
 .app { display: grid; grid-template-columns: 240px 1fr; grid-template-rows: 52px 1fr; height: 100vh; overflow: hidden; }
+/* session 失效橫幅：固定在最上方、不會自己消失 —— 從那一刻起這個分頁讀到的東西
+   可能不完整、寫入一定失敗，那是要一直看得到的事實（同 admin v2.37 的 #sb-authbar）*/
+#sb-authbar { position: fixed; top: 0; left: 0; right: 0; z-index: 9999; display: none;
+  background: #fdecea; color: #b3261e; border-bottom: 1px solid #b3261e;
+  padding: 8px 14px; font-size: 13px; font-weight: 600; text-align: center; line-height: 1.5; }
+#sb-authbar button { margin-left: 10px; padding: 3px 12px; border-radius: 6px; cursor: pointer;
+  border: 1px solid #b3261e; background: #b3261e; color: #fff; font-size: 12px; font-weight: 600; }
 .topbar { grid-column: 1/-1; background: var(--surface); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 16px; gap: 12px; z-index: 10; }
 .sidebar { background: var(--surface); border-right: 1px solid var(--border); overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 4px; }
 .main { overflow: hidden; display: flex; flex-direction: column; }
@@ -369,6 +376,8 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
 </head>
 <body>
 
+<div id="sb-authbar"></div>
+
 <div class="app">
 
   <!-- Topbar -->
@@ -380,7 +389,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="38" height="20" style="display:inline-block;vertical-align:middle;margin-right:4px;margin-top:-2px"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg>COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v2.41</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v2.42</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('en')">EN</button>
@@ -1130,6 +1139,8 @@ const I18N = {
     'label.batch_embed_none':'✅ 每一份文件都已經有向量了',
     'label.batch_embed_stop':'⏹ 停止',
     'toast.batch_embed_no_perm':'僅 Admin 或 DCC 可執行此維運動作',
+    'toast.auth_lost':'登入已逾期：這個分頁讀到的資料可能不完整，任何修改都不會存檔。','btn.relogin':'重新登入',
+    'toast.acct_inactive':'您的帳號已停用或已離職，無法存取知識庫。','toast.load_failed':'文件載入失敗',
     'label.batch_skipped':'（另有 {n} 份沒有內文，已略過）',
     'label.batch_found':'找到 {n} 份無摘要文件，開始處理…',
     'label.batch_summary_done':'✅ 完成！已處理 {n} 份文件',
@@ -1320,6 +1331,8 @@ const I18N = {
     'label.batch_embed_none':'✅ 每一份文档都已经有向量了',
     'label.batch_embed_stop':'⏹ 停止',
     'toast.batch_embed_no_perm':'仅 Admin 或 DCC 可执行此运维操作',
+    'toast.auth_lost':'登录已逾期：这个分页读到的数据可能不完整，任何修改都不会存档。','btn.relogin':'重新登录',
+    'toast.acct_inactive':'您的账号已停用或已离职，无法访问知识库。','toast.load_failed':'文件加载失败',
     'label.batch_skipped':'（另有 {n} 份没有正文，已跳过）',
     'label.batch_found':'找到 {n} 份无摘要文档，开始处理…',
     'label.batch_summary_done':'✅ 完成！已处理 {n} 份文档',
@@ -1512,6 +1525,8 @@ const I18N = {
     'label.batch_embed_none':'✅ Every document already has a vector',
     'label.batch_embed_stop':'⏹ Stop',
     'toast.batch_embed_no_perm':'Only Admin or DCC can run this maintenance task',
+    'toast.auth_lost':'Session expired: this tab may be showing incomplete data and nothing you change will be saved.','btn.relogin':'Sign in again',
+    'toast.acct_inactive':'Your account is disabled or has left the company; the knowledge base is not available.','toast.load_failed':'Failed to load documents',
     'label.batch_skipped':' ({n} skipped — no text)',
     'label.batch_found':'Found {n} documents without summaries, starting…',
     'label.batch_summary_done':'✅ Done! {n} documents processed',
@@ -1704,6 +1719,8 @@ const I18N = {
     'label.batch_embed_none':'✅ Mọi tài liệu đều đã có vector',
     'label.batch_embed_stop':'⏹ Dừng',
     'toast.batch_embed_no_perm':'Chỉ Admin hoặc DCC mới chạy được tác vụ này',
+    'toast.auth_lost':'Phiên đăng nhập đã hết hạn: dữ liệu trên tab này có thể không đầy đủ và mọi thay đổi sẽ không được lưu.','btn.relogin':'Đăng nhập lại',
+    'toast.acct_inactive':'Tài khoản của bạn đã bị vô hiệu hoá hoặc đã nghỉ việc, không truy cập được kho tri thức.','toast.load_failed':'Tải tài liệu thất bại',
     'label.batch_skipped':' (bỏ qua {n} tài liệu không có nội dung)',
     'label.batch_found':'Tìm thấy {n} tài liệu chưa tóm tắt, bắt đầu…',
     'label.batch_summary_done':'✅ Hoàn thành! Đã xử lý {n} tài liệu',
@@ -1896,6 +1913,8 @@ const I18N = {
     'label.batch_embed_none':'✅ すべての文書にベクトルがあります',
     'label.batch_embed_stop':'⏹ 停止',
     'toast.batch_embed_no_perm':'この保守操作は Admin または DCC のみ実行できます',
+    'toast.auth_lost':'ログインの有効期限が切れました：このタブのデータは不完全な可能性があり、変更は保存されません。','btn.relogin':'再ログイン',
+    'toast.acct_inactive':'アカウントが無効化または退職済みのため、ナレッジベースを利用できません。','toast.load_failed':'ドキュメントの読み込みに失敗しました',
     'label.batch_skipped':'（本文のない {n} 件はスキップ）',
     'label.batch_found':'概要なし {n} 件を検出、処理開始…',
     'label.batch_summary_done':'✅ 完了！{n} 件を処理しました',
@@ -2372,6 +2391,37 @@ function kmsSig() {
   if (!sig) { try { sig = (readPortalSession() || {}).sig || ''; } catch(e) {} }
   return sig;
 }
+// ── session 失效：說出來，不要靜默降級 ────────────────────────────────
+// 🔴 2026-09-21 實際發生：分頁從早上開到下午，session（8 小時）在 14:27 過期，
+//    之後每一個經 sb-proxy 的請求都回 401 —— 而畫面上完全看不出來。
+//    更糟的是 kms-secure-docs 那條路不回錯，只是把角色當成未登入 ⇒ **admin 的
+//    文件清單會悄悄少掉機密等級 2/3 的文件**。這種壞法沒有人會回報。
+//    橫幅不會自己消失，因為那個事實在重新登入之前不會改變。
+let _authLostShown = false;
+function sbAuthLost(msg) {
+  if (_authLostShown) return;
+  _authLostShown = true;
+  msg = msg || t('toast.auth_lost');
+  const bar = document.getElementById('sb-authbar');
+  if (bar) {
+    bar.innerHTML = '⚠️ ' + msg +
+      ' <button onclick="kmsRelogin()">' + t('btn.relogin') + '</button>';
+    bar.style.display = 'block';
+    // 橫幅高度依語言／視窗寬度會換行，所以量出來再推版面，不要寫死
+    const app = document.querySelector('.app');
+    if (app) { const h = bar.offsetHeight; app.style.marginTop = h + 'px'; app.style.height = 'calc(100vh - ' + h + 'px)'; }
+  }
+  try { toast(msg, 'error'); } catch(e) {}
+}
+function kmsRelogin() { location.href = '../index.html?next=kms/index.html'; }
+// 本機就能判斷的失效（expires 已過）不必等伺服器回 401 —— kms-secure-docs
+// 那條路根本不會回 401，只靠伺服器回應是抓不到的
+function sbSessionAlive() {
+  if (readPortalSession()) return true;
+  sbAuthLost();
+  return false;
+}
+
 async function sbFetch(path, options = {}) {
   if (!CFG.supabaseUrl || !CFG.supabaseKey) throw new Error('Supabase 未設定');
   const url = SB_KMS_WORKER + '/supabase' + path;
@@ -2380,8 +2430,10 @@ async function sbFetch(path, options = {}) {
     'Content-Type': 'application/json',
     'Prefer': options.prefer || 'return=representation',
   };
+  sbSessionAlive();
   const res = await fetch(url, { ...options, headers: { ...headers, ...(options.headers || {}) } });
   const text = await res.text();
+  if (res.status === 401 || res.status === 403) sbAuthLost();
   if (!res.ok) throw new Error(`Supabase error ${res.status}: ${text}`);
   return text ? JSON.parse(text) : null;
 }
@@ -2405,6 +2457,7 @@ async function sbFetchAll(pathBase, options = {}) {
 // 由伺服器端依「簽章驗證過的真實角色」決定機密等級，而不是像 confAccess() 那樣
 // 相信前端 localStorage 裡未簽章的 role 欄位（2026-07-08 修復，可被任意偽造）──
 async function secureDocs(action, extra = {}) {
+  sbSessionAlive();
   const base = CFG.supabaseUrl.replace(/\/(rest|auth|storage)\/v\d.*$/, '')
   const res = await fetch(`${base}/functions/v1/kms-secure-docs`, {
     method: 'POST',
@@ -2413,6 +2466,8 @@ async function secureDocs(action, extra = {}) {
   })
   const text = await res.text()
   const data = text ? JSON.parse(text) : null
+  if (data?.reason === 'inactive') sbAuthLost(t('toast.acct_inactive'))
+  else if (res.status === 401 || res.status === 403 || data?.reason === 'session_expired') sbAuthLost()
   if (!res.ok || data?.ok === false) throw new Error(data?.reason || `secureDocs ${action} HTTP ${res.status}`)
   return data
 }
@@ -2432,6 +2487,7 @@ async function kmsWrite(action, table, payload = null, id = null, filters = null
     body: JSON.stringify({ action, table, payload, id, filters, session: kmsSig() }),
   });
   const text = await res.text();
+  if (res.status === 401 || res.status === 403) sbAuthLost();
   if (!res.ok) throw new Error(`kms-write error ${res.status}: ${text}`);
   const data = text ? JSON.parse(text) : null;
   if (data?.error) throw new Error(data.error);
@@ -4439,7 +4495,10 @@ async function loadDocs(force = false) {
       docs = [...DEMO_DOCS, ...localDocs];
     }
   } catch(e) {
-    docs = [...DEMO_DOCS, ...localDocs];
+    // 🔴 後端失敗時**不可以**退回 DEMO_DOCS —— 那會讓「伺服器壞了」長得像「資料就是這些」。
+    //    有快取就沿用（至少是真的），沒有就空清單 ＋ 明確報錯。
+    docs = (_docsCache.rows && _docsCache.key === cacheKey) ? _docsCache.rows : [];
+    if (!_authLostShown) { try { toast(t('toast.load_failed') + '：' + (e.message || e), 'error'); } catch(_) {} }
   }
 
   // ── 套用篩選 ──
@@ -4486,26 +4545,29 @@ async function loadDocs(force = false) {
   if (justFetched) {
     checkAndArchiveExpired(docs).catch(()=>{});
   }
-  // 非同步載入留言數（分批查詢避免 URL 過長 400 錯誤）；結果快取供篩選重繪使用
+  // 非同步載入留言數：**整張表一次撈 doc_id**，不再用 `doc_id=in.(50 筆)` 分批。
+  // 🔴 原本 1,328 份文件 ＝ 每次重抓就打 27 個請求，每個網址近 2,000 字元
+  //    （CLAUDE.md 記載 `id=in.(...)` 塞進網址太長會 414）。
+  //    留言總數遠少於文件數，整張表撈回來只有一個欄位，一頁（1000 筆）多半就夠，
+  //    由 sbFetchAll 負責分頁 —— 請求數與文件數脫鉤。
   if (justFetched && CFG.supabaseUrl && CFG.supabaseKey && docs.length) {
-    const BATCH = 50;
-    const cnt = {};
-    const allIds = docs.map(d => d.id);
-    const fetchBatch = async () => {
-      for (let i = 0; i < allIds.length; i += BATCH) {
-        const batchIds = allIds.slice(i, i + BATCH).join(',');
-        try {
-          const rows = await sbFetch(`/rest/v1/kms_comments?select=doc_id&doc_id=in.(${batchIds})`);
-          if (rows) rows.forEach(r => { cnt[r.doc_id] = (cnt[r.doc_id]||0) + 1; });
-        } catch(e) {}
+    (async () => {
+      const cnt = {};
+      try {
+        const rows = await sbFetchAll('/rest/v1/kms_comments?select=doc_id');
+        (rows || []).forEach(r => { cnt[r.doc_id] = (cnt[r.doc_id] || 0) + 1; });
+      } catch (e) {
+        // 失敗就維持「沒有數字」，但要留下判據 —— 原本整段 catch(e){} 吞掉，
+        // 留言數變成一片 0 的時候完全看不出是「真的沒留言」還是「查詢失敗」
+        console.warn('[kms] 留言數載入失敗:', e.message || e);
+        return;
       }
       window._docCommentCnt = cnt;
       docs.forEach(d => {
         const el = document.getElementById('cc-' + d.id);
         if (el) el.textContent = cnt[d.id] || 0;
       });
-    };
-    fetchBatch();
+    })();
   } else if (window._docCommentCnt) {
     // 快取命中：用上次查到的留言數回填（清單剛重繪，元素是新的）
     setTimeout(() => {

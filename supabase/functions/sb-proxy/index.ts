@@ -63,6 +63,11 @@ const CHAT_HOST_ONLY = new Set(["status", "keep", "title", "members", "ended_at"
 const CHAT_DELETE_ROLES = new Set(["admin"])
 // 開啟者是整套權限的根，建立後不可改（改掉就等於把別人開的場次搶過來）
 const CHAT_IMMUTABLE = new Set(["host_emp_id", "id", "access"])
+// 🔴 邀請連結的通行碼（Portal v2.04）。**不可被任何人改寫** —— 改得動就等於
+//    有人可以把 code 換成自己知道的值，再用那個值把自己加進別人的對話。
+//    它也不在 CHAT_IMMUTABLE 裡：PATCH 只帶 {join_code} 是「持通行證加入」
+//    這個動作的暗號（見下方 chat_sessions 的分支），不是要寫進資料庫。
+const CHAT_JOIN_FIELD = "join_code"
 
 // ── 線上對話：單則訊息的修改與刪除（v2.01）──
 // 三組欄位，三種授權。**分組的依據是「改壞了會怎樣」，不是欄位長得像不像**：
@@ -304,6 +309,7 @@ serve(async (req) => {
   // 寫入 users 時剝除 pwd_hash（密碼只能經 auth-verify；防止有人用本代理改密碼雜湊）；
   // 自助 PATCH 再套欄位白名單（不得改 role/active/emp_id 等）
   let body: string | undefined = undefined
+  let chatJoin = false   // 這一次 PATCH 是不是「持邀請連結加入」（見 chat_sessions 分支）
   if (isWrite) {
     const rawText = await req.text()
     if (table === "users" && rawText) {
@@ -449,10 +455,55 @@ serve(async (req) => {
       let parsed: Record<string, unknown>
       try { parsed = JSON.parse(rawText) } catch { return json({ error: "bad_json" }, 400) }
       const keys = Object.keys(parsed || {})
-      if (keys.some((k) => CHAT_IMMUTABLE.has(k))) {
+
+      /* ── 持邀請連結加入（Portal v2.04）───────────────────────────────
+         body 只有 {join_code} ＝「我拿著這場的通行證，把我加進去」。
+         🔴 三件事全部由伺服器自己做，前端一個字都說不上話：
+           ① 比對 join_code（拿得到它的只有發起人，因為回應會剝除別人的）
+           ② status 必須是 open —— 已結束的是存檔，不該事後混進人
+           ③ **members 由伺服器自己組**（舊名單 ∪ 簽章身分）。
+              不採用前端送來的陣列：兩個人同時點連結會互相覆寫，
+              而且那等於把「誰在名單裡」交還給前端決定。
+         混在其他欄位裡一律拒絕：那是想藉這條路繞過 CHAT_HOST_ONLY。 */
+      if (keys.includes(CHAT_JOIN_FIELD)) {
+        if (keys.length !== 1) {
+          return json({ error: "forbidden", hint: "join_code must be the only field" }, 403)
+        }
+        const idFilter = url.searchParams.get("id") || ""
+        const sid = idFilter.startsWith("eq.") ? idFilter.slice(3) : ""
+        if (!sid) return json({ error: "forbidden", hint: "join requires ?id=eq.<session_id>" }, 403)
+        let row: Record<string, unknown> | null = null
+        try {
+          const chk = await fetch(
+            `${SUPABASE_URL}/rest/v1/chat_sessions?id=eq.${encodeURIComponent(sid)}&select=host_emp_id,status,members,join_code`,
+            { headers: elevatedApiHeaders(SERVICE_KEY) },
+          )
+          const rows = chk.ok ? await chk.json() : []
+          row = Array.isArray(rows) && rows[0] ? rows[0] : null
+        } catch { row = null }
+        // 查不到就拒絕（fail-closed，同 premortem 欄位守衛的判斷）
+        if (!row) return json({ error: "not_found" }, 404)
+        const code = String(parsed[CHAT_JOIN_FIELD] || "")
+        if (!code || code !== String(row.join_code || "")) {
+          return json({ error: "bad_join_code" }, 403)
+        }
+        if (String(row.status || "") !== "open") {
+          return json({ error: "chat_closed" }, 403)
+        }
+        const cur = Array.isArray(row.members) ? (row.members as string[]).map(String) : []
+        // 已經是發起人或參與人：不必寫，直接回成功（重複點連結是常態）
+        if (String(row.host_emp_id || "") === sessEmpId || cur.indexOf(sessEmpId) >= 0) {
+          return json({ ok: true, joined: false })
+        }
+        // 由伺服器改寫成一次單純的 members 寫入，再照原路轉發
+        body = JSON.stringify({ members: cur.concat([sessEmpId]) })
+        chatJoin = true
+      }
+
+      if (!chatJoin && keys.some((k) => CHAT_IMMUTABLE.has(k))) {
         return json({ error: "forbidden", hint: "host_emp_id/id are immutable" }, 403)
       }
-      if (keys.some((k) => CHAT_HOST_ONLY.has(k))) {
+      if (!chatJoin && keys.some((k) => CHAT_HOST_ONLY.has(k))) {
         const idFilter = url.searchParams.get("id") || ""
         const sid = idFilter.startsWith("eq.") ? idFilter.slice(3) : ""
         if (!sid) return json({ error: "forbidden", hint: "protected fields require ?id=eq.<session_id>" }, 403)
@@ -469,7 +520,7 @@ serve(async (req) => {
           return json({ error: "forbidden", hint: "only the host of this chat may change it" }, 403)
         }
       }
-      body = rawText
+      if (!chatJoin) body = rawText
     } else {
       body = rawText || undefined
     }
@@ -503,6 +554,22 @@ serve(async (req) => {
       const data = JSON.parse(text)
       const dropField = table === "users" ? "pwd_hash" : "body"
       const strip = (o: Record<string, unknown>) => { if (o && typeof o === "object") delete o[dropField]; return o }
+      const cleaned = Array.isArray(data) ? data.map(strip) : strip(data)
+      outText = JSON.stringify(cleaned)
+    } catch { /* 非 JSON（如錯誤訊息）原樣回傳 */ }
+  }
+  /* 🔴 邀請連結的通行碼只有**發起人自己那幾列**留得住（Portal v2.04）。
+     不剝的話，一般使用者的清單查詢就把他參與的每一場的 code 都送進瀏覽器，
+     而 admin 的清單是**全公司每一場** —— 那等於把「admin 讀不到別人的對話」
+     直接送掉。這裡刻意不限於 GET：PATCH last_at（每個人發言都會做）
+     帶 return=representation 時回的也是整列。 */
+  if (table === "chat_sessions" && text) {
+    try {
+      const data = JSON.parse(text)
+      const strip = (o: Record<string, unknown>) => {
+        if (o && typeof o === "object" && String(o.host_emp_id || "") !== sessEmpId) delete o.join_code
+        return o
+      }
       const cleaned = Array.isArray(data) ? data.map(strip) : strip(data)
       outText = JSON.stringify(cleaned)
     } catch { /* 非 JSON（如錯誤訊息）原樣回傳 */ }

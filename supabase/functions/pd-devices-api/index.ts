@@ -297,19 +297,17 @@ serve(async req => {
   const admin = isAdmin(sess, user)
 
   if (action === "bootstrap") {
-    const [types, users, departments, sites, pending, mine, mineCustody] = await Promise.all([
+    const [types, users, departments, sites, mine] = await Promise.all([
       sb.from("pd_device_types").select("*").eq("active", true).order("sort_order"),
       sb.from("users").select("emp_id,name_en,name_zh,email,role,dept,site,status,active").eq("active", true).order("emp_id"),
       sb.from("departments").select("id,key,zh,en").order("key"), sb.from("sites").select("id,key,zh,en").order("key"),
-      sb.from("pd_device_assets").select("id", { count: "exact", head: true }).eq("approval_status", "pending"),
       sb.from("pd_device_transfers").select("id", { count: "exact", head: true }).eq("status", "pending").eq("to_emp_id", sess.empId),
-      sb.from("pd_device_assets").select("id", { count: "exact", head: true }).eq("custodian_emp_id", sess.empId).is("custodian_confirmed_at", null),
     ])
-    const error = [types, users, departments, sites, pending, mine, mineCustody].find((x: any) => x.error)?.error
+    const error = [types, users, departments, sites, mine].find((x: any) => x.error)?.error
     if (error) return json({ error: error.message }, 500)
     return json({ profile: { empId: sess.empId, name: displayName(user), role: sess.role, site: user.site, dept: user.dept },
       types: types.data, users: users.data, departments: departments.data, sites: sites.data,
-      badges: { pendingAssets: pending.count || 0, pendingForMe: (mine.count || 0) + (mineCustody.count || 0) } })
+      badges: { pendingAssets: 0, pendingForMe: mine.count || 0 } })
   }
 
   if (action === "personalList") {
@@ -457,13 +455,10 @@ serve(async req => {
   }
 
   if (action === "pending") {
-    const assetQuery = admin
-      ? sb.from("pd_device_assets").select("*,custodian:users!pd_device_assets_custodian_emp_id_fkey(emp_id,name_en,name_zh)").eq("approval_status","pending").order("created_at")
-      : sb.from("pd_device_assets").select("*,custodian:users!pd_device_assets_custodian_emp_id_fkey(emp_id,name_en,name_zh)").or(`and(approval_status.eq.pending,created_by.eq.${sess.empId}),and(custodian_emp_id.eq.${sess.empId},custodian_confirmed_at.is.null)`).order("created_at")
     const transferQuery = sb.from("pd_device_transfers").select("*,asset:pd_device_assets(asset_code,brand,model)").eq("status","pending").or(`from_emp_id.eq.${sess.empId},to_emp_id.eq.${sess.empId},requested_by.eq.${sess.empId}`).order("requested_at")
-    const [assets, transfers] = await Promise.all([assetQuery, transferQuery])
-    if (assets.error || transfers.error) return json({ error: (assets.error || transfers.error).message }, 500)
-    return json({ assets: (assets.data || []).map((a:any)=>presentAsset(a,sess)), transfers: transfers.data || [] })
+    const transfers = await transferQuery
+    if (transfers.error) return json({ error: transfers.error.message }, 500)
+    return json({ assets: [], transfers: transfers.data || [] })
   }
 
   if (action === "addType") {
@@ -495,7 +490,8 @@ serve(async req => {
       imei1: nullable(body.imei1, 40), imei2: nullable(body.imei2, 40), color: nullable(body.color, 80),
       specifications: safeSpec(body.specifications), aliases: safeAliases(body.aliases), missing_fields: missing,
       custodian_emp_id: custodian, custodian_original_name: displayName(target),
-      custodian_confirmed_at: custodian === sess.empId ? new Date().toISOString() : null,
+      approval_status: "approved", approved_at: new Date().toISOString(),
+      custodian_confirmed_at: new Date().toISOString(), activated_at: new Date().toISOString(),
       ownership_unit: ownershipUnit, current_location: text(body.currentLocation || target.site, 100),
       purchase_amount: body.purchaseAmount === "" || body.purchaseAmount == null ? null : Number(body.purchaseAmount),
       purchase_currency: CURRENCIES.has(text(body.purchaseCurrency, 3)) ? text(body.purchaseCurrency, 3) : null,
@@ -505,8 +501,8 @@ serve(async req => {
     }
     const { data: created, error } = await sb.from("pd_device_assets").insert(row).select("*").single()
     if (error) return json({ error: error.message }, 500)
-    await audit(sb, sess, "create_pending", created.id, null, created)
-    await notify(sb, [custodian, ...await adminIds(sb)], displayName(user), `設備 ${created.asset_code} 待確認`, `${brand} ${model} 已建立，等待確認。`)
+    await audit(sb, sess, "create_active", created.id, null, created)
+    if (custodian !== sess.empId) await notify(sb, [custodian], displayName(user), `設備 ${created.asset_code} 已建立`, `${brand} ${model} 已登錄由你保管。`)
     const imageResult = await findOfficialImage(sb, sess, created)
     return json({ item: presentAsset(created, sess), officialImage: imageResult }, 201)
   }
@@ -537,7 +533,7 @@ serve(async req => {
     if (admin && body.custodianEmpId !== undefined && text(body.custodianEmpId,30) !== (before.custodian_emp_id || "")) {
       const nextId=text(body.custodianEmpId,30);const{data:next}=await sb.from("users").select("emp_id,name_en,name_zh,site,active,status,role").eq("emp_id",nextId).maybeSingle()
       if(!activeUser(next))return json({error:"invalid_custodian"},400)
-      patch.custodian_emp_id=nextId;patch.custodian_original_name=displayName(next);patch.custodian_confirmed_at=nextId===sess.empId?new Date().toISOString():null
+      patch.custodian_emp_id=nextId;patch.custodian_original_name=displayName(next);patch.custodian_confirmed_at=new Date().toISOString()
       if(!patch.current_location)patch.current_location=next.site
     }
     const { data: after, error } = await sb.from("pd_device_assets").update(patch).eq("id", id).select("*").single()
@@ -546,32 +542,11 @@ serve(async req => {
     return json({ item: presentAsset(after, sess) })
   }
 
-  if (action === "approve") {
-    if (!admin) return json({ error: "forbidden" }, 403)
-    const id = text(body.id, 40); const { data: before } = await sb.from("pd_device_assets").select("*").eq("id", id).maybeSingle()
-    if (!before || before.approval_status !== "pending") return json({ error: "invalid_state" }, 409)
-    const patch = { approval_status: "approved", approved_at: new Date().toISOString(), approved_by: sess.empId,
-      activated_at: before.custodian_emp_id && before.custodian_confirmed_at ? new Date().toISOString() : null, updated_by: sess.empId }
-    const { data: after, error } = await sb.from("pd_device_assets").update(patch).eq("id", id).select("*").single()
-    if (error) return json({ error: error.message }, 500)
-    await audit(sb, sess, "approve", id, before, after)
-    await notify(sb, [before.created_by, before.custodian_emp_id], displayName(user), `設備 ${before.asset_code} 已核准`, `${before.brand} ${before.model} 已可使用。`)
-    return json({ ok: true })
-  }
-
-  if (action === "confirmInitialCustody") {
-    const id=text(body.id,40);const{data:before}=await sb.from("pd_device_assets").select("*").eq("id",id).maybeSingle()
-    if(!before || before.custodian_emp_id!==sess.empId || before.custodian_confirmed_at)return json({error:"invalid_state_or_actor"},409)
-    const patch={custodian_confirmed_at:new Date().toISOString(),activated_at:before.approval_status==="approved"?new Date().toISOString():before.activated_at,updated_by:sess.empId}
-    const{data:after,error}=await sb.from("pd_device_assets").update(patch).eq("id",id).select("*").single();if(error)return json({error:error.message},500)
-    await audit(sb,sess,"initial_custody_confirmed",id,before,after);await notify(sb,await adminIds(sb),displayName(user),`設備 ${before.asset_code} 已確認保管`,`目前保管人已確認收到設備。`);return json({ok:true})
-  }
-
   if (action === "requestTransfer") {
     const id = text(body.assetId, 40), toEmp = text(body.toEmpId, 30), transferType = text(body.transferType, 20), purpose = text(body.purpose, 30)
     const { data: asset } = await sb.from("pd_device_assets").select("*").eq("id", id).maybeSingle()
     const { data: target } = await sb.from("users").select("*").eq("emp_id", toEmp).maybeSingle()
-    if (!asset || asset.approval_status !== "approved" || !asset.activated_at || !activeUser(target)) return json({ error: "invalid_asset_or_recipient" }, 400)
+    if (!asset || ["maintenance","lost","retired"].includes(asset.status) || !activeUser(target)) return json({ error: "invalid_asset_or_recipient" }, 400)
     if (!admin && asset.custodian_emp_id !== sess.empId && toEmp !== sess.empId) return json({ error: "forbidden" }, 403)
     if (!new Set(["temporary","permanent"]).has(transferType) || !PURPOSES.has(purpose) || purpose === "return") return json({ error: "invalid_transfer" }, 400)
     const startsOn = transferType === "temporary" ? dateValue(body.startsOn) : null, dueOn = transferType === "temporary" ? dateValue(body.dueOn) : null

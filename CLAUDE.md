@@ -106,7 +106,7 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 | `index.html` | v2.06 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
 | `admin/index.html` | v2.40 | Admin System — room booking, fleet, visitor, library, lottery | 5,650 |
 | `kms/index.html` | v2.41 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
-| `quotation/index.html` | v3.60 | Quotation & CRM system | 7,332 |
+| `quotation/index.html` | v3.61 | Quotation & CRM system | 7,332 |
 | `board/index.html` | v1.91 | 公告與會議 Bulletin & Meetings — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍、腦力激盪 | 4,600 |
 | `product_dev/` | v2.17 | **產品開發管理 —— 第六個子系統，不遵守單一檔案原則**（見下方專節） | — |
 
@@ -385,8 +385,9 @@ The portal supports EN, 繁中, 简中, VI, 日 via `setLang(lang)`. Each langua
 ## i18n：改字典一定要逐字典檢查（`scripts/i18n-audit.py`）
 
 ```bash
-python3 scripts/i18n-audit.py           # Portal（index.html 的 I18N，271 key × 5）
-python3 scripts/i18n-audit.py board     # Board（B_I18N 419 ＋ PL_I18N 109，各 × 5）
+python3 scripts/i18n-audit.py             # Portal（index.html 的 I18N）
+python3 scripts/i18n-audit.py board       # Board（B_I18N ＋ PL_I18N）
+python3 scripts/i18n-audit.py quotation   # 報價系統（UI）
 ```
 
 （v1.91 起通用化：字典邊界改用**大括號配對**掃出來，不再靠寫死的
@@ -493,6 +494,35 @@ python3 scripts/i18n-audit.py         # Portal 專用（key 沒引號：btn_save
   - Board：`<title>` + topbar `.logo-ver`（沒有自己的登入畫面，session 只從 `?_ps=` 取得）
 - 每次修改後自動 commit 並 `git push`，不需等候使用者指示
 - **每次修改完畢，回覆結尾必須告知目前各檔案最新版本號**（例如：`kms v2.06`、`admin v1.57`）
+
+### 🔴 報價系統：刪除一直是「不看回應」的（v3.61 修，2026-09-25）
+
+補 session 過期的橫幅時查出來的，**兩個都與 401 無關，只是被它引爆**：
+
+- 🔴 **`SB.delete` 完全沒有檢查 `res.ok`** ——
+  ```js
+  async delete(table, qs) { await fetch(url, { method:'DELETE', headers: this._h }); }
+  ```
+  這個函式**不可能 throw**，所以每一個呼叫端的失敗處理都是死程式碼
+  （`deleteOneQ` 的「Delete failed」永遠不會出現）。實際後果：
+  `deleteAccount` 刪 `crm_accounts` ＋ 三張子表全部靜默失敗，畫面照樣
+  toast「已刪除」並關掉視窗，**下次重新載入客戶就回來了**。
+- 🔴 **刪除是「先改快取、再送 DELETE、然後無條件說成功」**（`deleteOneQ`／`deleteOneP`
+  與它們的呼叫端）。這正是 CLAUDE.md 記載的 admin v2.37 公務車事件的形狀。
+  `deleteOneP` 更狠：頭三行就把那個產品的圖片快取刪掉 —— **產品還在資料庫裡，
+  本機的圖卻已經沒了**。兩者都改成「資料庫先成功，才改畫面與快取」，
+  失敗時清單、快取一律不動並說出原因。
+- 🔴 **`loadAll()`／`_reloadAfterLogin()` 會把查詢失敗寫回本機快取。**
+  `SB.get` 失敗回 `null` 而不是 throw，所以那個「用本機快取」的 catch
+  對查詢失敗一直是死路；原本一律 `|| []` 再 `lsSet` 寫回 ——
+  **一次 401 就把快取洗成空的**，使用者看到報價單與產品全部不見，
+  而那份本來要撐場面的備份也已經沒了。現在查詢回 null 就丟出去走同一條 catch：
+  沿用快取、**不覆寫快取**、並且 toast 講明「你看到的是這台裝置上的舊資料」。
+  ⚠️ 原本只有 `console.warn` —— 「伺服器連不上」與「資料真的長這樣」在畫面上
+  一模一樣，而使用者會照著舊資料報價。
+- `SB.upsert` 的 `.catch(()=>[])` 同 Portal v2.06，一併修掉。
+- 「重新登入」用**相對路徑** `../index.html?next=quotation/index.html`，
+  不是 `goPortal()` 寫死的網域 —— 那會讓本機開檔的開發方式失效。
 
 ## 報價系統：僅限業務部（2026-08-25）
 
@@ -1367,7 +1397,8 @@ v1.94 只做在 Portal，但**同事被邀請的時候人常常在 KMS 或報價
   設成 true，那個 switchTab 就會再彈一次「尚未存檔」—— 使用者剛答應還原，
   馬上被問要不要放棄。
 - 業務會議記錄有自己的草稿機制（`comart-board-mm-draft-v1`），不走這一套。
-- ✅ Portal v2.06 已補上同一套（見下節）；**報價系統仍然沒有**。
+- ✅ Portal v2.06 與報價系統 v3.61 都已補上同一套（各有一節）。
+  **五個系統現在都有 `#sb-authbar`。新的子系統請照抄，不要再各自發明。**
 
 ## Board 重要細節
 

@@ -68,6 +68,11 @@ const CHAT_IMMUTABLE = new Set(["host_emp_id", "id", "access"])
 //    它也不在 CHAT_IMMUTABLE 裡：PATCH 只帶 {join_code} 是「持通行證加入」
 //    這個動作的暗號（見下方 chat_sessions 的分支），不是要寫進資料庫。
 const CHAT_JOIN_FIELD = "join_code"
+// 🔴 聊天大廳是 chat_sessions 裡一列固定 id 的場次（migration 202609250001）。
+//    它是全公司共用的公共聊天室，兩件事必須在伺服器端釘死：
+//    ① 整列不可刪（cascade 會連大廳本身一起消失，而它是回不來的）
+//    ② 「清除對話紀錄」只能清它自己，不能借這條路清掉別人的對話
+const CHAT_LOBBY_ID = "lobby"
 
 // ── 線上對話：單則訊息的修改與刪除（v2.01）──
 // 三組欄位，三種授權。**分組的依據是「改壞了會怎樣」，不是欄位長得像不像**：
@@ -280,7 +285,19 @@ serve(async (req) => {
   // 前端一律走 PATCH（軟刪除 ＋ 抹掉內容）；真的要整列消失只有「整場刪除」那條路（cascade）。
   // 🔴 不擋的話，任何持有 session 的人都能把別人的訊息整列抹掉、連痕跡都不留。
   if (req.method === "DELETE" && table === "chat_messages") {
-    return json({ error: "forbidden", hint: "messages are soft-deleted via PATCH" }, 403)
+    /* 唯一的例外：聊天大廳的「清除對話紀錄」（Portal v2.05）。
+       使用者 2026-09-25 定案：**任何人都可以清，而且不留痕跡** ——
+       清除就是清除，不存檔、不記錄誰清的。
+       🔴 但「清哪一間」不能由前端決定：filter 必須**剛好**是大廳那一場，
+          否則這條路就成了「任何人都能清空任何一場對話」。
+          比對的是伺服器端的常數，不是前端送來的值。 */
+    const sf = url.searchParams.get("session_id") || ""
+    const onlyFilter = [...url.searchParams.keys()].every((k) => k === "session_id")
+    if (onlyFilter && sf === `eq.${CHAT_LOBBY_ID}`) {
+      // 放行，往下正常轉發
+    } else {
+      return json({ error: "forbidden", hint: "messages are soft-deleted via PATCH" }, 403)
+    }
   }
 
   // ── 線上對話：DELETE chat_sessions 必須是開啟者本人（cascade 會帶走所有訊息）──
@@ -288,6 +305,11 @@ serve(async (req) => {
     const idFilter = url.searchParams.get("id") || ""
     const sid = idFilter.startsWith("eq.") ? idFilter.slice(3) : ""
     if (!sid) return json({ error: "forbidden", hint: "delete requires ?id=eq.<session_id>" }, 403)
+    // 🔴 大廳整列不可刪：cascade 會把大廳本身帶走，而前端沒有任何地方建得回來。
+    //    admin 在別的場次上有刪除權，所以這一道不能只靠前端不畫按鈕
+    if (sid === CHAT_LOBBY_ID) {
+      return json({ error: "forbidden", hint: "the lobby cannot be deleted" }, 403)
+    }
     let hostId = ""
     try {
       const chk = await fetch(

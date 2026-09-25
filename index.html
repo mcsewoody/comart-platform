@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>COMART Platform v2.04</title>
+<title>COMART Platform v2.05</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script defer src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.js"></script>
 <style>
@@ -404,7 +404,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     <div class="login-logo">
       <div class="login-mark" style="background:transparent"><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="44" height="23"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></div>
       <div class="login-name">COMART Platform</div>
-      <div class="login-sub">Internal Portal · v2.04</div>
+      <div class="login-sub">Internal Portal · v2.05</div>
     </div>
     <form id="loginForm" onsubmit="doLogin();return false;" autocomplete="on">
     <div class="field">
@@ -472,7 +472,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   <div class="topbar">
     <div class="topbar-logo" onclick="switchView('home')">
       <div class="topbar-mark" style="background:transparent"><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="26" height="14"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></div>
-      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v2.04</span></div>
+      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v2.05</span></div>
     </div>
     <div class="topbar-right">
       <div class="lang-switcher">
@@ -608,7 +608,8 @@ input[type="date"]::-webkit-calendar-picker-indicator {
       <div class="view" id="view-ai" style="flex-direction:column;padding:0;">
         <div class="ai-tab-bar">
           <div style="font-size:14px;font-weight:700;color:#a78bfa;margin-right:6px;">🤖 AI</div>
-          <button class="ai-chip on" id="ptab-live" onclick="switchAITab('live')">💬 線上對話</button>
+          <button class="ai-chip on" id="ptab-lobby" onclick="switchAITab('lobby')">🏛 聊天大廳</button>
+          <button class="ai-chip" id="ptab-live" onclick="switchAITab('live')">💬 群組對話</button>
           <button class="ai-chip" id="ptab-translate" onclick="switchAITab('translate')">🌐 翻譯</button>
           <button class="ai-chip" id="ptab-chat" onclick="switchAITab('chat')">✦ Chat</button>
           <button class="ai-chip" id="ptab-skills" onclick="switchAITab('skills')">🛠 Skills</button>
@@ -649,7 +650,14 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 
         <!-- Live Chat Tab · 線上對話 -->
-        <div class="ai-tab-content on" id="ptab-content-live" style="flex-direction:column;min-height:0;">
+        <!-- 聊天大廳（v2.05）：一間永遠開著、不管控人員的公共聊天室。
+             🔴 這裡**沒有**自己的房間 DOM —— `#lc-room` 由 lcMountRoom() 在兩個頁籤之間搬。
+                複製一份會直接撞 id（lc-stream／lc-input／lc-composer… 三十幾個），
+                而那些 id 被 lcSend／lcPoll／lcRenderStream／圖片上傳／PDF 匯出綁死。
+                同 board 讓事前驗屍與腦力激盪共用 #pm-shell 的做法。 -->
+        <div class="ai-tab-content on" id="ptab-content-lobby" style="flex-direction:column;min-height:0;"></div>
+
+        <div class="ai-tab-content" id="ptab-content-live" style="flex-direction:column;min-height:0;">
 
           <!-- 清單 -->
           <div id="lc-listview" style="flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;max-width:820px;width:100%;margin:0 auto;">
@@ -701,12 +709,21 @@ input[type="date"]::-webkit-calendar-picker-indicator {
               <button class="lc-btn" id="lc-reopen-btn" onclick="lcReopen()" style="display:none;"></button>
               <button class="lc-btn" id="lc-pdf-btn" onclick="lcExportPDF().catch(function(e){console.warn(e);})" style="display:none;">📄 PDF</button>
               <button class="lc-btn" id="lc-link-btn" onclick="lcCopyLink()" style="display:none;"></button>
+              <button class="lc-btn danger" id="lc-clear-btn" onclick="lcClearAsk()" style="display:none;"></button>
               <button class="lc-btn danger" id="lc-end-btn" onclick="lcEndAsk()" style="display:none;">結束對話</button>
               <button class="lc-btn danger" id="lc-del-btn" onclick="lcDelete(lcSession&&lcSession.id,event)" style="display:none;">🗑</button>
             </div>
             <!-- 在線名單（lcWho*）：誰真的在這個房間裡。公開場次的「可進入名單」是全公司，
                  所以有意義的問題是「誰在裡面」而不是「誰進得來」。 -->
             <div id="lc-who" class="lc-who" style="display:none;"></div>
+            <!-- 清除確認列（v2.05）：使用者要的是三選一 ——
+                 「直接清除」「匯出後再清除」「取消」，而 confirm() 只給得起兩個。 -->
+            <div id="lc-clearbar" class="lc-endbar" style="display:none;">
+              <span id="lc-clearbar-q" style="flex:1;min-width:200px;"></span>
+              <button class="lc-btn" id="lc-clear-exp" onclick="lcClearNow(true)"></button>
+              <button class="lc-btn danger" id="lc-clear-go" onclick="lcClearNow(false)"></button>
+              <button class="lc-btn" id="lc-clear-no" onclick="lcClearCancel()"></button>
+            </div>
             <div id="lc-endbar" class="lc-endbar" style="display:none;">
               <span id="lc-endbar-q" style="flex:1;min-width:160px;"></span>
               <button class="lc-btn" onclick="lcEnd(true)" id="lc-keep-btn">保留</button>
@@ -1540,7 +1557,11 @@ function enterPortal() {
     // j = 邀請連結的通行碼（v2.04）。與場次 id 走同一道白名單：它會被放進網址與
     // 請求裡，不該讓任何奇怪字元通過
     var _lcJ = _lcSafeId(_lcP.get('j') || '');
-    if (_lcQ) {
+    // ?lobby=1 —— 大廳的連結。它不帶身分也不帶通行碼，只是「直接跳到那個頁籤」
+    if (_lcP.get('lobby') === '1') {
+      history.replaceState({}, '', window.location.pathname);
+      setTimeout(function() { switchView('ai'); switchAITab('lobby'); }, 0);
+    } else if (_lcQ) {
       history.replaceState({}, '', window.location.pathname);
       setTimeout(function() { lcGoto(_lcQ, _lcJ); }, 0);
     }
@@ -3050,7 +3071,7 @@ const I18N = {
     um_delete_failed:'Delete failed: ', um_deleted:'User deleted',
     // ai tab
     ai_tab_translate:'Translate', ai_tab_chat:'Claude Chat', ai_tab_skills:'Skills',
-    ai_tab_live:'Live Chat', lc_new:'New chat',
+    ai_tab_live:'Group Chats', ai_tab_lobby:'Lobby', lc_lobby_title:'Chat Lobby', lc_lobby_meta:'Open to everyone · always on', lc_lobby_link:'🔗 Lobby link', lc_lobby_copied:'Lobby link copied — send it to anyone on the team', lc_clear_btn:'🧹 Clear', lc_clear_q:'Once cleared the messages are gone for good. Clear now, or export first?', lc_clear_exp:'Export, then clear', lc_clear_go:'Clear now', lc_clear_no:'Cancel', lc_cleared:'Lobby cleared', lc_clear_failed:'Could not clear the lobby', lc_new:'New chat',
     lc_rules_h:'HOW THIS WORKS', 
     
     lc_rule3_t:'The host ends it and decides whether to keep it — ',
@@ -3186,7 +3207,7 @@ const I18N = {
     um_err_self_delete:'無法刪除自己的帳號', um_confirm_delete:'確定刪除用戶 %s？此操作無法復原。',
     um_delete_failed:'刪除失敗：', um_deleted:'用戶已刪除',
     ai_tab_translate:'翻譯', ai_tab_chat:'Claude Chat', ai_tab_skills:'技能',
-    ai_tab_live:'線上對話', lc_new:'開新對話',
+    ai_tab_live:'群組對話', ai_tab_lobby:'聊天大廳', lc_lobby_title:'聊天大廳', lc_lobby_meta:'全員皆可進入 · 永遠開著', lc_lobby_link:'🔗 大廳連結', lc_lobby_copied:'大廳連結已複製 —— 傳給團隊任何人都進得來', lc_clear_btn:'🧹 清除紀錄', lc_clear_q:'清除後資料將不保存，請問是否要清除？或是匯出後再清除？', lc_clear_exp:'匯出後再清除', lc_clear_go:'直接清除', lc_clear_no:'取消', lc_cleared:'大廳紀錄已清除', lc_clear_failed:'清除失敗', lc_new:'開新對話',
     lc_rules_h:'這裡的規則', 
     
     lc_rule3_t:'由發起人結束並決定是否保留 — ',
@@ -3315,7 +3336,7 @@ const I18N = {
     um_err_self_delete:'无法删除自己的账号', um_confirm_delete:'确定删除用户 %s？此操作无法撤销。',
     um_delete_failed:'删除失败：', um_deleted:'用户已删除',
     ai_tab_translate:'翻译', ai_tab_chat:'Claude Chat', ai_tab_skills:'技能',
-    ai_tab_live:'在线对话', lc_new:'开新对话',
+    ai_tab_live:'群组对话', ai_tab_lobby:'聊天大厅', lc_lobby_title:'聊天大厅', lc_lobby_meta:'全员皆可进入 · 永远开着', lc_lobby_link:'🔗 大厅链接', lc_lobby_copied:'大厅链接已复制 —— 传给团队任何人都进得来', lc_clear_btn:'🧹 清除记录', lc_clear_q:'清除后数据将不保存，请问是否要清除？或是导出后再清除？', lc_clear_exp:'导出后再清除', lc_clear_go:'直接清除', lc_clear_no:'取消', lc_cleared:'大厅记录已清除', lc_clear_failed:'清除失败', lc_new:'开新对话',
     lc_rules_h:'这里的规则', 
     
     lc_rule3_t:'由发起人结束并决定是否保留 — ',
@@ -3444,7 +3465,7 @@ const I18N = {
     um_err_self_delete:'Không thể xóa tài khoản của chính mình', um_confirm_delete:'Xóa người dùng %s? Không thể hoàn tác.',
     um_delete_failed:'Xóa thất bại: ', um_deleted:'Đã xóa người dùng',
     ai_tab_translate:'Dịch thuật', ai_tab_chat:'Claude Chat', ai_tab_skills:'Kỹ năng',
-    ai_tab_live:'Trò chuyện trực tiếp', lc_new:'Cuộc trò chuyện mới',
+    ai_tab_live:'Trò chuyện nhóm', ai_tab_lobby:'Sảnh chat', lc_lobby_title:'Sảnh chat', lc_lobby_meta:'Mọi người đều vào được · luôn mở', lc_lobby_link:'🔗 Liên kết sảnh', lc_lobby_copied:'Đã sao chép liên kết sảnh — gửi cho bất kỳ ai trong nhóm', lc_clear_btn:'🧹 Xoá lịch sử', lc_clear_q:'Sau khi xoá, dữ liệu sẽ không được lưu lại. Bạn muốn xoá ngay, hay xuất file rồi mới xoá?', lc_clear_exp:'Xuất rồi xoá', lc_clear_go:'Xoá ngay', lc_clear_no:'Huỷ', lc_cleared:'Đã xoá lịch sử sảnh', lc_clear_failed:'Xoá không thành công', lc_new:'Cuộc trò chuyện mới',
     lc_rules_h:'QUY TẮC Ở ĐÂY', 
     
     lc_rule3_t:'Người mở kết thúc và quyết định có lưu hay không — ',
@@ -3571,7 +3592,7 @@ const I18N = {
     um_err_self_delete:'自分自身のアカウントは削除できません', um_confirm_delete:'ユーザー %s を削除しますか？元に戻せません。',
     um_delete_failed:'削除失敗：', um_deleted:'ユーザーを削除しました',
     ai_tab_translate:'翻訳', ai_tab_chat:'Claude Chat', ai_tab_skills:'スキル',
-    ai_tab_live:'オンライン会話', lc_new:'新しい会話',
+    ai_tab_live:'グループ会話', ai_tab_lobby:'チャットロビー', lc_lobby_title:'チャットロビー', lc_lobby_meta:'全員参加可 · 常時開放', lc_lobby_link:'🔗 ロビーのリンク', lc_lobby_copied:'ロビーのリンクをコピーしました。チームの誰にでも渡せます', lc_clear_btn:'🧹 履歴を消去', lc_clear_q:'消去するとデータは保存されません。このまま消去しますか？それともエクスポートしてから消去しますか？', lc_clear_exp:'エクスポートしてから消去', lc_clear_go:'そのまま消去', lc_clear_no:'キャンセル', lc_cleared:'ロビーの履歴を消去しました', lc_clear_failed:'消去できませんでした', lc_new:'新しい会話',
     lc_rules_h:'ここでのルール',         lc_rule3_t:'開始者が終了し、保存するかを決めます — ',
     lc_rule3_d:'保存した会話は後から読め、開始者は再開して続きを話せます。PDF はいつでも出力でき、進行中に出力したものはその旨が紙面に記載されます。', lc_rule4_t:'開始者またはシステム管理者が削除できます — ',
     lc_rule4_d:'すべてのメッセージも一緒に削除され、元に戻せません。',
@@ -3810,6 +3831,8 @@ function applyI18nAll() {
   // AI tabs
   var tabTr = document.getElementById('ptab-translate');
   if (tabTr) tabTr.innerHTML = '🌐 ' + t('ai_tab_translate');
+  var tabLb = document.getElementById('ptab-lobby');
+  if (tabLb) tabLb.innerHTML = '🏛 ' + t('ai_tab_lobby');
   var tabLv = document.getElementById('ptab-live');
   if (tabLv) tabLv.innerHTML = '💬 ' + t('ai_tab_live');
   lcApplyI18n();
@@ -4070,20 +4093,28 @@ function escHtml(s) {
 // 只靠 HTML 的 on class 會讓人看到一個**空的清單**（class 對了，但
 // lcLoadList() 從來沒被呼叫過）。translate 當預設時不會有這個問題，
 // 因為它沒有需要載入的資料。
-var pAITab = 'live';
+var pAITab = 'lobby';   // 第一個頁籤＝聊天大廳（v2.05）
 
 function switchAITab(tab) {
   pAITab = tab;
-  // 離開線上對話就停輪詢：分頁在背景每 3 秒打一次請求是白費的
-  if (tab !== 'live') lcPollStop();
-  ['live','translate','chat','skills'].forEach(function(t) {
+  // 離開聊天就停輪詢：分頁在背景每 3 秒打一次請求是白費的
+  if (tab !== 'live' && tab !== 'lobby') lcPollStop();
+  ['lobby','live','translate','chat','skills'].forEach(function(t) {
     var btn = document.getElementById('ptab-' + t);
     var con = document.getElementById('ptab-content-' + t);
     if (btn) btn.classList.toggle('on', t === tab);
     if (con) con.classList.toggle('on', t === tab);
   });
-  // 進來時載清單；已經開在某個房間裡就把輪詢接回去
-  if (tab === 'live') {
+  if (tab === 'lobby') {
+    // 從群組對話的某個房間切過來：那一場要先收乾淨，否則輪詢與 lcSession 會留著上一間
+    if (lcSession && !lcIsLobby()) lcBackToList();
+    lcMountRoom('lobby');
+    lcOpenLobby();
+  } else if (tab === 'live') {
+    // 大廳不該留在 lcSession 裡 —— 不清的話「返回清單」會以為自己還在大廳
+    if (lcIsLobby()) lcBackToList();
+    lcMountRoom('live');
+    // 進來時載清單；已經開在某個房間裡就把輪詢接回去
     if (lcSession && lcSession.status === 'open') lcPollStart();
     else if (!lcSession) { lcShowRoom_hide(); lcLoadList(); }
   }
@@ -4207,6 +4238,71 @@ const LC_COL    = { 'zh-TW':'text_zhtw', 'zh-CN':'text_zhcn', 'en':'text_en', 'v
 const LC_LABEL  = { 'zh-TW':'繁中', 'zh-CN':'简中', 'en':'EN', 'vi':'VI' };
 const LC_POLL_MS   = 3000;
 const LC_MSG_LIMIT = 200;
+/* 聊天大廳（v2.05）——「一間永遠開著、不管控人員的公共聊天室」。
+   🔴 它是 chat_sessions 裡一列固定 id 的場次（migration 202609250001），
+      不是新的資料表、也不是新的一套程式：access='all' ＋ status='open'
+      讓 lcCanSee 自動對所有在職同事放行，host_emp_id='' 讓 lcIsHost() 對誰都是 false，
+      於是結束／邀請／重新開啟／刪除那幾顆鈕**自動**消失，不必寫一套大廳的例外。
+      訊息渲染、四語翻譯、輪詢、在線名單、圖片、PDF 全部沿用群組對話。 */
+const LC_LOBBY_ID = 'lobby';
+function lcIsLobby() { return !!(lcSession && lcSession.id === LC_LOBBY_ID); }
+
+/* 🔴 房間 DOM 只有一份，在兩個頁籤之間搬（同 board 的 pmMountShell）。
+   複製第二份會直接撞 id —— lc-stream／lc-input／lc-composer／lc-editbar…
+   三十幾個 id 被 lcSend／lcPoll／lcRenderStream／圖片上傳／PDF 匯出綁死。 */
+function lcMountRoom(tab) {
+  var room = document.getElementById('lc-room');
+  var host = document.getElementById(tab === 'lobby' ? 'ptab-content-lobby' : 'ptab-content-live');
+  if (room && host && room.parentNode !== host) host.appendChild(room);
+}
+
+async function lcOpenLobby() {
+  if (lcIsLobby()) { lcPollStart(); return; }   // 已經在大廳裡，只要把輪詢接回去
+  await lcOpen(LC_LOBBY_ID);
+}
+
+// 大廳的連結不帶通行碼：它本來就人人進得去，`?lobby=1` 只是「直接跳到那個頁籤」
+async function lcCopyLobbyLink() {
+  var url = location.origin + location.pathname + '?lobby=1';
+  try { await navigator.clipboard.writeText(url); toast(t('lc_lobby_copied'), 'ok'); }
+  catch (e) { prompt(t('lc_link_manual'), url); }
+}
+
+// ── 清除大廳紀錄 ──
+// 🔴 使用者 2026-09-25 定案：**任何人都可以清，而且不留痕跡**。
+//    清除就是清除 —— 不軟刪除、不存檔、不記錄誰清的。
+//    正因為收不回來，所以問句裡就直接把「匯出後再清除」擺成一個選項，
+//    而不是等使用者按下去之後才後悔。
+function lcClearAsk() {
+  var bar = document.getElementById('lc-clearbar');
+  if (bar) bar.style.display = 'flex';
+}
+function lcClearCancel() {
+  var bar = document.getElementById('lc-clearbar');
+  if (bar) bar.style.display = 'none';
+}
+async function lcClearNow(exportFirst) {
+  if (!lcIsLobby()) return;
+  var btns = ['lc-clear-exp','lc-clear-go','lc-clear-no'].map(function(i){ return document.getElementById(i); });
+  btns.forEach(function(b){ if (b) b.disabled = true; });
+  try {
+    // 🔴 先匯出、匯出成功才清 —— 反過來的話「匯出後再清除」這個選項是騙人的
+    if (exportFirst) await lcExportPDF();
+    await SB.delete('chat_messages', 'session_id=eq.' + encodeURIComponent(LC_LOBBY_ID));
+    lcMsgs = [];
+    lcSyncAt = '1970-01-01T00:00:00Z';   // 不重設的話輪詢會用舊游標，什麼都抓不回來也察覺不到
+    lcColorReset();
+    lcRenderStream();
+    lcClearCancel();
+    toast(t('lc_cleared'), 'ok');
+  } catch (e) {
+    // 失敗就**什麼都不要動** —— 畫面清空而資料庫還在，下一輪輪詢會整批冒回來
+    toast(t('lc_clear_failed') + '：' + (e.message || e), 'err');
+  } finally {
+    btns.forEach(function(b){ if (b) b.disabled = false; });
+  }
+}
+
 // 超過這個時間還沒有譯文，就當送出者已經離線，由開啟者接手補翻。
 // 60 秒是「三次重試加上退避（約 4 秒）」的數倍，正常流程絕對來不及變成孤兒。
 const LC_ORPHAN_MS = 60000;
@@ -4316,6 +4412,10 @@ function lcIsAdmin() { return !!SESSION && SESSION.role === 'admin'; }
 //    線上對話沒有匿名，而沒人收掉的房間會永遠掛在「進行中」，需要有人能清。
 function lcCanDelete(s) {
   if (!s) return false;
+  // 🔴 大廳是全公司的公共空間，整場刪掉就再也回不來（cascade 連訊息一起走），
+  //    而且前端沒有任何地方建得回那一列。admin 在別的場次有刪除權，這裡沒有。
+  //    sb-proxy 同步擋下 DELETE chat_sessions?id=eq.lobby —— 兩層都要有。
+  if (s.id === LC_LOBBY_ID) return false;
   return s.host_emp_id === lcMe() || lcIsAdmin();
 }
 
@@ -4608,7 +4708,13 @@ async function lcLoadList() {
     var b = (await SB.get('chat_sessions', statusQs + '&members=cs.' + arr + '&' + orderQs + '&limit=50')) || [];
     var c = thirdQs ? ((await SB.get('chat_sessions', statusQs + '&' + thirdQs + '&' + orderQs + '&limit=50')) || []) : [];
     var seen = {}, out = [];
-    a.concat(b).concat(c).forEach(function(x) { if (!seen[x.id]) { seen[x.id] = 1; out.push(x); } });
+    // 🔴 聊天大廳不進這份清單：它是 access='all' ＋ status='open'，
+    //    不排掉的話每個人的「進行中」都會多出一列，而它有自己的頁籤。
+    //    admin 那條查詢（撈全部）更是一定會撈到它。
+    a.concat(b).concat(c).forEach(function(x) {
+      if (x.id === LC_LOBBY_ID) return;
+      if (!seen[x.id]) { seen[x.id] = 1; out.push(x); }
+    });
     return out;
   }
   lcListAt = Date.now();
@@ -4726,9 +4832,12 @@ function lcShowRoom() {
   if (r) r.style.display = 'flex';
   var live = !!lcSession && lcSession.status === 'open';
   var ttl = document.getElementById('lc-room-title');
-  if (ttl) ttl.textContent = (lcSession && lcSession.title) || '';
+  if (ttl) ttl.textContent = lcIsLobby() ? t('lc_lobby_title') : ((lcSession && lcSession.title) || '');
   var meta = document.getElementById('lc-room-meta');
-  if (meta) meta.textContent = t('lc_host') + '：' + ((lcSession && (lcSession.host_name || lcSession.host_emp_id)) || '')
+  // 大廳沒有主持人，印「主持人：」後面空一格只會讓人以為資料壞了
+  if (meta && lcIsLobby()) meta.textContent = t('lc_lobby_meta')
+    + '　·　' + t('lc_tz_note').replace('{tz}', lcTzLabel());
+  else if (meta) meta.textContent = t('lc_host') + '：' + ((lcSession && (lcSession.host_name || lcSession.host_emp_id)) || '')
     + (live ? '' : '　·　' + t('lc_ended'))
     // 訊息時間是每位觀看者自己的當地時間，不標時區會讓跨廠的人以為資料錯了
     + '　·　' + t(lcAccessOf(lcSession) === 'all' ? 'lc_acc_all_tag' : 'lc_acc_invite_tag')
@@ -4769,6 +4878,28 @@ function lcShowRoom() {
      要開放給房裡所有人，改這一行的條件即可 —— 但那等於任何參與人都能拉人進來。 */
   var lnkBtn = document.getElementById('lc-link-btn');
   if (lnkBtn) lnkBtn.style.display = (live && lcIsHost()) ? 'inline-block' : 'none';
+
+  /* ── 聊天大廳的工具列（v2.05）────────────────────────────────
+     大廳沒有主人，所以結束／邀請／重新開啟／刪除那幾顆鈕在上面的判斷裡
+     **已經自動是隱藏的**（全部要 lcIsHost()）。這裡只負責三件事：
+     ① 沒有清單可回 → 收掉「‹ 返回」
+     ② 連結鈕改成「大廳連結」，而且給每一個人（不是只有發起人）——
+        大廳本來就不管控人員，連結只是省去「你去 AI 區找一下」這句話
+     ③ 「清除」也給每一個人（使用者 2026-09-25 定案） */
+  var lobby = lcIsLobby();
+  var backBtn = document.getElementById('lc-back-btn');
+  if (backBtn) backBtn.style.display = lobby ? 'none' : 'inline-block';
+  if (lobby && lnkBtn) {
+    lnkBtn.style.display = 'inline-block';
+    lnkBtn.textContent = t('lc_lobby_link');
+    lnkBtn.onclick = lcCopyLobbyLink;
+  } else if (lnkBtn) {
+    lnkBtn.textContent = t('lc_link_btn');
+    lnkBtn.onclick = lcCopyLink;
+  }
+  var clrBtn = document.getElementById('lc-clear-btn');
+  if (clrBtn) { clrBtn.style.display = lobby ? 'inline-block' : 'none'; clrBtn.textContent = t('lc_clear_btn'); }
+  lcClearCancel();   // 換房間時那條確認列不該跟著留在畫面上
   var whoBtn = document.getElementById('lc-who-btn');
   if (whoBtn) whoBtn.textContent = '👥 ' + (lcWhoLists().online.length);
   var delBtn = document.getElementById('lc-del-btn');
@@ -5240,10 +5371,15 @@ async function lcExportPDF() {
     var n = m.author_name || m.emp_id;
     if (names.indexOf(n) < 0) names.push(n);
   });
-  var body = '<h1>' + escHtml(lcSession.title || '線上對話') + '</h1>'
-    + '<div class="meta">開啟者：' + escHtml(lcSession.host_name || lcSession.host_emp_id)
-    + '　·　' + escHtml(lcDay(lcSession.created_at)) + ' ' + lcTime(lcSession.created_at)
-    + (lcSession.ended_at ? '　—　' + escHtml(lcDay(lcSession.ended_at)) + ' ' + lcTime(lcSession.ended_at) : '')
+  // 大廳沒有開啟者，印「開啟者：」後面空一格會讓收件人以為資料缺了。
+  // PDF 版面固定繁中（同 siteLabelZ 的道理：存檔格式不隨介面語言改變）
+  var body = '<h1>' + escHtml(lcIsLobby() ? '聊天大廳' : (lcSession.title || '群組對話')) + '</h1>'
+    + '<div class="meta">'
+    + (lcIsLobby()
+        ? '全員皆可進入的公共聊天室'
+        : '開啟者：' + escHtml(lcSession.host_name || lcSession.host_emp_id)
+          + '　·　' + escHtml(lcDay(lcSession.created_at)) + ' ' + lcTime(lcSession.created_at)
+          + (lcSession.ended_at ? '　—　' + escHtml(lcDay(lcSession.ended_at)) + ' ' + lcTime(lcSession.ended_at) : ''))
     + '</div>'
     + '<div class="meta">參與者（' + names.length + '）：' + escHtml(names.join('、')) + '</div>'
     + '<div class="meta">共 ' + lcMsgs.length + ' 則訊息</div>'
@@ -5940,6 +6076,8 @@ function _lcSafeId(v) {
 // lcOpen 自己會擋「不是參與人」（例如邀請後又被移出名單），所以這裡不重複判斷。
 async function lcGoto(sessionId, joinCode) {
   switchView('ai');
+  // 大廳有自己的頁籤：在群組對話裡開它會變成一間沒有「返回」可按的房間
+  if (sessionId === LC_LOBBY_ID) { switchAITab('lobby'); return; }
   switchAITab('live');
   // 帶通行碼進來（＝有人把邀請連結給了他）：先讓伺服器把自己併進 members。
   // 🔴 失敗也照樣往下開 —— 他可能本來就是參與人（例如自己按了自己發的連結，
@@ -6085,6 +6223,9 @@ function lcApplyI18n() {
   txt('lc-new-btn','lc_new');     txt('lc-new-hint','lc_new_hint');
   txt('lc-keep-btn','lc_keep');   txt('lc-discard-btn','lc_discard');
   txt('lc-endbar-q','lc_end_q');  txt('lc-end-btn','lc_end');
+  txt('lc-clearbar-q','lc_clear_q'); txt('lc-clear-exp','lc_clear_exp');
+  txt('lc-clear-go','lc_clear_go');  txt('lc-clear-no','lc_clear_no');
+  txt('lc-clear-btn','lc_clear_btn');
   ph('lc-input','lc_input_ph');
   // 🔴 送出鈕的字不能在這裡寫死：修改模式下它是「儲存」。
   //    lcEditPaint 是那顆鈕的唯一事實來源（切語言時也由它重上字）
@@ -6111,6 +6252,12 @@ function lcApplyI18n() {
   //    但 applyI18nAll() 也被 switchView() 呼叫（那不是切語言），而 switchView('ai')
   //    現在會先 switchAITab() 載一次 —— 沒有這個時間差判斷的話，每次點進 AI
   //    都會載兩次清單（非 admin 一次是 7 個查詢，剛好是 sb-proxy 併發上限那個坑）。
+  var lob = document.getElementById('ptab-content-lobby');
+  if (lob && lob.classList.contains('on')) {
+    // 大廳沒有清單可以重載，但工具列與標題要跟著換語言
+    if (lcSession) { lcShowRoom(); lcRenderStream(); }
+    return;
+  }
   var con = document.getElementById('ptab-content-live');
   if (con && con.classList.contains('on')) {
     if (lcSession) { lcShowRoom(); lcRenderStream(); }

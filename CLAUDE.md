@@ -103,7 +103,7 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 
 | File | Version | Purpose | ~Lines |
 |------|---------|---------|--------|
-| `index.html` | v2.03 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
+| `index.html` | v2.05 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
 | `admin/index.html` | v2.40 | Admin System — room booking, fleet, visitor, library, lottery | 5,650 |
 | `kms/index.html` | v2.41 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
 | `quotation/index.html` | v3.60 | Quotation & CRM system | 7,332 |
@@ -543,7 +543,53 @@ python3 scripts/i18n-audit.py         # Portal 專用（key 沒引號：btn_save
   強制改密碼畫面的說明段落現在直接寫出「不可使用常見密碼（公司名＋年份、自己的工號）」，
   讓使用者在打字之前就知道，而不是靠錯誤訊息事後補救。
 
-## 線上對話 Live Chat（Portal v1.80，2026-09-05，migration 202609050001）
+## 群組對話 Group Chats（原「線上對話」，Portal v1.80，2026-09-05，migration 202609050001）
+
+> 🔴 **2026-09-25（v2.05）由「線上對話」更名為「群組對話」**，並在它前面新增
+> **「聊天大廳」**（見下一節）。兩者**共用同一套 `lc*` 程式與同一組資料表** ——
+> 大廳只是 `chat_sessions` 裡一列固定 id 的場次。
+> 本節以下所有內容仍然成立，只是名字換了；i18n key 仍叫 `ai_tab_live`／函式仍是 `lc*`
+> （**改名時刻意不重新命名識別字**：那會讓下一次追問題變成「是搬壞了還是改名改壞了」兩件事）。
+
+### 🏛 聊天大廳 Lobby（v2.05，2026-09-25，migration 202609250001）
+
+AI 區的**第一個**頁籤。一間永遠開著、**不管控人員**的公共聊天室，點進去就能講話。
+
+- 🔴 **它不是新的資料表，也不是新的一套程式**：就是 `chat_sessions` 裡
+  `id='lobby'` 的一列，`access='all'`＋`status='open'`＋`host_emp_id=''`。
+  三個欄位各自讓既有邏輯自動做對的事 ——
+  `lcCanSee` 對「進行中的公開場次」放行所有在職同事（＝不管控人員）；
+  **`lcIsHost()` 對誰都是 false**，於是結束／邀請／重新開啟／刪除那幾顆鈕
+  全部自動消失，**不必為大廳寫一套「這些鈕不要畫」的例外**。
+  訊息渲染、四語翻譯、3 秒輪詢、在線名單、圖片附件、PDF 匯出全部沿用。
+- 🔴 **房間 DOM 只有一份，在兩個頁籤之間搬**（`lcMountRoom`，同 board 的 `pmMountShell`）。
+  複製第二份會直接撞 id —— `lc-stream`／`lc-input`／`lc-composer`／`lc-editbar`…
+  三十幾個 id 被 `lcSend`／`lcPoll`／`lcRenderStream`／圖片上傳／PDF 匯出綁死。
+  `switchAITab` 在兩邊切換時**先 `lcBackToList()` 收乾淨上一場**，否則輪詢與
+  `lcSession` 會留著前一間房。
+- 🔴 **大廳要從群組對話的清單裡排掉**（`fetchSet`）：它是 `access='all'`＋`open`，
+  不排的話每個人的「進行中」都會多一列，**admin 那條「撈全部」的查詢更是必中**。
+- **清除對話紀錄**：使用者 2026-09-25 定案 —— **任何人都可以清，而且不留痕跡**。
+  清除就是清除，不軟刪除、不存檔、不記錄誰清的。
+  - 🔴 **`SB.delete` 走的是 sb-proxy 那條「chat_messages 一律 403」的路**，
+    所以開了唯一的例外：`session_id` 必須**剛好**等於伺服器端常數 `CHAT_LOBBY_ID`，
+    而且不能有別的 filter。否則這條路就成了「任何人都能清空任何一場對話」。
+  - 因為收不回來，問句直接把**「匯出後再清除」擺成一個選項**（三選一，所以是
+    `#lc-clearbar` 而不是 `confirm()` —— 後者只給得起兩個）。
+    **先匯出成功才清**，反過來的話那個選項是騙人的。
+  - 清完要重設 `lcSyncAt`：不重設的話輪詢沿用舊游標，什麼都抓不回來而且**看不出來**。
+  - 失敗就什麼都不動（畫面清空而資料庫還在，下一輪輪詢會整批冒回來）。
+- 🔴 **大廳整列不可刪**：`lcCanDelete` 直接回 false，sb-proxy 也擋下
+  `DELETE chat_sessions?id=eq.lobby`。**兩層都要有** —— admin 在別的場次上有刪除權，
+  而 cascade 會把大廳本身帶走，前端沒有任何地方建得回那一列。
+- **大廳連結**是 `?lobby=1`（不帶身分、不帶通行碼，只是「直接跳到那個頁籤」），
+  **每一個人都看得到那顆鈕**（不像群組對話的邀請連結只給發起人）——
+  大廳本來就不管控人員，連結只是省掉「你去 AI 區找一下」這句話。
+  舊的 `?lc=lobby` 也會被 `lcGoto` 導到大廳頁籤，不會在群組對話裡開出一間沒有「返回」的房間。
+- **標題／副標與 PDF 表頭都走大廳專用文案**：`chat_sessions.title` 是固定繁中，
+  而「開啟者：」後面空一格會讓人以為資料缺了。
+
+
 
 Portal AI 功能區的第二個頁籤（`💬 線上對話`，在翻譯旁邊）。不同事業單位的同事各自用自己的
 語言打字，每一則訊息即時翻成**四語同時顯示**（繁中／簡中／英／越）。函式前綴 `lc*`，
@@ -751,9 +797,10 @@ Portal AI 功能區的第二個頁籤（`💬 線上對話`，在翻譯旁邊）
   兩處問的是同一個問題，各留一份必然分岔）。
 - **前端刪除鈕刻意不對「開啟者 × 進行中」顯示**：那條路是「結束對話 → 不保留」，
   同一件事給兩個入口只會讓人猜哪一個才對。admin 看別人的進行中場次則有刪除鈕。
-### 線上對話是 AI 區的第一個頁籤（v2.00）
+### 聊天大廳是 AI 區的第一個頁籤（v2.05；v2.00–v2.04 是線上對話）
 
-頁籤順序 `live → translate → chat → skills`，初始 `on` 在 `ptab-live` 與 `ptab-content-live`。
+頁籤順序 **`lobby → live → translate → chat → skills`**，初始 `on` 在 `ptab-lobby`／
+`ptab-content-lobby`，`pAITab` 預設 `'lobby'`（**HTML 的 `on` class 與 `pAITab` 要一致**）。
 
 - 🔴 **`switchView('ai')` 必須呼叫 `switchAITab(pAITab)`。**
   translate 當預設時不需要（它沒有要載的資料），但線上對話的清單得靠 `lcLoadList()`

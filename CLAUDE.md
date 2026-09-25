@@ -104,7 +104,7 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 | File | Version | Purpose | ~Lines |
 |------|---------|---------|--------|
 | `index.html` | v2.06 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
-| `admin/index.html` | v2.40 | Admin System — room booking, fleet, visitor, library, lottery | 5,650 |
+| `admin/index.html` | v2.41 | Admin System — room booking, fleet, visitor, library, lottery | 5,650 |
 | `kms/index.html` | v2.41 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
 | `quotation/index.html` | v3.61 | Quotation & CRM system | 7,332 |
 | `board/index.html` | v1.91 | 公告與會議 Bulletin & Meetings — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍、腦力激盪 | 4,600 |
@@ -385,10 +385,18 @@ The portal supports EN, 繁中, 简中, VI, 日 via `setLang(lang)`. Each langua
 ## i18n：改字典一定要逐字典檢查（`scripts/i18n-audit.py`）
 
 ```bash
-python3 scripts/i18n-audit.py             # Portal（index.html 的 I18N）
-python3 scripts/i18n-audit.py board       # Board（B_I18N ＋ PL_I18N）
-python3 scripts/i18n-audit.py quotation   # 報價系統（UI）
+python3 scripts/i18n-audit.py             # Portal      I18N        275 key × 5
+python3 scripts/i18n-audit.py board       # Board       B_I18N 419 ＋ PL_I18N 109
+python3 scripts/i18n-audit.py quotation   # 報價系統     UI          180
+python3 scripts/i18n-audit.py admin       # Admin       ADMIN_I18N  481
+python3 scripts/i18n-audit.py kms         # KMS         I18N        261
 ```
+
+🔴 **五個系統現在共用這一支**（v2.41 起）。字典邊界改用**大括號配對**掃出來，
+所以吃得下 Portal／Board 的 `key:'值'` 與 Admin／KMS／報價的 `'key':'值'` 兩種形狀。
+`scripts/kms-i18n-audit.py` 已刪除 —— 它與通用版對同一份檔案給出完全相同的結果
+（261 key、無重複、無缺漏），**留著兩支問同一個問題的腳本正是本檔案反覆記載的
+分岔起點**。
 
 （v1.91 起通用化：字典邊界改用**大括號配對**掃出來，不再靠寫死的
 `\n  en: {` regex 與「檔案結尾」。所以同一支腳本吃得下 Portal 的
@@ -418,14 +426,18 @@ key 名稱 —— 使用者看到才回報。
   用不到 `t('字面值')`，所以「找出所有被使用的 key」那一半永遠會漏。
   稽核腳本因此改成「比對五本字典彼此」而不是「比對程式碼與字典」—— 前者不需要知道誰在用。
 
-### KMS 的字典是另一份形狀，另一支稽核（`scripts/kms-i18n-audit.py`）
+### KMS 的字典是另一份形狀（`'key':'值'`），但已由同一支腳本涵蓋
 
 ```bash
-python3 scripts/kms-i18n-audit.py     # KMS 專用（key 有引號：'btn.save':'儲存'）
-python3 scripts/i18n-audit.py         # Portal 專用（key 沒引號：btn_save:'儲存'）
+python3 scripts/i18n-audit.py kms     # key 有引號：'btn.save':'儲存'
+python3 scripts/i18n-audit.py         # Portal，key 沒引號：btn_save:'儲存'
 ```
 
-2026-09-21 補上。實際抓到 **7 個重複定義**（五本字典 255 個 key 本身是齊的）：
+⚠️ 2026-09-21 曾為 KMS 另寫一支 `kms-i18n-audit.py`，**2026-09-26 已刪除**：
+通用版對同一份檔案給出完全相同的結果（261 key、無重複、無缺漏），
+留著兩支問同一個問題的腳本正是本檔案反覆記載的分岔起點。以下是它當初的成果與教訓。
+
+那一支實際抓到 **7 個重複定義**（五本字典 255 個 key 本身是齊的）：
 `review.title`／`comments.submit`／`btn.add_product_line` 五本都重複，
 而 zh-TW 的 `btn.cancel`／`conf.level.1~3` 是**早期的英文預設被後來的中文蓋掉** ——
 畫面上是對的（後者生效），但**去改前面那一份不會有任何效果**，那正是要清掉的理由。
@@ -521,6 +533,11 @@ python3 scripts/i18n-audit.py         # Portal 專用（key 沒引號：btn_save
   ⚠️ 原本只有 `console.warn` —— 「伺服器連不上」與「資料真的長這樣」在畫面上
   一模一樣，而使用者會照著舊資料報價。
 - `SB.upsert` 的 `.catch(()=>[])` 同 Portal v2.06，一併修掉。
+- **v3.62 補完剩下四處**（分類與供應商的存檔／刪除）：一樣是
+  「先改記憶體裡的陣列 → 寫資料庫 → `catch(e){}` 吞掉 → 無條件 toast 成功」。
+  🔴 那兩個 `catch(e){}` 在 `SB.delete` 不看回應的年代是「反正也不會丟」，
+  v3.61 之後它會丟 —— **吞掉等於把剛修好的東西又關掉一次**。
+  改東西的時候要一起看「誰在依賴它以前不會丟」。
 - 「重新登入」用**相對路徑** `../index.html?next=quotation/index.html`，
   不是 `goPortal()` 寫死的網域 —— 那會讓本機開檔的開發方式失效。
 
@@ -1355,6 +1372,23 @@ v1.94 只做在 Portal，但**同事被邀請的時候人常常在 KMS 或報價
   `callClaude(messages, system, …)` —— **參數順序不同，不要直接傳**。
   刻意重用 `pmClaude` 而不是自己 fetch：它已處理好 401 橫幅（`sbNoteAuth`）、
   refusal、空回覆。
+
+### 🔴 Admin：本機的過期預檢（v2.41，2026-09-26）
+
+admin 從 v2.37 就有紅色橫幅與 `SB.write()`，所以過期**不會產生爛資料** ——
+但它是五個系統裡最後一個沒有本機預檢的：使用者要先按下「歸還」才知道存不進去。
+
+- **`sbSessionAlive()` 放在 `SB._req`**（唯一的出入口，get／post／patch／del／write
+  全部自動吃到）。本機判定失敗時回 `status: 401`，這是刻意的 ——
+  `sbErrMsg()` 靠它翻成「登入已逾期，剛才的操作沒有存檔」，
+  伺服器回的 401 與本機判定的 401 對使用者是同一件事。
+- 🔴 **`sbAuthLost` 從 `401 || 403` 收斂成只認 401。**
+  sb-proxy 對「驗不過」一律回 401（`missing/invalid x-session`），
+  **403 全部是「這件事不歸你做」** —— 而在 admin 最可能的 403 其實是
+  **新加的資料表忘了進 `ALLOWED_TABLES`**。把它說成「登入已逾期」
+  會讓人跑去重新登入，然後再撞一次同一個錯。
+  `sbErrMsg()` 同步拆開，403 走新的 `sb.err_forbidden`。
+- 橫幅補上「重新登入」鈕（`../index.html?next=admin/index.html`，相對路徑）。
 
 ### 🔴 Board 的 session 過期也是**靜默**的（v1.91 修，2026-09-25）
 

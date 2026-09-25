@@ -3,6 +3,8 @@
 #   python3 scripts/i18n-audit.py                    # Portal（index.html 的 I18N）
 #   python3 scripts/i18n-audit.py board              # Board（board/index.html 的 B_I18N ＋ PL_I18N）
 #   python3 scripts/i18n-audit.py quotation          # 報價系統（quotation/index.html 的 UI）
+#   python3 scripts/i18n-audit.py admin              # Admin（ADMIN_I18N，key 帶引號）
+#   python3 scripts/i18n-audit.py kms                # KMS（I18N，key 帶引號）
 #
 # 🔴 為什麼要有這支：全域計數會放過一種錯誤 —— 10 份分佈成 (0,0,0,2,3)，
 #    總數對、分佈全錯。2026-09-08 的 lc_rule1_t 就是這樣：en／繁中／簡中各 0 份，
@@ -21,6 +23,8 @@ TARGETS = {
     'portal': ('index.html',       ['I18N']),
     'board':  ('board/index.html', ['B_I18N', 'PL_I18N']),
     'quotation': ('quotation/index.html', ['UI']),
+    'admin':  ('admin/index.html', ['ADMIN_I18N']),
+    'kms':    ('kms/index.html', ['I18N']),
 }
 name = (sys.argv[1] if len(sys.argv) > 1 else 'portal').lower()
 if name not in TARGETS:

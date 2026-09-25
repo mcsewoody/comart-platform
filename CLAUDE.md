@@ -107,7 +107,7 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 | `admin/index.html` | v2.40 | Admin System — room booking, fleet, visitor, library, lottery | 5,650 |
 | `kms/index.html` | v2.41 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
 | `quotation/index.html` | v3.60 | Quotation & CRM system | 7,332 |
-| `board/index.html` | v1.90 | 公告與會議 Bulletin & Meetings — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍、腦力激盪 | 4,600 |
+| `board/index.html` | v1.91 | 公告與會議 Bulletin & Meetings — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍、腦力激盪 | 4,600 |
 | `product_dev/` | v2.17 | **產品開發管理 —— 第六個子系統，不遵守單一檔案原則**（見下方專節） | — |
 
 `admin/lottery.html` is a standalone lottery page (separate from the lottery module inside `admin/index.html`).
@@ -385,8 +385,14 @@ The portal supports EN, 繁中, 简中, VI, 日 via `setLang(lang)`. Each langua
 ## i18n：改字典一定要逐字典檢查（`scripts/i18n-audit.py`）
 
 ```bash
-python3 scripts/i18n-audit.py     # Portal 專用（其他子系統的字典形狀不同）
+python3 scripts/i18n-audit.py           # Portal（index.html 的 I18N，271 key × 5）
+python3 scripts/i18n-audit.py board     # Board（B_I18N 419 ＋ PL_I18N 109，各 × 5）
 ```
+
+（v1.91 起通用化：字典邊界改用**大括號配對**掃出來，不再靠寫死的
+`\n  en: {` regex 與「檔案結尾」。所以同一支腳本吃得下 Portal 的
+`key:'值'` 與 Board 的 `'zh-TW': {` 兩種形狀。KMS 仍是另一支，
+因為它的 key 帶引號 —— 見下一節。）
 
 檢查兩件事：**同一本字典裡有沒有重複定義**（後者會贏，前者是死的）、
 **每個 key 是不是五本都有**（缺的那一本 `t()` 會回傳 key 本身）。
@@ -1292,9 +1298,53 @@ v1.94 只做在 Portal，但**同事被邀請的時候人常常在 KMS 或報價
   刻意重用 `pmClaude` 而不是自己 fetch：它已處理好 401 橫幅（`sbNoteAuth`）、
   refusal、空回覆。
 
+### 🔴 Board 的 session 過期也是**靜默**的（v1.91 修，2026-09-25）
+
+使用者貼上一整排 `woody_reports?id=eq.… 401`，**同一個網址連打六次**。
+成因與 KMS v2.42 完全相同（session 過期），但 board 多了兩個自己的壞法：
+
+- 🔴 **`sbNoteAuth` 原本只跳一個 2.6 秒的 toast，而且一次載入只跳一次。**
+  session 過期的語意是「從這一刻起，這個分頁什麼都讀不到、什麼都存不了」——
+  那是要**一直看得到**的事實，不是一則通知。改成 `#sb-authbar` 紅色橫幅
+  （放在 sticky 的 `.topbar` **裡面**，所以不必像 kms 那樣量高度再推版面），
+  附「重新登入」鈕走 `boardGoLogin(當前頁籤)`。
+  🔴 **`sbNoteAuth` 只認 401，不要順手把 403 收進來**：sb-proxy 對驗屍的
+  `phase`／`ai_summary`、投票、聊天訊息都用 403 表示「這件事不歸你做」，
+  那是正常的拒絕。當成 session 失效會讓整個分頁因為一次越權嘗試就停擺。
+- 🔴 **`sbSessionAlive()`：送出之前先問本機。** `readPortalSession()` 只在載入時
+  檢查一次，分頁開一整天之後 `expires` 早就過了。橫幅出現後它一律回 false，
+  請求就地停住 —— 重點不是省流量，是**不要再讓畫面繼續假裝自己在運作**。
+- 🔴 **`SB.get` 失敗回 `null`、查得到但沒有回 `[]`；呼叫端把兩者當成同一件事，
+  就會在「查詢根本沒成功」時講出「找不到這一筆」。** 那是一句假話，
+  而使用者對假話的反應就是再按一次（那六個 401 正是這樣來的）。
+  已修的六處：`wmOpenRecord`／`wrOpenReport`／`wrOpenRead`／`pmOpen`／`plOpen`／
+  `MeetingMinutesStore.load`。**新寫「開啟某一筆」的程式碼時照這個形狀寫。**
+  ⚠️ 其中 `MeetingMinutesStore.save` 的那個 null 後果不是講錯話，是
+  **權限檢查整條跳過**（`ownerScope` 是 undefined → `bizCanEdit` 不執行）——
+  一次 401 就等於把編輯權限檢查關掉。**「讀不到」要當成「不准」，不是「沒有限制」。**
+
+#### 未存檔內容的救援暫存（`comart-board-rescue-v1`）
+
+401 真正的損害不是錯誤訊息，是**週報／週會編輯器裡的內容**：存檔失敗後使用者
+接下來最可能做的每一件事（重新登入、重新整理、關掉）都會把它弄掉，而
+「重新登入」那顆鈕是**我們自己**放的，不先暫存等於我們親手弄丟他的稿子。
+
+- 🔴 **只在兩個時刻寫：存檔失敗、按下重新登入。** 不是每次打字就寫 ——
+  那會把「我剛剛刻意刪掉的那段」也存起來，下次冒出來只會讓人以為系統壞了，
+  而且等於偷偷做掉 2026-08-11 已經否決的自動存檔。這兩個時刻的共同點是
+  **使用者沒有別的辦法自救**。
+- 🔴 **存檔成功一定要 `boardRescueClear()`**，否則下次載入會拿一份舊的來問。
+- 🔴 **`boardRescueOffer()` 放在 `initBoard()` 的最後一行**：擺在
+  `boardOpenDeep()` 前面會被它的 `switchTab()` 切走，而且還原會把 `_boardDirty`
+  設成 true，那個 switchTab 就會再彈一次「尚未存檔」—— 使用者剛答應還原，
+  馬上被問要不要放棄。
+- 業務會議記錄有自己的草稿機制（`comart-board-mm-draft-v1`），不走這一套。
+- ⚠️ **Portal 與報價系統還沒有這道橫幅**（admin v2.37／kms v2.42／board v1.91 有）。
+  Portal 的群組對話是 3 秒輪詢，過期後的 401 量比 board 大得多。
+
 ## Board 重要細節
 
-`board/index.html`（公告與會議，v1.89）八個頁籤，各自一組前綴命名的函式與 Supabase 表：
+`board/index.html`（公告與會議，v1.91）八個頁籤，各自一組前綴命名的函式與 Supabase 表：
 
 | 頁籤 | 前綴 | 主要資料表 |
 |------|------|-----------|

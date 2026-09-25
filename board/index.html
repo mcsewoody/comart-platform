@@ -5,7 +5,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#080C14">
-<title>COMART · 公告與會議 v1.90</title>
+<title>COMART · 公告與會議 v1.91</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -32,6 +32,8 @@ input,select,textarea{font:inherit;color:inherit;line-height:1.4}
 h1,h2,h3,p{margin:0}
 
 /* ── TOPBAR ─────────────── */
+#sb-authbar{display:none;background:#3a1416;color:#ffb4ac;border-bottom:1px solid #b3261e;padding:8px 16px;font-size:13px;font-weight:600;text-align:center;line-height:1.6}
+#sb-authbar button{margin-left:10px;background:#b3261e;color:#fff;border:0;border-radius:6px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit}
 .topbar{position:sticky;top:0;z-index:200;background:rgba(8,12,20,0.9);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--br)}
 .topbar-main{display:flex;align-items:center;gap:10px;padding:10px 16px;max-width:1180px;margin:0 auto}
 .logo{display:flex;align-items:center;gap:9px;text-decoration:none;color:inherit}
@@ -341,12 +343,13 @@ body.pm-playing #pm-phasebar{padding:0}
 <body>
 
 <div class="topbar">
+  <div id="sb-authbar"></div>
   <div class="topbar-main">
     <a href="/" id="portal-back-btn">← Portal</a>
     <a class="logo" href="javascript:void(0)">
       <div class="logo-mark">告</div>
       <div class="logo-text" data-i18n="app_title">公告與會議</div>
-      <span class="logo-ver">v1.90</span>
+      <span class="logo-ver">v1.91</span>
     </a>
     <div class="topbar-right">
       <div id="langChips" style="display:flex;gap:4px"></div>
@@ -908,6 +911,11 @@ const B_I18N = {
   t_saved:'已儲存', t_deleted:'已刪除', t_del_failed:'刪除失敗', t_save_failed:'儲存失敗',
   t_load_failed:'載入失敗', t_not_found:'找不到該筆紀錄', t_admin_only_del:'僅管理員可刪除',
   t_session_expired:'登入已過期，請回入口網站重新登入',
+  t_auth_lost:'登入已過期 —— 這個分頁現在讀不到、也存不了任何資料。',
+  b_relogin:'重新登入',
+  b_rescue_ask:'偵測到一份未能存檔的{what}內容（{when}）。要把它載回編輯器嗎？',
+  b_rescue_done:'已還原未存檔的內容，請確認後按「儲存」。',
+  b_rescue_kept:'內容已暫存在這台裝置上，重新登入後可以還原。',
   t_popup_pdf:'請允許彈出視窗以列印 PDF', t_png_ok:'已匯出 PNG', t_png_fail:'PNG 匯出失敗，請改用 PDF',
   t_xlsx_ok:'已匯出 Excel', t_xlsx_fail:'Excel 匯出失敗',
   t_mail_fail:'無法開啟郵件，請改用匯出後手動附加',
@@ -1108,6 +1116,11 @@ const B_I18N = {
   t_saved:'已保存', t_deleted:'已删除', t_del_failed:'删除失败', t_save_failed:'保存失败',
   t_load_failed:'加载失败', t_not_found:'找不到该笔记录', t_admin_only_del:'仅管理员可删除',
   t_session_expired:'登录已过期，请回门户网站重新登录',
+  t_auth_lost:'登录已过期 —— 这个标签页现在读不到、也存不了任何数据。',
+  b_relogin:'重新登录',
+  b_rescue_ask:'检测到一份未能存档的{what}内容（{when}）。要把它载回编辑器吗？',
+  b_rescue_done:'已还原未存档的内容，请确认后按「保存」。',
+  b_rescue_kept:'内容已暂存在这台设备上，重新登录后可以还原。',
   t_popup_pdf:'请允许弹出窗口以打印 PDF', t_png_ok:'已导出 PNG', t_png_fail:'PNG 导出失败，请改用 PDF',
   t_xlsx_ok:'已导出 Excel', t_xlsx_fail:'Excel 导出失败',
   t_mail_fail:'无法打开邮件，请改用导出后手动附加',
@@ -1308,6 +1321,11 @@ const B_I18N = {
   t_saved:'Saved', t_deleted:'Deleted', t_del_failed:'Delete failed', t_save_failed:'Save failed',
   t_load_failed:'Load failed', t_not_found:'Record not found', t_admin_only_del:'Only admins can delete',
   t_session_expired:'Session expired — please sign in again on the portal',
+  t_auth_lost:'Your session has expired — this tab can no longer read or save anything.',
+  b_relogin:'Sign in again',
+  b_rescue_ask:'Found unsaved {what} content from {when}. Load it back into the editor?',
+  b_rescue_done:'Unsaved content restored — check it, then press Save.',
+  b_rescue_kept:'Your text is held on this device and can be restored after you sign in again.',
   t_popup_pdf:'Please allow pop-ups to print the PDF', t_png_ok:'PNG exported', t_png_fail:'PNG export failed — use PDF instead',
   t_xlsx_ok:'Excel exported', t_xlsx_fail:'Excel export failed',
   t_mail_fail:'Could not open mail — export the file and attach it manually',
@@ -1508,6 +1526,11 @@ const B_I18N = {
   t_saved:'Đã lưu', t_deleted:'Đã xóa', t_del_failed:'Xóa thất bại', t_save_failed:'Lưu thất bại',
   t_load_failed:'Tải thất bại', t_not_found:'Không tìm thấy bản ghi', t_admin_only_del:'Chỉ quản trị viên mới được xóa',
   t_session_expired:'Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại tại cổng thông tin',
+  t_auth_lost:'Phiên đăng nhập đã hết hạn — thẻ này không còn đọc hay lưu được dữ liệu nào.',
+  b_relogin:'Đăng nhập lại',
+  b_rescue_ask:'Tìm thấy nội dung {what} chưa lưu được ({when}). Tải lại vào trình soạn thảo?',
+  b_rescue_done:'Đã khôi phục nội dung chưa lưu — kiểm tra rồi bấm Lưu.',
+  b_rescue_kept:'Nội dung được giữ tạm trên thiết bị này, đăng nhập lại là khôi phục được.',
   t_popup_pdf:'Vui lòng cho phép cửa sổ bật lên để in PDF', t_png_ok:'Đã xuất PNG', t_png_fail:'Xuất PNG thất bại, hãy dùng PDF',
   t_xlsx_ok:'Đã xuất Excel', t_xlsx_fail:'Xuất Excel thất bại',
   t_mail_fail:'Không mở được email, hãy xuất tệp rồi đính kèm thủ công',
@@ -1708,6 +1731,11 @@ const B_I18N = {
   t_saved:'保存しました', t_deleted:'削除しました', t_del_failed:'削除に失敗しました', t_save_failed:'保存に失敗しました',
   t_load_failed:'読み込みに失敗しました', t_not_found:'該当の記録が見つかりません', t_admin_only_del:'管理者のみ削除できます',
   t_session_expired:'ログインの有効期限が切れました。ポータルで再ログインしてください',
+  t_auth_lost:'ログインの有効期限が切れました —— このタブではデータの読み込みも保存もできません。',
+  b_relogin:'再ログイン',
+  b_rescue_ask:'保存できなかった{what}の内容（{when}）が見つかりました。エディタに戻しますか？',
+  b_rescue_done:'未保存の内容を復元しました。確認して「保存」を押してください。',
+  b_rescue_kept:'内容はこの端末に一時保存しました。再ログイン後に復元できます。',
   t_popup_pdf:'PDF を印刷するにはポップアップを許可してください', t_png_ok:'PNG を書き出しました', t_png_fail:'PNG の書き出しに失敗しました。PDF をご利用ください',
   t_xlsx_ok:'Excel を書き出しました', t_xlsx_fail:'Excel の書き出しに失敗しました',
   t_mail_fail:'メールを開けません。書き出して手動で添付してください',
@@ -2219,6 +2247,10 @@ function sbHdrs(extra) {
 }
 const SB = {
   async get(table, params='') {
+    /* 🔴 送出之前先看本機這一道。readPortalSession() 只在載入時檢查一次，
+       分頁開一整天之後 expires 早就過了 —— 只等伺服器回 401 的話，每一次
+       操作都要先送出一個注定失敗的請求，而畫面上完全看不出來。 */
+    if (!sbSessionAlive()) return null;
     try {
       const res = await fetch(`${CFG.workerUrl}/supabase/rest/v1/${table}${params}`, { headers: sbHdrs() });
       if (!res.ok) { if (res.status === 401) sbNoteAuth(401); throw new Error(`${res.status}`); }
@@ -2226,11 +2258,13 @@ const SB = {
     } catch(e) { console.warn(`SB.get(${table}) failed:`, e.message); return null; }
   },
   async post(table, data, prefer='return=representation') {
+    if (!sbSessionAlive()) throw new Error(BT('t_auth_lost'));
     const res = await fetch(`${CFG.workerUrl}/supabase/rest/v1/${table}`, { method:'POST', headers: sbHdrs({ 'Prefer': prefer }), body: JSON.stringify(data) });
     if (!res.ok) { if (res.status === 401) sbNoteAuth(401); const e = await res.text(); throw new Error(e); }
     return await res.json();
   },
   async patch(table, filter, data) {
+    if (!sbSessionAlive()) throw new Error(BT('t_auth_lost'));
     const res = await fetch(`${CFG.workerUrl}/supabase/rest/v1/${table}?${filter}`, { method:'PATCH', headers: sbHdrs({ 'Prefer': 'return=representation' }), body: JSON.stringify(data) });
     if (!res.ok) { if (res.status === 401) sbNoteAuth(401); const e = await res.text(); throw new Error(e); }
     return await res.json();
@@ -2243,6 +2277,7 @@ const SB = {
     return this.post(table, data);
   },
   async del(table, filter) {
+    if (!sbSessionAlive()) throw new Error(BT('t_auth_lost'));
     const res = await fetch(`${CFG.workerUrl}/supabase/rest/v1/${table}?${filter}`, { method:'DELETE', headers: sbHdrs() });
     if (!res.ok) { if (res.status === 401) sbNoteAuth(401); throw new Error(`${res.status}`); }
     return true;
@@ -2266,10 +2301,14 @@ const BOARD_DEEP = (function () {
 // 沒有 session 時把人送去 Portal 登入，登入後由 Portal 的 ?next= 轉回來。
 // 以前這裡是死路：頁面打得開、右上寫「尚未登入」、所有請求 401，收到連結的人
 // 看到的是一片空白，連「請先登入」都不會說。
-function boardGoLogin() {
+function boardGoLogin(tabOverride) {
   let target = 'board/index.html';
   if (BOARD_DEEP) {
     target += '?tab=' + encodeURIComponent(BOARD_DEEP.tab) + (BOARD_DEEP.id ? '&id=' + encodeURIComponent(BOARD_DEEP.id) : '');
+  } else if (tabOverride) {
+    // 中途過期時按「重新登入」：回來要落在他剛才那個頁籤，不是從公告重新找一次。
+    // Portal 的 safeNext() 只放行 tab／id 兩個參數且值限定 [A-Za-z0-9_-]，頁籤名都符合。
+    target += '?tab=' + encodeURIComponent(tabOverride);
   }
   window.location.replace('../index.html?next=' + encodeURIComponent(target));
 }
@@ -2323,13 +2362,83 @@ function boardToast(msg) {
   t.textContent = msg; t.classList.add('show');
   clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('show'), 2600);
 }
-// 認證失敗（session 過期/未登入）統一提示，一次頁面載入只提醒一次
+// ═══════════════════════════════════════════════
+// 認證失效：紅色橫幅（比照 admin v2.37／kms v2.42）
+//
+// 🔴 這裡原本只是一個 2.6 秒就消失、而且一次載入只跳一次的 toast。
+//    但 session 過期的語意是「從這一刻起，這個分頁什麼都讀不到、什麼都存不了」——
+//    那是要一直看得到的事實，不是一則通知。2026-09-25 Woody 貼上來的 console
+//    正是這個形狀：一整排 woody_reports 401，畫面上沒有任何地方說得出原因，
+//    所以他只能一直重按（同一個網址連打了六次）。
+//
+// 🔴 橫幅出現之後 sbSessionAlive() 一律回 false，所有請求就地停住。
+//    重點不是省流量，是不要再讓畫面繼續假裝自己在運作。
+// ═══════════════════════════════════════════════
 let _sbAuthWarned = false;
-function sbNoteAuth(status) {
-  if (status === 401 && !_sbAuthWarned) {
-    _sbAuthWarned = true;
-    boardToast(BT('t_session_expired'));
+function sbAuthLost() {
+  if (_sbAuthWarned) return;
+  _sbAuthWarned = true;
+  const bar = document.getElementById('sb-authbar');
+  if (bar) {
+    bar.innerHTML = '⚠️ ' + escHtml(BT('t_auth_lost')) +
+      ' <button type="button" onclick="boardRelogin()">' + escHtml(BT('b_relogin')) + '</button>';
+    bar.style.display = 'block';
   }
+  try { boardToast(BT('t_auth_lost')); } catch (e) {}
+}
+/* 🔴 只認 401，不要「順手」把 403 也收進來：sb-proxy 對事前驗屍的 phase／
+   ai_summary、投票、聊天訊息都用 403 表示「這件事不歸你做」，那是正常的拒絕，
+   不是登入失效。把它當成 session 過期會讓整個分頁因為一次越權嘗試就停擺。 */
+function sbNoteAuth(status) { if (status === 401) sbAuthLost(); }
+function sbSessionAlive() {
+  if (_sbAuthWarned) return false;
+  if (readPortalSession()) return true;
+  sbAuthLost();
+  return false;
+}
+/* 「重新登入」會離開這一頁。編輯器裡如果還有沒存檔的東西，不先暫存起來，
+   等於是我們自己按鈕把使用者的稿子弄丟的。 */
+function boardRelogin() {
+  try { boardRescueStash(); } catch (e) {}
+  _boardDirty = false;          // 已經暫存過，不必再被 beforeunload 攔一次
+  const el = document.querySelector('.maintab.on');
+  boardGoLogin((el && el.dataset.tab) || '');
+}
+
+// ═══════════════════════════════════════════════
+// 未存檔內容的救援暫存（週會紀錄／Woody 週報）
+//
+// 🔴 只在兩個時刻寫：存檔失敗、以及按下「重新登入」。
+//    不是每次打字就寫 —— 那會把「我剛剛刻意刪掉的那段」也存起來，下次冒出來
+//    只會讓人以為系統壞了，而且等於偷偷做掉 2026-08-11 已經否決的自動存檔。
+//    這兩個時刻的共同點是「使用者沒有別的辦法自救」。
+// 🔴 存檔成功一定要清掉，否則下次載入會拿一份舊的來問。
+//    業務會議記錄有自己的草稿機制（comart-board-mm-draft-v1），不走這一套。
+// ═══════════════════════════════════════════════
+const BOARD_RESCUE_KEY = 'comart-board-rescue-v1';
+function boardRescueSave(kind, state) {
+  try { localStorage.setItem(BOARD_RESCUE_KEY, JSON.stringify({ kind: kind, at: Date.now(), state: state })); } catch (e) {}
+}
+function boardRescueClear() { try { localStorage.removeItem(BOARD_RESCUE_KEY); } catch (e) {} }
+function boardRescueStash() {
+  if (!_boardDirty) return;
+  const wr = document.getElementById('wr-editor-view');
+  const wm = document.getElementById('wm-editor-view');
+  if (wr && wr.style.display !== 'none' && wrState) boardRescueSave('wr', wrState);
+  else if (wm && wm.style.display !== 'none' && wmState) boardRescueSave('wm', wmState);
+}
+function boardRescueOffer() {
+  let r = null;
+  try { r = JSON.parse(localStorage.getItem(BOARD_RESCUE_KEY) || 'null'); } catch (e) {}
+  if (!r || !r.state || (r.kind !== 'wr' && r.kind !== 'wm')) return;
+  boardRescueClear();          // 問過一次就不再問第二次（答「不要」也是一種答覆）
+  const what = BT(r.kind === 'wr' ? 'nav_woody' : 'nav_weekly');
+  let when = ''; try { when = new Date(r.at || Date.now()).toLocaleString(); } catch (e) {}
+  if (!confirm(BT('b_rescue_ask', { what: what, when: when }))) return;
+  if (r.kind === 'wr') { switchTab('woody'); wrState = r.state; wrOpenEditor(); }
+  else { switchTab('weekly'); wmState = r.state; _wmEditId = r.state.id || null; wmOpenEditor(); }
+  boardMarkDirty();            // *OpenEditor() 會 clearDirty，但這份本來就還沒存檔
+  boardToast(BT('b_rescue_done'));
 }
 
 // 介面用（跟著語言切換）
@@ -2689,7 +2798,9 @@ function wmNewRecord() {
 async function wmOpenRecord(id) {
   try {
     const rows = await SB.get('weekly_minutes', '?id=eq.' + encodeURIComponent(id));
-    const r = rows && rows[0];
+    // null ＝ 查詢失敗（含 401），[] 才是真的沒有這一筆
+    if (rows === null) { boardToast(BT('t_load_failed')); return; }
+    const r = rows[0];
     if (!r) { boardToast(BT('t_not_found')); return; }
     _wmEditId = id;
     wmState = {
@@ -2973,7 +3084,12 @@ async function wmSave() {
   if (!s.id) { row.created_by = PORTAL_SESSION.empId; row.created_at = new Date().toISOString(); }
   try {
     await SB.upsert('weekly_minutes', row);
-  } catch(e) { boardToast(BT('t_save_failed') + '：' + e.message); return; }
+  } catch(e) {
+    boardRescueSave('wm', s);          // 同 wrSave：失敗的當下先把稿子留住
+    boardToast(BT('t_save_failed') + '：' + e.message + '　' + BT('b_rescue_kept'));
+    return;
+  }
+  boardRescueClear();
   s.id = row.id; _wmEditId = row.id;
   boardToast(BT('t_saved'));
   wmBackToList();
@@ -3811,7 +3927,8 @@ function wrIsWoody(){ return PORTAL_SESSION && PORTAL_SESSION.empId === 'C00001'
 async function wrOpenReport(id){
   try{
     const rows = await SB.get('woody_reports', '?id=eq.'+encodeURIComponent(id));
-    const r = rows && rows[0];
+    if(rows === null){ boardToast(BT('t_load_failed')); return; }   // 查詢失敗 ≠ 沒有這一筆
+    const r = rows[0];
     if(!r){ boardToast(BT('wr_not_found')); return; }
     wrState = { id:r.id, report_date:r.report_date, work:r.work||'', plan:r.plan||'', reflections:r.reflections||'', intel:r.intel||'', feedback:r.feedback||'', other:r.other||'', author_id:r.author_id||'', author_name:r.author_name||'' };
     wrOpenEditor();
@@ -3833,7 +3950,8 @@ function wrOpenRead(id){
   const wait = escHtml(BT('loading'));
   w.document.write('<!doctype html><meta charset="utf-8"><title>'+wait+'</title><body style="font-family:sans-serif;padding:40px;color:#666">'+wait+'</body>');
   SB.get('woody_reports', '?id=eq.'+encodeURIComponent(id)).then(rows => {
-    const r = rows && rows[0];
+    if(rows === null){ w.document.body.innerHTML = escHtml(BT('t_load_failed')); return; }
+    const r = rows[0];
     if(!r){ w.document.body.innerHTML = escHtml(BT('wr_not_found')); return; }
     w.document.open(); w.document.write(wrFullDocHTML(r)); w.document.close();
   }).catch(() => { try{ w.document.body.innerHTML = escHtml(BT('t_load_failed')); }catch(e){} });
@@ -3911,7 +4029,14 @@ async function wrSave(){
   _wrSaving = true;
   const btn = document.getElementById('wr-save-btn'); if(btn){ btn.disabled = true; }
   try{ await SB.upsert('woody_reports', row); }
-  catch(e){ boardToast(BT('t_save_failed')+'：'+e.message); _wrSaving=false; if(btn)btn.disabled=false; if(isNew) s.id=null; return; }
+  catch(e){
+    /* 🔴 存檔失敗時內容只活在這個分頁的表單裡。使用者接下來最可能做的事
+       （重新登入、重新整理、關掉）每一件都會把它弄掉，所以先暫存一份。 */
+    boardRescueSave('wr', s);
+    boardToast(BT('t_save_failed')+'：'+e.message+'　'+BT('b_rescue_kept'));
+    _wrSaving=false; if(btn)btn.disabled=false; if(isNew) s.id=null; return;
+  }
+  boardRescueClear();          // 已經存進資料庫了，暫存那一份要清掉，否則下次載入會拿舊的來問
   _wrSaving = false; if(btn) btn.disabled = false;
   boardToast(BT('bm_saved'));
   wrBackToList();
@@ -5315,7 +5440,8 @@ async function pmCreateSubmit() {
 // ── 開啟會議室 ──
 async function pmOpen(id) {
   const rows = await SB.get('premortem_sessions', '?id=eq.' + encodeURIComponent(id));
-  const s = rows && rows[0];
+  if (rows === null) { boardToast(BT('t_load_failed')); return; }   // 查詢失敗 ≠ 沒有這一場
+  const s = rows[0];
   if (!s) { boardToast(BT('pm_session_not_found')); return; }
   if (!pmCanSee(s)) { boardToast(BT('pm_out_of_scope')); return; }
   s.kind = s.kind || 'premortem';     // 舊資料沒有 kind
@@ -7064,7 +7190,8 @@ async function plCreateSubmit() {
 // ── 房間 ──
 async function plOpen(id) {
   const rows = await SB.get('poll_sessions', '?id=eq.' + encodeURIComponent(id));
-  const s = rows && rows[0];
+  if (rows === null) { boardToast(BT('t_load_failed')); return; }   // 查詢失敗 ≠ 沒有這一場
+  const s = rows[0];
   if (!s) { boardToast(BT('pl_t_not_found')); return; }
   if (!plCanSee(s)) { boardToast(BT('pl_t_not_in_scope')); return; }
   plSession = s;
@@ -7423,7 +7550,11 @@ async function initBoard() {
       const scope = rec.scope || (rec.data && rec.data.scope) || PORTAL_SESSION.site;
       if (!isNew) {
         const existing = await SB.get('biz_meeting_minutes', '?id=eq.' + encodeURIComponent(id) + '&select=site');
-        const ownerScope = existing && existing[0] && existing[0].site;
+        /* 🔴 查不成功就不要往下走：null 時 ownerScope 是 undefined，底下那個
+           bizCanEdit 判斷會整條跳過 —— 一次 401 就等於把編輯權限檢查關掉。
+           「讀不到」要當成「不准」，不是「沒有限制」。 */
+        if (existing === null) throw new Error(BT('t_load_failed'));
+        const ownerScope = existing[0] && existing[0].site;
         if (ownerScope && !bizCanEdit(ownerScope)) throw new Error(BT('bm_no_perm_scope'));
       }
       const row = {
@@ -7442,7 +7573,9 @@ async function initBoard() {
     },
     load: async function(id) {
       const rows = await SB.get('biz_meeting_minutes', '?id=eq.' + encodeURIComponent(id));
-      const r = rows && rows[0];
+      // null ＝ 查詢失敗；回 null 會被 loadRecord 說成「找不到該筆紀錄」
+      if (rows === null) throw new Error(BT('t_load_failed'));
+      const r = rows[0];
       if (!r) return null;
       return { id: r.id, title: r.title, savedAt: r.updated_at, data: r.data, view: r.view, site: r.site };
     },
@@ -7455,6 +7588,11 @@ async function initBoard() {
   // 深層連結：直接開到指定頁籤／指定那一場；沒有就照預設進公告
   if (BOARD_DEEP) await boardOpenDeep();
   else bbLoad();
+
+  /* 🔴 救援詢問一定要放在最後：boardOpenDeep() 會 switchTab()，擺在它前面
+     等於還原完又被切走；而且還原會把 _boardDirty 設成 true，那個 switchTab
+     就會再彈一次「尚未存檔」——使用者剛答應還原，馬上被問要不要放棄。 */
+  try { boardRescueOffer(); } catch (e) {}
 }
 
 // 深層連結的落點。

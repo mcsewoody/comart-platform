@@ -103,7 +103,7 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 
 | File | Version | Purpose | ~Lines |
 |------|---------|---------|--------|
-| `index.html` | v2.05 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
+| `index.html` | v2.06 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
 | `admin/index.html` | v2.40 | Admin System — room booking, fleet, visitor, library, lottery | 5,650 |
 | `kms/index.html` | v2.41 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
 | `quotation/index.html` | v3.60 | Quotation & CRM system | 7,332 |
@@ -556,6 +556,34 @@ python3 scripts/i18n-audit.py         # Portal 專用（key 沒引號：btn_save
 > 大廳只是 `chat_sessions` 裡一列固定 id 的場次。
 > 本節以下所有內容仍然成立，只是名字換了；i18n key 仍叫 `ai_tab_live`／函式仍是 `lc*`
 > （**改名時刻意不重新命名識別字**：那會讓下一次追問題變成「是搬壞了還是改名改壞了」兩件事）。
+
+### 🔴 Portal 的 session 過期會說「這場對話已經不存在了」（v2.06 修，2026-09-25）
+
+Portal 原本**整份檔案 grep 不到 `401`** —— 對認證失效沒有任何處理。
+補上的三件與 board v1.91 相同（`#sb-authbar` 紅色橫幅、`sbSessionAlive()`
+本機先檢查、401 只認 401 不收 403），另有兩個 Portal 自己的坑：
+
+- 🔴 **`lcPoll` 把 401 當成「整場被開啟者刪掉了」。**
+  ```js
+  if (!srow || !srow.length) { lcPollStop(); toast(t('lc_gone')); lcBackToList(); }
+  ```
+  `SB.get` 失敗回 `null`、查得到但沒有回 `[]`。混為一談的代價在這裡不只是講錯話，
+  是**跳出提示 ＋ 把人踢出房間 ＋ 宣告一份還在資料庫裡的對話已經消失**。
+  而且必定發生：**聊天大廳是 AI 區的預設頁籤、`status` 永遠是 `open`**，
+  所以分頁開著過夜的人在過期後 **3 秒內**就會看到它。現在 `null` 直接 `return`
+  跳過這一輪（下一輪再試），只有 `[]` 才說 `lc_gone`；`lcOpen` 同一句話同樣分開。
+  ⚠️ **這一段同時保護冷啟與併發上限**：那兩種情況也是回 `null`，
+  以前一樣會被說成「這場對話不存在」。
+- 🔴 **`SB.upsert` 的 `.catch(()=>[])` 把 PATCH 的錯誤吞掉再改送 POST。**
+  401 之後補一個 POST 只會再撞一次（既有列的話是 409 duplicate key），
+  **兩個錯誤都不見了** —— 與 admin v2.37 那台「顯示已歸還、其實還在使用中」的
+  公務車是同一個形狀。現在只有「PATCH 成功但沒有符合的列」才改送 POST。
+- **橫幅是 `position:fixed` ＋ 量出來的高度推版面**（`shell.paddingTop` 與
+  `.topbar` 的 `top` 兩個都要推，後者是 sticky，不推會捲到橫幅底下）。
+  board 那邊可以直接塞進 `.topbar` 裡是因為它是 block 容器；
+  Portal 的 `.topbar` 是 `display:flex; height:56px`，塞不進去。
+- 「重新登入」＝ `location.reload()`（Portal 自己就是登入頁）。
+  按之前會檢查 `#lc-input` 還有沒有沒送出的字，有就先問一聲。
 
 ### 🏛 聊天大廳 Lobby（v2.05，2026-09-25，migration 202609250001）
 
@@ -1339,8 +1367,7 @@ v1.94 只做在 Portal，但**同事被邀請的時候人常常在 KMS 或報價
   設成 true，那個 switchTab 就會再彈一次「尚未存檔」—— 使用者剛答應還原，
   馬上被問要不要放棄。
 - 業務會議記錄有自己的草稿機制（`comart-board-mm-draft-v1`），不走這一套。
-- ⚠️ **Portal 與報價系統還沒有這道橫幅**（admin v2.37／kms v2.42／board v1.91 有）。
-  Portal 的群組對話是 3 秒輪詢，過期後的 401 量比 board 大得多。
+- ✅ Portal v2.06 已補上同一套（見下節）；**報價系統仍然沒有**。
 
 ## Board 重要細節
 

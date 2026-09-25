@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>COMART Platform v2.05</title>
+<title>COMART Platform v2.06</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script defer src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.js"></script>
 <style>
@@ -49,6 +49,11 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:
 .shell.show{display:flex;}
 
 /* Topbar */
+/* 認證失效橫幅：position:fixed ＋ 量出來的高度推版面。
+   🔴 高度不可寫死：五種語言 × 視窗寬度，這條字會換行（kms v2.42 記載過）。
+   .topbar 是 sticky top:0，所以它的 top 也要一起推，否則捲動時會鑽到橫幅底下。*/
+#sb-authbar{display:none;position:fixed;top:0;left:0;right:0;z-index:9999;background:#3a1416;color:#ffb4ac;border-bottom:1px solid #b3261e;padding:8px 16px;font-size:13px;font-weight:600;text-align:center;line-height:1.6}
+#sb-authbar button{margin-left:10px;background:#b3261e;color:#fff;border:0;border-radius:6px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit}
 .topbar{background:rgba(17,24,39,.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--br);display:flex;align-items:center;padding:0 20px;height:56px;gap:12px;position:sticky;top:0;z-index:100;}
 .topbar-logo{display:flex;align-items:center;gap:9px;text-decoration:none;cursor:pointer;}
 .topbar-mark{width:30px;height:30px;background:var(--ac);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-style:italic;font-size:15px;color:#fff;}
@@ -404,7 +409,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     <div class="login-logo">
       <div class="login-mark" style="background:transparent"><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="44" height="23"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></div>
       <div class="login-name">COMART Platform</div>
-      <div class="login-sub">Internal Portal · v2.05</div>
+      <div class="login-sub">Internal Portal · v2.06</div>
     </div>
     <form id="loginForm" onsubmit="doLogin();return false;" autocomplete="on">
     <div class="field">
@@ -465,6 +470,8 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   </div>
 </div>
 
+<div id="sb-authbar"></div>
+
 <!-- ═══ SHELL ═══ -->
 <div class="shell" id="shell">
 
@@ -472,7 +479,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   <div class="topbar">
     <div class="topbar-logo" onclick="switchView('home')">
       <div class="topbar-mark" style="background:transparent"><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="26" height="14"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></div>
-      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v2.05</span></div>
+      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v2.06</span></div>
     </div>
     <div class="topbar-right">
       <div class="lang-switcher">
@@ -2632,6 +2639,59 @@ function sbHdrs(extra) {
   const s = SESSION || readSession() || {};
   return Object.assign({ 'x-session': s.sig || '', 'Content-Type': 'application/json' }, extra || {});
 }
+
+// ═══════════════════════════════════════════════
+// 認證失效：紅色橫幅（比照 admin v2.37／kms v2.42／board v1.91）
+//
+// 🔴 Portal 原本對 401 沒有任何處理（整份檔案 grep 不到 401）。
+//    最會踩到的是聊天大廳：它是 AI 區的預設頁籤、status 永遠是 open，
+//    所以分頁開著過夜 ＝ 每 3 秒一個 401，每小時 1,200 個，
+//    而畫面上唯一的反應是「這場對話已經不存在了」（見 lcPoll 的修正）。
+// 🔴 橫幅出現後 sbSessionAlive() 一律回 false，請求就地停住 ——
+//    重點不是省流量，是不要再讓畫面繼續假裝自己在運作。
+// ═══════════════════════════════════════════════
+let _authLost = false;
+function sbAuthLost() {
+  if (_authLost) return;
+  const shell = document.getElementById('shell');
+  // 還在登入畫面（尚未登入）不是「過期」，不要在登入框上面壓一條紅字
+  if (!shell || !shell.classList.contains('show')) return;
+  _authLost = true;
+  const bar = document.getElementById('sb-authbar');
+  if (bar) {
+    bar.innerHTML = '⚠️ ' + escHtml(t('auth_lost')) +
+      ' <button type="button" onclick="portalRelogin()">' + escHtml(t('btn_relogin')) + '</button>';
+    bar.style.display = 'block';
+    // 量出來再推：這條字會換行，高度隨語言與視窗寬度改變
+    const h = bar.offsetHeight;
+    shell.style.paddingTop = h + 'px';
+    const tb = document.querySelector('.topbar');
+    if (tb) tb.style.top = h + 'px';
+  }
+  try { toast(t('auth_lost'), 'err'); } catch (e) {}
+}
+/* 🔴 只認 401。sb-proxy 用 403 表示「這件事不歸你做」（聊天訊息的欄位守衛、
+   join_code 不符、大廳不可刪…），那是正常的拒絕，不是登入失效 ——
+   收進來會讓整個分頁因為一次越權嘗試就停擺。 */
+function sbNoteAuth(status) { if (status === 401) sbAuthLost(); }
+/* 🔴 本機這一道不可省：readSession() 只在載入時跑一次，分頁開一整天之後
+   expires 早就過了。只等伺服器回 401 的話，每一次操作都要先送出一個
+   注定失敗的請求，而畫面上完全看不出來。
+   身分來源比照 sbHdrs：先看記憶體裡的 SESSION（localStorage 配額爆滿時
+   寫不進去，但那一份仍然有效）。 */
+function sbSessionAlive() {
+  if (_authLost) return false;
+  const s = SESSION || readSession();
+  if (s && s.expires && Date.now() < s.expires) return true;
+  sbAuthLost();
+  return false;
+}
+function portalRelogin() {
+  // 輸入框裡還有沒送出的字就先問一聲：重新載入會把它弄掉
+  const inp = document.getElementById('lc-input');
+  if (inp && inp.value.trim() && !confirm(t('auth_relogin_unsaved'))) return;
+  location.reload();   // session 已過期 → readSession() 回 null → 落在登入畫面
+}
 // 頭像等外部 URL 僅允許 http(s) 與 data:image，並跳脫屬性字元，防儲存型 XSS
 function safeUrl(u) {
   u = String(u || '');
@@ -2642,6 +2702,7 @@ const SB = {
   get _h() { return sbHdrs(); },
   _url: t => `${SB_WORKER}/supabase/rest/v1/${t}`,
   async get(table, qs='') {
+    if (!sbSessionAlive()) return null;
     const url = `${this._url(table)}${qs?'?'+qs:''}`;
     // 重試一次：edge function 冷啟或撞到併發上限時，Supabase gateway 會直接回錯誤，
     // 那層回應「沒有 CORS 標頭」，瀏覽器一律報成 CORS blocked / ERR_FAILED（fetch reject）。
@@ -2650,6 +2711,7 @@ const SB = {
       try {
         const res = await fetch(url, {headers:this._h});
         if (res.ok) return res.json();
+        if (res.status === 401) { sbAuthLost(); return null; }
         if (res.status < 500 || attempt) { console.warn('SB.get',table,res.status); return null; }
       } catch (e) {
         if (attempt) { console.warn('SB.get',table,'network:',e.message); return null; }
@@ -2658,10 +2720,21 @@ const SB = {
     }
     return null;
   },
-  async post(table, data) { const res = await fetch(this._url(table),{method:'POST',headers:this._h,body:JSON.stringify(data)}); if(!res.ok){const e=await res.text();throw new Error(`SB.post ${table}: ${e}`);} },
-  async patch(table, qs, data) { const res = await fetch(`${this._url(table)}?${qs}`,{method:'PATCH',headers:{...this._h,Prefer:'return=representation'},body:JSON.stringify(data)}); if(!res.ok){const e=await res.text();throw new Error(`SB.patch ${table}: ${e}`);} return res.json(); },
-  async delete(table, qs) { const res = await fetch(`${this._url(table)}?${qs}`,{method:'DELETE',headers:this._h}); if(!res.ok) throw new Error('delete '+table+' HTTP '+res.status); },
-  async upsert(table, data, pk='id') { const pkVal=data[pk]; if(!pkVal) return this.post(table,data); const patched=await this.patch(table,`${pk}=eq.${encodeURIComponent(pkVal)}`,data).catch(()=>[]); if(patched&&patched.length>0) return; return this.post(table,data); }
+  async post(table, data) { if(!sbSessionAlive()) throw new Error(t('auth_lost')); const res = await fetch(this._url(table),{method:'POST',headers:this._h,body:JSON.stringify(data)}); if(!res.ok){sbNoteAuth(res.status); const e=await res.text();throw new Error(`SB.post ${table}: ${e}`);} },
+  async patch(table, qs, data) { if(!sbSessionAlive()) throw new Error(t('auth_lost')); const res = await fetch(`${this._url(table)}?${qs}`,{method:'PATCH',headers:{...this._h,Prefer:'return=representation'},body:JSON.stringify(data)}); if(!res.ok){sbNoteAuth(res.status); const e=await res.text();throw new Error(`SB.patch ${table}: ${e}`);} return res.json(); },
+  async delete(table, qs) { if(!sbSessionAlive()) throw new Error(t('auth_lost')); const res = await fetch(`${this._url(table)}?${qs}`,{method:'DELETE',headers:this._h}); if(!res.ok){ sbNoteAuth(res.status); throw new Error('delete '+table+' HTTP '+res.status); } },
+  async upsert(table, data, pk='id') {
+    const pkVal = data[pk];
+    if (!pkVal) return this.post(table, data);
+    /* 🔴 這裡原本是 .catch(()=>[])：PATCH 失敗被整個吞掉，然後改送 POST。
+       401 之後補一個 POST 只會再撞一次（既有列的話是 409 duplicate key），
+       而**兩個錯誤都不見了** —— CLAUDE.md 記載的 admin v2.37 公務車事件
+       （畫面顯示已歸還、資料庫還是使用中）就是這個形狀。
+       只有「PATCH 成功但沒有符合的列」才該改送 POST。 */
+    const patched = await this.patch(table, `${pk}=eq.${encodeURIComponent(pkVal)}`, data);
+    if (patched && patched.length > 0) return;
+    return this.post(table, data);
+  }
 };
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,8); }
 
@@ -3124,6 +3197,9 @@ const I18N = {
     lc_kept:'Conversation ended and saved', lc_discarded:'Conversation deleted',
     lc_end_failed:'Could not end the conversation - nothing was saved. Please try again.', lc_ended:'Ended',
     lc_host_ended:'The host has ended this conversation.', lc_gone:'This conversation no longer exists.',
+    auth_lost:'Your session has expired — this tab can no longer read or save anything.',
+    btn_relogin:'Sign in again', t_load_failed:'Could not load — please try again',
+    auth_relogin_unsaved:'You have text that has not been sent. Reloading will discard it. Sign in again anyway?',
     lc_empty_room:'No messages yet.', lc_translating:'Translating...',
     lc_tr_failed:'Translation failed', lc_retry:'Retry',
     lc_tr_stuck:'Translation did not finish',
@@ -3260,6 +3336,9 @@ const I18N = {
     lc_kept:'對話已結束並保留', lc_discarded:'對話已刪除',
     lc_end_failed:'結束失敗，剛才的操作沒有存檔，請再試一次。', lc_ended:'已結束',
     lc_host_ended:'開啟者已結束這場對話。', lc_gone:'這場對話已經不存在了。',
+    auth_lost:'登入已過期 —— 這個分頁現在讀不到、也存不了任何資料。',
+    btn_relogin:'重新登入', t_load_failed:'載入失敗，請再試一次',
+    auth_relogin_unsaved:'輸入框裡還有沒送出的字，重新載入會把它弄掉。仍要重新登入嗎？',
     lc_empty_room:'還沒有人發言。', lc_translating:'翻譯中…',
     lc_tr_failed:'翻譯失敗', lc_retry:'重試',
     lc_tr_stuck:'翻譯似乎沒有完成',
@@ -3389,6 +3468,9 @@ const I18N = {
     lc_kept:'对话已结束并保留', lc_discarded:'对话已删除',
     lc_end_failed:'结束失败，刚才的操作没有存档，请再试一次。', lc_ended:'已结束',
     lc_host_ended:'开启者已结束这场对话。', lc_gone:'这场对话已经不存在了。',
+    auth_lost:'登录已过期 —— 这个标签页现在读不到、也存不了任何数据。',
+    btn_relogin:'重新登录', t_load_failed:'加载失败，请再试一次',
+    auth_relogin_unsaved:'输入框里还有没送出的字，重新载入会把它弄掉。仍要重新登录吗？',
     lc_empty_room:'还没有人发言。', lc_translating:'翻译中…',
     lc_tr_failed:'翻译失败', lc_retry:'重试',
     lc_tr_stuck:'翻译似乎没有完成',
@@ -3516,6 +3598,9 @@ const I18N = {
     lc_kept:'Đã kết thúc và lưu lại', lc_discarded:'Đã xóa cuộc trò chuyện',
     lc_end_failed:'Không kết thúc được, thao tác vừa rồi chưa được lưu. Vui lòng thử lại.', lc_ended:'Đã kết thúc',
     lc_host_ended:'Người mở đã kết thúc cuộc trò chuyện này.', lc_gone:'Cuộc trò chuyện này không còn tồn tại.',
+    auth_lost:'Phiên đăng nhập đã hết hạn — thẻ này không còn đọc hay lưu được dữ liệu nào.',
+    btn_relogin:'Đăng nhập lại', t_load_failed:'Tải thất bại — vui lòng thử lại',
+    auth_relogin_unsaved:'Bạn còn nội dung chưa gửi. Tải lại trang sẽ mất nội dung đó. Vẫn đăng nhập lại chứ?',
     lc_empty_room:'Chưa có tin nhắn nào.', lc_translating:'Đang dịch…',
     lc_tr_failed:'Dịch không thành công', lc_retry:'Thử lại',
     lc_tr_stuck:'Bản dịch chưa hoàn tất',
@@ -3641,6 +3726,9 @@ const I18N = {
     lc_kept:'会話を終了し保存しました', lc_discarded:'会話を削除しました',
     lc_end_failed:'終了できませんでした。先ほどの操作は保存されていません。もう一度お試しください。', lc_ended:'終了',
     lc_host_ended:'開始者がこの会話を終了しました。', lc_gone:'この会話はすでに存在しません。',
+    auth_lost:'ログインの有効期限が切れました —— このタブではデータの読み込みも保存もできません。',
+    btn_relogin:'再ログイン', t_load_failed:'読み込みに失敗しました。もう一度お試しください',
+    auth_relogin_unsaved:'未送信の入力が残っています。再読み込みすると失われます。再ログインしますか？',
     lc_empty_room:'まだ発言がありません。', lc_translating:'翻訳中…',
     lc_tr_failed:'翻訳に失敗しました', lc_retry:'再試行',
     lc_tr_stuck:'翻訳が完了していないようです',
@@ -4793,7 +4881,8 @@ async function lcCreate() {
 // ─── 房間 ───
 async function lcOpen(id) {
   var rows = await SB.get('chat_sessions', 'id=eq.' + encodeURIComponent(id) + '&limit=1');
-  if (!rows || !rows.length) { toast(t('lc_gone'), 'err'); lcLoadList(); return; }
+  if (rows === null) { toast(t('t_load_failed'), 'err'); return; }   // 查詢失敗 ≠ 這場不存在
+  if (!rows.length) { toast(t('lc_gone'), 'err'); lcLoadList(); return; }
   // 從 ?lc= 深層連結進來時清單還沒載過，lcVisited 是 null —— 已結束的公開場次
   // 會因此被誤判成「沒進來過」。先補載一次再判斷。
   if (!lcVisited) await lcLoadVisited();
@@ -5207,6 +5296,11 @@ function lcPollStop() {
 
 async function lcPoll() {
   if (!lcSession) { lcPollStop(); return; }
+  /* 🔴 session 過期就停下來。少了這一行，下面那個「整場被刪掉了」的判斷會把
+     401 當成「這場不見了」，跳提示、把人趕回清單 —— 而聊天大廳是預設頁籤、
+     永遠 open，所以分頁開著過夜的人一定會在過期後 3 秒內看到它宣告
+     一個還好端端在資料庫裡的對話已經消失。 */
+  if (!sbSessionAlive()) { lcPollStop(); return; }
   var sid = lcSession.id;
   // 在線名單：心跳 30 秒、重讀 15 秒，兩者都自己節流（訊息輪詢是 3 秒，
   // 跟著跑會讓房裡 5 個人每分鐘打上百次請求）
@@ -5217,12 +5311,16 @@ async function lcPoll() {
 
     // 1) 開啟者結束了這場？（結束後就不該再收發）
     var srow = await SB.get('chat_sessions', 'id=eq.' + encodeURIComponent(sid) + '&select=status,keep,title&limit=1');
-    if (srow && srow.length && srow[0].status !== 'open') {
+    /* 🔴 null ＝ 查詢失敗（401、冷啟、併發上限都會回 null），[] 才是「這一場真的
+       不在了」。兩者混為一談的代價是一句假話 ＋ 把人踢出房間 ＋ 宣告一份還在的
+       資料已經消失。查不成功就跳過這一輪，下一輪（3 秒後）再試。 */
+    if (srow === null) return;
+    if (srow.length && srow[0].status !== 'open') {
       lcSession.status = srow[0].status; lcSession.keep = srow[0].keep;
       lcPollStop(); lcShowRoom(); toast(t('lc_host_ended'));
       return;
     }
-    if (!srow || !srow.length) {   // 整場被開啟者刪掉了（選了「不保留」）
+    if (!srow.length) {   // 整場被開啟者刪掉了（選了「不保留」）
       lcPollStop(); toast(t('lc_gone')); lcBackToList(); return;
     }
 

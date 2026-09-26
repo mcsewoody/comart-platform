@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART 行政管理平台 v2.44</title>
+<title>COMART 行政管理平台 v2.45</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -673,7 +673,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="logo">
     <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
     <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
-    <span><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="38" height="20" style="display:inline-block;vertical-align:middle;margin-top:-2px"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v2.44</span>
+    <span><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="38" height="20" style="display:inline-block;vertical-align:middle;margin-top:-2px"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v2.45</span>
   </div>
   <div class="trr">
     <div id="global-site-bar" style="display:flex;align-items:center;gap:4px"><span style="font-size:13px;color:var(--text-3);white-space:nowrap;font-weight:500" data-i18n="g.site_label">單位：</span>
@@ -2380,6 +2380,196 @@ const ADMIN_I18N = {
     'g.toast.import_fail':'Import failed: ',
     'lib.hint.limited':'Showing the %d newest of %d — use the search box',
     'lib.btn.borrow':'Borrow',
+    'visit.total_ntd':'Total NT$%s',
+    'room.auto_released':'🔓 Auto-released: %s',
+    'visit.unit.tw':'Taiwan HQ',
+    'visit.unit.dg':'Dongguan Plant',
+    'visit.unit.vn':'Vietnam Plant',
+    'visit.type.client':'Existing customer',
+    'visit.type.potential':'Prospect',
+    'visit.type.supplier':'Supplier',
+    'visit.type.partner':'Partner',
+    'visit.type.gov':'Government / Media',
+    'visit.type.other':'Other',
+    'visit.task.pickup':'Airport pickup',
+    'visit.task.dropoff':'Airport drop-off',
+    'visit.task.transfer':'Transfer',
+    'visit.task.hotel':'Accommodation',
+    'visit.task.breakfast':'Breakfast',
+    'visit.task.lunch':'Lunch',
+    'visit.task.dinner':'Dinner',
+    'visit.task.factory':'Factory tour',
+    'visit.task.meeting':'Business meeting',
+    'visit.task.demo':'Product demo',
+    'visit.task.contract':'Contract signing',
+    'visit.task.other':'Other',
+    'visit.cost.transport':'Transport',
+    'visit.cost.hotel':'Accommodation',
+    'visit.cost.meals':'Meals',
+    'visit.cost.gifts':'Gifts',
+    'visit.cost.misc':'Miscellaneous',
+    'visit.cost.other':'Other',
+    'visit.stat.upcoming':'Upcoming',
+    'visit.stat.ongoing':'In progress',
+    'visit.stat.month':'Visits this month',
+    'visit.stat.month_cost':'Hosting cost this month',
+    'visit.stat.unit':'',
+    'visit.alert.task_open':'%s · %s not done yet',
+    'visit.owner_prefix':'Owner: ',
+    'visit.tasks_done':'Tasks %d/%d done',
+    'visit.guests_n':'%d guests',
+    'visit.headcount_n':'%d people',
+    'visit.btn.detail':'View details',
+    'visit.btn.detail_s':'Details',
+    'visit.btn.edit':'Edit',
+    'visit.btn.delete':'Delete',
+    'visit.btn.close':'Close',
+    'visit.btn.broadcast':'🚨 Urgent broadcast',
+    'visit.btn.doc':'📄 Itinerary',
+    'visit.pick_from_db':'Pick from the database…',
+    'visit.conf.clear':'Clear the form?',
+    'visit.toast.cleared':'Form cleared',
+    'visit.ph.guest_note':'Notes',
+    'visit.no_guests':'No guests added yet',
+    'visit.btn.add_task':'＋ Task',
+    'visit.no_tasks':'Use "＋ Task" to add activities for the day',
+    'visit.ph.from':'From',
+    'visit.ph.to':'To',
+    'visit.ph.note':'Notes',
+    'visit.assign':'Assign…',
+    'visit.car.none':'No vehicle',
+    'visit.car.company':'Company car',
+    'visit.car.taxi':'Taxi / rental',
+    'visit.select_person':'Select a person…',
+    'visit.ph.escort_role':'Role (pickup / tour guide / meals)',
+    'visit.no_escorts':'No escorts added yet',
+    'visit.ph.cost_desc':'Description',
+    'visit.err.need_company':'Please enter the visiting company / organisation',
+    'visit.err.need_owner':'Please select the person in charge',
+    'visit.err.need_date':'Please enter the visit date',
+    'visit.toast.updated':'Visit itinerary updated',
+    'visit.toast.saved':'Visit itinerary saved',
+    'visit.detail_title':'%s visit details',
+    'visit.no_records':'No visit records',
+    'visit.g.visits_n':'%s visits',
+    'visit.g.last':'Last: %s',
+    'visit.g.spend':'Total spend NT$%s',
+    'visit.g.empty':'The guest database is empty',
+    'visit.g.add_first':'Add the first guest',
+    'visit.g.edit':'Edit guest',
+    'visit.g.add':'Add guest',
+    'visit.g.err_name':'Please enter a name',
+    'visit.g.err_company':'Please enter a company',
+    'visit.g.updated':'Guest details updated',
+    'visit.g.added':'Guest added to the database',
+    'visit.err.need_broadcast':'Please enter the broadcast message',
+    'visit.toast.broadcast':'Broadcast sent to everyone involved',
+    'visit.rpt.visits':'Visits',
+    'visit.rpt.cost_total':'Total hosting cost',
+    'visit.rpt.done':'Completed',
+    'visit.rpt.avg':'Average cost per visit',
+    'visit.unknown':'Unknown',
+    'lot.toast.reset':'Draw history cleared',
+    'lot.err.need_list':'Please build the participant list first',
+    'lot.all_drawn':'Everyone has been drawn — starting over',
+    'lot.people_n':'%d people',
+    'lot.remaining':'%d left',
+    'g.status_prefix':'Status: ',
+    'g.toast.updated':'Updated',
+    'g.other':'Other',
+    'g.yes':'Yes',
+    'g.no':'No',
+    'g.untitled':'(Untitled)',
+    'room.st.busy':'In use (%d min left)',
+    'room.st.meeting':'Meeting in progress',
+    'room.st.soon':'In use in %d min',
+    'room.st.starting':'Starting soon',
+    'room.st.free_all_day':'Free all day',
+    'room.st.bookable':'Available now',
+    'room.cap_fmt':'Up to %d people · %s',
+    'room.cap_only':'Capacity %d',
+    'room.cap_max':'Capacity: up to %d',
+    'room.over_cap':' ⚠ over capacity',
+    'room.over_cap_ppl':' ⚠ over capacity',
+    'room.faults_open':'⚠ %d fault(s) to fix',
+    'room.host_prefix':'Host: ',
+    'room.btn.quick_book':'＋ Quick booking',
+    'room.btn.checkin':'Check in',
+    'room.btn.cancel':'Cancel',
+    'room.btn.report_fault':'⚠ Report a fault',
+    'room.ev.meeting':'Meeting',
+    'room.ev.booking':'Booking',
+    'room.label':'Meeting room',
+    'room.inv.none':'(none selected)',
+    'room.inv.add':'＋ Add a participant…',
+    'room.slot.past':'Past',
+    'room.slot.full':'Full',
+    'room.slot.free_n':'%d free',
+    'room.err.need_date':'Please select a date',
+    'room.err.need_slot':'Please select a time slot',
+    'room.err.end_after_start':'The end time must be later than the start time',
+    'room.badge.conflict':'Clash',
+    'room.badge.recommended':'✓ Recommended',
+    'room.badge.bookable':'Available',
+    'room.badge.too_small':'Too small',
+    'room.rec_fmt':'👍 Recommended for %d',
+    'room.rec_fmt_long':'👍 Recommended for a %d-person meeting: %s',
+    'room.warn.booked':'⚠ Already booked: %s (%s)',
+    'room.err.need_room':'Please select a meeting room',
+    'room.err.need_room_first':'Please select a meeting room first',
+    'room.err.need_title':'Please enter a meeting title',
+    'room.err.slot_conflict':'⚠ Time slot clash — please choose another',
+    'room.toast.booked':'✓ Booked %s',
+    'room.all_rooms':'All meeting rooms',
+    'room.no_bookings':'No bookings',
+    'room.err.bk_notfound':'Booking not found',
+    'room.toast.cancelled':'Booking cancelled',
+    'room.checkin_msg':'Meeting room: %s  %s %s–%s\n"%s"\nHas it started? If not confirmed within 15 minutes the room is released automatically.',
+    'room.popup_cancel':'\n\nOK cancels this booking',
+    'room.rpt.week':'This week',
+    'room.rpt.month':'This month',
+    'room.rpt.usage':'%s utilisation',
+    'room.rpt.sessions':'%d sessions',
+    'room.rpt.hot':'Busiest slot: ',
+    'room.err.need_fault_desc':'Please describe the problem',
+    'g.weekdays':'Sun,Mon,Tue,Wed,Thu,Fri,Sat',
+    'g.cal.more':'+%d more',
+    'g.back_portal':'Back to Portal',
+    'g.portal_login':'Signed in via Portal',
+    'g.select_user':'Select a user',
+    'g.toast.switched':'Switched to %s',
+    'car.err.no_veh_data':'Vehicle not found',
+    'car.err.need_name_plate':'Please enter a name and a plate number',
+    'car.cal.booking':'Booking',
+    'car.cal.maint':'Service',
+    'car.cal.insp':'Inspection',
+    'car.conf.mark_done':'Vehicle: %s\nUser: %s\nTime: %s\nPurpose: %s\nStatus: %s\n\nOK marks this booking as completed (returned)',
+    'car.toast.marked_done':'Marked as completed',
+    'car.err.no_perm_edit':'You cannot edit this booking',
+    'car.err.bk_notfound':'Booking not found',
+    'car.err.only_pending':'Only bookings that have not departed can be edited',
+    'car.other_person':'someone else',
+    'car.warn.conflict':'⚠️ Clashes with %s (%s)',
+    'car.err.need_veh':'Please select a vehicle',
+    'car.err.need_user':'Please select a user',
+    'car.err.need_date':'Please select a date',
+    'car.err.need_purpose':'Please enter the purpose of the trip',
+    'car.err.slot_taken':'This vehicle is already booked for that period',
+    'car.err.orig_bk_notfound':'The original booking no longer exists',
+    'car.toast.bk_updated':'Booking updated: %s will use %s (%s)',
+    'car.toast.bk_created':'Booked: %s will use %s (%s)',
+    'car.toast.departed':'Departure recorded',
+    'car.toast.returned':'Return recorded',
+    'g.conf.cancel_bk':'Cancel this booking?',
+    'car.toast.bk_cancelled':'✓ Booking cancelled',
+    'car.err.need_liters':'Please enter the amount of fuel',
+    'car.err.need_maint_item':'Please enter the service item',
+    'car.err.need_next_insp':'Please enter the next inspection date',
+    'room.name.big':'Large Meeting Room',
+    'room.name.small':'Small Meeting Room',
+    'room.eq.video':'Video conferencing',
+    'room.eq.whiteboard':'Whiteboard',
+    'room.eq.projector':'Projector',
     'lib.btn.reserve':'Reserve',
     'lib.grid.avail':'%d on shelf',
     'lib.no_books':'No books found',
@@ -2585,6 +2775,196 @@ const ADMIN_I18N = {
     'g.toast.import_fail':'匯入失敗：',
     'lib.hint.limited':'顯示最新 %d 本（共 %d 本，可用關鍵字搜尋）',
     'lib.btn.borrow':'借閱',
+    'visit.total_ntd':'合計 NT$%s',
+    'room.auto_released':'🔓 已自動釋出：%s',
+    'visit.unit.tw':'台灣總部',
+    'visit.unit.dg':'東莞工廠',
+    'visit.unit.vn':'越南工廠',
+    'visit.type.client':'現有客戶',
+    'visit.type.potential':'潛在客戶',
+    'visit.type.supplier':'供應商',
+    'visit.type.partner':'合作夥伴',
+    'visit.type.gov':'政府/媒體',
+    'visit.type.other':'其他',
+    'visit.task.pickup':'接機',
+    'visit.task.dropoff':'送機',
+    'visit.task.transfer':'接送',
+    'visit.task.hotel':'住宿',
+    'visit.task.breakfast':'早餐',
+    'visit.task.lunch':'午餐',
+    'visit.task.dinner':'晚餐',
+    'visit.task.factory':'工廠參觀',
+    'visit.task.meeting':'商務會議',
+    'visit.task.demo':'產品展示',
+    'visit.task.contract':'簽約',
+    'visit.task.other':'其他',
+    'visit.cost.transport':'交通接送',
+    'visit.cost.hotel':'住宿',
+    'visit.cost.meals':'餐飲',
+    'visit.cost.gifts':'禮品',
+    'visit.cost.misc':'雜支',
+    'visit.cost.other':'其他',
+    'visit.stat.upcoming':'即將到訪',
+    'visit.stat.ongoing':'進行中',
+    'visit.stat.month':'本月到訪',
+    'visit.stat.month_cost':'本月接待費用',
+    'visit.stat.unit':'筆',
+    'visit.alert.task_open':'%s · %s 任務尚未完成',
+    'visit.owner_prefix':'負責：',
+    'visit.tasks_done':'任務 %d/%d 完成',
+    'visit.guests_n':'%d 位來賓',
+    'visit.headcount_n':'%d 人',
+    'visit.btn.detail':'查看詳情',
+    'visit.btn.detail_s':'詳情',
+    'visit.btn.edit':'編輯',
+    'visit.btn.delete':'刪除',
+    'visit.btn.close':'關閉',
+    'visit.btn.broadcast':'🚨 緊急廣播',
+    'visit.btn.doc':'📄 行程單',
+    'visit.pick_from_db':'從資料庫選…',
+    'visit.conf.clear':'確定清除？',
+    'visit.toast.cleared':'表單已清除',
+    'visit.ph.guest_note':'特殊備註',
+    'visit.no_guests':'尚未新增來賓',
+    'visit.btn.add_task':'＋ 任務',
+    'visit.no_tasks':'點「＋ 任務」新增當日活動',
+    'visit.ph.from':'出發地',
+    'visit.ph.to':'目的地',
+    'visit.ph.note':'備註',
+    'visit.assign':'指派…',
+    'visit.car.none':'無派車',
+    'visit.car.company':'公務車',
+    'visit.car.taxi':'計程車/租車',
+    'visit.select_person':'選擇人員…',
+    'visit.ph.escort_role':'負責環節（接機/陪同參觀/用餐）',
+    'visit.no_escorts':'尚未新增陪同人員',
+    'visit.ph.cost_desc':'說明',
+    'visit.err.need_company':'請填寫來訪公司/單位',
+    'visit.err.need_owner':'請選擇負責窗口',
+    'visit.err.need_date':'請填寫到訪日期',
+    'visit.toast.updated':'已更新到訪行程',
+    'visit.toast.saved':'到訪行程已儲存',
+    'visit.detail_title':'%s 到訪詳情',
+    'visit.no_records':'無到訪記錄',
+    'visit.g.visits_n':'來訪 %s 次',
+    'visit.g.last':'最近 %s',
+    'visit.g.spend':'累計費用 NT$%s',
+    'visit.g.empty':'來賓資料庫為空',
+    'visit.g.add_first':'新增第一位來賓',
+    'visit.g.edit':'編輯來賓',
+    'visit.g.add':'新增來賓',
+    'visit.g.err_name':'請填寫姓名',
+    'visit.g.err_company':'請填寫公司',
+    'visit.g.updated':'已更新來賓資料',
+    'visit.g.added':'來賓已新增至資料庫',
+    'visit.err.need_broadcast':'請填寫廣播內容',
+    'visit.toast.broadcast':'廣播已發送給所有相關人員',
+    'visit.rpt.visits':'到訪次數',
+    'visit.rpt.cost_total':'接待費用合計',
+    'visit.rpt.done':'完成接待',
+    'visit.rpt.avg':'平均費用/次',
+    'visit.unknown':'未知',
+    'lot.toast.reset':'已重置抽選紀錄',
+    'lot.err.need_list':'請先建立人員名單',
+    'lot.all_drawn':'全員已抽完，重新開始',
+    'lot.people_n':'%d 位',
+    'lot.remaining':'剩 %d',
+    'g.status_prefix':'狀態：',
+    'g.toast.updated':'已更新',
+    'g.other':'其他',
+    'g.yes':'是',
+    'g.no':'否',
+    'g.untitled':'（無標題）',
+    'room.st.busy':'使用中（剩 %d 分鐘）',
+    'room.st.meeting':'會議中',
+    'room.st.soon':'%d 分鐘後使用',
+    'room.st.starting':'即將開始',
+    'room.st.free_all_day':'整天空閒',
+    'room.st.bookable':'可立即預約',
+    'room.cap_fmt':'最多 %d 人 · %s',
+    'room.cap_only':'容量 %d 人',
+    'room.cap_max':'容量：最多 %d 人',
+    'room.over_cap':' ⚠ 超出',
+    'room.over_cap_ppl':' ⚠ 超出人數',
+    'room.faults_open':'⚠ %d 項故障待修',
+    'room.host_prefix':'主辦：',
+    'room.btn.quick_book':'＋ 快速預約',
+    'room.btn.checkin':'報到',
+    'room.btn.cancel':'取消',
+    'room.btn.report_fault':'⚠ 故障回報',
+    'room.ev.meeting':'會議',
+    'room.ev.booking':'預約',
+    'room.label':'會議室',
+    'room.inv.none':'（未選擇）',
+    'room.inv.add':'＋ 選擇人員加入…',
+    'room.slot.past':'過去',
+    'room.slot.full':'全滿',
+    'room.slot.free_n':'%d 間可用',
+    'room.err.need_date':'請選擇日期',
+    'room.err.need_slot':'請選擇時段',
+    'room.err.end_after_start':'結束時間必須晚於開始',
+    'room.badge.conflict':'時段衝突',
+    'room.badge.recommended':'✓ 推薦',
+    'room.badge.bookable':'可預約',
+    'room.badge.too_small':'容量不足',
+    'room.rec_fmt':'👍 %d 人推薦',
+    'room.rec_fmt_long':'👍 %d 人會議推薦使用 %s',
+    'room.warn.booked':'⚠ 已有預約：%s（%s）',
+    'room.err.need_room':'請選擇會議室',
+    'room.err.need_room_first':'請先選擇會議室',
+    'room.err.need_title':'請填寫會議標題',
+    'room.err.slot_conflict':'⚠ 時段衝突，請重新選擇',
+    'room.toast.booked':'✓ 已預約 %s',
+    'room.all_rooms':'所有會議室',
+    'room.no_bookings':'無預約記錄',
+    'room.err.bk_notfound':'找不到該預約',
+    'room.toast.cancelled':'已取消預約',
+    'room.checkin_msg':'會議室：%s  %s %s–%s\n「%s」\n已開始了嗎？若 15 分鐘內未確認，系統將自動釋出會議室。',
+    'room.popup_cancel':'\n\n點確定取消此預約',
+    'room.rpt.week':'本週',
+    'room.rpt.month':'本月',
+    'room.rpt.usage':'%s使用率',
+    'room.rpt.sessions':'%d 場',
+    'room.rpt.hot':'最熱門時段：',
+    'room.err.need_fault_desc':'請填寫問題描述',
+    'g.weekdays':'日,一,二,三,四,五,六',
+    'g.cal.more':'+%d 筆',
+    'g.back_portal':'返回 Portal',
+    'g.portal_login':'透過 Portal 登入',
+    'g.select_user':'選擇使用者',
+    'g.toast.switched':'已切換至 %s',
+    'car.err.no_veh_data':'找不到車輛資料',
+    'car.err.need_name_plate':'請輸入名稱和車牌',
+    'car.cal.booking':'預約',
+    'car.cal.maint':'保養',
+    'car.cal.insp':'驗車',
+    'car.conf.mark_done':'車輛：%s\n使用人：%s\n時間：%s\n目的：%s\n狀態：%s\n\n點確定標記為已完成（歸還）',
+    'car.toast.marked_done':'已標記完成',
+    'car.err.no_perm_edit':'無權限修改此預約',
+    'car.err.bk_notfound':'找不到預約',
+    'car.err.only_pending':'僅待出發的預約可修改',
+    'car.other_person':'其他人',
+    'car.warn.conflict':'⚠️ 與%s衝突（%s）',
+    'car.err.need_veh':'請選擇車輛',
+    'car.err.need_user':'請選擇使用人',
+    'car.err.need_date':'請選擇日期',
+    'car.err.need_purpose':'請填寫出行目的',
+    'car.err.slot_taken':'此車時段已有預約',
+    'car.err.orig_bk_notfound':'找不到原預約',
+    'car.toast.bk_updated':'已更新預約：%s 使用 %s（%s）',
+    'car.toast.bk_created':'已預約：%s 使用 %s（%s）',
+    'car.toast.departed':'已標記出發',
+    'car.toast.returned':'已登記歸還',
+    'g.conf.cancel_bk':'確定取消此預約？',
+    'car.toast.bk_cancelled':'✓ 已取消預約',
+    'car.err.need_liters':'請輸入加油量',
+    'car.err.need_maint_item':'請填寫保養項目',
+    'car.err.need_next_insp':'請填寫下次驗車日期',
+    'room.name.big':'大會議室',
+    'room.name.small':'小會議室',
+    'room.eq.video':'視訊系統',
+    'room.eq.whiteboard':'白板',
+    'room.eq.projector':'投影機',
     'lib.btn.reserve':'預約',
     'lib.grid.avail':'在館 %d',
     'lib.no_books':'查無書目',
@@ -2790,6 +3170,196 @@ const ADMIN_I18N = {
     'g.toast.import_fail':'导入失败：',
     'lib.hint.limited':'显示最新 %d 本（共 %d 本，可用关键字搜索）',
     'lib.btn.borrow':'借阅',
+    'visit.total_ntd':'合计 NT$%s',
+    'room.auto_released':'🔓 已自动释出：%s',
+    'visit.unit.tw':'台湾总部',
+    'visit.unit.dg':'东莞工厂',
+    'visit.unit.vn':'越南工厂',
+    'visit.type.client':'现有客户',
+    'visit.type.potential':'潜在客户',
+    'visit.type.supplier':'供应商',
+    'visit.type.partner':'合作伙伴',
+    'visit.type.gov':'政府/媒体',
+    'visit.type.other':'其他',
+    'visit.task.pickup':'接机',
+    'visit.task.dropoff':'送机',
+    'visit.task.transfer':'接送',
+    'visit.task.hotel':'住宿',
+    'visit.task.breakfast':'早餐',
+    'visit.task.lunch':'午餐',
+    'visit.task.dinner':'晚餐',
+    'visit.task.factory':'工厂参观',
+    'visit.task.meeting':'商务会议',
+    'visit.task.demo':'产品展示',
+    'visit.task.contract':'签约',
+    'visit.task.other':'其他',
+    'visit.cost.transport':'交通接送',
+    'visit.cost.hotel':'住宿',
+    'visit.cost.meals':'餐饮',
+    'visit.cost.gifts':'礼品',
+    'visit.cost.misc':'杂支',
+    'visit.cost.other':'其他',
+    'visit.stat.upcoming':'即将到访',
+    'visit.stat.ongoing':'进行中',
+    'visit.stat.month':'本月到访',
+    'visit.stat.month_cost':'本月接待费用',
+    'visit.stat.unit':'笔',
+    'visit.alert.task_open':'%s · %s 任务尚未完成',
+    'visit.owner_prefix':'负责：',
+    'visit.tasks_done':'任务 %d/%d 完成',
+    'visit.guests_n':'%d 位来宾',
+    'visit.headcount_n':'%d 人',
+    'visit.btn.detail':'查看详情',
+    'visit.btn.detail_s':'详情',
+    'visit.btn.edit':'编辑',
+    'visit.btn.delete':'删除',
+    'visit.btn.close':'关闭',
+    'visit.btn.broadcast':'🚨 紧急广播',
+    'visit.btn.doc':'📄 行程单',
+    'visit.pick_from_db':'从数据库选…',
+    'visit.conf.clear':'确定清除？',
+    'visit.toast.cleared':'表单已清除',
+    'visit.ph.guest_note':'特殊备注',
+    'visit.no_guests':'尚未新增来宾',
+    'visit.btn.add_task':'＋ 任务',
+    'visit.no_tasks':'点「＋ 任务」新增当日活动',
+    'visit.ph.from':'出发地',
+    'visit.ph.to':'目的地',
+    'visit.ph.note':'备注',
+    'visit.assign':'指派…',
+    'visit.car.none':'无派车',
+    'visit.car.company':'公务车',
+    'visit.car.taxi':'出租车/租车',
+    'visit.select_person':'选择人员…',
+    'visit.ph.escort_role':'负责环节（接机/陪同参观/用餐）',
+    'visit.no_escorts':'尚未新增陪同人员',
+    'visit.ph.cost_desc':'说明',
+    'visit.err.need_company':'请填写来访公司/单位',
+    'visit.err.need_owner':'请选择负责窗口',
+    'visit.err.need_date':'请填写到访日期',
+    'visit.toast.updated':'已更新到访行程',
+    'visit.toast.saved':'到访行程已保存',
+    'visit.detail_title':'%s 到访详情',
+    'visit.no_records':'无到访记录',
+    'visit.g.visits_n':'来访 %s 次',
+    'visit.g.last':'最近 %s',
+    'visit.g.spend':'累计费用 NT$%s',
+    'visit.g.empty':'来宾数据库为空',
+    'visit.g.add_first':'新增第一位来宾',
+    'visit.g.edit':'编辑来宾',
+    'visit.g.add':'新增来宾',
+    'visit.g.err_name':'请填写姓名',
+    'visit.g.err_company':'请填写公司',
+    'visit.g.updated':'已更新来宾资料',
+    'visit.g.added':'来宾已新增至数据库',
+    'visit.err.need_broadcast':'请填写广播内容',
+    'visit.toast.broadcast':'广播已发送给所有相关人员',
+    'visit.rpt.visits':'到访次数',
+    'visit.rpt.cost_total':'接待费用合计',
+    'visit.rpt.done':'完成接待',
+    'visit.rpt.avg':'平均费用/次',
+    'visit.unknown':'未知',
+    'lot.toast.reset':'已重置抽选记录',
+    'lot.err.need_list':'请先建立人员名单',
+    'lot.all_drawn':'全员已抽完，重新开始',
+    'lot.people_n':'%d 位',
+    'lot.remaining':'剩 %d',
+    'g.status_prefix':'状态：',
+    'g.toast.updated':'已更新',
+    'g.other':'其他',
+    'g.yes':'是',
+    'g.no':'否',
+    'g.untitled':'（无标题）',
+    'room.st.busy':'使用中（剩 %d 分钟）',
+    'room.st.meeting':'会议中',
+    'room.st.soon':'%d 分钟后使用',
+    'room.st.starting':'即将开始',
+    'room.st.free_all_day':'整天空闲',
+    'room.st.bookable':'可立即预约',
+    'room.cap_fmt':'最多 %d 人 · %s',
+    'room.cap_only':'容量 %d 人',
+    'room.cap_max':'容量：最多 %d 人',
+    'room.over_cap':' ⚠ 超出',
+    'room.over_cap_ppl':' ⚠ 超出人数',
+    'room.faults_open':'⚠ %d 项故障待修',
+    'room.host_prefix':'主办：',
+    'room.btn.quick_book':'＋ 快速预约',
+    'room.btn.checkin':'签到',
+    'room.btn.cancel':'取消',
+    'room.btn.report_fault':'⚠ 故障报修',
+    'room.ev.meeting':'会议',
+    'room.ev.booking':'预约',
+    'room.label':'会议室',
+    'room.inv.none':'（未选择）',
+    'room.inv.add':'＋ 选择人员加入…',
+    'room.slot.past':'过去',
+    'room.slot.full':'全满',
+    'room.slot.free_n':'%d 间可用',
+    'room.err.need_date':'请选择日期',
+    'room.err.need_slot':'请选择时段',
+    'room.err.end_after_start':'结束时间必须晚于开始',
+    'room.badge.conflict':'时段冲突',
+    'room.badge.recommended':'✓ 推荐',
+    'room.badge.bookable':'可预约',
+    'room.badge.too_small':'容量不足',
+    'room.rec_fmt':'👍 %d 人推荐',
+    'room.rec_fmt_long':'👍 %d 人会议推荐使用 %s',
+    'room.warn.booked':'⚠ 已有预约：%s（%s）',
+    'room.err.need_room':'请选择会议室',
+    'room.err.need_room_first':'请先选择会议室',
+    'room.err.need_title':'请填写会议标题',
+    'room.err.slot_conflict':'⚠ 时段冲突，请重新选择',
+    'room.toast.booked':'✓ 已预约 %s',
+    'room.all_rooms':'所有会议室',
+    'room.no_bookings':'无预约记录',
+    'room.err.bk_notfound':'找不到该预约',
+    'room.toast.cancelled':'已取消预约',
+    'room.checkin_msg':'会议室：%s  %s %s–%s\n「%s」\n已开始了吗？若 15 分钟内未确认，系统将自动释出会议室。',
+    'room.popup_cancel':'\n\n点确定取消此预约',
+    'room.rpt.week':'本周',
+    'room.rpt.month':'本月',
+    'room.rpt.usage':'%s使用率',
+    'room.rpt.sessions':'%d 场',
+    'room.rpt.hot':'最热门时段：',
+    'room.err.need_fault_desc':'请填写问题描述',
+    'g.weekdays':'日,一,二,三,四,五,六',
+    'g.cal.more':'+%d 条',
+    'g.back_portal':'返回 Portal',
+    'g.portal_login':'通过 Portal 登录',
+    'g.select_user':'选择使用者',
+    'g.toast.switched':'已切换至 %s',
+    'car.err.no_veh_data':'找不到车辆资料',
+    'car.err.need_name_plate':'请输入名称和车牌',
+    'car.cal.booking':'预约',
+    'car.cal.maint':'保养',
+    'car.cal.insp':'验车',
+    'car.conf.mark_done':'车辆：%s\n使用人：%s\n时间：%s\n目的：%s\n状态：%s\n\n点确定标记为已完成（归还）',
+    'car.toast.marked_done':'已标记完成',
+    'car.err.no_perm_edit':'无权限修改此预约',
+    'car.err.bk_notfound':'找不到预约',
+    'car.err.only_pending':'仅待出发的预约可修改',
+    'car.other_person':'其他人',
+    'car.warn.conflict':'⚠️ 与%s冲突（%s）',
+    'car.err.need_veh':'请选择车辆',
+    'car.err.need_user':'请选择使用人',
+    'car.err.need_date':'请选择日期',
+    'car.err.need_purpose':'请填写出行目的',
+    'car.err.slot_taken':'此车时段已有预约',
+    'car.err.orig_bk_notfound':'找不到原预约',
+    'car.toast.bk_updated':'已更新预约：%s 使用 %s（%s）',
+    'car.toast.bk_created':'已预约：%s 使用 %s（%s）',
+    'car.toast.departed':'已标记出发',
+    'car.toast.returned':'已登记归还',
+    'g.conf.cancel_bk':'确定取消此预约？',
+    'car.toast.bk_cancelled':'✓ 已取消预约',
+    'car.err.need_liters':'请输入加油量',
+    'car.err.need_maint_item':'请填写保养项目',
+    'car.err.need_next_insp':'请填写下次验车日期',
+    'room.name.big':'大会议室',
+    'room.name.small':'小会议室',
+    'room.eq.video':'视讯系统',
+    'room.eq.whiteboard':'白板',
+    'room.eq.projector':'投影机',
     'lib.btn.reserve':'预约',
     'lib.grid.avail':'在馆 %d',
     'lib.no_books':'未找到书目',
@@ -2995,6 +3565,196 @@ const ADMIN_I18N = {
     'g.toast.import_fail':'Nhập thất bại: ',
     'lib.hint.limited':'Hiển thị %d cuốn mới nhất trong %d — dùng ô tìm kiếm',
     'lib.btn.borrow':'Mượn',
+    'visit.total_ntd':'Tổng NT$%s',
+    'room.auto_released':'🔓 Đã tự động giải phóng: %s',
+    'visit.unit.tw':'Trụ sở Đài Loan',
+    'visit.unit.dg':'Nhà máy Đông Quản',
+    'visit.unit.vn':'Nhà máy Việt Nam',
+    'visit.type.client':'Khách hàng hiện tại',
+    'visit.type.potential':'Khách hàng tiềm năng',
+    'visit.type.supplier':'Nhà cung cấp',
+    'visit.type.partner':'Đối tác',
+    'visit.type.gov':'Chính phủ / Truyền thông',
+    'visit.type.other':'Khác',
+    'visit.task.pickup':'Đón sân bay',
+    'visit.task.dropoff':'Tiễn sân bay',
+    'visit.task.transfer':'Đưa đón',
+    'visit.task.hotel':'Lưu trú',
+    'visit.task.breakfast':'Bữa sáng',
+    'visit.task.lunch':'Bữa trưa',
+    'visit.task.dinner':'Bữa tối',
+    'visit.task.factory':'Tham quan nhà máy',
+    'visit.task.meeting':'Họp kinh doanh',
+    'visit.task.demo':'Trình diễn sản phẩm',
+    'visit.task.contract':'Ký hợp đồng',
+    'visit.task.other':'Khác',
+    'visit.cost.transport':'Đưa đón',
+    'visit.cost.hotel':'Lưu trú',
+    'visit.cost.meals':'Ăn uống',
+    'visit.cost.gifts':'Quà tặng',
+    'visit.cost.misc':'Chi phí khác',
+    'visit.cost.other':'Khác',
+    'visit.stat.upcoming':'Sắp đến',
+    'visit.stat.ongoing':'Đang diễn ra',
+    'visit.stat.month':'Lượt đến tháng này',
+    'visit.stat.month_cost':'Chi phí tiếp đón tháng này',
+    'visit.stat.unit':'lượt',
+    'visit.alert.task_open':'%s · nhiệm vụ %s chưa hoàn tất',
+    'visit.owner_prefix':'Phụ trách: ',
+    'visit.tasks_done':'Nhiệm vụ %d/%d hoàn tất',
+    'visit.guests_n':'%d khách',
+    'visit.headcount_n':'%d người',
+    'visit.btn.detail':'Xem chi tiết',
+    'visit.btn.detail_s':'Chi tiết',
+    'visit.btn.edit':'Sửa',
+    'visit.btn.delete':'Xóa',
+    'visit.btn.close':'Đóng',
+    'visit.btn.broadcast':'🚨 Thông báo khẩn',
+    'visit.btn.doc':'📄 Lịch trình',
+    'visit.pick_from_db':'Chọn từ cơ sở dữ liệu…',
+    'visit.conf.clear':'Xóa toàn bộ biểu mẫu?',
+    'visit.toast.cleared':'Đã xóa biểu mẫu',
+    'visit.ph.guest_note':'Ghi chú',
+    'visit.no_guests':'Chưa thêm khách',
+    'visit.btn.add_task':'＋ Nhiệm vụ',
+    'visit.no_tasks':'Nhấn "＋ Nhiệm vụ" để thêm hoạt động trong ngày',
+    'visit.ph.from':'Điểm đi',
+    'visit.ph.to':'Điểm đến',
+    'visit.ph.note':'Ghi chú',
+    'visit.assign':'Phân công…',
+    'visit.car.none':'Không bố trí xe',
+    'visit.car.company':'Xe công ty',
+    'visit.car.taxi':'Taxi / thuê xe',
+    'visit.select_person':'Chọn người…',
+    'visit.ph.escort_role':'Vai trò (đón sân bay / hướng dẫn / bữa ăn)',
+    'visit.no_escorts':'Chưa thêm người tháp tùng',
+    'visit.ph.cost_desc':'Mô tả',
+    'visit.err.need_company':'Vui lòng nhập công ty / đơn vị đến thăm',
+    'visit.err.need_owner':'Vui lòng chọn người phụ trách',
+    'visit.err.need_date':'Vui lòng nhập ngày đến thăm',
+    'visit.toast.updated':'Đã cập nhật lịch trình',
+    'visit.toast.saved':'Đã lưu lịch trình',
+    'visit.detail_title':'Chi tiết chuyến thăm của %s',
+    'visit.no_records':'Chưa có lịch sử đến thăm',
+    'visit.g.visits_n':'%s lượt đến',
+    'visit.g.last':'Gần nhất %s',
+    'visit.g.spend':'Tổng chi phí NT$%s',
+    'visit.g.empty':'Cơ sở dữ liệu khách đang trống',
+    'visit.g.add_first':'Thêm khách đầu tiên',
+    'visit.g.edit':'Sửa khách',
+    'visit.g.add':'Thêm khách',
+    'visit.g.err_name':'Vui lòng nhập họ tên',
+    'visit.g.err_company':'Vui lòng nhập công ty',
+    'visit.g.updated':'Đã cập nhật thông tin khách',
+    'visit.g.added':'Đã thêm khách vào cơ sở dữ liệu',
+    'visit.err.need_broadcast':'Vui lòng nhập nội dung thông báo',
+    'visit.toast.broadcast':'Đã gửi thông báo tới mọi người liên quan',
+    'visit.rpt.visits':'Số lượt đến',
+    'visit.rpt.cost_total':'Tổng chi phí tiếp đón',
+    'visit.rpt.done':'Đã hoàn tất',
+    'visit.rpt.avg':'Chi phí trung bình / lượt',
+    'visit.unknown':'Không rõ',
+    'lot.toast.reset':'Đã đặt lại lịch sử bốc thăm',
+    'lot.err.need_list':'Vui lòng tạo danh sách trước',
+    'lot.all_drawn':'Đã bốc hết — bắt đầu lại',
+    'lot.people_n':'%d người',
+    'lot.remaining':'Còn %d',
+    'g.status_prefix':'Trạng thái: ',
+    'g.toast.updated':'Đã cập nhật',
+    'g.other':'Khác',
+    'g.yes':'Có',
+    'g.no':'Không',
+    'g.untitled':'(Không có tiêu đề)',
+    'room.st.busy':'Đang dùng (còn %d phút)',
+    'room.st.meeting':'Đang họp',
+    'room.st.soon':'Dùng sau %d phút',
+    'room.st.starting':'Sắp bắt đầu',
+    'room.st.free_all_day':'Trống cả ngày',
+    'room.st.bookable':'Có thể đặt ngay',
+    'room.cap_fmt':'Tối đa %d người · %s',
+    'room.cap_only':'Sức chứa %d người',
+    'room.cap_max':'Sức chứa: tối đa %d người',
+    'room.over_cap':' ⚠ vượt sức chứa',
+    'room.over_cap_ppl':' ⚠ vượt số người',
+    'room.faults_open':'⚠ %d sự cố chờ sửa',
+    'room.host_prefix':'Chủ trì: ',
+    'room.btn.quick_book':'＋ Đặt nhanh',
+    'room.btn.checkin':'Điểm danh',
+    'room.btn.cancel':'Hủy',
+    'room.btn.report_fault':'⚠ Báo sự cố',
+    'room.ev.meeting':'Cuộc họp',
+    'room.ev.booking':'Đặt phòng',
+    'room.label':'Phòng họp',
+    'room.inv.none':'(chưa chọn)',
+    'room.inv.add':'＋ Thêm người tham dự…',
+    'room.slot.past':'Đã qua',
+    'room.slot.full':'Hết chỗ',
+    'room.slot.free_n':'Còn %d phòng',
+    'room.err.need_date':'Vui lòng chọn ngày',
+    'room.err.need_slot':'Vui lòng chọn khung giờ',
+    'room.err.end_after_start':'Giờ kết thúc phải sau giờ bắt đầu',
+    'room.badge.conflict':'Trùng giờ',
+    'room.badge.recommended':'✓ Đề xuất',
+    'room.badge.bookable':'Có thể đặt',
+    'room.badge.too_small':'Không đủ chỗ',
+    'room.rec_fmt':'👍 Đề xuất cho %d người',
+    'room.rec_fmt_long':'👍 Cuộc họp %d người nên dùng %s',
+    'room.warn.booked':'⚠ Đã có lịch: %s (%s)',
+    'room.err.need_room':'Vui lòng chọn phòng họp',
+    'room.err.need_room_first':'Vui lòng chọn phòng họp trước',
+    'room.err.need_title':'Vui lòng nhập tiêu đề cuộc họp',
+    'room.err.slot_conflict':'⚠ Trùng khung giờ — vui lòng chọn lại',
+    'room.toast.booked':'✓ Đã đặt %s',
+    'room.all_rooms':'Tất cả phòng họp',
+    'room.no_bookings':'Chưa có lịch đặt',
+    'room.err.bk_notfound':'Không tìm thấy lịch đặt',
+    'room.toast.cancelled':'Đã hủy lịch đặt',
+    'room.checkin_msg':'Phòng họp: %s  %s %s–%s\n"%s"\nĐã bắt đầu chưa? Nếu không xác nhận trong 15 phút, phòng sẽ được giải phóng tự động.',
+    'room.popup_cancel':'\n\nNhấn OK để hủy lịch đặt này',
+    'room.rpt.week':'Tuần này',
+    'room.rpt.month':'Tháng này',
+    'room.rpt.usage':'Tỷ lệ sử dụng %s',
+    'room.rpt.sessions':'%d buổi',
+    'room.rpt.hot':'Khung giờ đông nhất: ',
+    'room.err.need_fault_desc':'Vui lòng mô tả sự cố',
+    'g.weekdays':'CN,T2,T3,T4,T5,T6,T7',
+    'g.cal.more':'+%d nữa',
+    'g.back_portal':'Về Portal',
+    'g.portal_login':'Đăng nhập qua Portal',
+    'g.select_user':'Chọn người dùng',
+    'g.toast.switched':'Đã chuyển sang %s',
+    'car.err.no_veh_data':'Không tìm thấy dữ liệu xe',
+    'car.err.need_name_plate':'Vui lòng nhập tên và biển số',
+    'car.cal.booking':'Đặt xe',
+    'car.cal.maint':'Bảo dưỡng',
+    'car.cal.insp':'Đăng kiểm',
+    'car.conf.mark_done':'Xe: %s\nNgười dùng: %s\nThời gian: %s\nMục đích: %s\nTrạng thái: %s\n\nNhấn OK để đánh dấu đã hoàn tất (đã trả)',
+    'car.toast.marked_done':'Đã đánh dấu hoàn tất',
+    'car.err.no_perm_edit':'Bạn không có quyền sửa lịch đặt này',
+    'car.err.bk_notfound':'Không tìm thấy lịch đặt',
+    'car.err.only_pending':'Chỉ sửa được lịch đặt chưa khởi hành',
+    'car.other_person':'người khác',
+    'car.warn.conflict':'⚠️ Trùng với %s (%s)',
+    'car.err.need_veh':'Vui lòng chọn xe',
+    'car.err.need_user':'Vui lòng chọn người dùng',
+    'car.err.need_date':'Vui lòng chọn ngày',
+    'car.err.need_purpose':'Vui lòng nhập mục đích chuyến đi',
+    'car.err.slot_taken':'Xe đã được đặt trong khoảng thời gian này',
+    'car.err.orig_bk_notfound':'Không tìm thấy lịch đặt gốc',
+    'car.toast.bk_updated':'Đã cập nhật: %s dùng %s (%s)',
+    'car.toast.bk_created':'Đã đặt: %s dùng %s (%s)',
+    'car.toast.departed':'Đã ghi nhận khởi hành',
+    'car.toast.returned':'Đã ghi nhận trả xe',
+    'g.conf.cancel_bk':'Hủy lịch đặt này?',
+    'car.toast.bk_cancelled':'✓ Đã hủy lịch đặt',
+    'car.err.need_liters':'Vui lòng nhập số lít nhiên liệu',
+    'car.err.need_maint_item':'Vui lòng nhập hạng mục bảo dưỡng',
+    'car.err.need_next_insp':'Vui lòng nhập ngày đăng kiểm kế tiếp',
+    'room.name.big':'Phòng họp lớn',
+    'room.name.small':'Phòng họp nhỏ',
+    'room.eq.video':'Hệ thống hội nghị truyền hình',
+    'room.eq.whiteboard':'Bảng trắng',
+    'room.eq.projector':'Máy chiếu',
     'lib.btn.reserve':'Đặt trước',
     'lib.grid.avail':'Còn %d',
     'lib.no_books':'Không tìm thấy sách',
@@ -3200,6 +3960,196 @@ const ADMIN_I18N = {
     'g.toast.import_fail':'インポートに失敗しました：',
     'lib.hint.limited':'最新 %d 冊を表示（全 %d 冊、キーワード検索できます）',
     'lib.btn.borrow':'借りる',
+    'visit.total_ntd':'合計 NT$%s',
+    'room.auto_released':'🔓 自動解放しました：%s',
+    'visit.unit.tw':'台湾本社',
+    'visit.unit.dg':'東莞工場',
+    'visit.unit.vn':'ベトナム工場',
+    'visit.type.client':'既存顧客',
+    'visit.type.potential':'見込み客',
+    'visit.type.supplier':'サプライヤー',
+    'visit.type.partner':'パートナー',
+    'visit.type.gov':'政府・メディア',
+    'visit.type.other':'その他',
+    'visit.task.pickup':'空港送迎（出迎え）',
+    'visit.task.dropoff':'空港送迎（見送り）',
+    'visit.task.transfer':'送迎',
+    'visit.task.hotel':'宿泊',
+    'visit.task.breakfast':'朝食',
+    'visit.task.lunch':'昼食',
+    'visit.task.dinner':'夕食',
+    'visit.task.factory':'工場見学',
+    'visit.task.meeting':'商談',
+    'visit.task.demo':'製品デモ',
+    'visit.task.contract':'契約',
+    'visit.task.other':'その他',
+    'visit.cost.transport':'交通・送迎',
+    'visit.cost.hotel':'宿泊',
+    'visit.cost.meals':'飲食',
+    'visit.cost.gifts':'贈答品',
+    'visit.cost.misc':'雑費',
+    'visit.cost.other':'その他',
+    'visit.stat.upcoming':'来訪予定',
+    'visit.stat.ongoing':'進行中',
+    'visit.stat.month':'今月の来訪',
+    'visit.stat.month_cost':'今月の接待費用',
+    'visit.stat.unit':'件',
+    'visit.alert.task_open':'%s · %s のタスクが未完了です',
+    'visit.owner_prefix':'担当：',
+    'visit.tasks_done':'タスク %d/%d 完了',
+    'visit.guests_n':'来賓 %d 名',
+    'visit.headcount_n':'%d 名',
+    'visit.btn.detail':'詳細を見る',
+    'visit.btn.detail_s':'詳細',
+    'visit.btn.edit':'編集',
+    'visit.btn.delete':'削除',
+    'visit.btn.close':'閉じる',
+    'visit.btn.broadcast':'🚨 緊急連絡',
+    'visit.btn.doc':'📄 行程表',
+    'visit.pick_from_db':'データベースから選択…',
+    'visit.conf.clear':'フォームを消去しますか？',
+    'visit.toast.cleared':'フォームを消去しました',
+    'visit.ph.guest_note':'特記事項',
+    'visit.no_guests':'来賓が登録されていません',
+    'visit.btn.add_task':'＋ タスク',
+    'visit.no_tasks':'「＋ タスク」でその日の予定を追加します',
+    'visit.ph.from':'出発地',
+    'visit.ph.to':'目的地',
+    'visit.ph.note':'備考',
+    'visit.assign':'担当者…',
+    'visit.car.none':'車両手配なし',
+    'visit.car.company':'社用車',
+    'visit.car.taxi':'タクシー・レンタカー',
+    'visit.select_person':'担当者を選択…',
+    'visit.ph.escort_role':'担当（出迎え／案内／会食）',
+    'visit.no_escorts':'同行者が登録されていません',
+    'visit.ph.cost_desc':'説明',
+    'visit.err.need_company':'来訪企業・団体を入力してください',
+    'visit.err.need_owner':'担当窓口を選択してください',
+    'visit.err.need_date':'来訪日を入力してください',
+    'visit.toast.updated':'来訪スケジュールを更新しました',
+    'visit.toast.saved':'来訪スケジュールを保存しました',
+    'visit.detail_title':'%s の来訪詳細',
+    'visit.no_records':'来訪記録がありません',
+    'visit.g.visits_n':'来訪 %s 回',
+    'visit.g.last':'直近 %s',
+    'visit.g.spend':'累計費用 NT$%s',
+    'visit.g.empty':'来賓データベースは空です',
+    'visit.g.add_first':'最初の来賓を登録',
+    'visit.g.edit':'来賓を編集',
+    'visit.g.add':'来賓を追加',
+    'visit.g.err_name':'氏名を入力してください',
+    'visit.g.err_company':'会社名を入力してください',
+    'visit.g.updated':'来賓情報を更新しました',
+    'visit.g.added':'来賓をデータベースに追加しました',
+    'visit.err.need_broadcast':'連絡内容を入力してください',
+    'visit.toast.broadcast':'関係者全員に送信しました',
+    'visit.rpt.visits':'来訪回数',
+    'visit.rpt.cost_total':'接待費用合計',
+    'visit.rpt.done':'接待完了',
+    'visit.rpt.avg':'1 回あたり平均費用',
+    'visit.unknown':'不明',
+    'lot.toast.reset':'抽選履歴をリセットしました',
+    'lot.err.need_list':'先に名簿を作成してください',
+    'lot.all_drawn':'全員抽選済みです。最初からやり直します',
+    'lot.people_n':'%d 名',
+    'lot.remaining':'残り %d',
+    'g.status_prefix':'状態：',
+    'g.toast.updated':'更新しました',
+    'g.other':'その他',
+    'g.yes':'はい',
+    'g.no':'いいえ',
+    'g.untitled':'（無題）',
+    'room.st.busy':'使用中（残り %d 分）',
+    'room.st.meeting':'会議中',
+    'room.st.soon':'%d 分後に使用',
+    'room.st.starting':'まもなく開始',
+    'room.st.free_all_day':'終日空き',
+    'room.st.bookable':'今すぐ予約可',
+    'room.cap_fmt':'最大 %d 名 · %s',
+    'room.cap_only':'定員 %d 名',
+    'room.cap_max':'定員：最大 %d 名',
+    'room.over_cap':' ⚠ 定員超過',
+    'room.over_cap_ppl':' ⚠ 人数超過',
+    'room.faults_open':'⚠ 故障 %d 件対応待ち',
+    'room.host_prefix':'主催：',
+    'room.btn.quick_book':'＋ クイック予約',
+    'room.btn.checkin':'受付',
+    'room.btn.cancel':'取消',
+    'room.btn.report_fault':'⚠ 故障報告',
+    'room.ev.meeting':'会議',
+    'room.ev.booking':'予約',
+    'room.label':'会議室',
+    'room.inv.none':'（未選択）',
+    'room.inv.add':'＋ 参加者を追加…',
+    'room.slot.past':'過去',
+    'room.slot.full':'満室',
+    'room.slot.free_n':'%d 室空き',
+    'room.err.need_date':'日付を選択してください',
+    'room.err.need_slot':'時間帯を選択してください',
+    'room.err.end_after_start':'終了時刻は開始時刻より後にしてください',
+    'room.badge.conflict':'時間重複',
+    'room.badge.recommended':'✓ おすすめ',
+    'room.badge.bookable':'予約可',
+    'room.badge.too_small':'定員不足',
+    'room.rec_fmt':'👍 %d 名におすすめ',
+    'room.rec_fmt_long':'👍 %d 名の会議には %s がおすすめ',
+    'room.warn.booked':'⚠ 既に予約あり：%s（%s）',
+    'room.err.need_room':'会議室を選択してください',
+    'room.err.need_room_first':'先に会議室を選択してください',
+    'room.err.need_title':'会議のタイトルを入力してください',
+    'room.err.slot_conflict':'⚠ 時間帯が重複しています。選び直してください',
+    'room.toast.booked':'✓ %s を予約しました',
+    'room.all_rooms':'すべての会議室',
+    'room.no_bookings':'予約記録がありません',
+    'room.err.bk_notfound':'予約が見つかりません',
+    'room.toast.cancelled':'予約を取り消しました',
+    'room.checkin_msg':'会議室：%s  %s %s–%s\n「%s」\n開始しましたか？15 分以内に確認がない場合、自動的に解放されます。',
+    'room.popup_cancel':'\n\nOK でこの予約を取り消します',
+    'room.rpt.week':'今週',
+    'room.rpt.month':'今月',
+    'room.rpt.usage':'%s 稼働率',
+    'room.rpt.sessions':'%d 件',
+    'room.rpt.hot':'最も混む時間帯：',
+    'room.err.need_fault_desc':'問題の内容を入力してください',
+    'g.weekdays':'日,月,火,水,木,金,土',
+    'g.cal.more':'他 %d 件',
+    'g.back_portal':'ポータルへ戻る',
+    'g.portal_login':'ポータル経由でログイン',
+    'g.select_user':'ユーザーを選択',
+    'g.toast.switched':'%s に切り替えました',
+    'car.err.no_veh_data':'車両データが見つかりません',
+    'car.err.need_name_plate':'名称とナンバーを入力してください',
+    'car.cal.booking':'予約',
+    'car.cal.maint':'整備',
+    'car.cal.insp':'車検',
+    'car.conf.mark_done':'車両：%s\n使用者：%s\n時間：%s\n目的：%s\n状態：%s\n\nOK で完了（返却）として記録します',
+    'car.toast.marked_done':'完了として記録しました',
+    'car.err.no_perm_edit':'この予約を変更する権限がありません',
+    'car.err.bk_notfound':'予約が見つかりません',
+    'car.err.only_pending':'出発前の予約のみ変更できます',
+    'car.other_person':'他の人',
+    'car.warn.conflict':'⚠️ %s と重複しています（%s）',
+    'car.err.need_veh':'車両を選択してください',
+    'car.err.need_user':'使用者を選択してください',
+    'car.err.need_date':'日付を選択してください',
+    'car.err.need_purpose':'使用目的を入力してください',
+    'car.err.slot_taken':'この時間帯は既に予約されています',
+    'car.err.orig_bk_notfound':'元の予約が見つかりません',
+    'car.toast.bk_updated':'予約を更新しました：%s が %s を使用（%s）',
+    'car.toast.bk_created':'予約しました：%s が %s を使用（%s）',
+    'car.toast.departed':'出発を記録しました',
+    'car.toast.returned':'返却を記録しました',
+    'g.conf.cancel_bk':'この予約を取り消しますか？',
+    'car.toast.bk_cancelled':'✓ 予約を取り消しました',
+    'car.err.need_liters':'給油量を入力してください',
+    'car.err.need_maint_item':'整備項目を入力してください',
+    'car.err.need_next_insp':'次回車検日を入力してください',
+    'room.name.big':'大会議室',
+    'room.name.small':'小会議室',
+    'room.eq.video':'ビデオ会議システム',
+    'room.eq.whiteboard':'ホワイトボード',
+    'room.eq.projector':'プロジェクター',
     'lib.btn.reserve':'予約',
     'lib.grid.avail':'在庫 %d',
     'lib.no_books':'該当する書籍がありません',
@@ -3324,9 +4274,24 @@ function setLang(lang) {
   try{renderInsp();}catch(e){}
   try{renderUse();}catch(e){}
   try{renderCarDash();}catch(e){}
+  try{renderCal();}catch(e){}
+  try{popCarSels();}catch(e){}
+  // 會議室：看板、清單、故障、報表、兩個預約流程的推薦卡都是 JS 畫的
+  try{renderRoomDash();}catch(e){}
+  try{renderRoomList();}catch(e){}
+  try{renderFaults();}catch(e){}
+  try{iUpdateSlots();}catch(e){}         // 時段格子的「過去／全滿／N 間可用」
+  try{updateSlots();}catch(e){}
+  try{iRenderRoomRecommend();}catch(e){}
+  try{renderRoomRecommend();}catch(e){}
   try{renderVisitDash();}catch(e){}
   try{renderVisitList();}catch(e){}
   try{renderGuestDB();}catch(e){}
+  // 到訪表單的四個動態區塊（來賓／行程／陪同／費用）
+  try{renderVfGuests();}catch(e){}
+  try{renderVfDays();}catch(e){}
+  try{renderVfEscorts();}catch(e){}
+  try{renderVfCosts();}catch(e){}
 }
 
 async function init(){
@@ -3987,14 +4952,14 @@ async function openVehModal(id){
   if(id){
     let v=gVeh(id);
     if(!v){ await loadCarFromSB(); v=gVeh(id); }
-    if(!v){toast('找不到車輛資料','error');return;};document.getElementById('vnm').value=v.name||'';document.getElementById('vpl').value=v.plate||'';document.getElementById('vtp').value=v.type||'sedan';document.getElementById('vfl').value=v.fuel||'gas';document.getElementById('vkm').value=v.km||0;document.getElementById('vnmk').value=v.next_maint_km||'';document.getElementById('vni').value=v.next_insp||'';document.getElementById('vpk').value=v.pk_id||'';document.getElementById('vnt').value=v.notes||'';
+    if(!v){toast(t('car.err.no_veh_data'),'error');return;};document.getElementById('vnm').value=v.name||'';document.getElementById('vpl').value=v.plate||'';document.getElementById('vtp').value=v.type||'sedan';document.getElementById('vfl').value=v.fuel||'gas';document.getElementById('vkm').value=v.km||0;document.getElementById('vnmk').value=v.next_maint_km||'';document.getElementById('vni').value=v.next_insp||'';document.getElementById('vpk').value=v.pk_id||'';document.getElementById('vnt').value=v.notes||'';
     const _vstEl=document.getElementById('vstatus');if(_vstEl)_vstEl.value=v.st||v.status||'available';setVehFuel(v.fuel_lvl??4);}
   else{['vnm','vpl','vnt','vni'].forEach(x=>document.getElementById(x).value='');document.getElementById('vkm').value=0;document.getElementById('vnmk').value='';document.getElementById('vtp').value='sedan';document.getElementById('vfl').value='gas';setVehFuel(4);}
   openMo('mo-veh');
 }
 async function saveVeh(){
   const nm=document.getElementById('vnm').value.trim(),pl=document.getElementById('vpl').value.trim();
-  if(!nm||!pl)return toast('請輸入名稱和車牌','error');
+  if(!nm||!pl)return toast(t('car.err.need_name_plate'),'error');
   const data={name:nm,plate:pl,type:document.getElementById('vtp').value,fuel:document.getElementById('vfl').value,km:parseInt(document.getElementById('vkm').value)||0,next_maint_km:parseInt(document.getElementById('vnmk').value)||null,next_insp:document.getElementById('vni').value||null,pk_id:document.getElementById('vpk').value,parking_id:document.getElementById('vpk').value||null,notes:document.getElementById('vnt').value.trim(),st:document.getElementById('vstatus')?.value||'available',status:document.getElementById('vstatus')?.value||'available',site:_carSite||'TW',fuel_lvl:parseInt(document.getElementById('vfuel-lvl')?.value)??4};
   const newVid = editVid || uid();
   const fullVeh = {id:newVid, ...data};
@@ -4005,7 +4970,7 @@ async function saveVeh(){
   await sbSaveVehicle(fullVeh);
   closeMo('mo-veh');
   renderVeh();popCarSels();renderCarDash();
-  toast(editVid?'已更新':'已新增','success');
+  toast(t(editVid?'g.toast.updated':'g.toast.added'),'success');
 }
 function delVeh(id){if(ld(K.bks).find(b=>b.vh_id===id&&b.st!=='done'&&b.st!=='cancelled'))return toast(t('car.err.has_bookings'),'error');if(!confirm(t('g.conf.delete')))return;const _delVhId=id;sv(K.vh,ld(K.vh).filter(v=>v.id!==_delVhId));sbDelVehicle(_delVhId);renderVeh();popCarSels();renderCarDash();toast(t('g.toast.deleted'),'success');}
 
@@ -4018,8 +4983,8 @@ function renderMoCal(bks,mts,isps,vf){
   const y=calDt.getFullYear(),m=calDt.getMonth();document.getElementById('cal-tit').textContent=t('cal.month_fmt').replace('%Y',y).replace('%m',String(m+1).padStart(2,'0'));
   const first=new Date(y,m,1),last=new Date(y,m+1,0),sd=first.getDay();
   const days=[];for(let i=0;i<sd;i++)days.push({d:new Date(y,m,1-sd+i),cur:false});for(let i=1;i<=last.getDate();i++)days.push({d:new Date(y,m,i),cur:true});while(days.length%7)days.push({d:new Date(y,m+1,days.length-last.getDate()-sd+1),cur:false});
-  const today=tds();let h='<div class="cg7">';['日','一','二','三','四','五','六'].forEach(w=>h+=`<div class="cwd">${w}</div>`);
-  days.forEach(({d,cur})=>{const ds=dtStr(d),dbks=bks.filter(b=>b.start.slice(0,10)<=ds&&b.end.slice(0,10)>=ds),dmts=mts.filter(mt=>mt.ndt===ds&&(!vf||mt.vh_id===vf)),disps=isps.filter(isp=>isp.next===ds&&(!vf||isp.vh_id===vf));h+=`<div class="cday ${ds===today?'today':''} ${!cur?'om':''}"><div class="cdn">${d.getDate()}</div>`;let cnt=0;dbks.slice(0,2).forEach(b=>{const v=gVeh(b.vh_id);h+=`<div class="cev ev-${b.st}" onclick="viewBk('${b.id}')" title="${escapeHtml(v?.name||'')}: ${escapeHtml(b.purpose||'')}">${VICO[v?.type]||'🚗'} ${v?.plate?.slice(-4)||b.purpose||'預約'}</div>`;cnt++;});dmts.slice(0,1).forEach(mt=>{const v=gVeh(mt.vh_id);h+=`<div class="cev ev-m">🔧 ${v?.name||'保養'}</div>`;cnt++;});disps.slice(0,1).forEach(isp=>{const v=gVeh(isp.vh_id);h+=`<div class="cev ev-m">📋 驗車${v?.plate||''}</div>`;cnt++;});const tot=dbks.length+dmts.length+disps.length;if(tot>cnt)h+=`<div class="cmore">+${tot-cnt}筆</div>`;h+=`</div>`;});
+  const today=tds();let h='<div class="cg7">';t('g.weekdays').split(',').forEach(w=>h+=`<div class="cwd">${w}</div>`);
+  days.forEach(({d,cur})=>{const ds=dtStr(d),dbks=bks.filter(b=>b.start.slice(0,10)<=ds&&b.end.slice(0,10)>=ds),dmts=mts.filter(mt=>mt.ndt===ds&&(!vf||mt.vh_id===vf)),disps=isps.filter(isp=>isp.next===ds&&(!vf||isp.vh_id===vf));h+=`<div class="cday ${ds===today?'today':''} ${!cur?'om':''}"><div class="cdn">${d.getDate()}</div>`;let cnt=0;dbks.slice(0,2).forEach(b=>{const v=gVeh(b.vh_id);h+=`<div class="cev ev-${b.st}" onclick="viewBk('${b.id}')" title="${escapeHtml(v?.name||'')}: ${escapeHtml(b.purpose||'')}">${VICO[v?.type]||'🚗'} ${v?.plate?.slice(-4)||b.purpose||t('car.cal.booking')}</div>`;cnt++;});dmts.slice(0,1).forEach(mt=>{const v=gVeh(mt.vh_id);h+=`<div class="cev ev-m">🔧 ${v?.name||t('car.cal.maint')}</div>`;cnt++;});disps.slice(0,1).forEach(isp=>{const v=gVeh(isp.vh_id);h+=`<div class="cev ev-m">📋 ${t('car.cal.insp')}${v?.plate||''}</div>`;cnt++;});const tot=dbks.length+dmts.length+disps.length;if(tot>cnt)h+=`<div class="cmore">${t('g.cal.more').replace('%d',tot-cnt)}</div>`;h+=`</div>`;});
   h+='</div>';document.getElementById('cal-body').innerHTML=h;
 }
 function renderWkCal(bks,mts,isps,vf){
@@ -4028,7 +4993,7 @@ function renderWkCal(bks,mts,isps,vf){
   document.getElementById('cal-tit').textContent=`${ws.getFullYear()}/${ws.getMonth()+1}/${ws.getDate()} — ${days[6].getMonth()+1}/${days[6].getDate()}`;
   const today=tds(),hrs=Array.from({length:13},(_,i)=>i+7);
   let h='<div class="wg"><div><div class="wth"></div>';hrs.forEach(hr=>h+=`<div class="wtl">${String(hr).padStart(2,'0')}:00</div>`);h+='</div>';
-  days.forEach(d=>{const ds=ymdL(d),isT=ds===today;h+=`<div><div class="wth" style="${isT?'color:var(--tl)':''}">${['日','一','二','三','四','五','六'][d.getDay()]} ${d.getDate()}</div>`;hrs.forEach(hr=>{const ss=`${ds}T${String(hr).padStart(2,'0')}:00`,se=`${ds}T${String(hr+1).padStart(2,'0')}:00`;const hbks=bks.filter(b=>b.start<se&&b.end>ss&&b.start.slice(0,10)<=ds&&b.end.slice(0,10)>=ds);h+=`<div class="wcell">`;hbks.forEach(b=>{const v=gVeh(b.vh_id);h+=`<div class="wev ev-${b.st}" onclick="viewBk('${b.id}')" title="${escapeHtml(v?.name||'')}: ${escapeHtml(b.purpose||'')}">${v?.plate?.slice(-4)||b.purpose||'預約'}</div>`;});h+=`</div>`;});h+=`</div>`;});
+  days.forEach(d=>{const ds=ymdL(d),isT=ds===today;h+=`<div><div class="wth" style="${isT?'color:var(--tl)':''}">${t('g.weekdays').split(',')[d.getDay()]} ${d.getDate()}</div>`;hrs.forEach(hr=>{const ss=`${ds}T${String(hr).padStart(2,'0')}:00`,se=`${ds}T${String(hr+1).padStart(2,'0')}:00`;const hbks=bks.filter(b=>b.start<se&&b.end>ss&&b.start.slice(0,10)<=ds&&b.end.slice(0,10)>=ds);h+=`<div class="wcell">`;hbks.forEach(b=>{const v=gVeh(b.vh_id);h+=`<div class="wev ev-${b.st}" onclick="viewBk('${b.id}')" title="${escapeHtml(v?.name||'')}: ${escapeHtml(b.purpose||'')}">${v?.plate?.slice(-4)||b.purpose||t('car.cal.booking')}</div>`;});h+=`</div>`;});h+=`</div>`;});
   h+='</div>';document.getElementById('cal-body').innerHTML=h;
 }
 // 行事曆上的「標記為已完成」：同 doReturn，先寫資料庫、成功才改快取（v2.37）。
@@ -4036,13 +5001,13 @@ function renderWkCal(bks,mts,isps,vf){
 async function viewBk(id){
   const b=ld(K.bks).find(x=>x.id===id);if(!b)return;
   const v=gVeh(b.vh_id),u=gUsr(b.u_id);
-  if(!confirm(`車輛：${v?.name||'—'}\n使用人：${u?.name||'—'}\n時間：${b.start.replace('T',' ')} — ${b.end.replace('T',' ')}\n目的：${b.purpose||'—'}\n狀態：${b.st}\n\n點確定標記為已完成（歸還）`))return;
+  if(!confirm(t('car.conf.mark_done').replace('%s',v?.name||'—').replace('%s',u?.name||'—').replace('%s',`${b.start.replace('T',' ')} — ${b.end.replace('T',' ')}`).replace('%s',b.purpose||'—').replace('%s',b.st)))return;
   const upd={...b,st:'done',status:'done',actual_end:b.actual_end||tdm()};
   const r=await sbSaveCarBk(upd);
   if(!r.ok){toast(sbErrMsg(r),'error');return;}
   const bks=ld(K.bks),i=bks.findIndex(x=>x.id===id);
   if(i>=0){bks[i]=upd;sv(K.bks,bks);}
-  renderCal();renderCarDash();renderUse();toast('已標記完成','success');
+  renderCal();renderCarDash();renderUse();toast(t('car.toast.marked_done'),'success');
 }
 
 async function initCarBkForm(){
@@ -4093,7 +5058,7 @@ async function initCarBkForm(){
       return;
     }
     // 找不到該預約或無權限，回到新增模式
-    if(bk)toast('無權限修改此預約','error');
+    if(bk)toast(t('car.err.no_perm_edit'),'error');
     editCarBkId=null;
   }
   if(titleEl)titleEl.textContent=t('car.page.bk');
@@ -4115,9 +5080,9 @@ async function initCarBkForm(){
 function cancelBkForm(){editCarBkId=null;_bkPrefill=null;navCar('car-dash');}
 function editCarBk(id){
   const bk=ld(K.bks).find(b=>b.id===id);
-  if(!bk)return toast('找不到預約','error');
-  if((bk.st||bk.status)!=='pending')return toast('僅待出發的預約可修改','error');
-  if(!(isAdmin()||bk.u_id===curUid))return toast('無權限修改此預約','error');
+  if(!bk)return toast(t('car.err.bk_notfound'),'error');
+  if((bk.st||bk.status)!=='pending')return toast(t('car.err.only_pending'),'error');
+  if(!(isAdmin()||bk.u_id===curUid))return toast(t('car.err.no_perm_edit'),'error');
   editCarBkId=id;
   navCar('car-bk');
 }
@@ -4127,7 +5092,7 @@ function chkConflict(){
   const ns=`${sd}T${st}`,ne=`${ed}T${et}`;
   if(ne<=ns){el.style.display='';el.textContent='⚠️ '+t('err.time_order');return;}
   const cf=ld(K.bks).find(b=>b.vh_id===vid&&b.st!=='done'&&b.st!=='cancelled'&&b.start<ne&&b.end>ns);
-  if(cf){const u=gUsr(cf.u_id);el.style.display='';el.textContent=`⚠️ 與${u?.name||'其他人'}衝突（${cf.start.replace('T',' ')} — ${cf.end.replace('T',' ')}）`;}else el.style.display='none';
+  if(cf){const u=gUsr(cf.u_id);el.style.display='';el.textContent=t('car.warn.conflict').replace('%s',u?.name||t('car.other_person')).replace('%s',`${cf.start.replace('T',' ')} — ${cf.end.replace('T',' ')}`);}else el.style.display='none';
 }
 
 // 這台車「下一個沒有被佔用的日子」：取所有未結束預約中最晚的結束日，隔一天。
@@ -4153,21 +5118,21 @@ function startBk(vid,from){
 
 async function doBooking(){
   const vid=document.getElementById('bkv').value,uid2=document.getElementById('bku').value,sd=document.getElementById('bksd').value,st=document.getElementById('bkst2').value||'08:00',ed=document.getElementById('bked').value,et=document.getElementById('bket').value||'18:00',pur=document.getElementById('bkpur').value.trim();
-  if(!vid)return toast('請選擇車輛','error');if(!uid2)return toast('請選擇使用人','error');if(!sd||!ed)return toast('請選擇日期','error');if(!pur)return toast('請填寫出行目的','error');
+  if(!vid)return toast(t('car.err.need_veh'),'error');if(!uid2)return toast(t('car.err.need_user'),'error');if(!sd||!ed)return toast(t('car.err.need_date'),'error');if(!pur)return toast(t('car.err.need_purpose'),'error');
   const ns=`${sd}T${st}`,ne=`${ed}T${et}`;if(ne<=ns)return toast(t('err.time_order'),'error');
-  if(ld(K.bks).find(b=>b.vh_id===vid&&b.id!==editCarBkId&&b.st!=='done'&&b.st!=='cancelled'&&b.start<ne&&b.end>ns))return toast('此車時段已有預約','error');
+  if(ld(K.bks).find(b=>b.vh_id===vid&&b.id!==editCarBkId&&b.st!=='done'&&b.st!=='cancelled'&&b.start<ne&&b.end>ns))return toast(t('car.err.slot_taken'),'error');
   const bks=ld(K.bks);
   const fields={vh_id:vid,u_id:uid2,start:ns,end:ne,purpose:pur,km_plan:parseInt(document.getElementById('bkkm').value)||0,from:document.getElementById('bkfr').value.trim(),to:document.getElementById('bkto').value.trim(),note:document.getElementById('bknt').value.trim()};
   let saved,isEdit=false;
   if(editCarBkId){
     const i=bks.findIndex(b=>b.id===editCarBkId);
-    if(i<0){toast('找不到原預約','error');editCarBkId=null;return;}
-    if(!(isAdmin()||bks[i].u_id===curUid)){toast('無權限修改此預約','error');editCarBkId=null;return;}
+    if(i<0){toast(t('car.err.orig_bk_notfound'),'error');editCarBkId=null;return;}
+    if(!(isAdmin()||bks[i].u_id===curUid)){toast(t('car.err.no_perm_edit'),'error');editCarBkId=null;return;}
     bks[i]={...bks[i],...fields};saved=bks[i];isEdit=true;
   }else{
     saved={id:uid(),...fields,st:'pending'};bks.push(saved);
   }
-  sv(K.bks,bks);await sbSaveCarBk(saved);const v=gVeh(vid),u=gUsr(uid2);toast(isEdit?`已更新預約：${u?.name}使用${v?.name}（${sd}）`:`已預約：${u?.name}使用${v?.name}（${sd}）`,'success');
+  sv(K.bks,bks);await sbSaveCarBk(saved);const v=gVeh(vid),u=gUsr(uid2);toast(t(isEdit?'car.toast.bk_updated':'car.toast.bk_created').replace('%s',u?.name||'').replace('%s',v?.name||'').replace('%s',sd),'success');
   editCarBkId=null;
   ['bkpur','bkkm','bkfr','bkto','bknt'].forEach(x=>document.getElementById(x).value='');document.getElementById('bk-conf').style.display='none';navCar('car-dash');
 }
@@ -4203,7 +5168,7 @@ async function startUse(id){
   const cur=ld(K.bks),ci=cur.findIndex(x=>x.id===id);   // await 期間快取可能已被重新載入，重讀再改
   if(ci>=0)cur[ci]=upd;else cur.push(upd);
   sv(K.bks,cur);
-  renderUse();renderCarDash();toast('已標記出發','success');
+  renderUse();renderCarDash();toast(t('car.toast.departed'),'success');
 }
 function endUse(id){
   const bks=ld(K.bks),i=bks.findIndex(b=>b.id===id);if(i<0)return;
@@ -4256,7 +5221,7 @@ async function doReturn(){
     if(rv.ok){vehs[vi]=nv;sv(K.vh,vehs);}
     else toast(t('car.veh_sync_fail'),'error');
   }
-  closeMo('mo-ret');renderUse();renderCarDash();toast('已登記歸還','success');
+  closeMo('mo-ret');renderUse();renderCarDash();toast(t('car.toast.returned'),'success');
 }
 // 只刪「已取消」的預約，且僅 admin。已完成的用車紀錄是里程與使用歷程的來源，不開放刪除；
 // 待出發／使用中的請先取消再刪，免得刪掉別人正在用的那筆。
@@ -4277,9 +5242,9 @@ async function delCarBk(id){
   toast(t('g.toast.deleted'),'success');
 }
 async function cancelCarBk(id){
-  if(!confirm('確定取消此預約？'))return;
+  if(!confirm(t('g.conf.cancel_bk')))return;
   const bks=ld(K.bks),i=bks.findIndex(b=>b.id===id);
-  if(i<0){toast('找不到預約','error');return;}
+  if(i<0){toast(t('car.err.bk_notfound'),'error');return;}
   // 1. 更新本地快取（立即響應）
   bks[i].st='cancelled';
   bks[i].status='cancelled';
@@ -4292,28 +5257,30 @@ async function cancelCarBk(id){
   // 3. 重新從 SB 載入並更新看板
   await loadCarFromSB();
   renderUse();
-  toast('✓ 已取消預約','success');
+  toast(t('car.toast.bk_cancelled'),'success');
 }
+// 🔴 CSV 表頭是匯出的存檔格式，不隨介面語言變（同圖書館的匯出）。
 function expUseCSV(){const bks=ld(K.bks);const rows=[['車輛','車牌','使用人','出發','歸還','目的','里程','狀態']];bks.forEach(b=>{const v=gVeh(b.vh_id),u=gUsr(b.u_id);rows.push([v?.name||'',v?.plate||'',u?.name||'',b.start,b.end,b.purpose||'',b.km_plan||'',b.st]);});dl('usage.csv',rows.map(r=>r.map(c=>`"${c}"`).join(',')).join('\n'),'text/csv');toast(t('g.toast.exported'),'success');}
 
 function calcFuel(){const l=parseFloat(document.getElementById('flt').value)||0,p=parseFloat(document.getElementById('fpr').value)||0;if(l&&p)document.getElementById('ftot').value=(l*p).toFixed(0);}
 function renderFuelSum(){const logs=ld(K.fl).filter(l=>_siteVehIds().has(l.vh_id)),ym=ymL(new Date()),mth=logs.filter(l=>l.date.slice(0,7)===ym);document.getElementById('fl-c').textContent='$'+(mth.reduce((s,l)=>s+(l.total||0),0)).toLocaleString();document.getElementById('fl-l').textContent=mth.reduce((s,l)=>s+(l.liters||0),0).toFixed(1);document.getElementById('fl-n').textContent=logs.length;}
 function renderFuel(){let logs=ld(K.fl).filter(l=>_siteVehIds().has(l.vh_id));const vf=document.getElementById('fvf')?.value||'';if(vf)logs=logs.filter(l=>l.vh_id===vf);logs.sort((a,b)=>b.date.localeCompare(a.date));document.getElementById('fl-tb').innerHTML=logs.length?logs.map(l=>{const v=gVeh(l.vh_id),u=gUsr(l.u_id);return`<tr><td>${VICO[v?.type]||'⛽'} ${v?.name||'—'}</td><td class="tdm">${fmtD(l.date)}</td><td>${l.liters}</td><td>${(l.total||0).toLocaleString()}</td><td>${l.price||'—'}</td><td>${l.odo?l.odo.toLocaleString():'—'}</td><td>${u?.name||'—'}</td><td class="tdm">${l.note||'—'}</td><td><button class="btn bdr bsm" onclick="delFuel('${l.id}')">${t('g.btn.delete')}</button></td></tr>`}).join(''):`<tr><td colspan="9" class="tdm" style="text-align:center;padding:22px">${t('car.no_fuel')}</td></tr>`;}
 function openFuelModal(){const vehs=_carSite?ld(K.vh).filter(v=>v.site===_carSite):ld(K.vh),us=ld(K.us);document.getElementById('fveh').innerHTML=`<option value="">${t('g.select')}</option>`+vehs.map(v=>`<option value="${v.id}">${v.name}(${v.plate})</option>`).join('');document.getElementById('fusr').innerHTML=`<option value="">${t('g.select')}</option>`+us.map(u=>`<option value="${u.id}">${u.name}</option>`).join('');document.getElementById('fdt').value=tds();['flt','fpr','ftot','fod','fnt'].forEach(x=>document.getElementById(x).value='');if(curUid)document.getElementById('fusr').value=curUid;openMo('mo-fuel');}
-function saveFuel(){const vid=document.getElementById('fveh').value,lt=parseFloat(document.getElementById('flt').value);if(!vid)return toast('請選擇車輛','error');if(!lt)return toast('請輸入加油量','error');const pr=parseFloat(document.getElementById('fpr').value)||0;const logs=ld(K.fl);logs.push({id:uid(),vh_id:vid,u_id:document.getElementById('fusr').value,date:document.getElementById('fdt').value||tds(),liters:lt,price:pr,total:parseFloat(document.getElementById('ftot').value)||(lt*pr),odo:parseInt(document.getElementById('fod').value)||null,note:document.getElementById('fnt').value.trim()});sv(K.fl,logs);sbSaveFuelLog(logs[logs.length-1]);closeMo('mo-fuel');renderFuel();renderFuelSum();toast(t('g.toast.saved'),'success');}
-function delFuel(id){if(!confirm('確定刪除？'))return;sv(K.fl,ld(K.fl).filter(l=>l.id!==id));sbDelCarRow('car_fuel_logs',id);renderFuel();renderFuelSum();toast(t('g.toast.deleted'),'success');}
+function saveFuel(){const vid=document.getElementById('fveh').value,lt=parseFloat(document.getElementById('flt').value);if(!vid)return toast(t('car.err.need_veh'),'error');if(!lt)return toast(t('car.err.need_liters'),'error');const pr=parseFloat(document.getElementById('fpr').value)||0;const logs=ld(K.fl);logs.push({id:uid(),vh_id:vid,u_id:document.getElementById('fusr').value,date:document.getElementById('fdt').value||tds(),liters:lt,price:pr,total:parseFloat(document.getElementById('ftot').value)||(lt*pr),odo:parseInt(document.getElementById('fod').value)||null,note:document.getElementById('fnt').value.trim()});sv(K.fl,logs);sbSaveFuelLog(logs[logs.length-1]);closeMo('mo-fuel');renderFuel();renderFuelSum();toast(t('g.toast.saved'),'success');}
+function delFuel(id){if(!confirm(t('g.conf.delete')))return;sv(K.fl,ld(K.fl).filter(l=>l.id!==id));sbDelCarRow('car_fuel_logs',id);renderFuel();renderFuelSum();toast(t('g.toast.deleted'),'success');}
+// 🔴 同上。
 function expFuelCSV(){const logs=ld(K.fl);const rows=[['車輛','日期','油量L','金額','單價','里程','加油人','備註']];logs.forEach(l=>{const v=gVeh(l.vh_id),u=gUsr(l.u_id);rows.push([v?.name||'',l.date,l.liters,l.total||'',l.price||'',l.odo||'',u?.name||'',l.note||'']);});dl('fuel.csv',rows.map(r=>r.map(c=>`"${c}"`).join(',')).join('\n'),'text/csv');toast(t('g.toast.exported'),'success');}
 
 function renderMaint(){let logs=ld(K.mt).filter(l=>_siteVehIds().has(l.vh_id));const vf=document.getElementById('mtvf')?.value||'';if(vf)logs=logs.filter(l=>l.vh_id===vf);logs.sort((a,b)=>b.date.localeCompare(a.date));document.getElementById('mt-tb').innerHTML=logs.length?logs.map(l=>{const v=gVeh(l.vh_id);return`<tr><td>${VICO[v?.type]||'🔧'} ${v?.name||'—'}</td><td class="tdm">${fmtD(l.date)}</td><td>${l.items||'—'}</td><td>${l.km?l.km.toLocaleString():'—'}</td><td>${l.cost?'$'+l.cost.toLocaleString():'—'}</td><td>${l.nkm?l.nkm.toLocaleString():'—'}</td><td class="tdm">${fmtD(l.ndt)}</td><td class="tdm">${l.vendor||'—'}</td><td><button class="btn bdr bsm" onclick="delMaint('${l.id}')">${t('g.btn.delete')}</button></td></tr>`}).join(''):`<tr><td colspan="9" class="tdm" style="text-align:center;padding:22px">${t('car.no_maint')}</td></tr>`;}
 function openMaintModal(){document.getElementById('momtt').textContent=t('car.mo.add_maint');const vehs=_carSite?ld(K.vh).filter(v=>v.site===_carSite):ld(K.vh);document.getElementById('mtveh').innerHTML=`<option value="">${t('g.select')}</option>`+vehs.map(v=>`<option value="${v.id}">${v.name}(${v.plate})</option>`).join('');document.getElementById('mtdt').value=tds();['mtkm','mtit','mtcs','mtvd','mtnk','mtnt'].forEach(x=>document.getElementById(x).value='');document.getElementById('mtnd').value='';openMo('mo-maint');}
-function saveMaint(){const vid=document.getElementById('mtveh').value,it=document.getElementById('mtit').value.trim();if(!vid)return toast('請選擇車輛','error');if(!it)return toast('請填寫保養項目','error');const nkm=parseInt(document.getElementById('mtnk').value)||null,ndt=document.getElementById('mtnd').value||null;const data={id:uid(),vh_id:vid,date:document.getElementById('mtdt').value||tds(),km:parseInt(document.getElementById('mtkm').value)||null,items:it,cost:parseInt(document.getElementById('mtcs').value)||null,vendor:document.getElementById('mtvd').value.trim(),nkm,ndt,note:document.getElementById('mtnt').value.trim()};const logs=ld(K.mt);logs.push(data);sv(K.mt,logs);sbSaveMaintLog(data);if(nkm){const vehs=ld(K.vh),vi=vehs.findIndex(v=>v.id===vid);if(vi>=0){vehs[vi].next_maint_km=nkm;sv(K.vh,vehs);sbSaveVehicle(vehs[vi]);}}closeMo('mo-maint');renderMaint();updBadges();renderCarDash();toast(t('g.toast.saved'),'success');}
-function delMaint(id){if(!confirm('確定刪除？'))return;sv(K.mt,ld(K.mt).filter(l=>l.id!==id));sbDelCarRow('car_maint_logs',id);renderMaint();toast(t('g.toast.deleted'),'success');}
+function saveMaint(){const vid=document.getElementById('mtveh').value,it=document.getElementById('mtit').value.trim();if(!vid)return toast(t('car.err.need_veh'),'error');if(!it)return toast(t('car.err.need_maint_item'),'error');const nkm=parseInt(document.getElementById('mtnk').value)||null,ndt=document.getElementById('mtnd').value||null;const data={id:uid(),vh_id:vid,date:document.getElementById('mtdt').value||tds(),km:parseInt(document.getElementById('mtkm').value)||null,items:it,cost:parseInt(document.getElementById('mtcs').value)||null,vendor:document.getElementById('mtvd').value.trim(),nkm,ndt,note:document.getElementById('mtnt').value.trim()};const logs=ld(K.mt);logs.push(data);sv(K.mt,logs);sbSaveMaintLog(data);if(nkm){const vehs=ld(K.vh),vi=vehs.findIndex(v=>v.id===vid);if(vi>=0){vehs[vi].next_maint_km=nkm;sv(K.vh,vehs);sbSaveVehicle(vehs[vi]);}}closeMo('mo-maint');renderMaint();updBadges();renderCarDash();toast(t('g.toast.saved'),'success');}
+function delMaint(id){if(!confirm(t('g.conf.delete')))return;sv(K.mt,ld(K.mt).filter(l=>l.id!==id));sbDelCarRow('car_maint_logs',id);renderMaint();toast(t('g.toast.deleted'),'success');}
 
 let editIspId=null;
 function renderInsp(){const isps=ld(K.isp).filter(i=>_siteVehIds().has(i.vh_id));const cfg=lo(K.ccfg,DCCFG);document.getElementById('insp-tb').innerHTML=isps.length?isps.map(isp=>{const v=gVeh(isp.vh_id),d=isp.next?dDiff(isp.next):null,cls=d===null?'':d<=7?'rd':d<=cfg.insp_days?'rw':'';return`<tr class="${cls}"><td>${VICO[v?.type]||'📋'} ${v?.name||'—'} <span class="tdm">(${v?.plate||''})</span></td><td class="tdm">${fmtD(isp.last)}</td><td>${fmtD(isp.next)}</td><td>${d!==null?`<span class="badge ${d<=7?'br':d<=30?'by':'bg'}">${d}d</span>`:'—'}</td><td><span class="badge ${d!==null&&d<=cfg.insp_days?'by':'bg'}">${d!==null&&d<=cfg.insp_days?t('lib.stat.soon'):t('car.st.avail')}</span></td><td class="tdm">${isp.note||'—'}</td><td><button class="btn bg2 bsm" onclick="openInspModal('${isp.id}')">${t('lib.btn.update')}</button> <button class="btn bdr bsm" onclick="delInsp('${isp.id}')">${t('g.btn.delete')}</button></td></tr>`}).join(''):`<tr><td colspan="7" class="tdm" style="text-align:center;padding:22px">${t('car.no_insp')}</td></tr>`;}
 function openInspModal(id){editIspId=id||null;document.getElementById('moispt').textContent=id?t('car.mo.edit_insp'):t('car.mo.add_insp');const vehs=_carSite?ld(K.vh).filter(v=>v.site===_carSite):ld(K.vh);document.getElementById('ispveh').innerHTML=`<option value="">${t('g.select')}</option>`+vehs.map(v=>`<option value="${v.id}">${v.name}(${v.plate})</option>`).join('');if(id){const isp=ld(K.isp).find(i=>i.id===id);if(!isp)return;document.getElementById('ispveh').value=isp.vh_id;document.getElementById('ispls').value=isp.last||'';document.getElementById('ispnx').value=isp.next||'';document.getElementById('ispnt').value=isp.note||'';}else{['ispls','ispnx','ispnt'].forEach(x=>document.getElementById(x).value='');}openMo('mo-insp');}
-function saveInsp(){const vid=document.getElementById('ispveh').value,nxt=document.getElementById('ispnx').value;if(!vid)return toast('請選擇車輛','error');if(!nxt)return toast('請填寫下次驗車日期','error');const data={vh_id:vid,last:document.getElementById('ispls').value||null,next:nxt,note:document.getElementById('ispnt').value.trim()};const isps=ld(K.isp);let _savedIsp;if(editIspId){const i=isps.findIndex(x=>x.id===editIspId);if(i>=0){isps[i]={...isps[i],...data};_savedIsp=isps[i];}}else{_savedIsp={id:uid(),...data};isps.push(_savedIsp);}sv(K.isp,isps);if(_savedIsp)sbSaveInsp(_savedIsp);const vehs=ld(K.vh),vi=vehs.findIndex(v=>v.id===vid);if(vi>=0){vehs[vi].next_insp=nxt;sv(K.vh,vehs);sbSaveVehicle(vehs[vi]);}closeMo('mo-insp');renderInsp();updBadges();renderCarDash();toast('已更新','success');}
-function delInsp(id){if(!confirm('確定刪除？'))return;sv(K.isp,ld(K.isp).filter(i=>i.id!==id));sbDelCarRow('car_inspections',id);renderInsp();toast(t('g.toast.deleted'),'success');}
+function saveInsp(){const vid=document.getElementById('ispveh').value,nxt=document.getElementById('ispnx').value;if(!vid)return toast(t('car.err.need_veh'),'error');if(!nxt)return toast(t('car.err.need_next_insp'),'error');const data={vh_id:vid,last:document.getElementById('ispls').value||null,next:nxt,note:document.getElementById('ispnt').value.trim()};const isps=ld(K.isp);let _savedIsp;if(editIspId){const i=isps.findIndex(x=>x.id===editIspId);if(i>=0){isps[i]={...isps[i],...data};_savedIsp=isps[i];}}else{_savedIsp={id:uid(),...data};isps.push(_savedIsp);}sv(K.isp,isps);if(_savedIsp)sbSaveInsp(_savedIsp);const vehs=ld(K.vh),vi=vehs.findIndex(v=>v.id===vid);if(vi>=0){vehs[vi].next_insp=nxt;sv(K.vh,vehs);sbSaveVehicle(vehs[vi]);}closeMo('mo-insp');renderInsp();updBadges();renderCarDash();toast(t('g.toast.updated'),'success');}
+function delInsp(id){if(!confirm(t('g.conf.delete')))return;sv(K.isp,ld(K.isp).filter(i=>i.id!==id));sbDelCarRow('car_inspections',id);renderInsp();toast(t('g.toast.deleted'),'success');}
 
 function openParkUpdModal(vid){
   const veh=ld(K.vh).find(v=>v.id===vid);if(!veh)return;
@@ -4340,13 +5307,13 @@ function showUsw(){
     header=`<div style="background:var(--blue-bg);border:1px solid var(--blue-border);border-radius:var(--radius);padding:10px 12px;margin-bottom:12px;font-size:12px">
       <div style="font-weight:600;color:var(--blue);margin-bottom:2px">${s.nameZh||s.nameEn||''}</div>
       <div style="color:var(--text-3)">${s.email||''} · ${s.site||''} · ${s.role||''}</div>
-      <div style="color:var(--text-3);margin-top:4px;font-size:11px">透過 Portal 登入 · <a href="/" style="color:var(--blue)">返回 Portal</a></div>
+      <div style="color:var(--text-3);margin-top:4px;font-size:11px">${t('g.portal_login')} · <a href="/" style="color:var(--blue)">${t('g.back_portal')}</a></div>
     </div>`;
   }
   document.getElementById('usw-list').innerHTML=header+us.map(u=>`<div class="uitem ${curUid===u.id?'sel':''}" onclick="switchU('${u.id}')"><div style="font-size:13px;font-weight:600">${u.name||u.nameZh||u.nameEn||u.id}</div><div style="font-size:11px;color:var(--t3)">${u.dept||''}</div></div>`).join('');
   openMo('mo-usw');
 }
-function switchU(id){curUid=id;try{localStorage.setItem(K.cu,id);}catch(e){console.warn('[switchU] quota:',e.message);}updUsrDisp();closeMo('mo-usw');toast(`已切換至 ${gUsr(id)?.name}`,'success');}
+function switchU(id){curUid=id;try{localStorage.setItem(K.cu,id);}catch(e){console.warn('[switchU] quota:',e.message);}updUsrDisp();closeMo('mo-usw');toast(t('g.toast.switched').replace('%s',gUsr(id)?.name||''),'success');}
 function updUsrDisp(){
   if(PORTAL_SESSION){
     const name=PORTAL_SESSION.nameZh||PORTAL_SESSION.nameEn||PORTAL_SESSION.empId;
@@ -4355,7 +5322,7 @@ function updUsrDisp(){
   }
   const u=gUsr(curUid);
   const el=document.getElementById('cur-u');
-  if(el)el.textContent=u?(u.name||u.nameZh||u.nameEn||u.id):'選擇使用者';
+  if(el)el.textContent=u?(u.name||u.nameZh||u.nameEn||u.id):t('g.select_user');
 }
 
 function updBadges(){
@@ -4386,13 +5353,20 @@ function dl(fn,c,m){const a=document.createElement('a');a.href=URL.createObjectU
 // ══════════════════════════════
 const RK='room_v1';const FK='fault_v1';
 const ROOMS=[
-  {id:'TW-big',  name:'大會議室',cap:20,equip:['視訊系統','白板','投影機'],icon:'🏛️',site:'TW'},
-  {id:'TW-small',name:'小會議室',cap:8, equip:['視訊系統','白板','投影機'],icon:'🚪',site:'TW'},
-  {id:'CN-big',  name:'大會議室',cap:20,equip:['視訊系統','白板','投影機'],icon:'🏛️',site:'CN'},
-  {id:'CN-small',name:'小會議室',cap:8, equip:['視訊系統','白板','投影機'],icon:'🚪',site:'CN'},
-  {id:'VN-big',  name:'大會議室',cap:20,equip:['視訊系統','白板','投影機'],icon:'🏛️',site:'VN'},
-  {id:'VN-small',name:'小會議室',cap:8, equip:['視訊系統','白板','投影機'],icon:'🚪',site:'VN'},
+  // 🔴 存 key 不存文案（同其他所有標籤表：這個陣列在載入時求值一次）。
+  //    取名稱一律 roomName(r)、取設備一律 roomEquip(r)，不要直接讀 .name／.equip。
+  //    room_bookings 存的是 room_id，所以名稱純粹是顯示用，翻了不影響資料。
+  {id:'TW-big',  nameK:'room.name.big',  cap:20,equipK:['room.eq.video','room.eq.whiteboard','room.eq.projector'],icon:'🏛️',site:'TW'},
+  {id:'TW-small',nameK:'room.name.small',cap:8, equipK:['room.eq.video','room.eq.whiteboard','room.eq.projector'],icon:'🚪',site:'TW'},
+  {id:'CN-big',  nameK:'room.name.big',  cap:20,equipK:['room.eq.video','room.eq.whiteboard','room.eq.projector'],icon:'🏛️',site:'CN'},
+  {id:'CN-small',nameK:'room.name.small',cap:8, equipK:['room.eq.video','room.eq.whiteboard','room.eq.projector'],icon:'🚪',site:'CN'},
+  {id:'VN-big',  nameK:'room.name.big',  cap:20,equipK:['room.eq.video','room.eq.whiteboard','room.eq.projector'],icon:'🏛️',site:'VN'},
+  {id:'VN-small',nameK:'room.name.small',cap:8, equipK:['room.eq.video','room.eq.whiteboard','room.eq.projector'],icon:'🚪',site:'VN'},
 ];
+const roomName  = r => r ? (r.nameK ? t(r.nameK) : (r.name||'')) : '';
+// 固定繁中版，只給「寄出去／存下來」的內容用（同 board 的 siteLabelZ）
+const ROOM_NAME_ZH = {'room.name.big':'大會議室','room.name.small':'小會議室'};
+const roomEquip = r => r ? (r.equipK ? r.equipK.map(t) : (r.equip||[])) : [];
 const SITEFLAGS={TW:'🇹🇼',CN:'🇨🇳',VN:'🇻🇳'};
 let _roomSite='',_carSite='',_libSite='',_curSite='';
 function visRooms(){return _roomSite?ROOMS.filter(r=>r.site===_roomSite):ROOMS;}
@@ -4479,14 +5453,14 @@ function roomLiveStatus(roomId,bks){
   if(current){
     const e=new Date(current.date+'T'+current.end+':00');
     const remMin=Math.ceil((e-now)/60000);
-    return{type:'busy',label:`使用中（剩 ${remMin} 分鐘）`,detail:current.title||'會議中',cls:'rs-busy',bk:current};
+    return{type:'busy',label:t('room.st.busy').replace('%d',remMin),detail:current.title||t('room.st.meeting'),cls:'rs-busy',bk:current};
   }
   if(next){
     const s=new Date(next.date+'T'+next.start+':00');
     const waitMin=Math.ceil((s-now)/60000);
-    if(waitMin<=60){return{type:'soon',label:`${waitMin} 分鐘後使用`,detail:next.title||'即將開始',cls:'rs-soon',bk:next};}
+    if(waitMin<=60){return{type:'soon',label:t('room.st.soon').replace('%d',waitMin),detail:next.title||t('room.st.starting'),cls:'rs-soon',bk:next};}
   }
-  return{type:'free',label:'整天空閒',detail:'可立即預約',cls:'rs-free',bk:null};
+  return{type:'free',label:t('room.st.free_all_day'),detail:t('room.st.bookable'),cls:'rs-free',bk:null};
 }
 
 // ── Dashboard ──
@@ -4521,9 +5495,9 @@ function renderDashCards(bks){
     return `<div class="room-card" style="border-top:3px solid ${st.type==='busy'?'var(--rd)':st.type==='soon'?'var(--yw)':'var(--gn)'}">
       <div class="room-card-head">
         <div>
-          <div class="room-name">${room.icon} ${room.name}</div>
-          <div class="room-cap">最多 ${room.cap} 人 · ${room.equip.join(' · ')}</div>
-          ${faults.length?`<div style="margin-top:5px"><span class="badge br" style="font-size:10px">⚠ ${faults.length} 項故障待修</span></div>`:''}
+          <div class="room-name">${room.icon} ${roomName(room)}</div>
+          <div class="room-cap">${t('room.cap_fmt').replace('%d',room.cap).replace('%s',roomEquip(room).join(' · '))}</div>
+          ${faults.length?`<div style="margin-top:5px"><span class="badge br" style="font-size:10px">${t('room.faults_open').replace('%d',faults.length)}</span></div>`:''}
         </div>
         <div style="text-align:right">
           <div class="room-status-pill ${st.cls}">${st.label}</div>
@@ -4531,14 +5505,14 @@ function renderDashCards(bks){
         </div>
       </div>
       <div class="room-card-body">
-        <div class="room-equip">${room.equip.map(e=>`<span class="equip-tag">${e}</span>`).join('')}</div>
-        ${st.type==='busy'&&st.bk?`<div style="font-size:12px;color:var(--t2)">📋 ${st.bk.title||'—'} · 主辦：${gUsr(st.bk.hostId)?.name||st.bk.hostId||'—'}</div>`:''}
+        <div class="room-equip">${roomEquip(room).map(e=>`<span class="equip-tag">${e}</span>`).join('')}</div>
+        ${st.type==='busy'&&st.bk?`<div style="font-size:12px;color:var(--t2)">📋 ${st.bk.title||'—'} · ${t('room.host_prefix')}${gUsr(st.bk.hostId)?.name||st.bk.hostId||'—'}</div>`:''}
         <div style="font-size:12px;color:var(--t3)" id="today-slots-${room.id}"></div>
       </div>
       <div class="room-card-foot">
-        <button class="btn" style="background:var(--gn);color:#0f1117;border:none;cursor:pointer;padding:5px 12px;border-radius:var(--rs);font-size:12px;font-weight:600" onclick="quickBook('${room.id}')">＋ 快速預約</button>
-        ${st.type==='busy'&&st.bk?`<button class="btn bg2 bsm" onclick="openCheckin('${st.bk.id}')">報到</button>`:''}
-        <button class="btn bg2 bsm" onclick="openFaultModal('${room.id}')">⚠ 故障回報</button>
+        <button class="btn" style="background:var(--gn);color:#0f1117;border:none;cursor:pointer;padding:5px 12px;border-radius:var(--rs);font-size:12px;font-weight:600" onclick="quickBook('${room.id}')">${t('room.btn.quick_book')}</button>
+        ${st.type==='busy'&&st.bk?`<button class="btn bg2 bsm" onclick="openCheckin('${st.bk.id}')">${t('room.btn.checkin')}</button>`:''}
+        <button class="btn bg2 bsm" onclick="openFaultModal('${room.id}')">${t('room.btn.report_fault')}</button>
       </div>
     </div>`;
   }).join('');
@@ -4573,12 +5547,12 @@ async function renderRoomCal(){
   const first=new Date(y,m,1),last=new Date(y,m+1,0),sd=first.getDay();
   const days=[];for(let i=0;i<sd;i++)days.push({d:new Date(y,m,1-sd+i),cur:false});for(let i=1;i<=last.getDate();i++)days.push({d:new Date(y,m,i),cur:true});while(days.length%7)days.push({d:new Date(y,m+1,days.length-last.getDate()-sd+1),cur:false});
   const today=todayStr2();
-  let h='<div class="cg7">';['日','一','二','三','四','五','六'].forEach(w=>h+=`<div class="cwd">${w}</div>`);
+  let h='<div class="cg7">';t('g.weekdays').split(',').forEach(w=>h+=`<div class="cwd">${w}</div>`);
   days.forEach(({d,cur})=>{
     const ds=dtStr(d),dbks=bks.filter(b=>b.date===ds).sort((a,b)=>(a.start||'').localeCompare(b.start||''));
     h+=`<div class="cday ${ds===today?'today':''} ${!cur?'om':''}"><div class="cdn">${d.getDate()}</div>`;
-    dbks.slice(0,3).forEach(b=>{const room=ROOMS.find(r=>r.id===b.roomId),st=bkStatus(b),cls=st==='inprogress'?'ev-active':st==='done'?'ev-done':'ev-pending';h+=`<div class="cev ${cls}" onclick="showBkPopup('${b.id}',event)" title="${escapeHtml(room?.name||'')} ${b.start}-${b.end}: ${escapeHtml(b.title||'會議')}">${b.start} ${escapeHtml(room?.name||b.title||'預約')}</div>`;});
-    if(dbks.length>3)h+=`<div class="cmore">+${dbks.length-3}筆</div>`;
+    dbks.slice(0,3).forEach(b=>{const room=ROOMS.find(r=>r.id===b.roomId),st=bkStatus(b),cls=st==='inprogress'?'ev-active':st==='done'?'ev-done':'ev-pending';h+=`<div class="cev ${cls}" onclick="showBkPopup('${b.id}',event)" title="${escapeHtml(roomName(room))} ${b.start}-${b.end}: ${escapeHtml(b.title||t('room.ev.meeting'))}">${b.start} ${escapeHtml(roomName(room)||b.title||t('room.ev.booking'))}</div>`;});
+    if(dbks.length>3)h+=`<div class="cmore">${t('g.cal.more').replace('%d',dbks.length-3)}</div>`;
     h+=`</div>`;
   });
   h+='</div>';document.getElementById('room-full-gantt').innerHTML=h;
@@ -4597,7 +5571,7 @@ function buildGantt(bks){
   let h=`<div class="gantt-inner" style="width:${totalW}px">`;
   // header row
   h+=`<div class="gantt-head" style="width:${totalW}px">`;
-  h+=`<div class="gantt-label-col" style="width:${labelW}px;flex-shrink:0">會議室</div>`;
+  h+=`<div class="gantt-label-col" style="width:${labelW}px;flex-shrink:0">${t('room.label')}</div>`;
   h+=`<div style="display:flex;width:${timelineW}px;flex-shrink:0">`;
   hours.forEach(hr=>h+=`<div class="gantt-hour" style="width:${hourW}px;flex-shrink:0">${String(hr).padStart(2,'0')}:00</div>`);
   h+=`</div></div>`;
@@ -4605,7 +5579,7 @@ function buildGantt(bks){
   visRooms().forEach(room=>{
     const roomBks=bks.filter(b=>b.roomId===room.id);
     h+=`<div class="gantt-row" style="width:${totalW}px">`;
-    h+=`<div class="gantt-room-label" style="width:${labelW}px;flex-shrink:0">${room.icon} ${room.name}</div>`;
+    h+=`<div class="gantt-room-label" style="width:${labelW}px;flex-shrink:0">${room.icon} ${roomName(room)}</div>`;
     h+=`<div class="gantt-timeline" style="width:${timelineW}px;flex-shrink:0;position:relative;height:44px" id="gtl-${room.id}">`;
     h+=`<div class="gantt-now-line" id="gnl-${room.id}"></div>`;
     roomBks.forEach(bk=>{
@@ -4613,7 +5587,7 @@ function buildGantt(bks){
       const left=pct(timeToMin(bk.start));
       const width=widthPct(bk);
       const cls=st==='inprogress'?'gb-inprogress':st==='done'?'gb-cancelled':st==='confirmed'?'gb-confirmed':'gb-pending';
-      h+=`<div class="gantt-block ${cls}" style="left:${left};width:${width}" title="${escapeHtml(bk.title||'會議')} ${bk.start}-${bk.end}" onclick="showBkPopup('${bk.id}',event)">${bk.start} ${bk.title||room.name}</div>`;
+      h+=`<div class="gantt-block ${cls}" style="left:${left};width:${width}" title="${escapeHtml(bk.title||t('room.ev.meeting'))} ${bk.start}-${bk.end}" onclick="showBkPopup('${bk.id}',event)">${bk.start} ${bk.title||roomName(room)}</div>`;
     });
     h+=`</div></div>`;
   });
@@ -4681,8 +5655,8 @@ function showBkPopup(id,e){
   const room=ROOMS.find(r=>r.id===bk.roomId);
   const st=bkStatus(bk);
   const stLabel={confirmed:t('room.status.confirmed'),inprogress:t('room.status.inprogress'),done:t('room.status.done'),cancelled:t('room.status.cancelled'),pending:t('room.legend.pending')};
-  const msg=`${room?.name||'—'}\n${bk.date} ${bk.start}–${bk.end}\n${bk.title||'（無標題）'}\n主辦：${gUsr(bk.hostId)?.name||bk.hostId||'—'}\n狀態：${stLabel[st]||st}`;
-  if(confirm(msg+'\n\n點確定取消此預約')){cancelBk(id);}
+  const msg=`${roomName(room)||'—'}\n${bk.date} ${bk.start}–${bk.end}\n${bk.title||t('g.untitled')}\n${t('room.host_prefix')}${gUsr(bk.hostId)?.name||bk.hostId||'—'}\n${t('g.status_prefix')}${stLabel[st]||st}`;
+  if(confirm(msg+t('room.popup_cancel'))){cancelBk(id);}
 }
 
 // ── 依使用者 site 取得當地時間，進位到下一個 30 分 ──
@@ -4712,12 +5686,12 @@ function _invSiteUsers(){
 }
 function _renderInvChips(pfx,arr){
   const el=document.getElementById(`${pfx}-invite-chips`);if(!el)return;
-  el.innerHTML=arr.length?arr.map(id=>{const u=gUsr(id);return`<span style="display:inline-flex;align-items:center;gap:3px;padding:2px 8px 2px 10px;background:rgba(91,155,213,.18);color:var(--blue,#5b9bd5);border-radius:20px;font-size:12px;white-space:nowrap">${u?.name||id}<span onclick="${pfx==='bk'?'bkRmInvitee':'iBkRmInvitee'}('${id}')" style="cursor:pointer;margin-left:3px;opacity:.55">✕</span></span>`;}).join(''):'<span style="color:var(--t3);font-size:12px">（未選擇）</span>';
+  el.innerHTML=arr.length?arr.map(id=>{const u=gUsr(id);return`<span style="display:inline-flex;align-items:center;gap:3px;padding:2px 8px 2px 10px;background:rgba(91,155,213,.18);color:var(--blue,#5b9bd5);border-radius:20px;font-size:12px;white-space:nowrap">${u?.name||id}<span onclick="${pfx==='bk'?'bkRmInvitee':'iBkRmInvitee'}('${id}')" style="cursor:pointer;margin-left:3px;opacity:.55">✕</span></span>`;}).join(''):`<span style="color:var(--t3);font-size:12px">${t('room.inv.none')}</span>`;
 }
 function _popInvSel(pfx,arr){
   const sel=document.getElementById(`${pfx}-invite-sel`);if(!sel)return;
   const ex=new Set(arr);
-  sel.innerHTML=`<option value="">＋ 選擇人員加入…</option>`+_invSiteUsers().filter(u=>!ex.has(u.id)).map(u=>`<option value="${u.id}">${u.name}（${u.dept||''}）</option>`).join('');
+  sel.innerHTML=`<option value="">${t('room.inv.add')}</option>`+_invSiteUsers().filter(u=>!ex.has(u.id)).map(u=>`<option value="${u.id}">${u.name}（${u.dept||''}）</option>`).join('');
   _renderInvChips(pfx,arr);
 }
 function bkAddInvitee(sel){const id=sel.value;if(!id)return;if(!_bkInvitees.includes(id))_bkInvitees.push(id);sel.value='';_popInvSel('bk',_bkInvitees);}
@@ -4730,7 +5704,9 @@ async function sendMeetingNotifs(bk,invitees){
   if(!invitees?.length)return;
   const room=ROOMS.find(r=>r.id===bk.roomId);
   const from=PORTAL_SESSION?.empId||'';
-  const body=`${room?.name||'—'} · ${bk.date} ${bk.start}–${bk.end}`;
+  // 🔴 通知是寄給別人的內容，固定繁中 —— 同 board 的 siteLabelZ 規矩：
+  //    收件人看到的字不該取決於寄件人當下把介面切成哪一國語言。
+  const body=`${(ROOM_NAME_ZH[room?.nameK]||'—')} · ${bk.date} ${bk.start}–${bk.end}`;
   await Promise.allSettled(invitees.map(to_user=>
     SB.post('notifications',{id:uuid4(),to_user,from_user:from,type:'meeting',title:`📅 會議邀請：${bk.title}`,body,is_read:false})
   ));
@@ -4833,7 +5809,7 @@ function iUpdateSlots(){
   el.innerHTML=slots.map(s=>{
     const sel=iBkSelectedSlot&&iBkSelectedSlot.start===s.start&&iBkSelectedSlot.end===s.end;
     const cls=s.past?'slot-busy':s.freeRooms.length===0?'slot-busy':sel?'slot-sel':'';
-    const label=s.past?'過去':s.freeRooms.length===0?'全滿':`${s.freeRooms.length}間可用`;
+    const label=s.past?t('room.slot.past'):s.freeRooms.length===0?t('room.slot.full'):t('room.slot.free_n').replace('%d',s.freeRooms.length);
     return `<div class="slot ${cls}" onclick="${s.past||s.freeRooms.length===0?'':'iSelectSlot(this,\''+s.start+'\',\''+s.end+'\')'}">${s.start}<br><span style="font-size:9px;opacity:.8">${label}</span></div>`;
   }).join('');
   if(sEl&&eEl&&iBkSelectedSlot){sEl.value=iBkSelectedSlot.start;eEl.value=iBkSelectedSlot.end;}
@@ -4848,10 +5824,10 @@ function iSelectSlot(el,start,end){
 function iBkStep1Next(){
   const dateEl=document.getElementById('ibk-date');
   const sEl=document.getElementById('ibk-start');const eEl=document.getElementById('ibk-end');
-  if(!dateEl?.value){toast('請選擇日期','error');return;}
+  if(!dateEl?.value){toast(t('room.err.need_date'),'error');return;}
   if(!iBkSelectedSlot&&sEl?.value&&eEl?.value)iBkSelectedSlot={start:sEl.value,end:eEl.value};
-  if(!iBkSelectedSlot){toast('請選擇時段','error');return;}
-  if(timeToMin(iBkSelectedSlot.end)<=timeToMin(iBkSelectedSlot.start)){toast('結束時間必須晚於開始','error');return;}
+  if(!iBkSelectedSlot){toast(t('room.err.need_slot'),'error');return;}
+  if(timeToMin(iBkSelectedSlot.end)<=timeToMin(iBkSelectedSlot.start)){toast(t('room.err.end_after_start'),'error');return;}
   iBkGoStep(2);iRenderRoomRecommend();
 }
 function iRenderRoomRecommend(){
@@ -4877,12 +5853,12 @@ function iRenderRoomRecommend(){
     const sel=iBkSelectedRoom===room.id;
     html+=`<div data-room-id="${room.id}" style="border:2px solid ${sel?'var(--gn)':conflict?'var(--rd)':'var(--bd)'};border-radius:var(--r);padding:13px;cursor:${conflict?'not-allowed':'pointer'};background:${sel?'rgba(34,197,94,.08)':'var(--bg0)'};" onclick="${conflict?'':` iBkSelectRoom('${room.id}')`}">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-        <span style="font-size:14px;font-weight:700">${room.icon} ${room.name}</span>
-        <span class="badge ${conflict?'br':recommended?'bg':suitable?'ba':'by'}">${conflict?'時段衝突':recommended?'✓ 推薦':suitable?'可預約':'容量不足'}</span>
+        <span style="font-size:14px;font-weight:700">${room.icon} ${roomName(room)}</span>
+        <span class="badge ${conflict?'br':recommended?'bg':suitable?'ba':'by'}">${conflict?t('room.badge.conflict'):recommended?t('room.badge.recommended'):suitable?t('room.badge.bookable'):t('room.badge.too_small')}</span>
       </div>
-      <div style="font-size:12px;color:var(--t3)">容量 ${room.cap} 人${headcount>room.cap?' ⚠ 超出':''} · ${room.equip.join('、')}</div>
+      <div style="font-size:12px;color:var(--t3)">${t('room.cap_only').replace('%d',room.cap)}${headcount>room.cap?t('room.over_cap'):''} · ${roomEquip(room).join(' · ')}</div>
       ${conflict?`<div style="font-size:11px;color:var(--rd);margin-top:4px">⚠ ${conflict.title||'—'} (${conflict.start}–${conflict.end})</div>`:''}
-      ${recommended?`<div style="font-size:11px;color:var(--gn);margin-top:4px">👍 ${headcount}人推薦</div>`:''}
+      ${recommended?`<div style="font-size:11px;color:var(--gn);margin-top:4px">${t('room.rec_fmt').replace('%d',headcount)}</div>`:''}
     </div>`;
   });
   el.innerHTML=html;
@@ -4900,17 +5876,17 @@ function iRenderRoomRecommend(){
 function iBkSelectRoom(id){iBkSelectedRoom=id;iRenderRoomRecommend();}
 function iSelectAltSlot(s,e){iBkSelectedSlot={start:s,end:e};iBkSelectedRoom=null;iRenderRoomRecommend();}
 function iBkStep2Next(){
-  if(!iBkSelectedRoom){toast('請選擇會議室','error');return;}
+  if(!iBkSelectedRoom){toast(t('room.err.need_room'),'error');return;}
   iBkGoStep(3);
   const date=document.getElementById('ibk-date').value;
   const room=ROOMS.find(r=>r.id===iBkSelectedRoom);
   const el=document.getElementById('ibk-summary-box');
-  if(el)el.innerHTML=`<b>${room?.name||'—'}</b> · <b>${date}</b> · <b>${iBkSelectedSlot.start}–${iBkSelectedSlot.end}</b><br>${t('room.headcount_fmt').replace('%d',document.getElementById('ibk-headcount').value)}`;
+  if(el)el.innerHTML=`<b>${roomName(room)||'—'}</b> · <b>${date}</b> · <b>${iBkSelectedSlot.start}–${iBkSelectedSlot.end}</b><br>${t('room.headcount_fmt').replace('%d',document.getElementById('ibk-headcount').value)}`;
 }
 async function iBkSave(){
   const title=document.getElementById('ibk-title')?.value.trim();
-  if(!title){toast('請填寫會議標題','error');return;}
-  if(!iBkSelectedRoom){toast('請先選擇會議室','error');return;}
+  if(!title){toast(t('room.err.need_title'),'error');return;}
+  if(!iBkSelectedRoom){toast(t('room.err.need_room_first'),'error');return;}
   const date=document.getElementById('ibk-date').value;
   const invEmails=_iBkInvitees.map(id=>gUsr(id)?.email||'').filter(Boolean).join(', ');
   const bk={
@@ -4924,7 +5900,7 @@ async function iBkSave(){
   };
   const existing=getBookings().filter(b=>b.roomId===iBkSelectedRoom&&b.date===date&&b.status!=='cancelled');
   if(existing.some(b=>timeToMin(b.start)<timeToMin(bk.end)&&timeToMin(b.end)>timeToMin(bk.start))){
-    toast('⚠ 時段衝突，請重新選擇','error');iBkGoStep(2);iRenderRoomRecommend();return;
+    toast(t('room.err.slot_conflict'),'error');iBkGoStep(2);iRenderRoomRecommend();return;
   }
   const rbk=await saveRoomBooking(bk);   // 成功才進快取（v2.38）
   if(!rbk.ok){
@@ -4933,8 +5909,8 @@ async function iBkSave(){
     return;
   }
   await getRoomBookings(); // 從 SB 重新拉取確保快取一致
-  const roomName=ROOMS.find(r=>r.id===iBkSelectedRoom)?.name||'—';
-  toast(`✓ 已預約${roomName} ${bk.start}–${bk.end}「${title}」`,'success');
+  const rmLabel=roomName(ROOMS.find(r=>r.id===iBkSelectedRoom))||'—';
+  toast(t('room.toast.booked').replace('%s',`${rmLabel} ${bk.start}–${bk.end}「${title}」`),'success');
   sendMeetingNotifs(bk,[..._iBkInvitees]);
   updRoomBadge();
   // 收起表單並刷新看板
@@ -4983,7 +5959,7 @@ function renderSlotGrid(date,dur){
   el.innerHTML=slots.map(s=>{
     const sel=bkSelectedSlot&&bkSelectedSlot.start===s.start&&bkSelectedSlot.end===s.end;
     const cls=s.past?'slot-busy':s.freeRooms.length===0?'slot-busy':sel?'slot-sel':'';
-    const label=s.past?'過去':s.freeRooms.length===0?'全滿':`${s.freeRooms.length}間可用`;
+    const label=s.past?t('room.slot.past'):s.freeRooms.length===0?t('room.slot.full'):t('room.slot.free_n').replace('%d',s.freeRooms.length);
     return `<div class="slot ${cls}" onclick="${s.past||s.freeRooms.length===0?'':'selectSlot(this,\''+s.start+'\',\''+s.end+'\')'}">${s.start}<br><span style="font-size:9px;opacity:.8">${label}</span></div>`;
   }).join('');
   // sync manual time fields
@@ -5000,11 +5976,11 @@ function selectSlot(el,start,end){
 function bkStep1Next(){
   const dateEl=document.getElementById('bk-date');
   const sEl=document.getElementById('bk-start');const eEl=document.getElementById('bk-end');
-  if(!dateEl?.value){toast('請選擇日期','error');return;}
+  if(!dateEl?.value){toast(t('room.err.need_date'),'error');return;}
   // use manual time if no slot clicked
   if(!bkSelectedSlot&&sEl?.value&&eEl?.value)bkSelectedSlot={start:sEl.value,end:eEl.value};
-  if(!bkSelectedSlot){toast('請選擇時段','error');return;}
-  if(timeToMin(bkSelectedSlot.end)<=timeToMin(bkSelectedSlot.start)){toast('結束時間必須晚於開始','error');return;}
+  if(!bkSelectedSlot){toast(t('room.err.need_slot'),'error');return;}
+  if(timeToMin(bkSelectedSlot.end)<=timeToMin(bkSelectedSlot.start)){toast(t('room.err.end_after_start'),'error');return;}
   // 若已預選會議室（從看板快速預約），直接跳 Step 3
   if(_bkRoomFixed){bkGoStep(3);renderBkSummary();return;}
   bkGoStep(2);renderRoomRecommend();
@@ -5038,12 +6014,12 @@ function renderRoomRecommend(){
     const sel=bkSelectedRoom===room.id;
     html+=`<div data-room-id="${room.id}" style="border:2px solid ${sel?'var(--gn)':conflict?'var(--rd)':'var(--bd)'};border-radius:var(--r);padding:13px;cursor:${conflict?'not-allowed':'pointer'};background:${sel?'rgba(34,197,94,.08)':'var(--bg0)'};transition:all .15s" onclick="${conflict?'':` bkSelectRoom('${room.id}')`}">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-        <span style="font-size:14px;font-weight:700">${room.icon} ${room.name}</span>
-        <span class="badge ${conflict?'br':recommended?'bg':suitable?'ba':'by'}">${conflict?'時段衝突':recommended?'✓ 推薦':suitable?'可預約':'容量不足'}</span>
+        <span style="font-size:14px;font-weight:700">${room.icon} ${roomName(room)}</span>
+        <span class="badge ${conflict?'br':recommended?'bg':suitable?'ba':'by'}">${conflict?t('room.badge.conflict'):recommended?t('room.badge.recommended'):suitable?t('room.badge.bookable'):t('room.badge.too_small')}</span>
       </div>
-      <div style="font-size:12px;color:var(--t3)">容量：最多 ${room.cap} 人${headcount>room.cap?' ⚠ 超出人數':''} · ${room.equip.join('、')}</div>
-      ${conflict?`<div style="font-size:11px;color:var(--rd);margin-top:4px">⚠ 已有預約：${conflict.title||'—'} (${conflict.start}–${conflict.end})</div>`:''}
-      ${recommended?`<div style="font-size:11px;color:var(--gn);margin-top:4px">👍 ${headcount}人會議推薦使用${room.name}</div>`:''}
+      <div style="font-size:12px;color:var(--t3)">${t('room.cap_max').replace('%d',room.cap)}${headcount>room.cap?t('room.over_cap_ppl'):''} · ${roomEquip(room).join(' · ')}</div>
+      ${conflict?`<div style="font-size:11px;color:var(--rd);margin-top:4px">${t('room.warn.booked').replace('%s',conflict.title||'—').replace('%s',`${conflict.start}–${conflict.end}`)}</div>`:''}
+      ${recommended?`<div style="font-size:11px;color:var(--gn);margin-top:4px">${t('room.rec_fmt_long').replace('%d',headcount).replace('%s',roomName(room))}</div>`:''}
     </div>`;
   });
   el.innerHTML=html;
@@ -5067,21 +6043,21 @@ function bkSelectRoom(id){
 }
 function selectAltSlot(s,e){bkSelectedSlot={start:s,end:e};bkSelectedRoom=null;renderRoomRecommend();}
 function bkStep2Next(){
-  if(!bkSelectedRoom){toast('請選擇會議室','error');return;}
+  if(!bkSelectedRoom){toast(t('room.err.need_room'),'error');return;}
   bkGoStep(3);renderBkSummary();
 }
 function renderBkSummary(){
   const date=document.getElementById('bk-date').value;
   const room=ROOMS.find(r=>r.id===bkSelectedRoom);
   const el=document.getElementById('bk-summary-box');
-  if(el)el.innerHTML=`<b>${room?.name||'—'}</b> · <b>${date}</b> · <b>${bkSelectedSlot.start}–${bkSelectedSlot.end}</b><br>${t('room.headcount_fmt').replace('%d',document.getElementById('bk-headcount').value)}`;
+  if(el)el.innerHTML=`<b>${roomName(room)||'—'}</b> · <b>${date}</b> · <b>${bkSelectedSlot.start}–${bkSelectedSlot.end}</b><br>${t('room.headcount_fmt').replace('%d',document.getElementById('bk-headcount').value)}`;
 }
 
 // Step 3: save
 async function bkSave(){
   const title=document.getElementById('bk-title')?.value.trim();
-  if(!title){toast('請填寫會議標題','error');return;}
-  if(!bkSelectedRoom){toast('請先選擇會議室','error');return;}
+  if(!title){toast(t('room.err.need_title'),'error');return;}
+  if(!bkSelectedRoom){toast(t('room.err.need_room_first'),'error');return;}
   const date=document.getElementById('bk-date').value;
   const invEmails=_bkInvitees.map(id=>gUsr(id)?.email||'').filter(Boolean).join(', ');
   const bk={
@@ -5103,7 +6079,7 @@ async function bkSave(){
   // conflict check
   const existing=getBookings().filter(b=>b.roomId===bkSelectedRoom&&b.date===date&&b.status!=='cancelled'&&b.id!==bk.id);
   if(existing.some(b=>timeToMin(b.start)<timeToMin(bk.end)&&timeToMin(b.end)>timeToMin(bk.start))){
-    toast('⚠ 時段衝突，請重新選擇','error');bkGoStep(2);renderRoomRecommend();return;
+    toast(t('room.err.slot_conflict'),'error');bkGoStep(2);renderRoomRecommend();return;
   }
   const rbk=await saveRoomBooking(bk);   // 成功才進快取（v2.38）
   if(!rbk.ok){
@@ -5113,8 +6089,8 @@ async function bkSave(){
   }
   // 從 SB 重新拉取確保快取一致
   await getRoomBookings();
-  const roomName=ROOMS.find(r=>r.id===bkSelectedRoom)?.name||'—';
-  toast(`✓ 已預約${roomName} ${bk.start}–${bk.end}「${title}」`,'success');
+  const rmLabel=roomName(ROOMS.find(r=>r.id===bkSelectedRoom))||'—';
+  toast(t('room.toast.booked').replace('%s',`${rmLabel} ${bk.start}–${bk.end}「${title}」`),'success');
   sendMeetingNotifs(bk,[..._bkInvitees]);
   updRoomBadge();
   navRoom('room-dash');
@@ -5129,7 +6105,7 @@ function quickBook(roomId){
 async function renderRoomList(){
   const rf=document.getElementById('rl-room-f');
   const sf=document.getElementById('rl-status-f');
-  if(rf){const cur=rf.value;rf.innerHTML='<option value="">所有會議室</option>'+visRooms().map(r=>`<option value="${r.id}" ${cur===r.id?'selected':''}>${SITEFLAGS[r.site]||''} ${r.name}</option>`).join('');rf.value=cur||'';}
+  if(rf){const cur=rf.value;rf.innerHTML=`<option value="">${t('room.all_rooms')}</option>`+visRooms().map(r=>`<option value="${r.id}" ${cur===r.id?'selected':''}>${SITEFLAGS[r.site]||''} ${roomName(r)}</option>`).join('');rf.value=cur||'';}
   const _sRoomIds=new Set(visRooms().map(r=>r.id));
   let bks=(await getRoomBookings()).filter(b=>_sRoomIds.has(b.roomId)).sort((a,b)=>bkKey(b).localeCompare(bkKey(a)));
   const rFilt=rf?.value||'';const sFilt=sf?.value||'';
@@ -5145,25 +6121,25 @@ async function renderRoomList(){
     const host=gUsr(b.hostId);
     return`<tr>
     <td class="tdm">${b.date} ${b.start}–${b.end}</td>
-    <td>${room?.icon||''} ${room?.name||'—'}</td>
+    <td>${room?.icon||''} ${roomName(room)||'—'}</td>
     <td><b>${b.title||'—'}</b></td>
     <td class="tdm">${host?.name||b.hostId||'—'}</td>
-    <td class="tdm">${b.headcount||'—'}人</td>
-    <td class="tdm">${b.vc?'是':'否'}</td>
+    <td class="tdm">${t('visit.headcount_n').replace('%d',b.headcount||'—')}</td>
+    <td class="tdm">${t(b.vc?'g.yes':'g.no')}</td>
     <td><span class="badge ${stCls[st]||'bm'}">${stLabel[st]||st}</span></td>
     <td style="white-space:nowrap">
-      ${st==='confirmed'?`<button class="btn bg2 bsm" onclick="openCheckin('${b.id}')">報到</button>`:'' }
-      ${st!=='done'&&st!=='cancelled'?`<button class="btn bdr bsm" onclick="cancelBk('${b.id}')">取消</button>`:''}
+      ${st==='confirmed'?`<button class="btn bg2 bsm" onclick="openCheckin('${b.id}')">${t('room.btn.checkin')}</button>`:'' }
+      ${st!=='done'&&st!=='cancelled'?`<button class="btn bdr bsm" onclick="cancelBk('${b.id}')">${t('room.btn.cancel')}</button>`:''}
     </td></tr>`;
-  }).join(''):'<tr><td colspan="8" class="tdm" style="text-align:center;padding:22px">無預約記錄</td></tr>';
+  }).join(''):`<tr><td colspan="8" class="tdm" style="text-align:center;padding:22px">${t('room.no_bookings')}</td></tr>`;
 }
 async function cancelBk(id){
-  if(!confirm('確定取消此預約？'))return;
+  if(!confirm(t('g.conf.cancel_bk')))return;
   const arr=getBookings();const i=arr.findIndex(b=>b.id===id);
-  if(i<0){toast('找不到該預約','error');return;}
+  if(i<0){toast(t('room.err.bk_notfound'),'error');return;}
   const rc=await saveRoomBooking({...arr[i],status:'cancelled'}); // 成功才進快取（v2.38）
   if(!rc.ok){toast(sbErrMsg(rc),'error');return;}
-  renderRoomList();renderRoomDash();toast('已取消預約','success');updRoomBadge();
+  renderRoomList();renderRoomDash();toast(t('room.toast.cancelled'),'success');updRoomBadge();
 }
 
 // ── Check-in / Auto-release ──
@@ -5172,7 +6148,7 @@ function openCheckin(id){
   checkinBkId=id;
   const room=ROOMS.find(r=>r.id===bk.roomId);
   const el=document.getElementById('checkin-msg');
-  if(el)el.textContent=`會議室：${room?.name}  ${bk.date} ${bk.start}–${bk.end}\n「${bk.title||'（無標題）'}」\n已開始了嗎？若 15 分鐘內未確認，系統將自動釋出會議室。`;
+  if(el)el.textContent=t('room.checkin_msg').replace('%s',roomName(room)).replace('%s',bk.date).replace('%s',bk.start).replace('%s',bk.end).replace('%s',bk.title||t('g.untitled'));
   openMo('mo-checkin');
 }
 async function checkinAction(started){
@@ -5201,7 +6177,7 @@ function checkAutoReleaseWithToast(bksOverride){
     const minsAfterStart=(nowDate-startDT)/60000;
     if(minsAfterStart>=15&&!b.checkedIn){
       bks[i].status='cancelled';bks[i].autoReleased=true;
-      released.push(b.title||'會議');
+      released.push(b.title||t('room.ev.meeting'));
       toSync.push(bks[i]);
     }
   });
@@ -5211,7 +6187,8 @@ function checkAutoReleaseWithToast(bksOverride){
     saveBookings(bks);
     toSync.forEach(bk=>saveRoomBooking(bk)); // 同步到 SB
     updRoomBadge();
-    released.forEach(t=>toast(`🔓 auto released: ${t}`,'warn'));
+    // ⚠️ 參數原本叫 t，會在 callback 內遮蔽全域的翻譯函式 t()
+    released.forEach(title=>toast(t('room.auto_released').replace('%s',title),'warn'));
   }
 }
 
@@ -5232,10 +6209,10 @@ function renderReport(period){
     const dow=now.getDay();
     startDate=new Date(now);startDate.setDate(now.getDate()-dow);
     startDate.setHours(0,0,0,0);
-    label='本週';
+    label=t('room.rpt.week');
   }else{
     startDate=new Date(now.getFullYear(),now.getMonth(),1);
-    label='本月';
+    label=t('room.rpt.month');
   }
   const _sRoomIds=new Set(visRooms().map(r=>r.id));
   const bks=getBookings().filter(b=>{
@@ -5252,9 +6229,9 @@ function renderReport(period){
     const usedMin=roomBks.reduce((s,b)=>s+durMin(b),0);
     const pct2=Math.min(100,(usedMin/totalSlotMin*100)).toFixed(1);
     html+=`<div class="sc" style="border-color:rgba(34,197,94,.3)">
-      <div class="sl">${room.icon} ${room.name}</div>
+      <div class="sl">${room.icon} ${roomName(room)}</div>
       <div class="sv" style="color:var(--gn)">${pct2}%</div>
-      <div class="ss">${label}使用率</div>
+      <div class="ss">${t('room.rpt.usage').replace('%s',label)}</div>
       <div class="usage-bar-wrap"><div class="usage-bar" style="width:${pct2}%"></div></div>
       <div style="margin-top:8px;font-size:11px;color:var(--t3)">${t('room.report.room_stat').replace('%d',roomBks.length).replace('%d',Math.round(usedMin/60))}</div>
     </div>`;
@@ -5271,11 +6248,11 @@ function renderReport(period){
   const hotHour=hourCount.indexOf(Math.max(...hourCount));
   html+=`<div style="margin-top:16px"><div class="stt" style="margin-bottom:10px">${t('room.report.heat')}</div>
   <div style="display:flex;gap:3px;align-items:flex-end;height:60px">
-  ${hourCount.map((cnt,i)=>`<div style="flex:1;background:rgba(34,197,94,${(cnt/maxCount*.8+.1).toFixed(2)});border-radius:2px 2px 0 0;height:${Math.max(10,(cnt/maxCount*100))}%;position:relative" title="${ROOM_HOURS.start+i}:00  ${cnt}場"><div style="position:absolute;bottom:-16px;font-size:9px;color:var(--t3);text-align:center;left:0;right:0">${ROOM_HOURS.start+i}</div></div>`).join('')}
-  </div><div style="margin-top:20px;font-size:12px;color:var(--t3)">最熱門時段：<b style="color:var(--gn)">${ROOM_HOURS.start+hotHour}:00–${ROOM_HOURS.start+hotHour+1}:00</b></div></div>`;
+  ${hourCount.map((cnt,i)=>`<div style="flex:1;background:rgba(34,197,94,${(cnt/maxCount*.8+.1).toFixed(2)});border-radius:2px 2px 0 0;height:${Math.max(10,(cnt/maxCount*100))}%;position:relative" title="${ROOM_HOURS.start+i}:00  ${t('room.rpt.sessions').replace('%d',cnt)}"><div style="position:absolute;bottom:-16px;font-size:9px;color:var(--t3);text-align:center;left:0;right:0">${ROOM_HOURS.start+i}</div></div>`).join('')}
+  </div><div style="margin-top:20px;font-size:12px;color:var(--t3)">${t('room.rpt.hot')}<b style="color:var(--gn)">${ROOM_HOURS.start+hotHour}:00–${ROOM_HOURS.start+hotHour+1}:00</b></div></div>`;
   // 最常用部門
   const deptCount={};
-  bks.forEach(b=>{const u=gUsr(b.hostId);const dept=u?.dept||'其他';deptCount[dept]=(deptCount[dept]||0)+1;});
+  bks.forEach(b=>{const u=gUsr(b.hostId);const dept=u?.dept||t('g.other');deptCount[dept]=(deptCount[dept]||0)+1;});
   const topDepts=Object.entries(deptCount).sort((a,b)=>b[1]-a[1]).slice(0,5);
   if(topDepts.length){
     html+=`<div style="margin-top:16px"><div class="stt" style="margin-bottom:10px">${t('room.report.top_dept')}</div><div style="display:flex;flex-direction:column;gap:6px">`;
@@ -5295,7 +6272,7 @@ async function renderFaults(){
     return`<div class="fault-item ${f.status==='resolved'?'fi-resolved':'fi-open'}">
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
         <div>
-          <div style="font-weight:600;margin-bottom:3px">${room?.icon||''} ${room?.name||'—'} · ${f.equip||'—'}</div>
+          <div style="font-weight:600;margin-bottom:3px">${room?.icon||''} ${roomName(room)||'—'} · ${f.equip||'—'}</div>
           <div style="color:var(--t2);margin-bottom:3px">${f.desc||'—'}</div>
           <div style="color:var(--t3);font-size:10px">${t('room.fault.reporter_lbl')}${gUsr(f.reporterId)?.name||f.reporterId||'—'} · ${f.createdAt?.slice(0,16)||'—'}</div>
         </div>
@@ -5311,7 +6288,7 @@ async function renderFaults(){
 function openFaultModal(roomId){
   const us=ld(K.us);
   const rSel=document.getElementById('ft-room');
-  if(rSel){rSel.innerHTML=visRooms().map(r=>`<option value="${r.id}">${SITEFLAGS[r.site]||''} ${r.name}</option>`).join('');if(roomId)rSel.value=roomId;}
+  if(rSel){rSel.innerHTML=visRooms().map(r=>`<option value="${r.id}">${SITEFLAGS[r.site]||''} ${roomName(r)}</option>`).join('');if(roomId)rSel.value=roomId;}
   const rep=document.getElementById('ft-reporter');
   if(rep)rep.innerHTML=`<option value="">${t('g.select')}</option>`+us.map(u=>`<option value="${u.id}">${u.name}</option>`).join('');
   document.getElementById('ft-desc').value='';
@@ -5319,7 +6296,7 @@ function openFaultModal(roomId){
 }
 function submitFault(){
   const desc=document.getElementById('ft-desc')?.value.trim();
-  if(!desc){toast('請填寫問題描述','error');return;}
+  if(!desc){toast(t('room.err.need_fault_desc'),'error');return;}
   const f={
     id:uid(),
     roomId:document.getElementById('ft-room')?.value||visRooms()[0]?.id||'',
@@ -5356,8 +6333,20 @@ function updRoomBadge(){
 //  VISIT MODULE
 // ══════════════════════════════
 const VK='visit_v1'; const GK='guest_v1';
+// 🔴 兩套存取器，同 board 的 siteLabel()／siteLabelZ()：
+//    畫面走 unitLabel()／typeLabel()（隨介面語言），
+//    匯出與「到訪行程單」走下面這兩個固定繁中的表 —— 存檔與列印的版面
+//    不該因為誰按了列印鍵、介面剛好切成哪一國語言而長得不一樣。
 const UNIT_LABEL={tw:'台灣總部',dg:'東莞工廠',vn:'越南工廠'};
 const TYPE_LABEL={client:'現有客戶',potential:'潛在客戶',supplier:'供應商',partner:'合作夥伴',gov:'政府/媒體',other:'其他'};
+const unitLabel = k => UNIT_LABEL[k] ? t('visit.unit.'+k) : '';
+const typeLabel = k => TYPE_LABEL[k] ? t('visit.type.'+k) : '';
+// 🔴 TASK_TYPES／COST_CATS 的字串**就是存進資料庫的值**（tasks[].type／costs[].cat），
+//    所以陣列本身不能翻 —— 翻了會讓新舊紀錄用兩種寫法。只翻顯示：
+const TASK_TYPE_K={'接機':'pickup','送機':'dropoff','接送':'transfer','住宿':'hotel','早餐':'breakfast','午餐':'lunch','晚餐':'dinner','工廠參觀':'factory','商務會議':'meeting','產品展示':'demo','簽約':'contract','其他':'other'};
+const COST_CAT_K ={'交通接送':'transport','住宿':'hotel','餐飲':'meals','禮品':'gifts','雜支':'misc','其他':'other'};
+const taskTypeLabel = v => TASK_TYPE_K[v] ? t('visit.task.'+TASK_TYPE_K[v]) : (v||'');
+const costCatLabel  = v => COST_CAT_K[v]  ? t('visit.cost.'+COST_CAT_K[v])  : (v||'');
 const TYPE_CLS={client:'vt-client',potential:'vt-potential',supplier:'vt-supplier',partner:'vt-partner',gov:'vt-gov',other:'vt-other'};
 const TASK_TYPES=['接機','送機','接送','住宿','早餐','午餐','晚餐','工廠參觀','商務會議','產品展示','簽約','其他'];
 const COST_CATS=['交通接送','住宿','餐飲','禮品','雜支','其他'];
@@ -5405,15 +6394,16 @@ async function renderVisitDash(){
   const _mPfx=ymL(new Date());
   const totalCost=visits.filter(v=>(v.dateStart||'').startsWith(_mPfx)||(v.dateEnd||'').startsWith(_mPfx)).reduce((s,v)=>(v.costs||[]).reduce((ss,c)=>ss+(+c.amount||0),s),0);
   document.getElementById('visit-stats-row').innerHTML=`
-    <div class="sc" style="border-color:rgba(167,139,250,.3)"><div class="sl">即將到訪</div><div class="sv" style="color:#a78bfa">${upcoming}</div><div class="ss">筆</div></div>
-    <div class="sc cs"><div class="sl">進行中</div><div class="sv" style="color:var(--gn)">${ongoing}</div><div class="ss">筆</div></div>
-    <div class="sc ca"><div class="sl">本月到訪</div><div class="sv" style="color:var(--ac)">${thisMonth}</div><div class="ss">筆</div></div>
-    <div class="sc cw"><div class="sl">本月接待費用</div><div class="sv" style="color:var(--yw);font-size:18px">NT$${totalCost.toLocaleString()}</div></div>`;
+    <div class="sc" style="border-color:rgba(167,139,250,.3)"><div class="sl">${t('visit.stat.upcoming')}</div><div class="sv" style="color:#a78bfa">${upcoming}</div><div class="ss">${t('visit.stat.unit')}</div></div>
+    <div class="sc cs"><div class="sl">${t('visit.stat.ongoing')}</div><div class="sv" style="color:var(--gn)">${ongoing}</div><div class="ss">${t('visit.stat.unit')}</div></div>
+    <div class="sc ca"><div class="sl">${t('visit.stat.month')}</div><div class="sv" style="color:var(--ac)">${thisMonth}</div><div class="ss">${t('visit.stat.unit')}</div></div>
+    <div class="sc cw"><div class="sl">${t('visit.stat.month_cost')}</div><div class="sv" style="color:var(--yw);font-size:18px">NT$${totalCost.toLocaleString()}</div></div>`;
   // alert zone — ongoing tasks needing attention
   const alerts=[];
   visits.filter(v=>visitStatus(v)==='ongoing').forEach(v=>{
     (v.days||[]).forEach(day=>{
-      (day.tasks||[]).filter(t=>!t.done&&t.type==='接機').forEach(t=>alerts.push(`${v.company} · ${t.type} 任務尚未完成`));
+      // ⚠️ '接機' 是資料值（TASK_TYPES 存的就是繁中），這裡是比對不是文案，不可翻
+      (day.tasks||[]).filter(x=>!x.done&&x.type==='接機').forEach(x=>alerts.push(t('visit.alert.task_open').replace('%s',v.company).replace('%s',taskTypeLabel(x.type))));
     });
   });
   const az=document.getElementById('visit-alert-zone');
@@ -5433,19 +6423,19 @@ async function renderVisitDash(){
       <div style="flex:1">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
           <span style="font-size:15px;font-weight:700">${v.company||'—'}</span>
-          <span class="visit-type-badge ${TYPE_CLS[v.type]||'vt-other'}">${TYPE_LABEL[v.type]||'—'}</span>
+          <span class="visit-type-badge ${TYPE_CLS[v.type]||'vt-other'}">${typeLabel(v.type)||'—'}</span>
           <span class="badge ${V_ST_CLS[st]}">${V_ST_LABEL[st]}</span>
         </div>
-        <div style="font-size:12px;color:var(--t3)">${UNIT_LABEL[v.unit]||'—'} · ${v.dateStart}${v.dateEnd!==v.dateStart?' — '+v.dateEnd:''} · ${v.headcount||'—'}人</div>
-        <div style="font-size:12px;color:var(--t2);margin-top:3px">負責：${owner?.name||v.ownerId||'—'} · 任務 ${doneTasks}/${allTasks} 完成</div>
+        <div style="font-size:12px;color:var(--t3)">${unitLabel(v.unit)||'—'} · ${v.dateStart}${v.dateEnd!==v.dateStart?' — '+v.dateEnd:''} · ${t('visit.headcount_n').replace('%d',v.headcount||'—')}</div>
+        <div style="font-size:12px;color:var(--t2);margin-top:3px">${t('visit.owner_prefix')}${owner?.name||v.ownerId||'—'} · ${t('visit.tasks_done').replace('%d',doneTasks).replace('%d',allTasks)}</div>
       </div>
-      <div style="text-align:right;flex-shrink:0"><div style="font-size:13px;font-weight:700;color:#a78bfa">NT$${totalCost.toLocaleString()}</div><div style="font-size:11px;color:var(--t3)">${(v.guests||[]).length}位來賓</div></div>
+      <div style="text-align:right;flex-shrink:0"><div style="font-size:13px;font-weight:700;color:#a78bfa">NT$${totalCost.toLocaleString()}</div><div style="font-size:11px;color:var(--t3)">${t('visit.guests_n').replace('%d',(v.guests||[]).length)}</div></div>
     </div>
     <div class="vc-foot">
-      <button class="btn bg2 bsm" onclick="openVisitDetail('${v.id}')">查看詳情</button>
-      <button class="btn bg2 bsm" onclick="editVisit('${v.id}')">編輯</button>
-      <button class="broadcast-btn" style="padding:4px 10px;font-size:12px" onclick="openBroadcast('${v.id}')">🚨 緊急廣播</button>
-      <button class="btn bg2 bsm" onclick="genVisitDoc(getVisits().find(x=>x.id==='${v.id}'))">📄 行程單</button>
+      <button class="btn bg2 bsm" onclick="openVisitDetail('${v.id}')">${t('visit.btn.detail')}</button>
+      <button class="btn bg2 bsm" onclick="editVisit('${v.id}')">${t('visit.btn.edit')}</button>
+      <button class="broadcast-btn" style="padding:4px 10px;font-size:12px" onclick="openBroadcast('${v.id}')">${t('visit.btn.broadcast')}</button>
+      <button class="btn bg2 bsm" onclick="genVisitDoc(getVisits().find(x=>x.id==='${v.id}'))">${t('visit.btn.doc')}</button>
     </div>
   </div>`;
   }).join('');
@@ -5462,7 +6452,7 @@ function initVisitForm(){
   if(os)os.innerHTML=`<option value="">${t('g.select')}</option>`+us.map(u=>`<option value="${u.id}">${u.name}</option>`).join('');
   // guest db select
   const gs=document.getElementById('vf-guest-sel');
-  if(gs)gs.innerHTML='<option value="">從資料庫選…</option>'+getGuests().map(g=>`<option value="${g.id}">${g.name}（${g.company||''}）</option>`).join('');
+  if(gs)gs.innerHTML=`<option value="">${t('visit.pick_from_db')}</option>`+getGuests().map(g=>`<option value="${g.id}">${g.name}（${g.company||''}）</option>`).join('');
   // dates
   const sd=document.getElementById('vf-date-start'),ed=document.getElementById('vf-date-end');
   if(sd&&!sd.value){sd.value=tds();ed.value=tds();}
@@ -5470,7 +6460,7 @@ function initVisitForm(){
   renderVfGuests();renderVfDays();renderVfEscorts();renderVfCosts();
 }
 function resetVisitForm(){
-  if(!confirm('確定清除？'))return;
+  if(!confirm(t('visit.conf.clear')))return;
   vEditId=null;vfGuests=[];vfDays=[];vfEscorts=[];vfCosts=[];
   document.getElementById('visit-form-title').textContent=t('visit.form.title_new');
   ['vf-company','vf-note'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
@@ -5479,7 +6469,7 @@ function resetVisitForm(){
   if(sd)sd.value=tds();if(ed)ed.value=tds();
   vfAddDay();vfAddCost();
   renderVfGuests();renderVfDays();renderVfEscorts();renderVfCosts();
-  toast('表單已清除','warn');
+  toast(t('visit.toast.cleared'),'warn');
 }
 
 // ── Guests in form ──
@@ -5489,10 +6479,10 @@ function renderVfGuests(){
     return`<div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--bg0);border-radius:var(--rs)">
       <div style="font-size:18px">${COUNTRIES[db?.country||'other']||'🌏'}</div>
       <div style="flex:1"><div style="font-size:13px;font-weight:600">${g.name||db?.name||'—'}</div><div style="font-size:11px;color:var(--t3)">${g.title||db?.title||''}</div></div>
-      <input type="text" value="${escapeHtml(g.note||'')}" placeholder="特殊備註" style="width:130px;font-size:11px;padding:3px 6px" onchange="vfGuests[${i}].note=this.value">
+      <input type="text" value="${escapeHtml(g.note||'')}" placeholder="${t('visit.ph.guest_note')}" style="width:130px;font-size:11px;padding:3px 6px" onchange="vfGuests[${i}].note=this.value">
       <button class="btn bdr bsm bic" onclick="vfGuests.splice(${i},1);renderVfGuests()">✕</button>
     </div>`;
-  }).join(''):'<div style="font-size:12px;color:var(--t3);padding:8px 0">尚未新增來賓</div>';
+  }).join(''):`<div style="font-size:12px;color:var(--t3);padding:8px 0">${t('visit.no_guests')}</div>`;
 }
 function vfAddGuest(){
   vfGuests.push({guestId:'',name:'',title:'',note:''});
@@ -5513,33 +6503,33 @@ function renderVfDays(){
     <div class="day-block-head">
       <span>${t('g.lbl.day_n').replace('%d',di+1)}</span>
       <input type="date" value="${day.date}" onchange="vfDays[${di}].date=this.value" style="font-size:12px;padding:2px 6px;width:120px;margin-left:8px">
-      <button class="btn bg2 bsm" style="margin-left:auto" onclick="vfAddTask(${di})">＋ 任務</button>
+      <button class="btn bg2 bsm" style="margin-left:auto" onclick="vfAddTask(${di})">${t('visit.btn.add_task')}</button>
       ${vfDays.length>1?`<button class="btn bdr bsm bic" onclick="vfDays.splice(${di},1);renderVfDays()">✕</button>`:''}
     </div>
     <div class="day-block-body">
-      ${day.tasks.length===0?'<div style="font-size:12px;color:var(--t3)">點「＋ 任務」新增當日活動</div>':''}
+      ${day.tasks.length===0?`<div style="font-size:12px;color:var(--t3)">${t('visit.no_tasks')}</div>`:''}
       ${day.tasks.map((t,ti)=>renderTaskRow(di,ti,t)).join('')}
     </div>
   </div>`).join('');
 }
-function renderTaskRow(di,ti,t){
+function renderTaskRow(di,ti,tk){  // ⚠️ 參數不可叫 t：會遮蔽全域的翻譯函式 t()
   const us=ld(K.us);
   return`<div style="background:var(--bg1);border:1px solid var(--bd);border-radius:var(--rs);padding:8px 10px">
     <div style="display:flex;gap:7px;align-items:center;flex-wrap:wrap">
       <select style="width:90px;font-size:12px;padding:3px 5px" onchange="vfDays[${di}].tasks[${ti}].type=this.value">
-        ${TASK_TYPES.map(tp=>`<option value="${tp}" ${t.type===tp?'selected':''}>${tp}</option>`).join('')}
+        ${TASK_TYPES.map(tp=>`<option value="${tp}" ${tk.type===tp?'selected':''}>${taskTypeLabel(tp)}</option>`).join('')}
       </select>
-      <input type="time" value="${t.startTime||'09:00'}" style="width:84px;font-size:12px;padding:3px 5px" onchange="vfDays[${di}].tasks[${ti}].startTime=this.value">
-      <input type="text" value="${escapeHtml(t.from||'')}" placeholder="出發地" style="width:90px;font-size:12px;padding:3px 5px" onchange="vfDays[${di}].tasks[${ti}].from=this.value">
+      <input type="time" value="${tk.startTime||'09:00'}" style="width:84px;font-size:12px;padding:3px 5px" onchange="vfDays[${di}].tasks[${ti}].startTime=this.value">
+      <input type="text" value="${escapeHtml(tk.from||'')}" placeholder="${t('visit.ph.from')}" style="width:90px;font-size:12px;padding:3px 5px" onchange="vfDays[${di}].tasks[${ti}].from=this.value">
       <span style="font-size:11px;color:var(--t3)">→</span>
-      <input type="text" value="${escapeHtml(t.to||'')}" placeholder="目的地" style="width:90px;font-size:12px;padding:3px 5px" onchange="vfDays[${di}].tasks[${ti}].to=this.value">
+      <input type="text" value="${escapeHtml(tk.to||'')}" placeholder="${t('visit.ph.to')}" style="width:90px;font-size:12px;padding:3px 5px" onchange="vfDays[${di}].tasks[${ti}].to=this.value">
       <select style="width:90px;font-size:12px;padding:3px 5px" onchange="vfDays[${di}].tasks[${ti}].assigneeId=this.value">
-        <option value="">指派…</option>${us.map(u=>`<option value="${u.id}" ${t.assigneeId===u.id?'selected':''}>${u.name}</option>`).join('')}
+        <option value="">${t('visit.assign')}</option>${us.map(u=>`<option value="${u.id}" ${tk.assigneeId===u.id?'selected':''}>${u.name}</option>`).join('')}
       </select>
       <select style="width:78px;font-size:12px;padding:3px 5px" onchange="vfDays[${di}].tasks[${ti}].carType=this.value">
-        <option value="">無派車</option><option value="company">公務車</option><option value="taxi">計程車/租車</option>
+        <option value="">${t('visit.car.none')}</option><option value="company">${t('visit.car.company')}</option><option value="taxi">${t('visit.car.taxi')}</option>
       </select>
-      <input type="text" value="${escapeHtml(t.note||'')}" placeholder="備註" style="flex:1;min-width:80px;font-size:12px;padding:3px 5px" onchange="vfDays[${di}].tasks[${ti}].note=this.value">
+      <input type="text" value="${escapeHtml(tk.note||'')}" placeholder="${t('visit.ph.note')}" style="flex:1;min-width:80px;font-size:12px;padding:3px 5px" onchange="vfDays[${di}].tasks[${ti}].note=this.value">
       <button class="btn bdr bsm bic" onclick="vfDays[${di}].tasks.splice(${ti},1);renderVfDays()">✕</button>
     </div>
   </div>`;
@@ -5560,12 +6550,12 @@ function renderVfEscorts(){
   document.getElementById('vf-escorts-list').innerHTML=vfEscorts.length?vfEscorts.map((e,i)=>`
   <div style="display:flex;gap:8px;align-items:center;background:var(--bg0);border-radius:var(--rs);padding:7px 10px">
     <select style="flex:1;font-size:13px;padding:4px 6px" onchange="vfEscorts[${i}].userId=this.value">
-      <option value="">選擇人員…</option>${us.map(u=>`<option value="${u.id}" ${e.userId===u.id?'selected':''}>${u.name}（${u.dept||''}）</option>`).join('')}
+      <option value="">${t('visit.select_person')}</option>${us.map(u=>`<option value="${u.id}" ${e.userId===u.id?'selected':''}>${u.name}（${u.dept||''}）</option>`).join('')}
     </select>
-    <input type="text" value="${escapeHtml(e.role||'')}" placeholder="負責環節（接機/陪同參觀/用餐）" style="flex:1;font-size:12px;padding:4px 6px" onchange="vfEscorts[${i}].role=this.value">
+    <input type="text" value="${escapeHtml(e.role||'')}" placeholder="${t('visit.ph.escort_role')}" style="flex:1;font-size:12px;padding:4px 6px" onchange="vfEscorts[${i}].role=this.value">
     <span class="badge ${e.confirmed?'bg':'by'}" style="cursor:pointer" onclick="vfEscorts[${i}].confirmed=!vfEscorts[${i}].confirmed;renderVfEscorts()">${e.confirmed?t('visit.confirmed'):t('visit.unconfirmed')}</span>
     <button class="btn bdr bsm bic" onclick="vfEscorts.splice(${i},1);renderVfEscorts()">✕</button>
-  </div>`).join(''):'<div style="font-size:12px;color:var(--t3);padding:4px 0">尚未新增陪同人員</div>';
+  </div>`).join(''):`<div style="font-size:12px;color:var(--t3);padding:4px 0">${t('visit.no_escorts')}</div>`;
 }
 
 // ── Costs ──
@@ -5574,9 +6564,9 @@ function renderVfCosts(){
   document.getElementById('vf-costs-list').innerHTML=vfCosts.map((c,i)=>`
   <div style="display:flex;gap:7px;align-items:center;background:var(--bg0);border-radius:var(--rs);padding:7px 10px">
     <select style="width:90px;font-size:12px;padding:3px 5px" onchange="vfCosts[${i}].cat=this.value">
-      ${COST_CATS.map(cat=>`<option value="${cat}" ${c.cat===cat?'selected':''}>${cat}</option>`).join('')}
+      ${COST_CATS.map(cat=>`<option value="${cat}" ${c.cat===cat?'selected':''}>${costCatLabel(cat)}</option>`).join('')}
     </select>
-    <input type="text" value="${escapeHtml(c.desc||'')}" placeholder="說明" style="flex:1;font-size:12px;padding:3px 6px" onchange="vfCosts[${i}].desc=this.value;calcVfCostTotal()">
+    <input type="text" value="${escapeHtml(c.desc||'')}" placeholder="${t('visit.ph.cost_desc')}" style="flex:1;font-size:12px;padding:3px 6px" onchange="vfCosts[${i}].desc=this.value;calcVfCostTotal()">
     <select style="width:60px;font-size:12px;padding:3px 4px" onchange="vfCosts[${i}].currency=this.value">
       <option value="TWD" ${c.currency==='TWD'?'selected':''}>TWD</option>
       <option value="CNY" ${c.currency==='CNY'?'selected':''}>CNY</option>
@@ -5599,9 +6589,9 @@ async function saveVisit(genDoc){
   const ownerId=document.getElementById('vf-owner')?.value;
   const dateStart=document.getElementById('vf-date-start')?.value;
   const dateEnd=document.getElementById('vf-date-end')?.value;
-  if(!company)return toast('請填寫來訪公司/單位','error');
-  if(!ownerId)return toast('請選擇負責窗口','error');
-  if(!dateStart)return toast('請填寫到訪日期','error');
+  if(!company)return toast(t('visit.err.need_company'),'error');
+  if(!ownerId)return toast(t('visit.err.need_owner'),'error');
+  if(!dateStart)return toast(t('visit.err.need_date'),'error');
   let data={
     id:vEditId||uid(),
     createdAt:vEditId?undefined:tds(),updatedAt:tds(),
@@ -5624,7 +6614,7 @@ async function saveVisit(genDoc){
   // 合併只算出要送出的完整資料，先不進快取；資料庫成功後由 saveVisitRecord() 自己寫（v2.38）
   const rv=await saveVisitRecord(data); // 編輯路徑用合併後完整資料
   if(!rv.ok){toast(sbErrMsg(rv),'error');return;}
-  toast(vEditId?'已更新到訪行程':'到訪行程已儲存','success');
+  toast(t(vEditId?'visit.toast.updated':'visit.toast.saved'),'success');
   vEditId=data.id;
   updVisitBadge();
   if(genDoc)genVisitDoc(data);
@@ -5645,7 +6635,7 @@ function editVisit(id){
     const os=document.getElementById('vf-owner');
     if(os)os.innerHTML=`<option value="">${t('g.select')}</option>`+us.map(u=>`<option value="${u.id}">${u.name}</option>`).join('');
     const gs=document.getElementById('vf-guest-sel');
-    if(gs)gs.innerHTML='<option value="">從資料庫選…</option>'+getGuests().map(g=>`<option value="${g.id}">${g.name}（${g.company||''}）</option>`).join('');
+    if(gs)gs.innerHTML=`<option value="">${t('visit.pick_from_db')}</option>`+getGuests().map(g=>`<option value="${g.id}">${g.name}（${g.company||''}）</option>`).join('');
     document.getElementById('vf-company').value=v.company||'';
     document.getElementById('vf-type').value=v.type||'client';
     document.getElementById('vf-unit').value=v.unit||'tw';
@@ -5662,15 +6652,15 @@ function editVisit(id){
 // ── Visit Detail Modal ──
 function openVisitDetail(id){
   const v=getVisits().find(x=>x.id===id);if(!v)return;
-  document.getElementById('mo-vd-title').textContent=`${v.company||'—'} 到訪詳情`;
+  document.getElementById('mo-vd-title').textContent=t('visit.detail_title').replace('%s',v.company||'—');
   const st=visitStatus(v);
   const owner=gUsr(v.ownerId);
   const allTasks=(v.days||[]).flatMap(d=>d.tasks||[]);
   const doneTasks=allTasks.filter(t=>t.done).length;
   let html=`<div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
     <span class="badge ${V_ST_CLS[st]}">${V_ST_LABEL[st]}</span>
-    <span class="visit-type-badge ${TYPE_CLS[v.type]||'vt-other'}">${TYPE_LABEL[v.type]||'—'}</span>
-    <span class="badge bm">${UNIT_LABEL[v.unit]||'—'}</span>
+    <span class="visit-type-badge ${TYPE_CLS[v.type]||'vt-other'}">${typeLabel(v.type)||'—'}</span>
+    <span class="badge bm">${unitLabel(v.unit)||'—'}</span>
   </div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;font-size:13px">
     <div><span style="color:var(--t3)">${t('visit.lbl.period')}</span>${v.dateStart}${v.dateEnd!==v.dateStart?' — '+v.dateEnd:''}</div>
@@ -5686,31 +6676,33 @@ function openVisitDetail(id){
   v.days.forEach((day,di)=>{
     html+=`<div class="day-block"><div class="day-block-head">📅 ${day.date}（${t('g.lbl.day_n').replace('%d',di+1)}）</div><div class="day-block-body">`;
     if(!day.tasks?.length){html+=`<div style="font-size:12px;color:var(--t3)">${t('visit.lbl.no_task')}</div>`;}
-    day.tasks.forEach((t,ti)=>{
-      const assignee=gUsr(t.assigneeId);
+    // 🔴 參數原本叫 t，遮蔽了全域的翻譯函式 —— 而這一段本來就在呼叫 t('car.type.*')，
+    //    所以「任何一天有任務的到訪紀錄」按下詳情都會丟 t is not a function，整個視窗打不開。
+    day.tasks.forEach((tk,ti)=>{
+      const assignee=gUsr(tk.assigneeId);
       html+=`<div class="task-item">
-        <div class="task-check ${t.done?'done':''}" onclick="toggleVisitTask('${id}',${di},${ti})">${t.done?'✓':''}</div>
-        <div style="flex:1"><span style="font-weight:600">${t.type}</span> ${t.startTime||''} ${t.from?t.from+'→':''}${t.to||''}</div>
-        ${assignee?`<span class="assign-pill ${t.confirmed?'confirmed':''}">${assignee.name}</span>`:''}
-        <span class="badge ${t.carType==='company'?'bt':t.carType==='taxi'?'by':'bm'}">${t.carType==='company'?t('car.type.company'):t.carType==='taxi'?t('car.type.taxi'):t('car.type.none')}</span>
+        <div class="task-check ${tk.done?'done':''}" onclick="toggleVisitTask('${id}',${di},${ti})">${tk.done?'✓':''}</div>
+        <div style="flex:1"><span style="font-weight:600">${taskTypeLabel(tk.type)}</span> ${tk.startTime||''} ${tk.from?tk.from+'→':''}${tk.to||''}</div>
+        ${assignee?`<span class="assign-pill ${tk.confirmed?'confirmed':''}">${assignee.name}</span>`:''}
+        <span class="badge ${tk.carType==='company'?'bt':tk.carType==='taxi'?'by':'bm'}">${tk.carType==='company'?t('car.type.company'):tk.carType==='taxi'?t('car.type.taxi'):t('car.type.none')}</span>
       </div>`;
     });
     html+='</div></div>';
   });}
   if(v.escorts?.length){html+=`<div style="font-weight:600;margin:12px 0 7px;font-size:13px">${t('visit.sec.escorts')}</div>
   <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:12px">
-  ${v.escorts.map(e=>{const u=gUsr(e.userId);return`<div style="display:flex;align-items:center;gap:8px;font-size:12px;padding:5px 8px;background:var(--bg0);border-radius:var(--rs)"><span style="flex:1">${u?.name||e.userId||'—'}</span><span style="color:var(--t3)">${e.role||''}</span><span class="badge ${e.confirmed?'bg':'by'}">${e.confirmed?'已確認':'待確認'}</span></div>`;}).join('')}
+  ${v.escorts.map(e=>{const u=gUsr(e.userId);return`<div style="display:flex;align-items:center;gap:8px;font-size:12px;padding:5px 8px;background:var(--bg0);border-radius:var(--rs)"><span style="flex:1">${u?.name||e.userId||'—'}</span><span style="color:var(--t3)">${e.role||''}</span><span class="badge ${e.confirmed?'bg':'by'}">${t(e.confirmed?'visit.confirmed':'visit.unconfirmed')}</span></div>`;}).join('')}
   </div>`;}
   const totalCost=(v.costs||[]).reduce((s,c)=>s+(+c.amount||0),0);
   if(v.costs?.length){html+=`<div style="font-weight:600;margin-bottom:7px;font-size:13px">${t('visit.sec.costs')}</div>
-  ${v.costs.map(c=>`<div class="cost-row"><span style="color:var(--t3);width:70px">${c.cat}</span><span style="flex:1">${c.desc||''}</span><span style="font-weight:600">${c.currency||'TWD'} ${(+c.amount||0).toLocaleString()}</span></div>`).join('')}
-  <div style="padding:8px 0;font-size:13px;font-weight:700;color:#a78bfa;text-align:right">合計 NT$${totalCost.toLocaleString()}</div>`;}
+  ${v.costs.map(c=>`<div class="cost-row"><span style="color:var(--t3);width:70px">${costCatLabel(c.cat)}</span><span style="flex:1">${c.desc||''}</span><span style="font-weight:600">${c.currency||'TWD'} ${(+c.amount||0).toLocaleString()}</span></div>`).join('')}
+  <div style="padding:8px 0;font-size:13px;font-weight:700;color:#a78bfa;text-align:right">${t('visit.total_ntd').replace('%s',totalCost.toLocaleString())}</div>`;}
   document.getElementById('mo-vd-body').innerHTML=html;
   document.getElementById('mo-vd-foot').innerHTML=`
-    <button class="btn bg2" onclick="closeMo('mo-visit-detail')">關閉</button>
-    <button class="btn bg2" onclick="closeMo('mo-visit-detail');editVisit('${id}')">編輯</button>
-    <button class="broadcast-btn" style="padding:6px 12px;font-size:12px" onclick="closeMo('mo-visit-detail');openBroadcast('${id}')">🚨 緊急廣播</button>
-    <button class="btn" style="background:#a78bfa;color:#fff;border:none;cursor:pointer;padding:7px 14px;border-radius:var(--rs);font-size:13px" onclick="closeMo('mo-visit-detail');genVisitDoc(getVisits().find(x=>x.id==='${id}'))">📄 行程單</button>`;
+    <button class="btn bg2" onclick="closeMo('mo-visit-detail')">${t('visit.btn.close')}</button>
+    <button class="btn bg2" onclick="closeMo('mo-visit-detail');editVisit('${id}')">${t('visit.btn.edit')}</button>
+    <button class="broadcast-btn" style="padding:6px 12px;font-size:12px" onclick="closeMo('mo-visit-detail');openBroadcast('${id}')">${t('visit.btn.broadcast')}</button>
+    <button class="btn" style="background:#a78bfa;color:#fff;border:none;cursor:pointer;padding:7px 14px;border-radius:var(--rs);font-size:13px" onclick="closeMo('mo-visit-detail');genVisitDoc(getVisits().find(x=>x.id==='${id}'))">${t('visit.btn.doc')}</button>`;
   openMo('mo-visit-detail');
 }
 async function toggleVisitTask(visitId,di,ti){
@@ -5742,21 +6734,21 @@ async function renderVisitList(){
     return`<tr>
     <td class="tdm">${v.dateStart}${v.dateEnd!==v.dateStart?'—'+v.dateEnd:''}</td>
     <td><b>${v.company||'—'}</b></td>
-    <td><span class="visit-type-badge ${TYPE_CLS[v.type]||'vt-other'}">${TYPE_LABEL[v.type]||'—'}</span></td>
-    <td class="tdm">${UNIT_LABEL[v.unit]||'—'}</td>
-    <td class="tdm">${v.headcount||'—'}人</td>
+    <td><span class="visit-type-badge ${TYPE_CLS[v.type]||'vt-other'}">${typeLabel(v.type)||'—'}</span></td>
+    <td class="tdm">${unitLabel(v.unit)||'—'}</td>
+    <td class="tdm">${t('visit.headcount_n').replace('%d',v.headcount||'—')}</td>
     <td class="tdm">${owner?.name||'—'}</td>
     <td><span style="color:#a78bfa;font-weight:600">NT$${total.toLocaleString()}</span></td>
     <td><span class="badge ${V_ST_CLS[s]}">${V_ST_LABEL[s]}</span></td>
     <td style="white-space:nowrap">
-      <button class="btn bg2 bsm" onclick="openVisitDetail('${v.id}')">詳情</button>
-      <button class="btn bg2 bsm" onclick="editVisit('${v.id}')">編輯</button>
-      <button class="btn bdr bsm" onclick="deleteVisit('${v.id}')">刪除</button>
+      <button class="btn bg2 bsm" onclick="openVisitDetail('${v.id}')">${t('visit.btn.detail_s')}</button>
+      <button class="btn bg2 bsm" onclick="editVisit('${v.id}')">${t('visit.btn.edit')}</button>
+      <button class="btn bdr bsm" onclick="deleteVisit('${v.id}')">${t('visit.btn.delete')}</button>
     </td></tr>`;
-  }).join(''):'<tr><td colspan="9" class="tdm" style="text-align:center;padding:22px">無到訪記錄</td></tr>';
+  }).join(''):`<tr><td colspan="9" class="tdm" style="text-align:center;padding:22px">${t('visit.no_records')}</td></tr>`;
 }
 async function deleteVisit(id){
-  if(!confirm('確定刪除？'))return;
+  if(!confirm(t('g.conf.delete')))return;
   const r=await delVisitRecord(id);   // 資料庫刪成功才從快取移除（v2.38）
   if(!r.ok){toast(sbErrMsg(r),'error');return;}
   renderVisitList();toast(t('g.toast.deleted'),'success');
@@ -5778,7 +6770,7 @@ async function renderGuestDB(){
       <div style="flex:1">
         <div style="font-size:14px;font-weight:700">${g.name||'—'}</div>
         <div style="font-size:12px;color:var(--t3)">${g.title||''} · ${g.company||'—'}</div>
-        <div style="margin-top:4px"><span class="visit-type-badge ${TYPE_CLS[g.type]||'vt-other'}">${TYPE_LABEL[g.type]||'—'}</span></div>
+        <div style="margin-top:4px"><span class="visit-type-badge ${TYPE_CLS[g.type]||'vt-other'}">${typeLabel(g.type)||'—'}</span></div>
       </div>
     </div>
     <div class="vc-body" style="font-size:12px;color:var(--t3)">
@@ -5786,20 +6778,20 @@ async function renderGuestDB(){
       ${g.phone?`<div>📱 ${g.phone}</div>`:''}
       ${g.pref?`<div>💬 ${g.pref}</div>`:''}
       <div style="display:flex;gap:12px;margin-top:4px">
-        <span>來訪 <b style="color:var(--t1)">${visitCount}</b> 次</span>
-        ${lastVisit?`<span>最近 <b style="color:var(--t1)">${lastVisit.dateStart}</b></span>`:''}
-        ${totalSpend?`<span>累計費用 <b style="color:#a78bfa">NT$${totalSpend.toLocaleString()}</b></span>`:''}
+        <span>${t('visit.g.visits_n').replace('%s',`<b style="color:var(--t1)">${visitCount}</b>`)}</span>
+        ${lastVisit?`<span>${t('visit.g.last').replace('%s',`<b style="color:var(--t1)">${lastVisit.dateStart}</b>`)}</span>`:''}
+        ${totalSpend?`<span>${t('visit.g.spend').replace('%s',`<b style="color:#a78bfa">${totalSpend.toLocaleString()}</b>`)}</span>`:''}
       </div>
     </div>
     <div class="vc-foot">
-      <button class="btn bg2 bsm" onclick="openGuestModal('${g.id}')">編輯</button>
-      <button class="btn bdr bsm" onclick="deleteGuest('${g.id}')">刪除</button>
+      <button class="btn bg2 bsm" onclick="openGuestModal('${g.id}')">${t('visit.btn.edit')}</button>
+      <button class="btn bdr bsm" onclick="deleteGuest('${g.id}')">${t('visit.btn.delete')}</button>
     </div>
   </div>`;
-  }).join(''):'<div class="es" style="grid-column:1/-1"><div class="ei">👥</div><p>來賓資料庫為空<br><button class="btn bsm" style="background:#a78bfa;color:#fff;border:none;cursor:pointer;padding:5px 12px;border-radius:var(--rs);margin-top:8px" onclick="openGuestModal()">新增第一位來賓</button></p></div>';
+  }).join(''):`<div class="es" style="grid-column:1/-1"><div class="ei">👥</div><p>${t('visit.g.empty')}<br><button class="btn bsm" style="background:#a78bfa;color:#fff;border:none;cursor:pointer;padding:5px 12px;border-radius:var(--rs);margin-top:8px" onclick="openGuestModal()">${t('visit.g.add_first')}</button></p></div>`;
 }
 function openGuestModal(id){
-  editGuestId=id||null;document.getElementById('mo-guest-title').textContent=id?'編輯來賓':'新增來賓';
+  editGuestId=id||null;document.getElementById('mo-guest-title').textContent=t(id?'visit.g.edit':'visit.g.add');
   const us=ld(K.us);
   if(id){const g=getGuests().find(x=>x.id===id);if(!g)return;
     document.getElementById('mg-name').value=g.name||'';document.getElementById('mg-title').value=g.title||'';
@@ -5811,7 +6803,7 @@ function openGuestModal(id){
 }
 function saveGuest(){
   const name=document.getElementById('mg-name')?.value.trim();const company=document.getElementById('mg-company')?.value.trim();
-  if(!name)return toast('請填寫姓名','error');if(!company)return toast('請填寫公司','error');
+  if(!name)return toast(t('visit.g.err_name'),'error');if(!company)return toast(t('visit.g.err_company'),'error');
   const data={name,title:document.getElementById('mg-title').value.trim(),company,email:document.getElementById('mg-email').value.trim(),phone:document.getElementById('mg-phone').value.trim(),country:document.getElementById('mg-country').value,type:document.getElementById('mg-type').value,pref:document.getElementById('mg-pref').value.trim()};
   const arr=getGuests();
   if(editGuestId){const i=arr.findIndex(g=>g.id===editGuestId);if(i>=0)arr[i]={...arr[i],...data};}
@@ -5819,12 +6811,12 @@ function saveGuest(){
   saveGuests(arr);saveVisitGuest(editGuestId?arr.find(g=>g.id===editGuestId):arr[arr.length-1]);closeMo('mo-guest');renderGuestDB();
   // if in visit form, refresh
   const gs=document.getElementById('vf-guest-sel');
-  if(gs)gs.innerHTML='<option value="">從資料庫選…</option>'+getGuests().map(g=>`<option value="${g.id}">${g.name}（${g.company||''}）</option>`).join('');
-  toast(editGuestId?'已更新來賓資料':'來賓已新增至資料庫','success');
+  if(gs)gs.innerHTML=`<option value="">${t('visit.pick_from_db')}</option>`+getGuests().map(g=>`<option value="${g.id}">${g.name}（${g.company||''}）</option>`).join('');
+  toast(t(editGuestId?'visit.g.updated':'visit.g.added'),'success');
   // auto add to vfGuests if in form context
   if(!editGuestId&&data.name){const g=arr[arr.length-1];vfGuests.push({guestId:g.id,name:g.name,title:g.title||'',note:''});renderVfGuests();}
 }
-async function deleteGuest(id){if(!confirm('確定刪除？'))return;await delVisitGuest(id);renderGuestDB();toast(t('g.toast.deleted'),'success');}
+async function deleteGuest(id){if(!confirm(t('g.conf.delete')))return;await delVisitGuest(id);renderGuestDB();toast(t('g.toast.deleted'),'success');}
 
 // ── Broadcast ──
 function openBroadcast(visitId){
@@ -5833,7 +6825,7 @@ function openBroadcast(visitId){
   openMo('mo-broadcast');
 }
 function sendBroadcast(){
-  const msg=document.getElementById('bc-msg')?.value.trim();if(!msg)return toast('請填寫廣播內容','error');
+  const msg=document.getElementById('bc-msg')?.value.trim();if(!msg)return toast(t('visit.err.need_broadcast'),'error');
   const level=document.getElementById('bc-level')?.value;
   const v=broadcastVisitId?getVisits().find(x=>x.id===broadcastVisitId):null;
   const icons={info:'🔔',urgent:'🚨',cancel:'❌'};
@@ -5841,7 +6833,7 @@ function sendBroadcast(){
   toast(fullMsg,level==='urgent'||level==='cancel'?'error':'warn');
   // system notification badge
   const arr=getVisits();if(broadcastVisitId){const i=arr.findIndex(x=>x.id===broadcastVisitId);if(i>=0){if(!arr[i].broadcasts)arr[i].broadcasts=[];arr[i].broadcasts.push({msg:fullMsg,level,time:new Date().toISOString()});saveVisitRecord(arr[i]).then(r=>{if(!r.ok)toast(sbErrMsg(r),'error');});}}
-  closeMo('mo-broadcast');toast('廣播已發送給所有相關人員','success');
+  closeMo('mo-broadcast');toast(t('visit.toast.broadcast'),'success');
 }
 
 // ── Report ──
@@ -5860,24 +6852,25 @@ function renderVisitReport(period){
   const el=document.getElementById('vrpt-content');if(!el)return;
   const total=visits.length;const totalCost=visits.reduce((s,v)=>(v.costs||[]).reduce((ss,c)=>ss+(+c.amount||0),s),0);
   let html=`<div class="sg" style="margin-bottom:16px">
-    <div class="sc" style="border-color:rgba(167,139,250,.3)"><div class="sl">到訪次數</div><div class="sv" style="color:#a78bfa">${total}</div></div>
-    <div class="sc cw"><div class="sl">接待費用合計</div><div class="sv" style="color:var(--yw);font-size:18px">NT$${totalCost.toLocaleString()}</div></div>
-    <div class="sc cs"><div class="sl">完成接待</div><div class="sv" style="color:var(--gn)">${visits.filter(v=>visitStatus(v)==='done').length}</div></div>
-    <div class="sc ca"><div class="sl">平均費用/次</div><div class="sv" style="color:var(--ac);font-size:18px">NT$${total?Math.round(totalCost/total).toLocaleString():'0'}</div></div>
+    <div class="sc" style="border-color:rgba(167,139,250,.3)"><div class="sl">${t('visit.rpt.visits')}</div><div class="sv" style="color:#a78bfa">${total}</div></div>
+    <div class="sc cw"><div class="sl">${t('visit.rpt.cost_total')}</div><div class="sv" style="color:var(--yw);font-size:18px">NT$${totalCost.toLocaleString()}</div></div>
+    <div class="sc cs"><div class="sl">${t('visit.rpt.done')}</div><div class="sv" style="color:var(--gn)">${visits.filter(v=>visitStatus(v)==='done').length}</div></div>
+    <div class="sc ca"><div class="sl">${t('visit.rpt.avg')}</div><div class="sv" style="color:var(--ac);font-size:18px">NT$${total?Math.round(totalCost/total).toLocaleString():'0'}</div></div>
   </div>`;
   // by type
   const typeCnt={};visits.forEach(v=>typeCnt[v.type]=(typeCnt[v.type]||0)+1);
   const maxType=Math.max(...Object.values(typeCnt),1);
   html+=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
-  <div><div class="stt" style="margin-bottom:10px">${t('visit.report.by_type')}</div>${Object.entries(typeCnt).sort((a,b)=>b[1]-a[1]).map(([type,cnt])=>`<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:13px"><span class="visit-type-badge ${TYPE_CLS[type]||'vt-other'}" style="width:80px;text-align:center">${TYPE_LABEL[type]||type}</span><div style="flex:1;background:var(--bg0);border-radius:3px;height:8px;overflow:hidden"><div style="width:${cnt/maxType*100}%;height:100%;background:#a78bfa;border-radius:3px"></div></div><span style="color:var(--t3);font-size:12px;width:24px;text-align:right">${cnt}</span></div>`).join('')}</div>
-  <div><div class="stt" style="margin-bottom:10px">${t('visit.report.by_unit')}</div>${['tw','dg','vn'].map(u=>{const cnt=visits.filter(v=>v.unit===u).length;return`<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:13px"><span style="width:80px;color:var(--t2)">${UNIT_LABEL[u]}</span><div style="flex:1;background:var(--bg0);border-radius:3px;height:8px;overflow:hidden"><div style="width:${total?cnt/total*100:0}%;height:100%;background:var(--tl);border-radius:3px"></div></div><span style="color:var(--t3);font-size:12px;width:24px;text-align:right">${cnt}</span></div>`;}).join('')}</div>
+  <div><div class="stt" style="margin-bottom:10px">${t('visit.report.by_type')}</div>${Object.entries(typeCnt).sort((a,b)=>b[1]-a[1]).map(([type,cnt])=>`<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:13px"><span class="visit-type-badge ${TYPE_CLS[type]||'vt-other'}" style="width:80px;text-align:center">${typeLabel(type)||type}</span><div style="flex:1;background:var(--bg0);border-radius:3px;height:8px;overflow:hidden"><div style="width:${cnt/maxType*100}%;height:100%;background:#a78bfa;border-radius:3px"></div></div><span style="color:var(--t3);font-size:12px;width:24px;text-align:right">${cnt}</span></div>`).join('')}</div>
+  <div><div class="stt" style="margin-bottom:10px">${t('visit.report.by_unit')}</div>${['tw','dg','vn'].map(u=>{const cnt=visits.filter(v=>v.unit===u).length;return`<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:13px"><span style="width:80px;color:var(--t2)">${unitLabel(u)}</span><div style="flex:1;background:var(--bg0);border-radius:3px;height:8px;overflow:hidden"><div style="width:${total?cnt/total*100:0}%;height:100%;background:var(--tl);border-radius:3px"></div></div><span style="color:var(--t3);font-size:12px;width:24px;text-align:right">${cnt}</span></div>`;}).join('')}</div>
   </div>`;
   // top guests by visit count
-  const guestCnt={};visits.forEach(v=>(v.guests||[]).forEach(g=>{const name=g.name||getGuests().find(x=>x.id===g.guestId)?.name||'未知';guestCnt[name]=(guestCnt[name]||0)+1;}));
+  const guestCnt={};visits.forEach(v=>(v.guests||[]).forEach(g=>{const name=g.name||getGuests().find(x=>x.id===g.guestId)?.name||t('visit.unknown');guestCnt[name]=(guestCnt[name]||0)+1;}));
   const topGuests=Object.entries(guestCnt).sort((a,b)=>b[1]-a[1]).slice(0,5);
   if(topGuests.length){html+=`<div style="margin-top:4px"><div class="stt" style="margin-bottom:10px">${t('visit.report.top_guests')}</div><div style="display:flex;flex-direction:column;gap:6px">${topGuests.map(([name,cnt])=>`<div style="display:flex;align-items:center;gap:10px;font-size:13px"><span style="flex:1;color:var(--t2)">${name}</span><span style="color:var(--t3)">${t('lib.stat.borrow_cnt').replace('%d',cnt)}</span></div>`).join('')}</div></div>`;}
   el.innerHTML=html;
 }
+// 🔴 CSV 表頭與 UNIT_LABEL／TYPE_LABEL 都是固定繁中：匯出的是存檔格式。
 function exportVisitCSV(){
   const visits=getVisits();
   const rows=[['日期','公司','類型','接待單位','人數','負責窗口','目的','費用合計','狀態']];
@@ -5887,6 +6880,9 @@ function exportVisitCSV(){
 }
 
 // ── Generate Doc ──
+// 🔴「客戶到訪接待行程單」整份固定繁中 —— 那是公司的列印單據，
+//    不該因為誰按了列印鍵、介面剛好切成哪一國語言而長得不一樣（同 board 的 siteLabelZ）。
+//    這裡的中文全部是版面文字，i18n 稽核會算成漏翻，那是誤判。
 function genVisitDoc(v){
   if(!v){toast(t('g.toast.no_data'),'error');return;}
   const owner=gUsr(v.ownerId);const totalCost=(v.costs||[]).reduce((s,c)=>s+(+c.amount||0),0);
@@ -5948,7 +6944,7 @@ function toggleNoRepeat(){
 }
 function resetDrawn(){
   L_drawn=[];renderDrawnList();
-  toast && toast('已重置抽選紀錄','success');
+  toast && toast(t('lot.toast.reset'),'success');
 }
 
 function lottoInit(){
@@ -5965,7 +6961,7 @@ function lottoInit(){
     sel.innerHTML = `<option value="all">${t('visit.all_staff').replace('%d',_lottoAllUsers.length)}</option>`
       + sites.map(s=>{
           const cnt = _lottoAllUsers.filter(u=>inSite(u.site||'TW',s)).length;
-          return `<option value="${s}">${siteName(s)}（${cnt}位）</option>`;
+          return `<option value="${s}">${siteName(s)}（${t('lot.people_n').replace('%d',cnt)}）</option>`;
         }).join('');
   }
   lottoFilterSite(); // 套用目前選擇
@@ -5980,14 +6976,14 @@ function lottoFilterSite(){
     ? _lottoAllUsers
     : _lottoAllUsers.filter(u=>inSite(u.site||'TW',val));
   POOL = filtered.map(u=>u.nameZh||u.nameEn||u.name||u.id).filter(Boolean);
-  if(!POOL.length) POOL = ['請先建立人員名單'];
+  if(!POOL.length) POOL = [t('lot.err.need_list')];
   // 更新顯示
   const pc = document.getElementById('poolCount');
   if(pc) pc.textContent = POOL.length;
   const cpc = document.getElementById('cards-pool-count');
   if(cpc) cpc.textContent = POOL.length;
   const sc = document.getElementById('lotto-site-count');
-  if(sc) sc.textContent = val==='all'?'':`· ${siteName(val)} ${POOL.length} 位`;
+  if(sc) sc.textContent = val==='all'?'':`· ${siteName(val)} ${t('lot.people_n').replace('%d',POOL.length)}`;
 }
 
 /* ===================== 名單 ===================== */
@@ -5999,7 +6995,7 @@ const L_pickIdx = () => L_rand(POOL.length);
 function L_pickSafe(){
   const avail = L_noRepeat ? POOL.filter(n=>!L_drawn.includes(n)) : POOL;
   if(!avail.length){
-    if(L_noRepeat){ L_drawn=[]; renderDrawnList(); toast && toast('全員已抽完，重新開始','warn'); }
+    if(L_noRepeat){ L_drawn=[]; renderDrawnList(); toast && toast(t('lot.all_drawn'),'warn'); }
     return POOL[L_rand(POOL.length)];
   }
   return avail[L_rand(avail.length)];
@@ -6023,7 +7019,7 @@ function renderDrawnList(){
           <span class="chip-name">${n}</span>
         </span>`).join('');
       const rem=document.getElementById('drawn-remain');
-      if(rem) rem.textContent=`剩 ${POOL.filter(n=>!L_drawn.includes(n)).length}/${POOL.length}`;
+      if(rem) rem.textContent=t('lot.remaining').replace('%d',`${POOL.filter(n=>!L_drawn.includes(n)).length}/${POOL.length}`);
     }
   }
   // 四個 stage 裡的已抽清單

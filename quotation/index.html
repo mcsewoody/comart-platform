@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#080C14">
-<title>COMART · Quotation System v3.65</title>
+<title>COMART · Quotation System v3.66</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=Noto+Serif:wght@400;700&family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -270,7 +270,7 @@ html[lang="vi"]{--ff:'Be Vietnam Pro','DM Sans',-apple-system,sans-serif;--fd:'N
       <div class="logo-mark" style="background:transparent"><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="24" height="13"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></div>
       <div>
         <div class="logo-text">COMART</div>
-        <div id="appVersionDiv" style="font-size:10px;color:var(--ac);font-weight:600;letter-spacing:.04em;line-height:1.3">v3.65</div>
+        <div id="appVersionDiv" style="font-size:10px;color:var(--ac);font-weight:600;letter-spacing:.04em;line-height:1.3">v3.66</div>
       </div>
     </div>
     <div class="topbar-right">
@@ -1090,6 +1090,10 @@ const UI = {
     allInterfaces:'All Interfaces',
     statusLead:'Prospect',statusActive:'Active',statusCustomer:'Customer',statusLost:'Lost',statusDormant:'Dormant',
     factoryChina:'China',factoryVietnam:'Vietnam',factoryEither:'Either',
+    stageLead:'Inquiry',stageQuoted:'Quoted',stageSample:'Sample',stageNego:'Negotiation',stageWon:'Won',stageLost:'Lost',
+    tkfOpen:'Open',tkfOverdue:'Overdue',tkfToday:'Today',tkfWeek:'This Week',tkfAll:'All',tkfDone:'Done',
+    phCalcHint:'Auto-calculated default: ',
+    crmAllStatus:'All Statuses',crmAllFactory:'All Factories',crmAllSales:'Sales: All',
     addTask:'+ Add Task',
     searchCompany:'🔍 Search company/country/contact…',searchActivities:'🔍 Search activities…',
     acctCompanyName:'Company Name *',acctCountry:'Country/Region',
@@ -1102,7 +1106,7 @@ const UI = {
     contactModal:'Contact',ctName:'Name *',ctJobTitle:'Job Title',ctRole:'Role',ctPhone:'Phone',
     roleDecision:'Decision Maker',rolePurchasing:'Purchasing',roleEngineer:'Engineer',roleOwner:'Owner/CEO',roleOther:'Other',
     activityModal:'Activity Log',avType:'Type *',avDate:'Date *',avSummary:'Title / Summary *',avDetail:'Details',avFollowup:'Follow-up',
-    actMeeting:'🤝 Meeting',actShow:'🎪 Trade Show',actQuote:'📋 Quotation',actSample:'📦 Sample',actContract:'📝 Contract',actOrder:'✅ Order',actEmail:'📧 Email',actCall:'📞 Call',actNote:'📌 Note',
+    actMeeting:'Meeting',actShow:'Trade Show',actQuote:'Quotation',actSample:'Sample',actContract:'Contract',actOrder:'Order',actEmail:'Email',actCall:'Call',actNote:'Note',
     taskModal:'Task',tkContent:'Task Content *',tkDue:'Due Date',tkPriority:'Priority',tkAccount:'Related Account',tkNotes:'Notes',
     priHigh:'🔴 High',priMed:'🟡 Medium',priLow:'🟢 Low',
     errEditPerm:'Only assigned Sales, Operator or Admin can edit this quote',
@@ -1144,6 +1148,10 @@ const UI = {
     allInterfaces:'全部介面',
     statusLead:'潛在客戶',statusActive:'進行中',statusCustomer:'已成交',statusLost:'已流失',statusDormant:'暫停',
     factoryChina:'中國廠',factoryVietnam:'越南廠',factoryEither:'兩者皆可',
+    stageLead:'詢價',stageQuoted:'報價',stageSample:'樣品',stageNego:'議價',stageWon:'成交',stageLost:'流失',
+    tkfOpen:'未完成',tkfOverdue:'逾期',tkfToday:'今天',tkfWeek:'本週',tkfAll:'全部',tkfDone:'已完成',
+    phCalcHint:'預設加成計算值: ',
+    crmAllStatus:'全部狀態',crmAllFactory:'全部廠別',crmAllSales:'Sales: 全部',
     addTask:'+ 新增任務',
     searchCompany:'🔍 搜尋公司名/國家/聯絡人…',searchActivities:'🔍 搜尋互動紀錄…',
     acctCompanyName:'公司名稱 *',acctCountry:'國家/地區',
@@ -1156,7 +1164,7 @@ const UI = {
     contactModal:'聯絡人',ctName:'姓名 *',ctJobTitle:'職稱',ctRole:'角色',ctPhone:'電話',
     roleDecision:'決策者',rolePurchasing:'採購',roleEngineer:'工程',roleOwner:'老闆',roleOther:'其他',
     activityModal:'互動紀錄',avType:'類型 *',avDate:'日期 *',avSummary:'標題 / 摘要 *',avDetail:'詳細內容',avFollowup:'後續動作',
-    actMeeting:'🤝 會議',actShow:'🎪 展會見面',actQuote:'📋 報價',actSample:'📦 樣品寄送',actContract:'📝 合約簽訂',actOrder:'✅ 下單',actEmail:'📧 重要 Email',actCall:'📞 重要通話',actNote:'📌 其他備註',
+    actMeeting:'會議',actShow:'展會見面',actQuote:'報價',actSample:'樣品寄送',actContract:'合約簽訂',actOrder:'下單',actEmail:'重要 Email',actCall:'重要通話',actNote:'其他備註',
     taskModal:'任務',tkContent:'任務內容 *',tkDue:'到期日',tkPriority:'優先順序',tkAccount:'關聯客戶',tkNotes:'備註',
     priHigh:'🔴 高',priMed:'🟡 中',priLow:'🟢 低',
     errEditPerm:'只有負責業務、操作人員 或 Admin 可以編輯此報價',
@@ -1198,6 +1206,10 @@ const UI = {
     allInterfaces:'全部接口',
     statusLead:'潜在客户',statusActive:'进行中',statusCustomer:'已成交',statusLost:'已流失',statusDormant:'暂停',
     factoryChina:'中国厂',factoryVietnam:'越南厂',factoryEither:'两者皆可',
+    stageLead:'询价',stageQuoted:'报价',stageSample:'样品',stageNego:'议价',stageWon:'成交',stageLost:'流失',
+    tkfOpen:'未完成',tkfOverdue:'逾期',tkfToday:'今天',tkfWeek:'本周',tkfAll:'全部',tkfDone:'已完成',
+    phCalcHint:'默认加成计算值: ',
+    crmAllStatus:'全部状态',crmAllFactory:'全部厂别',crmAllSales:'Sales: 全部',
     addTask:'+ 新增任务',
     searchCompany:'🔍 搜索公司名/国家/联系人…',searchActivities:'🔍 搜索互动记录…',
     acctCompanyName:'公司名称 *',acctCountry:'国家/地区',
@@ -1210,7 +1222,7 @@ const UI = {
     contactModal:'联系人',ctName:'姓名 *',ctJobTitle:'职称',ctRole:'角色',ctPhone:'电话',
     roleDecision:'决策者',rolePurchasing:'采购',roleEngineer:'工程',roleOwner:'老板',roleOther:'其他',
     activityModal:'互动记录',avType:'类型 *',avDate:'日期 *',avSummary:'标题 / 摘要 *',avDetail:'详细内容',avFollowup:'后续动作',
-    actMeeting:'🤝 会议',actShow:'🎪 展会见面',actQuote:'📋 报价',actSample:'📦 样品寄送',actContract:'📝 合同签订',actOrder:'✅ 下单',actEmail:'📧 重要 Email',actCall:'📞 重要通话',actNote:'📌 其他备注',
+    actMeeting:'会议',actShow:'展会见面',actQuote:'报价',actSample:'样品寄送',actContract:'合同签订',actOrder:'下单',actEmail:'重要 Email',actCall:'重要通话',actNote:'其他备注',
     taskModal:'任务',tkContent:'任务内容 *',tkDue:'到期日',tkPriority:'优先顺序',tkAccount:'关联客户',tkNotes:'备注',
     priHigh:'🔴 高',priMed:'🟡 中',priLow:'🟢 低',
     errEditPerm:'只有负责业务、操作人员或 Admin 可以编辑此报价',
@@ -1252,6 +1264,10 @@ const UI = {
     allInterfaces:'Tất cả giao diện',
     statusLead:'Tiềm năng',statusActive:'Đang hoạt động',statusCustomer:'Đã mua',statusLost:'Đã mất',statusDormant:'Tạm dừng',
     factoryChina:'NM Trung Quốc',factoryVietnam:'NM Việt Nam',factoryEither:'Cả hai',
+    stageLead:'Hỏi giá',stageQuoted:'Đã báo giá',stageSample:'Mẫu',stageNego:'Đàm phán',stageWon:'Thành công',stageLost:'Đã mất',
+    tkfOpen:'Chưa xong',tkfOverdue:'Quá hạn',tkfToday:'Hôm nay',tkfWeek:'Tuần này',tkfAll:'Tất cả',tkfDone:'Đã xong',
+    phCalcHint:'Giá trị tính mặc định: ',
+    crmAllStatus:'Tất cả trạng thái',crmAllFactory:'Tất cả nhà máy',crmAllSales:'Sales: Tất cả',
     addTask:'+ Thêm công việc',
     searchCompany:'🔍 Tìm công ty/quốc gia/liên hệ…',searchActivities:'🔍 Tìm hoạt động…',
     acctCompanyName:'Tên công ty *',acctCountry:'Quốc gia/Vùng',
@@ -1264,7 +1280,7 @@ const UI = {
     contactModal:'Liên hệ',ctName:'Tên *',ctJobTitle:'Chức vụ',ctRole:'Vai trò',ctPhone:'Điện thoại',
     roleDecision:'Người quyết định',rolePurchasing:'Mua hàng',roleEngineer:'Kỹ sư',roleOwner:'Chủ/CEO',roleOther:'Khác',
     activityModal:'Nhật ký hoạt động',avType:'Loại *',avDate:'Ngày *',avSummary:'Tiêu đề / Tóm tắt *',avDetail:'Chi tiết',avFollowup:'Hành động tiếp theo',
-    actMeeting:'🤝 Cuộc họp',actShow:'🎪 Hội chợ',actQuote:'📋 Báo giá',actSample:'📦 Gửi mẫu',actContract:'📝 Hợp đồng',actOrder:'✅ Đặt hàng',actEmail:'📧 Email QT',actCall:'📞 Cuộc gọi',actNote:'📌 Ghi chú',
+    actMeeting:'Cuộc họp',actShow:'Hội chợ',actQuote:'Báo giá',actSample:'Gửi mẫu',actContract:'Hợp đồng',actOrder:'Đặt hàng',actEmail:'Email QT',actCall:'Cuộc gọi',actNote:'Ghi chú',
     taskModal:'Công việc',tkContent:'Nội dung *',tkDue:'Hạn chót',tkPriority:'Ưu tiên',tkAccount:'KH liên quan',tkNotes:'Ghi chú',
     priHigh:'🔴 Cao',priMed:'🟡 Trung bình',priLow:'🟢 Thấp',
     errEditPerm:'Chỉ Sales phụ trách, Operator hoặc Admin mới có thể sửa báo giá này',
@@ -1306,6 +1322,10 @@ const UI = {
     allInterfaces:'すべてインターフェース',
     statusLead:'見込み客',statusActive:'商談中',statusCustomer:'成約済',statusLost:'失注',statusDormant:'休眠',
     factoryChina:'中国工場',factoryVietnam:'ベトナム工場',factoryEither:'どちらでも',
+    stageLead:'引合',stageQuoted:'見積済',stageSample:'サンプル',stageNego:'交渉',stageWon:'受注',stageLost:'失注',
+    tkfOpen:'未完了',tkfOverdue:'期限超過',tkfToday:'今日',tkfWeek:'今週',tkfAll:'すべて',tkfDone:'完了',
+    phCalcHint:'デフォルト計算値: ',
+    crmAllStatus:'すべての状態',crmAllFactory:'すべての工場',crmAllSales:'Sales: すべて',
     addTask:'+ タスク追加',
     searchCompany:'🔍 会社/国/担当者を検索…',searchActivities:'🔍 活動を検索…',
     acctCompanyName:'会社名 *',acctCountry:'国・地域',
@@ -1318,7 +1338,7 @@ const UI = {
     contactModal:'連絡先',ctName:'氏名 *',ctJobTitle:'役職',ctRole:'役割',ctPhone:'電話',
     roleDecision:'意思決定者',rolePurchasing:'購買',roleEngineer:'エンジニア',roleOwner:'オーナー/CEO',roleOther:'その他',
     activityModal:'活動記録',avType:'種別 *',avDate:'日付 *',avSummary:'タイトル / 概要 *',avDetail:'詳細',avFollowup:'フォローアップ',
-    actMeeting:'🤝 会議',actShow:'🎪 展示会',actQuote:'📋 見積',actSample:'📦 サンプル送付',actContract:'📝 契約',actOrder:'✅ 発注',actEmail:'📧 重要メール',actCall:'📞 重要通話',actNote:'📌 その他メモ',
+    actMeeting:'会議',actShow:'展示会',actQuote:'見積',actSample:'サンプル送付',actContract:'契約',actOrder:'発注',actEmail:'重要メール',actCall:'重要通話',actNote:'その他メモ',
     taskModal:'タスク',tkContent:'タスク内容 *',tkDue:'期限',tkPriority:'優先度',tkAccount:'関連顧客',tkNotes:'メモ',
     priHigh:'🔴 高',priMed:'🟡 中',priLow:'🟢 低',
     errEditPerm:'担当Sales、オペレーターまたはAdminのみ編集可能です',
@@ -1453,37 +1473,47 @@ let CRM_TASKS = [];
 let _crmPollTimer = null;
 
 // CRM constants
+// 🔴 這四張表存 i18n key（`k`）不存文案：它們是模組層級的常值，
+// 只在載入時求值一次，存死字串的話切語言永遠換不掉。
+// 取文字一律 crmLabel(表, id)，不要再寫 `.label`。
 const CRM_STAGES = [
-  { id:'lead',     label:'詢價',  color:'#94a3b8' },
-  { id:'quoted',   label:'報價',  color:'#3b82f6' },
-  { id:'sample',   label:'樣品',  color:'#8b5cf6' },
-  { id:'nego',     label:'議價',  color:'#f59e0b' },
-  { id:'won',      label:'成交',  color:'#10b981' },
-  { id:'lost',     label:'流失',  color:'#ef4444' },
+  { id:'lead',     k:'stageLead',   color:'#94a3b8' },
+  { id:'quoted',   k:'stageQuoted', color:'#3b82f6' },
+  { id:'sample',   k:'stageSample', color:'#8b5cf6' },
+  { id:'nego',     k:'stageNego',   color:'#f59e0b' },
+  { id:'won',      k:'stageWon',    color:'#10b981' },
+  { id:'lost',     k:'stageLost',   color:'#ef4444' },
 ];
 const CRM_STATUSES = [
-  { id:'lead',     label:'潛在客戶' },
-  { id:'active',   label:'進行中' },
-  { id:'customer', label:'已成交' },
-  { id:'lost',     label:'已流失' },
-  { id:'dormant',  label:'暫停' },
+  { id:'lead',     k:'statusLead' },
+  { id:'active',   k:'statusActive' },
+  { id:'customer', k:'statusCustomer' },
+  { id:'lost',     k:'statusLost' },
+  { id:'dormant',  k:'statusDormant' },
 ];
 const CRM_FACTORIES = [
-  { id:'either',  label:'兩者皆可' },
-  { id:'china',   label:'中國廠' },
-  { id:'vietnam', label:'越南廠' },
+  { id:'either',  k:'factoryEither' },
+  { id:'china',   k:'factoryChina' },
+  { id:'vietnam', k:'factoryVietnam' },
 ];
+// icon 留在這裡、文字留在字典 —— 以前 act* 的字典值把 emoji 也寫進去了，
+// 於是同一個 emoji 有兩份，改一份另一份不會跟著動。
 const CRM_ACT_TYPES = [
-  { id:'meeting',  label:'會議',     icon:'🤝' },
-  { id:'show',     label:'展會見面', icon:'🎪' },
-  { id:'quote',    label:'報價',     icon:'📋' },
-  { id:'sample',   label:'樣品寄送', icon:'📦' },
-  { id:'contract', label:'合約簽訂', icon:'📝' },
-  { id:'order',    label:'下單',     icon:'✅' },
-  { id:'email',    label:'重要 Email',icon:'📧' },
-  { id:'call',     label:'重要通話', icon:'📞' },
-  { id:'note',     label:'其他備註', icon:'📌' },
+  { id:'meeting',  k:'actMeeting',  icon:'🤝' },
+  { id:'show',     k:'actShow',     icon:'🎪' },
+  { id:'quote',    k:'actQuote',    icon:'📋' },
+  { id:'sample',   k:'actSample',   icon:'📦' },
+  { id:'contract', k:'actContract', icon:'📝' },
+  { id:'order',    k:'actOrder',    icon:'✅' },
+  { id:'email',    k:'actEmail',    icon:'📧' },
+  { id:'call',     k:'actCall',     icon:'📞' },
+  { id:'note',     k:'actNote',     icon:'📌' },
 ];
+/** 取當下語言的標籤；查無此 id 回 '-'（呼叫端原本就是這個行為）。 */
+function crmLabel(table, id, fallback) {
+  const row = table.find(x => x.id === id);
+  return row ? t(row.k) : (fallback !== undefined ? fallback : '-');
+}
 
 let currentUser = null; // { empId, nameEn, nameZh, ext, mobile, email, login, role, mustChangePwd }
 
@@ -2122,6 +2152,18 @@ function applyLang(){
   s('acct-opt-statuslead','statusLead'); s('acct-opt-statusactive','statusActive'); s('acct-opt-statuscustomer','statusCustomer');
   s('acct-opt-statuslost','statusLost'); s('acct-opt-statusdormant','statusDormant');
   s('acct-opt-either','factoryEither'); s('acct-opt-china','factoryChina'); s('acct-opt-vietnam','factoryVietnam');
+  // 🔴 CRM 清單頁那三個篩選下拉原本一個都沒翻（applyLang 只處理了 modal 裡的 acct-opt-*）。
+  // 直接由四張表推出來，加狀態／廠別時不必再回來補一行。
+  s('crm-opt-allstatus','crmAllStatus'); s('crm-opt-allfactory','crmAllFactory'); s('crm-opt-allsales','crmAllSales');
+  CRM_STATUSES.forEach(x => s('crm-opt-' + x.id, x.k));
+  CRM_FACTORIES.forEach(x => s('crm-opt-' + x.id, x.k));
+  s('crm-opt-taskopen','tkfOpen'); s('crm-opt-taskoverdue','tkfOverdue'); s('crm-opt-tasktoday','tkfToday');
+  s('crm-opt-taskweek','tkfWeek'); s('crm-opt-taskall','tkfAll'); s('crm-opt-taskdone','tkfDone');
+  // 互動類型的下拉：emoji 在表裡、文字在字典裡，兩者在這裡合起來
+  CRM_ACT_TYPES.forEach(x => {
+    const el = document.getElementById('av-opt-' + x.id);
+    if (el) el.textContent = x.icon + ' ' + t(x.k);
+  });
   const _aac=document.getElementById('acct-add-contact-btn'); if(_aac) _aac.textContent=t('addContact');
   const _aaa=document.getElementById('acct-add-activity-btn'); if(_aaa) _aaa.textContent=t('addActivityBtn');
   const _aat=document.getElementById('acct-add-task-btn'); if(_aat) _aat.textContent=t('addTask');
@@ -2136,9 +2178,6 @@ function applyLang(){
   s('av-modal-title','activityModal');
   s('av-lbl-type','avType'); s('av-lbl-date','avDate'); s('av-lbl-summary','avSummary');
   s('av-lbl-detail','avDetail'); s('av-lbl-followup','avFollowup');
-  s('av-opt-meeting','actMeeting'); s('av-opt-show','actShow'); s('av-opt-quote','actQuote');
-  s('av-opt-sample','actSample'); s('av-opt-contract','actContract'); s('av-opt-order','actOrder');
-  s('av-opt-email','actEmail'); s('av-opt-call','actCall'); s('av-opt-note','actNote');
   const _avsv=document.getElementById('av-save-btn'); if(_avsv) _avsv.textContent='💾 '+t('save');
   s('av-cancel-btn','cancel');
   // Task modal
@@ -2151,7 +2190,9 @@ function applyLang(){
   // Re-render current page to sync language
   if(page==='products') renderProductList();
   if(page==='settings') renderSettingsPage();
-  if(page==='crm') { if(typeof renderCRMAccounts==='function') renderCRMAccounts(); }
+  // 🔴 重畫「當前的 CRM 子頁籤」而不是寫死 accounts：管線看板的欄位標題、
+  //    任務與互動紀錄都是 JS 畫的，只重畫 accounts 的話停在那幾頁切語言不會有反應。
+  if(page==='crm') { if(typeof showCRMTab==='function') showCRMTab(_crmTab); }
 }
 
 // ═══════════════════════════════════════
@@ -3980,7 +4021,7 @@ function renderPriceTbl(){
         ? (()=>{ const c=Math.round(base1k*MOQ_ADJ[m]*100)/100; return (c&&formOutCurrency&&formOutCurrency!=='USD'?usdToOut(c,formOutCurrency):c); })()
         : '';
       const ph = calcVal ? `≈${calcVal}` : '—';
-      return `<input class="pt-input" type="number" min="0" step="${step}" placeholder="${ph}" value="${dispVal}" data-id="${id}" data-moq="${m}" onchange="setPrOut('${id}',${m},this.value)" title="${calcVal?'預設加成計算值: '+ph:''}">`;
+      return `<input class="pt-input" type="number" min="0" step="${step}" placeholder="${ph}" value="${dispVal}" data-id="${id}" data-moq="${m}" onchange="setPrOut('${id}',${m},this.value)" title="${calcVal?t('phCalcHint')+ph:''}">`;
     }).join('');
     const isFeat=formFeatured[id]===true;
     return `<div class="pt-row" style="grid-template-columns:${cols}">
@@ -6403,18 +6444,20 @@ function _populateCRMSalesFilter(){
   if(sel.innerHTML !== newHtml){ sel.innerHTML = newHtml; sel.value = cur; }
 }
 
-function showCRMTab(t){
-  _crmTab = t;
+// ⚠️ 參數原本叫 t，會在函式內遮蔽全域的翻譯函式 t()。現在這裡負責換語言後重畫，
+// 留著遲早會有人在裡面呼叫 t() 然後拿到一個字串當函式用。
+function showCRMTab(tab){
+  _crmTab = tab;
   ['accounts','pipeline','tasks','activities'].forEach(x=>{
     const btn=document.getElementById('crmtab-'+x);
-    if(btn) btn.classList.toggle('on', x===t);
+    if(btn) btn.classList.toggle('on', x===tab);
     const c=document.getElementById('crmtab-content-'+x);
-    if(c) c.style.display = (x===t) ? 'block' : 'none';
+    if(c) c.style.display = (x===tab) ? 'block' : 'none';
   });
-  if(t==='accounts') renderCRMAccounts();
-  if(t==='pipeline') renderCRMPipeline();
-  if(t==='tasks') renderCRMTasks();
-  if(t==='activities') renderCRMActivities();
+  if(tab==='accounts') renderCRMAccounts();
+  if(tab==='pipeline') renderCRMPipeline();
+  if(tab==='tasks') renderCRMTasks();
+  if(tab==='activities') renderCRMActivities();
 }
 
 // ── ACCOUNT LIST ─────────────────────────────
@@ -6447,8 +6490,8 @@ function renderCRMAccounts(){
   }
 
   list.innerHTML = accts.map(a=>{
-    const stat = CRM_STATUSES.find(s=>s.id===a.status) || {label:'-'};
-    const fac  = CRM_FACTORIES.find(f=>f.id===a.factory) || {label:'-'};
+    const statLabel = crmLabel(CRM_STATUSES, a.status);
+    const facLabel  = crmLabel(CRM_FACTORIES, a.factory);
     const cnt  = CRM_CONTACTS.filter(c=>c.accountId===a.id).length;
     const qcnt = QUOTES.filter(q=>q.accountId===a.id || (q.company||'').toLowerCase()===(a.company||'').toLowerCase()).length;
     const lastAct = CRM_ACTIVITIES.filter(v=>v.accountId===a.id).sort((x,y)=>(y.date||'').localeCompare(x.date||''))[0];
@@ -6457,14 +6500,14 @@ function renderCRMAccounts(){
       onmouseover="this.style.borderColor='#10a37f'" onmouseout="this.style.borderColor='var(--br)'">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
         <div style="font-size:14px;font-weight:700;color:var(--tx);flex:1">${escHtml(a.company||'(無名)')}</div>
-        <div style="font-size:10px;padding:2px 8px;border-radius:5px;background:var(--s2);color:var(--tx2)">${stat.label}</div>
+        <div style="font-size:10px;padding:2px 8px;border-radius:5px;background:var(--s2);color:var(--tx2)">${statLabel}</div>
       </div>
       <div style="display:flex;gap:14px;font-size:11px;color:var(--tx3);flex-wrap:wrap">
         ${a.country?`<span>🌍 ${escHtml(a.country)}</span>`:''}
         ${a.industry?`<span>🏷 ${escHtml(a.industry)}</span>`:''}
         <span>👤 ${cnt} ${t('contactsCountLabel')}</span>
         <span>💰 ${qcnt} ${t('quotesCountLabel')}</span>
-        <span>🏭 ${fac.label}</span>
+        <span>🏭 ${facLabel}</span>
         ${lastAct?`<span>📋 ${t('lastActivityLabel')}${lastAct.date}</span>`:''}
       </div>
     </div>`;
@@ -6596,7 +6639,7 @@ function renderAcctActivities(){
   const list = CRM_ACTIVITIES.filter(v=>v.accountId===_editAcctId).sort((a,b)=>(b.date||'').localeCompare(a.date||''));
   if(!list.length){ el.innerHTML=`<div style="padding:14px;color:var(--tx3);font-size:12px;text-align:center">${t('crmNoActivities')}</div>`; return; }
   el.innerHTML = list.map(v=>{
-    const ty = CRM_ACT_TYPES.find(x=>x.id===v.type) || {icon:'📌',label:''};
+    const ty = CRM_ACT_TYPES.find(x=>x.id===v.type) || {icon:'📌',k:''};
     return `<div onclick="openActivityModal('${v.id}')"
       style="padding:10px 12px;border:1px solid var(--br);border-radius:8px;margin-bottom:6px;background:var(--s2);cursor:pointer">
       <div style="display:flex;align-items:center;gap:8px">
@@ -6847,7 +6890,7 @@ function renderCRMPipeline(){
     return `<div style="background:var(--s1);border:1px solid var(--br);border-radius:10px;padding:10px;min-height:200px">
       <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--br)">
         <div style="width:8px;height:8px;border-radius:50%;background:${st.color}"></div>
-        <div style="font-size:12px;font-weight:700;color:var(--tx);flex:1">${st.label}</div>
+        <div style="font-size:12px;font-weight:700;color:var(--tx);flex:1">${t(st.k)}</div>
         <div style="font-size:11px;color:var(--tx3)">${accts.length}</div>
       </div>
       ${accts.map(a=>`<div onclick="openAccountModal('${a.id}')"
@@ -6921,7 +6964,7 @@ function renderCRMActivities(){
   list.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
   if(!list.length){ el.innerHTML=`<div style="padding:40px;text-align:center;color:var(--tx3);font-size:13px">${t('crmNoActivityLog')}</div>`; return; }
   el.innerHTML = list.slice(0,100).map(v=>{
-    const ty = CRM_ACT_TYPES.find(x=>x.id===v.type) || {icon:'📌',label:''};
+    const ty = CRM_ACT_TYPES.find(x=>x.id===v.type) || {icon:'📌',k:''};
     const acct = CRM_ACCOUNTS.find(a=>a.id===v.accountId);
     return `<div onclick="openAccountModal('${v.accountId}')"
       style="padding:11px 13px;border:1px solid var(--br);border-radius:9px;margin-bottom:7px;background:var(--s1);cursor:pointer">
@@ -7454,7 +7497,7 @@ init();
         style="flex:1;min-width:180px;padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none">
       <select id="crm-filter-sales" onchange="renderCRMAccounts()"
         style="padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none;min-width:110px">
-        <option value="">Sales: 全部</option>
+        <option value="" id="crm-opt-allsales">Sales: 全部</option>
       </select>
       <select id="crm-filter-status" onchange="renderCRMAccounts()"
         style="padding:8px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:12px;outline:none">

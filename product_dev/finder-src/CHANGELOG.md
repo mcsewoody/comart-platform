@@ -3,6 +3,21 @@
 
 
 
+
+## 2.30
+
+上傳工具（`IncrementalUploadPage`）也上五語，Finder 的 i18n 至此完成（330 個 key）。
+涵蓋批次匯入、手動上傳、預設目錄補檔、AI 文件分析與 Users 權限管理五個畫面，
+以及上傳過程的所有進度與錯誤訊息。
+
+- 🔴 **`SKIP_REASON_LABELS` 一樣改成存 key**（同其他標籤表）。
+- 🔴 **`名片` 這個中文不可以翻**：它在 `excludedName()` 裡是**比對實際檔名**的規則，
+  不是介面文字。已就地加註，免得下次掃描時被當成漏翻。
+- 非元件的輔助函式（`uploadResumable`／`prepareBatch`／`storageUploadError` 等）
+  用模組層級的 `tr`，元件用 `useT()` 回傳的 `t` —— 兩者是同一個函式，
+  差別只在元件需要訂閱重繪。
+- `useCallback` 的 deps 補上 `t`。它是模組層級的穩定參考，不會造成重跑。
+
 ## 2.29
 
 讀取路徑全部上五語（173 個 key）：DocumentLibraryPage、PdDocumentDetailPage、

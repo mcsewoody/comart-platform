@@ -29,6 +29,7 @@ import {
   type StoredDirectoryHandle,
 } from "../lib/directory-access";
 import type { PdAnalysisLibraryStatus, PdAnalysisQueueStatus, PdDataset, PdSyncDocument, PdUploader } from "../lib/types";
+import { t as tr, useT } from "../i18n";
 
 type ImportFile = {
   file: File;
@@ -66,12 +67,13 @@ const ALLOWED = new Set([
 const MAX_FILE_BYTES = 50 * 1024 * 1024;
 const ARCHIVE_EXTENSIONS = new Set(["zip", "7z", "rar"]);
 const SKIP_REASON_LABELS: Record<SkipReason, string> = {
-  outside_dataset: "非產品目錄",
-  empty: "空檔案",
-  excluded: "系統／排除檔",
-  oversized: "超過 50 MB",
-  archive: "壓縮檔",
-  unsupported: "不支援格式",
+  /* 🔴 存 key 不存文案：模組載入時求值一次，存死字串切語言換不掉。*/
+  outside_dataset: "sk_outside_dataset",
+  empty: "sk_empty",
+  excluded: "sk_excluded",
+  oversized: "sk_oversized",
+  archive: "sk_archive",
+  unsupported: "sk_unsupported",
 };
 const BATCH_SIZE = 200;
 const HASH_QUERY_SIZE = 100;
@@ -80,6 +82,7 @@ const MANIFEST_STORAGE_KEY = "pd-document-import-manifest-v1";
 export type ImportToolMode = "batch" | "quick" | "sync" | "analysis";
 
 export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
+  const t = useT();
   const { profile } = useAuth();
   const inputRef = useRef<HTMLInputElement>(null);
   const quickInputRef = useRef<HTMLInputElement>(null);
@@ -119,9 +122,9 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
     try {
       setAnalysisStatus(await api.getPdAnalysisStatus());
     } catch (reason) {
-      if (!silent) setAnalysisMessage(`無法取得 AI 佇列：${reason instanceof Error ? reason.message : "未知錯誤"}`);
+      if (!silent) setAnalysisMessage(t("u_ai_queue_failed", { m: reason instanceof Error ? reason.message : t("u_unknown_err") }));
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     if (mode !== "analysis" || !profile?.canUpload) return;
@@ -132,7 +135,7 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
 
   const hasModeAccess = mode === "sync" ? profile?.canSync : profile?.canUpload;
   if (!hasModeAccess) {
-    return <Card className="p-8 text-center"><p className="font-black text-white">{mode === "sync" ? "你尚未取得全庫補檔／下載權限" : "你尚未列入 Product Finder 上傳者名單"}</p></Card>;
+    return <Card className="p-8 text-center"><p className="font-black text-white">{mode === "sync" ? t("u_no_sync_perm") : t("u_no_upload_perm")}</p></Card>;
   }
 
   async function choose(selected: FileList | File[] | null) {
@@ -155,7 +158,7 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
         return [];
       }
       if (!dataset) return [];
-      return [{ file, dataset, relativePath, sha256: "", status: "待上傳" } satisfies ImportFile];
+      return [{ file, dataset, relativePath, sha256: "", status: tr("u_st_pending") } satisfies ImportFile];
     }).sort((a, b) => a.relativePath.localeCompare(b.relativePath));
 
     try {
@@ -169,7 +172,7 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
         const cachedHash = reusableManifestHash(manifest[cacheKey], item.file);
         const sha256 = cachedHash || await hashFile(item.file);
         if (cachedHash) reusedHashes += 1;
-        setMessage(`正在掃描變更 ${index + 1} / ${candidates.length}；沿用 ${reusedHashes} 份快取…`);
+        setMessage(t("u_scanning", { i: index + 1, n: candidates.length, c: reusedHashes }));
         hashed.push({ ...item, sha256 });
         nextManifest[cacheKey] = {
           byteSize: item.file.size,
@@ -184,7 +187,7 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
       setLocalFiles(deduped.unique);
       if (mode === "sync") await refreshSync(deduped.unique);
       const existing = await findExistingHashes(deduped.unique, (checked, total) => {
-        setMessage(`正在比對資料庫 ${checked} / ${total}…`);
+        setMessage(t("u_comparing", { i: checked, n: total }));
         setProgress(75 + Math.round((checked / Math.max(total, 1)) * 25));
       });
       const pending = deduped.unique.filter((item) => !existing.has(importFileKey(item)));
@@ -205,12 +208,12 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
       setProgress(0);
       setPhase(batch.length ? "ready" : "finished");
       setMessage(batch.length
-        ? `盤點完成，沿用 ${reusedHashes} 份快取。本批準備 ${batch.length} 份；匯入後不會自動執行 AI。`
-        : `盤點完成，沿用 ${reusedHashes} 份快取；目前沒有待匯入的新文件。`);
+        ? t("u_inv_done", { c: reusedHashes, n: batch.length })
+        : t("u_inv_none", { c: reusedHashes }));
     } catch (reason) {
       setPhase("idle");
       setProgress(0);
-      setMessage(`盤點失敗：${reason instanceof Error ? reason.message : "未知錯誤"}`);
+      setMessage(t("u_inv_failed", { m: reason instanceof Error ? reason.message : t("u_unknown_err") }));
     }
   }
 
@@ -218,13 +221,13 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
     if (running) return;
     try {
       const handle = change || !directoryHandle ? await pickDefaultDirectory() : directoryHandle;
-      if (!await requestDirectoryPermission(handle)) throw new Error("未取得資料夾讀寫權限");
+      if (!await requestDirectoryPermission(handle)) throw new Error(t("u_e_dir_read"));
       setDirectoryHandle(handle);
-      setMessage(`正在讀取預設目錄 ${handle.name}…`);
+      setMessage(t("u_reading_dir", { n: handle.name }));
       await choose(await filesFromDirectory(handle));
     } catch (reason) {
       if (reason instanceof DOMException && reason.name === "AbortError") return;
-      setMessage(`資料夾讀取失敗：${reason instanceof Error ? reason.message : "未知錯誤"}`);
+      setMessage(t("u_dir_failed", { m: reason instanceof Error ? reason.message : t("u_unknown_err") }));
     }
   }
 
@@ -236,10 +239,10 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
       setSyncConflicts(compared.conflicts);
       setSyncCurrent(compared.current);
       setSyncMessage(compared.serverOnly.length
-        ? `Supabase 有 ${compared.serverOnly.length} 份本機尚未保存，可安全補回。`
-        : "Supabase 沒有本機缺少的文件。");
+        ? t("u_sync_avail", { n: compared.serverOnly.length })
+        : t("u_sync_none"));
     } catch (reason) {
-      setSyncMessage(`同步盤點失敗：${reason instanceof Error ? reason.message : "未知錯誤"}`);
+      setSyncMessage(t("u_sync_failed", { m: reason instanceof Error ? reason.message : t("u_unknown_err") }));
     }
   }
 
@@ -250,15 +253,15 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
     let conflicts = 0;
     let failed = 0;
     try {
-      if (!await requestDirectoryPermission(directoryHandle)) throw new Error("未取得資料夾寫入權限");
+      if (!await requestDirectoryPermission(directoryHandle)) throw new Error(t("u_e_dir_write"));
       for (let index = 0; index < serverOnly.length; index += 50) {
         const batch = serverOnly.slice(index, index + 50);
         const result = await api.getPdSyncUrls(batch.map((item) => ({ dataset: item.dataset, id: item.id })));
         for (const item of result.items) {
-          setSyncMessage(`正在補回 ${downloaded + conflicts + failed + 1} / ${serverOnly.length}：${item.relativePath}`);
+          setSyncMessage(t("u_sync_progress", { i: downloaded + conflicts + failed + 1, n: serverOnly.length, p: item.relativePath }));
           try {
             const response = await fetch(item.url);
-            if (!response.ok) throw new Error(`下載失敗 (${response.status})`);
+            if (!response.ok) throw new Error(t("u_e_download", { s: response.status }));
             const outcome = await writeFileWithoutOverwrite(directoryHandle, item.relativePath, await response.blob());
             if (outcome === "written") downloaded += 1;
             else conflicts += 1;
@@ -267,11 +270,11 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
           }
         }
       }
-      setSyncMessage(`本機補檔完成：新增 ${downloaded}、未覆寫衝突 ${conflicts}、失敗 ${failed}。`);
+      setSyncMessage(t("u_sync_done", { a: downloaded, c: conflicts, f: failed }));
       setSyncRunning(false);
       await choose(await filesFromDirectory(directoryHandle));
     } catch (reason) {
-      setSyncMessage(`補檔失敗：${reason instanceof Error ? reason.message : "未知錯誤"}`);
+      setSyncMessage(t("u_sync_fail2", { m: reason instanceof Error ? reason.message : t("u_unknown_err") }));
     } finally {
       setSyncRunning(false);
     }
@@ -288,19 +291,19 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
 
     for (let index = 0; index < files.length; index += 1) {
       const item = files[index];
-      updateStatus(index, "準備上傳…");
+      updateStatus(index, t("u_st_preparing"));
       try {
         const outcome = await uploadOne(item, (status) => updateStatus(index, status));
         processed.add(importFileKey(item));
         if (outcome === "duplicate") {
           duplicates += 1;
-          updateStatus(index, "內容重複，已略過");
+          updateStatus(index, t("u_st_duplicate"));
         } else {
           completed += 1;
         }
       } catch (reason) {
         failed += 1;
-        updateStatus(index, `失敗：${reason instanceof Error ? reason.message : "未知錯誤"}`);
+        updateStatus(index, t("u_st_failed", { m: reason instanceof Error ? reason.message : t("u_unknown_err") }));
       }
       setProgress(Math.round(((index + 1) / files.length) * 100));
     }
@@ -312,7 +315,7 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
       indexed: current.indexed + processed.size,
       pending: remaining.length,
     } : current);
-    setMessage(`本批完成：新增 ${completed}、重複略過 ${duplicates}、失敗 ${failed}；尚待匯入 ${remaining.length}。`);
+    setMessage(t("u_batch_done", { a: completed, d: duplicates, f: failed, r: remaining.length }));
     setPhase("finished");
   }
 
@@ -322,19 +325,19 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
     if (selectedFiles.length !== 1) {
       setQuickFiles([]);
       setQuickStatuses([]);
-      setQuickMessage("每次只能上傳一個檔案，請重新選擇。");
+      setQuickMessage(t("u_q_one_only"));
       return;
     }
     const file = selectedFiles[0];
     if (!ALLOWED.has(ext(file.name)) || file.size <= 0 || file.size > MAX_FILE_BYTES || excludedName(file.name)) {
       setQuickFiles([]);
       setQuickStatuses([]);
-      setQuickMessage("檔案不符合規則：請檢查格式、檔名及 50 MB 大小上限。");
+      setQuickMessage(t("u_q_invalid"));
       return;
     }
     setQuickFiles([file]);
-    setQuickStatuses(["待上傳"]);
-    setQuickMessage("已選擇 1 份；請確認要放入自製品或外購品。");
+    setQuickStatuses([t("u_st_pending")]);
+    setQuickMessage(t("u_q_selected"));
   }
 
   async function quickUpload() {
@@ -342,7 +345,7 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
     try {
       quickUploadRelativePath(quickDataset, "", quickFiles[0].name);
     } catch (reason) {
-      setQuickMessage(reason instanceof Error ? reason.message : "檔名無效");
+      setQuickMessage(reason instanceof Error ? reason.message : t("u_q_bad_name"));
       return;
     }
 
@@ -352,28 +355,28 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
     let failed = 0;
     for (let index = 0; index < quickFiles.length; index += 1) {
       const file = quickFiles[index];
-      updateQuickStatus(index, "計算雜湊…");
+      updateQuickStatus(index, t("u_st_hashing"));
       try {
         const item: ImportFile = {
           file,
           dataset: quickDataset,
           relativePath: quickUploadRelativePath(quickDataset, "", file.name),
           sha256: await hashFile(file),
-          status: "準備上傳…",
+          status: t("u_st_preparing"),
         };
         const outcome = await uploadOne(item, (status) => updateQuickStatus(index, status));
         if (outcome === "duplicate") {
           duplicates += 1;
-          updateQuickStatus(index, "內容重複，已略過");
+          updateQuickStatus(index, t("u_st_duplicate"));
         } else {
           completed += 1;
         }
       } catch (reason) {
         failed += 1;
-        updateQuickStatus(index, `失敗：${reason instanceof Error ? reason.message : "未知錯誤"}`);
+        updateQuickStatus(index, t("u_st_failed", { m: reason instanceof Error ? reason.message : t("u_unknown_err") }));
       }
     }
-    setQuickMessage(`手動上傳完成：新增 ${completed}、重複略過 ${duplicates}、失敗 ${failed}；不會自動執行 AI。`);
+    setQuickMessage(t("u_q_done", { a: completed, d: duplicates, f: failed }));
     if (failed === 0) {
       setQuickFiles([]);
       setQuickStatuses([]);
@@ -385,13 +388,13 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
   async function startAnalysis() {
     if (!analysisStatus?.configured || analysisRunning) return;
     setAnalysisRunning(true);
-    setAnalysisMessage("正在啟動 AI 分析…");
+    setAnalysisMessage(t("u_ai_starting"));
     try {
       await api.startPdAnalysis(analysisDataset, analysisLimit);
-      setAnalysisMessage(`已啟動 ${analysisDataset === "both" ? "自製品／外購品" : analysisDataset === "mfg" ? "自製品" : "外購品"} AI 分析；每個資料庫本次最多 ${analysisLimit} 份。`);
+      setAnalysisMessage(t("u_ai_started", { d: analysisDataset === "both" ? t("u_both") : analysisDataset === "mfg" ? t("u_mfg") : t("u_buy"), n: analysisLimit }));
       window.setTimeout(() => void refreshAnalysisStatus(true), 3_000);
     } catch (reason) {
-      setAnalysisMessage(`啟動失敗：${reason instanceof Error ? reason.message : "未知錯誤"}`);
+      setAnalysisMessage(t("u_ai_start_failed", { m: reason instanceof Error ? reason.message : t("u_unknown_err") }));
     } finally {
       setAnalysisRunning(false);
     }
@@ -406,7 +409,7 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
     setFiles(next);
     setProgress(0);
     setPhase(next.length ? "ready" : "finished");
-    setMessage(next.length ? `下一批已準備 ${next.length} 份。` : "所有可用文件皆已匯入。");
+    setMessage(next.length ? t("u_next_ready", { n: next.length }) : t("u_all_done"));
   }
 
   function openFolderPicker() {
@@ -418,7 +421,7 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
   function downloadSkippedReport() {
     if (!inventory?.skipped.length) return;
     const rows = [
-      ["略過原因", "檔案大小", "相對路徑"],
+      [t("u_sk_reason"), t("u_sk_size"), t("u_sk_path")],
       ...inventory.skipped.map((item) => [SKIP_REASON_LABELS[item.reason], formatBytes(item.byteSize), item.relativePath]),
     ];
     const csv = `\uFEFF${rows.map((row) => row.map(csvCell).join(",")).join("\r\n")}`;
@@ -435,10 +438,10 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
   }
 
   const pageCopy = {
-    batch: { eyebrow: "BATCH IMPORT", title: "批次匯入", description: "掃描預設 products 目錄，以 SHA-256 找出新增或內容變更的文件並分批匯入。" },
-    quick: { eyebrow: "MANUAL UPLOAD", title: "手動上傳", description: "每次上傳一個檔案；選擇自製品或外購品後，直接拖放或從資料夾選取。" },
-    sync: { eyebrow: "DIRECTORY SYNC", title: "預設目錄補檔", description: "比對 Supabase 與預設 products 目錄，安全補回本機缺少的文件，絕不覆寫同路徑檔案。" },
-    analysis: { eyebrow: "AI ANALYSIS", title: "文件分析", description: "查看待處理佇列並手動啟動 PDF、Office 與圖片的 AI 分析。" },
+    batch: { eyebrow: "BATCH IMPORT", title: t("u_h_batch"), description: t("u_h_batch_d") },
+    quick: { eyebrow: "MANUAL UPLOAD", title: t("u_h_quick"), description: t("u_h_quick_d") },
+    sync: { eyebrow: "DIRECTORY SYNC", title: t("u_h_sync"), description: t("u_h_sync_d") },
+    analysis: { eyebrow: "AI ANALYSIS", title: t("u_h_analysis"), description: t("u_h_analysis_d") },
   }[mode];
 
   return <>
@@ -447,7 +450,7 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
       title={pageCopy.title}
       description={pageCopy.description}
     />
-    <Link to={mode === "quick" ? "/" : "/upload"} className="mb-5 inline-flex rounded-lg px-1 py-1 text-sm font-bold text-slate-400 hover:text-cyan-300">← {mode === "quick" ? "回到文件搜尋" : "回到文件工具"}</Link>
+    <Link to={mode === "quick" ? "/" : "/upload"} className="mb-5 inline-flex rounded-lg px-1 py-1 text-sm font-bold text-slate-400 hover:text-cyan-300">← {mode === "quick" ? t("u_back_search") : t("u_back_tools")}</Link>
     <input
       ref={(node) => { inputRef.current = node; node?.setAttribute("webkitdirectory", ""); }}
       type="file"
@@ -458,7 +461,7 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
     {mode === "batch" && <Card className="p-5 md:p-6">
       <div className="mb-5 flex items-start gap-3">
         <span className="rounded-xl bg-cyan-950/50 p-3 text-cyan-300"><RefreshCw size={22} /></span>
-        <div><h2 className="text-lg font-black text-white">資料夾快速掃描</h2><p className="mt-1 text-sm leading-6 text-slate-500">建議日常使用。沿用上次 SHA-256 快取，只重新讀取新增或內容變更的檔案。</p></div>
+        <div><h2 className="text-lg font-black text-white">{t("u_scan_title")}</h2><p className="mt-1 text-sm leading-6 text-slate-500">{t("u_scan_desc")}</p></div>
       </div>
       <button
         type="button"
@@ -467,40 +470,40 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
         className="flex min-h-52 w-full flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-700 bg-slate-950/30 p-8 text-center transition hover:border-cyan-600 hover:bg-cyan-950/10 disabled:cursor-wait disabled:opacity-60"
       >
         <span className="rounded-2xl bg-slate-800 p-4 text-cyan-300">{phase === "inventory" ? <LoaderCircle className="animate-spin" size={30} /> : <FolderOpen size={30} />}</span>
-        <span className="mt-4 text-lg font-black text-white">{directoryHandle ? `掃描預設目錄：${directoryHandle.name}` : "設定預設 products 目錄"}</span>
-        <span className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">第一次授權後會記住目錄；瀏覽器仍會在需要時請你確認讀寫權限。</span>
+        <span className="mt-4 text-lg font-black text-white">{directoryHandle ? t("u_scan_dir", { n: directoryHandle.name }) : t("u_set_dir")}</span>
+        <span className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">{t("u_dir_hint")}</span>
       </button>
-      {directoryHandle && supportsDirectoryAccess() && <div className="mt-3 text-right"><Button variant="ghost" disabled={running} onClick={() => void setOrScanDefaultDirectory(true)}><FolderOpen size={17} />更換預設目錄</Button></div>}
-      {inventory && <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-6" aria-label="資料夾盤點結果">
-        <Metric label="資料夾檔案" value={inventory.total} />
-        <Metric label="符合格式" value={inventory.eligible} tone="cyan" />
-        <Metric label="唯一檔案" value={inventory.unique} tone="cyan" />
-        <Metric label="雲端已有相同內容" value={inventory.indexed} tone="green" />
-        <Metric label="待匯入" value={inventory.pending} tone="amber" />
-        <Metric label="資料夾內重複" value={inventory.folderDuplicates} />
+      {directoryHandle && supportsDirectoryAccess() && <div className="mt-3 text-right"><Button variant="ghost" disabled={running} onClick={() => void setOrScanDefaultDirectory(true)}><FolderOpen size={17} />{t("u_change_default_dir")}</Button></div>}
+      {inventory && <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-6" aria-label={t("u_inv_aria")}>
+        <Metric label={t("u_m_total")} value={inventory.total} />
+        <Metric label={t("u_m_eligible")} value={inventory.eligible} tone="cyan" />
+        <Metric label={t("u_m_unique")} value={inventory.unique} tone="cyan" />
+        <Metric label={t("u_m_indexed")} value={inventory.indexed} tone="green" />
+        <Metric label={t("u_m_pending")} value={inventory.pending} tone="amber" />
+        <Metric label={t("u_m_dupes")} value={inventory.folderDuplicates} />
       </div>}
-      {inventory && inventory.skipped.length > 0 && <div className="mt-3 rounded-xl border border-slate-700 bg-slate-950/35 p-4" aria-label="未納入匯入明細">
+      {inventory && inventory.skipped.length > 0 && <div className="mt-3 rounded-xl border border-slate-700 bg-slate-950/35 p-4" aria-label={t("u_skipped_aria")}>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-sm font-black text-slate-200">未納入匯入 {inventory.skipped.length} 份</p>
+            <p className="text-sm font-black text-slate-200">{t("u_skipped_n", { n: inventory.skipped.length })}</p>
             <div className="mt-2 flex flex-wrap gap-2">
               {skipReasonSummary(inventory.skipped).map(([reason, count]) => <Badge key={reason}>{SKIP_REASON_LABELS[reason]} {count}</Badge>)}
             </div>
           </div>
-          <Button variant="ghost" onClick={downloadSkippedReport}><Download size={17} />下載略過清單</Button>
+          <Button variant="ghost" onClick={downloadSkippedReport}><Download size={17} />{t("u_dl_skipped")}</Button>
         </div>
       </div>}
 
       {files.length > 0 && <>
         <div className="mt-5 flex flex-wrap items-center gap-3">
-          <p className="mr-2 text-sm font-black text-white">本批 {files.length} 份</p>
-          <Badge tone="accent">自製品 {mfg.length}</Badge>
-          <Badge tone="accent">外購品 {buy.length}</Badge>
+          <p className="mr-2 text-sm font-black text-white">{t("u_batch_n", { n: files.length })}</p>
+          <Badge tone="accent">{t("u_mfg")} {mfg.length}</Badge>
+          <Badge tone="accent">{t("u_buy")} {buy.length}</Badge>
           <Badge>{formatBytes(files.reduce((sum, item) => sum + item.file.size, 0))}</Badge>
         </div>
-        <div className="mt-4 max-h-[460px] overflow-auto rounded-xl border border-slate-700" tabIndex={0} aria-label="本批匯入文件">
+        <div className="mt-4 max-h-[460px] overflow-auto rounded-xl border border-slate-700" tabIndex={0} aria-label={t("u_batch_aria")}>
           {files.map((item) => <div key={`${item.dataset}-${item.sha256}`} className="grid gap-2 border-b border-slate-800 px-4 py-3 text-sm last:border-0 md:grid-cols-[90px_minmax(0,1fr)_190px]">
-            <span className={item.dataset === "mfg" ? "text-cyan-300" : "text-amber-300"}>{item.dataset === "mfg" ? "自製品" : "外購品"}</span>
+            <span className={item.dataset === "mfg" ? "text-cyan-300" : "text-amber-300"}>{item.dataset === "mfg" ? t("u_mfg") : t("u_buy")}</span>
             <span className="truncate text-slate-200" title={item.relativePath}>{item.relativePath}</span>
             <span className="text-xs text-slate-500">{item.status}</span>
           </div>)}
@@ -513,11 +516,11 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
           {message && <p role="status" className="mt-2 text-sm leading-6 text-slate-400">{message}</p>}
         </div>
         {phase === "finished" && pendingFiles.length > 0 ? (
-          <Button onClick={prepareNext}><RefreshCw size={18} />準備下一批</Button>
+          <Button onClick={prepareNext}><RefreshCw size={18} />{t("u_next_batch")}</Button>
         ) : (
           <Button disabled={!files.length || phase !== "ready"} onClick={() => void upload()}>
             {phase === "uploading" ? <LoaderCircle className="animate-spin" size={18} /> : phase === "finished" ? <CheckCircle2 size={18} /> : <UploadCloud size={18} />}
-            {phase === "idle" ? "請先選擇資料夾" : phase === "inventory" ? `盤點中 ${progress}%` : phase === "uploading" ? `匯入中 ${progress}%` : phase === "finished" ? "目前已全部匯入" : `匯入本批 ${files.length} 份`}
+            {phase === "idle" ? t("u_pick_dir_first") : phase === "inventory" ? t("u_inv_pct", { p: progress }) : phase === "uploading" ? t("u_imp_pct", { p: progress }) : phase === "finished" ? t("u_all_imported") : t("u_import_n", { n: files.length })}
           </Button>
         )}
       </div>
@@ -526,22 +529,22 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
     {mode === "quick" && <Card className="p-5 md:p-6">
       <div className="flex items-start gap-3">
         <span className="rounded-xl bg-amber-950/50 p-3 text-amber-300"><Zap size={22} /></span>
-        <div><h2 className="text-lg font-black text-white">手動上傳</h2><p className="mt-1 text-sm leading-6 text-slate-500">適合臨時新增單一文件。選取後會直接放入自製品或外購品資料庫。</p></div>
+        <div><h2 className="text-lg font-black text-white">{t("u_h_quick")}</h2><p className="mt-1 text-sm leading-6 text-slate-500">{t("u_q_desc")}</p></div>
       </div>
       <fieldset className="mt-6">
-        <legend className="text-sm font-bold text-slate-300">1. 選擇文件資料庫</legend>
-        <div className="mt-3 grid gap-3 sm:grid-cols-2" role="radiogroup" aria-label="文件資料庫">
-          <button type="button" role="radio" aria-checked={quickDataset === "mfg"} disabled={quickRunning} onClick={() => setQuickDataset("mfg")} className={`flex min-h-20 items-center gap-4 rounded-2xl border-2 px-5 text-left transition focus:outline-none focus:ring-2 focus:ring-cyan-400 ${quickDataset === "mfg" ? "border-cyan-400 bg-cyan-950/50 text-white" : "border-slate-700 bg-slate-950/50 text-slate-400 hover:border-slate-500"}`}><Factory size={27} className={quickDataset === "mfg" ? "text-cyan-300" : "text-slate-500"} /><span><span className="block text-lg font-black">自製品</span><span className="mt-1 block text-xs">OwnProduct</span></span>{quickDataset === "mfg" && <CheckCircle2 className="ml-auto text-cyan-300" size={22} />}</button>
-          <button type="button" role="radio" aria-checked={quickDataset === "buy"} disabled={quickRunning} onClick={() => setQuickDataset("buy")} className={`flex min-h-20 items-center gap-4 rounded-2xl border-2 px-5 text-left transition focus:outline-none focus:ring-2 focus:ring-amber-400 ${quickDataset === "buy" ? "border-amber-400 bg-amber-950/40 text-white" : "border-slate-700 bg-slate-950/50 text-slate-400 hover:border-slate-500"}`}><ShoppingBag size={27} className={quickDataset === "buy" ? "text-amber-300" : "text-slate-500"} /><span><span className="block text-lg font-black">外購品</span><span className="mt-1 block text-xs">Outsourcing</span></span>{quickDataset === "buy" && <CheckCircle2 className="ml-auto text-amber-300" size={22} />}</button>
+        <legend className="text-sm font-bold text-slate-300">{t("u_q_step1")}</legend>
+        <div className="mt-3 grid gap-3 sm:grid-cols-2" role="radiogroup" aria-label={t("u_q_lib_aria")}>
+          <button type="button" role="radio" aria-checked={quickDataset === "mfg"} disabled={quickRunning} onClick={() => setQuickDataset("mfg")} className={`flex min-h-20 items-center gap-4 rounded-2xl border-2 px-5 text-left transition focus:outline-none focus:ring-2 focus:ring-cyan-400 ${quickDataset === "mfg" ? "border-cyan-400 bg-cyan-950/50 text-white" : "border-slate-700 bg-slate-950/50 text-slate-400 hover:border-slate-500"}`}><Factory size={27} className={quickDataset === "mfg" ? "text-cyan-300" : "text-slate-500"} /><span><span className="block text-lg font-black">{t("u_mfg")}</span><span className="mt-1 block text-xs">OwnProduct</span></span>{quickDataset === "mfg" && <CheckCircle2 className="ml-auto text-cyan-300" size={22} />}</button>
+          <button type="button" role="radio" aria-checked={quickDataset === "buy"} disabled={quickRunning} onClick={() => setQuickDataset("buy")} className={`flex min-h-20 items-center gap-4 rounded-2xl border-2 px-5 text-left transition focus:outline-none focus:ring-2 focus:ring-amber-400 ${quickDataset === "buy" ? "border-amber-400 bg-amber-950/40 text-white" : "border-slate-700 bg-slate-950/50 text-slate-400 hover:border-slate-500"}`}><ShoppingBag size={27} className={quickDataset === "buy" ? "text-amber-300" : "text-slate-500"} /><span><span className="block text-lg font-black">{t("u_buy")}</span><span className="mt-1 block text-xs">Outsourcing</span></span>{quickDataset === "buy" && <CheckCircle2 className="ml-auto text-amber-300" size={22} />}</button>
         </div>
       </fieldset>
 
       <div className="mt-6">
-        <p className="text-sm font-bold text-slate-300">2. 拖放或選擇一個檔案</p>
+        <p className="text-sm font-bold text-slate-300">{t("u_q_step2")}</p>
         <button type="button" disabled={quickRunning} onDragEnter={(event) => { event.preventDefault(); setQuickDragActive(true); }} onDragOver={(event) => { event.preventDefault(); setQuickDragActive(true); }} onDragLeave={() => setQuickDragActive(false)} onDrop={(event) => { event.preventDefault(); setQuickDragActive(false); chooseQuick(event.dataTransfer.files); }} onClick={() => { if (!quickInputRef.current) return; quickInputRef.current.value = ""; quickInputRef.current.click(); }} className={`mt-3 flex min-h-44 w-full flex-col items-center justify-center rounded-2xl border-2 border-dashed p-6 text-center transition focus:outline-none focus:ring-2 focus:ring-cyan-400 ${quickDragActive ? "border-cyan-300 bg-cyan-950/50" : "border-slate-700 bg-slate-950/50 hover:border-cyan-700 hover:bg-cyan-950/20"}`}>
           <UploadCloud size={34} className={quickDragActive ? "text-cyan-200" : "text-cyan-400"} />
-          <span className="mt-3 text-base font-black text-white">{quickDragActive ? "放開以選擇這個檔案" : "將一個檔案拖到這裡"}</span>
-          <span className="mt-1 text-sm text-slate-500">或點擊後從電腦資料夾選擇一個檔案</span>
+          <span className="mt-3 text-base font-black text-white">{quickDragActive ? t("u_q_drop_active") : t("u_q_drop")}</span>
+          <span className="mt-1 text-sm text-slate-500">{t("u_q_or_pick")}</span>
         </button>
         <input ref={quickInputRef} type="file" className="hidden" onChange={(event) => chooseQuick(event.target.files)} />
       </div>
@@ -555,10 +558,10 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
       </div>}
 
       <div className="mt-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <p role="status" className="min-w-0 flex-1 text-sm leading-6 text-slate-400">{quickMessage || "檔案會直接進入所選的自製品或外購品資料庫。"}</p>
+        <p role="status" className="min-w-0 flex-1 text-sm leading-6 text-slate-400">{quickMessage || t("u_q_hint")}</p>
         <Button disabled={!quickFiles.length || quickRunning || running} onClick={() => void quickUpload()}>
           {quickRunning ? <LoaderCircle className="animate-spin" size={18} /> : <UploadCloud size={18} />}
-          {quickRunning ? "上傳中…" : quickFiles.length ? "上傳這個檔案" : "請先選擇檔案"}
+          {quickRunning ? t("u_st_uploading") : quickFiles.length ? t("u_q_btn_up") : t("u_q_btn_pick")}
         </Button>
       </div>
     </Card>}
@@ -567,37 +570,37 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
     <Card className="p-5 md:p-6">
       <div className="mb-5 flex items-start gap-3">
         <span className="rounded-xl bg-cyan-950/50 p-3 text-cyan-300"><FolderOpen size={22} /></span>
-        <div><h2 className="text-lg font-black text-white">預設 products 目錄</h2><p className="mt-1 text-sm leading-6 text-slate-500">先授權並掃描預設目錄，系統才會比對雲端與本機差異。</p></div>
+        <div><h2 className="text-lg font-black text-white">{t("u_s_dir_title")}</h2><p className="mt-1 text-sm leading-6 text-slate-500">{t("u_s_dir_desc")}</p></div>
       </div>
       <Button disabled={running} onClick={() => supportsDirectoryAccess() ? void setOrScanDefaultDirectory() : openFolderPicker()}>
         {phase === "inventory" ? <LoaderCircle className="animate-spin" size={18} /> : <FolderOpen size={18} />}
-        {directoryHandle ? `掃描預設目錄：${directoryHandle.name}` : "設定預設 products 目錄"}
+        {directoryHandle ? t("u_scan_dir", { n: directoryHandle.name }) : t("u_set_dir")}
       </Button>
-      {directoryHandle && supportsDirectoryAccess() && <Button className="ml-3" variant="ghost" disabled={running} onClick={() => void setOrScanDefaultDirectory(true)}>更換目錄</Button>}
+      {directoryHandle && supportsDirectoryAccess() && <Button className="ml-3" variant="ghost" disabled={running} onClick={() => void setOrScanDefaultDirectory(true)}>{t("u_change_dir")}</Button>}
       {message && <p role="status" className="mt-3 text-sm leading-6 text-slate-400">{message}</p>}
     </Card>
     <Card className="mt-6 p-5 md:p-6">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div className="flex items-start gap-3">
           <span className="rounded-xl bg-emerald-950/50 p-3 text-emerald-300"><Download size={22} /></span>
-          <div><h2 className="text-lg font-black text-white">Supabase → 預設目錄補檔</h2><p className="mt-1 text-sm leading-6 text-slate-500">讓同事上傳、但你本機沒有的文件回到相同分類路徑。同路徑已有檔案時絕不覆寫。</p></div>
+          <div><h2 className="text-lg font-black text-white">{t("u_s_title")}</h2><p className="mt-1 text-sm leading-6 text-slate-500">{t("u_s_desc")}</p></div>
         </div>
-        <Button variant="secondary" disabled={!localFiles.length || syncRunning} onClick={() => void refreshSync()}><RefreshCw size={17} />重新盤點</Button>
+        <Button variant="secondary" disabled={!localFiles.length || syncRunning} onClick={() => void refreshSync()}><RefreshCw size={17} />{t("u_s_rescan")}</Button>
       </div>
       <div className="mt-5 grid gap-3 sm:grid-cols-3">
-        <Metric label="本機與雲端一致" value={syncCurrent} tone="green" />
-        <Metric label="雲端有／本機缺少" value={serverOnly.length} tone="cyan" />
-        <Metric label="同路徑不同內容" value={syncConflicts.length} tone="amber" />
+        <Metric label={t("u_s_same")} value={syncCurrent} tone="green" />
+        <Metric label={t("u_s_missing")} value={serverOnly.length} tone="cyan" />
+        <Metric label={t("u_s_conflict")} value={syncConflicts.length} tone="amber" />
       </div>
       {syncConflicts.length > 0 && <div className="mt-4 max-h-40 overflow-auto rounded-xl border border-amber-900/70 bg-amber-950/20 p-3 text-xs leading-6 text-amber-200">
-        <p className="mb-1 font-black">以下衝突不會自動下載或覆寫：</p>
+        <p className="mb-1 font-black">{t("u_s_conflict_note")}</p>
         {syncConflicts.map((item) => <p key={`${item.dataset}-${item.id}`} className="truncate" title={item.relativePath}>{item.relativePath}</p>)}
       </div>}
       <div className="mt-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <p role="status" className="min-w-0 flex-1 text-sm leading-6 text-slate-400">{syncMessage || (directoryHandle ? "掃描預設目錄後即可比對雲端差異。" : "請先設定預設目錄。")}</p>
+        <p role="status" className="min-w-0 flex-1 text-sm leading-6 text-slate-400">{syncMessage || (directoryHandle ? t("u_s_hint_scan") : t("u_s_hint_set"))}</p>
         <Button disabled={!directoryHandle || !serverOnly.length || syncRunning} onClick={() => void downloadServerOnly()}>
           {syncRunning ? <LoaderCircle className="animate-spin" size={18} /> : <Download size={18} />}
-          {syncRunning ? "補檔中…" : `安全補回 ${serverOnly.length} 份`}
+          {syncRunning ? t("u_s_running") : t("u_s_btn", { n: serverOnly.length })}
         </Button>
       </div>
     </Card></>}
@@ -618,6 +621,7 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
 }
 
 export function UploaderAccessPage() {
+  const t = useT();
   const { profile } = useAuth();
   const [items, setItems] = useState<PdUploader[]>([]);
   const [loading, setLoading] = useState(true);
@@ -628,48 +632,48 @@ export function UploaderAccessPage() {
     try {
       const result = await api.getPdUploaders();
       setItems(result.items);
-      setMessage(`已同步 Platform users 主表，共 ${result.items.length} 人。`);
+      setMessage(t("u_us_synced", { n: result.items.length }));
     } catch (reason) {
-      setMessage(`無法取得名單：${reason instanceof Error ? reason.message : "未知錯誤"}`);
+      setMessage(t("u_us_list_failed", { m: reason instanceof Error ? reason.message : t("u_unknown_err") }));
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => { if (profile?.role === "admin") void load(); }, [load, profile?.role]);
 
   async function toggle(item: PdUploader, permission: "upload" | "sync") {
     const currentAllowed = permission === "upload" ? item.uploadAllowed : item.syncAllowed;
-    setMessage(`正在更新 ${item.displayName}…`);
+    setMessage(t("u_us_updating", { n: item.displayName }));
     try {
       await api.setPdUploader(item.id, permission, !currentAllowed);
       setItems((current) => current.map((value) => value.id === item.id ? {
         ...value,
         [permission === "upload" ? "uploadAllowed" : "syncAllowed"]: !currentAllowed,
       } : value));
-      setMessage(`${item.displayName} 的 ${permission === "upload" ? "上傳" : "全庫補檔／下載"} 權限已更新。`);
+      setMessage(t("u_us_updated", { n: item.displayName, p: permission === "upload" ? t("u_us_p_upload") : t("u_us_p_sync") }));
     } catch (reason) {
-      setMessage(`更新失敗：${reason instanceof Error ? reason.message : "未知錯誤"}`);
+      setMessage(t("u_us_update_failed", { m: reason instanceof Error ? reason.message : t("u_unknown_err") }));
     }
   }
 
   if (profile?.role !== "admin") {
-    return <Card className="p-8 text-center"><p className="font-black text-white">只有管理員可以管理 Users</p></Card>;
+    return <Card className="p-8 text-center"><p className="font-black text-white">{t("u_us_admin_only")}</p></Card>;
   }
 
   return <>
-    <PageHeader eyebrow="USERS" title="Users" description="名單即時讀取 Platform users 主表；上傳與全庫補檔／下載分開授權。" action={<Button variant="secondary" disabled={loading} onClick={() => void load()}>{loading ? <LoaderCircle className="animate-spin" size={17} /> : <RefreshCw size={17} />}重新同步</Button>} />
-    <Link to="/upload" className="mb-5 inline-flex rounded-lg px-1 py-1 text-sm font-bold text-slate-400 hover:text-cyan-300">← 回到文件工具</Link>
+    <PageHeader eyebrow="USERS" title="Users" description={t("u_us_desc")} action={<Button variant="secondary" disabled={loading} onClick={() => void load()}>{loading ? <LoaderCircle className="animate-spin" size={17} /> : <RefreshCw size={17} />}{t("u_us_resync")}</Button>} />
+    <Link to="/upload" className="mb-5 inline-flex rounded-lg px-1 py-1 text-sm font-bold text-slate-400 hover:text-cyan-300">← {t("u_back_tools")}</Link>
     <Card className="p-5 md:p-6">
     <div className="flex items-start gap-3">
       <span className="rounded-xl bg-violet-950/50 p-3 text-violet-300"><ShieldCheck size={22} /></span>
-      <div><h2 className="text-lg font-black text-white">Users</h2><p className="mt-1 text-sm leading-6 text-slate-500">「全庫補檔」可下載自製品與外購品全部原檔，請只授權給確實需要的同事。</p></div>
+      <div><h2 className="text-lg font-black text-white">Users</h2><p className="mt-1 text-sm leading-6 text-slate-500">{t("u_us_note")}</p></div>
     </div>
     <div className="mt-5 overflow-hidden rounded-xl border border-slate-700">
-      {loading ? <p className="p-4 text-sm text-slate-400">讀取名單中…</p> : items.map((item) => <div key={item.id} className="grid gap-3 border-b border-slate-800 px-4 py-3 last:border-0 hover:bg-slate-800/50 md:grid-cols-[minmax(0,1fr)_150px_190px] md:items-center">
-        <span className="min-w-0"><span className="flex items-center gap-2"><span className="truncate text-sm font-bold text-slate-200">{item.displayName}</span><Badge tone={item.platformActive ? "success" : "neutral"}>{item.platformActive ? "Platform 啟用" : "Platform 停用"}</Badge></span><span className="block truncate text-xs text-slate-500">{item.email} · {item.id}{item.platformStatus ? ` · ${item.platformStatus}` : ""}</span></span>
-        <label className={`flex items-center gap-2 text-sm font-semibold ${item.platformActive ? "cursor-pointer text-slate-300" : "cursor-not-allowed text-slate-600"}`}><input type="checkbox" checked={item.uploadAllowed} disabled={!item.platformActive || item.platformRole === "admin"} onChange={() => void toggle(item, "upload")} className="h-4 w-4 accent-cyan-400" />上傳</label>
-        <label className={`flex items-center gap-2 text-sm font-semibold ${item.platformActive ? "cursor-pointer text-amber-300" : "cursor-not-allowed text-slate-600"}`}><input type="checkbox" checked={item.syncAllowed} disabled={!item.platformActive} onChange={() => void toggle(item, "sync")} className="h-4 w-4 accent-amber-400" />全庫補檔／下載</label>
+      {loading ? <p className="p-4 text-sm text-slate-400">{t("u_us_loading")}</p> : items.map((item) => <div key={item.id} className="grid gap-3 border-b border-slate-800 px-4 py-3 last:border-0 hover:bg-slate-800/50 md:grid-cols-[minmax(0,1fr)_150px_190px] md:items-center">
+        <span className="min-w-0"><span className="flex items-center gap-2"><span className="truncate text-sm font-bold text-slate-200">{item.displayName}</span><Badge tone={item.platformActive ? "success" : "neutral"}>{item.platformActive ? t("u_us_active") : t("u_us_inactive")}</Badge></span><span className="block truncate text-xs text-slate-500">{item.email} · {item.id}{item.platformStatus ? ` · ${item.platformStatus}` : ""}</span></span>
+        <label className={`flex items-center gap-2 text-sm font-semibold ${item.platformActive ? "cursor-pointer text-slate-300" : "cursor-not-allowed text-slate-600"}`}><input type="checkbox" checked={item.uploadAllowed} disabled={!item.platformActive || item.platformRole === "admin"} onChange={() => void toggle(item, "upload")} className="h-4 w-4 accent-cyan-400" />{t("u_us_p_upload")}</label>
+        <label className={`flex items-center gap-2 text-sm font-semibold ${item.platformActive ? "cursor-pointer text-amber-300" : "cursor-not-allowed text-slate-600"}`}><input type="checkbox" checked={item.syncAllowed} disabled={!item.platformActive} onChange={() => void toggle(item, "sync")} className="h-4 w-4 accent-amber-400" />{t("u_us_p_sync")}</label>
       </div>)}
     </div>
     {message && <p role="status" className="mt-3 text-sm text-slate-400">{message}</p>}
@@ -699,6 +703,7 @@ function AnalysisControl({
   onRefresh: () => void;
   onStart: () => void;
 }) {
+  const t = useT();
   const selected = status ? selectedAnalysisStatus(status, dataset) : emptyAnalysisStatus();
   const ready = selected.queued + selected.retryableFailed;
   const disabled = !status?.configured || ready === 0 || selected.processing > 0 || running || pageBusy;
@@ -707,55 +712,56 @@ function AnalysisControl({
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div className="flex items-start gap-3">
           <span className="rounded-xl bg-cyan-950/70 p-3 text-cyan-300"><BrainCircuit size={22} /></span>
-          <div><h2 className="text-lg font-black text-white">AI 文件分析</h2><p className="mt-1 max-w-3xl text-sm leading-6 text-slate-400">由這裡啟動後端 worker，擷取 PDF、Office 與圖片的全文、摘要、關鍵字及縮圖。不會分析 CAD 或影片內容。</p></div>
+          <div><h2 className="text-lg font-black text-white">{t("u_ai_title")}</h2><p className="mt-1 max-w-3xl text-sm leading-6 text-slate-400">{t("u_ai_desc")}</p></div>
         </div>
-        <Button variant="ghost" disabled={running} onClick={onRefresh}><RefreshCw size={17} />更新狀態</Button>
+        <Button variant="ghost" disabled={running} onClick={onRefresh}><RefreshCw size={17} />{t("u_ai_refresh")}</Button>
       </div>
     </div>
 
     <div className="grid gap-4 p-5 md:grid-cols-2 md:p-6">
-      <AnalysisLibraryCard title="自製品" status={status?.mfg || emptyAnalysisStatus()} tone="cyan" />
-      <AnalysisLibraryCard title="外購品" status={status?.buy || emptyAnalysisStatus()} tone="amber" />
+      <AnalysisLibraryCard title={t("u_mfg")} status={status?.mfg || emptyAnalysisStatus()} tone="cyan" />
+      <AnalysisLibraryCard title={t("u_buy")} status={status?.buy || emptyAnalysisStatus()} tone="amber" />
     </div>
 
     <div className="border-t border-slate-800 bg-slate-950/30 p-5 md:p-6">
       <div className="grid gap-4 lg:grid-cols-[220px_180px_minmax(0,1fr)_auto] lg:items-end">
-        <label className="text-sm font-bold text-slate-300">分析資料庫
+        <label className="text-sm font-bold text-slate-300">{t("u_ai_lib")}
           <select value={dataset} onChange={(event) => onDatasetChange(event.target.value as PdDataset | "both")} disabled={running} className="mt-2 h-12 w-full rounded-xl border border-slate-700 bg-slate-950 px-3 text-slate-100 outline-none focus:border-cyan-500">
-            <option value="both">自製品／外購品</option>
-            <option value="mfg">只有自製品</option>
-            <option value="buy">只有外購品</option>
+            <option value="both">{t("u_both")}</option>
+            <option value="mfg">{t("u_ai_only_mfg")}</option>
+            <option value="buy">{t("u_ai_only_buy")}</option>
           </select>
         </label>
-        <label className="text-sm font-bold text-slate-300">每個資料庫本次份數
+        <label className="text-sm font-bold text-slate-300">{t("u_ai_limit")}
           <input type="number" min={1} max={50} value={limit} onChange={(event) => onLimitChange(Math.min(50, Math.max(1, Number(event.target.value) || 1)))} disabled={running} className="mt-2 h-12 w-full rounded-xl border border-slate-700 bg-slate-950 px-4 text-slate-100 outline-none focus:border-cyan-500" />
         </label>
         <div className="rounded-xl border border-slate-800 bg-slate-950/60 px-4 py-3 text-sm leading-6 text-slate-400">
-          <span className="font-black text-white">選取範圍待處理 {ready} 份</span>
-          <span className="mx-2 text-slate-700">|</span>處理中 {selected.processing} 份
+          <span className="font-black text-white">{t("u_ai_ready", { n: ready })}</span>
+          <span className="mx-2 text-slate-700">|</span>{t("u_ai_processing_n", { n: selected.processing })}
         </div>
         <Button disabled={disabled} onClick={onStart} className="h-12 px-6">
           {running ? <LoaderCircle className="animate-spin" size={18} /> : <Play size={18} />}
-          {running ? "啟動中…" : selected.processing > 0 ? "AI 分析中" : ready > 0 ? `開始分析 ${Math.min(ready, limit * (dataset === "both" ? 2 : 1))} 份` : "沒有待分析文件"}
+          {running ? t("u_ai_starting_btn") : selected.processing > 0 ? t("u_ai_running") : ready > 0 ? t("u_ai_start_n", { n: Math.min(ready, limit * (dataset === "both" ? 2 : 1)) }) : t("u_ai_none")}
         </Button>
       </div>
       <p role="status" className={`mt-3 text-sm leading-6 ${status && !status.configured ? "text-amber-300" : "text-slate-400"}`}>
-        {status && !status.configured ? "尚差一次性的後端授權設定；設定後不再需要進入 GitHub。" : message || "建議先以每庫 20 份驗證搜尋品質，確認後再處理下一批。"}
+        {status && !status.configured ? t("u_ai_setup") : message || t("u_ai_tip")}
       </p>
     </div>
   </Card>;
 }
 
 function AnalysisLibraryCard({ title, status, tone }: { title: string; status: PdAnalysisLibraryStatus; tone: "cyan" | "amber" }) {
+  const t = useT();
   return <div className="rounded-2xl border border-slate-800 bg-slate-950/55 p-4">
-    <div className="flex items-center justify-between gap-3"><h3 className="font-black text-white">{title}</h3><span className={tone === "cyan" ? "text-cyan-300" : "text-amber-300"}>{status.queued + status.retryableFailed} 待處理</span></div>
+    <div className="flex items-center justify-between gap-3"><h3 className="font-black text-white">{title}</h3><span className={tone === "cyan" ? "text-cyan-300" : "text-amber-300"}>{status.queued + status.retryableFailed} {t("u_ai_pending")}</span></div>
     <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
-      <AnalysisMetric label="排隊" value={status.queued} />
-      <AnalysisMetric label="處理中" value={status.processing} />
-      <AnalysisMetric label="可重試" value={status.retryableFailed} />
-      <AnalysisMetric label="已完成" value={status.completed} />
+      <AnalysisMetric label={t("u_ai_m_queued")} value={status.queued} />
+      <AnalysisMetric label={t("u_ai_m_processing")} value={status.processing} />
+      <AnalysisMetric label={t("u_ai_m_retryable")} value={status.retryableFailed} />
+      <AnalysisMetric label={t("u_ai_m_completed")} value={status.completed} />
     </div>
-    {status.blockedFailed > 0 && <p className="mt-3 text-xs font-semibold text-rose-300">{status.blockedFailed} 份已失敗三次，需要管理員檢查。</p>}
+    {status.blockedFailed > 0 && <p className="mt-3 text-xs font-semibold text-rose-300">{t("u_ai_blocked", { n: status.blockedFailed })}</p>}
   </div>;
 }
 
@@ -800,31 +806,31 @@ async function uploadOne(item: ImportFile, onStatus: (status: string) => void): 
       sha256: item.sha256,
     });
     if (init.duplicate) return "duplicate";
-    if (!init.storagePath) throw new Error("未取得上傳位置");
+    if (!init.storagePath) throw new Error(tr("u_e_no_path"));
     storagePath = init.storagePath;
 
     if (init.storageExists) {
-      onStatus("原檔已存在，補建索引…");
+      onStatus(tr("u_st_exists"));
       break;
     }
-    if (!init.signedUrl) throw new Error("未取得 signed upload URL");
+    if (!init.signedUrl) throw new Error(tr("u_e_no_url"));
 
     if (shouldUseResumableUpload(item.file.size)) {
-      if (!init.signedToken) throw new Error("未取得大檔續傳授權");
-      onStatus("大檔續傳準備中…");
+      if (!init.signedToken) throw new Error(tr("u_e_no_token"));
+      onStatus(tr("u_st_big_prep"));
       try {
         await uploadResumable(item, storagePath, init.signedToken, onStatus);
         break;
       } catch (error) {
         if (!isSignedTusAuthError(error)) throw error;
-        onStatus("續傳授權失效，改用標準安全上傳…");
+        onStatus(tr("u_st_big_fallback"));
       }
     }
 
     const form = new FormData();
     form.append("cacheControl", "3600");
     form.append("", item.file);
-    onStatus(attempt === 1 ? "上傳中…" : `第 ${attempt} 次重試上傳…`);
+    onStatus(attempt === 1 ? tr("u_st_uploading") : tr("u_st_retry", { n: attempt }));
 
     let response: Response;
     try {
@@ -834,9 +840,9 @@ async function uploadOne(item: ImportFile, onStatus: (status: string) => void): 
         body: form,
       });
     } catch (error) {
-      lastError = error instanceof Error ? error : new Error("Storage 上傳失敗");
+      lastError = error instanceof Error ? error : new Error(tr("u_e_storage"));
       if (attempt === 3) throw lastError;
-      onStatus(`Storage 連線暫時失敗，第 ${attempt + 1} 次重試…`);
+      onStatus(tr("u_st_conn_retry", { n: attempt + 1 }));
       await delay(700 * attempt);
       continue;
     }
@@ -847,11 +853,11 @@ async function uploadOne(item: ImportFile, onStatus: (status: string) => void): 
     lastError = storageUploadError(item.file, response.status, responseText);
     if (!isTransientUploadStatus(response.status) || attempt === 3) throw lastError;
 
-    onStatus(`Storage 暫時失敗，第 ${attempt + 1} 次重試…`);
+    onStatus(tr("u_st_tmp_retry", { n: attempt + 1 }));
     await delay(700 * attempt);
   }
 
-  if (!storagePath) throw lastError || new Error("Storage 上傳失敗");
+  if (!storagePath) throw lastError || new Error(tr("u_e_storage"));
 
   const result = await api.completePdUpload({
     dataset: item.dataset,
@@ -863,7 +869,7 @@ async function uploadOne(item: ImportFile, onStatus: (status: string) => void): 
     lastModified: item.file.lastModified,
   });
   if (result.duplicate) return "duplicate";
-  onStatus(result.analysisStatus === "metadata_only" ? "已建立 metadata 索引" : "已建立文件索引");
+  onStatus(result.analysisStatus === "metadata_only" ? tr("u_st_meta_idx") : tr("u_st_doc_idx"));
   return "completed";
 }
 
@@ -896,7 +902,7 @@ function uploadResumable(
       onError: (error) => reject(error),
       onProgress: (uploaded, total) => {
         const percentage = total > 0 ? Math.floor((uploaded / total) * 100) : 0;
-        onStatus(`大檔續傳 ${percentage}%`);
+        onStatus(tr("u_st_big_pct", { p: percentage }));
       },
       onSuccess: () => resolve(),
     });
@@ -915,7 +921,7 @@ function delay(milliseconds: number) {
 }
 
 function prepareBatch(files: ImportFile[]) {
-  return selectIncrementalBatch(files, BATCH_SIZE).map((item) => ({ ...item, status: "待上傳" }));
+  return selectIncrementalBatch(files, BATCH_SIZE).map((item) => ({ ...item, status: tr("u_st_pending") }));
 }
 
 async function findExistingHashes(files: ImportFile[], onProgress: (checked: number, total: number) => void) {
@@ -958,6 +964,8 @@ function datasetFor(relativePath: string): PdDataset | null {
 }
 
 function excludedName(name: string) {
+  /* 🔴 這裡的「名片」是**比對實際檔名**的規則，不是介面文字 —— 不可以翻譯。
+     i18n 掃描時會把它當成漏翻的中文，那是誤判。*/
   return name === ".DS_Store" || /\.log(?:\.\d+)?$|\.bak$|名片|business\s*card/i.test(name);
 }
 
@@ -980,9 +988,9 @@ function skipReasonSummary(files: SkippedFile[]) {
 function storageUploadError(file: File, status: number, responseText: string) {
   const detail = storageErrorDetail(responseText);
   if (status === 413 || /EntityTooLarge|maximum allowed size|exceeded.*size/i.test(responseText)) {
-    return new Error(`檔案 ${formatBytes(file.size)} 超過 Product Finder 的 50 MB 上傳上限。`);
+    return new Error(tr("u_e_too_big", { s: formatBytes(file.size) }));
   }
-  return new Error(`Storage 上傳失敗 (${status})${detail ? `：${detail}` : ""}`);
+  return new Error(tr("u_e_storage_s", { s: status, d: detail ? `：${detail}` : "" }));
 }
 
 function storageErrorDetail(responseText: string) {

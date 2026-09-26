@@ -414,7 +414,7 @@ python3 scripts/i18n-audit.py admin       # Admin       ADMIN_I18N  481
 python3 scripts/i18n-audit.py kms         # KMS         I18N        261
 python3 scripts/i18n-audit.py pd-hub      # Product Dev 首頁        21
 python3 scripts/i18n-audit.py pd-devices  # 手機與配件  DV_I18N     215
-python3 scripts/i18n-audit.py pd-finder   # Finder      DICT（.ts） 173
+python3 scripts/i18n-audit.py pd-finder   # Finder      DICT（.ts） 330
 ```
 
 🔴 **第三項檢查：「畫面上取用了、但字典裡沒有的 key」。** 原本只比對五本字典彼此，
@@ -1987,7 +1987,7 @@ Portal 入口：APPS 的 `id:'product-dev'`（`roles:[]`，**不限角色，全�
 | 部分 | 路徑 | 版本 | 形態 |
 |---|---|---|---|
 | 工作區首頁（hub） | `product_dev/index.html` | **v2.24** | 單檔，只有入口卡片 |
-| Document Finder | `product_dev/finder/`（產物）← `finder-src/`（原始碼） | **v2.29**（尚未上 i18n） | **React 19 + TypeScript + Vite + Tailwind 4** |
+| Document Finder | `product_dev/finder/`（產物）← `finder-src/`（原始碼） | **v2.30**（尚未上 i18n） | **React 19 + TypeScript + Vite + Tailwind 4** |
 | 手機與配件（裝置保管） | `product_dev/devices/index.html` | **v1.10** | 單檔，53KB |
 
 - 🔴 **hub 不再標示另外兩個模組的版本**（v2.20 拿掉）。那是第二份副本，
@@ -2044,10 +2044,14 @@ DM Sans／DM Mono）。🔴 **要改配色請先改 Portal 再同步過來，不
   擺在回應之後的話，後端不通時整個畫面會停在繁中。
 - ⚠️ **已存進 state 的訊息不會跟著換語言**（例如載入時就產生的錯誤字串）：
   下一次動作才會是新語言。這是刻意不處理的 —— 要修得把每個訊息都改存 key ＋ 參數。
-- ⚠️ **`IncrementalUploadPage`（上傳工具，約 172 條）刻意未轉換**（Woody 2026-09-26
-  決定只做讀取路徑：上傳工具只有 uploader 名單那幾個人會用，且多在台灣）。
-  `lib/utils.ts` 的 `processingLabels`／`sensitivityLabels` 同理未轉 ——
-  它們目前只被沒有掛路由的舊頁面引用。
+- ✅ **v2.30 起上傳工具也做完了**（`IncrementalUploadPage`）：批次匯入、手動上傳、
+  預設目錄補檔、AI 文件分析、Users 權限管理五個畫面，以及上傳過程的所有進度與
+  錯誤訊息。**Finder 的 i18n 至此完成，330 個 key。**
+- 🔴 **`excludedName()` 裡的「名片」不可以翻**：那是**比對實際檔名**的規則
+  （排除名片檔），不是介面文字。已就地加註 —— i18n 掃描會把它當成漏翻，那是誤判。
+  **凡是拿中文去比對資料的地方都要這樣標。**
+- ⚠️ `lib/utils.ts` 的 `processingLabels`／`sensitivityLabels` 未轉 ——
+  它們目前只被沒有掛路由的舊頁面引用（見下一節）。
 
 ### ⚠️ 有 11 個模組沒有掛上路由（死程式碼）
 

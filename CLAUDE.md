@@ -104,9 +104,9 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 | File | Version | Purpose | ~Lines |
 |------|---------|---------|--------|
 | `index.html` | v2.07 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
-| `admin/index.html` | v2.41 | Admin System — room booking, fleet, visitor, library, lottery | 5,650 |
-| `kms/index.html` | v2.42 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
-| `quotation/index.html` | v3.64 | Quotation & CRM system | 7,332 |
+| `admin/index.html` | v2.42 | Admin System — room booking, fleet, visitor, library, lottery | 5,650 |
+| `kms/index.html` | v2.43 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
+| `quotation/index.html` | v3.65 | Quotation & CRM system | 7,332 |
 | `board/index.html` | v1.92 | 公告與會議 Bulletin & Meetings — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍、腦力激盪 | 4,600 |
 | `product_dev/` | v2.24 | **產品開發管理 —— 第六個子系統，不遵守單一檔案原則**（見下方專節） | — |
 
@@ -347,8 +347,13 @@ The portal supports EN, 繁中, 简中, VI, 日 via `setLang(lang)`. Each langua
 
 所以在 Portal 切成越南文，**報價／Admin／KMS 不會跟著換**。
 這不是壞掉，是這句話從來沒有全部實現過。
-🔴 **要統一不能直接換 key** —— 那會讓所有人既有的語言偏好一次歸零。
-做法是「先讀 `comart-lang`、沒有才退回舊 key，寫入時兩邊都寫」撐一段時間。尚未做。
+✅ **2026-09-26 已統一**：Admin v2.42／KMS v2.43／報價 v3.65 現在都
+**先讀 `comart-lang`、沒有才退回自己原本的 key**，而寫入時**兩個 key 都寫**。
+🔴 **不能直接換 key** —— 那會讓所有人既有的語言偏好一次歸零；兩邊都寫是過渡期的做法，
+等舊 key 確定沒人在用了再拿掉。
+🔴 **KMS 那個「依所屬中心猜語言」的後備條件要同時看兩個 key**
+（`!comart-lang && !kms-lang`）—— 只看舊的話，已經在 Portal 選過語言的人
+會在這裡被中心預設覆蓋掉。
 
 **Board 的 i18n（v1.48）**：`B_I18N`（330 key × 5 語）＋ `BT(key, params)`，`{n}` 佔位。
 靜態 HTML 用 `data-i18n` / `data-i18n-ph` / `data-i18n-title`，由 `bApplyI18n()` 套上；
@@ -2039,9 +2044,12 @@ Google Fonts 對 DM Sans **只給 `latin` 與 `latin-ext` 兩個 unicode-range**
   ```
   `Be Vietnam Pro`（幾何無襯線，與 DM Sans 相容）與 `Noto Serif` 都有完整越南文字集。
   靠 `document.documentElement.lang` 觸發，所以切語言的函式一定要設它。
-- ✅ **Portal v2.07／Board v1.92／報價 v3.64 已一併修好**（2026-09-26），做法相同。
-  ⚠️ **Admin／KMS 還沒修** —— 它們的 `--ff` 是 Segoe UI／PingFang TC，
-  PingFang 也沒有越南文，同一個坑。
+- ✅ **五個系統全部修好了**（2026-09-26）：Portal v2.07／Board v1.92／報價 v3.64／
+  Admin v2.42／KMS v2.43，加上 Product Dev 的 hub 與裝置。
+  Admin／KMS 的字型堆疊不同（`Segoe UI`／`PingFang TC`，**而且 Segoe UI 在 Mac 上
+  根本不存在**），但 PingFang 同樣沒有越南文，所以是同一個坑、同一個修法：
+  Admin 用 `html[lang="vi"] body{…}`（它的字型寫死在 body，沒有變數），
+  KMS 覆寫它自己的 `--font`。
 - 🔴 **Portal 與報價系統原本從來沒有設過 `document.documentElement.lang`**
   （整份 grep 為 0），所以 `html[lang="vi"]` 本來不會生效。
   Portal 補在 `setLang()` 與 DOMContentLoaded（**沒存過語言時 `setLang` 不會被呼叫**，

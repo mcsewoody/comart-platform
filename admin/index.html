@@ -4,7 +4,11 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART 行政管理平台 v2.41</title>
+<title>COMART 行政管理平台 v2.42</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
 <style>
 :root{
   /* KMS-aligned dark theme */
@@ -49,6 +53,11 @@
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{max-width:100vw;overflow-x:hidden}
 body{font-family:'Segoe UI','PingFang TC','Microsoft JhengHei',sans-serif;background:var(--bg0);color:var(--t1);min-height:100vh;font-size:14px}
+/* 🔴 Segoe UI 在 Mac 上根本不存在，PingFang TC 又沒有越南文字集 —— 越南文的
+   U+1EA0–U+1EF9（ị ế ộ ả ẩ ể…）因此逐字掉到系統預設字型，同一個詞混兩種字，
+   看起來像變音符號散掉。切成越南文時整份換成 Be Vietnam Pro（有完整越南文字集）。
+   靠 documentElement.lang 觸發，所以 setLang 一定要設它（admin 原本沒設）。*/
+html[lang="vi"] body{font-family:'Be Vietnam Pro','Segoe UI','PingFang TC',sans-serif}
 #app{display:flex;flex-direction:column;min-height:100vh}
 #tabs{background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;height:var(--th);position:sticky;top:0;z-index:200;padding:0 16px;gap:4px}
 /* ── 頂部主功能列 ── */
@@ -664,7 +673,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="logo">
     <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
     <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
-    <span><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="38" height="20" style="display:inline-block;vertical-align:middle;margin-top:-2px"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v2.41</span>
+    <span><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="38" height="20" style="display:inline-block;vertical-align:middle;margin-top:-2px"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v2.42</span>
   </div>
   <div class="trr">
     <div id="global-site-bar" style="display:flex;align-items:center;gap:4px"><span style="font-size:13px;color:var(--text-3);white-space:nowrap;font-weight:500">單位：</span>
@@ -2963,6 +2972,12 @@ function applyI18n() {
 }
 function setLang(lang) {
   currentAdminLang = lang;
+  // 越南文靠這個屬性才換得到有越南文字集的字型；順帶讓螢幕閱讀器拿到正確語言
+  document.documentElement.lang = lang;
+  /* 🔴 兩個 key 都寫：`comart-lang` 是平台共用的那一把（Portal／Board／Product Dev
+     都用它），`admin-lang` 是本系統原本的。只寫新的會讓既有使用者的偏好一次歸零，
+     只寫舊的則永遠同步不到其他系統 —— 所以過渡期兩邊都寫。*/
+  try{localStorage.setItem('comart-lang', lang);}catch(e){}
   try{localStorage.setItem('admin-lang', lang);}catch(e){console.warn('setLang: localStorage quota exceeded',e);}
   document.querySelectorAll('.admin-lang-btn').forEach(b => {
     const oc = b.getAttribute('onclick') || '';
@@ -3007,7 +3022,8 @@ async function init(){
   chkOv();popCatSel();popUsrSel();
   const _siteLang = { TW:'zh-TW', CN:'zh-CN', VN:'vi' }[PORTAL_SESSION?.site];
   let savedLang = _siteLang || 'en';
-  try { savedLang = localStorage.getItem('admin-lang') || savedLang; } catch(_) {}
+  // 先讀平台共用的那一把，沒有才退回本系統原本的 key（見 setLang 的說明）
+  try { savedLang = localStorage.getItem('comart-lang') || localStorage.getItem('admin-lang') || savedLang; } catch(_) {}
   setLang(savedLang);
   // 依登入 site 設定全域過濾
   _curSite = PORTAL_SESSION?.site || '';

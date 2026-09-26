@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART 行政管理平台 v2.42</title>
+<title>COMART 行政管理平台 v2.43</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -673,10 +673,10 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="logo">
     <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
     <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
-    <span><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="38" height="20" style="display:inline-block;vertical-align:middle;margin-top:-2px"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v2.42</span>
+    <span><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="38" height="20" style="display:inline-block;vertical-align:middle;margin-top:-2px"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v2.43</span>
   </div>
   <div class="trr">
-    <div id="global-site-bar" style="display:flex;align-items:center;gap:4px"><span style="font-size:13px;color:var(--text-3);white-space:nowrap;font-weight:500">單位：</span>
+    <div id="global-site-bar" style="display:flex;align-items:center;gap:4px"><span style="font-size:13px;color:var(--text-3);white-space:nowrap;font-weight:500" data-i18n="g.site_label">單位：</span>
       <button class="admin-lang-btn site-gbtn active" data-site="" onclick="setGlobalSite('')">全部</button>
       <button class="admin-lang-btn site-gbtn" data-site="TW" onclick="setGlobalSite('TW')">TW</button>
       <button class="admin-lang-btn site-gbtn" data-site="CN" onclick="setGlobalSite('CN')">CN</button>
@@ -2257,6 +2257,8 @@ async function delVisitGuest(id) {
 let currentAdminLang = 'en';
 const ADMIN_I18N = {
   en: {
+    'sub.dash':'Board','sub.overview':'Overview','sub.new':'New','sub.new_booking':'New booking','sub.calendar':'Calendar','sub.month':'Month','sub.list':'List','sub.booking_list':'Bookings','sub.fault':'Faults','sub.report':'Reports','sub.settings':'Settings','sub.use_log':'Trips','sub.fuel':'Fuel','sub.vehicles':'Vehicles','sub.maint':'Service','sub.insp':'Inspection','sub.books':'Books','sub.return':'Return','sub.manage':'Manage','sub.loans':'Loans',
+    'g.site_label':'Site:',
     'mod.room':'Meeting Rooms','mod.car':'Fleet','mod.visit':'Visitors',
     'mod.lib':'Library','mod.lottery':'Lottery',
     'g.nav.main':'Main Menu','g.nav.settings':'Settings','g.nav.func':'Functions','g.nav.cfg':'Config',
@@ -2397,6 +2399,8 @@ const ADMIN_I18N = {
     'visit.ph.company':'Company/Organization name','visit.ph.notes':'Special requirements, notes…','visit.ph.search':'Company, contact…','visit.ph.guest_search':'Name, company…'
   },
   'zh-TW': {
+    'sub.dash':'看板','sub.overview':'總覽','sub.new':'新增','sub.new_booking':'新增預約','sub.calendar':'日曆','sub.month':'月曆','sub.list':'清單','sub.booking_list':'預約清單','sub.fault':'故障回報','sub.report':'報表','sub.settings':'設定','sub.use_log':'用車紀錄','sub.fuel':'油資','sub.vehicles':'車輛','sub.maint':'保養','sub.insp':'驗車','sub.books':'書目','sub.return':'歸還','sub.manage':'管理','sub.loans':'借閱記錄',
+    'g.site_label':'單位：',
     'mod.room':'會議室','mod.car':'公務車','mod.visit':'客戶到訪',
     'mod.lib':'圖書館','mod.lottery':'抽籤',
     'g.nav.main':'主選單','g.nav.settings':'設定','g.nav.func':'功能','g.nav.cfg':'系統設定',
@@ -2537,6 +2541,8 @@ const ADMIN_I18N = {
     'visit.ph.company':'公司/單位名稱','visit.ph.notes':'特殊需求、注意事項…','visit.ph.search':'公司、負責人…','visit.ph.guest_search':'姓名、公司…'
   },
   'zh-CN': {
+    'sub.dash':'看板','sub.overview':'总览','sub.new':'新增','sub.new_booking':'新增预约','sub.calendar':'日历','sub.month':'月历','sub.list':'清单','sub.booking_list':'预约清单','sub.fault':'故障报修','sub.report':'报表','sub.settings':'设定','sub.use_log':'用车记录','sub.fuel':'油资','sub.vehicles':'车辆','sub.maint':'保养','sub.insp':'验车','sub.books':'书目','sub.return':'归还','sub.manage':'管理','sub.loans':'借阅记录',
+    'g.site_label':'单位：',
     'mod.room':'会议室','mod.car':'公务车','mod.visit':'客户到访',
     'mod.lib':'图书馆','mod.lottery':'抽签',
     'g.nav.main':'主菜单','g.nav.settings':'设置','g.nav.func':'功能','g.nav.cfg':'系统设置',
@@ -2677,6 +2683,8 @@ const ADMIN_I18N = {
     'visit.ph.company':'公司/单位名称','visit.ph.notes':'特殊需求、注意事项…','visit.ph.search':'公司、负责人…','visit.ph.guest_search':'姓名、公司…'
   },
   vi: {
+    'sub.dash':'Bảng','sub.overview':'Tổng quan','sub.new':'Thêm mới','sub.new_booking':'Đặt phòng mới','sub.calendar':'Lịch','sub.month':'Lịch tháng','sub.list':'Danh sách','sub.booking_list':'Danh sách đặt','sub.fault':'Báo hỏng','sub.report':'Báo cáo','sub.settings':'Cài đặt','sub.use_log':'Nhật ký dùng xe','sub.fuel':'Nhiên liệu','sub.vehicles':'Xe','sub.maint':'Bảo dưỡng','sub.insp':'Đăng kiểm','sub.books':'Sách','sub.return':'Trả sách','sub.manage':'Quản lý','sub.loans':'Lịch sử mượn',
+    'g.site_label':'Đơn vị:',
     'mod.room':'Phòng họp','mod.car':'Xe công vụ','mod.visit':'Khách thăm',
     'mod.lib':'Thư viện','mod.lottery':'Rút thăm',
     'g.nav.main':'Menu chính','g.nav.settings':'Cài đặt','g.nav.func':'Chức năng','g.nav.cfg':'Cấu hình',
@@ -2817,6 +2825,8 @@ const ADMIN_I18N = {
     'visit.ph.company':'Tên công ty/đơn vị','visit.ph.notes':'Yêu cầu đặc biệt, ghi chú…','visit.ph.search':'Công ty, người phụ trách…','visit.ph.guest_search':'Tên, công ty…'
   },
   ja: {
+    'sub.dash':'ボード','sub.overview':'概要','sub.new':'新規','sub.new_booking':'新規予約','sub.calendar':'カレンダー','sub.month':'月表示','sub.list':'一覧','sub.booking_list':'予約一覧','sub.fault':'故障報告','sub.report':'レポート','sub.settings':'設定','sub.use_log':'利用記録','sub.fuel':'燃料費','sub.vehicles':'車両','sub.maint':'整備','sub.insp':'車検','sub.books':'蔵書','sub.return':'返却','sub.manage':'管理','sub.loans':'貸出履歴',
+    'g.site_label':'拠点：',
     'mod.room':'会議室','mod.car':'社用車','mod.visit':'来訪管理',
     'mod.lib':'図書館','mod.lottery':'抽選',
     'g.nav.main':'メインメニュー','g.nav.settings':'設定','g.nav.func':'機能','g.nav.cfg':'システム設定',
@@ -2984,6 +2994,7 @@ function setLang(lang) {
     b.classList.toggle('active', oc.includes(`'${lang}'`));
   });
   applyI18n();
+  refreshSubNav();   // 次頁籤那一列是 JS 畫的，applyI18n 掃不到
   // Re-render dynamic table content to pick up new language
   try{renderBooks();}catch(e){}
   try{renderLoans();}catch(e){}
@@ -3066,42 +3077,56 @@ function switchMod(m){
   if(m==='visit'){navVisit('visit-dash');}
 }
 
-// ══ 手機版導覽 JS ══
+/* ══ 次頁籤導覽 ══
+   ⚠️ 名字叫 MOBILE_SUBNAV，但**桌機版也在用**（desktopSubNav 吃同一份）——
+      改標籤時兩邊都會跟著變，不要以為只影響手機。
+   🔴 存 key 不存文案：這個物件在載入時求值一次，寫死中文的話切語言換不掉。
+      標籤刻意用短版（「看板」而不是側欄的「車輛看板」），因為這一列很窄，
+      所以另開 sub.* 一組 key，不重用 car.nav.* 那些長標籤。 */
 const MOBILE_SUBNAV = {
   room:[
-    {p:'room-dash',ic:'📊',lb:'看板'},
-    {p:'room-new',ic:'➕',lb:'新增預約'},
-    {p:'room-cal',ic:'📅',lb:'日曆'},
-    {p:'room-list',ic:'📋',lb:'預約清單'},
-    {p:'room-fault',ic:'🔧',lb:'故障回報'},
-    {p:'room-report',ic:'📈',lb:'報表'},
-    {p:'room-cfg',ic:'⚙️',lb:'設定'},
+    {p:'room-dash',ic:'📊',lb:'sub.dash'},
+    {p:'room-new',ic:'➕',lb:'sub.new_booking'},
+    {p:'room-cal',ic:'📅',lb:'sub.calendar'},
+    {p:'room-list',ic:'📋',lb:'sub.booking_list'},
+    {p:'room-fault',ic:'🔧',lb:'sub.fault'},
+    {p:'room-report',ic:'📈',lb:'sub.report'},
+    {p:'room-cfg',ic:'⚙️',lb:'sub.settings'},
   ],
   car:[
-    {p:'car-dash',ic:'📊',lb:'看板'},
-    {p:'car-use',ic:'🚗',lb:'用車紀錄'},
-    {p:'car-cal',ic:'📅',lb:'月曆'},
-    {p:'car-fuel',ic:'⛽',lb:'油資'},
-    {p:'car-veh',ic:'🔑',lb:'車輛'},
-    {p:'car-maint',ic:'🔧',lb:'保養'},
-    {p:'car-insp',ic:'📋',lb:'驗車'},
-    {p:'car-cfg',ic:'⚙️',lb:'設定'},
+    {p:'car-dash',ic:'📊',lb:'sub.dash'},
+    {p:'car-use',ic:'🚗',lb:'sub.use_log'},
+    {p:'car-cal',ic:'📅',lb:'sub.month'},
+    {p:'car-fuel',ic:'⛽',lb:'sub.fuel'},
+    {p:'car-veh',ic:'🔑',lb:'sub.vehicles'},
+    {p:'car-maint',ic:'🔧',lb:'sub.maint'},
+    {p:'car-insp',ic:'📋',lb:'sub.insp'},
+    {p:'car-cfg',ic:'⚙️',lb:'sub.settings'},
   ],
   lib:[
-    {p:'lib-books',ic:'📖',lb:'書目'},
-    {p:'lib-return',ic:'↩️',lb:'歸還'},
-    {p:'lib-mgmt',ic:'🏷️',lb:'管理'},
-    {p:'lib-loans',ic:'📋',lb:'借閱記錄'},
-    {p:'lib-cfg',ic:'⚙️',lb:'設定'},
+    {p:'lib-books',ic:'📖',lb:'sub.books'},
+    {p:'lib-return',ic:'↩️',lb:'sub.return'},
+    {p:'lib-mgmt',ic:'🏷️',lb:'sub.manage'},
+    {p:'lib-loans',ic:'📋',lb:'sub.loans'},
+    {p:'lib-cfg',ic:'⚙️',lb:'sub.settings'},
   ],
   visit:[
-    {p:'visit-dash',ic:'📊',lb:'總覽'},
-    {p:'visit-new',ic:'➕',lb:'新增'},
-    {p:'visit-list',ic:'📋',lb:'清單'},
-    {p:'visit-report',ic:'📈',lb:'報表'},
+    {p:'visit-dash',ic:'📊',lb:'sub.overview'},
+    {p:'visit-new',ic:'➕',lb:'sub.new'},
+    {p:'visit-list',ic:'📋',lb:'sub.list'},
+    {p:'visit-report',ic:'📈',lb:'sub.report'},
   ],
   lottery:[],
 };
+
+/* 🔴 切語言時要重畫這一列。記下最後一次畫的是哪個模塊／哪一頁 ——
+   否則只能等使用者自己切模塊才會更新，而那看起來就像「這一排不能翻譯」。*/
+let _subNavMod = null, _subNavPage = null;
+function refreshSubNav(){
+  if(!_subNavMod) return;
+  mobileSubNav(_subNavMod, _subNavPage);
+  desktopSubNav(_subNavMod, _subNavPage);
+}
 
 function mobileModSwitch(m){
   // mm-item removed
@@ -3117,11 +3142,13 @@ function desktopSubNav(mod, activeP){
   if(!items.length){bar.innerHTML='';return;}
   bar.innerHTML = items.map(it=>`
     <button class="dsn-btn${activeP===it.p?' active':''}" onclick="mobileNavTo('${mod}','${it.p}')">
-      ${it.ic} ${it.lb}
+      ${it.ic} ${t(it.lb)}
     </button>`).join('');
 }
 
 function mobileSubNav(mod, activeP){
+  // 兩個 render 都由呼叫端成對呼叫，所以只在這裡記一次狀態就夠
+  _subNavMod = mod; _subNavPage = activeP;
   const bar = document.getElementById('mobile-subnav');
   if(!bar) return;
   const items = MOBILE_SUBNAV[mod]||[];
@@ -3134,7 +3161,7 @@ function mobileSubNav(mod, activeP){
   // 只在手機實際顯示時才設 display
   bar.innerHTML = items.map(it=>`
     <button class="msn-btn${activeP===it.p?' active':''}" onclick="mobileNavTo('${mod}','${it.p}')">
-      ${it.ic} ${it.lb}
+      ${it.ic} ${t(it.lb)}
     </button>`).join('');
   // display 由 CSS @media 控制，這裡不強設（除非確定要顯示）
   if(window.matchMedia('(max-width:680px)').matches){

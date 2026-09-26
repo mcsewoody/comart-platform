@@ -104,7 +104,7 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 | File | Version | Purpose | ~Lines |
 |------|---------|---------|--------|
 | `index.html` | v2.07 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
-| `admin/index.html` | v2.42 | Admin System — room booking, fleet, visitor, library, lottery | 5,650 |
+| `admin/index.html` | v2.43 | Admin System — room booking, fleet, visitor, library, lottery | 5,650 |
 | `kms/index.html` | v2.43 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
 | `quotation/index.html` | v3.65 | Quotation & CRM system | 7,332 |
 | `board/index.html` | v1.92 | 公告與會議 Bulletin & Meetings — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍、腦力激盪 | 4,600 |
@@ -410,7 +410,7 @@ The portal supports EN, 繁中, 简中, VI, 日 via `setLang(lang)`. Each langua
 python3 scripts/i18n-audit.py             # Portal      I18N        275 key × 5
 python3 scripts/i18n-audit.py board       # Board       B_I18N 419 ＋ PL_I18N 109
 python3 scripts/i18n-audit.py quotation   # 報價系統     UI          180
-python3 scripts/i18n-audit.py admin       # Admin       ADMIN_I18N  481
+python3 scripts/i18n-audit.py admin       # Admin       ADMIN_I18N  502
 python3 scripts/i18n-audit.py kms         # KMS         I18N        261
 python3 scripts/i18n-audit.py pd-hub      # Product Dev 首頁        21
 python3 scripts/i18n-audit.py pd-devices  # 手機與配件  DV_I18N     215
@@ -1404,6 +1404,28 @@ v1.94 只做在 Portal，但**同事被邀請的時候人常常在 KMS 或報價
   `callClaude(messages, system, …)` —— **參數順序不同，不要直接傳**。
   刻意重用 `pmClaude` 而不是自己 fetch：它已處理好 401 橫幅（`sbNoteAuth`）、
   refusal、空回覆。
+
+### 🔴 Admin 的次頁籤是 JS 畫的，`applyI18n()` 掃不到（v2.43，2026-09-26）
+
+模塊底下那一排（看板／用車紀錄／月曆／油資…）來自 **`MOBILE_SUBNAV`**，
+文案原本寫死在物件裡，所以 `data-i18n` 那一套完全管不到 —— 切成越南文時
+其他地方都換了，只有這一排還是中文。**五個模塊都有，不只公務車**，共 20 個標籤。
+
+- ⚠️ **名字叫 `MOBILE_SUBNAV`，但桌機版也在用**（`desktopSubNav` 吃同一份）。
+  改它會同時影響手機與桌機，不要以為只動到手機。
+- 🔴 **存 key 不存文案**（同其他所有標籤表：物件在載入時求值一次）。
+  另開 `sub.*` 一組短標籤，**不重用 `car.nav.*`** —— 側欄是「車輛看板」，
+  這一列只放得下「看板」，兩者本來就該不同。
+- 🔴 **`setLang()` 要呼叫 `refreshSubNav()`**：這一排是 JS 畫的，
+  只換字典不會重畫。用 `_subNavMod`／`_subNavPage` 記住最後畫的模塊與頁面，
+  所以**切語言之後選中狀態不會掉**（實測停在「油資」切越南文，
+  仍停在 `Nhiên liệu`）。沒有這一步的話要等使用者自己切模塊才更新，
+  那看起來就像「這一排不能翻譯」。
+- 同一條工具列的 `單位：` 也補上 `g.site_label`。
+
+⚠️ **Admin 的 JS 裡還有約 89 種會進 DOM 的寫死中文**（`renderXxx()` 產生的表格、
+匯出版面、列印單據）。**其中「客戶到訪接待行程單」那一類是輸出格式，照 board 的
+規矩本來就不該翻**（`siteLabelZ` 的道理）；其餘是真的漏翻。**尚未處理。**
 
 ### 🔴 Admin：本機的過期預檢（v2.41，2026-09-26）
 

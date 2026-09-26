@@ -5,6 +5,7 @@
 #   python3 scripts/i18n-audit.py quotation          # 報價系統（quotation/index.html 的 UI）
 #   python3 scripts/i18n-audit.py admin              # Admin（ADMIN_I18N，key 帶引號）
 #   python3 scripts/i18n-audit.py kms                # KMS（I18N，key 帶引號）
+#   python3 scripts/i18n-audit.py pd-hub             # Product Dev 工作區首頁（PD_I18N）
 #
 # 🔴 為什麼要有這支：全域計數會放過一種錯誤 —— 10 份分佈成 (0,0,0,2,3)，
 #    總數對、分佈全錯。2026-09-08 的 lc_rule1_t 就是這樣：en／繁中／簡中各 0 份，
@@ -25,6 +26,7 @@ TARGETS = {
     'quotation': ('quotation/index.html', ['UI']),
     'admin':  ('admin/index.html', ['ADMIN_I18N']),
     'kms':    ('kms/index.html', ['I18N']),
+    'pd-hub': ('product_dev/index.html', ['PD_I18N']),
 }
 name = (sys.argv[1] if len(sys.argv) > 1 else 'portal').lower()
 if name not in TARGETS:
@@ -105,10 +107,39 @@ def keys_of(seg):
     return out
 
 
+def used_keys(src):
+    """畫面上真的取用到的 key：data-i18n 系列屬性 ＋ t('字面值') 這類呼叫。
+
+    🔴 只回報「用了但字典沒有」（畫面會直接顯示 key 名稱），不回報「字典有但沒用到」——
+       CLAUDE.md 記載過 key 可以是組出來的（`'lc_rule'+ri+'_t'`），
+       那一邊一定會誤報，而誤報會把真的問題蓋掉。"""
+    # 註解要先拿掉：board 的 `// BT('key', {n:3}) —— …` 是說明文字，不是真的呼叫
+    src = re.sub(r'/\*.*?\*/', ' ', src, flags=re.S)
+    src = re.sub(r'(?m)^\s*//.*$', ' ', src)
+    out = set()
+    for m in re.finditer(r'data-i18n(?:-ph|-title)?="([^"]+)"', src):
+        out.add(m.group(1))
+    for m in re.finditer(r"\b(?:t|BT|PT|BTZ)\(\s*'([A-Za-z0-9_.\-]+)'", src):
+        k = m.group(1)
+        # 組出來的 key 只抓得到前綴（`BT('site_' + s)`、`t('car.fuel.' + x)`）——
+        # 那不是缺漏，報出來只會把真的問題蓋掉
+        if k[-1] not in '_.-':
+            out.add(k)
+    return out
+
+
+def assigned_keys(src):
+    """字典物件之外補上的 key：`B_I18N['zh-TW'].pl_nav = '投票'` 這種寫法。"""
+    return set(re.findall(r"\w+\[['\"][\w-]+['\"]\]\.(\w+)\s*=", src))
+
+
 bad, total = 0, 0
+defined = set()
 for var in varnames:
-    i = s.index('const %s = {' % var)
-    segs = lang_segments(s, s.index('{', i))
+    # 宣告的空白寫法各檔不同（`const X = {` 與 `const X={` 都有），不要寫死
+    m = re.search(r'const\s+%s\s*=\s*\{' % re.escape(var), s)
+    assert m, '%s 的宣告找不到' % var
+    segs = lang_segments(s, m.end() - 1)
     assert segs, '%s 的語言字典找不到（格式改了？）' % var
     per = {n: keys_of(seg) for n, seg in segs.items()}
     allk = set().union(*(set(d) for d in per.values()))
@@ -121,7 +152,15 @@ for var in varnames:
         miss = [n for n in segs if per[n].get(k, 0) == 0]
         if miss:
             bad += 1; print('缺漏      %-8s %-26s 缺: %s' % (var, k, ', '.join(miss)))
+    defined |= allk
     print('%-8s 字典 %s，共 %d 個 key' % (var, list(segs), len(allk)))
+
+# ③ 畫面上取用了、但字典裡沒有的 key —— t() 會原樣回傳 key，
+#    使用者看到的就是 `hero_h1` 這種字串，而稽核「五本字典互相對齊」永遠抓不到它。
+missing = sorted(used_keys(s) - defined - assigned_keys(s))
+if missing:
+    bad += len(missing)
+    print('未定義    %s' % ', '.join(missing))
 print('---')
 print(('❌ 有 %d 個問題' % bad) if bad else '✅ %s：字典完全對齊，無重複、無缺漏（共 %d 個 key）' % (name, total))
 sys.exit(1 if bad else 0)

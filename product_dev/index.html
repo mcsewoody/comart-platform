@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>COMART Product Dev v2.21</title>
+  <title>COMART Product Dev v2.22</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -31,6 +31,10 @@
     .mark{width:30px;height:30px;border-radius:8px;background:var(--ac);display:grid;place-items:center;color:#fff;font-family:var(--fm);font-size:12px;font-weight:500;flex-shrink:0}
     .brand b{display:block;font-size:14px;font-weight:600}
     .brand span{color:var(--tx3);font-size:11px;font-family:var(--fm)}
+    .lchip{font-size:11px;font-weight:600;padding:4px 9px;border-radius:20px;border:1px solid var(--br);background:transparent;color:var(--tx3);cursor:pointer;transition:all .12s;white-space:nowrap}
+    .lchip:hover{color:var(--tx);border-color:var(--br2)}
+    .lchip.on{background:var(--ac2);border-color:var(--ac);color:var(--ac)}
+    #langChips{display:flex;gap:4px;margin-left:auto;overflow:auto;-webkit-overflow-scrolling:touch}
     .back{color:var(--tx3);text-decoration:none;border:1px solid var(--br);padding:7px 12px;border-radius:var(--r);font-size:12px;transition:.18s;white-space:nowrap}
     .back:hover{color:var(--tx);border-color:var(--br2);background:var(--s2)}
     main{max-width:1180px;margin:auto;padding:48px 20px 80px}
@@ -69,46 +73,179 @@
 <body>
   <header class="top">
     <a class="back" href="../index.html">← Portal</a>
-    <div class="brand"><div class="mark">PD</div><div><b>COMART Product Dev</b><span>Product Development Workspace · v2.21</span></div></div>
+    <div class="brand"><div class="mark">PD</div><div><b>COMART Product Dev</b><span>Product Development Workspace · v2.22</span></div></div>
+    <div id="langChips"></div>
   </header>
   <main>
     <section class="hero">
       <div>
         <div class="eyebrow">Product Development Workspace</div>
-        <h1>從產品情報，到開案落地。</h1>
-        <p class="lead">Product Dev 是產品開發工作的共用入口。Document Finder 將自製品與外購品完全分開，每筆結果只代表一份原始文件；後續開案、打樣、模具、驗證與量產節點會各自成為獨立模組。</p>
+        <h1 data-i18n="hero_h1">從產品情報，到開案落地。</h1>
+        <p class="lead" data-i18n="hero_lead">Product Dev 是產品開發工作的共用入口。</p>
       </div>
-      <div class="user"><small>目前登入</small><strong id="userName">驗證中…</strong><span class="role" id="userRole"></span></div>
+      <div class="user"><small data-i18n="u_logged_in">目前登入</small><strong id="userName" data-i18n="u_verifying">驗證中…</strong><span class="role" id="userRole"></span></div>
     </section>
-    <p class="section-title">Available modules</p>
+    <p class="section-title" data-i18n="sec_modules">Available modules</p>
     <section class="grid">
       <a class="card active" href="#" id="finderCard">
-        <span class="tag new">AVAILABLE</span><span class="icon">⌕</span>
+        <span class="tag new" data-i18n="tag_available">AVAILABLE</span><span class="icon">⌕</span>
         <h2>Document Finder</h2>
-        <p>分別搜尋自製品的設計圖、BOM 與 CAD，以及外購品的型錄、報價單、簡報與產品圖。</p>
-        <span class="go">進入文件搜尋 →</span>
+        <p data-i18n="m_finder_d">分別搜尋自製品的設計圖、BOM 與 CAD。</p>
+        <span class="go" data-i18n="m_finder_go">進入文件搜尋 →</span>
       </a>
       <a class="card active" href="#" id="devicesCard">
-        <span class="tag new">NEW</span><span class="icon">▣</span>
-        <h2>手機與配件</h2>
-        <p>查找公司設備、查看目前保管人，並處理借用、移轉、維修、退役與年度盤點。</p>
-        <span class="go">進入設備管理 →</span>
+        <span class="tag new" data-i18n="tag_new">NEW</span><span class="icon">▣</span>
+        <h2 data-i18n="m_dev_t">手機與配件</h2>
+        <p data-i18n="m_dev_d">查找公司設備、查看目前保管人。</p>
+        <span class="go" data-i18n="m_dev_go">進入設備管理 →</span>
       </a>
       <article class="card disabled">
-        <span class="tag soon">PLANNED</span><span class="icon">◇</span>
+        <span class="tag soon" data-i18n="tag_planned">PLANNED</span><span class="icon">◇</span>
         <h2>Project Pipeline</h2>
-        <p>開案需求、負責人、客戶節點、風險與決策紀錄。保留給後續專案管理模組。</p>
+        <p data-i18n="m_pipe_d">開案需求、負責人、客戶節點。</p>
       </article>
       <article class="card disabled">
-        <span class="tag soon">PLANNED</span><span class="icon">⚙</span>
+        <span class="tag soon" data-i18n="tag_planned">PLANNED</span><span class="icon">⚙</span>
         <h2>Sample & Tooling</h2>
-        <p>樣品輪次、模具、測試認證與中越供應鏈進度追蹤。</p>
+        <p data-i18n="m_tool_d">樣品輪次、模具、測試認證。</p>
       </article>
     </section>
-    <div id="error">登入資訊已失效。請返回 COMART Platform 重新登入。</div>
-    <div class="foot"><span>Document Finder 使用全新 pd_mfg_／pd_buy_ 命名空間，不改寫舊 CPF、KMS 或 Quotation。</span><span>COMART Internal Use</span></div>
+    <div id="error" data-i18n="err_session">登入資訊已失效。</div>
+    <div class="foot"><span data-i18n="foot_note">Document Finder 使用獨立的命名空間。</span><span data-i18n="foot_use">COMART Internal Use</span></div>
   </main>
   <script>
+    /* ═══ i18n ═══
+       🔴 與其他五個系統共用 localStorage['comart-lang']，所以在 Portal 切語言，
+          這裡下次載入就跟著換。值只有 en / zh-TW / zh-CN / vi / ja 五種。
+       🔴 模組名稱刻意不翻：Document Finder／Project Pipeline／Sample & Tooling
+          本來就是英文專名（同 COMART Platform／KMS）。只有「手機與配件」是中文
+          取的名字，所以它有五語。 */
+    const PD_LANGS=[['zh-TW','繁中'],['zh-CN','简中'],['en','EN'],['vi','VI'],['ja','日本語']];
+    const PD_I18N={
+      'zh-TW':{
+        hero_h1:'從產品情報，到開案落地。',
+        hero_lead:'Product Dev 是產品開發工作的共用入口。Document Finder 將自製品與外購品完全分開，每筆結果只代表一份原始文件；後續開案、打樣、模具、驗證與量產節點會各自成為獨立模組。',
+        u_logged_in:'目前登入', u_verifying:'驗證中…',
+        sec_modules:'可用模組',
+        tag_available:'可用', tag_new:'新增', tag_planned:'規劃中',
+        m_finder_d:'分別搜尋自製品的設計圖、BOM 與 CAD，以及外購品的型錄、報價單、簡報與產品圖。',
+        m_finder_go:'進入文件搜尋 →',
+        m_dev_t:'手機與配件',
+        m_dev_d:'查找公司設備、查看目前保管人，並處理借用、移轉、維修、退役與年度盤點。',
+        m_dev_go:'進入設備管理 →',
+        m_pipe_d:'開案需求、負責人、客戶節點、風險與決策紀錄。保留給後續專案管理模組。',
+        m_tool_d:'樣品輪次、模具、測試認證與中越供應鏈進度追蹤。',
+        err_session:'登入資訊已失效。請返回 COMART Platform 重新登入。',
+        role_admin:'管理員', role_dcc:'編輯者', role_user:'查詢者',
+        foot_note:'Document Finder 使用獨立的 pd_mfg_／pd_buy_ 命名空間，不改寫既有的 KMS 或報價資料。',
+        foot_use:'COMART 內部使用'
+      },
+      'zh-CN':{
+        hero_h1:'从产品情报，到开案落地。',
+        hero_lead:'Product Dev 是产品开发工作的共用入口。Document Finder 将自制品与外购品完全分开，每笔结果只代表一份原始文件；后续开案、打样、模具、验证与量产节点会各自成为独立模块。',
+        u_logged_in:'目前登录', u_verifying:'验证中…',
+        sec_modules:'可用模块',
+        tag_available:'可用', tag_new:'新增', tag_planned:'规划中',
+        m_finder_d:'分别搜索自制品的设计图、BOM 与 CAD，以及外购品的型录、报价单、简报与产品图。',
+        m_finder_go:'进入文件搜索 →',
+        m_dev_t:'手机与配件',
+        m_dev_d:'查找公司设备、查看目前保管人，并处理借用、移转、维修、退役与年度盘点。',
+        m_dev_go:'进入设备管理 →',
+        m_pipe_d:'开案需求、负责人、客户节点、风险与决策记录。保留给后续项目管理模块。',
+        m_tool_d:'样品轮次、模具、测试认证与中越供应链进度追踪。',
+        err_session:'登录信息已失效。请返回 COMART Platform 重新登录。',
+        role_admin:'管理员', role_dcc:'编辑者', role_user:'查询者',
+        foot_note:'Document Finder 使用独立的 pd_mfg_／pd_buy_ 命名空间，不改写既有的 KMS 或报价数据。',
+        foot_use:'COMART 内部使用'
+      },
+      en:{
+        hero_h1:'From product intelligence to project delivery.',
+        hero_lead:'Product Dev is the shared entry point for product development work. Document Finder keeps in-house and purchased items completely separate — each result is exactly one source document. Project kickoff, sampling, tooling, validation and mass-production milestones will each become their own module.',
+        u_logged_in:'Signed in as', u_verifying:'Verifying…',
+        sec_modules:'Available modules',
+        tag_available:'AVAILABLE', tag_new:'NEW', tag_planned:'PLANNED',
+        m_finder_d:'Search drawings, BOMs and CAD for in-house items, and catalogues, quotations, decks and product photos for purchased items — kept apart.',
+        m_finder_go:'Open document search →',
+        m_dev_t:'Device Custody',
+        m_dev_d:'Find company devices, see who currently holds them, and handle borrowing, transfers, repairs, retirement and the annual stocktake.',
+        m_dev_go:'Open device management →',
+        m_pipe_d:'Kickoff requirements, owners, customer milestones, risks and decision records. Reserved for the upcoming project management module.',
+        m_tool_d:'Sample rounds, tooling, test certification and supply-chain progress across Taiwan, Dongguan and Vietnam.',
+        err_session:'Your session is no longer valid. Please return to COMART Platform and sign in again.',
+        role_admin:'Administrator', role_dcc:'Editor', role_user:'Viewer',
+        foot_note:'Document Finder uses its own pd_mfg_ / pd_buy_ namespace and does not touch existing KMS or Quotation data.',
+        foot_use:'COMART Internal Use'
+      },
+      vi:{
+        hero_h1:'Từ thông tin sản phẩm đến triển khai dự án.',
+        hero_lead:'Product Dev là cổng vào chung cho công việc phát triển sản phẩm. Document Finder tách hoàn toàn hàng tự sản xuất và hàng mua ngoài — mỗi kết quả chỉ là một tài liệu gốc. Mở dự án, làm mẫu, khuôn, kiểm định và các mốc sản xuất hàng loạt sẽ lần lượt trở thành mô-đun riêng.',
+        u_logged_in:'Đang đăng nhập', u_verifying:'Đang xác minh…',
+        sec_modules:'Mô-đun khả dụng',
+        tag_available:'KHẢ DỤNG', tag_new:'MỚI', tag_planned:'DỰ KIẾN',
+        m_finder_d:'Tìm bản vẽ, BOM và CAD của hàng tự sản xuất, cùng catalogue, báo giá, bản trình bày và ảnh sản phẩm của hàng mua ngoài — hoàn toàn tách biệt.',
+        m_finder_go:'Vào tìm kiếm tài liệu →',
+        m_dev_t:'Quản lý thiết bị',
+        m_dev_d:'Tra cứu thiết bị công ty, xem ai đang giữ, và xử lý mượn, chuyển giao, sửa chữa, thanh lý và kiểm kê hằng năm.',
+        m_dev_go:'Vào quản lý thiết bị →',
+        m_pipe_d:'Yêu cầu mở dự án, người phụ trách, mốc với khách hàng, rủi ro và hồ sơ quyết định. Dành cho mô-đun quản lý dự án sắp tới.',
+        m_tool_d:'Các vòng làm mẫu, khuôn, chứng nhận kiểm định và tiến độ chuỗi cung ứng Đài Loan – Đông Quản – Việt Nam.',
+        err_session:'Phiên đăng nhập không còn hiệu lực. Vui lòng quay lại COMART Platform và đăng nhập lại.',
+        role_admin:'Quản trị viên', role_dcc:'Biên tập viên', role_user:'Người xem',
+        foot_note:'Document Finder dùng không gian tên riêng pd_mfg_ / pd_buy_, không ảnh hưởng dữ liệu KMS hay báo giá hiện có.',
+        foot_use:'Sử dụng nội bộ COMART'
+      },
+      ja:{
+        hero_h1:'製品情報から、案件の立ち上げまで。',
+        hero_lead:'Product Dev は製品開発業務の共通入口です。Document Finder は自社製品と外部購入品を完全に分け、1 件の結果が 1 つの原本に対応します。案件立ち上げ、試作、金型、検証、量産マイルストーンは今後それぞれ独立したモジュールになります。',
+        u_logged_in:'ログイン中', u_verifying:'確認中…',
+        sec_modules:'利用可能なモジュール',
+        tag_available:'利用可能', tag_new:'新規', tag_planned:'予定',
+        m_finder_d:'自社製品の図面・BOM・CAD と、外部購入品のカタログ・見積書・資料・製品画像を、それぞれ分けて検索します。',
+        m_finder_go:'文書検索へ →',
+        m_dev_t:'携帯電話と周辺機器',
+        m_dev_d:'社内機器の検索、現在の保管者の確認、貸出・移管・修理・廃棄・年次棚卸の処理を行います。',
+        m_dev_go:'機器管理へ →',
+        m_pipe_d:'案件要件、担当者、顧客マイルストーン、リスクと意思決定の記録。今後のプロジェクト管理モジュール用です。',
+        m_tool_d:'試作ラウンド、金型、試験認証、および台湾・東莞・ベトナムのサプライチェーン進捗の追跡。',
+        err_session:'ログイン情報が無効になりました。COMART Platform に戻って再ログインしてください。',
+        role_admin:'管理者', role_dcc:'編集者', role_user:'閲覧者',
+        foot_note:'Document Finder は独自の pd_mfg_ / pd_buy_ 名前空間を使用し、既存の KMS や見積データには影響しません。',
+        foot_use:'COMART 社内利用'
+      }
+    };
+    let PDLANG='zh-TW';
+    function PT(k){ return (PD_I18N[PDLANG]||PD_I18N['zh-TW'])[k] || PD_I18N['zh-TW'][k] || k; }
+    function pdInitLang(sess){
+      let l=''; try{ l=localStorage.getItem('comart-lang')||''; }catch(_){}
+      // 沒設定過就依所屬中心猜一次（同 board bInitLang）：台灣繁中、東莞簡中、越南越南文
+      if(!PD_I18N[l]) l=({TW:'zh-TW',CN:'zh-CN',VN:'vi'})[sess&&sess.site]||'zh-TW';
+      PDLANG=l; document.documentElement.lang=l;
+    }
+    function pdSetLang(l){
+      if(!PD_I18N[l]||l===PDLANG) return;
+      PDLANG=l;
+      try{ localStorage.setItem('comart-lang',l); }catch(_){}   // 與 Portal 共用同一把鑰匙
+      document.documentElement.lang=l;
+      pdApplyI18n();
+    }
+    function pdApplyI18n(){
+      document.querySelectorAll('[data-i18n]').forEach(function(e){ e.textContent=PT(e.getAttribute('data-i18n')); });
+      var box=document.getElementById('langChips');
+      if(box){
+        box.innerHTML=PD_LANGS.map(function(l){
+          return '<button class="lchip'+(l[0]===PDLANG?' on':'')+'" onclick="pdSetLang(\''+l[0]+'\')">'+l[1]+'</button>';
+        }).join('');
+        var on=box.querySelector('.lchip.on');
+        if(on){ try{ on.scrollIntoView({block:'nearest',inline:'nearest'}); }catch(_){} }
+      }
+      // 使用者名稱與角色是資料不是文案，語言換了要重畫的只有角色標籤
+      if(window._pdSess){
+        document.getElementById('userName').removeAttribute('data-i18n');
+        document.getElementById('userName').textContent=_pdSess.nameZh||_pdSess.nameEn||_pdSess.empId;
+        document.getElementById('userRole').textContent=
+          PT(_pdSess.role==='admin'?'role_admin':_pdSess.role==='dcc'?'role_dcc':'role_user')+' · '+_pdSess.empId;
+      }
+    }
     const KEY='comart-portal-session';
     function decode(v){try{return JSON.parse(decodeURIComponent(escape(atob(v))))}catch(_){return null}}
     const q=new URLSearchParams(location.search);
@@ -118,9 +255,7 @@
     const valid=s&&s.empId&&s.sig&&(!s.expires||Date.now()<s.expires);
     if(!valid){document.getElementById('error').style.display='block';document.getElementById('finderCard').classList.add('disabled');document.getElementById('devicesCard').classList.add('disabled');}
     else{
-      document.getElementById('userName').textContent=s.nameZh||s.nameEn||s.empId;
-      const role=s.role==='admin'?'管理員':s.role==='dcc'?'編輯者':'查詢者';
-      document.getElementById('userRole').textContent=role+' · '+s.empId;
+      window._pdSess=s;
       document.getElementById('finderCard').onclick=function(e){
         e.preventDefault();
         const token=btoa(unescape(encodeURIComponent(JSON.stringify(s))));
@@ -133,6 +268,8 @@
       };
     }
     if(q.has('_ps'))history.replaceState(null,'',location.pathname);
+    pdInitLang(s);
+    pdApplyI18n();
   </script>
 </body>
 </html>

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART KMS v2.43</title>
+<title>COMART KMS v2.44</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -398,7 +398,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="38" height="20" style="display:inline-block;vertical-align:middle;margin-right:4px;margin-top:-2px"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg>COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v2.43</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v2.44</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('en')">EN</button>
@@ -855,11 +855,11 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         <div style="padding:12px 20px;border-bottom:1px solid var(--border);flex-shrink:0;">
           <div style="font-size:15px;font-weight:500;margin-bottom:10px;" data-i18n="review.title">審核流程管理</div>
           <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
-            <span class="review-step active" id="rs-draft" onclick="filterReviewPanel('draft')" style="cursor:pointer;" data-i18n="status.filter.draft">草稿</span>
+            <span class="review-step active" id="rs-draft" onclick="filterReviewPanel('draft')" style="cursor:pointer;" data-i18n="st.draft">草稿</span>
             <span class="review-arrow">→</span>
-            <span class="review-step" id="rs-published" onclick="filterReviewPanel('published')" style="cursor:pointer;" data-i18n="status.filter.published">已發佈</span>
+            <span class="review-step" id="rs-published" onclick="filterReviewPanel('published')" style="cursor:pointer;" data-i18n="st.published">已發佈</span>
             <span class="review-arrow">→</span>
-            <span class="review-step" id="rs-archived" onclick="filterReviewPanel('archived')" style="cursor:pointer;" data-i18n="status.filter.archived">已封存</span>
+            <span class="review-step" id="rs-archived" onclick="filterReviewPanel('archived')" style="cursor:pointer;" data-i18n="st.archived">已封存</span>
             <span style="color:var(--border);margin:0 2px;">|</span>
             <span id="rs-noauthor" onclick="filterReviewPanel('noauthor')" style="cursor:pointer;padding:5px 12px;border-radius:var(--radius);font-size:12px;font-weight:500;border:1px solid var(--amber);color:var(--amber);background:transparent;" data-i18n="label.noauthor">⚠ 未署名</span>
             <span style="color:var(--border);margin:0 2px;">|</span>
@@ -1066,9 +1066,31 @@ const I18N = {
     'comments.submit':'送出',
     
     'pl.all':'所有產品線',
-    'status.filter.draft':'草稿',
-    'status.filter.published':'已發佈',
-    'status.filter.archived':'已封存',
+    'st.draft':'草稿',
+    'st.published':'已發佈',
+    'st.archived':'已封存',
+    'st.review':'待審核',
+    'st.withdrawn':'已撤回',
+    'st.template':'範本',
+    'rv.new':'新增文件',
+    'rv.edit':'修改文件',
+    'rv.delete':'刪除文件',
+    'rv.published':'核准發佈',
+    'rv.withdrawn':'撤回',
+    'rv.archived':'封存',
+    'rv.draft':'退回草稿',
+    'label.no_activity':'尚無活動記錄',
+    'label.unknown_doc':'（未知文件）',
+    'label.dup_found':'⚠ 發現 {g} 組重複文件，共 {n} 份',
+    'label.select_all':'全選',
+    'label.batch_delete':'🗑 批次刪除',
+    'ra.published':'✅ 核准發佈',
+    'ra.draft':'↩ 退回草稿',
+    'ra.withdrawn':'⚠ 撤回',
+    'ra.archived':'📦 封存',
+    'label.cat_no_docs':'此分類尚無文件',
+    'label.cat_empty':'此分類無文件',
+    'label.all_authored':'所有文件均已署名 ✅',
     'label.no_versions':'尚無版本紀錄',
     'label.no_results':'無符合人員',
     'label.saving_version':'儲存後自動記錄版本',
@@ -1255,9 +1277,31 @@ const I18N = {
     'comments.submit':'发送',
     
     'pl.all':'所有产品线',
-    'status.filter.draft':'草稿',
-    'status.filter.published':'已发布',
-    'status.filter.archived':'已归档',
+    'st.draft':'草稿',
+    'st.published':'已发布',
+    'st.archived':'已归档',
+    'st.review':'待审核',
+    'st.withdrawn':'已撤回',
+    'st.template':'模板',
+    'rv.new':'新增文档',
+    'rv.edit':'修改文档',
+    'rv.delete':'删除文档',
+    'rv.published':'核准发布',
+    'rv.withdrawn':'撤回',
+    'rv.archived':'归档',
+    'rv.draft':'退回草稿',
+    'label.no_activity':'暂无活动记录',
+    'label.unknown_doc':'（未知文档）',
+    'label.dup_found':'⚠ 发现 {g} 组重复文档，共 {n} 份',
+    'label.select_all':'全选',
+    'label.batch_delete':'🗑 批量删除',
+    'ra.published':'✅ 核准发布',
+    'ra.draft':'↩ 退回草稿',
+    'ra.withdrawn':'⚠ 撤回',
+    'ra.archived':'📦 归档',
+    'label.cat_no_docs':'此分类暂无文档',
+    'label.cat_empty':'此分类无文档',
+    'label.all_authored':'所有文档均已署名 ✅',
     'label.no_versions':'暂无版本记录',
     'label.no_results':'无符合人员',
     'label.saving_version':'保存后自动记录版本',
@@ -1449,9 +1493,31 @@ const I18N = {
     'comments.submit':'Send',
     
     'pl.all':'All Product Lines',
-    'status.filter.draft':'Draft',
-    'status.filter.published':'Published',
-    'status.filter.archived':'Archived',
+    'st.draft':'Draft',
+    'st.published':'Published',
+    'st.archived':'Archived',
+    'st.review':'Pending Review',
+    'st.withdrawn':'Withdrawn',
+    'st.template':'Template',
+    'rv.new':'Created',
+    'rv.edit':'Edited',
+    'rv.delete':'Deleted',
+    'rv.published':'Approved',
+    'rv.withdrawn':'Withdrawn',
+    'rv.archived':'Archived',
+    'rv.draft':'To Draft',
+    'label.no_activity':'No activity yet',
+    'label.unknown_doc':'(Unknown document)',
+    'label.dup_found':'⚠ Found {g} duplicate groups, {n} documents in total',
+    'label.select_all':'Select all',
+    'label.batch_delete':'🗑 Delete selected',
+    'ra.published':'✅ Approve & Publish',
+    'ra.draft':'↩ Return to Draft',
+    'ra.withdrawn':'⚠ Withdraw',
+    'ra.archived':'📦 Archive',
+    'label.cat_no_docs':'No documents in this category yet',
+    'label.cat_empty':'No documents in this category',
+    'label.all_authored':'Every document has an author ✅',
     'label.no_versions':'No version history',
     'label.no_results':'No matching users',
     'label.saving_version':'Version saved automatically on save',
@@ -1643,9 +1709,31 @@ const I18N = {
     'comments.submit':'Gửi',
     
     'pl.all':'Tất cả dòng sản phẩm',
-    'status.filter.draft':'Nháp',
-    'status.filter.published':'Đã xuất bản',
-    'status.filter.archived':'Đã lưu trữ',
+    'st.draft':'Nháp',
+    'st.published':'Đã xuất bản',
+    'st.archived':'Đã lưu trữ',
+    'st.review':'Chờ duyệt',
+    'st.withdrawn':'Đã thu hồi',
+    'st.template':'Mẫu',
+    'rv.new':'Đã tạo',
+    'rv.edit':'Đã sửa',
+    'rv.delete':'Đã xóa',
+    'rv.published':'Đã duyệt',
+    'rv.withdrawn':'Thu hồi',
+    'rv.archived':'Lưu trữ',
+    'rv.draft':'Trả về nháp',
+    'label.no_activity':'Chưa có hoạt động',
+    'label.unknown_doc':'(Tài liệu không xác định)',
+    'label.dup_found':'⚠ Phát hiện {g} nhóm trùng lặp, tổng cộng {n} tài liệu',
+    'label.select_all':'Chọn tất cả',
+    'label.batch_delete':'🗑 Xóa mục đã chọn',
+    'ra.published':'✅ Duyệt & xuất bản',
+    'ra.draft':'↩ Trả về nháp',
+    'ra.withdrawn':'⚠ Thu hồi',
+    'ra.archived':'📦 Lưu trữ',
+    'label.cat_no_docs':'Danh mục này chưa có tài liệu',
+    'label.cat_empty':'Không có tài liệu trong danh mục này',
+    'label.all_authored':'Mọi tài liệu đều đã có tác giả ✅',
     'label.no_versions':'Chưa có lịch sử phiên bản',
     'label.no_results':'Không tìm thấy',
     'label.saving_version':'Tự động lưu phiên bản sau khi lưu',
@@ -1837,9 +1925,31 @@ const I18N = {
     'comments.submit':'送信',
     
     'pl.all':'すべての製品ライン',
-    'status.filter.draft':'下書き',
-    'status.filter.published':'公開済み',
-    'status.filter.archived':'アーカイブ済み',
+    'st.draft':'下書き',
+    'st.published':'公開済み',
+    'st.archived':'アーカイブ済み',
+    'st.review':'審査待ち',
+    'st.withdrawn':'取り下げ済み',
+    'st.template':'テンプレート',
+    'rv.new':'新規作成',
+    'rv.edit':'編集',
+    'rv.delete':'削除',
+    'rv.published':'承認・公開',
+    'rv.withdrawn':'取り下げ',
+    'rv.archived':'アーカイブ',
+    'rv.draft':'下書きへ戻す',
+    'label.no_activity':'アクティビティはまだありません',
+    'label.unknown_doc':'（不明な文書）',
+    'label.dup_found':'⚠ 重複 {g} 組、計 {n} 件を検出しました',
+    'label.select_all':'すべて選択',
+    'label.batch_delete':'🗑 一括削除',
+    'ra.published':'✅ 承認して公開',
+    'ra.draft':'↩ 下書きへ戻す',
+    'ra.withdrawn':'⚠ 取り下げ',
+    'ra.archived':'📦 アーカイブ',
+    'label.cat_no_docs':'このカテゴリーにはまだ文書がありません',
+    'label.cat_empty':'このカテゴリーに文書はありません',
+    'label.all_authored':'すべての文書に著者が設定されています ✅',
     'label.no_versions':'バージョン履歴なし',
     'label.no_results':'該当者なし',
     'label.saving_version':'保存時に自動でバージョンを記録',
@@ -2008,6 +2118,12 @@ const I18N = {
   };
 
 function t(key) { return (I18N[currentLang] || I18N['zh-TW'])[key] || (I18N['zh-TW'][key] || key); }
+
+// 🔴 文件狀態徽章的唯一出口。以前有 7 份各自的對照表，其中 3 份寫死中文、
+// review 還有「審核中／待審核」兩種寫法 —— 去改字典不會有任何效果。
+// st.* 是「狀態形」（已發佈），status.* 是編輯器下拉的「動作形」（發佈），兩者刻意不同。
+const DOC_ST = ['draft','review','published','withdrawn','archived','template'];
+function docStatusLabel(st) { return DOC_ST.includes(st) ? t('st.' + st) : (st || ''); }
 
 // Templates
 
@@ -3472,9 +3588,7 @@ async function processFile(file) {
         `/rest/v1/kms_documents?file_name=eq.${encodeURIComponent(file.name)}&file_size=eq.${file.size}&select=id,title,status&limit=3`
       );
       if (dupCheck && dupCheck.length > 0) {
-        const s_ = I18N[currentLang] || I18N['zh-TW'];
-        const stLabel = { draft: s_['status.draft']||'草稿', published: s_['status.published']||'發佈', template: s_['status.template']||'範本', archived: s_['status.archived']||'封存', withdrawn: s_['status.withdrawn']||'撤回' };
-        const dupList = dupCheck.map(d => `「${d.title}」（${stLabel[d.status]||d.status}）`).join('、');
+        const dupList = dupCheck.map(d => `「${d.title}」（${docStatusLabel(d.status)}）`).join('、');
         const proceed = confirm(`⚠ 資料庫已有相同檔案：
 ${dupList}
 
@@ -4550,8 +4664,6 @@ async function loadDocs(force = false) {
 
   const catLabel = Object.fromEntries(Object.entries(CAT_META).map(([k,v])=>[k, (I18N[currentLang]||I18N['zh-TW'])['cat.'+k] || v.name]));
   const catClass = { product:'product', mfg:'sop', quality:'sop', sales:'sop', supply:'sop', compliance:'sop', hr:'hr', tacit:'tacit', ai_tech:'product', industry:'product' };
-  const s__ = I18N[currentLang]||I18N['zh-TW']; const statusLabel = { draft:s__['status.draft']||'Draft', published:s__['status.published']||'Publish', archived:s__['status.archived']||'Archive', withdrawn:s__['status.withdrawn']||'Withdraw' };
-  const statusCls   = { draft:'sb-draft', published:'sb-published', archived:'sb-archived' };
 
   // 到期自動封存與留言數查詢：只在真正重新抓取資料時執行（快取命中的純前端篩選不重跑）
   if (justFetched) {
@@ -5516,12 +5628,11 @@ async function openReader(id) {
   // Meta badges
   const _cl = Object.fromEntries(Object.entries(CAT_META).map(([k,v])=>[k,(I18N[currentLang]||I18N['zh-TW'])['cat.'+k]||v.name])); const catLabel = { ..._cl,
     supply:'供應鏈採購', compliance:'法規認證', hr:'人資培訓', tacit:'內隱知識', ai_tech:'AI 科技', industry:'產業新知' };
-  const s__ = I18N[currentLang]||I18N['zh-TW']; const statusLabel = { draft:s__['status.draft']||'Draft', published:s__['status.published']||'Publish', archived:s__['status.archived']||'Archive', withdrawn:s__['status.withdrawn']||'Withdraw' };
   const metaParts = [
     doc.category ? `<span style="font-size:11px;padding:2px 8px;border-radius:10px;background:var(--blue-bg);color:var(--blue);">${catLabel[doc.category]||doc.category}</span>` : '',
     doc.product_line ? `<span style="font-size:11px;padding:2px 8px;border-radius:10px;background:#2a1508;color:#f09060;">📦 ${doc.product_line}</span>` : '',
     doc.lang ? `<span style="font-size:11px;padding:2px 8px;border-radius:10px;background:var(--bg);color:var(--text-3);border:1px solid var(--border);">${doc.lang}</span>` : '',
-    doc.status ? `<span style="font-size:11px;padding:2px 8px;border-radius:10px;background:var(--green-bg);color:var(--green);">${statusLabel[doc.status]||doc.status}</span>` : '',
+    doc.status ? `<span style="font-size:11px;padding:2px 8px;border-radius:10px;background:var(--green-bg);color:var(--green);">${docStatusLabel(doc.status)}</span>` : '',
     doc.author_name ? `<span style="font-size:11px;color:var(--text-3);">✍ ${doc.author_name}</span>` : '',
     doc.updated_at ? `<span style="font-size:11px;color:var(--text-3);">${new Date(doc.updated_at).toLocaleDateString('zh-TW')}</span>` : '',
     ...(doc.customer_tag||[]).map(t => `<span style="font-size:11px;padding:2px 7px;border-radius:10px;background:#1e1030;color:#b494f0;">🏢 ${t}</span>`),
@@ -6428,7 +6539,7 @@ async function loadKmap(filterCat) {
       <div class="kmap-back" onclick="loadKmap(null)">← 回分類總覽</div>
       <div style="padding:12px 20px;">
         ${catDocs.length === 0
-          ? '<div style="color:var(--text-3);font-size:13px;padding:20px 0;">此分類尚無文件</div>'
+          ? `<div style="color:var(--text-3);font-size:13px;padding:20px 0;">${t('label.cat_no_docs')}</div>`
           : catDocs.map(d => {
               const safeTitle = (d.title||'').replace(/'/g,'').replace(/"/g,'');
               const canEditDoc = true; // 登入即可編輯（與知識庫列表一致）
@@ -6437,7 +6548,7 @@ async function loadKmap(filterCat) {
               <span class="doc-cat ${d.category==='tacit'?'tacit':d.category==='product'?'product':'sop'}">${catLabel}</span>
               <span class="doc-title" onclick="openReader('${d.id}')" style="cursor:pointer;flex:1;">${d.title}</span>
               <span style="font-size:11px;color:var(--text-3);margin-right:4px;">👁 ${d.view_count||0}</span>
-              <span class="status-badge sb-${d.status||'draft'}">${{draft:'草稿',review:'審核中',published:'已發佈',archived:'封存'}[d.status]||d.status}</span>
+              <span class="status-badge sb-${d.status||'draft'}">${docStatusLabel(d.status||'draft')}</span>
               <button onclick="openDoc('${d.id}')"
                 style="padding:2px 7px;border-radius:5px;border:1px solid var(--border);background:var(--bg);font-size:11px;cursor:pointer;flex-shrink:0;" title="編輯">✏️</button>
               <button onclick="deleteDoc('${d.id}','${safeTitle}','${(d.author_name||'').replace(/'/g,'')}')"
@@ -6885,14 +6996,8 @@ function filterReviewPanel(status) {
 
 function renderReviewList(filterStatus) {
   const content = document.getElementById('review-content');
-  const s_ = I18N[currentLang] || I18N['zh-TW'];
-  const stCfg = {
-    draft:     { label: s_['status.draft']     || 'Draft',    badge:'sb-draft'     },
-    review:    { label: '待審核',                              badge:'sb-review'    },
-    published: { label: s_['status.published'] || 'Publish',  badge:'sb-published' },
-    withdrawn: { label: s_['status.withdrawn'] || 'Withdraw', badge:'sb-withdrawn' },
-    archived:  { label: s_['status.archived']  || 'Archive',  badge:'sb-archived'  },
-  };
+  const stCfg = {};
+  DOC_ST.forEach(k => { stCfg[k] = { label: t('st.' + k), badge: 'sb-' + k }; });
   let docs = window._reviewAllDocs || [];
   if (filterStatus === 'noauthor') {
     docs = docs.filter(d => !d.author_name || !d.author_name.trim());
@@ -6900,7 +7005,7 @@ function renderReviewList(filterStatus) {
     docs = docs.filter(d => d.status === filterStatus);
   }
   if (!docs.length) {
-    const emptyMsg = filterStatus === 'noauthor' ? '所有文件均已署名 ✅' : '此分類無文件';
+    const emptyMsg = filterStatus === 'noauthor' ? t('label.all_authored') : t('label.cat_empty');
     content.innerHTML = `<div style="text-align:center;color:var(--text-3);padding:40px 0;font-size:13px;">${emptyMsg}</div>`;
     return;
   }
@@ -6935,7 +7040,7 @@ function renderReviewList(filterStatus) {
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;padding:8px 10px;background:var(--surface-2);border-radius:var(--radius);border:1px solid var(--border);">
       <input type="checkbox" id="rv-select-all" style="width:14px;height:14px;cursor:pointer;accent-color:var(--blue);"
         onchange="document.querySelectorAll('.rv-cb').forEach(cb=>cb.checked=this.checked)">
-      <label for="rv-select-all" style="font-size:12px;color:var(--text-2);cursor:pointer;user-select:none;">全選</label>
+      <label for="rv-select-all" style="font-size:12px;color:var(--text-2);cursor:pointer;user-select:none;">${t('label.select_all')}</label>
       <span style="flex:1;font-size:12px;color:var(--text-3);">共 ${docs.length} 份封存文件</span>
       <button onclick="batchRepublish()"
         style="padding:4px 12px;border-radius:var(--radius);border:1px solid var(--green);background:var(--green-bg);color:var(--green);font-size:12px;cursor:pointer;font-weight:500;">
@@ -7011,18 +7116,16 @@ async function findAndRenderDuplicates() {
     }
 
     const totalDups = dupGroups.reduce((s, g) => s + g.length, 0);
-    const stCfg = { draft:'sb-draft', review:'sb-review', published:'sb-published', withdrawn:'sb-withdrawn', archived:'sb-archived' };
-    const stLabel = { draft:'草稿', review:'待審核', published:'已發佈', withdrawn:'已撤回', archived:'已封存' };
 
     let html = `<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;padding:8px 12px;background:var(--red-bg);border:1px solid var(--red);border-radius:var(--radius);font-size:12px;color:var(--red);">
-      ⚠ 發現 ${dupGroups.length} 組重複文件，共 ${totalDups} 份`;
+      ${t('label.dup_found').replace('{g}', dupGroups.length).replace('{n}', totalDups)}`;
     if (canDel) {
       html += `<span style="flex:1;"></span>
         <input type="checkbox" id="dup-select-all" style="width:14px;height:14px;cursor:pointer;accent-color:var(--blue);"
           onchange="document.querySelectorAll('.dup-cb').forEach(cb=>cb.checked=this.checked)">
-        <label for="dup-select-all" style="cursor:pointer;user-select:none;color:var(--text-2);">全選</label>
+        <label for="dup-select-all" style="cursor:pointer;user-select:none;color:var(--text-2);">${t('label.select_all')}</label>
         <button onclick="batchDeleteDuplicates()"
-          style="padding:4px 12px;border-radius:var(--radius);border:1px solid var(--red);background:var(--red-bg);color:var(--red);font-size:12px;cursor:pointer;font-weight:500;">🗑 批次刪除</button>`;
+          style="padding:4px 12px;border-radius:var(--radius);border:1px solid var(--red);background:var(--red-bg);color:var(--red);font-size:12px;cursor:pointer;font-weight:500;">${t('label.batch_delete')}</button>`;
     }
     html += `</div>`;
 
@@ -7038,8 +7141,8 @@ async function findAndRenderDuplicates() {
         </div>`;
       group.forEach(doc => {
         const dt = doc.updated_at ? new Date(doc.updated_at).toLocaleDateString('zh-TW',{month:'2-digit',day:'2-digit'}) : '';
-        const badge = stCfg[doc.status] || 'sb-draft';
-        const label = stLabel[doc.status] || doc.status;
+        const badge = DOC_ST.includes(doc.status) ? 'sb-' + doc.status : 'sb-draft';
+        const label = docStatusLabel(doc.status);
         const safeTitle = (doc.title||'').replace(/'/g,'');
         const safeAuthor = (doc.author_name||'').replace(/'/g,'');
         html += `<div class="doc-item" style="margin:0;border-radius:0;border-top:1px solid var(--border);">
@@ -7115,26 +7218,27 @@ async function loadActivityLog() {
     );
     const logs = res.ok ? await res.json() : [];
     if (!Array.isArray(logs) || !logs.length) {
-      content.innerHTML = '<div style="text-align:center;color:var(--text-3);padding:40px 0;font-size:13px;">尚無活動記錄</div>';
+      content.innerHTML = `<div style="text-align:center;color:var(--text-3);padding:40px 0;font-size:13px;">${t('label.no_activity')}</div>`;
       return;
     }
+    // 🔴 text 取 rv.*（過去式：這是已經發生的事），與按鈕的 ra.*（祈使：請做這件事）刻意分開
     const CRUD = {
-      new:    { icon:'📝', text:'新增文件', color:'var(--green)' },
-      edit:   { icon:'✏️', text:'修改文件', color:'var(--blue)'  },
-      delete: { icon:'🗑', text:'刪除文件', color:'var(--red)'   },
+      new:    { icon:'📝', text:t('rv.new'),    color:'var(--green)' },
+      edit:   { icon:'✏️', text:t('rv.edit'),   color:'var(--blue)'  },
+      delete: { icon:'🗑', text:t('rv.delete'), color:'var(--red)'   },
     };
     const REVIEW = {
-      published: { icon:'✅', text:'核准發佈', color:'var(--green)'  },
-      withdrawn: { icon:'⚠️', text:'撤回',    color:'var(--amber)'  },
-      archived:  { icon:'📦', text:'封存',    color:'var(--text-3)' },
-      draft:     { icon:'↩',  text:'退回草稿', color:'var(--text-2)' },
+      published: { icon:'✅', text:t('rv.published'), color:'var(--green)'  },
+      withdrawn: { icon:'⚠️', text:t('rv.withdrawn'), color:'var(--amber)'  },
+      archived:  { icon:'📦', text:t('rv.archived'),  color:'var(--text-3)' },
+      draft:     { icon:'↩',  text:t('rv.draft'),     color:'var(--text-2)' },
     };
     const rows = logs.map(l => {
       const isCRUD = l.from_status in CRUD;
       const lbl = isCRUD ? CRUD[l.from_status] : (REVIEW[l.to_status] || { icon:'🔄', text:`${l.from_status}→${l.to_status}`, color:'var(--text-3)' });
       const dt = l.created_at ? new Date(l.created_at).toLocaleString('zh-TW',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}) : '';
       // note 統一存文件標題；JOIN 取 kms_documents.title 作為現存文件備援
-      const docTitle = l.note || l.kms_documents?.title || '（未知文件）';
+      const docTitle = l.note || l.kms_documents?.title || t('label.unknown_doc');
       const titleEsc = docTitle.replace(/"/g,'&quot;');
       return `<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);">
         <span style="color:${lbl.color};font-weight:600;white-space:nowrap;min-width:76px;font-size:12px;">${lbl.icon} ${lbl.text}</span>
@@ -7213,10 +7317,10 @@ async function loadReviewPanel() {
 
   // 審核動作：Admin/DCC 不論現在狀態都可執行四種動作
   const actions = [
-    { label:'✅ 核准發佈', cls:'review-btn-approve', next:'published',  needReason: false },
-    { label:'↩ 退回草稿', cls:'review-btn-reject',  next:'draft',      needReason: false },
-    { label:'⚠ 撤回',    cls:'review-btn-reject',   next:'withdrawn',  needReason: true  },
-    { label:'📦 封存',    cls:'review-btn-archive',  next:'archived',   needReason: true  },
+    { label:t('ra.published'), cls:'review-btn-approve', next:'published',  needReason: false },
+    { label:t('ra.draft'),     cls:'review-btn-reject',  next:'draft',      needReason: false },
+    { label:t('ra.withdrawn'), cls:'review-btn-reject',  next:'withdrawn',  needReason: true  },
+    { label:t('ra.archived'),  cls:'review-btn-archive',  next:'archived',   needReason: true  },
   ];
 
   // 讀審核紀錄

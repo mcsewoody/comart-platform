@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART 行政管理平台 v2.43</title>
+<title>COMART 行政管理平台 v2.44</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -673,7 +673,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="logo">
     <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
     <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
-    <span><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="38" height="20" style="display:inline-block;vertical-align:middle;margin-top:-2px"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v2.43</span>
+    <span><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="38" height="20" style="display:inline-block;vertical-align:middle;margin-top:-2px"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v2.44</span>
   </div>
   <div class="trr">
     <div id="global-site-bar" style="display:flex;align-items:center;gap:4px"><span style="font-size:13px;color:var(--text-3);white-space:nowrap;font-weight:500" data-i18n="g.site_label">單位：</span>
@@ -2363,9 +2363,72 @@ const ADMIN_I18N = {
     'room.fault.open':'Pending','room.fault.resolved':'Resolved','room.fault.none':'No fault reports',
     'room.fault.reporter_lbl':'Reporter:',
     'lib.st.returned':'Returned','lib.st.overdue_days':'Overdue %d days','lib.st.due_soon_days':'%d days left','lib.st.loaned':'Borrowed',
-    'lib.no_loans':'No loan records','lib.no_overdue':'No overdue','lib.grid.loaned':'Loaned','lib.grid.uncat':'All Categories',
+    'lib.no_loans':'No loan records','lib.no_overdue':'No overdue','lib.grid.loaned':'Loaned','lib.uncat':'Uncategorized',
     'lib.btn.return':'Return','lib.all_cats2':'All Categories',
     'lib.btn.update':'Update','lib.stat.borrow_cnt':'%d times',
+    'g.err.admin_only':'Admins only',
+    'g.conf.delete':'Delete this item?',
+    'g.conf.reset_all':'⚠️ Clear all local data?',
+    'g.err.xlsx_load':'Could not load the Excel library — check your connection',
+    'g.dlg.download':'Download file',
+    'g.toast.dl_fail':'Download failed: ',
+    'g.toast.dl_ok':'✓ "%s" saved to your Downloads folder',
+    'g.preparing':'Preparing…',
+    'g.prep_fail':'Preparation failed: ',
+    'g.toast.importing':'Importing…',
+    'g.err.no_data':'The file contains no rows',
+    'g.toast.import_fail':'Import failed: ',
+    'lib.hint.limited':'Showing the %d newest of %d — use the search box',
+    'lib.btn.borrow':'Borrow',
+    'lib.btn.reserve':'Reserve',
+    'lib.grid.avail':'%d on shelf',
+    'lib.no_books':'No books found',
+    'lib.no_book_data':'No book records',
+    'lib.tbl.lang':'Language',
+    'lib.btn.edit':'Edit',
+    'lib.mo.edit_book':'Edit Book',
+    'lib.err.need_title':'Please enter a title',
+    'lib.err.has_loans':'This book has open loans and cannot be deleted',
+    'lib.conf.del_book':'Delete this book? This cannot be undone.',
+    'lib.toast.book_added':'Book added',
+    'lib.err.need_isbn':'Please enter an ISBN',
+    'lib.toast.isbn_ok':'Book details filled in',
+    'lib.toast.isbn_none':'No book found for this ISBN',
+    'lib.toast.isbn_fail':'Lookup failed',
+    'lib.isbn.searching':'🔄 Looking up…',
+    'lib.isbn.notfound':'No book found',
+    'lib.isbn.filled':'✓ Book details filled in',
+    'lib.isbn.failed':'❌ Lookup failed: ',
+    'lib.mo.borrow_confirm':'Confirm Loan',
+    'lib.mo.reserve_confirm':'Confirm Reservation',
+    'lib.ph.select_emp':'Select an employee…',
+    'lib.mo.borrowed_n':'%d/%d borrowed',
+    'lib.mo.all_out':'All copies are out — you will be notified when one is returned',
+    'lib.btn.confirm_borrow':'✓ Confirm Loan',
+    'lib.btn.confirm_reserve':'✓ Confirm Reservation',
+    'lib.err.need_borrower':'Please select a borrower',
+    'lib.toast.reserved':'Reserved: "%s"',
+    'lib.err.max_loans':'Loan limit reached (%d books)',
+    'lib.err.none_avail':'No copies are on the shelf',
+    'lib.err.need_due':'Please set a due date',
+    'lib.toast.loaned':'Lent "%s" to %s',
+    'lib.toast.returned':'Return recorded',
+    'lib.toast.returned_waiting':'Returned — %s has a reservation waiting',
+    'lib.cat.n_books':'%d books',
+    'lib.err.need_cat_name':'Please enter a category name',
+    'lib.err.cat_exists':'That category already exists',
+    'lib.err.cat_has_books':'This category still has books and cannot be deleted',
+    'lib.export.title':'Export books (%d titles)',
+    'lib.btn.export_books':'↓ Export books',
+    'lib.btn.dl_template':'Download import template',
+    'lib.toast.import_done':'%d added, %d updated',
+    'lib.cover.all_have':'Every book with an ISBN already has a cover',
+    'lib.cover.working':'⏳ Fetching covers…',
+    'lib.cover.start':'Fetching covers for %d books with an ISBN…',
+    'lib.cover.progress':'Progress %s — %d found, %d not found',
+    'lib.cover.done':'Done — %d covers added, %d not found',
+    'lib.btn.fetch_covers':'🖼 Fetch covers',
+    'car.err.has_bookings':'This vehicle has active bookings and cannot be deleted',
     'car.card.type_lbl':'Type','car.card.km_lbl':'Mileage','car.card.fuel_lbl':'Fuel Lvl','car.card.park_lbl':'Parking','car.card.driver_lbl':'Driver','car.card.last_use_lbl':'Last Return','car.del_admin_only':'Admin only','car.del_only_cancelled':'Only cancelled bookings can be deleted','car.del_confirm':'Delete this cancelled booking permanently? This cannot be undone.','car.del_failed':'Delete failed: ','car.card.using_bk_lbl':'Current booking','car.card.next_bk_lbl':'Next booking','car.bk_not_found':'Booking not found','car.warn_not_today':'This booking does NOT start today. Departing with it will mark THIS booking as in use. If you meant your own booking, find it in Usage Records and press Depart there.',
     'sb.relogin':'Sign in again','sb.err_forbidden':'The server refused this action (not permitted, or the table is not enabled in the data proxy). This is not a sign-in problem: ',
     'sb.err_auth':'Your session has expired — the last action was NOT saved. Please go back to the Portal, sign in again, then retry.','sb.err_write':'Could not write to the database. This action was NOT saved: ','car.only_pending_depart':'This booking is no longer Pending — someone may have already departed with it. Please refresh and check.','car.already_active':'This vehicle already has a booking In Use:\n%s\n\nReturn that one first, then depart the next.\nIf it was in fact returned, its return never reached the database — find it in Usage Records and press Return again.','car.multi_active':'%d bookings are marked In Use at the same time — a return most likely failed to save. Go to Usage Records and return the ones that are already finished.','car.veh_sync_fail':'Returned, but the vehicle mileage/fuel could not be saved. Sign in again and correct it under Vehicles.','car.db_one_active':'This vehicle already has a booking In Use, so this one cannot depart. Return the one in use first — see Usage Records, filtered by In Use.','room.err_overlap':'That time slot was just booked by someone else while you were filling this in. The list has been refreshed — please pick another slot.',
@@ -2505,9 +2568,72 @@ const ADMIN_I18N = {
     'room.fault.open':'待修','room.fault.resolved':'已修復','room.fault.none':'目前無故障回報',
     'room.fault.reporter_lbl':'回報人：',
     'lib.st.returned':'已歸還','lib.st.overdue_days':'逾期 %d 天','lib.st.due_soon_days':'剩 %d 天','lib.st.loaned':'借閱中',
-    'lib.no_loans':'無借閱記錄','lib.no_overdue':'無逾期記錄','lib.grid.loaned':'借出中','lib.grid.uncat':'所有分類',
+    'lib.no_loans':'無借閱記錄','lib.no_overdue':'無逾期記錄','lib.grid.loaned':'借出中','lib.uncat':'未分類',
     'lib.btn.return':'還書','lib.all_cats2':'所有分類',
     'lib.btn.update':'更新','lib.stat.borrow_cnt':'%d 次',
+    'g.err.admin_only':'此功能僅限管理員操作',
+    'g.conf.delete':'確定刪除？',
+    'g.conf.reset_all':'⚠️ 確定清除所有資料？',
+    'g.err.xlsx_load':'無法載入 Excel 套件，請檢查網路連線',
+    'g.dlg.download':'下載檔案',
+    'g.toast.dl_fail':'下載失敗：',
+    'g.toast.dl_ok':'✓ 已下載「%s」至您的下載資料夾',
+    'g.preparing':'準備中…',
+    'g.prep_fail':'準備失敗：',
+    'g.toast.importing':'匯入中…',
+    'g.err.no_data':'檔案無資料',
+    'g.toast.import_fail':'匯入失敗：',
+    'lib.hint.limited':'顯示最新 %d 本（共 %d 本，可用關鍵字搜尋）',
+    'lib.btn.borrow':'借閱',
+    'lib.btn.reserve':'預約',
+    'lib.grid.avail':'在館 %d',
+    'lib.no_books':'查無書目',
+    'lib.no_book_data':'無書目資料',
+    'lib.tbl.lang':'語言',
+    'lib.btn.edit':'編輯',
+    'lib.mo.edit_book':'編輯書籍',
+    'lib.err.need_title':'請輸入書名',
+    'lib.err.has_loans':'有借閱記錄，無法刪除',
+    'lib.conf.del_book':'確定刪除此書籍？此操作無法復原。',
+    'lib.toast.book_added':'書籍已新增',
+    'lib.err.need_isbn':'請輸入 ISBN',
+    'lib.toast.isbn_ok':'書目已帶入',
+    'lib.toast.isbn_none':'查無此 ISBN',
+    'lib.toast.isbn_fail':'查詢失敗',
+    'lib.isbn.searching':'🔄 查詢中…',
+    'lib.isbn.notfound':'找不到書目',
+    'lib.isbn.filled':'✓ 已帶入書目資訊',
+    'lib.isbn.failed':'❌ 查詢失敗：',
+    'lib.mo.borrow_confirm':'借閱確認',
+    'lib.mo.reserve_confirm':'預約確認',
+    'lib.ph.select_emp':'請選擇員工…',
+    'lib.mo.borrowed_n':'已借 %d/%d 冊',
+    'lib.mo.all_out':'目前全數借出，預約後待書歸還通知',
+    'lib.btn.confirm_borrow':'✓ 確認借出',
+    'lib.btn.confirm_reserve':'✓ 確認預約',
+    'lib.err.need_borrower':'請選擇借閱人',
+    'lib.toast.reserved':'已預約《%s》',
+    'lib.err.max_loans':'已達借閱上限（%d 冊）',
+    'lib.err.none_avail':'目前無在館書籍',
+    'lib.err.need_due':'請設定應還日期',
+    'lib.toast.loaned':'已借出《%s》給 %s',
+    'lib.toast.returned':'已登記還書',
+    'lib.toast.returned_waiting':'已還書，%s 有預約等候',
+    'lib.cat.n_books':'%d 本',
+    'lib.err.need_cat_name':'請輸入分類名稱',
+    'lib.err.cat_exists':'分類已存在',
+    'lib.err.cat_has_books':'此分類有書籍，無法刪除',
+    'lib.export.title':'匯出書目（共 %d 本）',
+    'lib.btn.export_books':'↓ 匯出書目',
+    'lib.btn.dl_template':'下載匯入範本',
+    'lib.toast.import_done':'已新增 %d 本，更新 %d 本',
+    'lib.cover.all_have':'所有有 ISBN 的書目已有封面圖片',
+    'lib.cover.working':'⏳ 補圖中…',
+    'lib.cover.start':'開始批次補圖，共 %d 本（有 ISBN）…',
+    'lib.cover.progress':'進度 %s：找到封面 %d 本，未找到 %d 本',
+    'lib.cover.done':'補圖完成！成功 %d 本，未找到封面 %d 本',
+    'lib.btn.fetch_covers':'🖼 批次補圖',
+    'car.err.has_bookings':'有進行中預約，無法刪除',
     'car.card.type_lbl':'車型','car.card.km_lbl':'里程','car.card.fuel_lbl':'油量','car.card.park_lbl':'停車位','car.card.driver_lbl':'用車人','car.card.last_use_lbl':'最後歸還','car.del_admin_only':'僅管理者可刪除','car.del_only_cancelled':'只有已取消的預約可以刪除','car.del_confirm':'確定永久刪除這筆已取消的預約？此動作無法復原。','car.del_failed':'刪除失敗：','car.card.using_bk_lbl':'目前預約','car.card.next_bk_lbl':'下一筆預約','car.bk_not_found':'找不到預約','car.warn_not_today':'這筆預約的出發日不是今天。用它出發會把「這一筆」標記為使用中。若你要出發的是自己的預約，請到「用車記錄」找到自己那一筆再按出發。',
     'sb.relogin':'重新登入','sb.err_forbidden':'伺服器拒絕了這個操作（權限不足，或這張表沒有開放給資料代理）。這不是登入的問題：',
     'sb.err_auth':'登入已逾期，剛才的操作沒有存檔。請回到 Portal 重新登入後再操作一次。','sb.err_write':'寫入資料庫失敗，這筆操作沒有存檔：','car.only_pending_depart':'這筆預約已經不是「待出發」了（可能別人已按過出發）。請重新整理後再確認。','car.already_active':'這輛車已經有一筆「使用中」的預約：\n%s\n\n請先把那一筆歸還，再讓下一筆出發。\n若那一筆其實早就還車了，就是它的歸還沒有寫進資料庫 —— 請到「用車記錄」找到它，重新按一次歸還。','car.multi_active':'這輛車有 %d 筆同時「使用中」，最可能的原因是前一筆的歸還沒有存檔。請到「用車記錄」把已經結束的那幾筆逐一歸還。','car.veh_sync_fail':'預約已歸還，但車輛里程／油量沒寫進資料庫。請重新登入後到「車輛管理」補正。','car.db_one_active':'這輛車已經有一筆「使用中」的預約，所以這一筆不能出發。請先把使用中的那一筆歸還 —— 在「用車記錄」把狀態篩成「使用中」就看得到。','room.err_overlap':'這個時段在你填寫的這段時間裡剛剛被別人預約了。清單已重新載入，請改選其他時段。',
@@ -2647,9 +2773,72 @@ const ADMIN_I18N = {
     'room.fault.open':'待修','room.fault.resolved':'已修复','room.fault.none':'目前无故障反馈',
     'room.fault.reporter_lbl':'反馈人：',
     'lib.st.returned':'已归还','lib.st.overdue_days':'逾期 %d 天','lib.st.due_soon_days':'剩 %d 天','lib.st.loaned':'借阅中',
-    'lib.no_loans':'无借阅记录','lib.no_overdue':'无逾期记录','lib.grid.loaned':'借出中','lib.grid.uncat':'所有分类',
+    'lib.no_loans':'无借阅记录','lib.no_overdue':'无逾期记录','lib.grid.loaned':'借出中','lib.uncat':'未分类',
     'lib.btn.return':'还书','lib.all_cats2':'所有分类',
     'lib.btn.update':'更新','lib.stat.borrow_cnt':'%d 次',
+    'g.err.admin_only':'此功能仅限管理员操作',
+    'g.conf.delete':'确定删除？',
+    'g.conf.reset_all':'⚠️ 确定清除所有数据？',
+    'g.err.xlsx_load':'无法加载 Excel 套件，请检查网络连接',
+    'g.dlg.download':'下载文件',
+    'g.toast.dl_fail':'下载失败：',
+    'g.toast.dl_ok':'✓ 已下载「%s」至您的下载文件夹',
+    'g.preparing':'准备中…',
+    'g.prep_fail':'准备失败：',
+    'g.toast.importing':'导入中…',
+    'g.err.no_data':'文件无数据',
+    'g.toast.import_fail':'导入失败：',
+    'lib.hint.limited':'显示最新 %d 本（共 %d 本，可用关键字搜索）',
+    'lib.btn.borrow':'借阅',
+    'lib.btn.reserve':'预约',
+    'lib.grid.avail':'在馆 %d',
+    'lib.no_books':'未找到书目',
+    'lib.no_book_data':'无书目数据',
+    'lib.tbl.lang':'语言',
+    'lib.btn.edit':'编辑',
+    'lib.mo.edit_book':'编辑书籍',
+    'lib.err.need_title':'请输入书名',
+    'lib.err.has_loans':'有借阅记录，无法删除',
+    'lib.conf.del_book':'确定删除此书籍？此操作无法恢复。',
+    'lib.toast.book_added':'书籍已新增',
+    'lib.err.need_isbn':'请输入 ISBN',
+    'lib.toast.isbn_ok':'书目已带入',
+    'lib.toast.isbn_none':'未找到此 ISBN',
+    'lib.toast.isbn_fail':'查询失败',
+    'lib.isbn.searching':'🔄 查询中…',
+    'lib.isbn.notfound':'找不到书目',
+    'lib.isbn.filled':'✓ 已带入书目信息',
+    'lib.isbn.failed':'❌ 查询失败：',
+    'lib.mo.borrow_confirm':'借阅确认',
+    'lib.mo.reserve_confirm':'预约确认',
+    'lib.ph.select_emp':'请选择员工…',
+    'lib.mo.borrowed_n':'已借 %d/%d 册',
+    'lib.mo.all_out':'目前全数借出，预约后待书归还通知',
+    'lib.btn.confirm_borrow':'✓ 确认借出',
+    'lib.btn.confirm_reserve':'✓ 确认预约',
+    'lib.err.need_borrower':'请选择借阅人',
+    'lib.toast.reserved':'已预约《%s》',
+    'lib.err.max_loans':'已达借阅上限（%d 册）',
+    'lib.err.none_avail':'目前无在馆书籍',
+    'lib.err.need_due':'请设定应还日期',
+    'lib.toast.loaned':'已借出《%s》给 %s',
+    'lib.toast.returned':'已登记还书',
+    'lib.toast.returned_waiting':'已还书，%s 有预约等候',
+    'lib.cat.n_books':'%d 本',
+    'lib.err.need_cat_name':'请输入分类名称',
+    'lib.err.cat_exists':'分类已存在',
+    'lib.err.cat_has_books':'此分类有书籍，无法删除',
+    'lib.export.title':'导出书目（共 %d 本）',
+    'lib.btn.export_books':'↓ 导出书目',
+    'lib.btn.dl_template':'下载导入模板',
+    'lib.toast.import_done':'已新增 %d 本，更新 %d 本',
+    'lib.cover.all_have':'所有有 ISBN 的书目已有封面图片',
+    'lib.cover.working':'⏳ 补图中…',
+    'lib.cover.start':'开始批量补图，共 %d 本（有 ISBN）…',
+    'lib.cover.progress':'进度 %s：找到封面 %d 本，未找到 %d 本',
+    'lib.cover.done':'补图完成！成功 %d 本，未找到封面 %d 本',
+    'lib.btn.fetch_covers':'🖼 批量补图',
+    'car.err.has_bookings':'有进行中预约，无法删除',
     'car.card.type_lbl':'车型','car.card.km_lbl':'里程','car.card.fuel_lbl':'油量','car.card.park_lbl':'停车位','car.card.driver_lbl':'用车人','car.card.last_use_lbl':'最后归还','car.del_admin_only':'仅管理者可删除','car.del_only_cancelled':'只有已取消的预约可以删除','car.del_confirm':'确定永久删除这笔已取消的预约？此动作无法复原。','car.del_failed':'删除失败：','car.card.using_bk_lbl':'目前预约','car.card.next_bk_lbl':'下一笔预约','car.bk_not_found':'找不到预约','car.warn_not_today':'这笔预约的出发日不是今天。用它出发会把「这一笔」标记为使用中。若你要出发的是自己的预约，请到「用车记录」找到自己那一笔再按出发。',
     'sb.relogin':'重新登录','sb.err_forbidden':'服务器拒绝了这个操作（权限不足，或这张表没有开放给数据代理）。这不是登录的问题：',
     'sb.err_auth':'登录已过期，刚才的操作没有存档。请回到 Portal 重新登录后再操作一次。','sb.err_write':'写入数据库失败，这笔操作没有存档：','car.only_pending_depart':'这笔预约已经不是「待出发」了（可能别人已按过出发）。请刷新后再确认。','car.already_active':'这辆车已经有一笔「使用中」的预约：\n%s\n\n请先把那一笔归还，再让下一笔出发。\n若那一笔其实早就还车了，就是它的归还没有写进数据库 —— 请到「用车记录」找到它，重新按一次归还。','car.multi_active':'这辆车有 %d 笔同时「使用中」，最可能的原因是前一笔的归还没有存档。请到「用车记录」把已经结束的那几笔逐一归还。','car.veh_sync_fail':'预约已归还，但车辆里程／油量没写进数据库。请重新登录后到「车辆管理」补正。','car.db_one_active':'这辆车已经有一笔「使用中」的预约，所以这一笔不能出发。请先把使用中的那一笔归还 —— 在「用车记录」把状态筛成「使用中」就看得到。','room.err_overlap':'这个时段在你填写的这段时间里刚刚被别人预约了。清单已重新载入，请改选其他时段。',
@@ -2789,9 +2978,72 @@ const ADMIN_I18N = {
     'room.fault.open':'Chờ sửa','room.fault.resolved':'Đã sửa','room.fault.none':'Không có sự cố nào',
     'room.fault.reporter_lbl':'Người báo:',
     'lib.st.returned':'Đã trả','lib.st.overdue_days':'Quá hạn %d ngày','lib.st.due_soon_days':'Còn %d ngày','lib.st.loaned':'Đang mượn',
-    'lib.no_loans':'Không có lịch sử mượn','lib.no_overdue':'Không có quá hạn','lib.grid.loaned':'Đang cho mượn','lib.grid.uncat':'Tất cả danh mục',
+    'lib.no_loans':'Không có lịch sử mượn','lib.no_overdue':'Không có quá hạn','lib.grid.loaned':'Đang cho mượn','lib.uncat':'Chưa phân loại',
     'lib.btn.return':'Trả sách','lib.all_cats2':'Tất cả danh mục',
     'lib.btn.update':'Cập nhật','lib.stat.borrow_cnt':'%d lượt',
+    'g.err.admin_only':'Chỉ dành cho quản trị viên',
+    'g.conf.delete':'Xác nhận xóa?',
+    'g.conf.reset_all':'⚠️ Xóa toàn bộ dữ liệu?',
+    'g.err.xlsx_load':'Không tải được thư viện Excel — kiểm tra kết nối mạng',
+    'g.dlg.download':'Tải tệp',
+    'g.toast.dl_fail':'Tải xuống thất bại: ',
+    'g.toast.dl_ok':'✓ Đã tải "%s" vào thư mục Downloads',
+    'g.preparing':'Đang chuẩn bị…',
+    'g.prep_fail':'Chuẩn bị thất bại: ',
+    'g.toast.importing':'Đang nhập…',
+    'g.err.no_data':'Tệp không có dữ liệu',
+    'g.toast.import_fail':'Nhập thất bại: ',
+    'lib.hint.limited':'Hiển thị %d cuốn mới nhất trong %d — dùng ô tìm kiếm',
+    'lib.btn.borrow':'Mượn',
+    'lib.btn.reserve':'Đặt trước',
+    'lib.grid.avail':'Còn %d',
+    'lib.no_books':'Không tìm thấy sách',
+    'lib.no_book_data':'Chưa có dữ liệu sách',
+    'lib.tbl.lang':'Ngôn ngữ',
+    'lib.btn.edit':'Sửa',
+    'lib.mo.edit_book':'Sửa sách',
+    'lib.err.need_title':'Vui lòng nhập tên sách',
+    'lib.err.has_loans':'Sách đang được mượn, không thể xóa',
+    'lib.conf.del_book':'Xóa cuốn sách này? Không thể hoàn tác.',
+    'lib.toast.book_added':'Đã thêm sách',
+    'lib.err.need_isbn':'Vui lòng nhập ISBN',
+    'lib.toast.isbn_ok':'Đã điền thông tin sách',
+    'lib.toast.isbn_none':'Không tìm thấy ISBN này',
+    'lib.toast.isbn_fail':'Tra cứu thất bại',
+    'lib.isbn.searching':'🔄 Đang tra cứu…',
+    'lib.isbn.notfound':'Không tìm thấy sách',
+    'lib.isbn.filled':'✓ Đã điền thông tin sách',
+    'lib.isbn.failed':'❌ Tra cứu thất bại: ',
+    'lib.mo.borrow_confirm':'Xác nhận mượn',
+    'lib.mo.reserve_confirm':'Xác nhận đặt trước',
+    'lib.ph.select_emp':'Chọn nhân viên…',
+    'lib.mo.borrowed_n':'Đã mượn %d/%d cuốn',
+    'lib.mo.all_out':'Đã cho mượn hết — bạn sẽ được báo khi có sách trả về',
+    'lib.btn.confirm_borrow':'✓ Xác nhận mượn',
+    'lib.btn.confirm_reserve':'✓ Xác nhận đặt trước',
+    'lib.err.need_borrower':'Vui lòng chọn người mượn',
+    'lib.toast.reserved':'Đã đặt trước "%s"',
+    'lib.err.max_loans':'Đã đạt giới hạn mượn (%d cuốn)',
+    'lib.err.none_avail':'Hiện không còn cuốn nào trên kệ',
+    'lib.err.need_due':'Vui lòng đặt hạn trả',
+    'lib.toast.loaned':'Đã cho %s mượn "%s"',
+    'lib.toast.returned':'Đã ghi nhận trả sách',
+    'lib.toast.returned_waiting':'Đã trả — %s đang chờ đặt trước',
+    'lib.cat.n_books':'%d cuốn',
+    'lib.err.need_cat_name':'Vui lòng nhập tên danh mục',
+    'lib.err.cat_exists':'Danh mục đã tồn tại',
+    'lib.err.cat_has_books':'Danh mục vẫn còn sách, không thể xóa',
+    'lib.export.title':'Xuất danh mục sách (%d cuốn)',
+    'lib.btn.export_books':'↓ Xuất danh mục',
+    'lib.btn.dl_template':'Tải mẫu nhập liệu',
+    'lib.toast.import_done':'Đã thêm %d, cập nhật %d',
+    'lib.cover.all_have':'Mọi sách có ISBN đều đã có ảnh bìa',
+    'lib.cover.working':'⏳ Đang lấy ảnh bìa…',
+    'lib.cover.start':'Bắt đầu lấy ảnh bìa cho %d cuốn (có ISBN)…',
+    'lib.cover.progress':'Tiến độ %s — tìm thấy %d, không thấy %d',
+    'lib.cover.done':'Hoàn tất — thêm %d ảnh bìa, %d không tìm thấy',
+    'lib.btn.fetch_covers':'🖼 Lấy ảnh bìa hàng loạt',
+    'car.err.has_bookings':'Xe đang có lịch đặt, không thể xóa',
     'car.card.type_lbl':'Loại xe','car.card.km_lbl':'Số km','car.card.fuel_lbl':'Nhiên liệu','car.card.park_lbl':'Bãi đỗ','car.card.driver_lbl':'Người dùng','car.card.last_use_lbl':'Trả gần nhất','car.del_admin_only':'Chỉ quản trị viên mới xoá được','car.del_only_cancelled':'Chỉ xoá được đặt xe đã huỷ','car.del_confirm':'Xoá vĩnh viễn đặt xe đã huỷ này? Không thể hoàn tác.','car.del_failed':'Xoá thất bại: ','car.card.using_bk_lbl':'Đặt xe hiện tại','car.card.next_bk_lbl':'Đặt xe kế tiếp','car.bk_not_found':'Không tìm thấy đặt xe','car.warn_not_today':'Đặt xe này KHÔNG khởi hành hôm nay. Xuất phát bằng nó sẽ đánh dấu CHÍNH đặt xe này là đang dùng. Nếu bạn muốn đi theo đặt xe của mình, hãy vào Lịch sử sử dụng và bấm Xuất phát ở dòng của bạn.',
     'sb.relogin':'Đăng nhập lại','sb.err_forbidden':'Máy chủ đã từ chối thao tác này (không đủ quyền, hoặc bảng chưa được mở cho proxy dữ liệu). Đây không phải vấn đề đăng nhập: ',
     'sb.err_auth':'Phiên đăng nhập đã hết hạn — thao tác vừa rồi CHƯA được lưu. Vui lòng về Portal, đăng nhập lại rồi thực hiện lại.','sb.err_write':'Không ghi được vào cơ sở dữ liệu, thao tác này CHƯA được lưu: ','car.only_pending_depart':'Đặt xe này không còn ở trạng thái Chờ xuất phát (có thể người khác đã bấm xuất phát). Vui lòng tải lại và kiểm tra.','car.already_active':'Xe này đã có một lượt đặt đang sử dụng:\n%s\n\nHãy trả lượt đó trước, rồi mới xuất phát lượt tiếp theo.\nNếu xe thực ra đã được trả, nghĩa là lần trả đó chưa ghi được vào cơ sở dữ liệu — vào Lịch sử sử dụng, tìm lượt đó và bấm Trả xe một lần nữa.','car.multi_active':'Xe này có %d lượt cùng ở trạng thái đang sử dụng — rất có thể một lần trả xe đã không được lưu. Vào Lịch sử sử dụng và trả những lượt đã kết thúc.','car.veh_sync_fail':'Đã trả xe, nhưng số km / mức nhiên liệu của xe chưa ghi được. Hãy đăng nhập lại và sửa trong phần Quản lý xe.','car.db_one_active':'Xe này đã có một lượt đặt đang sử dụng nên lượt này không thể xuất phát. Hãy trả lượt đang dùng trước — vào Lịch sử sử dụng và lọc theo trạng thái đang sử dụng.','room.err_overlap':'Khung giờ này vừa được người khác đặt trong lúc bạn đang điền. Danh sách đã được tải lại, vui lòng chọn khung giờ khác.',
@@ -2931,9 +3183,72 @@ const ADMIN_I18N = {
     'room.fault.open':'対応待ち','room.fault.resolved':'修復済み','room.fault.none':'障害報告なし',
     'room.fault.reporter_lbl':'報告者：',
     'lib.st.returned':'返却済','lib.st.overdue_days':'%d日延滞','lib.st.due_soon_days':'残り%d日','lib.st.loaned':'貸出中',
-    'lib.no_loans':'貸出記録なし','lib.no_overdue':'延滞なし','lib.grid.loaned':'貸出中','lib.grid.uncat':'全カテゴリ',
+    'lib.no_loans':'貸出記録なし','lib.no_overdue':'延滞なし','lib.grid.loaned':'貸出中','lib.uncat':'未分類',
     'lib.btn.return':'返却','lib.all_cats2':'全カテゴリ',
     'lib.btn.update':'更新','lib.stat.borrow_cnt':'%d回',
+    'g.err.admin_only':'管理者のみ実行できます',
+    'g.conf.delete':'削除しますか？',
+    'g.conf.reset_all':'⚠️ すべてのデータを消去しますか？',
+    'g.err.xlsx_load':'Excel ライブラリを読み込めません。接続を確認してください',
+    'g.dlg.download':'ファイルをダウンロード',
+    'g.toast.dl_fail':'ダウンロードに失敗しました：',
+    'g.toast.dl_ok':'✓「%s」をダウンロードフォルダーに保存しました',
+    'g.preparing':'準備中…',
+    'g.prep_fail':'準備に失敗しました：',
+    'g.toast.importing':'インポート中…',
+    'g.err.no_data':'ファイルにデータがありません',
+    'g.toast.import_fail':'インポートに失敗しました：',
+    'lib.hint.limited':'最新 %d 冊を表示（全 %d 冊、キーワード検索できます）',
+    'lib.btn.borrow':'借りる',
+    'lib.btn.reserve':'予約',
+    'lib.grid.avail':'在庫 %d',
+    'lib.no_books':'該当する書籍がありません',
+    'lib.no_book_data':'書籍データがありません',
+    'lib.tbl.lang':'言語',
+    'lib.btn.edit':'編集',
+    'lib.mo.edit_book':'書籍を編集',
+    'lib.err.need_title':'書名を入力してください',
+    'lib.err.has_loans':'貸出記録があるため削除できません',
+    'lib.conf.del_book':'この書籍を削除しますか？元に戻せません。',
+    'lib.toast.book_added':'書籍を追加しました',
+    'lib.err.need_isbn':'ISBN を入力してください',
+    'lib.toast.isbn_ok':'書誌情報を取り込みました',
+    'lib.toast.isbn_none':'この ISBN は見つかりません',
+    'lib.toast.isbn_fail':'検索に失敗しました',
+    'lib.isbn.searching':'🔄 検索中…',
+    'lib.isbn.notfound':'書誌が見つかりません',
+    'lib.isbn.filled':'✓ 書誌情報を取り込みました',
+    'lib.isbn.failed':'❌ 検索に失敗しました：',
+    'lib.mo.borrow_confirm':'貸出の確認',
+    'lib.mo.reserve_confirm':'予約の確認',
+    'lib.ph.select_emp':'社員を選択…',
+    'lib.mo.borrowed_n':'貸出中 %d/%d 冊',
+    'lib.mo.all_out':'全冊貸出中です。返却され次第お知らせします',
+    'lib.btn.confirm_borrow':'✓ 貸出を確定',
+    'lib.btn.confirm_reserve':'✓ 予約を確定',
+    'lib.err.need_borrower':'借りる人を選択してください',
+    'lib.toast.reserved':'「%s」を予約しました',
+    'lib.err.max_loans':'貸出上限に達しています（%d 冊）',
+    'lib.err.none_avail':'在庫がありません',
+    'lib.err.need_due':'返却期限を設定してください',
+    'lib.toast.loaned':'「%s」を %s に貸し出しました',
+    'lib.toast.returned':'返却を登録しました',
+    'lib.toast.returned_waiting':'返却されました。%s さんが予約待ちです',
+    'lib.cat.n_books':'%d 冊',
+    'lib.err.need_cat_name':'分類名を入力してください',
+    'lib.err.cat_exists':'その分類は既に存在します',
+    'lib.err.cat_has_books':'この分類には書籍があるため削除できません',
+    'lib.export.title':'書目をエクスポート（全 %d 冊）',
+    'lib.btn.export_books':'↓ 書目をエクスポート',
+    'lib.btn.dl_template':'インポート用テンプレートをダウンロード',
+    'lib.toast.import_done':'%d 冊を追加、%d 冊を更新しました',
+    'lib.cover.all_have':'ISBN のある書籍にはすべて表紙があります',
+    'lib.cover.working':'⏳ 表紙を取得中…',
+    'lib.cover.start':'表紙の一括取得を開始します（ISBN あり %d 冊）…',
+    'lib.cover.progress':'進捗 %s：%d 冊取得、%d 冊未取得',
+    'lib.cover.done':'完了：%d 冊取得、%d 冊は表紙が見つかりません',
+    'lib.btn.fetch_covers':'🖼 表紙を一括取得',
+    'car.err.has_bookings':'進行中の予約があるため削除できません',
     'car.card.type_lbl':'車種','car.card.km_lbl':'走行距離','car.card.fuel_lbl':'燃料','car.card.park_lbl':'駐車場','car.card.driver_lbl':'利用者','car.card.last_use_lbl':'最終返却','car.del_admin_only':'管理者のみ削除できます','car.del_only_cancelled':'キャンセル済みの予約のみ削除できます','car.del_confirm':'このキャンセル済み予約を完全に削除しますか？元に戻せません。','car.del_failed':'削除に失敗しました：','car.card.using_bk_lbl':'現在の予約','car.card.next_bk_lbl':'次の予約','car.bk_not_found':'予約が見つかりません','car.warn_not_today':'この予約の出発日は今日ではありません。これで出発すると「この予約」が使用中になります。自分の予約で出発する場合は、利用記録から自分の行の出発を押してください。',
     'sb.relogin':'再ログイン','sb.err_forbidden':'サーバーがこの操作を拒否しました（権限不足、またはこのテーブルがデータプロキシで許可されていません）。ログインの問題ではありません：',
     'sb.err_auth':'ログインの有効期限が切れました。直前の操作は保存されていません。Portal に戻って再度ログインしてから操作し直してください。','sb.err_write':'データベースへの書き込みに失敗しました。この操作は保存されていません：','car.only_pending_depart':'この予約はすでに「出発待ち」ではありません（他の人が出発を押した可能性があります）。再読み込みして確認してください。','car.already_active':'この車両にはすでに「使用中」の予約があります：\n%s\n\nまずその予約を返却してから、次の予約で出発してください。\nすでに返却済みのはずなら、その返却がデータベースに保存されていません。「利用記録」から該当の行を探して、もう一度返却を押してください。','car.multi_active':'この車両は %d 件が同時に「使用中」になっています。前の返却が保存されなかった可能性が高いです。「利用記録」で終了済みの予約を返却してください。','car.veh_sync_fail':'返却は登録されましたが、車両の走行距離／燃料が保存できませんでした。再ログイン後、「車両管理」で修正してください。','car.db_one_active':'この車両にはすでに「使用中」の予約があるため、この予約では出発できません。まず使用中の予約を返却してください（「利用記録」で状態を「使用中」に絞り込むと確認できます）。','room.err_overlap':'この時間帯は入力中に他の方が予約しました。一覧を再読み込みしましたので、別の時間帯を選んでください。',
@@ -2997,6 +3312,9 @@ function setLang(lang) {
   refreshSubNav();   // 次頁籤那一列是 JS 畫的，applyI18n 掃不到
   // Re-render dynamic table content to pick up new language
   try{renderBooks();}catch(e){}
+  try{renderMgmtBookList();}catch(e){}   // 書目管理的表頭與「編輯」鈕也是 JS 畫的
+  try{popCatSel();}catch(e){}            // 兩個分類下拉的「未分類」那一列同理
+  try{popCatSel4Mgmt();}catch(e){}
   try{renderLoans();}catch(e){}
   try{renderReturn();}catch(e){}
   try{renderCats();}catch(e){}
@@ -3227,7 +3545,7 @@ function isAdmin(){
   return role === 'admin' || role === 'dcc';
 }
 function requireAdmin(fn){
-  if(!isAdmin()){toast('此功能僅限管理員操作','error');return;}
+  if(!isAdmin()){toast(t('g.err.admin_only'),'error');return;}
   if(typeof fn==='function') fn();
 }
 
@@ -3297,35 +3615,35 @@ function renderBooks(){
   const limited=!q&&!cat&&!st;
   if(limited)bks=bks.slice(0,25);
   const hintEl=document.getElementById('bk-hint');
-  if(hintEl)hintEl.textContent=limited?`顯示最新 ${bks.length} 本（共 ${allBks.length} 本，可用關鍵字搜尋）`:'';
+  if(hintEl)hintEl.textContent=limited?t('lib.hint.limited').replace('%d',bks.length).replace('%d',allBks.length):'';
   if(bkV==='g'){
-    document.getElementById('bk-gv').innerHTML=bks.length?bks.map(b=>{const av=bkAvail(b),bc=gCat(b.cat_id);const btn=av>0?`<button class="btn bp bsm" style="width:100%;margin-top:8px" onclick="event.stopPropagation();quickBorrow('${b.id}')">借閱</button>`:`<button class="btn bg2 bsm" style="width:100%;margin-top:8px" onclick="event.stopPropagation();quickReserve('${b.id}')">預約</button>`;return`<div class="bkcard"><div class="bkcov">${b.cover?`<img src="${escapeHtml(b.cover)}" onerror="this.style.display='none'">`:''}<div class="bkph" style="${b.cover?'display:none':''}">📗</div></div><div class="bki"><div class="bktt">${escapeHtml(b.title)}</div><div class="bkau">${escapeHtml(b.author||'—')}</div><div class="bkft">${bc?`<span class="ctag">${bc.name}</span>`:'<span></span>'}<span class="badge ${av>0?'bg':'br'}">${av>0?`在館 ${av}`:t('lib.grid.loaned')}</span></div>${btn}</div></div>`}).join(''):'<div class="es" style="grid-column:1/-1"><div class="ei">📚</div><p>查無書目</p></div>';
+    document.getElementById('bk-gv').innerHTML=bks.length?bks.map(b=>{const av=bkAvail(b),bc=gCat(b.cat_id);const btn=av>0?`<button class="btn bp bsm" style="width:100%;margin-top:8px" onclick="event.stopPropagation();quickBorrow('${b.id}')">${t('lib.btn.borrow')}</button>`:`<button class="btn bg2 bsm" style="width:100%;margin-top:8px" onclick="event.stopPropagation();quickReserve('${b.id}')">${t('lib.btn.reserve')}</button>`;return`<div class="bkcard"><div class="bkcov">${b.cover?`<img src="${escapeHtml(b.cover)}" onerror="this.style.display='none'">`:''}<div class="bkph" style="${b.cover?'display:none':''}">📗</div></div><div class="bki"><div class="bktt">${escapeHtml(b.title)}</div><div class="bkau">${escapeHtml(b.author||'—')}</div><div class="bkft">${bc?`<span class="ctag">${bc.name}</span>`:'<span></span>'}<span class="badge ${av>0?'bg':'br'}">${av>0?t('lib.grid.avail').replace('%d',av):t('lib.grid.loaned')}</span></div>${btn}</div></div>`}).join(''):`<div class="es" style="grid-column:1/-1"><div class="ei">📚</div><p>${t('lib.no_books')}</p></div>`;
   }else{
-    document.getElementById('bk-lt').innerHTML=bks.length?bks.map(b=>{const av=bkAvail(b),bc=gCat(b.cat_id);return`<tr><td><b>${escapeHtml(b.title)}</b>${b.lang?` <span class="badge bm">${b.lang}</span>`:''}</td><td class="tdm">${escapeHtml(b.author||'—')}</td><td>${bc?`<span class="ctag">${bc.name}</span>`:'—'}</td><td><span class="badge ${av>0?'bg':'br'}">${av>0?`在館 ${av}`:t('lib.grid.loaned')}</span></td><td>${av>0?`<button class="btn bp bsm" onclick="quickBorrow('${b.id}')">借閱</button>`:`<button class="btn bg2 bsm" onclick="quickReserve('${b.id}')">預約</button>`}</td></tr>`}).join(''):`<tr><td colspan="5" style="text-align:center;padding:22px;color:var(--t3)">查無書目</td></tr>`;
+    document.getElementById('bk-lt').innerHTML=bks.length?bks.map(b=>{const av=bkAvail(b),bc=gCat(b.cat_id);return`<tr><td><b>${escapeHtml(b.title)}</b>${b.lang?` <span class="badge bm">${b.lang}</span>`:''}</td><td class="tdm">${escapeHtml(b.author||'—')}</td><td>${bc?`<span class="ctag">${bc.name}</span>`:'—'}</td><td><span class="badge ${av>0?'bg':'br'}">${av>0?t('lib.grid.avail').replace('%d',av):t('lib.grid.loaned')}</span></td><td>${av>0?`<button class="btn bp bsm" onclick="quickBorrow('${b.id}')">${t('lib.btn.borrow')}</button>`:`<button class="btn bg2 bsm" onclick="quickReserve('${b.id}')">${t('lib.btn.reserve')}</button>`}</td></tr>`}).join(''):`<tr><td colspan="5" style="text-align:center;padding:22px;color:var(--t3)">${t('lib.no_books')}</td></tr>`;
   }
 }
 function openBkModal(id){
-  editBkId=id||null;document.getElementById('mobkt').textContent=id?'編輯書籍':'新增書籍';
-  const cats=ld(K.ct);document.getElementById('bkcatsel').innerHTML=`<option value="">${t('lib.grid.uncat')}</option>`+cats.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+  editBkId=id||null;document.getElementById('mobkt').textContent=t(id?'lib.mo.edit_book':'lib.mo.add_book');
+  const cats=ld(K.ct);document.getElementById('bkcatsel').innerHTML=`<option value="">${t('lib.uncat')}</option>`+cats.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
   if(id){const b=gBk(id);if(!b)return;['bkisbn','bktit','bkaut','bkyr','bkcov','bknt2'].forEach(x=>document.getElementById(x).value=b[{bkisbn:'isbn',bktit:'title',bkaut:'author',bkyr:'year',bkcov:'cover',bknt2:'notes'}[x]]||'');document.getElementById('bklng').value=b.lang||'繁中';document.getElementById('bkcp').value=b.copies||1;document.getElementById('bkcatsel').value=b.cat_id||'';}
   else{['bkisbn','bktit','bkaut','bkyr','bkcov','bknt2'].forEach(x=>document.getElementById(x).value='');document.getElementById('bkcp').value=1;document.getElementById('bklng').value='繁中';}
   const _delBtn=document.getElementById('mo-book-del');if(_delBtn)_delBtn.style.display=id?'':'none';
   openMo('mo-book');
 }
 function saveBook(){
-  const tit=document.getElementById('bktit').value.trim();if(!tit){toast('請輸入書名','error');return;}
+  const tit=document.getElementById('bktit').value.trim();if(!tit){toast(t('lib.err.need_title'),'error');return;}
   const data={isbn:document.getElementById('bkisbn').value.trim(),title:tit,author:document.getElementById('bkaut').value.trim(),year:parseInt(document.getElementById('bkyr').value)||null,cat_id:document.getElementById('bkcatsel').value,lang:document.getElementById('bklng').value,copies:parseInt(document.getElementById('bkcp').value)||1,cover:document.getElementById('bkcov').value.trim(),notes:document.getElementById('bknt2').value.trim(),site:_libSite||'TW'};
   const newId=editBkId||uid();
   const fullData={id:newId,...data};
   const bks=ld(K.bk);
   if(editBkId){const i=bks.findIndex(b=>b.id===editBkId);if(i>=0)bks[i]={...bks[i],...fullData};}
   else bks.push(fullData);
-  sv(K.bk,bks);sbSaveBook(fullData);closeMo('mo-book');renderBooks();if(_editFromMgmt){renderMgmtBookList();_editFromMgmt=false;}toast(editBkId?'已更新':'已新增','success');
+  sv(K.bk,bks);sbSaveBook(fullData);closeMo('mo-book');renderBooks();if(_editFromMgmt){renderMgmtBookList();_editFromMgmt=false;}toast(t(editBkId?'g.toast.updated':'g.toast.added'),'success');
 }
 function delBkFromModal(){
   if(!editBkId)return;
-  if(ld(K.ln).find(l=>l.bk_id===editBkId&&l.st!=='returned')){toast('有借閱記錄，無法刪除','error');return;}
-  if(!confirm('確定刪除此書籍？此操作無法復原。'))return;
+  if(ld(K.ln).find(l=>l.bk_id===editBkId&&l.st!=='returned')){toast(t('lib.err.has_loans'),'error');return;}
+  if(!confirm(t('lib.conf.del_book')))return;
   const id=editBkId,fromMgmt=_editFromMgmt;_editFromMgmt=false;
   closeMo('mo-book');
   sv(K.bk,ld(K.bk).filter(b=>b.id!==id));sbDelBook(id);
@@ -3333,11 +3651,11 @@ function delBkFromModal(){
   toast(t('g.toast.deleted'),'success');
 }
 async function lookupISBN(){
-  const isbn=document.getElementById('bkisbn').value.trim().replace(/-/g,'');if(!isbn){toast('請輸入ISBN','error');return;}
+  const isbn=document.getElementById('bkisbn').value.trim().replace(/-/g,'');if(!isbn){toast(t('lib.err.need_isbn'),'error');return;}
   document.getElementById('isbnld').style.display='block';
   try{const r=await fetch(`https://openlibrary.org/api/books?bibkeys=ISBN:${isbn}&format=json&jscmd=data`);const j=await r.json();const d=j[`ISBN:${isbn}`];
-  if(d){document.getElementById('bktit').value=d.title||'';document.getElementById('bkaut').value=d.authors?.[0]?.name||'';document.getElementById('bkyr').value=d.publish_date?.slice(-4)||'';if(d.cover?.medium)document.getElementById('bkcov').value=d.cover.medium;toast('書目已帶入','success');}else toast('查無此ISBN','warn');
-  }catch{toast('查詢失敗','error');}
+  if(d){document.getElementById('bktit').value=d.title||'';document.getElementById('bkaut').value=d.authors?.[0]?.name||'';document.getElementById('bkyr').value=d.publish_date?.slice(-4)||'';if(d.cover?.medium)document.getElementById('bkcov').value=d.cover.medium;toast(t('lib.toast.isbn_ok'),'success');}else toast(t('lib.toast.isbn_none'),'warn');
+  }catch{toast(t('lib.toast.isbn_fail'),'error');}
   document.getElementById('isbnld').style.display='none';
 }
 
@@ -3345,55 +3663,55 @@ let _qlBkId=null,_qlIsRsv=false;
 function quickBorrow(bid){
   const b=gBk(bid);if(!b)return;
   _qlBkId=bid;_qlIsRsv=false;
-  document.getElementById('ql-header').textContent='借閱確認';
+  document.getElementById('ql-header').textContent=t('lib.mo.borrow_confirm');
   document.getElementById('ql-bktitle').textContent=b.title;
   const cat=gCat(b.cat_id);
   document.getElementById('ql-bkinfo').textContent=`${b.author||''}${cat?' · '+cat.name:''}`;
-  const us=ld(K.us),opts=`<option value="">請選擇員工…</option>`+us.map(u=>`<option value="${u.id}">${u.name}（${u.dept||'—'}）</option>`).join('');
+  const us=ld(K.us),opts=`<option value="">${t('lib.ph.select_emp')}</option>`+us.map(u=>`<option value="${u.id}">${u.name}（${u.dept||'—'}）</option>`).join('');
   const qlUsr=document.getElementById('ql-usr');qlUsr.innerHTML=opts;if(curUid)qlUsr.value=curUid;
-  qlUsr.onchange=()=>{const cfg=lo(K.lcfg,DLCFG),uid2=qlUsr.value,a=uid2?ld(K.ln).filter(l=>l.u_id===uid2&&l.st!=='returned').length:0;document.getElementById('ql-uinfo').textContent=uid2?`已借 ${a}/${cfg.max_loans} 冊`:'';};
+  qlUsr.onchange=()=>{const cfg=lo(K.lcfg,DLCFG),uid2=qlUsr.value,a=uid2?ld(K.ln).filter(l=>l.u_id===uid2&&l.st!=='returned').length:0;document.getElementById('ql-uinfo').textContent=uid2?t('lib.mo.borrowed_n').replace('%d',a).replace('%d',cfg.max_loans):'';};
   qlUsr.onchange();
   const cfg=lo(K.lcfg,DLCFG),d=new Date();d.setDate(d.getDate()+(cfg.loan_days||30));
   document.getElementById('ql-bwdt').value=tds();
   document.getElementById('ql-dudt').value=ymdL(d);
-  document.getElementById('ql-btn').textContent='✓ 確認借出';
+  document.getElementById('ql-btn').textContent=t('lib.btn.confirm_borrow');
   openMo('mo-quickloan');
 }
 function quickReserve(bid){
   const b=gBk(bid);if(!b)return;
   _qlBkId=bid;_qlIsRsv=true;
-  document.getElementById('ql-header').textContent='預約確認';
+  document.getElementById('ql-header').textContent=t('lib.mo.reserve_confirm');
   document.getElementById('ql-bktitle').textContent=b.title;
-  document.getElementById('ql-bkinfo').textContent='目前全數借出，預約後待書歸還通知';
-  const us=ld(K.us),opts=`<option value="">請選擇員工…</option>`+us.map(u=>`<option value="${u.id}">${u.name}（${u.dept||'—'}）</option>`).join('');
+  document.getElementById('ql-bkinfo').textContent=t('lib.mo.all_out');
+  const us=ld(K.us),opts=`<option value="">${t('lib.ph.select_emp')}</option>`+us.map(u=>`<option value="${u.id}">${u.name}（${u.dept||'—'}）</option>`).join('');
   const qlUsr=document.getElementById('ql-usr');qlUsr.innerHTML=opts;if(curUid)qlUsr.value=curUid;
   qlUsr.onchange=()=>{};
   document.getElementById('ql-uinfo').textContent='';
   document.getElementById('ql-bwdt').value='';document.getElementById('ql-dudt').value='';
-  document.getElementById('ql-btn').textContent='✓ 確認預約';
+  document.getElementById('ql-btn').textContent=t('lib.btn.confirm_reserve');
   openMo('mo-quickloan');
 }
 // 🔴 借出／預約／還書一律「資料庫成功才改快取、才關視窗、才報成功」（v2.38）。
 //    這三件事都是別人會照著行動的狀態：書其實還在架上卻顯示借閱中，就沒有人去借它；
 //    預約沒存進資料庫，那個人永遠等不到通知。
 async function doQuickLoan(){
-  const uid2=document.getElementById('ql-usr').value;if(!uid2)return toast('請選擇借閱人','error');
+  const uid2=document.getElementById('ql-usr').value;if(!uid2)return toast(t('lib.err.need_borrower'),'error');
   if(_qlIsRsv){
     const _nrsv={id:uid(),bk_id:_qlBkId,u_id:uid2,dt:tds(),st:'waiting'};
     const rr=await sbSaveRsv(_nrsv);
     if(!rr.ok){toast(sbErrMsg(rr),'error');return;}
     const rv=ld(K.rv);rv.push(_nrsv);sv(K.rv,rv);
-    closeMo('mo-quickloan');renderBooks();toast(`已預約《${gBk(_qlBkId)?.title}》`,'success');return;
+    closeMo('mo-quickloan');renderBooks();toast(t('lib.toast.reserved').replace('%s',gBk(_qlBkId)?.title||''),'success');return;
   }
   const cfg=lo(K.lcfg,DLCFG);
-  if(ld(K.ln).filter(l=>l.u_id===uid2&&l.st!=='returned').length>=cfg.max_loans)return toast(`已達借閱上限（${cfg.max_loans}冊）`,'error');
-  const bk=gBk(_qlBkId);if(!bk||bkAvail(bk)===0)return toast('目前無在館書籍','error');
-  const bw=document.getElementById('ql-bwdt').value||tds(),due=document.getElementById('ql-dudt').value;if(!due)return toast('請設定應還日期','error');
+  if(ld(K.ln).filter(l=>l.u_id===uid2&&l.st!=='returned').length>=cfg.max_loans)return toast(t('lib.err.max_loans').replace('%d',cfg.max_loans),'error');
+  const bk=gBk(_qlBkId);if(!bk||bkAvail(bk)===0)return toast(t('lib.err.none_avail'),'error');
+  const bw=document.getElementById('ql-bwdt').value||tds(),due=document.getElementById('ql-dudt').value;if(!due)return toast(t('lib.err.need_due'),'error');
   const loan={id:uid(),bk_id:_qlBkId,u_id:uid2,bw,due,ret:null,st:'active'};
   const rl=await sbSaveLoan(loan);
   if(!rl.ok){toast(sbErrMsg(rl),'error');return;}   // 視窗不關，使用者可重新登入後再按一次
   const ln=ld(K.ln);ln.push(loan);sv(K.ln,ln);
-  closeMo('mo-quickloan');renderBooks();updBadges();toast(`已借出《${bk.title}》給 ${gUsr(uid2)?.name}`,'success');
+  closeMo('mo-quickloan');renderBooks();updBadges();toast(t('lib.toast.loaned').replace('%s',bk.title||'').replace('%s',gUsr(uid2)?.name||''),'success');
 }
 function showMgmtTab(tab){
   ['add','edit','cats'].forEach(k=>{
@@ -3410,35 +3728,35 @@ function renderMgmtBookList(){
   const cats=ld(K.ct);
   const list=document.getElementById('bkedit-list');if(!list)return;
   const filtered=q?allBks.filter(b=>(b.title||'').toLowerCase().includes(q)||(b.author||'').toLowerCase().includes(q)||(b.isbn||'').includes(q)):allBks;
-  if(!filtered.length){list.innerHTML='<div style="color:var(--t3);padding:20px;text-align:center">無書目資料</div>';return;}
-  list.innerHTML=`<div class="tw"><table><thead><tr><th>書名</th><th>作者</th><th>分類</th><th>ISBN</th><th>語言</th><th>館藏</th><th></th></tr></thead><tbody>${
-    filtered.map(b=>{const cat=cats.find(c=>c.id===b.cat_id);return`<tr><td>${b.title||''}</td><td style="color:var(--t2)">${b.author||''}</td><td style="white-space:nowrap">${cat?`<span class="ctag">${cat.name}</span>`:'<span style="color:var(--t3)">未分類</span>'}</td><td style="font-size:12px;color:var(--t3);white-space:nowrap">${b.isbn||''}</td><td style="color:var(--t2);white-space:nowrap">${b.lang||''}</td><td style="text-align:center">${b.copies||1}</td><td style="white-space:nowrap"><button class="btn bg2 bsm" onclick="openBkModalFromEdit('${b.id}')">編輯</button></td></tr>`;}).join('')
+  if(!filtered.length){list.innerHTML=`<div style="color:var(--t3);padding:20px;text-align:center">${t('lib.no_book_data')}</div>`;return;}
+  list.innerHTML=`<div class="tw"><table><thead><tr><th>${t('lib.tbl.title')}</th><th>${t('lib.tbl.author')}</th><th>${t('lib.tbl.cat')}</th><th>ISBN</th><th>${t('lib.tbl.lang')}</th><th>${t('lib.tbl.copies')}</th><th></th></tr></thead><tbody>${
+    filtered.map(b=>{const cat=cats.find(c=>c.id===b.cat_id);return`<tr><td>${b.title||''}</td><td style="color:var(--t2)">${b.author||''}</td><td style="white-space:nowrap">${cat?`<span class="ctag">${cat.name}</span>`:`<span style="color:var(--t3)">${t('lib.uncat')}</span>`}</td><td style="font-size:12px;color:var(--t3);white-space:nowrap">${b.isbn||''}</td><td style="color:var(--t2);white-space:nowrap">${b.lang||''}</td><td style="text-align:center">${b.copies||1}</td><td style="white-space:nowrap"><button class="btn bg2 bsm" onclick="openBkModalFromEdit('${b.id}')">${t('lib.btn.edit')}</button></td></tr>`;}).join('')
   }</tbody></table></div>`;
 }
 function openBkModalFromEdit(id){openBkModal(id);_editFromMgmt=true;}
 let _editFromMgmt=false;
-function popCatSel4Mgmt(){const cats=ld(K.ct);const opts=`<option value="">未分類</option>`+cats.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');const el=document.getElementById('mgbk-cat');if(el)el.innerHTML=opts;}
+function popCatSel4Mgmt(){const cats=ld(K.ct);const opts=`<option value="">${t('lib.uncat')}</option>`+cats.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');const el=document.getElementById('mgbk-cat');if(el)el.innerHTML=opts;}
 function clearMgmtForm(){['mgbk-isbn','mgbk-tit','mgbk-aut','mgbk-cov','mgbk-nt'].forEach(x=>{const el=document.getElementById(x);if(el)el.value='';});const yr=document.getElementById('mgbk-yr');if(yr)yr.value='';const cp=document.getElementById('mgbk-cp');if(cp)cp.value=1;const lng=document.getElementById('mgbk-lng');if(lng)lng.value='繁中';const cat=document.getElementById('mgbk-cat');if(cat)cat.value='';}
 function saveMgmtBook(){
-  const tit=(document.getElementById('mgbk-tit')?.value||'').trim();if(!tit)return toast('請輸入書名','error');
+  const tit=(document.getElementById('mgbk-tit')?.value||'').trim();if(!tit)return toast(t('lib.err.need_title'),'error');
   const data={isbn:(document.getElementById('mgbk-isbn')?.value||'').trim(),title:tit,author:(document.getElementById('mgbk-aut')?.value||'').trim(),year:parseInt(document.getElementById('mgbk-yr')?.value)||null,cat_id:document.getElementById('mgbk-cat')?.value||'',lang:document.getElementById('mgbk-lng')?.value||'繁中',copies:parseInt(document.getElementById('mgbk-cp')?.value)||1,cover:(document.getElementById('mgbk-cov')?.value||'').trim(),notes:(document.getElementById('mgbk-nt')?.value||'').trim(),site:_libSite||'TW'};
   const fullData={id:uid(),...data};
-  const bks=ld(K.bk);bks.unshift(fullData);sv(K.bk,bks);sbSaveBook(fullData);clearMgmtForm();toast('書籍已新增','success');
+  const bks=ld(K.bk);bks.unshift(fullData);sv(K.bk,bks);sbSaveBook(fullData);clearMgmtForm();toast(t('lib.toast.book_added'),'success');
 }
 async function lookupISBNMgmt(){
-  const isbn=(document.getElementById('mgbk-isbn')?.value||'').trim();if(!isbn)return toast('請輸入 ISBN','error');
-  const ld2=document.getElementById('mgbk-isbnld');if(ld2){ld2.style.display='';ld2.textContent='🔄 查詢中…';}
+  const isbn=(document.getElementById('mgbk-isbn')?.value||'').trim();if(!isbn)return toast(t('lib.err.need_isbn'),'error');
+  const ld2=document.getElementById('mgbk-isbnld');if(ld2){ld2.style.display='';ld2.textContent=t('lib.isbn.searching');}
   try{
     const r=await fetch(`https://openlibrary.org/api/books?bibkeys=ISBN:${isbn}&format=json&jscmd=data`);
     const d=await r.json();const k=`ISBN:${isbn}`;
-    if(!d[k])throw new Error('找不到書目');
+    if(!d[k])throw new Error(t('lib.isbn.notfound'));
     const b=d[k];
     const ti=document.getElementById('mgbk-tit');if(ti&&!ti.value)ti.value=b.title||'';
     const au=document.getElementById('mgbk-aut');if(au&&!au.value)au.value=(b.authors||[]).map(a=>a.name).join(', ')||'';
     const yr=document.getElementById('mgbk-yr');if(yr&&!yr.value&&b.publish_date)yr.value=b.publish_date.slice(-4)||'';
     const cv=document.getElementById('mgbk-cov');if(cv&&!cv.value&&b.cover)cv.value=b.cover.medium||b.cover.large||'';
-    if(ld2)ld2.textContent='✓ 已帶入書目資訊';
-  }catch(e){if(ld2)ld2.textContent='❌ 查詢失敗：'+e.message;}
+    if(ld2)ld2.textContent=t('lib.isbn.filled');
+  }catch(e){if(ld2)ld2.textContent=t('lib.isbn.failed')+e.message;}
 }
 function renderLoans(){
   chkOv();const _sbids=_siteBkIds();let ln=ld(K.ln).filter(l=>_sbids.has(l.bk_id));
@@ -3455,9 +3773,10 @@ async function qReturn(lid){
   if(!r0.ok){toast(sbErrMsg(r0),'error');return;}
   ln[i]=l;sv(K.ln,ln);
   const rv=ld(K.rv).find(r=>r.bk_id===l.bk_id&&r.st==='waiting');
-  if(rv)toast(`已還書，${gUsr(rv.u_id)?.name}有預約等候`,'warn');else toast('已登記還書','success');
+  if(rv)toast(t('lib.toast.returned_waiting').replace('%s',gUsr(rv.u_id)?.name||''),'warn');else toast(t('lib.toast.returned'),'success');
   chkOv();renderLoans();renderReturn();updBadges();
 }
+// 🔴 CSV 表頭同上：這是匯出的存檔格式，不隨介面語言改變。
 function exportLoansCSV(){const _sbids=_siteBkIds();const ln=ld(K.ln).filter(l=>_sbids.has(l.bk_id));const rows=[['書名','作者','借閱人','部門','借出日','應還日','歸還日','狀態']];ln.forEach(l=>{const b=gBk(l.bk_id),u=gUsr(l.u_id);rows.push([b?.title||'',b?.author||'',u?.name||'',u?.dept||'',l.bw,l.due,l.ret||'',l.st]);});dl('loans.csv',rows.map(r=>r.map(c=>`"${c}"`).join(',')).join('\n'),'text/csv');toast(t('g.toast.exported'),'success');}
 
 let selBwBk=null;
@@ -3476,10 +3795,10 @@ function renderReturn(){
 
 
 
-function renderCats(){const cats=ld(K.ct),bks=ld(K.bk);document.getElementById('cat-list').innerHTML=cats.map(c=>{const cnt=bks.filter(b=>b.cat_id===c.id).length;return`<div style="background:var(--bg2);border:1px solid var(--bd);border-radius:var(--rs);padding:8px 13px;display:flex;align-items:center;gap:8px"><span class="ctag">${c.name}</span><span class="tdm">${cnt}本</span><button class="btn bic bdr bsm" onclick="delCat('${c.id}')">✕</button></div>`}).join('');}
+function renderCats(){const cats=ld(K.ct),bks=ld(K.bk);document.getElementById('cat-list').innerHTML=cats.map(c=>{const cnt=bks.filter(b=>b.cat_id===c.id).length;return`<div style="background:var(--bg2);border:1px solid var(--bd);border-radius:var(--rs);padding:8px 13px;display:flex;align-items:center;gap:8px"><span class="ctag">${c.name}</span><span class="tdm">${t('lib.cat.n_books').replace('%d',cnt)}</span><button class="btn bic bdr bsm" onclick="delCat('${c.id}')">✕</button></div>`}).join('');}
 function openCatModal(){document.getElementById('catnm').value='';openMo('mo-cat');}
-function saveCat(){const nm=document.getElementById('catnm').value.trim();if(!nm)return toast('請輸入分類名稱','error');const cats=ld(K.ct);if(cats.find(c=>c.name===nm))return toast('分類已存在','error');const _newCat={id:uid(),name:nm};cats.push(_newCat);sv(K.ct,cats);sbSaveCat(_newCat);closeMo('mo-cat');renderCats();popCatSel();toast(t('g.toast.added'),'success');}
-function delCat(id){if(ld(K.bk).find(b=>b.cat_id===id))return toast('此分類有書籍，無法刪除','error');if(!confirm('確定刪除？'))return;const _delCatId=id;sv(K.ct,ld(K.ct).filter(c=>c.id!==_delCatId));sbDelCat(_delCatId);renderCats();popCatSel();toast(t('g.toast.deleted'),'success');}
+function saveCat(){const nm=document.getElementById('catnm').value.trim();if(!nm)return toast(t('lib.err.need_cat_name'),'error');const cats=ld(K.ct);if(cats.find(c=>c.name===nm))return toast(t('lib.err.cat_exists'),'error');const _newCat={id:uid(),name:nm};cats.push(_newCat);sv(K.ct,cats);sbSaveCat(_newCat);closeMo('mo-cat');renderCats();popCatSel();toast(t('g.toast.added'),'success');}
+function delCat(id){if(ld(K.bk).find(b=>b.cat_id===id))return toast(t('lib.err.cat_has_books'),'error');if(!confirm(t('g.conf.delete')))return;const _delCatId=id;sv(K.ct,ld(K.ct).filter(c=>c.id!==_delCatId));sbDelCat(_delCatId);renderCats();popCatSel();toast(t('g.toast.deleted'),'success');}
 
 function loadLibCfg(){const cfg=lo(K.lcfg,DLCFG);document.getElementById('cfml').value=cfg.max_loans||3;document.getElementById('cfld').value=cfg.loan_days||30;document.getElementById('cfrd').value=cfg.remind_days||3;}
 function saveLibCfg(){sv(K.lcfg,{max_loans:parseInt(document.getElementById('cfml').value)||3,loan_days:parseInt(document.getElementById('cfld').value)||30,remind_days:parseInt(document.getElementById('cfrd').value)||3});toast(t('g.toast.saved'),'success');}
@@ -3494,14 +3813,14 @@ async function _loadXLSX(){
     const s=document.createElement('script');
     s.src='https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js';
     s.onload=()=>res();
-    s.onerror=()=>rej(new Error('無法載入 Excel 套件，請檢查網路連線'));
+    s.onerror=()=>rej(new Error(t('g.err.xlsx_load')));
     document.head.appendChild(s);
   });
 }
 let _xlsxPendingWb=null;
 function _dlgXlsxShow(wb,defaultName,title){
   _xlsxPendingWb=wb;
-  document.getElementById('dlg-xlsx-ttl').textContent=title||'下載檔案';
+  document.getElementById('dlg-xlsx-ttl').textContent=title||t('g.dlg.download');
   const nameEl=document.getElementById('dlg-xlsx-name');
   nameEl.value=(defaultName||'export').replace(/\.xlsx$/i,'');
   document.getElementById('dlg-xlsx').showModal();
@@ -3512,36 +3831,42 @@ function _dlgXlsxDo(){
   let name=(document.getElementById('dlg-xlsx-name')?.value||'export').trim().replace(/\.xlsx$/i,'');
   if(!name)name='export';
   const filename=name+'.xlsx';
-  try{XLSX.writeFile(_xlsxPendingWb,filename);}catch(e){toast('下載失敗：'+e.message,'error');return;}
+  try{XLSX.writeFile(_xlsxPendingWb,filename);}catch(e){toast(t('g.toast.dl_fail')+e.message,'error');return;}
   _xlsxPendingWb=null;
   document.getElementById('dlg-xlsx').close();
-  toast(`✓ 已下載「${filename}」至您的下載資料夾`,'success');
+  toast(t('g.toast.dl_ok').replace('%s',filename),'success');
 }
+// 🔴 下面三個函式裡的中文欄位名（書名／作者／分類／語言…）**不可翻譯**：
+//    exportBooksXlsx 寫出去、downloadBooksTemplate 當範本、importBooksXlsx 照著讀回來，
+//    三者必須逐字相同。翻掉的話匯出的檔案就匯不回去，而且看起來只是「欄位空白」。
+//    這與 board 的「輸出版面固定繁中」是同一條規矩，只是這裡另有技術上的硬理由。
+//    （'繁中' 是書籍語言欄位的預設「值」，那是資料不是文案，同樣不翻。）
+//    i18n 稽核會把它們算成漏翻 —— 那是誤判。
 async function exportBooksXlsx(){
-  const btn=event?.currentTarget;if(btn){btn.disabled=true;btn.textContent='準備中…';}
+  const btn=event?.currentTarget;if(btn){btn.disabled=true;btn.textContent=t('g.preparing');}
   try{
     await _loadXLSX();
     const cats=ld(K.ct);
     const allBks=_libSite?ld(K.bk).filter(b=>b.site===_libSite):ld(K.bk);
-    const rows=allBks.map(b=>{const cat=cats.find(c=>c.id===b.cat_id);return{'ISBN':b.isbn||'','書名':b.title||'','作者':b.author||'','出版年':b.year||'','分類':cat?cat.name:'',' 語言':b.lang||'繁中','館藏數量':b.copies||1,'封面圖片URL':b.cover||'','備註':b.notes||''};});
+    const rows=allBks.map(b=>{const cat=cats.find(c=>c.id===b.cat_id);return{'ISBN':b.isbn||'','書名':b.title||'','作者':b.author||'','出版年':b.year||'','分類':cat?cat.name:'','語言':b.lang||'繁中','館藏數量':b.copies||1,'封面圖片URL':b.cover||'','備註':b.notes||''};});
     const ws=XLSX.utils.json_to_sheet(rows);
     const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,'書目',ws);
-    _dlgXlsxShow(wb,'comart_books',`匯出書目（共 ${rows.length} 本）`);
-  }catch(e){toast('準備失敗：'+e.message,'error');}
-  finally{if(btn){btn.disabled=false;btn.textContent='↓ 匯出書目';}}
+    _dlgXlsxShow(wb,'comart_books',t('lib.export.title').replace('%d',rows.length));
+  }catch(e){toast(t('g.prep_fail')+e.message,'error');}
+  finally{if(btn){btn.disabled=false;btn.textContent=t('lib.btn.export_books');}}
 }
 async function downloadBooksTemplate(){
   try{
     await _loadXLSX();
     const ws=XLSX.utils.json_to_sheet([{'ISBN':'9789867757289','書名':'設計的法則','作者':'William Lidwell','出版年':2010,'分類':'設計','語言':'繁中','館藏數量':1,'封面圖片URL':'','備註':'範例書目，請替換'}]);
     const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,'書目',ws);
-    _dlgXlsxShow(wb,'comart_books_template','下載匯入範本');
-  }catch(e){toast('準備失敗：'+e.message,'error');}
+    _dlgXlsxShow(wb,'comart_books_template',t('lib.btn.dl_template'));
+  }catch(e){toast(t('g.prep_fail')+e.message,'error');}
 }
 function importBooksTrig(){document.getElementById('bk-impf').click();}
 async function importBooksXlsx(e){
   const f=e.target.files[0];if(!f)return;e.target.value='';
-  toast('匯入中…','info');
+  toast(t('g.toast.importing'),'info');
   await _loadXLSX();
   const reader=new FileReader();
   reader.onload=ev=>{
@@ -3549,7 +3874,7 @@ async function importBooksXlsx(e){
       const wb=XLSX.read(ev.target.result,{type:'array'});
       const ws=wb.Sheets[wb.SheetNames[0]];
       const rows=XLSX.utils.sheet_to_json(ws,{raw:false,defval:''});
-      if(!rows.length)return toast('檔案無資料','error');
+      if(!rows.length)return toast(t('g.err.no_data'),'error');
       const cats=ld(K.ct);
       let bks=ld(K.bk);
       let addCnt=0,updCnt=0;
@@ -3565,12 +3890,12 @@ async function importBooksXlsx(e){
       });
       sv(K.bk,bks);sv(K.ct,cats);
       renderMgmtBookList();renderBooks();popCatSel();popCatSel4Mgmt();
-      toast(`已新增 ${addCnt} 本，更新 ${updCnt} 本`,'success');
-    }catch(err){toast('匯入失敗：'+err.message,'error');}
+      toast(t('lib.toast.import_done').replace('%d',addCnt).replace('%d',updCnt),'success');
+    }catch(err){toast(t('g.toast.import_fail')+err.message,'error');}
   };
   reader.readAsArrayBuffer(f);
 }
-function resetData(){if(!confirm('⚠️ 確定清除所有資料？'))return;Object.values(K).forEach(k=>localStorage.removeItem(k));toast(t('g.toast.reset'),'warn');setTimeout(()=>location.reload(),1000);}
+function resetData(){if(!confirm(t('g.conf.reset_all')))return;Object.values(K).forEach(k=>localStorage.removeItem(k));toast(t('g.toast.reset'),'warn');setTimeout(()=>location.reload(),1000);}
 
 // ── 批次補圖 ─────────────────────────────────────────
 let _fetchCoverAbort=false;
@@ -3593,12 +3918,12 @@ async function _fetchCoverByIsbn(isbn){
 async function batchFetchCovers(){
   const allBks=ld(K.bk);
   const targets=allBks.filter(b=>!b.cover&&b.isbn);
-  if(!targets.length)return toast('所有有ISBN的書目已有封面圖片','info');
+  if(!targets.length)return toast(t('lib.cover.all_have'),'info');
   const btn=document.getElementById('btn-fetchcovers');
-  if(btn){btn.disabled=true;btn.textContent='⏳ 補圖中…';}
+  if(btn){btn.disabled=true;btn.textContent=t('lib.cover.working');}
   _fetchCoverAbort=false;
   let ok=0,fail=0,total=targets.length;
-  toast(`開始批次補圖，共 ${total} 本（有ISBN）…`,'info');
+  toast(t('lib.cover.start').replace('%d',total),'info');
   for(let i=0;i<targets.length;i++){
     if(_fetchCoverAbort)break;
     const b=targets[i];
@@ -3608,13 +3933,13 @@ async function batchFetchCovers(){
       if(idx>=0){allBks[idx]={...allBks[idx],cover};sbSaveBook(allBks[idx]);}
       ok++;
     }else fail++;
-    if((i+1)%20===0||i===targets.length-1)toast(`進度 ${i+1}/${total}：找到封面 ${ok} 本，未找到 ${fail} 本`,'info');
+    if((i+1)%20===0||i===targets.length-1)toast(t('lib.cover.progress').replace('%s',(i+1)+'/'+total).replace('%d',ok).replace('%d',fail),'info');
     await new Promise(r=>setTimeout(r,250)); // 每筆間隔 250ms 避免限速
   }
   sv(K.bk,allBks);
   renderBooks();renderMgmtBookList();
-  if(btn){btn.disabled=false;btn.textContent='🖼 批次補圖';}
-  toast(`補圖完成！成功 ${ok} 本，未找到封面 ${fail} 本`,'success');
+  if(btn){btn.disabled=false;btn.textContent=t('lib.btn.fetch_covers');}
+  toast(t('lib.cover.done').replace('%d',ok).replace('%d',fail),'success');
 }
 
 function popCatSel(){const cats=ld(K.ct),opts=`<option value="">${t('lib.all_cats2')}</option>`+cats.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');const el=document.getElementById('bkcat');if(el)el.innerHTML=opts;}
@@ -3682,7 +4007,7 @@ async function saveVeh(){
   renderVeh();popCarSels();renderCarDash();
   toast(editVid?'已更新':'已新增','success');
 }
-function delVeh(id){if(ld(K.bks).find(b=>b.vh_id===id&&b.st!=='done'&&b.st!=='cancelled'))return toast('有進行中預約，無法刪除','error');if(!confirm('確定刪除？'))return;const _delVhId=id;sv(K.vh,ld(K.vh).filter(v=>v.id!==_delVhId));sbDelVehicle(_delVhId);renderVeh();popCarSels();renderCarDash();toast(t('g.toast.deleted'),'success');}
+function delVeh(id){if(ld(K.bks).find(b=>b.vh_id===id&&b.st!=='done'&&b.st!=='cancelled'))return toast(t('car.err.has_bookings'),'error');if(!confirm(t('g.conf.delete')))return;const _delVhId=id;sv(K.vh,ld(K.vh).filter(v=>v.id!==_delVhId));sbDelVehicle(_delVhId);renderVeh();popCarSels();renderCarDash();toast(t('g.toast.deleted'),'success');}
 
 let calDt=new Date(),calV='month';
 function setCalV(v){calV=v;document.getElementById('cvbm').classList.toggle('active',v==='month');document.getElementById('cvbw').classList.toggle('active',v==='week');renderCal();}

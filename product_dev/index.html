@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>COMART Product Dev v2.22</title>
+  <title>COMART Product Dev v2.24</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Noto+Serif:wght@400&family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     /* 🔴 這一段與 Portal index.html 的 :root 完全相同 —— 平台共用的設計 token。
        要改配色請先改 Portal，再同步過來，不要只在這裡調（v2.21 之前這裡是
@@ -23,6 +23,12 @@
       --fm:'DM Mono',monospace;
       --r:10px;--rl:14px;
     }
+/* 🔴 DM Sans 沒有越南文字集 —— Google Fonts 對它只給 latin 與 latin-ext 兩個
+       unicode-range，連明確指定 subset=vietnamese 也一樣。越南文的 U+1EA0–U+1EF9
+       （ị ế ộ ự…）因此會**逐字**掉到系統字型，同一個詞裡混兩種字，看起來像變音
+       符號散掉了。介面切成越南文時整份換成 Be Vietnam Pro（幾何無襯線，與 DM Sans
+       相容，且有完整越南文字集）。lang 由 dvSetLang／pdSetLang 設定。*/
+    html[lang="vi"]{--ff:'Be Vietnam Pro','DM Sans',-apple-system,sans-serif;--fd:'Noto Serif','DM Serif Display',Georgia,serif}
     *{box-sizing:border-box}
     body{margin:0;background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:100vh}
     button,a{font:inherit}
@@ -73,7 +79,7 @@
 <body>
   <header class="top">
     <a class="back" href="../index.html">← Portal</a>
-    <div class="brand"><div class="mark">PD</div><div><b>COMART Product Dev</b><span>Product Development Workspace · v2.22</span></div></div>
+    <div class="brand"><div class="mark">PD</div><div><b>COMART Product Dev</b><span>Product Development Workspace · v2.24</span></div></div>
     <div id="langChips"></div>
   </header>
   <main>

@@ -6,6 +6,7 @@
 #   python3 scripts/i18n-audit.py admin              # Admin（ADMIN_I18N，key 帶引號）
 #   python3 scripts/i18n-audit.py kms                # KMS（I18N，key 帶引號）
 #   python3 scripts/i18n-audit.py pd-hub             # Product Dev 工作區首頁（PD_I18N）
+#   python3 scripts/i18n-audit.py pd-devices         # Product Dev 手機與配件（DV_I18N）
 #
 # 🔴 為什麼要有這支：全域計數會放過一種錯誤 —— 10 份分佈成 (0,0,0,2,3)，
 #    總數對、分佈全錯。2026-09-08 的 lc_rule1_t 就是這樣：en／繁中／簡中各 0 份，
@@ -27,6 +28,7 @@ TARGETS = {
     'admin':  ('admin/index.html', ['ADMIN_I18N']),
     'kms':    ('kms/index.html', ['I18N']),
     'pd-hub': ('product_dev/index.html', ['PD_I18N']),
+    'pd-devices': ('product_dev/devices/index.html', ['DV_I18N']),
 }
 name = (sys.argv[1] if len(sys.argv) > 1 else 'portal').lower()
 if name not in TARGETS:
@@ -119,7 +121,7 @@ def used_keys(src):
     out = set()
     for m in re.finditer(r'data-i18n(?:-ph|-title)?="([^"]+)"', src):
         out.add(m.group(1))
-    for m in re.finditer(r"\b(?:t|BT|PT|BTZ)\(\s*'([A-Za-z0-9_.\-]+)'", src):
+    for m in re.finditer(r"\b(?:t|BT|PT|DT|BTZ)\(\s*'([A-Za-z0-9_.\-]+)'", src):
         k = m.group(1)
         # 組出來的 key 只抓得到前綴（`BT('site_' + s)`、`t('car.fuel.' + x)`）——
         # 那不是缺漏，報出來只會把真的問題蓋掉

@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <title>COMART 手機與配件 v1.09</title>
+  <title>COMART 手機與配件 v1.10</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
   <meta name="theme-color" content="#080c14">
   <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -29,8 +29,15 @@
       --accent:var(--ac);--yellow:var(--amb);
       --shadow:0 18px 55px rgba(0,0,0,.45)
     }
+/* 🔴 DM Sans 沒有越南文字集 —— Google Fonts 對它只給 latin 與 latin-ext 兩個
+       unicode-range，連明確指定 subset=vietnamese 也一樣。越南文的 U+1EA0–U+1EF9
+       （ị ế ộ ự…）因此會**逐字**掉到系統字型，同一個詞裡混兩種字，看起來像變音
+       符號散掉了。介面切成越南文時整份換成 Be Vietnam Pro（幾何無襯線，與 DM Sans
+       相容，且有完整越南文字集）。lang 由 dvSetLang／pdSetLang 設定。*/
+    html[lang="vi"]{--ff:'Be Vietnam Pro','DM Sans',-apple-system,sans-serif}
+
     *{box-sizing:border-box}html{color-scheme:dark}body{margin:0;background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:100vh}button,input,select,textarea{font:inherit}button{cursor:pointer}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}:focus-visible{outline:3px solid var(--ac);outline-offset:3px}
-    .top{position:sticky;top:0;z-index:20;height:72px;background:rgba(17,24,39,.95);backdrop-filter:blur(18px);border-bottom:1px solid #1d2d45;display:flex;align-items:center;gap:14px;padding:0 max(20px,calc((100vw - 1500px)/2));padding-left:max(20px,env(safe-area-inset-left));padding-right:max(20px,env(safe-area-inset-right))}.back,.icon-btn,.btn{min-height:44px;border-radius:12px;border:1px solid var(--line);background:#101a2b;color:var(--text);display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:0 16px;text-decoration:none;font-weight:750}.back:hover,.icon-btn:hover,.btn:hover{border-color:#4d6d99;background:#17243a}.brand{display:flex;align-items:center;gap:11px;min-width:0}.mark{width:42px;height:42px;border-radius:13px;background:var(--ac2);color:var(--ac);display:grid;place-items:center}.brand b{display:block;font-size:17px;white-space:nowrap}.brand small{display:block;color:var(--muted);font-weight:700;letter-spacing:.12em;margin-top:3px}.grow{flex:1}.user{text-align:right}.user b{display:block;font-size:13px}.user small{color:var(--muted)}
+    .lchip{font-size:11px;font-weight:600;padding:4px 9px;border-radius:20px;border:1px solid var(--br);background:transparent;color:var(--tx3);cursor:pointer;transition:all .12s;white-space:nowrap}.lchip:hover{color:var(--tx);border-color:var(--br2)}.lchip.on{background:var(--ac2);border-color:var(--ac);color:var(--ac)}#langChips{display:flex;gap:4px;overflow:auto;-webkit-overflow-scrolling:touch;flex-shrink:0}.top{position:sticky;top:0;z-index:20;height:72px;background:rgba(17,24,39,.95);backdrop-filter:blur(18px);border-bottom:1px solid #1d2d45;display:flex;align-items:center;gap:14px;padding:0 max(20px,calc((100vw - 1500px)/2));padding-left:max(20px,env(safe-area-inset-left));padding-right:max(20px,env(safe-area-inset-right))}.back,.icon-btn,.btn{min-height:44px;border-radius:12px;border:1px solid var(--line);background:#101a2b;color:var(--text);display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:0 16px;text-decoration:none;font-weight:750}.back:hover,.icon-btn:hover,.btn:hover{border-color:#4d6d99;background:#17243a}.brand{display:flex;align-items:center;gap:11px;min-width:0}.mark{width:42px;height:42px;border-radius:13px;background:var(--ac2);color:var(--ac);display:grid;place-items:center}.brand b{display:block;font-size:17px;white-space:nowrap}.brand small{display:block;color:var(--muted);font-weight:700;letter-spacing:.12em;margin-top:3px}.grow{flex:1}.user{text-align:right}.user b{display:block;font-size:13px}.user small{color:var(--muted)}
     .shell{max-width:1500px;margin:auto;padding:28px 24px 70px}.hero{display:flex;align-items:end;justify-content:space-between;gap:24px;margin-bottom:25px}.eyebrow{color:var(--accent);font-size:12px;font-weight:900;letter-spacing:.2em}.hero h1{font-size:clamp(30px,4vw,48px);letter-spacing:-.045em;margin:7px 0}.hero p{color:var(--muted);margin:0;line-height:1.65}.btn.primary{border-color:var(--ac);background:var(--ac);color:#fff}.btn.danger{border-color:#743543;color:#ffb0b7;background:#29121a}.btn.good{border-color:#227050;color:#7ef0ba;background:#102820}.btn.small{min-height:36px;padding:0 12px;font-size:12px}.btn[disabled]{opacity:.45;cursor:not-allowed}
     .scope-switch{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:0 0 24px;padding:7px;background:#0a1322;border:1px solid var(--line);border-radius:18px}.scope-btn{min-height:68px;border:1px solid transparent;border-radius:13px;background:transparent;color:var(--muted);font-weight:900;font-size:17px;display:flex;align-items:center;justify-content:center;gap:10px}.scope-btn.active{color:#fff;background:var(--ac);box-shadow:0 8px 24px rgba(45,127,249,.22)}.scope-btn:not(.active):hover{background:#142238;color:var(--text);border-color:#304866}
     .tabs{display:flex;gap:8px;border-bottom:1px solid var(--line);margin-bottom:22px;overflow:auto}.tab{position:relative;background:none;border:0;color:var(--muted);padding:15px 18px;font-weight:850;white-space:nowrap}.tab.active{color:var(--text)}.tab.active:after{content:"";position:absolute;left:12px;right:12px;bottom:-1px;height:3px;border-radius:3px;background:var(--accent)}.badge{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 6px;margin-left:6px;border-radius:20px;background:#233550;color:#cfdbec;font-size:11px}.badge.hot{background:#5b201f;color:#ffb8b6}
@@ -46,119 +53,1262 @@
   </style>
 </head>
 <body>
-  <a class="sr-only" href="#main">跳至主要內容</a>
+  <a class="sr-only" href="#main" data-i18n="skip">跳至主要內容</a>
   <header class="top">
     <a class="back" id="backLink" href="../index.html"><i data-lucide="arrow-left" width="18"></i><span>Product Dev</span></a>
-    <div class="brand"><div class="mark"><i data-lucide="smartphone" width="22"></i></div><div><b>手機與配件</b><small>DEVICE CUSTODY · v1.09</small></div></div>
-    <div class="grow"></div><div class="user"><b id="userName">驗證中…</b><small id="userMeta"></small></div>
+    <div class="brand"><div class="mark"><i data-lucide="smartphone" width="22"></i></div><div><b data-i18n="app_title">手機與配件</b><small>DEVICE CUSTODY · v1.10</small></div></div>
+    <div class="grow"></div><div id="langChips"></div><div class="user"><b id="userName" data-i18n="verifying">驗證中…</b><small id="userMeta"></small></div>
   </header>
   <main class="shell" id="main">
-    <section class="hero"><div><span class="eyebrow">PRODUCT DEVELOPMENT</span><h1>手機與配件</h1><p>公司資產依流程管理；個人資產由同事自行登錄與維護。</p></div><button class="btn primary" id="newBtn"><i data-lucide="plus"></i>新增公司設備</button></section>
-    <nav class="scope-switch" aria-label="資產大類"><button class="scope-btn active" id="companyScope"><i data-lucide="building-2"></i>公司資產</button><button class="scope-btn" id="personalScope"><i data-lucide="user-round"></i>個人資產</button></nav>
+    <section class="hero"><div><span class="eyebrow">PRODUCT DEVELOPMENT</span><h1 data-i18n="app_title">手機與配件</h1><p data-i18n="hero_p">公司資產依流程管理。</p></div><button class="btn primary" id="newBtn"><i data-lucide="plus"></i><span data-i18n="btn_new_company">新增公司設備</span></button></section>
+    <nav class="scope-switch" data-i18n-label="scope_group" aria-label="資產大類"><button class="scope-btn active" id="companyScope"><i data-lucide="building-2"></i><span data-i18n="scope_company">公司資產</span></button><button class="scope-btn" id="personalScope"><i data-lucide="user-round"></i><span data-i18n="scope_personal">個人資產</span></button></nav>
     <div id="companyArea">
-    <nav class="tabs" role="tablist" aria-label="手機與配件功能">
-      <button class="tab active" role="tab" data-tab="list">設備清單</button>
-      <button class="tab" role="tab" data-tab="pending">待我確認<span class="badge" id="pendingBadge">0</span></button>
-      <button class="tab hidden" role="tab" data-tab="manage" id="manageTab">管理</button>
+    <nav class="tabs" role="tablist" data-i18n-label="tabs_aria" aria-label="手機與配件功能">
+      <button class="tab active" role="tab" data-tab="list" data-i18n="tab_list">設備清單</button>
+      <button class="tab" role="tab" data-tab="pending"><span data-i18n="tab_pending">待我確認</span><span class="badge" id="pendingBadge">0</span></button>
+      <button class="tab hidden" role="tab" data-tab="manage" id="manageTab" data-i18n="tab_manage">管理</button>
     </nav>
     <section id="view-list">
       <div class="filters">
-        <div class="search"><i data-lucide="search" width="18"></i><label class="sr-only" for="q">搜尋設備</label><input class="control" id="q" placeholder="資產編號、品牌、型號、序號、保管人…"></div>
-        <select class="control" id="typeFilter" aria-label="設備類型"><option value="">所有類型</option></select>
-        <select class="control" id="statusFilter" aria-label="設備狀態"><option value="">所有狀態</option><option value="available">可借用</option><option value="in_use">使用中</option><option value="maintenance">維修中</option><option value="lost">遺失／遭竊</option></select>
-        <select class="control" id="ownerFilter" aria-label="資產歸屬"><option value="">所有歸屬單位</option></select>
+        <div class="search"><i data-lucide="search" width="18"></i><label class="sr-only" for="q" data-i18n="search_device">搜尋設備</label><input class="control" id="q" data-i18n-ph="ph_search" placeholder="資產編號、品牌、型號、序號、保管人…"></div>
+        <select class="control" id="typeFilter" data-i18n-label="f_type" aria-label="設備類型"><option value="" data-i18n="opt_all_types">所有類型</option></select>
+        <select class="control" id="statusFilter" data-i18n-label="f_status" aria-label="設備狀態"><option value="" data-i18n="opt_all_status">所有狀態</option><option value="available" data-i18n="st_available">可借用</option><option value="in_use" data-i18n="st_in_use">使用中</option><option value="maintenance" data-i18n="st_maintenance">維修中</option><option value="lost" data-i18n="st_lost">遺失／遭竊</option></select>
+        <select class="control" id="ownerFilter" data-i18n-label="f_owner" aria-label="資產歸屬"><option value="" data-i18n="opt_all_owner">所有歸屬單位</option></select>
       </div>
-      <label style="display:flex;align-items:center;gap:8px;color:var(--muted);font-size:13px;margin-bottom:8px"><input type="checkbox" id="includeRetired"> 顯示已退役設備</label>
-      <div class="summary"><span id="totalText">讀取中…</span><span id="resultHint"></span></div>
-      <div class="grid" id="cards" aria-live="polite"></div><button class="btn loadmore hidden" id="loadMore">載入下 30 筆</button>
+      <label style="display:flex;align-items:center;gap:8px;color:var(--muted);font-size:13px;margin-bottom:8px"><input type="checkbox" id="includeRetired"> <span data-i18n="show_retired">顯示已退役設備</span></label>
+      <div class="summary"><span id="totalText" data-i18n="loading">讀取中…</span><span id="resultHint"></span></div>
+      <div class="grid" id="cards" aria-live="polite"></div><button class="btn loadmore hidden" id="loadMore" data-i18n="load_more">載入下 30 筆</button>
     </section>
-    <section id="view-pending" class="hidden"><div class="panel"><h2>待處理</h2><p style="color:var(--muted)">設備資料與保管權移轉分開確認，不會因資料缺漏阻擋舊設備啟用。</p><div class="pending-list" id="pendingList"></div></div></section>
-    <section id="view-manage" class="hidden"><div class="manage-grid"><div class="panel"><h2>設備類型</h2><div id="typeRows"></div><div class="actions" style="justify-content:flex-start"><button class="btn small" id="addTypeBtn">新增類型</button></div></div><div class="panel"><h2>最近稽核紀錄</h2><div class="history" id="auditRows"></div></div></div></section>
+    <section id="view-pending" class="hidden"><div class="panel"><h2 data-i18n="pending_title">待處理</h2><p style="color:var(--muted)" data-i18n="pending_note">設備資料與保管權移轉分開確認。</p><div class="pending-list" id="pendingList"></div></div></section>
+    <section id="view-manage" class="hidden"><div class="manage-grid"><div class="panel"><h2 data-i18n="f_type">設備類型</h2><div id="typeRows"></div><div class="actions" style="justify-content:flex-start"><button class="btn small" id="addTypeBtn" data-i18n="mg_add_type">新增類型</button></div></div><div class="panel"><h2 data-i18n="mg_audit">最近稽核紀錄</h2><div class="history" id="auditRows"></div></div></div></section>
     </div>
     <section id="personalArea" class="hidden">
-      <div class="personal-head"><div><h2>個人資產調查</h2><p>登錄即代表同事可聯絡詢問借用；是否出借仍由擁有人自行決定。</p></div><button class="btn primary" id="personalNewBtn"><i data-lucide="plus"></i>登錄我的資產</button></div>
+      <div class="personal-head"><div><h2 data-i18n="p_title">個人資產調查</h2><p data-i18n="p_note">登錄即代表同事可聯絡詢問借用。</p></div><button class="btn primary" id="personalNewBtn"><i data-lucide="plus"></i><span data-i18n="p_new">登錄我的資產</span></button></div>
       <div class="personal-filters">
-        <div class="search"><i data-lucide="search" width="18"></i><label class="sr-only" for="personalQ">搜尋個人資產</label><input class="control" id="personalQ" placeholder="品牌、型號、顏色、擁有人…"></div>
-        <select class="control" id="personalType" aria-label="個人資產類型"><option value="">所有類型</option></select>
-        <label class="checkline"><input type="checkbox" id="personalMine"> 只看我的</label>
-        <label class="checkline hidden" id="personalInactiveWrap"><input type="checkbox" id="personalInactive"> 顯示離職／停權資料</label>
+        <div class="search"><i data-lucide="search" width="18"></i><label class="sr-only" for="personalQ" data-i18n="p_search">搜尋個人資產</label><input class="control" id="personalQ" data-i18n-ph="p_ph_search" placeholder="品牌、型號、顏色、擁有人…"></div>
+        <select class="control" id="personalType" data-i18n-label="p_type_aria" aria-label="個人資產類型"><option value="" data-i18n="opt_all_types">所有類型</option></select>
+        <label class="checkline"><input type="checkbox" id="personalMine"> <span data-i18n="p_mine">只看我的</span></label>
+        <label class="checkline hidden" id="personalInactiveWrap"><input type="checkbox" id="personalInactive"> <span data-i18n="p_inactive">顯示離職／停權資料</span></label>
       </div>
-      <div class="summary"><span id="personalTotal">共 0 筆</span><span>只顯示自願登錄資料</span></div>
-      <div class="grid" id="personalCards" aria-live="polite"></div><button class="btn loadmore hidden" id="personalMore">載入下 30 筆</button>
+      <div class="summary"><span id="personalTotal" data-i18n="p_count0">共 0 筆</span><span data-i18n="p_voluntary">只顯示自願登錄資料</span></div>
+      <div class="grid" id="personalCards" aria-live="polite"></div><button class="btn loadmore hidden" id="personalMore" data-i18n="load_more">載入下 30 筆</button>
     </section>
   </main>
 
-  <div class="overlay" id="formOverlay" role="dialog" aria-modal="true" aria-labelledby="formTitle"><div class="modal"><div class="modal-head"><h2 id="formTitle">新增設備</h2><button class="icon-btn close" data-close="formOverlay" aria-label="關閉"><i data-lucide="x"></i></button></div><form class="modal-body" id="assetForm"><div class="form-grid">
-    <div class="field"><label class="required" for="fType">設備類型</label><select class="control" id="fType" required></select></div>
-    <div class="field"><label class="required" for="fBrand">品牌</label><input class="control" id="fBrand" required></div>
-    <div class="field wide"><label class="required" for="fModel">型號或名稱</label><input class="control" id="fModel" required></div>
-    <div class="field"><label for="fOfficial">原廠代號</label><input class="control" id="fOfficial"></div><div class="field"><label for="fColor">顏色</label><input class="control" id="fColor"></div>
-    <div class="field"><label for="fSerial">原廠序號</label><input class="control" id="fSerial"></div><div class="field"><label for="fImei">IMEI 1（手機）</label><input class="control" id="fImei"></div>
-    <div class="field"><label class="required" for="fOwner">資產歸屬單位</label><select class="control" id="fOwner" required></select></div><div class="field"><label class="required" for="fCustodian">初始保管人</label><select class="control" id="fCustodian" required></select></div>
-    <div class="field"><label for="fAmount">採購金額</label><input class="control" id="fAmount" type="number" min="0" step="0.01"></div><div class="field"><label for="fCurrency">幣別</label><select class="control" id="fCurrency"><option>NTD</option><option>USD</option><option>CNY</option><option>HKD</option><option>VND</option></select></div>
-    <div class="field"><label for="fCountry">採購國家／地區</label><input class="control" id="fCountry"></div><div class="field"><label for="fVendor">商店／供應商</label><input class="control" id="fVendor"></div>
-    <div class="field wide"><label for="fNote">來源與備註</label><textarea class="control" id="fNote"></textarea></div>
-  </div><div class="live" id="formLive" aria-live="polite"></div><div class="actions"><button type="button" class="btn" data-close="formOverlay">取消</button><button class="btn primary" type="submit">建立並尋找官方圖片</button></div></form></div></div>
+  <div class="overlay" id="formOverlay" role="dialog" aria-modal="true" aria-labelledby="formTitle"><div class="modal"><div class="modal-head"><h2 id="formTitle" data-i18n="form_new">新增設備</h2><button class="icon-btn close" data-close="formOverlay" data-i18n-label="btn_close" aria-label="關閉"><i data-lucide="x"></i></button></div><form class="modal-body" id="assetForm"><div class="form-grid">
+    <div class="field"><label class="required" for="fType" data-i18n="f_type">設備類型</label><select class="control" id="fType" required></select></div>
+    <div class="field"><label class="required" for="fBrand" data-i18n="fld_brand">品牌</label><input class="control" id="fBrand" required></div>
+    <div class="field wide"><label class="required" for="fModel" data-i18n="fld_model_name">型號或名稱</label><input class="control" id="fModel" required></div>
+    <div class="field"><label for="fOfficial" data-i18n="fld_official">原廠代號</label><input class="control" id="fOfficial"></div><div class="field"><label for="fColor" data-i18n="fld_color">顏色</label><input class="control" id="fColor"></div>
+    <div class="field"><label for="fSerial" data-i18n="fld_serial">原廠序號</label><input class="control" id="fSerial"></div><div class="field"><label for="fImei" data-i18n="fld_imei">IMEI 1（手機）</label><input class="control" id="fImei"></div>
+    <div class="field"><label class="required" for="fOwner" data-i18n="fld_owner_unit">資產歸屬單位</label><select class="control" id="fOwner" required></select></div><div class="field"><label class="required" for="fCustodian" data-i18n="fld_custodian0">初始保管人</label><select class="control" id="fCustodian" required></select></div>
+    <div class="field"><label for="fAmount" data-i18n="fld_amount">採購金額</label><input class="control" id="fAmount" type="number" min="0" step="0.01"></div><div class="field"><label for="fCurrency" data-i18n="fld_currency">幣別</label><select class="control" id="fCurrency"><option>NTD</option><option>USD</option><option>CNY</option><option>HKD</option><option>VND</option></select></div>
+    <div class="field"><label for="fCountry" data-i18n="fld_country">採購國家／地區</label><input class="control" id="fCountry"></div><div class="field"><label for="fVendor" data-i18n="fld_vendor">商店／供應商</label><input class="control" id="fVendor"></div>
+    <div class="field wide"><label for="fNote" data-i18n="fld_source_note">來源與備註</label><textarea class="control" id="fNote"></textarea></div>
+  </div><div class="live" id="formLive" aria-live="polite"></div><div class="actions"><button type="button" class="btn" data-close="formOverlay" data-i18n="btn_cancel">取消</button><button class="btn primary" type="submit" data-i18n="btn_create_find">建立並尋找官方圖片</button></div></form></div></div>
 
-  <div class="overlay" id="detailOverlay" role="dialog" aria-modal="true" aria-labelledby="detailHeading"><div class="modal"><div class="modal-head"><h2 id="detailHeading">設備詳情</h2><button class="icon-btn close" data-close="detailOverlay" aria-label="關閉"><i data-lucide="x"></i></button></div><div class="modal-body" id="detailBody"></div></div></div>
-  <div class="overlay" id="actionOverlay" role="dialog" aria-modal="true" aria-labelledby="actionTitle"><div class="modal" style="width:min(650px,100%)"><div class="modal-head"><h2 id="actionTitle">處理設備</h2><button class="icon-btn close" data-close="actionOverlay"><i data-lucide="x"></i></button></div><form class="modal-body" id="actionForm"><div id="actionFields" class="form-grid"></div><div class="actions"><button type="button" class="btn" data-close="actionOverlay">取消</button><button class="btn primary" type="submit">確認送出</button></div></form></div></div>
-  <div class="overlay" id="personalFormOverlay" role="dialog" aria-modal="true" aria-labelledby="personalFormTitle"><div class="modal" style="width:min(650px,100%)"><div class="modal-head"><h2 id="personalFormTitle">登錄我的個人資產</h2><button class="icon-btn close" data-close="personalFormOverlay"><i data-lucide="x"></i></button></div><form class="modal-body" id="personalForm"><input type="hidden" id="personalId"><div class="form-grid"><div class="field"><label class="required" for="personalFormType">設備類型</label><select class="control" id="personalFormType" required></select></div><div class="field"><label class="required" for="personalBrand">品牌</label><input class="control" id="personalBrand" required maxlength="120"></div><div class="field"><label class="required" for="personalModel">型號</label><input class="control" id="personalModel" required maxlength="200"></div><div class="field"><label for="personalColor">顏色</label><input class="control" id="personalColor" maxlength="80"></div></div><p class="sub" style="min-height:0;margin-top:16px">儲存後立即顯示，官方圖片會在背景補上；找不到時可自行上傳。</p><div class="actions"><button type="button" class="btn" data-close="personalFormOverlay">取消</button><button class="btn primary" type="submit">儲存</button></div></form></div></div>
+  <div class="overlay" id="detailOverlay" role="dialog" aria-modal="true" aria-labelledby="detailHeading"><div class="modal"><div class="modal-head"><h2 id="detailHeading" data-i18n="detail_title">設備詳情</h2><button class="icon-btn close" data-close="detailOverlay" data-i18n-label="btn_close" aria-label="關閉"><i data-lucide="x"></i></button></div><div class="modal-body" id="detailBody"></div></div></div>
+  <div class="overlay" id="actionOverlay" role="dialog" aria-modal="true" aria-labelledby="actionTitle"><div class="modal" style="width:min(650px,100%)"><div class="modal-head"><h2 id="actionTitle" data-i18n="act_title">處理設備</h2><button class="icon-btn close" data-close="actionOverlay"><i data-lucide="x"></i></button></div><form class="modal-body" id="actionForm"><div id="actionFields" class="form-grid"></div><div class="actions"><button type="button" class="btn" data-close="actionOverlay" data-i18n="btn_cancel">取消</button><button class="btn primary" type="submit" data-i18n="btn_submit">確認送出</button></div></form></div></div>
+  <div class="overlay" id="personalFormOverlay" role="dialog" aria-modal="true" aria-labelledby="personalFormTitle"><div class="modal" style="width:min(650px,100%)"><div class="modal-head"><h2 id="personalFormTitle" data-i18n="p_form_new">登錄我的個人資產</h2><button class="icon-btn close" data-close="personalFormOverlay"><i data-lucide="x"></i></button></div><form class="modal-body" id="personalForm"><input type="hidden" id="personalId"><div class="form-grid"><div class="field"><label class="required" for="personalFormType" data-i18n="f_type">設備類型</label><select class="control" id="personalFormType" required></select></div><div class="field"><label class="required" for="personalBrand" data-i18n="fld_brand">品牌</label><input class="control" id="personalBrand" required maxlength="120"></div><div class="field"><label class="required" for="personalModel" data-i18n="fld_model">型號</label><input class="control" id="personalModel" required maxlength="200"></div><div class="field"><label for="personalColor" data-i18n="fld_color">顏色</label><input class="control" id="personalColor" maxlength="80"></div></div><p class="sub" style="min-height:0;margin-top:16px" data-i18n="p_form_note">儲存後立即顯示。</p><div class="actions"><button type="button" class="btn" data-close="personalFormOverlay" data-i18n="btn_cancel">取消</button><button class="btn primary" type="submit" data-i18n="btn_save">儲存</button></div></form></div></div>
   <input class="hidden" id="personalImageInput" type="file" accept="image/jpeg,image/png,image/webp">
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
 const API='https://tcvlnpgpuphdalzvmoyo.supabase.co/functions/v1/pd-devices-api',KEY='comart-portal-session';let S=null,B=null,items=[],offset=0,total=0,current=null,actionHandler=null,loadSeq=0,scope='company',personalItems=[],personalOffset=0,personalTotal=0,personalSeq=0,personalImageId=null;
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+/* ═══ i18n ═══
+   🔴 與其他系統共用 localStorage['comart-lang']（en / zh-TW / zh-CN / vi / ja）。
+   🔴 設備「資料」不翻：品牌、型號、顏色、資產編號、人名、備註都是使用者輸入的內容，
+      翻了就是竄改。只翻介面文案，以及 status／purpose／condition 這類列舉值。
+   🔴 切語言一定要重畫：卡片與詳情都是 JS 產生的，只套 data-i18n 會變成
+      「頁籤換了、卡片沒換」。dvRerender() 每個 render 各自 try 包起來 ——
+      沒初始化過的區塊丟例外不該擋住其他區塊（同 board 的 bRerenderAll）。*/
+const DV_LANGS=[['zh-TW','繁中'],['zh-CN','简中'],['en','EN'],['vi','VI'],['ja','日本語']];
+const DV_I18N={
+'zh-TW':{
+  custodian_of:'保管：{n}',
+  open_asset:'開啟 {c} {b} {m}',
+  skip:'跳至主要內容',
+  app_title:'手機與配件',
+  verifying:'驗證中…',
+  hero_p:'公司資產依流程管理；個人資產由同事自行登錄與維護。',
+  btn_new_company:'新增公司設備',
+  scope_group:'資產大類',
+  scope_company:'公司資產',
+  scope_personal:'個人資產',
+  tabs_aria:'手機與配件功能',
+  tab_list:'設備清單',
+  tab_pending:'待我確認',
+  tab_manage:'管理',
+  search_device:'搜尋設備',
+  ph_search:'資產編號、品牌、型號、序號、保管人…',
+  f_type:'設備類型',
+  opt_all_types:'所有類型',
+  f_status:'設備狀態',
+  opt_all_status:'所有狀態',
+  f_owner:'資產歸屬',
+  opt_all_owner:'所有歸屬單位',
+  show_retired:'顯示已退役設備',
+  loading:'讀取中…',
+  load_more:'載入下 30 筆',
+  count_shown:'共 {t} 筆，已顯示 {n} 筆',
+  sort_rank:'依命中率排序',
+  sort_avail:'可借用設備優先',
+  no_match:'沒有符合條件的設備',
+  load_failed:'讀取失敗：{m}',
+  init_failed:'初始化失敗：{m}',
+  st_available:'可借用',
+  st_in_use:'使用中',
+  st_maintenance:'維修中',
+  st_lost:'遺失／遭竊',
+  st_retired:'已退役',
+  pu_borrow:'借用',
+  pu_product_test:'產品測試',
+  pu_production:'生產需求',
+  pu_maintenance:'維修',
+  pu_other:'其他',
+  pu_return:'歸還',
+  cd_normal:'正常',
+  cd_used:'有使用痕跡',
+  cd_damaged:'有損壞',
+  no_color:'顏色未填',
+  custodian_label:'保管',
+  not_linked:'尚未連結',
+  expect_prefix:'預計 {d}',
+  act_borrow:'申請借用',
+  act_transfer:'設備移轉',
+  not_requestable:'暫不可申請',
+  pending_title:'待處理',
+  pending_note:'設備資料與保管權移轉分開確認，不會因資料缺漏阻擋舊設備啟用。',
+  pending_empty:'目前沒有待處理項目',
+  time_conflict:'時段衝突',
+  btn_confirm:'確認',
+  btn_reject:'拒絕',
+  btn_force:'例外核准',
+  btn_cancel_req:'取消',
+  device_word:'設備',
+  mg_add_type:'新增類型',
+  mg_audit:'最近稽核紀錄',
+  mg_no_record:'尚無紀錄',
+  dlg_add_type:'新增設備類型',
+  fld_code_initial:'代碼首字母',
+  fld_name_zh:'中文名稱',
+  fld_name_en:'英文名稱',
+  p_title:'個人資產調查',
+  p_note:'登錄即代表同事可聯絡詢問借用；是否出借仍由擁有人自行決定。',
+  p_new:'登錄我的資產',
+  p_search:'搜尋個人資產',
+  p_ph_search:'品牌、型號、顏色、擁有人…',
+  p_type_aria:'個人資產類型',
+  p_mine:'只看我的',
+  p_inactive:'顯示離職／停權資料',
+  p_count0:'共 0 筆',
+  p_voluntary:'只顯示自願登錄資料',
+  p_form_new:'登錄我的個人資產',
+  p_form_edit:'編輯我的個人資產',
+  p_form_note:'儲存後立即顯示，官方圖片會在背景補上；找不到時可自行上傳。',
+  p_empty:'尚無符合條件的個人資產',
+  p_deleted:'個人資產已永久刪除',
+  p_updated:'個人資產已更新',
+  p_created:'已登錄，官方圖片將在背景補上',
+  p_acct_disabled:'帳號已停用',
+  p_no_dept:'部門／據點未設定',
+  p_del_confirm:'永久刪除 {b} {m}？資料與圖片都無法復原。',
+  p_img_too_big:'圖片不可超過 8 MB',
+  p_uploading:'正在上傳照片…',
+  p_img_updated:'照片已更新',
+  btn_edit:'編輯',
+  btn_change_photo_s:'換照片',
+  btn_delete:'刪除',
+  form_new:'新增設備',
+  fld_brand:'品牌',
+  fld_model_name:'型號或名稱',
+  fld_model:'型號',
+  fld_official:'原廠代號',
+  fld_color:'顏色',
+  fld_serial:'原廠序號',
+  fld_imei:'IMEI 1（手機）',
+  fld_owner_unit:'資產歸屬單位',
+  fld_custodian0:'初始保管人',
+  fld_amount:'採購金額',
+  fld_currency:'幣別',
+  fld_country:'採購國家／地區',
+  fld_vendor:'商店／供應商',
+  fld_source_note:'來源與備註',
+  btn_cancel:'取消',
+  btn_create_find:'建立並尋找官方圖片',
+  creating:'建立資料並查找官方圖片中…',
+  created_ok:'已建立 {c}，可立即申請借用',
+  detail_title:'設備詳情',
+  act_title:'處理設備',
+  btn_submit:'確認送出',
+  btn_save:'儲存',
+  btn_close:'關閉',
+  d_custodian:'保管人',
+  d_not_linked:'未連結',
+  d_location:'目前位置',
+  d_purchase:'採購',
+  d_source:'來源',
+  d_warranty:'保固至',
+  d_todo:'待補：{n}',
+  d_receipts:'採購單據',
+  d_view_receipt:'查看發票／收據',
+  d_specs:'設備規格',
+  d_no_specs:'尚未填寫規格',
+  d_history:'借用與保管歷史',
+  d_no_transfer:'尚無移轉紀錄',
+  d_repairs:'維修紀錄',
+  d_no_repair:'尚無維修紀錄',
+  d_no_vendor:'廠商未填',
+  d_print_label:'列印單張標籤',
+  d_img_source:'圖片來源',
+  d_img_got:'取得日期：{d}',
+  d_image:'設備圖片',
+  btn_return_req:'提出歸還',
+  btn_inventory:'年度盤點確認',
+  btn_edit_core:'編輯核心資料',
+  btn_update_status:'更新狀態',
+  btn_add_repair:'新增維修',
+  btn_change_photo:'更換照片',
+  btn_upload_receipt:'上傳發票／收據',
+  btn_restore:'恢復使用',
+  btn_mark_lost:'遺失／遭竊',
+  btn_retire:'退役',
+  dlg_borrow:'申請借用 {c}',
+  dlg_transfer:'設備移轉 {c}',
+  l_asset:'申請設備',
+  l_borrower:'借用人',
+  l_purpose:'用途',
+  l_start:'開始日',
+  l_due:'預計歸還日',
+  l_project:'客戶／專案／產品編號',
+  l_purpose_note:'用途說明',
+  l_transfer_asset:'移轉設備',
+  l_cur_custodian:'目前保管人',
+  l_new_custodian:'新保管人',
+  me_suffix:'（本人）',
+  l_transfer_reason:'移轉原因',
+  pu_repair_arrange:'維修安排',
+  l_transfer_note:'移轉說明（選其他時必填）',
+  transfer_perm_note:'這是永久更換保管人，不設定歸還日；交付雙方確認後才會生效。',
+  dlg_edit_core:'編輯核心資料',
+  fld_model_formal:'正式型號',
+  dlg_update_status:'更新設備狀態',
+  l_status:'狀態',
+  l_expected_date:'預計可用日',
+  l_condition_note:'狀況備註',
+  dlg_add_repair:'新增維修紀錄',
+  l_sent_on:'送修日期',
+  l_repair_reason:'送修原因',
+  l_repair_vendor:'維修廠商',
+  l_cost:'費用',
+  l_returned_on:'取回日期',
+  l_repair_result:'維修結果',
+  dlg_retire:'退役設備',
+  l_retire_date:'退役日期',
+  l_reason:'原因',
+  rt_scrap:'報廢',
+  rt_sold:'出售',
+  rt_donated:'捐贈',
+  rt_broken:'損壞無法修復',
+  l_note:'說明',
+  dlg_lost:'標記遺失／遭竊',
+  l_happened_on:'發生日期',
+  dlg_inventory:'年度盤點確認',
+  l_inv_result:'盤點結果',
+  inv_held:'仍在保管',
+  inv_abnormal:'設備異常',
+  inv_missing:'已找不到',
+  l_memo:'備註',
+  dlg_upload_photo:'上傳實物照片',
+  file_hint:'{t}，最大 8 MB',
+  file_types_receipt:'PDF、JPG 或 PNG',
+  file_types_photo:'JPG、PNG 或 WebP',
+  pick_file:'請選擇檔案',
+  confirm_restore:'確定恢復為可借用？',
+  restored:'已恢復',
+  dlg_confirm_transfer:'確認設備移轉',
+  l_condition:'設備狀況',
+  l_condition_desc:'狀況說明',
+  cancelled:'申請已取消',
+  dlg_reject:'拒絕移轉申請',
+  l_reject_reason:'拒絕原因',
+  dlg_force:'Admin 例外核准',
+  l_force_reason:'保管人離職、停權或無法聯繫的原因',
+  force_note:'需要兩位不同 Platform Admin 分別核准。',
+  return_requested:'已提出歸還，等待原保管人確認',
+  done:'已完成',
+  role_admin:'管理員',
+  role_user:'使用者',
+  cd_missing_accessory:'配件缺少'
+},
+'zh-CN':{
+  custodian_of:'保管：{n}',
+  open_asset:'打开 {c} {b} {m}',
+  skip:'跳至主要内容',
+  app_title:'手机与配件',
+  verifying:'验证中…',
+  hero_p:'公司资产依流程管理；个人资产由同事自行登录与维护。',
+  btn_new_company:'新增公司设备',
+  scope_group:'资产大类',
+  scope_company:'公司资产',
+  scope_personal:'个人资产',
+  tabs_aria:'手机与配件功能',
+  tab_list:'设备清单',
+  tab_pending:'待我确认',
+  tab_manage:'管理',
+  search_device:'搜索设备',
+  ph_search:'资产编号、品牌、型号、序号、保管人…',
+  f_type:'设备类型',
+  opt_all_types:'所有类型',
+  f_status:'设备状态',
+  opt_all_status:'所有状态',
+  f_owner:'资产归属',
+  opt_all_owner:'所有归属单位',
+  show_retired:'显示已退役设备',
+  loading:'读取中…',
+  load_more:'载入下 30 笔',
+  count_shown:'共 {t} 笔，已显示 {n} 笔',
+  sort_rank:'依命中率排序',
+  sort_avail:'可借用设备优先',
+  no_match:'没有符合条件的设备',
+  load_failed:'读取失败：{m}',
+  init_failed:'初始化失败：{m}',
+  st_available:'可借用',
+  st_in_use:'使用中',
+  st_maintenance:'维修中',
+  st_lost:'遗失／遭窃',
+  st_retired:'已退役',
+  pu_borrow:'借用',
+  pu_product_test:'产品测试',
+  pu_production:'生产需求',
+  pu_maintenance:'维修',
+  pu_other:'其他',
+  pu_return:'归还',
+  cd_normal:'正常',
+  cd_used:'有使用痕迹',
+  cd_damaged:'有损坏',
+  no_color:'颜色未填',
+  custodian_label:'保管',
+  not_linked:'尚未连结',
+  expect_prefix:'预计 {d}',
+  act_borrow:'申请借用',
+  act_transfer:'设备移转',
+  not_requestable:'暂不可申请',
+  pending_title:'待处理',
+  pending_note:'设备资料与保管权移转分开确认，不会因资料缺漏阻挡旧设备启用。',
+  pending_empty:'目前没有待处理项目',
+  time_conflict:'时段冲突',
+  btn_confirm:'确认',
+  btn_reject:'拒绝',
+  btn_force:'例外核准',
+  btn_cancel_req:'取消',
+  device_word:'设备',
+  mg_add_type:'新增类型',
+  mg_audit:'最近稽核记录',
+  mg_no_record:'尚无记录',
+  dlg_add_type:'新增设备类型',
+  fld_code_initial:'代码首字母',
+  fld_name_zh:'中文名称',
+  fld_name_en:'英文名称',
+  p_title:'个人资产调查',
+  p_note:'登录即代表同事可联络询问借用；是否出借仍由拥有人自行决定。',
+  p_new:'登录我的资产',
+  p_search:'搜索个人资产',
+  p_ph_search:'品牌、型号、颜色、拥有人…',
+  p_type_aria:'个人资产类型',
+  p_mine:'只看我的',
+  p_inactive:'显示离职／停权资料',
+  p_count0:'共 0 笔',
+  p_voluntary:'只显示自愿登录资料',
+  p_form_new:'登录我的个人资产',
+  p_form_edit:'编辑我的个人资产',
+  p_form_note:'保存后立即显示，官方图片会在背景补上；找不到时可自行上传。',
+  p_empty:'尚无符合条件的个人资产',
+  p_deleted:'个人资产已永久删除',
+  p_updated:'个人资产已更新',
+  p_created:'已登录，官方图片将在背景补上',
+  p_acct_disabled:'帐号已停用',
+  p_no_dept:'部门／据点未设定',
+  p_del_confirm:'永久删除 {b} {m}？资料与图片都无法复原。',
+  p_img_too_big:'图片不可超过 8 MB',
+  p_uploading:'正在上传照片…',
+  p_img_updated:'照片已更新',
+  btn_edit:'编辑',
+  btn_change_photo_s:'换照片',
+  btn_delete:'删除',
+  form_new:'新增设备',
+  fld_brand:'品牌',
+  fld_model_name:'型号或名称',
+  fld_model:'型号',
+  fld_official:'原厂代号',
+  fld_color:'颜色',
+  fld_serial:'原厂序号',
+  fld_imei:'IMEI 1（手机）',
+  fld_owner_unit:'资产归属单位',
+  fld_custodian0:'初始保管人',
+  fld_amount:'采购金额',
+  fld_currency:'币别',
+  fld_country:'采购国家／地区',
+  fld_vendor:'商店／供应商',
+  fld_source_note:'来源与备注',
+  btn_cancel:'取消',
+  btn_create_find:'建立并寻找官方图片',
+  creating:'建立资料并查找官方图片中…',
+  created_ok:'已建立 {c}，可立即申请借用',
+  detail_title:'设备详情',
+  act_title:'处理设备',
+  btn_submit:'确认送出',
+  btn_save:'保存',
+  btn_close:'关闭',
+  d_custodian:'保管人',
+  d_not_linked:'未连结',
+  d_location:'目前位置',
+  d_purchase:'采购',
+  d_source:'来源',
+  d_warranty:'保固至',
+  d_todo:'待补：{n}',
+  d_receipts:'采购单据',
+  d_view_receipt:'查看发票／收据',
+  d_specs:'设备规格',
+  d_no_specs:'尚未填写规格',
+  d_history:'借用与保管历史',
+  d_no_transfer:'尚无移转记录',
+  d_repairs:'维修记录',
+  d_no_repair:'尚无维修记录',
+  d_no_vendor:'厂商未填',
+  d_print_label:'打印单张标签',
+  d_img_source:'图片来源',
+  d_img_got:'取得日期：{d}',
+  d_image:'设备图片',
+  btn_return_req:'提出归还',
+  btn_inventory:'年度盘点确认',
+  btn_edit_core:'编辑核心资料',
+  btn_update_status:'更新状态',
+  btn_add_repair:'新增维修',
+  btn_change_photo:'更换照片',
+  btn_upload_receipt:'上传发票／收据',
+  btn_restore:'恢复使用',
+  btn_mark_lost:'遗失／遭窃',
+  btn_retire:'退役',
+  dlg_borrow:'申请借用 {c}',
+  dlg_transfer:'设备移转 {c}',
+  l_asset:'申请设备',
+  l_borrower:'借用人',
+  l_purpose:'用途',
+  l_start:'开始日',
+  l_due:'预计归还日',
+  l_project:'客户／项目／产品编号',
+  l_purpose_note:'用途说明',
+  l_transfer_asset:'移转设备',
+  l_cur_custodian:'目前保管人',
+  l_new_custodian:'新保管人',
+  me_suffix:'（本人）',
+  l_transfer_reason:'移转原因',
+  pu_repair_arrange:'维修安排',
+  l_transfer_note:'移转说明（选其他时必填）',
+  transfer_perm_note:'这是永久更换保管人，不设定归还日；交付双方确认后才会生效。',
+  dlg_edit_core:'编辑核心资料',
+  fld_model_formal:'正式型号',
+  dlg_update_status:'更新设备状态',
+  l_status:'状态',
+  l_expected_date:'预计可用日',
+  l_condition_note:'状况备注',
+  dlg_add_repair:'新增维修记录',
+  l_sent_on:'送修日期',
+  l_repair_reason:'送修原因',
+  l_repair_vendor:'维修厂商',
+  l_cost:'费用',
+  l_returned_on:'取回日期',
+  l_repair_result:'维修结果',
+  dlg_retire:'退役设备',
+  l_retire_date:'退役日期',
+  l_reason:'原因',
+  rt_scrap:'报废',
+  rt_sold:'出售',
+  rt_donated:'捐赠',
+  rt_broken:'损坏无法修复',
+  l_note:'说明',
+  dlg_lost:'标记遗失／遭窃',
+  l_happened_on:'发生日期',
+  dlg_inventory:'年度盘点确认',
+  l_inv_result:'盘点结果',
+  inv_held:'仍在保管',
+  inv_abnormal:'设备异常',
+  inv_missing:'已找不到',
+  l_memo:'备注',
+  dlg_upload_photo:'上传实物照片',
+  file_hint:'{t}，最大 8 MB',
+  file_types_receipt:'PDF、JPG 或 PNG',
+  file_types_photo:'JPG、PNG 或 WebP',
+  pick_file:'请选择文件',
+  confirm_restore:'确定恢复为可借用？',
+  restored:'已恢复',
+  dlg_confirm_transfer:'确认设备移转',
+  l_condition:'设备状况',
+  l_condition_desc:'状况说明',
+  cancelled:'申请已取消',
+  dlg_reject:'拒绝移转申请',
+  l_reject_reason:'拒绝原因',
+  dlg_force:'Admin 例外核准',
+  l_force_reason:'保管人离职、停权或无法联系的原因',
+  force_note:'需要两位不同 Platform Admin 分别核准。',
+  return_requested:'已提出归还，等待原保管人确认',
+  done:'已完成',
+  role_admin:'管理员',
+  role_user:'使用者',
+  cd_missing_accessory:'配件缺少'
+},
+en:{
+  custodian_of:'Held by {n}',
+  open_asset:'Open {c} {b} {m}',
+  skip:'Skip to main content',
+  app_title:'Device Custody',
+  verifying:'Verifying…',
+  hero_p:'Company assets follow the managed workflow; personal assets are registered and maintained by colleagues themselves.',
+  btn_new_company:'Add company device',
+  scope_group:'Asset scope',
+  scope_company:'Company assets',
+  scope_personal:'Personal assets',
+  tabs_aria:'Device custody sections',
+  tab_list:'Devices',
+  tab_pending:'Awaiting me',
+  tab_manage:'Manage',
+  search_device:'Search devices',
+  ph_search:'Asset code, brand, model, serial, custodian…',
+  f_type:'Device type',
+  opt_all_types:'All types',
+  f_status:'Device status',
+  opt_all_status:'All statuses',
+  f_owner:'Ownership',
+  opt_all_owner:'All owning units',
+  show_retired:'Show retired devices',
+  loading:'Loading…',
+  load_more:'Load next 30',
+  count_shown:'{n} of {t} shown',
+  sort_rank:'Sorted by relevance',
+  sort_avail:'Available devices first',
+  no_match:'No devices match these filters',
+  load_failed:'Could not load: {m}',
+  init_failed:'Startup failed: {m}',
+  st_available:'Available',
+  st_in_use:'In use',
+  st_maintenance:'Under repair',
+  st_lost:'Lost / stolen',
+  st_retired:'Retired',
+  pu_borrow:'Borrow',
+  pu_product_test:'Product testing',
+  pu_production:'Production need',
+  pu_maintenance:'Repair',
+  pu_other:'Other',
+  pu_return:'Return',
+  cd_normal:'Normal',
+  cd_used:'Signs of use',
+  cd_damaged:'Damaged',
+  no_color:'Colour not set',
+  custodian_label:'Held by',
+  not_linked:'Not linked',
+  expect_prefix:'Expected {d}',
+  act_borrow:'Request to borrow',
+  act_transfer:'Transfer device',
+  not_requestable:'Not available to request',
+  pending_title:'Pending',
+  pending_note:'Device details and custody transfer are confirmed separately, so missing data never blocks an older device from being put into service.',
+  pending_empty:'Nothing pending right now',
+  time_conflict:'Schedule conflict',
+  btn_confirm:'Confirm',
+  btn_reject:'Reject',
+  btn_force:'Override approval',
+  btn_cancel_req:'Cancel',
+  device_word:'Device',
+  mg_add_type:'Add type',
+  mg_audit:'Recent audit log',
+  mg_no_record:'No records yet',
+  dlg_add_type:'Add device type',
+  fld_code_initial:'Code initial',
+  fld_name_zh:'Chinese name',
+  fld_name_en:'English name',
+  p_title:'Personal asset register',
+  p_note:'Registering means colleagues may contact you to ask about borrowing; whether to lend is entirely up to the owner.',
+  p_new:'Register my asset',
+  p_search:'Search personal assets',
+  p_ph_search:'Brand, model, colour, owner…',
+  p_type_aria:'Personal asset type',
+  p_mine:'Mine only',
+  p_inactive:'Show resigned / suspended',
+  p_count0:'0 items',
+  p_voluntary:'Voluntarily registered entries only',
+  p_form_new:'Register my personal asset',
+  p_form_edit:'Edit my personal asset',
+  p_form_note:'It appears immediately after saving; the official image is fetched in the background, and you can upload one yourself if none is found.',
+  p_empty:'No personal assets match these filters',
+  p_deleted:'Personal asset permanently deleted',
+  p_updated:'Personal asset updated',
+  p_created:'Registered — the official image will be added in the background',
+  p_acct_disabled:'Account disabled',
+  p_no_dept:'Department / site not set',
+  p_del_confirm:'Permanently delete {b} {m}? Neither the data nor the image can be recovered.',
+  p_img_too_big:'Images must be 8 MB or smaller',
+  p_uploading:'Uploading photo…',
+  p_img_updated:'Photo updated',
+  btn_edit:'Edit',
+  btn_change_photo_s:'Change photo',
+  btn_delete:'Delete',
+  form_new:'Add device',
+  fld_brand:'Brand',
+  fld_model_name:'Model or name',
+  fld_model:'Model',
+  fld_official:'Manufacturer code',
+  fld_color:'Colour',
+  fld_serial:'Serial number',
+  fld_imei:'IMEI 1 (phone)',
+  fld_owner_unit:'Owning unit',
+  fld_custodian0:'Initial custodian',
+  fld_amount:'Purchase amount',
+  fld_currency:'Currency',
+  fld_country:'Purchase country / region',
+  fld_vendor:'Store / supplier',
+  fld_source_note:'Source and notes',
+  btn_cancel:'Cancel',
+  btn_create_find:'Create and find official image',
+  creating:'Creating the record and looking for the official image…',
+  created_ok:'{c} created — you can request it right away',
+  detail_title:'Device details',
+  act_title:'Device action',
+  btn_submit:'Submit',
+  btn_save:'Save',
+  btn_close:'Close',
+  d_custodian:'Custodian',
+  d_not_linked:'Not linked',
+  d_location:'Current location',
+  d_purchase:'Purchase',
+  d_source:'Source',
+  d_warranty:'Warranty until',
+  d_todo:'Still needed: {n}',
+  d_receipts:'Purchase documents',
+  d_view_receipt:'View invoice / receipt',
+  d_specs:'Specifications',
+  d_no_specs:'No specifications yet',
+  d_history:'Borrowing and custody history',
+  d_no_transfer:'No transfer records yet',
+  d_repairs:'Repair records',
+  d_no_repair:'No repair records yet',
+  d_no_vendor:'Vendor not set',
+  d_print_label:'Print single label',
+  d_img_source:'Image source',
+  d_img_got:'Retrieved on {d}',
+  d_image:'Device image',
+  btn_return_req:'Request return',
+  btn_inventory:'Annual stocktake check',
+  btn_edit_core:'Edit core data',
+  btn_update_status:'Update status',
+  btn_add_repair:'Add repair',
+  btn_change_photo:'Replace photo',
+  btn_upload_receipt:'Upload invoice / receipt',
+  btn_restore:'Restore to service',
+  btn_mark_lost:'Lost / stolen',
+  btn_retire:'Retire',
+  dlg_borrow:'Request to borrow {c}',
+  dlg_transfer:'Transfer {c}',
+  l_asset:'Device',
+  l_borrower:'Borrower',
+  l_purpose:'Purpose',
+  l_start:'Start date',
+  l_due:'Expected return date',
+  l_project:'Customer / project / product no.',
+  l_purpose_note:'Purpose details',
+  l_transfer_asset:'Device to transfer',
+  l_cur_custodian:'Current custodian',
+  l_new_custodian:'New custodian',
+  me_suffix:' (me)',
+  l_transfer_reason:'Transfer reason',
+  pu_repair_arrange:'Repair arrangement',
+  l_transfer_note:'Transfer note (required when Other is selected)',
+  transfer_perm_note:'This permanently changes the custodian with no return date; it takes effect only after both sides confirm the handover.',
+  dlg_edit_core:'Edit core data',
+  fld_model_formal:'Official model',
+  dlg_update_status:'Update device status',
+  l_status:'Status',
+  l_expected_date:'Expected available date',
+  l_condition_note:'Condition notes',
+  dlg_add_repair:'Add repair record',
+  l_sent_on:'Sent for repair on',
+  l_repair_reason:'Reason for repair',
+  l_repair_vendor:'Repair vendor',
+  l_cost:'Cost',
+  l_returned_on:'Collected on',
+  l_repair_result:'Repair outcome',
+  dlg_retire:'Retire device',
+  l_retire_date:'Retirement date',
+  l_reason:'Reason',
+  rt_scrap:'Scrapped',
+  rt_sold:'Sold',
+  rt_donated:'Donated',
+  rt_broken:'Damaged beyond repair',
+  l_note:'Notes',
+  dlg_lost:'Mark as lost / stolen',
+  l_happened_on:'Date it happened',
+  dlg_inventory:'Annual stocktake check',
+  l_inv_result:'Stocktake result',
+  inv_held:'Still in my custody',
+  inv_abnormal:'Device abnormal',
+  inv_missing:'Can no longer find it',
+  l_memo:'Notes',
+  dlg_upload_photo:'Upload device photo',
+  file_hint:'{t}, up to 8 MB',
+  file_types_receipt:'PDF, JPG or PNG',
+  file_types_photo:'JPG, PNG or WebP',
+  pick_file:'Please choose a file',
+  confirm_restore:'Restore this device to Available?',
+  restored:'Restored',
+  dlg_confirm_transfer:'Confirm device transfer',
+  l_condition:'Device condition',
+  l_condition_desc:'Condition details',
+  cancelled:'Request cancelled',
+  dlg_reject:'Reject transfer request',
+  l_reject_reason:'Reason for rejection',
+  dlg_force:'Admin override approval',
+  l_force_reason:'Why the custodian has left, is suspended, or cannot be reached',
+  force_note:'Requires approval from two different Platform admins.',
+  return_requested:'Return requested — waiting for the original custodian to confirm',
+  done:'Done',
+  role_admin:'Administrator',
+  role_user:'User',
+  cd_missing_accessory:'Accessories missing'
+},
+vi:{
+  custodian_of:'Người giữ {n}',
+  open_asset:'Mở {c} {b} {m}',
+  skip:'Bỏ qua đến nội dung chính',
+  app_title:'Quản lý thiết bị',
+  verifying:'Đang xác minh…',
+  hero_p:'Tài sản công ty theo quy trình quản lý; tài sản cá nhân do đồng nghiệp tự đăng ký và duy trì.',
+  btn_new_company:'Thêm thiết bị công ty',
+  scope_group:'Nhóm tài sản',
+  scope_company:'Tài sản công ty',
+  scope_personal:'Tài sản cá nhân',
+  tabs_aria:'Các mục quản lý thiết bị',
+  tab_list:'Danh sách thiết bị',
+  tab_pending:'Chờ tôi xác nhận',
+  tab_manage:'Quản lý',
+  search_device:'Tìm thiết bị',
+  ph_search:'Mã tài sản, hãng, mẫu, số sê-ri, người giữ…',
+  f_type:'Loại thiết bị',
+  opt_all_types:'Tất cả loại',
+  f_status:'Trạng thái thiết bị',
+  opt_all_status:'Tất cả trạng thái',
+  f_owner:'Thuộc về',
+  opt_all_owner:'Tất cả đơn vị sở hữu',
+  show_retired:'Hiện thiết bị đã thanh lý',
+  loading:'Đang tải…',
+  load_more:'Tải 30 mục tiếp theo',
+  count_shown:'Hiển thị {n} trong {t}',
+  sort_rank:'Sắp xếp theo mức phù hợp',
+  sort_avail:'Ưu tiên thiết bị có thể mượn',
+  no_match:'Không có thiết bị nào khớp',
+  load_failed:'Tải thất bại: {m}',
+  init_failed:'Khởi động thất bại: {m}',
+  st_available:'Có thể mượn',
+  st_in_use:'Đang sử dụng',
+  st_maintenance:'Đang sửa chữa',
+  st_lost:'Mất / bị đánh cắp',
+  st_retired:'Đã thanh lý',
+  pu_borrow:'Mượn',
+  pu_product_test:'Thử nghiệm sản phẩm',
+  pu_production:'Nhu cầu sản xuất',
+  pu_maintenance:'Sửa chữa',
+  pu_other:'Khác',
+  pu_return:'Trả lại',
+  cd_normal:'Bình thường',
+  cd_used:'Có dấu vết sử dụng',
+  cd_damaged:'Có hư hỏng',
+  no_color:'Chưa ghi màu',
+  custodian_label:'Người giữ',
+  not_linked:'Chưa liên kết',
+  expect_prefix:'Dự kiến {d}',
+  act_borrow:'Yêu cầu mượn',
+  act_transfer:'Chuyển giao thiết bị',
+  not_requestable:'Tạm thời không thể yêu cầu',
+  pending_title:'Chờ xử lý',
+  pending_note:'Thông tin thiết bị và chuyển giao quyền giữ được xác nhận riêng, nên dữ liệu thiếu không chặn việc đưa thiết bị cũ vào sử dụng.',
+  pending_empty:'Hiện không có mục nào chờ xử lý',
+  time_conflict:'Xung đột lịch',
+  btn_confirm:'Xác nhận',
+  btn_reject:'Từ chối',
+  btn_force:'Phê duyệt ngoại lệ',
+  btn_cancel_req:'Hủy',
+  device_word:'Thiết bị',
+  mg_add_type:'Thêm loại',
+  mg_audit:'Nhật ký kiểm toán gần đây',
+  mg_no_record:'Chưa có bản ghi',
+  dlg_add_type:'Thêm loại thiết bị',
+  fld_code_initial:'Chữ cái mã',
+  fld_name_zh:'Tên tiếng Trung',
+  fld_name_en:'Tên tiếng Anh',
+  p_title:'Khảo sát tài sản cá nhân',
+  p_note:'Đăng ký nghĩa là đồng nghiệp có thể liên hệ hỏi mượn; việc cho mượn hay không hoàn toàn do chủ sở hữu quyết định.',
+  p_new:'Đăng ký tài sản của tôi',
+  p_search:'Tìm tài sản cá nhân',
+  p_ph_search:'Hãng, mẫu, màu, chủ sở hữu…',
+  p_type_aria:'Loại tài sản cá nhân',
+  p_mine:'Chỉ của tôi',
+  p_inactive:'Hiện dữ liệu đã nghỉ việc / bị khóa',
+  p_count0:'0 mục',
+  p_voluntary:'Chỉ hiển thị mục tự nguyện đăng ký',
+  p_form_new:'Đăng ký tài sản cá nhân của tôi',
+  p_form_edit:'Sửa tài sản cá nhân của tôi',
+  p_form_note:'Hiển thị ngay sau khi lưu; ảnh chính hãng được bổ sung ở chế độ nền, nếu không tìm thấy bạn có thể tự tải lên.',
+  p_empty:'Không có tài sản cá nhân nào khớp',
+  p_deleted:'Đã xóa vĩnh viễn tài sản cá nhân',
+  p_updated:'Đã cập nhật tài sản cá nhân',
+  p_created:'Đã đăng ký — ảnh chính hãng sẽ được bổ sung ở chế độ nền',
+  p_acct_disabled:'Tài khoản đã bị khóa',
+  p_no_dept:'Chưa đặt phòng ban / địa điểm',
+  p_del_confirm:'Xóa vĩnh viễn {b} {m}? Không thể khôi phục dữ liệu lẫn hình ảnh.',
+  p_img_too_big:'Ảnh không được vượt quá 8 MB',
+  p_uploading:'Đang tải ảnh lên…',
+  p_img_updated:'Đã cập nhật ảnh',
+  btn_edit:'Sửa',
+  btn_change_photo_s:'Đổi ảnh',
+  btn_delete:'Xóa',
+  form_new:'Thêm thiết bị',
+  fld_brand:'Hãng',
+  fld_model_name:'Mẫu hoặc tên',
+  fld_model:'Mẫu',
+  fld_official:'Mã nhà sản xuất',
+  fld_color:'Màu',
+  fld_serial:'Số sê-ri',
+  fld_imei:'IMEI 1 (điện thoại)',
+  fld_owner_unit:'Đơn vị sở hữu',
+  fld_custodian0:'Người giữ ban đầu',
+  fld_amount:'Giá mua',
+  fld_currency:'Tiền tệ',
+  fld_country:'Quốc gia / khu vực mua',
+  fld_vendor:'Cửa hàng / nhà cung cấp',
+  fld_source_note:'Nguồn và ghi chú',
+  btn_cancel:'Hủy',
+  btn_create_find:'Tạo và tìm ảnh chính hãng',
+  creating:'Đang tạo bản ghi và tìm ảnh chính hãng…',
+  created_ok:'Đã tạo {c} — có thể yêu cầu mượn ngay',
+  detail_title:'Chi tiết thiết bị',
+  act_title:'Thao tác thiết bị',
+  btn_submit:'Gửi xác nhận',
+  btn_save:'Lưu',
+  btn_close:'Đóng',
+  d_custodian:'Người giữ',
+  d_not_linked:'Chưa liên kết',
+  d_location:'Vị trí hiện tại',
+  d_purchase:'Mua sắm',
+  d_source:'Nguồn',
+  d_warranty:'Bảo hành đến',
+  d_todo:'Còn thiếu: {n}',
+  d_receipts:'Chứng từ mua hàng',
+  d_view_receipt:'Xem hóa đơn / biên lai',
+  d_specs:'Thông số thiết bị',
+  d_no_specs:'Chưa có thông số',
+  d_history:'Lịch sử mượn và giữ',
+  d_no_transfer:'Chưa có bản ghi chuyển giao',
+  d_repairs:'Bản ghi sửa chữa',
+  d_no_repair:'Chưa có bản ghi sửa chữa',
+  d_no_vendor:'Chưa ghi nhà cung cấp',
+  d_print_label:'In nhãn đơn',
+  d_img_source:'Nguồn ảnh',
+  d_img_got:'Lấy ngày {d}',
+  d_image:'Ảnh thiết bị',
+  btn_return_req:'Đề nghị trả lại',
+  btn_inventory:'Xác nhận kiểm kê năm',
+  btn_edit_core:'Sửa dữ liệu chính',
+  btn_update_status:'Cập nhật trạng thái',
+  btn_add_repair:'Thêm sửa chữa',
+  btn_change_photo:'Thay ảnh',
+  btn_upload_receipt:'Tải lên hóa đơn / biên lai',
+  btn_restore:'Khôi phục sử dụng',
+  btn_mark_lost:'Mất / bị đánh cắp',
+  btn_retire:'Thanh lý',
+  dlg_borrow:'Yêu cầu mượn {c}',
+  dlg_transfer:'Chuyển giao {c}',
+  l_asset:'Thiết bị',
+  l_borrower:'Người mượn',
+  l_purpose:'Mục đích',
+  l_start:'Ngày bắt đầu',
+  l_due:'Ngày trả dự kiến',
+  l_project:'Khách hàng / dự án / mã sản phẩm',
+  l_purpose_note:'Chi tiết mục đích',
+  l_transfer_asset:'Thiết bị chuyển giao',
+  l_cur_custodian:'Người giữ hiện tại',
+  l_new_custodian:'Người giữ mới',
+  me_suffix:' (tôi)',
+  l_transfer_reason:'Lý do chuyển giao',
+  pu_repair_arrange:'Sắp xếp sửa chữa',
+  l_transfer_note:'Ghi chú chuyển giao (bắt buộc khi chọn Khác)',
+  transfer_perm_note:'Đây là thay đổi người giữ vĩnh viễn, không đặt ngày trả; chỉ có hiệu lực sau khi hai bên xác nhận bàn giao.',
+  dlg_edit_core:'Sửa dữ liệu chính',
+  fld_model_formal:'Mẫu chính thức',
+  dlg_update_status:'Cập nhật trạng thái thiết bị',
+  l_status:'Trạng thái',
+  l_expected_date:'Ngày dự kiến khả dụng',
+  l_condition_note:'Ghi chú tình trạng',
+  dlg_add_repair:'Thêm bản ghi sửa chữa',
+  l_sent_on:'Ngày gửi sửa',
+  l_repair_reason:'Lý do sửa chữa',
+  l_repair_vendor:'Nhà cung cấp sửa chữa',
+  l_cost:'Chi phí',
+  l_returned_on:'Ngày nhận lại',
+  l_repair_result:'Kết quả sửa chữa',
+  dlg_retire:'Thanh lý thiết bị',
+  l_retire_date:'Ngày thanh lý',
+  l_reason:'Lý do',
+  rt_scrap:'Phế bỏ',
+  rt_sold:'Bán',
+  rt_donated:'Quyên góp',
+  rt_broken:'Hư hỏng không sửa được',
+  l_note:'Ghi chú',
+  dlg_lost:'Đánh dấu mất / bị đánh cắp',
+  l_happened_on:'Ngày xảy ra',
+  dlg_inventory:'Xác nhận kiểm kê năm',
+  l_inv_result:'Kết quả kiểm kê',
+  inv_held:'Vẫn đang giữ',
+  inv_abnormal:'Thiết bị bất thường',
+  inv_missing:'Không còn tìm thấy',
+  l_memo:'Ghi chú',
+  dlg_upload_photo:'Tải lên ảnh thiết bị',
+  file_hint:'{t}, tối đa 8 MB',
+  file_types_receipt:'PDF, JPG hoặc PNG',
+  file_types_photo:'JPG, PNG hoặc WebP',
+  pick_file:'Vui lòng chọn tệp',
+  confirm_restore:'Khôi phục thiết bị này thành Có thể mượn?',
+  restored:'Đã khôi phục',
+  dlg_confirm_transfer:'Xác nhận chuyển giao thiết bị',
+  l_condition:'Tình trạng thiết bị',
+  l_condition_desc:'Chi tiết tình trạng',
+  cancelled:'Đã hủy yêu cầu',
+  dlg_reject:'Từ chối yêu cầu chuyển giao',
+  l_reject_reason:'Lý do từ chối',
+  dlg_force:'Phê duyệt ngoại lệ của Admin',
+  l_force_reason:'Lý do người giữ đã nghỉ việc, bị khóa hoặc không liên hệ được',
+  force_note:'Cần hai Platform Admin khác nhau phê duyệt.',
+  return_requested:'Đã đề nghị trả lại — chờ người giữ ban đầu xác nhận',
+  done:'Hoàn tất',
+  role_admin:'Quản trị viên',
+  role_user:'Người dùng',
+  cd_missing_accessory:'Thiếu phụ kiện'
+},
+ja:{
+  custodian_of:'保管者：{n}',
+  open_asset:'{c} {b} {m} を開く',
+  skip:'メインコンテンツへスキップ',
+  app_title:'携帯電話と周辺機器',
+  verifying:'確認中…',
+  hero_p:'会社資産は所定のフローで管理し、個人資産は各自が登録・管理します。',
+  btn_new_company:'会社機器を追加',
+  scope_group:'資産区分',
+  scope_company:'会社資産',
+  scope_personal:'個人資産',
+  tabs_aria:'機器管理の機能',
+  tab_list:'機器一覧',
+  tab_pending:'自分の確認待ち',
+  tab_manage:'管理',
+  search_device:'機器を検索',
+  ph_search:'資産番号、ブランド、型番、シリアル、保管者…',
+  f_type:'機器タイプ',
+  opt_all_types:'すべてのタイプ',
+  f_status:'機器ステータス',
+  opt_all_status:'すべてのステータス',
+  f_owner:'資産帰属',
+  opt_all_owner:'すべての帰属部署',
+  show_retired:'廃棄済み機器を表示',
+  loading:'読み込み中…',
+  load_more:'次の 30 件を読み込む',
+  count_shown:'{t} 件中 {n} 件を表示',
+  sort_rank:'関連度順',
+  sort_avail:'貸出可能な機器を優先',
+  no_match:'条件に一致する機器はありません',
+  load_failed:'読み込みに失敗しました：{m}',
+  init_failed:'初期化に失敗しました：{m}',
+  st_available:'貸出可能',
+  st_in_use:'使用中',
+  st_maintenance:'修理中',
+  st_lost:'紛失・盗難',
+  st_retired:'廃棄済み',
+  pu_borrow:'貸出',
+  pu_product_test:'製品テスト',
+  pu_production:'生産需要',
+  pu_maintenance:'修理',
+  pu_other:'その他',
+  pu_return:'返却',
+  cd_normal:'正常',
+  cd_used:'使用感あり',
+  cd_damaged:'破損あり',
+  no_color:'色未入力',
+  custodian_label:'保管者',
+  not_linked:'未連携',
+  expect_prefix:'予定 {d}',
+  act_borrow:'貸出を申請',
+  act_transfer:'機器を移管',
+  not_requestable:'現在申請できません',
+  pending_title:'保留中',
+  pending_note:'機器情報と保管権の移管は別々に確認するため、情報が欠けていても古い機器の運用開始は妨げられません。',
+  pending_empty:'現在、保留中の項目はありません',
+  time_conflict:'期間の重複',
+  btn_confirm:'確認',
+  btn_reject:'却下',
+  btn_force:'例外承認',
+  btn_cancel_req:'取消',
+  device_word:'機器',
+  mg_add_type:'タイプを追加',
+  mg_audit:'最近の監査ログ',
+  mg_no_record:'記録はまだありません',
+  dlg_add_type:'機器タイプを追加',
+  fld_code_initial:'コード頭文字',
+  fld_name_zh:'中国語名',
+  fld_name_en:'英語名',
+  p_title:'個人資産の登録状況',
+  p_note:'登録すると同僚が貸出の相談に来る場合があります。貸すかどうかは所有者の判断です。',
+  p_new:'自分の資産を登録',
+  p_search:'個人資産を検索',
+  p_ph_search:'ブランド、型番、色、所有者…',
+  p_type_aria:'個人資産のタイプ',
+  p_mine:'自分のみ',
+  p_inactive:'退職・停止中も表示',
+  p_count0:'0 件',
+  p_voluntary:'自主登録された分のみ表示',
+  p_form_new:'自分の個人資産を登録',
+  p_form_edit:'自分の個人資産を編集',
+  p_form_note:'保存すると即座に表示され、公式画像はバックグラウンドで補完されます。見つからない場合は自分でアップロードできます。',
+  p_empty:'条件に一致する個人資産はありません',
+  p_deleted:'個人資産を完全に削除しました',
+  p_updated:'個人資産を更新しました',
+  p_created:'登録しました。公式画像はバックグラウンドで補完されます',
+  p_acct_disabled:'アカウント停止中',
+  p_no_dept:'部署・拠点が未設定',
+  p_del_confirm:'{b} {m} を完全に削除しますか？データも画像も復元できません。',
+  p_img_too_big:'画像は 8 MB 以下にしてください',
+  p_uploading:'写真をアップロード中…',
+  p_img_updated:'写真を更新しました',
+  btn_edit:'編集',
+  btn_change_photo_s:'写真を変更',
+  btn_delete:'削除',
+  form_new:'機器を追加',
+  fld_brand:'ブランド',
+  fld_model_name:'型番または名称',
+  fld_model:'型番',
+  fld_official:'メーカー型番',
+  fld_color:'色',
+  fld_serial:'シリアル番号',
+  fld_imei:'IMEI 1（携帯）',
+  fld_owner_unit:'帰属部署',
+  fld_custodian0:'初期保管者',
+  fld_amount:'購入金額',
+  fld_currency:'通貨',
+  fld_country:'購入国・地域',
+  fld_vendor:'店舗・仕入先',
+  fld_source_note:'入手元・備考',
+  btn_cancel:'キャンセル',
+  btn_create_find:'作成して公式画像を検索',
+  creating:'データを作成し、公式画像を検索中…',
+  created_ok:'{c} を作成しました。すぐに貸出申請できます',
+  detail_title:'機器の詳細',
+  act_title:'機器の操作',
+  btn_submit:'送信する',
+  btn_save:'保存',
+  btn_close:'閉じる',
+  d_custodian:'保管者',
+  d_not_linked:'未連携',
+  d_location:'現在の場所',
+  d_purchase:'購入',
+  d_source:'入手元',
+  d_warranty:'保証期限',
+  d_todo:'要補足：{n}',
+  d_receipts:'購入書類',
+  d_view_receipt:'請求書・領収書を見る',
+  d_specs:'機器仕様',
+  d_no_specs:'仕様は未入力です',
+  d_history:'貸出・保管履歴',
+  d_no_transfer:'移管記録はまだありません',
+  d_repairs:'修理記録',
+  d_no_repair:'修理記録はまだありません',
+  d_no_vendor:'業者未入力',
+  d_print_label:'ラベルを 1 枚印刷',
+  d_img_source:'画像の出典',
+  d_img_got:'取得日：{d}',
+  d_image:'機器の画像',
+  btn_return_req:'返却を申し出る',
+  btn_inventory:'年次棚卸の確認',
+  btn_edit_core:'基本データを編集',
+  btn_update_status:'ステータス更新',
+  btn_add_repair:'修理を追加',
+  btn_change_photo:'写真を差し替え',
+  btn_upload_receipt:'請求書・領収書をアップロード',
+  btn_restore:'再稼働する',
+  btn_mark_lost:'紛失・盗難',
+  btn_retire:'廃棄',
+  dlg_borrow:'{c} の貸出を申請',
+  dlg_transfer:'{c} を移管',
+  l_asset:'対象機器',
+  l_borrower:'借用者',
+  l_purpose:'用途',
+  l_start:'開始日',
+  l_due:'返却予定日',
+  l_project:'顧客・案件・製品番号',
+  l_purpose_note:'用途の説明',
+  l_transfer_asset:'移管する機器',
+  l_cur_custodian:'現在の保管者',
+  l_new_custodian:'新しい保管者',
+  me_suffix:'（本人）',
+  l_transfer_reason:'移管理由',
+  pu_repair_arrange:'修理手配',
+  l_transfer_note:'移管の説明（「その他」選択時は必須）',
+  transfer_perm_note:'これは保管者の恒久的な変更で、返却日は設定しません。双方が引き渡しを確認してから有効になります。',
+  dlg_edit_core:'基本データを編集',
+  fld_model_formal:'正式型番',
+  dlg_update_status:'機器ステータスの更新',
+  l_status:'ステータス',
+  l_expected_date:'利用可能予定日',
+  l_condition_note:'状態メモ',
+  dlg_add_repair:'修理記録を追加',
+  l_sent_on:'修理依頼日',
+  l_repair_reason:'修理理由',
+  l_repair_vendor:'修理業者',
+  l_cost:'費用',
+  l_returned_on:'返却受領日',
+  l_repair_result:'修理結果',
+  dlg_retire:'機器を廃棄',
+  l_retire_date:'廃棄日',
+  l_reason:'理由',
+  rt_scrap:'廃棄処分',
+  rt_sold:'売却',
+  rt_donated:'寄贈',
+  rt_broken:'修復不能な破損',
+  l_note:'説明',
+  dlg_lost:'紛失・盗難として記録',
+  l_happened_on:'発生日',
+  dlg_inventory:'年次棚卸の確認',
+  l_inv_result:'棚卸結果',
+  inv_held:'引き続き保管中',
+  inv_abnormal:'機器に異常',
+  inv_missing:'見つからない',
+  l_memo:'備考',
+  dlg_upload_photo:'実機写真をアップロード',
+  file_hint:'{t}、最大 8 MB',
+  file_types_receipt:'PDF、JPG または PNG',
+  file_types_photo:'JPG、PNG または WebP',
+  pick_file:'ファイルを選択してください',
+  confirm_restore:'この機器を「貸出可能」に戻しますか？',
+  restored:'復旧しました',
+  dlg_confirm_transfer:'機器移管の確認',
+  l_condition:'機器の状態',
+  l_condition_desc:'状態の説明',
+  cancelled:'申請を取り消しました',
+  dlg_reject:'移管申請を却下',
+  l_reject_reason:'却下の理由',
+  dlg_force:'Admin による例外承認',
+  l_force_reason:'保管者が退職・停止中・連絡不能である理由',
+  force_note:'異なる 2 名の Platform 管理者による承認が必要です。',
+  return_requested:'返却を申し出ました。元の保管者の確認待ちです',
+  done:'完了しました',
+  role_admin:'管理者',
+  role_user:'ユーザー',
+  cd_missing_accessory:'付属品不足'
+}
+};
+let DVLANG='zh-TW';
+function DT(k,p){
+  let v=(DV_I18N[DVLANG]||DV_I18N['zh-TW'])[k];
+  if(v===undefined)v=DV_I18N['zh-TW'][k];
+  if(v===undefined)return k;
+  if(p)Object.keys(p).forEach(x=>{v=v.split('{'+x+'}').join(p[x])});
+  return v;
+}
+function dvInitLang(){
+  let l='';try{l=localStorage.getItem('comart-lang')||''}catch{}
+  if(!DV_I18N[l])l=({TW:'zh-TW',CN:'zh-CN',VN:'vi'})[S&&S.site]||'zh-TW';
+  DVLANG=l;document.documentElement.lang=l;
+}
+function dvSetLang(l){
+  if(!DV_I18N[l]||l===DVLANG)return;
+  DVLANG=l;try{localStorage.setItem('comart-lang',l)}catch{}
+  document.documentElement.lang=l;dvApplyI18n();dvRerender();
+}
+function dvApplyI18n(){
+  $$('[data-i18n]').forEach(e=>{e.textContent=DT(e.getAttribute('data-i18n'))});
+  $$('[data-i18n-ph]').forEach(e=>{e.placeholder=DT(e.getAttribute('data-i18n-ph'))});
+  $$('[data-i18n-label]').forEach(e=>{e.setAttribute('aria-label',DT(e.getAttribute('data-i18n-label')))});
+  document.title='COMART '+DT('app_title')+' v1.10';
+  const box=$('#langChips');
+  if(box){
+    box.innerHTML=DV_LANGS.map(l=>`<button class="lchip${l[0]===DVLANG?' on':''}" onclick="dvSetLang('${l[0]}')">${l[1]}</button>`).join('');
+    const on=box.querySelector('.lchip.on');if(on){try{on.scrollIntoView({block:'nearest',inline:'nearest'})}catch{}}
+  }
+  if(B&&B.profile)$('#userMeta').textContent=DT(B.profile.role==='admin'?'role_admin':'role_user')+' · '+B.profile.empId;
+}
+function dvRerender(){
+  try{fillOptions()}catch{}
+  try{renderTypes()}catch{}
+  try{renderCards()}catch{}
+  try{if(scope==='personal')renderPersonalCards()}catch{}
+  try{if(current)renderDetail()}catch{}
+  try{if($('.tab.active')?.dataset.tab==='pending')loadPending()}catch{}
+  try{lucide.createIcons()}catch{}
+}
 function decode(v){try{return JSON.parse(decodeURIComponent(escape(atob(v))))}catch{return null}}
 function toast(msg,err=false){const e=$('#toast');e.textContent=msg;e.className='toast show'+(err?' err':'');clearTimeout(e._t);e._t=setTimeout(()=>e.className='toast',4500)}
 async function api(action,data={}){const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json','x-session':S.sig},body:JSON.stringify({action,...data})});const j=await r.json().catch(()=>({error:'invalid_response'}));if(!r.ok)throw Error(j.error||`HTTP ${r.status}`);return j}
 function open(id){$('#'+id).classList.add('open');setTimeout(()=>$('#'+id).querySelector('button,input,select')?.focus(),20)}function close(id){$('#'+id).classList.remove('open')}
 function fmtDate(v){return v?new Date(v).toLocaleDateString('zh-TW'):'—'}function fmtMoney(a,c){return a==null?'—':`${c||''} ${Number(a).toLocaleString()}`}
-const statusName={available:'可借用',in_use:'使用中',maintenance:'維修中',lost:'遺失／遭竊',retired:'已退役'},purposeName={borrow:'借用',product_test:'產品測試',production:'生產需求',maintenance:'維修',other:'其他',return:'歸還'},conditionName={normal:'正常',used:'有使用痕跡',damaged:'有損壞',missing_accessory:'配件缺少'};
+/* 🔴 列舉值不能在載入時就算好：那樣切語言之後卡片上的狀態會留在舊語言。
+   用 Proxy 讓 `statusName[x]` 這種既有寫法原封不動，但每次取值都走當下的 DT()。
+   查無此鍵時回 undefined（不是回 key 名稱）—— 呼叫端有 `||DT('not_requestable')` 這種
+   後備，回字串會讓那個後備永遠不生效。 */
+const enumName=pre=>new Proxy({},{get:(_,k)=>{const key=pre+String(k);return DV_I18N['zh-TW'][key]!==undefined?DT(key):undefined}});
+const statusName=enumName('st_'),purposeName=enumName('pu_'),conditionName=enumName('cd_');
 function session(){const q=new URLSearchParams(location.search);S=q.get('_ps')?decode(q.get('_ps')):null;if(S?.sig)localStorage.setItem(KEY,JSON.stringify(S));if(!S)try{S=JSON.parse(localStorage.getItem(KEY)||'null')}catch{}if(q.has('_ps')){q.delete('_ps');history.replaceState(null,'',location.pathname+(q.toString()?'?'+q:''))}if(!S?.sig||!S.empId||S.expires&&Date.now()>S.expires){location.href='../index.html';return false}return true}
-async function init(){if(!session())return;B=await api('bootstrap');$('#userName').textContent=B.profile.name;$('#userMeta').textContent=(B.profile.role==='admin'?'管理員':'使用者')+' · '+B.profile.empId;$('#pendingBadge').textContent=B.badges.pendingForMe;if(B.profile.role==='admin'){$('#manageTab').classList.remove('hidden');$('#personalInactiveWrap').classList.remove('hidden')}fillOptions();renderTypes();const assetCode=new URLSearchParams(location.search).get('asset');if(assetCode)$('#q').value=assetCode;await load(true);if(assetCode){const exact=items.find(x=>x.assetCode.toUpperCase()===assetCode.toUpperCase());if(exact)await showDetail(exact.id)}lucide.createIcons()}
-function fillOptions(){const ts=B.types.map(t=>`<option value="${esc(t.code)}">${esc(t.name_zh)} · ${esc(t.code)}xxx</option>`).join('');$('#fType').innerHTML=ts;$('#typeFilter').innerHTML='<option value="">所有類型</option>'+ts;$('#personalType').innerHTML='<option value="">所有類型</option>'+B.types.map(t=>`<option value="${esc(t.code)}">${esc(t.name_zh)}</option>`).join('');$('#personalFormType').innerHTML=B.types.map(t=>`<option value="${esc(t.code)}">${esc(t.name_zh)}</option>`).join('');const users=B.users.map(u=>`<option value="${esc(u.emp_id)}">${esc(u.name_zh||u.name_en||u.emp_id)} · ${esc(u.emp_id)}</option>`).join('');$('#fCustodian').innerHTML=users;$('#fCustodian').value=B.profile.empId;const units=[...new Map([...B.departments,...B.sites].map(x=>[(x.zh||x.en||x.key),x])).values()].map(x=>x.zh||x.en||x.key);$('#fOwner').innerHTML=units.map(x=>`<option>${esc(x)}</option>`).join('');$('#ownerFilter').innerHTML='<option value="">所有歸屬單位</option>'+units.map(x=>`<option>${esc(x)}</option>`).join('')}
-async function load(reset=false){const seq=++loadSeq;if(reset){offset=0;items=[];$('#cards').innerHTML='<div class="empty">讀取中…</div>'}try{const j=await api('list',{query:$('#q').value,typeCode:$('#typeFilter').value,status:$('#statusFilter').value,owner:$('#ownerFilter').value,includeRetired:$('#includeRetired').checked,limit:30,offset});if(seq!==loadSeq)return;total=j.total;items.push(...j.items);offset=items.length;renderCards();$('#loadMore').classList.toggle('hidden',offset>=total)}catch(e){if(seq===loadSeq)$('#cards').innerHTML=`<div class="empty">讀取失敗：${esc(e.message)}</div>`}}
-function renderCards(){$('#totalText').textContent=`共 ${total} 筆，已顯示 ${items.length} 筆`;$('#resultHint').textContent=$('#q').value?'依命中率排序':'可借用設備優先';$('#cards').innerHTML=items.length?items.map(a=>{const canRequest=!['maintenance','lost','retired'].includes(a.status);const reason=statusName[a.status]||'暫不可申請';return`<article class="card" tabindex="0" data-id="${a.id}" aria-label="開啟 ${esc(a.assetCode)} ${esc(a.brand)} ${esc(a.model)}"><div class="card-image">${a.imageUrl?`<img src="${esc(a.imageUrl)}" alt="${esc(a.brand+' '+a.model)}">`:'<i data-lucide="smartphone" class="placeholder"></i>'}<span class="status s-${a.status}">${statusName[a.status]||a.status}</span></div><div class="card-body"><span class="code">${esc(a.assetCode)}</span><h3>${esc(a.brand)} ${esc(a.model)}</h3><div class="sub">${esc(a.color||'顏色未填')} · ${esc(B.types.find(t=>t.code===a.typeCode)?.name_zh||a.typeCode)}</div><div class="meta"><span class="custodian">保管：${esc(a.custodianName||'尚未連結')}</span><span>${a.expectedAvailableDate?'預計 '+fmtDate(a.expectedAvailableDate):''}</span></div><div class="card-actions"><button class="btn borrow-cta borrow-btn" data-id="${a.id}" ${canRequest?'':'disabled'}><i data-lucide="hand"></i>${canRequest?'申請借用':esc(reason)}</button><button class="btn transfer-cta transfer-btn" data-id="${a.id}" ${canRequest?'':'disabled'}><i data-lucide="repeat-2"></i>設備移轉</button></div></div></article>`}).join(''):'<div class="empty">沒有符合條件的設備</div>';$$('.card').forEach(c=>{c.onclick=()=>showDetail(c.dataset.id);c.onkeydown=e=>{if((e.key==='Enter'||e.key===' ')&&e.target===c){e.preventDefault();showDetail(c.dataset.id)}}});$$('.borrow-btn').forEach(b=>b.onclick=e=>{e.stopPropagation();borrowFromCard(b.dataset.id)});$$('.transfer-btn').forEach(b=>b.onclick=e=>{e.stopPropagation();transferFromCard(b.dataset.id)});lucide.createIcons()}
-async function personalLoad(reset=false){const seq=++personalSeq;if(reset){personalOffset=0;personalItems=[];$('#personalCards').innerHTML='<div class="empty">讀取中…</div>'}try{const j=await api('personalList',{query:$('#personalQ').value,typeCode:$('#personalType').value,mine:$('#personalMine').checked,includeInactive:$('#personalInactive').checked,limit:30,offset:personalOffset});if(seq!==personalSeq)return;personalTotal=j.total;personalItems.push(...j.items);personalOffset=personalItems.length;renderPersonalCards();$('#personalMore').classList.toggle('hidden',personalOffset>=personalTotal)}catch(e){if(seq===personalSeq)$('#personalCards').innerHTML=`<div class="empty">讀取失敗：${esc(e.message)}</div>`}}
-function renderPersonalCards(){$('#personalTotal').textContent=`共 ${personalTotal} 筆，已顯示 ${personalItems.length} 筆`;$('#personalCards').innerHTML=personalItems.length?personalItems.map(a=>{const canDelete=a.isMine||B.profile.role==='admin';const place=[a.ownerDept,a.ownerSite].filter(Boolean).join(' · ')||'部門／據點未設定';return`<article class="card personal-card"><div class="card-image">${a.imageUrl?`<img src="${esc(a.imageUrl)}" alt="${esc(a.brand+' '+a.model)}">`:'<i data-lucide="image" class="placeholder"></i>'}${a.ownerActive?'':'<span class="status s-retired">帳號已停用</span>'}</div><div class="card-body"><span class="code">${esc(B.types.find(t=>t.code===a.typeCode)?.name_zh||a.typeCode)}</span><h3>${esc(a.brand)} ${esc(a.model)}</h3><div class="sub">${esc(a.color||'顏色未填')}</div><div class="owner-line"><span class="owner-avatar">${esc((a.ownerName||'?').slice(0,1))}</span><span><b>${esc(a.ownerName)}</b><small>${esc(place)}</small></span></div>${a.isMine||canDelete?`<div class="personal-actions">${a.isMine?`<button class="btn small" onclick="editPersonal('${a.id}')">編輯</button><button class="btn small" onclick="choosePersonalImage('${a.id}')">換照片</button>`:''}${canDelete?`<button class="btn danger small" onclick="deletePersonal('${a.id}')">刪除</button>`:''}</div>`:''}</div></article>`}).join(''):'<div class="empty">尚無符合條件的個人資產</div>';lucide.createIcons()}
+async function init(){if(!session())return;
+  /* 🔴 語言要在 bootstrap 之前就套用：等 API 回來才套的話，後端不通時
+     整頁會停在中文、連語言鈕都不會出現 —— 而那正是最需要看懂錯誤訊息的時候。*/
+  dvInitLang();dvApplyI18n();
+  B=await api('bootstrap');$('#userName').textContent=B.profile.name;$('#userMeta').textContent=(B.profile.role==='admin'?DT('role_admin'):DT('role_user'))+' · '+B.profile.empId;$('#pendingBadge').textContent=B.badges.pendingForMe;if(B.profile.role==='admin'){$('#manageTab').classList.remove('hidden');$('#personalInactiveWrap').classList.remove('hidden')}fillOptions();renderTypes();const assetCode=new URLSearchParams(location.search).get('asset');if(assetCode)$('#q').value=assetCode;await load(true);if(assetCode){const exact=items.find(x=>x.assetCode.toUpperCase()===assetCode.toUpperCase());if(exact)await showDetail(exact.id)}lucide.createIcons()}
+function fillOptions(){const ts=B.types.map(t=>`<option value="${esc(t.code)}">${esc(t.name_zh)} · ${esc(t.code)}xxx</option>`).join('');$('#fType').innerHTML=ts;$('#typeFilter').innerHTML=`<option value="">${DT('opt_all_types')}</option>`+ts;$('#personalType').innerHTML=`<option value="">${DT('opt_all_types')}</option>`+B.types.map(t=>`<option value="${esc(t.code)}">${esc(t.name_zh)}</option>`).join('');$('#personalFormType').innerHTML=B.types.map(t=>`<option value="${esc(t.code)}">${esc(t.name_zh)}</option>`).join('');const users=B.users.map(u=>`<option value="${esc(u.emp_id)}">${esc(u.name_zh||u.name_en||u.emp_id)} · ${esc(u.emp_id)}</option>`).join('');$('#fCustodian').innerHTML=users;$('#fCustodian').value=B.profile.empId;const units=[...new Map([...B.departments,...B.sites].map(x=>[(x.zh||x.en||x.key),x])).values()].map(x=>x.zh||x.en||x.key);$('#fOwner').innerHTML=units.map(x=>`<option>${esc(x)}</option>`).join('');$('#ownerFilter').innerHTML=`<option value="">${DT('opt_all_owner')}</option>`+units.map(x=>`<option>${esc(x)}</option>`).join('')}
+async function load(reset=false){const seq=++loadSeq;if(reset){offset=0;items=[];$('#cards').innerHTML=`<div class="empty">${DT('loading')}</div>`}try{const j=await api('list',{query:$('#q').value,typeCode:$('#typeFilter').value,status:$('#statusFilter').value,owner:$('#ownerFilter').value,includeRetired:$('#includeRetired').checked,limit:30,offset});if(seq!==loadSeq)return;total=j.total;items.push(...j.items);offset=items.length;renderCards();$('#loadMore').classList.toggle('hidden',offset>=total)}catch(e){if(seq===loadSeq)$('#cards').innerHTML=`<div class="empty">${DT('load_failed',{m:esc(e.message)})}</div>`}}
+function renderCards(){$('#totalText').textContent=DT('count_shown',{t:total,n:items.length});$('#resultHint').textContent=$('#q').value?DT('sort_rank'):DT('sort_avail');$('#cards').innerHTML=items.length?items.map(a=>{const canRequest=!['maintenance','lost','retired'].includes(a.status);const reason=statusName[a.status]||DT('not_requestable');return`<article class="card" tabindex="0" data-id="${a.id}" aria-label="${DT('open_asset',{c:esc(a.assetCode),b:esc(a.brand),m:esc(a.model)})}"><div class="card-image">${a.imageUrl?`<img src="${esc(a.imageUrl)}" alt="${esc(a.brand+' '+a.model)}">`:'<i data-lucide="smartphone" class="placeholder"></i>'}<span class="status s-${a.status}">${statusName[a.status]||a.status}</span></div><div class="card-body"><span class="code">${esc(a.assetCode)}</span><h3>${esc(a.brand)} ${esc(a.model)}</h3><div class="sub">${esc(a.color||DT('no_color'))} · ${esc(B.types.find(t=>t.code===a.typeCode)?.name_zh||a.typeCode)}</div><div class="meta"><span class="custodian">${DT('custodian_of',{n:esc(a.custodianName||DT('not_linked'))})}</span><span>${a.expectedAvailableDate?DT('expect_prefix',{d:fmtDate(a.expectedAvailableDate)}):''}</span></div><div class="card-actions"><button class="btn borrow-cta borrow-btn" data-id="${a.id}" ${canRequest?'':'disabled'}><i data-lucide="hand"></i>${canRequest?DT('act_borrow'):esc(reason)}</button><button class="btn transfer-cta transfer-btn" data-id="${a.id}" ${canRequest?'':'disabled'}><i data-lucide="repeat-2"></i>${DT('act_transfer')}</button></div></div></article>`}).join(''):`<div class="empty">${DT('no_match')}</div>`;$$('.card').forEach(c=>{c.onclick=()=>showDetail(c.dataset.id);c.onkeydown=e=>{if((e.key==='Enter'||e.key===' ')&&e.target===c){e.preventDefault();showDetail(c.dataset.id)}}});$$('.borrow-btn').forEach(b=>b.onclick=e=>{e.stopPropagation();borrowFromCard(b.dataset.id)});$$('.transfer-btn').forEach(b=>b.onclick=e=>{e.stopPropagation();transferFromCard(b.dataset.id)});lucide.createIcons()}
+async function personalLoad(reset=false){const seq=++personalSeq;if(reset){personalOffset=0;personalItems=[];$('#personalCards').innerHTML=`<div class="empty">${DT('loading')}</div>`}try{const j=await api('personalList',{query:$('#personalQ').value,typeCode:$('#personalType').value,mine:$('#personalMine').checked,includeInactive:$('#personalInactive').checked,limit:30,offset:personalOffset});if(seq!==personalSeq)return;personalTotal=j.total;personalItems.push(...j.items);personalOffset=personalItems.length;renderPersonalCards();$('#personalMore').classList.toggle('hidden',personalOffset>=personalTotal)}catch(e){if(seq===personalSeq)$('#personalCards').innerHTML=`<div class="empty">${DT('load_failed',{m:esc(e.message)})}</div>`}}
+function renderPersonalCards(){$('#personalTotal').textContent=DT('count_shown',{t:personalTotal,n:personalItems.length});$('#personalCards').innerHTML=personalItems.length?personalItems.map(a=>{const canDelete=a.isMine||B.profile.role==='admin';const place=[a.ownerDept,a.ownerSite].filter(Boolean).join(' · ')||DT('p_no_dept');return`<article class="card personal-card"><div class="card-image">${a.imageUrl?`<img src="${esc(a.imageUrl)}" alt="${esc(a.brand+' '+a.model)}">`:'<i data-lucide="image" class="placeholder"></i>'}${a.ownerActive?'':`<span class="status s-retired">${DT('p_acct_disabled')}</span>`}</div><div class="card-body"><span class="code">${esc(B.types.find(t=>t.code===a.typeCode)?.name_zh||a.typeCode)}</span><h3>${esc(a.brand)} ${esc(a.model)}</h3><div class="sub">${esc(a.color||DT('no_color'))}</div><div class="owner-line"><span class="owner-avatar">${esc((a.ownerName||'?').slice(0,1))}</span><span><b>${esc(a.ownerName)}</b><small>${esc(place)}</small></span></div>${a.isMine||canDelete?`<div class="personal-actions">${a.isMine?`<button class="btn small" onclick="editPersonal('${a.id}')">${DT('btn_edit')}</button><button class="btn small" onclick="choosePersonalImage('${a.id}')">${DT('btn_change_photo_s')}</button>`:''}${canDelete?`<button class="btn danger small" onclick="deletePersonal('${a.id}')">${DT('btn_delete')}</button>`:''}</div>`:''}</div></article>`}).join(''):`<div class="empty">${DT('p_empty')}</div>`;lucide.createIcons()}
 function switchScope(next){scope=next;const personal=next==='personal';$('#companyArea').classList.toggle('hidden',personal);$('#personalArea').classList.toggle('hidden',!personal);$('#companyScope').classList.toggle('active',!personal);$('#personalScope').classList.toggle('active',personal);$('#newBtn').classList.toggle('hidden',personal);if(personal)personalLoad(true);lucide.createIcons()}
-function openPersonalForm(item=null){$('#personalForm').reset();$('#personalId').value=item?.id||'';$('#personalFormTitle').textContent=item?'編輯我的個人資產':'登錄我的個人資產';if(item){$('#personalFormType').value=item.typeCode;$('#personalBrand').value=item.brand;$('#personalModel').value=item.model;$('#personalColor').value=item.color||''}open('personalFormOverlay')}
+function openPersonalForm(item=null){$('#personalForm').reset();$('#personalId').value=item?.id||'';$('#personalFormTitle').textContent=item?DT('p_form_edit'):DT('p_form_new');if(item){$('#personalFormType').value=item.typeCode;$('#personalBrand').value=item.brand;$('#personalModel').value=item.model;$('#personalColor').value=item.color||''}open('personalFormOverlay')}
 function editPersonal(id){const item=personalItems.find(x=>x.id===id);if(item?.isMine)openPersonalForm(item)}
-async function deletePersonal(id){const item=personalItems.find(x=>x.id===id);if(!item||!confirm(`永久刪除 ${item.brand} ${item.model}？資料與圖片都無法復原。`))return;try{await api('personalDelete',{id});toast('個人資產已永久刪除');await personalLoad(true)}catch(e){toast(e.message,true)}}
+async function deletePersonal(id){const item=personalItems.find(x=>x.id===id);if(!item||!confirm(DT('p_del_confirm',{b:item.brand,m:item.model})))return;try{await api('personalDelete',{id});toast(DT('p_deleted'));await personalLoad(true)}catch(e){toast(e.message,true)}}
 function choosePersonalImage(id){personalImageId=id;$('#personalImageInput').value='';$('#personalImageInput').click()}
-async function showDetail(id){open('detailOverlay');$('#detailBody').innerHTML='<div class="empty">讀取中…</div>';try{current=await api('detail',{id});renderDetail()}catch(e){$('#detailBody').innerHTML=`<div class="empty">${esc(e.message)}</div>`}}
-function renderDetail(){const a=current.item,admin=B.profile.role==='admin',mine=a.custodianEmpId===B.profile.empId;$('#detailHeading').textContent=`${a.assetCode} · ${a.brand} ${a.model}`;const spec=Object.entries(a.specifications||{}).map(([k,v])=>`<div class="fact"><small>${esc(k)}</small>${esc(v)}</div>`).join('');const history=(current.transfers||[]).map(t=>`<div class="history-row"><b>${esc(purposeName[t.purpose]||t.purpose)} · ${esc(t.status)}</b><br><small>${fmtDate(t.requestedAt||t.requested_at)}｜${esc(t.from_emp_id||'—')} → ${esc(t.to_emp_id)}</small>${t.conflict_detected?'<div class="warn">時段衝突</div>':''}${t.transfer_type==='temporary'&&t.status==='accepted'&&t.to_emp_id===B.profile.empId?`<div><button class="btn small" onclick="requestReturn('${t.id}')">提出歸還</button></div>`:''}</div>`).join('')||'<span class="sub">尚無移轉紀錄</span>';const repairs=(current.repairs||[]).map(r=>`<div class="history-row"><b>${fmtDate(r.sent_on)} · ${esc(r.reason)}</b><br><small>${esc(r.vendor||'廠商未填')}｜${fmtMoney(r.cost,r.currency)}</small></div>`).join('')||'<span class="sub">尚無維修紀錄</span>';
-$('#detailBody').innerHTML=`<div class="detail-hero"><div class="detail-image">${a.imageUrl?`<img src="${esc(a.imageUrl)}" alt="設備圖片">`:'<i data-lucide="image" class="placeholder"></i>'}</div><div class="detail-title"><span class="code">${esc(a.assetCode)}</span><h2>${esc(a.brand)} ${esc(a.model)}</h2><div class="pills"><span class="pill s-${a.status}">${statusName[a.status]}</span><span class="pill">${esc(B.types.find(t=>t.code===a.typeCode)?.name_zh||a.typeCode)}</span></div><div class="facts"><div class="fact custodian-fact"><small>保管人</small>${esc(a.custodianName||'未連結')}</div><div class="fact"><small>資產歸屬</small>${esc(a.ownershipUnit)}</div><div class="fact"><small>目前位置</small>${esc(a.currentLocation||'—')}</div><div class="fact"><small>原廠代號</small>${esc(a.officialModelCode||'—')}</div><div class="fact"><small>原廠序號</small>${esc(a.manufacturerSerial||'—')}</div><div class="fact"><small>IMEI</small>${esc(a.imei1||'—')}</div><div class="fact"><small>採購</small>${esc(fmtMoney(a.purchaseAmount,a.purchaseCurrency))}</div><div class="fact"><small>來源</small>${esc([a.purchaseCountry,a.purchaseVendor].filter(Boolean).join(' · ')||'—')}</div><div class="fact"><small>保固至</small>${fmtDate(a.warrantyExpiresOn)}</div></div>${a.missingFields?.length?`<div class="warn">待補：${esc(a.missingFields.join('、'))}</div>`:''}</div></div>
-<div class="actions" style="justify-content:flex-start">${!['maintenance','lost','retired'].includes(a.status)?`<button class="btn borrow-cta" onclick="borrowDialog(current.item)"><i data-lucide="hand"></i>申請借用</button><button class="btn transfer-cta" onclick="transferDialog(current.item)"><i data-lucide="repeat-2"></i>設備移轉</button>`:''}${mine&&new Date().getMonth()===11?`<button class="btn good small" onclick="inventoryDialog()">年度盤點確認</button>`:''}${admin?`<button class="btn small" onclick="editDialog()">編輯核心資料</button>`:''}${admin||mine?`<button class="btn small" onclick="dailyDialog()">更新狀態</button><button class="btn small" onclick="repairDialog()">新增維修</button><button class="btn small" onclick="uploadDialog('image')">更換照片</button><button class="btn small" onclick="uploadDialog('receipt')">上傳發票／收據</button>`:''}${admin?`${a.status==='retired'||a.status==='lost'?'<button class="btn good small" onclick="restoreCurrent()">恢復使用</button>':'<button class="btn danger small" onclick="lostDialog()">遺失／遭竊</button><button class="btn danger small" onclick="retireDialog()">退役</button>'}`:''}</div>
-<div class="sections" style="margin-top:20px">${a.receiptUrl?`<details class="section"><summary>採購單據</summary><div class="inside"><a class="btn small" href="${esc(a.receiptUrl)}" target="_blank" rel="noopener"><i data-lucide="file-text"></i>查看發票／收據</a></div></details>`:''}<details class="section" open><summary>設備規格</summary><div class="inside facts">${spec||'<span class="sub">尚未填寫規格</span>'}</div></details><details class="section"><summary>借用與保管歷史</summary><div class="inside history">${history}</div></details><details class="section"><summary>維修紀錄</summary><div class="inside history">${repairs}</div></details><details class="section"><summary>QR Code</summary><div class="inside"><div id="qr"></div><button class="btn small" onclick="window.print()" style="margin-top:12px">列印單張標籤</button></div></details>${a.imageSourceUrl?`<details class="section"><summary>圖片來源</summary><div class="inside"><a href="${esc(a.imageSourceUrl)}" target="_blank" rel="noopener" style="color:var(--accent)">${esc(a.imageSourceName||a.imageSourceUrl)}</a><p class="sub">取得日期：${fmtDate(a.imageRetrievedAt)}</p></div></details>`:''}</div>`;new QRCode($('#qr'),{text:`https://platform.comart.com.tw/product_dev/devices/?asset=${encodeURIComponent(a.assetCode)}`,width:140,height:140,colorDark:'#07101d',colorLight:'#ffffff'});lucide.createIcons()}
+async function showDetail(id){open('detailOverlay');$('#detailBody').innerHTML=`<div class="empty">${DT('loading')}</div>`;try{current=await api('detail',{id});renderDetail()}catch(e){$('#detailBody').innerHTML=`<div class="empty">${esc(e.message)}</div>`}}
+function renderDetail(){const a=current.item,admin=B.profile.role==='admin',mine=a.custodianEmpId===B.profile.empId;$('#detailHeading').textContent=`${a.assetCode} · ${a.brand} ${a.model}`;const spec=Object.entries(a.specifications||{}).map(([k,v])=>`<div class="fact"><small>${esc(k)}</small>${esc(v)}</div>`).join('');const history=(current.transfers||[]).map(t=>`<div class="history-row"><b>${esc(purposeName[t.purpose]||t.purpose)} · ${esc(t.status)}</b><br><small>${fmtDate(t.requestedAt||t.requested_at)}｜${esc(t.from_emp_id||'—')} → ${esc(t.to_emp_id)}</small>${t.conflict_detected?`<div class="warn">${DT('time_conflict')}</div>`:''}${t.transfer_type==='temporary'&&t.status==='accepted'&&t.to_emp_id===B.profile.empId?`<div><button class="btn small" onclick="requestReturn('${t.id}')">${DT('btn_return_req')}</button></div>`:''}</div>`).join('')||`<span class="sub">${DT('d_no_transfer')}</span>`;const repairs=(current.repairs||[]).map(r=>`<div class="history-row"><b>${fmtDate(r.sent_on)} · ${esc(r.reason)}</b><br><small>${esc(r.vendor||DT('d_no_vendor'))}｜${fmtMoney(r.cost,r.currency)}</small></div>`).join('')||`<span class="sub">${DT('d_no_repair')}</span>`;
+$('#detailBody').innerHTML=`<div class="detail-hero"><div class="detail-image">${a.imageUrl?`<img src="${esc(a.imageUrl)}" alt=DT('d_image')>`:'<i data-lucide="image" class="placeholder"></i>'}</div><div class="detail-title"><span class="code">${esc(a.assetCode)}</span><h2>${esc(a.brand)} ${esc(a.model)}</h2><div class="pills"><span class="pill s-${a.status}">${statusName[a.status]}</span><span class="pill">${esc(B.types.find(t=>t.code===a.typeCode)?.name_zh||a.typeCode)}</span></div><div class="facts"><div class="fact custodian-fact"><small>${DT('d_custodian')}</small>${esc(a.custodianName||DT('d_not_linked'))}</div><div class="fact"><small>${DT('f_owner')}</small>${esc(a.ownershipUnit)}</div><div class="fact"><small>${DT('d_location')}</small>${esc(a.currentLocation||'—')}</div><div class="fact"><small>${DT('fld_official')}</small>${esc(a.officialModelCode||'—')}</div><div class="fact"><small>${DT('fld_serial')}</small>${esc(a.manufacturerSerial||'—')}</div><div class="fact"><small>IMEI</small>${esc(a.imei1||'—')}</div><div class="fact"><small>${DT('d_purchase')}</small>${esc(fmtMoney(a.purchaseAmount,a.purchaseCurrency))}</div><div class="fact"><small>${DT('d_source')}</small>${esc([a.purchaseCountry,a.purchaseVendor].filter(Boolean).join(' · ')||'—')}</div><div class="fact"><small>${DT('d_warranty')}</small>${fmtDate(a.warrantyExpiresOn)}</div></div>${a.missingFields?.length?`<div class="warn">${DT('d_todo',{n:esc(a.missingFields.join('、'))})}</div>`:''}</div></div>
+<div class="actions" style="justify-content:flex-start">${!['maintenance','lost','retired'].includes(a.status)?`<button class="btn borrow-cta" onclick="borrowDialog(current.item)"><i data-lucide="hand"></i>${DT('act_borrow')}</button><button class="btn transfer-cta" onclick="transferDialog(current.item)"><i data-lucide="repeat-2"></i>${DT('act_transfer')}</button>`:''}${mine&&new Date().getMonth()===11?`<button class="btn good small" onclick="inventoryDialog()">${DT('dlg_inventory')}</button>`:''}${admin?`<button class="btn small" onclick="editDialog()">${DT('dlg_edit_core')}</button>`:''}${admin||mine?`<button class="btn small" onclick="dailyDialog()">${DT('btn_update_status')}</button><button class="btn small" onclick="repairDialog()">${DT('btn_add_repair')}</button><button class="btn small" onclick="uploadDialog('image')">${DT('btn_change_photo')}</button><button class="btn small" onclick="uploadDialog('receipt')">${DT('btn_upload_receipt')}</button>`:''}${admin?`${a.status==='retired'||a.status==='lost'?`<button class="btn good small" onclick="restoreCurrent()">${DT('btn_restore')}</button>`:`<button class="btn danger small" onclick="lostDialog()">${DT('btn_mark_lost')}</button><button class="btn danger small" onclick="retireDialog()">${DT('btn_retire')}</button>`}`:''}</div>
+<div class="sections" style="margin-top:20px">${a.receiptUrl?`<details class="section"><summary>${DT('d_receipts')}</summary><div class="inside"><a class="btn small" href="${esc(a.receiptUrl)}" target="_blank" rel="noopener"><i data-lucide="file-text"></i>${DT('d_view_receipt')}</a></div></details>`:''}<details class="section" open><summary>${DT('d_specs')}</summary><div class="inside facts">${spec||`<span class="sub">${DT('d_no_specs')}</span>`}</div></details><details class="section"><summary>${DT('d_history')}</summary><div class="inside history">${history}</div></details><details class="section"><summary>${DT('d_repairs')}</summary><div class="inside history">${repairs}</div></details><details class="section"><summary>QR Code</summary><div class="inside"><div id="qr"></div><button class="btn small" onclick="window.print()" style="margin-top:12px">${DT('d_print_label')}</button></div></details>${a.imageSourceUrl?`<details class="section"><summary>${DT('d_img_source')}</summary><div class="inside"><a href="${esc(a.imageSourceUrl)}" target="_blank" rel="noopener" style="color:var(--accent)">${esc(a.imageSourceName||a.imageSourceUrl)}</a><p class="sub">${DT('d_img_got',{d:fmtDate(a.imageRetrievedAt)})}</p></div></details>`:''}</div>`;new QRCode($('#qr'),{text:`https://platform.comart.com.tw/product_dev/devices/?asset=${encodeURIComponent(a.assetCode)}`,width:140,height:140,colorDark:'#07101d',colorLight:'#ffffff'});lucide.createIcons()}
 function actionDialog(title,html,handler){$('#actionTitle').textContent=title;$('#actionFields').innerHTML=html;actionHandler=handler;open('actionOverlay')}
 function field(id,label,type='text',extra=''){return`<div class="field"><label for="${id}">${label}</label><input class="control" id="${id}" type="${type}" ${extra}></div>`}
-function borrowDialog(item){const me=esc(B.profile.name||B.profile.empId);actionDialog(`申請借用 ${item.assetCode}`,`<div class="field wide"><label>申請設備</label><div class="control">${esc(item.brand)} ${esc(item.model)}</div></div><div class="field"><label>借用人</label><div class="control">${me}</div></div><div class="field"><label>用途</label><select class="control" id="aPurpose"><option value="borrow">借用</option><option value="product_test">產品測試</option><option value="production">生產需求</option><option value="maintenance">維修</option><option value="other">其他</option></select></div>${field('aStart','開始日','date','required')}${field('aDue','預計歸還日','date','required')}${field('aProject','客戶／專案／產品編號')}<div class="field wide"><label>用途說明</label><textarea class="control" id="aNote"></textarea></div>`,async()=>api('requestTransfer',{assetId:item.id,transferType:'temporary',toEmpId:B.profile.empId,purpose:$('#aPurpose').value,projectRef:$('#aProject').value,startsOn:$('#aStart').value,dueOn:$('#aDue').value,purposeNote:$('#aNote').value}))}
-function transferDialog(item){const canChoose=B.profile.role==='admin'||item.custodianEmpId===B.profile.empId;const recipient=canChoose?`<div class="field"><label>新保管人</label><select class="control" id="aTo">${B.users.filter(u=>u.emp_id!==item.custodianEmpId).map(u=>`<option value="${esc(u.emp_id)}">${esc(u.name_zh||u.name_en||u.emp_id)}</option>`).join('')}</select></div>`:`<div class="field"><label>新保管人</label><div class="control">${esc(B.profile.name||B.profile.empId)}（本人）</div><input type="hidden" id="aTo" value="${esc(B.profile.empId)}"></div>`;actionDialog(`設備移轉 ${item.assetCode}`,`<div class="field wide"><label>移轉設備</label><div class="control">${esc(item.brand)} ${esc(item.model)}</div></div><div class="field"><label>目前保管人</label><div class="control">${esc(item.custodianName||'尚未連結')}</div></div>${recipient}<div class="field"><label>移轉原因</label><select class="control" id="aPurpose"><option value="product_test">產品測試</option><option value="production">生產需求</option><option value="maintenance">維修安排</option><option value="other">其他</option></select></div>${field('aProject','客戶／專案／產品編號')}<div class="field wide"><label>移轉說明（選其他時必填）</label><textarea class="control" id="aNote"></textarea></div><p class="wide sub" style="min-height:0">這是永久更換保管人，不設定歸還日；交付雙方確認後才會生效。</p>`,async()=>api('requestTransfer',{assetId:item.id,transferType:'permanent',toEmpId:$('#aTo').value,purpose:$('#aPurpose').value,projectRef:$('#aProject').value,purposeNote:$('#aNote').value}))}
+function borrowDialog(item){const me=esc(B.profile.name||B.profile.empId);actionDialog(DT('dlg_borrow',{c:item.assetCode}),`<div class="field wide"><label>${DT('l_asset')}</label><div class="control">${esc(item.brand)} ${esc(item.model)}</div></div><div class="field"><label>${DT('l_borrower')}</label><div class="control">${me}</div></div><div class="field"><label>${DT('l_purpose')}</label><select class="control" id="aPurpose"><option value="borrow">${DT('pu_borrow')}</option><option value="product_test">${DT('pu_product_test')}</option><option value="production">${DT('pu_production')}</option><option value="maintenance">${DT('pu_maintenance')}</option><option value="other">${DT('pu_other')}</option></select></div>${field('aStart',DT('l_start'),'date','required')}${field('aDue',DT('l_due'),'date','required')}${field('aProject',DT('l_project'))}<div class="field wide"><label>${DT('l_purpose_note')}</label><textarea class="control" id="aNote"></textarea></div>`,async()=>api('requestTransfer',{assetId:item.id,transferType:'temporary',toEmpId:B.profile.empId,purpose:$('#aPurpose').value,projectRef:$('#aProject').value,startsOn:$('#aStart').value,dueOn:$('#aDue').value,purposeNote:$('#aNote').value}))}
+function transferDialog(item){const canChoose=B.profile.role==='admin'||item.custodianEmpId===B.profile.empId;const recipient=canChoose?`<div class="field"><label>${DT('l_new_custodian')}</label><select class="control" id="aTo">${B.users.filter(u=>u.emp_id!==item.custodianEmpId).map(u=>`<option value="${esc(u.emp_id)}">${esc(u.name_zh||u.name_en||u.emp_id)}</option>`).join('')}</select></div>`:`<div class="field"><label>${DT('l_new_custodian')}</label><div class="control">${esc(B.profile.name||B.profile.empId)}${DT('me_suffix')}</div><input type="hidden" id="aTo" value="${esc(B.profile.empId)}"></div>`;actionDialog(DT('dlg_transfer',{c:item.assetCode}),`<div class="field wide"><label>${DT('l_transfer_asset')}</label><div class="control">${esc(item.brand)} ${esc(item.model)}</div></div><div class="field"><label>${DT('l_cur_custodian')}</label><div class="control">${esc(item.custodianName||DT('not_linked'))}</div></div>${recipient}<div class="field"><label>${DT('l_transfer_reason')}</label><select class="control" id="aPurpose"><option value="product_test">${DT('pu_product_test')}</option><option value="production">${DT('pu_production')}</option><option value="maintenance">${DT('pu_repair_arrange')}</option><option value="other">${DT('pu_other')}</option></select></div>${field('aProject',DT('l_project'))}<div class="field wide"><label>${DT('l_transfer_note')}</label><textarea class="control" id="aNote"></textarea></div><p class="wide sub" style="min-height:0">${DT('transfer_perm_note')}</p>`,async()=>api('requestTransfer',{assetId:item.id,transferType:'permanent',toEmpId:$('#aTo').value,purpose:$('#aPurpose').value,projectRef:$('#aProject').value,purposeNote:$('#aNote').value}))}
 async function borrowFromCard(id){try{const detail=await api('detail',{id});current=detail;borrowDialog(detail.item)}catch(e){toast(e.message,true)}}
 async function transferFromCard(id){try{const detail=await api('detail',{id});current=detail;transferDialog(detail.item)}catch(e){toast(e.message,true)}}
-function editDialog(){const a=current.item;actionDialog('編輯核心資料',`${field('aBrand','品牌','text','required value="'+esc(a.brand)+'"')}${field('aModel','正式型號','text','required value="'+esc(a.model)+'"')}${field('aOfficial','原廠代號','text','value="'+esc(a.officialModelCode||'')+'"')}${field('aSerial','原廠序號','text','value="'+esc(a.manufacturerSerial?.replace(/^••••/,'')||'')+'"')}${field('aImei','IMEI 1','text','value="'+esc(a.imei1?.replace(/^••••/,'')||'')+'"')}${field('aColor','顏色','text','value="'+esc(a.color||'')+'"')}<div class="field"><label>保管人</label><select class="control" id="aCust">${B.users.map(u=>`<option value="${esc(u.emp_id)}" ${u.emp_id===a.custodianEmpId?'selected':''}>${esc(u.name_zh||u.name_en||u.emp_id)}</option>`).join('')}</select></div><div class="field"><label>資產歸屬</label><select class="control" id="aOwner">${[...$('#fOwner').options].map(o=>`<option ${o.value===a.ownershipUnit?'selected':''}>${esc(o.value)}</option>`).join('')}</select></div>${field('aLoc','目前位置','text','value="'+esc(a.currentLocation||'')+'"')}${field('aAmount','採購金額','number','min="0" step="0.01" value="'+esc(a.purchaseAmount??'')+'"')}<div class="field"><label>幣別</label><select class="control" id="aCurr">${['NTD','USD','CNY','HKD','VND'].map(x=>`<option ${x===a.purchaseCurrency?'selected':''}>${x}</option>`).join('')}</select></div>${field('aCountry','採購國家／地區','text','value="'+esc(a.purchaseCountry||'')+'"')}${field('aVendor','商店／供應商','text','value="'+esc(a.purchaseVendor||'')+'"')}`,async()=>api('update',{id:a.id,brand:$('#aBrand').value,model:$('#aModel').value,officialModelCode:$('#aOfficial').value,manufacturerSerial:$('#aSerial').value,imei1:$('#aImei').value,color:$('#aColor').value,custodianEmpId:$('#aCust').value,ownershipUnit:$('#aOwner').value,currentLocation:$('#aLoc').value,purchaseAmount:$('#aAmount').value,purchaseCurrency:$('#aCurr').value,purchaseCountry:$('#aCountry').value,purchaseVendor:$('#aVendor').value}))}
-function dailyDialog(){actionDialog('更新設備狀態',`<div class="field"><label>狀態</label><select class="control" id="aStatus"><option value="available">可借用</option><option value="in_use">使用中</option><option value="maintenance">維修中</option></select></div>${field('aExpected','預計可用日','date')}<div class="field wide"><label>狀況備註</label><textarea class="control" id="aCondition">${esc(current.item.conditionNote||'')}</textarea></div>`,async()=>api('update',{id:current.item.id,status:$('#aStatus').value,expectedAvailableDate:$('#aExpected').value,conditionNote:$('#aCondition').value}))}
-function repairDialog(){actionDialog('新增維修紀錄',`${field('aSent','送修日期','date','required') }<div class="field wide"><label>送修原因</label><textarea class="control" id="aReason" required></textarea></div>${field('aVendor','維修廠商')}${field('aCost','費用','number','min="0" step="0.01"')}<div class="field"><label>幣別</label><select class="control" id="aCurrency"><option>NTD</option><option>USD</option><option>CNY</option><option>HKD</option><option>VND</option></select></div>${field('aReturned','取回日期','date')}<div class="field wide"><label>維修結果</label><textarea class="control" id="aResult"></textarea></div>`,async()=>api('addRepair',{assetId:current.item.id,sentOn:$('#aSent').value,reason:$('#aReason').value,vendor:$('#aVendor').value,cost:$('#aCost').value,currency:$('#aCurrency').value,returnedOn:$('#aReturned').value,result:$('#aResult').value}))}
-function retireDialog(){actionDialog('退役設備',`${field('aDate','退役日期','date','required')}<div class="field"><label>原因</label><select class="control" id="aRetire"><option value="scrapped">報廢</option><option value="sold">出售</option><option value="donated">捐贈</option><option value="irreparable">損壞無法修復</option><option value="other">其他</option></select></div><div class="field wide"><label>說明</label><textarea class="control" id="aRNote" required></textarea></div>`,async()=>api('retire',{id:current.item.id,date:$('#aDate').value,reason:$('#aRetire').value,note:$('#aRNote').value}))}
-function lostDialog(){actionDialog('標記遺失／遭竊',`${field('aDate','發生日期','date','required')}${field('aLostReason','原因','text','required')}<div class="field wide"><label>說明</label><textarea class="control" id="aLostNote" required></textarea></div>`,async()=>api('markLost',{id:current.item.id,date:$('#aDate').value,reason:$('#aLostReason').value,note:$('#aLostNote').value}))}
-function inventoryDialog(){actionDialog('年度盤點確認',`<div class="field"><label>盤點結果</label><select class="control" id="aInv"><option value="held">仍在保管</option><option value="abnormal">設備異常</option><option value="missing">已找不到</option></select></div><div class="field wide"><label>備註</label><textarea class="control" id="aInvNote"></textarea></div>`,async()=>api('inventoryConfirm',{assetId:current.item.id,year:new Date().getFullYear(),result:$('#aInv').value,note:$('#aInvNote').value}))}
-function uploadDialog(kind){const receipt=kind==='receipt';actionDialog(receipt?'上傳發票／收據':'上傳實物照片',`<div class="field wide"><label>${receipt?'PDF、JPG 或 PNG':'JPG、PNG 或 WebP'}，最大 8 MB</label><input class="control" id="aFile" type="file" accept="${receipt?'application/pdf,image/jpeg,image/png':'image/jpeg,image/png,image/webp'}" required></div>`,async()=>{const f=$('#aFile').files[0];if(!f)throw Error('請選擇檔案');const base64=await new Promise((ok,no)=>{const r=new FileReader;r.onload=()=>ok(String(r.result).split(',')[1]);r.onerror=no;r.readAsDataURL(f)});return api('uploadFile',{assetId:current.item.id,kind,name:f.name,mime:f.type,base64})})}
-async function restoreCurrent(){if(!confirm('確定恢復為可借用？'))return;await api('restore',{id:current.item.id});toast('已恢復');await refreshDetail()}async function refreshDetail(){current=await api('detail',{id:current.item.id});renderDetail();load(true)}
-async function loadPending(){const j=await api('pending');const rows=j.transfers.map(t=>`<div class="pending-item"><div class="main"><h3>${esc(t.asset?.asset_code||'設備')} · ${esc(purposeName[t.purpose]||t.purpose)}</h3><p>${esc(t.from_emp_id||'—')} → ${esc(t.to_emp_id)}${t.conflict_detected?' · 時段衝突':''}</p></div>${t.to_emp_id===B.profile.empId||t.from_emp_id===B.profile.empId?`<button class="btn good small" onclick="respondDialog('${t.id}')">確認</button><button class="btn danger small" onclick="rejectDialog('${t.id}')">拒絕</button>`:''}${B.profile.role==='admin'?`<button class="btn small" onclick="forceDialog('${t.id}')">例外核准</button>`:''}${t.requested_by===B.profile.empId?`<button class="btn small" onclick="cancelTransfer('${t.id}')">取消</button>`:''}</div>`);$('#pendingList').innerHTML=rows.join('')||'<div class="empty">目前沒有待處理項目</div>'}
-function respondDialog(id){actionDialog('確認設備移轉',`<div class="field"><label>設備狀況</label><select class="control" id="aCond"><option value="normal">正常</option><option value="used">有使用痕跡</option><option value="damaged">有損壞</option><option value="missing_accessory">配件缺少</option></select></div><div class="field wide"><label>狀況說明</label><textarea class="control" id="aCNote"></textarea></div>`,async()=>api('respondTransfer',{id,accept:true,condition:$('#aCond').value,conditionNote:$('#aCNote').value}))}async function cancelTransfer(id){await api('cancelTransfer',{id});toast('申請已取消');loadPending()}
-function rejectDialog(id){actionDialog('拒絕移轉申請',`<div class="field wide"><label>拒絕原因</label><textarea class="control" id="aReject" required></textarea></div>`,async()=>api('respondTransfer',{id,accept:false,rejectionReason:$('#aReject').value}))}
-function forceDialog(id){actionDialog('Admin 例外核准',`<div class="field wide"><label>保管人離職、停權或無法聯繫的原因</label><textarea class="control" id="aForce" required></textarea></div><p class="wide warn">需要兩位不同 Platform Admin 分別核准。</p>`,async()=>api('forceTransferApproval',{id,reason:$('#aForce').value}))}
-async function requestReturn(id){try{await api('requestReturn',{transferId:id});toast('已提出歸還，等待原保管人確認');await refreshDetail()}catch(e){toast(e.message,true)}}
+function editDialog(){const a=current.item;actionDialog(DT('dlg_edit_core'),`${field('aBrand',DT('fld_brand'),'text','required value="'+esc(a.brand)+'"')}${field('aModel',DT('fld_model_formal'),'text','required value="'+esc(a.model)+'"')}${field('aOfficial',DT('fld_official'),'text','value="'+esc(a.officialModelCode||'')+'"')}${field('aSerial',DT('fld_serial'),'text','value="'+esc(a.manufacturerSerial?.replace(/^••••/,'')||'')+'"')}${field('aImei','IMEI 1','text','value="'+esc(a.imei1?.replace(/^••••/,'')||'')+'"')}${field('aColor',DT('fld_color'),'text','value="'+esc(a.color||'')+'"')}<div class="field"><label>${DT('d_custodian')}</label><select class="control" id="aCust">${B.users.map(u=>`<option value="${esc(u.emp_id)}" ${u.emp_id===a.custodianEmpId?'selected':''}>${esc(u.name_zh||u.name_en||u.emp_id)}</option>`).join('')}</select></div><div class="field"><label>${DT('f_owner')}</label><select class="control" id="aOwner">${[...$('#fOwner').options].map(o=>`<option ${o.value===a.ownershipUnit?'selected':''}>${esc(o.value)}</option>`).join('')}</select></div>${field('aLoc',DT('d_location'),'text','value="'+esc(a.currentLocation||'')+'"')}${field('aAmount',DT('fld_amount'),'number','min="0" step="0.01" value="'+esc(a.purchaseAmount??'')+'"')}<div class="field"><label>${DT('fld_currency')}</label><select class="control" id="aCurr">${['NTD','USD','CNY','HKD','VND'].map(x=>`<option ${x===a.purchaseCurrency?'selected':''}>${x}</option>`).join('')}</select></div>${field('aCountry',DT('fld_country'),'text','value="'+esc(a.purchaseCountry||'')+'"')}${field('aVendor',DT('fld_vendor'),'text','value="'+esc(a.purchaseVendor||'')+'"')}`,async()=>api('update',{id:a.id,brand:$('#aBrand').value,model:$('#aModel').value,officialModelCode:$('#aOfficial').value,manufacturerSerial:$('#aSerial').value,imei1:$('#aImei').value,color:$('#aColor').value,custodianEmpId:$('#aCust').value,ownershipUnit:$('#aOwner').value,currentLocation:$('#aLoc').value,purchaseAmount:$('#aAmount').value,purchaseCurrency:$('#aCurr').value,purchaseCountry:$('#aCountry').value,purchaseVendor:$('#aVendor').value}))}
+function dailyDialog(){actionDialog(DT('dlg_update_status'),`<div class="field"><label>${DT('l_status')}</label><select class="control" id="aStatus"><option value="available">${DT('st_available')}</option><option value="in_use">${DT('st_in_use')}</option><option value="maintenance">${DT('st_maintenance')}</option></select></div>${field('aExpected',DT('l_expected_date'),'date')}<div class="field wide"><label>${DT('l_condition_note')}</label><textarea class="control" id="aCondition">${esc(current.item.conditionNote||'')}</textarea></div>`,async()=>api('update',{id:current.item.id,status:$('#aStatus').value,expectedAvailableDate:$('#aExpected').value,conditionNote:$('#aCondition').value}))}
+function repairDialog(){actionDialog(DT('dlg_add_repair'),`${field('aSent',DT('l_sent_on'),'date','required') }<div class="field wide"><label>${DT('l_repair_reason')}</label><textarea class="control" id="aReason" required></textarea></div>${field('aVendor',DT('l_repair_vendor'))}${field('aCost',DT('l_cost'),'number','min="0" step="0.01"')}<div class="field"><label>${DT('fld_currency')}</label><select class="control" id="aCurrency"><option>NTD</option><option>USD</option><option>CNY</option><option>HKD</option><option>VND</option></select></div>${field('aReturned',DT('l_returned_on'),'date')}<div class="field wide"><label>${DT('l_repair_result')}</label><textarea class="control" id="aResult"></textarea></div>`,async()=>api('addRepair',{assetId:current.item.id,sentOn:$('#aSent').value,reason:$('#aReason').value,vendor:$('#aVendor').value,cost:$('#aCost').value,currency:$('#aCurrency').value,returnedOn:$('#aReturned').value,result:$('#aResult').value}))}
+function retireDialog(){actionDialog(DT('dlg_retire'),`${field('aDate',DT('l_retire_date'),'date','required')}<div class="field"><label>${DT('l_reason')}</label><select class="control" id="aRetire"><option value="scrapped">${DT('rt_scrap')}</option><option value="sold">${DT('rt_sold')}</option><option value="donated">${DT('rt_donated')}</option><option value="irreparable">${DT('rt_broken')}</option><option value="other">${DT('pu_other')}</option></select></div><div class="field wide"><label>${DT('l_note')}</label><textarea class="control" id="aRNote" required></textarea></div>`,async()=>api('retire',{id:current.item.id,date:$('#aDate').value,reason:$('#aRetire').value,note:$('#aRNote').value}))}
+function lostDialog(){actionDialog(DT('dlg_lost'),`${field('aDate',DT('l_happened_on'),'date','required')}${field('aLostReason',DT('l_reason'),'text','required')}<div class="field wide"><label>${DT('l_note')}</label><textarea class="control" id="aLostNote" required></textarea></div>`,async()=>api('markLost',{id:current.item.id,date:$('#aDate').value,reason:$('#aLostReason').value,note:$('#aLostNote').value}))}
+function inventoryDialog(){actionDialog(DT('dlg_inventory'),`<div class="field"><label>${DT('l_inv_result')}</label><select class="control" id="aInv"><option value="held">${DT('inv_held')}</option><option value="abnormal">${DT('inv_abnormal')}</option><option value="missing">${DT('inv_missing')}</option></select></div><div class="field wide"><label>${DT('l_memo')}</label><textarea class="control" id="aInvNote"></textarea></div>`,async()=>api('inventoryConfirm',{assetId:current.item.id,year:new Date().getFullYear(),result:$('#aInv').value,note:$('#aInvNote').value}))}
+function uploadDialog(kind){const receipt=kind==='receipt';actionDialog(receipt?DT('btn_upload_receipt'):DT('dlg_upload_photo'),`<div class="field wide"><label>${DT('file_hint',{t:receipt?DT('file_types_receipt'):DT('file_types_photo')})}</label><input class="control" id="aFile" type="file" accept="${receipt?'application/pdf,image/jpeg,image/png':'image/jpeg,image/png,image/webp'}" required></div>`,async()=>{const f=$('#aFile').files[0];if(!f)throw Error(DT('pick_file'));const base64=await new Promise((ok,no)=>{const r=new FileReader;r.onload=()=>ok(String(r.result).split(',')[1]);r.onerror=no;r.readAsDataURL(f)});return api('uploadFile',{assetId:current.item.id,kind,name:f.name,mime:f.type,base64})})}
+async function restoreCurrent(){if(!confirm(DT('confirm_restore')))return;await api('restore',{id:current.item.id});toast(DT('restored'));await refreshDetail()}async function refreshDetail(){current=await api('detail',{id:current.item.id});renderDetail();load(true)}
+async function loadPending(){const j=await api('pending');const rows=j.transfers.map(t=>`<div class="pending-item"><div class="main"><h3>${esc(t.asset?.asset_code||DT('device_word'))} · ${esc(purposeName[t.purpose]||t.purpose)}</h3><p>${esc(t.from_emp_id||'—')} → ${esc(t.to_emp_id)}${t.conflict_detected?' · '+DT('time_conflict'):''}</p></div>${t.to_emp_id===B.profile.empId||t.from_emp_id===B.profile.empId?`<button class="btn good small" onclick="respondDialog('${t.id}')">${DT('btn_confirm')}</button><button class="btn danger small" onclick="rejectDialog('${t.id}')">${DT('btn_reject')}</button>`:''}${B.profile.role==='admin'?`<button class="btn small" onclick="forceDialog('${t.id}')">${DT('btn_force')}</button>`:''}${t.requested_by===B.profile.empId?`<button class="btn small" onclick="cancelTransfer('${t.id}')">${DT('btn_cancel')}</button>`:''}</div>`);$('#pendingList').innerHTML=rows.join('')||`<div class="empty">${DT('pending_empty')}</div>`}
+function respondDialog(id){actionDialog(DT('dlg_confirm_transfer'),`<div class="field"><label>${DT('l_condition')}</label><select class="control" id="aCond"><option value="normal">${DT('cd_normal')}</option><option value="used">${DT('cd_used')}</option><option value="damaged">${DT('cd_damaged')}</option><option value="missing_accessory">${DT('cd_missing_accessory')}</option></select></div><div class="field wide"><label>${DT('l_condition_desc')}</label><textarea class="control" id="aCNote"></textarea></div>`,async()=>api('respondTransfer',{id,accept:true,condition:$('#aCond').value,conditionNote:$('#aCNote').value}))}async function cancelTransfer(id){await api('cancelTransfer',{id});toast(DT('cancelled'));loadPending()}
+function rejectDialog(id){actionDialog(DT('dlg_reject'),`<div class="field wide"><label>${DT('l_reject_reason')}</label><textarea class="control" id="aReject" required></textarea></div>`,async()=>api('respondTransfer',{id,accept:false,rejectionReason:$('#aReject').value}))}
+function forceDialog(id){actionDialog(DT('dlg_force'),`<div class="field wide"><label>${DT('l_force_reason')}</label><textarea class="control" id="aForce" required></textarea></div><p class="wide warn">${DT('force_note')}</p>`,async()=>api('forceTransferApproval',{id,reason:$('#aForce').value}))}
+async function requestReturn(id){try{await api('requestReturn',{transferId:id});toast(DT('return_requested'));await refreshDetail()}catch(e){toast(e.message,true)}}
 function renderTypes(){$('#typeRows').innerHTML=B.types.map(t=>`<div class="type-row"><b class="type-code">${esc(t.code)}xxx</b><span>${esc(t.name_zh)}</span><span>${esc(t.name_en)}</span></div>`).join('')}
-async function loadAudit(){const j=await api('adminAudit');$('#auditRows').innerHTML=j.items.slice(0,40).map(a=>`<div class="history-row"><b>${esc(a.action)}</b><br><small>${esc(a.actor_emp_id)} · ${new Date(a.created_at).toLocaleString('zh-TW')}</small></div>`).join('')||'<span class="sub">尚無紀錄</span>'}
-$('#assetForm').onsubmit=async e=>{e.preventDefault();const btn=e.submitter;btn.disabled=true;$('#formLive').textContent='建立資料並查找官方圖片中…';try{const j=await api('create',{typeCode:$('#fType').value,brand:$('#fBrand').value,model:$('#fModel').value,officialModelCode:$('#fOfficial').value,color:$('#fColor').value,manufacturerSerial:$('#fSerial').value,imei1:$('#fImei').value,ownershipUnit:$('#fOwner').value,custodianEmpId:$('#fCustodian').value,purchaseAmount:$('#fAmount').value,purchaseCurrency:$('#fCurrency').value,purchaseCountry:$('#fCountry').value,purchaseVendor:$('#fVendor').value,sourceNote:$('#fNote').value});close('formOverlay');e.target.reset();$('#fCustodian').value=B.profile.empId;toast(`已建立 ${j.item.assetCode}，可立即申請借用`);await load(true)}catch(x){toast(x.message,true)}finally{btn.disabled=false;$('#formLive').textContent=''}};
-$('#personalForm').onsubmit=async e=>{e.preventDefault();const b=e.submitter;b.disabled=true;const id=$('#personalId').value;try{await api(id?'personalUpdate':'personalCreate',{id,typeCode:$('#personalFormType').value,brand:$('#personalBrand').value,model:$('#personalModel').value,color:$('#personalColor').value});close('personalFormOverlay');e.target.reset();toast(id?'個人資產已更新':'已登錄，官方圖片將在背景補上');await personalLoad(true);if(!id)setTimeout(()=>scope==='personal'&&personalLoad(true),15000)}catch(x){toast(x.message,true)}finally{b.disabled=false}};
-$('#personalImageInput').onchange=async e=>{const f=e.target.files[0];if(!f||!personalImageId)return;if(f.size>8*1024*1024){toast('圖片不可超過 8 MB',true);return}try{const base64=await new Promise((ok,no)=>{const r=new FileReader;r.onload=()=>ok(String(r.result).split(',')[1]);r.onerror=no;r.readAsDataURL(f)});toast('正在上傳照片…');await api('personalUploadImage',{id:personalImageId,name:f.name,mime:f.type,base64});toast('照片已更新');await personalLoad(true)}catch(x){toast(x.message,true)}finally{personalImageId=null;e.target.value=''}};
-$('#actionForm').onsubmit=async e=>{e.preventDefault();const b=e.submitter;b.disabled=true;try{await actionHandler();close('actionOverlay');toast('已完成');if(current)await refreshDetail();await loadPending()}catch(x){toast(x.message,true)}finally{b.disabled=false}};
+async function loadAudit(){const j=await api('adminAudit');$('#auditRows').innerHTML=j.items.slice(0,40).map(a=>`<div class="history-row"><b>${esc(a.action)}</b><br><small>${esc(a.actor_emp_id)} · ${new Date(a.created_at).toLocaleString('zh-TW')}</small></div>`).join('')||`<span class="sub">${DT('mg_no_record')}</span>`}
+$('#assetForm').onsubmit=async e=>{e.preventDefault();const btn=e.submitter;btn.disabled=true;$('#formLive').textContent=DT('creating');try{const j=await api('create',{typeCode:$('#fType').value,brand:$('#fBrand').value,model:$('#fModel').value,officialModelCode:$('#fOfficial').value,color:$('#fColor').value,manufacturerSerial:$('#fSerial').value,imei1:$('#fImei').value,ownershipUnit:$('#fOwner').value,custodianEmpId:$('#fCustodian').value,purchaseAmount:$('#fAmount').value,purchaseCurrency:$('#fCurrency').value,purchaseCountry:$('#fCountry').value,purchaseVendor:$('#fVendor').value,sourceNote:$('#fNote').value});close('formOverlay');e.target.reset();$('#fCustodian').value=B.profile.empId;toast(DT('created_ok',{c:j.item.assetCode}));await load(true)}catch(x){toast(x.message,true)}finally{btn.disabled=false;$('#formLive').textContent=''}};
+$('#personalForm').onsubmit=async e=>{e.preventDefault();const b=e.submitter;b.disabled=true;const id=$('#personalId').value;try{await api(id?'personalUpdate':'personalCreate',{id,typeCode:$('#personalFormType').value,brand:$('#personalBrand').value,model:$('#personalModel').value,color:$('#personalColor').value});close('personalFormOverlay');e.target.reset();toast(id?DT('p_updated'):DT('p_created'));await personalLoad(true);if(!id)setTimeout(()=>scope==='personal'&&personalLoad(true),15000)}catch(x){toast(x.message,true)}finally{b.disabled=false}};
+$('#personalImageInput').onchange=async e=>{const f=e.target.files[0];if(!f||!personalImageId)return;if(f.size>8*1024*1024){toast(DT('p_img_too_big'),true);return}try{const base64=await new Promise((ok,no)=>{const r=new FileReader;r.onload=()=>ok(String(r.result).split(',')[1]);r.onerror=no;r.readAsDataURL(f)});toast(DT('p_uploading'));await api('personalUploadImage',{id:personalImageId,name:f.name,mime:f.type,base64});toast(DT('p_img_updated'));await personalLoad(true)}catch(x){toast(x.message,true)}finally{personalImageId=null;e.target.value=''}};
+$('#actionForm').onsubmit=async e=>{e.preventDefault();const b=e.submitter;b.disabled=true;try{await actionHandler();close('actionOverlay');toast(DT('done'));if(current)await refreshDetail();await loadPending()}catch(x){toast(x.message,true)}finally{b.disabled=false}};
 $('#newBtn').onclick=()=>open('formOverlay');$('#personalNewBtn').onclick=()=>openPersonalForm();$('#companyScope').onclick=()=>switchScope('company');$('#personalScope').onclick=()=>switchScope('personal');$$('[data-close]').forEach(b=>b.onclick=()=>close(b.dataset.close));$$('.tab').forEach(t=>t.onclick=async()=>{$$('.tab').forEach(x=>x.classList.remove('active'));t.classList.add('active');['list','pending','manage'].forEach(v=>$('#view-'+v).classList.toggle('hidden',v!==t.dataset.tab));if(t.dataset.tab==='pending')await loadPending();if(t.dataset.tab==='manage')await loadAudit()});let timer;$('#q').oninput=()=>{clearTimeout(timer);timer=setTimeout(()=>load(true),350)};let personalTimer;$('#personalQ').oninput=()=>{clearTimeout(personalTimer);personalTimer=setTimeout(()=>personalLoad(true),350)};['typeFilter','statusFilter','ownerFilter','includeRetired'].forEach(id=>$('#'+id).onchange=()=>load(true));['personalType','personalMine','personalInactive'].forEach(id=>$('#'+id).onchange=()=>personalLoad(true));$('#loadMore').onclick=()=>load(false);$('#personalMore').onclick=()=>personalLoad(false);
-$('#addTypeBtn').onclick=()=>actionDialog('新增設備類型',`${field('aCode','代碼首字母','text','maxlength="1" required')}${field('aZh','中文名稱','text','required')}${field('aEn','英文名稱','text','required')}`,async()=>{await api('addType',{code:$('#aCode').value,nameZh:$('#aZh').value,nameEn:$('#aEn').value});B=await api('bootstrap');fillOptions();renderTypes()});
-init().catch(e=>{toast('初始化失敗：'+e.message,true);$('#cards').innerHTML=`<div class="empty">${esc(e.message)}</div>`});
+$('#addTypeBtn').onclick=()=>actionDialog(DT('dlg_add_type'),`${field('aCode',DT('fld_code_initial'),'text','maxlength="1" required')}${field('aZh',DT('fld_name_zh'),'text','required')}${field('aEn',DT('fld_name_en'),'text','required')}`,async()=>{await api('addType',{code:$('#aCode').value,nameZh:$('#aZh').value,nameEn:$('#aEn').value});B=await api('bootstrap');fillOptions();renderTypes()});
+init().catch(e=>{toast(DT('init_failed',{m:e.message}),true);$('#cards').innerHTML=`<div class="empty">${esc(e.message)}</div>`});
 </script>
 </body></html>

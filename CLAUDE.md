@@ -104,9 +104,9 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 | File | Version | Purpose | ~Lines |
 |------|---------|---------|--------|
 | `index.html` | v2.07 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
-| `admin/index.html` | v2.43 | Admin System — room booking, fleet, visitor, library, lottery | 5,650 |
-| `kms/index.html` | v2.43 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
-| `quotation/index.html` | v3.65 | Quotation & CRM system | 7,332 |
+| `admin/index.html` | v2.44 | Admin System — room booking, fleet, visitor, library, lottery | 5,650 |
+| `kms/index.html` | v2.44 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
+| `quotation/index.html` | v3.66 | Quotation & CRM system | 7,332 |
 | `board/index.html` | v1.92 | 公告與會議 Bulletin & Meetings — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍、腦力激盪 | 4,600 |
 | `product_dev/` | v2.24 | **產品開發管理 —— 第六個子系統，不遵守單一檔案原則**（見下方專節） | — |
 
@@ -409,9 +409,9 @@ The portal supports EN, 繁中, 简中, VI, 日 via `setLang(lang)`. Each langua
 # 八個目標，全部共用這一支
 python3 scripts/i18n-audit.py             # Portal      I18N        275 key × 5
 python3 scripts/i18n-audit.py board       # Board       B_I18N 419 ＋ PL_I18N 109
-python3 scripts/i18n-audit.py quotation   # 報價系統     UI          180
-python3 scripts/i18n-audit.py admin       # Admin       ADMIN_I18N  502
-python3 scripts/i18n-audit.py kms         # KMS         I18N        261
+python3 scripts/i18n-audit.py quotation   # 報價系統     UI          197
+python3 scripts/i18n-audit.py admin       # Admin       ADMIN_I18N  565
+python3 scripts/i18n-audit.py kms         # KMS         I18N        283
 python3 scripts/i18n-audit.py pd-hub      # Product Dev 首頁        21
 python3 scripts/i18n-audit.py pd-devices  # 手機與配件  DV_I18N     215
 python3 scripts/i18n-audit.py pd-finder   # Finder      DICT（.ts） 330
@@ -538,6 +538,35 @@ python3 scripts/i18n-audit.py         # Portal，key 沒引號：btn_save:'儲�
   - Board：`<title>` + topbar `.logo-ver`（沒有自己的登入畫面，session 只從 `?_ps=` 取得）
 - 每次修改後自動 commit 並 `git push`，不需等候使用者指示
 - **每次修改完畢，回覆結尾必須告知目前各檔案最新版本號**（例如：`kms v2.06`、`admin v1.57`）
+
+### 🔴 標籤表存死字串 ＝ 切語言換不掉（KMS v2.44／報價 v3.66，2026-09-26）
+
+同一天在兩個系統各抓到一組，形狀相同：**模組層級的物件只在載入時求值一次**，
+所以把文案寫死在裡面的標籤表，切語言永遠不會變。
+
+**KMS：同一組文件狀態標籤散在 7 個地方**，其中 3 份直接寫死中文，
+`review` 還有「審核中／待審核」兩種寫法，另有 1 份是宣告了沒人用的死程式碼。
+🔴 **這比單純漏翻更糟：去改字典完全不會有效果**，下一個人會白做工。
+- 收斂成 `docStatusLabel()` 一個出口，狀態清單是 `DOC_ST`。
+- 🔴 **`st.*`（狀態形：已發佈）與 `status.*`（編輯器下拉的動作形：發佈）刻意分開。**
+  原本的 `status.filter.*` 只是不完整的狀態形，已改名 `st.*` 並補齊
+  `review`／`withdrawn`／`template`。
+- 🔴 **活動記錄的 `rv.*`（過去式）與審核按鈕的 `ra.*`（祈使）也分開** ——
+  中文兩者同字（「核准發佈」），英／日／越不同（Approved vs Approve & Publish）。
+  **看到中文一樣就併成一組，是這類 bug 的起點。**
+
+**報價系統：`CRM_STAGES`／`CRM_STATUSES`／`CRM_FACTORIES`／`CRM_ACT_TYPES` 四張表**
+把文案寫死在 `label` 欄位。狀態與廠別的 key **字典裡本來就有**，陣列自己又寫了一份
+—— 又一個「改字典沒效果」的分岔。四張表改成存 key（`k`），取值一律 `crmLabel()`。
+- `act*` 的字典值原本把 emoji 也寫進去，與陣列的 `icon` 重複；
+  **emoji 留在陣列、文字留在字典**，下拉在 `applyLang` 合起來。
+- 🔴 **CRM 清單頁那三個篩選下拉（`crm-opt-*`）與任務篩選（`crm-opt-task*`）
+  `applyLang` 從來沒有處理過** —— modal 裡的 `acct-opt-*`／`av-opt-*` 都有，就漏了這些。
+  有 id、看起來像會被翻譯，實際上沒有。**逐行列舉的 `s(id,key)` 必然會漏，已改成從那四張表推。**
+- 🔴 **`applyLang` 原本只重畫 `renderCRMAccounts()`**，停在管線看板切語言不會有反應 ——
+  而管線的欄位標題正是這次翻的東西。改成重畫當前子頁籤 `showCRMTab(_crmTab)`。
+- `showCRMTab(t)` 的參數名會**遮蔽全域的翻譯函式 `t()`**，已改名 `tab`。
+  它現在負責換語言後重畫，留著遲早有人在裡面呼叫 `t()`。
 
 ### 🔴 報價系統：刪除一直是「不看回應」的（v3.61 修，2026-09-25）
 
@@ -1423,9 +1452,32 @@ v1.94 只做在 Portal，但**同事被邀請的時候人常常在 KMS 或報價
   那看起來就像「這一排不能翻譯」。
 - 同一條工具列的 `單位：` 也補上 `g.site_label`。
 
-⚠️ **Admin 的 JS 裡還有約 89 種會進 DOM 的寫死中文**（`renderXxx()` 產生的表格、
-匯出版面、列印單據）。**其中「客戶到訪接待行程單」那一類是輸出格式，照 board 的
-規矩本來就不該翻**（`siteLabelZ` 的道理）；其餘是真的漏翻。**尚未處理。**
+### 🔴 Admin 圖書館模組：靜態 HTML 有 i18n，JS 畫的部分幾乎整片中文（v2.44，2026-09-26）
+
+側欄與表頭早就有 `data-i18n`，但 `renderBooks()`／三個對話框／書目管理／
+ISBN 查詢／分類／匯出匯入／批次補圖全是寫死的中文 —— 越南同仁切成越南文，
+只有外框會換。62 處改走 `t()`，字典 502 → 565 key × 5。
+
+- 🔴 **匯出／範本／匯入的中文欄位名不可翻，已就地加註。**
+  `exportBooksXlsx` 寫出去、`downloadBooksTemplate` 當範本、`importBooksXlsx`
+  照著讀回來 —— 三者必須逐字相同，翻掉的話匯出的檔案匯不回去，
+  而且壞法是「欄位空白」沒有人看得出原因。書籍語言欄位的預設值 `'繁中'`
+  同理（那是資料不是文案）。**i18n 稽核會把它們算成漏翻，那是誤判**
+  （同 Finder `excludedName()` 裡的「名片」）。
+- 🔴 **`setLang()` 要重畫的清單漏了三個**：`renderMgmtBookList`／`popCatSel`／
+  `popCatSel4Mgmt`。那三個也是 JS 畫的，漏掉的話書目管理的表頭切語言不會變 ——
+  與次頁籤那一排（v2.43）是同一個形狀。**新增 JS 渲染的畫面時，記得回頭加進那份清單。**
+- 順手修到兩個既有 bug：
+  ① **匯出寫 `' 語言'`（前面多一個空白）、匯入讀 `'語言'`** —— 語言欄位一直匯不回來。
+  ② **`lib.grid.uncat` 的值其實是「所有分類」**，key 名稱與內容相反，
+  而且與 `lib.all_cats2` 完全重複；挑書分類的那個空選項顯示「所有分類」
+  在語意上是錯的（那裡是「未分類」）。已改成 `lib.uncat`。
+  **key 名稱說謊比缺 key 更難發現 —— 畫面上看起來只是「用詞怪」。**
+
+⚠️ **Admin 的其他三個模塊（會議室、客戶到訪、公務車）仍有寫死中文**
+（`renderXxx()` 產生的表格、匯出版面、列印單據）。
+**其中「客戶到訪接待行程單」那一類是輸出格式，照 board 的規矩本來就不該翻**
+（`siteLabelZ` 的道理）；其餘是真的漏翻。**尚未處理。**
 
 ### 🔴 Admin：本機的過期預檢（v2.41，2026-09-26）
 

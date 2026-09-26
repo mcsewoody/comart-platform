@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART KMS v2.44</title>
+<title>COMART KMS v2.45</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -398,7 +398,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="38" height="20" style="display:inline-block;vertical-align:middle;margin-right:4px;margin-top:-2px"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg>COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v2.44</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v2.45</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('en')">EN</button>
@@ -1069,6 +1069,26 @@ const I18N = {
     'st.draft':'草稿',
     'st.published':'已發佈',
     'st.archived':'已封存',
+    'up.reparsing':'⏳ 重新解析中，請稍候…',
+    'up.parsing':'⏳ 解析中，請稍候…',
+    'up.parsing_file':'⏳ 解析檔案內容中，請稍候…',
+    'up.parsing_short':'⏳ 解析中…',
+    'up.batch_bar':'批次上傳 {n} / {total}',
+    'up.batch_dup':'⚠ 批次上傳（{n}/{total}）\n「{name}」已存在：{list}\n\n繼續上傳？',
+    'up.conf_cancel_batch':'確定取消剩餘的批次上傳？',
+    'up.dup_file':'⚠ 資料庫已有相同檔案：\n{list}\n\n確定要繼續上傳並建立新條目嗎？',
+    'up.url_failed':'無法擷取此網址（',
+    'up.url_too_short':'擷取到的內容太少，可能是需要登入的頁面',
+    'up.ai_empty':'AI 整理結果為空',
+    'up.lib_missing':'{lib} 尚未載入',
+    'up.doc_legacy':'.doc 格式無法自動解析，請在 Word 中另存為 .docx 後重新上傳',
+    'up.pptx_failed':'PPTX 解析失敗，請確認檔案未損壞（舊版 .ppt 格式不支援，請另存為 .pptx）',
+    'up.pptx_empty':'找不到投影片內容，請確認這是有效的 .pptx 檔案',
+    'up.unsupported':'不支援的格式：',
+    'up.timeout':'請求超時，檔案可能太大或網路太慢。原始檔已上傳，文字請手動補充。',
+    'up.rate_limit':'Claude API 暫時繁忙（rate limit），請稍後再試。原始檔已上傳，文字請手動補充。',
+    'up.pdfjs_fail':'pdfjs 載入失敗',
+    'up.pdfjs_timeout':'pdfjs 載入超時',
     'st.review':'待審核',
     'st.withdrawn':'已撤回',
     'st.template':'範本',
@@ -1280,6 +1300,26 @@ const I18N = {
     'st.draft':'草稿',
     'st.published':'已发布',
     'st.archived':'已归档',
+    'up.reparsing':'⏳ 重新解析中，请稍候…',
+    'up.parsing':'⏳ 解析中，请稍候…',
+    'up.parsing_file':'⏳ 解析文件内容中，请稍候…',
+    'up.parsing_short':'⏳ 解析中…',
+    'up.batch_bar':'批量上传 {n} / {total}',
+    'up.batch_dup':'⚠ 批量上传（{n}/{total}）\n「{name}」已存在：{list}\n\n继续上传？',
+    'up.conf_cancel_batch':'确定取消剩余的批量上传？',
+    'up.dup_file':'⚠ 数据库已有相同文件：\n{list}\n\n确定要继续上传并创建新条目吗？',
+    'up.url_failed':'无法抓取此网址（',
+    'up.url_too_short':'抓取到的内容太少，可能是需要登录的页面',
+    'up.ai_empty':'AI 整理结果为空',
+    'up.lib_missing':'{lib} 尚未加载',
+    'up.doc_legacy':'.doc 格式无法自动解析，请在 Word 中另存为 .docx 后重新上传',
+    'up.pptx_failed':'PPTX 解析失败，请确认文件未损坏（旧版 .ppt 格式不支持，请另存为 .pptx）',
+    'up.pptx_empty':'找不到幻灯片内容，请确认这是有效的 .pptx 文件',
+    'up.unsupported':'不支持的格式：',
+    'up.timeout':'请求超时，文件可能太大或网络太慢。原始文件已上传，文字请手动补充。',
+    'up.rate_limit':'Claude API 暂时繁忙（rate limit），请稍后再试。原始文件已上传，文字请手动补充。',
+    'up.pdfjs_fail':'pdfjs 加载失败',
+    'up.pdfjs_timeout':'pdfjs 加载超时',
     'st.review':'待审核',
     'st.withdrawn':'已撤回',
     'st.template':'模板',
@@ -1496,6 +1536,26 @@ const I18N = {
     'st.draft':'Draft',
     'st.published':'Published',
     'st.archived':'Archived',
+    'up.reparsing':'⏳ Re-parsing, please wait…',
+    'up.parsing':'⏳ Parsing, please wait…',
+    'up.parsing_file':'⏳ Extracting the file contents, please wait…',
+    'up.parsing_short':'⏳ Parsing…',
+    'up.batch_bar':'Batch upload {n} / {total}',
+    'up.batch_dup':'⚠ Batch upload ({n}/{total})\n"{name}" already exists: {list}\n\nUpload anyway?',
+    'up.conf_cancel_batch':'Cancel the remaining files in this batch?',
+    'up.dup_file':'⚠ The database already has this file:\n{list}\n\nUpload it anyway and create a new entry?',
+    'up.url_failed':'Could not fetch this URL (',
+    'up.url_too_short':'Too little content was retrieved — the page may require a login',
+    'up.ai_empty':'The AI returned no content',
+    'up.lib_missing':'{lib} has not loaded yet',
+    'up.doc_legacy':'.doc files cannot be parsed automatically — save as .docx in Word and upload again',
+    'up.pptx_failed':'Could not parse the PPTX — check that the file is not corrupted (the older .ppt format is not supported; save as .pptx)',
+    'up.pptx_empty':'No slide content found — check that this is a valid .pptx file',
+    'up.unsupported':'Unsupported format: ',
+    'up.timeout':'The request timed out — the file may be too large or the connection too slow. The original file was uploaded; please add the text manually.',
+    'up.rate_limit':'The Claude API is busy (rate limit) — please try again shortly. The original file was uploaded; please add the text manually.',
+    'up.pdfjs_fail':'Could not load pdfjs',
+    'up.pdfjs_timeout':'Loading pdfjs timed out',
     'st.review':'Pending Review',
     'st.withdrawn':'Withdrawn',
     'st.template':'Template',
@@ -1712,6 +1772,26 @@ const I18N = {
     'st.draft':'Nháp',
     'st.published':'Đã xuất bản',
     'st.archived':'Đã lưu trữ',
+    'up.reparsing':'⏳ Đang phân tích lại, vui lòng đợi…',
+    'up.parsing':'⏳ Đang phân tích, vui lòng đợi…',
+    'up.parsing_file':'⏳ Đang trích xuất nội dung tệp, vui lòng đợi…',
+    'up.parsing_short':'⏳ Đang phân tích…',
+    'up.batch_bar':'Tải hàng loạt {n} / {total}',
+    'up.batch_dup':'⚠ Tải hàng loạt ({n}/{total})\n"{name}" đã tồn tại: {list}\n\nVẫn tải lên?',
+    'up.conf_cancel_batch':'Hủy các tệp còn lại trong lô này?',
+    'up.dup_file':'⚠ Cơ sở dữ liệu đã có tệp này:\n{list}\n\nVẫn tải lên và tạo mục mới?',
+    'up.url_failed':'Không lấy được URL này (',
+    'up.url_too_short':'Nội dung lấy được quá ít — trang này có thể yêu cầu đăng nhập',
+    'up.ai_empty':'AI không trả về nội dung nào',
+    'up.lib_missing':'{lib} chưa được tải',
+    'up.doc_legacy':'Không thể phân tích tệp .doc — hãy lưu thành .docx trong Word rồi tải lại',
+    'up.pptx_failed':'Không phân tích được PPTX — kiểm tra tệp có bị hỏng không (định dạng .ppt cũ không được hỗ trợ; hãy lưu thành .pptx)',
+    'up.pptx_empty':'Không tìm thấy nội dung slide — kiểm tra đây có phải tệp .pptx hợp lệ không',
+    'up.unsupported':'Định dạng không được hỗ trợ: ',
+    'up.timeout':'Yêu cầu hết thời gian — tệp có thể quá lớn hoặc mạng quá chậm. Tệp gốc đã được tải lên; vui lòng nhập nội dung thủ công.',
+    'up.rate_limit':'Claude API đang bận (rate limit) — vui lòng thử lại sau. Tệp gốc đã được tải lên; vui lòng nhập nội dung thủ công.',
+    'up.pdfjs_fail':'Không tải được pdfjs',
+    'up.pdfjs_timeout':'Tải pdfjs quá thời gian',
     'st.review':'Chờ duyệt',
     'st.withdrawn':'Đã thu hồi',
     'st.template':'Mẫu',
@@ -1928,6 +2008,26 @@ const I18N = {
     'st.draft':'下書き',
     'st.published':'公開済み',
     'st.archived':'アーカイブ済み',
+    'up.reparsing':'⏳ 再解析中です。しばらくお待ちください…',
+    'up.parsing':'⏳ 解析中です。しばらくお待ちください…',
+    'up.parsing_file':'⏳ ファイルの内容を抽出中です。しばらくお待ちください…',
+    'up.parsing_short':'⏳ 解析中…',
+    'up.batch_bar':'一括アップロード {n} / {total}',
+    'up.batch_dup':'⚠ 一括アップロード（{n}/{total}）\n「{name}」は既に存在します：{list}\n\nそれでもアップロードしますか？',
+    'up.conf_cancel_batch':'残りの一括アップロードを中止しますか？',
+    'up.dup_file':'⚠ 同じファイルが既にデータベースにあります：\n{list}\n\nそれでもアップロードして新規に登録しますか？',
+    'up.url_failed':'この URL を取得できませんでした（',
+    'up.url_too_short':'取得できた内容が少なすぎます。ログインが必要なページの可能性があります',
+    'up.ai_empty':'AI の整理結果が空です',
+    'up.lib_missing':'{lib} がまだ読み込まれていません',
+    'up.doc_legacy':'.doc 形式は自動解析できません。Word で .docx として保存し直してからアップロードしてください',
+    'up.pptx_failed':'PPTX を解析できませんでした。ファイルが破損していないか確認してください（旧 .ppt 形式は非対応です。.pptx で保存してください）',
+    'up.pptx_empty':'スライドの内容が見つかりません。有効な .pptx ファイルか確認してください',
+    'up.unsupported':'対応していない形式です：',
+    'up.timeout':'リクエストがタイムアウトしました。ファイルが大きすぎるか回線が遅い可能性があります。元ファイルはアップロード済みです。本文は手動で追加してください。',
+    'up.rate_limit':'Claude API が混み合っています（レート制限）。しばらくしてからお試しください。元ファイルはアップロード済みです。本文は手動で追加してください。',
+    'up.pdfjs_fail':'pdfjs の読み込みに失敗しました',
+    'up.pdfjs_timeout':'pdfjs の読み込みがタイムアウトしました',
     'st.review':'審査待ち',
     'st.withdrawn':'取り下げ済み',
     'st.template':'テンプレート',
@@ -3262,7 +3362,7 @@ async function reparseCurrentDoc() {
       }
     }
     const file = new File([blob], fileName, { type: mimeType });
-    if (tiptapEditor) tiptapEditor.commands.setContent('<p style="color:var(--text-3);font-style:italic;">⏳ 重新解析中，請稍候…</p>');
+    if (tiptapEditor) tiptapEditor.commands.setContent(`<p style="color:var(--text-3);font-style:italic;">${t('up.reparsing')}</p>`);
     toast(t('toast.reparsing'), '');
     // extractText 已內建 pdfjs 優先 → claude-proxy fallback
     const text = await extractText(file, ext);
@@ -3361,10 +3461,7 @@ async function processBatchNext() {
       );
       if (dupCheck && dupCheck.length > 0) {
         const dupList = dupCheck.map(d => `「${d.title}」`).join('、');
-        const proceed = confirm(`⚠ 批次上傳（${current}/${total}）
-「${f.name}」已存在：${dupList}
-
-繼續上傳？`);
+        const proceed = confirm(t('up.batch_dup').replace('{n}',current).replace('{total}',total).replace('{name}',f.name).replace('{list}',dupList));
         if (!proceed) { skipBatchFile(); return; }
       }
     } catch(e) { console.warn('[dup-check]', e.message); }
@@ -3378,7 +3475,7 @@ async function processBatchNext() {
   // 進度 banner
   const progressHtml = `
     <div id="batch-progress-bar" style="background:var(--blue-bg);border:1px solid var(--blue);border-radius:var(--radius);padding:8px 14px;margin-bottom:8px;font-size:12px;display:flex;align-items:center;gap:10px;flex-shrink:0;">
-      <span style="color:var(--blue);font-weight:600;">批次上傳 ${current} / ${total}</span>
+      <span style="color:var(--blue);font-weight:600;">${t('up.batch_bar').replace('{n}',current).replace('{total}',total)}</span>
       <span style="color:var(--text-2);">${f.name}</span>
       <span style="margin-left:auto;display:flex;gap:6px;">
         <button onclick="skipBatchFile()" style="padding:3px 10px;border-radius:5px;border:1px solid var(--border);background:transparent;cursor:pointer;font-size:11px;">${(I18N[currentLang]||I18N['zh-TW'])['batch.skip']||'跳過'}</button>
@@ -3428,7 +3525,7 @@ async function processBatchNext() {
   }
 
   // 解析文字
-  if (tiptapEditor) tiptapEditor.commands.setContent('<p style="color:var(--text-3);font-style:italic;">⏳ 解析中，請稍候…</p>');
+  if (tiptapEditor) tiptapEditor.commands.setContent(`<p style="color:var(--text-3);font-style:italic;">${t('up.parsing')}</p>`);
   try {
     const text = await extractText(f, ext);
     if (text && text.length > 10) {
@@ -3469,7 +3566,7 @@ function skipBatchFile() {
 }
 
 function skipAllBatch() {
-  if (!confirm('確定取消剩餘的批次上傳？')) return;
+  if (!confirm(t('up.conf_cancel_batch'))) return;
   _batchFiles = [];
   _batchIdx = 0;
   _restoreSaveBtn();
@@ -3507,9 +3604,9 @@ async function fetchUrlContent() {
     const res = await fetch(jinaUrl, {
       headers: { 'Accept': 'text/plain', 'X-Return-Format': 'markdown' }
     });
-    if (!res.ok) throw new Error('無法擷取此網址（' + res.status + '）');
+    if (!res.ok) throw new Error(t('up.url_failed') + res.status + '）');
     const raw = await res.text();
-    if (!raw || raw.length < 100) throw new Error('擷取到的內容太少，可能是需要登入的頁面');
+    if (!raw || raw.length < 100) throw new Error(t('up.url_too_short'));
 
     toast(t('toast.ai_processing'), '', true);
 
@@ -3521,7 +3618,7 @@ async function fetchUrlContent() {
       2000
     );
 
-    if (!organized || organized.length < 50) throw new Error('AI 整理結果為空');
+    if (!organized || organized.length < 50) throw new Error(t('up.ai_empty'));
 
     // 填入編輯器
     if (tiptapEditor) {
@@ -3589,10 +3686,7 @@ async function processFile(file) {
       );
       if (dupCheck && dupCheck.length > 0) {
         const dupList = dupCheck.map(d => `「${d.title}」（${docStatusLabel(d.status)}）`).join('、');
-        const proceed = confirm(`⚠ 資料庫已有相同檔案：
-${dupList}
-
-確定要繼續上傳並建立新條目嗎？`);
+        const proceed = confirm(t('up.dup_file').replace('{list}',dupList));
         if (!proceed) {
           const fi = document.getElementById('file-input');
           if (fi) fi.value = '';
@@ -3609,11 +3703,11 @@ ${dupList}
 
   // 立即清空 editor，顯示「解析中」佔位
   if (tiptapEditor) {
-    tiptapEditor.commands.setContent('<p style="color:var(--text-3);font-style:italic;">⏳ 解析檔案內容中，請稍候…</p>');
+    tiptapEditor.commands.setContent(`<p style="color:var(--text-3);font-style:italic;">${t('up.parsing_file')}</p>`);
   }
   if (window._tiptapFallback) {
     const _ta = document.getElementById('tiptap-fallback');
-    if (_ta) _ta.value = '⏳ 解析中…';
+    if (_ta) _ta.value = t('up.parsing_short');
   }
 
   uploadedFile = file;
@@ -3679,6 +3773,12 @@ ${dupList}
 }
 
 // ─── 文字抽取：依格式分流 ───
+// 🔴 這個函式往下**塞進回傳文字裡**的中文（`（此工作表無資料）`、`### 第 N 張投影片`、
+//    `[第 N 頁]`、`（共 N 列，已截取前 500 列）`…）**不可翻譯**：那些會成為文件的內文、
+//    存進 kms_documents.body、進向量、被搜尋。翻了會讓同一種標記出現五種寫法，
+//    而且同一份文件的內文會因為「上傳時介面是哪一國語言」而不同。
+//    丟出去的 Error 訊息才是使用者看的介面文字，那些已經走 t()。
+//    i18n 稽核會把前者算成漏翻 —— 那是誤判。
 async function extractText(file, ext) {
   // TXT / Markdown：直接讀
   if (ext === 'txt' || ext === 'md') {
@@ -3687,7 +3787,7 @@ async function extractText(file, ext) {
 
   // Word：docx 用 mammoth.js，doc 直接走 claude-proxy
   if (ext === 'docx') {
-    if (!window.mammoth) throw new Error('mammoth.js 尚未載入');
+    if (!window.mammoth) throw new Error(t('up.lib_missing').replace('{lib}','mammoth.js'));
     const arrayBuffer = await file.arrayBuffer();
     try {
       const result = await mammoth.extractRawText({ arrayBuffer });
@@ -3698,12 +3798,12 @@ async function extractText(file, ext) {
   if (ext === 'doc') {
     // OLE2 binary，Claude 不支援非 PDF document type
     // 建議另存為 .docx 再上傳
-    throw new Error('.doc 格式無法自動解析，請在 Word 中另存為 .docx 後重新上傳');
+    throw new Error(t('up.doc_legacy'));
   }
 
   // Excel (.xlsx/.xls)：SheetJS → Markdown 表格格式
   if (ext === 'xlsx' || ext === 'xls') {
-    if (!window.XLSX) throw new Error('SheetJS 尚未載入');
+    if (!window.XLSX) throw new Error(t('up.lib_missing').replace('{lib}','SheetJS'));
     const arrayBuffer = await file.arrayBuffer();
     const wb = XLSX.read(arrayBuffer, { type: 'array' });
     const lines = [];
@@ -3767,13 +3867,13 @@ async function extractText(file, ext) {
 
   // PowerPoint (.pptx / .ppt)：JSZip 解析 XML
   if (ext === 'pptx' || ext === 'ppt') {
-    if (!window.JSZip) throw new Error('JSZip 尚未載入');
+    if (!window.JSZip) throw new Error(t('up.lib_missing').replace('{lib}','JSZip'));
     const arrayBuffer = await file.arrayBuffer();
     let zip;
     try {
       zip = await JSZip.loadAsync(arrayBuffer);
     } catch(e) {
-      throw new Error('PPTX 解析失敗，請確認檔案未損壞（舊版 .ppt 格式不支援，請另存為 .pptx）');
+      throw new Error(t('up.pptx_failed'));
     }
 
     // 找所有 slide XML（ppt/slides/slide1.xml, slide2.xml, ...）
@@ -3786,7 +3886,7 @@ async function extractText(file, ext) {
       });
 
     if (!slideFiles.length) {
-      throw new Error('找不到投影片內容，請確認這是有效的 .pptx 檔案');
+      throw new Error(t('up.pptx_empty'));
     }
 
     const slides = [];
@@ -3832,7 +3932,7 @@ async function extractText(file, ext) {
     return await extractImageWithClaude(file, ext);
   }
 
-  throw new Error('不支援的格式：' + ext);
+  throw new Error(t('up.unsupported') + ext);
 }
 
 // ─── 共用：帶 retry 的 claude-proxy 呼叫（處理 429 rate limit）───
@@ -3882,12 +3982,12 @@ async function callClaudeProxyRaw(body, timeoutMs = 60000) {
       return await res.json();
     } catch(e) {
       clearTimeout(timeoutId);
-      if (e.name === 'AbortError') throw new Error('請求超時，檔案可能太大或網路太慢。原始檔已上傳，文字請手動補充。');
+      if (e.name === 'AbortError') throw new Error(t('up.timeout'));
       if (e.message === 'rate_limit_429') { lastErr = e; continue; }
       throw e;
     }
   }
-  throw new Error(`Claude API 暫時繁忙（rate limit），請稍後再試。原始檔已上傳，文字請手動補充。`);
+  throw new Error(t('up.rate_limit'));
 }
 
 // ─── PDF 前端解析：pdfjs（不走 API，速度快）───
@@ -3901,9 +4001,9 @@ async function loadPdfjsLib() {
         'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
       res();
     };
-    s.onerror = () => rej(new Error('pdfjs 載入失敗'));
+    s.onerror = () => rej(new Error(t('up.pdfjs_fail')));
     document.head.appendChild(s);
-    setTimeout(() => rej(new Error('pdfjs 載入超時')), 15000);
+    setTimeout(() => rej(new Error(t('up.pdfjs_timeout'))), 15000);
   });
 }
 

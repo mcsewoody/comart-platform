@@ -310,6 +310,41 @@ serve(async req => {
       badges: { pendingAssets: 0, pendingForMe: mine.count || 0 } })
   }
 
+  /* 🔴 篩選器的選項必須從 pd_device_assets 自己長出來，不能從 departments／sites 推。
+     原本「資產歸屬」下拉是拿 departments ∪ sites 的顯示名稱去填，而 SQL 端是
+     `a.ownership_unit = p_owner` 的**完全相等比對** —— 只要資料不是透過本表單
+     建立的（匯入、種子、人工改過），兩邊就永遠對不上，而症狀是「選了什麼都是 0 筆」，
+     看起來像沒有資料而不是像設定錯誤。
+     從同一個欄位取 distinct，這個錯就不可能再發生。
+     保管人同理，而且這正是使用者要的「只顯示真的有保管設備的人」。
+     ⚠️ 兩者都排除 retired：已退役的設備不算「有人在保管」。 */
+  if (action === "facets") {
+    const { data, error } = await sb.from("pd_device_assets")
+      .select("ownership_unit,custodian_emp_id,custodian_original_name,custodian:users!pd_device_assets_custodian_emp_id_fkey(emp_id,name_en,name_zh)")
+      .neq("status", "retired")
+    if (error) return json({ error: error.message }, 500)
+    const owners = new Map<string, number>()
+    const custodians = new Map<string, { empId: string; name: string; n: number }>()
+    for (const row of data || []) {
+      const unit = (row.ownership_unit || "").trim()
+      if (unit) owners.set(unit, (owners.get(unit) || 0) + 1)
+      const empId = (row.custodian_emp_id || "").trim()
+      if (!empId) continue
+      const prev = custodians.get(empId)
+      if (prev) prev.n += 1
+      else custodians.set(empId, {
+        empId,
+        name: row.custodian ? displayName(row.custodian) : (row.custodian_original_name || empId),
+        n: 1,
+      })
+    }
+    return json({
+      owners: [...owners.entries()].map(([unit, n]) => ({ unit, n }))
+        .sort((a, b) => a.unit.localeCompare(b.unit, "zh-Hant")),
+      custodians: [...custodians.values()].sort((a, b) => a.name.localeCompare(b.name, "zh-Hant")),
+    })
+  }
+
   if (action === "personalList") {
     const query = text(body.query, 200), normalized = query.toLowerCase().trim()
     const group = PERSONAL_SEARCH_GROUPS.find(g => g.terms.some(x => x.toLowerCase() === normalized))
@@ -421,13 +456,13 @@ serve(async req => {
     const offset = Math.max(Number(body.offset) || 0, 0)
     let ids: string[] = []; let total = 0
     if (expanded.length <= 1) {
-      const { data, error } = await sb.rpc("pd_device_search", { p_query: query, p_type: effectiveType, p_status: text(body.status, 30), p_owner: text(body.owner, 100), p_include_retired: Boolean(body.includeRetired), p_limit: limit, p_offset: offset })
+      const { data, error } = await sb.rpc("pd_device_search", { p_query: query, p_type: effectiveType, p_status: text(body.status, 30), p_owner: text(body.owner, 100), p_custodian: text(body.custodian, 30), p_include_retired: Boolean(body.includeRetired), p_limit: limit, p_offset: offset })
       if (error) return json({ error: error.message }, 500)
       ids = (data || []).map((x: any) => x.asset_id); total = Number(data?.[0]?.total_count || 0)
     } else {
       const all = new Map<string, number>()
       for (const q of expanded) {
-        const { data } = await sb.rpc("pd_device_search", { p_query: q, p_type: effectiveType, p_status: text(body.status, 30), p_owner: text(body.owner, 100), p_include_retired: Boolean(body.includeRetired), p_limit: 100, p_offset: 0 })
+        const { data } = await sb.rpc("pd_device_search", { p_query: q, p_type: effectiveType, p_status: text(body.status, 30), p_owner: text(body.owner, 100), p_custodian: text(body.custodian, 30), p_include_retired: Boolean(body.includeRetired), p_limit: 100, p_offset: 0 })
         for (const x of data || []) all.set(x.asset_id, Math.max(all.get(x.asset_id) || 0, Number(x.score || 0)))
       }
       const ranked = [...all.entries()].sort((a,b) => b[1]-a[1]); total = ranked.length; ids = ranked.slice(offset, offset+limit).map(x => x[0])

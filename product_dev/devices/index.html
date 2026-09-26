@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <title>COMART 手機與配件 v1.11</title>
+  <title>COMART 手機與配件 v1.12</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -37,7 +37,7 @@
     html[lang="vi"]{--ff:'Be Vietnam Pro','DM Sans',-apple-system,sans-serif}
 
     *{box-sizing:border-box}html{color-scheme:dark}body{margin:0;background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:100vh}button,input,select,textarea{font:inherit}button{cursor:pointer}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}:focus-visible{outline:3px solid var(--ac);outline-offset:3px}
-    .lchip{font-size:11px;font-weight:600;padding:4px 9px;border-radius:20px;border:1px solid var(--br);background:transparent;color:var(--tx3);cursor:pointer;transition:all .12s;white-space:nowrap}.lchip:hover{color:var(--tx);border-color:var(--br2)}.lchip.on{background:var(--ac2);border-color:var(--ac);color:var(--ac)}#langChips{display:flex;gap:4px;overflow:auto;-webkit-overflow-scrolling:touch;flex-shrink:0}/* 🔴 尺寸與字重刻意逐項對齊平台（v1.11 之前這裡自成一套：72px topbar、
+    .lchip{font-size:11px;font-weight:600;padding:4px 9px;border-radius:20px;border:1px solid var(--br);background:transparent;color:var(--tx3);cursor:pointer;transition:all .12s;white-space:nowrap}.lchip:hover{color:var(--tx);border-color:var(--br2)}.lchip.on{background:var(--ac2);border-color:var(--ac);color:var(--ac)}#langChips{display:flex;gap:4px;overflow:auto;-webkit-overflow-scrolling:touch;flex-shrink:0}/* 🔴 尺寸與字重刻意逐項對齊平台（v1.12 之前這裡自成一套：72px topbar、
    44px 按鈕、46px 輸入框、font-weight 750–900、17px 分段鈕 —— 顏色雖然
    一樣，密度與字重差一個量級，一眼就看得出不是同一個系統）。
    對照基準：Portal 的 .topbar/.app-card 與 board 的 .topbar-main。*/
@@ -50,7 +50,16 @@
     .btn.primary:hover{background:var(--ac);color:#fff;border-color:var(--ac);filter:brightness(1.08)}.btn.danger{border-color:#743543;color:#ffb0b7;background:#29121a}.btn.good{border-color:#227050;color:#7ef0ba;background:#102820}.btn.small{min-height:36px;padding:0 12px;font-size:12px}.btn[disabled]{opacity:.45;cursor:not-allowed}
     .scope-switch{display:inline-grid;grid-template-columns:1fr 1fr;gap:4px;margin:0 0 20px;padding:3px;background:var(--s2);border:1px solid var(--line);border-radius:var(--r)}.scope-btn{min-height:32px;padding:0 20px;border:1px solid transparent;border-radius:7px;background:transparent;color:var(--muted);font-weight:600;font-size:13px;display:flex;align-items:center;justify-content:center;gap:7px}.scope-btn.active{color:#fff;background:var(--ac)}.scope-btn:not(.active):hover{background:#142238;color:var(--text);border-color:#304866}
     .tabs{display:flex;gap:8px;border-bottom:1px solid var(--line);margin-bottom:22px;overflow:auto}.tab{position:relative;background:none;border:0;color:var(--muted);padding:10px 14px;font-size:13px;font-weight:600;white-space:nowrap}.tab.active{color:var(--text)}.tab.active:after{content:"";position:absolute;left:12px;right:12px;bottom:-1px;height:3px;border-radius:3px;background:var(--accent)}.badge{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 6px;margin-left:6px;border-radius:20px;background:#233550;color:#cfdbec;font-size:11px}.badge.hot{background:#5b201f;color:#ffb8b6}
-    .filters{display:grid;grid-template-columns:minmax(240px,1fr) repeat(3,minmax(145px,190px));gap:10px;margin-bottom:18px}.field{display:flex;flex-direction:column;gap:7px}.field label{font-size:12px;color:#a9bad0;font-weight:800}.control{width:100%;min-height:36px;padding:8px 11px;font-size:13px;color:var(--text);background:var(--bg);border:1px solid var(--line);border-radius:var(--r)}.search{position:relative}.search i{position:absolute;left:14px;top:15px;color:var(--muted)}.search input{padding-left:44px}
+    /* 🔴 align-items:center 是對齊的關鍵：grid 預設 stretch，搜尋框那一格會被拉成
+   整列的高度，而裡面的 <input> 只有 min-height:36px 不會跟著拉長 —— 結果就是
+   輸入框黏在格子頂端、比右邊三個下拉高出一截，放大鏡還浮在它上方。*/
+    .filters{display:grid;grid-template-columns:minmax(240px,1fr) repeat(3,minmax(145px,190px));gap:10px;margin-bottom:18px;align-items:center}.field{display:flex;flex-direction:column;gap:7px}.field label{font-size:12px;color:#a9bad0;font-weight:800}.control{width:100%;min-height:36px;padding:8px 11px;font-size:13px;color:var(--text);background:var(--bg);border:1px solid var(--line);border-radius:var(--r)}/* 放大鏡用 translateY 置中，不要寫死 top —— 寫死的那個值是配 46px 輸入框調的，
+   v1.12 把輸入框縮到 36px 之後就偏掉了。這樣以後改高度也不用回來調。*/
+    .search{position:relative;display:flex}
+    /* 🔴 選擇器要同時涵蓋 svg：lucide.createIcons() 會把 <i data-lucide> **換成 <svg>**，
+       只寫 `.search i` 的話，圖示畫出來的那一刻規則就失效，放大鏡會跑到輸入框外面。*/
+    .search i,.search svg{position:absolute;left:11px;top:50%;width:16px;height:16px;transform:translateY(-50%);color:var(--muted);pointer-events:none}
+    .search input{padding-left:35px}
     .summary{display:flex;justify-content:space-between;align-items:center;margin:10px 0 15px;color:var(--muted);font-size:13px}.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}.card{background:var(--s1);border:1px solid var(--line);border-radius:var(--rl);overflow:hidden;min-width:0;transition:.18s transform,.18s border-color}.card:hover{transform:translateY(-2px);border-color:#3e6387}.card-image{aspect-ratio:16/10;background:#07101d;display:grid;place-items:center;overflow:hidden;position:relative}.card-image img{width:100%;height:100%;object-fit:contain;background:#fff}.placeholder{font-size:44px;color:#44617e}.status{position:absolute;left:12px;top:12px;padding:5px 9px;border-radius:999px;background:#0b1524dd;border:1px solid #ffffff20;font-size:11px;font-weight:850}.s-available{color:#65ecb3}.s-in_use{color:#72c3ff}.s-maintenance{color:#ffd77d}.s-lost,.s-retired{color:#ff929d}.card-body{padding:16px}.code{font-family:var(--fm);color:var(--accent);font-weight:900;letter-spacing:.12em;font-size:12px}.card h3{margin:8px 0 5px;font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sub{font-size:13px;color:var(--muted);min-height:38px}.meta{border-top:1px solid #22334d;margin-top:13px;padding-top:12px;display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12px;color:#b6c4d6}.custodian{font-size:15px;font-weight:900;color:#f4f7fb}.card-actions{display:grid;grid-template-columns:1.08fr .92fr;gap:8px;margin-top:13px}.card-actions .btn{width:100%;position:relative;z-index:2;padding:0 8px}.btn.borrow-cta,.btn.transfer-cta{min-height:48px;font-size:14px;font-weight:950}.btn.borrow-cta{border:1px solid var(--ac);background:var(--ac);color:#fff;box-shadow:0 8px 22px rgba(45,127,249,.28)}.btn.borrow-cta:hover{border-color:#5B9BFF;background:#4A8FFF;transform:translateY(-1px)}.btn.transfer-cta{border:1px solid var(--br2);background:var(--s2);color:var(--tx);box-shadow:none}.btn.transfer-cta:hover{border-color:var(--ac);background:var(--s3);transform:translateY(-1px)}.btn.borrow-cta[disabled],.btn.transfer-cta[disabled]{background:#16243a;color:#71839b;border-color:#2d405d;box-shadow:none;transform:none}.custodian-fact{border-color:#2D4F7A;background:linear-gradient(135deg,#10283a,#111d30);font-size:18px;font-weight:900}.custodian-fact small{font-size:12px;font-weight:700}.empty{grid-column:1/-1;padding:70px 20px;text-align:center;background:#0d1725;border:1px dashed #334968;border-radius:var(--rl);color:var(--muted)}.loadmore{display:block;margin:24px auto 0}.hidden{display:none!important}
     .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--rl);padding:20px}.pending-list{display:grid;gap:12px}.pending-item{display:flex;align-items:center;gap:15px;border:1px solid #263956;border-radius:14px;padding:15px;background:#0b1525}.pending-item .main{flex:1;min-width:0}.pending-item h3{margin:0 0 5px}.pending-item p{margin:0;color:var(--muted);font-size:13px}.warn{color:var(--yellow);font-size:12px;font-weight:800}.manage-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.type-row{display:grid;grid-template-columns:50px 1fr 1fr;gap:10px;padding:10px 0;border-bottom:1px solid #21314a}.type-code{font-family:var(--fm);font-size:18px;color:var(--accent)}
     .personal-head{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:18px}.personal-head h2{font-size:25px;margin:0 0 6px}.personal-head p{margin:0;color:var(--muted);line-height:1.6}.personal-filters{display:grid;grid-template-columns:minmax(260px,1fr) 190px auto auto;align-items:center;gap:10px;margin-bottom:16px}.checkline{display:flex;align-items:center;gap:8px;color:#b9c7d8;font-size:13px;white-space:nowrap}.owner-line{display:flex;align-items:center;gap:9px;border-top:1px solid #22334d;margin-top:13px;padding-top:12px}.owner-avatar{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:#203552;color:#7FB2FF;font-size:12px;font-weight:900}.owner-line b{display:block;font-size:12px}.owner-line small{color:var(--muted);font-size:11px}.personal-card .sub{min-height:auto}.personal-actions{display:flex;gap:7px;margin-top:13px}.personal-actions .btn{flex:1;padding:0 9px}
@@ -65,7 +74,7 @@
   <a class="sr-only" href="#main" data-i18n="skip">跳至主要內容</a>
   <header class="top">
     <a class="back" id="backLink" href="../index.html"><span>← Product Dev</span></a>
-    <div class="brand"><div class="mark"><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="26" height="14"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></div><div class="brand-title"><b data-i18n="app_title">手機與配件</b><span class="ver">v1.11</span></div></div>
+    <div class="brand"><div class="mark"><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="26" height="14"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></div><div class="brand-title"><b data-i18n="app_title">手機與配件</b><span class="ver">v1.12</span></div></div>
     <div class="grow"></div><div id="langChips"></div><div class="user"><b id="userName" data-i18n="verifying">驗證中…</b><small id="userMeta"></small></div>
   </header>
   <main class="shell" id="main">
@@ -81,7 +90,7 @@
       <div class="filters">
         <div class="search"><i data-lucide="search" width="18"></i><label class="sr-only" for="q" data-i18n="search_device">搜尋設備</label><input class="control" id="q" data-i18n-ph="ph_search" placeholder="資產編號、品牌、型號、序號、保管人…"></div>
         <select class="control" id="typeFilter" data-i18n-label="f_type" aria-label="設備類型"><option value="" data-i18n="opt_all_types">所有類型</option></select>
-        <select class="control" id="statusFilter" data-i18n-label="f_status" aria-label="設備狀態"><option value="" data-i18n="opt_all_status">所有狀態</option><option value="available" data-i18n="st_available">可借用</option><option value="in_use" data-i18n="st_in_use">使用中</option><option value="maintenance" data-i18n="st_maintenance">維修中</option><option value="lost" data-i18n="st_lost">遺失／遭竊</option></select>
+        <select class="control" id="custodianFilter" data-i18n-label="f_custodian" aria-label="保管人"><option value="" data-i18n="opt_all_custodian">所有保管人</option></select>
         <select class="control" id="ownerFilter" data-i18n-label="f_owner" aria-label="資產歸屬"><option value="" data-i18n="opt_all_owner">所有歸屬單位</option></select>
       </div>
       <label style="display:flex;align-items:center;gap:8px;color:var(--muted);font-size:13px;margin-bottom:8px"><input type="checkbox" id="includeRetired"> <span data-i18n="show_retired">顯示已退役設備</span></label>
@@ -135,6 +144,7 @@ const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],esc
 const DV_LANGS=[['zh-TW','繁中'],['zh-CN','简中'],['en','EN'],['vi','VI'],['ja','日本語']];
 const DV_I18N={
 'zh-TW':{
+    f_custodian:'保管人', opt_all_custodian:'所有保管人',
   custodian_of:'保管：{n}',
   open_asset:'開啟 {c} {b} {m}',
   skip:'跳至主要內容',
@@ -153,8 +163,6 @@ const DV_I18N={
   ph_search:'資產編號、品牌、型號、序號、保管人…',
   f_type:'設備類型',
   opt_all_types:'所有類型',
-  f_status:'設備狀態',
-  opt_all_status:'所有狀態',
   f_owner:'資產歸屬',
   opt_all_owner:'所有歸屬單位',
   show_retired:'顯示已退役設備',
@@ -352,6 +360,7 @@ const DV_I18N={
   cd_missing_accessory:'配件缺少'
 },
 'zh-CN':{
+    f_custodian:'保管人', opt_all_custodian:'所有保管人',
   custodian_of:'保管：{n}',
   open_asset:'打开 {c} {b} {m}',
   skip:'跳至主要内容',
@@ -370,8 +379,6 @@ const DV_I18N={
   ph_search:'资产编号、品牌、型号、序号、保管人…',
   f_type:'设备类型',
   opt_all_types:'所有类型',
-  f_status:'设备状态',
-  opt_all_status:'所有状态',
   f_owner:'资产归属',
   opt_all_owner:'所有归属单位',
   show_retired:'显示已退役设备',
@@ -569,6 +576,7 @@ const DV_I18N={
   cd_missing_accessory:'配件缺少'
 },
 en:{
+    f_custodian:'Custodian', opt_all_custodian:'All custodians',
   custodian_of:'Held by {n}',
   open_asset:'Open {c} {b} {m}',
   skip:'Skip to main content',
@@ -587,8 +595,6 @@ en:{
   ph_search:'Asset code, brand, model, serial, custodian…',
   f_type:'Device type',
   opt_all_types:'All types',
-  f_status:'Device status',
-  opt_all_status:'All statuses',
   f_owner:'Ownership',
   opt_all_owner:'All owning units',
   show_retired:'Show retired devices',
@@ -786,6 +792,7 @@ en:{
   cd_missing_accessory:'Accessories missing'
 },
 vi:{
+    f_custodian:'Người giữ', opt_all_custodian:'Tất cả người giữ',
   custodian_of:'Người giữ {n}',
   open_asset:'Mở {c} {b} {m}',
   skip:'Bỏ qua đến nội dung chính',
@@ -804,8 +811,6 @@ vi:{
   ph_search:'Mã tài sản, hãng, mẫu, số sê-ri, người giữ…',
   f_type:'Loại thiết bị',
   opt_all_types:'Tất cả loại',
-  f_status:'Trạng thái thiết bị',
-  opt_all_status:'Tất cả trạng thái',
   f_owner:'Thuộc về',
   opt_all_owner:'Tất cả đơn vị sở hữu',
   show_retired:'Hiện thiết bị đã thanh lý',
@@ -1003,6 +1008,7 @@ vi:{
   cd_missing_accessory:'Thiếu phụ kiện'
 },
 ja:{
+    f_custodian:'保管者', opt_all_custodian:'すべての保管者',
   custodian_of:'保管者：{n}',
   open_asset:'{c} {b} {m} を開く',
   skip:'メインコンテンツへスキップ',
@@ -1021,8 +1027,6 @@ ja:{
   ph_search:'資産番号、ブランド、型番、シリアル、保管者…',
   f_type:'機器タイプ',
   opt_all_types:'すべてのタイプ',
-  f_status:'機器ステータス',
-  opt_all_status:'すべてのステータス',
   f_owner:'資産帰属',
   opt_all_owner:'すべての帰属部署',
   show_retired:'廃棄済み機器を表示',
@@ -1242,7 +1246,7 @@ function dvApplyI18n(){
   $$('[data-i18n]').forEach(e=>{e.textContent=DT(e.getAttribute('data-i18n'))});
   $$('[data-i18n-ph]').forEach(e=>{e.placeholder=DT(e.getAttribute('data-i18n-ph'))});
   $$('[data-i18n-label]').forEach(e=>{e.setAttribute('aria-label',DT(e.getAttribute('data-i18n-label')))});
-  document.title='COMART '+DT('app_title')+' v1.11';
+  document.title='COMART '+DT('app_title')+' v1.12';
   const box=$('#langChips');
   if(box){
     box.innerHTML=DV_LANGS.map(l=>`<button class="lchip${l[0]===DVLANG?' on':''}" onclick="dvSetLang('${l[0]}')">${l[1]}</button>`).join('');
@@ -1279,9 +1283,30 @@ async function init(){if(!session())return;
      呼叫 createIcons()，所以後端一不通，整頁 11 個 <i data-lucide> 全部留在
      原地不會變成 SVG —— 返回鈕、搜尋、新增全部沒有圖示，看起來像頁面壞掉。*/
   try{lucide.createIcons()}catch{}
-  B=await api('bootstrap');$('#userName').textContent=B.profile.name;$('#userMeta').textContent=(B.profile.role==='admin'?DT('role_admin'):DT('role_user'))+' · '+B.profile.empId;$('#pendingBadge').textContent=B.badges.pendingForMe;if(B.profile.role==='admin'){$('#manageTab').classList.remove('hidden');$('#personalInactiveWrap').classList.remove('hidden')}fillOptions();renderTypes();const assetCode=new URLSearchParams(location.search).get('asset');if(assetCode)$('#q').value=assetCode;await load(true);if(assetCode){const exact=items.find(x=>x.assetCode.toUpperCase()===assetCode.toUpperCase());if(exact)await showDetail(exact.id)}lucide.createIcons()}
-function fillOptions(){const ts=B.types.map(t=>`<option value="${esc(t.code)}">${esc(t.name_zh)} · ${esc(t.code)}xxx</option>`).join('');$('#fType').innerHTML=ts;$('#typeFilter').innerHTML=`<option value="">${DT('opt_all_types')}</option>`+ts;$('#personalType').innerHTML=`<option value="">${DT('opt_all_types')}</option>`+B.types.map(t=>`<option value="${esc(t.code)}">${esc(t.name_zh)}</option>`).join('');$('#personalFormType').innerHTML=B.types.map(t=>`<option value="${esc(t.code)}">${esc(t.name_zh)}</option>`).join('');const users=B.users.map(u=>`<option value="${esc(u.emp_id)}">${esc(u.name_zh||u.name_en||u.emp_id)} · ${esc(u.emp_id)}</option>`).join('');$('#fCustodian').innerHTML=users;$('#fCustodian').value=B.profile.empId;const units=[...new Map([...B.departments,...B.sites].map(x=>[(x.zh||x.en||x.key),x])).values()].map(x=>x.zh||x.en||x.key);$('#fOwner').innerHTML=units.map(x=>`<option>${esc(x)}</option>`).join('');$('#ownerFilter').innerHTML=`<option value="">${DT('opt_all_owner')}</option>`+units.map(x=>`<option>${esc(x)}</option>`).join('')}
-async function load(reset=false){const seq=++loadSeq;if(reset){offset=0;items=[];$('#cards').innerHTML=`<div class="empty">${DT('loading')}</div>`}try{const j=await api('list',{query:$('#q').value,typeCode:$('#typeFilter').value,status:$('#statusFilter').value,owner:$('#ownerFilter').value,includeRetired:$('#includeRetired').checked,limit:30,offset});if(seq!==loadSeq)return;total=j.total;items.push(...j.items);offset=items.length;renderCards();$('#loadMore').classList.toggle('hidden',offset>=total)}catch(e){if(seq===loadSeq)$('#cards').innerHTML=`<div class="empty">${DT('load_failed',{m:esc(e.message)})}</div>`}}
+  B=await api('bootstrap');$('#userName').textContent=B.profile.name;$('#userMeta').textContent=(B.profile.role==='admin'?DT('role_admin'):DT('role_user'))+' · '+B.profile.empId;$('#pendingBadge').textContent=B.badges.pendingForMe;if(B.profile.role==='admin'){$('#manageTab').classList.remove('hidden');$('#personalInactiveWrap').classList.remove('hidden')}fillOptions();renderTypes();fillFacets();const assetCode=new URLSearchParams(location.search).get('asset');if(assetCode)$('#q').value=assetCode;await load(true);if(assetCode){const exact=items.find(x=>x.assetCode.toUpperCase()===assetCode.toUpperCase());if(exact)await showDetail(exact.id)}lucide.createIcons()}
+function fillOptions(){const ts=B.types.map(t=>`<option value="${esc(t.code)}">${esc(t.name_zh)} · ${esc(t.code)}xxx</option>`).join('');$('#fType').innerHTML=ts;$('#typeFilter').innerHTML=`<option value="">${DT('opt_all_types')}</option>`+ts;$('#personalType').innerHTML=`<option value="">${DT('opt_all_types')}</option>`+B.types.map(t=>`<option value="${esc(t.code)}">${esc(t.name_zh)}</option>`).join('');$('#personalFormType').innerHTML=B.types.map(t=>`<option value="${esc(t.code)}">${esc(t.name_zh)}</option>`).join('');const users=B.users.map(u=>`<option value="${esc(u.emp_id)}">${esc(u.name_zh||u.name_en||u.emp_id)} · ${esc(u.emp_id)}</option>`).join('');$('#fCustodian').innerHTML=users;$('#fCustodian').value=B.profile.empId;/* 表單（新增設備）的「資產歸屬單位」仍從 departments ∪ sites 取 —— 那是「可以選什麼」。
+     但**篩選器**的選項必須從實際資料取（fillFacets），因為 SQL 端是完全相等比對。*/
+  const units=[...new Map([...B.departments,...B.sites].map(x=>[(x.zh||x.en||x.key),x])).values()].map(x=>x.zh||x.en||x.key);$('#fOwner').innerHTML=units.map(x=>`<option>${esc(x)}</option>`).join('')}
+
+/* 🔴 篩選器的選項一律從 pd_device_assets 自己長出來，不要從 departments／sites 推。
+   舊版「所有歸屬單位」就是拿 departments ∪ sites 的顯示名稱去填，而後端是
+   `ownership_unit = 選到的值` 的完全相等比對 —— 資料只要不是透過本表單建立的
+   （匯入、種子、人工改過），選什麼都是 0 筆，而且看起來像「沒有資料」不像「設定錯誤」。
+   選項數量後面帶上筆數，順便讓人一眼看出資料實際長什麼樣。
+   失敗時保留「所有…」那一項就好 —— 下拉空掉比篩選壞掉更難懂。*/
+async function fillFacets(){
+  const oSel=$('#ownerFilter'), cSel=$('#custodianFilter');
+  const keepO=oSel.value, keepC=cSel.value;
+  let f;
+  try{ f=await api('facets'); }
+  catch(e){ console.warn('[devices] facets 載入失敗：', e.message); return; }
+  oSel.innerHTML=`<option value="">${DT('opt_all_owner')}</option>`
+    +(f.owners||[]).map(x=>`<option value="${esc(x.unit)}">${esc(x.unit)}（${x.n}）</option>`).join('');
+  cSel.innerHTML=`<option value="">${DT('opt_all_custodian')}</option>`
+    +(f.custodians||[]).map(x=>`<option value="${esc(x.empId)}">${esc(x.name)}（${x.n}）</option>`).join('');
+  oSel.value=keepO; cSel.value=keepC;   // 重新載入時不要把使用者選的條件弄掉
+}
+async function load(reset=false){const seq=++loadSeq;if(reset){offset=0;items=[];$('#cards').innerHTML=`<div class="empty">${DT('loading')}</div>`}try{const j=await api('list',{query:$('#q').value,typeCode:$('#typeFilter').value,custodian:$('#custodianFilter').value,owner:$('#ownerFilter').value,includeRetired:$('#includeRetired').checked,limit:30,offset});if(seq!==loadSeq)return;total=j.total;items.push(...j.items);offset=items.length;renderCards();$('#loadMore').classList.toggle('hidden',offset>=total)}catch(e){if(seq===loadSeq)$('#cards').innerHTML=`<div class="empty">${DT('load_failed',{m:esc(e.message)})}</div>`}}
 function renderCards(){$('#totalText').textContent=DT('count_shown',{t:total,n:items.length});$('#resultHint').textContent=$('#q').value?DT('sort_rank'):DT('sort_avail');$('#cards').innerHTML=items.length?items.map(a=>{const canRequest=!['maintenance','lost','retired'].includes(a.status);const reason=statusName[a.status]||DT('not_requestable');return`<article class="card" tabindex="0" data-id="${a.id}" aria-label="${DT('open_asset',{c:esc(a.assetCode),b:esc(a.brand),m:esc(a.model)})}"><div class="card-image">${a.imageUrl?`<img src="${esc(a.imageUrl)}" alt="${esc(a.brand+' '+a.model)}">`:'<i data-lucide="smartphone" class="placeholder"></i>'}<span class="status s-${a.status}">${statusName[a.status]||a.status}</span></div><div class="card-body"><span class="code">${esc(a.assetCode)}</span><h3>${esc(a.brand)} ${esc(a.model)}</h3><div class="sub">${esc(a.color||DT('no_color'))} · ${esc(B.types.find(t=>t.code===a.typeCode)?.name_zh||a.typeCode)}</div><div class="meta"><span class="custodian">${DT('custodian_of',{n:esc(a.custodianName||DT('not_linked'))})}</span><span>${a.expectedAvailableDate?DT('expect_prefix',{d:fmtDate(a.expectedAvailableDate)}):''}</span></div><div class="card-actions"><button class="btn borrow-cta borrow-btn" data-id="${a.id}" ${canRequest?'':'disabled'}><i data-lucide="hand"></i>${canRequest?DT('act_borrow'):esc(reason)}</button><button class="btn transfer-cta transfer-btn" data-id="${a.id}" ${canRequest?'':'disabled'}><i data-lucide="repeat-2"></i>${DT('act_transfer')}</button></div></div></article>`}).join(''):`<div class="empty">${DT('no_match')}</div>`;$$('.card').forEach(c=>{c.onclick=()=>showDetail(c.dataset.id);c.onkeydown=e=>{if((e.key==='Enter'||e.key===' ')&&e.target===c){e.preventDefault();showDetail(c.dataset.id)}}});$$('.borrow-btn').forEach(b=>b.onclick=e=>{e.stopPropagation();borrowFromCard(b.dataset.id)});$$('.transfer-btn').forEach(b=>b.onclick=e=>{e.stopPropagation();transferFromCard(b.dataset.id)});lucide.createIcons()}
 async function personalLoad(reset=false){const seq=++personalSeq;if(reset){personalOffset=0;personalItems=[];$('#personalCards').innerHTML=`<div class="empty">${DT('loading')}</div>`}try{const j=await api('personalList',{query:$('#personalQ').value,typeCode:$('#personalType').value,mine:$('#personalMine').checked,includeInactive:$('#personalInactive').checked,limit:30,offset:personalOffset});if(seq!==personalSeq)return;personalTotal=j.total;personalItems.push(...j.items);personalOffset=personalItems.length;renderPersonalCards();$('#personalMore').classList.toggle('hidden',personalOffset>=personalTotal)}catch(e){if(seq===personalSeq)$('#personalCards').innerHTML=`<div class="empty">${DT('load_failed',{m:esc(e.message)})}</div>`}}
 function renderPersonalCards(){$('#personalTotal').textContent=DT('count_shown',{t:personalTotal,n:personalItems.length});$('#personalCards').innerHTML=personalItems.length?personalItems.map(a=>{const canDelete=a.isMine||B.profile.role==='admin';const place=[a.ownerDept,a.ownerSite].filter(Boolean).join(' · ')||DT('p_no_dept');return`<article class="card personal-card"><div class="card-image">${a.imageUrl?`<img src="${esc(a.imageUrl)}" alt="${esc(a.brand+' '+a.model)}">`:'<i data-lucide="image" class="placeholder"></i>'}${a.ownerActive?'':`<span class="status s-retired">${DT('p_acct_disabled')}</span>`}</div><div class="card-body"><span class="code">${esc(B.types.find(t=>t.code===a.typeCode)?.name_zh||a.typeCode)}</span><h3>${esc(a.brand)} ${esc(a.model)}</h3><div class="sub">${esc(a.color||DT('no_color'))}</div><div class="owner-line"><span class="owner-avatar">${esc((a.ownerName||'?').slice(0,1))}</span><span><b>${esc(a.ownerName)}</b><small>${esc(place)}</small></span></div>${a.isMine||canDelete?`<div class="personal-actions">${a.isMine?`<button class="btn small" onclick="editPersonal('${a.id}')">${DT('btn_edit')}</button><button class="btn small" onclick="choosePersonalImage('${a.id}')">${DT('btn_change_photo_s')}</button>`:''}${canDelete?`<button class="btn danger small" onclick="deletePersonal('${a.id}')">${DT('btn_delete')}</button>`:''}</div>`:''}</div></article>`}).join(''):`<div class="empty">${DT('p_empty')}</div>`;lucide.createIcons()}
@@ -1320,7 +1345,7 @@ $('#assetForm').onsubmit=async e=>{e.preventDefault();const btn=e.submitter;btn.
 $('#personalForm').onsubmit=async e=>{e.preventDefault();const b=e.submitter;b.disabled=true;const id=$('#personalId').value;try{await api(id?'personalUpdate':'personalCreate',{id,typeCode:$('#personalFormType').value,brand:$('#personalBrand').value,model:$('#personalModel').value,color:$('#personalColor').value});close('personalFormOverlay');e.target.reset();toast(id?DT('p_updated'):DT('p_created'));await personalLoad(true);if(!id)setTimeout(()=>scope==='personal'&&personalLoad(true),15000)}catch(x){toast(x.message,true)}finally{b.disabled=false}};
 $('#personalImageInput').onchange=async e=>{const f=e.target.files[0];if(!f||!personalImageId)return;if(f.size>8*1024*1024){toast(DT('p_img_too_big'),true);return}try{const base64=await new Promise((ok,no)=>{const r=new FileReader;r.onload=()=>ok(String(r.result).split(',')[1]);r.onerror=no;r.readAsDataURL(f)});toast(DT('p_uploading'));await api('personalUploadImage',{id:personalImageId,name:f.name,mime:f.type,base64});toast(DT('p_img_updated'));await personalLoad(true)}catch(x){toast(x.message,true)}finally{personalImageId=null;e.target.value=''}};
 $('#actionForm').onsubmit=async e=>{e.preventDefault();const b=e.submitter;b.disabled=true;try{await actionHandler();close('actionOverlay');toast(DT('done'));if(current)await refreshDetail();await loadPending()}catch(x){toast(x.message,true)}finally{b.disabled=false}};
-$('#newBtn').onclick=()=>open('formOverlay');$('#personalNewBtn').onclick=()=>openPersonalForm();$('#companyScope').onclick=()=>switchScope('company');$('#personalScope').onclick=()=>switchScope('personal');$$('[data-close]').forEach(b=>b.onclick=()=>close(b.dataset.close));$$('.tab').forEach(t=>t.onclick=async()=>{$$('.tab').forEach(x=>x.classList.remove('active'));t.classList.add('active');['list','pending','manage'].forEach(v=>$('#view-'+v).classList.toggle('hidden',v!==t.dataset.tab));if(t.dataset.tab==='pending')await loadPending();if(t.dataset.tab==='manage')await loadAudit()});let timer;$('#q').oninput=()=>{clearTimeout(timer);timer=setTimeout(()=>load(true),350)};let personalTimer;$('#personalQ').oninput=()=>{clearTimeout(personalTimer);personalTimer=setTimeout(()=>personalLoad(true),350)};['typeFilter','statusFilter','ownerFilter','includeRetired'].forEach(id=>$('#'+id).onchange=()=>load(true));['personalType','personalMine','personalInactive'].forEach(id=>$('#'+id).onchange=()=>personalLoad(true));$('#loadMore').onclick=()=>load(false);$('#personalMore').onclick=()=>personalLoad(false);
+$('#newBtn').onclick=()=>open('formOverlay');$('#personalNewBtn').onclick=()=>openPersonalForm();$('#companyScope').onclick=()=>switchScope('company');$('#personalScope').onclick=()=>switchScope('personal');$$('[data-close]').forEach(b=>b.onclick=()=>close(b.dataset.close));$$('.tab').forEach(t=>t.onclick=async()=>{$$('.tab').forEach(x=>x.classList.remove('active'));t.classList.add('active');['list','pending','manage'].forEach(v=>$('#view-'+v).classList.toggle('hidden',v!==t.dataset.tab));if(t.dataset.tab==='pending')await loadPending();if(t.dataset.tab==='manage')await loadAudit()});let timer;$('#q').oninput=()=>{clearTimeout(timer);timer=setTimeout(()=>load(true),350)};let personalTimer;$('#personalQ').oninput=()=>{clearTimeout(personalTimer);personalTimer=setTimeout(()=>personalLoad(true),350)};['typeFilter','custodianFilter','ownerFilter','includeRetired'].forEach(id=>$('#'+id).onchange=()=>load(true));['personalType','personalMine','personalInactive'].forEach(id=>$('#'+id).onchange=()=>personalLoad(true));$('#loadMore').onclick=()=>load(false);$('#personalMore').onclick=()=>personalLoad(false);
 $('#addTypeBtn').onclick=()=>actionDialog(DT('dlg_add_type'),`${field('aCode',DT('fld_code_initial'),'text','maxlength="1" required')}${field('aZh',DT('fld_name_zh'),'text','required')}${field('aEn',DT('fld_name_en'),'text','required')}`,async()=>{await api('addType',{code:$('#aCode').value,nameZh:$('#aZh').value,nameEn:$('#aEn').value});B=await api('bootstrap');fillOptions();renderTypes()});
 init().catch(e=>{toast(DT('init_failed',{m:e.message}),true);$('#cards').innerHTML=`<div class="empty">${esc(e.message)}</div>`});
 </script>

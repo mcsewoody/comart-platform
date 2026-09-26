@@ -111,8 +111,6 @@ enabled = true
 # The maximum file size allowed (e.g. "5MB", "500KB").
 file_size_limit = "50MiB"
 
-[functions.cpf-ai-worker]
-verify_jwt = true
 
 [functions.pd-devices-api]
 verify_jwt = false
@@ -481,12 +479,17 @@ entrypoint = "./functions/holidays-proxy/index.ts"
 # For example, if you want to serve static HTML pages in your function:
 # static_files = [ "./functions/holidays-proxy/*.html" ]
 
-[functions.cpf-platform-api]
-enabled = true
-verify_jwt = false
-entrypoint = "./functions/cpf-platform-api/index.ts"
 
 [functions.pd-documents-api]
 enabled = true
 verify_jwt = false
 entrypoint = "./functions/pd-documents-api/index.ts"
+
+# 🔴 pd-ai-worker 原本沒有條目（2026-09-26 補）。它已部署且 ACTIVE，但少了這一段，
+#    下一次 `supabase functions deploy pd-ai-worker` 會用預設的 verify_jwt = true，
+#    而它是 GitHub Actions 只帶 apikey 標頭呼叫的 —— 會變成 401。
+#    而且 pd-document-worker.yml 只能手動觸發，壞掉不會有人立刻發現。
+[functions.pd-ai-worker]
+enabled = true
+verify_jwt = false
+entrypoint = "./functions/pd-ai-worker/index.ts"

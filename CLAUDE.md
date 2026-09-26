@@ -108,7 +108,7 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 | `kms/index.html` | v2.41 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
 | `quotation/index.html` | v3.61 | Quotation & CRM system | 7,332 |
 | `board/index.html` | v1.91 | 公告與會議 Bulletin & Meetings — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍、腦力激盪 | 4,600 |
-| `product_dev/` | v2.17 | **產品開發管理 —— 第六個子系統，不遵守單一檔案原則**（見下方專節） | — |
+| `product_dev/` | v2.20 | **產品開發管理 —— 第六個子系統，不遵守單一檔案原則**（見下方專節） | — |
 
 `admin/lottery.html` is a standalone lottery page (separate from the lottery module inside `admin/index.html`).
 
@@ -1954,11 +1954,16 @@ Portal 入口：APPS 的 `id:'product-dev'`（`roles:[]`，**不限角色，全�
 
 | 部分 | 路徑 | 版本 | 形態 |
 |---|---|---|---|
-| 工作區首頁（hub） | `product_dev/index.html` | **v2.17** | 單檔，94 行，只有入口卡片 |
+| 工作區首頁（hub） | `product_dev/index.html` | **v2.20** | 單檔，只有入口卡片 |
 | Document Finder | `product_dev/finder/`（產物）← `finder-src/`（原始碼） | **v2.26** | **React 19 + TypeScript + Vite + Tailwind 4** |
-| 手機與配件（裝置保管） | `product_dev/devices/index.html` | **v1.06** | 單檔，53KB |
+| 手機與配件（裝置保管） | `product_dev/devices/index.html` | **v1.08** | 單檔，53KB |
 
-- 🔴 **三個版本號互不相干。** commit 訊息用的是 hub 那一個（`v2.17 - …`），
+- 🔴 **hub 不再標示另外兩個模組的版本**（v2.20 拿掉）。那是第二份副本，
+  而 Finder 那一個已經漂到 `v2.10`／實際 `v2.26`，差 16 個版本 —— **錯的版本號
+  比沒有版本號更糟**，查問題的人會照著它去找不存在的程式碼。
+  兩個模組本來就各自在自己的畫面上顯示版本（Finder 的 `AppShell`、裝置的 brand 列），
+  不需要 hub 再存一份。**不要把 badge 加回去。**
+- 🔴 **三個版本號互不相干。** commit 訊息用的是 hub 那一個（`v2.20 - …`），
   但同一個 commit 裡 `devices/index.html` 可能是 v1.06、finder 是 v2.26。
   改哪一部分就 bump 哪一個，**不要以為只有一個版本號**。
 - Finder 的版本在 `finder-src/src/version.ts` 的 `CPF_VERSION`（名稱是 CPF 時代留下的），
@@ -1990,9 +1995,12 @@ rsync -a --delete dist/ ../finder/
   那是**文件上傳與同步**的軌跡。裝置移轉看 `pd_device_transfers` 與 `pd_device_audit_log`。名字很像，別搞混。
 - **Storage bucket 命名不一致**（既成事實）：文件用底線 `pd_mfg_source`／`pd_mfg_preview`／`pd_mfg_thumbnail`／
   `pd_buy_*`，裝置用連字號 `pd-device-files`。全部 `public=false`。
-- 🔴 **`202609040001_retire_legacy_cpf.sql` 已把所有 `cpf_*` 表移除**，但
-  `supabase/functions/cpf-ai-worker`／`cpf-platform-api` **仍留在 repo 裡而且沒有部署**
-  （`supabase functions list` 看不到它們），`config.toml` 也還留著條目。那是死程式碼。
+- ✅ **`cpf_*` 遺留已清乾淨（2026-09-26）**：`202609040001_retire_legacy_cpf.sql` 移除了所有
+  `cpf_*` 表；`cpf-ai-worker`／`cpf-platform-api` 的程式碼其實早就不在版控裡了
+  （只剩兩個本機空目錄），`config.toml` 的兩個條目已一併移除 —— 其中
+  `[functions.cpf-ai-worker]` 是整份 config **唯一**的 `verify_jwt = true`，
+  所以「全數固化 verify_jwt = false」這句話到現在才真的成立。
+  ⚠️ **`finder-worker/cpf_worker/` 這個 Python package 不能刪**（見下方 worker 一節）。
 
 ### Edge Functions：兩支給人用、兩支給機器用
 
@@ -2002,6 +2010,15 @@ rsync -a --delete dist/ ../finder/
 | `pd-devices-api` | `x-session` HMAC | 27 個 action：建立、核准、移轉、歸還、維修、退役、盤點、個人資產… |
 | `pd-ai-worker` | `apikey` 標頭 | GitHub Actions 呼叫，轉發 OpenAI Responses API |
 | `pd-device-reminders` | `apikey` 標頭 | 每日提醒，逾期／盤點，經 Resend 寄信 |
+
+- 🔴 **`pd-ai-worker` 在 `config.toml` 裡原本沒有條目**（2026-09-26 補上）。
+  它已部署且 ACTIVE，所以現在是好的 —— 但少了那一段，**下一次 `supabase functions
+  deploy pd-ai-worker` 會用預設的 `verify_jwt = true`**，而它是 GitHub Actions
+  只帶 `apikey` 標頭呼叫的，會直接變成 401。2026-07-20 的全站 401 就是同一個原因。
+  而且 `pd-document-worker.yml` 只能手動觸發，壞掉不會有人立刻發現。
+  **對照方式**：`supabase functions list` 的結果要與 `config.toml` 的
+  `[functions.*]` 條目一一對上（扣掉官網那三支 `enquiry`／`translate`／`admin-users`），
+  現在是 13 對 13、且全部 `verify_jwt = false`。
 
 - ✅ **給人用的兩支與平台其他部分同一套驗證**（`_shared/session.ts` 的 `verifySession`），
   角色對應：平台 `admin` → `admin`、`dcc` → `editor`、其餘 → `viewer`。
@@ -2025,12 +2042,29 @@ rsync -a --delete dist/ ../finder/
   **要清 CPF 遺留時不能整個目錄刪掉** —— `extractors.py` 是現役的解析器。
 - `golden-set/` 是評測集（`evaluate_golden.py` 用退出碼強制門檻：型號 90%／類別 90%／廠商 85%／Top-5 90%）。
 
+### 🔴 由 Claude 接手維護（Woody 2026-09-26 決定）
+
+**形態不變** —— React + TypeScript + Vite 留著，**不要改寫成單一 HTML 檔**。
+理由是實測出來的：`npm run typecheck` 乾淨、`npm test` 17 個全過、
+`npm run build:platform` 重建的產物與版控裡的 `finder/` **位元組完全相同**，
+而且它用的就是平台自己的 `comart-portal-session` ＋ `x-session`，
+`getPlatformSession()` 每次呼叫都檢查 `expires`、`platformCall()` 對任何非 2xx
+都丟出帶訊息的例外 —— **2026-09-25~26 在另外五個系統補的那一套，它本來就有**。
+單一檔案原則是另外五個長成那樣，不是品質標準；把 6,604 行 TS 塞回一個 HTML 檔
+會丟掉型別檢查與 17 個測試，換來風格一致。**不要再提議重寫。**
+
 ### ⚠️ `finder-src/README.md` 的後半段已經過期
 
 前段（已實作範圍、架構圖）是現況，但**「Supabase 設定」「GitHub 設定」以下仍停留在 CPF 時代**：
 它叫你部署 `cpf-search`／`cpf-file-url`／`cpf-admin-user`（三支都不存在）、
 建 `cpf_profiles`、用 `cpf_source`／`cpf_preview`／`cpf_thumbnail` bucket（都已移除）。
 **以本節與實際資料庫為準**，不要照著那幾段跑。
+
+✅ **2026-09-26 已在 README 裡就地標記**：那幾節前面加了一個 ⚠️ 區塊直接說
+「以下不要照著做」，末尾那節「已知上線阻擋」（寫著本 repo 沒連到任何真實帳號、
+沒有部署）換成了查證過的現況表。
+🔴 **警告寫在 CLAUDE.md 裡救不了讀 README 的人** —— 這個坑之所以能一直存在，
+就是因為唯一的警告放在另一個檔案。以後發現哪份文件過期，先在那份文件上標。
 
 ## Development Workflow
 

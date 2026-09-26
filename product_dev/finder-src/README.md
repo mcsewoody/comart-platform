@@ -82,6 +82,20 @@ python3 worker/import_directory.py --root .. --limit 20
 
 最後一行是 dry-run，不會上傳。
 
+> ## ⚠️ 以下全部停留在 CPF 時代，**不要照著做**
+>
+> 這份 README 的前半段（已實作範圍、架構）是現況；**從這一行以下到檔尾**
+> 寫的是 2026-08 改名成 `pd_*` 之前的設定流程，已經與實際環境不符：
+>
+> - 它叫你部署 `cpf-search`／`cpf-file-url`／`cpf-admin-user` —— **三支都不存在**。
+> - 它叫你建 `cpf_profiles`、用 `cpf_source`／`cpf_preview`／`cpf_thumbnail` bucket
+>   —— 已由 `202609040001_retire_legacy_cpf.sql` 全部移除。
+> - 「已知上線阻擋」那一節說本 repo 沒有連到任何真實帳號、沒有部署 ——
+>   **那已經不是事實**（見下方「現況」）。
+>
+> **以 `CLAUDE.md` 的〈Product Dev〉專節與實際資料庫為準。**
+> 保留這幾節只是為了讓人看得懂當初的設計意圖，不是操作指南。
+
 ## 正式上線前置資料
 
 | 項目 | 用途 |
@@ -211,10 +225,19 @@ worker/.venv/bin/python worker/evaluate_golden.py \
 結果、證據、模型、提示版本與用量。模型分層遵循
 [OpenAI 最新模型指引](https://developers.openai.com/api/docs/guides/latest-model)。
 
-## 已知上線阻擋
+## 現況（2026-09-26 查證）
 
-這份 repository 目前未連到任何真實 Supabase／OpenAI／GitHub／OneDrive
-帳號，因此沒有套用遠端 migration、沒有上傳 4.94 GiB 原檔、沒有呼叫
-Responses API、沒有建立 GitHub repository，也沒有公開部署。這是刻意的：
-缺少上述 owner、project ref、keys 與備援管理員決策時，不應猜測或把資料送到
-錯誤帳號。
+上面那一節原本寫著「本 repository 未連到任何真實帳號、沒有部署」——
+**那是 CPF 時代的描述，早就不成立了**，留著會讓人以為這套東西還沒上線。
+實際狀態：
+
+| 項目 | 現況 |
+|---|---|
+| 部署 | 已上線，`platform.comart.com.tw/product_dev/` |
+| 資料 | `pd_mfg_documents` 1,148 筆／`pd_buy_documents` 269 筆 |
+| Edge Functions | `pd-documents-api`／`pd-devices-api`／`pd-ai-worker`／`pd-device-reminders` 皆 ACTIVE |
+| 退役 | `cpf-platform-api`／`cpf-ai-worker` 已停用，程式碼與 `config.toml` 條目均已移除 |
+| GitHub Actions | `pd-device-reminders.yml` 每日 00:15 UTC；`pd-document-worker.yml` **只能手動觸發**（README 別處寫的「5 分鐘 worker」是舊的） |
+
+⚠️ `cpf_worker/` 這個 Python package **不是死的**：`pd_worker/run.py` 仍
+`from cpf_worker.extractors import extract_document`。清 CPF 遺留時不能整包刪掉。

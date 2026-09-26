@@ -18,7 +18,7 @@ export function Button({
       className={cn(
         "inline-flex min-h-10 items-center justify-center gap-2 rounded-xl px-4 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 disabled:pointer-events-none disabled:opacity-45",
         variant === "primary" &&
-          "bg-cyan-400 text-slate-950 shadow-sm hover:bg-cyan-300",
+          "bg-cyan-400 text-white shadow-sm hover:bg-cyan-300",
         variant === "secondary" &&
           "border border-slate-600 bg-slate-900 text-slate-100 hover:border-slate-500 hover:bg-slate-800",
         variant === "ghost" &&

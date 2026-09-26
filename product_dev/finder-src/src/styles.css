@@ -1,11 +1,54 @@
 @import "tailwindcss";
 
+/* ─────────────────────────────────────────────────────────────
+   平台設計 token（與 Portal index.html 的 :root 相同）
+
+   🔴 Tailwind 4 可以直接改寫色階本身，所以這裡把 slate／cyan 兩條色階
+      重新指到平台的顏色 —— 這樣 640 多處既有的 `bg-slate-900`／`text-cyan-300`
+      不必逐一改寫就會落在平台色上。**要改配色改這裡，不要去改各頁的 class。**
+
+   ⚠️ 這個專案把 slate 當成兩種東西用：500 以下是「深色表面與邊框」，
+      400 以上是「淺色文字」。所以色階不是單純由亮到暗 ——
+      對照表如下，加新的色階時照這個語意放。
+   ───────────────────────────────────────────────────────────── */
+@theme {
+  --color-slate-950: #0A0E17;  /* --bg   頁面底 */
+  --color-slate-900: #111827;  /* --s1   卡片、面板 */
+  --color-slate-800: #1A2335;  /* --s2   次層表面、hover */
+  --color-slate-700: #2D3F5A;  /* --br   邊框 */
+  --color-slate-600: #3D5275;  /* --br2  強調邊框 */
+  --color-slate-500: #A8C4EC;  /* --tx3  次要文字（本專案用它當文字，不是邊框）*/
+  --color-slate-400: #A8C4EC;  /* --tx3 */
+  --color-slate-300: #CDE0FF;  /* --tx2 */
+  --color-slate-200: #CDE0FF;  /* --tx2 */
+  --color-slate-100: #F5F9FF;  /* --tx   主要文字 */
+  --color-slate-50:  #F5F9FF;  /* --tx */
+
+  /* 主色：原本是 cyan，整條換成 Portal 的 --ac 藍 */
+  --color-cyan-300: #5B9BFF;
+  --color-cyan-400: #2D7FF9;   /* --ac */
+  --color-cyan-500: #2D7FF9;
+  --color-cyan-600: #1F6FE0;
+  --color-cyan-700: #2D3F5A;   /* 當邊框用 */
+  --color-cyan-800: #7FB2FF;   /* 當文字用 */
+  --color-cyan-900: #142A4A;
+  --color-cyan-950: #101C2E;   /* 主色淡底 */
+
+  /* 語意色：與 Portal 的 --red / --grn / --amb 對齊 */
+  --color-red-300:     #F25C5C;
+  --color-red-700:     #F25C5C;
+  --color-emerald-300: #3DD68C;
+  --color-emerald-700: #3DD68C;
+  --color-amber-300:   #F0A429;
+  --color-amber-700:   #F0A429;
+}
+
 :root {
   font-family:
-    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
-    "Segoe UI", "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
-  color: #e7eef7;
-  background: #070b12;
+    "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+  color: #F5F9FF;
+  background: #0A0E17;
   color-scheme: dark;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -19,9 +62,7 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  background:
-    radial-gradient(circle at 14% 0%, rgba(31, 91, 110, 0.2), transparent 34rem),
-    #070b12;
+  background: #0A0E17;
 }
 
 button,
@@ -40,110 +81,44 @@ button:disabled {
 }
 
 ::selection {
-  background: #41c9bd;
-  color: #04110f;
+  background: rgba(45, 127, 249, 0.35);
+  color: #F5F9FF;
 }
 
-/* Product Dev dark theme.
-   These semantic overrides keep legacy utility-based pages visually consistent
-   while the component library is gradually migrated to design tokens. */
+/* 🔴 這幾個 class 的語意本來就是「淺色表面」，色階改寫救不了它們
+   （`bg-white` 改寫之後還是白的），所以仍然需要覆寫。
+   只剩這幾條 —— 原本那一長串 .text-slate-* / .text-cyan-* 的覆寫已經刪掉，
+   由上面的 @theme 統一處理，不要再加回來變成兩份事實。
+   ⚠️ 用到它們的頁面目前都沒有掛上路由（見 App.tsx），留著只是保險。 */
 .bg-white,
 .bg-white\/90,
 .bg-white\/95 {
-  background-color: #101822 !important;
+  background-color: #111827 !important;
 }
 
-.bg-slate-50 {
-  background-color: #0b121c !important;
-}
-
+.bg-slate-50,
 .bg-slate-100 {
-  background-color: #182332 !important;
-}
-
-.text-slate-950,
-.text-slate-900,
-.text-slate-800 {
-  color: #edf4fb !important;
-}
-
-.text-slate-700,
-.text-slate-600 {
-  color: #bdc9d8 !important;
-}
-
-.text-slate-500 {
-  color: #8fa0b5 !important;
-}
-
-.text-slate-400 {
-  color: #71839a !important;
+  background-color: #1A2335 !important;
 }
 
 .border-slate-100,
 .border-slate-200,
 .border-slate-300,
 .border-slate-400 {
-  border-color: #26364a !important;
-}
-
-.text-cyan-800,
-.text-cyan-900,
-.text-cyan-950 {
-  color: #65ddd2 !important;
-}
-
-.bg-cyan-50,
-.bg-cyan-100 {
-  background-color: rgba(30, 144, 137, 0.16) !important;
-}
-
-.border-cyan-200,
-.border-cyan-700 {
-  border-color: #277f7a !important;
-}
-
-.bg-amber-50 {
-  background-color: rgba(181, 123, 34, 0.14) !important;
-}
-
-.text-amber-800,
-.text-amber-900,
-.text-amber-950 {
-  color: #f3cf81 !important;
-}
-
-.border-amber-200 {
-  border-color: rgba(214, 158, 66, 0.45) !important;
-}
-
-.bg-emerald-50 {
-  background-color: rgba(26, 139, 91, 0.16) !important;
-}
-
-.text-emerald-700 {
-  color: #65d9a2 !important;
-}
-
-.bg-red-50 {
-  background-color: rgba(182, 55, 72, 0.15) !important;
-}
-
-.text-red-700 {
-  color: #ff8897 !important;
+  border-color: #2D3F5A !important;
 }
 
 input,
 select,
 textarea {
-  border-color: #314258 !important;
-  background: #0b121c !important;
-  color: #edf4fb !important;
+  border-color: #2D3F5A !important;
+  background: #1A2335 !important;
+  color: #F5F9FF !important;
 }
 
 input::placeholder,
 textarea::placeholder {
-  color: #64768e;
+  color: #A8C4EC;
 }
 
 @media (prefers-reduced-motion: reduce) {

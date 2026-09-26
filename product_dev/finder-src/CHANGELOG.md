@@ -1,5 +1,20 @@
 # COMART Product Finder 版本紀錄
 
+
+## 2.27
+
+- 配色與字體改為與 COMART Platform 一致（Portal `index.html` 的 `:root`）：
+  主色由 cyan `#22d3ee` 換成平台的 `--ac` 藍 `#2D7FF9`，深色表面／邊框／文字
+  改用 `--bg`／`--s1`／`--s2`／`--br`／`--tx` 那一組，字體改為 DM Sans／DM Mono。
+- 做法是 Tailwind 4 的 `@theme` **直接改寫 slate／cyan 兩條色階**，
+  所以 640 多處既有 class 不必逐一改寫。改配色請改 `src/styles.css` 的 `@theme`，
+  不要去改各頁的 class。
+- `styles.css` 裡原本那一長串 `.text-slate-*` / `.text-cyan-*` 的 `!important`
+  覆寫已刪除（改由 `@theme` 統一），只留語意上真的是「淺色表面」的那幾條。
+- 登入頁右半邊原本是白底（整個平台唯一的亮色畫面），改為深色。
+- 主色按鈕上的文字由 `text-slate-950` 改為 `text-white` —— 色階改寫後
+  slate-950 是深藍，留著會變成深藍字配藍底。
+
 ## v2.26 — 2026-09-13
 
 - Document Finder 左上角返回按鈕由「Portal」改為「Product Dev」，直接回到 Product Dev 工作區首頁；桌機、手機及本機預覽使用相同導覽層級。

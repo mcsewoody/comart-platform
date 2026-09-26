@@ -20,11 +20,11 @@ export function SignInPage() {
   }
 
   return (
-    <main className="grid min-h-screen bg-[#f5f7f6] lg:grid-cols-[1.05fr_.95fr]">
+    <main className="grid min-h-screen bg-[#0A0E17] lg:grid-cols-[1.05fr_.95fr]">
       <section className="relative hidden overflow-hidden bg-slate-950 p-12 text-white lg:flex lg:flex-col">
-        <div className="absolute inset-0 opacity-30 [background-image:radial-gradient(circle_at_25%_20%,#18a7a7_0,transparent_28%),linear-gradient(135deg,transparent_0%,#0f172a_52%,#123237_100%)]" />
+        <div className="absolute inset-0 opacity-30 [background-image:radial-gradient(circle_at_25%_20%,#2D7FF9_0,transparent_28%),linear-gradient(135deg,transparent_0%,#111827_52%,#1A2335_100%)]" />
         <div className="relative z-10 flex items-center gap-3">
-          <div className="rounded-xl bg-white p-2.5 text-slate-950">
+          <div className="rounded-xl bg-cyan-400 p-2.5 text-white">
             <Boxes size={24} />
           </div>
           <div>
@@ -80,7 +80,7 @@ export function SignInPage() {
           <p className="text-xs font-bold uppercase tracking-[0.18em] text-cyan-800">
             Secure access
           </p>
-          <h2 className="mt-3 text-3xl font-black tracking-tight text-slate-950">
+          <h2 className="mt-3 text-3xl font-black tracking-tight text-slate-100">
             請由 Platform 進入
           </h2>
           <p className="mt-3 text-sm leading-6 text-slate-600">
@@ -90,7 +90,7 @@ export function SignInPage() {
 
           <div className="mt-8 rounded-2xl border border-cyan-200 bg-cyan-50 p-5">
             <CheckCircle2 className="text-cyan-800" />
-            <p className="mt-3 font-bold text-slate-950">單一登入</p>
+            <p className="mt-3 font-bold text-slate-100">單一登入</p>
             <p className="mt-1 text-sm leading-6 text-slate-600">
               不需再次輸入 Email，也不會寄送 Magic Link。
             </p>

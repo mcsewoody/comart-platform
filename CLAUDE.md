@@ -108,7 +108,7 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 | `kms/index.html` | v2.41 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
 | `quotation/index.html` | v3.61 | Quotation & CRM system | 7,332 |
 | `board/index.html` | v1.91 | 公告與會議 Bulletin & Meetings — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍、腦力激盪 | 4,600 |
-| `product_dev/` | v2.20 | **產品開發管理 —— 第六個子系統，不遵守單一檔案原則**（見下方專節） | — |
+| `product_dev/` | v2.21 | **產品開發管理 —— 第六個子系統，不遵守單一檔案原則**（見下方專節） | — |
 
 `admin/lottery.html` is a standalone lottery page (separate from the lottery module inside `admin/index.html`).
 
@@ -323,6 +323,10 @@ KMS (`kms/index.html`) implements RAG (Retrieval-Augmented Generation):
 All apps use a dark theme with CSS custom properties. Two slightly different palettes:
 - **Portal + Quotation + Board**: `--bg:#080C14`, accent `--ac:#2D7FF9`, fonts: DM Sans / DM Serif Display / DM Mono
 - **Admin + KMS**: `--bg:#0f1117`, accent `--blue:#5b9bd5`, fonts: Segoe UI / PingFang TC
+
+- **Product Dev**（2026-09-26 起）：**用 Portal 那一組**（`--bg:#0A0E17`、`--ac:#2D7FF9`、DM Sans）。
+  它在這之前是三個畫面三種顏色 —— hub teal `#47d7c9`、devices cyan `#16cee5`、
+  Finder 另一套 cyan，而且都不是平台的任何一組。詳見〈Product Dev〉專節。
 
 Board 的列印／匯出版面（`.sheet`）刻意反轉為白底黑字（PingFang TC），供 PDF／PNG／Email 輸出使用。
 
@@ -1954,20 +1958,59 @@ Portal 入口：APPS 的 `id:'product-dev'`（`roles:[]`，**不限角色，全�
 
 | 部分 | 路徑 | 版本 | 形態 |
 |---|---|---|---|
-| 工作區首頁（hub） | `product_dev/index.html` | **v2.20** | 單檔，只有入口卡片 |
-| Document Finder | `product_dev/finder/`（產物）← `finder-src/`（原始碼） | **v2.26** | **React 19 + TypeScript + Vite + Tailwind 4** |
-| 手機與配件（裝置保管） | `product_dev/devices/index.html` | **v1.08** | 單檔，53KB |
+| 工作區首頁（hub） | `product_dev/index.html` | **v2.21** | 單檔，只有入口卡片 |
+| Document Finder | `product_dev/finder/`（產物）← `finder-src/`（原始碼） | **v2.27** | **React 19 + TypeScript + Vite + Tailwind 4** |
+| 手機與配件（裝置保管） | `product_dev/devices/index.html` | **v1.09** | 單檔，53KB |
 
 - 🔴 **hub 不再標示另外兩個模組的版本**（v2.20 拿掉）。那是第二份副本，
   而 Finder 那一個已經漂到 `v2.10`／實際 `v2.26`，差 16 個版本 —— **錯的版本號
   比沒有版本號更糟**，查問題的人會照著它去找不存在的程式碼。
   兩個模組本來就各自在自己的畫面上顯示版本（Finder 的 `AppShell`、裝置的 brand 列），
   不需要 hub 再存一份。**不要把 badge 加回去。**
-- 🔴 **三個版本號互不相干。** commit 訊息用的是 hub 那一個（`v2.20 - …`），
+- 🔴 **三個版本號互不相干。** commit 訊息用的是 hub 那一個（`v2.21 - …`），
   但同一個 commit 裡 `devices/index.html` 可能是 v1.06、finder 是 v2.26。
   改哪一部分就 bump 哪一個，**不要以為只有一個版本號**。
 - Finder 的版本在 `finder-src/src/version.ts` 的 `CPF_VERSION`（名稱是 CPF 時代留下的），
   異動寫進 `finder-src/CHANGELOG.md`；裝置模組的異動寫進 `DEVICE_ASSET_SPEC.md` 的版本紀錄。
+
+### 🔴 配色與平台一致（2026-09-26：hub v2.21／Finder 2.27／devices v1.09）
+
+三個部分原本是**三套互不相干的配色**，而且沒有一套是平台的：
+hub teal `#47d7c9`、devices cyan `#16cee5`、Finder 又一套 cyan。
+現在三個都改用 **Portal `index.html` 的 `:root`**（`--bg:#0A0E17`、`--ac:#2D7FF9`、
+DM Sans／DM Mono）。🔴 **要改配色請先改 Portal 再同步過來，不要只改其中一個。**
+
+- 🔴 **Finder 改顏色只改 `src/styles.css` 的 `@theme`，不要去改各頁的 class。**
+  Tailwind 4 可以直接改寫色階本身，所以那裡把 `slate`／`cyan` 兩條重新指到平台色，
+  **640 多處既有的 `bg-slate-900`／`text-cyan-300` 一行都不必動**。
+  ⚠️ 這個專案把 `slate` 當兩種東西用：**500 以下是深色表面與邊框，400 以上是淺色文字**，
+  所以色階不是單純由亮到暗。`styles.css` 的 `@theme` 裡逐階寫了語意註解，照著放。
+- 🔴 **`text-slate-950` 在主色按鈕上要改成 `text-white`。** 色階改寫後 slate-950 是
+  `#0A0E17`（頁面底色），留著會變成深藍字配藍底。活著的程式碼有 4 處，已改。
+- `styles.css` 原本有一長串 `.text-slate-*` / `.text-cyan-*` 的 `!important` 覆寫
+  （Codex 的漸進遷移層），**已刪除**改由 `@theme` 統一 —— 兩份事實必然分岔。
+  只留語意上真的是「淺色表面」的那幾條（`.bg-white`／`.bg-slate-50`／`.border-slate-100~400`）。
+- **devices 的兩顆 CTA 要改做法**：原本「借用」青色、「移轉」藍色，靠兩種亮色區分；
+  主色統一成藍之後那樣會變成兩顆一樣的藍。改成 **借用＝實心主色、移轉＝外框次要**，
+  區分仍在，而且與 Portal 的按鈕階層一致。
+- ⚠️ **這次沒有做視覺驗收**（瀏覽器擴充當時連不上）。靜態驗過：編譯後的 CSS 只剩平台色、
+  舊 cyan 零殘留、三個檔案都載入 DM Sans、typecheck／lint／17 個測試全過、
+  產物已 rsync。**畫面請實際點過一輪。**
+
+### ⚠️ 有 11 個模組沒有掛上路由（死程式碼）
+
+`App.tsx` 實際只路由 7 個頁面。**沒有任何人 import 的有 11 個**：
+`AdminPage`／`DocumentDetailPage`／`DocumentsPage`／`PilotUploadPage`／`ProductDetailPage`／
+`ReviewPage`／`SearchPage`／`TrashPage`／`UploadPage`，以及只被它們用到的
+`DocumentRow`／`ProductCard`。
+
+- 🔴 **它們是 CPF 時代的頁面，樣式也還是淺色的。** 2026-09-26 配色統一時**刻意沒有改它們** ——
+  改不會有人看到，但會讓 diff 大三倍。
+- ⚠️ **Tailwind 仍然會掃描它們並把樣式編進 CSS**：`ProductDetailPage` 的
+  `bg-[radial-gradient(...#f8fafc,#e5e9e8)]` 就是編出來的 CSS 裡唯一剩下的淺色。
+  **所以「沒有人 import」不等於「不影響產物」。**
+- 要刪的話連 `App.tsx` 都不用動（本來就沒引用），但**要先確認不是「暫時拿掉路由、之後要接回來」**。
+  尚未刪，等 Woody 決定。
 
 ### 🔴 Finder 改完一定要重新建置並 rsync，否則網站上什麼都不會變
 

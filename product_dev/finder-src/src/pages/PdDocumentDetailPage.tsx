@@ -124,7 +124,7 @@ export function PdDocumentDetailPage() {
       <Link to={dataset === "mfg" ? "/" : "/buy"} className="text-sm font-semibold text-slate-400 hover:text-white">← 回到{dataset === "mfg" ? "自製品" : "外購品"}搜尋</Link>
       <div className="flex flex-wrap gap-2">
         {profile?.role === "admin" && <Button variant="danger" onClick={() => { setDeleteOpen(true); setDeleteMessage(""); }}><Trash2 size={18} />刪除</Button>}
-        {item.sourceUrl && <a href={item.sourceUrl} download className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-cyan-400 px-5 text-sm font-black text-slate-950 hover:bg-cyan-300"><Download size={18} />下載原檔</a>}
+        {item.sourceUrl && <a href={item.sourceUrl} download className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-cyan-400 px-5 text-sm font-black text-white hover:bg-cyan-300"><Download size={18} />下載原檔</a>}
       </div>
     </div>
     <header className="mb-6"><div className="flex flex-wrap gap-2"><Badge tone="accent">{kindLabel(dataset, item.documentKind)}</Badge><Badge>{item.extension.toUpperCase()}</Badge><Badge tone={["bom", "quotation"].includes(item.documentKind) ? "warning" : "neutral"}>主要日期：{formatDocumentDate(item.primaryDocumentDate)}</Badge>{item.revisionLabel && <Badge>版本／版次：{item.revisionLabel}</Badge>}{item.isReference && <Badge tone="warning">參考資料</Badge>}</div><h1 className="mt-3 break-words text-2xl font-black text-white md:text-4xl">{item.title}</h1><p className="mt-2 break-all text-sm text-slate-500">{item.relativePath}</p></header>

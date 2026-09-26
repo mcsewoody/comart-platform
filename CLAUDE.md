@@ -103,9 +103,9 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 
 | File | Version | Purpose | ~Lines |
 |------|---------|---------|--------|
-| `index.html` | v2.07 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
+| `index.html` | v2.08 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
 | `admin/index.html` | v2.45 | Admin System — room booking, fleet, visitor, library, lottery | 5,650 |
-| `kms/index.html` | v2.44 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
+| `kms/index.html` | v2.45 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
 | `quotation/index.html` | v3.66 | Quotation & CRM system | 7,332 |
 | `board/index.html` | v1.92 | 公告與會議 Bulletin & Meetings — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍、腦力激盪 | 4,600 |
 | `product_dev/` | v2.24 | **產品開發管理 —— 第六個子系統，不遵守單一檔案原則**（見下方專節） | — |
@@ -249,6 +249,25 @@ KMS (`kms/index.html`) implements RAG (Retrieval-Augmented Generation):
   「文件沒有可供索引的內文」—— 直接把 API 的 `text required` 丟給使用者，
   那句話描述的是欄位不是他的處境。
 
+### 🔴 同一個函式裡有兩種中文，只能翻一種（KMS v2.45，2026-09-26）
+
+`extractText()`（Word／Excel／PPT／PDF 的解析）裡的中文分成兩類，
+**分界不是「重不重要」，是「這行字最後會跑到哪裡」**：
+
+| | 例子 | 處置 |
+|---|---|---|
+| **丟出去的 Error** | `.doc 格式無法自動解析，請在 Word 中另存為 .docx…` | ✅ 翻。那是使用者上傳失敗時**唯一看得到的東西** |
+| **push 進回傳文字裡的** | `（此工作表無資料）`、`### 第 N 張投影片`、`[第 N 頁]`、`（共 N 列，已截取前 500 列）` | ❌ 不翻。那些會成為**文件的內文** |
+
+後者會存進 `kms_documents.body`、進向量、被搜尋。翻了的後果有兩層：
+同一種標記出現五種寫法（搜尋「第 3 頁」再也找不齊），而且**同一份文件的內文
+會因為「上傳時介面剛好是哪一國語言」而不同** —— 那是沒有人查得出來的差異。
+已在函式開頭就地加註；i18n 稽核會把它們算成漏翻，那是誤判。
+
+⚠️ **剩下沒翻的 KMS 中文**：`CAT_META` 的分類說明（同時是 AI 分類提示詞的一部分）、
+`DEMO_DOCS` 示範資料（只在 Supabase 根本沒設定時出現）、`[KMS]` 開頭的 console 診斷。
+前兩者要動之前先想清楚它同時餵給誰。
+
 ### 批次工具在「設定管理 → 🛠 批次工具」（v2.41，2026-09-21）
 
 原本掛在「分析報表」頁面底下（既有的「批次產生摘要」就在那裡）。
@@ -376,6 +395,12 @@ The portal supports EN, 繁中, 简中, VI, 日 via `setLang(lang)`. Each langua
 
 ## Portal 行事曆
 
+- **出差航班查詢的五行狀態訊息**（格式錯誤／查詢中／查詢失敗／查無結果／網路錯誤）
+  已於 v2.08 上五語（`fl_*`）。那是 Portal 最後一批真的漏翻的介面文字 ——
+  其餘 grep 得到的中文是**內建假日表的資料**（`New Year's Day 中華民國開國紀念日`
+  那種本來就中英並列）、**AI 提示詞**、以及**聊天室 PDF 匯出的固定繁中版面**，
+  三者都是刻意的。
+
 - 🔴 **同時顯示的日曆上限只有一個事實來源：`CAL_MAX_CATS`（＝4）。**
   v1.96 之前有三個答案：`toggleCatFilter` 判斷 4、五語的 `cal_max_cats` 訊息寫 4、
   HTML 初始值寫 `1/4`，而 `renderCatSidebar` **寫死 `'/3'`** ——
@@ -407,11 +432,11 @@ The portal supports EN, 繁中, 简中, VI, 日 via `setLang(lang)`. Each langua
 
 ```bash
 # 八個目標，全部共用這一支
-python3 scripts/i18n-audit.py             # Portal      I18N        275 key × 5
+python3 scripts/i18n-audit.py             # Portal      I18N        280 key × 5
 python3 scripts/i18n-audit.py board       # Board       B_I18N 419 ＋ PL_I18N 109
 python3 scripts/i18n-audit.py quotation   # 報價系統     UI          197
 python3 scripts/i18n-audit.py admin       # Admin       ADMIN_I18N  755
-python3 scripts/i18n-audit.py kms         # KMS         I18N        283
+python3 scripts/i18n-audit.py kms         # KMS         I18N        303
 python3 scripts/i18n-audit.py pd-hub      # Product Dev 首頁        21
 python3 scripts/i18n-audit.py pd-devices  # 手機與配件  DV_I18N     215
 python3 scripts/i18n-audit.py pd-finder   # Finder      DICT（.ts） 330

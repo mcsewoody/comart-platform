@@ -108,7 +108,7 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 | `kms/index.html` | v2.45 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
 | `quotation/index.html` | v3.66 | Quotation & CRM system | 7,332 |
 | `board/index.html` | v1.92 | 公告與會議 Bulletin & Meetings — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍、腦力激盪 | 4,600 |
-| `product_dev/` | v2.24 | **產品開發管理 —— 第六個子系統，不遵守單一檔案原則**（見下方專節） | — |
+| `product_dev/` | v2.25 | **產品開發管理 —— 第六個子系統，不遵守單一檔案原則**（見下方專節） | — |
 
 `admin/lottery.html` is a standalone lottery page (separate from the lottery module inside `admin/index.html`).
 
@@ -2120,16 +2120,16 @@ Portal 入口：APPS 的 `id:'product-dev'`（`roles:[]`，**不限角色，全�
 
 | 部分 | 路徑 | 版本 | 形態 |
 |---|---|---|---|
-| 工作區首頁（hub） | `product_dev/index.html` | **v2.24** | 單檔，只有入口卡片 |
-| Document Finder | `product_dev/finder/`（產物）← `finder-src/`（原始碼） | **v2.30**（尚未上 i18n） | **React 19 + TypeScript + Vite + Tailwind 4** |
-| 手機與配件（裝置保管） | `product_dev/devices/index.html` | **v1.10** | 單檔，53KB |
+| 工作區首頁（hub） | `product_dev/index.html` | **v2.25** | 單檔，只有入口卡片 |
+| Document Finder | `product_dev/finder/`（產物）← `finder-src/`（原始碼） | **v2.32** | **React 19 + TypeScript + Vite + Tailwind 4** |
+| 手機與配件（裝置保管） | `product_dev/devices/index.html` | **v1.11** | 單檔，53KB |
 
 - 🔴 **hub 不再標示另外兩個模組的版本**（v2.20 拿掉）。那是第二份副本，
   而 Finder 那一個已經漂到 `v2.10`／實際 `v2.26`，差 16 個版本 —— **錯的版本號
   比沒有版本號更糟**，查問題的人會照著它去找不存在的程式碼。
   兩個模組本來就各自在自己的畫面上顯示版本（Finder 的 `AppShell`、裝置的 brand 列），
   不需要 hub 再存一份。**不要把 badge 加回去。**
-- 🔴 **三個版本號互不相干。** commit 訊息用的是 hub 那一個（`v2.24 - …`），
+- 🔴 **三個版本號互不相干。** commit 訊息用的是 hub 那一個（`v2.25 - …`），
   但同一個 commit 裡 `devices/index.html` 可能是 v1.06、finder 是 v2.26。
   改哪一部分就 bump 哪一個，**不要以為只有一個版本號**。
 - Finder 的版本在 `finder-src/src/version.ts` 的 `CPF_VERSION`（名稱是 CPF 時代留下的），
@@ -2187,20 +2187,19 @@ DM Sans／DM Mono）。🔴 **要改配色請先改 Portal 再同步過來，不
 - ⚠️ `lib/utils.ts` 的 `processingLabels`／`sensitivityLabels` 未轉 ——
   它們目前只被沒有掛路由的舊頁面引用（見下一節）。
 
-### ⚠️ 有 11 個模組沒有掛上路由（死程式碼）
+### ✅ 11 個沒掛路由的死模組已刪除（2.31，2026-09-26）
 
-`App.tsx` 實際只路由 7 個頁面。**沒有任何人 import 的有 11 個**：
 `AdminPage`／`DocumentDetailPage`／`DocumentsPage`／`PilotUploadPage`／`ProductDetailPage`／
 `ReviewPage`／`SearchPage`／`TrashPage`／`UploadPage`，以及只被它們用到的
-`DocumentRow`／`ProductCard`。
+`DocumentRow`／`ProductCard`。`App.tsx` 一行都不用改（本來就沒有引用）。
 
-- 🔴 **它們是 CPF 時代的頁面，樣式也還是淺色的。** 2026-09-26 配色統一時**刻意沒有改它們** ——
-  改不會有人看到，但會讓 diff 大三倍。
-- ⚠️ **Tailwind 仍然會掃描它們並把樣式編進 CSS**：`ProductDetailPage` 的
-  `bg-[radial-gradient(...#f8fafc,#e5e9e8)]` 就是編出來的 CSS 裡唯一剩下的淺色。
-  **所以「沒有人 import」不等於「不影響產物」。**
-- 要刪的話連 `App.tsx` 都不用動（本來就沒引用），但**要先確認不是「暫時拿掉路由、之後要接回來」**。
-  尚未刪，等 Woody 決定。
+- 🔴 **「沒有人 import」不等於「不影響產物」**：Tailwind 仍然會掃描它們並把樣式
+  編進 CSS。刪掉之後 **CSS 51,780 → 39,057 bytes（−24.6%）**，而且編譯後的 CSS 裡
+  最後兩處淺色殘留（`#f8fafc`／`#e5e9e8`，來自 `ProductDetailPage` 的 radial-gradient）
+  也一併消失。
+- ⚠️ **確認「沒有人引用」時小心子字串誤判**：`grep DocumentDetailPage` 會命中
+  `PdDocumentDetailPage`、`grep UploadPage` 會命中 `IncrementalUploadPage`。
+  逐一看過來源行才算數。
 
 ### 🔴 越南文：DM Sans 根本沒有越南文字集（2026-09-26 查出）
 
@@ -2248,6 +2247,44 @@ Google Fonts 對 DM Sans **只給 `latin` 與 `latin-ext` 兩個 unicode-range**
   那種寫法在其他語言的語序下必然錯。
 - ⚠️ **設備「資料」不翻**：品牌、型號、顏色、資產編號、人名、備註是使用者輸入的內容，
   翻了就是竄改。只翻介面文案與 status／purpose／condition 這類列舉值。
+
+### 🔴 風格對齊平台的是「版面與元件」，不只是顏色（2026-09-26，hub v2.25／devices v1.11／finder 2.32）
+
+v2.27 統一了**顏色**，但使用者仍然說「UI 風格與原本大不同」—— 因為差的是
+**版面與元件形狀**：行銷式大標 hero、72px topbar、`font-black`(900) 標題、
+48px 表單控制項、280px 高的卡片、2xl 圓角＋陰影。顏色一樣、密度差一個量級。
+
+🔴 **對照基準是平台既有的兩個慣例，不要自己發明第三套**：
+
+| | 照誰 |
+|---|---|
+| topbar（`← Portal` 鈕、COMART 三角標、DM Serif 斜體名稱、語言膠囊） | board・admin・報價 |
+| 內容區（`.home-greeting` 22px/600、`.section-title`、`.app-grid`、`.app-card`） | Portal 首頁 |
+
+- **hub**：拿掉 hero 與「目前登入」方塊，改成問候語 ＋ 區段標題 ＋ 緊湊卡片，
+  整張卡可點。移除 5 個只服務舊版面的 i18n key。
+- **devices**：topbar 72→56、按鈕 44→34、輸入框 46→36、分段鈕 68→32、
+  字重 750–900→600；卡片的漸層與陰影換成平面。
+- **Finder**：登入頁重做成 Portal 登入畫面的形狀；`ui.tsx` 的
+  `PageHeader`／`Button`／`Card`／`Badge`／`EmptyState` **一次改到底**
+  （改一個共用元件比逐頁改 class 可靠得多）；各頁 49 處 `font-black`／
+  `text-4xl`／`rounded-2xl` 降級。
+  🔴 **Tailwind 的 `font-serif`／`font-mono` 預設不是平台字體**，要在 `@theme`
+  裡指成 DM Serif Display／DM Mono，否則 topbar 的品牌會長得跟其他系統不一樣。
+
+**三個順手修到的既有 bug：**
+- 🔴 **Finder 登入頁有一行字是隱形的**：`bg-cyan-50` 配 `text-slate-100` ——
+  配色統一後 cyan-50 變淺底而 slate-100 是淺色文字。**沒有 session 的人一進
+  Finder 第一眼就是這張卡。**
+- 🔴 **`styles.css` 的 `input,select,textarea { font: inherit }`**：`font` 簡寫會把
+  font-size 一起設成繼承來的 16px，而這條規則**沒有進 `@layer`** ——
+  未分層的規則在串接上贏過 Tailwind 的 utilities，所以**全站所有輸入框與下拉的
+  `text-sm`／`text-xs` 都不生效**。改成只繼承 `font-family`。
+- 🔴 **devices 的 `lucide.createIcons()` 只在 bootstrap 成功那一行尾端呼叫**，
+  所以**後端一不通，整頁 11 個 `<i data-lucide>` 全部留在原地不變成 SVG** ——
+  返回鈕、搜尋、新增全部沒有圖示，看起來像頁面壞掉。已比照 `dvApplyI18n`
+  移到 `await api('bootstrap')` 之前。**「後端不通時畫面仍要能看」這件事，
+  i18n 與圖示是同一個要求。**
 
 ### 🔴 Finder 改完一定要重新建置並 rsync，否則網站上什麼都不會變
 

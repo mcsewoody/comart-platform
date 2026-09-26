@@ -4,6 +4,23 @@
 
 
 
+## 2.31
+
+刪除 11 個沒有掛上路由的 CPF 時代模組：`AdminPage`／`DocumentDetailPage`／
+`DocumentsPage`／`PilotUploadPage`／`ProductDetailPage`／`ReviewPage`／`SearchPage`／
+`TrashPage`／`UploadPage`，以及只被它們用到的 `DocumentRow`／`ProductCard`。
+
+`App.tsx` 一行都不用改（本來就沒有引用）。確認方式是逐一 grep：
+唯一看起來像引用的幾處全是**子字串誤判**（`PdDocumentDetailPage` 含
+`DocumentDetailPage`、`IncrementalUploadPage` 含 `UploadPage`）或**死模組互相引用**。
+
+🔴 **「沒有人 import」不等於「不影響產物」**：Tailwind 仍然會掃描它們並把樣式
+編進 CSS。刪掉之後 **CSS 51,780 → 39,057 bytes（−24.6%）**，而且編譯後的 CSS
+裡最後兩處淺色殘留（`#f8fafc`／`#e5e9e8`，來自 `ProductDetailPage` 的
+radial-gradient）也一併消失了。
+
+typecheck／lint／17 個測試全過。
+
 ## 2.30
 
 上傳工具（`IncrementalUploadPage`）也上五語，Finder 的 i18n 至此完成（330 個 key）。

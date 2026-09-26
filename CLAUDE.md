@@ -104,7 +104,7 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 | File | Version | Purpose | ~Lines |
 |------|---------|---------|--------|
 | `index.html` | v2.07 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
-| `admin/index.html` | v2.44 | Admin System — room booking, fleet, visitor, library, lottery | 5,650 |
+| `admin/index.html` | v2.45 | Admin System — room booking, fleet, visitor, library, lottery | 5,650 |
 | `kms/index.html` | v2.44 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
 | `quotation/index.html` | v3.66 | Quotation & CRM system | 7,332 |
 | `board/index.html` | v1.92 | 公告與會議 Bulletin & Meetings — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍、腦力激盪 | 4,600 |
@@ -410,7 +410,7 @@ The portal supports EN, 繁中, 简中, VI, 日 via `setLang(lang)`. Each langua
 python3 scripts/i18n-audit.py             # Portal      I18N        275 key × 5
 python3 scripts/i18n-audit.py board       # Board       B_I18N 419 ＋ PL_I18N 109
 python3 scripts/i18n-audit.py quotation   # 報價系統     UI          197
-python3 scripts/i18n-audit.py admin       # Admin       ADMIN_I18N  565
+python3 scripts/i18n-audit.py admin       # Admin       ADMIN_I18N  755
 python3 scripts/i18n-audit.py kms         # KMS         I18N        283
 python3 scripts/i18n-audit.py pd-hub      # Product Dev 首頁        21
 python3 scripts/i18n-audit.py pd-devices  # 手機與配件  DV_I18N     215
@@ -1474,10 +1474,42 @@ ISBN 查詢／分類／匯出匯入／批次補圖全是寫死的中文 —— �
   在語意上是錯的（那裡是「未分類」）。已改成 `lib.uncat`。
   **key 名稱說謊比缺 key 更難發現 —— 畫面上看起來只是「用詞怪」。**
 
-⚠️ **Admin 的其他三個模塊（會議室、客戶到訪、公務車）仍有寫死中文**
-（`renderXxx()` 產生的表格、匯出版面、列印單據）。
-**其中「客戶到訪接待行程單」那一類是輸出格式，照 board 的規矩本來就不該翻**
-（`siteLabelZ` 的道理）；其餘是真的漏翻。**尚未處理。**
+### 🔴 Admin 其餘四個模塊（v2.45，2026-09-26）—— 並撞到一個既有的壞掉功能
+
+公務車／會議室／客戶到訪／抽籤一次做完，字典 565 → 755 key × 5。
+
+🔴 **`openVisitDetail` 的「查看詳情」本來就是壞的**：
+```js
+day.tasks.forEach((t,ti)=>{ … t('car.type.company') … })   // 參數 t 遮蔽了翻譯函式
+```
+那一段本來就在呼叫 `t(...)`，所以**任何一天有任務的到訪紀錄，按下詳情都會丟
+`t is not a function`、整個視窗打不開** —— 而實務上每一筆到訪都有任務。
+`renderTaskRow(di,ti,t)` 有同一顆地雷（我在裡面加 `t('…')` 才引爆）。
+**這個 repo 的翻譯函式就叫 `t`，所以迴圈變數千萬不要叫 `t`。**
+報價系統的 `showCRMTab(t)` 是同一件事（v3.66 一併改掉）。
+
+**翻／不翻的分界（已全部就地加註）：**
+
+| 不翻 | 為什麼 |
+|---|---|
+| `expUseCSV`／`expFuelCSV`／`exportVisitCSV` 的表頭 | 匯出的存檔格式 |
+| `genVisitDoc`「客戶到訪接待行程單」整份 | 公司的列印單據 |
+| `sendMeetingNotifs` 的通知內容 | 寄給別人的字不該取決於**寄件人**當下的介面語言 |
+| `TASK_TYPES`／`COST_CATS` | 🔴 **那就是存進資料庫的值**（`tasks[].type`／`costs[].cat`），翻了會讓新舊紀錄用兩種寫法 |
+| `car_bookings` 出發地預設 `'公司'`、故障設備 `'其他'` | 同上，是存下來的值 |
+
+- **兩套存取器**（同 board 的 `siteLabel()`／`siteLabelZ()`）：
+  `unitLabel()`／`typeLabel()` 給畫面，`UNIT_LABEL`／`TYPE_LABEL` 固定繁中給匯出與行程單；
+  通知另有 `ROOM_NAME_ZH`。
+  `TASK_TYPE_K`／`COST_CAT_K` 則是「**從存下來的繁中值反查 key**」，只翻顯示不動資料 ——
+  實測切成越南文後存下來的仍是 `'接送'`／`'交通接送'`。
+- **`ROOMS` 改存 key**（`nameK`／`equipK`）＋ `roomName()`／`roomEquip()`。
+  `room_bookings` 存的是 `room_id`，名稱純粹是顯示用，所以翻了不影響資料。
+  ⚠️ 兩個預約流程裡各有一個**區域變數也叫 `roomName`**，會遮蔽存取器，已改名 `rmLabel`。
+- 🔴 **`setLang()` 的重畫清單這次補了 13 個**（月曆、會議室看板／清單／故障／
+  兩個預約流程的**時段格**與推薦卡、到訪看板／清單／來賓庫／表單四區塊）。
+  **漏一個的症狀就是「那一塊不能翻譯」** —— 時段格就是實測時才發現漏掉的。
+  加新的 JS 渲染畫面時，記得回頭加進那份清單。
 
 ### 🔴 Admin：本機的過期預檢（v2.41，2026-09-26）
 

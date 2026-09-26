@@ -4,6 +4,31 @@
 
 
 
+## 2.32
+
+風格對齊平台。v2.27 統一了**顏色**，但版面與元件形狀仍是另一套設計語言：
+72px topbar、行銷式左右分割登入頁、`font-black`(900) 的標題、48px 表單控制項、
+`text-4xl` 頁標、2xl 圓角＋陰影的卡片。顏色一樣、密度差一個量級，一眼還是看得出
+不是同一個系統。
+
+- **登入頁重做成 Portal 登入畫面的形狀**（置中單卡、max-w-380、COMART 三角標）。
+  🔴 順帶修掉一個**真的看不見的 bug**：那張卡是 `bg-cyan-50` 配 `text-slate-100` ——
+  配色統一後 cyan-50 變淺底而 slate-100 是淺色文字，**「單一登入」那行標題整個隱形**，
+  而沒有 session 的人一進 Finder 第一眼就是這張卡。
+- **AppShell**：topbar 72 → 56px，品牌改成 COMART 三角標 ＋ DM Serif 斜體名稱 ＋
+  DM Mono 版本（照 board／admin 的子系統慣例）；語言鈕、側欄寬度與 nav 項目
+  對齊 Portal。
+- **共用元件一次改到底**（`ui.tsx`）：`PageHeader` 拿掉行銷式 eyebrow、標題降到
+  Portal 的 22px/600；`Button` 40 → 34px；`Card` 去掉陰影與 2xl 圓角；`Badge`、
+  `EmptyState` 同步縮。改一個共用元件比逐頁改 class 可靠得多。
+- 各頁 49 處 `font-black`／`text-4xl`／`rounded-2xl` 降級。
+- 🔴 **`styles.css` 的 `input,select,textarea { font: inherit }` 是個隱形 bug**：
+  `font` 簡寫會把 font-size 一起設成繼承來的 16px，而這條規則**沒有進 @layer**，
+  未分層的規則在串接上贏過 Tailwind utilities —— 結果全站所有輸入框與下拉的
+  `text-sm`／`text-xs` 都不生效，一律 16px。改成只繼承 `font-family`。
+
+typecheck／lint／17 個測試全過。
+
 ## 2.31
 
 刪除 11 個沒有掛上路由的 CPF 時代模組：`AdminPage`／`DocumentDetailPage`／

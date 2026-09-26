@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>COMART Product Dev v2.24</title>
+  <title>COMART Product Dev v2.25</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Noto+Serif:wght@400&family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -32,91 +32,87 @@
     *{box-sizing:border-box}
     body{margin:0;background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:100vh}
     button,a{font:inherit}
-    .top{height:56px;border-bottom:1px solid var(--br);background:rgba(17,24,39,.95);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);display:flex;align-items:center;gap:12px;padding:0 20px;position:sticky;top:0;z-index:3}
-    .brand{display:flex;align-items:center;gap:10px}
-    .mark{width:30px;height:30px;border-radius:8px;background:var(--ac);display:grid;place-items:center;color:#fff;font-family:var(--fm);font-size:12px;font-weight:500;flex-shrink:0}
-    .brand b{display:block;font-size:14px;font-weight:600}
-    .brand span{color:var(--tx3);font-size:11px;font-family:var(--fm)}
+    /* 🔴 以下的版面與元件刻意逐項照抄平台既有的兩個慣例，不要自己發明：
+         · topbar（back 鈕／COMART 三角標／DM Serif 斜體名稱／.lchip 語言膠囊）
+           照 admin・報價・board 的子系統慣例
+         · 內容區（.home-wrap／.home-greeting／.section-title／.app-grid／.app-card）
+           照 Portal index.html 的首頁
+       v2.25 之前這裡是「行銷式大標 hero ＋ 280px 高的卡片 ＋ 進入…→ 連結」，
+       顏色雖然統一了，版面語言仍然是另一套，一眼就看得出不是同一個系統。 */
+    .topbar{height:56px;border-bottom:1px solid var(--br);background:rgba(17,24,39,.95);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);display:flex;align-items:center;gap:10px;padding:0 20px;position:sticky;top:0;z-index:100}
+    #portal-back-btn{padding:5px 11px;border:1px solid var(--br);border-radius:var(--r);font-size:12px;color:var(--tx2);text-decoration:none;background:transparent;transition:all .15s;white-space:nowrap;margin-right:6px}
+    #portal-back-btn:hover{color:var(--tx);border-color:var(--br2);background:var(--s2)}
+    .logo{display:flex;align-items:center;gap:9px;text-decoration:none}
+    .logo-mark{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .logo-text{font-family:var(--fd);font-style:italic;font-size:17px;color:var(--tx);letter-spacing:-.01em;white-space:nowrap}
+    .logo-ver{font-family:var(--fm);font-size:11px;color:var(--tx3);opacity:.8;margin-left:6px;white-space:nowrap}
     .lchip{font-size:11px;font-weight:600;padding:4px 9px;border-radius:20px;border:1px solid var(--br);background:transparent;color:var(--tx3);cursor:pointer;transition:all .12s;white-space:nowrap}
     .lchip:hover{color:var(--tx);border-color:var(--br2)}
     .lchip.on{background:var(--ac2);border-color:var(--ac);color:var(--ac)}
     #langChips{display:flex;gap:4px;margin-left:auto;overflow:auto;-webkit-overflow-scrolling:touch}
-    .back{color:var(--tx3);text-decoration:none;border:1px solid var(--br);padding:7px 12px;border-radius:var(--r);font-size:12px;transition:.18s;white-space:nowrap}
-    .back:hover{color:var(--tx);border-color:var(--br2);background:var(--s2)}
-    main{max-width:1180px;margin:auto;padding:48px 20px 80px}
-    .eyebrow{color:var(--ac);font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;font-family:var(--fm)}
-    .hero{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:40px;align-items:end;margin-bottom:40px}
-    .hero>div{min-width:0}
-    h1{font-family:var(--fd);font-weight:400;font-size:clamp(32px,5vw,52px);line-height:1.1;margin:12px 0 16px;letter-spacing:-.01em;overflow-wrap:anywhere}
-    .lead{font-size:15px;line-height:1.75;color:var(--tx3);max-width:720px;margin:0}
-    .user{background:var(--s1);border:1px solid var(--br);border-radius:var(--rl);padding:16px}
-    .user small{color:var(--tx3);font-size:12px}
-    .user strong{display:block;margin-top:6px;font-weight:600}
-    .user .role{display:inline-block;margin-top:10px;color:var(--ac);font-size:12px;font-weight:600}
-    .section-title{font-size:11px;color:var(--tx3);font-weight:600;letter-spacing:.14em;text-transform:uppercase;font-family:var(--fm);margin:0 0 14px}
-    .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
-    /* 卡片刻意與 Portal 的 .app-card 同一個做法：--s1 底、--br 框、--rl 圓角，
-       hover 時邊框變 --ac ＋ 蓋一層 --ac3，位移 1px。 */
-    .card{min-height:230px;border-radius:var(--rl);border:1px solid var(--br);background:var(--s1);padding:20px;display:flex;flex-direction:column;position:relative;overflow:hidden;text-decoration:none;color:var(--tx);transition:all .18s}
-    .card::before{content:'';position:absolute;inset:0;background:var(--ac3);opacity:0;transition:opacity .18s}
-    .card.active:hover{transform:translateY(-1px);border-color:var(--ac)}
-    .card.active:hover::before{opacity:1}
-    .card>*{position:relative}
-    .icon{font-size:26px;color:var(--tx2)}
-    .tag{position:absolute;top:18px;right:18px;border-radius:999px;padding:4px 9px;font-size:10px;font-weight:600;letter-spacing:.08em;font-family:var(--fm)}
-    .new{background:var(--ac2);color:var(--ac)}
-    .soon{background:var(--s3);color:var(--tx3)}
-    .card h2{font-size:19px;font-weight:600;margin:22px 0 8px}
-    .card p{color:var(--tx3);font-size:13.5px;line-height:1.65;margin:0}
-    .go{margin-top:auto;color:var(--ac);font-size:13px;font-weight:600}
-    .disabled{opacity:.45;cursor:not-allowed}
-    .foot{margin-top:32px;padding-top:20px;border-top:1px solid var(--br);font-size:12px;color:var(--tx3);display:flex;justify-content:space-between}
-    #error{display:none;margin-top:30px;padding:14px 16px;border:1px solid var(--red);background:var(--red2);color:var(--red);border-radius:var(--r)}
-    @media(max-width:850px){.hero{grid-template-columns:1fr}.grid{grid-template-columns:1fr}.user{max-width:420px}}
-    @media(max-width:520px){.top{padding:0 16px}main{padding:32px 16px 60px}.brand span{display:none}.back{font-size:12px}.foot{display:block;line-height:1.8}}
+
+    /* ── 內容區：與 Portal 首頁同一組尺寸 ── */
+    .home-wrap{max-width:960px;margin:0 auto;padding:28px 20px 60px;width:100%}
+    .home-greeting{margin-bottom:24px}
+    .home-hello{font-size:22px;font-weight:600}
+    .home-sub{font-size:13px;color:var(--tx2);margin-top:3px}
+    .section-title{font-size:11px;font-weight:600;color:var(--tx2);letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px}
+    .app-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px;margin-bottom:32px}
+    .app-card{background:var(--s1);border:1px solid var(--br);border-radius:var(--rl);padding:18px;cursor:pointer;text-decoration:none;display:block;transition:all .18s;position:relative;overflow:hidden;color:var(--tx)}
+    .app-card:hover{border-color:var(--ac);transform:translateY(-1px)}
+    .app-card.locked{opacity:.45;cursor:not-allowed}
+    .app-card.locked:hover{border-color:var(--br);transform:none}
+    .app-icon{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:12px}
+    .app-name{font-size:14px;font-weight:600;margin-bottom:3px}
+    .app-desc{font-size:11px;color:var(--tx2);line-height:1.5}
+    .app-badge{position:absolute;top:10px;right:10px;background:var(--ac);color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:10px}
+    .app-badge.soon{background:var(--s3);color:var(--tx3)}
+    .foot{margin-top:32px;padding-top:20px;border-top:1px solid var(--br);font-size:11px;color:var(--tx3);display:flex;justify-content:space-between;gap:16px}
+    #error{display:none;margin-bottom:24px;padding:14px 16px;border:1px solid var(--red);background:var(--red2);color:var(--red);border-radius:var(--r);font-size:13px}
+    @media(max-width:520px){.topbar{padding:0 14px}.home-wrap{padding:22px 16px 50px}.logo-text{font-size:15px}.foot{display:block;line-height:1.8}}
   </style>
 </head>
 <body>
-  <header class="top">
-    <a class="back" href="../index.html">← Portal</a>
-    <div class="brand"><div class="mark">PD</div><div><b>COMART Product Dev</b><span>Product Development Workspace · v2.24</span></div></div>
+  <header class="topbar">
+    <a href="../index.html" id="portal-back-btn">← Portal</a>
+    <a class="logo" href="../index.html">
+      <div class="logo-mark"><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="26" height="14"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></div>
+      <div class="logo-text">COMART Product Dev<span class="logo-ver">v2.25</span></div>
+    </a>
     <div id="langChips"></div>
   </header>
-  <main>
-    <section class="hero">
-      <div>
-        <div class="eyebrow">Product Development Workspace</div>
-        <h1 data-i18n="hero_h1">從產品情報，到開案落地。</h1>
-        <p class="lead" data-i18n="hero_lead">Product Dev 是產品開發工作的共用入口。</p>
-      </div>
-      <div class="user"><small data-i18n="u_logged_in">目前登入</small><strong id="userName" data-i18n="u_verifying">驗證中…</strong><span class="role" id="userRole"></span></div>
-    </section>
-    <p class="section-title" data-i18n="sec_modules">Available modules</p>
-    <section class="grid">
-      <a class="card active" href="#" id="finderCard">
-        <span class="tag new" data-i18n="tag_available">AVAILABLE</span><span class="icon">⌕</span>
-        <h2>Document Finder</h2>
-        <p data-i18n="m_finder_d">分別搜尋自製品的設計圖、BOM 與 CAD。</p>
-        <span class="go" data-i18n="m_finder_go">進入文件搜尋 →</span>
-      </a>
-      <a class="card active" href="#" id="devicesCard">
-        <span class="tag new" data-i18n="tag_new">NEW</span><span class="icon">▣</span>
-        <h2 data-i18n="m_dev_t">手機與配件</h2>
-        <p data-i18n="m_dev_d">查找公司設備、查看目前保管人。</p>
-        <span class="go" data-i18n="m_dev_go">進入設備管理 →</span>
-      </a>
-      <article class="card disabled">
-        <span class="tag soon" data-i18n="tag_planned">PLANNED</span><span class="icon">◇</span>
-        <h2>Project Pipeline</h2>
-        <p data-i18n="m_pipe_d">開案需求、負責人、客戶節點。</p>
-      </article>
-      <article class="card disabled">
-        <span class="tag soon" data-i18n="tag_planned">PLANNED</span><span class="icon">⚙</span>
-        <h2>Sample & Tooling</h2>
-        <p data-i18n="m_tool_d">樣品輪次、模具、測試認證。</p>
-      </article>
-    </section>
+  <main class="home-wrap">
+    <div class="home-greeting">
+      <div class="home-hello" data-i18n="page_title">產品開發管理</div>
+      <div class="home-sub" id="userLine" data-i18n="u_verifying">驗證中…</div>
+    </div>
     <div id="error" data-i18n="err_session">登入資訊已失效。</div>
+    <div class="section-title" data-i18n="sec_modules">Available modules</div>
+    <div class="app-grid">
+      <a class="app-card" href="#" id="finderCard">
+        <div class="app-icon" style="background:#0A1A2E">🔍</div>
+        <div class="app-name">Document Finder</div>
+        <div class="app-desc" data-i18n="m_finder_d">分別搜尋自製品的設計圖、BOM 與 CAD。</div>
+      </a>
+      <a class="app-card" href="#" id="devicesCard">
+        <div class="app-badge" data-i18n="tag_new">NEW</div>
+        <div class="app-icon" style="background:#0A2A1A">📱</div>
+        <div class="app-name" data-i18n="m_dev_t">手機與配件</div>
+        <div class="app-desc" data-i18n="m_dev_d">查找公司設備、查看目前保管人。</div>
+      </a>
+      <div class="app-card locked">
+        <div class="app-badge soon" data-i18n="tag_planned">PLANNED</div>
+        <div class="app-icon" style="background:#1A0A1A">🗂</div>
+        <div class="app-name">Project Pipeline</div>
+        <div class="app-desc" data-i18n="m_pipe_d">開案需求、負責人、客戶節點。</div>
+      </div>
+      <div class="app-card locked">
+        <div class="app-badge soon" data-i18n="tag_planned">PLANNED</div>
+        <div class="app-icon" style="background:#1A1A08">🧪</div>
+        <div class="app-name">Sample &amp; Tooling</div>
+        <div class="app-desc" data-i18n="m_tool_d">樣品輪次、模具、測試認證。</div>
+      </div>
+    </div>
     <div class="foot"><span data-i18n="foot_note">Document Finder 使用獨立的命名空間。</span><span data-i18n="foot_use">COMART Internal Use</span></div>
   </main>
   <script>
@@ -129,16 +125,13 @@
     const PD_LANGS=[['zh-TW','繁中'],['zh-CN','简中'],['en','EN'],['vi','VI'],['ja','日本語']];
     const PD_I18N={
       'zh-TW':{
-        hero_h1:'從產品情報，到開案落地。',
-        hero_lead:'Product Dev 是產品開發工作的共用入口。Document Finder 將自製品與外購品完全分開，每筆結果只代表一份原始文件；後續開案、打樣、模具、驗證與量產節點會各自成為獨立模組。',
-        u_logged_in:'目前登入', u_verifying:'驗證中…',
+        tag_new:'新增', tag_planned:'規劃中',
+        page_title:'產品開發管理',
+        u_logged_in:'目前登入：', u_verifying:'驗證中…',
         sec_modules:'可用模組',
-        tag_available:'可用', tag_new:'新增', tag_planned:'規劃中',
         m_finder_d:'分別搜尋自製品的設計圖、BOM 與 CAD，以及外購品的型錄、報價單、簡報與產品圖。',
-        m_finder_go:'進入文件搜尋 →',
         m_dev_t:'手機與配件',
         m_dev_d:'查找公司設備、查看目前保管人，並處理借用、移轉、維修、退役與年度盤點。',
-        m_dev_go:'進入設備管理 →',
         m_pipe_d:'開案需求、負責人、客戶節點、風險與決策紀錄。保留給後續專案管理模組。',
         m_tool_d:'樣品輪次、模具、測試認證與中越供應鏈進度追蹤。',
         err_session:'登入資訊已失效。請返回 COMART Platform 重新登入。',
@@ -147,16 +140,13 @@
         foot_use:'COMART 內部使用'
       },
       'zh-CN':{
-        hero_h1:'从产品情报，到开案落地。',
-        hero_lead:'Product Dev 是产品开发工作的共用入口。Document Finder 将自制品与外购品完全分开，每笔结果只代表一份原始文件；后续开案、打样、模具、验证与量产节点会各自成为独立模块。',
-        u_logged_in:'目前登录', u_verifying:'验证中…',
+        tag_new:'新增', tag_planned:'规划中',
+        page_title:'产品开发管理',
+        u_logged_in:'目前登录：', u_verifying:'验证中…',
         sec_modules:'可用模块',
-        tag_available:'可用', tag_new:'新增', tag_planned:'规划中',
         m_finder_d:'分别搜索自制品的设计图、BOM 与 CAD，以及外购品的型录、报价单、简报与产品图。',
-        m_finder_go:'进入文件搜索 →',
         m_dev_t:'手机与配件',
         m_dev_d:'查找公司设备、查看目前保管人，并处理借用、移转、维修、退役与年度盘点。',
-        m_dev_go:'进入设备管理 →',
         m_pipe_d:'开案需求、负责人、客户节点、风险与决策记录。保留给后续项目管理模块。',
         m_tool_d:'样品轮次、模具、测试认证与中越供应链进度追踪。',
         err_session:'登录信息已失效。请返回 COMART Platform 重新登录。',
@@ -165,16 +155,13 @@
         foot_use:'COMART 内部使用'
       },
       en:{
-        hero_h1:'From product intelligence to project delivery.',
-        hero_lead:'Product Dev is the shared entry point for product development work. Document Finder keeps in-house and purchased items completely separate — each result is exactly one source document. Project kickoff, sampling, tooling, validation and mass-production milestones will each become their own module.',
-        u_logged_in:'Signed in as', u_verifying:'Verifying…',
+        tag_new:'NEW', tag_planned:'PLANNED',
+        page_title:'Product Development',
+        u_logged_in:'Signed in as ', u_verifying:'Verifying…',
         sec_modules:'Available modules',
-        tag_available:'AVAILABLE', tag_new:'NEW', tag_planned:'PLANNED',
         m_finder_d:'Search drawings, BOMs and CAD for in-house items, and catalogues, quotations, decks and product photos for purchased items — kept apart.',
-        m_finder_go:'Open document search →',
         m_dev_t:'Device Custody',
         m_dev_d:'Find company devices, see who currently holds them, and handle borrowing, transfers, repairs, retirement and the annual stocktake.',
-        m_dev_go:'Open device management →',
         m_pipe_d:'Kickoff requirements, owners, customer milestones, risks and decision records. Reserved for the upcoming project management module.',
         m_tool_d:'Sample rounds, tooling, test certification and supply-chain progress across Taiwan, Dongguan and Vietnam.',
         err_session:'Your session is no longer valid. Please return to COMART Platform and sign in again.',
@@ -183,16 +170,13 @@
         foot_use:'COMART Internal Use'
       },
       vi:{
-        hero_h1:'Từ thông tin sản phẩm đến triển khai dự án.',
-        hero_lead:'Product Dev là cổng vào chung cho công việc phát triển sản phẩm. Document Finder tách hoàn toàn hàng tự sản xuất và hàng mua ngoài — mỗi kết quả chỉ là một tài liệu gốc. Mở dự án, làm mẫu, khuôn, kiểm định và các mốc sản xuất hàng loạt sẽ lần lượt trở thành mô-đun riêng.',
-        u_logged_in:'Đang đăng nhập', u_verifying:'Đang xác minh…',
+        tag_new:'MỚI', tag_planned:'DỰ KIẾN',
+        page_title:'Quản lý phát triển sản phẩm',
+        u_logged_in:'Đang đăng nhập: ', u_verifying:'Đang xác minh…',
         sec_modules:'Mô-đun khả dụng',
-        tag_available:'KHẢ DỤNG', tag_new:'MỚI', tag_planned:'DỰ KIẾN',
         m_finder_d:'Tìm bản vẽ, BOM và CAD của hàng tự sản xuất, cùng catalogue, báo giá, bản trình bày và ảnh sản phẩm của hàng mua ngoài — hoàn toàn tách biệt.',
-        m_finder_go:'Vào tìm kiếm tài liệu →',
         m_dev_t:'Quản lý thiết bị',
         m_dev_d:'Tra cứu thiết bị công ty, xem ai đang giữ, và xử lý mượn, chuyển giao, sửa chữa, thanh lý và kiểm kê hằng năm.',
-        m_dev_go:'Vào quản lý thiết bị →',
         m_pipe_d:'Yêu cầu mở dự án, người phụ trách, mốc với khách hàng, rủi ro và hồ sơ quyết định. Dành cho mô-đun quản lý dự án sắp tới.',
         m_tool_d:'Các vòng làm mẫu, khuôn, chứng nhận kiểm định và tiến độ chuỗi cung ứng Đài Loan – Đông Quản – Việt Nam.',
         err_session:'Phiên đăng nhập không còn hiệu lực. Vui lòng quay lại COMART Platform và đăng nhập lại.',
@@ -201,16 +185,13 @@
         foot_use:'Sử dụng nội bộ COMART'
       },
       ja:{
-        hero_h1:'製品情報から、案件の立ち上げまで。',
-        hero_lead:'Product Dev は製品開発業務の共通入口です。Document Finder は自社製品と外部購入品を完全に分け、1 件の結果が 1 つの原本に対応します。案件立ち上げ、試作、金型、検証、量産マイルストーンは今後それぞれ独立したモジュールになります。',
-        u_logged_in:'ログイン中', u_verifying:'確認中…',
+        tag_new:'新規', tag_planned:'予定',
+        page_title:'製品開発管理',
+        u_logged_in:'ログイン中：', u_verifying:'確認中…',
         sec_modules:'利用可能なモジュール',
-        tag_available:'利用可能', tag_new:'新規', tag_planned:'予定',
         m_finder_d:'自社製品の図面・BOM・CAD と、外部購入品のカタログ・見積書・資料・製品画像を、それぞれ分けて検索します。',
-        m_finder_go:'文書検索へ →',
         m_dev_t:'携帯電話と周辺機器',
         m_dev_d:'社内機器の検索、現在の保管者の確認、貸出・移管・修理・廃棄・年次棚卸の処理を行います。',
-        m_dev_go:'機器管理へ →',
         m_pipe_d:'案件要件、担当者、顧客マイルストーン、リスクと意思決定の記録。今後のプロジェクト管理モジュール用です。',
         m_tool_d:'試作ラウンド、金型、試験認証、および台湾・東莞・ベトナムのサプライチェーン進捗の追跡。',
         err_session:'ログイン情報が無効になりました。COMART Platform に戻って再ログインしてください。',
@@ -244,12 +225,13 @@
         var on=box.querySelector('.lchip.on');
         if(on){ try{ on.scrollIntoView({block:'nearest',inline:'nearest'}); }catch(_){} }
       }
-      // 使用者名稱與角色是資料不是文案，語言換了要重畫的只有角色標籤
-      if(window._pdSess){
-        document.getElementById('userName').removeAttribute('data-i18n');
-        document.getElementById('userName').textContent=_pdSess.nameZh||_pdSess.nameEn||_pdSess.empId;
-        document.getElementById('userRole').textContent=
-          PT(_pdSess.role==='admin'?'role_admin':_pdSess.role==='dcc'?'role_dcc':'role_user')+' · '+_pdSess.empId;
+      // 登入者那一行照 Portal 首頁的 greetSub：姓名是資料、角色標籤才隨語言換
+      var ul=document.getElementById('userLine');
+      if(ul&&window._pdSess){
+        ul.removeAttribute('data-i18n');
+        ul.textContent=PT('u_logged_in')+(_pdSess.nameZh||_pdSess.nameEn||_pdSess.empId)+' · '
+          +PT(_pdSess.role==='admin'?'role_admin':_pdSess.role==='dcc'?'role_dcc':'role_user')
+          +' · '+_pdSess.empId;
       }
     }
     const KEY='comart-portal-session';
@@ -259,7 +241,7 @@
     if(s&&s.empId&&s.sig){try{localStorage.setItem(KEY,JSON.stringify(s))}catch(_){}}
     if(!s){try{s=JSON.parse(localStorage.getItem(KEY)||'null')}catch(_){}}
     const valid=s&&s.empId&&s.sig&&(!s.expires||Date.now()<s.expires);
-    if(!valid){document.getElementById('error').style.display='block';document.getElementById('finderCard').classList.add('disabled');document.getElementById('devicesCard').classList.add('disabled');}
+    if(!valid){document.getElementById('error').style.display='block';document.getElementById('finderCard').classList.add('locked');document.getElementById('devicesCard').classList.add('locked');}
     else{
       window._pdSess=s;
       document.getElementById('finderCard').onclick=function(e){

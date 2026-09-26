@@ -41,6 +41,13 @@
   --color-emerald-700: #3DD68C;
   --color-amber-300:   #F0A429;
   --color-amber-700:   #F0A429;
+
+  /* 🔴 字族也對齊平台：font-serif → DM Serif Display（品牌名稱用的襯線斜體）、
+     font-mono → DM Mono（版本號）。Tailwind 預設的 font-serif 是 Georgia，
+     font-mono 是 ui-monospace —— 不重新指的話 topbar 的品牌會長得跟
+     Portal／board 不一樣，而那正是最容易一眼看出「不是同一個系統」的地方。*/
+  --font-serif: "DM Serif Display", Georgia, serif;
+  --font-mono:  "DM Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
 :root {
@@ -75,10 +82,15 @@ html[lang="vi"] {
 }
 
 button,
+/* 🔴 只繼承字族，不要用 `font: inherit` 簡寫。
+   簡寫會把 font-size 一起設成繼承來的 16px，而這條規則沒有進 @layer，
+   **未分層的規則在串接順序上贏過 Tailwind 的 utilities** —— 結果是全站
+   所有輸入框與下拉的 `text-sm`／`text-xs` 都不生效，一律 16px。
+   （這也是為什麼表單看起來比平台其他系統大一號。）*/
 input,
 select,
 textarea {
-  font: inherit;
+  font-family: inherit;
 }
 
 button {

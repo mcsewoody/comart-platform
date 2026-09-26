@@ -135,7 +135,7 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
 
   const hasModeAccess = mode === "sync" ? profile?.canSync : profile?.canUpload;
   if (!hasModeAccess) {
-    return <Card className="p-8 text-center"><p className="font-black text-white">{mode === "sync" ? t("u_no_sync_perm") : t("u_no_upload_perm")}</p></Card>;
+    return <Card className="p-8 text-center"><p className="font-semibold text-white">{mode === "sync" ? t("u_no_sync_perm") : t("u_no_upload_perm")}</p></Card>;
   }
 
   async function choose(selected: FileList | File[] | null) {
@@ -461,16 +461,16 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
     {mode === "batch" && <Card className="p-5 md:p-6">
       <div className="mb-5 flex items-start gap-3">
         <span className="rounded-xl bg-cyan-950/50 p-3 text-cyan-300"><RefreshCw size={22} /></span>
-        <div><h2 className="text-lg font-black text-white">{t("u_scan_title")}</h2><p className="mt-1 text-sm leading-6 text-slate-500">{t("u_scan_desc")}</p></div>
+        <div><h2 className="text-[15px] font-semibold text-white">{t("u_scan_title")}</h2><p className="mt-1 text-sm leading-6 text-slate-500">{t("u_scan_desc")}</p></div>
       </div>
       <button
         type="button"
         disabled={running}
         onClick={() => supportsDirectoryAccess() ? void setOrScanDefaultDirectory() : openFolderPicker()}
-        className="flex min-h-52 w-full flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-700 bg-slate-950/30 p-8 text-center transition hover:border-cyan-600 hover:bg-cyan-950/10 disabled:cursor-wait disabled:opacity-60"
+        className="flex min-h-52 w-full flex-col items-center justify-center rounded-[14px] border-2 border-dashed border-slate-700 bg-slate-950/30 p-8 text-center transition hover:border-cyan-600 hover:bg-cyan-950/10 disabled:cursor-wait disabled:opacity-60"
       >
-        <span className="rounded-2xl bg-slate-800 p-4 text-cyan-300">{phase === "inventory" ? <LoaderCircle className="animate-spin" size={30} /> : <FolderOpen size={30} />}</span>
-        <span className="mt-4 text-lg font-black text-white">{directoryHandle ? t("u_scan_dir", { n: directoryHandle.name }) : t("u_set_dir")}</span>
+        <span className="rounded-[14px] bg-slate-800 p-4 text-cyan-300">{phase === "inventory" ? <LoaderCircle className="animate-spin" size={30} /> : <FolderOpen size={30} />}</span>
+        <span className="mt-4 text-[15px] font-semibold text-white">{directoryHandle ? t("u_scan_dir", { n: directoryHandle.name }) : t("u_set_dir")}</span>
         <span className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">{t("u_dir_hint")}</span>
       </button>
       {directoryHandle && supportsDirectoryAccess() && <div className="mt-3 text-right"><Button variant="ghost" disabled={running} onClick={() => void setOrScanDefaultDirectory(true)}><FolderOpen size={17} />{t("u_change_default_dir")}</Button></div>}
@@ -485,7 +485,7 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
       {inventory && inventory.skipped.length > 0 && <div className="mt-3 rounded-xl border border-slate-700 bg-slate-950/35 p-4" aria-label={t("u_skipped_aria")}>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-sm font-black text-slate-200">{t("u_skipped_n", { n: inventory.skipped.length })}</p>
+            <p className="text-sm font-semibold text-slate-200">{t("u_skipped_n", { n: inventory.skipped.length })}</p>
             <div className="mt-2 flex flex-wrap gap-2">
               {skipReasonSummary(inventory.skipped).map(([reason, count]) => <Badge key={reason}>{SKIP_REASON_LABELS[reason]} {count}</Badge>)}
             </div>
@@ -496,7 +496,7 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
 
       {files.length > 0 && <>
         <div className="mt-5 flex flex-wrap items-center gap-3">
-          <p className="mr-2 text-sm font-black text-white">{t("u_batch_n", { n: files.length })}</p>
+          <p className="mr-2 text-sm font-semibold text-white">{t("u_batch_n", { n: files.length })}</p>
           <Badge tone="accent">{t("u_mfg")} {mfg.length}</Badge>
           <Badge tone="accent">{t("u_buy")} {buy.length}</Badge>
           <Badge>{formatBytes(files.reduce((sum, item) => sum + item.file.size, 0))}</Badge>
@@ -529,21 +529,21 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
     {mode === "quick" && <Card className="p-5 md:p-6">
       <div className="flex items-start gap-3">
         <span className="rounded-xl bg-amber-950/50 p-3 text-amber-300"><Zap size={22} /></span>
-        <div><h2 className="text-lg font-black text-white">{t("u_h_quick")}</h2><p className="mt-1 text-sm leading-6 text-slate-500">{t("u_q_desc")}</p></div>
+        <div><h2 className="text-[15px] font-semibold text-white">{t("u_h_quick")}</h2><p className="mt-1 text-sm leading-6 text-slate-500">{t("u_q_desc")}</p></div>
       </div>
       <fieldset className="mt-6">
         <legend className="text-sm font-bold text-slate-300">{t("u_q_step1")}</legend>
         <div className="mt-3 grid gap-3 sm:grid-cols-2" role="radiogroup" aria-label={t("u_q_lib_aria")}>
-          <button type="button" role="radio" aria-checked={quickDataset === "mfg"} disabled={quickRunning} onClick={() => setQuickDataset("mfg")} className={`flex min-h-20 items-center gap-4 rounded-2xl border-2 px-5 text-left transition focus:outline-none focus:ring-2 focus:ring-cyan-400 ${quickDataset === "mfg" ? "border-cyan-400 bg-cyan-950/50 text-white" : "border-slate-700 bg-slate-950/50 text-slate-400 hover:border-slate-500"}`}><Factory size={27} className={quickDataset === "mfg" ? "text-cyan-300" : "text-slate-500"} /><span><span className="block text-lg font-black">{t("u_mfg")}</span><span className="mt-1 block text-xs">OwnProduct</span></span>{quickDataset === "mfg" && <CheckCircle2 className="ml-auto text-cyan-300" size={22} />}</button>
-          <button type="button" role="radio" aria-checked={quickDataset === "buy"} disabled={quickRunning} onClick={() => setQuickDataset("buy")} className={`flex min-h-20 items-center gap-4 rounded-2xl border-2 px-5 text-left transition focus:outline-none focus:ring-2 focus:ring-amber-400 ${quickDataset === "buy" ? "border-amber-400 bg-amber-950/40 text-white" : "border-slate-700 bg-slate-950/50 text-slate-400 hover:border-slate-500"}`}><ShoppingBag size={27} className={quickDataset === "buy" ? "text-amber-300" : "text-slate-500"} /><span><span className="block text-lg font-black">{t("u_buy")}</span><span className="mt-1 block text-xs">Outsourcing</span></span>{quickDataset === "buy" && <CheckCircle2 className="ml-auto text-amber-300" size={22} />}</button>
+          <button type="button" role="radio" aria-checked={quickDataset === "mfg"} disabled={quickRunning} onClick={() => setQuickDataset("mfg")} className={`flex min-h-20 items-center gap-4 rounded-[14px] border-2 px-5 text-left transition focus:outline-none focus:ring-2 focus:ring-cyan-400 ${quickDataset === "mfg" ? "border-cyan-400 bg-cyan-950/50 text-white" : "border-slate-700 bg-slate-950/50 text-slate-400 hover:border-slate-500"}`}><Factory size={27} className={quickDataset === "mfg" ? "text-cyan-300" : "text-slate-500"} /><span><span className="block text-[15px] font-semibold">{t("u_mfg")}</span><span className="mt-1 block text-xs">OwnProduct</span></span>{quickDataset === "mfg" && <CheckCircle2 className="ml-auto text-cyan-300" size={22} />}</button>
+          <button type="button" role="radio" aria-checked={quickDataset === "buy"} disabled={quickRunning} onClick={() => setQuickDataset("buy")} className={`flex min-h-20 items-center gap-4 rounded-[14px] border-2 px-5 text-left transition focus:outline-none focus:ring-2 focus:ring-amber-400 ${quickDataset === "buy" ? "border-amber-400 bg-amber-950/40 text-white" : "border-slate-700 bg-slate-950/50 text-slate-400 hover:border-slate-500"}`}><ShoppingBag size={27} className={quickDataset === "buy" ? "text-amber-300" : "text-slate-500"} /><span><span className="block text-[15px] font-semibold">{t("u_buy")}</span><span className="mt-1 block text-xs">Outsourcing</span></span>{quickDataset === "buy" && <CheckCircle2 className="ml-auto text-amber-300" size={22} />}</button>
         </div>
       </fieldset>
 
       <div className="mt-6">
         <p className="text-sm font-bold text-slate-300">{t("u_q_step2")}</p>
-        <button type="button" disabled={quickRunning} onDragEnter={(event) => { event.preventDefault(); setQuickDragActive(true); }} onDragOver={(event) => { event.preventDefault(); setQuickDragActive(true); }} onDragLeave={() => setQuickDragActive(false)} onDrop={(event) => { event.preventDefault(); setQuickDragActive(false); chooseQuick(event.dataTransfer.files); }} onClick={() => { if (!quickInputRef.current) return; quickInputRef.current.value = ""; quickInputRef.current.click(); }} className={`mt-3 flex min-h-44 w-full flex-col items-center justify-center rounded-2xl border-2 border-dashed p-6 text-center transition focus:outline-none focus:ring-2 focus:ring-cyan-400 ${quickDragActive ? "border-cyan-300 bg-cyan-950/50" : "border-slate-700 bg-slate-950/50 hover:border-cyan-700 hover:bg-cyan-950/20"}`}>
+        <button type="button" disabled={quickRunning} onDragEnter={(event) => { event.preventDefault(); setQuickDragActive(true); }} onDragOver={(event) => { event.preventDefault(); setQuickDragActive(true); }} onDragLeave={() => setQuickDragActive(false)} onDrop={(event) => { event.preventDefault(); setQuickDragActive(false); chooseQuick(event.dataTransfer.files); }} onClick={() => { if (!quickInputRef.current) return; quickInputRef.current.value = ""; quickInputRef.current.click(); }} className={`mt-3 flex min-h-44 w-full flex-col items-center justify-center rounded-[14px] border-2 border-dashed p-6 text-center transition focus:outline-none focus:ring-2 focus:ring-cyan-400 ${quickDragActive ? "border-cyan-300 bg-cyan-950/50" : "border-slate-700 bg-slate-950/50 hover:border-cyan-700 hover:bg-cyan-950/20"}`}>
           <UploadCloud size={34} className={quickDragActive ? "text-cyan-200" : "text-cyan-400"} />
-          <span className="mt-3 text-base font-black text-white">{quickDragActive ? t("u_q_drop_active") : t("u_q_drop")}</span>
+          <span className="mt-3 text-base font-semibold text-white">{quickDragActive ? t("u_q_drop_active") : t("u_q_drop")}</span>
           <span className="mt-1 text-sm text-slate-500">{t("u_q_or_pick")}</span>
         </button>
         <input ref={quickInputRef} type="file" className="hidden" onChange={(event) => chooseQuick(event.target.files)} />
@@ -570,7 +570,7 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
     <Card className="p-5 md:p-6">
       <div className="mb-5 flex items-start gap-3">
         <span className="rounded-xl bg-cyan-950/50 p-3 text-cyan-300"><FolderOpen size={22} /></span>
-        <div><h2 className="text-lg font-black text-white">{t("u_s_dir_title")}</h2><p className="mt-1 text-sm leading-6 text-slate-500">{t("u_s_dir_desc")}</p></div>
+        <div><h2 className="text-[15px] font-semibold text-white">{t("u_s_dir_title")}</h2><p className="mt-1 text-sm leading-6 text-slate-500">{t("u_s_dir_desc")}</p></div>
       </div>
       <Button disabled={running} onClick={() => supportsDirectoryAccess() ? void setOrScanDefaultDirectory() : openFolderPicker()}>
         {phase === "inventory" ? <LoaderCircle className="animate-spin" size={18} /> : <FolderOpen size={18} />}
@@ -583,7 +583,7 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div className="flex items-start gap-3">
           <span className="rounded-xl bg-emerald-950/50 p-3 text-emerald-300"><Download size={22} /></span>
-          <div><h2 className="text-lg font-black text-white">{t("u_s_title")}</h2><p className="mt-1 text-sm leading-6 text-slate-500">{t("u_s_desc")}</p></div>
+          <div><h2 className="text-[15px] font-semibold text-white">{t("u_s_title")}</h2><p className="mt-1 text-sm leading-6 text-slate-500">{t("u_s_desc")}</p></div>
         </div>
         <Button variant="secondary" disabled={!localFiles.length || syncRunning} onClick={() => void refreshSync()}><RefreshCw size={17} />{t("u_s_rescan")}</Button>
       </div>
@@ -593,7 +593,7 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
         <Metric label={t("u_s_conflict")} value={syncConflicts.length} tone="amber" />
       </div>
       {syncConflicts.length > 0 && <div className="mt-4 max-h-40 overflow-auto rounded-xl border border-amber-900/70 bg-amber-950/20 p-3 text-xs leading-6 text-amber-200">
-        <p className="mb-1 font-black">{t("u_s_conflict_note")}</p>
+        <p className="mb-1 font-semibold">{t("u_s_conflict_note")}</p>
         {syncConflicts.map((item) => <p key={`${item.dataset}-${item.id}`} className="truncate" title={item.relativePath}>{item.relativePath}</p>)}
       </div>}
       <div className="mt-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -658,7 +658,7 @@ export function UploaderAccessPage() {
   }
 
   if (profile?.role !== "admin") {
-    return <Card className="p-8 text-center"><p className="font-black text-white">{t("u_us_admin_only")}</p></Card>;
+    return <Card className="p-8 text-center"><p className="font-semibold text-white">{t("u_us_admin_only")}</p></Card>;
   }
 
   return <>
@@ -667,7 +667,7 @@ export function UploaderAccessPage() {
     <Card className="p-5 md:p-6">
     <div className="flex items-start gap-3">
       <span className="rounded-xl bg-violet-950/50 p-3 text-violet-300"><ShieldCheck size={22} /></span>
-      <div><h2 className="text-lg font-black text-white">Users</h2><p className="mt-1 text-sm leading-6 text-slate-500">{t("u_us_note")}</p></div>
+      <div><h2 className="text-[15px] font-semibold text-white">Users</h2><p className="mt-1 text-sm leading-6 text-slate-500">{t("u_us_note")}</p></div>
     </div>
     <div className="mt-5 overflow-hidden rounded-xl border border-slate-700">
       {loading ? <p className="p-4 text-sm text-slate-400">{t("u_us_loading")}</p> : items.map((item) => <div key={item.id} className="grid gap-3 border-b border-slate-800 px-4 py-3 last:border-0 hover:bg-slate-800/50 md:grid-cols-[minmax(0,1fr)_150px_190px] md:items-center">
@@ -712,7 +712,7 @@ function AnalysisControl({
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div className="flex items-start gap-3">
           <span className="rounded-xl bg-cyan-950/70 p-3 text-cyan-300"><BrainCircuit size={22} /></span>
-          <div><h2 className="text-lg font-black text-white">{t("u_ai_title")}</h2><p className="mt-1 max-w-3xl text-sm leading-6 text-slate-400">{t("u_ai_desc")}</p></div>
+          <div><h2 className="text-[15px] font-semibold text-white">{t("u_ai_title")}</h2><p className="mt-1 max-w-3xl text-sm leading-6 text-slate-400">{t("u_ai_desc")}</p></div>
         </div>
         <Button variant="ghost" disabled={running} onClick={onRefresh}><RefreshCw size={17} />{t("u_ai_refresh")}</Button>
       </div>
@@ -736,7 +736,7 @@ function AnalysisControl({
           <input type="number" min={1} max={50} value={limit} onChange={(event) => onLimitChange(Math.min(50, Math.max(1, Number(event.target.value) || 1)))} disabled={running} className="mt-2 h-12 w-full rounded-xl border border-slate-700 bg-slate-950 px-4 text-slate-100 outline-none focus:border-cyan-500" />
         </label>
         <div className="rounded-xl border border-slate-800 bg-slate-950/60 px-4 py-3 text-sm leading-6 text-slate-400">
-          <span className="font-black text-white">{t("u_ai_ready", { n: ready })}</span>
+          <span className="font-semibold text-white">{t("u_ai_ready", { n: ready })}</span>
           <span className="mx-2 text-slate-700">|</span>{t("u_ai_processing_n", { n: selected.processing })}
         </div>
         <Button disabled={disabled} onClick={onStart} className="h-12 px-6">
@@ -753,8 +753,8 @@ function AnalysisControl({
 
 function AnalysisLibraryCard({ title, status, tone }: { title: string; status: PdAnalysisLibraryStatus; tone: "cyan" | "amber" }) {
   const t = useT();
-  return <div className="rounded-2xl border border-slate-800 bg-slate-950/55 p-4">
-    <div className="flex items-center justify-between gap-3"><h3 className="font-black text-white">{title}</h3><span className={tone === "cyan" ? "text-cyan-300" : "text-amber-300"}>{status.queued + status.retryableFailed} {t("u_ai_pending")}</span></div>
+  return <div className="rounded-[14px] border border-slate-800 bg-slate-950/55 p-4">
+    <div className="flex items-center justify-between gap-3"><h3 className="font-semibold text-white">{title}</h3><span className={tone === "cyan" ? "text-cyan-300" : "text-amber-300"}>{status.queued + status.retryableFailed} {t("u_ai_pending")}</span></div>
     <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
       <AnalysisMetric label={t("u_ai_m_queued")} value={status.queued} />
       <AnalysisMetric label={t("u_ai_m_processing")} value={status.processing} />
@@ -766,7 +766,7 @@ function AnalysisLibraryCard({ title, status, tone }: { title: string; status: P
 }
 
 function AnalysisMetric({ label, value }: { label: string; value: number }) {
-  return <div><p className="text-[11px] font-semibold text-slate-500">{label}</p><p className="mt-1 text-xl font-black tabular-nums text-slate-200">{value}</p></div>;
+  return <div><p className="text-[11px] font-semibold text-slate-500">{label}</p><p className="mt-1 text-[15px] font-semibold tabular-nums text-slate-200">{value}</p></div>;
 }
 
 function emptyAnalysisStatus(): PdAnalysisLibraryStatus {
@@ -791,7 +791,7 @@ function Metric({ label, value, tone = "slate" }: { label: string; value: number
     green: "border-emerald-900 bg-emerald-950/30 text-emerald-200",
     amber: "border-amber-900 bg-amber-950/30 text-amber-200",
   };
-  return <div className={`rounded-xl border p-4 ${colors[tone]}`}><p className="text-xs font-semibold text-slate-500">{label}</p><p className="mt-1 text-2xl font-black tabular-nums">{value}</p></div>;
+  return <div className={`rounded-xl border p-4 ${colors[tone]}`}><p className="text-xs font-semibold text-slate-500">{label}</p><p className="mt-1 text-[16px] font-semibold tabular-nums">{value}</p></div>;
 }
 
 async function uploadOne(item: ImportFile, onStatus: (status: string) => void): Promise<"completed" | "duplicate"> {

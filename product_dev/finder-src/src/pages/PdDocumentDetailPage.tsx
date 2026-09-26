@@ -132,10 +132,10 @@ export function PdDocumentDetailPage() {
       <Link to={dataset === "mfg" ? "/" : "/buy"} className="text-sm font-semibold text-slate-400 hover:text-white">{dataset === "mfg" ? t("d_back_mfg") : t("d_back_buy")}</Link>
       <div className="flex flex-wrap gap-2">
         {profile?.role === "admin" && <Button variant="danger" onClick={() => { setDeleteOpen(true); setDeleteMessage(""); }}><Trash2 size={18} />{t("d_delete")}</Button>}
-        {item.sourceUrl && <a href={item.sourceUrl} download className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-cyan-400 px-5 text-sm font-black text-white hover:bg-cyan-300"><Download size={18} />{t("d_download")}</a>}
+        {item.sourceUrl && <a href={item.sourceUrl} download className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-cyan-400 px-5 text-sm font-semibold text-white hover:bg-cyan-300"><Download size={18} />{t("d_download")}</a>}
       </div>
     </div>
-    <header className="mb-6"><div className="flex flex-wrap gap-2"><Badge tone="accent">{kindLabel(dataset, item.documentKind)}</Badge><Badge>{item.extension.toUpperCase()}</Badge><Badge tone={["bom", "quotation"].includes(item.documentKind) ? "warning" : "neutral"}>{t("lib_primary_date", { d: formatDocumentDate(item.primaryDocumentDate) })}</Badge>{item.revisionLabel && <Badge>{t("lib_revision", { r: item.revisionLabel })}</Badge>}{item.isReference && <Badge tone="warning">{t("lib_badge_ref")}</Badge>}</div><h1 className="mt-3 break-words text-2xl font-black text-white md:text-4xl">{item.title}</h1><p className="mt-2 break-all text-sm text-slate-500">{item.relativePath}</p></header>
+    <header className="mb-6"><div className="flex flex-wrap gap-2"><Badge tone="accent">{kindLabel(dataset, item.documentKind)}</Badge><Badge>{item.extension.toUpperCase()}</Badge><Badge tone={["bom", "quotation"].includes(item.documentKind) ? "warning" : "neutral"}>{t("lib_primary_date", { d: formatDocumentDate(item.primaryDocumentDate) })}</Badge>{item.revisionLabel && <Badge>{t("lib_revision", { r: item.revisionLabel })}</Badge>}{item.isReference && <Badge tone="warning">{t("lib_badge_ref")}</Badge>}</div><h1 className="mt-3 break-words text-[16px] font-semibold text-white md:text-[22px]">{item.title}</h1><p className="mt-2 break-all text-sm text-slate-500">{item.relativePath}</p></header>
     <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_380px]">
       <Card className="min-h-[560px] overflow-hidden">
         <div className="border-b border-slate-700 px-5 py-4 font-bold text-white">{t("d_preview")}</div>
@@ -143,7 +143,7 @@ export function PdDocumentDetailPage() {
       </Card>
       <aside className="space-y-4">
         <Card className="p-5">
-          <div className="flex items-center justify-between gap-3"><h2 className="font-black text-white">{t("d_info")}</h2>{profile?.canUpload && !activeEditor && <Button variant="ghost" className="min-h-9 px-3 py-1.5" onClick={() => { setActiveEditor("info"); setSaveMessage(""); }}><Pencil size={15} />{t("d_edit")}</Button>}</div>
+          <div className="flex items-center justify-between gap-3"><h2 className="font-semibold text-white">{t("d_info")}</h2>{profile?.canUpload && !activeEditor && <Button variant="ghost" className="min-h-9 px-3 py-1.5" onClick={() => { setActiveEditor("info"); setSaveMessage(""); }}><Pencil size={15} />{t("d_edit")}</Button>}</div>
           {activeEditor === "info" ? <form className="mt-4 space-y-4" onSubmit={(event) => void save(event)}>
             <Field label={t("d_f_title")}><input value={form.title} maxLength={300} onChange={(event) => setForm({ ...form, title: event.target.value })} className={inputClass} /></Field>
             <Field label={t("d_f_kind")}><select value={form.documentKind} onChange={(event) => setForm({ ...form, documentKind: event.target.value })} className={inputClass}>{KIND_OPTIONS[dataset].map(([value, label]) => <option key={value} value={value}>{t(label)}</option>)}</select></Field>
@@ -163,7 +163,7 @@ export function PdDocumentDetailPage() {
         </Card>
         <Card className="p-5">
           <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2 font-black text-white"><Folder size={18} className="text-cyan-300" />{t("d_keywords")}</div>
+            <div className="flex items-center gap-2 font-semibold text-white"><Folder size={18} className="text-cyan-300" />{t("d_keywords")}</div>
             {profile?.canUpload && !activeEditor && <Button variant="ghost" className="min-h-9 px-3 py-1.5" onClick={() => { setActiveEditor("keywords"); setSaveMessage(""); }}><Pencil size={15} />{t("d_edit_kw")}</Button>}
           </div>
           {activeEditor === "keywords" ? <form className="mt-4 space-y-3" onSubmit={(event) => void save(event)}>
@@ -179,7 +179,7 @@ export function PdDocumentDetailPage() {
     </div>
     {deleteOpen && <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4" role="dialog" aria-modal="true" aria-labelledby="delete-document-title">
       <Card className="w-full max-w-lg border-rose-900 p-6 shadow-2xl">
-        <div className="flex items-start gap-3"><span className="rounded-xl bg-rose-950 p-3 text-rose-300"><AlertTriangle size={22} /></span><div><h2 id="delete-document-title" className="text-xl font-black text-white">{t("d_del_title")}</h2><p className="mt-2 break-all text-sm leading-6 text-slate-400">{item.relativePath}</p></div></div>
+        <div className="flex items-start gap-3"><span className="rounded-xl bg-rose-950 p-3 text-rose-300"><AlertTriangle size={22} /></span><div><h2 id="delete-document-title" className="text-[15px] font-semibold text-white">{t("d_del_title")}</h2><p className="mt-2 break-all text-sm leading-6 text-slate-400">{item.relativePath}</p></div></div>
         <div className="mt-5 space-y-3">
           <label className="flex cursor-pointer gap-3 rounded-xl border border-slate-700 p-4 text-sm text-slate-200"><input type="radio" name="delete-scope" checked={!deleteLocal} onChange={() => setDeleteLocal(false)} className="mt-0.5 accent-cyan-400" /><span><strong className="block text-white">{t("d_del_cloud")}</strong><span className="mt-1 block text-slate-500">{t("d_del_cloud_desc")}</span></span></label>
           <label className="flex cursor-pointer gap-3 rounded-xl border border-rose-900/80 p-4 text-sm text-slate-200"><input type="radio" name="delete-scope" checked={deleteLocal} onChange={() => setDeleteLocal(true)} className="mt-0.5 accent-rose-500" /><span><strong className="block text-rose-200">{t("d_del_both")}</strong><span className="mt-1 block text-slate-500">{t("d_del_both_desc")}</span></span></label>

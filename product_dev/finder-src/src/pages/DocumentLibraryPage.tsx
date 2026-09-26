@@ -109,14 +109,14 @@ export function DocumentLibraryPage({ dataset }: { dataset: PdDataset }) {
         <label className="relative block">
           <span className="sr-only">{t("lib_sr_query")}</span>
           <Search className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={19} />
-          <input value={query} onChange={(event) => setQuery(event.target.value)} className="h-12 w-full rounded-xl border pl-11 pr-4 text-sm" placeholder={isMfg ? t("lib_ph_mfg") : t("lib_ph_buy")} />
+          <input value={query} onChange={(event) => setQuery(event.target.value)} className="h-9 w-full rounded-[10px] border pl-10 pr-3 text-[13px]" placeholder={isMfg ? t("lib_ph_mfg") : t("lib_ph_buy")} />
         </label>
-        {isMfg ? <div className="hidden xl:block" /> : <input value={supplier} onChange={(event) => setSupplier(event.target.value)} className="h-12 rounded-xl border px-4 text-sm" placeholder={t("lib_ph_supplier")} />}
-        <select value={kind} onChange={(event) => setKind(event.target.value)} className="h-12 rounded-xl border px-4 text-sm" aria-label={t("lib_aria_kind")}>
+        {isMfg ? <div className="hidden xl:block" /> : <input value={supplier} onChange={(event) => setSupplier(event.target.value)} className="h-9 rounded-[10px] border px-3 text-[13px]" placeholder={t("lib_ph_supplier")} />}
+        <select value={kind} onChange={(event) => setKind(event.target.value)} className="h-9 rounded-[10px] border px-3 text-[13px]" aria-label={t("lib_aria_kind")}>
           <option value="">{t("lib_all_kinds")}</option>
           {kinds.map((value) => <option key={value} value={value}>{kindLabel(value)}</option>)}
         </select>
-        <Button className="h-12 px-6" type="submit" disabled={loading}>{loading ? <LoaderCircle className="animate-spin" size={18} /> : <Search size={18} />}{t("lib_search")}</Button>
+        <Button className="h-9 px-5" type="submit" disabled={loading}>{loading ? <LoaderCircle className="animate-spin" size={18} /> : <Search size={18} />}{t("lib_search")}</Button>
       </form>
       <label className="mt-4 inline-flex items-center gap-2 text-sm text-slate-400"><input type="checkbox" checked={includeReference} onChange={(event) => setIncludeReference(event.target.checked)} /><SlidersHorizontal size={15} />{t("lib_include_ref")}</label>
     </Card>
@@ -131,7 +131,7 @@ export function DocumentLibraryPage({ dataset }: { dataset: PdDataset }) {
         </div>
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2"><Badge tone="accent">{kindLabel(item.documentKind)}</Badge>{item.isReference && <Badge tone="warning">{t("lib_badge_ref")}</Badge>}<span className="text-xs font-bold uppercase text-slate-500">{item.extension}</span></div>
-          <h2 className="mt-2 truncate text-base font-black text-white group-hover:text-cyan-300">{item.title}</h2>
+          <h2 className="mt-2 truncate text-base font-semibold text-white group-hover:text-cyan-300">{item.title}</h2>
           <p className="mt-1 truncate text-xs text-slate-500">{item.relativePath}</p>
           <p className="mt-2 text-sm text-slate-400">{item.supplierName ? t("lib_supplier_of", { n: item.supplierName }) : item.sourceFactory ? t("lib_source_of", { n: item.sourceFactory }) : item.pathLabels.join(" · ")}</p>
         </div>

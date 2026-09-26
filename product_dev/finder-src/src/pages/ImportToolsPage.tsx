@@ -17,7 +17,7 @@ export function ImportToolsPage() {
   const { profile } = useAuth();
 
   if (!profile?.canUpload && !profile?.canSync) {
-    return <Card className="p-8 text-center"><p className="font-black text-white">{t("it_no_perm")}</p></Card>;
+    return <Card className="p-8 text-center"><p className="font-semibold text-white">{t("it_no_perm")}</p></Card>;
   }
 
   return <>
@@ -30,10 +30,10 @@ export function ImportToolsPage() {
 }
 
 function ToolLink({ to, title, description, icon: Icon, tone }: { to: string; title: string; description: string; icon: LucideIcon; tone: string }) {
-  return <Link to={to} className="group rounded-2xl border border-slate-800 bg-slate-900/70 p-5 transition hover:-translate-y-0.5 hover:border-cyan-700 hover:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-cyan-400 md:p-6">
+  return <Link to={to} className="group rounded-[14px] border border-slate-800 bg-slate-900/70 p-5 transition hover:-translate-y-0.5 hover:border-cyan-700 hover:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-cyan-400 md:p-6">
     <div className="flex items-start gap-4">
       <span className={`rounded-xl p-3 ${tone}`}><Icon size={23} /></span>
-      <span className="min-w-0 flex-1"><span className="block text-lg font-black text-white">{title}</span><span className="mt-1 block text-sm leading-6 text-slate-400">{description}</span></span>
+      <span className="min-w-0 flex-1"><span className="block text-[15px] font-semibold text-white">{title}</span><span className="mt-1 block text-sm leading-6 text-slate-400">{description}</span></span>
       <ArrowRight className="mt-2 text-slate-600 transition group-hover:translate-x-1 group-hover:text-cyan-300" size={20} />
     </div>
   </Link>;

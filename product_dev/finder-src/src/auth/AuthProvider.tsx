@@ -7,6 +7,7 @@ import {
   type ReactNode,
 } from "react";
 import { appConfig } from "../lib/config";
+import { initLang } from "../i18n";
 import {
   getPlatformSession,
   platformHomeUrl,
@@ -43,8 +44,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 
   useEffect(() => {
-    if (appConfig.demoMode) return;
+    if (appConfig.demoMode) {
+      initLang();
+      return;
+    }
     const nextSession = getPlatformSession();
+    /* 🔴 語言要在取 session 之後、打 API 之前就定下來：擺在 bootstrap 回應之後的話，
+       後端不通時整個畫面會停在繁中（devices v1.10 踩過同一個坑）。
+       沒有 session 也要 initLang()，否則登入頁不會跟著 Portal 的語言。 */
+    initLang(nextSession?.site);
     if (!nextSession) {
       setLoading(false);
       return;

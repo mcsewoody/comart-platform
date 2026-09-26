@@ -1,6 +1,26 @@
 # COMART Product Finder 版本紀錄
 
 
+
+## 2.28
+
+- 建立 i18n 基礎（`src/i18n.ts`）：`t()`／`useT()`／`setLang()`，
+  與其他系統共用 `localStorage['comart-lang']`。
+  🔴 用 `useSyncExternalStore` 訂閱而不是 React context —— 這個 app 有很多
+  非元件的呼叫點（`lib/api.ts` 的錯誤訊息、`lib/utils.ts` 的標籤表）也要拿得到
+  當下語言，所以事實來源是模組 state，hook 只是讓元件訂閱它。
+- topbar 與行動版側欄加上語言鈕（樣式與其他系統的 `.lchip` 一致）。
+- AppShell 的字串已全部走 `t()`。🔴 `navigation` 陣列存 **key 不存文案** ——
+  那個陣列在模組載入時求值一次，存死字串就換不掉了。
+- 越南文字型：`html[lang="vi"]` 換成 Be Vietnam Pro
+  （DM Sans 沒有越南文字集，見 CLAUDE.md）。
+- `initLang()` 在 AuthProvider 取得 session 之後、打 bootstrap **之前**呼叫 ——
+  擺在回應之後的話後端不通時整個畫面會停在繁中。
+
+⚠️ **其餘頁面的字串尚未轉換**（約 430 條）：DocumentLibraryPage、
+PdDocumentDetailPage、IncrementalUploadPage、ImportToolsPage、SignInPage、
+NotFoundPage 與 `lib/` 的標籤表。畫面目前仍是繁中，切語言只會換掉外框與導覽。
+
 ## 2.27
 
 - 配色與字體改為與 COMART Platform 一致（Portal `index.html` 的 `:root`）：

@@ -103,11 +103,11 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 
 | File | Version | Purpose | ~Lines |
 |------|---------|---------|--------|
-| `index.html` | v2.06 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
+| `index.html` | v2.07 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
 | `admin/index.html` | v2.41 | Admin System — room booking, fleet, visitor, library, lottery | 5,650 |
-| `kms/index.html` | v2.41 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
-| `quotation/index.html` | v3.61 | Quotation & CRM system | 7,332 |
-| `board/index.html` | v1.91 | 公告與會議 Bulletin & Meetings — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍、腦力激盪 | 4,600 |
+| `kms/index.html` | v2.42 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
+| `quotation/index.html` | v3.64 | Quotation & CRM system | 7,332 |
+| `board/index.html` | v1.92 | 公告與會議 Bulletin & Meetings — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍、腦力激盪 | 4,600 |
 | `product_dev/` | v2.24 | **產品開發管理 —— 第六個子系統，不遵守單一檔案原則**（見下方專節） | — |
 
 `admin/lottery.html` is a standalone lottery page (separate from the lottery module inside `admin/index.html`).
@@ -336,7 +336,19 @@ Responsive breakpoint at 768px: desktop shows sidebar, mobile shows bottom nav. 
 
 The portal supports EN, 繁中, 简中, VI, 日 via `setLang(lang)`. Each language has a full i18n dictionary stored as a JS object in the HTML file. KMS and admin have their own i18n dictionaries.
 
-五個系統共用 `localStorage['comart-lang']`（值為 `en` / `zh-TW` / `zh-CN` / `vi` / `ja`），在任一系統切換語言，其他系統下次載入就跟著換。
+🔴 **「五個系統共用 `localStorage['comart-lang']`」這句話只對兩個系統成立**（2026-09-26 查證）：
+
+| 系統 | 記語言的 key |
+|---|---|
+| Portal、Board、Product Dev（hub／裝置） | `comart-lang` ✅ |
+| **報價系統** | `qi-lang-v2` |
+| **Admin** | `admin-lang` |
+| **KMS** | `kms-lang` |
+
+所以在 Portal 切成越南文，**報價／Admin／KMS 不會跟著換**。
+這不是壞掉，是這句話從來沒有全部實現過。
+🔴 **要統一不能直接換 key** —— 那會讓所有人既有的語言偏好一次歸零。
+做法是「先讀 `comart-lang`、沒有才退回舊 key，寫入時兩邊都寫」撐一段時間。尚未做。
 
 **Board 的 i18n（v1.48）**：`B_I18N`（330 key × 5 語）＋ `BT(key, params)`，`{n}` 佔位。
 靜態 HTML 用 `data-i18n` / `data-i18n-ph` / `data-i18n-title`，由 `bApplyI18n()` 套上；
@@ -2027,9 +2039,14 @@ Google Fonts 對 DM Sans **只給 `latin` 與 `latin-ext` 兩個 unicode-range**
   ```
   `Be Vietnam Pro`（幾何無襯線，與 DM Sans 相容）與 `Noto Serif` 都有完整越南文字集。
   靠 `document.documentElement.lang` 觸發，所以切語言的函式一定要設它。
-- 🔴 **這不是 product_dev 獨有的** —— Portal／Board／報價系統的 `--ff` 也是 DM Sans，
-  越南同仁看到的介面一直是這樣。**尚未修。**
-  Admin／KMS 用 Segoe UI／PingFang TC，PingFang 也沒有越南文，同一個坑。
+- ✅ **Portal v2.07／Board v1.92／報價 v3.64 已一併修好**（2026-09-26），做法相同。
+  ⚠️ **Admin／KMS 還沒修** —— 它們的 `--ff` 是 Segoe UI／PingFang TC，
+  PingFang 也沒有越南文，同一個坑。
+- 🔴 **Portal 與報價系統原本從來沒有設過 `document.documentElement.lang`**
+  （整份 grep 為 0），所以 `html[lang="vi"]` 本來不會生效。
+  Portal 補在 `setLang()` 與 DOMContentLoaded（**沒存過語言時 `setLang` 不會被呼叫**，
+  仍要設一次）；報價補在 **`applyLang()`** —— 啟動與切換兩條路都會經過它。
+  Board 本來就有設。順帶讓螢幕閱讀器與瀏覽器的翻譯提示拿到正確語言。
 - **怎麼看出來的**：`document.fonts` 裡 DM Sans 的 `@font-face` 只有兩段 unicode-range。
   畫面上很容易被當成「這個字體風格就是這樣」而不會有人回報。
 

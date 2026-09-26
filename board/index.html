@@ -5,10 +5,10 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#080C14">
-<title>COMART · 公告與會議 v1.91</title>
+<title>COMART · 公告與會議 v1.92</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=Noto+Serif:wght@400;700&family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#080C14;--s1:#0F1520;--s2:#172030;--s3:#1E2B40;
@@ -35,6 +35,14 @@ h1,h2,h3,p{margin:0}
 #sb-authbar{display:none;background:#3a1416;color:#ffb4ac;border-bottom:1px solid #b3261e;padding:8px 16px;font-size:13px;font-weight:600;text-align:center;line-height:1.6}
 #sb-authbar button{margin-left:10px;background:#b3261e;color:#fff;border:0;border-radius:6px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit}
 .topbar{position:sticky;top:0;z-index:200;background:rgba(8,12,20,0.9);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--br)}
+/* 🔴 DM Sans 沒有越南文字集 —— Google Fonts 對它只給 latin 與 latin-ext 兩個
+   unicode-range，連明確指定 subset=vietnamese 也一樣。越南文的 U+1EA0–U+1EF9
+   （ị ế ộ ự ả ẩ ể…）因此會**逐字**掉到系統字型，同一個詞裡混兩種字，看起來像
+   變音符號散掉、鉤號飄在半空。DM Serif Display 同樣沒有，大標更明顯。
+   🔴 修法是切成越南文時整份換字型，不是只補缺字 —— 補缺字仍然是一個詞兩種字體。
+   靠 documentElement.lang 觸發，所以 setLang 一定要設它。 */
+html[lang="vi"]{--ff:'Be Vietnam Pro','DM Sans',-apple-system,sans-serif;--fd:'Noto Serif','DM Serif Display',Georgia,serif}
+
 .topbar-main{display:flex;align-items:center;gap:10px;padding:10px 16px;max-width:1180px;margin:0 auto}
 .logo{display:flex;align-items:center;gap:9px;text-decoration:none;color:inherit}
 .logo-mark{width:30px;height:30px;background:var(--ac);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-style:italic;font-size:15px;color:#fff;font-weight:400;flex-shrink:0}
@@ -349,7 +357,7 @@ body.pm-playing #pm-phasebar{padding:0}
     <a class="logo" href="javascript:void(0)">
       <div class="logo-mark">告</div>
       <div class="logo-text" data-i18n="app_title">公告與會議</div>
-      <span class="logo-ver">v1.91</span>
+      <span class="logo-ver">v1.92</span>
     </a>
     <div class="topbar-right">
       <div id="langChips" style="display:flex;gap:4px"></div>

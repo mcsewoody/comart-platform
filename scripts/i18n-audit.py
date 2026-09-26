@@ -7,6 +7,7 @@
 #   python3 scripts/i18n-audit.py kms                # KMS（I18N，key 帶引號）
 #   python3 scripts/i18n-audit.py pd-hub             # Product Dev 工作區首頁（PD_I18N）
 #   python3 scripts/i18n-audit.py pd-devices         # Product Dev 手機與配件（DV_I18N）
+#   python3 scripts/i18n-audit.py pd-finder          # Product Dev Finder（TypeScript 模組的 DICT）
 #
 # 🔴 為什麼要有這支：全域計數會放過一種錯誤 —— 10 份分佈成 (0,0,0,2,3)，
 #    總數對、分佈全錯。2026-09-08 的 lc_rule1_t 就是這樣：en／繁中／簡中各 0 份，
@@ -29,6 +30,7 @@ TARGETS = {
     'kms':    ('kms/index.html', ['I18N']),
     'pd-hub': ('product_dev/index.html', ['PD_I18N']),
     'pd-devices': ('product_dev/devices/index.html', ['DV_I18N']),
+    'pd-finder': ('product_dev/finder-src/src/i18n.ts', ['DICT']),
 }
 name = (sys.argv[1] if len(sys.argv) > 1 else 'portal').lower()
 if name not in TARGETS:
@@ -139,7 +141,7 @@ bad, total = 0, 0
 defined = set()
 for var in varnames:
     # 宣告的空白寫法各檔不同（`const X = {` 與 `const X={` 都有），不要寫死
-    m = re.search(r'const\s+%s\s*=\s*\{' % re.escape(var), s)
+    m = re.search(r'const\s+%s\s*(?::[^=]+?)?=\s*\{' % re.escape(var), s)
     assert m, '%s 的宣告找不到' % var
     segs = lang_segments(s, m.end() - 1)
     assert segs, '%s 的語言字典找不到（格式改了？）' % var

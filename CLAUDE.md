@@ -406,12 +406,23 @@ The portal supports EN, 繁中, 简中, VI, 日 via `setLang(lang)`. Each langua
 ## i18n：改字典一定要逐字典檢查（`scripts/i18n-audit.py`）
 
 ```bash
+# 八個目標，全部共用這一支
 python3 scripts/i18n-audit.py             # Portal      I18N        275 key × 5
 python3 scripts/i18n-audit.py board       # Board       B_I18N 419 ＋ PL_I18N 109
 python3 scripts/i18n-audit.py quotation   # 報價系統     UI          180
 python3 scripts/i18n-audit.py admin       # Admin       ADMIN_I18N  481
 python3 scripts/i18n-audit.py kms         # KMS         I18N        261
+python3 scripts/i18n-audit.py pd-hub      # Product Dev 首頁        21
+python3 scripts/i18n-audit.py pd-devices  # 手機與配件  DV_I18N     215
+python3 scripts/i18n-audit.py pd-finder   # Finder      DICT（.ts） 173
 ```
+
+🔴 **第三項檢查：「畫面上取用了、但字典裡沒有的 key」。** 原本只比對五本字典彼此，
+抓不到這一類 —— 而 `t()` 找不到時原樣回傳 key，使用者看到的就是 key 名稱。
+加上之後立刻抓到報價系統的 `t('deleted')` 從來沒有定義過（toast 五語都顯示英文字
+`deleted`，因為它剛好長得像英文，沒有人回報）。
+只報「用了但沒有」，不報「有但沒用到」—— 組出來的 key（`BT('site_'+s)`）那一邊
+必然誤報，而 CLAUDE.md 記過兩次「誤報會把真的問題蓋掉」。
 
 🔴 **五個系統現在共用這一支**（v2.41 起）。字典邊界改用**大括號配對**掃出來，
 所以吃得下 Portal／Board 的 `key:'值'` 與 Admin／KMS／報價的 `'key':'值'` 兩種形狀。
@@ -1976,7 +1987,7 @@ Portal 入口：APPS 的 `id:'product-dev'`（`roles:[]`，**不限角色，全�
 | 部分 | 路徑 | 版本 | 形態 |
 |---|---|---|---|
 | 工作區首頁（hub） | `product_dev/index.html` | **v2.24** | 單檔，只有入口卡片 |
-| Document Finder | `product_dev/finder/`（產物）← `finder-src/`（原始碼） | **v2.27**（尚未上 i18n） | **React 19 + TypeScript + Vite + Tailwind 4** |
+| Document Finder | `product_dev/finder/`（產物）← `finder-src/`（原始碼） | **v2.29**（尚未上 i18n） | **React 19 + TypeScript + Vite + Tailwind 4** |
 | 手機與配件（裝置保管） | `product_dev/devices/index.html` | **v1.10** | 單檔，53KB |
 
 - 🔴 **hub 不再標示另外兩個模組的版本**（v2.20 拿掉）。那是第二份副本，
@@ -2013,6 +2024,30 @@ DM Sans／DM Mono）。🔴 **要改配色請先改 Portal 再同步過來，不
 - ⚠️ **這次沒有做視覺驗收**（瀏覽器擴充當時連不上）。靜態驗過：編譯後的 CSS 只剩平台色、
   舊 cyan 零殘留、三個檔案都載入 DM Sans、typecheck／lint／17 個測試全過、
   產物已 rsync。**畫面請實際點過一輪。**
+
+### 🔴 Finder 的 i18n（v2.28–v2.29）
+
+- **`src/i18n.ts` 是唯一事實來源**：`t()`／`useT()`／`setLang()`，共用
+  `localStorage['comart-lang']`。
+  🔴 **用 `useSyncExternalStore` 而不是 React context** —— 這個 app 有很多
+  非元件的呼叫點（`lib/api.ts` 的錯誤訊息）也要拿得到當下語言，
+  所以事實來源是模組 state，hook 只負責讓元件訂閱它。
+- 🔴 **所有標籤表一律存 key 不存文案**（`navigation`／`kindLabels`／`matchLabels`／
+  `KIND_OPTIONS`／`DATE_TYPE_LABELS`／`confirmationLabelKeys`／`tools`）。
+  那些物件在**模組載入時求值一次**，存死字串切語言換不掉 ——
+  這是整個改動裡最容易漏、也最難察覺的一項。
+- 🔴 **i18n 之後才會變成 bug 的寫法**：`PdDocumentDetailPage` 原本用
+  `saveMessage.startsWith("搜尋關鍵字")` 判斷訊息要顯示在哪一區。翻譯之後其他
+  四種語言必定判斷失敗，壞法是「成功訊息不出現」，沒有人會回報。
+  已改成明確的 `savedKeywords` 旗標。**用文案判斷狀態的地方都要這樣拆掉。**
+- `initLang()` 在 `AuthProvider` 取得 session 之後、打 `bootstrap` **之前**呼叫 ——
+  擺在回應之後的話，後端不通時整個畫面會停在繁中。
+- ⚠️ **已存進 state 的訊息不會跟著換語言**（例如載入時就產生的錯誤字串）：
+  下一次動作才會是新語言。這是刻意不處理的 —— 要修得把每個訊息都改存 key ＋ 參數。
+- ⚠️ **`IncrementalUploadPage`（上傳工具，約 172 條）刻意未轉換**（Woody 2026-09-26
+  決定只做讀取路徑：上傳工具只有 uploader 名單那幾個人會用，且多在台灣）。
+  `lib/utils.ts` 的 `processingLabels`／`sensitivityLabels` 同理未轉 ——
+  它們目前只被沒有掛路由的舊頁面引用。
 
 ### ⚠️ 有 11 個模組沒有掛上路由（死程式碼）
 

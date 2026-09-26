@@ -7,6 +7,7 @@ import {
   demoProducts,
   demoReviewTasks,
 } from "./demo-data";
+import { t } from "../i18n";
 import { getPlatformSession } from "./platform-session";
 import type {
   Category,
@@ -105,7 +106,7 @@ async function platformCall<T>(
   payload: Record<string, unknown> = {},
 ): Promise<T> {
   const session = getPlatformSession();
-  if (!session?.sig) throw new Error("Platform 登入已失效，請返回首頁重新登入。");
+  if (!session?.sig) throw new Error(t("api_session_lost"));
   const response = await fetch(appConfig.platformApiUrl, {
     method: "POST",
     headers: {
@@ -117,7 +118,7 @@ async function platformCall<T>(
   const result = await response.json().catch(() => ({}));
   if (!response.ok) {
     throw new Error(
-      String(result.message || result.error || `操作失敗 (${response.status})`),
+      String(result.message || result.error || t("api_op_failed", { s: response.status })),
     );
   }
   return result as T;
@@ -228,7 +229,7 @@ export const api = {
   },
 
   async inviteUser() {
-    throw new Error("使用者由 COMART Platform 的「用戶管理」統一管理。");
+    throw new Error(t("api_users_managed"));
   },
 
   async getFileUrl(
@@ -458,7 +459,7 @@ export const api = {
         headers: { "x-upsert": "false" },
         body: form,
       });
-      if (!upload.ok) throw new Error(`上傳失敗：${file.name}`);
+      if (!upload.ok) throw new Error(t("api_upload_failed", { n: file.name }));
       results.push(
         await platformCall("completeUpload", {
           name: file.name,

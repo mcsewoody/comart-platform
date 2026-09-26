@@ -2,8 +2,10 @@ import { Boxes, CheckCircle2, Search, ShieldCheck } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "../auth/AuthProvider";
 import { Button, Card } from "../components/ui";
+import { useT } from "../i18n";
 
 export function SignInPage() {
+  const t = useT();
   const { signIn, demoMode } = useAuth();
   const [status, setStatus] = useState<"idle" | "sending">("idle");
   const [error, setError] = useState("");
@@ -14,7 +16,7 @@ export function SignInPage() {
     try {
       await signIn("");
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "登入失敗");
+      setError(caught instanceof Error ? caught.message : t("si_login_failed"));
       setStatus("idle");
     }
   }
@@ -39,18 +41,18 @@ export function SignInPage() {
             Internal product intelligence
           </p>
           <h1 className="text-5xl font-black leading-[1.08] tracking-tight">
-            從散落的產品文件，
+            {t("si_h1a")}
             <br />
-            找到可用的答案。
+            {t("si_h1b")}
           </h1>
           <p className="mt-6 max-w-lg text-lg leading-8 text-slate-300">
-            用型號、廠商、產品類別或自然語句，快速定位既有產品與原始證據。
+            {t("si_lead")}
           </p>
           <div className="mt-10 grid gap-4 sm:grid-cols-3">
             {[
-              [Search, "跨語言混合搜尋"],
-              [ShieldCheck, "欄位證據與審核"],
-              [CheckCircle2, "原檔版本可追溯"],
+              [Search, t("si_f1")],
+              [ShieldCheck, t("si_f2")],
+              [CheckCircle2, t("si_f3")],
             ].map(([Icon, label]) => {
               const ItemIcon = Icon as typeof Search;
               return (
@@ -65,7 +67,7 @@ export function SignInPage() {
           </div>
         </div>
         <p className="relative z-10 text-xs text-slate-500">
-          僅供 COMART 核准之內部使用者
+          {t("si_internal")}
         </p>
       </section>
 
@@ -81,18 +83,17 @@ export function SignInPage() {
             Secure access
           </p>
           <h2 className="mt-3 text-3xl font-black tracking-tight text-slate-100">
-            請由 Platform 進入
+            {t("si_enter")}
           </h2>
           <p className="mt-3 text-sm leading-6 text-slate-600">
-            Product Finder 已改用 COMART Platform 的員工帳號與角色。請先在
-            Platform 登入，再由 Product Dev 開啟本系統。
+            {t("si_enter_desc")}
           </p>
 
           <div className="mt-8 rounded-2xl border border-cyan-200 bg-cyan-50 p-5">
             <CheckCircle2 className="text-cyan-800" />
-            <p className="mt-3 font-bold text-slate-100">單一登入</p>
+            <p className="mt-3 font-bold text-slate-100">{t("si_sso")}</p>
             <p className="mt-1 text-sm leading-6 text-slate-600">
-              不需再次輸入 Email，也不會寄送 Magic Link。
+              {t("si_sso_desc")}
             </p>
           </div>
           {error && (
@@ -105,12 +106,12 @@ export function SignInPage() {
             disabled={status === "sending"}
             onClick={() => void returnToPlatform()}
           >
-            {status === "sending" ? "返回中…" : "返回 COMART Platform"}
+            {status === "sending" ? t("si_returning") : t("si_return")}
           </Button>
 
           {demoMode && (
             <div className="mt-6 rounded-xl bg-amber-50 p-3 text-xs leading-5 text-amber-900">
-              目前為 Demo Mode：未設定 Supabase 環境變數，因此會直接進入示範資料。
+              {t("si_demo")}
             </div>
           )}
         </Card>

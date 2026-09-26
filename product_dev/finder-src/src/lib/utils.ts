@@ -27,11 +27,13 @@ export function formatDate(value: string) {
   }).format(new Date(value));
 }
 
-export const confirmationLabels: Record<ConfirmationStatus, string> = {
-  human_confirmed: "已人工確認",
-  ai_high_confidence: "AI 高信心",
-  needs_review: "待確認",
-  conflict: "有衝突",
+/* 🔴 存 key 不存文案：這個物件在模組載入時求值一次，存死字串切語言換不掉。
+   呼叫端（components/ui.tsx）用 t() 取值。*/
+export const confirmationLabelKeys: Record<ConfirmationStatus, string> = {
+  human_confirmed: "cf_human_confirmed",
+  ai_high_confidence: "cf_ai_high_confidence",
+  needs_review: "cf_needs_review",
+  conflict: "cf_conflict",
 };
 
 export const processingLabels: Record<ProcessingStatus, string> = {

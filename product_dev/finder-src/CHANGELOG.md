@@ -2,6 +2,27 @@
 
 
 
+
+## 2.29
+
+讀取路徑全部上五語（173 個 key）：DocumentLibraryPage、PdDocumentDetailPage、
+SignInPage、NotFoundPage、ImportToolsPage、components/ui、lib/api。
+
+- 🔴 **所有標籤表一律存 key 不存文案**（`kindLabels`／`matchLabels`／`KIND_OPTIONS`／
+  `DATE_TYPE_LABELS`／`confirmationLabels`）。那些物件在**模組載入時求值一次**，
+  存死字串的話切語言換不掉 —— 這是這次改動裡最容易漏、也最難察覺的一項。
+- 🔴 **修掉一個 i18n 之後才會變成 bug 的寫法**：`PdDocumentDetailPage` 原本用
+  `saveMessage.startsWith("搜尋關鍵字")` 判斷訊息要顯示在哪一區。翻譯之後其他
+  四種語言必定判斷失敗，而壞法是「成功訊息不出現」—— 沒有人會回報。
+  改成明確的 `savedKeywords` 旗標。
+- `lib/api.ts` 的錯誤訊息也走 `t()`（它不是元件，用的是模組層級的 `t`，
+  這正是 i18n 用 module state 而不是 React context 的理由）。
+
+⚠️ **`IncrementalUploadPage`（上傳工具，約 172 條）刻意未轉換** —— Woody 2026-09-26
+決定只做讀取路徑：上傳工具只有 uploader 名單那幾個人會用，且多在台灣。
+`lib/utils.ts` 的 `processingLabels`／`sensitivityLabels` 同理未轉，
+它們目前只被沒有掛路由的舊頁面引用。
+
 ## 2.28
 
 - 建立 i18n 基礎（`src/i18n.ts`）：`t()`／`useT()`／`setLang()`，

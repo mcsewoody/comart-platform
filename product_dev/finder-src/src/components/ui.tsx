@@ -3,7 +3,8 @@ import type {
   HTMLAttributes,
   ReactNode,
 } from "react";
-import { cn, confirmationLabels } from "../lib/utils";
+import { cn, confirmationLabelKeys } from "../lib/utils";
+import { useT } from "../i18n";
 import type { ConfirmationStatus } from "../lib/types";
 
 export function Button({
@@ -75,6 +76,7 @@ export function ConfirmationBadge({
 }: {
   status: ConfirmationStatus;
 }) {
+  const t = useT();
   const tone =
     status === "human_confirmed"
       ? "success"
@@ -83,7 +85,7 @@ export function ConfirmationBadge({
         : status === "conflict"
           ? "danger"
           : "warning";
-  return <Badge tone={tone}>{confirmationLabels[status]}</Badge>;
+  return <Badge tone={tone}>{t(confirmationLabelKeys[status])}</Badge>;
 }
 
 export function EmptyState({

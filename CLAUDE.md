@@ -108,7 +108,7 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 | `kms/index.html` | v2.41 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
 | `quotation/index.html` | v3.61 | Quotation & CRM system | 7,332 |
 | `board/index.html` | v1.91 | 公告與會議 Bulletin & Meetings — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍、腦力激盪 | 4,600 |
-| `product_dev/` | v2.21 | **產品開發管理 —— 第六個子系統，不遵守單一檔案原則**（見下方專節） | — |
+| `product_dev/` | v2.24 | **產品開發管理 —— 第六個子系統，不遵守單一檔案原則**（見下方專節） | — |
 
 `admin/lottery.html` is a standalone lottery page (separate from the lottery module inside `admin/index.html`).
 
@@ -1958,16 +1958,16 @@ Portal 入口：APPS 的 `id:'product-dev'`（`roles:[]`，**不限角色，全�
 
 | 部分 | 路徑 | 版本 | 形態 |
 |---|---|---|---|
-| 工作區首頁（hub） | `product_dev/index.html` | **v2.21** | 單檔，只有入口卡片 |
-| Document Finder | `product_dev/finder/`（產物）← `finder-src/`（原始碼） | **v2.27** | **React 19 + TypeScript + Vite + Tailwind 4** |
-| 手機與配件（裝置保管） | `product_dev/devices/index.html` | **v1.09** | 單檔，53KB |
+| 工作區首頁（hub） | `product_dev/index.html` | **v2.24** | 單檔，只有入口卡片 |
+| Document Finder | `product_dev/finder/`（產物）← `finder-src/`（原始碼） | **v2.27**（尚未上 i18n） | **React 19 + TypeScript + Vite + Tailwind 4** |
+| 手機與配件（裝置保管） | `product_dev/devices/index.html` | **v1.10** | 單檔，53KB |
 
 - 🔴 **hub 不再標示另外兩個模組的版本**（v2.20 拿掉）。那是第二份副本，
   而 Finder 那一個已經漂到 `v2.10`／實際 `v2.26`，差 16 個版本 —— **錯的版本號
   比沒有版本號更糟**，查問題的人會照著它去找不存在的程式碼。
   兩個模組本來就各自在自己的畫面上顯示版本（Finder 的 `AppShell`、裝置的 brand 列），
   不需要 hub 再存一份。**不要把 badge 加回去。**
-- 🔴 **三個版本號互不相干。** commit 訊息用的是 hub 那一個（`v2.21 - …`），
+- 🔴 **三個版本號互不相干。** commit 訊息用的是 hub 那一個（`v2.24 - …`），
   但同一個 commit 裡 `devices/index.html` 可能是 v1.06、finder 是 v2.26。
   改哪一部分就 bump 哪一個，**不要以為只有一個版本號**。
 - Finder 的版本在 `finder-src/src/version.ts` 的 `CPF_VERSION`（名稱是 CPF 時代留下的），
@@ -2011,6 +2011,45 @@ DM Sans／DM Mono）。🔴 **要改配色請先改 Portal 再同步過來，不
   **所以「沒有人 import」不等於「不影響產物」。**
 - 要刪的話連 `App.tsx` 都不用動（本來就沒引用），但**要先確認不是「暫時拿掉路由、之後要接回來」**。
   尚未刪，等 Woody 決定。
+
+### 🔴 越南文：DM Sans 根本沒有越南文字集（2026-09-26 查出）
+
+Google Fonts 對 DM Sans **只給 `latin` 與 `latin-ext` 兩個 unicode-range**，
+連明確加 `&subset=vietnamese` 也一樣 —— 它就是沒有。
+越南文的 **U+1EA0–U+1EF9**（ị ế ộ ự ả ẩ ể…）因此會**逐字**掉到系統字型，
+同一個詞裡混兩種字，看起來像變音符號散掉、鉤號飄在半空。
+`DM Serif Display` 同樣沒有，所以大標更明顯。
+
+- **修法是切成越南文時整份換字型，不是只補缺字** —— 補缺字仍然是一個詞兩種字體：
+  ```css
+  html[lang="vi"]{--ff:'Be Vietnam Pro','DM Sans',-apple-system,sans-serif;
+                  --fd:'Noto Serif','DM Serif Display',Georgia,serif}
+  ```
+  `Be Vietnam Pro`（幾何無襯線，與 DM Sans 相容）與 `Noto Serif` 都有完整越南文字集。
+  靠 `document.documentElement.lang` 觸發，所以切語言的函式一定要設它。
+- 🔴 **這不是 product_dev 獨有的** —— Portal／Board／報價系統的 `--ff` 也是 DM Sans，
+  越南同仁看到的介面一直是這樣。**尚未修。**
+  Admin／KMS 用 Segoe UI／PingFang TC，PingFang 也沒有越南文，同一個坑。
+- **怎麼看出來的**：`document.fonts` 裡 DM Sans 的 `@font-face` 只有兩段 unicode-range。
+  畫面上很容易被當成「這個字體風格就是這樣」而不會有人回報。
+
+### 🔴 手機與配件的 i18n（v1.10，215 個 key × 5 語）
+
+- **列舉值用 `Proxy`，不要在載入時算好**：`statusName`／`purposeName`／`conditionName`
+  原本是寫死中文的物件，切語言之後卡片上的狀態會留在舊語言。改成
+  `enumName('st_')` 回傳 Proxy，`statusName[x]` 這種既有寫法原封不動，
+  但每次取值都走當下的 `DT()`。
+  🔴 **查無此鍵要回 `undefined` 而不是 key 名稱** —— 呼叫端有
+  `statusName[a.status]||DT('not_requestable')` 這種後備，回字串會讓後備永遠不生效。
+- 🔴 **切語言一定要重畫**（`dvRerender`）：卡片與詳情都是 JS 產生的，
+  只套 `data-i18n` 會變成「頁籤換了、卡片沒換」。每個 render 各自 `try` 包起來 ——
+  沒初始化過的區塊丟例外不該擋住其他區塊（同 board 的 `bRerenderAll`）。
+- 🔴 **`dvApplyI18n()` 要在 `await api('bootstrap')` 之前**：擺在後面的話，
+  後端不通時整頁停在中文、連語言鈕都不會出現 —— 而那正是最需要看懂錯誤訊息的時候。
+- **組合字串一律用佔位符**（`DT('count_shown',{t,n})`），不要拆成三段接起來 ——
+  那種寫法在其他語言的語序下必然錯。
+- ⚠️ **設備「資料」不翻**：品牌、型號、顏色、資產編號、人名、備註是使用者輸入的內容，
+  翻了就是竄改。只翻介面文案與 status／purpose／condition 這類列舉值。
 
 ### 🔴 Finder 改完一定要重新建置並 rsync，否則網站上什麼都不會變
 

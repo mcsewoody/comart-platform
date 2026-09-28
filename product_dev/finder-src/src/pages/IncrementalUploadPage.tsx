@@ -6,6 +6,7 @@ import { Badge, Button, Card, PageHeader } from "../components/ui";
 import { SessionExpiredError, api } from "../lib/api";
 import { tag, uploadOne, type ImportFile, type StatusTag } from "../lib/upload-one";
 import { formatBytes } from "../lib/utils";
+import { skipReasonLabel, type SkipReason } from "../lib/document-labels";
 import {
   dedupeByDatasetHash,
   compareSyncManifest,
@@ -40,7 +41,6 @@ type Inventory = {
   reusedHashes: number;
 };
 
-type SkipReason = "outside_dataset" | "empty" | "excluded" | "oversized" | "archive" | "unsupported";
 
 type SkippedFile = {
   relativePath: string;
@@ -56,15 +56,6 @@ const ALLOWED = new Set([
 ]);
 const MAX_FILE_BYTES = 50 * 1024 * 1024;
 const ARCHIVE_EXTENSIONS = new Set(["zip", "7z", "rar"]);
-const SKIP_REASON_LABELS: Record<SkipReason, string> = {
-  /* 🔴 存 key 不存文案：模組載入時求值一次，存死字串切語言換不掉。*/
-  outside_dataset: "sk_outside_dataset",
-  empty: "sk_empty",
-  excluded: "sk_excluded",
-  oversized: "sk_oversized",
-  archive: "sk_archive",
-  unsupported: "sk_unsupported",
-};
 const BATCH_SIZE = 200;
 const HASH_QUERY_SIZE = 100;
 const MANIFEST_STORAGE_KEY = "pd-document-import-manifest-v1";
@@ -461,7 +452,7 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
     if (!inventory?.skipped.length) return;
     const rows = [
       [t("u_sk_reason"), t("u_sk_size"), t("u_sk_path")],
-      ...inventory.skipped.map((item) => [SKIP_REASON_LABELS[item.reason], formatBytes(item.byteSize), item.relativePath]),
+      ...inventory.skipped.map((item) => [skipReasonLabel(item.reason), formatBytes(item.byteSize), item.relativePath]),
     ];
     const csv = `\uFEFF${rows.map((row) => row.map(csvCell).join(",")).join("\r\n")}`;
     const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
@@ -526,7 +517,7 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
           <div>
             <p className="text-sm font-semibold text-slate-200">{t("u_skipped_n", { n: inventory.skipped.length })}</p>
             <div className="mt-2 flex flex-wrap gap-2">
-              {skipReasonSummary(inventory.skipped).map(([reason, count]) => <Badge key={reason}>{t(SKIP_REASON_LABELS[reason])} {count}</Badge>)}
+              {skipReasonSummary(inventory.skipped).map(([reason, count]) => <Badge key={reason}>{skipReasonLabel(reason)} {count}</Badge>)}
             </div>
           </div>
           <Button variant="ghost" onClick={downloadSkippedReport}><Download size={17} />{t("u_dl_skipped")}</Button>

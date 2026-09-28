@@ -5,23 +5,13 @@ import { useAuth } from "../auth/AuthProvider";
 import { Badge, Button, Card, EmptyState } from "../components/ui";
 import { api } from "../lib/api";
 import { documentListText, parseDocumentList } from "../lib/pd-document-edit";
+import { dateTypeLabel, kindOptionLabel, kindOptions } from "../lib/document-labels";
 import { deleteFileAtRelativePath, loadDirectoryHandle, requestDirectoryPermission, type StoredDirectoryHandle } from "../lib/directory-access";
 import { formatBytes } from "../lib/utils";
 import type { PdDataset, PdDocumentDetail, PdDocumentEdit } from "../lib/types";
 import { t as tr, useT } from "../i18n";
 
-const KIND_OPTIONS: Record<PdDataset, Array<[string, string]>> = {
-  /* 🔴 存 key 不存文案：這個物件在模組載入時求值一次，存死字串切語言換不掉。*/
-  mfg: [["design_drawing", "k_design_drawing"], ["bom", "k_bom"], ["cad", "k_cad2"], ["image", "k_image2"], ["presentation", "k_presentation"], ["document", "k_document2"], ["other", "k_other"]],
-  buy: [["catalog", "k_catalog"], ["quotation", "k_quotation"], ["image", "k_image2"], ["presentation", "k_presentation"], ["document", "k_document2"], ["cad", "k_cad2"], ["other", "k_other"]],
-};
-
 type EditState = { title: string; documentKind: string; sourceParty: string; pathLabels: string; keywords: string; summary: string; isReference: boolean; primaryDocumentDate: string; revisionLabel: string };
-
-const DATE_TYPE_LABELS: Record<string, string> = {
-  quotation_date: "dt_quotation_date", issue_date: "dt_issue_date", revision_date: "dt_revision_date",
-  creation_date: "dt_creation_date", filename_date: "dt_filename_date", manual: "dt_manual",
-};
 
 export function PdDocumentDetailPage() {
   const t = useT();
@@ -136,7 +126,7 @@ export function PdDocumentDetailPage() {
         {item.sourceUrl && <a href={item.sourceUrl} download className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-cyan-400 px-5 text-sm font-semibold text-white hover:bg-cyan-300"><Download size={18} />{t("d_download")}</a>}
       </div>
     </div>
-    <header className="mb-6"><div className="flex flex-wrap gap-2"><Badge tone="accent">{kindLabel(dataset, item.documentKind)}</Badge><Badge>{item.extension.toUpperCase()}</Badge><Badge tone={["bom", "quotation"].includes(item.documentKind) ? "warning" : "neutral"}>{t("lib_primary_date", { d: formatDocumentDate(item.primaryDocumentDate) })}</Badge>{item.revisionLabel && <Badge>{t("lib_revision", { r: item.revisionLabel })}</Badge>}{item.isReference && <Badge tone="warning">{t("lib_badge_ref")}</Badge>}</div><h1 className="mt-3 break-words text-[16px] font-semibold text-white md:text-[22px]">{item.title}</h1><p className="mt-2 break-all text-sm text-slate-500">{item.relativePath}</p></header>
+    <header className="mb-6"><div className="flex flex-wrap gap-2"><Badge tone="accent">{kindOptionLabel(dataset, item.documentKind)}</Badge><Badge>{item.extension.toUpperCase()}</Badge><Badge tone={["bom", "quotation"].includes(item.documentKind) ? "warning" : "neutral"}>{t("lib_primary_date", { d: formatDocumentDate(item.primaryDocumentDate) })}</Badge>{item.revisionLabel && <Badge>{t("lib_revision", { r: item.revisionLabel })}</Badge>}{item.isReference && <Badge tone="warning">{t("lib_badge_ref")}</Badge>}</div><h1 className="mt-3 break-words text-[16px] font-semibold text-white md:text-[22px]">{item.title}</h1><p className="mt-2 break-all text-sm text-slate-500">{item.relativePath}</p></header>
     <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_380px]">
       <Card className="min-h-[560px] overflow-hidden">
         <div className="border-b border-slate-700 px-5 py-4 font-bold text-white">{t("d_preview")}</div>
@@ -147,7 +137,7 @@ export function PdDocumentDetailPage() {
           <div className="flex items-center justify-between gap-3"><h2 className="font-semibold text-white">{t("d_info")}</h2>{profile?.canUpload && !activeEditor && <Button variant="ghost" className="min-h-9 px-3 py-1.5" onClick={() => { setActiveEditor("info"); setSaveMessage(""); }}><Pencil size={15} />{t("d_edit")}</Button>}</div>
           {activeEditor === "info" ? <form className="mt-4 space-y-4" onSubmit={(event) => void save(event)}>
             <Field label={t("d_f_title")}><input value={form.title} maxLength={300} onChange={(event) => setForm({ ...form, title: event.target.value })} className={inputClass} /></Field>
-            <Field label={t("d_f_kind")}><select value={form.documentKind} onChange={(event) => setForm({ ...form, documentKind: event.target.value })} className={inputClass}>{KIND_OPTIONS[dataset].map(([value, label]) => <option key={value} value={value}>{t(label)}</option>)}</select></Field>
+            <Field label={t("d_f_kind")}><select value={form.documentKind} onChange={(event) => setForm({ ...form, documentKind: event.target.value })} className={inputClass}>{kindOptions(dataset).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></Field>
             <Field label={dataset === "mfg" ? t("d_f_factory") : t("d_f_supplier")}><input value={form.sourceParty} maxLength={200} onChange={(event) => setForm({ ...form, sourceParty: event.target.value })} className={inputClass} /></Field>
             <Field label={t("d_f_paths")}><textarea value={form.pathLabels} rows={2} onChange={(event) => setForm({ ...form, pathLabels: event.target.value })} placeholder={t("d_ph_sep")} className={textareaClass} /></Field>
             <Field label={t("d_f_summary")}><textarea value={form.summary} maxLength={2000} rows={4} onChange={(event) => setForm({ ...form, summary: event.target.value })} className={textareaClass} /></Field>
@@ -158,7 +148,7 @@ export function PdDocumentDetailPage() {
             {saveMessage && <p role="status" className="text-sm leading-5 text-cyan-200">{saveMessage}</p>}
             <div className="flex gap-2"><Button type="submit" disabled={saving}>{saving ? <LoaderCircle className="animate-spin" size={16} /> : <Save size={16} />}{saving ? t("d_saving") : t("d_save")}</Button><Button type="button" variant="secondary" disabled={saving} onClick={cancelEdit}><X size={16} />{t("d_cancel")}</Button></div>
           </form> : <>
-            <dl className="mt-4 space-y-4 text-sm"><Info label={dataset === "mfg" ? t("d_f_factory") : t("d_f_supplier_short")} value={item.sourceFactory || item.supplierName || t("d_unlabelled")} /><Info label={t("d_f_paths")} value={item.pathLabels.join(" › ") || t("d_uncategorised")} /><Info label={t("d_f_kind")} value={kindLabel(dataset, item.documentKind)} /><Info label={t("d_f_primary_date")} value={formatDocumentDate(item.primaryDocumentDate)} /><Info label={t("d_date_type")} value={item.primaryDateType ? (DATE_TYPE_LABELS[item.primaryDateType] ? t(DATE_TYPE_LABELS[item.primaryDateType]) : item.primaryDateType) : t("d_unidentified")} />{item.primaryDateEvidence && <Info label={t("d_date_evidence")} value={[item.primaryDateEvidence, item.primaryDateLocation].filter(Boolean).join(" · ")} />}<Info label={t("d_f_revision")} value={item.revisionLabel || t("d_unidentified")} />{item.revisionEvidence && <Info label={t("d_rev_evidence")} value={[item.revisionEvidence, item.revisionLocation].filter(Boolean).join(" · ")} />}<Info label={t("d_file_size")} value={formatBytes(item.byteSize)} /><Info label={t("d_index_state")} value={item.analysisStatus === "completed" ? t("d_idx_done") : item.analysisStatus === "metadata_only" ? t("d_idx_meta") : t("d_idx_wait")} />{item.summary && <Info label={t("d_f_summary")} value={item.summary} />}</dl>
+            <dl className="mt-4 space-y-4 text-sm"><Info label={dataset === "mfg" ? t("d_f_factory") : t("d_f_supplier_short")} value={item.sourceFactory || item.supplierName || t("d_unlabelled")} /><Info label={t("d_f_paths")} value={item.pathLabels.join(" › ") || t("d_uncategorised")} /><Info label={t("d_f_kind")} value={kindOptionLabel(dataset, item.documentKind)} /><Info label={t("d_f_primary_date")} value={formatDocumentDate(item.primaryDocumentDate)} /><Info label={t("d_date_type")} value={dateTypeLabel(item.primaryDateType)} />{item.primaryDateEvidence && <Info label={t("d_date_evidence")} value={[item.primaryDateEvidence, item.primaryDateLocation].filter(Boolean).join(" · ")} />}<Info label={t("d_f_revision")} value={item.revisionLabel || t("d_unidentified")} />{item.revisionEvidence && <Info label={t("d_rev_evidence")} value={[item.revisionEvidence, item.revisionLocation].filter(Boolean).join(" · ")} />}<Info label={t("d_file_size")} value={formatBytes(item.byteSize)} /><Info label={t("d_index_state")} value={item.analysisStatus === "completed" ? t("d_idx_done") : item.analysisStatus === "metadata_only" ? t("d_idx_meta") : t("d_idx_wait")} />{item.summary && <Info label={t("d_f_summary")} value={item.summary} />}</dl>
             {saveMessage && <p role="status" className="mt-4 rounded-xl border border-emerald-900 bg-emerald-950/30 px-3 py-2 text-sm text-emerald-200">{saveMessage}</p>}
           </>}
         </Card>
@@ -193,7 +183,6 @@ export function PdDocumentDetailPage() {
 }
 
 function editStateFrom(item: PdDocumentDetail): EditState { return { title: item.title, documentKind: item.documentKind, sourceParty: item.sourceFactory || item.supplierName || "", pathLabels: documentListText(item.pathLabels), keywords: documentListText(item.keywords), summary: item.summary, isReference: item.isReference, primaryDocumentDate: item.primaryDocumentDate || "", revisionLabel: item.revisionLabel || "" }; }
-function kindLabel(dataset: PdDataset, value: string) { return KIND_OPTIONS[dataset].find(([kind]) => kind === value)?.[1] || value; }
 function Field({ label, children }: { label: string; children: ReactNode }) { return <label className="block text-xs font-bold text-slate-400"><span className="mb-1.5 block">{label}</span>{children}</label>; }
 const inputClass = "h-11 w-full rounded-xl border border-slate-700 bg-slate-950 px-3 text-sm text-slate-100 outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20";
 const textareaClass = "w-full resize-y rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 text-sm leading-5 text-slate-100 outline-none placeholder:text-slate-600 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20";

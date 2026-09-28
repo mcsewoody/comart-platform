@@ -2138,7 +2138,7 @@ Portal 入口：APPS 的 `id:'product-dev'`（`roles:[]`，**不限角色，全�
 | 部分 | 路徑 | 版本 | 形態 |
 |---|---|---|---|
 | 工作區首頁（hub） | `product_dev/index.html` | **v2.25** | 單檔，只有入口卡片 |
-| Document Finder | `product_dev/finder/`（產物）← `finder-src/`（原始碼） | **v2.32** | **React 19 + TypeScript + Vite + Tailwind 4** |
+| Document Finder | `product_dev/finder/`（產物）← `finder-src/`（原始碼） | **2.36** | **React 19 + TypeScript + Vite + Tailwind 4** |
 | 手機與配件（裝置保管） | `product_dev/devices/index.html` | **v1.11** | 單檔，53KB |
 
 - 🔴 **hub 不再標示另外兩個模組的版本**（v2.20 拿掉）。那是第二份副本，
@@ -2303,6 +2303,24 @@ v2.27 統一了**顏色**，但使用者仍然說「UI 風格與原本大不同�
   移到 `await api('bootstrap')` 之前。**「後端不通時畫面仍要能看」這件事，
   i18n 與圖示是同一個要求。**
 
+### 🔴 標籤表只能住在 `finder-src/src/lib/document-labels.ts`
+
+Finder 在 i18n 上摔過兩次，**兩次的壞法不一樣**：
+
+| | 2.33 | 2.36 |
+|---|---|---|
+| 壞在哪 | 字典**少了 key**（`tr(\`k_${kind}\`)` 動態組，grep 找不到就被當孤兒刪了） | 字典好好的，**呼叫端忘了包 `t()`** |
+| 使用者看到 | `m_keyword` | `k_cad2`、`sk_oversized` |
+| 舊測試擋得住嗎 | 補了 `i18n.test.ts` 之後可以 | **擋不住，測試全綠** |
+
+所以規則不是「記得包 `t()`」，是**沒有東西可以忘記包**：
+
+- `document-labels.ts` 只導出**已經翻好的字串**（`kindLabel`／`matchLabel`／
+  `kindOptions`／`kindOptionLabel`／`skipReasonLabel`／`dateTypeLabel`）
+- **不要在 `pages/`、`components/`、`auth/` 裡開「值是 i18n key」的對照表**
+  （`const X = { a: "k_bom" }`、`[["cad", "k_cad2"]]`）。`i18n.test.ts` 會掃原始碼擋下來
+- 要加新標籤就加在 `document-labels.ts`，順手把五種語言的字典補齊
+
 ### 🔴 Finder 改完一定要重新建置並 rsync，否則網站上什麼都不會變
 
 ```bash
@@ -2315,7 +2333,7 @@ rsync -a --delete dist/ ../finder/
   （GitHub Pages 直接服務它）。`vite.config.ts` 的 `base` 寫死 `/product_dev/finder/`。
 - **只改 `finder-src/` 而忘記這兩步，線上完全不會變**，而且 git diff 看起來「有改」。
   這是這個子系統最容易踩的坑。
-- 驗證指令：`npm run typecheck` / `npm run lint` / `npm test`（vitest，30 個）。
+- 驗證指令：`npm run typecheck` / `npm run lint` / `npm test`（vitest，39 個）。
 - 🔴 **2.33 之前 `npm run build` 會靜默產出「假資料版」**：`demoMode` 的判定是
   `!supabaseAnonKey && VITE_PLATFORM_MODE !== "true"`，沒帶環境變數就自動成立，
   而 demo 版會發一個假的管理員（canUpload／canSync 全開）進到主畫面 —— 但現存

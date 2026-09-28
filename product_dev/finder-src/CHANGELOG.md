@@ -3,6 +3,39 @@
 
 
 
+## 2.36
+
+### 🔴 三處把 i18n key 直接印到畫面上（五種語言全錯，已上線）
+
+`k_*` / `sk_*` 的標籤表存的是**字典 key**，呼叫端得自己記得包一層 `t()`。
+三個地方忘了包：
+
+| 位置 | 使用者看到的 |
+|---|---|
+| 文件詳情頁頂端的類型徽章 | `k_design_drawing`、`k_cad2` |
+| 文件詳情頁「文件類型」欄位 | 同上 |
+| 跳過清單匯出的 CSV「原因」欄 | `sk_oversized`、`sk_archive` |
+
+CSV 那一份特別明顯：標題列是翻好的（`t("u_sk_reason")`），資料列卻是 key。
+
+這是 2.33 的同一類事故的第二次。差別在於 2.33 是**字典少了 key**，
+`i18n.test.ts` 補上之後守得住；這次三個 key 在五種語言裡都好好存在，
+測試全綠 —— 壞的是**呼叫端**。
+
+所以這次不是再加一條「記得包 `t()`」的規則，而是把責任結構性拿掉：
+
+- `lib/document-labels.ts` 現在只導出**已經翻好的字串**
+  （`kindOptions` / `kindOptionLabel` / `skipReasonLabel` / `dateTypeLabel`），
+  沒有東西可以忘記包
+- 各頁自己的 `KIND_OPTIONS`、`SKIP_REASON_LABELS`、`DATE_TYPE_LABELS` 三張表刪除
+- `i18n.test.ts` 加一條**來源掃描**：`pages/` `components/` `auth/` 裡不准再出現
+  「值是 i18n key」的對照表。塞一張回去驗證過會紅
+
+順帶：`type SkipReason` 從上傳頁移到 `document-labels.ts`，與標籤同住。
+
+測試 34 → 39。前端行為除上述三處外沒有變動。
+
+
 ## 2.35
 
 後端與資料層，前端只動版本號。

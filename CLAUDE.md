@@ -2365,6 +2365,28 @@ rsync -a --delete dist/ ../finder/
   它們沒有 trgm 索引，那裡的 `lower()` 是為了大小寫不敏感比對。
 - **驗證方式**：搜尋幾次之後再看 `index-stats`，`Index scans` 應該開始累加。
 
+### 🔴 兩張 documents 表的欄位名稱不一樣，改成明確列欄位時炸掉過
+
+`summary()` 兩個都讀（`row.source_factory || null`、`row.category_path || row.product_path`），
+因為它本來是餵 `select("*")` 的結果 —— `select("*")` 不在乎那張表有沒有這個欄位。
+
+| | 來源方 | 路徑 |
+|---|---|---|
+| `pd_mfg_documents` | `source_factory` | `category_path` |
+| `pd_buy_documents` | `supplier_name` | `product_path` |
+
+2.35 把搜尋的 `select("*")` 換成明確欄位清單時把兩套都列上去，Postgres 回
+`column pd_mfg_documents.supplier_name does not exist`，**搜尋整個 500、畫面變成
+「已顯示 0／總共 0 份」**，而且是上線之後使用者回報才發現的。
+
+- 欄位清單抽到 `document-columns.js`，`summaryColumns(dataset)` 分資料庫回傳。
+- `document-columns.test.mjs` **直接讀 `supabase/migrations/` 的建表與 alter 語句**
+  比對，不靠人記得哪張表有哪些欄位。實測把 `supplier_name` 加回共用清單，
+  三個斷言會同時紅。
+- 🔴 **edge function 沒辦法在本機跑**（要有效的 `x-session` HMAC），所以這類改動
+  唯一的防線就是把邏輯抽成 `.js` 再用 `node --test` 測。
+  跑法：`cd supabase/functions/pd-documents-api && node --test *.test.mjs`（19 個）。
+
 ### 🔴 AI 佇列狀態原本每 15 秒打 10 個 count(*)（2.35 修）
 
 `analysisStatus` 對每個資料庫各發 5 個 `count(*)`（queued／processing／

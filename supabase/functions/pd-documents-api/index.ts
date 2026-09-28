@@ -4,6 +4,7 @@ import { verifySession } from "../_shared/session.ts"
 import { namedSecretKey } from "../_shared/api-keys.ts"
 import { expandSearchQueries } from "./search-aliases.js"
 import { resolveProductFinderAccess } from "./access-control.js"
+import { summaryColumns } from "./document-columns.js"
 
 const CORS = {
   "Access-Control-Allow-Origin": "*",
@@ -433,7 +434,7 @@ serve(async (req) => {
        各 300 KB）整份撈出來再丟掉 —— summary() 一個欄位都沒用到。
        下面的 document／updateDocument 端點是真的需要 extracted_text，那幾處要留。*/
     const { data: rows, error } = await sb.from(table)
-      .select("id,title,relative_path,source_factory,supplier_name,category_path,product_path,document_kind,extension,byte_size,keywords,summary_zh_tw,is_reference,analysis_status,thumbnail_path,storage_path,updated_at,source_modified_at,primary_document_date,primary_date_type,primary_date_evidence,primary_date_location,revision_label,revision_evidence,revision_location")
+      .select(summaryColumns(dataset))
       .in("id", ids)
     if (error) return json({ error: error.message }, 500)
     const byId = new Map((rows || []).map((row: any) => [row.id, row]))

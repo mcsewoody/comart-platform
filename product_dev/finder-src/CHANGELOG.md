@@ -3,6 +3,51 @@
 
 
 
+## 2.35
+
+後端與資料層，前端只動版本號。
+
+### 🔴 搜尋的 trigram 索引從來沒生效過
+
+`pd_*_documents_search_trgm_idx` 建在 `gin(search_text gin_trgm_ops)`，但三代 RPC
+（`202608300001` / `202609130006` / `202609130008`）查的都是 `lower(d.search_text)`。
+Postgres 不會拿 `col` 上的索引去服務 `lower(col)` 的條件。
+
+不是推論 —— `supabase inspect db index-stats` 的數字：
+
+| 索引 | 大小 | Index scans | Unused |
+|---|---:|---:|---|
+| `pd_mfg_documents_search_trgm_idx` | 6,760 kB | 0 | true |
+| `pd_buy_documents_search_trgm_idx` | 1,680 kB | 0 | true |
+| `pd_mfg_documents_pkey`（對照） | 88 kB | 5,073 | false |
+
+從 2026-08-30 建立到 2026-09-28，一次都沒用過。每次搜尋是全表掃描，再
+`cross join` 乘上最多 12 個語言變體。
+
+**修法不是加 `gin(lower(search_text))` 表達式索引**：analysis 完成後 worker 會把
+最多 300 KB 的文件內文塞進 `search_text`（`pd_worker/run.py` 的 `path_context`），
+mfg 那個索引已經 6.7 MB 比表本身還大，再長一份只是把維護成本變兩倍。改成把欄位
+正規化成小寫，現有索引直接可用。
+
+🔴 **正規化放在 DB 的 trigger，不是應用層**：`search_text` 有三個寫入點
+（`completeUpload`、`updateDocument`、worker），放應用層任何一處漏掉就破壞不變量，
+而症狀只是「搜尋變慢」—— 不會有人發現。其他欄位（`title`、`keywords`、
+`category_path`）的 `lower()` 保留，它們沒有 trgm 索引。
+
+### AI 佇列狀態 10 次查詢併成 1 次
+
+`analysisStatus` 對每個資料庫各發 5 個 `count(*)`，兩個資料庫 10 次往返，而前端
+在分析頁每 15 秒 poll 一次：`pd_mfg_jobs` 929 列累積 10,603 次 seq scan、
+`pd_buy_jobs` 266 列 10,332 次。新增 `pd_analysis_queue_status()` RPC，用
+`count(*) filter (...)` 讓五個分組共用同一次掃描。
+
+### 搜尋不再 `select("*")`
+
+把 `extracted_text` 與 `search_text`（各最多 300 KB）整份撈出來再丟掉，而
+`summary()` 一個欄位都沒用到。改成明確列 25 個欄位。`document` 與
+`updateDocument` 端點是真的需要 `extracted_text`，那幾處保留。
+
+
 ## 2.34
 
 修 2.33 自己造成的迴歸。

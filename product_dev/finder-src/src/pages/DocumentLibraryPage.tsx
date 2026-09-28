@@ -3,19 +3,11 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import { Badge, Button, Card, EmptyState, PageHeader } from "../components/ui";
 import { api } from "../lib/api";
+import { kindLabel, matchLabel } from "../lib/document-labels";
 import { formatBytes } from "../lib/utils";
 import type { PdDataset, PdDocumentSummary } from "../lib/types";
 import { t as tr, useT } from "../i18n";
 
-/* 🔴 標籤表存 key 不存文案 —— 這個物件在模組載入時求值一次，
-   存死字串的話切語言換不掉（AppShell 的 navigation 是同一個道理）。*/
-const KIND_KEYS = ["design_drawing", "bom", "cad", "image", "presentation", "document", "catalog", "quotation", "other"] as const;
-const kindLabel = (kind: string) =>
-  (KIND_KEYS as readonly string[]).includes(kind) ? tr(`k_${kind}`) : kind;
-
-const MATCH_KEYS = ["exact_filename", "filename", "keyword", "category", "factory", "supplier", "product_path", "path", "content", "cross_language", "recent"];
-const matchLabel = (reason: string) =>
-  MATCH_KEYS.includes(reason) ? tr(`m_${reason}`) : tr("m_default");
 
 const PAGE_SIZE = 30;
 

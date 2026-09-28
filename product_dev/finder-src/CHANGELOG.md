@@ -3,6 +3,35 @@
 
 
 
+## 2.34
+
+修 2.33 自己造成的迴歸。
+
+2.33 清 i18n 孤兒 key 時，我用 grep 找「定義了但沒人用」的 key，regex 只比對
+`t(` 沒比對 `tr(`。但 `DocumentLibraryPage` 有**兩處是動態組 key** 的：
+
+```ts
+const kindLabel  = (kind)   => KIND_KEYS.includes(kind)    ? tr(`k_${kind}`)   : kind;
+const matchLabel = (reason) => MATCH_KEYS.includes(reason) ? tr(`m_${reason}`) : tr("m_default");
+```
+
+於是 `k_cad`／`k_image`／`k_document` 與 11 個 `m_*` 被判成孤兒刪掉，文件庫列表的
+**文件類型與命中原因整片變成 `m_keyword` 這種 key 名稱**，而且已經上線。
+14 個 key × 5 語言已從 git 還原。
+
+🔴 **真正的修法是把這個檢查變成測試**，因為出錯的是掃描方式，不是程式 ——
+靠肉眼 grep 找動態 key 本來就不可靠。新增 `src/i18n.test.ts`：
+
+- 五種語言的 key 集合完全一致（少一個就紅）
+- 沒有任何語言留空字串
+- `KIND_KEYS` / `MATCH_KEYS` / `confirmationLabelKeys` 的每一個值都查得到字典，
+  且 `t()` 回傳的不是 key 本身
+
+實測過：把 `m_keyword` 拿掉，上面第一與第三項會同時失敗。
+
+測試 29 → 34 個。
+
+
 ## 2.33
 
 Codex 交接後的第一次體檢。i18n（330 key × 5 語言零缺漏）、上傳的重試／tus 續傳／

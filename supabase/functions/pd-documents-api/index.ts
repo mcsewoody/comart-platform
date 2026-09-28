@@ -4,7 +4,7 @@ import { verifySession } from "../_shared/session.ts"
 import { namedSecretKey } from "../_shared/api-keys.ts"
 import { expandSearchQueries } from "./search-aliases.js"
 import { resolveProductFinderAccess } from "./access-control.js"
-import { summaryColumns } from "./document-columns.js"
+import { deleteColumns, editColumns, summaryColumns } from "./document-columns.js"
 
 const CORS = {
   "Access-Control-Allow-Origin": "*",
@@ -179,10 +179,17 @@ function classify(dataset: Dataset, relativePath: string, extension: string) {
   }
 }
 
-async function signPaths(sb: any, bucket: string, paths: string[]) {
+/* 🔴 300 秒對「列表縮圖」夠用（圖片馬上就載完了），對另外兩個場景不夠：
+     - 詳情頁：開著讀完一份規格書再按下載，很容易超過 5 分鐘 → 網址已失效
+     - syncUrls：一次發 50 個來源檔的網址，單檔上限 50 MB，五分鐘下載不完
+   所以分成兩級。 */
+const SIGN_TTL_LIST = 900
+const SIGN_TTL_FILE = 3600
+
+async function signPaths(sb: any, bucket: string, paths: string[], ttl = SIGN_TTL_LIST) {
   const unique = [...new Set(paths.filter(Boolean))]
   if (!unique.length) return new Map<string, string>()
-  const { data, error } = await sb.storage.from(bucket).createSignedUrls(unique, 300)
+  const { data, error } = await sb.storage.from(bucket).createSignedUrls(unique, ttl)
   if (error) return new Map<string, string>()
   return new Map((data || []).flatMap((item: any) =>
     item.signedUrl ? [[item.path, item.signedUrl] as [string, string]] : []
@@ -253,12 +260,13 @@ serve(async (req) => {
     return json({ error: "uploader_access_unavailable" }, 500)
   }
 
+  /* 🔴 bootstrap 只回 profile。2.37 之前還回了 counts 與 suppliers ——
+     前端**一個都沒讀過**（api.ts 連 bootstrap 方法都沒有，AuthProvider 只取
+     profile），卻讓每一次開頁都多兩個 count(*) 加一次 pd_buy_documents 全表
+     select("supplier_name")。而且那份清單就算有人要用也是壞的：沒帶 range，
+     Supabase 預設 1000 列會靜默截斷，供應商會少。
+     真的需要供應商下拉時請另開一支 distinct 的 RPC，不要把它加回這裡。*/
   if (action === "bootstrap") {
-    const [mfg, buy, suppliers] = await Promise.all([
-      sb.from("pd_mfg_documents").select("id", { count: "exact", head: true }),
-      sb.from("pd_buy_documents").select("id", { count: "exact", head: true }),
-      sb.from("pd_buy_documents").select("supplier_name").order("supplier_name"),
-    ])
     return json({
       profile: {
         id: user.emp_id,
@@ -269,8 +277,6 @@ serve(async (req) => {
         canUpload: uploadAllowed,
         canSync: syncAllowed,
       },
-      counts: { mfg: mfg.count || 0, buy: buy.count || 0 },
-      suppliers: [...new Set((suppliers.data || []).map((item: any) => item.supplier_name).filter(Boolean))],
     })
   }
 
@@ -388,7 +394,7 @@ serve(async (req) => {
       const { data, error } = await sb.from(tableFor(targetDataset))
         .select("id,relative_path,sha256,byte_size,storage_path").in("id", ids)
       if (error) return json({ error: error.message }, 500)
-      const urls = await signPaths(sb, bucketFor(targetDataset, "source"), (data || []).map((row: any) => row.storage_path))
+      const urls = await signPaths(sb, bucketFor(targetDataset, "source"), (data || []).map((row: any) => row.storage_path), SIGN_TTL_FILE)
       for (const row of data || []) {
         const url = urls.get(row.storage_path)
         if (url) items.push({ id: row.id, dataset: targetDataset, relativePath: row.relative_path, sha256: row.sha256, byteSize: Number(row.byte_size || 0), url })
@@ -462,8 +468,8 @@ serve(async (req) => {
     if (error) return json({ error: error.message }, 500)
     if (!row) return json({ item: null })
     const [source, preview, thumbnail] = await Promise.all([
-      signPaths(sb, bucketFor(dataset, "source"), [row.storage_path]),
-      signPaths(sb, bucketFor(dataset, "preview"), row.preview_path ? [row.preview_path] : []),
+      signPaths(sb, bucketFor(dataset, "source"), [row.storage_path], SIGN_TTL_FILE),
+      signPaths(sb, bucketFor(dataset, "preview"), row.preview_path ? [row.preview_path] : [], SIGN_TTL_FILE),
       signPaths(sb, bucketFor(dataset, "thumbnail"), row.thumbnail_path ? [row.thumbnail_path] : []),
     ])
     const sourceUrl = source.get(row.storage_path) || null
@@ -479,30 +485,44 @@ serve(async (req) => {
     if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id)) {
       return json({ error: "invalid_document_id" }, 400)
     }
-    const { data: current, error: readError } = await sb.from(table).select("*").eq("id", id).maybeSingle()
+    /* 🔴 不要 select("*")：extracted_text 與 search_text 分析完成後各可到 300 KB，
+       這裡只需要三個路徑加兩個稽核欄位。*/
+    const { data: current, error: readError } = await sb.from(table)
+      .select(deleteColumns()).eq("id", id).maybeSingle()
     if (readError) return json({ error: readError.message }, 500)
     if (!current) return json({ error: "document_not_found" }, 404)
 
-    for (const [kind, path] of [
-      ["preview", current.preview_path], ["thumbnail", current.thumbnail_path], ["source", current.storage_path],
-    ] as Array<["source" | "preview" | "thumbnail", string | null]>) {
-      if (!path) continue
-      const { error } = await sb.storage.from(bucketFor(dataset, kind)).remove([path])
-      if (error) return json({ error: `storage_delete_failed:${kind}:${error.message}` }, 500)
-    }
-
+    /* 🔴 順序是「先資料列、後檔案」，不能反過來。
+       反過來的話中間失敗會留下「資料列還在、檔案沒了」—— 文件照樣出現在搜尋
+       結果裡，點進去才壞，而且沒有任何人會發現。
+       這個順序失敗只會在 storage 留下孤兒 bytes：看不見、可事後清、不會騙人。*/
     const editDelete = await sb.from("pd_document_edits").delete().eq("dataset", dataset).eq("document_id", id)
     if (editDelete.error) return json({ error: editDelete.error.message }, 500)
-    const transferDelete = await sb.from("pd_transfer_audit").delete().eq("dataset", dataset).eq("document_id", id)
-    if (transferDelete.error) return json({ error: transferDelete.error.message }, 500)
     const { error: deleteError } = await sb.from(table).delete().eq("id", id)
     if (deleteError) return json({ error: deleteError.message }, 500)
+
+    /* 🔴 pd_transfer_audit 的舊紀錄**保留**。2.37 之前這裡會把該文件的稽核歷史
+       整批 delete 掉再補一筆 delete —— 會被刪掉的稽核紀錄不是稽核紀錄，
+       「誰在什麼時候下載過這份圖」正是刪檔之後最需要查的東西。
+       這張表沒有 FK 到文件，所以文件刪掉之後紀錄仍然留著（刻意的）。*/
     const { error: auditError } = await sb.from("pd_transfer_audit").insert({
       emp_id: sess.empId, action: "delete", dataset, document_id: id,
       relative_path: current.relative_path, sha256: current.sha256,
     })
     if (auditError) console.error("Document deletion audit failed", auditError)
-    return json({ ok: true, relativePath: current.relative_path })
+
+    const orphaned: string[] = []
+    for (const [kind, path] of [
+      ["preview", current.preview_path], ["thumbnail", current.thumbnail_path], ["source", current.storage_path],
+    ] as Array<["source" | "preview" | "thumbnail", string | null]>) {
+      if (!path) continue
+      const { error } = await sb.storage.from(bucketFor(dataset, kind)).remove([path])
+      if (error) {
+        orphaned.push(`${kind}:${path}`)
+        console.error("Storage delete failed after row removal", kind, path, error.message)
+      }
+    }
+    return json({ ok: true, relativePath: current.relative_path, orphanedStoragePaths: orphaned })
   }
 
   if (action === "updateDocument") {
@@ -525,7 +545,10 @@ serve(async (req) => {
         (primaryDocumentDate !== null && !/^\d{4}-\d{2}-\d{2}$/.test(primaryDocumentDate)) || revisionLabel.length > 100) {
       return json({ error: "invalid_document_patch" }, 400)
     }
-    const { data: current, error: readError } = await sb.from(table).select("*").eq("id", id).maybeSingle()
+    /* 🔴 不要 select("*")：search_text 分析完成後最多 300 KB，而這裡是整份重拼的，
+       舊值一個字都用不到。extracted_text 反而一定要撈（下面用它重建 search_text）。*/
+    const { data: current, error: readError } = await sb.from(table)
+      .select(editColumns(dataset)).eq("id", id).maybeSingle()
     if (readError) return json({ error: readError.message }, 500)
     if (!current) return json({ error: "document_not_found" }, 404)
     const update: Record<string, unknown> = {

@@ -3,6 +3,96 @@
 
 
 
+## 2.37
+
+一次做完九項檢討，前後端都有。
+
+### ① 搜尋 RPC：三段「證明無效」的東西
+
+`202609280004_pd_search_simplify.sql`。
+
+- **`iq.q = ''` 這個 disjunct 讓 trigram 索引永遠用不到。** WHERE 原本是
+  `(iq.q = '' or search_text like ... or search_text % ...)`，第一條只碰 cross join
+  的另一邊、不碰 `d`，Postgres 就沒辦法把任何一條轉成 `d` 的 index condition。
+  2.35 正規化了大小寫、索引仍然 Unused，原因就是這個。
+  🔴 **而它是多餘的**：`search_text` 是 `not null`，`q = ''` 時
+  `like '%' || '' || '%'` 就是 `like '%%'`，恆為真。刪掉語意完全等價。
+- **`search_text % iq.q`（similarity）是純成本零效果。** 走到 similarity 的
+  base_score 最大 `1 × 180 = 180`，門檻是 200，`rank_weight` 的 CHECK 又是 `<= 1`。
+  **永遠過不了** —— 它讓列通過 WHERE，只為了在下一個 CTE 被丟掉。
+- **評分用 `extracted_text`、過濾用 `search_text`，同一份 300 KB 掃兩遍。**
+  worker 把 `extracted_text` 整份接進 `search_text`，所以那是掃一份副本，
+  而且 `extracted_text` 沒有索引、每列都要再 detoast 一次。改成直接給 220。
+  ⚠️ 唯一的行為差異：「只在 AI 摘要裡命中」的文件原本落到 similarity 分支被丟掉，
+  現在算成 content 留下。那是修正。
+- 連帶：`relevant` 那個 CTE 的 WHERE 現在恆為真，併回 `scored`。
+
+🔴 **`rank_weight` 全 repo 沒有任何一行寫入**，永遠是 default 1。欄位與乘法保留
+（那是預留的降權鉤子），但要用它得先有寫入路徑。
+
+### ② 搜尋結果看不出「這份文件的內文還沒進索引」
+
+`analysisStatus` 以前只在詳情頁看得到，列表完全沒有 —— 所以
+**「這份文件搜不到內文」與「沒有這份文件」在畫面上長得一模一樣**。
+而且 `failed` 跟 queued 共用「等待內容分析」，**永遠失敗的文件會永遠顯示等待中**。
+
+- 列表對非 `completed` 的文件加狀態徽章（`failed` 用 danger 色）
+- 新增 `d_idx_processing`／`d_idx_failed`（五語）
+- 查無結果時多一句：也可能是還在等待分析或分析失敗，那種情況只有檔名與路徑查得到
+
+### ③ `loadMore()` 少了 `searchDocuments()` 已經有的那層保護
+
+`searchDocuments()` 有 `searchSeq` + abort，`loadMore()` 兩個都沒有 ——
+按「下一頁」之後立刻改條件送出新搜尋，舊的分頁回應會把舊資料接在新結果後面，
+並覆蓋 `total` 與 `elapsed`。同一個 race，之前只修了一半。
+
+### ④ `bootstrap` 每次開頁全撈供應商，前端根本沒讀
+
+`select("supplier_name")` 沒有 range，加上兩個 `count(*)`。
+`suppliers` 與 `counts` 在前端**一次都沒被使用過**（`api.ts` 連 bootstrap 方法都沒有）。
+而且那份清單就算有人要用也是壞的：Supabase 預設 1000 列會靜默截斷。整組移除。
+
+### ⑤ `deleteDocument` 的失敗順序是反的
+
+原本先刪 storage 三個 bucket、再刪資料列。中間失敗 → **資料列還在、檔案沒了**：
+搜尋找得到、點進去壞掉，沒有人會知道。改成先資料列後檔案 ——
+那個方向失敗只會留下孤兒 bytes，看不見也便宜，而且回應會列出來。
+
+**`pd_transfer_audit` 的舊紀錄不再被刪掉。** 原本會整批 delete 再補一筆 delete ——
+會被刪掉的稽核紀錄不是稽核紀錄，而「誰下載過這份圖」正是刪檔之後最需要查的。
+
+### ⑥ 三個端點的 `select("*")`
+
+`deleteDocument` 只需要三個路徑與兩個稽核欄位、`updateDocument` 需要
+`extracted_text` 但不需要舊的 `search_text`。兩者都改成明確清單
+（`deleteColumns()`／`editColumns(dataset)`），`document` 維持 `*`（它真的要全部）。
+
+🔴 **順手修好 schema 讀取器的一個洞**：`document-columns.test.mjs` 的欄位名
+regex 是 `[a-z_]+`，**讀不到任何含數字的欄位名** —— `sha256` 就是一個。
+也就是那支「拿真 schema 來驗」的測試，對含數字的欄位一直是空轉的。
+
+### ⑦ 簽章網址的 TTL 分兩級
+
+300 秒對列表縮圖夠用，對另外兩個場景不夠：詳情頁讀完一份規格書再按下載很容易
+超過 5 分鐘；`syncUrls` 一次發 50 個來源檔、單檔上限 50 MB，五分鐘下載不完。
+列表 900 秒、檔案 3600 秒。
+
+### ⑧ `search-ranking.js` 是死碼，而且有 4 個測試在假裝它活著
+
+沒有任何檔案 import 它，邏輯早就搬進 SQL RPC 了。edge function 的 19 個通過測試
+裡有 4 個測的是不會執行的程式碼。連同測試一起刪除。
+
+（它的註解「at most 180」對門檻 200，正是 ① 第二點的旁證 —— 是知道的，
+但條件留在 SQL 裡沒拿掉。）
+
+### 測試
+
+前端 40 個（+1）、edge function 21 個（19 − 4 死碼 + 6 新）。
+另外用 `pglast`（libpg_query 的 Python binding，＝真的 PostgreSQL 文法）
+把全部 migration 與 `$$` 裡的函式本體驗過一遍 —— 這裡沒有 Docker、沒有本機
+Postgres，`db push` 是直接打正式庫，2.35 就是這樣上線再壞掉的。
+
+
 ## 2.36
 
 ### 🔴 三處把 i18n key 直接印到畫面上（五種語言全錯，已上線）

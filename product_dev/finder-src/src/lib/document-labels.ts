@@ -1,5 +1,5 @@
 import { t as tr } from "../i18n";
-import type { PdDataset } from "./types";
+import type { PdAnalysisStatus, PdDataset } from "./types";
 
 /* 🔴 這幾組清單與 `k_*` / `m_*` / `sk_*` 字典 key 是**動態拼出來**的關係
    （`tr(\`k_${kind}\`)`），所以字典裡那些 key 用 grep 搜不到字面引用。
@@ -64,3 +64,26 @@ export const DATE_TYPES = Object.keys(DATE_TYPE_KEYS);
 
 export const dateTypeLabel = (type: string | null) =>
   type ? (DATE_TYPE_KEYS[type] ? tr(DATE_TYPE_KEYS[type]) : type) : tr("d_unidentified");
+
+/* 內容索引狀態。🔴 `failed` 以前跟 queued／processing 一起被顯示成「等待內容
+   分析」—— 永遠失敗的文件會永遠顯示「等待中」，沒有人知道它其實已經放棄了。
+   而且這個狀態原本只在詳情頁看得到，搜尋結果列表完全沒有，所以
+   「這份文件搜不到內文」與「沒有這份文件」在畫面上長得一模一樣。*/
+const ANALYSIS_STATUS_KEYS: Record<PdAnalysisStatus, string> = {
+  completed: "d_idx_done",
+  metadata_only: "d_idx_meta",
+  queued: "d_idx_wait",
+  processing: "d_idx_processing",
+  failed: "d_idx_failed",
+};
+
+export const ANALYSIS_STATUSES = Object.keys(ANALYSIS_STATUS_KEYS) as PdAnalysisStatus[];
+
+export const analysisStatusLabel = (status: PdAnalysisStatus) =>
+  tr(ANALYSIS_STATUS_KEYS[status] ?? "d_idx_wait");
+
+/** 只有 completed 是「內文查得到」。其餘都該在列表上講出來。 */
+export const isContentIndexed = (status: PdAnalysisStatus) => status === "completed";
+
+export const analysisStatusTone = (status: PdAnalysisStatus): "danger" | "warning" =>
+  status === "failed" ? "danger" : "warning";

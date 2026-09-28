@@ -3,7 +3,7 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import { Badge, Button, Card, EmptyState, PageHeader } from "../components/ui";
 import { api } from "../lib/api";
-import { kindLabel, matchLabel } from "../lib/document-labels";
+import { analysisStatusLabel, analysisStatusTone, isContentIndexed, kindLabel, matchLabel } from "../lib/document-labels";
 import { formatBytes } from "../lib/utils";
 import type { PdDataset, PdDocumentSummary } from "../lib/types";
 import { t as tr, useT } from "../i18n";
@@ -63,8 +63,16 @@ export function DocumentLibraryPage({ dataset }: { dataset: PdDataset }) {
     }
   }
 
+  /* 🔴 分頁也要認過期的回應。searchDocuments() 已經有 searchSeq + abort，
+     loadMore() 原本兩個都沒有 —— 按下「下一頁」之後立刻改條件送出新搜尋，
+     舊的分頁回應會把舊資料接在新結果後面，並且覆蓋掉 total 與 elapsed。
+     同一個 race，之前只修了一半。*/
   async function loadMore() {
     if (loadingMore || items.length >= total) return;
+    const seq = searchSeq.current;
+    const controller = new AbortController();
+    inFlight.current?.abort();
+    inFlight.current = controller;
     setLoadingMore(true);
     setError("");
     try {
@@ -72,7 +80,8 @@ export function DocumentLibraryPage({ dataset }: { dataset: PdDataset }) {
         ...activeSearch.current,
         limit: PAGE_SIZE,
         offset: serverOffset.current,
-      });
+      }, controller.signal);
+      if (seq !== searchSeq.current) return;
       serverOffset.current += result.items.length;
       setItems((current) => {
         const known = new Set(current.map((item) => item.id));
@@ -81,9 +90,10 @@ export function DocumentLibraryPage({ dataset }: { dataset: PdDataset }) {
       setTotal(result.total);
       setElapsed(result.elapsedMs);
     } catch (reason) {
+      if (controller.signal.aborted || seq !== searchSeq.current) return;
       setError(reason instanceof Error ? reason.message : t("err_load_next"));
     } finally {
-      setLoadingMore(false);
+      if (seq === searchSeq.current) setLoadingMore(false);
     }
   }
 
@@ -143,13 +153,13 @@ export function DocumentLibraryPage({ dataset }: { dataset: PdDataset }) {
     <div className="mt-5 flex items-center justify-between text-sm text-slate-500"><span>{loading ? t("lib_searching") : t("lib_shown", { n: items.length, t: total })}</span>{elapsed > 0 && <span>{elapsed} ms</span>}</div>
     {error && <div role="alert" className="mt-4 rounded-xl border border-red-800 bg-red-950/40 p-4 text-sm text-red-300">{error}</div>}
 
-    {!loading && !error && items.length === 0 ? <div className="mt-5"><EmptyState icon={<Search />} title={t("lib_empty_title")} description={t("lib_empty_desc")} /></div> :
+    {!loading && !error && items.length === 0 ? <div className="mt-5"><EmptyState icon={<Search />} title={t("lib_empty_title")} description={`${t("lib_empty_desc")} ${t("lib_empty_hint")}`} /></div> :
       <section className="mt-4 space-y-3" aria-live="polite">{items.map((item) => <Link key={item.id} to={`/documents/${dataset}/${item.id}`} className="block"><Card className="group grid gap-4 p-4 transition hover:border-cyan-700 md:grid-cols-[108px_minmax(0,1fr)_auto] md:items-center">
         <div className="flex h-20 items-center justify-center overflow-hidden rounded-xl border border-slate-700 bg-slate-950/60">
           {item.thumbnailUrl ? <img src={item.thumbnailUrl} alt="" className="h-full w-full object-cover" loading="lazy" /> : item.extension.includes("xls") ? <FileSpreadsheet className="text-emerald-400" /> : item.documentKind === "image" ? <FileImage className="text-cyan-300" /> : <File className="text-slate-500" />}
         </div>
         <div className="min-w-0">
-          <div className="flex flex-wrap items-center gap-2"><Badge tone="accent">{kindLabel(item.documentKind)}</Badge>{item.isReference && <Badge tone="warning">{t("lib_badge_ref")}</Badge>}<span className="text-xs font-bold uppercase text-slate-500">{item.extension}</span></div>
+          <div className="flex flex-wrap items-center gap-2"><Badge tone="accent">{kindLabel(item.documentKind)}</Badge>{item.isReference && <Badge tone="warning">{t("lib_badge_ref")}</Badge>}{!isContentIndexed(item.analysisStatus) && <Badge tone={analysisStatusTone(item.analysisStatus)}>{analysisStatusLabel(item.analysisStatus)}</Badge>}<span className="text-xs font-bold uppercase text-slate-500">{item.extension}</span></div>
           <h2 className="mt-2 truncate text-base font-semibold text-white group-hover:text-cyan-300">{item.title}</h2>
           <p className="mt-1 truncate text-xs text-slate-500">{item.relativePath}</p>
           <p className="mt-2 text-sm text-slate-400">{item.supplierName ? t("lib_supplier_of", { n: item.supplierName }) : item.sourceFactory ? t("lib_source_of", { n: item.sourceFactory }) : item.pathLabels.join(" · ")}</p>

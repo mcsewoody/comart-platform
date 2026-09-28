@@ -53,3 +53,39 @@ export function summaryColumnList(dataset) {
 export function summaryColumns(dataset) {
   return summaryColumnList(dataset).join(",")
 }
+
+/* ── 編輯與刪除要撈的欄位 ───────────────────────────────────
+   兩個端點原本都是 select("*")，把 search_text（分析完成後最多 300 KB）整份
+   撈出來再丟掉。updateDocument 真的需要 extracted_text —— 它要用內文重新拼
+   search_text —— 但不需要舊的 search_text 本身。 */
+
+export const EDIT_COMMON_COLUMNS = [
+  "id",
+  "title",
+  "relative_path",
+  "document_kind",
+  "keywords",
+  "summary_zh_tw",
+  "is_reference",
+  "primary_document_date",
+  "revision_label",
+  "extracted_text",
+]
+
+export function editColumnList(dataset) {
+  return [
+    ...EDIT_COMMON_COLUMNS,
+    ...(dataset === "mfg" ? MFG_ONLY_COLUMNS : BUY_ONLY_COLUMNS),
+  ]
+}
+
+export function editColumns(dataset) {
+  return editColumnList(dataset).join(",")
+}
+
+/** 刪除只需要三個 storage 路徑與兩個稽核欄位。 */
+export const DELETE_COLUMNS = [
+  "id", "relative_path", "sha256", "storage_path", "preview_path", "thumbnail_path",
+]
+
+export const deleteColumns = () => DELETE_COLUMNS.join(",")

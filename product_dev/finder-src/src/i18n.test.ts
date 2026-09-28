@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { DICT, LANGS, t } from "./i18n";
 import {
-  DATE_TYPES, KIND_KEYS, MATCH_KEYS, SKIP_REASONS,
-  dateTypeLabel, kindOptionLabel, kindOptions, skipReasonLabel,
+  ANALYSIS_STATUSES, DATE_TYPES, KIND_KEYS, MATCH_KEYS, SKIP_REASONS,
+  analysisStatusLabel, dateTypeLabel, kindOptionLabel, kindOptions, skipReasonLabel,
 } from "./lib/document-labels";
 import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
@@ -92,6 +92,17 @@ describe("標籤 helper 回傳的是文案，不是 key", () => {
       expect(skipReasonLabel(reason)).not.toMatch(/^sk_/);
       expect(skipReasonLabel(reason).trim()).not.toBe("");
     }
+  });
+
+  it("analysisStatusLabel 五個狀態都翻得出來，而且 failed 不等於 queued", () => {
+    for (const status of ANALYSIS_STATUSES) {
+      expect(analysisStatusLabel(status)).not.toMatch(/^d_idx_/);
+      expect(analysisStatusLabel(status).trim()).not.toBe("");
+    }
+    /* 🔴 2.37 之前 failed 跟 queued 共用「等待內容分析」—— 永遠失敗的文件
+       會永遠顯示「等待中」。這兩個必須不一樣。*/
+    expect(analysisStatusLabel("failed")).not.toBe(analysisStatusLabel("queued"));
+    expect(analysisStatusLabel("processing")).not.toBe(analysisStatusLabel("queued"));
   });
 
   it("dateTypeLabel 六種日期型態都翻得出來，null 有預設文案", () => {

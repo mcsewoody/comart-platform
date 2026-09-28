@@ -2138,7 +2138,7 @@ Portal 入口：APPS 的 `id:'product-dev'`（`roles:[]`，**不限角色，全�
 | 部分 | 路徑 | 版本 | 形態 |
 |---|---|---|---|
 | 工作區首頁（hub） | `product_dev/index.html` | **v2.25** | 單檔，只有入口卡片 |
-| Document Finder | `product_dev/finder/`（產物）← `finder-src/`（原始碼） | **2.36** | **React 19 + TypeScript + Vite + Tailwind 4** |
+| Document Finder | `product_dev/finder/`（產物）← `finder-src/`（原始碼） | **2.37** | **React 19 + TypeScript + Vite + Tailwind 4** |
 | 手機與配件（裝置保管） | `product_dev/devices/index.html` | **v1.11** | 單檔，53KB |
 
 - 🔴 **hub 不再標示另外兩個模組的版本**（v2.20 拿掉）。那是第二份副本，
@@ -2333,7 +2333,7 @@ rsync -a --delete dist/ ../finder/
   （GitHub Pages 直接服務它）。`vite.config.ts` 的 `base` 寫死 `/product_dev/finder/`。
 - **只改 `finder-src/` 而忘記這兩步，線上完全不會變**，而且 git diff 看起來「有改」。
   這是這個子系統最容易踩的坑。
-- 驗證指令：`npm run typecheck` / `npm run lint` / `npm test`（vitest，39 個）。
+- 驗證指令：`npm run typecheck` / `npm run lint` / `npm test`（vitest，40 個）。
 - 🔴 **2.33 之前 `npm run build` 會靜默產出「假資料版」**：`demoMode` 的判定是
   `!supabaseAnonKey && VITE_PLATFORM_MODE !== "true"`，沒帶環境變數就自動成立，
   而 demo 版會發一個假的管理員（canUpload／canSync 全開）進到主畫面 —— 但現存
@@ -2360,6 +2360,55 @@ rsync -a --delete dist/ ../finder/
   `[functions.cpf-ai-worker]` 是整份 config **唯一**的 `verify_jwt = true`，
   所以「全數固化 verify_jwt = false」這句話到現在才真的成立。
   ⚠️ **`finder-worker/cpf_worker/` 這個 Python package 不能刪**（見下方 worker 一節）。
+
+### 🔴 沒有 Docker，所以 migration 只能用文法驗（`scripts/sql-syntax-check.py`）
+
+```bash
+python3 scripts/sql-syntax-check.py    # 需要 pglast（pip3 install pglast）
+```
+
+這台機器沒有 Docker、沒有本機 Postgres，所以 `supabase db push` 是**直接打正式庫**，
+而 `supabase db dump` 根本跑不起來（要 Docker）——「本機先驗一遍」這條路是斷的，
+2.35 的搜尋 500 就是這樣上線再壞掉的。
+
+`pglast` 是 libpg_query 的 binding，**用的就是 PostgreSQL 真正的文法**（不是 regex）。
+🔴 **`$$ … $$` 裡的函式本體要另外驗**：對外層 parser 那只是一個字串常值，
+語法錯誤完全看不出來 —— 而搜尋 RPC 的一百多行邏輯全都在那裡面。
+plpgsql（`begin`／`declare` 開頭）跳過，libpg_query 只認 SQL 文法。
+
+⚠️ **它只驗文法，不驗語意。** 欄位名打錯、型別不合、函式不存在都過得了 ——
+那些仍然要靠 `document-columns.test.mjs` 那種「讀真 schema 來比對」的測試。
+
+### 🔴 搜尋的 trigram 索引曾經整整一個月沒被用到（2.35 修，2.37 才真的修好）
+
+🔴 **2.35 只修對了一半。** 正規化大小寫之後索引仍然 `Unused: true`，
+真正的原因在 WHERE 的形狀，2.37（`202609280004`）才處理：
+
+```sql
+where (iq.q = '' or d.search_text like '%'||iq.q||'%' or d.search_text % iq.q)
+```
+
+`iq.q = ''` 只碰 cross join 的**另一邊**（`input_queries`），不碰 `d`。
+帶著這種 OR，Postgres 沒辦法把任何一條轉成 `d` 上的 index condition。
+**而它是多餘的**：`search_text` 是 `not null`，`q = ''` 時
+`like '%' || '' || '%'` 就是 `like '%%'`，恆為真 —— 刪掉語意完全等價，
+WHERE 變成單一 like 述詞，GIN trgm 才用得到。
+
+**同一支 migration 還拿掉兩件證明無效的東西**：
+
+| 拿掉的 | 為什麼它一定無效 |
+|---|---|
+| `d.search_text % iq.q` | similarity 分支 base_score 最大 `1 × 180 = 180`，門檻 200，`rank_weight` 的 CHECK 是 `<= 1` → 永遠過不了。它讓列通過 WHERE，只為了在下一個 CTE 被丟掉 |
+| `lower(d.extracted_text) like …` | `search_text` **本來就含 `extracted_text`**（worker 的 `path_context`），那是掃一份副本，而且 `extracted_text` 沒索引、每列要再 detoast 一次最多 300 KB |
+
+🔴 **`rank_weight` 全 repo 沒有任何一行寫入，永遠是 default 1。**
+它是預留的降權鉤子（例如壓低 `is_reference` 或舊版本），欄位與乘法留著沒有副作用 ——
+但**要用它得先有寫入路徑，而那會改變排序**，屬產品決策。
+看到評分公式裡有它，不要以為它在做事。
+
+---
+
+（以下是 2.35 當時的紀錄，成因判斷正確但不完整）
 
 ### 🔴 搜尋的 trigram 索引曾經整整一個月沒被用到（2.35 修）
 
@@ -2397,13 +2446,47 @@ rsync -a --delete dist/ ../finder/
 `column pd_mfg_documents.supplier_name does not exist`，**搜尋整個 500、畫面變成
 「已顯示 0／總共 0 份」**，而且是上線之後使用者回報才發現的。
 
-- 欄位清單抽到 `document-columns.js`，`summaryColumns(dataset)` 分資料庫回傳。
+- 欄位清單抽到 `document-columns.js`，`summaryColumns(dataset)` 分資料庫回傳；
+  2.37 另加 `editColumns(dataset)`（`updateDocument` 要 `extracted_text` 重拼 `search_text`，
+  但不要舊的 `search_text`）與 `deleteColumns()`。只有 `document` 端點還用 `select("*")`。
+- 🔴 **那支測試自己有過一個洞**：欄位名的 regex 是 `[a-z_]+`，
+  **讀不到任何含數字的欄位名** —— `sha256` 就是一個，而且它是去重的依據。
+  也就是「拿真 schema 來驗」對那類欄位一直是空轉的（2.37 修，並釘了一條斷言）。
+  **自己寫的檢查工具也要有檢查。**
 - `document-columns.test.mjs` **直接讀 `supabase/migrations/` 的建表與 alter 語句**
   比對，不靠人記得哪張表有哪些欄位。實測把 `supplier_name` 加回共用清單，
   三個斷言會同時紅。
 - 🔴 **edge function 沒辦法在本機跑**（要有效的 `x-session` HMAC），所以這類改動
   唯一的防線就是把邏輯抽成 `.js` 再用 `node --test` 測。
-  跑法：`cd supabase/functions/pd-documents-api && node --test *.test.mjs`（19 個）。
+  跑法：`cd supabase/functions/pd-documents-api && node --test *.test.mjs`（21 個）。
+
+### 🔴 `deleteDocument` 先刪檔案、後刪資料列（2.37 反過來）
+
+原本的順序是 storage 三個 bucket → `pd_document_edits` → 資料列。
+**中間失敗的後果是「資料列還在、檔案沒了」** —— 文件照樣出現在搜尋結果裡，
+點進去才壞，而且沒有任何人會發現。
+反過來（先資料列、後檔案）失敗只會在 storage 留下孤兒 bytes：
+看不見、可事後清、不會騙人。回應帶 `orphanedStoragePaths` 讓呼叫端知道。
+
+**`pd_transfer_audit` 的舊紀錄不再被刪掉。** 原本會整批 `delete` 再補一筆 `delete`
+—— 會被刪掉的稽核紀錄不是稽核紀錄，而「誰在什麼時候下載過這份圖」正是
+刪檔之後最需要查的東西。那張表沒有 FK 到文件，所以文件刪掉之後紀錄仍然留著（刻意的）。
+（`pd_*_jobs` 有 `on delete cascade`，不必手動清。）
+
+### ⚠️ `bootstrap` 只回 `profile`，不要把 counts／suppliers 加回去
+
+2.37 之前它還回 `counts` 與 `suppliers`，而**前端一個都沒讀過**
+（`api.ts` 連 bootstrap 方法都沒有，`AuthProvider` 只取 `profile`）——
+代價是每一次開頁多兩個 `count(*)` 加一次 `pd_buy_documents` 全表
+`select("supplier_name")`。而且那份清單就算有人要用也是壞的：
+沒帶 `range`，**Supabase 預設 1000 列會靜默截斷**，供應商會少。
+真的需要供應商下拉時另開一支 distinct 的 RPC。
+
+### 簽章網址的 TTL 分兩級（`SIGN_TTL_LIST` 900／`SIGN_TTL_FILE` 3600）
+
+300 秒對「列表縮圖」夠用（圖片馬上就載完了），對另外兩個場景不夠：
+詳情頁開著讀完一份規格書再按下載很容易超過 5 分鐘；
+`syncUrls` 一次發 50 個來源檔的網址，單檔上限 50 MB，五分鐘下載不完。
 
 ### 🔴 AI 佇列狀態原本每 15 秒打 10 個 count(*)（2.35 修）
 

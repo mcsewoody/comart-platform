@@ -1615,6 +1615,23 @@ admin 從 v2.37 就有紅色橫幅與 `SB.write()`，所以過期**不會產生�
 | 意見徵集 | `pm*`（同一套） | 同上三張表（`kind='collect'`） |
 | 投票 | `pl*` | `poll_sessions`、`poll_options`、`poll_votes`、`poll_comments` |
 
+**Woody 週報的 2021–2022 歷史資料是補匯入的**（`supabase/migrations/202609280001_import_woody_reports_2021_2022.sql`，
+2026-09-28）。原本平台最早只有 2023-01-01，但 Gmail 寄件備份裡還有 **62 篇**，最早到 2021-09-12。匯入時踩到三件事，
+之後若要再補（例如另一位主管的週報）會遇到同樣的：
+
+- 🔴 **日期要取信件內文的報告日，不是寄出日**。有 11 篇是前一晚寄的（2021-11-19 21:05 寄出、內文寫 `2021.11.20`），
+  用寄出日會整批錯開一天，而 `report_date` 是列表排序與去重的依據。
+- 🔴 **每封信在信箱裡都有兩份**：同一時間戳、兩個 thread id，因為 `woody.comart@gmail.com` 同時收
+  `woody@comart.com.tw` 與 `woody@peripower.com` 兩條路徑。不去重會變成 124 筆。
+  但**少數是刻意重寄**（先寄 `comart@`，再補寄 `taiwan@`），只看時間戳會誤殺，要看收件人。
+- 🔴 **信末的「願景／使命／價值觀」與「知識學習平台」清單不能匯入**：那是 `WR_OKR`／`WR_LEARN` 兩個常數，
+  `wrReportInnerHTML()` 每次都會自己接在後面，存進 `other` 會變成畫面上出現兩份。
+
+寫入路徑是 `supabase db push`（CLI 對 `tcvlnpgpuphdalzvmoyo` 是通的），不是 `sb-proxy` —— 前端那條要有效的
+HMAC `x-session`，本機偽造不了。反過來說 **`db dump` 需要 Docker，所以本機讀不到既有資料**，
+INSERT 一律寫成 `where not exists (select 1 … where report_date = …)`，id 由日期雜湊產生（非隨機），
+重跑這支 migration 不會產生第二筆。
+
 **事前驗屍 Premortem**（Gary Klein 方法，v1.21 起分階段開發，v1.46 完成）：
 - 階段機（`PM_PHASES`）：`intro` 說明 → `setup` 情境設定 → `writing` 開放填寫 →
   `reveal` 揭露 → `ranking` 排序分類 → `mitigation` 對策 → `locked` 定稿

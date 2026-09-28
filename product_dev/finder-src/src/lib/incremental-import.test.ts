@@ -1,13 +1,14 @@
 import { describe, expect, it } from "vitest";
 import {
+  compareSyncManifest,
   dedupeByDatasetHash,
   isSignedTusAuthError,
   isTransientUploadStatus,
+  mergeManifest,
   quickUploadRelativePath,
   reusableManifestHash,
   selectIncrementalBatch,
   shouldUseResumableUpload,
-  compareSyncManifest,
 } from "./incremental-import";
 
 function item(dataset: "mfg" | "buy", index: number, sha256 = `${index}`.padStart(64, "0")) {
@@ -101,5 +102,35 @@ describe("incremental import", () => {
     expect(result.current).toBe(1);
     expect(result.conflicts.map((item) => item.id)).toEqual(["2"]);
     expect(result.serverOnly.map((item) => item.id)).toEqual(["3"]);
+  });
+});
+
+describe("mergeManifest", () => {
+  const entry = (sha: string) => ({ byteSize: 1, lastModified: 1, sha256: sha });
+
+  it("保留這次沒掃到的舊指紋 —— 掃子資料夾不該把其他資料夾的快取清掉", () => {
+    const merged = mergeManifest(
+      { "mfg:A.pdf": entry("a"), "mfg:B.pdf": entry("b") },
+      { "mfg:B.pdf": entry("b2"), "mfg:C.pdf": entry("c") },
+    );
+    expect(Object.keys(merged).sort()).toEqual(["mfg:A.pdf", "mfg:B.pdf", "mfg:C.pdf"]);
+    expect(merged["mfg:A.pdf"].sha256).toBe("a");
+    // 這次掃到的以新的為準
+    expect(merged["mfg:B.pdf"].sha256).toBe("b2");
+  });
+
+  it("超過上限時從最舊的砍起，這次掃到的一定留著", () => {
+    const previous = Object.fromEntries(
+      Array.from({ length: 5 }, (_, i) => [`old${i}`, entry(`o${i}`)]),
+    );
+    const scanned = { new0: entry("n0"), new1: entry("n1") };
+    const merged = mergeManifest(previous, scanned, 3);
+
+    expect(Object.keys(merged)).toEqual(["old4", "new0", "new1"]);
+  });
+
+  it("上限剛好時不淘汰任何東西", () => {
+    const merged = mergeManifest({ a: entry("a") }, { b: entry("b") }, 2);
+    expect(Object.keys(merged)).toEqual(["a", "b"]);
   });
 });

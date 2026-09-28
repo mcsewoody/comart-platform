@@ -1,22 +1,20 @@
-import { BrainCircuit, CheckCircle2, Download, Factory, FolderOpen, LoaderCircle, Play, RefreshCw, ShieldCheck, ShoppingBag, UploadCloud, Zap } from "lucide-react";
+import { BrainCircuit, CheckCircle2, CircleStop, Download, Factory, FolderOpen, LoaderCircle, Play, RefreshCw, ShieldCheck, ShoppingBag, UploadCloud, Zap } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { Upload } from "tus-js-client";
 import { useAuth } from "../auth/AuthProvider";
 import { Badge, Button, Card, PageHeader } from "../components/ui";
-import { api } from "../lib/api";
-import { appConfig } from "../lib/config";
+import { SessionExpiredError, api } from "../lib/api";
+import { tag, uploadOne, type ImportFile, type StatusTag } from "../lib/upload-one";
+import { formatBytes } from "../lib/utils";
 import {
   dedupeByDatasetHash,
   compareSyncManifest,
   importFileKey,
-  isSignedTusAuthError,
-  isTransientUploadStatus,
   manifestFileKey,
+  mergeManifest,
   quickUploadRelativePath,
   reusableManifestHash,
   selectIncrementalBatch,
-  shouldUseResumableUpload,
   type ImportManifestEntry,
 } from "../lib/incremental-import";
 import {
@@ -29,15 +27,7 @@ import {
   type StoredDirectoryHandle,
 } from "../lib/directory-access";
 import type { PdAnalysisLibraryStatus, PdAnalysisQueueStatus, PdDataset, PdSyncDocument, PdUploader } from "../lib/types";
-import { t as tr, useT } from "../i18n";
-
-type ImportFile = {
-  file: File;
-  dataset: PdDataset;
-  relativePath: string;
-  sha256: string;
-  status: string;
-};
+import { useT } from "../i18n";
 
 type Inventory = {
   total: number;
@@ -86,6 +76,7 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
   const { profile } = useAuth();
   const inputRef = useRef<HTMLInputElement>(null);
   const quickInputRef = useRef<HTMLInputElement>(null);
+  const abortRef = useRef<AbortController | null>(null);
   const [files, setFiles] = useState<ImportFile[]>([]);
   const [pendingFiles, setPendingFiles] = useState<ImportFile[]>([]);
   const [inventory, setInventory] = useState<Inventory | null>(null);
@@ -94,7 +85,7 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
   const [message, setMessage] = useState("");
   const [quickDataset, setQuickDataset] = useState<PdDataset>("mfg");
   const [quickFiles, setQuickFiles] = useState<File[]>([]);
-  const [quickStatuses, setQuickStatuses] = useState<string[]>([]);
+  const [quickStatuses, setQuickStatuses] = useState<StatusTag[]>([]);
   const [quickRunning, setQuickRunning] = useState(false);
   const [quickMessage, setQuickMessage] = useState("");
   const [quickDragActive, setQuickDragActive] = useState(false);
@@ -158,7 +149,7 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
         return [];
       }
       if (!dataset) return [];
-      return [{ file, dataset, relativePath, sha256: "", status: tr("u_st_pending") } satisfies ImportFile];
+      return [{ file, dataset, relativePath, sha256: "", status: tag("u_st_pending") } satisfies ImportFile];
     }).sort((a, b) => a.relativePath.localeCompare(b.relativePath));
 
     try {
@@ -181,7 +172,7 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
         };
         setProgress(Math.round(((index + 1) / Math.max(candidates.length, 1)) * 75));
       }
-      saveManifest(nextManifest);
+      saveManifest(mergeManifest(manifest, nextManifest));
 
       const deduped = dedupeByDatasetHash(hashed);
       setLocalFiles(deduped.unique);
@@ -280,34 +271,59 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
     }
   }
 
+  /* 🔴 批次上傳要能被「叫停」，而且要分得出「這個檔壞掉」跟「整條線斷了」。
+
+     舊版是一個跑完 200 次、沒有出口的 for-await：session 中途過期的話，剩下
+     197 個檔會各自送一次注定失敗的請求、各留一行錯誤，十幾分鐘的進度就沒了。
+     現在兩個出口：
+       a. SessionExpiredError → 立刻停，並告訴使用者停在第幾個檔
+       b. 使用者按「停止」→ AbortController 同時中斷 in-flight 的請求
+     兩種情況都保留 processed，所以「下一批」接得下去，不會重做已完成的。 */
   async function upload() {
     if (!files.length || phase !== "ready") return;
+    const controller = new AbortController();
+    abortRef.current = controller;
     setPhase("uploading");
     setProgress(0);
     let completed = 0;
     let duplicates = 0;
     let failed = 0;
+    let stoppedAt = -1;
+    let sessionLost = false;
     const processed = new Set<string>();
 
     for (let index = 0; index < files.length; index += 1) {
+      if (controller.signal.aborted) { stoppedAt = index; break; }
       const item = files[index];
-      updateStatus(index, t("u_st_preparing"));
+      updateStatus(index, tag("u_st_preparing"));
       try {
-        const outcome = await uploadOne(item, (status) => updateStatus(index, status));
+        const outcome = await uploadOne(item, (status) => updateStatus(index, status), controller.signal);
         processed.add(importFileKey(item));
         if (outcome === "duplicate") {
           duplicates += 1;
-          updateStatus(index, t("u_st_duplicate"));
+          updateStatus(index, tag("u_st_duplicate"));
         } else {
           completed += 1;
         }
       } catch (reason) {
+        if (reason instanceof SessionExpiredError) {
+          sessionLost = true;
+          stoppedAt = index;
+          updateStatus(index, tag("u_st_cancelled"));
+          break;
+        }
+        if (controller.signal.aborted) {
+          stoppedAt = index;
+          updateStatus(index, tag("u_st_cancelled"));
+          break;
+        }
         failed += 1;
-        updateStatus(index, t("u_st_failed", { m: reason instanceof Error ? reason.message : t("u_unknown_err") }));
+        updateStatus(index, tag("u_st_failed", { m: reason instanceof Error ? reason.message : t("u_unknown_err") }));
       }
       setProgress(Math.round(((index + 1) / files.length) * 100));
     }
 
+    abortRef.current = null;
     const remaining = pendingFiles.filter((item) => !processed.has(importFileKey(item)));
     setPendingFiles(remaining);
     setInventory((current) => current ? {
@@ -315,8 +331,21 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
       indexed: current.indexed + processed.size,
       pending: remaining.length,
     } : current);
-    setMessage(t("u_batch_done", { a: completed, d: duplicates, f: failed, r: remaining.length }));
+    if (sessionLost) {
+      setMessage(t("u_session_expired", { i: stoppedAt + 1 }));
+    } else if (stoppedAt >= 0) {
+      setMessage(t("u_cancelled", {
+        a: completed, d: duplicates, f: failed,
+        r: remaining.length + (files.length - stoppedAt),
+      }));
+    } else {
+      setMessage(t("u_batch_done", { a: completed, d: duplicates, f: failed, r: remaining.length }));
+    }
     setPhase("finished");
+  }
+
+  function stopUpload() {
+    abortRef.current?.abort();
   }
 
   function chooseQuick(selected: FileList | File[] | null) {
@@ -336,7 +365,7 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
       return;
     }
     setQuickFiles([file]);
-    setQuickStatuses([t("u_st_pending")]);
+    setQuickStatuses([tag("u_st_pending")]);
     setQuickMessage(t("u_q_selected"));
   }
 
@@ -349,33 +378,43 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
       return;
     }
 
+    const controller = new AbortController();
+    abortRef.current = controller;
     setQuickRunning(true);
     let completed = 0;
     let duplicates = 0;
     let failed = 0;
     for (let index = 0; index < quickFiles.length; index += 1) {
       const file = quickFiles[index];
-      updateQuickStatus(index, t("u_st_hashing"));
+      updateQuickStatus(index, tag("u_st_hashing"));
       try {
         const item: ImportFile = {
           file,
           dataset: quickDataset,
           relativePath: quickUploadRelativePath(quickDataset, "", file.name),
           sha256: await hashFile(file),
-          status: t("u_st_preparing"),
+          status: tag("u_st_preparing"),
         };
-        const outcome = await uploadOne(item, (status) => updateQuickStatus(index, status));
+        const outcome = await uploadOne(item, (status) => updateQuickStatus(index, status), controller.signal);
         if (outcome === "duplicate") {
           duplicates += 1;
-          updateQuickStatus(index, t("u_st_duplicate"));
+          updateQuickStatus(index, tag("u_st_duplicate"));
         } else {
           completed += 1;
         }
       } catch (reason) {
+        if (reason instanceof SessionExpiredError) {
+          updateQuickStatus(index, tag("u_st_cancelled"));
+          setQuickMessage(t("u_session_expired", { i: index + 1 }));
+          abortRef.current = null;
+          setQuickRunning(false);
+          return;
+        }
         failed += 1;
-        updateQuickStatus(index, t("u_st_failed", { m: reason instanceof Error ? reason.message : t("u_unknown_err") }));
+        updateQuickStatus(index, tag("u_st_failed", { m: reason instanceof Error ? reason.message : t("u_unknown_err") }));
       }
     }
+    abortRef.current = null;
     setQuickMessage(t("u_q_done", { a: completed, d: duplicates, f: failed }));
     if (failed === 0) {
       setQuickFiles([]);
@@ -400,7 +439,7 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
     }
   }
 
-  function updateQuickStatus(index: number, status: string) {
+  function updateQuickStatus(index: number, status: StatusTag) {
     setQuickStatuses((current) => current.map((item, itemIndex) => itemIndex === index ? status : item));
   }
 
@@ -433,7 +472,7 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
     URL.revokeObjectURL(url);
   }
 
-  function updateStatus(index: number, status: string) {
+  function updateStatus(index: number, status: StatusTag) {
     setFiles((current) => current.map((item, itemIndex) => itemIndex === index ? { ...item, status } : item));
   }
 
@@ -487,7 +526,7 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
           <div>
             <p className="text-sm font-semibold text-slate-200">{t("u_skipped_n", { n: inventory.skipped.length })}</p>
             <div className="mt-2 flex flex-wrap gap-2">
-              {skipReasonSummary(inventory.skipped).map(([reason, count]) => <Badge key={reason}>{SKIP_REASON_LABELS[reason]} {count}</Badge>)}
+              {skipReasonSummary(inventory.skipped).map(([reason, count]) => <Badge key={reason}>{t(SKIP_REASON_LABELS[reason])} {count}</Badge>)}
             </div>
           </div>
           <Button variant="ghost" onClick={downloadSkippedReport}><Download size={17} />{t("u_dl_skipped")}</Button>
@@ -505,7 +544,7 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
           {files.map((item) => <div key={`${item.dataset}-${item.sha256}`} className="grid gap-2 border-b border-slate-800 px-4 py-3 text-sm last:border-0 md:grid-cols-[90px_minmax(0,1fr)_190px]">
             <span className={item.dataset === "mfg" ? "text-cyan-300" : "text-amber-300"}>{item.dataset === "mfg" ? t("u_mfg") : t("u_buy")}</span>
             <span className="truncate text-slate-200" title={item.relativePath}>{item.relativePath}</span>
-            <span className="text-xs text-slate-500">{item.status}</span>
+            <span className="text-xs text-slate-500">{t(item.status.key, item.status.params)}</span>
           </div>)}
         </div>
       </>}
@@ -515,12 +554,14 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
           <div className="h-2 overflow-hidden rounded-full bg-slate-800"><div className="h-full rounded-full bg-cyan-400 transition-all" style={{ width: `${progress}%` }} /></div>
           {message && <p role="status" className="mt-2 text-sm leading-6 text-slate-400">{message}</p>}
         </div>
-        {phase === "finished" && pendingFiles.length > 0 ? (
+        {phase === "uploading" ? (
+          <Button variant="secondary" onClick={stopUpload}><CircleStop size={18} />{t("u_cancel")}</Button>
+        ) : phase === "finished" && pendingFiles.length > 0 ? (
           <Button onClick={prepareNext}><RefreshCw size={18} />{t("u_next_batch")}</Button>
         ) : (
           <Button disabled={!files.length || phase !== "ready"} onClick={() => void upload()}>
-            {phase === "uploading" ? <LoaderCircle className="animate-spin" size={18} /> : phase === "finished" ? <CheckCircle2 size={18} /> : <UploadCloud size={18} />}
-            {phase === "idle" ? t("u_pick_dir_first") : phase === "inventory" ? t("u_inv_pct", { p: progress }) : phase === "uploading" ? t("u_imp_pct", { p: progress }) : phase === "finished" ? t("u_all_imported") : t("u_import_n", { n: files.length })}
+            {phase === "inventory" ? <LoaderCircle className="animate-spin" size={18} /> : phase === "finished" ? <CheckCircle2 size={18} /> : <UploadCloud size={18} />}
+            {phase === "idle" ? t("u_pick_dir_first") : phase === "inventory" ? t("u_inv_pct", { p: progress }) : phase === "finished" ? t("u_all_imported") : t("u_import_n", { n: files.length })}
           </Button>
         )}
       </div>
@@ -553,7 +594,7 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
         {quickFiles.map((file, index) => <div key={`${file.name}-${file.size}-${file.lastModified}`} className="grid gap-2 border-b border-slate-800 px-4 py-3 text-sm last:border-0 md:grid-cols-[minmax(0,1fr)_120px_190px]">
           <span className="truncate text-slate-200" title={file.name}>{file.name}</span>
           <span className="text-xs text-slate-500">{formatBytes(file.size)}</span>
-          <span className="text-xs text-slate-500">{quickStatuses[index]}</span>
+          <span className="text-xs text-slate-500">{quickStatuses[index] && t(quickStatuses[index].key, quickStatuses[index].params)}</span>
         </div>)}
       </div>}
 
@@ -794,134 +835,8 @@ function Metric({ label, value, tone = "slate" }: { label: string; value: number
   return <div className={`rounded-xl border p-4 ${colors[tone]}`}><p className="text-xs font-semibold text-slate-500">{label}</p><p className="mt-1 text-[16px] font-semibold tabular-nums">{value}</p></div>;
 }
 
-async function uploadOne(item: ImportFile, onStatus: (status: string) => void): Promise<"completed" | "duplicate"> {
-  let storagePath: string | null = null;
-  let lastError: Error | null = null;
-
-  for (let attempt = 1; attempt <= 3; attempt += 1) {
-    const init = await api.initPdUpload({
-      dataset: item.dataset,
-      relativePath: item.relativePath,
-      byteSize: item.file.size,
-      sha256: item.sha256,
-    });
-    if (init.duplicate) return "duplicate";
-    if (!init.storagePath) throw new Error(tr("u_e_no_path"));
-    storagePath = init.storagePath;
-
-    if (init.storageExists) {
-      onStatus(tr("u_st_exists"));
-      break;
-    }
-    if (!init.signedUrl) throw new Error(tr("u_e_no_url"));
-
-    if (shouldUseResumableUpload(item.file.size)) {
-      if (!init.signedToken) throw new Error(tr("u_e_no_token"));
-      onStatus(tr("u_st_big_prep"));
-      try {
-        await uploadResumable(item, storagePath, init.signedToken, onStatus);
-        break;
-      } catch (error) {
-        if (!isSignedTusAuthError(error)) throw error;
-        onStatus(tr("u_st_big_fallback"));
-      }
-    }
-
-    const form = new FormData();
-    form.append("cacheControl", "3600");
-    form.append("", item.file);
-    onStatus(attempt === 1 ? tr("u_st_uploading") : tr("u_st_retry", { n: attempt }));
-
-    let response: Response;
-    try {
-      response = await fetch(init.signedUrl, {
-        method: "PUT",
-        headers: { "x-upsert": "false" },
-        body: form,
-      });
-    } catch (error) {
-      lastError = error instanceof Error ? error : new Error(tr("u_e_storage"));
-      if (attempt === 3) throw lastError;
-      onStatus(tr("u_st_conn_retry", { n: attempt + 1 }));
-      await delay(700 * attempt);
-      continue;
-    }
-
-    const responseText = response.ok ? "" : await response.text();
-    if (response.ok || /resource already exists/i.test(responseText)) break;
-
-    lastError = storageUploadError(item.file, response.status, responseText);
-    if (!isTransientUploadStatus(response.status) || attempt === 3) throw lastError;
-
-    onStatus(tr("u_st_tmp_retry", { n: attempt + 1 }));
-    await delay(700 * attempt);
-  }
-
-  if (!storagePath) throw lastError || new Error(tr("u_e_storage"));
-
-  const result = await api.completePdUpload({
-    dataset: item.dataset,
-    relativePath: item.relativePath,
-    byteSize: item.file.size,
-    mimeType: item.file.type || "application/octet-stream",
-    sha256: item.sha256,
-    storagePath,
-    lastModified: item.file.lastModified,
-  });
-  if (result.duplicate) return "duplicate";
-  onStatus(result.analysisStatus === "metadata_only" ? tr("u_st_meta_idx") : tr("u_st_doc_idx"));
-  return "completed";
-}
-
-function uploadResumable(
-  item: ImportFile,
-  storagePath: string,
-  signedToken: string,
-  onStatus: (status: string) => void,
-) {
-  const projectId = new URL(appConfig.supabaseUrl).hostname.split(".")[0];
-  const bucketName = item.dataset === "mfg" ? "pd_mfg_source" : "pd_buy_source";
-
-  return new Promise<void>((resolve, reject) => {
-    const upload = new Upload(item.file, {
-      endpoint: `https://${projectId}.storage.supabase.co/storage/v1/upload/resumable`,
-      retryDelays: [0, 3000, 5000, 10000, 20000],
-      headers: {
-        "x-signature": signedToken,
-        "x-upsert": "false",
-      },
-      uploadDataDuringCreation: true,
-      removeFingerprintOnSuccess: true,
-      metadata: {
-        bucketName,
-        objectName: storagePath,
-        contentType: item.file.type || "application/octet-stream",
-        cacheControl: "3600",
-      },
-      chunkSize: 6 * 1024 * 1024,
-      onError: (error) => reject(error),
-      onProgress: (uploaded, total) => {
-        const percentage = total > 0 ? Math.floor((uploaded / total) * 100) : 0;
-        onStatus(tr("u_st_big_pct", { p: percentage }));
-      },
-      onSuccess: () => resolve(),
-    });
-
-    upload.findPreviousUploads()
-      .then((previousUploads) => {
-        if (previousUploads.length > 0) upload.resumeFromPreviousUpload(previousUploads[0]);
-        upload.start();
-      })
-      .catch(reject);
-  });
-}
-
-function delay(milliseconds: number) {
-  return new Promise((resolve) => window.setTimeout(resolve, milliseconds));
-}
-
 function prepareBatch(files: ImportFile[]) {
-  return selectIncrementalBatch(files, BATCH_SIZE).map((item) => ({ ...item, status: tr("u_st_pending") }));
+  return selectIncrementalBatch(files, BATCH_SIZE).map((item) => ({ ...item, status: tag("u_st_pending") }));
 }
 
 async function findExistingHashes(files: ImportFile[], onProgress: (checked: number, total: number) => void) {
@@ -985,32 +900,9 @@ function skipReasonSummary(files: SkippedFile[]) {
   return [...counts.entries()];
 }
 
-function storageUploadError(file: File, status: number, responseText: string) {
-  const detail = storageErrorDetail(responseText);
-  if (status === 413 || /EntityTooLarge|maximum allowed size|exceeded.*size/i.test(responseText)) {
-    return new Error(tr("u_e_too_big", { s: formatBytes(file.size) }));
-  }
-  return new Error(tr("u_e_storage_s", { s: status, d: detail ? `：${detail}` : "" }));
-}
-
-function storageErrorDetail(responseText: string) {
-  let value: unknown = responseText;
-  for (let depth = 0; depth < 3; depth += 1) {
-    if (typeof value !== "string") break;
-    try { value = JSON.parse(value); } catch { break; }
-  }
-  if (value && typeof value === "object") {
-    const record = value as Record<string, unknown>;
-    const message = record.message || record.error || record.code;
-    if (typeof message === "string") return message.slice(0, 240);
-  }
-  return typeof value === "string" ? value.replace(/\s+/g, " ").slice(0, 240) : "";
-}
-
 function csvCell(value: string) {
   return `"${value.replaceAll('"', '""')}"`;
 }
 
 function ext(name: string) { return name.toLowerCase().split(".").pop() || ""; }
 async function hashFile(file: File) { const digest = await crypto.subtle.digest("SHA-256", await file.arrayBuffer()); return Array.from(new Uint8Array(digest)).map((value) => value.toString(16).padStart(2, "0")).join(""); }
-function formatBytes(value: number) { return value < 1024 * 1024 ? `${Math.max(1, Math.round(value / 1024))} KB` : `${(value / 1024 / 1024).toFixed(1)} MB`; }

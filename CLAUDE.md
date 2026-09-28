@@ -2307,7 +2307,7 @@ v2.27 統一了**顏色**，但使用者仍然說「UI 風格與原本大不同�
 
 ```bash
 cd product_dev/finder-src
-npm run build:platform          # 帶 VITE_PLATFORM_MODE 與 Supabase URL
+npm run build                   # 2.33 起不需要任何環境變數
 rsync -a --delete dist/ ../finder/
 ```
 
@@ -2315,7 +2315,14 @@ rsync -a --delete dist/ ../finder/
   （GitHub Pages 直接服務它）。`vite.config.ts` 的 `base` 寫死 `/product_dev/finder/`。
 - **只改 `finder-src/` 而忘記這兩步，線上完全不會變**，而且 git diff 看起來「有改」。
   這是這個子系統最容易踩的坑。
-- 驗證指令：`npm run typecheck` / `npm run lint` / `npm test`（vitest）。
+- 驗證指令：`npm run typecheck` / `npm run lint` / `npm test`（vitest，30 個）。
+- 🔴 **2.33 之前 `npm run build` 會靜默產出「假資料版」**：`demoMode` 的判定是
+  `!supabaseAnonKey && VITE_PLATFORM_MODE !== "true"`，沒帶環境變數就自動成立，
+  而 demo 版會發一個假的管理員（canUpload／canSync 全開）進到主畫面 —— 但現存
+  每一頁用到的 API 都沒有 demo 分支，所以只是一個「看起來已登入、每頁都丟登入
+  失效」的殼，rsync 上線也沒有任何提示。**demo 模式已整個移除**，`build:platform`
+  留成 `npm run build` 的別名。`vite.config.ts` 會擋下 `VITE_DEMO_MODE` /
+  `VITE_PLATFORM_MODE` / `VITE_SUPABASE_ANON_KEY`，照舊指令打會直接 build 失敗。
 
 ### 資料層：17 張 `pd_*` 表，`cpf_*` 已全數移除
 
@@ -2380,7 +2387,7 @@ rsync -a --delete dist/ ../finder/
 
 **形態不變** —— React + TypeScript + Vite 留著，**不要改寫成單一 HTML 檔**。
 理由是實測出來的：`npm run typecheck` 乾淨、`npm test` 17 個全過、
-`npm run build:platform` 重建的產物與版控裡的 `finder/` **位元組完全相同**，
+`npm run build` 重建的產物與版控裡的 `finder/` **位元組完全相同**，
 而且它用的就是平台自己的 `comart-portal-session` ＋ `x-session`，
 `getPlatformSession()` 每次呼叫都檢查 `expires`、`platformCall()` 對任何非 2xx
 都丟出帶訊息的例外 —— **2026-09-25~26 在另外五個系統補的那一套，它本來就有**。

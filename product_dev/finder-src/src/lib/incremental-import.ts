@@ -1,3 +1,4 @@
+import { t } from "../i18n";
 import type { PdDataset } from "./types";
 
 export type IncrementalFile = {
@@ -55,6 +56,34 @@ export function selectIncrementalBatch<T extends IncrementalFile>(files: T[], li
   return selected.slice(0, limit);
 }
 
+/* ═══════════════════════════════════════════════════════════
+   🔴 掃描指紋快取要「合併」不是「覆寫」。
+
+   舊版在 IncrementalUploadPage 直接 saveManifest(nextManifest)，而 nextManifest
+   只裝這一次掃到的檔 —— 掃了子資料夾 A，整個 B 的快取就沒了，下次掃 B 又要
+   重算全部 sha256（hashFile 是讀整個檔，50 MB 上限、幾千個檔）。
+
+   但單純合併會無上限長大，localStorage 滿了之後 saveManifest 把 QuotaExceeded
+   整個吞掉，就變成「每次全部重算」而且沒有任何訊號。所以合併 + 上限淘汰：
+   物件的字串 key 保持插入順序，把這次掃到的排到最後，超過上限就從最舊的砍。
+   ═══════════════════════════════════════════════════════════ */
+export const MANIFEST_MAX_ENTRIES = 8000;
+
+export function mergeManifest(
+  previous: Record<string, ImportManifestEntry>,
+  scanned: Record<string, ImportManifestEntry>,
+  max = MANIFEST_MAX_ENTRIES,
+): Record<string, ImportManifestEntry> {
+  const ordered = [
+    ...Object.keys(previous).filter((key) => !(key in scanned)),
+    ...Object.keys(scanned),
+  ];
+  const kept = ordered.length > max ? ordered.slice(ordered.length - max) : ordered;
+  const merged: Record<string, ImportManifestEntry> = {};
+  for (const key of kept) merged[key] = scanned[key] ?? previous[key];
+  return merged;
+}
+
 export function importFileKey(file: Pick<IncrementalFile, "dataset" | "sha256">) {
   return `${file.dataset}:${file.sha256}`;
 }
@@ -84,10 +113,10 @@ export function isSignedTusAuthError(error: unknown) {
 export function quickUploadRelativePath(dataset: PdDataset, subpath: string, fileName: string) {
   const parts = subpath.replaceAll("\\", "/").split("/").map((part) => part.trim()).filter(Boolean);
   if (parts.some((part) => part === "." || part === ".." || part.includes("\0"))) {
-    throw new Error("分類路徑無效");
+    throw new Error(t("e_bad_subpath"));
   }
   const safeName = fileName.replaceAll("\\", "/").split("/").at(-1)?.trim() || "";
-  if (!safeName || safeName === "." || safeName === "..") throw new Error("檔名無效");
+  if (!safeName || safeName === "." || safeName === "..") throw new Error(t("e_bad_filename"));
   const library = dataset === "mfg" ? "OwnProduct" : "Outsourcing";
   return parts.length ? `${library}/${parts.join("/")}/${safeName}` : `${library}/${safeName}`;
 }

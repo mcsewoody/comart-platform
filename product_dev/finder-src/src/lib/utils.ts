@@ -1,9 +1,5 @@
 import { clsx, type ClassValue } from "clsx";
-import type {
-  ConfirmationStatus,
-  ProcessingStatus,
-  Sensitivity,
-} from "./types";
+import type { ConfirmationStatus } from "./types";
 
 export function cn(...values: ClassValue[]) {
   return clsx(values);
@@ -19,13 +15,6 @@ export function formatBytes(bytes: number) {
   return `${(bytes / 1024 ** order).toFixed(order === 0 ? 0 : 1)} ${units[order]}`;
 }
 
-export function formatDate(value: string) {
-  return new Intl.DateTimeFormat("zh-TW", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(new Date(value));
-}
 
 /* 🔴 存 key 不存文案：這個物件在模組載入時求值一次，存死字串切語言換不掉。
    呼叫端（components/ui.tsx）用 t() 取值。*/
@@ -34,19 +23,4 @@ export const confirmationLabelKeys: Record<ConfirmationStatus, string> = {
   ai_high_confidence: "cf_ai_high_confidence",
   needs_review: "cf_needs_review",
   conflict: "cf_conflict",
-};
-
-export const processingLabels: Record<ProcessingStatus, string> = {
-  queued: "排隊",
-  converting: "轉檔",
-  analyzing: "AI 分析",
-  needs_review: "待審核",
-  completed: "完成",
-  failed: "失敗",
-};
-
-export const sensitivityLabels: Record<Sensitivity, string> = {
-  general: "一般",
-  commercial: "商業敏感",
-  highly_confidential: "高度機密",
 };

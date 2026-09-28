@@ -63,9 +63,14 @@ npm run dev
 正式 Platform 建置：
 
 ```bash
-npm run build:platform
+npm run build
 rsync -a --delete dist/ ../finder/
 ```
+
+2.33 起不需要任何環境變數 —— demo 模式已移除，build 一律連 platform。
+（`build:platform` 保留為 `npm run build` 的別名。若指令裡還帶著
+`VITE_DEMO_MODE` / `VITE_PLATFORM_MODE` / `VITE_SUPABASE_ANON_KEY`，
+build 會直接失敗並提示拿掉。）
 
 一般 `npm run dev` 未帶 Platform session 時會顯示返回 Platform 的單一登入提示。
 

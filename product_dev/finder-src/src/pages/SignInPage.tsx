@@ -33,7 +33,7 @@ const COMART_MARK = (
 
 export function SignInPage() {
   const t = useT();
-  const { signIn, demoMode } = useAuth();
+  const { signIn } = useAuth();
   const [status, setStatus] = useState<"idle" | "sending">("idle");
   const [error, setError] = useState("");
 
@@ -41,7 +41,7 @@ export function SignInPage() {
     setError("");
     setStatus("sending");
     try {
-      await signIn("");
+      await signIn();
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : t("si_login_failed"));
       setStatus("idle");
@@ -92,12 +92,6 @@ export function SignInPage() {
         >
           {status === "sending" ? t("si_returning") : t("si_return")}
         </Button>
-
-        {demoMode && (
-          <div className="mt-5 rounded-xl border border-amber-500/40 bg-amber-500/10 px-3 py-2.5 text-[12px] leading-5 text-amber-300">
-            {t("si_demo")}
-          </div>
-        )}
 
         <p className="mt-7 text-center text-[11px] text-slate-500">
           {t("si_internal")}

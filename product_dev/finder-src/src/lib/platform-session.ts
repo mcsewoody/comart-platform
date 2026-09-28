@@ -58,6 +58,15 @@ export function getPlatformSession(): PlatformSession | null {
   }
 }
 
+/** session 失效時清掉，否則重新整理會拿著同一把壞簽章再撞一次。 */
+export function clearPlatformSession() {
+  try {
+    localStorage.removeItem(SESSION_KEY);
+  } catch {
+    // 清不掉也沒關係：下一次 getPlatformSession() 仍會被後端擋下來。
+  }
+}
+
 export function platformHomeUrl() {
   return `${window.location.origin}/index.html`;
 }

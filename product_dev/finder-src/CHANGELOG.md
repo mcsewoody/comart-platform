@@ -3,6 +3,84 @@
 
 
 
+## 2.33
+
+Codex 交接後的第一次體檢。i18n（330 key × 5 語言零缺漏）、上傳的重試／tus 續傳／
+sha256 秒傳、路徑穿越白名單都做得很紮實；這一版處理的是**環境與流程**上的三個
+會咬人的地方，外加清掉 2.31 刪頁面時沒跟著刪的後端。
+
+### 🔴 `npm run build` 會靜默產出「假資料版」
+
+`demoMode` 的判定是 `!supabaseAnonKey && VITE_PLATFORM_MODE !== "true"` ——
+沒帶環境變數就自動成立。demo 版會發一個假的管理員（canUpload／canSync 全開）
+讓人進到主畫面，但**現存每一頁用到的 13 個 API 全都沒有 demo 分支**，所以它只是
+一個「看起來已登入、每頁都丟登入失效」的殼，而且 rsync 上線沒有任何提示。
+實測：`npm run build` 的產物含 `demo-user`，`build:platform` 的不含。
+
+→ **整個拿掉 demo 模式**，不留旗標。不是換預設值 —— 是刪掉一個本來就不能運作的
+東西。`vite.config.ts` 另外擋下 `VITE_DEMO_MODE` / `VITE_PLATFORM_MODE` /
+`VITE_SUPABASE_ANON_KEY`，照舊文件打指令會**直接 build 失敗**而不是默默忽略。
+`npm run build` 現在就是正確的指令，`build:platform` 保留為別名。
+
+### 🔴 批次上傳沒有出口
+
+`upload()` 是一個跑完 200 次、沒有取消機制的 for-await，而 `platformCall` 對 401
+只丟普通 Error —— session 中途過期時，剩下 197 個檔會各自送一次注定失敗的請求、
+各留一行錯誤，十幾分鐘的進度就沒了。
+
+→ 新增 `SessionExpiredError`（401／403 專用）讓呼叫端 `instanceof` 得出來，批次
+立刻停並告知停在第幾個檔；`AuthProvider` 同時把 profile 清掉回到登入轉接頁。
+另加「停止」鈕 ＋ `AbortController`，訊號一路串到 api、storage PUT 與 tus。
+🔴 tus 的重試迴圈吃不進 AbortSignal，要手動掛 listener 並自己 reject，
+否則按了停止那個 Promise 永遠不 settle，整批卡在該檔上。
+
+### 🔴 掃描指紋快取每次被整份覆寫
+
+`saveManifest(nextManifest)` 只寫這一次掃到的檔 —— 掃了子資料夾 A，整個 B 的快取
+就沒了，下次掃 B 又要重算全部 sha256（`hashFile` 讀整個檔，上限 50 MB）。
+
+→ 改成 `mergeManifest(舊, 新)` 合併，並加 8,000 筆上限從最舊淘汰。單純合併會無上限
+長大，localStorage 一滿 `saveManifest` 把 QuotaExceeded 整個吞掉，就變成「永遠全部
+重算」而且沒有任何訊號。
+
+### 其他修正
+
+- **跳過原因的徽章顯示的是 key 名稱**：`{SKIP_REASON_LABELS[reason]}` 漏了包 `t()`，
+  畫面上是 `sk_oversized` 而不是「超過大小上限」。
+- **切語言時檔案狀態欄不會更新**：狀態是 `status: tr("u_st_pending")` 這樣把「當下
+  語言的字串」寫進 state 的。改成存 `{key, params}`，渲染時才翻譯 —— 跟同一支檔案
+  上方 `SKIP_REASON_LABELS` 的註解講的是同一條規則，只是當初沒套用到這裡。
+- **搜尋競態**：送出鈕雖然 `disabled={loading}`，但輸入框按 Enter 不受 disabled 按鈕
+  限制，連按兩次舊結果會蓋掉新的。加序號比對 ＋ abort 前一個請求。順帶把
+  `loadMore` 的 offset 改用獨立的 `serverOffset` —— 原本用 `items.length`，而 items
+  被 id 去重過濾，會愈翻愈偏。
+- **四份 `formatBytes`** 併成一份。頁面那版把 2 GB 顯示成「2048.0 MB」、
+  0 bytes 顯示成「1 KB」。
+- `directory-access.ts` 與 `incremental-import.ts` 的錯誤訊息原本寫死中文，而且
+  會直接顯示給使用者（越南同仁看到的是中文）。改走 i18n。
+- 第一次繪製的語言：`initLang()` 原本只在 AuthProvider 的 effect 裡呼叫，跑在首次
+  繪製之後，所以「驗證登入狀態…」那個 splash 固定閃一下繁中。改成 `main.tsx` 先叫
+  一次（只讀 localStorage），AuthProvider 拿到 session 再叫一次帶 site 的。
+
+### 清理與結構
+
+- **`api.ts` 41 → 13 個方法**。其餘 28 個是 2.31 刪掉 11 個 CPF 時代頁面後的遺留，
+  沒有任何呼叫點。`types.ts` 382 → 143 行，刪掉 `supabase.ts`（零 import）與
+  `demo-data.ts`，移除未使用的相依 `zod` 與 `@supabase/supabase-js`。
+- **i18n 清掉 21 個孤兒 key × 5 語言 = 105 條**，新增 11 個 key × 5 語言。
+  其中 6 個 `si_*` 是 2.32 改寫登入頁時我自己留下的。
+- **`uploadOne` 抽成 `lib/upload-one.ts`**：三條路（秒傳／tus／一般 PUT）加上重試與
+  回退，是整包最會出事的一段，留在 1,000 行的元件裡沒辦法單獨測。行為沒改。
+- **路由層 code splitting**：上傳頁與詳情頁改 `lazy()`，tus-js-client 不再進首屏。
+- **測試 17 → 30 個**。新增 `uploadOne` 8 個（秒傳、已存在、503 重試會重新取簽章
+  網址、400 不重試、「已存在」視為成功、413 訊息、signal 串接、狀態回傳 key）與
+  `mergeManifest` 3 個。`App.test.tsx` 原本靠 demo 模式繞過登入，改成餵真的 session
+  進 localStorage ＋ 攔 API，順便把「Portal 帶 session 進來」這條路測到，並補一個
+  「沒有 session 要停在登入頁」的案例。
+  🔴 這個 jsdom 設定沒有 `localStorage`，`src/test/setup.ts` 補了最小實作 ——
+  產品程式碼的 try/catch 要留著，Safari 封鎖儲存時是真的會 throw。
+
+
 
 ## 2.32
 

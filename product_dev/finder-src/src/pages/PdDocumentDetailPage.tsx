@@ -6,6 +6,7 @@ import { Badge, Button, Card, EmptyState } from "../components/ui";
 import { api } from "../lib/api";
 import { documentListText, parseDocumentList } from "../lib/pd-document-edit";
 import { deleteFileAtRelativePath, loadDirectoryHandle, requestDirectoryPermission, type StoredDirectoryHandle } from "../lib/directory-access";
+import { formatBytes } from "../lib/utils";
 import type { PdDataset, PdDocumentDetail, PdDocumentEdit } from "../lib/types";
 import { t as tr, useT } from "../i18n";
 
@@ -197,5 +198,4 @@ function Field({ label, children }: { label: string; children: ReactNode }) { re
 const inputClass = "h-11 w-full rounded-xl border border-slate-700 bg-slate-950 px-3 text-sm text-slate-100 outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20";
 const textareaClass = "w-full resize-y rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 text-sm leading-5 text-slate-100 outline-none placeholder:text-slate-600 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20";
 function Info({ label, value }: { label: string; value: string }) { return <div><dt className="text-xs font-bold text-slate-500">{label}</dt><dd className="mt-1 break-words text-slate-200">{value}</dd></div>; }
-function formatBytes(value: number) { return value < 1024 * 1024 ? `${Math.max(1, Math.round(value / 1024))} KB` : `${(value / 1024 / 1024).toFixed(1)} MB`; }
 function formatDocumentDate(value: string | null) { if (!value) return tr("lib_to_identify"); const [year, month, day] = value.slice(0, 10).split("-"); return year && month && day ? `${year}/${month}/${day}` : value; }

@@ -7,8 +7,10 @@ import {
   type ReactNode,
 } from "react";
 import { appConfig } from "../lib/config";
+import { setSessionLostHandler } from "../lib/api";
 import { initLang } from "../i18n";
 import {
+  clearPlatformSession,
   getPlatformSession,
   platformHomeUrl,
   type PlatformSession,
@@ -19,35 +21,30 @@ interface AuthContextValue {
   loading: boolean;
   session: PlatformSession | null;
   profile: Profile | null;
-  demoMode: boolean;
-  signIn(email: string): Promise<void>;
+  signIn(): Promise<void>;
   signOut(): Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-const demoProfile: Profile = {
-  id: "demo-user",
-  email: "woody@comart.com.tw",
-  displayName: "Woody",
-  role: "admin",
-  active: true,
-  canUpload: true,
-  canSync: true,
-};
-
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [loading, setLoading] = useState(!appConfig.demoMode);
+  const [loading, setLoading] = useState(true);
   const [session, setSession] = useState<PlatformSession | null>(null);
-  const [profile, setProfile] = useState<Profile | null>(
-    appConfig.demoMode ? demoProfile : null,
-  );
+  const [profile, setProfile] = useState<Profile | null>(null);
+
+  /* 🔴 session 中途失效時把人送回登入轉接頁，而不是讓每一次呼叫各自丟錯。
+     掛在自己的 effect 裡（不是下面那個 bootstrap effect），因為 StrictMode
+     會把 effect 跑兩次，混在一起會在第一次 cleanup 時把 handler 解除掉。 */
+  useEffect(() => {
+    setSessionLostHandler(() => {
+      clearPlatformSession();
+      setSession(null);
+      setProfile(null);
+    });
+    return () => setSessionLostHandler(null);
+  }, []);
 
   useEffect(() => {
-    if (appConfig.demoMode) {
-      initLang();
-      return;
-    }
     const nextSession = getPlatformSession();
     /* 🔴 語言要在取 session 之後、打 API 之前就定下來：擺在 bootstrap 回應之後的話，
        後端不通時整個畫面會停在繁中（devices v1.10 踩過同一個坑）。
@@ -71,7 +68,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return response.json() as Promise<{ profile: Profile }>;
       })
       .then((result) => setProfile(result.profile))
-      .catch(() => setProfile(null))
+      .catch(() => {
+        clearPlatformSession();
+        setProfile(null);
+      })
       .finally(() => setLoading(false));
   }, []);
 
@@ -80,11 +80,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       loading,
       session,
       profile,
-      demoMode: appConfig.demoMode,
       async signIn() {
         window.location.href = platformHomeUrl();
       },
       async signOut() {
+        clearPlatformSession();
         window.location.href = platformHomeUrl();
       },
     }),

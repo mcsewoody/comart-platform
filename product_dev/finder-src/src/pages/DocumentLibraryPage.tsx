@@ -3,6 +3,7 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import { Badge, Button, Card, EmptyState, PageHeader } from "../components/ui";
 import { api } from "../lib/api";
+import { formatBytes } from "../lib/utils";
 import type { PdDataset, PdDocumentSummary } from "../lib/types";
 import { t as tr, useT } from "../i18n";
 
@@ -31,23 +32,42 @@ export function DocumentLibraryPage({ dataset }: { dataset: PdDataset }) {
   const [error, setError] = useState("");
   const [elapsed, setElapsed] = useState(0);
   const activeSearch = useRef({ dataset, query: "", supplier: "", kind: "", includeReference: false });
+  /* 🔴 搜尋要能認出「過期的回應」。送出鈕雖然 disabled={loading}，但**輸入框按
+     Enter 不受 disabled 按鈕限制** —— 連按兩次、先發的舊結果後到，就會蓋掉新的。
+     每次送出遞增 searchSeq，回來時比對；順便 abort 掉還在飛的那一個。*/
+  const searchSeq = useRef(0);
+  const inFlight = useRef<AbortController | null>(null);
+  /* 伺服器端的 offset 要獨立記：items 會被 id 去重過濾，用 items.length 當
+     offset 會愈翻愈偏。*/
+  const serverOffset = useRef(0);
 
   async function searchDocuments() {
+    const seq = ++searchSeq.current;
+    inFlight.current?.abort();
+    const controller = new AbortController();
+    inFlight.current = controller;
     setLoading(true);
     setError("");
     const params = { dataset, query, supplier, kind, includeReference };
     activeSearch.current = params;
     try {
-      const result = await api.searchPdDocuments({ ...params, limit: PAGE_SIZE, offset: 0 });
+      const result = await api.searchPdDocuments(
+        { ...params, limit: PAGE_SIZE, offset: 0 },
+        controller.signal,
+      );
+      if (seq !== searchSeq.current) return;
       setItems(result.items);
       setTotal(result.total);
       setElapsed(result.elapsedMs);
+      serverOffset.current = result.items.length;
     } catch (reason) {
+      if (controller.signal.aborted || seq !== searchSeq.current) return;
       setError(reason instanceof Error ? reason.message : t("err_search"));
       setItems([]);
       setTotal(0);
+      serverOffset.current = 0;
     } finally {
-      setLoading(false);
+      if (seq === searchSeq.current) setLoading(false);
     }
   }
 
@@ -59,8 +79,9 @@ export function DocumentLibraryPage({ dataset }: { dataset: PdDataset }) {
       const result = await api.searchPdDocuments({
         ...activeSearch.current,
         limit: PAGE_SIZE,
-        offset: items.length,
+        offset: serverOffset.current,
       });
+      serverOffset.current += result.items.length;
       setItems((current) => {
         const known = new Set(current.map((item) => item.id));
         return [...current, ...result.items.filter((item) => !known.has(item.id))];
@@ -81,8 +102,14 @@ export function DocumentLibraryPage({ dataset }: { dataset: PdDataset }) {
     setIncludeReference(false);
     setLoading(true);
     activeSearch.current = { dataset, query: "", supplier: "", kind: "", includeReference: false };
+    const seq = ++searchSeq.current;
+    serverOffset.current = 0;
     void api.searchPdDocuments({ dataset, query: "", limit: PAGE_SIZE, offset: 0 })
-      .then((result) => { setItems(result.items); setTotal(result.total); setElapsed(result.elapsedMs); setError(""); })
+      .then((result) => {
+        if (seq !== searchSeq.current) return;
+        setItems(result.items); setTotal(result.total); setElapsed(result.elapsedMs); setError("");
+        serverOffset.current = result.items.length;
+      })
       .catch((reason) => { setItems([]); setTotal(0); setError(reason instanceof Error ? reason.message : t("err_load")); })
       .finally(() => setLoading(false));
   }, [dataset, t]);
@@ -152,10 +179,6 @@ export function DocumentLibraryPage({ dataset }: { dataset: PdDataset }) {
   </>;
 }
 
-function formatBytes(value: number) {
-  if (value < 1024 * 1024) return `${Math.max(1, Math.round(value / 1024))} KB`;
-  return `${(value / 1024 / 1024).toFixed(1)} MB`;
-}
 
 function formatDocumentDate(value: string | null) {
   if (!value) return tr("lib_to_identify");

@@ -1,112 +1,58 @@
 import { appConfig } from "./config";
-import {
-  demoCategories,
-  demoDocuments,
-  demoJobs,
-  demoProductDetails,
-  demoProducts,
-  demoReviewTasks,
-} from "./demo-data";
 import { t } from "../i18n";
 import { getPlatformSession } from "./platform-session";
 import type {
-  Category,
-  BatchApprovalResult,
-  BatchProductGapResult,
-  MappingSuggestion,
-  DocumentSummary,
-  DeferredReviewResult,
-  ExtractedItemResolution,
-  ProcessingJob,
-  ProductDetail,
-  ProductSummary,
-  ProductReviewGap,
-  Profile,
-  ReviewTask,
-  SearchFilters,
-  SearchResponse,
-  SupplierOption,
-  TrashItem,
+  PdAnalysisQueueStatus,
   PdDataset,
   PdDocumentDetail,
+  PdDocumentEdit,
   PdDocumentSummary,
   PdSearchParams,
-  PdUploadInit,
-  PdAnalysisQueueStatus,
   PdSyncDocument,
   PdSyncDownload,
   PdUploader,
-  PdDocumentEdit,
+  PdUploadInit,
 } from "./types";
 
-function normalize(value: string) {
-  return value.trim().toLocaleLowerCase("zh-Hant");
+/* ═══════════════════════════════════════════════════════════
+   🔴 session 過期要能被「認出來」，不能只是一個普通 Error。
+
+   舊版對 401 的處理就是丟 `new Error("操作失敗（401）")`。上傳頁的批次迴圈
+   是一個跑完 200 次的 for-await，它分不出「這個檔壞掉」跟「整條線斷了」，
+   所以 session 一過期，剩下 197 個檔會各自送一次注定失敗的請求、各留一行
+   錯誤，使用者得整批重來。
+
+   現在 401／403 丟 SessionExpiredError，兩件事同時發生：
+     1. 呼叫端（上傳迴圈）可以 `instanceof` 判斷，立刻中止整批
+     2. onSessionLost 通知 AuthProvider 把 profile 清掉 → 回到登入轉接頁
+   ═══════════════════════════════════════════════════════════ */
+export class SessionExpiredError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "SessionExpiredError";
+  }
 }
 
-function includesAny(values: Array<string | null | undefined>, query: string) {
-  const term = normalize(query);
-  if (!term) return true;
-  return values.some((value) => normalize(value ?? "").includes(term));
+let sessionLostHandler: (() => void) | null = null;
+
+/** AuthProvider 掛一個進來；api 層不自己碰 React state。 */
+export function setSessionLostHandler(handler: (() => void) | null) {
+  sessionLostHandler = handler;
 }
 
-function demoSearchProducts(
-  query: string,
-  filters: SearchFilters,
-): SearchResponse<ProductSummary> {
-  const started = performance.now();
-  const items = demoProducts.filter(
-    (product) =>
-      includesAny(
-        [
-          product.nameOriginal,
-          product.nameZhTw,
-          product.nameEn,
-          product.nameVi,
-          product.brand,
-          ...product.modelNumbers,
-          ...product.functions,
-          ...product.keywords,
-        ],
-        query,
-      ) &&
-      (!filters.categoryId || product.category?.id === filters.categoryId) &&
-      (!filters.supplierId ||
-        product.suppliers.some((item) => item.id === filters.supplierId)) &&
-      (!filters.confirmationStatus ||
-        product.confirmationStatus === filters.confirmationStatus),
-  );
-  return {
-    items,
-    total: items.length,
-    queryId: crypto.randomUUID(),
-    elapsedMs: Math.max(18, Math.round(performance.now() - started)),
-  };
-}
-
-function demoSearchDocuments(
-  query: string,
-  filters: SearchFilters,
-): SearchResponse<DocumentSummary> {
-  const started = performance.now();
-  const items = demoDocuments.filter(
-    (document) =>
-      includesAny([document.title, document.sourcePath], query) &&
-      (!filters.extension || document.extension === filters.extension),
-  );
-  return {
-    items,
-    total: items.length,
-    queryId: crypto.randomUUID(),
-    elapsedMs: Math.max(14, Math.round(performance.now() - started)),
-  };
+function sessionLost(): never {
+  sessionLostHandler?.();
+  throw new SessionExpiredError(t("api_session_lost"));
 }
 
 async function platformCall<T>(
   action: string,
   payload: Record<string, unknown> = {},
+  signal?: AbortSignal,
 ): Promise<T> {
   const session = getPlatformSession();
-  if (!session?.sig) throw new Error(t("api_session_lost"));
+  if (!session?.sig) sessionLost();
+
   const response = await fetch(appConfig.platformApiUrl, {
     method: "POST",
     headers: {
@@ -114,7 +60,11 @@ async function platformCall<T>(
       "x-session": session.sig,
     },
     body: JSON.stringify({ action, ...payload }),
+    signal,
   });
+
+  if (response.status === 401 || response.status === 403) sessionLost();
+
   const result = await response.json().catch(() => ({}));
   if (!response.ok) {
     throw new Error(
@@ -125,19 +75,17 @@ async function platformCall<T>(
 }
 
 export const api = {
-  async searchPdDocuments(params: PdSearchParams) {
+  async searchPdDocuments(params: PdSearchParams, signal?: AbortSignal) {
     return platformCall<{ items: PdDocumentSummary[]; total: number; elapsedMs: number }>(
       "search",
       { ...params },
+      signal,
     );
   },
 
   async getPdDocument(dataset: PdDataset, id: string) {
     return (
-      await platformCall<{ item: PdDocumentDetail | null }>("document", {
-        dataset,
-        id,
-      })
+      await platformCall<{ item: PdDocumentDetail | null }>("document", { dataset, id })
     ).item;
   },
 
@@ -149,31 +97,33 @@ export const api = {
     return platformCall<{ ok: boolean; relativePath: string }>("deleteDocument", { dataset, id });
   },
 
-  async initPdUpload(payload: {
-    dataset: PdDataset;
-    relativePath: string;
-    byteSize: number;
-    sha256: string;
-  }) {
-    return platformCall<PdUploadInit>("initUpload", payload);
+  async initPdUpload(
+    payload: { dataset: PdDataset; relativePath: string; byteSize: number; sha256: string },
+    signal?: AbortSignal,
+  ) {
+    return platformCall<PdUploadInit>("initUpload", payload, signal);
   },
 
-  async checkPdHashes(dataset: PdDataset, hashes: string[]) {
-    return platformCall<{ existing: string[] }>("checkHashes", { dataset, hashes });
+  async checkPdHashes(dataset: PdDataset, hashes: string[], signal?: AbortSignal) {
+    return platformCall<{ existing: string[] }>("checkHashes", { dataset, hashes }, signal);
   },
 
-  async completePdUpload(payload: {
-    dataset: PdDataset;
-    relativePath: string;
-    byteSize: number;
-    mimeType: string;
-    sha256: string;
-    storagePath: string;
-    lastModified: number;
-  }) {
+  async completePdUpload(
+    payload: {
+      dataset: PdDataset;
+      relativePath: string;
+      byteSize: number;
+      mimeType: string;
+      sha256: string;
+      storagePath: string;
+      lastModified: number;
+    },
+    signal?: AbortSignal,
+  ) {
     return platformCall<{ duplicate: boolean; documentId: string; analysisStatus?: string }>(
       "completeUpload",
       payload,
+      signal,
     );
   },
 
@@ -192,8 +142,8 @@ export const api = {
     return platformCall<{ items: PdSyncDocument[] }>("syncManifest");
   },
 
-  async getPdSyncUrls(items: Array<{ dataset: PdDataset; id: string }>) {
-    return platformCall<{ items: PdSyncDownload[] }>("syncUrls", { items });
+  async getPdSyncUrls(items: Array<{ dataset: PdDataset; id: string }>, signal?: AbortSignal) {
+    return platformCall<{ items: PdSyncDownload[] }>("syncUrls", { items }, signal);
   },
 
   async getPdUploaders() {
@@ -202,274 +152,5 @@ export const api = {
 
   async setPdUploader(empId: string, permission: "upload" | "sync", allowed: boolean) {
     return platformCall<{ ok: boolean }>("setUploader", { empId, permission, allowed });
-  },
-  async getProfiles(): Promise<Profile[]> {
-    if (appConfig.demoMode) {
-      return [
-        {
-          id: "demo-user",
-          email: "woody@comart.com.tw",
-          displayName: "Woody",
-          role: "admin",
-          active: true,
-        },
-      ];
-    }
-    return (await platformCall<{ items: Profile[] }>("profiles")).items;
-  },
-
-  async getTrashItems(): Promise<TrashItem[]> {
-    if (appConfig.demoMode) return [];
-    return (await platformCall<{ items: TrashItem[] }>("trash")).items;
-  },
-
-  async restoreTrashItem(item: TrashItem) {
-    if (appConfig.demoMode) return;
-    await platformCall("restore", { item });
-  },
-
-  async inviteUser() {
-    throw new Error(t("api_users_managed"));
-  },
-
-  async getFileUrl(
-    documentId: string,
-    kind: "source" | "preview" | "thumbnail",
-  ): Promise<string | null> {
-    if (appConfig.demoMode) return null;
-    return (
-      await platformCall<{ url: string | null }>("fileUrl", {
-        documentId,
-        kind,
-      })
-    ).url;
-  },
-
-  async getProductThumbnailUrl(productId: string): Promise<string | null> {
-    if (appConfig.demoMode) return null;
-    return (
-      await platformCall<{ url: string | null }>("fileUrl", {
-        productId,
-        kind: "product_thumbnail",
-      })
-    ).url;
-  },
-
-  async searchProducts(query: string, filters: SearchFilters) {
-    if (appConfig.demoMode) return demoSearchProducts(query, filters);
-    return platformCall<SearchResponse<ProductSummary>>("searchProducts", {
-      query,
-      filters,
-    });
-  },
-
-  async searchDocuments(query: string, filters: SearchFilters) {
-    if (appConfig.demoMode) return demoSearchDocuments(query, filters);
-    return platformCall<SearchResponse<DocumentSummary>>("searchDocuments", {
-      query,
-      filters,
-    });
-  },
-
-  async getProduct(id: string): Promise<ProductDetail | null> {
-    if (appConfig.demoMode) {
-      return demoProductDetails.find((item) => item.id === id) ?? null;
-    }
-    return (await platformCall<{ item: ProductDetail | null }>("product", { id }))
-      .item;
-  },
-
-  async updateProduct(id: string, patch: Record<string, unknown>) {
-    if (appConfig.demoMode) return;
-    await platformCall("updateProduct", { id, patch });
-  },
-
-  async getDocument(id: string): Promise<DocumentSummary | null> {
-    if (appConfig.demoMode) {
-      return demoDocuments.find((item) => item.id === id) ?? null;
-    }
-    return (
-      await platformCall<{ item: DocumentSummary | null }>("document", { id })
-    ).item;
-  },
-
-  async resolveExtractedItem(
-    itemId: string,
-    resolution: ExtractedItemResolution,
-  ): Promise<{ productId: string | null }> {
-    if (appConfig.demoMode) return { productId: resolution.productId ?? null };
-    return (
-      await platformCall<{ result: { productId: string | null } }>(
-        "resolveExtractedItem",
-        { itemId, resolution },
-      )
-    ).result;
-  },
-
-  async getProductReviewGaps(): Promise<ProductReviewGap[]> {
-    if (appConfig.demoMode) return [];
-    return (
-      await platformCall<{ items: ProductReviewGap[] }>("productReviewGaps")
-    ).items;
-  },
-
-  async batchFillProductGaps(
-    productIds: string[],
-    field: "category" | "supplier" | "model",
-    value: Record<string, unknown>,
-  ): Promise<BatchProductGapResult> {
-    if (appConfig.demoMode) {
-      return { requested: productIds.length, updated: productIds.length, field };
-    }
-    return (
-      await platformCall<{ result: BatchProductGapResult }>(
-        "batchFillProductGaps",
-        { productIds, field, value },
-      )
-    ).result;
-  },
-
-  async getCategories(): Promise<Category[]> {
-    if (appConfig.demoMode) return demoCategories;
-    return (await platformCall<{ items: Category[] }>("categories")).items;
-  },
-
-  async getSuppliers(): Promise<SupplierOption[]> {
-    if (appConfig.demoMode) return [];
-    return (await platformCall<{ items: SupplierOption[] }>("suppliers")).items;
-  },
-
-  async createCategory(nameZhTw: string): Promise<Category> {
-    if (appConfig.demoMode) {
-      return { id: crypto.randomUUID(), nameZhTw, parentId: null };
-    }
-    return (
-      await platformCall<{ item: Category }>("createCategory", { nameZhTw })
-    ).item;
-  },
-
-  async createSupplier(legalName: string): Promise<SupplierOption> {
-    if (appConfig.demoMode) {
-      return { id: crypto.randomUUID(), name: legalName };
-    }
-    return (
-      await platformCall<{ item: SupplierOption }>("createSupplier", {
-        legalName,
-      })
-    ).item;
-  },
-
-  async updateMaster(
-    kind: "category" | "supplier",
-    id: string,
-    name: string,
-    aliases: string[],
-  ) {
-    if (appConfig.demoMode) return;
-    await platformCall("updateMaster", { kind, id, name, aliases });
-  },
-
-  async mergeMaster(
-    kind: "category" | "supplier",
-    sourceId: string,
-    targetId: string,
-  ) {
-    if (appConfig.demoMode) return;
-    await platformCall("mergeMaster", { kind, sourceId, targetId });
-  },
-
-  async getJobs(): Promise<ProcessingJob[]> {
-    if (appConfig.demoMode) return demoJobs;
-    return (await platformCall<{ items: ProcessingJob[] }>("jobs")).items;
-  },
-
-  async getReviewTasks(): Promise<ReviewTask[]> {
-    if (appConfig.demoMode) return demoReviewTasks;
-    return (await platformCall<{ items: ReviewTask[] }>("reviews")).items;
-  },
-
-  async getMappingSuggestions(): Promise<MappingSuggestion[]> {
-    if (appConfig.demoMode) return [];
-    return (
-      await platformCall<{ items: MappingSuggestion[] }>("mappingSuggestions")
-    ).items;
-  },
-
-  async applyMappingSuggestions(ids: string[]): Promise<{ applied: number }> {
-    if (appConfig.demoMode) return { applied: ids.length };
-    return (
-      await platformCall<{ result: { applied: number } }>(
-        "applyMappingSuggestions",
-        { ids },
-      )
-    ).result;
-  },
-
-  async closeReviewTask(id: string, status: "resolved" | "dismissed") {
-    if (appConfig.demoMode) return;
-    await platformCall("closeReview", { id, status });
-  },
-
-  async batchApproveDocuments(documentIds: string[]) {
-    if (appConfig.demoMode) {
-      return {
-        documentsApproved: documentIds.length,
-        productsConfirmed: documentIds.length,
-        reviewTasksResolved: documentIds.length,
-      } satisfies BatchApprovalResult;
-    }
-    return (
-      await platformCall<{ result: BatchApprovalResult }>(
-        "batchApproveDocuments",
-        { documentIds },
-      )
-    ).result;
-  },
-
-  async deferRoutineReviews(documentIds: string[]): Promise<DeferredReviewResult> {
-    if (appConfig.demoMode) {
-      return {
-        documentsCompleted: documentIds.length,
-        routineTasksDeferred: documentIds.length,
-      };
-    }
-    return (
-      await platformCall<{ result: DeferredReviewResult }>(
-        "deferRoutineReviews",
-        { documentIds },
-      )
-    ).result;
-  },
-
-  async uploadFiles(files: File[], sensitivity: string) {
-    if (appConfig.demoMode) {
-      return files.map((file) => ({ name: file.name, status: "queued" }));
-    }
-    const results = [];
-    for (const file of files) {
-      const init = await platformCall<{ path: string; signedUrl: string }>(
-        "initUpload",
-        { name: file.name, byteSize: file.size },
-      );
-      const form = new FormData();
-      form.append("cacheControl", "3600");
-      form.append("", file);
-      const upload = await fetch(init.signedUrl, {
-        method: "PUT",
-        headers: { "x-upsert": "false" },
-        body: form,
-      });
-      if (!upload.ok) throw new Error(t("api_upload_failed", { n: file.name }));
-      results.push(
-        await platformCall("completeUpload", {
-          name: file.name,
-          path: init.path,
-          mimeType: file.type || "application/octet-stream",
-          byteSize: file.size,
-          sensitivity,
-        }),
-      );
-    }
-    return results;
   },
 };

@@ -1,3 +1,5 @@
+import { t } from "../i18n";
+
 export type StoredDirectoryHandle = FileSystemDirectoryHandle & {
   queryPermission(options?: { mode: "read" | "readwrite" }): Promise<PermissionState>;
   requestPermission(options?: { mode: "read" | "readwrite" }): Promise<PermissionState>;
@@ -22,13 +24,13 @@ export function safeRelativeParts(relativePath: string) {
   const parts = relativePath.replaceAll("\\", "/").replace(/^products\//i, "").split("/").filter(Boolean);
   if (!parts.length || !["OwnProduct", "Outsourcing"].includes(parts[0]) ||
       parts.some((part) => part === "." || part === ".." || part.includes("\0"))) {
-    throw new Error("不安全或不屬於產品資料庫的相對路徑");
+    throw new Error(t("e_path_unsafe"));
   }
   return parts;
 }
 
 export async function pickDefaultDirectory() {
-  if (!window.showDirectoryPicker) throw new Error("此瀏覽器不支援固定本機資料夾");
+  if (!window.showDirectoryPicker) throw new Error(t("e_dir_unsupported"));
   const handle = await window.showDirectoryPicker({ id: "comart-product-library", mode: "readwrite" });
   await saveDirectoryHandle(handle);
   return handle;

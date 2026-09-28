@@ -54,24 +54,25 @@ async function fetchSyncRows(sb: any, dataset: Dataset) {
   return rows
 }
 
-async function analysisLibraryStatus(sb: any, dataset: Dataset) {
-  const table = jobTableFor(dataset)
-  const [queued, processing, retryableFailed, blockedFailed, completed] = await Promise.all([
-    sb.from(table).select("id", { count: "exact", head: true }).eq("status", "queued"),
-    sb.from(table).select("id", { count: "exact", head: true }).eq("status", "processing"),
-    sb.from(table).select("id", { count: "exact", head: true }).eq("status", "failed").lt("attempts", 3),
-    sb.from(table).select("id", { count: "exact", head: true }).eq("status", "failed").gte("attempts", 3),
-    sb.from(table).select("id", { count: "exact", head: true }).eq("status", "completed"),
-  ])
-  const error = [queued, processing, retryableFailed, blockedFailed, completed].find((result) => result.error)?.error
+const EMPTY_QUEUE = { queued: 0, processing: 0, retryableFailed: 0, blockedFailed: 0, completed: 0 }
+
+/* 🔴 一次 RPC 拿兩個資料庫的五個分組。舊版是每個資料庫各 5 個 count(*)、
+   共 10 次往返，而前端在分析頁每 15 秒 poll 一次 —— pd_mfg_jobs 929 列卻
+   累積了 10,603 次 seq scan。count(*) filter (...) 讓五組共用同一次掃描。*/
+async function analysisQueueStatus(sb: any) {
+  const { data, error } = await sb.rpc("pd_analysis_queue_status")
   if (error) throw error
-  return {
-    queued: queued.count || 0,
-    processing: processing.count || 0,
-    retryableFailed: retryableFailed.count || 0,
-    blockedFailed: blockedFailed.count || 0,
-    completed: completed.count || 0,
+  const byDataset: Record<string, typeof EMPTY_QUEUE> = { mfg: { ...EMPTY_QUEUE }, buy: { ...EMPTY_QUEUE } }
+  for (const row of data || []) {
+    byDataset[row.dataset] = {
+      queued: Number(row.queued || 0),
+      processing: Number(row.processing || 0),
+      retryableFailed: Number(row.retryable_failed || 0),
+      blockedFailed: Number(row.blocked_failed || 0),
+      completed: Number(row.completed || 0),
+    }
   }
+  return byDataset
 }
 
 function tableFor(dataset: Dataset) {
@@ -275,10 +276,7 @@ serve(async (req) => {
   if (action === "analysisStatus") {
     if (!uploadAllowed) return json({ error: "forbidden" }, 403)
     try {
-      const [mfg, buy] = await Promise.all([
-        analysisLibraryStatus(sb, "mfg"),
-        analysisLibraryStatus(sb, "buy"),
-      ])
+      const { mfg, buy } = await analysisQueueStatus(sb)
       return json({ configured: Boolean(Deno.env.get("PD_GITHUB_TOKEN")), mfg, buy })
     } catch (error) {
       return json({ error: error instanceof Error ? error.message : "analysis_status_failed" }, 500)
@@ -431,7 +429,12 @@ serve(async (req) => {
     const total = Number(rankedCandidates[0]?.total_count || 0)
     const ids = rankedCandidates.map((item: any) => item.document_id)
     if (!ids.length) return json({ items: [], total, elapsedMs: Math.round(performance.now() - started) })
-    const { data: rows, error } = await sb.from(table).select("*").in("id", ids)
+    /* 🔴 不能 select("*")：那會把 extracted_text 與 search_text（分析完成後最多
+       各 300 KB）整份撈出來再丟掉 —— summary() 一個欄位都沒用到。
+       下面的 document／updateDocument 端點是真的需要 extracted_text，那幾處要留。*/
+    const { data: rows, error } = await sb.from(table)
+      .select("id,title,relative_path,source_factory,supplier_name,category_path,product_path,document_kind,extension,byte_size,keywords,summary_zh_tw,is_reference,analysis_status,thumbnail_path,storage_path,updated_at,source_modified_at,primary_document_date,primary_date_type,primary_date_evidence,primary_date_location,revision_label,revision_evidence,revision_location")
+      .in("id", ids)
     if (error) return json({ error: error.message }, 500)
     const byId = new Map((rows || []).map((row: any) => [row.id, row]))
     const rankedRows = rankedCandidates.flatMap((rank: any) => {

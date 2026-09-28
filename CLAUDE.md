@@ -2343,6 +2343,36 @@ rsync -a --delete dist/ ../finder/
   所以「全數固化 verify_jwt = false」這句話到現在才真的成立。
   ⚠️ **`finder-worker/cpf_worker/` 這個 Python package 不能刪**（見下方 worker 一節）。
 
+### 🔴 搜尋的 trigram 索引曾經整整一個月沒被用到（2.35 修）
+
+`pd_*_documents_search_trgm_idx` 建在 `gin(search_text gin_trgm_ops)`，但三代 RPC
+（`202608300001` / `202609130006` / `202609130008`）查的都是 `lower(d.search_text)`。
+**Postgres 不會拿 `col` 上的索引去服務 `lower(col)` 的條件**，所以這兩個索引從
+2026-08-30 建立到 2026-09-28 從來沒生效過 —— 每次搜尋都是全表掃描，再 `cross join`
+乘上最多 12 個語言變體。
+
+判斷依據不是推論，是統計：`supabase inspect db index-stats` 顯示兩個索引
+`Index scans: 0`、`Unused: true`，同一張表的 pkey 是 5,073 次。
+
+- **修法不是加 `gin(lower(search_text))` 表達式索引**：analysis 完成後
+  `search_text` 會被 worker 塞進最多 300 KB 的文件內文（`pd_worker/run.py` 的
+  `path_context`），mfg 那個索引已經 6.7 MB 比表本身還大，再長一份只是把維護
+  成本變兩倍。改成**把欄位正規化成小寫**，現有索引直接可用。
+- 🔴 **正規化放在 DB 的 trigger，不是應用層**：`search_text` 有三個寫入點
+  （`completeUpload`、`updateDocument`、worker 的 `path_context`），放應用層
+  任何一處漏掉就破壞不變量，而且不會有人發現 —— 症狀只是「搜尋變慢」。
+- 其他欄位（`title`、`keywords`、`category_path`…）的 `lower()` **要保留**：
+  它們沒有 trgm 索引，那裡的 `lower()` 是為了大小寫不敏感比對。
+- **驗證方式**：搜尋幾次之後再看 `index-stats`，`Index scans` 應該開始累加。
+
+### 🔴 AI 佇列狀態原本每 15 秒打 10 個 count(*)（2.35 修）
+
+`analysisStatus` 對每個資料庫各發 5 個 `count(*)`（queued／processing／
+failed<3／failed≥3／completed），兩個資料庫就是 10 次往返，而前端在分析頁
+每 15 秒 poll 一次。統計上很明顯：`pd_mfg_jobs` 929 列累積 10,603 次 seq scan、
+`pd_buy_jobs` 266 列累積 10,332 次。改成一支 `pd_analysis_queue_status()` RPC，
+用 `count(*) filter (...)` 讓五個分組共用同一次掃描，10 次 → 1 次。
+
 ### Edge Functions：兩支給人用、兩支給機器用
 
 | Function | 驗證 | 用途 |

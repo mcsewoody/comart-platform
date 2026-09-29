@@ -681,8 +681,22 @@ serve(async (req) => {
       }
       return json({ error: error.message }, 400)
     }
+    /* 🔴 這個 insert 的錯誤原本沒有人看。失敗的話文件的 analysis_status 停在
+       'queued'，但佇列裡沒有對應的工作 —— worker 永遠不會撿到它，畫面上
+       **永遠顯示「等待內容分析」**，而它在等的東西根本不存在。
+       這種壞法沒有人會回報（看起來只是「還沒輪到」），所以寧可退回
+       metadata_only：至少檔名與路徑仍然搜尋得到，而且狀態是誠實的。*/
     if (analysisStatus === "queued") {
-      await sb.from(jobTableFor(dataset)).insert({ document_id: row.id })
+      const { error: jobError } = await sb.from(jobTableFor(dataset)).insert({ document_id: row.id })
+      if (jobError) {
+        console.error("Analysis job enqueue failed", dataset, row.id, jobError.message)
+        await sb.from(table).update({ analysis_status: "metadata_only" }).eq("id", row.id)
+        await sb.from("pd_transfer_audit").insert({
+          emp_id: sess.empId, action: "upload", dataset, document_id: row.id,
+          relative_path: relativePath, sha256,
+        })
+        return json({ duplicate: false, documentId: row.id, analysisStatus: "metadata_only", enqueueFailed: true })
+      }
     }
     await sb.from("pd_transfer_audit").insert({
       emp_id: sess.empId, action: "upload", dataset, document_id: row.id,

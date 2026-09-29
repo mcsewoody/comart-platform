@@ -131,10 +131,10 @@ export const api = {
     return platformCall<PdAnalysisQueueStatus>("analysisStatus");
   },
 
-  async startPdAnalysis(dataset: PdDataset | "both", limit: number) {
-    return platformCall<{ accepted: boolean; dataset: PdDataset | "both"; limit: number }>(
+  async startPdAnalysis(dataset: PdDataset | "both", limit: number, maxBatches = 1) {
+    return platformCall<{ accepted: boolean; dataset: PdDataset | "both"; limit: number; maxBatches: number }>(
       "startAnalysis",
-      { dataset, limit },
+      { dataset, limit, maxBatches },
     );
   },
 

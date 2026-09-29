@@ -2138,7 +2138,7 @@ Portal 入口：APPS 的 `id:'product-dev'`（`roles:[]`，**不限角色，全�
 | 部分 | 路徑 | 版本 | 形態 |
 |---|---|---|---|
 | 工作區首頁（hub） | `product_dev/index.html` | **v2.25** | 單檔，只有入口卡片 |
-| Document Finder | `product_dev/finder/`（產物）← `finder-src/`（原始碼） | **2.37** | **React 19 + TypeScript + Vite + Tailwind 4** |
+| Document Finder | `product_dev/finder/`（產物）← `finder-src/`（原始碼） | **2.38** | **React 19 + TypeScript + Vite + Tailwind 4** |
 | 手機與配件（裝置保管） | `product_dev/devices/index.html` | **v1.11** | 單檔，53KB |
 
 - 🔴 **hub 不再標示另外兩個模組的版本**（v2.20 拿掉）。那是第二份副本，
@@ -2333,7 +2333,7 @@ rsync -a --delete dist/ ../finder/
   （GitHub Pages 直接服務它）。`vite.config.ts` 的 `base` 寫死 `/product_dev/finder/`。
 - **只改 `finder-src/` 而忘記這兩步，線上完全不會變**，而且 git diff 看起來「有改」。
   這是這個子系統最容易踩的坑。
-- 驗證指令：`npm run typecheck` / `npm run lint` / `npm test`（vitest，40 個）。
+- 驗證指令：`npm run typecheck` / `npm run lint` / `npm test`（vitest，43 個）。
 - 🔴 **2.33 之前 `npm run build` 會靜默產出「假資料版」**：`demoMode` 的判定是
   `!supabaseAnonKey && VITE_PLATFORM_MODE !== "true"`，沒帶環境變數就自動成立，
   而 demo 版會發一個假的管理員（canUpload／canSync 全開）進到主畫面 —— 但現存
@@ -2458,7 +2458,7 @@ WHERE 變成單一 like 述詞，GIN trgm 才用得到。
   三個斷言會同時紅。
 - 🔴 **edge function 沒辦法在本機跑**（要有效的 `x-session` HMAC），所以這類改動
   唯一的防線就是把邏輯抽成 `.js` 再用 `node --test` 測。
-  跑法：`cd supabase/functions/pd-documents-api && node --test *.test.mjs`（21 個）。
+  跑法：`cd supabase/functions/pd-documents-api && node --test *.test.mjs`（28 個）。
 
 ### 🔴 `deleteDocument` 先刪檔案、後刪資料列（2.37 反過來）
 
@@ -2523,10 +2523,54 @@ failed<3／failed≥3／completed），兩個資料庫就是 10 次往返，而�
 ### GitHub Actions：一支排程、一支只能手動
 
 - `pd-device-reminders.yml` —— **每天 00:15 UTC（台灣 08:15）** ＋ 可手動。
-- `pd-document-worker.yml` —— **只有 `workflow_dispatch`，沒有排程**。
-  ⚠️ README 寫「5 分鐘 worker」，那是舊的；**現在文件解析要人去按**。
+- `pd-document-worker.yml` —— **只有 `workflow_dispatch`，沒有排程**（刻意的，見下）。
   runner 會裝 LibreOffice／Poppler／libmagic，跑 `python -m pd_worker.run`，
   單次最多 20 batch、逾時 240 分鐘，模型 `PD_ROUTINE_MODEL=gpt-5.6-luna`。
+  ⚠️ README 寫「5 分鐘 worker」，那是 CPF 時代那一支的，這一支從來沒有過排程。
+
+  🔴 **觸發是事件驅動的：上傳完，前端直接呼叫 `startAnalysis`**（Finder 2.38，
+  `autoStartAnalysis`）。批次匯入結束與手動上傳結束各觸發一次。
+
+  **2.38 之前沒有任何東西會自動執行 worker** —— 流程實際上是
+  「上傳 → 排進佇列 → **有人記得去按『AI 文件分析』**」，而畫面上只寫
+  「等待內容分析」，看不出來它在等的是一個人。執行紀錄佐證：每一筆都是手動觸發，
+  2026-09-28 之前的上一次是 09-13。
+
+  - 🔴 **評估過每 15 分鐘排程，否決。** 上傳是「兩個月一次」的事件，用每天 96 次
+    輪詢去等它，絕大多數執行都是空轉。**事件驅動才對。**（Woody 2026-09-29 指出。）
+  - **而且事件驅動不必改 workflow 檔案** —— `startAnalysis` 本來就會 dispatch，
+    只需要 `repo` 權限。`workflow` 權限管的是「**修改** workflow 檔案」，
+    這台機器的 OAuth token 沒有那個 scope，推 `.github/workflows/` 會被 GitHub 拒絕。
+  - 失敗不擋上傳：檔案已經進去了，而 2.37 之後搜尋結果列表會顯示
+    「等待內容分析」徽章，看得出來，訊息也會說可以手動重試。
+
+  🔴 **`startAnalysis` 要送 `max_batches`**（2.38 補）。workflow 早就吃這個
+  input（1–20），但 edge function 一直沒送 → 預設 1 → **按一次最多處理 `limit` 份
+  （上限 50）**。輪數由 `analysisBatchesFor(份數)` 算（`ceil(n/50)`，夾 1–20）。
+  ⚠️ `analysis-request.test.mjs` 有一條**直接讀 workflow YAML 比對那個範圍檢查**：
+  兩邊分岔的話，edge function 放行的值會讓 GitHub job 在第一步 `exit 1`，
+  而使用者只看到「已啟動分析」然後什麼都沒發生。
+
+  🔴 **`completeUpload` 建立佇列工作的 insert 原本沒有人看它的錯誤。**
+  失敗的話文件的 `analysis_status` 停在 `queued` 但佇列裡沒有對應的工作 ——
+  worker 永遠撿不到它，畫面上**永遠顯示「等待內容分析」**，而它在等的東西
+  根本不存在。現在失敗會退回 `metadata_only`：檔名與路徑仍然搜尋得到，
+  而且狀態是誠實的。**這種「看起來只是還沒輪到」的壞法沒有人會回報。**
+
+### ⚠️ 新增 RPC 記得 revoke —— Postgres 預設是 `EXECUTE TO PUBLIC`
+
+`pd_analysis_queue_status()`（2.35 加的）漏了 revoke，所以用**印在每一頁 HTML
+原始碼裡的 anon key** 就呼叫得到，回傳兩個資料庫的佇列與完成數。
+洩漏的只是數字，但同一批 `pd_*` RPC（`pd_claim_jobs`／`pd_finish_job`／兩支搜尋）
+全都有明確 revoke，漏掉這一支純粹是寫 migration 時忘了。
+已於 `202609290001` 補上，實測 anon 回 `42501 permission denied`。
+
+**新增 function 的 migration 一律附這兩行**（同「新表要 `enable row level security`」）：
+
+```sql
+revoke all on function public.<名稱>(<參數型別>) from public, anon, authenticated;
+grant execute on function public.<名稱>(<參數型別>) to service_role;
+```
 
 ### Python worker（`finder-worker/`）
 

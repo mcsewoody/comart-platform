@@ -8,6 +8,8 @@ import { tag, uploadOne, type ImportFile, type StatusTag } from "../lib/upload-o
 import { formatBytes } from "../lib/utils";
 import { skipReasonLabel, type SkipReason } from "../lib/document-labels";
 import {
+  ANALYSIS_LIMIT,
+  analysisBatchesFor,
   dedupeByDatasetHash,
   compareSyncManifest,
   importFileKey,
@@ -333,6 +335,9 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
       setMessage(t("u_batch_done", { a: completed, d: duplicates, f: failed, r: remaining.length }));
     }
     setPhase("finished");
+    /* session 失效時不要再打一個注定 401 的請求；中途停止仍然要觸發 ——
+       已經傳上去的那些檔案照樣該被分析。*/
+    if (!sessionLost) await autoStartAnalysis("both", completed);
   }
 
   function stopUpload() {
@@ -413,6 +418,8 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
       if (quickInputRef.current) quickInputRef.current.value = "";
     }
     setQuickRunning(false);
+    // 手動上傳走同一條路：上傳完就觸發，不要留給人去按。
+    await autoStartAnalysis(quickDataset, completed);
   }
 
   async function startAnalysis() {
@@ -425,6 +432,37 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
       window.setTimeout(() => void refreshAnalysisStatus(true), 3_000);
     } catch (reason) {
       setAnalysisMessage(t("u_ai_start_failed", { m: reason instanceof Error ? reason.message : t("u_unknown_err") }));
+    } finally {
+      setAnalysisRunning(false);
+    }
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     🔴 上傳完直接觸發分析，不要留給人去按。
+
+     在這之前的流程是：上傳 → 排進佇列 → **有人記得去按「AI 文件分析」**。
+     沒有任何東西會自動執行 worker，而畫面上只寫「等待內容分析」，
+     看不出來它在等的是一個人。實際後果就是文件躺在佇列裡好幾天。
+
+     評估過改成 GitHub Actions 每 15 分鐘排程，但那是錯的形狀：上傳是
+     「兩個月一次」的事件，用每天 96 次輪詢去等它，絕大多數的執行都是空轉。
+     **事件驅動才對** —— 而且這條路連 workflow 檔案都不用改
+     （`startAnalysis` 本來就會 dispatch，只需要 `repo` 權限）。
+
+     失敗不擋上傳：檔案已經進去了，分析沒觸發到最多是晚一點做，
+     而且搜尋結果列表現在會顯示「等待內容分析」徽章（2.37），看得出來。
+     ═══════════════════════════════════════════════════════════ */
+  async function autoStartAnalysis(dataset: PdDataset | "both", uploadedCount: number) {
+    const batches = analysisBatchesFor(uploadedCount);
+    if (!analysisStatus?.configured || batches < 1) return;
+    setAnalysisRunning(true);
+    setAnalysisMessage(t("u_ai_auto_starting"));
+    try {
+      await api.startPdAnalysis(dataset, ANALYSIS_LIMIT, batches);
+      setAnalysisMessage(t("u_ai_auto_started", { n: uploadedCount }));
+      window.setTimeout(() => void refreshAnalysisStatus(true), 3_000);
+    } catch (reason) {
+      setAnalysisMessage(t("u_ai_auto_failed", { m: reason instanceof Error ? reason.message : t("u_unknown_err") }));
     } finally {
       setAnalysisRunning(false);
     }

@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
+  ANALYSIS_MAX_BATCHES,
+  analysisBatchesFor,
   compareSyncManifest,
   dedupeByDatasetHash,
   isSignedTusAuthError,
@@ -132,5 +134,27 @@ describe("mergeManifest", () => {
   it("上限剛好時不淘汰任何東西", () => {
     const merged = mergeManifest({ a: entry("a") }, { b: entry("b") }, 2);
     expect(Object.keys(merged)).toEqual(["a", "b"]);
+  });
+});
+
+describe("analysisBatchesFor", () => {
+  it("沒有新上傳的檔案就不要觸發", () => {
+    expect(analysisBatchesFor(0)).toBe(0);
+    expect(analysisBatchesFor(-3)).toBe(0);
+    expect(analysisBatchesFor(Number.NaN)).toBe(0);
+  });
+
+  it("一輪 50 份，不滿一輪也算一輪", () => {
+    expect(analysisBatchesFor(1)).toBe(1);
+    expect(analysisBatchesFor(50)).toBe(1);
+    expect(analysisBatchesFor(51)).toBe(2);
+    expect(analysisBatchesFor(200)).toBe(4);
+  });
+
+  /* 🔴 workflow 的 max_batches 檢查是 1–20，超出它會在第一步 exit 1 ——
+     而畫面上只會說「已啟動分析」。夾住上限比讓 job 失敗好。*/
+  it("再多也不超過 workflow 允許的 20 輪", () => {
+    expect(analysisBatchesFor(1000)).toBe(ANALYSIS_MAX_BATCHES);
+    expect(analysisBatchesFor(999999)).toBe(ANALYSIS_MAX_BATCHES);
   });
 });

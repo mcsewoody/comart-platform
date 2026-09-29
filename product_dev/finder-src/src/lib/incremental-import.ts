@@ -137,3 +137,20 @@ export function compareSyncManifest<T extends IncrementalFile & { id?: string; b
   }
   return { serverOnly, conflicts, current };
 }
+
+/* 上傳完自動觸發分析時，要請 worker 跑幾輪。
+
+   🔴 一輪最多 claim `limit` 份（上限 50），而 workflow 的 max_batches 自己
+   檢查 1–20 —— 超出範圍它會在第一步 exit 1，使用者只會看到「已啟動分析」
+   然後什麼都沒發生。所以這裡一定要夾在範圍內。
+
+   算的是「這次新上傳的份數」而不是「真的需要深度分析的份數」：CAD 與影片是
+   metadata_only 不會進佇列，所以多估。多出來的那幾輪各自 claim 到 0 就
+   立刻結束，代價可以忽略 —— 而少估的代價是文件留在佇列裡沒人處理。 */
+export const ANALYSIS_LIMIT = 50;
+export const ANALYSIS_MAX_BATCHES = 20;
+
+export function analysisBatchesFor(uploadedCount: number, limit = ANALYSIS_LIMIT) {
+  if (!Number.isFinite(uploadedCount) || uploadedCount < 1) return 0;
+  return Math.min(ANALYSIS_MAX_BATCHES, Math.max(1, Math.ceil(uploadedCount / limit)));
+}

@@ -5,6 +5,7 @@ import { namedSecretKey } from "../_shared/api-keys.ts"
 import { expandSearchQueries } from "./search-aliases.js"
 import { resolveProductFinderAccess } from "./access-control.js"
 import { deleteColumns, editColumns, summaryColumns } from "./document-columns.js"
+import { dispatchInputs, parseAnalysisRequest } from "./analysis-request.js"
 
 const CORS = {
   "Access-Control-Allow-Origin": "*",
@@ -292,11 +293,15 @@ serve(async (req) => {
 
   if (action === "startAnalysis") {
     if (!uploadAllowed) return json({ error: "forbidden" }, 403)
-    const requestedDataset = String(body.dataset || "")
-    const limit = Number(body.limit)
-    if (!["mfg", "buy", "both"].includes(requestedDataset) || !Number.isInteger(limit) || limit < 1 || limit > 50) {
-      return json({ error: "invalid_analysis_request" }, 400)
-    }
+    /* 🔴 workflow 早就吃 max_batches 這個 input 了（1–20），只是這裡一直沒送，
+       所以按一次最多處理 `limit` 份（上限 50）—— 一次匯入幾百份要按很多次。
+       上傳完自動觸發之後更需要它：沒有人會在背後幫忙多按幾次。
+       驗證抽到 analysis-request.js，測試會比對 workflow 自己的範圍檢查 ——
+       兩邊分岔的話 edge function 放行的值會讓 GitHub job 在第一步 exit 1，
+       而使用者只看到「已啟動分析」然後什麼都沒發生。*/
+    const parsed = parseAnalysisRequest(body)
+    if (!parsed.ok) return json({ error: parsed.error }, 400)
+    const { dataset: requestedDataset, limit, maxBatches } = parsed
     const token = Deno.env.get("PD_GITHUB_TOKEN") || ""
     if (!token) return json({ error: "AI 啟動尚未完成一次性後端授權" }, 503)
     const owner = Deno.env.get("PD_GITHUB_OWNER") || "mcsewoody"
@@ -315,7 +320,7 @@ serve(async (req) => {
         },
         body: JSON.stringify({
           ref: "main",
-          inputs: { dataset: requestedDataset, limit: String(limit) },
+          inputs: dispatchInputs(parsed),
         }),
       },
     )
@@ -324,7 +329,7 @@ serve(async (req) => {
       console.error("GitHub workflow dispatch failed", response.status, detail.slice(0, 1000))
       return json({ error: `AI 工作器啟動失敗 (${response.status})` }, 502)
     }
-    return json({ accepted: true, dataset: requestedDataset, limit }, 202)
+    return json({ accepted: true, dataset: requestedDataset, limit, maxBatches }, 202)
   }
 
   if (action === "uploaders") {

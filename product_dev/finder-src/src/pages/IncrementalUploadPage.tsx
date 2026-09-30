@@ -1,10 +1,10 @@
-import { BrainCircuit, CheckCircle2, CircleStop, Download, Factory, FolderOpen, LoaderCircle, Play, RefreshCw, ShieldCheck, ShoppingBag, UploadCloud, Zap } from "lucide-react";
+import { BrainCircuit, CheckCircle2, CircleStop, Download, Factory, FolderOpen, LoaderCircle, Play, RefreshCw, RotateCcw, ShieldCheck, ShoppingBag, UploadCloud, Zap } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../auth/AuthProvider";
 import { Badge, Button, Card, PageHeader } from "../components/ui";
 import { SessionExpiredError, api } from "../lib/api";
-import { tag, uploadOne, type ImportFile, type StatusTag } from "../lib/upload-one";
+import { DeletedDocumentError, tag, uploadOne, type ImportFile, type StatusTag } from "../lib/upload-one";
 import { formatBytes } from "../lib/utils";
 import { skipReasonLabel, type SkipReason } from "../lib/document-labels";
 import {
@@ -29,7 +29,7 @@ import {
   writeFileWithoutOverwrite,
   type StoredDirectoryHandle,
 } from "../lib/directory-access";
-import type { PdAnalysisLibraryStatus, PdAnalysisQueueStatus, PdDataset, PdSyncDocument, PdUploader } from "../lib/types";
+import type { PdAnalysisLibraryStatus, PdAnalysisQueueStatus, PdDataset, PdDeletedInfo, PdSyncDocument, PdUploader } from "../lib/types";
 import { useT } from "../i18n";
 
 type Inventory = {
@@ -41,7 +41,13 @@ type Inventory = {
   folderDuplicates: number;
   skipped: SkippedFile[];
   reusedHashes: number;
+  deleted: number;
 };
+
+/* 曾在 Product Finder 被刪除、所以這次略過的檔案（2.39）。
+   🔴 要列出來而不是默默略過：「我資料夾裡明明有，為什麼沒匯入」是一定會被問的事，
+      而答案是「有人刪過它」—— 講不出來的話，使用者只會以為系統壞了。 */
+type DeletedEntry = { item: ImportFile; info: PdDeletedInfo; status?: StatusTag };
 
 
 type SkippedFile = {
@@ -67,12 +73,16 @@ export type ImportToolMode = "batch" | "quick" | "sync" | "analysis";
 export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
   const t = useT();
   const { profile } = useAuth();
+  // 還原與刪除同一個權限（伺服器端也是這樣驗）
+  const isAdmin = profile?.role === "admin";
   const inputRef = useRef<HTMLInputElement>(null);
   const quickInputRef = useRef<HTMLInputElement>(null);
   const abortRef = useRef<AbortController | null>(null);
   const [files, setFiles] = useState<ImportFile[]>([]);
   const [pendingFiles, setPendingFiles] = useState<ImportFile[]>([]);
   const [inventory, setInventory] = useState<Inventory | null>(null);
+  const [deletedFiles, setDeletedFiles] = useState<DeletedEntry[]>([]);
+  const [quickDeleted, setQuickDeleted] = useState<PdDeletedInfo | null>(null);
   const [phase, setPhase] = useState<Phase>("idle");
   const [progress, setProgress] = useState(0);
   const [message, setMessage] = useState("");
@@ -128,6 +138,7 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
     setFiles([]);
     setPendingFiles([]);
     setInventory(null);
+    setDeletedFiles([]);
     setProgress(0);
 
     const selectedFiles = Array.from(selected);
@@ -170,11 +181,14 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
       const deduped = dedupeByDatasetHash(hashed);
       setLocalFiles(deduped.unique);
       if (mode === "sync") await refreshSync(deduped.unique);
-      const existing = await findExistingHashes(deduped.unique, (checked, total) => {
+      const { existing, deleted } = await findExistingHashes(deduped.unique, (checked, total) => {
         setMessage(t("u_comparing", { i: checked, n: total }));
         setProgress(75 + Math.round((checked / Math.max(total, 1)) * 25));
       });
-      const pending = deduped.unique.filter((item) => !existing.has(importFileKey(item)));
+      const deletedEntries: DeletedEntry[] = deduped.unique
+        .filter((item) => deleted.has(importFileKey(item)))
+        .map((item) => ({ item, info: deleted.get(importFileKey(item)) as PdDeletedInfo }));
+      const pending = deduped.unique.filter((item) => !existing.has(importFileKey(item)) && !deleted.has(importFileKey(item)));
       const batch = prepareBatch(pending);
 
       setInventory({
@@ -186,7 +200,9 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
         folderDuplicates: deduped.duplicates,
         skipped,
         reusedHashes,
+        deleted: deletedEntries.length,
       });
+      setDeletedFiles(deletedEntries);
       setPendingFiles(pending);
       setFiles(batch);
       setProgress(0);
@@ -281,6 +297,7 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
     let completed = 0;
     let duplicates = 0;
     let failed = 0;
+    let deletedSkipped = 0;
     let stoppedAt = -1;
     let sessionLost = false;
     const processed = new Set<string>();
@@ -299,6 +316,15 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
           completed += 1;
         }
       } catch (reason) {
+        /* 盤點之後、上傳之前才被刪掉的：伺服器擋下，算「曾刪除」不算「失敗」，
+           而且標成已處理 —— 下一批不該再試一次。 */
+        if (reason instanceof DeletedDocumentError) {
+          deletedSkipped += 1;
+          processed.add(importFileKey(item));
+          updateStatus(index, tag("u_st_deleted"));
+          setProgress(Math.round(((index + 1) / files.length) * 100));
+          continue;
+        }
         if (reason instanceof SessionExpiredError) {
           sessionLost = true;
           stoppedAt = index;
@@ -321,8 +347,9 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
     setPendingFiles(remaining);
     setInventory((current) => current ? {
       ...current,
-      indexed: current.indexed + processed.size,
+      indexed: current.indexed + processed.size - deletedSkipped,
       pending: remaining.length,
+      deleted: current.deleted + deletedSkipped,
     } : current);
     if (sessionLost) {
       setMessage(t("u_session_expired", { i: stoppedAt + 1 }));
@@ -332,12 +359,34 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
         r: remaining.length + (files.length - stoppedAt),
       }));
     } else {
-      setMessage(t("u_batch_done", { a: completed, d: duplicates, f: failed, r: remaining.length }));
+      setMessage(t("u_batch_done", { a: completed, d: duplicates, f: failed, r: remaining.length })
+        + (deletedSkipped ? " " + t("u_batch_deleted_n", { n: deletedSkipped }) : ""));
     }
     setPhase("finished");
     /* session 失效時不要再打一個注定 401 的請求；中途停止仍然要觸發 ——
        已經傳上去的那些檔案照樣該被分析。*/
     if (!sessionLost) await autoStartAnalysis("both", completed);
+  }
+
+  /* admin 把一份「曾經刪除」的檔案重新匯入。逐份確認，不做「全部還原」：
+     還原是推翻刪除的決定，一次推翻幾十份很難是深思熟慮過的。 */
+  async function restoreOne(index: number) {
+    const entry = deletedFiles[index];
+    if (!entry || running || !isAdmin) return;
+    if (!window.confirm(t("u_restore_confirm", {
+      p: entry.item.relativePath, d: formatDeletedAt(entry.info.deletedAt), n: entry.info.deletedByName || "—",
+    }))) return;
+    const setStatus = (status: StatusTag) => setDeletedFiles((current) => current.map((e, i) => i === index ? { ...e, status } : e));
+    setStatus(tag("u_st_preparing"));
+    const controller = new AbortController();
+    try {
+      const outcome = await uploadOne({ ...entry.item, restore: true }, setStatus, controller.signal);
+      setStatus(tag(outcome === "duplicate" ? "u_st_duplicate" : "u_st_restored"));
+      setInventory((current) => current ? { ...current, indexed: current.indexed + 1, deleted: Math.max(0, current.deleted - 1) } : current);
+      if (outcome === "completed") await autoStartAnalysis(entry.item.dataset, 1);
+    } catch (reason) {
+      setStatus(tag("u_st_failed", { m: reason instanceof Error ? reason.message : t("u_unknown_err") }));
+    }
   }
 
   function stopUpload() {
@@ -346,6 +395,7 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
 
   function chooseQuick(selected: FileList | File[] | null) {
     if (!selected || quickRunning) return;
+    setQuickDeleted(null);
     const selectedFiles = Array.from(selected);
     if (selectedFiles.length !== 1) {
       setQuickFiles([]);
@@ -365,8 +415,12 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
     setQuickMessage(t("u_q_selected"));
   }
 
-  async function quickUpload() {
+  async function quickUpload(restore = false) {
     if (!quickFiles.length || quickRunning || running) return;
+    if (restore && quickDeleted && !window.confirm(t("u_restore_confirm", {
+      p: quickFiles[0].name, d: formatDeletedAt(quickDeleted.deletedAt), n: quickDeleted.deletedByName || "—",
+    }))) return;
+    setQuickDeleted(null);
     try {
       quickUploadRelativePath(quickDataset, "", quickFiles[0].name);
     } catch (reason) {
@@ -390,6 +444,7 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
           relativePath: quickUploadRelativePath(quickDataset, "", file.name),
           sha256: await hashFile(file),
           status: tag("u_st_preparing"),
+          ...(restore ? { restore: true } : {}),
         };
         const outcome = await uploadOne(item, (status) => updateQuickStatus(index, status), controller.signal);
         if (outcome === "duplicate") {
@@ -399,6 +454,16 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
           completed += 1;
         }
       } catch (reason) {
+        if (reason instanceof DeletedDocumentError) {
+          // 手動上傳是刻意的單一檔案：說清楚是誰、什麼時候刪的，admin 可以就地選擇還原
+          setQuickDeleted(reason.info);
+          updateQuickStatus(index, tag("u_st_deleted"));
+          setQuickMessage(t("u_q_deleted", { d: formatDeletedAt(reason.info.deletedAt), n: reason.info.deletedByName || "—" })
+            + " " + (isAdmin ? t("u_q_deleted_admin") : t("u_del_ask_admin")));
+          abortRef.current = null;
+          setQuickRunning(false);
+          return;
+        }
         if (reason instanceof SessionExpiredError) {
           updateQuickStatus(index, tag("u_st_cancelled"));
           setQuickMessage(t("u_session_expired", { i: index + 1 }));
@@ -542,13 +607,25 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
         <span className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">{t("u_dir_hint")}</span>
       </button>
       {directoryHandle && supportsDirectoryAccess() && <div className="mt-3 text-right"><Button variant="ghost" disabled={running} onClick={() => void setOrScanDefaultDirectory(true)}><FolderOpen size={17} />{t("u_change_default_dir")}</Button></div>}
-      {inventory && <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-6" aria-label={t("u_inv_aria")}>
+      {inventory && <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7" aria-label={t("u_inv_aria")}>
         <Metric label={t("u_m_total")} value={inventory.total} />
         <Metric label={t("u_m_eligible")} value={inventory.eligible} tone="cyan" />
         <Metric label={t("u_m_unique")} value={inventory.unique} tone="cyan" />
         <Metric label={t("u_m_indexed")} value={inventory.indexed} tone="green" />
         <Metric label={t("u_m_pending")} value={inventory.pending} tone="amber" />
         <Metric label={t("u_m_dupes")} value={inventory.folderDuplicates} />
+        <Metric label={t("u_m_deleted")} value={inventory.deleted} />
+      </div>}
+      {deletedFiles.length > 0 && <div className="mt-3 rounded-xl border border-slate-700 bg-slate-950/35 p-4" aria-label={t("u_del_title", { n: deletedFiles.length })}>
+        <p className="text-sm font-semibold text-slate-200">{t("u_del_title", { n: deletedFiles.length })}</p>
+        <p className="mt-1 text-xs leading-5 text-slate-500">{t("u_del_desc")} {isAdmin ? t("u_del_desc_admin") : t("u_del_ask_admin")}</p>
+        <div className="mt-3 max-h-72 overflow-y-auto rounded-lg border border-slate-800">
+          {deletedFiles.map((entry, index) => <div key={importFileKey(entry.item)} className="grid gap-2 border-b border-slate-800 px-3 py-2 text-sm last:border-0 md:grid-cols-[minmax(0,1fr)_220px_auto] md:items-center">
+            <span className="truncate text-slate-200" title={entry.item.relativePath}>{entry.item.relativePath}</span>
+            <span className="text-xs text-slate-500">{entry.status ? t(entry.status.key, entry.status.params) : t("u_del_meta", { d: formatDeletedAt(entry.info.deletedAt), n: entry.info.deletedByName || "—" })}</span>
+            {isAdmin && !entry.status && <Button variant="ghost" disabled={running} onClick={() => void restoreOne(index)}><RotateCcw size={15} />{t("u_restore")}</Button>}
+          </div>)}
+        </div>
       </div>}
       {inventory && inventory.skipped.length > 0 && <div className="mt-3 rounded-xl border border-slate-700 bg-slate-950/35 p-4" aria-label={t("u_skipped_aria")}>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -629,6 +706,7 @@ export function IncrementalUploadPage({ mode }: { mode: ImportToolMode }) {
 
       <div className="mt-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <p role="status" className="min-w-0 flex-1 text-sm leading-6 text-slate-400">{quickMessage || t("u_q_hint")}</p>
+        {isAdmin && quickDeleted && quickFiles.length > 0 && <Button variant="ghost" disabled={quickRunning || running} onClick={() => void quickUpload(true)}><RotateCcw size={17} />{t("u_q_restore")}</Button>}
         <Button disabled={!quickFiles.length || quickRunning || running} onClick={() => void quickUpload()}>
           {quickRunning ? <LoaderCircle className="animate-spin" size={18} /> : <UploadCloud size={18} />}
           {quickRunning ? t("u_st_uploading") : quickFiles.length ? t("u_q_btn_up") : t("u_q_btn_pick")}
@@ -870,6 +948,7 @@ function prepareBatch(files: ImportFile[]) {
 
 async function findExistingHashes(files: ImportFile[], onProgress: (checked: number, total: number) => void) {
   const existing = new Set<string>();
+  const deleted = new Map<string, PdDeletedInfo>();
   let checked = 0;
   for (const dataset of ["mfg", "buy"] as const) {
     const hashes = files.filter((item) => item.dataset === dataset).map((item) => item.sha256);
@@ -877,11 +956,20 @@ async function findExistingHashes(files: ImportFile[], onProgress: (checked: num
       const chunk = hashes.slice(index, index + HASH_QUERY_SIZE);
       const result = await api.checkPdHashes(dataset, chunk);
       result.existing.forEach((sha256) => existing.add(`${dataset}:${sha256}`));
+      (result.deleted || []).forEach((info) => deleted.set(`${dataset}:${info.sha256}`, info));
       checked += chunk.length;
       onProgress(checked, files.length);
     }
   }
-  return existing;
+  return { existing, deleted };
+}
+
+// 刪除時間用當地日期（沒有就顯示 —）
+function formatDeletedAt(value: string | null) {
+  if (!value) return "—";
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return "—";
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 
 function loadManifest(): Record<string, ImportManifestEntry> {

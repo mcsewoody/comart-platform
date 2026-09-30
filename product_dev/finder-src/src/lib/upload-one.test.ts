@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { tag, uploadOne, type ImportFile } from "./upload-one";
+import { DeletedDocumentError, tag, uploadOne, type ImportFile } from "./upload-one";
 import { api } from "./api";
 
 /* uploadOne 有三條路（秒傳／已存在／一般 PUT）外加重試與回退，是整包最會出事的
@@ -46,6 +46,38 @@ afterEach(() => {
 });
 
 describe("uploadOne", () => {
+  const tomb = { sha256: "a".repeat(64), relativePath: "OwnProduct/素亦/X1.pdf", title: "X1", deletedAt: "2026-10-01T00:00:00Z", deletedByName: "管理者" };
+
+  it("曾被刪除：伺服器擋下就丟 DeletedDocumentError，不碰 storage、不回報完成", async () => {
+    initPdUpload.mockResolvedValue({ duplicate: false, deleted: true, tombstone: tomb });
+    const fetchSpy = vi.fn();
+    vi.stubGlobal("fetch", fetchSpy);
+
+    await expect(uploadOne(file(), noop, signal)).rejects.toBeInstanceOf(DeletedDocumentError);
+    expect(fetchSpy).not.toHaveBeenCalled();
+    expect(completePdUpload).not.toHaveBeenCalled();
+  });
+
+  it("還原：restore 要同時送到 initUpload 與 completeUpload", async () => {
+    initPdUpload.mockResolvedValue({ duplicate: false, storageExists: true, storagePath: "aa/x/source.pdf" });
+    await expect(uploadOne({ ...file(), restore: true }, noop, signal)).resolves.toBe("completed");
+    expect(initPdUpload.mock.calls[0][0]).toMatchObject({ restore: true });
+    expect(completePdUpload.mock.calls[0][0]).toMatchObject({ restore: true });
+  });
+
+  it("一般上傳不送 restore（伺服器看到 restore 會要求 admin）", async () => {
+    initPdUpload.mockResolvedValue({ duplicate: false, storageExists: true, storagePath: "aa/x/source.pdf" });
+    await uploadOne(file(), noop, signal);
+    expect(initPdUpload.mock.calls[0][0]).not.toHaveProperty("restore");
+    expect(completePdUpload.mock.calls[0][0]).not.toHaveProperty("restore");
+  });
+
+  it("initUpload 之後才被刪掉：completeUpload 擋下也要丟 DeletedDocumentError", async () => {
+    initPdUpload.mockResolvedValue({ duplicate: false, storageExists: true, storagePath: "aa/x/source.pdf" });
+    completePdUpload.mockResolvedValue({ duplicate: false, deleted: true, tombstone: tomb, documentId: "" });
+    await expect(uploadOne(file(), noop, signal)).rejects.toBeInstanceOf(DeletedDocumentError);
+  });
+
   it("秒傳：後端說這個 sha256 已經有了，就不碰 storage", async () => {
     initPdUpload.mockResolvedValue({ duplicate: true });
     const fetchSpy = vi.fn();

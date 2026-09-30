@@ -11,7 +11,7 @@ import { appConfig } from "./config";
 import { formatBytes } from "./utils";
 import { isSignedTusAuthError, isTransientUploadStatus, shouldUseResumableUpload } from "./incremental-import";
 import { t as tr } from "../i18n";
-import type { PdDataset } from "./types";
+import type { PdDataset, PdDeletedInfo } from "./types";
 
 /* 🔴 狀態存 key 不存文案：把「當下語言的字串」寫進 React state 的話，切語言時
    元件雖然重畫，但 state 裡的字不會重算，檔案清單的狀態欄會卡在舊語言。*/
@@ -25,7 +25,19 @@ export type ImportFile = {
   relativePath: string;
   sha256: string;
   status: StatusTag;
+  /* 只有 admin 在「曾經刪除」清單按「重新匯入」時才是 true。
+     伺服器會再驗一次角色，前端設錯也只會得到 403。*/
+  restore?: boolean;
 };
+
+/* 曾被刪除而被伺服器擋下。用例外而不是回傳值：呼叫端各自決定怎麼顯示，
+   而且忘了處理時會落到「失敗」那一格，不會被當成成功。 */
+export class DeletedDocumentError extends Error {
+  constructor(public info: PdDeletedInfo) {
+    super("deleted_document");
+    this.name = "DeletedDocumentError";
+  }
+}
 
 export async function uploadOne(
   item: ImportFile,
@@ -41,8 +53,10 @@ export async function uploadOne(
       relativePath: item.relativePath,
       byteSize: item.file.size,
       sha256: item.sha256,
+      ...(item.restore ? { restore: true } : {}),
     }, signal);
     if (init.duplicate) return "duplicate";
+    if (init.deleted && init.tombstone) throw new DeletedDocumentError(init.tombstone);
     if (!init.storagePath) throw new Error(tr("u_e_no_path"));
     storagePath = init.storagePath;
 
@@ -105,8 +119,10 @@ export async function uploadOne(
     sha256: item.sha256,
     storagePath,
     lastModified: item.file.lastModified,
+    ...(item.restore ? { restore: true } : {}),
   }, signal);
   if (result.duplicate) return "duplicate";
+  if (result.deleted && result.tombstone) throw new DeletedDocumentError(result.tombstone);
   onStatus(result.analysisStatus === "metadata_only" ? tag("u_st_meta_idx") : tag("u_st_doc_idx"));
   return "completed";
 }

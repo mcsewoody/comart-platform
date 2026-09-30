@@ -2348,7 +2348,7 @@ Portal 入口：APPS 的 `id:'product-dev'`（`roles:[]`，**不限角色，全�
 | 部分 | 路徑 | 版本 | 形態 |
 |---|---|---|---|
 | 工作區首頁（hub） | `product_dev/index.html` | **v2.25** | 單檔，只有入口卡片 |
-| Document Finder | `product_dev/finder/`（產物）← `finder-src/`（原始碼） | **2.38** | **React 19 + TypeScript + Vite + Tailwind 4** |
+| Document Finder | `product_dev/finder/`（產物）← `finder-src/`（原始碼） | **2.39** | **React 19 + TypeScript + Vite + Tailwind 4** |
 | 手機與配件（裝置保管） | `product_dev/devices/index.html` | **v1.11** | 單檔，53KB |
 
 - 🔴 **hub 不再標示另外兩個模組的版本**（v2.20 拿掉）。那是第二份副本，
@@ -2669,6 +2669,22 @@ WHERE 變成單一 like 述詞，GIN trgm 才用得到。
 - 🔴 **edge function 沒辦法在本機跑**（要有效的 `x-session` HMAC），所以這類改動
   唯一的防線就是把邏輯抽成 `.js` 再用 `node --test` 測。
   跑法：`cd supabase/functions/pd-documents-api && node --test *.test.mjs`（28 個）。
+
+### 🔴 刪除後不再匯入：`pd_deleted_documents`（2.39，2026-10-01）
+
+「匯入過沒有」原本唯一的依據是伺服器上還有沒有同一個 sha256，所以**刪掉的文件
+只要任何一台電腦還有那個檔，下一次批次匯入就回來了**。「同時刪除本機檔案」
+只刪得到當下那一台，擋不住另一台 Mac 或其他同事。
+
+- 刪除時先 upsert 一筆 `(dataset, sha256)` 到 `pd_deleted_documents`，**記不下來就不刪**。
+- 🔴 **擋在伺服器**：`initUpload`／`completeUpload` 都查（`tombstoneDecision`），
+  命中回 `deleted:true`；**查詢失敗一律不放行**。`checkHashes` 另回 `deleted[]`
+  只是讓盤點畫面列得出來 —— 前端的略過不是那道牆。
+- **還原只有 admin**，帶 `restore:true`、逐份確認；完成後才移除那一筆，稽核記 `restore`。
+  `pd_transfer_audit` 的 action check 因此多了 `'restore'`。
+- 依據是**內容指紋**，所以檔名、路徑、哪一台電腦都不影響。
+  ⚠️ 反過來說：內容改過一個字就是另一份文件，不會被擋（那是對的）。
+- 上線時稽核表裡沒有任何 `delete` 紀錄可補，**更早以前刪掉的追不回來**。
 
 ### 🔴 `deleteDocument` 先刪檔案、後刪資料列（2.37 反過來）
 

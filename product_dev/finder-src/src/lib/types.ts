@@ -108,8 +108,20 @@ export interface PdSearchParams {
   offset?: number;
 }
 
+/* 曾在 Product Finder 被刪除的內容指紋（pd_deleted_documents）。
+   批次匯入與上傳一律略過；admin 帶 restore 才能重新匯入。*/
+export interface PdDeletedInfo {
+  sha256: string;
+  relativePath: string;
+  title: string;
+  deletedAt: string | null;
+  deletedByName: string;
+}
+
 export interface PdUploadInit {
   duplicate: boolean;
+  deleted?: boolean;
+  tombstone?: PdDeletedInfo;
   documentId?: string;
   title?: string;
   storageExists?: boolean;

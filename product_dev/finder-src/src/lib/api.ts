@@ -4,6 +4,7 @@ import { getPlatformSession } from "./platform-session";
 import type {
   PdAnalysisQueueStatus,
   PdDataset,
+  PdDeletedInfo,
   PdDocumentDetail,
   PdDocumentEdit,
   PdDocumentSummary,
@@ -98,14 +99,14 @@ export const api = {
   },
 
   async initPdUpload(
-    payload: { dataset: PdDataset; relativePath: string; byteSize: number; sha256: string },
+    payload: { dataset: PdDataset; relativePath: string; byteSize: number; sha256: string; restore?: boolean },
     signal?: AbortSignal,
   ) {
     return platformCall<PdUploadInit>("initUpload", payload, signal);
   },
 
   async checkPdHashes(dataset: PdDataset, hashes: string[], signal?: AbortSignal) {
-    return platformCall<{ existing: string[] }>("checkHashes", { dataset, hashes }, signal);
+    return platformCall<{ existing: string[]; deleted?: PdDeletedInfo[] }>("checkHashes", { dataset, hashes }, signal);
   },
 
   async completePdUpload(
@@ -117,10 +118,11 @@ export const api = {
       sha256: string;
       storagePath: string;
       lastModified: number;
+      restore?: boolean;
     },
     signal?: AbortSignal,
   ) {
-    return platformCall<{ duplicate: boolean; documentId: string; analysisStatus?: string }>(
+    return platformCall<{ duplicate: boolean; deleted?: boolean; tombstone?: PdDeletedInfo; documentId: string; analysisStatus?: string }>(
       "completeUpload",
       payload,
       signal,

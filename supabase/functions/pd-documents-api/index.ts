@@ -5,6 +5,7 @@ import { namedSecretKey } from "../_shared/api-keys.ts"
 import { expandSearchQueries } from "./search-aliases.js"
 import { resolveProductFinderAccess } from "./access-control.js"
 import { deleteColumns, editColumns, summaryColumns } from "./document-columns.js"
+import { tombstoneDecision, tombstonePublic } from "./tombstone.js"
 import { dispatchInputs, parseAnalysisRequest } from "./analysis-request.js"
 
 const CORS = {
@@ -54,6 +55,17 @@ async function fetchSyncRows(sb: any, dataset: Dataset) {
     if ((data || []).length < 1000) break
   }
   return rows
+}
+
+/* 🔴 刪除紀錄查詢失敗一律「不放行」（fail-closed）：放行的話，資料庫一抖動，
+   刪掉的文件就趁那幾秒被匯入回來 —— 而那正是這張表存在的理由。
+   上傳失敗只是「這個檔這次沒傳上去」，下一批會再試。 */
+async function findTombstone(sb: any, dataset: Dataset, sha256: string) {
+  const { data, error } = await sb.from("pd_deleted_documents")
+    .select("sha256,relative_path,title,deleted_at,deleted_by_name")
+    .eq("dataset", dataset).eq("sha256", sha256).maybeSingle()
+  if (error) throw new Error(`tombstone_lookup_failed: ${error.message}`)
+  return data || null
 }
 
 const EMPTY_QUEUE = { queued: 0, processing: 0, retryableFailed: 0, blockedFailed: 0, completed: 0 }
@@ -501,6 +513,17 @@ serve(async (req) => {
        反過來的話中間失敗會留下「資料列還在、檔案沒了」—— 文件照樣出現在搜尋
        結果裡，點進去才壞，而且沒有任何人會發現。
        這個順序失敗只會在 storage 留下孤兒 bytes：看不見、可事後清、不會騙人。*/
+    /* 🔴 先記「刻意刪除」再刪資料列（2.39）。記不下來就不刪：
+       沒有這一筆，任何一台電腦的下一次批次匯入都會把它匯入回來，
+       而那正是使用者按下刪除時最不想要的結果。 */
+    const { error: tombError } = await sb.from("pd_deleted_documents").upsert({
+      dataset, sha256: current.sha256, relative_path: current.relative_path || "",
+      title: current.title || "", deleted_by: sess.empId,
+      deleted_by_name: user.name_zh || user.name_en || user.emp_id || sess.empId,
+      deleted_at: new Date().toISOString(),
+    }, { onConflict: "dataset,sha256" })
+    if (tombError) return json({ error: `tombstone_write_failed: ${tombError.message}` }, 500)
+
     const editDelete = await sb.from("pd_document_edits").delete().eq("dataset", dataset).eq("document_id", id)
     if (editDelete.error) return json({ error: editDelete.error.message }, 500)
     const { error: deleteError } = await sb.from(table).delete().eq("id", id)
@@ -616,7 +639,15 @@ serve(async (req) => {
     }
     const { data, error } = await sb.from(table).select("sha256").in("sha256", hashes)
     if (error) return json({ error: error.message }, 500)
-    return json({ existing: (data || []).map((row: any) => row.sha256) })
+    const existing = (data || []).map((row: any) => row.sha256)
+    // 曾刪除的指紋另外回報，讓盤點畫面說得出「略過了哪些、為什麼」
+    const { data: tombs, error: tombError } = await sb.from("pd_deleted_documents")
+      .select("sha256,relative_path,title,deleted_at,deleted_by_name")
+      .eq("dataset", dataset).in("sha256", hashes)
+    if (tombError) return json({ error: `tombstone_lookup_failed: ${tombError.message}` }, 500)
+    const existingSet = new Set(existing)
+    const deleted = (tombs || []).filter((row: any) => !existingSet.has(row.sha256)).map(tombstonePublic)
+    return json({ existing, deleted })
   }
 
   if (action === "initUpload") {
@@ -635,6 +666,12 @@ serve(async (req) => {
     }
     const { data: existing } = await sb.from(table).select("id,title").eq("sha256", sha256).maybeSingle()
     if (existing) return json({ duplicate: true, documentId: existing.id, title: existing.title })
+    const restore = body.restore === true
+    let tomb: any = null
+    try { tomb = await findTombstone(sb, dataset, sha256) } catch (e) { return json({ error: (e as Error).message }, 500) }
+    const decision = tombstoneDecision(tomb, { restore, isAdmin: sess.role === "admin" && user.role === "admin" })
+    if (decision === "blocked") return json({ duplicate: false, deleted: true, tombstone: tombstonePublic(tomb) })
+    if (decision === "restore_forbidden") return json({ error: "restore_forbidden" }, 403)
     const storagePath = `${sha256.slice(0, 2)}/${sha256}/source.${extension}`
     const { data, error } = await sb.storage.from(bucketFor(dataset, "source")).createSignedUploadUrl(storagePath)
     if (error && /resource already exists/i.test(error.message)) {
@@ -663,6 +700,16 @@ serve(async (req) => {
         byteSize <= 0 || byteSize > 52428800 || storagePath !== expectedStoragePath) {
       return json({ error: "invalid_upload_completion" }, 400)
     }
+    /* 🔴 completeUpload 也要擋：initUpload 之後、完成之前，那份可能剛好被刪掉；
+       而且只擋 initUpload 等於相信前端一定會先呼叫它。 */
+    const restore = body.restore === true
+    let tomb: any = null
+    try { tomb = await findTombstone(sb, dataset, sha256) } catch (e) { return json({ error: (e as Error).message }, 500) }
+    const decision = tombstoneDecision(tomb, { restore, isAdmin: sess.role === "admin" && user.role === "admin" })
+    if (decision === "blocked") return json({ duplicate: false, deleted: true, tombstone: tombstonePublic(tomb) })
+    if (decision === "restore_forbidden") return json({ error: "restore_forbidden" }, 403)
+    const auditAction = tomb ? "restore" : "upload"
+
     const classified = classify(dataset, relativePath, extension)
     const analysisStatus = DEEP_EXTENSIONS.has(extension) ? "queued" : "metadata_only"
     const payload = {
@@ -686,6 +733,11 @@ serve(async (req) => {
       }
       return json({ error: error.message }, 400)
     }
+    if (tomb) {
+      // 還原成功才移除刪除紀錄；移除失敗不影響文件本身（它已經存在，之後會被當成重複）
+      const { error: clearError } = await sb.from("pd_deleted_documents").delete().eq("dataset", dataset).eq("sha256", sha256)
+      if (clearError) console.error("Tombstone clear failed after restore", dataset, sha256, clearError.message)
+    }
     /* 🔴 這個 insert 的錯誤原本沒有人看。失敗的話文件的 analysis_status 停在
        'queued'，但佇列裡沒有對應的工作 —— worker 永遠不會撿到它，畫面上
        **永遠顯示「等待內容分析」**，而它在等的東西根本不存在。
@@ -697,14 +749,14 @@ serve(async (req) => {
         console.error("Analysis job enqueue failed", dataset, row.id, jobError.message)
         await sb.from(table).update({ analysis_status: "metadata_only" }).eq("id", row.id)
         await sb.from("pd_transfer_audit").insert({
-          emp_id: sess.empId, action: "upload", dataset, document_id: row.id,
+          emp_id: sess.empId, action: auditAction, dataset, document_id: row.id,
           relative_path: relativePath, sha256,
         })
         return json({ duplicate: false, documentId: row.id, analysisStatus: "metadata_only", enqueueFailed: true })
       }
     }
     await sb.from("pd_transfer_audit").insert({
-      emp_id: sess.empId, action: "upload", dataset, document_id: row.id,
+      emp_id: sess.empId, action: auditAction, dataset, document_id: row.id,
       relative_path: relativePath, sha256,
     })
     return json({ duplicate: false, documentId: row.id, analysisStatus })

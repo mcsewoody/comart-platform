@@ -84,8 +84,9 @@ export function editColumns(dataset) {
 }
 
 /** 刪除只需要三個 storage 路徑與兩個稽核欄位。 */
+// title 是給 pd_deleted_documents 的：盤點畫面說「這份曾被刪除」時要講得出是哪一份
 export const DELETE_COLUMNS = [
-  "id", "relative_path", "sha256", "storage_path", "preview_path", "thumbnail_path",
+  "id", "title", "relative_path", "sha256", "storage_path", "preview_path", "thumbnail_path",
 ]
 
 export const deleteColumns = () => DELETE_COLUMNS.join(",")

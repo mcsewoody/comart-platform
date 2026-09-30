@@ -14,6 +14,7 @@
 #    ./scripts/handoff.sh park     離開這台之前跑
 #    ./scripts/handoff.sh resume   到另一台開工時跑
 #    ./scripts/handoff.sh status   看目前狀態（不改任何東西）
+#    ./scripts/handoff.sh doctor   新機器第一次開工：檢查缺什麼並給修法
 # ══════════════════════════════════════════════════════════════
 set -uo pipefail
 
@@ -161,9 +162,90 @@ cmd_resume() {
   if [ -f "$HANDOFF" ]; then c_head "上次的交接筆記"; cat "$HANDOFF"; fi
 }
 
+
+# ── 體檢：另一台機器第一次開工時跑這個 ─────────────────────────
+# 🔴 這支存在的理由：~/.zshrc、Homebrew、gh／supabase 的登入、pip 套件
+#    **全部都在家目錄或系統層，不在 ~/Documents 底下，所以 iCloud 不會同步**。
+#    新機器上會缺什麼只能實際檢查，不能憑印象列清單。
+cmd_doctor() {
+  local bad=0
+  fix() { printf '      \033[36m→ %s\033[0m\n' "$*"; }
+
+  c_head "1  iCloud 桌面與文件同步"
+  local icdoc="$ICLOUD/Documents/comart-platform"
+  if [ -d "$icdoc" ] && [ "$(stat -f %i "$icdoc" 2>/dev/null)" = "$(stat -f %i "$REPO" 2>/dev/null)" ]; then
+    c_ok "已開啟，repo 就是 iCloud 裡的那一份"
+  else
+    c_err "沒開啟（或 repo 不在 iCloud 裡）—— 這台不會自動拿到另一台的未提交檔案"
+    fix "系統設定 → Apple 帳戶 → iCloud → iCloud 雲碟 → 開啟「桌面與文件」"
+    bad=$((bad+1))
+  fi
+
+  c_head "2  repo"
+  if [ -d "$REPO/.git" ]; then
+    c_ok "${REPO}（$(git -C "$REPO" rev-parse --abbrev-ref HEAD) @ $(git -C "$REPO" log --oneline -1 2>/dev/null)）"
+  else
+    c_err "找不到 repo"; fix "git clone https://github.com/mcsewoody/comart-platform.git ~/Documents/comart-platform"; bad=$((bad+1))
+  fi
+
+  c_head "3  cccmt 別名（~/.zshrc 不在 iCloud，不會同步）"
+  if grep -q "alias cccmt=" "$HOME/.zshrc" 2>/dev/null; then
+    c_ok "$(grep 'alias cccmt=' "$HOME/.zshrc" | head -1)"
+  else
+    c_err "沒有 —— 從別的目錄啟動 claude 會拿到別的記憶 key，20 份記憶一份都不會載入"
+    fix "echo \"alias cccmt='cd ~/Documents/comart-platform && claude'\" >> ~/.zshrc && source ~/.zshrc"
+    bad=$((bad+1))
+  fi
+
+  c_head "4  記憶共用"
+  local linked=0
+  for m in "$HOME/.claude/projects"/*/memory; do [ -L "$m" ] && linked=$((linked+1)); done
+  if [ "$linked" -gt 0 ]; then
+    c_ok "$linked 個專案的記憶已連到 iCloud"
+  else
+    c_warn "還沒連"; fix "./scripts/handoff.sh resume"
+  fi
+
+  c_head "5  指令列工具"
+  for c in git gh supabase node npm python3 rsync brctl; do
+    if command -v "$c" >/dev/null 2>&1; then printf '   ✅ %s\n' "$c"
+    else
+      printf '   \033[31m🔴 %s\033[0m\n' "$c"; bad=$((bad+1))
+      case "$c" in
+        gh|supabase|node|npm) fix "brew install $c" ;;
+        python3) fix "從 python.org 安裝，或 brew install python@3.12" ;;
+        *) fix "macOS 內建，檢查 PATH" ;;
+      esac
+    fi
+  done
+
+  c_head "6  Python 套件（scripts/ 用得到）"
+  for m in pglast yaml; do
+    if python3 -c "import $m" 2>/dev/null; then printf '   ✅ %s\n' "$m"
+    else
+      printf '   \033[31m🔴 %s\033[0m\n' "$m"; bad=$((bad+1))
+      [ "$m" = "yaml" ] && fix "pip3 install pyyaml" || fix "pip3 install $m"
+    fi
+  done
+
+  c_head "7  登入狀態"
+  if gh auth status >/dev/null 2>&1; then c_ok "gh 已登入"
+  else c_err "gh 未登入"; fix "gh auth login"; bad=$((bad+1)); fi
+  if supabase projects list >/dev/null 2>&1; then c_ok "supabase CLI 已登入"
+  else c_warn "supabase CLI 未登入（只有要 db push／deploy 才需要）"; fix "supabase login"; fi
+
+  c_head "8  Product Finder 的建置環境"
+  if [ -d "$REPO/product_dev/finder-src/node_modules" ]; then c_ok "node_modules 已安裝"
+  else c_warn "沒有 node_modules（只有要改 Finder 才需要）"; fix "cd product_dev/finder-src && npm install"; fi
+
+  c_head "結果"
+  if [ "$bad" = "0" ]; then c_ok "可以開工"; else c_err "有 $bad 項要處理（上面藍色那幾行）"; fi
+}
+
 case "${1:-status}" in
   park)   cmd_park ;;
   resume) cmd_resume ;;
   status) cmd_status ;;
-  *) echo "用法：$0 {park|resume|status}"; exit 1 ;;
+  doctor) cmd_doctor ;;
+  *) echo "用法：$0 {park|resume|status|doctor}"; exit 1 ;;
 esac

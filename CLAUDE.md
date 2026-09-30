@@ -7,10 +7,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Woody 在兩台 Mac 上輪流工作，兩台都開著 iCloud「桌面與文件」同步。
 
 ```bash
+./scripts/handoff.sh doctor     # 新機器第一次開工：檢查缺什麼並直接給修法
 ./scripts/handoff.sh resume     # 到一台開工時
 ./scripts/handoff.sh park       # 離開那台之前
 ./scripts/handoff.sh status     # 只看狀態，不改東西
 ```
+
+🔴 **`~/.zshrc`、Homebrew、`gh`／`supabase` 的登入、pip 套件全都在家目錄或系統層，
+`~/Documents` 的 iCloud 同步涵蓋不到** —— 新機器缺什麼只能實際檢查，
+所以有 `doctor`，不要憑印象列清單。
 
 **哪些本來就通、哪些會斷：**
 

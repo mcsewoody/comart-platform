@@ -138,7 +138,7 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 |------|---------|---------|--------|
 | `index.html` | v2.10 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
 | `admin/index.html` | v2.51 | Admin System — **機場接送**、公務車、圖書館、會議室、客戶到訪、抽籤 | 8,221 |
-| `kms/index.html` | v2.45 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
+| `kms/index.html` | v2.46 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
 | `quotation/index.html` | v3.66 | Quotation & CRM system | 7,332 |
 | `board/index.html` | v1.92 | 公告與會議 Bulletin & Meetings — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍、腦力激盪 | 4,600 |
 | `product_dev/` | v2.25 | **產品開發管理 —— 第六個子系統，不遵守單一檔案原則**（見下方專節） | — |
@@ -288,6 +288,36 @@ KMS (`kms/index.html`) implements RAG (Retrieval-Augmented Generation):
 - 診斷起點：存檔時 console 的 `[embed-document]`。空內文現在在前端就擋下來並講
   「文件沒有可供索引的內文」—— 直接把 API 的 `text required` 丟給使用者，
   那句話描述的是欄位不是他的處境。
+
+### 🔴 KMS 原始檔改私有 bucket ＋ 掃描型 PDF 的 OCR（v2.46，2026-10-01）
+
+**起因**：使用者上傳兩份 10 MB 左右的 PDF，「卡了五分鐘沒動」。
+查資料庫：兩份都有存進去。其中良興那份是**掃描型 PDF（42 頁）**，走 OCR 路徑，
+舊版**一頁一頁依序**送 AI、最多 30 頁、進度只用幾秒就消失的 toast 顯示 ——
+約 5 分鐘，編輯器只有一行不會動的「解析中」。**而且第 31–42 頁根本沒進知識庫。**
+
+- OCR 改成**同時 4 頁**（`OCR_CONCURRENCY`）、上限 **80 頁**（`OCR_MAX_PAGES`），
+  結果依頁碼排序；進度寫在**編輯器的佔位文字**（`kmsParseProgress`），不靠 toast。
+  canvas 繪製仍排隊依序（很吃記憶體），只有辨識請求並行。
+- pdfjs 的 `getDocument`／每批頁面都加上逾時（`kmsWithTimeout`，60 秒）：
+  那些 promise 本身沒有上限，元件載入不完整時會永遠停在「解析中」。
+- 🔴 **批次上傳補上 parse token**（單檔流程原本就有）：解析中按「跳過」會直接開始下一份，
+  上一份的結果晚回來就會**把上一份的內文寫進下一份的編輯器**。
+- 🔴 **拿掉「內文超過 24,000 字就截斷寫回資料庫」**。那是向量長度上限的舊做法，
+  v2.40 起 `embed-document` 自己處理長度，這一刀只剩副作用：長文件後半段從關鍵字搜尋消失。
+
+**同時修的安全問題：`kms-files` 原本是公開 bucket ＋ anon 可上傳。**
+1,209 份原始檔（約 2 GB，含機密等級 2／3）不必登入就能下載；任何人也能用 anon key 往裡面塞檔案。
+
+- **讀**：`kms-secure-docs` 的 `fileUrl`（`{id}` → 先過與清單同一個 `allowed()` → 簽 10 分鐘網址）。
+  前端一律 `kmsFileSignedUrl()`／`kmsDownloadFile()`，四個入口（編輯器、讀取器、AI 來源卡片、重新解析）都改了。
+- **寫**：`kms-secure-docs` 的 `uploadUrl`（要有效 session，路徑由伺服器決定）→ 前端 XHR PUT 到簽章網址
+  （檔案不經 edge function，也拿得到上傳進度）。
+- 🔴 **sb-proxy 的 storage 轉發對 `kms-files` 一律 403**：那裡是 service role 無條件轉發，
+  無法依每份文件的機密等級判斷 —— 放行等於把牆開一個洞。
+- ⚠️ **`file_url` 的格式刻意不改**（仍是 `.../object/public/kms-files/uploads/...`），
+  它現在只是**定位字串**，本身打不開（`kmsFilePath()` 從它取出路徑，`node --test` 4 個）。
+  改寫 1,209 筆的代價與風險都大於收益。**看到這個網址打不開不是壞掉。**
 
 ### 🔴 同一個函式裡有兩種中文，只能翻一種（KMS v2.45，2026-09-26）
 

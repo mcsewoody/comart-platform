@@ -281,6 +281,12 @@ serve(async (req) => {
        再加。只要「受限 bucket 的名字出現在路徑的任何一段」就套守衛：
        誤擋一個名字剛好相同的路徑，代價是一次 403；漏放一次，代價是成本資料外流。 */
     const segs = stPath.split("?")[0].split("/").filter(Boolean)
+    /* 🔴 kms-files 一律不經這裡（2026-10-01 改私有）。KMS 原始檔要依**每份文件的機密等級**
+       判斷，那個規則只在 kms-secure-docs（fileUrl／uploadUrl）。這裡用 service role
+       無條件轉發的話，任何登入者都能簽到機密等級 3 的檔案 —— 等於把牆開一個洞。 */
+    if (segs.includes("kms-files")) {
+      return json({ error: "forbidden", hint: "kms-files is served by kms-secure-docs" }, 403)
+    }
     if (segs.some((x) => RESTRICTED_BUCKETS.has(x))) {
       // 停用／離職者一律不給，即使 role 還是 admin（判斷在 liveRoleOf 裡）
       const liveRole = await liveRoleOf(SUPABASE_URL, SERVICE_KEY, sessEmpId)

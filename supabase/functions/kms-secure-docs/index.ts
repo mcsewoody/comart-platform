@@ -11,6 +11,7 @@
 // 已過濾過的，不是「拿到全部、UI 選擇性顯示」。
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
+import { kmsFilePath, kmsLocator, kmsUploadPath } from "./file-path.js"
 import { verifySession } from "../_shared/session.ts"
 import { namedSecretKey } from "../_shared/api-keys.ts"
 import { embedText } from "../_shared/embed.ts"
@@ -117,6 +118,36 @@ serve(async (req) => {
       if (!doc) return json({ ok: false, reason: "not_found" })
       if (!allowed(doc)) return json({ ok: false, reason: "forbidden" }, 403)
       return json({ ok: true, doc })
+    }
+
+    /* ── fileUrl：原始檔的 10 分鐘簽章網址（2026-10-01，kms-files 改私有）──
+       🔴 先過 allowed() 再簽：以前 bucket 是公開的，機密等級 2／3 的原始檔
+       只要知道網址，不必登入就能下載。現在「看得到這份文件」才拿得到檔案，
+       判斷與 list／get 完全同一個函式，不另外發明規則。 */
+    if (action === "fileUrl") {
+      const id = String(body.id || "")
+      if (!/^[0-9a-f-]{36}$/i.test(id)) return json({ ok: false, reason: "bad_request" }, 400)
+      const { data, error } = await sb.from("kms_documents").select("id,conf_level,author_name,file_url,file_name").eq("id", id).limit(1)
+      if (error) return json({ ok: false, reason: "server_error", message: error.message }, 500)
+      const doc = data?.[0]
+      if (!doc) return json({ ok: false, reason: "not_found" }, 404)
+      if (!allowed(doc)) return json({ ok: false, reason: "forbidden" }, 403)
+      const path = kmsFilePath(doc.file_url)
+      if (!path) return json({ ok: false, reason: "no_file" }, 404)
+      const { data: signed, error: signErr } = await sb.storage.from("kms-files").createSignedUrl(path, 600)
+      if (signErr || !signed?.signedUrl) return json({ ok: false, reason: "sign_failed", message: signErr?.message }, 500)
+      return json({ ok: true, url: signed.signedUrl, name: doc.file_name || "" })
+    }
+
+    /* ── uploadUrl：上傳原始檔的一次性授權（2026-10-01）──
+       以前前端直接用**印在網頁原始碼裡的 anon key** 寫進 kms-files，
+       任何人不必登入就能往這個 bucket 塞檔案。現在要有效的 session（上面已驗），
+       而且只能寫到伺服器決定的新路徑（不能覆蓋既有檔案）。 */
+    if (action === "uploadUrl") {
+      const path = kmsUploadPath(String(body.fileName || ""))
+      const { data: up, error: upErr } = await sb.storage.from("kms-files").createSignedUploadUrl(path)
+      if (upErr || !up?.signedUrl) return json({ ok: false, reason: "sign_failed", message: upErr?.message }, 500)
+      return json({ ok: true, path, signedUrl: up.signedUrl, locator: kmsLocator(SUPABASE_URL, path) })
     }
 
     /* ── embedMissing：補齊沒有向量的文件（admin／dcc 專用）──

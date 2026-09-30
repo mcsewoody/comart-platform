@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART 行政管理平台 v2.48</title>
+<title>COMART 行政管理平台 v2.49</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -667,26 +667,34 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
 .admin-lang-btn.active{background:var(--blue);border-color:var(--blue);color:#fff;font-weight:600}
 
 /* ══ 機場接送預約 ══════════════════════════════════════════
-   🔴 **刻意與 admin 其餘模塊不同色**：這一塊照原系統
-   （comart-car-booking.web.app）的淺色外觀呈現，Woody 2026-09-30 指定。
-   所以整個面板是一座「淺色島」—— 變數在 #panel-airport 上重新定義，
-   影響範圍到此為止，不會漏到別的模塊。
+   版面與幾何照原系統 comart-car-booking（間距、欄寬、1180px 置中、
+   送機／接機的左側彩色直條），**配色改用 admin 的深色 token**
+   （Woody 2026-09-30：與其他子系統一致）。
 
-   ⚠️ 因此**這裡每一處文字顏色都要寫死**：admin 的全域文字色是接近白的
-   var(--text)，繼承進白底卡片會整片看不見。
-   顏色值直接取自原始檔的 :root，不要自己調。 */
+   🔴 調色盤集中在下面這組 --ap* 變數裡，換主題只改這一段。
+      2026-09-30 已經在深↔淺之間來回過一次，所以刻意留著這層間接。
+
+   🔴 這個面板不能只靠 admin 的全域樣式：
+      **admin 沒有定義 `.card`**（它有 .ccard／.bkcard／.bki，就是沒有 .card），
+      而且 **`.btn` 本身沒有背景色**（要靠 .bp／.btl／.bdr 變體）。
+      第一版直接套宿主 class，結果每張卡片都是沒有樣式的裸 div、按鈕全透明。
+      所以結構性的 class 一律自己定義並限定在 #panel-airport 裡。 */
 #panel-airport{
-  --apbg:#f4f6f9; --apcard:#fff; --apink:#1f2933; --apmuted:#667085; --apline:#e3e8ef;
-  --apbrand:#1d4e89; --apsoft:#e8f0fa; --apaccent:#0f8b8d;
-  --apwarn:#b54708; --apwarnbg:#fff6e5; --aperr:#b42318; --aperrbg:#fdecea;
-  --apok:#067647; --apokbg:#e7f6ee; --apr:10px;
-  background:var(--apbg); color:var(--apink);
-  font:15px/1.55 "Noto Sans TC","Microsoft JhengHei","PingFang TC",system-ui,sans-serif;
-  padding:18px; border-radius:12px;
+  --apcard:var(--surface); --apink:var(--text); --apmuted:var(--text-3);
+  --apline:var(--border); --apbrand:var(--blue); --apsoft:var(--blue-bg);
+  --apaccent:var(--tl); --apfield:var(--bgi); --apfieldbd:var(--border-mid);
+  --apwarn:var(--amber); --apwarnbg:var(--amber-bg); --aperr:var(--red); --aperrbg:var(--red-bg);
+  --apok:var(--green); --apokbg:var(--green-bg); --apr:10px;
+  color:var(--apink);
+  /* 🔴 沒有這一行，radio 與 checkbox 會用淺色 color-scheme 繪製 ——
+     未選取的 radio 是**實心白點**，在深色卡片上看起來像已經選取了。
+     （admin 全域只對 date/time 設了 color-scheme:dark，沒有涵蓋其他控制項。）
+     渲染出來才看得到，程式碼上完全正常。 */
+  color-scheme:dark;
 }
 /* 🔴 原系統的內容區是 `.wrap{max-width:1180px;margin:0 auto}`。
    少了這一條，面板會撐滿整個 admin 版面（約 1500px），欄位被拉得過寬、
-   服務類型那三張卡各變成兩倍寬 —— 密度整個跑掉，那正是「看起來不對」的主因。 */
+   服務類型那三張卡各變成兩倍寬 —— 密度整個跑掉。 */
 #panel-airport .apage{max-width:1180px;margin:0 auto}
 #panel-airport .ap-layout{display:grid;grid-template-columns:1fr 330px;gap:20px;align-items:start}
 @media(max-width:1100px){#panel-airport .ap-layout{grid-template-columns:1fr}}
@@ -695,51 +703,40 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
 @media(max-width:1100px){#panel-airport .ap-aside{position:static}}
 #panel-airport .ap-h{font-size:16px;margin:0 0 14px;display:flex;align-items:center;gap:8px;color:var(--apink);font-weight:600}
 #panel-airport .ap-n{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--apbrand);color:#fff;font-size:12px;flex:none}
-#panel-airport .ap-fixed{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:13px;color:var(--apmuted);background:#f8fafc;border:1px dashed var(--apline);border-radius:8px;padding:8px 12px;margin-bottom:14px}
-#panel-airport .ap-fixed b{color:var(--apink);font-weight:500}
+#panel-airport .ap-fixed{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:13px;color:var(--apmuted);background:var(--surface-2);border:1px dashed var(--apline);border-radius:8px;padding:8px 12px;margin-bottom:14px}
+#panel-airport .ap-fixed b{color:var(--text-2);font-weight:500}
 /* 🔴 送機／接機各有一條左側彩色直條，是原系統用來分辨兩趟的主要視覺線索。 */
 #panel-airport .ap-legwrap{border-left:4px solid var(--apaccent);padding-left:14px}
-#panel-airport .ap-legwrap.in{border-left-color:#7a5af8}
+#panel-airport .ap-legwrap.in{border-left-color:#8b7bff}
 #panel-airport .ap-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px 14px}
 #panel-airport .ap-grid .w2{grid-column:span 2}
 @media(max-width:560px){#panel-airport .ap-grid .w2{grid-column:1/-1}}
 #panel-airport label.apf{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--apmuted)}
 #panel-airport label.apf.req>span:first-child::after{content:" *";color:var(--aperr)}
-/* 🔴 這一段要對抗 admin 的三條全域規則，實際渲染出來才看得到：
-     ① `input,select,textarea{color:var(--text)!important}` —— 帶 !important，
-        所以這裡的文字色也必須 !important，否則白底配接近白的字，整片看不見。
-     ② `input[type=date],input[type=time]{color-scheme:dark}` —— 原生日期／時間
-        選擇器會是深色面板，配白底很突兀。
-     ③ 全域的 `input[type=text],…,select{background:var(--bgi)}` 是深色底，
-        而且選擇器要涵蓋**面板裡所有**欄位，不能只寫 `.apf input` ——
-        航班編號在 `.ap-row` 裡，不在 `.apf` 底下，第一版就因此留著深色底。
+/* 🔴 選擇器要涵蓋面板裡**所有**欄位，不能只寫 `.apf input` ——
+   航班編號在 `.ap-row` 裡，不在 `.apf` 底下，第一版就因此漏掉。
    ⚠️ checkbox／radio 要排除，否則會被 width:100%;min-height:38px 撐成大方塊。 */
 #panel-airport input:not([type=checkbox]):not([type=radio]),
 #panel-airport select,
 #panel-airport textarea{
-  width:100%;padding:8px 10px;border:1px solid #cfd6df;border-radius:8px;
-  background:#fff;color:var(--apink)!important;min-height:38px;font:inherit;font-size:14px;
-  color-scheme:light}
+  width:100%;padding:8px 10px;border:1px solid var(--apfieldbd);border-radius:8px;
+  background:var(--apfield);color:var(--apink);min-height:38px;font:inherit;font-size:14px}
 #panel-airport textarea{min-height:70px;resize:vertical}
 #panel-airport input:not([type=checkbox]):not([type=radio]):focus,
 #panel-airport select:focus,#panel-airport textarea:focus{
-  outline:2px solid var(--apsoft);border-color:var(--apbrand)}
-#panel-airport input[readonly]{background:#f2f4f7;color:var(--apmuted)!important}
-#panel-airport input::placeholder,#panel-airport textarea::placeholder{color:#98a2b3!important}
+  outline:none;border-color:var(--apbrand);box-shadow:0 0 0 2px rgba(91,155,213,.2)}
+#panel-airport input[readonly]{background:var(--surface-2);color:var(--apmuted)!important}
 #panel-airport input[type=checkbox],#panel-airport input[type=radio]{
   width:auto;min-height:0;accent-color:var(--apbrand)}
-/* 費用表與卡片內文同樣要壓過全域的淺色文字 */
-#panel-airport,#panel-airport .card,#panel-airport .ap-card-b{color:var(--apink)}
-#panel-airport input.bad,#panel-airport select.bad{border-color:var(--aperr)!important;background:var(--aperrbg)!important}
 #panel-airport .ap-row{display:flex;gap:8px;align-items:flex-end}
 #panel-airport .ap-row input{flex:1}
-#panel-airport .ap-chk{display:flex;gap:6px;align-items:center;color:var(--apink);font-size:13px;min-height:38px}
+#panel-airport .ap-chk{display:flex;gap:6px;align-items:center;color:var(--text-2);font-size:13px;min-height:38px}
 #panel-airport .ap-subh{font-size:13px;font-weight:600;color:var(--apmuted);margin:16px 0 8px;text-transform:uppercase;letter-spacing:.5px}
 #panel-airport .ap-hint{font-size:12.5px;color:var(--apmuted);margin-top:4px;line-height:1.6}
 #panel-airport .ap-small{font-size:12px;color:var(--apmuted);line-height:1.6}
 #panel-airport .ap-seg{display:flex;gap:8px;flex-wrap:wrap}
-#panel-airport .ap-seg label{flex:1;min-width:140px;border:1.5px solid var(--apline);border-radius:10px;padding:12px 14px;cursor:pointer;display:flex;gap:10px;align-items:flex-start;color:var(--apink);font-size:13px;background:#fff}
-#panel-airport .ap-seg label:has(input:checked){border-color:var(--apbrand);background:var(--apsoft)}
+#panel-airport .ap-seg label{flex:1;min-width:140px;border:1.5px solid var(--apline);border-radius:10px;padding:12px 14px;cursor:pointer;display:flex;gap:10px;align-items:flex-start;color:var(--text-2);font-size:13px;background:var(--surface-2)}
+#panel-airport .ap-seg label:has(input:checked){border-color:var(--apbrand);background:var(--apsoft);color:var(--apink)}
 #panel-airport .ap-seg input{margin-top:4px}
 #panel-airport .ap-seg small{display:block;color:var(--apmuted);margin-top:2px}
 #panel-airport .ap-pax{border:1px solid var(--apline);border-radius:8px;padding:12px;margin-bottom:10px}
@@ -747,37 +744,35 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
 #panel-airport .ap-lug{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
 @media(max-width:560px){#panel-airport .ap-lug{grid-template-columns:repeat(2,1fr)}}
 #panel-airport .ap-car{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
-#panel-airport .ap-car label{flex:1;min-width:150px;border:1.5px solid var(--apline);border-radius:10px;padding:10px 12px;cursor:pointer;color:var(--apink);font-size:13px;background:#fff}
-#panel-airport .ap-car label:has(input:checked){border-color:var(--apbrand);background:var(--apsoft)}
-#panel-airport .ap-car .rec{font-size:11px;background:var(--apaccent);color:#fff;border-radius:99px;padding:1px 8px;margin-left:6px}
+#panel-airport .ap-car label{flex:1;min-width:150px;border:1.5px solid var(--apline);border-radius:10px;padding:10px 12px;cursor:pointer;color:var(--text-2);font-size:13px;background:var(--surface-2)}
+#panel-airport .ap-car label:has(input:checked){border-color:var(--apbrand);background:var(--apsoft);color:var(--apink)}
+#panel-airport .ap-car .rec{font-size:11px;background:var(--apaccent);color:#06222b;border-radius:99px;padding:1px 8px;margin-left:6px;font-weight:600}
 #panel-airport .ap-msg{border-radius:8px;padding:9px 12px;font-size:13.5px;margin-top:10px;line-height:1.6}
-#panel-airport .ap-msg.warn{background:var(--apwarnbg);color:var(--apwarn)}
-#panel-airport .ap-msg.err{background:var(--aperrbg);color:var(--aperr)}
+#panel-airport .ap-msg.warn{background:var(--apwarnbg);color:var(--apwarn);border:1px solid var(--amber-border)}
+#panel-airport .ap-msg.err{background:var(--aperrbg);color:var(--aperr);border:1px solid var(--aperr)}
 #panel-airport .ap-msg.ok{background:var(--apokbg);color:var(--apok)}
 #panel-airport .ap-flight{margin-top:10px;border-radius:8px;font-size:13.5px;line-height:1.7;color:var(--apmuted)}
-#panel-airport .ap-flight:not(:empty){padding:10px 12px;background:#f8fafc;border:1px solid var(--apline)}
+#panel-airport .ap-flight:not(:empty){padding:10px 12px;background:var(--surface-2);border:1px solid var(--apline)}
 #panel-airport .ap-flight.ok{color:var(--apok);background:var(--apokbg);border-color:transparent}
-#panel-airport .ap-flight.warn{color:var(--apwarn);background:var(--apwarnbg);border-color:transparent}
+#panel-airport .ap-flight.warn{color:var(--apwarn);background:var(--apwarnbg);border-color:var(--amber-border)}
 /* 🔴 admin 有 `td{color:var(--text)!important}`（裸 td ＋ !important）——
-   !important 不管特異度都會贏，所以這裡也必須加。第一版沒加，
-   整張費用表是白底白字，**在程式碼裡完全看不出來，渲染出來才發現**。 */
+   !important 不管特異度都會贏，所以這裡要覆寫顏色一律得加 !important。 */
 #panel-airport .ap-fare{width:100%;border-collapse:collapse;font-size:14px}
-#panel-airport .ap-fare td{padding:5px 0;border-bottom:1px dashed var(--apline);color:var(--apink)!important}
+#panel-airport .ap-fare td{padding:5px 0;border-bottom:1px dashed var(--apline);color:var(--text-2)!important}
 #panel-airport .ap-fare td:last-child{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
 #panel-airport .ap-fare tr.leg td{font-weight:600;color:var(--apmuted)!important;font-size:12.5px;border:0;padding-top:10px}
 #panel-airport .ap-fare tr.tot td{font-weight:700;font-size:18px;border:0;padding-top:10px;color:var(--apbrand)!important}
-#panel-airport .ap-notices{margin:0;padding-left:20px;font-size:14px;color:var(--apink);line-height:1.85}
-/* 按鈕：原系統的 .btn 預設是白底外框，.pri 深藍、.acc 青、.dng 紅字。
-   🔴 admin 的 .btn 沒有背景色（要靠 .bp／.btl／.bdr 變體），裸 .btn 是透明的 ——
-      在淺色島上更是完全看不見，所以這裡整組重新定義。 */
-#panel-airport .btn{border:1px solid #cfd6df;background:#fff;color:var(--apink);border-radius:8px;padding:8px 14px;min-height:38px;font:inherit;font-size:14px;cursor:pointer}
-#panel-airport .btn:hover{background:#f2f4f7}
+#panel-airport .ap-notices{margin:0;padding-left:20px;font-size:14px;color:var(--text-2);line-height:1.85}
+/* 🔴 admin 的 .btn 沒有背景色（要靠 .bp／.btl／.bdr 變體），裸 .btn 是透明的。
+   原系統的 .btn 預設是外框鈕，這裡照那個語意補一組。 */
+#panel-airport .btn{border:1px solid var(--apfieldbd);background:var(--surface-2);color:var(--text-2);border-radius:8px;padding:8px 14px;min-height:38px;font:inherit;font-size:14px;cursor:pointer}
+#panel-airport .btn:hover{background:var(--bgh);color:var(--apink)}
 #panel-airport .btn.bp{background:var(--apbrand);border-color:var(--apbrand);color:#fff}
 #panel-airport .btn.bp:hover{filter:brightness(1.12)}
-#panel-airport .btn.btl{background:var(--apaccent);border-color:var(--apaccent);color:#fff}
+#panel-airport .btn.btl{background:var(--apaccent);border-color:var(--apaccent);color:#06222b;font-weight:600}
 #panel-airport .btn.btl:hover{filter:brightness(1.12)}
-#panel-airport .btn.bdr{background:#fff;color:var(--aperr);border-color:#f3b5ae}
-#panel-airport .btn.bdr:hover{background:var(--aperrbg)}
+#panel-airport .btn.bdr{background:var(--aperrbg);color:var(--aperr);border-color:rgba(240,106,106,.35)}
+#panel-airport .btn.bdr:hover{filter:brightness(1.15)}
 #panel-airport .btn.bsm{padding:4px 10px;min-height:30px;font-size:13px}
 #panel-airport .btn:disabled{opacity:.5;cursor:default}
 /* 清單 */
@@ -785,17 +780,17 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
 #panel-airport .ap-tools input{max-width:280px;flex:1}
 #panel-airport .ap-tools select{width:auto}
 #panel-airport .ap-card{background:var(--apcard);border:1px solid var(--apline);border-radius:var(--apr);margin-bottom:10px;overflow:hidden}
-#panel-airport .ap-card.off{opacity:.65}
-#panel-airport .ap-card.ap-justsaved{border-color:var(--apok);box-shadow:0 0 0 2px rgba(6,118,71,.15)}
-#panel-airport .ap-card-h{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:11px 16px;background:#f8fafc;border-bottom:1px solid var(--apline)}
+#panel-airport .ap-card.off{opacity:.6}
+#panel-airport .ap-card.ap-justsaved{border-color:var(--apok);box-shadow:0 0 0 2px rgba(62,207,142,.2)}
+#panel-airport .ap-card-h{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:11px 16px;background:var(--surface-2);border-bottom:1px solid var(--apline)}
 #panel-airport .ap-id{font-weight:600;font-family:ui-monospace,Consolas,monospace;font-size:13px;color:var(--apink)}
 #panel-airport .ap-tag{font-size:12px;padding:2px 9px;border-radius:99px}
 #panel-airport .ap-tag.on{background:var(--apsoft);color:var(--apbrand)}
-#panel-airport .ap-tag.off{background:#f2f4f7;color:#98a2b3;text-decoration:line-through}
+#panel-airport .ap-tag.off{background:var(--surface-2);color:var(--apmuted);text-decoration:line-through}
 #panel-airport .ap-tag.sent{background:var(--apokbg);color:var(--apok)}
 #panel-airport .ap-tag.warn{background:var(--apwarnbg);color:var(--apwarn)}
-#panel-airport .ap-card-b{padding:14px 16px;font-size:14px;color:var(--apink);display:grid;gap:10px}
-#panel-airport .ap-leg{border-left:2px solid var(--apline);padding-left:10px;line-height:1.6}
+#panel-airport .ap-card-b{padding:14px 16px;font-size:14px;color:var(--text-2);display:grid;gap:10px}
+#panel-airport .ap-leg{border-left:2px solid var(--border-mid);padding-left:10px;line-height:1.6}
 #panel-airport .ap-card-f{display:flex;gap:8px;flex-wrap:wrap;padding:11px 16px;border-top:1px solid var(--apline)}
 </style>
 </head>
@@ -805,7 +800,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="logo">
     <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
     <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
-    <span><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="38" height="20" style="display:inline-block;vertical-align:middle;margin-top:-2px"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v2.48</span>
+    <span><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="38" height="20" style="display:inline-block;vertical-align:middle;margin-top:-2px"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v2.49</span>
   </div>
   <div class="trr">
     <div id="global-site-bar" style="display:flex;align-items:center;gap:4px"><span style="font-size:13px;color:var(--text-3);white-space:nowrap;font-weight:500" data-i18n="g.site_label">單位：</span>

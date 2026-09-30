@@ -104,7 +104,7 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 | File | Version | Purpose | ~Lines |
 |------|---------|---------|--------|
 | `index.html` | v2.08 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
-| `admin/index.html` | v2.45 | Admin System — room booking, fleet, visitor, library, lottery | 5,650 |
+| `admin/index.html` | v2.46 | Admin System — **機場接送**、公務車、圖書館、會議室、客戶到訪、抽籤 | 8,221 |
 | `kms/index.html` | v2.45 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
 | `quotation/index.html` | v3.66 | Quotation & CRM system | 7,332 |
 | `board/index.html` | v1.92 | 公告與會議 Bulletin & Meetings — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍、腦力激盪 | 4,600 |
@@ -120,7 +120,8 @@ Numbered backup files (`index112.html`, `index328.html`, etc.) are iteration sna
 
 **Opening sub-apps**: `openApp(id)` navigates to the sub-app HTML file, passing the session via URL parameter `?_ps=<base64-JSON>` since localStorage cannot be shared cross-origin.
 
-**Within `admin/index.html`**: `switchMod(m)` activates modules — `'room'`, `'car'`, `'visit'`, `'lib'`, `'lottery'`.
+**Within `admin/index.html`**: `switchMod(m)` activates modules — `'airport'`, `'room'`, `'car'`, `'visit'`, `'lib'`, `'lottery'`。
+🔴 **`'airport'` 是第一個模塊，也是預設落點**（`init` 尾端的 `switchMod('airport')`）。
 
 **Within `board/index.html`**: `switchTab(name)` activates 主頁籤 — `'bulletin'`、`'weekly'`、`'biz'`、`'woody'`、`'premortem'`、`'brainstorm'`。後兩者共用同一份 DOM（`#pm-shell`）與同一套 `pm*` 函式，切換時由 `pmMountShell()` 把 shell 搬進當前 tabpanel。Portal 端由 `index.html` 的 app 清單項目 `id:'bulletin'`（`path:'./board/index.html'`）進入。
 
@@ -1353,6 +1354,68 @@ v1.94 只做在 Portal，但**同事被邀請的時候人常常在 KMS 或報價
   會退回 `TW`（紀錄的 site 必須是真的營運中心）。
 - board 的介面標籤是 `site_GRP`（五語），文件用固定繁中的 `SITE_LABEL_ZH.GRP = '集團'`；
   badge class `.site-GRP`。Portal／KMS 的 `SITE_FLAG` 用 🏢。
+
+## 機場接送預約（admin 第一個模塊，`ap*`，2026-09-30）
+
+從 **`comart-car-booking.web.app`** 搬進來。原系統是一支單檔 HTML ＋
+**Google Apps Script** 後端（背後是 Google Sheet），形態剛好與平台一致，
+所以搬的是後端與權限，不是重寫。
+
+### 🔴 為什麼要搬 —— 兩個都不是「想整合」
+
+1. **原後端對整個網際網路開放。** `API_URL` 直接寫在網頁原始碼第 428 行，
+   而 `call(fn, ...args)` 會把**任意函式名**送過去執行，整份程式碼沒有任何一處驗身分。
+   實測：用不存在的預約編號打 `cancelBooking`，回的是應用層的
+   `{"ok":false,"error":"找不到預約 AP99999999-999"}` 而**不是 401**。
+   也就是 `listBookings` 同樣是開的 —— 那會吐出每一筆預約的申請人姓名、工號、
+   手機、**住家地址**、乘客資料與航班。
+   ⚠️ **刻意沒有去呼叫 `listBookings` 驗證**：那會把同事的個資拉進工作紀錄裡。
+   `getAppInfo` 成功（回傳廠商信箱）＋ dispatcher 無條件執行任意 `fn`，已經足以證明。
+2. **`script.google.com` 是 Google 網域、在中國被 GFW 封鎖**，
+   所以東莞廠同事本來就用不了（同產品圖放 Firebase 的那個坑）。
+
+### 不需要 Apps Script 的原始碼
+
+原前端裡有一個 `Demo` 物件，是原作者為了離線試用寫的**後端參考實作** ——
+編號格式、狀態轉換、取消驗證規則全部寫在裡面，等於把契約留在程式碼中。
+寄給廠商的信件內容也是前端的 `bookingText()` 組的，不在後端。
+所以只有 Google Sheet 裡的**既有資料**拿不到（Woody 確認還沒有人正式用，不必搬）。
+
+### 權限（Woody 2026-09-30 定案）
+
+**自己的 ＋ 行政部 ＋ admin 看全部。** 🔴 `role === 'admin'`（系統管理者）與
+`dept === 'admin'`（**行政部**）是兩件事，名字剛好一樣，兩者都放行但不要寫成同一個判斷。
+
+- 落實在 **sb-proxy**，不是前端隱藏：`forceOwnRows()` 把 `emp_id=eq.<自己>`
+  **取代**進查詢字串（附加的話會變成兩個條件 AND，結果為空 —— 安全但看起來像壞了）。
+  其餘 filter 一律保留，PostgREST 的頂層參數彼此 AND，`or=(...)` 也繞不過去。
+- 🔴 **PATCH 也要限縮**：編號是 `AP20260930-001` 這種**猜得出來**的格式，
+  少了這一條，知道編號的人就改得動別人的預約。
+- `emp_id` / `cancelled_by` / `sent_by` 一律由簽章決定（可以指定就可以嫁禍）；
+  `id` / `emp_id` / `created_at` 建立後不可改；**DELETE 一律 403**
+  （取消是 status 的狀態轉換，紀錄要留著）。
+- 判斷與改寫抽到 `sb-proxy/airport-guard.js`，`node --test` 7 個測試 ——
+  edge function 沒辦法在本機跑，而這一層錯了**不會有人看得出來**
+  （畫面照樣正常，只是多看得到別人的資料）。
+
+### 其他決定
+
+- **預約編號由 DB 產生**（`airport_next_booking_id()` ＋ advisory lock）。
+  原系統在前端算「已有筆數 + 1」，兩個人同一天同時送出會拿到同一個編號，
+  而那個編號會印在給廠商的單據上。
+- **航班查詢沿用 Portal 既有的 `claude-proxy` + web search**，不是 TDX。
+  原系統是 Apps Script 打 TDX，搬過來就要再放一份憑證 —— 平台本來就有會動的路。
+  ⚠️ Portal 的 `autoFillFlight()` 還寫著 `claude-sonnet-4-20250514`（舊代號），
+  這裡用的是 `claude-sonnet-5`。**Portal 那支也該更新。**
+- **寄給廠商是一顆按鈕，人按了才寄**（Woody 定案）。用 `mailto:` 而不是平台的
+  Resend：寄件人是申請人自己的信箱，廠商回信才回得到對的人，而且寄出前看得到內容。
+- 🔴 **欄位名是機械轉換**（`outPickupDate` ↔ `out_pickup_date`），`apSnake`／`apCamel`
+  雙向對映，**不要手寫對照表** —— 50 個欄位的手寫對照表必然會漏，
+  而漏掉的症狀是「那一格永遠是空的」，沒有人會回報。
+- 給廠商的預約文字與 CSV 表頭**固定繁中**（同 `siteLabelZ`／`expUseCSV` 的規則）。
+
+⚠️ **介面文字目前只有繁中**（原系統就是），只有模塊名與次頁籤上了五語。
+表單與清單的 i18n 是下一步。
 
 ## Admin 重要細節
 

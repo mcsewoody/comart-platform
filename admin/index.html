@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART 行政管理平台 v2.45</title>
+<title>COMART 行政管理平台 v2.46</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -665,6 +665,78 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
 .admin-lang-btn{background:transparent;border:1px solid var(--border);color:var(--text-3);border-radius:5px;padding:2px 7px;font-size:11px;cursor:pointer;transition:all .15s;white-space:nowrap}
 .admin-lang-btn:hover{border-color:var(--blue);color:var(--blue)}
 .admin-lang-btn.active{background:var(--blue);border-color:var(--blue);color:#fff;font-weight:600}
+
+/* ══ 機場接送預約 ══
+   原系統是淺色主題（--bg:#f4f6f9、白卡片、#1d4e89 藍），這裡全部換成 admin
+   既有的深色 token，不新增第二套配色。 */
+#panel-airport .ap-layout{display:grid;grid-template-columns:1fr 320px;gap:18px;align-items:start}
+@media(max-width:1024px){#panel-airport .ap-layout{grid-template-columns:1fr}}
+#panel-airport .ap-aside{position:sticky;top:12px}
+@media(max-width:1024px){#panel-airport .ap-aside{position:static}}
+#panel-airport .ap-h{font-size:15px;margin:0 0 14px;display:flex;align-items:center;gap:8px;color:var(--text)}
+#panel-airport .ap-n{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--blue);color:#fff;font-size:12px;flex:none}
+#panel-airport .ap-fixed{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:12px;color:var(--text-3);background:var(--surface-2);border:1px dashed var(--border);border-radius:var(--radius);padding:8px 12px;margin-bottom:14px}
+#panel-airport .ap-fixed b{color:var(--text-2);font-weight:600}
+#panel-airport .ap-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:12px 14px}
+#panel-airport .ap-grid .w2{grid-column:span 2}
+@media(max-width:560px){#panel-airport .ap-grid .w2{grid-column:1/-1}}
+#panel-airport .apf{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--text-3)}
+#panel-airport .apf.req>span:first-child::after{content:" *";color:var(--red)}
+#panel-airport .apf input,#panel-airport .apf select,#panel-airport .apf textarea{
+  width:100%;padding:7px 9px;border:1px solid var(--border);border-radius:var(--radius);
+  background:var(--bgi);color:var(--text);min-height:34px;font-size:13px;font-family:inherit}
+#panel-airport .apf textarea{min-height:66px;resize:vertical}
+#panel-airport .apf input:focus,#panel-airport .apf select:focus,#panel-airport .apf textarea:focus{
+  outline:none;border-color:var(--blue);box-shadow:0 0 0 2px rgba(91,155,213,.18)}
+#panel-airport .apf input[readonly]{background:var(--surface-2);color:var(--text-3)}
+#panel-airport input.bad,#panel-airport select.bad{border-color:var(--red)!important;background:var(--red-bg)!important}
+#panel-airport .ap-row{display:flex;gap:8px;align-items:center}
+#panel-airport .ap-row input{flex:1}
+#panel-airport .ap-chk{display:flex;gap:6px;align-items:center;color:var(--text-2);font-size:13px;min-height:34px}
+#panel-airport .ap-subh{font-size:12px;font-weight:700;color:var(--blue);margin:16px 0 8px;padding-bottom:4px;border-bottom:1px solid var(--border)}
+#panel-airport .ap-hint,#panel-airport .ap-small{font-size:12px;color:var(--text-3);line-height:1.6}
+#panel-airport .ap-seg{display:flex;gap:8px;flex-wrap:wrap}
+#panel-airport .ap-seg label{flex:1;min-width:150px;border:1.5px solid var(--border);border-radius:var(--radius-lg);padding:11px 13px;cursor:pointer;display:flex;gap:9px;align-items:flex-start;color:var(--text-2)}
+#panel-airport .ap-seg label:has(input:checked){border-color:var(--blue);background:var(--blue-bg)}
+#panel-airport .ap-seg small{display:block;color:var(--text-3);font-size:11px;margin-top:2px}
+#panel-airport .ap-pax{border:1px solid var(--border);border-radius:var(--radius);padding:12px;margin-bottom:12px}
+#panel-airport .ap-pax .t{font-size:13px;font-weight:600;color:var(--text-2);margin-bottom:10px;display:flex;gap:8px;align-items:center}
+#panel-airport .ap-lug{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+@media(max-width:560px){#panel-airport .ap-lug{grid-template-columns:repeat(2,1fr)}}
+#panel-airport .ap-car{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+#panel-airport .ap-car label{flex:1;min-width:150px;border:1.5px solid var(--border);border-radius:var(--radius-lg);padding:11px 13px;cursor:pointer;color:var(--text-2)}
+#panel-airport .ap-car label:has(input:checked){border-color:var(--blue);background:var(--blue-bg)}
+#panel-airport .ap-car .rec{margin-left:6px;font-size:11px;padding:1px 7px;border-radius:99px;background:var(--green-bg);color:var(--green)}
+#panel-airport .ap-msg{font-size:12.5px;border-radius:var(--radius);padding:8px 11px;margin-top:8px;line-height:1.6}
+#panel-airport .ap-msg.warn{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-border)}
+#panel-airport .ap-msg.err{background:var(--red-bg);color:var(--red);border:1px solid var(--red)}
+#panel-airport .ap-flight{font-size:12.5px;line-height:1.7;margin-top:6px;color:var(--text-3)}
+#panel-airport .ap-flight.ok{color:var(--green)}
+#panel-airport .ap-flight.warn{color:var(--amber)}
+#panel-airport .ap-fare{width:100%;border-collapse:collapse;font-size:13px}
+#panel-airport .ap-fare td{padding:5px 0;border-bottom:1px solid var(--border);color:var(--text-2)}
+#panel-airport .ap-fare td:last-child{text-align:right;white-space:nowrap}
+#panel-airport .ap-fare tr.leg td{color:var(--blue);font-weight:600;padding-top:12px;border-bottom:0}
+#panel-airport .ap-fare tr.tot td{font-weight:700;color:var(--text);border-bottom:0;border-top:2px solid var(--border-mid);padding-top:8px}
+#panel-airport .ap-notices{margin:0;padding-left:20px;font-size:13px;color:var(--text-2);line-height:1.85}
+/* 清單 */
+#panel-airport .ap-tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+#panel-airport .ap-tools input,#panel-airport .ap-tools select{padding:7px 9px;border:1px solid var(--border);border-radius:var(--radius);background:var(--bgi);color:var(--text);min-height:34px;font-size:13px}
+#panel-airport .ap-tools input{flex:1;min-width:180px}
+#panel-airport .ap-card{border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--surface);margin-bottom:10px;overflow:hidden}
+#panel-airport .ap-card.off{opacity:.55}
+#panel-airport .ap-card.ap-justsaved{border-color:var(--green);box-shadow:0 0 0 2px rgba(62,207,142,.2)}
+#panel-airport .ap-card-h{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:10px 14px;background:var(--surface-2);border-bottom:1px solid var(--border)}
+#panel-airport .ap-id{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;color:var(--text)}
+#panel-airport .ap-tag{font-size:11px;padding:2px 8px;border-radius:99px}
+#panel-airport .ap-tag.on{background:var(--blue-bg);color:var(--blue)}
+#panel-airport .ap-tag.off{background:var(--surface-2);color:var(--text-3)}
+#panel-airport .ap-tag.sent{background:var(--green-bg);color:var(--green)}
+#panel-airport .ap-tag.warn{background:var(--amber-bg);color:var(--amber)}
+#panel-airport .ap-card-b{padding:12px 14px;font-size:13px;color:var(--text-2);display:grid;gap:10px}
+#panel-airport .ap-leg{border-left:2px solid var(--border-mid);padding-left:10px}
+#panel-airport .ap-card-f{display:flex;gap:8px;flex-wrap:wrap;padding:10px 14px;border-top:1px solid var(--border)}
+
 </style>
 </head>
 <body>
@@ -673,7 +745,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="logo">
     <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
     <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
-    <span><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="38" height="20" style="display:inline-block;vertical-align:middle;margin-top:-2px"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v2.45</span>
+    <span><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="38" height="20" style="display:inline-block;vertical-align:middle;margin-top:-2px"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v2.46</span>
   </div>
   <div class="trr">
     <div id="global-site-bar" style="display:flex;align-items:center;gap:4px"><span style="font-size:13px;color:var(--text-3);white-space:nowrap;font-weight:500" data-i18n="g.site_label">單位：</span>
@@ -705,7 +777,12 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
 
 <!-- ── 主功能列（sticky，緊接 #tabs）── -->
 <div id="mod-nav">
-  <div class="modnav-item active" data-module="car" onclick="switchMod('car')" title="公務車管理">
+  <div class="modnav-item active" data-module="airport" onclick="switchMod('airport')" title="機場接送預約">
+    <span class="modnav-icon">✈️</span>
+    <span class="modnav-label" data-i18n="mod.airport">機場接送</span>
+    <span class="tbadge" id="tb-airport" style="display:none">0</span>
+  </div>
+  <div class="modnav-item" data-module="car" onclick="switchMod('car')" title="公務車管理">
     <span class="modnav-icon">🚗</span>
     <span class="modnav-label" data-i18n="mod.car">公務車</span>
     <span class="tbadge" id="tb-car" style="display:none">0</span>
@@ -827,6 +904,234 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
 </div>
 
 <!-- CAR -->
+<!-- ══════════════ 機場接送預約 ══════════════
+     來源：comart-car-booking.web.app（Apps Script + Google Sheet）。
+     搬進來的理由有兩個，都不是「想整合」：
+       ① 原後端網址寫在網頁原始碼裡，而且不驗身分 —— 任何人都讀得到
+          每一筆預約的申請人、手機、**住家地址**與航班。
+       ② script.google.com 在中國被 GFW 封鎖，東莞廠同事本來就用不了。
+     業務規則（價目、容量、48 小時、報到時間）逐條照搬，沒有改。 -->
+<div class="mpanel" id="panel-airport">
+
+  <!-- ── 新增預約 ── -->
+  <div class="apage" id="airport-new">
+    <form id="ap-f" novalidate autocomplete="off">
+    <div class="ap-layout">
+    <div>
+      <div class="card">
+        <h3 class="ap-h"><span class="ap-n">1</span>申請人資料</h3>
+        <div class="ap-fixed">
+          <span>公司名稱 <b>怡業股份有限公司</b></span>
+          <span>統編 <b>84756310</b></span>
+          <span>室內電話 <b>(02) 8911-1133</b></span>
+          <span>發票寄送地址 <b>235新北市新店區寶橋路235巷12號4樓</b></span>
+        </div>
+        <div class="ap-grid">
+          <label class="apf req"><span>申請人姓名</span><input type="text" name="applicant"></label>
+          <label class="apf"><span>部門</span><input type="text" name="dept"></label>
+          <label class="apf"><span>員工編號</span><input type="text" name="empNo" readonly></label>
+          <label class="apf req"><span>行動電話</span><input type="tel" name="mobile" placeholder="09xx-xxx-xxx"></label>
+          <label class="apf"><span>分機</span><input type="text" name="ext"></label>
+          <label class="apf"><span>E-mail</span><input type="email" name="email"></label>
+          <label class="apf"><span>使用目的</span><input type="text" name="purpose" placeholder="例：出差、參展" list="ap-purposeList"></label>
+          <label class="apf"><span>出差單單號（可免填）</span><input type="text" name="tripNo"></label>
+        </div>
+        <!-- 🔴 申請人四欄由登入身分自動帶入，不是「記住我」。原系統是打字打出來的，
+             等於誰都能用別人的名義預約，而取消只驗手機末四碼。 -->
+        <div class="ap-hint" style="margin-top:10px">申請人資料由登入身分自動帶入；手機與分機可修改，改過的值只影響這一筆預約。</div>
+        <datalist id="ap-purposeList"><option>出差</option><option>參展</option><option>客戶拜訪</option><option>教育訓練</option></datalist>
+      </div>
+
+      <div class="card">
+        <h3 class="ap-h"><span class="ap-n">2</span>服務類型</h3>
+        <div class="ap-seg">
+          <label><input type="radio" name="serviceType" value="out" checked><div><b>送機（出國）</b><small>從指定地點送往機場</small></div></label>
+          <label><input type="radio" name="serviceType" value="in"><div><b>接機（回國）</b><small>從機場接回指定地點</small></div></label>
+          <label><input type="radio" name="serviceType" value="both"><div><b>來回</b><small>送機＋接機</small></div></label>
+        </div>
+      </div>
+
+      <div class="card" id="ap-cardOut">
+        <h3 class="ap-h"><span class="ap-n">3</span>送機・出國航班</h3>
+        <div class="ap-grid">
+          <label class="apf req"><span>出國日期（台灣起飛日）</span><input type="date" name="outDate"></label>
+          <div class="w2">
+            <label class="apf req"><span>出國航班編號</span></label>
+            <div class="ap-row"><input type="text" name="outFlight" placeholder="例：BR189" style="text-transform:uppercase"><button type="button" class="btn" data-ap-lookup="out">查詢航班</button></div>
+          </div>
+        </div>
+        <div class="ap-flight" id="ap-fOut"></div>
+        <div class="ap-grid" style="margin-top:12px">
+          <label class="apf req"><span>機場</span><select name="outAirport"><option value="TPE">桃園機場</option><option value="TSA">松山機場</option></select></label>
+          <label class="apf"><span>航廈</span><input type="text" name="outTerminal" placeholder="例：2"></label>
+          <label class="apf req"><span>台灣起飛時間（24h）</span><input type="time" name="outDepTime"></label>
+          <label class="apf"><span>目的地</span><input type="text" name="outDest" placeholder="例：東京羽田 HND"></label>
+        </div>
+        <div class="ap-subh">預約接送時間</div>
+        <div class="ap-grid">
+          <label class="apf req"><span>接送日期</span><input type="date" name="outPickupDate"></label>
+          <label class="apf req"><span>接送時間（24h）</span><input type="time" name="outPickupTime"></label>
+          <div class="w2"><div class="ap-hint" id="ap-outPickupHint">輸入起飛時間後，系統會自動建議上車時間（可自行修改）。</div></div>
+        </div>
+        <div class="ap-subh">送機等候地址（上車地點）</div>
+        <div class="ap-grid">
+          <label class="apf req"><span>縣市</span><select name="outCity" data-ap-city></select></label>
+          <label class="apf"><span>區域</span><input type="text" name="outDist" list="ap-dl-outCity"></label>
+          <label class="apf req w2"><span>地址</span><input type="text" name="outAddr"></label>
+        </div>
+      </div>
+
+      <div class="card" id="ap-cardIn">
+        <h3 class="ap-h"><span class="ap-n">4</span>接機・回國航班</h3>
+        <div class="ap-grid">
+          <label class="apf req"><span>回國日期（台灣降落日）</span><input type="date" name="inDate"></label>
+          <div class="w2">
+            <label class="apf req"><span>回國航班編號</span></label>
+            <div class="ap-row"><input type="text" name="inFlight" placeholder="例：CI101" style="text-transform:uppercase"><button type="button" class="btn" data-ap-lookup="in">查詢航班</button></div>
+          </div>
+        </div>
+        <div class="ap-flight" id="ap-fIn"></div>
+        <div class="ap-grid" style="margin-top:12px">
+          <label class="apf req"><span>機場</span><select name="inAirport"><option value="TPE">桃園機場</option><option value="TSA">松山機場</option></select></label>
+          <label class="apf"><span>航廈</span><input type="text" name="inTerminal" placeholder="例：1"></label>
+          <label class="apf req"><span>台灣降落時間（24h）</span><input type="time" name="inArrTime"></label>
+          <label class="apf"><span>出發地</span><input type="text" name="inOrigin" placeholder="例：東京成田 NRT"></label>
+        </div>
+        <div class="ap-subh">接機時間</div>
+        <div class="ap-grid">
+          <label class="apf"><span>延後接機</span>
+            <select name="inDelay"><option value="0">不延後（依降落時間）</option><option value="30">延後 30 分鐘</option><option value="60">延後 60 分鐘</option><option value="90">延後 90 分鐘</option></select></label>
+          <label class="apf req"><span>接機日期</span><input type="date" name="inPickupDate"></label>
+          <label class="apf req"><span>接機時間（24h）</span><input type="time" name="inPickupTime"></label>
+          <label class="apf"><span>&nbsp;</span><span class="ap-chk"><input type="checkbox" name="signboard" value="是"> 需要舉牌（+$105）</span></label>
+        </div>
+        <div class="ap-hint">接機時間＝飛機降落時間；若需延後，系統會自動加上並註記在備註。</div>
+        <div class="ap-subh">接機前往地址（下車地點）</div>
+        <div class="ap-grid">
+          <label class="apf req"><span>縣市</span><select name="inCity" data-ap-city></select></label>
+          <label class="apf"><span>區域</span><input type="text" name="inDist" list="ap-dl-inCity"></label>
+          <label class="apf req w2"><span>地址</span><input type="text" name="inAddr"></label>
+        </div>
+        <button type="button" class="btn bsm" id="ap-copyAddr" style="margin-top:8px">同送機地址</button>
+      </div>
+
+      <div class="card">
+        <h3 class="ap-h"><span class="ap-n">5</span>乘客與行李</h3>
+        <div class="ap-pax">
+          <div class="t">乘客 1 <button type="button" class="btn bsm" id="ap-sameAsApplicant">同申請人</button></div>
+          <div class="ap-grid">
+            <label class="apf req"><span>姓名</span><input type="text" name="p1Name"></label>
+            <label class="apf req"><span>行動電話</span><input type="tel" name="p1Mobile"></label>
+            <label class="apf"><span>E-mail</span><input type="email" name="p1Email"></label>
+            <label class="apf"><span>備註</span><input type="text" name="p1Note"></label>
+          </div>
+        </div>
+        <div class="ap-pax">
+          <div class="t">乘客 2（選填）</div>
+          <div class="ap-grid">
+            <label class="apf"><span>姓名</span><input type="text" name="p2Name"></label>
+            <label class="apf"><span>行動電話</span><input type="tel" name="p2Mobile"></label>
+            <label class="apf"><span>E-mail</span><input type="email" name="p2Email"></label>
+            <label class="apf"><span>備註</span><input type="text" name="p2Note"></label>
+          </div>
+        </div>
+        <div class="ap-grid" style="margin-bottom:10px">
+          <label class="apf req"><span>搭乘人數</span><input type="number" name="paxCount" min="1" max="7" value="1"></label>
+        </div>
+        <div class="ap-small" style="margin-bottom:6px">行李件數（依尺寸）</div>
+        <div class="ap-lug">
+          <label class="apf"><span>20 吋</span><input type="number" name="lug20" min="0" value="0"></label>
+          <label class="apf"><span>25 吋</span><input type="number" name="lug25" min="0" value="0"></label>
+          <label class="apf"><span>27 吋</span><input type="number" name="lug27" min="0" value="0"></label>
+          <label class="apf"><span>29 吋</span><input type="number" name="lug29" min="0" value="0"></label>
+        </div>
+        <label class="apf" style="margin-top:10px"><span>其他行李（高爾夫球具、展品等）</span><input type="text" name="lugOther"></label>
+        <div class="ap-car">
+          <label><input type="radio" name="carType" value="4人座" checked> <b>4 人座</b><span class="rec" id="ap-rec4" hidden>建議</span><div class="ap-small">單趟 $1,100</div></label>
+          <label><input type="radio" name="carType" value="7人座"> <b>7 人座</b><span class="rec" id="ap-rec7" hidden>建議</span><div class="ap-small">單趟 $1,500</div></label>
+        </div>
+        <div id="ap-carMsg"></div>
+      </div>
+
+      <div class="card">
+        <h3 class="ap-h"><span class="ap-n">6</span>停靠站與備註</h3>
+        <div class="ap-grid">
+          <label class="apf"><span>停靠站</span>
+            <select name="stopLeg"><option value="">不需要</option><option value="送機">送機途中停靠</option><option value="接機">接機途中停靠</option><option value="送機,接機">兩段都停靠</option></select></label>
+        </div>
+        <div class="ap-grid" id="ap-stopFields" style="margin-top:10px" hidden>
+          <label class="apf"><span>縣市</span><select name="stopCity" data-ap-city></select></label>
+          <label class="apf"><span>區域</span><input type="text" name="stopDist" list="ap-dl-stopCity"></label>
+          <label class="apf w2"><span>停靠站地址</span><input type="text" name="stopAddr"></label>
+        </div>
+        <label class="apf" style="margin-top:12px"><span>備註</span><textarea name="note" placeholder="例：兒童安全座椅、需開收據、特殊需求…"></textarea></label>
+      </div>
+    </div>
+
+    <aside class="ap-aside">
+      <div class="card">
+        <h3 class="ap-h">預估費用</h3>
+        <table class="ap-fare" id="ap-fareTbl"></table>
+        <div class="ap-small" style="margin-top:8px">＊台北－桃園計價；停靠點 5 公里內 $210，超過每公里加收 $53。夜間加價時段（23:00–06:00）為系統預設，<b>實際以全鋒報價為準</b>。</div>
+      </div>
+      <div id="ap-checks"></div>
+      <button type="submit" class="btn bp" style="width:100%;padding:12px;font-size:15px;margin-top:6px" id="ap-submitBtn">送出預約</button>
+      <button type="button" class="btn" style="width:100%;margin-top:8px" id="ap-resetBtn">清除表單</button>
+    </aside>
+    </div>
+    </form>
+  </div>
+
+  <!-- ── 預約清單 ── -->
+  <div class="apage" id="airport-list" style="display:none">
+    <div class="ap-tools">
+      <input type="text" id="ap-q" placeholder="搜尋姓名、航班、編號、部門…">
+      <select id="ap-fStatus">
+        <option value="upcoming">即將出發</option>
+        <option value="all">全部</option>
+        <option value="已預約">已預約</option>
+        <option value="sent">已送出全鋒</option>
+        <option value="已取消">已取消</option>
+      </select>
+      <button class="btn" id="ap-reload">重新整理</button>
+      <button class="btn" id="ap-csv">匯出 CSV</button>
+      <span class="ap-small" id="ap-listCount"></span>
+    </div>
+    <div id="ap-scopeNote" class="ap-hint" style="margin-bottom:10px"></div>
+    <div id="ap-list"></div>
+  </div>
+
+  <!-- ── 計費與注意事項 ── -->
+  <div class="apage" id="airport-info" style="display:none">
+    <div class="card">
+      <h3 class="ap-h">計費方式（台北－桃園）</h3>
+      <table class="ap-fare">
+        <tr><td>4 人座 單趟</td><td>$1,100</td></tr>
+        <tr><td>7 人座 單趟</td><td>$1,500</td></tr>
+        <tr><td>夜間加價（23:00–06:00）</td><td>$210</td></tr>
+        <tr><td>舉牌服務</td><td>$105</td></tr>
+        <tr><td>停靠點（5 公里內）</td><td>$210</td></tr>
+        <tr><td>臨時取消（服務前 6 小時內）空趟費</td><td>$315</td></tr>
+      </table>
+      <div class="ap-small" style="margin-top:8px">停靠點超過 5 公里，每公里加收 $53。以上含稅，實際以全鋒報價為準。</div>
+    </div>
+    <div class="card">
+      <h3 class="ap-h">注意事項</h3>
+      <ul class="ap-notices" id="ap-noticeList"></ul>
+    </div>
+    <div class="card">
+      <h3 class="ap-h">車輛容量參考</h3>
+      <table class="ap-fare">
+        <tr><td>4 人座</td><td>4 人；20 吋 ×3　或　25 吋 ×2　或　27 吋 ×2　或　29 吋 ×1</td></tr>
+        <tr><td>7 人座</td><td>7 人；20 吋 ×8　或　25 吋 ×6　或　27 吋 ×5　或　29 吋 ×4</td></tr>
+      </table>
+      <div class="ap-small" style="margin-top:8px">混裝時系統會依比例估算是否放得下，並在表單上提示。</div>
+    </div>
+  </div>
+
+</div>
+
+
 <div class="mpanel" id="panel-car">
   <div class="msb cf">
     <div class="sbh" data-i18n="car.title">🚗 公務車</div>
@@ -2259,7 +2564,8 @@ const ADMIN_I18N = {
   en: {
     'sub.dash':'Board','sub.overview':'Overview','sub.new':'New','sub.new_booking':'New booking','sub.calendar':'Calendar','sub.month':'Month','sub.list':'List','sub.booking_list':'Bookings','sub.fault':'Faults','sub.report':'Reports','sub.settings':'Settings','sub.use_log':'Trips','sub.fuel':'Fuel','sub.vehicles':'Vehicles','sub.maint':'Service','sub.insp':'Inspection','sub.books':'Books','sub.return':'Return','sub.manage':'Manage','sub.loans':'Loans',
     'g.site_label':'Site:',
-    'mod.room':'Meeting Rooms','mod.car':'Fleet','mod.visit':'Visitors',
+    'mod.airport':'Airport Transfer','mod.room':'Meeting Rooms','mod.car':'Fleet','mod.visit':'Visitors',
+    'sub.ap_new':'New booking','sub.ap_list':'Bookings','sub.ap_info':'Rates & notes',
     'mod.lib':'Library','mod.lottery':'Lottery',
     'g.nav.main':'Main Menu','g.nav.settings':'Settings','g.nav.func':'Functions','g.nav.cfg':'Config',
     'g.btn.save':'Save','g.btn.cancel':'Cancel','g.btn.delete':'Delete','g.btn.edit':'Edit','g.btn.csv':'↓ CSV',
@@ -2654,7 +2960,8 @@ const ADMIN_I18N = {
   'zh-TW': {
     'sub.dash':'看板','sub.overview':'總覽','sub.new':'新增','sub.new_booking':'新增預約','sub.calendar':'日曆','sub.month':'月曆','sub.list':'清單','sub.booking_list':'預約清單','sub.fault':'故障回報','sub.report':'報表','sub.settings':'設定','sub.use_log':'用車紀錄','sub.fuel':'油資','sub.vehicles':'車輛','sub.maint':'保養','sub.insp':'驗車','sub.books':'書目','sub.return':'歸還','sub.manage':'管理','sub.loans':'借閱記錄',
     'g.site_label':'單位：',
-    'mod.room':'會議室','mod.car':'公務車','mod.visit':'客戶到訪',
+    'mod.airport':'機場接送','mod.room':'會議室','mod.car':'公務車','mod.visit':'客戶到訪',
+    'sub.ap_new':'新增預約','sub.ap_list':'預約清單','sub.ap_info':'計費與注意事項',
     'mod.lib':'圖書館','mod.lottery':'抽籤',
     'g.nav.main':'主選單','g.nav.settings':'設定','g.nav.func':'功能','g.nav.cfg':'系統設定',
     'g.btn.save':'儲存','g.btn.cancel':'取消','g.btn.delete':'刪除','g.btn.edit':'編輯','g.btn.csv':'↓ CSV',
@@ -3049,7 +3356,8 @@ const ADMIN_I18N = {
   'zh-CN': {
     'sub.dash':'看板','sub.overview':'总览','sub.new':'新增','sub.new_booking':'新增预约','sub.calendar':'日历','sub.month':'月历','sub.list':'清单','sub.booking_list':'预约清单','sub.fault':'故障报修','sub.report':'报表','sub.settings':'设定','sub.use_log':'用车记录','sub.fuel':'油资','sub.vehicles':'车辆','sub.maint':'保养','sub.insp':'验车','sub.books':'书目','sub.return':'归还','sub.manage':'管理','sub.loans':'借阅记录',
     'g.site_label':'单位：',
-    'mod.room':'会议室','mod.car':'公务车','mod.visit':'客户到访',
+    'mod.airport':'机场接送','mod.room':'会议室','mod.car':'公务车','mod.visit':'客户到访',
+    'sub.ap_new':'新增预约','sub.ap_list':'预约清单','sub.ap_info':'计费与注意事项',
     'mod.lib':'图书馆','mod.lottery':'抽签',
     'g.nav.main':'主菜单','g.nav.settings':'设置','g.nav.func':'功能','g.nav.cfg':'系统设置',
     'g.btn.save':'保存','g.btn.cancel':'取消','g.btn.delete':'删除','g.btn.edit':'编辑','g.btn.csv':'↓ CSV',
@@ -3444,7 +3752,8 @@ const ADMIN_I18N = {
   vi: {
     'sub.dash':'Bảng','sub.overview':'Tổng quan','sub.new':'Thêm mới','sub.new_booking':'Đặt phòng mới','sub.calendar':'Lịch','sub.month':'Lịch tháng','sub.list':'Danh sách','sub.booking_list':'Danh sách đặt','sub.fault':'Báo hỏng','sub.report':'Báo cáo','sub.settings':'Cài đặt','sub.use_log':'Nhật ký dùng xe','sub.fuel':'Nhiên liệu','sub.vehicles':'Xe','sub.maint':'Bảo dưỡng','sub.insp':'Đăng kiểm','sub.books':'Sách','sub.return':'Trả sách','sub.manage':'Quản lý','sub.loans':'Lịch sử mượn',
     'g.site_label':'Đơn vị:',
-    'mod.room':'Phòng họp','mod.car':'Xe công vụ','mod.visit':'Khách thăm',
+    'mod.airport':'Đưa đón sân bay','mod.room':'Phòng họp','mod.car':'Xe công vụ','mod.visit':'Khách thăm',
+    'sub.ap_new':'Đặt mới','sub.ap_list':'Danh sách đặt','sub.ap_info':'Giá & lưu ý',
     'mod.lib':'Thư viện','mod.lottery':'Rút thăm',
     'g.nav.main':'Menu chính','g.nav.settings':'Cài đặt','g.nav.func':'Chức năng','g.nav.cfg':'Cấu hình',
     'g.btn.save':'Lưu','g.btn.cancel':'Hủy','g.btn.delete':'Xóa','g.btn.edit':'Sửa','g.btn.csv':'↓ CSV',
@@ -3839,7 +4148,8 @@ const ADMIN_I18N = {
   ja: {
     'sub.dash':'ボード','sub.overview':'概要','sub.new':'新規','sub.new_booking':'新規予約','sub.calendar':'カレンダー','sub.month':'月表示','sub.list':'一覧','sub.booking_list':'予約一覧','sub.fault':'故障報告','sub.report':'レポート','sub.settings':'設定','sub.use_log':'利用記録','sub.fuel':'燃料費','sub.vehicles':'車両','sub.maint':'整備','sub.insp':'車検','sub.books':'蔵書','sub.return':'返却','sub.manage':'管理','sub.loans':'貸出履歴',
     'g.site_label':'拠点：',
-    'mod.room':'会議室','mod.car':'社用車','mod.visit':'来訪管理',
+    'mod.airport':'空港送迎','mod.room':'会議室','mod.car':'社用車','mod.visit':'来訪管理',
+    'sub.ap_new':'新規予約','sub.ap_list':'予約一覧','sub.ap_info':'料金と注意事項',
     'mod.lib':'図書館','mod.lottery':'抽選',
     'g.nav.main':'メインメニュー','g.nav.settings':'設定','g.nav.func':'機能','g.nav.cfg':'システム設定',
     'g.btn.save':'保存','g.btn.cancel':'キャンセル','g.btn.delete':'削除','g.btn.edit':'編集','g.btn.csv':'↓ CSV',
@@ -4323,7 +4633,7 @@ async function init(){
   _curSite = PORTAL_SESSION?.site || '';
   _roomSite = _curSite; _carSite = _curSite; _libSite = _curSite;
   setGlobalSite(_curSite);
-  switchMod('car');updUsrDisp();updBadges();
+  switchMod('airport');updUsrDisp();updBadges();
   document.querySelectorAll('#panel-lib .navi').forEach(el=>el.addEventListener('click',()=>{const p=el.dataset.p;if(p)navLib(p);}));
   document.querySelectorAll('#panel-car .navi').forEach(el=>el.addEventListener('click',()=>{const p=el.dataset.p;if(p)navCar(p);}));
   const bd=document.getElementById('bwdt');
@@ -4350,6 +4660,7 @@ function switchMod(m){
   document.getElementById(`panel-${m}`).classList.add('active');
   // 手機版模塊 tab bar
   mobileModSwitch(m);
+  if(m==='airport'){apInit();navAirport(apCurPg);}
   if(m==='lib'){loadLibFromSB().then(()=>{popCatSel();renderLibPg('lib-books');}).catch(()=>renderLibPg('lib-books'));}
   if(m==='car')renderCarPg('car-dash');
   if(m==='lottery'){syncUsersFromSupabase().catch(()=>{}).then(()=>lottoInit());}
@@ -4367,6 +4678,11 @@ function switchMod(m){
       標籤刻意用短版（「看板」而不是側欄的「車輛看板」），因為這一列很窄，
       所以另開 sub.* 一組 key，不重用 car.nav.* 那些長標籤。 */
 const MOBILE_SUBNAV = {
+  airport:[
+    {p:'airport-new',ic:'📝',lb:'sub.ap_new'},
+    {p:'airport-list',ic:'📋',lb:'sub.ap_list'},
+    {p:'airport-info',ic:'💲',lb:'sub.ap_info'},
+  ],
   room:[
     {p:'room-dash',ic:'📊',lb:'sub.dash'},
     {p:'room-new',ic:'➕',lb:'sub.new_booking'},
@@ -4453,7 +4769,8 @@ function mobileSubNav(mod, activeP){
 }
 
 function mobileNavTo(mod, p){
-  if(mod==='room') navRoom(p);
+  if(mod==='airport') navAirport(p);
+  else if(mod==='room') navRoom(p);
   else if(mod==='car') navCar(p);
   else if(mod==='lib') navLib(p);
   else if(mod==='visit') navVisit(p);
@@ -7322,6 +7639,589 @@ function stopConfetti(){cancelAnimationFrame(confAnim);if(L_confCanvas)L_confCan
 
 
 init();
+
+/* ════════ 機場接送預約 ════════ */
+/* ══════════════════ 機場接送預約（ap*）══════════════════
+   來源：comart-car-booking.web.app（Apps Script + Google Sheet），2026-09-30 搬入。
+   業務規則（價目、車輛容量、48 小時、報到時間）逐條照搬，沒有改動。
+
+   🔴 搬過來不是為了「整合」，是因為原系統有兩個問題：
+     ① 後端網址寫在網頁原始碼裡而且不驗身分 —— 任何人都讀得到每一筆預約的
+        申請人、手機、住家地址與航班（實測過：用不存在的編號打 cancelBooking，
+        回的是應用層錯誤而不是 401）。
+     ② script.google.com 在中國被 GFW 封鎖，東莞廠同事本來就用不了。 */
+
+const AP_CFG = {
+  PREP_MIN: { TPE: 180, TSA: 150 },   // 建議上車時間＝起飛前 N 分鐘（含報到＋車程）
+  NIGHT_START: 23, NIGHT_END: 6,
+  PRICE: { '4人座': 1100, '7人座': 1500 }, SIGN: 105, NIGHT: 210, STOP: 210,
+  LUG_CAP: { '4人座': { 20: 3, 25: 2, 27: 2, 29: 1 }, '7人座': { 20: 8, 25: 6, 27: 5, 29: 4 } },
+  SEATS: { '4人座': 4, '7人座': 7 },
+  VENDOR_PHONE: '02-2775-9325',
+};
+const AP_AIRPORTS = { TPE: '桃園', TSA: '松山' };
+const AP_NOTICES = [
+  '請於 48 小時前通知客服中心進行預約（客服信箱：Tmsbooking@tmsv.com.tw／客服專線：02-2775-9325），連假請提前 7 個工作天預約。',
+  '若預約服務時間為農曆春節或三天以上之連續假期，需酌收旺季服務費，農曆春節期間之定義依行政院人事行政局公告為依據。',
+  '若需異動或取消服務，請於原服務時間 12 小時前來電或來信客服中心變更或取消。',
+  '若於服務時間 6 小時內來電取消，須酌收空趟費用 $315（含稅）。',
+  '若服務車輛準時於預約時間抵達而客戶臨時取消，則視同使用服務請款。',
+  '若臨時取消為天候或其它不可抗力之因素，則以個案方式由雙方協議處理。',
+];
+const AP_CITIES = ['臺北市','新北市','桃園市','基隆市','新竹市','新竹縣','苗栗縣','臺中市','彰化縣','南投縣','雲林縣','嘉義市','嘉義縣','臺南市','高雄市','屏東縣','宜蘭縣','花蓮縣','臺東縣','澎湖縣','金門縣','連江縣'];
+const AP_DISTS = {
+  '臺北市':'中正 大同 中山 松山 大安 萬華 信義 士林 北投 內湖 南港 文山',
+  '新北市':'板橋 三重 中和 永和 新莊 新店 樹林 鶯歌 三峽 淡水 汐止 瑞芳 土城 蘆洲 五股 泰山 林口 深坑 石碇 坪林 三芝 石門 八里 平溪 雙溪 貢寮 金山 萬里 烏來',
+  '桃園市':'桃園 中壢 大溪 楊梅 蘆竹 大園 龜山 八德 龍潭 平鎮 新屋 觀音 復興',
+  '基隆市':'仁愛 信義 中正 中山 安樂 暖暖 七堵',
+  '新竹市':'東 北 香山', '臺中市':'中 東 南 西 北 西屯 南屯 北屯 豐原 大里 太平 清水 沙鹿 大甲 東勢 梧棲 烏日 神岡 大肚 龍井 潭子 大雅 新社 石岡 外埔 大安 和平 霧峰 后里',
+  '臺南市':'中西 東 南 北 安平 安南 永康 歸仁 新化 左鎮 玉井 楠西 南化 仁德 關廟 龍崎 官田 麻豆 佳里 西港 七股 將軍 學甲 北門 新營 後壁 白河 東山 六甲 下營 柳營 鹽水 善化 大內 山上 新市 安定',
+  '高雄市':'楠梓 左營 鼓山 三民 鹽埕 前金 新興 苓雅 前鎮 旗津 小港 鳳山 大寮 鳥松 林園 仁武 大樹 大社 岡山 路竹 橋頭 梓官 彌陀 永安 燕巢 田寮 阿蓮 茄萣 湖內 旗山 美濃 內門 杉林 甲仙 六龜 茂林 桃源 那瑪夏',
+};
+
+/* 🔴 欄位名是機械轉換（outPickupDate ↔ out_pickup_date），**不要手寫對照表**：
+   50 個欄位的手寫對照表必然會漏，而漏掉的症狀是「那一格永遠是空的」，
+   沒有人會回報。lug20 沒有大寫字母，兩邊都原樣通過。 */
+const apSnake = s => s.replace(/[A-Z]/g, c => '_' + c.toLowerCase());
+const apCamel = s => s.replace(/_([a-z])/g, (_, c) => c.toUpperCase());
+/** 這些欄位由伺服器決定，送過去也會被 sb-proxy 丟掉（列出來只是省一趟網路）。 */
+const AP_SERVER_OWNED = new Set(['id','emp_id','status','created_at','updated_at','cancelled_by','cancelled_at','sent_by','sent_to_vendor_at']);
+const AP_NUM = new Set(['pax_count','lug20','lug25','lug27','lug29','in_delay','fare_estimate']);
+const AP_DATE = new Set(['out_date','in_date','out_pickup_date','in_pickup_date']);
+
+function apToRow(b) {
+  const row = {};
+  for (const k of Object.keys(b)) {
+    const col = apSnake(k);
+    if (AP_SERVER_OWNED.has(col)) continue;
+    let v = b[k];
+    if (col === 'signboard') { row[col] = !!v && v !== ''; continue; }
+    if (v === '' || v === undefined) v = null;
+    // 🔴 空字串不能送進 date 欄位（Postgres 會回 22007 invalid input syntax）
+    if (v !== null && AP_NUM.has(col)) v = Number(v) || 0;
+    row[col] = v;
+  }
+  return row;
+}
+function apFromRow(r) {
+  const b = {};
+  for (const k of Object.keys(r || {})) b[apCamel(k)] = r[k] === null ? '' : r[k];
+  return b;
+}
+
+/* ── 狀態 ── */
+let apSeeAll = false;      // admin 或行政部：看得到全部
+let apRows = [];
+let apOutTouched = false, apInTouched = false;
+let apInited = false;
+let apCurPg = 'airport-new';
+
+const apF = () => document.getElementById('ap-f');
+const apFld = n => apF().elements[n];
+const ap$ = s => document.querySelector(s);
+const ap$$ = s => [...document.querySelectorAll(s)];
+const apPad = n => String(n).padStart(2, '0');
+const apEsc = s => escapeHtml(String(s == null ? '' : s));
+/* 編號進 onclick 之前一律過白名單（同 _lcSafeId 的理由）：它是從資料庫回來的字串。 */
+const apSafeId = s => /^AP\d{8}-\d{3}$/.test(String(s || '')) ? String(s) : '';
+const apTwDate = (d, t) => d && t ? new Date(d + 'T' + t + ':00+08:00') : null;
+const apToday = () => new Date(Date.now() + 8 * 3600e3).toISOString().slice(0, 10);
+const apApName = c => c ? (AP_AIRPORTS[c] ? AP_AIRPORTS[c] + ' ' + c : c) : '';
+const apHoursUntil = (d, t) => { const x = apTwDate(d, t); return x ? (x - Date.now()) / 3600e3 : null; };
+const apIsNight = t => { if (!t) return false; const h = +t.slice(0, 2); return h >= AP_CFG.NIGHT_START || h < AP_CFG.NIGHT_END; };
+/* 純日曆運算，不受這台電腦的時區影響 */
+function apShift(d, t, mins) {
+  const x = new Date(d + 'T' + t + ':00Z'); x.setUTCMinutes(x.getUTCMinutes() + mins);
+  return { date: x.toISOString().slice(0, 10), time: x.toISOString().slice(11, 16) };
+}
+
+/* ── 次頁籤 ── */
+function navAirport(p) {
+  apCurPg = p;
+  ap$$('#panel-airport .apage').forEach(el => el.style.display = 'none');
+  const el = document.getElementById(p); if (el) el.style.display = '';
+  mobileSubNav('airport', p); desktopSubNav('airport', p);
+  if (p === 'airport-list') apLoadList();
+}
+
+/* ── 一次性初始化 ── */
+function apInit() {
+  if (apInited) return; apInited = true;
+  // 縣市／區域
+  ap$$('#panel-airport select[data-ap-city]').forEach(s => {
+    s.innerHTML = AP_CITIES.map(c => `<option>${c}</option>`).join('');
+    s.value = '新北市';
+    const dl = document.createElement('datalist'); dl.id = 'ap-dl-' + s.name; document.body.appendChild(dl);
+    const fill = () => { dl.innerHTML = (AP_DISTS[s.value] || '').split(' ').filter(Boolean).map(d => `<option>${d}區</option>`).join(''); };
+    s.addEventListener('change', fill); fill();
+  });
+  ap$('#ap-noticeList').innerHTML = AP_NOTICES.map(n => `<li>${apEsc(n)}</li>`).join('');
+  apFld('outDate').min = apFld('inDate').min = apToday();
+
+  apFillApplicant();
+
+  ap$$('#panel-airport input[name=serviceType]').forEach(r => r.onchange = apSyncService);
+  ['outPickupDate','outPickupTime'].forEach(n => apFld(n).addEventListener('input', () => { apOutTouched = true; apRefresh(); }));
+  ['outDate','outDepTime','outAirport'].forEach(n => apFld(n).addEventListener('change', () => apSuggestOutPickup()));
+  apFld('outDepTime').addEventListener('input', () => apSuggestOutPickup());
+  ['inPickupDate','inPickupTime'].forEach(n => apFld(n).addEventListener('input', () => { apInTouched = true; apRefresh(); }));
+  ['inDate','inArrTime','inDelay'].forEach(n => apFld(n).addEventListener('change', () => { if (n === 'inDelay') apInTouched = false; apSyncInPickup(); }));
+  apFld('inArrTime').addEventListener('input', apSyncInPickup);
+
+  ap$('#ap-copyAddr').onclick = () => {
+    ['City','Dist','Addr'].forEach(k => apFld('in' + k).value = apFld('out' + k).value);
+    apFld('inCity').dispatchEvent(new Event('change'));
+  };
+  ap$('#ap-sameAsApplicant').onclick = () => {
+    apFld('p1Name').value = apFld('applicant').value;
+    apFld('p1Mobile').value = apFld('mobile').value;
+    apFld('p1Email').value = apFld('email').value;
+    apRefresh();
+  };
+  apFld('stopLeg').onchange = () => { ap$('#ap-stopFields').hidden = !apFld('stopLeg').value; apRefresh(); };
+  ap$$('#panel-airport [data-ap-lookup]').forEach(b => b.onclick = () => apLookupFlight(b.dataset.apLookup));
+
+  apF().addEventListener('input', e => {
+    e.target.classList.remove('bad');
+    apRefresh(['paxCount','lug20','lug25','lug27','lug29','p2Name'].includes(e.target.name));
+  });
+  apF().addEventListener('change', () => apRefresh());
+  apF().addEventListener('submit', apSubmit);
+  ap$('#ap-resetBtn').onclick = () => { if (confirm('確定清除表單內容？')) apResetForm(); };
+  ap$('#ap-reload').onclick = () => apLoadList();
+  ap$('#ap-csv').onclick = () => apExportCsv();
+  ap$('#ap-q').addEventListener('input', () => apRenderList());
+  ap$('#ap-fStatus').addEventListener('change', () => apRenderList());
+
+  apSyncService();
+}
+
+/* 🔴 申請人由登入身分帶入，不是打字。原系統的申請人是自由輸入的，
+   等於誰都能用別人的名義預約 —— 而取消只驗手機末四碼，那四碼就在同一份資料裡。
+   工號設成 readonly：它是這筆預約的擁有者，前端改了也沒用（sb-proxy 以簽章為準）。 */
+function apFillApplicant() {
+  const s = PORTAL_SESSION || {};
+  const me = (ld(K.us) || []).find(u => u.id === s.empId || u.emp_id === s.empId) || {};
+  const set = (n, v) => { if (v && !apFld(n).value) apFld(n).value = v; };
+  set('applicant', s.nameZh || s.nameEn || me.nameZh || me.name || '');
+  set('empNo', s.empId || me.emp_id || '');
+  set('dept', s.dept || me.dept || '');
+  set('email', s.email || me.email || '');
+  set('ext', me.ext || '');
+  set('mobile', me.mobile || me.phone || '');
+}
+
+/* ── 表單互動 ── */
+const apSvc = () => apF().serviceType.value;
+const apLegsOn = () => { const s = apSvc(); return { out: s !== 'in', in: s !== 'out' }; };
+function apSyncService() {
+  const l = apLegsOn();
+  ap$('#ap-cardOut').hidden = !l.out;
+  ap$('#ap-cardIn').hidden = !l.in;
+  ap$('#ap-copyAddr').hidden = !l.out;
+  apRefresh();
+}
+function apSuggestOutPickup(force) {
+  const d = apFld('outDate').value, t = apFld('outDepTime').value, ap = apFld('outAirport').value;
+  if (!d || !t) return;
+  const mins = AP_CFG.PREP_MIN[ap] || 240, s = apShift(d, t, -mins);
+  ap$('#ap-outPickupHint').innerHTML =
+    `建議上車時間：<b>${s.date === d ? '' : s.date + ' '}${s.time}</b>（${apEsc(apApName(ap))}，起飛前約 ${mins / 60} 小時，含報到與車程）` +
+    (apOutTouched && !force ? ` <button type="button" class="btn bsm" id="ap-useSug">套用建議</button>` : '');
+  const u = ap$('#ap-useSug'); if (u) u.onclick = () => apSuggestOutPickup(true);
+  if (!apOutTouched || force) {
+    apFld('outPickupDate').value = s.date; apFld('outPickupTime').value = s.time;
+    if (force) apOutTouched = false;
+  }
+  apRefresh();
+}
+function apSyncInPickup() {
+  const d = apFld('inDate').value, t = apFld('inArrTime').value;
+  if (!d || !t) return;
+  if (!apInTouched) {
+    const s = apShift(d, t, +apFld('inDelay').value || 0);
+    apFld('inPickupDate').value = s.date; apFld('inPickupTime').value = s.time;
+  }
+  apRefresh();
+}
+
+/* ── 車款建議 / 費用 / 檢查（規則照搬，未改）── */
+function apLugLoad(car) {
+  const cap = AP_CFG.LUG_CAP[car]; let s = 0;
+  for (const k of [20, 25, 27, 29]) s += (+apFld('lug' + k).value || 0) / cap[k];
+  return s;
+}
+function apRecommendCar() {
+  const pax = +apFld('paxCount').value || 1;
+  if (pax <= AP_CFG.SEATS['4人座'] && apLugLoad('4人座') <= 1) return '4人座';
+  if (pax <= AP_CFG.SEATS['7人座'] && apLugLoad('7人座') <= 1) return '7人座';
+  return null;
+}
+function apCarCheck(autoPick) {
+  const rec = apRecommendCar(), pax = +apFld('paxCount').value || 1;
+  ap$('#ap-rec4').hidden = rec !== '4人座';
+  ap$('#ap-rec7').hidden = rec !== '7人座';
+  if (autoPick && rec) ap$$('#panel-airport input[name=carType]').forEach(r => r.checked = r.value === rec);
+  const now = apF().carType.value, msgs = [];
+  if (!rec) msgs.push(['err', '人數或行李超過單一 7 人座容量，建議分兩台車預約，或在備註說明。']);
+  else if (now === '4人座' && (apLugLoad('4人座') > 1 || pax > 4)) msgs.push(['warn', '行李或人數可能超過 4 人座容量（四人座：27 吋＋29 吋各一件很可能放不下），建議改選 7 人座。']);
+  ap$('#ap-carMsg').innerHTML = msgs.map(m => `<div class="ap-msg ${m[0]}">${apEsc(m[1])}</div>`).join('');
+}
+function apFareOf(b) {
+  const lines = [], price = AP_CFG.PRICE[b.carType] || 0, stops = (b.stopLeg || '').split(',');
+  const legs = [];
+  if (b.serviceType !== 'in') legs.push(['送機', b.outPickupTime]);
+  if (b.serviceType !== 'out') legs.push(['接機', b.inPickupTime]);
+  let total = 0;
+  for (const [name, t] of legs) {
+    lines.push(['leg', name + (t ? '　' + t : '')]);
+    lines.push([b.carType + ' 單趟', price]); total += price;
+    if (apIsNight(t)) { lines.push(['夜間加價', AP_CFG.NIGHT]); total += AP_CFG.NIGHT; }
+    if (name === '接機' && b.signboard) { lines.push(['舉牌', AP_CFG.SIGN]); total += AP_CFG.SIGN; }
+    if (stops.includes(name)) { lines.push(['停靠點（5 公里內）', AP_CFG.STOP]); total += AP_CFG.STOP; }
+  }
+  return { lines, total };
+}
+function apCollect() {
+  const b = {};
+  for (const el of apF().elements) {
+    if (!el.name) continue;
+    if (el.type === 'radio') { if (el.checked) b[el.name] = el.value; }
+    else if (el.type === 'checkbox') b[el.name] = el.checked ? el.value : '';
+    else b[el.name] = (el.value || '').trim();
+  }
+  const l = apLegsOn();
+  if (!l.out) Object.keys(b).filter(k => k.startsWith('out')).forEach(k => b[k] = '');
+  if (!l.in) { Object.keys(b).filter(k => k.startsWith('in')).forEach(k => b[k] = ''); b.signboard = ''; }
+  if (!b.stopLeg) b.stopCity = b.stopDist = b.stopAddr = '';
+  if (b.inDelay === '0') b.inDelay = '';
+  b.fareEstimate = String(apFareOf(b).total);
+  return b;
+}
+function apRefresh(autoCar) {
+  apCarCheck(autoCar);
+  const b = apCollect(), fr = apFareOf(b);
+  ap$('#ap-fareTbl').innerHTML =
+    fr.lines.map(l => l[0] === 'leg'
+      ? `<tr class="leg"><td colspan="2">${apEsc(l[1])}</td></tr>`
+      : `<tr><td>${apEsc(l[0])}</td><td>$${l[1].toLocaleString()}</td></tr>`).join('') +
+    `<tr class="tot"><td>合計</td><td>$${fr.total.toLocaleString()}</td></tr>`;
+  const c = [], l = apLegsOn(), times = [];
+  if (l.out && b.outPickupDate && b.outPickupTime) times.push(['送機', b.outPickupDate, b.outPickupTime]);
+  if (l.in && b.inPickupDate && b.inPickupTime) times.push(['接機', b.inPickupDate, b.inPickupTime]);
+  for (const [n, d, t] of times) {
+    const h = apHoursUntil(d, t);
+    if (h < 0) c.push(['err', `${n}時間已經過去了，請確認日期。`]);
+    else if (h < 48) c.push(['warn', `${n}距今不到 48 小時（約 ${Math.floor(h)} 小時），全鋒規定需 48 小時前預約，送出後請務必電話聯繫客服 ${AP_CFG.VENDOR_PHONE}。`]);
+  }
+  if (l.out && l.in && b.outDate && b.inDate && b.inDate < b.outDate) c.push(['err', '回國日期早於出國日期。']);
+  if (l.out && b.outDepTime && b.outPickupTime && b.outPickupDate) {
+    const gap = (apTwDate(b.outDate, b.outDepTime) - apTwDate(b.outPickupDate, b.outPickupTime)) / 60000;
+    if (gap < 120) c.push(['warn', `上車時間距起飛只有 ${Math.round(gap)} 分鐘，可能來不及報到。`]);
+  }
+  ap$('#ap-checks').innerHTML = c.map(m => `<div class="ap-msg ${m[0]}">${apEsc(m[1])}</div>`).join('');
+}
+
+/* SB.get/post/patch 只回 data 或 null，錯誤細節在 SB.lastStatus。
+   sbErrMsg 要的是整包結果物件，所以這裡補一個。 */
+const apErr = fallback => `${fallback}（${sbErrMsg({ status: SB.lastStatus, err: '' })}）`;
+
+/* ── 航班查詢 ───────────────────────────────────────────────
+   🔴 沿用 Portal 既有的做法（index.html 的 autoFillFlight）：走 claude-proxy 的
+   web search，**不是 TDX**。原系統是 Apps Script 在後端打 TDX，搬過來就得把
+   TDX 憑證再放一份 —— 而平台本來就有一條會動的路，不需要第二套。 */
+function apFlightStatus(leg, html, cls) {
+  const el = ap$('#ap-f' + (leg === 'out' ? 'Out' : 'In'));
+  el.className = 'ap-flight' + (cls ? ' ' + cls : '');
+  el.innerHTML = html;
+}
+async function apLookupFlight(leg) {
+  const no = (apFld(leg + 'Flight').value || '').trim().toUpperCase();
+  const dateEl = apFld(leg === 'out' ? 'outDate' : 'inDate');
+  if (!no) { apFlightStatus(leg, '請先輸入航班編號。', 'warn'); return; }
+  if (!/^[A-Z0-9]{2}\d{1,4}$/.test(no)) { apFlightStatus(leg, '航班編號格式不正確，例如 BR189、CI100、JX800。', 'warn'); return; }
+  const dateStr = dateEl.value || apToday();
+  apFlightStatus(leg, '查詢中…', '');
+  const prompt = 'Flight ' + no + ' on ' + dateStr +
+    '. Search web for scheduled timetable. Return ONLY valid JSON no markdown: ' +
+    '{"dep_iata":"","dep_city":"","dep_terminal":"","dep_time":"HH:MM","arr_iata":"","arr_city":"","arr_terminal":"","arr_time":"HH:MM"}. ' +
+    'Use local scheduled times. Unknown fields use empty string.';
+  try {
+    const resp = await fetch(ADMIN_CFG.workerUrl.replace('/sb-proxy', '/claude-proxy'), {
+      method: 'POST',
+      headers: sbHdrs(),
+      body: JSON.stringify({
+        model: 'claude-sonnet-5', max_tokens: 512,
+        tools: [{ type: 'web_search_20250305', name: 'web_search' }],
+        messages: [{ role: 'user', content: prompt }],
+      }),
+    });
+    if (!resp.ok) { apFlightStatus(leg, `查詢失敗（${resp.status}），請手動填寫。`, 'warn'); return; }
+    const data = await resp.json();
+    let text = '';
+    if (Array.isArray(data.content)) {
+      for (let i = data.content.length - 1; i >= 0; i--) {
+        if (data.content[i].type === 'text') { text = String(data.content[i].text || '').trim(); break; }
+      }
+    }
+    const m = text.match(/\{[\s\S]*?\}/);
+    if (!m) { apFlightStatus(leg, '查不到這班航班的班表，請手動填寫。', 'warn'); return; }
+    const f = JSON.parse(m[0]);
+    /* 送機看**出發**、接機看**抵達** —— 兩邊拿的是同一次查詢的不同端。
+       台灣這一端的機場／航廈／時間才是我們要填的欄位。 */
+    const side = leg === 'out'
+      ? { iata: f.dep_iata, terminal: f.dep_terminal, time: f.dep_time, other: f.arr_city || f.arr_iata }
+      : { iata: f.arr_iata, terminal: f.arr_terminal, time: f.arr_time, other: f.dep_city || f.dep_iata };
+    if (side.iata && AP_AIRPORTS[side.iata]) apFld(leg + 'Airport').value = side.iata;
+    if (side.terminal) apFld(leg + 'Terminal').value = String(side.terminal).replace(/\D/g, '') || side.terminal;
+    if (/^\d{2}:\d{2}$/.test(side.time || '')) apFld(leg === 'out' ? 'outDepTime' : 'inArrTime').value = side.time;
+    if (side.other) apFld(leg === 'out' ? 'outDest' : 'inOrigin').value = side.other;
+    apFlightStatus(leg,
+      `查到：${apEsc(f.dep_iata || '?')} ${apEsc(f.dep_time || '')} → ${apEsc(f.arr_iata || '?')} ${apEsc(f.arr_time || '')}` +
+      `${side.terminal ? '　航廈 ' + apEsc(side.terminal) : ''}　<span class="ap-small">班表為排定時間，請與機票核對</span>`, 'ok');
+    if (leg === 'out') apSuggestOutPickup(); else apSyncInPickup();
+  } catch (e) {
+    apFlightStatus(leg, '查詢時發生錯誤，請手動填寫。', 'warn');
+    console.warn('[airport] flight lookup failed:', e && e.message);
+  }
+}
+
+/* ── 送出 ─────────────────────────────────────────────────── */
+const AP_REQUIRED = {
+  base: ['applicant','mobile','p1Name','p1Mobile','paxCount'],
+  out: ['outDate','outFlight','outAirport','outDepTime','outPickupDate','outPickupTime','outCity','outAddr'],
+  in: ['inDate','inFlight','inAirport','inArrTime','inPickupDate','inPickupTime','inCity','inAddr'],
+};
+function apValidate(b) {
+  const l = apLegsOn();
+  const need = [...AP_REQUIRED.base, ...(l.out ? AP_REQUIRED.out : []), ...(l.in ? AP_REQUIRED.in : [])];
+  const missing = need.filter(n => !String(b[n] || '').trim());
+  missing.forEach(n => { const el = apFld(n); if (el) el.classList.add('bad'); });
+  return missing;
+}
+async function apSubmit(ev) {
+  ev.preventDefault();
+  const b = apCollect();
+  const missing = apValidate(b);
+  if (missing.length) {
+    toast(`還有 ${missing.length} 個必填欄位沒有填`, 'error');
+    const el = apFld(missing[0]); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+  if (b.inDelay) b.note = (b.note ? b.note + '；' : '') + `請於降落後延後 ${b.inDelay} 分鐘接機`;
+  const btn = ap$('#ap-submitBtn');
+  btn.disabled = true; btn.textContent = '送出中…';
+  try {
+    /* 🔴 DB-first：寫入成功才動畫面（CLAUDE.md v2.37 的公務車事件）。
+       這一筆會有第三個人照著行動（行政要據此通知廠商派車），
+       「顯示成功但其實沒存進去」的代價是有人到了機場沒有車。 */
+    const rows = await SB.post('airport_bookings', apToRow(b));
+    if (!rows || !rows[0]) {
+      toast(apErr('送出失敗，預約沒有存檔'), 'error');
+      return;
+    }
+    const saved = apFromRow(rows[0]);
+    toast(`預約已送出：${saved.id}`);
+    apShowDone(saved);
+    apResetForm();
+  } finally {
+    btn.disabled = false; btn.textContent = '送出預約';
+  }
+}
+function apResetForm() {
+  apF().reset();
+  ap$$('#panel-airport select[data-ap-city]').forEach(s => { s.value = '新北市'; s.dispatchEvent(new Event('change')); });
+  ap$$('#panel-airport .ap-flight').forEach(x => { x.className = 'ap-flight'; x.innerHTML = ''; });
+  ap$('#ap-stopFields').hidden = true;
+  apOutTouched = apInTouched = false;
+  ap$('#ap-outPickupHint').textContent = '輸入起飛時間後，系統會自動建議上車時間（可自行修改）。';
+  apFillApplicant();
+  apSyncService();
+}
+function apShowDone(b) {
+  navAirport('airport-list');
+  apLoadList().then(() => {
+    const el = document.getElementById('ap-row-' + b.id);
+    if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.classList.add('ap-justsaved'); }
+  });
+}
+
+/* ── 給廠商的預約文字（信件內容就是這一段，不在後端）── */
+function apLegText(b, dir) {
+  if (dir === 'out') return `【送機】${b.outPickupDate} ${b.outPickupTime} 上車\n  航班 ${b.outFlight}　${apApName(b.outAirport)}${b.outTerminal ? ' 第' + b.outTerminal + '航廈' : ''}　起飛 ${b.outDate} ${b.outDepTime}${b.outDest ? '　往 ' + b.outDest : ''}\n  上車地址：${b.outCity}${b.outDist}${b.outAddr}`;
+  return `【接機】${b.inPickupDate} ${b.inPickupTime} 接機　航班 ${b.inFlight}　${apApName(b.inAirport)}${b.inTerminal ? ' 第' + b.inTerminal + '航廈' : ''}　降落 ${b.inDate} ${b.inArrTime}${b.inOrigin ? '　自 ' + b.inOrigin : ''}${b.signboard ? '　需舉牌' : ''}\n  下車地址：${b.inCity}${b.inDist}${b.inAddr}`;
+}
+/* 🔴 這段固定繁中，不隨介面語言變（同 siteLabelZ 的道理）：
+   它是寄給廠商的內容，不該因為「寄件人當下把介面切成哪一國語言」而長得不一樣。 */
+function apBookingText(b) {
+  const L = [];
+  L.push(`全鋒專接服務預約（${b.id}）`, `公司：怡業股份有限公司（統編 84756310）　發票寄送：235新北市新店區寶橋路235巷12號4樓`);
+  L.push(`申請人：${b.dept ? b.dept + ' ' : ''}${b.applicant}　手機 ${b.mobile}　電話 (02)8911-1133${b.ext ? ' #' + b.ext : ''}${b.email ? '　' + b.email : ''}`);
+  if (b.empNo || b.purpose || b.tripNo) L.push(`員工編號：${b.empNo || '-'}　使用目的：${b.purpose || '-'}　出差單號：${b.tripNo || '-'}`);
+  L.push(`乘客1：${b.p1Name}　${b.p1Mobile}${b.p1Email ? '　' + b.p1Email : ''}${b.p1Note ? '　（' + b.p1Note + '）' : ''}`);
+  if (b.p2Name) L.push(`乘客2：${b.p2Name}　${b.p2Mobile || ''}${b.p2Email ? '　' + b.p2Email : ''}${b.p2Note ? '　（' + b.p2Note + '）' : ''}`);
+  L.push(`搭乘人數：${b.paxCount}　車款：${b.carType}　行李：20吋×${b.lug20 || 0}、25吋×${b.lug25 || 0}、27吋×${b.lug27 || 0}、29吋×${b.lug29 || 0}${b.lugOther ? '、' + b.lugOther : ''}`);
+  if (b.serviceType !== 'in') L.push(apLegText(b, 'out'));
+  if (b.serviceType !== 'out') L.push(apLegText(b, 'in'));
+  if (b.stopLeg) L.push(`停靠站（${b.stopLeg}）：${b.stopCity || ''}${b.stopDist || ''}${b.stopAddr || ''}`);
+  if (b.note) L.push(`備註：${b.note}`);
+  if (b.fareEstimate) L.push(`預估費用：$${Number(b.fareEstimate).toLocaleString()}（僅供參考，實際以貴公司報價為準）`);
+  return L.join('\n');
+}
+
+/* ── 預約清單 ─────────────────────────────────────────────── */
+async function apLoadList() {
+  const box = ap$('#ap-list');
+  box.innerHTML = '<div class="ap-hint">載入中…</div>';
+  /* 🔴 不必也不能自己帶 emp_id：sb-proxy 會依「當下」的角色與部門決定範圍，
+     一般同事送什麼都會被改寫成自己的工號。這裡不送，範圍完全由伺服器決定。 */
+  const rows = await SB.get('airport_bookings', '?select=*&order=created_at.desc&limit=500');
+  if (!rows) {
+    /* 🔴 SB.get 失敗回 null、查得到但沒有回 []。兩者混為一談就會在「查詢根本沒
+       成功」時說出「目前沒有預約」—— 那是一句假話，而使用者對假話的反應是再按一次。 */
+    box.innerHTML = `<div class="ap-msg err">${apEsc(apErr('讀取預約清單失敗'))}</div>`;
+    ap$('#ap-listCount').textContent = '';
+    return;
+  }
+  apRows = rows.map(apFromRow);
+  // 看得到別人的資料 ⇒ 自己就是 admin 或行政部（範圍是伺服器決定的，這裡只是照實說明）
+  apSeeAll = apRows.some(r => r.empId && r.empId !== (PORTAL_SESSION?.empId || ''));
+  ap$('#ap-scopeNote').textContent = apSeeAll
+    ? '你看得到全部同仁的預約（系統管理者或行政部）。'
+    : '這裡只列出你自己申請的預約。需要查別人的請找行政部。';
+  apRenderList();
+}
+function apMatchStatus(b, f) {
+  if (f === 'all') return true;
+  if (f === 'sent') return !!b.sentToVendorAt;
+  if (f === 'upcoming') {
+    if (b.status !== '已預約') return false;
+    const d = b.outPickupDate || b.inPickupDate, t = b.outPickupTime || b.inPickupTime;
+    const h = apHoursUntil(d, t);
+    return h === null || h >= -12;   // 12 小時內剛出發的也還留著
+  }
+  return b.status === f;
+}
+function apRenderList() {
+  const q = (ap$('#ap-q').value || '').trim().toLowerCase();
+  const f = ap$('#ap-fStatus').value;
+  const list = apRows.filter(b => apMatchStatus(b, f)).filter(b => !q ||
+    [b.id, b.applicant, b.dept, b.empNo, b.outFlight, b.inFlight, b.p1Name, b.p2Name]
+      .some(v => String(v || '').toLowerCase().includes(q)));
+  ap$('#ap-listCount').textContent = `共 ${list.length} 筆`;
+  if (!list.length) { ap$('#ap-list').innerHTML = '<div class="ap-hint">沒有符合條件的預約。</div>'; return; }
+  ap$('#ap-list').innerHTML = list.map(apCardHtml).join('');
+}
+function apCardHtml(b) {
+  const id = apSafeId(b.id);
+  const cancelled = b.status === '已取消';
+  const legs = [];
+  if (b.serviceType !== 'in' && b.outPickupDate) legs.push(`<div class="ap-leg"><b>送機</b> ${apEsc(b.outPickupDate)} ${apEsc(b.outPickupTime || '')}　${apEsc(b.outFlight || '')}　${apEsc(apApName(b.outAirport))}<div class="ap-small">${apEsc((b.outCity || '') + (b.outDist || '') + (b.outAddr || ''))}</div></div>`);
+  if (b.serviceType !== 'out' && b.inPickupDate) legs.push(`<div class="ap-leg"><b>接機</b> ${apEsc(b.inPickupDate)} ${apEsc(b.inPickupTime || '')}　${apEsc(b.inFlight || '')}　${apEsc(apApName(b.inAirport))}${b.signboard ? '　舉牌' : ''}<div class="ap-small">${apEsc((b.inCity || '') + (b.inDist || '') + (b.inAddr || ''))}</div></div>`);
+  const tags = [`<span class="ap-tag ${cancelled ? 'off' : 'on'}">${apEsc(b.status)}</span>`];
+  if (b.sentToVendorAt) tags.push('<span class="ap-tag sent">已送出全鋒</span>');
+  else if (!cancelled) tags.push('<span class="ap-tag warn">尚未通知廠商</span>');
+  const acts = [];
+  if (id) {
+    acts.push(`<button class="btn bsm" onclick="apCopyText('${id}')">複製預約文字</button>`);
+    if (!cancelled) {
+      acts.push(`<button class="btn bsm" onclick="apSendToVendor('${id}')">${b.sentToVendorAt ? '重新寄給廠商' : '寄給廠商'}</button>`);
+      acts.push(`<button class="btn bsm bdr" onclick="apCancel('${id}')">取消預約</button>`);
+    }
+  }
+  return `<div class="ap-card${cancelled ? ' off' : ''}" id="ap-row-${apEsc(id)}">
+    <div class="ap-card-h">
+      <span class="ap-id">${apEsc(b.id)}</span>
+      ${tags.join('')}
+      <span class="ap-small" style="margin-left:auto">${apEsc(b.createdAt ? String(b.createdAt).slice(0, 16).replace('T', ' ') : '')}</span>
+    </div>
+    <div class="ap-card-b">
+      <div><b>${apEsc(b.applicant)}</b>${b.dept ? ' · ' + apEsc(b.dept) : ''}　${apEsc(b.mobile || '')}
+        <div class="ap-small">乘客：${apEsc(b.p1Name || '')}${b.p2Name ? '、' + apEsc(b.p2Name) : ''}　${apEsc(b.carType || '')}　${apEsc(String(b.paxCount || ''))} 人</div>
+      </div>
+      ${legs.join('')}
+      ${b.note ? `<div class="ap-small">備註：${apEsc(b.note)}</div>` : ''}
+      ${cancelled && b.cancelReason ? `<div class="ap-small">取消原因：${apEsc(b.cancelReason)}</div>` : ''}
+    </div>
+    <div class="ap-card-f">${acts.join('')}</div>
+  </div>`;
+}
+const apFind = id => apRows.find(b => b.id === id);
+
+function apCopyText(id) {
+  const b = apFind(id); if (!b) return;
+  const text = apBookingText(b);
+  navigator.clipboard?.writeText(text)
+    .then(() => toast('預約文字已複製，可貼進信件或 LINE'))
+    .catch(() => { prompt('複製下面這段文字：', text); });
+}
+
+/* 🔴 寄信是**人按了才寄**（Woody 2026-09-30 定案）。對外寄信不可逆，
+   而預約單上有同事的手機與住家地址 —— 自動寄出等於把「要不要寄、寄什麼」
+   整個交給程式判斷。這顆按鈕只負責把已經組好的內容送出去。 */
+async function apSendToVendor(id) {
+  const b = apFind(id); if (!b) return;
+  const again = b.sentToVendorAt ? `\n\n⚠️ 這筆在 ${String(b.sentToVendorAt).slice(0, 16).replace('T', ' ')} 已經寄過一次，再寄一次廠商會收到兩封。` : '';
+  if (!confirm(`要把 ${b.id} 的預約內容寄給全鋒嗎？${again}`)) return;
+  const subject = `怡業股份有限公司 機場接送預約 ${b.id}`;
+  const body = apBookingText(b);
+  /* 用 mailto 讓寄件人是**申請人自己的信箱**，廠商回信才回得到對的人；
+     而且寄出前他看得到內容、可以加話。平台的 Resend 是系統信箱，
+     廠商回覆會掉進沒有人看的地方。 */
+  const to = 'tmsbooking@24tms.com.tw,joanpeng@24tms.com.tw';
+  window.location.href = `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  // DB-first：標記「已通知」要真的存進去才改畫面
+  const rows = await SB.patch('airport_bookings', `id=eq.${encodeURIComponent(b.id)}`, { sent_to_vendor_at: new Date().toISOString() });
+  if (!rows || !rows[0]) { toast(apErr('信件已開啟，但「已通知廠商」沒有存檔'), 'error'); return; }
+  toast('已標記為已送出全鋒');
+  apLoadList();
+}
+
+async function apCancel(id) {
+  const b = apFind(id); if (!b) return;
+  /* 原系統是用「手機末四碼」驗身分 —— 而那四碼就在同一份公開資料裡。
+     現在身分由 session 決定，sb-proxy 也只讓自己（或行政／admin）改得到，
+     所以這裡只需要問原因。 */
+  const reason = prompt(`要取消 ${b.id} 嗎？請填取消原因（會記錄下來）：`, '');
+  if (reason === null) return;
+  if (!reason.trim()) { toast('請填寫取消原因', 'error'); return; }
+  const h = apHoursUntil(b.outPickupDate || b.inPickupDate, b.outPickupTime || b.inPickupTime);
+  if (h !== null && h >= 0 && h < 6 &&
+      !confirm(`距離服務時間只剩約 ${Math.floor(h)} 小時。依全鋒規定，服務前 6 小時內取消須付空趟費 $315。仍要取消嗎？`)) return;
+  const rows = await SB.patch('airport_bookings', `id=eq.${encodeURIComponent(b.id)}`,
+    { status: '已取消', cancel_reason: reason.trim() });
+  if (!rows || !rows[0]) { toast(apErr('取消失敗，狀態沒有改變'), 'error'); return; }
+  toast('已取消');
+  if (b.sentToVendorAt) toast(`這筆已經通知過廠商，請另外電話告知客服 ${AP_CFG.VENDOR_PHONE}`, 'warn');
+  apLoadList();
+}
+
+/* CSV 匯出：🔴 表頭固定繁中，不隨介面語言變（同 expUseCSV／expFuelCSV 的規則）。
+   那是匯出的存檔格式，翻掉的話同一份報表會因為誰按的而長得不一樣。 */
+function apExportCsv() {
+  const q = (ap$('#ap-q').value || '').trim().toLowerCase();
+  const f = ap$('#ap-fStatus').value;
+  const list = apRows.filter(b => apMatchStatus(b, f)).filter(b => !q ||
+    [b.id, b.applicant, b.dept, b.empNo, b.outFlight, b.inFlight, b.p1Name, b.p2Name]
+      .some(v => String(v || '').toLowerCase().includes(q)));
+  if (!list.length) { toast('目前的篩選沒有資料可以匯出', 'error'); return; }
+  const cols = [
+    ['編號','id'],['狀態','status'],['申請人','applicant'],['部門','dept'],['員工編號','empNo'],
+    ['手機','mobile'],['服務類型','serviceType'],['車款','carType'],['人數','paxCount'],
+    ['送機日期','outPickupDate'],['送機時間','outPickupTime'],['出國航班','outFlight'],
+    ['接機日期','inPickupDate'],['接機時間','inPickupTime'],['回國航班','inFlight'],
+    ['乘客1','p1Name'],['乘客2','p2Name'],['預估費用','fareEstimate'],
+    ['已通知廠商','sentToVendorAt'],['建立時間','createdAt'],['備註','note'],
+  ];
+  const cell = v => `"${String(v == null ? '' : v).replace(/"/g, '""')}"`;
+  const csv = '﻿' + [cols.map(c => cell(c[0])).join(',')]
+    .concat(list.map(b => cols.map(c => cell(b[c[1]])).join(','))).join('\r\n');
+  const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+  const a = document.createElement('a');
+  a.href = url; a.download = `airport-bookings-${apToday()}.csv`; a.click();
+  URL.revokeObjectURL(url);
+}
+
 </script>
 </body>
 </html>

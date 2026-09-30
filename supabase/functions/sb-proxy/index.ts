@@ -16,6 +16,9 @@
 //  - 回應一律移除 kms_documents.body（機密內容只有 kms-secure-docs 依角色提供）
 //  - 寫入 users 時剝除 pwd_hash（密碼只能經 auth-verify 設定）
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import {
+  AIRPORT_IMMUTABLE, AIRPORT_SERVER_OWNED, airportSeeAll, forceOwnRows,
+} from "./airport-guard.js"
 import { verifySession } from "../_shared/session.ts"
 import { elevatedApiHeaders, namedSecretKey } from "../_shared/api-keys.ts"
 
@@ -42,7 +45,7 @@ const ALLOWED_TABLES = new Set([
   "logs","notifications","portal_bulletin","portal_messages","price_history",
   "products","quotation_settings","quotes","room_bookings","room_faults",
   "sites","suppliers","trips","users","visit_guests","visit_records","weekly_minutes",
-  "woody_reports",
+  "woody_reports","airport_bookings",
   "premortem_sessions","premortem_entries","premortem_mitigations",
   // 注意：premortem_summary_log（AI 結論的版本歷史）**刻意不列入**——
   // 稽核紀錄不該能被應用程式讀取或刪除，只能從 Supabase 後台查。
@@ -68,6 +71,17 @@ const CHAT_IMMUTABLE = new Set(["host_emp_id", "id", "access"])
 //    它也不在 CHAT_IMMUTABLE 裡：PATCH 只帶 {join_code} 是「持通行證加入」
 //    這個動作的暗號（見下方 chat_sessions 的分支），不是要寫進資料庫。
 const CHAT_JOIN_FIELD = "join_code"
+
+/* ═══ 機場接送預約 ═══════════════════════════════════════════
+   原系統（Apps Script）對任何人開放任何函式，所以每一筆預約的申請人姓名、
+   工號、手機、**住家地址**、乘客資料與航班，對整個網際網路是可讀的。
+   搬進平台的重點就是把這件事關掉。
+
+   規則（Woody 2026-09-30 定案）：**自己的 + 行政部 + admin 看全部**。
+
+   🔴 判斷與查詢改寫在 `airport-guard.js`，因為 edge function 沒辦法在本機跑，
+      而這一層錯了不會有人看得出來（畫面照樣正常，只是多看得到別人的資料）。
+      跑法：`cd supabase/functions/sb-proxy && node --test *.test.mjs` */
 // 🔴 聊天大廳是 chat_sessions 裡一列固定 id 的場次（migration 202609250001）。
 //    它是全公司共用的公共聊天室，兩件事必須在伺服器端釘死：
 //    ① 整列不可刪（cascade 會連大廳本身一起消失，而它是回不來的）
@@ -113,18 +127,30 @@ const PM_IMMUTABLE = new Set([
 // 🔴 角色一律重新查資料庫，不讀簽章裡的 role：簽章是登入當時簽發的，
 //    降權之後舊 token 在有效期內還是帶著舊角色。停用／離職者一律不算。
 //    查詢失敗回空字串（fail-closed，呼叫端一律當成「沒有角色」）。
-async function liveRoleOf(SUPABASE_URL: string, SERVICE_KEY: string, empId: string): Promise<string> {
-  if (!empId) return ""
+/* 重新查資料庫拿「當下」的角色與部門，不讀簽章裡的值 ——
+   簽章是登入當時簽發的，降權或調部門之後舊 token 還在有效期內。
+   停用／離職者一律回空值。 */
+async function liveUserOf(
+  SUPABASE_URL: string, SERVICE_KEY: string, empId: string,
+): Promise<{ role: string; dept: string }> {
+  const none = { role: "", dept: "" }
+  if (!empId) return none
   try {
     const ur = await fetch(
-      `${SUPABASE_URL}/rest/v1/users?emp_id=eq.${encodeURIComponent(empId)}&select=role,active,status`,
+      `${SUPABASE_URL}/rest/v1/users?emp_id=eq.${encodeURIComponent(empId)}&select=role,dept,active,status`,
       { headers: elevatedApiHeaders(SERVICE_KEY) },
     )
     const rows = ur.ok ? await ur.json() : []
     const u = Array.isArray(rows) && rows[0] ? rows[0] : null
-    if (u && u.active !== false && u.status !== "disabled" && u.status !== "resigned") return String(u.role || "")
+    if (u && u.active !== false && u.status !== "disabled" && u.status !== "resigned") {
+      return { role: String(u.role || ""), dept: String(u.dept || "") }
+    }
   } catch { /* fall through */ }
-  return ""
+  return none
+}
+
+async function liveRoleOf(SUPABASE_URL: string, SERVICE_KEY: string, empId: string): Promise<string> {
+  return (await liveUserOf(SUPABASE_URL, SERVICE_KEY, empId)).role
 }
 
 function json(obj: unknown, status = 200) {
@@ -240,7 +266,7 @@ serve(async (req) => {
   const marker = "/rest/v1/"
   const idx = url.pathname.indexOf(marker)
   if (idx === -1) return json({ error: "bad_path" }, 400)
-  const restPath = url.pathname.slice(idx + marker.length) + url.search // e.g. "users?select=..."
+  let restPath = url.pathname.slice(idx + marker.length) + url.search // e.g. "users?select=..."
 
   const table = restPath.split(/[?/]/)[0]
   if (!ALLOWED_TABLES.has(table)) {
@@ -248,6 +274,25 @@ serve(async (req) => {
   }
 
   const isWrite = req.method !== "GET" && req.method !== "HEAD"
+
+  // ── 機場接送預約：讀寫都限縮到「自己的」，除非是 admin 或行政部 ──
+  if (table === "airport_bookings") {
+    if (!sessEmpId) return json({ error: "forbidden", hint: "session required" }, 403)
+    // 角色與部門都重新查資料庫（簽章是登入當時發的，調部門後舊 token 還在）
+    const live = await liveUserOf(SUPABASE_URL, SERVICE_KEY, sessEmpId)
+    const seeAll = airportSeeAll(live)
+    /* 🔴 不給硬刪。「取消」是 status 的狀態轉換，紀錄要留著 ——
+       已經送給廠商的預約憑空消失，對不上帳，而且沒有人查得出是誰刪的。 */
+    if (req.method === "DELETE") {
+      return json({ error: "forbidden", hint: "cancel sets status; rows are never deleted" }, 403)
+    }
+    /* POST 不必限縮（新增的是自己的，emp_id 由下面的 body 改寫強制）。
+       GET 與 PATCH 都要 —— PATCH 少了這一條，知道編號的人就改得動別人的預約，
+       而編號是 AP20260930-001 這種**猜得出來**的格式。 */
+    if (!seeAll && req.method !== "POST") {
+      restPath = forceOwnRows(restPath, sessEmpId)
+    }
+  }
 
   // ── 寫入授權：users/departments/sites 僅限 admin；
   //    例外：一般使用者可 PATCH「自己那筆 users」的個人資料欄位（頭像/簡介等）──
@@ -372,6 +417,44 @@ serve(async (req) => {
         }
       }
       body = rawText
+    } else if (table === "airport_bookings" && rawText) {
+      /* 🔴 身分欄位一律由伺服器填，前端送什麼都丟掉。
+         原系統的申請人是**打字打出來的** —— 誰都能用別人的名義預約，
+         而取消只驗手機末四碼，那四碼就在同一份資料裡。
+         `id` 不接受前端指定：它由 DB 的 default（airport_next_booking_id()）產生，
+         同一天的流水號在 DB 用 advisory lock 序列化。原系統是在前端算
+         `已有筆數 + 1`，兩個人同時送出會拿到同一個編號。 */
+      let parsed: unknown
+      try { parsed = JSON.parse(rawText) } catch { return json({ error: "bad_json" }, 400) }
+      const fix = (o: Record<string, unknown>) => {
+        if (req.method === "POST") {
+          delete o.id
+          for (const k of AIRPORT_SERVER_OWNED) delete o[k]
+          o.emp_id = sessEmpId
+          // 新單一律從「已預約」開始，不讓前端直接送出一張「已完成」的單
+          o.status = "已預約"
+          delete o.cancelled_at
+          delete o.sent_to_vendor_at
+        } else {
+          for (const k of Object.keys(o)) {
+            if (AIRPORT_IMMUTABLE.has(k)) {
+              throw new Error(`${k} is immutable`)
+            }
+          }
+          for (const k of AIRPORT_SERVER_OWNED) delete o[k]
+          // 取消與寄送是誰做的，由簽章決定 —— 可以指定就可以嫁禍
+          if (o.status === "已取消") { o.cancelled_by = sessEmpId; o.cancelled_at = new Date().toISOString() }
+          if (o.sent_to_vendor_at !== undefined) { o.sent_by = sessEmpId; o.sent_to_vendor_at = new Date().toISOString() }
+        }
+        return o
+      }
+      try {
+        body = JSON.stringify(
+          Array.isArray(parsed) ? (parsed as Record<string, unknown>[]).map(fix) : fix(parsed as Record<string, unknown>),
+        )
+      } catch (e) {
+        return json({ error: "forbidden", hint: (e as Error).message }, 403)
+      }
     } else if (table === "chat_presence" && rawText) {
       // ── 在線名單：emp_id 一律改寫成簽章裡的身分 ──
       // 這張表任何人都寫得（每個人要能報告自己在線），所以唯一需要擋的是

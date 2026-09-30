@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART KMS v2.46</title>
+<title>COMART KMS v2.47</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -398,7 +398,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="38" height="20" style="display:inline-block;vertical-align:middle;margin-right:4px;margin-top:-2px"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg>COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v2.46</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v2.47</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('en')">EN</button>
@@ -1089,6 +1089,7 @@ const I18N = {
     'up.rate_limit':'Claude API 暫時繁忙（rate limit），請稍後再試。原始檔已上傳，文字請手動補充。',
     'up.pdfjs_fail':'pdfjs 載入失敗',
     'up.pdfjs_timeout':'pdfjs 載入超時',
+    'toast.ocr_pages_failed':'⚠️ 有 {n} 頁辨識失敗，這幾頁的內容沒有進知識庫',
     'up.ocr_progress':'⏳ 圖片型 PDF，逐頁辨識中：已完成 {done} / {n} 頁（全文共 {total} 頁）',
     'up.pdf_reading':'⏳ 讀取 PDF 文字中：{done} / {total} 頁',
     'up.parse_timeout':'解析逾時（超過 {sec} 秒）',
@@ -1325,6 +1326,7 @@ const I18N = {
     'up.rate_limit':'Claude API 暂时繁忙（rate limit），请稍后再试。原始文件已上传，文字请手动补充。',
     'up.pdfjs_fail':'pdfjs 加载失败',
     'up.pdfjs_timeout':'pdfjs 加载超时',
+    'toast.ocr_pages_failed':'⚠️ 有 {n} 页识别失败，这几页的内容没有进知识库',
     'up.ocr_progress':'⏳ 图片型 PDF，逐页识别中：已完成 {done} / {n} 页（全文共 {total} 页）',
     'up.pdf_reading':'⏳ 读取 PDF 文字中：{done} / {total} 页',
     'up.parse_timeout':'解析超时（超过 {sec} 秒）',
@@ -1566,6 +1568,7 @@ const I18N = {
     'up.rate_limit':'The Claude API is busy (rate limit) — please try again shortly. The original file was uploaded; please add the text manually.',
     'up.pdfjs_fail':'Could not load pdfjs',
     'up.pdfjs_timeout':'Loading pdfjs timed out',
+    'toast.ocr_pages_failed':'⚠️ {n} pages could not be recognised; their content was not added to the knowledge base',
     'up.ocr_progress':'⏳ Image-based PDF, recognising page by page: {done} / {n} done ({total} pages in total)',
     'up.pdf_reading':'⏳ Reading PDF text: {done} / {total} pages',
     'up.parse_timeout':'Parsing timed out (over {sec} s)',
@@ -1807,6 +1810,7 @@ const I18N = {
     'up.rate_limit':'Claude API đang bận (rate limit) — vui lòng thử lại sau. Tệp gốc đã được tải lên; vui lòng nhập nội dung thủ công.',
     'up.pdfjs_fail':'Không tải được pdfjs',
     'up.pdfjs_timeout':'Tải pdfjs quá thời gian',
+    'toast.ocr_pages_failed':'⚠️ {n} trang nhận dạng thất bại; nội dung các trang này chưa vào kho tri thức',
     'up.ocr_progress':'⏳ PDF dạng ảnh, đang nhận dạng từng trang: xong {done} / {n} trang (tổng {total} trang)',
     'up.pdf_reading':'⏳ Đang đọc chữ trong PDF: {done} / {total} trang',
     'up.parse_timeout':'Phân tích quá thời gian (hơn {sec} giây)',
@@ -2048,6 +2052,7 @@ const I18N = {
     'up.rate_limit':'Claude API が混み合っています（レート制限）。しばらくしてからお試しください。元ファイルはアップロード済みです。本文は手動で追加してください。',
     'up.pdfjs_fail':'pdfjs の読み込みに失敗しました',
     'up.pdfjs_timeout':'pdfjs の読み込みがタイムアウトしました',
+    'toast.ocr_pages_failed':'⚠️ {n} ページの認識に失敗し、その内容はナレッジベースに入っていません',
     'up.ocr_progress':'⏳ 画像型 PDF をページごとに認識中：{done} / {n} ページ完了（全 {total} ページ）',
     'up.pdf_reading':'⏳ PDF のテキストを読み込み中：{done} / {total} ページ',
     'up.parse_timeout':'解析がタイムアウトしました（{sec} 秒超過）',
@@ -4100,7 +4105,108 @@ async function extractPdfWithPdfjs(file, onProgress) {
   return result;
 }
 
-// ─── 圖片型 PDF → Canvas render → Claude Vision OCR ───
+// ─── 圖片型 PDF → 切成小 PDF → Claude 直接讀 ───
+/* 🔴 2026-10-01（KMS v2.46）。舊版一頁一頁「用 canvas 畫成 JPEG → 送 AI」，
+   一份 42 頁的掃描簡報要約 5 分鐘、只做前 30 頁，而且**分頁一進背景就更慢**：
+   canvas 繪製佔用主執行緒，Chrome 會大幅限速背景分頁（實測背景下一頁要 30 秒以上）。
+   使用者上傳後切去做別的事是最常見的情況，所以繪製這一步不能留在瀏覽器裡。
+
+   現在：pdf-lib 把原檔每 OCR_CHUNK_PAGES 頁複製成一份小 PDF（只複製頁面、不繪製，
+   幾秒就切完），並行 OCR_CONCURRENCY 份送給 Claude —— Claude 本身就讀得懂掃描型 PDF。
+   實測同一份 42 頁：**背景分頁 113 秒、42 頁全部辨識**。
+   - 單份超過 OCR_CHUNK_MAX_BYTES 就再對半切（實測 4 頁 2.8 MB 的那一份要 79 秒，拖住整體）
+   - 回覆要求用 <page n="k"> 包每一頁，轉成內文的 `[第N頁]`（🔴 那是內文，不可翻譯）
+   - pdf-lib 載不到或讀不了這份 PDF（加密、格式怪）→ 退回 canvas 版 */
+const OCR_CONCURRENCY = 4;
+const OCR_MAX_PAGES = 80;
+const OCR_CHUNK_PAGES = 4;
+const OCR_CHUNK_MAX_BYTES = 1.5 * 1024 * 1024;
+async function loadPdfLib() {
+  if (window.PDFLib) return;
+  await kmsWithTimeout(new Promise((res, rej) => {
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js';
+    s.onload = () => res(); s.onerror = () => rej(new Error('pdf-lib load failed'));
+    document.head.appendChild(s);
+  }), 20000);
+}
+async function extractImagePdfWithVision(file, onProgress) {
+  let src;
+  try {
+    await loadPdfLib();
+    src = await kmsWithTimeout(PDFLib.PDFDocument.load(await file.arrayBuffer(), { ignoreEncryption: true }), 60000);
+  } catch (e) {
+    console.warn('[OCR] pdf-lib 無法使用，改用 canvas 版：', e.message);
+    return extractImagePdfByCanvas(file, onProgress);
+  }
+  const totalPages = src.getPageCount();
+  const pagesToProcess = Math.min(totalPages, OCR_MAX_PAGES);
+  let done = 0;
+  const report = () => onProgress?.(t('up.ocr_progress').replace('{done}', done).replace('{n}', pagesToProcess).replace('{total}', totalPages));
+  report();
+
+  async function build(pages) {
+    const d = await PDFLib.PDFDocument.create();
+    (await d.copyPages(src, pages)).forEach(pg => d.addPage(pg));
+    return d.saveAsBase64();
+  }
+  // 依頁數切，太大再對半切（直到單頁為止）
+  const chunks = [];
+  async function addChunk(pages) {
+    const b64 = await build(pages);
+    if (b64.length * 0.75 > OCR_CHUNK_MAX_BYTES && pages.length > 1) {
+      const mid = Math.ceil(pages.length / 2);
+      await addChunk(pages.slice(0, mid));
+      await addChunk(pages.slice(mid));
+    } else chunks.push({ pages, b64 });
+  }
+  for (let s0 = 0; s0 < pagesToProcess; s0 += OCR_CHUNK_PAGES) {
+    await addChunk(Array.from({ length: Math.min(OCR_CHUNK_PAGES, pagesToProcess - s0) }, (_, k) => s0 + k));
+  }
+
+  const texts = new Array(pagesToProcess).fill('');
+  let failedPages = 0, next = 0;
+  async function worker() {
+    while (next < chunks.length) {
+      const c = chunks[next++];
+      try {
+        const r = await callClaudeProxyRaw({
+          model: 'claude-sonnet-4-6',
+          max_tokens: 2000 * c.pages.length,
+          messages: [{ role: 'user', content: [
+            { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: c.b64 } },
+            { type: 'text', text: `這份 PDF 有 ${c.pages.length} 頁。請逐頁完整擷取所有文字內容，保持段落結構。每一頁用 <page n="頁碼"> 與 </page> 包起來（頁碼從 1 開始），只輸出這些標籤與文字，不要加任何說明。` },
+          ] }],
+        }, 150000);
+        const out = r?.content?.[0]?.text || '';
+        const tagged = [...out.matchAll(/<page n="(\d+)">([\s\S]*?)<\/page>/g)];
+        if (tagged.length) {
+          for (const m of tagged) {
+            const k = +m[1] - 1;
+            if (k >= 0 && k < c.pages.length) texts[c.pages[k]] = m[2].trim();
+          }
+        } else if (out.trim()) {
+          texts[c.pages[0]] = out.trim();   // 模型沒照格式：整段放在這一段的第一頁，不丟內容
+        }
+      } catch (e) {
+        failedPages += c.pages.length;
+        console.warn(`[OCR] 第 ${c.pages[0] + 1}–${c.pages[c.pages.length - 1] + 1} 頁失敗:`, e.message);
+      }
+      done += c.pages.length;
+      report();
+    }
+  }
+  await Promise.all(Array.from({ length: Math.min(OCR_CONCURRENCY, chunks.length) }, worker));
+
+  if (failedPages) toast(t('toast.ocr_pages_failed').replace('{n}', failedPages), 'error');
+  const results = texts.map((txt, k) => txt ? `[第${k + 1}頁]\n${txt}` : '').filter(Boolean);
+  if (totalPages > OCR_MAX_PAGES) {
+    results.push(`\n（共 ${totalPages} 頁，已 OCR 前 ${OCR_MAX_PAGES} 頁）`);
+  }
+  return results.join('\n\n');
+}
+
+// ─── 備援：圖片型 PDF → Canvas render → Claude Vision OCR（pdf-lib 載不到或讀不了這份 PDF 時才用）───
 /* 🔴 2026-10-01 改寫。舊版是**一頁一頁依序**送 AI 辨識、最多 30 頁、進度只用幾秒就
    消失的 toast 顯示：一份 42 頁的掃描簡報要等約 5 分鐘，編輯器只有一行不會動的
    「解析中」，看起來就是當掉了；而且**第 31 頁以後的內容根本沒進知識庫**。
@@ -4109,9 +4215,7 @@ async function extractPdfWithPdfjs(file, onProgress) {
    - 進度由 onProgress 寫在編輯器裡，不靠 toast
    - 結果依頁碼排序，不會因為並行而亂序
    🔴 頁碼標記 `[第N頁]` 會成為內文，不可翻譯（見 extractText 開頭的註解）。 */
-const OCR_CONCURRENCY = 4;
-const OCR_MAX_PAGES = 80;
-async function extractImagePdfWithVision(file, onProgress) {
+async function extractImagePdfByCanvas(file, onProgress) {
   await loadPdfjsLib();
   const arrayBuffer = await file.arrayBuffer();
   const pdf = await kmsWithTimeout(window.pdfjsLib.getDocument({

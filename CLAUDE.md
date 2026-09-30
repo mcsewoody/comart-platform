@@ -2,6 +2,34 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## 🔄 兩台 Mac 交替工作 —— 開工先做這件事
+
+Woody 在兩台 Mac 上輪流工作，兩台都開著 iCloud「桌面與文件」同步。
+
+```bash
+./scripts/handoff.sh resume     # 到一台開工時
+./scripts/handoff.sh park       # 離開那台之前
+./scripts/handoff.sh status     # 只看狀態，不改東西
+```
+
+**哪些本來就通、哪些會斷：**
+
+| | 狀況 |
+|---|---|
+| `~/Documents` | **是 iCloud firmlink** → repo 本身就在 iCloud 裡，連未 commit 的檔案都同步 |
+| `~/.claude`（記憶） | **不在 iCloud** → 已由 `handoff.sh` symlink 到 `iCloud/_claude-memory/` |
+| 這個 repo | **PUBLIC on GitHub** → 私人筆記絕不能進版控 |
+
+- 🔴 **一律用 `cccmt` 別名啟動**（`cd ~/Documents/comart-platform && claude`）。
+  記憶目錄是**用啟動路徑當 key** 的 —— 從家目錄啟動會拿到幾乎空的
+  `-Users-woodyliu`，20 份記憶一份都不會載入（2026-09-30 實際發生過）。
+- 🔴 **`HANDOFF.md`（repo 根目錄，在 .gitignore 裡）是「上次做到哪裡」的筆記。**
+  它不進版控（repo 是 public），靠 iCloud 同步。
+  **開工時先看它**，裡面的〈手寫備註〉那一段 `park` 不會覆蓋。
+- ⚠️ **兩台不要同時開著這個 repo。** `.git/index 2` 是 iCloud 的衝突副本
+  （2026-06-22 留下的），證明 iCloud 真的動過 `.git`。同時開有損毀風險。
+  關機前確認選單列的 iCloud 圖示沒在轉圈。
+
 ## 語言設定
 
 **所有回覆請使用繁體中文。** 程式碼、變數名稱、API 路徑等技術內容維持原文，但說明文字、錯誤分析、操作步驟一律以繁體中文撰寫。

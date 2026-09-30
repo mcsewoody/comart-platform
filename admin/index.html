@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART 行政管理平台 v2.50</title>
+<title>COMART 行政管理平台 v2.51</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -800,7 +800,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="logo">
     <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
     <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
-    <span><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="38" height="20" style="display:inline-block;vertical-align:middle;margin-top:-2px"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v2.50</span>
+    <span><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="38" height="20" style="display:inline-block;vertical-align:middle;margin-top:-2px"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v2.51</span>
   </div>
   <div class="trr">
     <div id="global-site-bar" style="display:flex;align-items:center;gap:4px"><span style="font-size:13px;color:var(--text-3);white-space:nowrap;font-weight:500" data-i18n="g.site_label">單位：</span>
@@ -7788,7 +7788,7 @@ const apEsc = s => escapeHtml(String(s == null ? '' : s));
 /* 編號進 onclick 之前一律過白名單（同 _lcSafeId 的理由）：它是從資料庫回來的字串。 */
 const apSafeId = s => /^AP\d{8}-\d{3}$/.test(String(s || '')) ? String(s) : '';
 const apTwDate = (d, t) => d && t ? new Date(d + 'T' + t + ':00+08:00') : null;
-const apToday = () => new Date(Date.now() + 8 * 3600e3).toISOString().slice(0, 10);
+const apToday = () => tds();   // 🔴 當地日期；不要寫死 +8（越南廠是 UTC+7）
 const apApName = c => c ? (AP_AIRPORTS[c] ? AP_AIRPORTS[c] + ' ' + c : c) : '';
 const apHoursUntil = (d, t) => { const x = apTwDate(d, t); return x ? (x - Date.now()) / 3600e3 : null; };
 const apIsNight = t => { if (!t) return false; const h = +t.slice(0, 2); return h >= AP_CFG.NIGHT_START || h < AP_CFG.NIGHT_END; };
@@ -7998,23 +7998,74 @@ function apFlightStatus(leg, html, cls) {
   el.className = 'ap-flight' + (cls ? ' ' + cls : '');
   el.innerHTML = html;
 }
+/* 🔴 航班時間的來源分兩級（2026-09-30）：
+   ① flight-schedule（TDX 定期航班時刻表 = 航空公司報給民航局的班表）
+   ② 查不到／還沒設定 TDX 金鑰時，才退回 claude-proxy + web search
+   只用 ② 的時候，使用者回報 10/11 CI601「與華航差了五分鐘」：web search 讀到
+   哪個第三方網站就用哪個，而它們彼此就不一致（同一天一個寫 07:20、一個寫 07:25）。
+   錯五分鐘沒有人會察覺，直到司機晚到 —— 所以 ② 的結果一定要在畫面上講明
+   「這是網路搜尋，請與機票核對」，不能長得跟 ① 一樣。 */
+function apApplyFlight(leg, side) {
+  if (side.iata && AP_AIRPORTS[side.iata]) apFld(leg + 'Airport').value = side.iata;
+  if (side.terminal) apFld(leg + 'Terminal').value = String(side.terminal).replace(/\D/g, '') || side.terminal;
+  if (/^\d{2}:\d{2}$/.test(side.time || '')) apFld(leg === 'out' ? 'outDepTime' : 'inArrTime').value = side.time;
+  if (side.other) apFld(leg === 'out' ? 'outDest' : 'inOrigin').value = side.other;
+  if (leg === 'out') apSuggestOutPickup(); else apSyncInPickup();
+}
+async function apLookupTdx(leg, no, dateStr) {
+  let r;
+  try {
+    const resp = await fetch(ADMIN_CFG.workerUrl.replace('/sb-proxy', '/flight-schedule'), {
+      method: 'POST', headers: sbHdrs(), body: JSON.stringify({ flight: no, date: dateStr }),
+    });
+    r = await resp.json().catch(() => null);
+    if (!resp.ok || !r) { console.warn('[airport] flight-schedule', resp.status, r && (r.reason + ' ' + (r.detail || ''))); return false; }
+  } catch (e) { console.warn('[airport] flight-schedule failed:', e && e.message); return false; }
+  if (!r.ok) { if (r.reason !== 'tdx_not_configured') console.warn('[airport] flight-schedule', r.reason); return false; }
+  if (!r.known) return false;                       // TDX 沒有這個班號 → 讓網路搜尋試試看
+  // 送機看「從台灣出發」的那一段、接機看「抵達台灣」的那一段
+  const twSide = m => leg === 'out' ? AP_AIRPORTS[m.from] : AP_AIRPORTS[m.to];
+  const m = r.matches.find(twSide) || r.matches[0];
+  if (!m) {
+    /* 🔴 權威來源說「那一天沒有這班」就照實講，不退回網路搜尋 ——
+       後者一定查得到「某一天」的時間，而那正是會填錯的那一種。 */
+    apFlightStatus(leg, `${apEsc(no)} 在 ${apEsc(apDW(dateStr))} 沒有排定班次。` +
+      `<div class="ap-small">班表期間：${apEsc(r.periods.join('、') || '—')}。請確認日期或班號，或直接手動填寫。</div>`, 'warn');
+    return true;
+  }
+  apApplyFlight(leg, leg === 'out'
+    ? { iata: m.from, terminal: m.terminal, time: m.depTime, other: m.to }
+    : { iata: m.to, terminal: m.terminal, time: m.arrTime, other: m.from });
+  apFlightStatus(leg,
+    `${apEsc(m.flight)}　${apEsc(m.from)} ${apEsc(m.depTime)} → ${apEsc(m.to)} ${apEsc(m.arrTime)}${m.terminal ? '　第 ' + apEsc(m.terminal) + ' 航廈' : ''}` +
+    `<div class="ap-small">航空公司排定班表（TDX）· 飛航日 每週${apEsc(m.opDays || '—')} · 班表期間 ${apEsc(m.period || '—')}</div>`, 'ok');
+  return true;
+}
 async function apLookupFlight(leg) {
-  const no = (apFld(leg + 'Flight').value || '').trim().toUpperCase();
+  const no = (apFld(leg + 'Flight').value || '').trim().toUpperCase().replace(/\s+/g, '');
   const dateEl = apFld(leg === 'out' ? 'outDate' : 'inDate');
   if (!no) { apFlightStatus(leg, '請先輸入航班編號。', 'warn'); return; }
   if (!/^[A-Z0-9]{2}\d{1,4}$/.test(no)) { apFlightStatus(leg, '航班編號格式不正確，例如 BR189、CI100、JX800。', 'warn'); return; }
-  const dateStr = dateEl.value || apToday();
+  apFld(leg + 'Flight').value = no;
+  /* 🔴 一定要先選日期：換季時同一班機的時間會變（CI601 10/24 前 07:25、10/25 起 07:15），
+     拿「今天」去查會得到另一季的時間。 */
+  if (!dateEl.value) { apFlightStatus(leg, `請先選擇${leg === 'out' ? '出國' : '回國'}日期 —— 同一班機換季時時間會變。`, 'warn'); return; }
+  const dateStr = dateEl.value;
   apFlightStatus(leg, '查詢中…', '');
-  const prompt = 'Flight ' + no + ' on ' + dateStr +
-    '. Search web for scheduled timetable. Return ONLY valid JSON no markdown: ' +
-    '{"dep_iata":"","dep_city":"","dep_terminal":"","dep_time":"HH:MM","arr_iata":"","arr_city":"","arr_terminal":"","arr_time":"HH:MM"}. ' +
-    'Use local scheduled times. Unknown fields use empty string.';
+  if (await apLookupTdx(leg, no, dateStr)) return;
+  const prompt = 'Flight ' + no + ' scheduled on ' + dateStr +
+    '. Search the web for the airline\'s OFFICIAL published timetable for that specific date ' +
+    '(prefer the operating airline\'s own website or the departure airport\'s website; ' +
+    'ignore actual/historical departure times from flight trackers, and mind seasonal schedule changes). ' +
+    'Return ONLY valid JSON no markdown: ' +
+    '{"dep_iata":"","dep_city":"","dep_terminal":"","dep_time":"HH:MM","arr_iata":"","arr_city":"","arr_terminal":"","arr_time":"HH:MM","source":""}. ' +
+    'Use local scheduled times. "source" is the website you used. Unknown fields use empty string.';
   try {
     const resp = await fetch(ADMIN_CFG.workerUrl.replace('/sb-proxy', '/claude-proxy'), {
       method: 'POST',
       headers: sbHdrs(),
       body: JSON.stringify({
-        model: 'claude-sonnet-5', max_tokens: 512,
+        model: 'claude-sonnet-5', max_tokens: 1024,
         tools: [{ type: 'web_search_20250305', name: 'web_search' }],
         messages: [{ role: 'user', content: prompt }],
       }),
@@ -8035,14 +8086,11 @@ async function apLookupFlight(leg) {
     const side = leg === 'out'
       ? { iata: f.dep_iata, terminal: f.dep_terminal, time: f.dep_time, other: f.arr_city || f.arr_iata }
       : { iata: f.arr_iata, terminal: f.arr_terminal, time: f.arr_time, other: f.dep_city || f.dep_iata };
-    if (side.iata && AP_AIRPORTS[side.iata]) apFld(leg + 'Airport').value = side.iata;
-    if (side.terminal) apFld(leg + 'Terminal').value = String(side.terminal).replace(/\D/g, '') || side.terminal;
-    if (/^\d{2}:\d{2}$/.test(side.time || '')) apFld(leg === 'out' ? 'outDepTime' : 'inArrTime').value = side.time;
-    if (side.other) apFld(leg === 'out' ? 'outDest' : 'inOrigin').value = side.other;
+    apApplyFlight(leg, side);
     apFlightStatus(leg,
       `查到：${apEsc(f.dep_iata || '?')} ${apEsc(f.dep_time || '')} → ${apEsc(f.arr_iata || '?')} ${apEsc(f.arr_time || '')}` +
-      `${side.terminal ? '　航廈 ' + apEsc(side.terminal) : ''}　<span class="ap-small">班表為排定時間，請與機票核對</span>`, 'ok');
-    if (leg === 'out') apSuggestOutPickup(); else apSyncInPickup();
+      `${side.terminal ? '　航廈 ' + apEsc(side.terminal) : ''}` +
+      `<div class="ap-small">⚠️ 這是網路搜尋的結果${f.source ? '（' + apEsc(f.source) + '）' : ''}，不是航空公司的班表，時間可能差幾分鐘 —— 請務必與機票核對。</div>`, 'warn');
   } catch (e) {
     apFlightStatus(leg, '查詢時發生錯誤，請手動填寫。', 'warn');
     console.warn('[airport] flight lookup failed:', e && e.message);
@@ -8084,7 +8132,9 @@ async function apSubmit(ev) {
       return;
     }
     const saved = apFromRow(rows[0]);
-    toast(`預約已送出：${saved.id}`);
+    /* 🔴 「送出」只是存進平台，全鋒還不知道 —— 那要靠下一步的郵件草稿。
+       舊系統在這裡是一整個「下一步」對話框；只講「已送出」會讓人以為車已經訂好了。 */
+    toast(`預約已建立：${saved.id}。下一步：按「寄給全鋒（郵件草稿）」，在 Outlook 檢查後傳送。`, 'success');
     apShowDone(saved);
     apResetForm();
   } finally {
@@ -8271,8 +8321,11 @@ function apCardHtml(b) {
   const acts = [];
   if (id) {
     acts.push(`<button class="btn bsm" onclick="apCopyText('${id}')">複製預約文字</button>`);
+    acts.push(`<button class="btn bsm" onclick="apDownloadXlsx('${id}', this)">Excel 預約表</button>`);
+    acts.push(`<button class="btn bsm" onclick="apPrint('${id}')">列印</button>`);
     if (!cancelled) {
-      acts.push(`<button class="btn bsm" onclick="apSendToVendor('${id}')">${b.sentToVendorAt ? '重新寄給廠商' : '寄給廠商'}</button>`);
+      acts.push(`<button class="btn bsm bp" onclick="apSendToVendor('${id}', this)" title="下載 Outlook 郵件草稿（收件人、主旨、內文、Excel 附件都已填好）">${b.sentToVendorAt ? '重新產生郵件草稿' : '寄給全鋒（郵件草稿）'}</button>`);
+      if (!b.sentToVendorAt) acts.push(`<button class="btn bsm" onclick="apMarkSent('${id}')">已寄出</button>`);
       acts.push(`<button class="btn bsm bdr" onclick="apCancel('${id}')">取消預約</button>`);
     }
   }
@@ -8303,25 +8356,227 @@ function apCopyText(id) {
     .catch(() => { prompt('複製下面這段文字：', text); });
 }
 
-/* 🔴 寄信是**人按了才寄**（Woody 2026-09-30 定案）。對外寄信不可逆，
-   而預約單上有同事的手機與住家地址 —— 自動寄出等於把「要不要寄、寄什麼」
-   整個交給程式判斷。這顆按鈕只負責把已經組好的內容送出去。 */
-async function apSendToVendor(id) {
+/* ── 全鋒預約表（Excel）／Outlook 郵件草稿／列印 ─────────────────────────
+   照舊系統 comart-car-booking 的做法：拿**全鋒自己的空白預約表**
+   （admin/airport-template.xlsx）填進儲存格，所以廠商收到的就是他們認得的那張表。
+   🔴 用 JSZip 直接改 sheet XML，不用 SheetJS：社群版 SheetJS 讀進來再寫出去會把
+      樣式、合併儲存格、圖片全部丟掉，廠商收到的會是一張沒有框線的裸表。
+   🔴 儲存格位置是對著範本寫死的（F2、B3…）。換範本之前先打開確認位置沒變，
+      找不到的儲存格會在 console 印「儲存格不存在」。 */
+const AP_VENDOR = ['tmsbooking@24tms.com.tw', 'joanpeng@24tms.com.tw'];
+const AP_XLSX_MIME = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+let apTemplate = null;
+async function apLoadJSZip() {
+  if (window.JSZip) return;
+  await new Promise((res, rej) => {
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
+    s.onload = () => res(); s.onerror = () => rej(new Error('Excel 元件載入失敗，請確認網路連線'));
+    document.head.appendChild(s);
+  });
+}
+async function apLoadTemplate() {
+  if (apTemplate) return apTemplate;
+  // 相對路徑：file:// 開檔的開發方式也能用
+  const r = await fetch('airport-template.xlsx');
+  if (!r.ok) throw new Error('找不到預約表範本 airport-template.xlsx（' + r.status + '）');
+  return (apTemplate = await r.arrayBuffer());
+}
+const apXmlEsc = v => String(v).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+// 改寫單一儲存格，保留原本的樣式（s=）；數字寫數值，其餘寫文字
+function apSetCell(xml, ref, val) {
+  const re = new RegExp('<c r="' + ref + '"([^>]*?)(/>|>[\\s\\S]*?</c>)');
+  if (!re.test(xml)) { console.warn('[airport] 儲存格不存在', ref); return xml; }
+  return xml.replace(re, (m, attrs) => {
+    attrs = attrs.replace(/\s+t="[^"]*"/, '');
+    if (val === '' || val == null) return `<c r="${ref}"${attrs}/>`;
+    if (typeof val === 'number') return `<c r="${ref}"${attrs}><v>${val}</v></c>`;
+    return `<c r="${ref}"${attrs} t="inlineStr"><is><t xml:space="preserve">${apXmlEsc(val)}</t></is></c>`;
+  });
+}
+// 時間寫成 Excel 的日分數，範本的時間格式才吃得到
+const apTimeNum = t => { if (!t) return ''; const [h, m] = t.split(':').map(Number); return +((h * 60 + m) / 1440).toFixed(10); };
+// 🔴 年份填民國年：範本那一格只放得下 3 位數，西元年會顯示成 ###
+const apYmdRoc = d => { if (!d) return ['', '', '']; const [y, m, dd] = d.split('-').map(Number); return [y - 1911, m, dd]; };
+const apApBox = ap => ap === 'TPE' ? '■桃園機場\n□松山機場' : ap === 'TSA' ? '□桃園機場\n■松山機場' : '□桃園機場\n□松山機場';
+
+async function apBuildXlsx(b) {
+  await apLoadJSZip();
+  const zip = await JSZip.loadAsync(await apLoadTemplate());
+  const path = 'xl/worksheets/sheet1.xml';
+  let x = await zip.file(path).async('string');
+  const hasOut = b.serviceType !== 'in' && !!b.outDate, hasIn = b.serviceType !== 'out' && !!b.inDate;
+  const lugN = ['lug20', 'lug25', 'lug27', 'lug29'].reduce((n, k) => n + (+b[k] || 0), 0);
+  const [oy, om, od] = apYmdRoc(hasOut ? b.outPickupDate : ''), [iy, im, idd] = apYmdRoc(hasIn ? b.inPickupDate : '');
+  const extra = [
+    `預約編號 ${b.id}`,
+    `行李：${apLugText(b)}`,
+    hasOut ? `出國：${b.outDate} 起飛${b.outTerminal ? '・第' + b.outTerminal + '航廈' : ''}${b.outDest ? '・往' + b.outDest : ''}` : '',
+    hasIn ? `回國：${b.inDate} 降落${b.inTerminal ? '・第' + b.inTerminal + '航廈' : ''}${b.inOrigin ? '・自' + b.inOrigin : ''}${b.signboard ? '・需舉牌' : ''}` : '',
+    b.stopLeg ? `停靠站用於${b.stopLeg}` : '',
+    b.note,
+  ].filter(Boolean).join('；');
+  const cells = {
+    F2: b.dept, J2: b.email,
+    B3: b.applicant, D3: b.mobile, J4: b.ext,
+    B5: b.empNo, D5: b.purpose, B6: b.tripNo || '(可免填)',
+    L5: oy, M5: om, N5: od, O5: hasOut ? apTimeNum(b.outPickupTime) : '',
+    L6: iy, M6: im, N6: idd, O6: hasIn ? apTimeNum(b.inPickupTime) : '',
+    B7: b.p1Name, D7: b.p1Mobile, F7: b.p1Email, L7: b.p1Note,
+    B8: b.p2Name, D8: b.p2Mobile, F8: b.p2Email, L8: b.p2Note,
+    B9: hasOut ? b.outFlight : '', D9: apApBox(hasOut ? b.outAirport : ''), F9: hasOut ? b.outDepTime : '',
+    I9: hasOut ? (+b.paxCount || '') : '', K9: hasOut ? lugN : '', N9: hasOut ? b.carType : '',
+    B10: hasIn ? b.inFlight : '', D10: apApBox(hasIn ? b.inAirport : ''), F10: hasIn ? b.inArrTime : '',
+    I10: hasIn ? (+b.paxCount || '') : '', K10: hasIn ? lugN : '', N10: hasIn ? b.carType : '',
+    B12: hasOut ? b.outCity : '', C12: hasOut ? b.outDist : '', D12: hasOut ? b.outAddr : '',
+    B13: hasIn ? b.inCity : '', C13: hasIn ? b.inDist : '', D13: hasIn ? b.inAddr : '',
+    B14: b.stopLeg ? b.stopCity : '', C14: b.stopLeg ? b.stopDist : '', D14: b.stopLeg ? b.stopAddr : '',
+    B15: extra,
+  };
+  for (const [ref, v] of Object.entries(cells)) x = apSetCell(x, ref, v === undefined ? '' : v);
+  zip.file(path, x);
+  // 工作表名稱「預約表-xxx」→「預約表-乘客姓名」（Excel 限 31 字、不可含 []:*?/\）
+  const sheetName = ('預約表-' + (b.p1Name || b.id)).replace(/[\[\]:*?\/\\]/g, '').slice(0, 31);
+  for (const p of ['xl/workbook.xml', 'docProps/app.xml']) {
+    const f = zip.file(p); if (!f) continue;
+    zip.file(p, (await f.async('string')).split('預約表-xxx').join(apXmlEsc(sheetName)));
+  }
+  const bytes = await zip.generateAsync({ type: 'uint8array', compression: 'DEFLATE' });
+  return { bytes, name: `全鋒預約表_${b.id}_${b.p1Name || ''}.xlsx` };
+}
+function apSaveFile(blob, name) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 10000);
+}
+async function apBusy(btn, fn) {
+  const old = btn && btn.innerHTML;
+  if (btn) { btn.disabled = true; btn.innerHTML = '產生中…'; }
+  try { await fn(); } finally { if (btn) { btn.disabled = false; btn.innerHTML = old; } }
+}
+function apDownloadXlsx(id, btn) {
   const b = apFind(id); if (!b) return;
-  const again = b.sentToVendorAt ? `\n\n⚠️ 這筆在 ${String(b.sentToVendorAt).slice(0, 16).replace('T', ' ')} 已經寄過一次，再寄一次廠商會收到兩封。` : '';
-  if (!confirm(`要把 ${b.id} 的預約內容寄給全鋒嗎？${again}`)) return;
-  const subject = `怡業股份有限公司 機場接送預約 ${b.id}`;
-  const body = apBookingText(b);
-  /* 用 mailto 讓寄件人是**申請人自己的信箱**，廠商回信才回得到對的人；
-     而且寄出前他看得到內容、可以加話。平台的 Resend 是系統信箱，
-     廠商回覆會掉進沒有人看的地方。 */
-  const to = 'tmsbooking@24tms.com.tw,joanpeng@24tms.com.tw';
-  window.location.href = `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  // DB-first：標記「已通知」要真的存進去才改畫面
+  return apBusy(btn, async () => {
+    try { const x = await apBuildXlsx(b); apSaveFile(new Blob([x.bytes], { type: AP_XLSX_MIME }), x.name); toast('已下載 Excel 預約表'); }
+    catch (e) { toast('Excel 產生失敗：' + (e && e.message || e), 'error'); }
+  });
+}
+
+/* Outlook 郵件草稿（.eml，附 Excel）。
+   🔴 `X-Unsent: 1` 讓 Outlook 把它當成**還沒寄出的新郵件**開啟：收件人、主旨、
+      內文、附件都填好了，使用者看過再按「傳送」；關掉時 Outlook 會問要不要存到
+      草稿匣。寄件人是**申請人自己的信箱**，廠商回信才回得到對的人
+      （這也是不用平台 Resend 的理由：那是系統信箱，回覆會掉進沒有人看的地方）。
+   ⚠️ 這是 Outlook 的行為。Apple Mail 會把 .eml 當成「收到的信」唯讀開啟，
+      那種情況請用「Excel 預約表」＋「複製預約文字」自己寫信。
+   🔴 內文用 HTML：Outlook 加簽名檔時會保留格式；純文字內文會把簽名轉成純文字。 */
+const apB64Bytes = u8 => { let s = ''; for (let i = 0; i < u8.length; i += 32768) s += String.fromCharCode.apply(null, u8.subarray(i, i + 32768)); return btoa(s); };
+const apB64Utf8 = str => apB64Bytes(new TextEncoder().encode(str));
+const apMimeWord = str => '=?UTF-8?B?' + apB64Utf8(str) + '?=';
+const apWrap76 = s => s.replace(/.{1,76}/g, '$&\r\n');
+function apMailHtml(b) {
+  const intro = ['全鋒客服您好：', '', '附件為本公司機場接送預約表，請協助安排派車，謝謝。', ''];
+  // 預約文字靠字寬對齊，用等寬的細明體（Windows）才對得齊；不自己加署名，由 Outlook 簽名檔加
+  // 🔴 空白要轉成 &nbsp;：Outlook 用 Word 引擎排版，不吃 white-space:pre，縮排會整個消失
+  const pre = apBookingText(b).split('\n').map(l => apEsc(l).replace(/ {2,}|^ /g, m => '&nbsp;'.repeat(m.length)) || '&nbsp;').join('<br>');
+  return '<html><head><meta charset="utf-8"></head><body>' +
+    '<div style="font-family:Calibri,\'Microsoft JhengHei\',sans-serif;font-size:11pt">' +
+    intro.map(l => '<div>' + (apEsc(l) || '&nbsp;') + '</div>').join('') +
+    '<div style="font-family:MingLiU,\'細明體\',\'Courier New\',monospace;font-size:10.5pt;white-space:pre-wrap">' + pre + '</div>' +
+    '<div>&nbsp;</div></div></body></html>';
+}
+async function apSendToVendor(id, btn) {
+  const b = apFind(id); if (!b) return;
+  if (b.sentToVendorAt && !confirm(`⚠️ 這筆在 ${String(b.sentToVendorAt).slice(0, 16).replace('T', ' ')} 已經寄過一次，再寄一次廠商會收到兩封。\n\n仍要產生郵件草稿嗎？`)) return;
+  return apBusy(btn, async () => {
+    try {
+      const x = await apBuildXlsx(b);
+      const cc = [b.email, b.p1Email, b.p2Email].map(v => String(v || '').trim()).filter(Boolean)
+        .filter((v, i, a) => a.indexOf(v) === i && !AP_VENDOR.includes(v));
+      const bd = '----=_airport_' + Date.now();
+      const eml = [
+        'X-Unsent: 1',
+        'To: ' + AP_VENDOR.join(', '),
+        ...(cc.length ? ['Cc: ' + cc.join(', ')] : []),
+        'Subject: ' + apMimeWord(`怡業股份有限公司 機場接送預約 ${b.id} ${b.p1Name || ''}`.trim()),
+        'MIME-Version: 1.0',
+        'Content-Type: multipart/mixed; boundary="' + bd + '"',
+        '',
+        '--' + bd,
+        'Content-Type: text/html; charset="utf-8"',
+        'Content-Transfer-Encoding: base64',
+        '',
+        apWrap76(apB64Utf8(apMailHtml(b))),
+        '--' + bd,
+        'Content-Type: ' + AP_XLSX_MIME + '; name="' + apMimeWord(x.name) + '"',
+        'Content-Disposition: attachment; filename="' + apMimeWord(x.name) + '"',
+        'Content-Transfer-Encoding: base64',
+        '',
+        apWrap76(apB64Bytes(x.bytes)),
+        '--' + bd + '--',
+        '',
+      ].join('\r\n');
+      apSaveFile(new Blob([eml], { type: 'message/rfc822' }), `全鋒預約郵件_${b.id}.eml`);
+      toast('郵件草稿已下載：點開 .eml 會在 Outlook 開出附好 Excel 的新郵件，檢查後按「傳送」。寄出後再回來按「已寄出」。', 'success');
+    } catch (e) { toast('郵件草稿產生失敗：' + (e && e.message || e), 'error'); }
+  });
+}
+/* 🔴 「已送出全鋒」要人確認才標：下載草稿不等於寄出了。
+   以前 mailto 一開啟就標記，於是「郵件軟體沒跳出來」「開了但沒按傳送」
+   都會被記成已通知 —— 而那個標籤正是取消時判斷「要不要打電話告知廠商」的依據。 */
+async function apMarkSent(id) {
+  const b = apFind(id); if (!b) return;
+  if (!confirm(`確認 ${b.id} 的預約郵件已經寄給全鋒了嗎？`)) return;
+  // DB-first：真的存進去才改畫面
   const rows = await SB.patch('airport_bookings', `id=eq.${encodeURIComponent(b.id)}`, { sent_to_vendor_at: new Date().toISOString() });
-  if (!rows || !rows[0]) { toast(apErr('信件已開啟，但「已通知廠商」沒有存檔'), 'error'); return; }
+  if (!rows || !rows[0]) { toast(apErr('「已送出全鋒」沒有存檔'), 'error'); return; }
   toast('已標記為已送出全鋒');
   apLoadList();
+}
+
+// 列印：全鋒預約表的版面（固定繁中，同給廠商的文字）
+function apPrint(id) {
+  const b = apFind(id); if (!b) return;
+  const w = window.open('', '_blank');
+  if (!w) { toast('瀏覽器擋下了列印視窗，請允許此網站開啟彈出式視窗', 'error'); return; }
+  const e = apEsc, hasOut = b.serviceType !== 'in' && !!b.outDate, hasIn = b.serviceType !== 'out' && !!b.inDate;
+  const svc = { out: '送機', in: '接機', both: '來回' }[b.serviceType] || '';
+  const addr = p => [b[p + 'City'], b[p + 'Dist'], b[p + 'Addr']].filter(Boolean).join('');
+  const box = ap => ap === 'TPE' ? '■桃園機場 □松山機場' : ap === 'TSA' ? '□桃園機場 ■松山機場' : '□桃園機場 □松山機場';
+  const legRow = (on, lbl, no, ap, tLbl, t, date, pick) => {
+    const [y, m, d] = on && date ? date.split('-') : ['', '', ''];
+    return `<tr><th>${lbl}</th><td>${e(on ? no : '')}</td><th>機場</th><td>${box(on ? ap : '')}</td>
+      <th>${tLbl}</th><td>${e(on ? t : '')}</td><th>搭乘人數</th><td>${e(on ? b.paxCount : '')}</td>
+      <th>行李件數</th><td>${e(on ? apLugText(b) : '')}</td><th>選用車款</th><td>${e(on ? b.carType : '')}</td>
+      <th>日期</th><td>${e(y)} 年 ${e(m)} 月 ${e(d)} 日</td><th>預約接送時間</th><td><b>${e(on ? pick : '')}</b></td></tr>`;
+  };
+  w.document.open();
+  w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>全鋒預約表 ${e(b.id)}</title><style>
+    @page{size:A4 landscape;margin:10mm}
+    body{font-family:'PingFang TC','Microsoft JhengHei',sans-serif;color:#000;background:#fff;margin:0}
+    table{border-collapse:collapse;width:100%;font-size:10.5px}
+    th,td{border:1px solid #333;padding:4px 5px;vertical-align:top}
+    th{background:#eef1f6;font-weight:600;white-space:nowrap;text-align:left}
+    .ttl{text-align:center;font-size:18px;font-weight:700;letter-spacing:6px;padding:8px;border:none}
+    .notes{white-space:pre-wrap;line-height:1.5}
+  </style></head><body><table>
+    <tr><td colspan="16" class="ttl">全 鋒 專 接 服 務 預 約 表</td></tr>
+    <tr><th>公司名稱</th><td colspan="3">怡業股份有限公司</td><th>部門</th><td colspan="3">${e(b.dept)}</td><th>E-mail</th><td colspan="3">${e(b.email)}</td><th>預約編號</th><td>${e(b.id)}</td><th>服務</th><td>${svc}</td></tr>
+    <tr><th>申請人姓名</th><td colspan="3">${e(b.applicant)}</td><th>行動電話</th><td colspan="3">${e(b.mobile)}</td><th>室內電話</th><td colspan="3">(02) 8911-1133${b.ext ? ' 分機 ' + e(b.ext) : ''}</td><th>公司統編</th><td colspan="3">84756310</td></tr>
+    <tr><th>員工編號</th><td colspan="3">${e(b.empNo)}</td><th>使用目的</th><td colspan="3">${e(b.purpose)}</td><th>發票寄送地址</th><td colspan="3">235新北市新店區寶橋路235巷12號4樓</td><th>出差單單號</th><td colspan="3">${e(b.tripNo)}</td></tr>
+    <tr><th>1.乘客姓名</th><td colspan="3">${e(b.p1Name)}</td><th>行動電話</th><td colspan="3">${e(b.p1Mobile)}</td><th>E-mail</th><td colspan="3">${e(b.p1Email)}</td><th>備註</th><td colspan="3">${e(b.p1Note)}</td></tr>
+    <tr><th>2.乘客姓名</th><td colspan="3">${e(b.p2Name)}</td><th>行動電話</th><td colspan="3">${e(b.p2Mobile)}</td><th>E-mail</th><td colspan="3">${e(b.p2Email)}</td><th>備註</th><td colspan="3">${e(b.p2Note)}</td></tr>
+    ${legRow(hasOut, '出國航班編號', b.outFlight, b.outAirport, '台灣航班起飛時間', b.outDepTime, b.outPickupDate, b.outPickupTime)}
+    ${legRow(hasIn, '回國航班編號', b.inFlight, b.inAirport, '台灣航班降落時間', b.inArrTime, b.inPickupDate, b.inPickupTime)}
+    <tr><th>送機等候地址</th><td colspan="15">${hasOut ? e(addr('out')) : ''}</td></tr>
+    <tr><th>接機前往地址</th><td colspan="15">${hasIn ? e(addr('in')) + (b.signboard ? '　（需舉牌）' : '') : ''}</td></tr>
+    <tr><th>停靠站地址</th><td colspan="15">${b.stopLeg ? e(b.stopLeg + '：' + addr('stop')) : ''}</td></tr>
+    <tr><th>備註</th><td colspan="15">${e(b.note)}　預估費用 $${Number(b.fareEstimate || 0).toLocaleString()}</td></tr>
+    <tr><th>注意事項</th><td colspan="15" class="notes">${AP_NOTICES.map((n, i) => (i + 1) + '. ' + e(n)).join('\n')}</td></tr>
+    <tr><td colspan="16" style="font-size:10px;border:none">■全鋒接送改寄送 ${AP_VENDOR.join(', ')}　客服電話：(02)7733-0589 #623　客服：${AP_CFG.VENDOR_PHONE}</td></tr>
+  </table><script>window.onload=function(){window.print()}<\/script></body></html>`);
+  w.document.close();
 }
 
 async function apCancel(id) {

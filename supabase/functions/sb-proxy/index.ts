@@ -153,6 +153,38 @@ async function liveRoleOf(SUPABASE_URL: string, SERVICE_KEY: string, empId: stri
   return (await liveUserOf(SUPABASE_URL, SERVICE_KEY, empId)).role
 }
 
+/* 🔴 在職狀態閘門（2026-09-30，session 由 8 小時放寬成 3 天時一併加上）。
+   簽章裡只有登入當下的身分，放寬之前，離職／停用的人最長 8 小時失效；
+   放寬之後會變成 3 天 —— 所以每個請求都要知道「這個人現在還在職嗎」。
+   - 快取 5 分鐘（同一個 isolate 內）：每個請求都查一次 users 等於把
+     sb-proxy 的流量翻倍，而 CLAUDE.md 記載過併發上限的坑。
+   - 🔴 查詢失敗一律放行（fail-open）：這一道是「縮短離職者的空窗」，
+     不是主要的權限牆。資料庫一次抖動就把全公司登出，代價遠大於收益。
+     只有「確定查到、而且確定不在職（或查無此人）」才擋。 */
+const LIVE_TTL_MS = 5 * 60 * 1000
+const liveCache = new Map<string, { ok: boolean; at: number }>()
+async function stillEmployed(SUPABASE_URL: string, SERVICE_KEY: string, empId: string): Promise<boolean> {
+  if (!empId) return false
+  const hit = liveCache.get(empId)
+  if (hit && Date.now() - hit.at < LIVE_TTL_MS) return hit.ok
+  try {
+    const ur = await fetch(
+      `${SUPABASE_URL}/rest/v1/users?emp_id=eq.${encodeURIComponent(empId)}&select=active,status,role`,
+      { headers: elevatedApiHeaders(SERVICE_KEY) },
+    )
+    if (!ur.ok) return true
+    const rows = await ur.json()
+    if (!Array.isArray(rows)) return true
+    const u = rows[0]
+    const ok = !!u && u.active !== false && u.status !== "disabled" && u.status !== "resigned" &&
+      String(u.role || "") !== "inactive"
+    liveCache.set(empId, { ok, at: Date.now() })
+    return ok
+  } catch {
+    return true
+  }
+}
+
 function json(obj: unknown, status = 200) {
   return new Response(JSON.stringify(obj), { status, headers: { ...CORS, "Content-Type": "application/json" } })
 }
@@ -169,6 +201,10 @@ serve(async (req) => {
   if (!sess) return json({ error: "unauthorized", hint: "missing/invalid x-session" }, 401)
   const role = sess?.role || ""
   const sessEmpId = String(sess?.empId || "")
+  // 401 而不是 403：前端的 #sb-authbar 只認 401，而對當事人來說這就是「這個登入不能再用了」
+  if (!(await stillEmployed(SUPABASE_URL, SERVICE_KEY, sessEmpId))) {
+    return json({ error: "unauthorized", hint: "account_inactive" }, 401)
+  }
 
   const url = new URL(req.url)
 

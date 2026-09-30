@@ -136,8 +136,8 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 
 | File | Version | Purpose | ~Lines |
 |------|---------|---------|--------|
-| `index.html` | v2.09 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
-| `admin/index.html` | v2.49 | Admin System — **機場接送**、公務車、圖書館、會議室、客戶到訪、抽籤 | 8,221 |
+| `index.html` | v2.10 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
+| `admin/index.html` | v2.51 | Admin System — **機場接送**、公務車、圖書館、會議室、客戶到訪、抽籤 | 8,221 |
 | `kms/index.html` | v2.45 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
 | `quotation/index.html` | v3.66 | Quotation & CRM system | 7,332 |
 | `board/index.html` | v1.92 | 公告與會議 Bulletin & Meetings — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍、腦力激盪 | 4,600 |
@@ -243,6 +243,12 @@ https://platform.comart.com.tw/board/index.html?tab=poll&id=<場次 id>
 - 登入成功後 `auth-verify` 簽發 HMAC 簽章 session token，前端存在 SESSION 物件的 `sig` 欄位，隨 `?_ps=` 傳給子系統，供 `kms-secure-docs` 等驗證真實角色
 - `users.must_change_pwd`：全員已標記，下次登入 Portal 強制改密碼才能進入
 - Session stored in `localStorage` key `comart-portal-session` as JSON with expiry
+- 🔴 **session 壽命 3 天**（2026-09-30 由 8 小時放寬，Woody 決定）。**兩處必須一致**：
+  Portal 的 `SESSION_TTL`（本機 `expires`）與 `auth-verify` 的 `SESSION_TTL_MS`（簽章裡的 `exp`）。
+  放寬的代價是簽章裡的身分最長活 3 天，所以 **sb-proxy 每個請求都查一次在職狀態**（`stillEmployed`，
+  快取 5 分鐘）：離職／停用的人最慢 5 分鐘被擋（回 401 `account_inactive`）。
+  🔴 **查詢失敗一律放行**：這一道是縮短空窗，不是主要的權限牆，資料庫抖一下不該把全公司登出。
+  ⚠️ 只有 sb-proxy 有這一道；claude-proxy／transcribe 等仍只看簽章（那些不碰資料）。
 - Roles: `admin`, `dcc`, `user` — admin role gates user management and destructive operations。**角色判斷若涉及敏感資料，必須經 edge function 的 `verifySession()` 驗證，不能只信前端 role 欄位（可偽造）**
 - Sub-apps read session from URL `?_ps=` on load, then persist to their own localStorage key
 
@@ -1521,12 +1527,35 @@ naive regex 會誤判成「沒定義」。
 - **預約編號由 DB 產生**（`airport_next_booking_id()` ＋ advisory lock）。
   原系統在前端算「已有筆數 + 1」，兩個人同一天同時送出會拿到同一個編號，
   而那個編號會印在給廠商的單據上。
-- **航班查詢沿用 Portal 既有的 `claude-proxy` + web search**，不是 TDX。
-  原系統是 Apps Script 打 TDX，搬過來就要再放一份憑證 —— 平台本來就有會動的路。
-  ⚠️ Portal 的 `autoFillFlight()` 還寫著 `claude-sonnet-4-20250514`（舊代號），
-  這裡用的是 `claude-sonnet-5`。**Portal 那支也該更新。**
-- **寄給廠商是一顆按鈕，人按了才寄**（Woody 定案）。用 `mailto:` 而不是平台的
-  Resend：寄件人是申請人自己的信箱，廠商回信才回得到對的人，而且寄出前看得到內容。
+- 🔴 **航班查詢先打 `flight-schedule`（TDX 定期航班時刻表），查不到才退回 `claude-proxy` + web search**
+  （admin v2.51，2026-09-30）。原本只有 web search，使用者回報 **10/11 CI601「與華航差了五分鐘」**：
+  web search 讀到哪個第三方網站就用哪個，而它們彼此不一致（同一天一個寫 07:20、一個寫 07:25），
+  還常把「上週的實際起飛」當成班表。**錯五分鐘沒有人會察覺，直到司機晚到。**
+  - ⚠️ **TDX 需要 `TDX_CLIENT_ID`／`TDX_CLIENT_SECRET` 兩個 secret，尚未設定**
+    （https://tdx.transportdata.tw 免費註冊 → 會員中心 → API 金鑰，要 Woody 自己申請）。
+    沒設定時 function 回 `tdx_not_configured`，前端退回 web search ——
+    **而 web search 的結果一律標黃、明講「不是航空公司班表，請與機票核對」**，不能長得跟 TDX 一樣。
+  - 🔴 **要依「那一天」挑班季**（`schedule.js` 的 `pickSchedule`，`node --test` 7 個）：
+    換季時同一班機時間會變（CI601 10/24 前 07:25、10/25 起 07:15），拿第一筆就用必然錯。
+    所以前端**沒選日期不給查**（以前會拿今天去查）。
+  - 🔴 **TDX 說「那天沒有這班」就照實講，不退回 web search** —— 後者一定查得到「某一天」的時間，
+    而那正是會填錯的那一種。只有 TDX 根本不認得這個班號時才退回。
+  ⚠️ Portal 的 `autoFillFlight()` 仍是舊的 web search（還寫著 `claude-sonnet-4-20250514`），
+  有同一個問題。**要修就改打 `flight-schedule`，不要再複製一份 prompt。**
+- **寄給全鋒 ＝ 下載 Outlook 郵件草稿（`.eml`，附全鋒的 Excel 預約表）**（admin v2.51，照原系統做法）。
+  `X-Unsent: 1` 讓 Outlook 把它當成未寄出的新郵件開啟：收件人、副本（申請人＋乘客）、主旨、
+  內文、附件都已填好，人檢查後按「傳送」；關掉時 Outlook 會問要不要存到草稿匣。
+  寄件人是申請人自己的信箱，廠商回信才回得到對的人（所以不用 Resend）。
+  - Excel 是**全鋒自己的空白預約表**（`admin/airport-template.xlsx`，已清掉檔案屬性裡的作者姓名，
+    `.gitignore` 有例外），用 **JSZip 直接改 sheet XML**（`apSetCell`）。
+    🔴 不要改用 SheetJS：社群版讀進來再寫出去會丟掉樣式、合併儲存格與圖片。
+    儲存格位置是對著範本寫死的，換範本前先確認。年份填民國年（那一格只放得下 3 位數）。
+  - 🔴 **「已送出全鋒」要人按「已寄出」才標**（`apMarkSent`）。以前 mailto 一開啟就標記，
+    「郵件軟體沒跳出來」「開了沒按傳送」都會被記成已通知 —— 而取消時「要不要打電話告知廠商」看的就是它。
+  - ⚠️ Apple Mail 會把 .eml 當成收到的信唯讀開啟，那種情況用「Excel 預約表」＋「複製預約文字」。
+  - ⚠️ **全鋒的收件信箱可能過期**：範本裡的圖片寫著「2024/12/01 起正式啟用新信箱 Tmsbooking@tmsv.com.tw」，
+    但同一份範本的文字列與程式（`AP_VENDOR`）仍是 `tmsbooking@24tms.com.tw`、`joanpeng@24tms.com.tw`。**待 Woody 向全鋒確認。**
+- 列印（`apPrint`）開新視窗畫全鋒預約表版面，固定繁中。
 - 🔴 **欄位名是機械轉換**（`outPickupDate` ↔ `out_pickup_date`），`apSnake`／`apCamel`
   雙向對映，**不要手寫對照表** —— 50 個欄位的手寫對照表必然會漏，
   而漏掉的症狀是「那一格永遠是空的」，沒有人會回報。

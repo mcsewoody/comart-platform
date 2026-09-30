@@ -493,3 +493,10 @@ entrypoint = "./functions/pd-documents-api/index.ts"
 enabled = true
 verify_jwt = false
 entrypoint = "./functions/pd-ai-worker/index.ts"
+
+# 航班定期時刻表（admin 機場接送）。需要 TDX_CLIENT_ID／TDX_CLIENT_SECRET 兩個 secret；
+# 沒設定時回 tdx_not_configured，前端退回網路搜尋。驗證走 x-session。
+[functions.flight-schedule]
+enabled = true
+verify_jwt = false
+entrypoint = "./functions/flight-schedule/index.ts"

@@ -16,7 +16,11 @@ const CORS = {
 }
 
 const LEGACY_SALT = "::COMART-QS-2024" // 對照前端 PWD_SALT，僅用於驗證舊格式雜湊
-const SESSION_TTL_MS = 8 * 60 * 60 * 1000 // 8h，比照前端既有 SESSION_TTL
+// 3 天（2026-09-30 由 8 小時放寬，Woody 決定）。🔴 必須與 Portal index.html 的
+// SESSION_TTL 一致，否則本機判斷與伺服器判斷會分岔。
+// 代價：簽章內的 role 是登入當下的值，被停用／降權的人最長要 3 天才失效 ——
+// 需要即時生效的地方（受限 bucket、KMS 機密等級、聊天刪除）已改為重查資料庫。
+const SESSION_TTL_MS = 3 * 24 * 60 * 60 * 1000
 
 const USER_FIELDS =
   "id,emp_id,name_en,name_zh,role,dept,site,email,mobile,ext,title_en,title_zh,active,status,must_change_pwd"

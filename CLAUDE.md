@@ -103,8 +103,8 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 
 | File | Version | Purpose | ~Lines |
 |------|---------|---------|--------|
-| `index.html` | v2.08 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
-| `admin/index.html` | v2.46 | Admin System — **機場接送**、公務車、圖書館、會議室、客戶到訪、抽籤 | 8,221 |
+| `index.html` | v2.09 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
+| `admin/index.html` | v2.47 | Admin System — **機場接送**、公務車、圖書館、會議室、客戶到訪、抽籤 | 8,221 |
 | `kms/index.html` | v2.45 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
 | `quotation/index.html` | v3.66 | Quotation & CRM system | 7,332 |
 | `board/index.html` | v1.92 | 公告與會議 Bulletin & Meetings — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍、腦力激盪 | 4,600 |
@@ -1380,6 +1380,37 @@ v1.94 只做在 Portal，但**同事被邀請的時候人常常在 KMS 或報價
 編號格式、狀態轉換、取消驗證規則全部寫在裡面，等於把契約留在程式碼中。
 寄給廠商的信件內容也是前端的 `bookingText()` 組的，不在後端。
 所以只有 Google Sheet 裡的**既有資料**拿不到（Woody 確認還沒有人正式用，不必搬）。
+
+### 🔴 admin 沒有 `.card`，套宿主的 class 之前先確認它存在
+
+第一版把面板套上 `class="card"`，結果**整頁塌成一條** —— admin 從來沒有定義過
+`.card`（它有 `.ccard`／`.bkcard`／`.bki`，就是沒有 `.card`），所以每一張卡片
+都是沒有背景、沒有邊框、沒有內距的裸 `div`。
+
+同一件事在按鈕上也踩到：**admin 的 `.btn` 本身沒有背景色**（要靠
+`.bp`／`.btl`／`.bdr` 這些變體），所以裸 `.btn` 是透明的。
+
+現在結構性的 class 一律**自己定義並限定在 `#panel-airport` 裡**，
+幾何（間距、欄寬、字級、圓角）完全照原始檔，只把顏色換成 admin 的 token。
+
+**檢查方式**（會抓到這一類問題）：把面板 HTML 裡出現的 class 全部撈出來，
+逐一確認整份檔案定義過。⚠️ 注意 `.apf.req>span` 這種帶組合子的選擇器，
+naive regex 會誤判成「沒定義」。
+
+### 🔴 給廠商的預約單：兩個排版坑
+
+實際渲染一份出來才看得到（**不要只看程式碼就收工**）：
+
+1. **標籤要補到固定「顯示寬度」，不是固定字數。**
+   `E-mail` 是 6 個半形字元、`行動電話` 是 4 個全形字元，字數差一倍但寬度一樣。
+   用字數補的結果是四個字的標籤完全沒有間隔：`室內電話(02) 8911-1133`。
+   `apW()` 把 CJK 算 2、其餘算 1，補到寬度 10。
+2. **星期不要用 `new Date(d + 'T00:00:00+08:00')` 再取 `getUTCDay()`。**
+   那個值是 UTC 的前一天 16:00，**星期會整整差一天**（實測把週一印成週日）。
+   用 `Date.UTC(y, m-1, d)` 從年月日直接算。
+
+排版本身：分段用 `▍標題` ＋ 縮排兩格，每一趟（送機／接機）用整條分隔線切開。
+🔴 **不用方框線（┌─┐）**：多數信件客戶端是比例字型，框線一定對不齊，比沒有框更亂。
 
 ### 權限（Woody 2026-09-30 定案）
 

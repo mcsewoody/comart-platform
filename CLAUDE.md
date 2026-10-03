@@ -136,7 +136,7 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 
 | File | Version | Purpose | ~Lines |
 |------|---------|---------|--------|
-| `index.html` | v2.10 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
+| `index.html` | v2.11 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
 | `admin/index.html` | v2.52 | Admin System — **機場接送**、公務車、圖書館、會議室、客戶到訪、抽籤 | 8,221 |
 | `kms/index.html` | v2.50 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
 | `quotation/index.html` | v3.66 | Quotation & CRM system | 7,332 |
@@ -1598,8 +1598,10 @@ naive regex 會誤判成「沒定義」。
     所以前端**沒選日期不給查**（以前會拿今天去查）。
   - 🔴 **TDX 說「那天沒有這班」就照實講，不退回 web search** —— 後者一定查得到「某一天」的時間，
     而那正是會填錯的那一種。只有 TDX 根本不認得這個班號時才退回。
-  ⚠️ Portal 的 `autoFillFlight()` 仍是舊的 web search（還寫著 `claude-sonnet-4-20250514`），
-  有同一個問題。**要修就改打 `flight-schedule`，不要再複製一份 prompt。**
+  ✅ **Portal 行事曆的出差航班（`autoFillFlight`）也改打同一支 `flight-schedule`**（Portal v2.11）。
+  順帶修了兩個它自己的 bug：**回程一直拿出發日去查**（只讀 `trip-date-from`，換季前後回程必錯），
+  以及沒填日期時用 `toISOString()`（UTC，台灣早上 8 點前是昨天）。
+  ⚠️ TDX 只涵蓋起降台灣的航班，越南／中國境內線一定走 web search（標橘、寫明請核對）。
 - **寄給全鋒 ＝ 下載 Outlook 郵件草稿（`.eml`，附全鋒的 Excel 預約表）**（admin v2.51，照原系統做法）。
   `X-Unsent: 1` 讓 Outlook 把它當成未寄出的新郵件開啟：收件人、副本（申請人＋乘客）、主旨、
   內文、附件都已填好，人檢查後按「傳送」；關掉時 Outlook 會問要不要存到草稿匣。

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART KMS v2.48</title>
+<title>COMART KMS v2.49</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -398,7 +398,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="38" height="20" style="display:inline-block;vertical-align:middle;margin-right:4px;margin-top:-2px"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg>COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v2.48</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v2.49</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('en')">EN</button>
@@ -3831,10 +3831,58 @@ async function processFile(file) {
 //    而且同一份文件的內文會因為「上傳時介面是哪一國語言」而不同。
 //    丟出去的 Error 訊息才是使用者看的介面文字，那些已經走 t()。
 //    i18n 稽核會把前者算成漏翻 —— 那是誤判。
+/* 🔴 亂碼偵測（v2.49，2026-10-03）。
+   有些 PDF 的字型沒有正確的「字形 → 文字」對照表（ToUnicode），pdfjs 讀得到每個字的
+   位置，卻對應到錯的字元 —— 抽出來是一整片「墡 㬸 ᶿ 㠫 䒙」。字數夠多，所以舊版以為
+   解析成功、不走 OCR，亂碼就這樣存進知識庫（實際查到 3 份 PDF）。
+   分數 ＝ 可疑字元 / 非空白字元。可疑字元是正常文件幾乎不會出現的區段：
+   控制字元、CJK 擴充 A（U+3400–4DBF）、私用區、U+FFFD、拉丁擴充 B／IPA、
+   符號區（U+2000–2BFF，扣掉常用的項目符號、箭頭、圈數字、框線）。
+   🔴 U+1E00–1EFF 不算：那是**越南文**的字母（ẩ ệ ố）。第一版沒扣，越南文件全被誤判。
+   ơ／ư（U+01A0/01A1/01AF/01B0）同理。
+   門檻 5% **而且**至少 30 個可疑字元：實測全庫 1,087 份，正常文件最高 2.9%、亂碼文件最低 6.4%。
+   後一個條件是給短文件的：一份越南文簡報只有 11 個圖示字型符號（私用區 U+E900），
+   因為全文很短，比例就到 7%。真正的亂碼一頁就上百個。 */
+const KMS_GARBLE_MAX = 0.05;
+const KMS_GARBLE_MIN_COUNT = 30;
+const KMS_SYMBOL_OK = new Set('•→←↑↓…※‧–—‘’“”″′℃①②③④⑤⑥⑦⑧⑨⑩■□●○◆◇★☆▲△▼▽►▶◀✓✔✕✗×÷≥≤≠±∶∙√∞≈─│┌┐└┘├┤⚫');
+const KMS_VI_OK = new Set([0x01A0, 0x01A1, 0x01AF, 0x01B0]);
+function kmsGarbleScore(text) {
+  let total = 0, bad = 0;
+  for (const c of String(text || '')) {
+    if (/\s/.test(c)) continue;
+    total++;
+    const o = c.codePointAt(0);
+    if (o < 0x20 || (o >= 0x3400 && o <= 0x4DBF) || (o >= 0xE000 && o <= 0xF8FF) || o === 0xFFFD ||
+        (o >= 0x0180 && o <= 0x02FF && !KMS_VI_OK.has(o)) ||
+        (o >= 0x1D00 && o <= 0x1DFF) || (o >= 0x1F00 && o <= 0x1FFF) ||
+        (o >= 0x2000 && o <= 0x2BFF && !KMS_SYMBOL_OK.has(c))) bad++;
+  }
+  return total && bad >= KMS_GARBLE_MIN_COUNT ? bad / total : 0;
+}
+
+/* 純文字檔的編碼：台灣用 Excel 另存的 CSV 多半是 Big5（CP950），不是 UTF-8。
+   舊版一律 file.text()（＝UTF-8），Big5 的中文全變成 U+FFFD —— 「公司BSMI產品 清單」就是這樣。
+   順序：UTF-8（嚴格）→ Big5 → GB18030，取第一個解得乾淨的。 */
+async function kmsDecodeText(file) {
+  const buf = await file.arrayBuffer();
+  try { return new TextDecoder('utf-8', { fatal: true }).decode(buf).replace(/^\uFEFF/, ''); } catch (e) {}
+  for (const enc of ['big5', 'gb18030']) {
+    try {
+      const txt = new TextDecoder(enc).decode(buf);
+      if ((txt.match(/\uFFFD/g) || []).length / Math.max(txt.length, 1) < 0.01) {
+        console.warn('[KMS] text decoded as ' + enc + ' (not UTF-8): ' + file.name);
+        return txt;
+      }
+    } catch (e) {}
+  }
+  return new TextDecoder('utf-8').decode(buf);   // 都不乾淨：照舊，至少不比以前差
+}
+
 async function extractText(file, ext, onProgress) {
-  // TXT / Markdown：直接讀
+  // TXT / Markdown：直接讀（編碼自動判斷）
   if (ext === 'txt' || ext === 'md') {
-    return await file.text();
+    return await kmsDecodeText(file);
   }
 
   // Word：docx 用 mammoth.js，doc 直接走 claude-proxy
@@ -3894,7 +3942,7 @@ async function extractText(file, ext, onProgress) {
 
   // CSV：PapaParse → Markdown 表格格式
   if (ext === 'csv') {
-    const text = await file.text();
+    const text = await kmsDecodeText(file);
     if (!window.Papa) return text; // fallback
     const result = Papa.parse(text, { header: false, skipEmptyLines: true });
     const rows = result.data;
@@ -4102,6 +4150,12 @@ async function extractPdfWithPdfjs(file, onProgress) {
   const avgCharsPerPage = result.length / totalPages;
   if (avgCharsPerPage < 30) {
     throw new Error('IMAGE_PDF'); // 觸發 Vision OCR fallback
+  }
+  // 抽得到字、但是亂碼（字型沒有正確的 ToUnicode）→ 同樣改走 OCR（讓 AI 看頁面本身）
+  const garble = kmsGarbleScore(result);
+  if (garble > KMS_GARBLE_MAX) {
+    console.warn('[KMS] pdf text looks garbled: score=' + garble.toFixed(3) + ' > ' + KMS_GARBLE_MAX + ' → OCR: ' + file.name);
+    throw new Error('IMAGE_PDF');
   }
 
   return result;

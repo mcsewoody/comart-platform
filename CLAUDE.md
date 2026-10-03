@@ -138,7 +138,7 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 |------|---------|---------|--------|
 | `index.html` | v2.10 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
 | `admin/index.html` | v2.51 | Admin System — **機場接送**、公務車、圖書館、會議室、客戶到訪、抽籤 | 8,221 |
-| `kms/index.html` | v2.48 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
+| `kms/index.html` | v2.49 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
 | `quotation/index.html` | v3.66 | Quotation & CRM system | 7,332 |
 | `board/index.html` | v1.92 | 公告與會議 Bulletin & Meetings — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍、腦力激盪 | 4,600 |
 | `product_dev/` | v2.25 | **產品開發管理 —— 第六個子系統，不遵守單一檔案原則**（見下方專節） | — |
@@ -311,6 +311,18 @@ KMS (`kms/index.html`) implements RAG (Retrieval-Augmented Generation):
   上一份的結果晚回來就會**把上一份的內文寫進下一份的編輯器**。
 - 🔴 **拿掉「內文超過 24,000 字就截斷寫回資料庫」**。那是向量長度上限的舊做法，
   v2.40 起 `embed-document` 自己處理長度，這一刀只剩副作用：長文件後半段從關鍵字搜尋消失。
+
+- 🔴 **亂碼 PDF 改走 OCR**（v2.49，2026-10-03）：有些 PDF 的字型沒有正確的 ToUnicode，
+  pdfjs 抽得到「字」卻是一整片「墡 㬸 ᶿ 㠫」，字數夠多所以舊版以為成功，亂碼直接存進知識庫。
+  `kmsGarbleScore()` 算可疑字元比例（CJK 擴充 A、私用區、控制字元、拉丁擴充 B、冷門符號），
+  **超過 5% 且至少 30 個** → 視同圖片型 PDF 改走 OCR。門檻是拿全庫 1,087 份實測訂的：
+  正常文件最高 2.9%、亂碼最低 6.4%；只抓到真正的 4 份。
+  🔴 **越南文字母（U+1E00–1EFF、ơ／ư）不算可疑**，第一版沒扣，越南文件全被誤判；
+  「至少 30 個」是給短文件的（一份越南文簡報只有 11 個圖示字型符號，比例卻到 7%）。
+- **CSV／TXT 自動判斷編碼**（`kmsDecodeText`）：UTF-8（嚴格）→ Big5 → GB18030。
+  台灣 Excel 另存的 CSV 多半是 Big5，舊版一律當 UTF-8 讀，中文全變成 U+FFFD。
+- ⚠️ **既有的 4 份亂碼文件要各自按「重新解析」才會修好**：
+  從AI治理到提升企業競爭力、SQM供應商品質管理、peripower TBM（PDF）、公司BSMI產品 清單（CSV）。
 
 **同時修的安全問題：`kms-files` 原本是公開 bucket ＋ anon 可上傳。**
 1,209 份原始檔（約 2 GB，含機密等級 2／3）不必登入就能下載；任何人也能用 anon key 往裡面塞檔案。

@@ -55,3 +55,15 @@ test("航廈只留數字、飛航日照週一到週日排", () => {
   assert.equal(m.terminal, "1");
   assert.equal(m.opDays, "一三四五六日");
 });
+
+test("超出已公布範圍：covered=false，不可當成「那天不飛」", () => {
+  const onlyAutumn = [CI601[0]]; // 只到 10/24
+  const r = pickSchedule(onlyAutumn, "CI601", "2026-10-25");
+  assert.equal(r.matches.length, 0);
+  assert.equal(r.covered, false);
+  assert.equal(r.coveredTo, "2026-10-24");
+  // 範圍內但當天停飛（週二）才是真的不飛
+  const tue = pickSchedule(onlyAutumn, "CI601", "2026-10-13");
+  assert.equal(tue.covered, true);
+  assert.equal(tue.matches.length, 0);
+});

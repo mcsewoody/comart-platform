@@ -137,7 +137,7 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 | File | Version | Purpose | ~Lines |
 |------|---------|---------|--------|
 | `index.html` | v2.10 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
-| `admin/index.html` | v2.51 | Admin System — **機場接送**、公務車、圖書館、會議室、客戶到訪、抽籤 | 8,221 |
+| `admin/index.html` | v2.52 | Admin System — **機場接送**、公務車、圖書館、會議室、客戶到訪、抽籤 | 8,221 |
 | `kms/index.html` | v2.50 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
 | `quotation/index.html` | v3.66 | Quotation & CRM system | 7,332 |
 | `board/index.html` | v1.92 | 公告與會議 Bulletin & Meetings — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍、腦力激盪 | 4,600 |
@@ -1583,9 +1583,15 @@ naive regex 會誤判成「沒定義」。
   （admin v2.51，2026-09-30）。原本只有 web search，使用者回報 **10/11 CI601「與華航差了五分鐘」**：
   web search 讀到哪個第三方網站就用哪個，而它們彼此不一致（同一天一個寫 07:20、一個寫 07:25），
   還常把「上週的實際起飛」當成班表。**錯五分鐘沒有人會察覺，直到司機晚到。**
-  - ⚠️ **TDX 需要 `TDX_CLIENT_ID`／`TDX_CLIENT_SECRET` 兩個 secret，尚未設定**
-    （https://tdx.transportdata.tw 免費註冊 → 會員中心 → API 金鑰，要 Woody 自己申請）。
-    沒設定時 function 回 `tdx_not_configured`，前端退回 web search ——
+  - ✅ **TDX 已接通（2026-10-03）**：`TDX_CLIENT_ID`／`TDX_CLIENT_SECRET` 已設定。
+    實測 CI601 10/11 ＝ **07:20**（web search 當初給 07:25，正是使用者說的五分鐘）。
+    🔴 **要用 TDX「API金鑰內容」那一組，不是下面的「MQTT金鑰內容」** —— 兩區都有一格叫 Client Id，
+    第一次就是貼錯，TDX 回 `400 invalid_client`。值要按「複製」鈕拿（畫面上是星號遮罩）。
+    function 讀 secret 時會 trim，失敗時錯誤訊息帶 TDX 的錯誤代碼（不含金鑰）。
+  - 🔴 **TDX 的班表是一週一週公布的**（10/3 查只到 10/24）。超出範圍 ≠「那天不飛」：
+    `pickSchedule` 回 `covered:false`，前端註明「官方班表只公布到 X」並退回 web search。
+    第一版把兩者混為一談，10/25 的 CI601 被說成停飛 —— 會讓人以為班機取消。
+    未設定 secret 時 function 回 `tdx_not_configured`，前端退回 web search ——
     **而 web search 的結果一律標黃、明講「不是航空公司班表，請與機票核對」**，不能長得跟 TDX 一樣。
   - 🔴 **要依「那一天」挑班季**（`schedule.js` 的 `pickSchedule`，`node --test` 7 個）：
     換季時同一班機時間會變（CI601 10/24 前 07:25、10/25 起 07:15），拿第一筆就用必然錯。

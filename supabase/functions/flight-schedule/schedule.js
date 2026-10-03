@@ -61,5 +61,12 @@ export function pickSchedule(records, flight, date) {
     matches.push(leg);
   }
   const periods = [...new Set(rows.map((r) => `${day(r.ScheduleStartDate)} ～ ${day(r.ScheduleEndDate)}`))];
-  return { matches, periods, known: rows.length > 0 };
+  /* 🔴 「那天沒有這班」與「班表還沒公布到那天」是兩件事。TDX 的定期時刻表是一週一週公布的
+     （實測 2026-10-03 只到 10/24，冬季班表尚未上架），超出範圍的日期查不到任何一筆 ——
+     當成「不飛」會讓人以為班機取消了。covered=false 時前端要說明並退回網路搜尋。 */
+  const starts = rows.map((r) => day(r.ScheduleStartDate)).filter(Boolean).sort();
+  const ends = rows.map((r) => day(r.ScheduleEndDate)).filter(Boolean).sort();
+  const coveredFrom = starts[0] || "", coveredTo = ends[ends.length - 1] || "";
+  const covered = rows.length > 0 && (!coveredFrom || date >= coveredFrom) && (!coveredTo || date <= coveredTo);
+  return { matches, periods, known: rows.length > 0, covered, coveredFrom, coveredTo };
 }

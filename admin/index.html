@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART 行政管理平台 v2.51</title>
+<title>COMART 行政管理平台 v2.52</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -800,7 +800,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="logo">
     <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
     <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
-    <span><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="38" height="20" style="display:inline-block;vertical-align:middle;margin-top:-2px"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v2.51</span>
+    <span><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="38" height="20" style="display:inline-block;vertical-align:middle;margin-top:-2px"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v2.52</span>
   </div>
   <div class="trr">
     <div id="global-site-bar" style="display:flex;align-items:center;gap:4px"><span style="font-size:13px;color:var(--text-3);white-space:nowrap;font-weight:500" data-i18n="g.site_label">單位：</span>
@@ -8023,6 +8023,12 @@ async function apLookupTdx(leg, no, dateStr) {
   } catch (e) { console.warn('[airport] flight-schedule failed:', e && e.message); return false; }
   if (!r.ok) { if (r.reason !== 'tdx_not_configured') console.warn('[airport] flight-schedule', r.reason); return false; }
   if (!r.known) return false;                       // TDX 沒有這個班號 → 讓網路搜尋試試看
+  /* 🔴 超出 TDX 已公布的範圍（班表一週一週上架，實測 10/3 只到 10/24）≠「那天不飛」。
+     說成不飛會讓人以為班機取消；改退回網路搜尋，並在結果上註明為什麼不是官方班表。 */
+  if (r.covered === false) {
+    apTdxNote = `官方班表（TDX）目前只公布到 ${r.coveredTo || '—'}，${dateStr} 還查不到。`;
+    return false;
+  }
   // 送機看「從台灣出發」的那一段、接機看「抵達台灣」的那一段
   const twSide = m => leg === 'out' ? AP_AIRPORTS[m.from] : AP_AIRPORTS[m.to];
   const m = r.matches.find(twSide) || r.matches[0];
@@ -8041,7 +8047,9 @@ async function apLookupTdx(leg, no, dateStr) {
     `<div class="ap-small">航空公司排定班表（TDX）· 飛航日 每週${apEsc(m.opDays || '—')} · 班表期間 ${apEsc(m.period || '—')}</div>`, 'ok');
   return true;
 }
+let apTdxNote = '';
 async function apLookupFlight(leg) {
+  apTdxNote = '';
   const no = (apFld(leg + 'Flight').value || '').trim().toUpperCase().replace(/\s+/g, '');
   const dateEl = apFld(leg === 'out' ? 'outDate' : 'inDate');
   if (!no) { apFlightStatus(leg, '請先輸入航班編號。', 'warn'); return; }
@@ -8090,7 +8098,7 @@ async function apLookupFlight(leg) {
     apFlightStatus(leg,
       `查到：${apEsc(f.dep_iata || '?')} ${apEsc(f.dep_time || '')} → ${apEsc(f.arr_iata || '?')} ${apEsc(f.arr_time || '')}` +
       `${side.terminal ? '　航廈 ' + apEsc(side.terminal) : ''}` +
-      `<div class="ap-small">⚠️ 這是網路搜尋的結果${f.source ? '（' + apEsc(f.source) + '）' : ''}，不是航空公司的班表，時間可能差幾分鐘 —— 請務必與機票核對。</div>`, 'warn');
+      `<div class="ap-small">${apTdxNote ? apEsc(apTdxNote) + ' ' : ''}⚠️ 這是網路搜尋的結果${f.source ? '（' + apEsc(f.source) + '）' : ''}，不是航空公司的班表，時間可能差幾分鐘 —— 請務必與機票核對。</div>`, 'warn');
   } catch (e) {
     apFlightStatus(leg, '查詢時發生錯誤，請手動填寫。', 'warn');
     console.warn('[airport] flight lookup failed:', e && e.message);

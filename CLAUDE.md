@@ -138,7 +138,7 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 |------|---------|---------|--------|
 | `index.html` | v2.10 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
 | `admin/index.html` | v2.51 | Admin System — **機場接送**、公務車、圖書館、會議室、客戶到訪、抽籤 | 8,221 |
-| `kms/index.html` | v2.49 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
+| `kms/index.html` | v2.50 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
 | `quotation/index.html` | v3.66 | Quotation & CRM system | 7,332 |
 | `board/index.html` | v1.92 | 公告與會議 Bulletin & Meetings — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍、腦力激盪 | 4,600 |
 | `product_dev/` | v2.25 | **產品開發管理 —— 第六個子系統，不遵守單一檔案原則**（見下方專節） | — |
@@ -304,6 +304,10 @@ KMS (`kms/index.html`) implements RAG (Retrieval-Augmented Generation):
   **實測同一份 42 頁：背景分頁 113 秒、42 頁全部辨識**（舊版前景 5 分鐘、只做 30 頁）。
   單份超過 1.5 MB 就再對半切（4 頁 2.8 MB 那份要 79 秒，會拖住整體）。
   pdf-lib 載不到或讀不了這份 PDF 才退回 canvas 版（`extractImagePdfByCanvas`）。
+  🔴 **pdf-lib 一定要 `parseSpeed: Fastest` ＋ `saveAsBase64({objectsPerTick: Infinity})`**（v2.50）：
+  它預設每處理一批物件就用 `setTimeout` 讓出主執行緒，而**背景分頁的 setTimeout 被壓到 ≥1 秒、
+  5 分鐘後每分鐘一次** —— 物件多的 PDF（SQM 42 頁）在背景卡了十幾分鐘，同一份在 Node 只要 23 ms。
+  **凡是會在背景分頁跑、內部靠 setTimeout 分批的函式庫，都要檢查這一點。**
   上限 **80 頁**（`OCR_MAX_PAGES`）；進度寫在**編輯器的佔位文字**（`kmsParseProgress`），不靠 toast。
 - pdfjs 的 `getDocument`／每批頁面都加上逾時（`kmsWithTimeout`，60 秒）：
   那些 promise 本身沒有上限，元件載入不完整時會永遠停在「解析中」。

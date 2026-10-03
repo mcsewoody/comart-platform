@@ -40,7 +40,13 @@ async function tdxToken(id: string, secret: string): Promise<string> {
     headers: { "content-type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({ grant_type: "client_credentials", client_id: id, client_secret: secret }),
   })
-  if (!r.ok) throw new Error(`tdx_token_${r.status}`)
+  if (!r.ok) {
+    // 帶出 TDX 的錯誤代碼（invalid_client／unauthorized_client…），不含任何金鑰內容 ——
+    // 只有狀態碼的話分不出是「金鑰錯」還是「帳號還沒啟用」
+    let code = ""
+    try { const e = await r.json(); code = String(e.error || "") + (e.error_description ? ":" + String(e.error_description).slice(0, 80) : "") } catch { /* 非 JSON */ }
+    throw new Error(`tdx_token_${r.status}${code ? "_" + code : ""}`)
+  }
   const j = await r.json()
   if (!j.access_token) throw new Error("tdx_token_empty")
   tok = { v: j.access_token, exp: Date.now() + Math.max(60, (Number(j.expires_in) || 3600) - 300) * 1000 }
@@ -74,8 +80,9 @@ Deno.serve(async (req) => {
     return json({ ok: false, reason: "bad_request" }, 400)
   }
 
-  const id = Deno.env.get("TDX_CLIENT_ID") || ""
-  const secret = Deno.env.get("TDX_CLIENT_SECRET") || ""
+  // 🔴 trim：從網頁後台貼上的值常常帶著前後空白或換行，TDX 會直接回 400 invalid_client
+  const id = (Deno.env.get("TDX_CLIENT_ID") || "").trim()
+  const secret = (Deno.env.get("TDX_CLIENT_SECRET") || "").trim()
   if (!id || !secret) return json({ ok: false, reason: "tdx_not_configured" })
 
   try {

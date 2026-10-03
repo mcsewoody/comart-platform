@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART KMS v2.47</title>
+<title>COMART KMS v2.48</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -398,7 +398,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="38" height="20" style="display:inline-block;vertical-align:middle;margin-right:4px;margin-top:-2px"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg>COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v2.47</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v2.48</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('en')">EN</button>
@@ -549,12 +549,13 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
             ondragover="handleDragOver(event)"
             ondragleave="handleDragLeave(event)"
             ondrop="handleDrop(event)"
-            style="padding:10px;margin-bottom:6px;">
+            style="padding:13px;margin-bottom:8px;">
             <input type="file" id="file-input" accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.pptx,.ppt,.jpg,.jpeg,.png,.txt,.md"
               multiple onchange="handleFileSelect(event)" />
-            <div style="display:flex;align-items:center;gap:8px;justify-content:center;">
-              <span class="upload-zone-icon" style="font-size:18px;margin:0;">📎</span>
-              <span class="upload-zone-text" style="font-size:12px;">點擊或拖放檔案（可多選，上限 50MB）</span>
+            <!-- 上傳區放大 30%（2026-10-03 使用者要求）：內距 10→13、圖示 18→23、文字 12→15.6 -->
+            <div style="display:flex;align-items:center;gap:10px;justify-content:center;">
+              <span class="upload-zone-icon" style="font-size:23px;margin:0;">📎</span>
+              <span class="upload-zone-text" style="font-size:15.6px;">點擊或拖放檔案（可多選，上限 50MB）</span>
             </div>
           </div>
           <div class="upload-progress" id="upload-progress">
@@ -563,17 +564,18 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
           <div id="file-preview-area"></div>
 
           <!-- URL 抓取 -->
-          <div style="display:flex;gap:6px;margin-top:6px;align-items:center;" onclick="event.stopPropagation()">
-            <span style="font-size:16px;flex-shrink:0;">🔗</span>
+          <!-- 網址區放大 50%（2026-10-03 使用者要求）：圖示 16→24、字 12→18、內距同比例 -->
+          <div style="display:flex;gap:9px;margin-top:9px;align-items:center;" onclick="event.stopPropagation()">
+            <span style="font-size:24px;flex-shrink:0;">🔗</span>
             <input id="url-fetch-input" type="url"
               data-i18n-placeholder="editor.url.placeholder"
               placeholder="貼上網址，AI 自動擷取內文…" data-i18n-placeholder="editor.url.placeholder"
-              style="flex:1;font-size:12px;padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg);color:var(--text-1);outline:none;"
+              style="flex:1;font-size:18px;padding:9px 15px;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg);color:var(--text-1);outline:none;"
               onclick="event.stopPropagation()"
               onkeydown="if(event.isComposing)return;if(event.key==='Enter'){event.preventDefault();event.stopPropagation();fetchUrlContent();}"
               autocomplete="off" autocorrect="off" autocapitalize="off" />
             <button onclick="event.stopPropagation();fetchUrlContent()"
-              style="padding:5px 12px;border-radius:var(--radius);border:1px solid var(--blue);background:var(--blue-bg);color:var(--blue);font-size:12px;cursor:pointer;white-space:nowrap;flex-shrink:0;"
+              style="padding:8px 18px;border-radius:var(--radius);border:1px solid var(--blue);background:var(--blue-bg);color:var(--blue);font-size:18px;cursor:pointer;white-space:nowrap;flex-shrink:0;"
               data-i18n="btn.fetch_url">擷取內文</button>
           </div>
         </div>

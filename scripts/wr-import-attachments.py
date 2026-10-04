@@ -34,9 +34,23 @@ def req(method, path, key, body=None, ctype='application/json', extra=None):
         t = res.read()
         return json.loads(t) if t else None
 
+def hdr(v):
+    # 🔴 不用 make_header：信件宣告 gb2312 但實際是 GBK/GB18030 的字（例如「圖」），它會直接丟例外
+    out = []
+    for b, cs in decode_header(v or ''):
+        if isinstance(b, str):
+            out.append(b); continue
+        for c in ([cs] if cs else []) + ['gb18030', 'big5', 'utf-8']:
+            try:
+                out.append(b.decode('gb18030' if c and c.lower() in ('gb2312', 'gbk') else c)); break
+            except Exception:
+                pass
+        else:
+            out.append(b.decode('utf-8', 'replace'))
+    return ''.join(out)
+
 def fname(part):
-    n = part.get_filename()
-    return str(make_header(decode_header(n))) if n else ''
+    return hdr(part.get_filename() or '')
 
 def img_size(data):
     try:
@@ -78,7 +92,7 @@ def main():
                 parts.append((fname(part) or 'image', ct, data))
         # 同一個 thread 可能有重寄的版本；Gmail 上已用「週報附件匯出」標籤標出要用的那一封，
         # Takeout 會把標籤寫進 X-Gmail-Labels。有標籤的優先，其次取附件最多的
-        tagged = LABEL in str(make_header(decode_header(msg.get('X-Gmail-Labels', ''))))
+        tagged = LABEL in hdr(msg.get('X-Gmail-Labels', ''))
         prev = found.get(w['date'])
         if prev is None or (tagged and not prev[2]) or (tagged == prev[2] and len(parts) > len(prev[0])):
             found[w['date']] = (parts, w, tagged)

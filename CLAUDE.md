@@ -140,7 +140,7 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 | `admin/index.html` | v2.52 | Admin System — **機場接送**、公務車、圖書館、會議室、客戶到訪、抽籤 | 8,221 |
 | `kms/index.html` | v2.50 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
 | `quotation/index.html` | v3.66 | Quotation & CRM system | 7,332 |
-| `board/index.html` | v1.92 | 公告與會議 Bulletin & Meetings — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍、腦力激盪 | 4,600 |
+| `board/index.html` | v1.93 | 公告與會議 Bulletin & Meetings — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍、腦力激盪 | 4,600 |
 | `product_dev/` | v2.25 | **產品開發管理 —— 第六個子系統，不遵守單一檔案原則**（見下方專節） | — |
 
 `admin/lottery.html` is a standalone lottery page (separate from the lottery module inside `admin/index.html`).
@@ -1896,6 +1896,17 @@ admin 從 v2.37 就有紅色橫幅與 `SB.write()`，所以過期**不會產生�
   但**少數是刻意重寄**（先寄 `comart@`，再補寄 `taiwan@`），只看時間戳會誤殺，要看收件人。
 - 🔴 **信末的「願景／使命／價值觀」與「知識學習平台」清單不能匯入**：那是 `WR_OKR`／`WR_LEARN` 兩個常數，
   `wrReportInnerHTML()` 每次都會自己接在後面，存進 `other` 會變成畫面上出現兩份。
+
+**Woody 週報的「附件」欄**（board v1.93，migration `202610050001`）：`woody_reports.attachments`（jsonb 陣列
+`{path,name,mime,size,w,h}`），檔案在**私有** bucket `woody-attachments`（25 MB／檔），顯示一律換簽章網址（`wrSign`）。
+- 可按鈕選檔、**直接貼上截圖（Ctrl+V）**、拖放；只收圖片與 PDF。物件鍵純 ASCII（`wr/<資料夾>/<uid>.<ext>`），原檔名存 `name`。
+- 🔴 **移除附件只先從清單拿掉，存檔成功後才刪實體檔**（`wrAttPurgeRemoved`）——按取消的話週報仍指向原檔。
+- 上傳中不准存檔（`_wrAttBusy`），否則那一份會漏掉。閱讀視窗與列印會**先簽好全部網址再寫入文件**；列印等圖片載完才叫 `print()`。
+- `mailto` 帶不了附件：寄送內文列出檔名＋平台連結（`?tab=woody`）。
+- **歷史附件回填**：`scripts/wr-import-attachments.py <Takeout.mbox> <盤點.json>`。Gmail MCP **只給得到附件清單、下載不了檔案**，
+  所以要 Woody 從 Google Takeout 匯出郵件。對應靠 `X-GM-THRID`＝盤點的 threadId；HEIC 轉 JPEG；同內容 sha256 去重。
+  2026-10-05 盤點：Gmail 有 **249 份**週報（2021-09-12～2026-10-04），**45 份有附件、58 個檔**；
+  ⚠️ 平台只有 **239 份** —— 少 10 份（例如 2023 年 2 月整月沒有，其中 2023-02-12 是有附件的），尚未補。
 
 寫入路徑是 `supabase db push`（CLI 對 `tcvlnpgpuphdalzvmoyo` 是通的），不是 `sb-proxy` —— 前端那條要有效的
 HMAC `x-session`，本機偽造不了。反過來說 **`db dump` 需要 Docker，所以本機讀不到既有資料**，

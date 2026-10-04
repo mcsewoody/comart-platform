@@ -2,7 +2,7 @@
 """把 Gmail 週報信件裡的附件補進 woody_reports.attachments（board v1.93 起的「附件」欄）。
 
 用法：
-  python3 scripts/wr-import-attachments.py <takeout.mbox> <wr_attachments.json> [--dry-run]
+  python3 scripts/wr-import-attachments.py <takeout.mbox> .local/wr_attachments.json [--dry-run]
 
 - mbox：Google Takeout 匯出的郵件（只勾「Woody 週報」那些信或整個信箱都可以）。
 - json：盤點清單（date／threadId／messageId／files），由 Gmail 掃描產生。
@@ -19,6 +19,7 @@ from email.header import decode_header, make_header
 
 SB = 'https://tcvlnpgpuphdalzvmoyo.supabase.co'
 BUCKET = 'woody-attachments'
+LABEL = '週報附件匯出'   # 2026-10-05 已在 Gmail 標好那 45 封
 
 def secret_key():
     out = subprocess.run(['supabase', 'projects', 'api-keys', '--project-ref', 'tcvlnpgpuphdalzvmoyo',
@@ -75,8 +76,12 @@ def main():
             data = part.get_payload(decode=True)
             if data:
                 parts.append((fname(part) or 'image', ct, data))
-        if len(parts) > len(found.get(w['date'], ([], None))[0]):
-            found[w['date']] = (parts, w)
+        # 同一個 thread 可能有重寄的版本；Gmail 上已用「週報附件匯出」標籤標出要用的那一封，
+        # Takeout 會把標籤寫進 X-Gmail-Labels。有標籤的優先，其次取附件最多的
+        tagged = LABEL in str(make_header(decode_header(msg.get('X-Gmail-Labels', ''))))
+        prev = found.get(w['date'])
+        if prev is None or (tagged and not prev[2]) or (tagged == prev[2] and len(parts) > len(prev[0])):
+            found[w['date']] = (parts, w, tagged)
 
     key = None if dry else secret_key()
     reports = {}
@@ -87,7 +92,7 @@ def main():
     total = 0
     for w in want:
         d = w['date']
-        parts = found.get(d, ([], None))[0]
+        parts = found.get(d, ([], None, False))[0]
         if not parts:
             print(f'⚠ {d}: mbox 裡找不到這封信的附件'); continue
         seen, atts = set(), []

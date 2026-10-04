@@ -5,7 +5,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#080C14">
-<title>COMART · 公告與會議 v1.93</title>
+<title>COMART · 公告與會議 v1.94</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=Noto+Serif:wght@400;700&family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -60,6 +60,8 @@ html[lang="vi"]{--ff:'Be Vietnam Pro','DM Sans',-apple-system,sans-serif;--fd:'N
 .wr-att .nm{font-size:11px;color:var(--tx2);padding:4px 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .wr-att .x{position:absolute;top:3px;right:3px;width:22px;height:22px;border-radius:50%;border:none;background:rgba(0,0,0,.65);color:#fff;font-size:13px;line-height:22px;cursor:pointer;padding:0}
 .wr-att.busy{opacity:.55;cursor:progress}
+.wr-seq{display:inline-block;min-width:3.2em;font-family:var(--fm);font-size:12px;color:var(--tx3);margin-right:8px}
+.wr-clip{display:inline-flex;align-items:center;gap:3px;margin-left:6px;padding:1px 8px;border-radius:999px;font-size:12px;font-weight:600;color:#ffd166;background:rgba(255,209,102,.12);border:1px solid rgba(255,209,102,.45);vertical-align:1px}
 #portal-back-btn{padding:5px 11px;border:1px solid var(--br);border-radius:var(--r);font-size:12px;color:var(--tx2);text-decoration:none;background:transparent;transition:all .15s;white-space:nowrap;margin-right:6px}
 #portal-back-btn:hover{background:var(--s2);color:var(--tx)}
 .topbar-right{display:flex;gap:8px;margin-left:auto;align-items:center;font-size:12px;color:var(--tx3)}
@@ -367,7 +369,7 @@ body.pm-playing #pm-phasebar{padding:0}
     <a class="logo" href="javascript:void(0)">
       <div class="logo-mark">告</div>
       <div class="logo-text" data-i18n="app_title">公告與會議</div>
-      <span class="logo-ver">v1.93</span>
+      <span class="logo-ver">v1.94</span>
     </a>
     <div class="topbar-right">
       <div id="langChips" style="display:flex;gap:4px"></div>
@@ -1000,6 +1002,7 @@ const B_I18N = {
   wr_p_keep:'需長期保存（可搜尋）', wr_f_reflections:'心得思考', wr_f_intel:'視野情報',
   wr_f_feedback:'團隊回饋', wr_p_work:'工作與計畫', wr_p_work_sub:'本週工作／下週計畫也會一併存檔',
   wr_f_work:'本週工作', wr_f_plan:'下週計畫', wr_f_other:'其他資訊',
+  wr_att_n:'{n} 個附件',
   wr_p_att:'附件', wr_att_sub:'截圖、圖片或 PDF；可直接貼上（Ctrl+V）或拖放', wr_att_add:'📎 加入附件', wr_att_remove:'移除附件',
   wr_att_confirm_rm:'移除附件「{n}」？（按儲存後才會真的刪除）', wr_att_open_fail:'附件開啟失敗', wr_att_bad_type:'「{n}」不是圖片或 PDF，已略過',
   wr_att_too_big:'「{n}」超過 25 MB，已略過', wr_att_failed:'「{n}」上傳失敗', wr_att_wait:'附件還在上傳中，請稍候再儲存',
@@ -1208,6 +1211,7 @@ const B_I18N = {
   wr_p_keep:'需长期保存（可搜索）', wr_f_reflections:'心得思考', wr_f_intel:'视野情报',
   wr_f_feedback:'团队反馈', wr_p_work:'工作与计划', wr_p_work_sub:'本周工作／下周计划也会一并存档',
   wr_f_work:'本周工作', wr_f_plan:'下周计划', wr_f_other:'其他信息',
+  wr_att_n:'{n} 个附件',
   wr_p_att:'附件', wr_att_sub:'截图、图片或 PDF；可直接粘贴（Ctrl+V）或拖放', wr_att_add:'📎 添加附件', wr_att_remove:'移除附件',
   wr_att_confirm_rm:'移除附件“{n}”？（按保存后才会真正删除）', wr_att_open_fail:'附件打开失败', wr_att_bad_type:'“{n}”不是图片或 PDF，已跳过',
   wr_att_too_big:'“{n}”超过 25 MB，已跳过', wr_att_failed:'“{n}”上传失败', wr_att_wait:'附件还在上传中，请稍候再保存',
@@ -1416,6 +1420,7 @@ const B_I18N = {
   wr_p_keep:'Long-term record (searchable)', wr_f_reflections:'Reflections', wr_f_intel:'Intel & perspective',
   wr_f_feedback:'Team feedback', wr_p_work:'Work & plans', wr_p_work_sub:'This week’s work and next week’s plan are archived too',
   wr_f_work:'This week', wr_f_plan:'Next week', wr_f_other:'Other notes',
+  wr_att_n:'{n} attachment(s)',
   wr_p_att:'Attachments', wr_att_sub:'Screenshots, images or PDF — paste (Ctrl+V) or drag & drop', wr_att_add:'📎 Add attachment', wr_att_remove:'Remove attachment',
   wr_att_confirm_rm:'Remove attachment "{n}"? (Deleted only after you save)', wr_att_open_fail:'Could not open attachment', wr_att_bad_type:'"{n}" is not an image or PDF — skipped',
   wr_att_too_big:'"{n}" exceeds 25 MB — skipped', wr_att_failed:'Upload failed: "{n}"', wr_att_wait:'Attachments are still uploading — please wait before saving',
@@ -1624,6 +1629,7 @@ const B_I18N = {
   wr_p_keep:'Lưu trữ lâu dài (có thể tìm kiếm)', wr_f_reflections:'Suy ngẫm', wr_f_intel:'Thông tin & tầm nhìn',
   wr_f_feedback:'Phản hồi nhóm', wr_p_work:'Công việc & kế hoạch', wr_p_work_sub:'Công việc tuần này và kế hoạch tuần tới cũng được lưu',
   wr_f_work:'Công việc tuần này', wr_f_plan:'Kế hoạch tuần tới', wr_f_other:'Thông tin khác',
+  wr_att_n:'{n} tệp đính kèm',
   wr_p_att:'Tệp đính kèm', wr_att_sub:'Ảnh chụp màn hình, hình ảnh hoặc PDF; có thể dán (Ctrl+V) hoặc kéo thả', wr_att_add:'📎 Thêm tệp đính kèm', wr_att_remove:'Gỡ tệp đính kèm',
   wr_att_confirm_rm:'Gỡ tệp "{n}"? (Chỉ thực sự xóa sau khi bấm Lưu)', wr_att_open_fail:'Không mở được tệp đính kèm', wr_att_bad_type:'"{n}" không phải hình ảnh hoặc PDF, đã bỏ qua',
   wr_att_too_big:'"{n}" vượt quá 25 MB, đã bỏ qua', wr_att_failed:'Tải lên thất bại: "{n}"', wr_att_wait:'Tệp đính kèm đang tải lên, vui lòng chờ rồi mới lưu',
@@ -1832,6 +1838,7 @@ const B_I18N = {
   wr_p_keep:'長期保存（検索可）', wr_f_reflections:'学びと考察', wr_f_intel:'視野と情報',
   wr_f_feedback:'チームへのフィードバック', wr_p_work:'業務と計画', wr_p_work_sub:'今週の業務／来週の計画も併せて保存されます',
   wr_f_work:'今週の業務', wr_f_plan:'来週の計画', wr_f_other:'その他',
+  wr_att_n:'添付 {n} 件',
   wr_p_att:'添付ファイル', wr_att_sub:'スクリーンショット・画像・PDF。貼り付け（Ctrl+V）やドラッグ＆ドロップも可', wr_att_add:'📎 添付を追加', wr_att_remove:'添付を削除',
   wr_att_confirm_rm:'添付「{n}」を削除しますか？（保存した時点で実際に削除されます）', wr_att_open_fail:'添付を開けませんでした', wr_att_bad_type:'「{n}」は画像または PDF ではないためスキップしました',
   wr_att_too_big:'「{n}」は 25 MB を超えるためスキップしました', wr_att_failed:'「{n}」のアップロードに失敗しました', wr_att_wait:'添付をアップロード中です。完了してから保存してください',
@@ -3939,8 +3946,10 @@ function wrFreshState(){
 
 async function wrLoadList(){
   try{
-    const rows = await SB.get('woody_reports', '?select=id,report_date,reflections,intel,feedback,attachments,author_id,author_name,updated_at&order=report_date.desc&limit=300');
+    const rows = await SB.get('woody_reports', '?select=id,report_date,reflections,intel,feedback,attachments,author_id,author_name,updated_at&order=report_date.desc&limit=2000');
     WR_LIST = rows || [];
+    // 序號：#1 ＝ 最早的一份。依日期由舊到新編，搜尋過濾時號碼不變（同一份永遠是同一號）
+    WR_LIST.forEach((r, i) => { r._seq = WR_LIST.length - i; });
   }catch(e){ WR_LIST = []; }
   wrRenderList();
 }
@@ -3958,8 +3967,9 @@ function wrRenderList(){
   const woody = wrIsWoody();
   box.innerHTML = rows.map(r => {
     return '<div class="saved-row" style="cursor:pointer" onclick="wrOpenRead(\''+r.id+'\')" title="'+escHtml(BT('wr_open_tip'))+'">'+
-      '<div><div class="t">'+escHtml(r.report_date||'')+' <span class="site-badge site-group">'+escHtml(BT('wr_badge'))+'</span></div>'+
-      '<div class="m"><span>'+escHtml(BT('wr_author'))+escHtml(r.author_name||'—')+'</span>'+(wrAttsOf(r).length?'<span title="'+escHtml(BT('wr_p_att'))+'">📎 '+wrAttsOf(r).length+'</span>':'')+'<span>'+escHtml(wrSnippet(r))+'</span></div></div>'+
+      '<div><div class="t"><span class="wr-seq">#'+(r._seq||'')+'</span>'+escHtml(r.report_date||'')+' <span class="site-badge site-group">'+escHtml(BT('wr_badge'))+'</span>'+
+        (wrAttsOf(r).length?' <span class="wr-clip" title="'+escHtml(BT('wr_att_n',{n:wrAttsOf(r).length}))+'">📎 '+wrAttsOf(r).length+'</span>':'')+'</div>'+
+      '<div class="m"><span>'+escHtml(BT('wr_author'))+escHtml(r.author_name||'—')+'</span><span>'+escHtml(wrSnippet(r))+'</span></div></div>'+
       '<div class="ops"><span class="btn sm">'+escHtml(BT('wr_open'))+'</span>'+
       (woody?'<button class="btn sm" onclick="event.stopPropagation();wrOpenReport(\''+r.id+'\')">'+escHtml(BT('wr_edit'))+'</button>':'')+
       '</div></div>';

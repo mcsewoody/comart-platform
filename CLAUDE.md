@@ -1903,7 +1903,7 @@ admin 從 v2.37 就有紅色橫幅與 `SB.write()`，所以過期**不會產生�
 - 🔴 **移除附件只先從清單拿掉，存檔成功後才刪實體檔**（`wrAttPurgeRemoved`）——按取消的話週報仍指向原檔。
 - 上傳中不准存檔（`_wrAttBusy`），否則那一份會漏掉。閱讀視窗與列印會**先簽好全部網址再寫入文件**；列印等圖片載完才叫 `print()`。
 - `mailto` 帶不了附件：寄送內文列出檔名＋平台連結（`?tab=woody`）。
-- **歷史附件回填**：`scripts/wr-import-attachments.py <Takeout.mbox> <盤點.json>`。Gmail MCP **只給得到附件清單、下載不了檔案**，
+- **歷史附件回填**：`scripts/wr-import-attachments.py <Takeout.mbox> .local/wr_attachments.json`（盤點清單在 `.local/`，不進版控、靠 iCloud 同步）。Gmail MCP **只給得到附件清單、下載不了檔案**，
   所以要 Woody 從 Google Takeout 匯出郵件。對應靠 `X-GM-THRID`＝盤點的 threadId；HEIC 轉 JPEG；同內容 sha256 去重。
   2026-10-05 盤點：Gmail 有 **249 份**週報（2021-09-12～2026-10-04），**45 份有附件、58 個檔**；
   ⚠️ 平台只有 **239 份** —— 少 10 份（例如 2023 年 2 月整月沒有，其中 2023-02-12 是有附件的），尚未補。

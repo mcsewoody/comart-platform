@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>COMART Platform v2.11</title>
+<title>COMART Platform v2.12</title>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=Noto+Serif:wght@400;700&family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script defer src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.js"></script>
 <style>
@@ -299,6 +299,20 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:
 .lc-empty { font-size:12.5px; color:var(--tx3); padding:14px 2px; }
 .lc-del { flex:0 0 auto; padding:4px 8px; border-radius:7px; border:1px solid var(--br); background:var(--s2); color:var(--tx3); font-size:12px; cursor:pointer; font-family:var(--ff); }
 .lc-del:hover { border-color:#e05260; color:#e05260; }
+.aw-avatar { flex:0 0 32px; height:32px; border-radius:50%; background:linear-gradient(135deg,#7c3aed,#2D7FF9); color:#fff; font-weight:800; display:flex; align-items:center; justify-content:center; font-family:var(--fd,serif); font-size:16px; }
+.aw-welcome { max-width:640px; width:100%; margin:8px auto 0; background:var(--s1); border:1px solid var(--br); border-radius:12px; padding:16px 18px; }
+.aw-welcome p { font-size:13.5px; color:var(--tx2); line-height:1.7; margin:0 0 12px; white-space:pre-wrap; }
+.aw-sugs { display:flex; flex-direction:column; gap:7px; }
+.aw-sug { text-align:left; padding:9px 12px; border-radius:9px; border:1px solid var(--br); background:var(--s2); color:var(--tx); font-size:13px; cursor:pointer; font-family:var(--ff); }
+.aw-sug:hover { border-color:#7c3aed; color:#a78bfa; }
+.aw-ai { border-left-color:#7c3aed !important; }
+.aw-badge { font-size:9.5px; font-weight:800; letter-spacing:.06em; color:#a78bfa; border:1px solid rgba(167,139,250,.5); border-radius:5px; padding:0 5px; }
+.aw-foot { display:flex; align-items:center; gap:10px; margin-top:7px; flex-wrap:wrap; }
+.aw-disc { font-size:10.5px; color:var(--tx3); }
+.aw-langs { font-size:11px; color:#a78bfa; background:none; border:none; cursor:pointer; padding:0; font-family:var(--ff); }
+.aw-langs:hover { text-decoration:underline; }
+.aw-caret { display:inline-block; width:7px; height:14px; background:#a78bfa; vertical-align:-2px; margin-left:2px; animation:awBlink 1s steps(2) infinite; }
+@keyframes awBlink { 50% { opacity:0; } }
 .lc-roombar { display:flex; align-items:center; gap:9px; padding:10px 14px; border-bottom:1px solid var(--br); background:var(--s1); flex-shrink:0; }
 .lc-btn { padding:6px 12px; border-radius:8px; border:1px solid var(--br); background:var(--s2); color:var(--tx2); font-size:11.5px; cursor:pointer; font-family:var(--ff); white-space:nowrap; }
 .lc-btn:hover { border-color:#7c3aed; color:#a78bfa; }
@@ -417,7 +431,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     <div class="login-logo">
       <div class="login-mark" style="background:transparent"><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="44" height="23"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></div>
       <div class="login-name">COMART Platform</div>
-      <div class="login-sub">Internal Portal · v2.11</div>
+      <div class="login-sub">Internal Portal · v2.12</div>
     </div>
     <form id="loginForm" onsubmit="doLogin();return false;" autocomplete="on">
     <div class="field">
@@ -487,7 +501,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   <div class="topbar">
     <div class="topbar-logo" onclick="switchView('home')">
       <div class="topbar-mark" style="background:transparent"><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="26" height="14"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></div>
-      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v2.11</span></div>
+      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v2.12</span></div>
     </div>
     <div class="topbar-right">
       <div class="lang-switcher">
@@ -628,6 +642,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
           <button class="ai-chip" id="ptab-translate" onclick="switchAITab('translate')">🌐 翻譯</button>
           <button class="ai-chip" id="ptab-chat" onclick="switchAITab('chat')">✦ Chat</button>
           <button class="ai-chip" id="ptab-skills" onclick="switchAITab('skills')">🛠 Skills</button>
+          <button class="ai-chip" id="ptab-woody" onclick="switchAITab('woody')">🧭 AI Woody</button>
         </div>
 
         <!-- Translate Tab -->
@@ -671,6 +686,34 @@ input[type="date"]::-webkit-calendar-picker-indicator {
                 而那些 id 被 lcSend／lcPoll／lcRenderStream／圖片上傳／PDF 匯出綁死。
                 同 board 讓事前驗屍與腦力激盪共用 #pm-shell 的做法。 -->
         <div class="ai-tab-content on" id="ptab-content-lobby" style="flex-direction:column;min-height:0;"></div>
+
+        <!-- AI Woody（v2.12）：Woody 的 AI 分身。一對一、不存檔、可匯出 PDF。
+             🔴 版面借用聊天大廳的 lc-* 樣式，但 DOM 與 id 完全自己一套（aw-*）——
+                #lc-room 是在大廳與群組對話之間搬的那一份，不能拿來共用。
+             🔴 人格檔不在這裡：它在伺服器端（edge function ai-woody 從 ai_personas 讀），
+                這份 HTML 是公開的。 -->
+        <div class="ai-tab-content" id="ptab-content-woody" style="flex-direction:column;min-height:0;">
+          <div class="lc-roombar">
+            <div class="aw-avatar">W</div>
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:14px;font-weight:700;color:var(--tx);">AI Woody</div>
+              <div id="aw-sub" style="font-size:11px;color:var(--tx3);margin-top:1px;"></div>
+            </div>
+            <button class="lc-btn" id="aw-pdf-btn" onclick="awExportPDF()">📄 PDF</button>
+            <button class="lc-btn" id="aw-new-btn" onclick="awReset()"></button>
+          </div>
+          <div id="aw-stream" class="lc-stream"></div>
+          <div id="aw-composer" class="lc-composer">
+            <textarea id="aw-input" rows="3" onkeydown="awKeydown(event)"
+              oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,LC_INPUT_MAX)+'px';"></textarea>
+            <div class="lc-cbtns">
+              <span id="aw-mic-wrap" class="lc-mic-wrap" style="display:none;">
+                <button class="lc-mic" id="aw-mic-btn" onclick="awRecToggle()">🎙</button>
+              </span>
+              <button class="lc-send" id="aw-send-btn" onclick="awSend()"></button>
+            </div>
+          </div>
+        </div>
 
         <div class="ai-tab-content" id="ptab-content-live" style="flex-direction:column;min-height:0;">
 
@@ -3155,7 +3198,31 @@ const I18N = {
     um_err_self_delete:'Cannot delete yourself', um_confirm_delete:'Delete user %s? This cannot be undone.',
     um_delete_failed:'Delete failed: ', um_deleted:'User deleted',
     // ai tab
-    ai_tab_translate:'Translate', ai_tab_chat:'Claude Chat', ai_tab_skills:'Skills',
+    ai_tab_translate:'Translate', ai_tab_chat:'Claude Chat', ai_tab_skills:'Skills', ai_tab_woody:'AI Woody',
+    aw_sub:'AI-generated, not Woody himself · nothing is saved',
+    aw_new:'+ New chat',
+    aw_send:'Send',
+    aw_ph:'Ask in your own language…',
+    aw_intro:'Hi, I\'m AI Woody, an AI version of Woody built from everything he has written in his weekly reports.\nAsk me about accountability, teamwork, learning, AI, customers, or where the company is heading. I can\'t make decisions or promises on Woody\'s behalf. This chat isn\'t saved; export it as a PDF if you need a copy.',
+    aw_q1:'What does accountability mean to you?',
+    aw_q2:'This isn\'t my department\'s job. Why should I handle it?',
+    aw_q3:'How should I start using AI in my work?',
+    aw_q4:'What is the company\'s direction this year?',
+    aw_disclaimer:'AI-generated · not Woody himself',
+    aw_more_langs:'Other languages',
+    aw_hide_langs:'Hide other languages',
+    aw_thinking:'Thinking…',
+    aw_retry:'Retry',
+    aw_err_generic:'Something went wrong. Please try again.',
+    aw_err_auth:'Your login has expired. Please sign in again.',
+    aw_err_busy:'Too many requests right now. Please try again shortly.',
+    aw_err_timeout:'The reply took too long. Please try again.',
+    aw_refusal:'I can\'t answer that one. Please ask Woody directly.',
+    aw_you:'Me',
+    aw_new_confirm:'Start a new chat? The current conversation will be cleared (it isn\'t saved).',
+    aw_cut:'The reply was cut off. You can ask again.',
+    aw_too_long:'Message is too long (max 6,000 characters).',
+    aw_nothing_export:'Nothing to export yet.',
     ai_tab_live:'Group Chats', ai_tab_lobby:'Lobby', lc_lobby_title:'Chat Lobby', lc_lobby_meta:'Open to everyone · always on', lc_lobby_link:'🔗 Lobby link', lc_lobby_copied:'Lobby link copied — send it to anyone on the team', lc_clear_btn:'🧹 Clear', lc_clear_q:'Once cleared the messages are gone for good. Clear now, or export first?', lc_clear_exp:'Export, then clear', lc_clear_go:'Clear now', lc_clear_no:'Cancel', lc_cleared:'Lobby cleared', lc_clear_failed:'Could not clear the lobby', lc_new:'New chat',
     lc_rules_h:'HOW THIS WORKS', 
     
@@ -3295,7 +3362,31 @@ const I18N = {
     login_err_resigned:'此員工已離職，帳號無法登入。如有疑問請聯絡人資。',
     um_err_self_delete:'無法刪除自己的帳號', um_confirm_delete:'確定刪除用戶 %s？此操作無法復原。',
     um_delete_failed:'刪除失敗：', um_deleted:'用戶已刪除',
-    ai_tab_translate:'翻譯', ai_tab_chat:'Claude Chat', ai_tab_skills:'技能',
+    ai_tab_translate:'翻譯', ai_tab_chat:'Claude Chat', ai_tab_skills:'技能', ai_tab_woody:'AI Woody',
+    aw_sub:'AI 生成，非 Woody 本人 · 對話不存檔',
+    aw_new:'＋ 新對話',
+    aw_send:'送出',
+    aw_ph:'用你自己的語言提問…',
+    aw_intro:'你好，我是 AI Woody，根據 Woody 在週報裡寫過的所有內容打造的 AI 分身。\n可以問我當責、團隊、學習、AI、客戶，或是公司的方向。我不能代 Woody 做決定或承諾。這段對話不會存檔，需要的話可以匯出 PDF。',
+    aw_q1:'你怎麼看「當責」？',
+    aw_q2:'這件事不是我們部門負責的，為什麼要我處理？',
+    aw_q3:'我該怎麼開始在工作上用 AI？',
+    aw_q4:'公司今年的方向是什麼？',
+    aw_disclaimer:'AI 生成 · 非 Woody 本人發言',
+    aw_more_langs:'看其他語言',
+    aw_hide_langs:'收起其他語言',
+    aw_thinking:'思考中…',
+    aw_retry:'重試',
+    aw_err_generic:'發生錯誤，請再試一次。',
+    aw_err_auth:'登入已逾期，請重新登入。',
+    aw_err_busy:'目前請求太多，請稍後再試。',
+    aw_err_timeout:'回覆時間太長，請再試一次。',
+    aw_refusal:'這題我無法回答，請直接找 Woody 本人。',
+    aw_you:'我',
+    aw_new_confirm:'要開始新對話嗎？目前的對話會被清除（對話不存檔）。',
+    aw_cut:'回覆中斷了，可以再問一次。',
+    aw_too_long:'訊息太長（上限 6,000 字）。',
+    aw_nothing_export:'目前沒有可以匯出的內容。',
     ai_tab_live:'群組對話', ai_tab_lobby:'聊天大廳', lc_lobby_title:'聊天大廳', lc_lobby_meta:'全員皆可進入 · 永遠開著', lc_lobby_link:'🔗 大廳連結', lc_lobby_copied:'大廳連結已複製 —— 傳給團隊任何人都進得來', lc_clear_btn:'🧹 清除紀錄', lc_clear_q:'清除後資料將不保存，請問是否要清除？或是匯出後再清除？', lc_clear_exp:'匯出後再清除', lc_clear_go:'直接清除', lc_clear_no:'取消', lc_cleared:'大廳紀錄已清除', lc_clear_failed:'清除失敗', lc_new:'開新對話',
     lc_rules_h:'這裡的規則', 
     
@@ -3428,7 +3519,31 @@ const I18N = {
     login_err_resigned:'此员工已离职，账号无法登录。如有疑问请联系人资。',
     um_err_self_delete:'无法删除自己的账号', um_confirm_delete:'确定删除用户 %s？此操作无法撤销。',
     um_delete_failed:'删除失败：', um_deleted:'用户已删除',
-    ai_tab_translate:'翻译', ai_tab_chat:'Claude Chat', ai_tab_skills:'技能',
+    ai_tab_translate:'翻译', ai_tab_chat:'Claude Chat', ai_tab_skills:'技能', ai_tab_woody:'AI Woody',
+    aw_sub:'AI 生成，非 Woody 本人 · 对话不存档',
+    aw_new:'＋ 新对话',
+    aw_send:'发送',
+    aw_ph:'用你自己的语言提问…',
+    aw_intro:'你好，我是 AI Woody，根据 Woody 在周报里写过的所有内容打造的 AI 分身。\n可以问我当责、团队、学习、AI、客户，或是公司的方向。我不能代 Woody 做决定或承诺。这段对话不会存档，需要的话可以导出 PDF。',
+    aw_q1:'你怎么看“当责”？',
+    aw_q2:'这件事不是我们部门负责的，为什么要我处理？',
+    aw_q3:'我该怎么开始在工作上用 AI？',
+    aw_q4:'公司今年的方向是什么？',
+    aw_disclaimer:'AI 生成 · 非 Woody 本人发言',
+    aw_more_langs:'看其他语言',
+    aw_hide_langs:'收起其他语言',
+    aw_thinking:'思考中…',
+    aw_retry:'重试',
+    aw_err_generic:'发生错误，请再试一次。',
+    aw_err_auth:'登录已过期，请重新登录。',
+    aw_err_busy:'目前请求太多，请稍后再试。',
+    aw_err_timeout:'回复时间太长，请再试一次。',
+    aw_refusal:'这题我无法回答，请直接找 Woody 本人。',
+    aw_you:'我',
+    aw_new_confirm:'要开始新对话吗？目前的对话会被清除（对话不存档）。',
+    aw_cut:'回复中断了，可以再问一次。',
+    aw_too_long:'消息太长（上限 6,000 字）。',
+    aw_nothing_export:'目前没有可以导出的内容。',
     ai_tab_live:'群组对话', ai_tab_lobby:'聊天大厅', lc_lobby_title:'聊天大厅', lc_lobby_meta:'全员皆可进入 · 永远开着', lc_lobby_link:'🔗 大厅链接', lc_lobby_copied:'大厅链接已复制 —— 传给团队任何人都进得来', lc_clear_btn:'🧹 清除记录', lc_clear_q:'清除后数据将不保存，请问是否要清除？或是导出后再清除？', lc_clear_exp:'导出后再清除', lc_clear_go:'直接清除', lc_clear_no:'取消', lc_cleared:'大厅记录已清除', lc_clear_failed:'清除失败', lc_new:'开新对话',
     lc_rules_h:'这里的规则', 
     
@@ -3561,7 +3676,31 @@ const I18N = {
     login_err_resigned:'Nhân viên này đã nghỉ việc, tài khoản không thể đăng nhập. Vui lòng liên hệ bộ phận nhân sự.',
     um_err_self_delete:'Không thể xóa tài khoản của chính mình', um_confirm_delete:'Xóa người dùng %s? Không thể hoàn tác.',
     um_delete_failed:'Xóa thất bại: ', um_deleted:'Đã xóa người dùng',
-    ai_tab_translate:'Dịch thuật', ai_tab_chat:'Claude Chat', ai_tab_skills:'Kỹ năng',
+    ai_tab_translate:'Dịch thuật', ai_tab_chat:'Claude Chat', ai_tab_skills:'Kỹ năng', ai_tab_woody:'AI Woody',
+    aw_sub:'Do AI tạo, không phải chính Woody · không lưu cuộc trò chuyện',
+    aw_new:'+ Cuộc trò chuyện mới',
+    aw_send:'Gửi',
+    aw_ph:'Hỏi bằng ngôn ngữ của bạn…',
+    aw_intro:'Xin chào, tôi là AI Woody, phiên bản AI của Woody, được xây dựng từ tất cả những gì anh ấy đã viết trong báo cáo tuần.\nBạn có thể hỏi tôi về tinh thần trách nhiệm, làm việc nhóm, học tập, AI, khách hàng hoặc định hướng của công ty. Tôi không thể thay Woody đưa ra quyết định hay cam kết. Cuộc trò chuyện này không được lưu; nếu cần, bạn có thể xuất ra PDF.',
+    aw_q1:'Anh hiểu "tinh thần trách nhiệm" như thế nào?',
+    aw_q2:'Việc này không thuộc bộ phận của tôi, tại sao tôi phải xử lý?',
+    aw_q3:'Tôi nên bắt đầu dùng AI trong công việc như thế nào?',
+    aw_q4:'Định hướng của công ty năm nay là gì?',
+    aw_disclaimer:'Do AI tạo · không phải chính Woody',
+    aw_more_langs:'Xem ngôn ngữ khác',
+    aw_hide_langs:'Ẩn ngôn ngữ khác',
+    aw_thinking:'Đang suy nghĩ…',
+    aw_retry:'Thử lại',
+    aw_err_generic:'Đã xảy ra lỗi, vui lòng thử lại.',
+    aw_err_auth:'Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại.',
+    aw_err_busy:'Hiện có quá nhiều yêu cầu, vui lòng thử lại sau.',
+    aw_err_timeout:'Phản hồi quá lâu, vui lòng thử lại.',
+    aw_refusal:'Tôi không thể trả lời câu này, vui lòng hỏi trực tiếp Woody.',
+    aw_you:'Tôi',
+    aw_new_confirm:'Bắt đầu cuộc trò chuyện mới? Cuộc trò chuyện hiện tại sẽ bị xóa (không được lưu).',
+    aw_cut:'Phản hồi bị gián đoạn, bạn có thể hỏi lại.',
+    aw_too_long:'Tin nhắn quá dài (tối đa 6.000 ký tự).',
+    aw_nothing_export:'Chưa có nội dung để xuất.',
     ai_tab_live:'Trò chuyện nhóm', ai_tab_lobby:'Sảnh chat', lc_lobby_title:'Sảnh chat', lc_lobby_meta:'Mọi người đều vào được · luôn mở', lc_lobby_link:'🔗 Liên kết sảnh', lc_lobby_copied:'Đã sao chép liên kết sảnh — gửi cho bất kỳ ai trong nhóm', lc_clear_btn:'🧹 Xoá lịch sử', lc_clear_q:'Sau khi xoá, dữ liệu sẽ không được lưu lại. Bạn muốn xoá ngay, hay xuất file rồi mới xoá?', lc_clear_exp:'Xuất rồi xoá', lc_clear_go:'Xoá ngay', lc_clear_no:'Huỷ', lc_cleared:'Đã xoá lịch sử sảnh', lc_clear_failed:'Xoá không thành công', lc_new:'Cuộc trò chuyện mới',
     lc_rules_h:'QUY TẮC Ở ĐÂY', 
     
@@ -3692,7 +3831,31 @@ const I18N = {
     login_err_resigned:'この従業員は退職済みのため、ログインできません。ご不明な点は人事までお問い合わせください。',
     um_err_self_delete:'自分自身のアカウントは削除できません', um_confirm_delete:'ユーザー %s を削除しますか？元に戻せません。',
     um_delete_failed:'削除失敗：', um_deleted:'ユーザーを削除しました',
-    ai_tab_translate:'翻訳', ai_tab_chat:'Claude Chat', ai_tab_skills:'スキル',
+    ai_tab_translate:'翻訳', ai_tab_chat:'Claude Chat', ai_tab_skills:'スキル', ai_tab_woody:'AI Woody',
+    aw_sub:'AI生成・Woody本人ではありません・会話は保存されません',
+    aw_new:'＋ 新しい会話',
+    aw_send:'送信',
+    aw_ph:'自分の言語で質問してください…',
+    aw_intro:'こんにちは、AI Woodyです。Woodyが週報に書いてきたすべての内容をもとにつくられたAI分身です。\n当事者意識、チームワーク、学び、AI、顧客、会社の方向性などについて質問してください。Woodyに代わって決定や約束をすることはできません。この会話は保存されません。必要ならPDFで書き出せます。',
+    aw_q1:'「当事者意識（当責）」をどう考えていますか？',
+    aw_q2:'自分の部署の担当ではないのに、なぜ私が対応するのですか？',
+    aw_q3:'仕事でAIを使い始めるにはどうすればいいですか？',
+    aw_q4:'今年の会社の方向性は？',
+    aw_disclaimer:'AI生成・Woody本人の発言ではありません',
+    aw_more_langs:'他の言語を表示',
+    aw_hide_langs:'他の言語を隠す',
+    aw_thinking:'考え中…',
+    aw_retry:'再試行',
+    aw_err_generic:'エラーが発生しました。もう一度お試しください。',
+    aw_err_auth:'ログインの有効期限が切れました。再ログインしてください。',
+    aw_err_busy:'現在リクエストが集中しています。しばらくしてからお試しください。',
+    aw_err_timeout:'応答に時間がかかりすぎました。もう一度お試しください。',
+    aw_refusal:'この質問にはお答えできません。Woody本人に直接お尋ねください。',
+    aw_you:'自分',
+    aw_new_confirm:'新しい会話を始めますか？現在の会話は消去されます（保存されません）。',
+    aw_cut:'応答が途中で切れました。もう一度質問できます。',
+    aw_too_long:'メッセージが長すぎます（最大6,000文字）。',
+    aw_nothing_export:'書き出せる内容がまだありません。',
     ai_tab_live:'グループ会話', ai_tab_lobby:'チャットロビー', lc_lobby_title:'チャットロビー', lc_lobby_meta:'全員参加可 · 常時開放', lc_lobby_link:'🔗 ロビーのリンク', lc_lobby_copied:'ロビーのリンクをコピーしました。チームの誰にでも渡せます', lc_clear_btn:'🧹 履歴を消去', lc_clear_q:'消去するとデータは保存されません。このまま消去しますか？それともエクスポートしてから消去しますか？', lc_clear_exp:'エクスポートしてから消去', lc_clear_go:'そのまま消去', lc_clear_no:'キャンセル', lc_cleared:'ロビーの履歴を消去しました', lc_clear_failed:'消去できませんでした', lc_new:'新しい会話',
     lc_rules_h:'ここでのルール',         lc_rule3_t:'開始者が終了し、保存するかを決めます — ',
     lc_rule3_d:'保存した会話は後から読め、開始者は再開して続きを話せます。PDF はいつでも出力でき、進行中に出力したものはその旨が紙面に記載されます。', lc_rule4_t:'開始者またはシステム管理者が削除できます — ',
@@ -3948,6 +4111,9 @@ function applyI18nAll() {
   if (tabCh) tabCh.innerHTML = '✦ ' + t('ai_tab_chat');
   var tabSk = document.getElementById('ptab-skills');
   if (tabSk) tabSk.innerHTML = '🛠 ' + t('ai_tab_skills');
+  var tabWd = document.getElementById('ptab-woody');
+  if (tabWd) tabWd.innerHTML = '🧭 ' + t('ai_tab_woody');
+  awApplyI18n();
 
   // Skills tab content
   var el;
@@ -4208,7 +4374,7 @@ function switchAITab(tab) {
   pAITab = tab;
   // 離開聊天就停輪詢：分頁在背景每 3 秒打一次請求是白費的
   if (tab !== 'live' && tab !== 'lobby') lcPollStop();
-  ['lobby','live','translate','chat','skills'].forEach(function(t) {
+  ['lobby','live','translate','chat','skills','woody'].forEach(function(t) {
     var btn = document.getElementById('ptab-' + t);
     var con = document.getElementById('ptab-content-' + t);
     if (btn) btn.classList.toggle('on', t === tab);
@@ -4226,6 +4392,8 @@ function switchAITab(tab) {
     // 進來時載清單；已經開在某個房間裡就把輪詢接回去
     if (lcSession && lcSession.status === 'open') lcPollStart();
     else if (!lcSession) { lcShowRoom_hide(); lcLoadList(); }
+  } else if (tab === 'woody') {
+    awInit();
   }
 }
 // 從別的頁籤回來、或第一次進來：確保顯示的是清單而不是空房間
@@ -4276,6 +4444,325 @@ async function pCallClaude(messages, system, maxTokens, model, timeoutMs) {
   var data = await res.json();
   if (data.error) throw new Error(JSON.stringify(data.error).slice(0, 120));
   return (data.content || []).map(function(b) { return b.text || ''; }).join('') || data.reply || '';
+}
+
+
+// ═══════════════════════════════════════════════════════════════════════
+// AI Woody（v2.12）—— Woody 的 AI 分身，「AI 工具」最右邊的頁籤
+//
+// Woody 2026-10-05 定案：一對一私人對話；完全不存檔（只活在這個分頁的記憶體裡，
+// 伺服器不記內容也不記誰用過）；用提問者的語言回答，其他三語收合、點開才翻；
+// 匯出畫面上看得到的內容；全體在職同仁可用、不限次數。
+//
+// 🔴 人格檔不在這份 HTML 裡（repo 公開）。edge function ai-woody 從 ai_personas 讀出來
+//    才放進 system prompt，前端只送對話。
+// 🔴 歷史每一輪都由前端整段送出，伺服器會逐則驗證角色交替 —— 所以失敗的那一輪
+//    不能留在送出的歷史裡（awHistory 只取「問題＋成功回答」成對的部分）。
+// ═══════════════════════════════════════════════════════════════════════
+var awMsgs = [];          // { id, role:'user'|'assistant', text, at, streaming, err, stop, tr, trOpen, trBusy, trErr }
+var awBusy = false;
+var awCtl = null;
+var awRaf = 0;
+const AW_TIMEOUT = 180000;
+const AW_MAX_HISTORY_CHARS = 70000;   // 伺服器上限 80000，留點餘裕
+
+function awId() { return 'aw' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+function awMyName() { return (SESSION && (SESSION.nameZh || SESSION.nameEn || SESSION.empId)) || t('aw_you'); }
+
+function awInit() {
+  awApplyI18n();
+  var wrap = document.getElementById('aw-mic-wrap');
+  if (wrap) wrap.style.display = lcVoiceOK() ? 'flex' : 'none';
+  awRender(true);
+  var el = document.getElementById('aw-input');
+  if (el && window.innerWidth > 768) el.focus();
+}
+
+function awApplyI18n() {
+  var set = function (id, k, attr) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    if (attr) el.setAttribute(attr, t(k)); else el.textContent = t(k);
+  };
+  set('aw-sub', 'aw_sub');
+  set('aw-new-btn', 'aw_new');
+  set('aw-send-btn', 'aw_send');
+  set('aw-input', 'aw_ph', 'placeholder');
+  if (document.getElementById('ptab-content-woody')) awRender(false);
+}
+
+// 送出用的歷史：只取「問題＋成功的回答」成對的部分，再加上這一次的問題。
+// 太長就從最舊的那一對開始丟，直到符合伺服器的上限。
+function awHistory(current) {
+  var pairs = [];
+  for (var i = 0; i < awMsgs.length - 1; i++) {
+    var a = awMsgs[i], b = awMsgs[i + 1];
+    if (a.role === 'user' && b.role === 'assistant' && !b.err && !b.streaming && b.text) {
+      pairs.push([a.text, b.text]); i++;
+    }
+  }
+  var size = function () {
+    return pairs.reduce(function (n, p) { return n + p[0].length + p[1].length; }, current.length);
+  };
+  while (pairs.length && (size() > AW_MAX_HISTORY_CHARS || pairs.length > 29)) pairs.shift();
+  var out = [];
+  pairs.forEach(function (p) { out.push({ role: 'user', content: p[0] }, { role: 'assistant', content: p[1] }); });
+  out.push({ role: 'user', content: current });
+  return out;
+}
+
+async function awSend(preset) {
+  var el = document.getElementById('aw-input');
+  var text = String(preset != null ? preset : (el ? el.value : '')).trim();
+  if (!text || awBusy) return;
+  if (text.length > 6000) { toast(t('aw_too_long'), 'err'); return; }
+  if (typeof sbSessionAlive === 'function' && !sbSessionAlive()) { toast(t('aw_err_auth'), 'err'); return; }
+  var history = awHistory(text);
+  var q = { id: awId(), role: 'user', text: text, at: new Date().toISOString() };
+  var r = { id: awId(), role: 'assistant', text: '', at: new Date().toISOString(), streaming: true };
+  awMsgs.push(q, r);
+  if (el && preset == null) { el.value = ''; el.style.height = 'auto'; }
+  awBusy = true; awPaintSend();
+  awRender(true);
+
+  awCtl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+  var tmr = awCtl ? setTimeout(function () { awCtl.abort(); }, AW_TIMEOUT) : null;
+  try {
+    var res = await fetch(SB_URL + '/functions/v1/ai-woody', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + SB_ANON,
+        'apikey': SB_ANON,
+        'x-session': (SESSION && SESSION.sig) || (readSession() || {}).sig || '',
+      },
+      body: JSON.stringify({ messages: history, lang: LANG }),
+      signal: awCtl ? awCtl.signal : undefined,
+    });
+    if (!res.ok) {
+      var info = {};
+      try { info = await res.json(); } catch (e) {}
+      if (res.status === 401) { if (typeof sbNoteAuth === 'function') sbNoteAuth(401); throw new Error('auth'); }
+      if (res.status === 429) throw new Error('busy');
+      console.warn('[aw] http ' + res.status + ' ' + (info.error || '') + ' ' + (info.type || ''));
+      throw new Error('http');
+    }
+    await awReadStream(res, r);
+    if (!r.text && r.stop !== 'refusal') throw new Error('empty');
+  } catch (e) {
+    var code = (e && e.name === 'AbortError') ? 'timeout' : (e && e.message) || 'http';
+    if (!r.text) r.err = code;
+    else r.cut = true;      // 串到一半斷了：留著已經收到的字，標示不完整
+    console.warn('[aw] failed ' + code);
+  } finally {
+    if (tmr) clearTimeout(tmr);
+    r.streaming = false; awBusy = false; awCtl = null;
+    awPaintSend();
+    awRender(true);
+  }
+}
+
+// 解析 Anthropic 的 SSE：只取文字，記下停止原因
+async function awReadStream(res, r) {
+  var reader = res.body.getReader();
+  var dec = new TextDecoder();
+  var buf = '';
+  for (;;) {
+    var chunk = await reader.read();
+    if (chunk.done) break;
+    buf += dec.decode(chunk.value, { stream: true });
+    var parts = buf.split('\n\n');
+    buf = parts.pop();
+    parts.forEach(function (block) {
+      block.split('\n').forEach(function (line) {
+        if (line.indexOf('data:') !== 0) return;
+        var d;
+        try { d = JSON.parse(line.slice(5).trim()); } catch (e) { return; }
+        if (d.type === 'content_block_delta' && d.delta && d.delta.type === 'text_delta') {
+          r.text += d.delta.text || '';
+          awScheduleRender();
+        } else if (d.type === 'message_delta' && d.delta && d.delta.stop_reason) {
+          r.stop = d.delta.stop_reason;
+        } else if (d.type === 'error') {
+          throw new Error('stream');
+        }
+      });
+    });
+  }
+}
+
+function awScheduleRender() {
+  if (awRaf) return;
+  awRaf = requestAnimationFrame(function () { awRaf = 0; awRender(false); });
+}
+
+function awPaintSend() {
+  var b = document.getElementById('aw-send-btn');
+  if (b) { b.disabled = awBusy; b.style.opacity = awBusy ? '.6' : '1'; }
+}
+
+function awKeydown(ev) {
+  // 🔴 組字中的 Enter 是「確認選字」不是送出（同 lcKeydown）
+  if (ev.key === 'Enter' && !ev.shiftKey && !ev.isComposing && ev.keyCode !== 229) {
+    ev.preventDefault(); awSend();
+  }
+}
+
+function awReset() {
+  if (awBusy && awCtl) awCtl.abort();
+  if (awMsgs.length && !confirm(t('aw_new_confirm'))) return;
+  awMsgs = []; awBusy = false; awPaintSend();
+  awRender(true);
+}
+
+function awRetry(id) {
+  var i = awMsgs.findIndex(function (m) { return m.id === id; });
+  if (i < 1 || awBusy) return;
+  var q = awMsgs[i - 1];
+  awMsgs.splice(i - 1, 2);
+  awSend(q.text);
+}
+
+function awSafeId(id) { return /^aw[a-z0-9]+$/.test(String(id || '')) ? id : ''; }
+
+function awSugs() { return ['aw_q1', 'aw_q2', 'aw_q3', 'aw_q4'].map(function (k) { return t(k); }); }
+
+function awMsgHtml(m) {
+  var ai = m.role === 'assistant';
+  var id = awSafeId(m.id);
+  var h = '<div class="lc-msg' + (ai ? ' aw-ai' : ' mine') + '">'
+    + '<div class="lc-msg-head"><b style="color:' + (ai ? '#a78bfa' : 'var(--tx)') + '">'
+    + escHtml(ai ? 'AI Woody' : awMyName()) + '</b>'
+    + (ai ? '<span class="aw-badge">AI</span>' : '')
+    + '<span class="lc-msg-time">' + lcTime(m.at) + '</span></div>';
+  if (ai && m.err) {
+    return h + '<div class="lc-fail">⚠ ' + escHtml(t({ auth: 'aw_err_auth', busy: 'aw_err_busy', timeout: 'aw_err_timeout' }[m.err] || 'aw_err_generic'))
+      + ' <button class="lc-retry" onclick="awRetry(\'' + id + '\')">↻ ' + escHtml(t('aw_retry')) + '</button></div></div>';
+  }
+  var body = m.text;
+  if (ai && m.stop === 'refusal' && !body) body = t('aw_refusal');
+  h += '<div class="lc-otext">' + escHtml(body)
+    + (m.streaming ? (body ? '<span class="aw-caret"></span>' : '<span class="lc-pending">' + escHtml(t('aw_thinking')) + '</span>') : '')
+    + '</div>';
+  if (m.streaming) return h + '</div>';
+  if (m.cut) h += '<div class="lc-fail" style="margin-top:6px;">⚠ ' + escHtml(t('aw_cut')) + '</div>';
+
+  // 其他語言：收合，點開才翻（翻譯沿用聊天大廳的 lcTranslate）
+  if (m.trOpen) {
+    if (m.tr) {
+      var lines = LC_LANGS.filter(function (l) { return l[0] !== m.tr.src; }).map(function (l) {
+        var v = m.tr[l[0]] || '';
+        return v ? '<div class="lc-line"><span class="lc-lab">' + escHtml(LC_LABEL[l[0]]) + '</span><span class="lc-ltext">' + escHtml(v) + '</span></div>' : '';
+      }).join('');
+      h += '<div class="lc-tr">' + lines + '</div>';
+    } else if (m.trBusy) {
+      h += '<div class="lc-tr"><div class="lc-pending">' + escHtml(t('lc_translating')) + '</div></div>';
+    } else if (m.trErr) {
+      h += '<div class="lc-tr"><div class="lc-fail">⚠ ' + escHtml(t('lc_tr_failed')) + '</div></div>';
+    }
+  }
+  h += '<div class="aw-foot">';
+  if (ai) h += '<span class="aw-disc">' + escHtml(t('aw_disclaimer')) + '</span>';
+  if (m.text) h += '<button class="aw-langs" onclick="awToggleLangs(\'' + id + '\')">🌐 ' + escHtml(t(m.trOpen ? 'aw_hide_langs' : 'aw_more_langs')) + '</button>';
+  return h + '</div></div>';
+}
+
+async function awToggleLangs(id) {
+  var m = awMsgs.find(function (x) { return x.id === id; });
+  if (!m) return;
+  m.trOpen = !m.trOpen;
+  if (m.trOpen && !m.tr && !m.trBusy) {
+    m.trBusy = true; m.trErr = false; awRender(false);
+    for (var i = 0; i < 2 && !m.tr; i++) {
+      try { m.tr = await lcTranslate(m.text); } catch (e) { console.warn('[aw] translate ' + (e && e.message)); }
+    }
+    m.trBusy = false; if (!m.tr) m.trErr = true;
+  }
+  awRender(false);
+}
+
+function awRender(scroll) {
+  var box = document.getElementById('aw-stream');
+  if (!box) return;
+  var nearBottom = box.scrollHeight - box.scrollTop - box.clientHeight < 120;
+  if (!awMsgs.length) {
+    box.innerHTML = '<div class="aw-welcome"><p>' + escHtml(t('aw_intro')) + '</p><div class="aw-sugs">'
+      + awSugs().map(function (q, i) {
+          return '<button class="aw-sug" onclick="awSend(awSugs()[' + i + '])">' + escHtml(q) + '</button>';
+        }).join('')
+      + '</div></div>';
+    return;
+  }
+  box.innerHTML = awMsgs.map(awMsgHtml).join('');
+  if (scroll || nearBottom) box.scrollTop = box.scrollHeight;
+}
+
+function awRecToggle() {
+  if (!lcVoiceOK()) { toast(t('lc_mic_unsupported'), 'err'); return; }
+  ComartVoice.toggle({
+    sbUrl: SB_URL,
+    sig: function () { return (SESSION && SESSION.sig) || ''; },
+    lang: lcSpeechLang,
+    callClaude: pCallClaude,
+    onState: function (st, sec) {
+      var b = document.getElementById('aw-mic-btn');
+      if (!b) return;
+      b.classList.toggle('on', st === 'recording');
+      b.disabled = (st === 'uploading' || st === 'polishing');
+      b.textContent = st === 'recording' ? ('⏹ ' + (sec || 0) + 's') : st === 'uploading' ? '⋯' : st === 'polishing' ? '✨' : '🎙';
+    },
+    onError: function (code) {
+      toast(t({ unsupported: 'lc_mic_unsupported', denied: 'lc_mic_denied', empty: 'lc_mic_empty',
+                silent: 'lc_mic_silent', expired: 'lc_mic_expired' }[code] || 'lc_mic_failed'), 'err');
+      var b = document.getElementById('aw-mic-btn'); if (b) { b.classList.remove('on'); b.disabled = false; b.textContent = '🎙'; }
+    },
+    onText: function (txt) {
+      var el = document.getElementById('aw-input');
+      if (!el) return;
+      el.value = el.value ? (el.value.replace(/\s+$/, '') + ' ' + txt) : txt;
+      el.style.height = 'auto';
+      el.style.height = Math.min(el.scrollHeight, LC_INPUT_MAX) + 'px';
+      el.focus();
+    },
+  });
+}
+
+// 匯出 PDF：畫面上看得到的內容（原文＋已經點開的其他語言）。版面固定繁中（同 lcExportPDF）。
+function awExportPDF() {
+  var done = awMsgs.filter(function (m) { return !m.streaming && !m.err && m.text; });
+  if (!done.length) { toast(t('aw_nothing_export')); return; }
+  var w = window.open('', '_blank');
+  if (!w) { toast(t('lc_popup')); return; }
+  var now = new Date();
+  var stamp = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0')
+    + ' ' + String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+  var rows = done.map(function (m) {
+    var ai = m.role === 'assistant';
+    var tr = '';
+    if (m.trOpen && m.tr) {
+      tr = LC_LANGS.filter(function (l) { return l[0] !== m.tr.src && m.tr[l[0]]; }).map(function (l) {
+        return '<div class="tr"><span>' + escHtml(LC_LABEL[l[0]]) + '</span>' + escHtml(m.tr[l[0]]) + '</div>';
+      }).join('');
+    }
+    return '<div class="m ' + (ai ? 'ai' : 'q') + '"><div class="h"><b>' + escHtml(ai ? 'AI Woody（AI 生成）' : awMyName())
+      + '</b> <i>' + lcTime(m.at) + '</i></div><div class="t">' + escHtml(m.text) + '</div>' + tr + '</div>';
+  }).join('');
+  var css = 'body{font-family:"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;color:#1a1a1a;margin:28px;font-size:13px;line-height:1.65}'
+    + 'h1{font-size:19px;margin:0 0 4px}.meta{color:#666;font-size:11.5px;margin-bottom:12px}'
+    + '.warn{border:1px solid #c9a227;background:#fff8e1;padding:8px 12px;border-radius:6px;font-size:12px;margin-bottom:16px}'
+    + '.m{border:1px solid #ddd;border-left:4px solid #bbb;border-radius:6px;padding:9px 12px;margin-bottom:10px;page-break-inside:avoid}'
+    + '.m.ai{border-left-color:#7c3aed}.h{font-size:12px;margin-bottom:4px}.h i{color:#888;font-style:normal;margin-left:6px}'
+    + '.t{white-space:pre-wrap}.tr{margin-top:6px;padding-top:6px;border-top:1px dashed #ccc;color:#444;white-space:pre-wrap}'
+    + '.tr span{display:inline-block;width:34px;color:#888;font-size:11px}@media print{@page{margin:14mm}}';
+  w.document.open();
+  w.document.write('<!doctype html><html><head><meta charset="utf-8"><title>AI Woody 對話紀錄 ' + stamp + '</title><style>' + css + '</style></head><body>'
+    + '<h1>AI Woody 對話紀錄</h1>'
+    + '<div class="meta">匯出者：' + escHtml(awMyName()) + '　匯出時間：' + stamp + '　' + escHtml(lcTzLabel()) + '</div>'
+    + '<div class="warn">⚠ 本文件中「AI Woody」的回答由 AI 生成，非 Woody 本人發言，不代表 Woody 或公司的正式決定。'
+    + '對話未存檔，這是匯出當下的快照。</div>'
+    + rows + '</body></html>');
+  w.document.close();
+  w.onload = function () { try { w.focus(); w.print(); } catch (e) {} };
 }
 
 // ─── Translate ───

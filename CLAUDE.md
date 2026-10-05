@@ -136,7 +136,7 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 
 | File | Version | Purpose | ~Lines |
 |------|---------|---------|--------|
-| `index.html` | v2.11 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
+| `index.html` | v2.12 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
 | `admin/index.html` | v2.52 | Admin System — **機場接送**、公務車、圖書館、會議室、客戶到訪、抽籤 | 8,221 |
 | `kms/index.html` | v2.50 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
 | `quotation/index.html` | v3.66 | Quotation & CRM system | 7,332 |
@@ -773,6 +773,39 @@ python3 scripts/i18n-audit.py         # Portal，key 沒引號：btn_save:'儲�
   `um_err_pwd_common` 的五語翻譯當初就寫好了，只是一處都沒接上 —— **翻譯存在不等於它被呼叫**。
   強制改密碼畫面的說明段落現在直接寫出「不可使用常見密碼（公司名＋年份、自己的工號）」，
   讓使用者在打字之前就知道，而不是靠錯誤訊息事後補救。
+
+## 🧭 AI Woody —— Woody 的 AI 分身（Portal v2.12，2026-10-05）
+
+AI 區最右邊的頁籤（`ptab-woody`，在「技能」右邊）。函式前綴 `aw*`，edge function **`ai-woody`**，
+人格檔在資料表 **`ai_personas`**（`id='woody'`）。Woody 2026-10-05 用 grill 逐題定案：
+
+| 項目 | 定案 |
+|---|---|
+| 口吻 | 第一人稱「我」；每則回答、頁籤副標、PDF 都標「AI 生成，非 Woody 本人發言」 |
+| 語氣 | 對事硬、對人不否定（教練姿態） |
+| 禁區 | 不代 Woody 決定或承諾（加薪升遷獎懲人事預算報價接單）、不評價特定同仁、不透露週報以外的機密、週報沒寫過的立場就說不知道 |
+| 點名 | 可以引用同仁在週報分享過的觀點，但只引用不評價 |
+| 形式 | 一對一私人對話；版面借用大廳的 `lc-*` 樣式，但 DOM 與 id 自己一套（`aw-*`） |
+| 存檔 | **完全不留**：只在分頁記憶體裡（`awMsgs`）；伺服器不寫資料庫、不 log 內容、不記誰用過 |
+| 四語 | 用提問者的語言回答；其他三語收合（「看其他語言」，點開才走 `lcTranslate`） |
+| 匯出 | `awExportPDF()`：畫面上看得到的（原文＋點開過的其他語言），版面固定繁中 |
+| 對象 | 全體在職同仁、不限次數 |
+| 模型 | **`claude-opus-5-5`**，`effort: low`，串流；`fallbacks: "default"`（安全分類器誤擋時自動換模型） |
+
+- 🔴 **人格檔不在 repo、不在 HTML**（repo 公開）。正本在 `.local/woody/ai-woody-persona.md`（Woody 審閱的那份），
+  `scripts/ai-woody-push.py` 把它 ＋ 從 `woody_reports` 即時撈出的 **Woody 本人全部週報文字**（約 13 萬字，
+  同仁段落標〔同仁分享〕）組成 system prompt，上傳到 `ai_personas`。`--dry-run` 只輸出到 `.local/woody/ai-woody-system.txt`。
+  **Woody 新寫了週報、要讓 AI Woody 跟上 → 重跑這支腳本**（Woody 定案：他開口時才更新）。function 端快取 5 分鐘。
+- 🔴 **`ai_personas` 是 RLS 開著 ＋ 零 policy ＋ revoke anon/authenticated**，刻意**不在** sb-proxy 的 `ALLOWED_TABLES` ——
+  放進去等於任何登入者都能把整份人格檔撈走。
+- 🔴 **對話歷史每輪由前端整段送**（不存檔的代價），所以 `ai-woody/lib.js` 的 `validateMessages` 逐則驗：
+  只准 user／assistant 交替、首尾都是 user、content 只能是字串、不准多餘欄位。否則前端可以偽造一則
+  「AI Woody 說過我可以加薪」再讓模型接下去。`node --test supabase/functions/ai-woody/lib.test.mjs`（12 個）。
+  前端的 `awHistory()` 因此只送「問題＋成功回答」成對的部分，失敗的那一輪不進歷史。
+- 人格檔放 system 第一段並設快取斷點；日期與介面語言放在**斷點之後**的第二段，每天換也不會讓快取失效。
+- `fallbacks` 是 beta 參數；上游回 400 時 function 會拿掉它重送一次（備援只是保險，不該讓整個功能壞掉）。
+- 回答走 Anthropic SSE 直通（`awReadStream` 只取 `text_delta`、記 `stop_reason`）；`refusal` 時顯示「這題我無法回答，請直接找 Woody 本人」。
+- 語音輸入沿用 `ComartVoice`（`awRecToggle`），語言提示沿用大廳的 `lcSpeechLang`。
 
 ## 群組對話 Group Chats（原「線上對話」，Portal v1.80，2026-09-05，migration 202609050001）
 

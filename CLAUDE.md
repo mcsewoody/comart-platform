@@ -136,7 +136,7 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 
 | File | Version | Purpose | ~Lines |
 |------|---------|---------|--------|
-| `index.html` | v2.12 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
+| `index.html` | v2.13 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
 | `admin/index.html` | v2.52 | Admin System — **機場接送**、公務車、圖書館、會議室、客戶到訪、抽籤 | 8,221 |
 | `kms/index.html` | v2.50 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
 | `quotation/index.html` | v3.66 | Quotation & CRM system | 7,332 |

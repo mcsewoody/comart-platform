@@ -136,7 +136,7 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 
 | File | Version | Purpose | ~Lines |
 |------|---------|---------|--------|
-| `index.html` | v2.15 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
+| `index.html` | v2.16 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
 | `admin/index.html` | v2.52 | Admin System — **機場接送**、公務車、圖書館、會議室、客戶到訪、抽籤 | 8,221 |
 | `kms/index.html` | v2.50 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
 | `quotation/index.html` | v3.66 | Quotation & CRM system | 7,332 |
@@ -808,6 +808,14 @@ AI 區最右邊的頁籤（`ptab-woody`，在「技能」右邊）。函式前�
   瀏覽器用 mammoth／pdf.js 抽文字送上去；② 本機 `python3 scripts/ai-woody-push.py --rebuild`（textutil／pypdf）。
   🔴 **重新彙整永遠不動 `woody-core`** —— 人格正文要先給 Woody 看修改的段落、他同意才上線（Woody 2026-10-06 定案）。
   `AI Woody/` 資料夾在 `.gitignore` 裡（文章有版權、repo 公開）。function 端快取 5 分鐘，彙整完會立即清掉。
+- 🔴 **圖片文章（掃描的雜誌頁、手機截圖）由伺服器端 Opus 逐字抄錄**（v2.16）。Woody 第一次按鈕就放了 42 張
+  何飛鵬專欄的掃描圖，舊版只讀 Word／PDF，全部被略過。現在：前端長邊縮到 2000px 轉 JPEG → `action:'ocr'`
+  （直排由右至左、開頭三行「標題／作者／出處」—— 引用時要講出處正靠這個）→ 結果存成 `ai_personas` 的
+  **`ocr:<資料夾>/<檔名>|<位元組數>`**，一張圖一列（並行 3 張也不會互相蓋掉）。之後按更新只辨識新圖，約 10 秒一張。
+  🔴 **rebuild 時圖片要以 `{folder,name,size,ocr:true}` 列進 docs**：伺服器會清掉「這次沒列到」的圖片快取。
+  本機腳本與按鈕都照這個做；新寫第三個入口時別漏掉，否則一次彙整就把全部辨識結果刪光。
+- 更新結果合成一則提示、停留 8～15 秒（`toast` 多了第三個參數 `ms`；原本 3 秒且第二則會蓋掉第一則，Woody 回報「來不及看」），
+  同時寫一行 `[aw] sync …` 到 console。
 - 🔴 **`ai_personas` 是 RLS 開著 ＋ 零 policy ＋ revoke anon/authenticated**，刻意**不在** sb-proxy 的 `ALLOWED_TABLES` ——
   放進去等於任何登入者都能把整份人格檔撈走。
 - 🔴 **對話歷史每輪由前端整段送**（不存檔的代價），所以 `ai-woody/lib.js` 的 `validateMessages` 逐則驗：

@@ -15,12 +15,15 @@
 🔴 組裝只有 assemble.js 一份；這支腳本與 Portal 的按鈕都只負責「抽文字、送出去」。
    文字抽取兩邊工具不同（這裡用 textutil／pypdf，瀏覽器用 mammoth／pdf.js），結果可能有些微差異，那是可接受的。
 """
-import json, logging, os, subprocess, sys, urllib.request
+import base64, json, logging, os, subprocess, sys, tempfile, urllib.request
+from concurrent.futures import ThreadPoolExecutor
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PERSONA = os.path.join(ROOT, '.local/woody/ai-woody-persona.md')
 DOC_ROOT = os.path.join(ROOT, 'AI Woody')
 FOLDERS = ['必讀資料', '好文分享']
+IMAGE_EXT = ('.png', '.jpg', '.jpeg', '.webp', '.gif')
+OCR_PAR = 3   # 同 Portal 按鈕：同時辨識幾張
 SB = 'https://tcvlnpgpuphdalzvmoyo.supabase.co'
 
 
@@ -58,8 +61,29 @@ def extract(path):
     return ''
 
 
-def collect_docs():
-    docs = []
+def is_image(name):
+    return os.path.splitext(name)[1].lower() in IMAGE_EXT
+
+
+def ocr_key(folder, name, path):
+    return f'{folder}/{name}|{os.path.getsize(path)}'
+
+
+def ocr_one(key, path, fn):
+    # 同 Portal：長邊 2000px、JPEG，由 edge function 的 'ocr' 動作抄錄並存進伺服器端快取
+    with tempfile.TemporaryDirectory() as d:
+        out = os.path.join(d, 'x.jpg')
+        subprocess.run(['sips', '-s', 'format', 'jpeg', '-s', 'formatOptions', '90', '-Z', '2000', path, '--out', out],
+                       capture_output=True, check=True)
+        data = base64.b64encode(open(out, 'rb').read()).decode()
+    return fn({'action': 'ocr', 'key': key, 'mime': 'image/jpeg', 'data': data})
+
+
+def collect_docs(api):
+    """圖片送 { ocr: True, size }（文字由伺服器端快取補）；沒辨識過的先辨識。
+    🔴 圖片一定要列進去：rebuild 會清掉「這次沒列到的」圖片快取。"""
+    docs, todo = [], []
+    cached = None
     for folder in FOLDERS:
         d = os.path.join(DOC_ROOT, folder)
         if not os.path.isdir(d):
@@ -67,11 +91,32 @@ def collect_docs():
         for name in sorted(os.listdir(d)):
             if name.startswith('.'):
                 continue
-            text = extract(os.path.join(d, name)).strip()
+            path = os.path.join(d, name)
+            if is_image(name):
+                if cached is None:
+                    cached = set(api({'action': 'ocrList'}).get('keys') or [])
+                key = ocr_key(folder, name, path)
+                docs.append({'folder': folder, 'name': name, 'size': os.path.getsize(path), 'ocr': True})
+                if key not in cached:
+                    todo.append((key, path, name))
+                continue
+            text = extract(path).strip()
             if text:
                 docs.append({'folder': folder, 'name': name, 'text': text})
             else:
                 print(f'  ⚠ 讀不到文字，略過：{folder}/{name}')
+    if todo:
+        print(f'辨識圖片 {len(todo)} 張…')
+        def run(t):
+            try:
+                ocr_one(t[0], t[1], api)
+                return None
+            except Exception as e:
+                return f'{t[2]}（{e}）'
+        with ThreadPoolExecutor(OCR_PAR) as ex:
+            for bad in ex.map(run, todo):
+                if bad:
+                    print(f'  ⚠ 辨識失敗：{bad}')
     return docs
 
 
@@ -86,11 +131,13 @@ def main():
              {'Authorization': 'Bearer ' + key, 'Prefer': 'resolution=merge-duplicates,return=minimal'})
         print('已上傳人格正文（woody-core）')
     if do_rebuild:
-        docs = collect_docs()
+        api = lambda body: http('POST', SB + '/functions/v1/ai-woody', key, json.dumps(body).encode())
+        docs = collect_docs(api)
         print(f'AI Woody 資料夾：{len(docs)} 份文件')
-        r = http('POST', SB + '/functions/v1/ai-woody', key,
-                 json.dumps({'action': 'rebuild', 'docs': docs}).encode())
+        r = api({'action': 'rebuild', 'docs': docs})
         print(f"已重新彙整：週報 {r['reports']} 份（最新 {r['latest']}）、文件 {len(r['docs'] or [])} 份、共 {r['chars']:,} 字")
+        if r.get('ocrMissing'):
+            print('  ⚠ 這些圖片沒有文字可用：' + '、'.join(r['ocrMissing']))
 
 
 if __name__ == '__main__':

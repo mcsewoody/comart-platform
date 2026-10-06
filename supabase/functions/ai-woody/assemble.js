@@ -121,3 +121,45 @@ export function buildDocsAppendix(docs) {
 export function assemble(core, reportsAppendix, docsAppendix) {
   return [String(core).trim(), reportsAppendix, docsAppendix].filter(Boolean).join("\n\n---\n\n");
 }
+
+// ── 圖片文章（掃描的雜誌頁、手機截圖）──
+// 文字辨識很貴（一張圖一次 Opus），所以結果存成 ai_personas 的獨立資料列 'ocr:<資料夾>/<檔名>|<大小>'，
+// 下次按「更新」只辨識新放進來的圖。一張圖一列，三張並行辨識也不會互相蓋掉。
+// 檔案換了內容（大小不同）就是另一個 key，會重新辨識。
+export const OCR_PREFIX = "ocr:";
+export const IMAGE_EXT = ["png", "jpg", "jpeg", "webp", "gif"];
+export function isImageName(name) {
+  const m = String(name || "").toLowerCase().match(/\.([a-z0-9]+)$/);
+  return !!m && IMAGE_EXT.includes(m[1]);
+}
+export function ocrKey(folder, name, size) {
+  return `${folder}/${name}|${Number(size) || 0}`;
+}
+export function validOcrKey(key) {
+  const k = String(key || "");
+  if (k.length > 260) return false;
+  const m = k.match(/^(.+?)\/(.+)\|(\d+)$/);
+  return !!m && DOC_FOLDERS.includes(m[1]) && isImageName(m[2]);
+}
+// docs 裡 { folder, name, size, ocr: true }（沒有 text）的項目，用快取補上文字。
+// 回傳補好的 docs、找不到快取的檔名、以及這次用到的 key（用來清掉已經不在資料夾裡的舊快取）。
+export function fillOcr(docs, cache) {
+  const out = [], missing = [], used = [];
+  for (const d of Array.isArray(docs) ? docs : []) {
+    if (d && d.ocr === true) {
+      const k = ocrKey(d.folder, d.name, d.size);
+      used.push(k);
+      if (cache[k]) out.push({ folder: d.folder, name: d.name, text: cache[k] });
+      else missing.push(d.name);
+    } else out.push(d);
+  }
+  return { docs: out, missing, used };
+}
+
+export const OCR_SYSTEM =
+  "你是逐字抄錄員。把圖片裡的文章完整抄成文字，不摘要、不改寫、不加評論、不翻譯。\n" +
+  "- 直排文字由右至左、由上而下讀；多欄版面依閱讀順序接起來。\n" +
+  "- 第一段先寫三行：「標題：…」「作者：…」「出處：…」（例如刊物名稱、期數、日期；看不出來就寫「不詳」）。\n" +
+  "- 之後空一行，接著是全文，保留原本的分段。頁首頁尾、頁碼、部落格網址、圖說不用抄。\n" +
+  "- 看不清楚的字用「□」代替，不要猜。\n" +
+  "- 圖片裡沒有文章（例如照片）就只回「（無文字）」。";

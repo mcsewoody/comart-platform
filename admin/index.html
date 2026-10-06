@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART 行政管理平台 v2.52</title>
+<title>COMART 行政管理平台 v2.53</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -364,6 +364,34 @@ input[type=time]::-webkit-calendar-picker-indicator{
 .fuel-lvl-btn:hover{border-color:var(--tl);color:var(--tl)}
 .fuel-lvl-btn.active{background:var(--tld);border-color:var(--tl);color:var(--tl);font-weight:700}
 .calw{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden}
+/* 公務車週曆預約（cwk*，v2.53） */
+.cwk{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);padding:14px;margin-bottom:16px}
+.cwk-hd{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.cwk-nav{display:flex;align-items:center;gap:6px;margin-left:auto}
+.cwk-vehs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.cwk-veh{display:inline-flex;align-items:center;gap:6px;padding:6px 11px;border-radius:8px;border:1px solid var(--bd);background:var(--bg3,rgba(255,255,255,.03));color:var(--t2);font-size:12.5px;cursor:pointer}
+.cwk-veh i{width:9px;height:9px;border-radius:50%;background:var(--c)}
+.cwk-veh span{color:var(--t3);font-size:11.5px}
+.cwk-veh.on{border-color:var(--c);box-shadow:0 0 0 1px var(--c) inset;color:var(--t1,#fff);background:color-mix(in srgb,var(--c) 14%,transparent)}
+.cwk-none{font-size:12px;color:var(--t3)}
+.cwk-hint{font-size:12px;color:var(--t3);margin-bottom:8px}
+.cwk-wrap{max-height:520px;overflow:auto;border:1px solid var(--bd);border-radius:var(--rs,6px);position:relative}
+#cwk-grid{display:grid;grid-template-columns:46px repeat(7,minmax(78px,1fr));min-width:600px}
+.cwk-corner,.cwk-dh{position:sticky;top:0;z-index:3;background:var(--bg2);border-bottom:1px solid var(--bd);height:38px}
+.cwk-dh{display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:11px;color:var(--t3);border-left:1px solid var(--bd)}
+.cwk-dh b{font-size:12.5px;color:var(--t2)}.cwk-dh.today b{color:var(--ac)}
+.cwk-times div{font-size:10px;color:var(--t3);text-align:right;padding-right:5px;box-sizing:border-box;transform:translateY(-6px)}
+.cwk-col{position:relative;border-left:1px solid var(--bd);touch-action:none;user-select:none;-webkit-user-select:none;cursor:crosshair;
+  background-image:linear-gradient(to bottom,rgba(255,255,255,.06) 1px,transparent 1px),linear-gradient(to bottom,rgba(255,255,255,.025) 1px,transparent 1px);
+  background-size:100% 36px,100% 18px}
+.cwk-col.today{background-color:rgba(91,155,213,.05)}
+.cwk-past{position:absolute;left:0;right:0;background:rgba(0,0,0,.28);pointer-events:none}
+.cwk-bk{position:absolute;border-radius:4px;background:color-mix(in srgb,var(--c) 30%,transparent);border-left:3px solid var(--c);font-size:10.5px;line-height:1.25;color:var(--t1,#fff);padding:2px 3px;overflow:hidden;box-sizing:border-box;pointer-events:auto}
+.cwk-bk b{display:block;font-size:10.5px}
+.cwk-bk.done{opacity:.35}.cwk-bk.dim{opacity:.3}.cwk-bk.mine{background:color-mix(in srgb,var(--c) 45%,transparent);z-index:1}
+.cwk-sel{position:absolute;left:2px;right:2px;border-radius:5px;border:2px dashed var(--c);background:color-mix(in srgb,var(--c) 22%,transparent);z-index:2;pointer-events:none}
+.cwk-sel.bad{border-color:var(--rd);background:rgba(239,68,68,.18)}
+
 .calh{background:var(--bg1);padding:11px 15px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--bd)}
 .calnav{background:none;border:1px solid var(--bd);border-radius:var(--rs);color:var(--t2);cursor:pointer;padding:4px 10px;font-size:13px;transition:all var(--tr)}.calnav:hover{background:var(--bgh);color:var(--t1)}
 .caltit{font-size:14px;font-weight:600;min-width:130px;text-align:center}
@@ -800,7 +828,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="logo">
     <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
     <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
-    <span><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="38" height="20" style="display:inline-block;vertical-align:middle;margin-top:-2px"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v2.52</span>
+    <span><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="38" height="20" style="display:inline-block;vertical-align:middle;margin-top:-2px"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v2.53</span>
   </div>
   <div class="trr">
     <div id="global-site-bar" style="display:flex;align-items:center;gap:4px"><span style="font-size:13px;color:var(--text-3);white-space:nowrap;font-weight:500" data-i18n="g.site_label">單位：</span>
@@ -1237,6 +1265,13 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
       <div style="margin-top:10px;display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--t3)"><span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:rgba(6,182,212,.2);margin-right:4px"></span><span data-i18n="car.legend.inuse">使用中</span></span><span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:rgba(245,158,11,.2);margin-right:4px"></span><span data-i18n="car.legend.booked">已預約</span></span><span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:rgba(249,115,22,.2);margin-right:4px"></span><span data-i18n="car.legend.maint">保養/驗車</span></span><span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:rgba(34,197,94,.15);margin-right:4px"></span><span data-i18n="car.legend.done">已完成</span></span></div>
     </div>
     <div class="pg" id="pg-car-bk">
+      <div class="cwk" id="cwk">
+        <div class="cwk-hd"><div class="stt" data-i18n="car.wk.title">📅 週曆預約</div>
+          <div class="cwk-nav"><button class="calnav" onclick="cwkMove(-1)">‹</button><div class="caltit" id="cwk-tit"></div><button class="calnav" onclick="cwkMove(1)">›</button><button class="calnav" onclick="cwkMove(0)" data-i18n="g.cal.today">Today</button></div></div>
+        <div class="cwk-vehs" id="cwk-vehs"></div>
+        <div class="cwk-hint" id="cwk-hint"></div>
+        <div class="cwk-wrap" id="cwk-wrap"><div id="cwk-grid"></div></div>
+      </div>
       <div style="max-width:550px"><div class="sth" style="margin-bottom:14px"><div class="stt" id="bk-form-title" data-i18n="car.page.bk">新增用車預約</div></div>
         <div style="background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);padding:20px">
           <div class="fg2" style="margin-bottom:4px">
@@ -2657,7 +2692,7 @@ const ADMIN_I18N = {
     'car.tbl.km_vol':'Volume(L)','car.tbl.amount':'Amount','car.tbl.price':'Unit Price','car.tbl.fueler':'Fueled By',
     'car.tbl.maint_date':'Maint. Date','car.tbl.cost':'Cost','car.tbl.next_km2':'Next(km)','car.tbl.next_date':'Next Date','car.tbl.vendor':'Vendor',
     'car.tbl.last_insp':'Last Insp.','car.tbl.next_insp':'Next Insp.','car.tbl.remain_days':'Days Left','car.tbl.notes':'Notes',
-    'car.page.bk':'New Vehicle Booking','car.page.edit_bk':'Edit Vehicle Booking','car.page.insp':'Inspection Mgmt','car.page.cfg':'Fleet Config',
+    'car.wk.title':'📅 Weekly booking calendar','car.wk.hint_pick':'Pick a vehicle above, then press and drag on the calendar to choose a time slot. Or just fill in the form below.','car.wk.hint_drag':'Press and drag on the calendar to choose a time slot (across days is fine). Booked and past slots cannot be selected. Then fill in the purpose below and confirm.','car.wk.pick_first':'Pick a vehicle first','car.wk.taken':'This slot is already booked','car.wk.past':'You cannot book a time that has already passed','car.wk.picked':'Selected %s — %s. Fill in the purpose below and confirm the booking.','car.page.bk':'New Vehicle Booking','car.page.edit_bk':'Edit Vehicle Booking','car.page.insp':'Inspection Mgmt','car.page.cfg':'Fleet Config',
     'car.lbl.driver':'Driver *','car.lbl.vehicle':'Vehicle *','car.lbl.date_start':'Start Date *','car.lbl.time_start':'Start Time',
     'car.lbl.date_end':'End Date *','car.lbl.time_end':'End Time','car.lbl.purpose':'Purpose *',
     'car.lbl.km_est':'Est. Distance(km)','car.lbl.from':'Departure','car.lbl.to':'Destination','car.btn.add_bk':'＋ New Booking','car.btn.add_fuel':'＋ Fuel Log','car.btn.add_maint':'＋ Maint. Log',
@@ -3053,7 +3088,7 @@ const ADMIN_I18N = {
     'car.tbl.km_vol':'油量L','car.tbl.amount':'金額元','car.tbl.price':'單價','car.tbl.fueler':'加油人',
     'car.tbl.maint_date':'保養日期','car.tbl.cost':'費用','car.tbl.next_km2':'下次km','car.tbl.next_date':'下次日期','car.tbl.vendor':'廠商',
     'car.tbl.last_insp':'上次驗車','car.tbl.next_insp':'下次驗車','car.tbl.remain_days':'剩餘天數','car.tbl.notes':'備註',
-    'car.page.bk':'新增用車預約','car.page.edit_bk':'修改用車預約','car.page.insp':'驗車管理','car.page.cfg':'公務車設定',
+    'car.wk.title':'📅 週曆預約','car.wk.hint_pick':'先點選上方的車輛，再在週曆上按住拖拉選擇時段；也可以直接填寫下方表單。','car.wk.hint_drag':'在週曆上按住拖拉選擇時段（可跨日）；已被預約與已過去的時段無法選取。選好後在下方填寫目的並確認預約。','car.wk.pick_first':'請先點選車輛','car.wk.taken':'這個時段已有人預約','car.wk.past':'不能預約已經過去的時間','car.wk.picked':'已選 %s — %s，請在下方填寫目的後確認預約','car.page.bk':'新增用車預約','car.page.edit_bk':'修改用車預約','car.page.insp':'驗車管理','car.page.cfg':'公務車設定',
     'car.lbl.driver':'使用人 *','car.lbl.vehicle':'車輛 *','car.lbl.date_start':'開始日期 *','car.lbl.time_start':'開始時間',
     'car.lbl.date_end':'結束日期 *','car.lbl.time_end':'結束時間','car.lbl.purpose':'出行目的 *',
     'car.lbl.km_est':'預計里程(km)','car.lbl.from':'出發地點','car.lbl.to':'目的地','car.btn.add_bk':'＋ 新增預約','car.btn.add_fuel':'＋ 記錄加油','car.btn.add_maint':'＋ 新增保養記錄',
@@ -3449,7 +3484,7 @@ const ADMIN_I18N = {
     'car.tbl.km_vol':'油量L','car.tbl.amount':'金额元','car.tbl.price':'单价','car.tbl.fueler':'加油人',
     'car.tbl.maint_date':'保养日期','car.tbl.cost':'费用','car.tbl.next_km2':'下次km','car.tbl.next_date':'下次日期','car.tbl.vendor':'厂商',
     'car.tbl.last_insp':'上次验车','car.tbl.next_insp':'下次验车','car.tbl.remain_days':'剩余天数','car.tbl.notes':'备注',
-    'car.page.bk':'新增用车预约','car.page.edit_bk':'修改用车预约','car.page.insp':'验车管理','car.page.cfg':'公务车设置',
+    'car.wk.title':'📅 周历预约','car.wk.hint_pick':'先点选上方的车辆，再在周历上按住拖拉选择时段；也可以直接填写下方表单。','car.wk.hint_drag':'在周历上按住拖拉选择时段（可跨日）；已被预约与已过去的时段无法选取。选好后在下方填写目的并确认预约。','car.wk.pick_first':'请先点选车辆','car.wk.taken':'这个时段已有人预约','car.wk.past':'不能预约已经过去的时间','car.wk.picked':'已选 %s — %s，请在下方填写目的后确认预约','car.page.bk':'新增用车预约','car.page.edit_bk':'修改用车预约','car.page.insp':'验车管理','car.page.cfg':'公务车设置',
     'car.lbl.driver':'使用人 *','car.lbl.vehicle':'车辆 *','car.lbl.date_start':'开始日期 *','car.lbl.time_start':'开始时间',
     'car.lbl.date_end':'结束日期 *','car.lbl.time_end':'结束时间','car.lbl.purpose':'出行目的 *',
     'car.lbl.km_est':'预计里程(km)','car.lbl.from':'出发地点','car.lbl.to':'目的地','car.btn.add_bk':'＋ 新增预约','car.btn.add_fuel':'＋ 记录加油','car.btn.add_maint':'＋ 新增保养记录',
@@ -3845,7 +3880,7 @@ const ADMIN_I18N = {
     'car.tbl.km_vol':'Thể tích(L)','car.tbl.amount':'Số tiền','car.tbl.price':'Đơn giá','car.tbl.fueler':'Người đổ xăng',
     'car.tbl.maint_date':'Ngày BD','car.tbl.cost':'Chi phí','car.tbl.next_km2':'Tiếp(km)','car.tbl.next_date':'Ngày tiếp','car.tbl.vendor':'Đơn vị',
     'car.tbl.last_insp':'KĐ lần cuối','car.tbl.next_insp':'KĐ tiếp theo','car.tbl.remain_days':'Ngày còn lại','car.tbl.notes':'Ghi chú',
-    'car.page.bk':'Đặt xe mới','car.page.edit_bk':'Sửa đặt xe','car.page.insp':'Quản lý kiểm định','car.page.cfg':'Cấu hình xe',
+    'car.wk.title':'📅 Lịch đặt xe theo tuần','car.wk.hint_pick':'Chọn xe ở trên, rồi nhấn giữ và kéo trên lịch để chọn khung giờ. Hoặc điền trực tiếp biểu mẫu bên dưới.','car.wk.hint_drag':'Nhấn giữ và kéo trên lịch để chọn khung giờ (có thể qua nhiều ngày). Khung giờ đã có người đặt hoặc đã qua không thể chọn. Sau đó điền mục đích bên dưới và xác nhận.','car.wk.pick_first':'Vui lòng chọn xe trước','car.wk.taken':'Khung giờ này đã có người đặt','car.wk.past':'Không thể đặt thời gian đã qua','car.wk.picked':'Đã chọn %s — %s. Vui lòng điền mục đích bên dưới và xác nhận đặt xe.','car.page.bk':'Đặt xe mới','car.page.edit_bk':'Sửa đặt xe','car.page.insp':'Quản lý kiểm định','car.page.cfg':'Cấu hình xe',
     'car.lbl.driver':'Người dùng *','car.lbl.vehicle':'Xe *','car.lbl.date_start':'Ngày bắt đầu *','car.lbl.time_start':'Giờ bắt đầu',
     'car.lbl.date_end':'Ngày kết thúc *','car.lbl.time_end':'Giờ kết thúc','car.lbl.purpose':'Mục đích *',
     'car.lbl.km_est':'KM dự kiến','car.lbl.from':'Điểm xuất phát','car.lbl.to':'Điểm đến','car.btn.add_bk':'＋ Đặt xe','car.btn.add_fuel':'＋ Ghi nhiên liệu','car.btn.add_maint':'＋ Ghi bảo dưỡng',
@@ -4241,7 +4276,7 @@ const ADMIN_I18N = {
     'car.tbl.km_vol':'給油量(L)','car.tbl.amount':'金額','car.tbl.price':'単価','car.tbl.fueler':'給油者',
     'car.tbl.maint_date':'整備日','car.tbl.cost':'費用','car.tbl.next_km2':'次回(km)','car.tbl.next_date':'次回日','car.tbl.vendor':'業者',
     'car.tbl.last_insp':'前回車検','car.tbl.next_insp':'次回車検','car.tbl.remain_days':'残り日数','car.tbl.notes':'備考',
-    'car.page.bk':'車両予約','car.page.edit_bk':'予約変更','car.page.insp':'車検管理','car.page.cfg':'車両設定',
+    'car.wk.title':'📅 週間予約カレンダー','car.wk.hint_pick':'上の車両を選んでから、カレンダー上でドラッグして時間帯を選んでください。下のフォームに直接入力することもできます。','car.wk.hint_drag':'カレンダー上でドラッグして時間帯を選択（日をまたいでも可）。予約済み・過去の時間帯は選べません。選んだら下で目的を入力して予約を確定してください。','car.wk.pick_first':'先に車両を選んでください','car.wk.taken':'この時間帯はすでに予約されています','car.wk.past':'過去の時間は予約できません','car.wk.picked':'%s — %s を選択しました。下で目的を入力して予約を確定してください。','car.page.bk':'車両予約','car.page.edit_bk':'予約変更','car.page.insp':'車検管理','car.page.cfg':'車両設定',
     'car.lbl.driver':'利用者 *','car.lbl.vehicle':'車両 *','car.lbl.date_start':'開始日 *','car.lbl.time_start':'開始時刻',
     'car.lbl.date_end':'終了日 *','car.lbl.time_end':'終了時刻','car.lbl.purpose':'目的 *',
     'car.lbl.km_est':'予定距離(km)','car.lbl.from':'出発地','car.lbl.to':'目的地','car.btn.add_bk':'＋ 予約追加','car.btn.add_fuel':'＋ 給油記録','car.btn.add_maint':'＋ 整備記録',
@@ -4648,6 +4683,7 @@ function setLang(lang) {
   try{renderUse();}catch(e){}
   try{renderCarDash();}catch(e){}
   try{renderCal();}catch(e){}
+  try{if(curCarPg==='car-bk')cwkRender();}catch(e){}
   try{popCarSels();}catch(e){}
   // 會議室：看板、清單、故障、報表、兩個預約流程的推薦卡都是 JS 畫的
   try{renderRoomDash();}catch(e){}
@@ -4862,6 +4898,7 @@ function renderLibPg(p){
 }
 function navCar(p){
   curCarPg=p;
+  if(p!=='car-bk'&&typeof cwkTouched!=='undefined') cwkTouched=false;   // 下次打開預約頁從乾淨的週曆開始
   document.querySelectorAll('#panel-car .navi').forEach(el=>el.classList.remove('active'));
   document.querySelector(`#panel-car .navi[data-p="${p}"]`)?.classList.add('active');
   mobileSubNav('car',p);
@@ -4874,7 +4911,7 @@ async function renderCarPg(p){
   if(p==='car-dash')await renderCarDash();
   if(p==='car-veh'){loadCarFromSB().then(()=>renderVeh());}
   if(p==='car-cal'){popCarSels();renderCal();}
-  if(p==='car-bk')setTimeout(()=>initCarBkForm().catch(e=>console.warn(e)),50);
+  if(p==='car-bk')setTimeout(()=>initCarBkForm().then(cwkInit).catch(e=>console.warn(e)),50);
   if(p==='car-use'){popCarSels();loadCarFromSB().then(()=>renderUse());}
   if(p==='car-fuel'){popCarSels();renderFuel();renderFuelSum();}
   if(p==='car-maint'){popCarSels();renderMaint();}
@@ -5467,6 +5504,7 @@ function editCarBk(id){
   navCar('car-bk');
 }
 function chkConflict(){
+  if(typeof cwkSyncFromForm==='function')cwkSyncFromForm(!cwkNoJump);   // 表單 → 週曆
   const vid=document.getElementById('bkv').value,sd=document.getElementById('bksd').value,st=document.getElementById('bkst2').value||'00:00',ed=document.getElementById('bked').value,et=document.getElementById('bket').value||'23:59';
   const el=document.getElementById('bk-conf');if(!vid||!sd||!ed){el.style.display='none';return;}
   const ns=`${sd}T${st}`,ne=`${ed}T${et}`;
@@ -5493,7 +5531,159 @@ let _bkPrefill=null;
 function startBk(vid,from){
   editCarBkId=null;                      // 保險：不要沿用上一次的修改模式
   _bkPrefill={vid:vid,from:from||nextFreeDay(vid)};
+  cwkTouched=true;                       // 從看板帶入的日期是使用者點出來的，週曆要畫出來
   navCar('car-bk');
+}
+
+// ═══ 公務車週曆預約（cwk*，v2.53）═══════════════════════════════════
+// 預約頁上方是週曆、下方是原本的表單，兩者是同一份資料的兩種輸入方式：
+//   點車輛卡片 → 在週曆上按住拖拉選時段 → 自動帶入下方表單 → 填目的 → 原本的「確認預約」（doBooking）。
+// 🔴 週曆不自己寫資料庫。送出、權限、衝突的最後一道仍是 doBooking —— 兩條入口共用同一個出口，
+//    規則才不會分岔。週曆只負責「選得到的時段」與「看得到誰借了」。
+// 🔴 反過來也同步：改表單的車輛／日期／時間（全部會呼叫 chkConflict）→ 週曆跟著畫出那一段。
+// 🔴 衝突規則與 chkConflict／doBooking 相同：同一台車、未歸還未取消、時段重疊（[start,end) 半開區間），
+//    修改模式要排除正在改的那一筆（editCarBkId）。
+const CWK_SLOT = 30, CWK_PX = 18, CWK_ROWS = 48;   // 30 分鐘一格、一天 48 格
+const CWK_COLORS = ['#06b6d4','#f59e0b','#a855f7','#22c55e','#ef4444','#3b82f6','#ec4899','#14b8a6','#eab308','#8b5cf6'];
+let cwkWeek = null, cwkVid = '', cwkSel = null, cwkDrag = null, cwkNoJump = false;
+// 表單一打開就有預設的「今天 09:00–18:00」—— 那不是使用者選的，畫在週曆上只會讓人以為已經選好了。
+// 所以只有使用者真的動過（拖拉、改日期時間、從看板帶入、修改既有預約）才把表單的時段畫出來。
+let cwkTouched = false;
+
+function cwkVehs(){ const ids=_siteVehIds(); return ld(K.vh).filter(v=>ids.has(v.id)); }
+function cwkColor(vid){ const i=cwkVehs().findIndex(v=>v.id===vid); return CWK_COLORS[(i<0?0:i)%CWK_COLORS.length]; }
+function cwkMonday(d){ const x=new Date(d.getFullYear(),d.getMonth(),d.getDate()); x.setDate(x.getDate()-((x.getDay()+6)%7)); return x; }
+function cwkDays(){ return [...Array(7)].map((_,i)=>{ const d=new Date(cwkWeek); d.setDate(d.getDate()+i); return d; }); }
+// 'YYYY-MM-DDTHH:mm'（或空白分隔）→ 當地時間 Date；格式不對回 null
+function cwkParse(s){ const m=dtn(s).match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/); return m?new Date(+m[1],+m[2]-1,+m[3],+m[4],+m[5]):null; }
+function cwkFmt(d){ return `${ymdL(d)}T${_z2(d.getHours())}:${_z2(d.getMinutes())}`; }
+function cwkLive(b){ const s=b.st||b.status; return s!=='done'&&s!=='cancelled'; }
+// 與 doBooking 同一條判斷：同車、未結束、重疊（半開區間，10:00 結束與 10:00 開始可以並存）
+function cwkClash(vid,s,e){
+  const ns=cwkFmt(s), ne=cwkFmt(e);
+  return ld(K.bks).find(b=>b.vh_id===vid&&b.id!==editCarBkId&&cwkLive(b)&&dtn(b.start)<ne&&dtn(b.end)>ns);
+}
+function cwkMove(n){
+  if(n===0) cwkWeek=cwkMonday(new Date());
+  else { const d=new Date(cwkWeek||cwkMonday(new Date())); d.setDate(d.getDate()+7*n); cwkWeek=d; }
+  cwkRender();
+}
+function cwkPickVeh(vid){
+  cwkVid = cwkVid===vid ? '' : vid;
+  const sel=document.getElementById('bkv');
+  // chkConflict 會回頭呼叫 cwkSyncFromForm；點車輛時不要把週曆跳回表單日期那一週（使用者可能正在看下週）
+  if(sel){ sel.value=cwkVid; cwkNoJump=true; try{ chkConflict(); } finally{ cwkNoJump=false; } }
+  cwkRender();
+}
+// 表單 → 週曆（chkConflict 的尾端呼叫；改了表單的任何一格都會到這裡）
+function cwkSyncFromForm(jump){
+  const g=id=>document.getElementById(id)?.value||'';
+  cwkVid=g('bkv');
+  const s=cwkParse(`${g('bksd')}T${g('bkst2')||'00:00'}`), e=cwkParse(`${g('bked')}T${g('bket')||'23:59'}`);
+  cwkSel = (cwkTouched&&s&&e&&e>s) ? {s,e} : null;
+  if(jump&&cwkSel){ const m=cwkMonday(cwkSel.s); if(!cwkWeek||m.getTime()!==cwkWeek.getTime()) cwkWeek=m; }
+  cwkRender();
+}
+// 週曆 → 表單
+function cwkApply(){
+  if(!cwkSel||!cwkVid) return;
+  const {s,e}=cwkSel, set=(id,v)=>{const el=document.getElementById(id); if(el) el.value=v;};
+  set('bkv',cwkVid); set('bksd',ymdL(s)); set('bkst2',`${_z2(s.getHours())}:${_z2(s.getMinutes())}`);
+  set('bked',ymdL(e)); set('bket',`${_z2(e.getHours())}:${_z2(e.getMinutes())}`);
+  chkConflict();
+  const v=gVeh(cwkVid);
+  toast(t('car.wk.picked').replace('%s',`${v?.name||''} ${cwkFmt(s).replace('T',' ')}`).replace('%s',cwkFmt(e).replace('T',' ')),'success');
+  const pur=document.getElementById('bkpur');
+  if(pur){ pur.scrollIntoView({behavior:'smooth',block:'center'}); setTimeout(()=>pur.focus({preventScroll:true}),350); }
+}
+
+function cwkRender(){
+  const box=document.getElementById('cwk-grid'); if(!box) return;
+  if(!cwkWeek) cwkWeek=cwkMonday(new Date());
+  const days=cwkDays(), vehs=cwkVehs(), lanes=Math.max(1,vehs.length), today=tds(), locale=currentAdminLang||'zh-TW';
+  document.getElementById('cwk-tit').textContent=`${ymdL(days[0])} – ${ymdL(days[6])}`;
+  document.getElementById('cwk-vehs').innerHTML = vehs.length ? vehs.map(v=>
+    `<button class="cwk-veh${cwkVid===v.id?' on':''}" style="--c:${cwkColor(v.id)}" data-vid="${escapeHtml(v.id)}" onclick="cwkPickVeh(this.dataset.vid)">
+      <i></i>${VICO[v.type]||'🚗'} ${escapeHtml(v.name||'')} <span>${escapeHtml(v.plate||'')}</span></button>`).join('')
+    : `<span class="cwk-none">${t('car.no_data')}</span>`;
+  document.getElementById('cwk-hint').textContent = cwkVid ? t('car.wk.hint_drag') : t('car.wk.hint_pick');
+
+  const vIdx={}; vehs.forEach((v,i)=>vIdx[v.id]=i);
+  const bks=ld(K.bks).filter(b=>vIdx[b.vh_id]!==undefined&&(b.st||b.status)!=='cancelled');
+  let h=`<div class="cwk-corner"></div>`+days.map(d=>`<div class="cwk-dh${ymdL(d)===today?' today':''}">${d.toLocaleDateString(locale,{weekday:'short'})}<b>${d.getMonth()+1}/${d.getDate()}</b></div>`).join('');
+  h+=`<div class="cwk-times">`+[...Array(24)].map((_,i)=>`<div style="height:${CWK_PX*2}px">${_z2(i)}:00</div>`).join('')+`</div>`;
+  const now=new Date();
+  days.forEach((d,di)=>{
+    const ds=new Date(d), de=new Date(d); de.setDate(de.getDate()+1);
+    const pos=(a,b)=>{ const s=Math.max(a,ds), e=Math.min(b,de); return e>s ? {top:(s-ds)/60000/CWK_SLOT*CWK_PX, h:(e-s)/60000/CWK_SLOT*CWK_PX} : null; };
+    let inner='';
+    // 已過去的時段灰掉（不能選）
+    if(de<=now) inner+=`<div class="cwk-past" style="top:0;height:100%"></div>`;
+    else if(ds<now) inner+=`<div class="cwk-past" style="top:0;height:${(now-ds)/60000/CWK_SLOT*CWK_PX}px"></div>`;
+    bks.forEach(b=>{
+      const s=cwkParse(b.start), e=cwkParse(b.end); if(!s||!e) return;
+      const p=pos(s,e); if(!p) return;
+      const v=gVeh(b.vh_id), u=gUsr(b.u_id), lane=vIdx[b.vh_id], live=cwkLive(b);
+      const cls=['cwk-bk', live?'':'done', cwkVid&&b.vh_id!==cwkVid?'dim':'', cwkVid===b.vh_id?'mine':''].join(' ');
+      const tip=`${v?.name||''} ${v?.plate||''}\n${u?.name||'—'}\n${dtn(b.start).replace('T',' ')} — ${dtn(b.end).replace('T',' ')}\n${b.purpose||''}`;
+      inner+=`<div class="${cls}" style="--c:${cwkColor(b.vh_id)};top:${p.top}px;height:${Math.max(p.h,CWK_PX/2)}px;left:calc(${lane/lanes*100}% + 1px);width:calc(${100/lanes}% - 2px)" title="${escapeHtml(tip)}">${p.h>=CWK_PX*2?`<b>${escapeHtml(v?.plate||v?.name||'')}</b>${escapeHtml(u?.name||'')}`:''}</div>`;
+    });
+    if(cwkSel&&cwkVid){
+      const p=pos(cwkSel.s,cwkSel.e);
+      if(p){ const bad=!cwkDrag&&cwkClash(cwkVid,cwkSel.s,cwkSel.e); inner+=`<div class="cwk-sel${bad?' bad':''}" style="--c:${cwkColor(cwkVid)};top:${p.top}px;height:${p.h}px"></div>`; }
+    }
+    h+=`<div class="cwk-col${ymdL(d)===today?' today':''}" data-di="${di}" style="height:${CWK_ROWS*CWK_PX}px">${inner}</div>`;
+  });
+  box.innerHTML=h;
+}
+
+// ── 拖拉 ──（pointer events：滑鼠、觸控筆、手指同一套）
+function cwkPoint(ev){
+  const el=document.elementFromPoint(ev.clientX,ev.clientY)?.closest('#cwk-grid .cwk-col'); if(!el) return null;
+  const r=el.getBoundingClientRect(), slot=Math.min(CWK_ROWS-1,Math.max(0,Math.floor((ev.clientY-r.top)/CWK_PX)));
+  const d=new Date(cwkDays()[+el.dataset.di]); d.setMinutes(slot*CWK_SLOT); return d;
+}
+function cwkRange(a,b){ const s=a<=b?a:b, e=new Date((a<=b?b:a).getTime()+CWK_SLOT*60000); return {s,e}; }
+function cwkDown(ev){
+  if(!ev.target.closest('#cwk-grid .cwk-col')||ev.button>0) return;
+  if(!cwkVid){ toast(t('car.wk.pick_first'),'error'); return; }
+  const p=cwkPoint(ev); if(!p) return;
+  if(new Date(p.getTime()+CWK_SLOT*60000)<=new Date()){ toast(t('car.wk.past'),'error'); return; }
+  const r=cwkRange(p,p);
+  if(cwkClash(cwkVid,r.s,r.e)){ toast(t('car.wk.taken'),'error'); return; }
+  ev.preventDefault();
+  cwkDrag={anchor:p}; cwkSel=r; cwkTouched=true; cwkRender();
+}
+function cwkMoveEv(ev){
+  if(!cwkDrag) return;
+  ev.preventDefault();
+  // 拖到可視範圍邊緣時自動捲動（一天 48 格放不進一個畫面）
+  const wrap=document.getElementById('cwk-wrap'), wr=wrap.getBoundingClientRect();
+  if(ev.clientY>wr.bottom-24) wrap.scrollTop+=12; else if(ev.clientY<wr.top+40) wrap.scrollTop-=12;
+  const p=cwkPoint(ev); if(!p) return;
+  const r=cwkRange(cwkDrag.anchor,p);
+  // 🔴 碰到別人的預約或過去的時間就停在上一個合法的範圍 —— 拖不過去，而不是畫出一段送不出去的紅色
+  if(r.s<new Date(Math.floor(Date.now()/(CWK_SLOT*60000))*CWK_SLOT*60000)) return;
+  if(cwkClash(cwkVid,r.s,r.e)) return;
+  if(cwkSel&&cwkSel.s.getTime()===r.s.getTime()&&cwkSel.e.getTime()===r.e.getTime()) return;
+  cwkSel=r; cwkRender();
+}
+function cwkUp(){
+  if(!cwkDrag) return;
+  cwkDrag=null; cwkRender(); cwkApply();
+}
+document.addEventListener('pointerdown',cwkDown);
+document.addEventListener('pointermove',cwkMoveEv,{passive:false});
+document.addEventListener('pointerup',cwkUp);
+document.addEventListener('pointercancel',()=>{ if(cwkDrag){ cwkDrag=null; cwkRender(); } });
+function cwkInit(){
+  if(editCarBkId) cwkTouched=true;
+  ['bksd','bkst2','bked','bket'].forEach(id=>{ const el=document.getElementById(id);
+    if(el&&!el.dataset.cwk){ el.dataset.cwk='1'; el.addEventListener('input',()=>{ cwkTouched=true; }); } });
+  cwkSyncFromForm(true);
+  // 第一次打開捲到早上 7 點（一天 48 格放不進一個畫面，從半夜開始看沒有意義）
+  const wrap=document.getElementById('cwk-wrap');
+  if(wrap&&!wrap.dataset.scrolled){ wrap.scrollTop=7*2*CWK_PX; wrap.dataset.scrolled='1'; }
 }
 
 async function doBooking(){

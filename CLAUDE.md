@@ -137,7 +137,7 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 | File | Version | Purpose | ~Lines |
 |------|---------|---------|--------|
 | `index.html` | v2.17 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
-| `admin/index.html` | v2.52 | Admin System — **機場接送**、公務車、圖書館、會議室、客戶到訪、抽籤 | 8,221 |
+| `admin/index.html` | v2.53 | Admin System — **機場接送**、公務車、圖書館、會議室、客戶到訪、抽籤 | 8,221 |
 | `kms/index.html` | v2.52 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
 | `quotation/index.html` | v3.67 | Quotation & CRM system | 7,332 |
 | `board/index.html` | v1.94 | 公告與會議 Bulletin & Meetings — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍、腦力激盪 | 4,600 |
@@ -1702,6 +1702,19 @@ naive regex 會誤判成「沒定義」。
 表單與清單的 i18n 是下一步。
 
 ## Admin 重要細節
+
+### 公務車「週曆預約」（v2.53，2026-10-06，`cwk*`）
+
+預約頁（`pg-car-bk`）上方是週曆、下方是原本的表單（Woody 要求兩種都保留）。
+點車輛卡片 → 在週曆上按住拖拉（30 分鐘一格、可跨日）→ 自動帶入下方表單 → 填目的 → 原本的「確認預約」。
+- 🔴 **週曆不寫資料庫，出口只有 `doBooking`**：兩條入口共用同一個送出、權限與衝突檢查，規則才不會分岔。
+- 🔴 **雙向同步靠 `chkConflict`**：表單每一格改動都會呼叫它，它開頭呼叫 `cwkSyncFromForm()` 把表單時段畫回週曆；
+  週曆拖完由 `cwkApply()` 寫進表單再呼叫 `chkConflict()`。
+- 🔴 **拖不過去，而不是畫出一段送不出去的紅色**：碰到同車未結束的預約或過去的時間，選取停在上一個合法範圍（`cwkMoveEv`）。
+  衝突條件與 `doBooking` 相同（半開區間、排除 `editCarBkId`）。
+- 表單一打開的預設「今天 09:00–18:00」不是使用者選的，所以只有 `cwkTouched`（拖過、改過日期時間、從看板帶入、修改既有預約）才畫出來。
+- 每台車固定一條直欄＋固定顏色（`CWK_COLORS` 依站點車輛順序），選中的車其他車變淡；已完成的預約淡化顯示，已取消的不畫。
+- 驗證用模擬資料跑過三個情境：跨日拖拉帶入表單、撞到既有預約時停住、按在已預約格子上提示（headless Chrome，2026-10-06）。
 
 - `cancelCarBk(id)` 公務車取消，`cancelBk(id)` 會議室取消，**不可混用**
 - localStorage 只是快取，正本在 Supabase

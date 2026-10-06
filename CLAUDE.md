@@ -139,7 +139,7 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 | `index.html` | v2.17 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
 | `admin/index.html` | v2.52 | Admin System — **機場接送**、公務車、圖書館、會議室、客戶到訪、抽籤 | 8,221 |
 | `kms/index.html` | v2.52 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
-| `quotation/index.html` | v3.66 | Quotation & CRM system | 7,332 |
+| `quotation/index.html` | v3.67 | Quotation & CRM system | 7,332 |
 | `board/index.html` | v1.94 | 公告與會議 Bulletin & Meetings — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍、腦力激盪 | 4,600 |
 | `product_dev/` | v2.25 | **產品開發管理 —— 第六個子系統，不遵守單一檔案原則**（見下方專節） | — |
 
@@ -718,6 +718,24 @@ python3 scripts/i18n-audit.py         # Portal，key 沒引號：btn_save:'儲�
   改東西的時候要一起看「誰在依賴它以前不會丟」。
 - 「重新登入」用**相對路徑** `../index.html?next=quotation/index.html`，
   不是 `goPortal()` 寫死的網域 —— 那會讓本機開檔的開發方式失效。
+
+## 🇻🇳 報價系統「越南廠成本」頁籤（v3.67，2026-10-06，migration 202610060001）
+
+越南廠同仁做的一份獨立 HTML（`quotation/越南廠報價查詢.html`）：755 個料號的料工費（材料／人工／製費，VND）、
+每月實際單位成本、階梯報價（方案 A 成本曲線／方案 B 毛利遞減）、客戶殺價試算、全廠規模效益分析。
+**全部數字原本直接寫在 HTML 裡** —— 拿到檔案的人不用登入就看得到全廠成本。函式前綴 `vq*`，字典 `VQ_I18N`（122 key × 5 語）。
+
+- 🔴 **那份 HTML 絕不能進版控**（repo 公開），已列在 `.gitignore`。資料進 **`vn_part_costs`**（一料號一列，`mo` 是每月明細 jsonb）
+  與 **`vn_cost_meta`**（`id='current'`，全廠分析）；RLS 開 ＋ 零 policy ＋ revoke。migration 只有結構，**數字不進 repo**。
+- 🔴 **權限在 sb-proxy（`VN_COST_TABLES`）**：讀＝當下查資料庫的 `role='admin'` 或 `dept='sales'`（Woody 定案「報價系統所有使用者」）；
+  寫一律 403。這比報價系統本身的部門限制強 —— 那一道只是前端守衛，而成本是最不該外流的數字。
+- **更新資料**：目前 `python3 scripts/vn-cost-import.py <那份 HTML>`（整批取代，這次沒有的料號會刪掉）。
+  ⚠️ **第二階段（未做）**：在頁面上傳越南廠 ERP 的「生產入庫料工費」Excel、自動重算。要等越南廠同仁提供原始報表與處理規則
+  （排除旗標 Y/Z 重工單、同工單合併、偏離中位數 3 倍剔除、規模彈性回歸 —— 原檔只有結果，沒有產生它的程式）。
+- 計算逐行照搬原檔（`vqS`／`vqCost`／`vqTierCost`／`vqPriceAt`／`vqStatus`），已用真資料逐項比對過，與原檔數字相同（比對數字不寫在這裡：repo 公開）。
+  🔴 品名是 ERP 原文，原檔直接進 innerHTML；這裡一律 `escHtml`。
+- ⚠️ 與報價系統產品的連結**刻意沒做**：337 個產品只有 2 個的 `series` 是越南料號（不同料號體系）。
+- 「結論摘要」第 5 點的建議數字（5k 守 20%、1k 24%…）是原作者依 2026-01～09 資料寫的**固定文字**，換資料後要重看。
 
 ## 報價系統：僅限業務部（2026-08-25）
 

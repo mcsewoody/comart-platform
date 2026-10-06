@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#080C14">
-<title>COMART · Quotation System v3.66</title>
+<title>COMART · Quotation System v3.67</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=Noto+Serif:wght@400;700&family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -251,6 +251,54 @@ html[lang="vi"]{--ff:'Be Vietnam Pro','DM Sans',-apple-system,sans-serif;--fd:'N
   #pmtab-cost [style*="font-size:20px"]{font-size:16px !important;}
   #pmtab-cost [style*="font-size:22px"]{font-size:16px !important;}
 }
+
+/* ── 🇻🇳 越南廠成本（vq*）：一律限定在 #pageVNCost，class 前綴 vq- 避免撞到 .card 等既有樣式 ── */
+#pageVNCost{max-width:1240px;margin:0 auto;padding:12px 16px}
+#pageVNCost .vq-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+#pageVNCost .vq-head h1{font-size:17px;font-weight:600;margin:0}
+#pageVNCost .vq-head .sub{color:var(--tx3);font-size:12px}
+#pageVNCost .vq-nav{display:flex;gap:4px;margin-left:auto}
+#pageVNCost .vq-nav button{border:1px solid var(--br);color:var(--tx2);padding:5px 13px;border-radius:20px;font-size:12px;font-weight:600}
+#pageVNCost .vq-nav button.on{background:var(--ac);border-color:var(--ac);color:#fff}
+#pageVNCost .vq-card{background:var(--s1);border:1px solid var(--br);border-radius:var(--rl);padding:16px;margin-bottom:12px}
+#pageVNCost .vq-card h2{font-size:14px;font-weight:600;margin:0 0 12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+#pageVNCost .vq-card h2 small{font-weight:400;color:var(--tx3);font-size:12px}
+#pageVNCost .vq-set{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:flex-end}
+#pageVNCost .vq-set label{display:flex;flex-direction:column;font-size:12px;color:var(--tx3);gap:3px}
+#pageVNCost input,#pageVNCost select{font:inherit;font-size:13px;padding:6px 8px;border:1px solid var(--br2);border-radius:6px;background:var(--s2);color:var(--tx)}
+#pageVNCost input.n{width:84px;text-align:right}
+#pageVNCost .vq-search{position:relative}#pageVNCost .vq-search input{width:100%;font-size:15px;padding:10px 12px}
+#pageVNCost .vq-sug{position:absolute;left:0;right:0;top:100%;background:var(--s2);border:1px solid var(--br2);border-radius:0 0 8px 8px;max-height:340px;overflow:auto;z-index:5;box-shadow:0 8px 20px rgba(0,0,0,.4);display:none}
+#pageVNCost .vq-sug div{padding:7px 12px;cursor:pointer;border-bottom:1px solid var(--br);display:flex;gap:10px;font-size:13px}
+#pageVNCost .vq-sug div:hover,#pageVNCost .vq-sug div.hl{background:var(--ac2)}
+#pageVNCost .vq-sug b{font-family:var(--fm);min-width:110px}#pageVNCost .vq-sug span{color:var(--tx3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#pageVNCost .vq-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+#pageVNCost .vq-kpi{border:1px solid var(--br);border-radius:8px;padding:10px 12px;background:var(--s2)}
+#pageVNCost .vq-kpi .l{font-size:12px;color:var(--tx3)}#pageVNCost .vq-kpi .v{font-size:19px;font-weight:700;font-variant-numeric:tabular-nums}#pageVNCost .vq-kpi .s{font-size:12px;color:var(--tx3)}
+#pageVNCost .vq-kpi.hi{background:var(--ac2);border-color:var(--ac)}
+#pageVNCost .vq-t{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:13px}
+#pageVNCost .vq-t th,#pageVNCost .vq-t td{padding:7px 8px;border-bottom:1px solid var(--br);text-align:right;white-space:nowrap}
+#pageVNCost .vq-t th{font-size:12px;color:var(--tx3);font-weight:600;background:var(--s2)}
+#pageVNCost .vq-t td:first-child,#pageVNCost .vq-t th:first-child{text-align:left}
+#pageVNCost .vq-t th.g{text-align:center;border-left:2px solid var(--br2)}#pageVNCost .vq-t td.gl,#pageVNCost .vq-t th.gl{border-left:2px solid var(--br2)}
+#pageVNCost .vq-tw{overflow-x:auto}
+#pageVNCost .vq-pill{display:inline-block;padding:2px 8px;border-radius:99px;font-size:12px;font-weight:600}
+#pageVNCost .s-ok{background:var(--grn2);color:var(--grn)}#pageVNCost .s-warn{background:var(--amb2);color:var(--amb)}
+#pageVNCost .s-or{background:rgba(240,120,60,.15);color:#F0884A}#pageVNCost .s-bad{background:var(--red2);color:var(--red)}
+#pageVNCost .vq-verdict{border-radius:8px;padding:12px 14px;font-weight:600;margin-top:10px}
+#pageVNCost .vq-bar{display:flex;height:22px;border-radius:5px;overflow:hidden;margin:6px 0}
+#pageVNCost .vq-bar div{display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;white-space:nowrap;overflow:hidden}
+#pageVNCost .vq-legend{display:flex;gap:14px;font-size:12px;color:var(--tx3);flex-wrap:wrap}
+#pageVNCost .vq-legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;vertical-align:-1px}
+#pageVNCost .vq-hbar{background:var(--ac);opacity:.55;height:10px;border-radius:3px}
+#pageVNCost .vq-two{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:860px){#pageVNCost .vq-two{grid-template-columns:1fr}}
+#pageVNCost .vq-note{font-size:12px;color:var(--tx3);margin-top:8px;line-height:1.6}
+#pageVNCost .vq-empty{color:var(--tx3);text-align:center;padding:40px}
+#pageVNCost .vq-mono{font-family:var(--fm)}
+#pageVNCost .vq-prose li{margin:5px 0 5px 18px;font-size:13px;line-height:1.7}
+#pageVNCost .vq-hide{display:none}
+#pageVNCost .vq-nm{text-align:left!important;max-width:360px;overflow:hidden;text-overflow:ellipsis}
+#pageVNCost #vq-tbl tbody tr:hover{background:var(--s2);cursor:pointer}
 </style>
 </head>
 <body>
@@ -270,7 +318,7 @@ html[lang="vi"]{--ff:'Be Vietnam Pro','DM Sans',-apple-system,sans-serif;--fd:'N
       <div class="logo-mark" style="background:transparent"><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="24" height="13"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></div>
       <div>
         <div class="logo-text">COMART</div>
-        <div id="appVersionDiv" style="font-size:10px;color:var(--ac);font-weight:600;letter-spacing:.04em;line-height:1.3">v3.66</div>
+        <div id="appVersionDiv" style="font-size:10px;color:var(--ac);font-weight:600;letter-spacing:.04em;line-height:1.3">v3.67</div>
       </div>
     </div>
     <div class="topbar-right">
@@ -297,6 +345,7 @@ html[lang="vi"]{--ff:'Be Vietnam Pro','DM Sans',-apple-system,sans-serif;--fd:'N
     <button class="npill" data-tab="products" onclick="switchTab('products')"><span id="np-products">Product</span> <span class="badge" id="np-cnt-p">0</span></button>
     <button class="npill" data-tab="quotes" onclick="switchTab('quotes')"><span id="np-quotes">Quote</span> <span class="badge" id="np-cnt-q">0</span></button>
     <button class="npill" data-tab="crm" onclick="switchTab('crm')">👥 <span id="np-crm">CRM</span> <span class="badge" id="np-cnt-crm">0</span></button>
+    <button class="npill" data-tab="vncost" onclick="switchTab('vncost')">🇻🇳 <span id="np-vncost">VN Cost</span></button>
     <button class="npill" data-tab="files" onclick="switchTab('files')">📁 <span id="np-files">File</span></button>
     <button class="npill" data-tab="settings" onclick="goPage('settings')" id="np-settings-btn">⚙ <span id="np-settings">Settings</span></button>
   </div>
@@ -1069,7 +1118,7 @@ html[lang="vi"]{--ff:'Be Vietnam Pro','DM Sans',-apple-system,sans-serif;--fd:'N
 const LANGS = ['en','zh-TW','zh-CN','vi','ja'];
 const LANG_LABELS = {en:'EN','zh-TW':'繁中','zh-CN':'簡中',vi:'VI',ja:'日本語'};
 const UI = {
-  en:{files:'File',crm:'CRM',translate:'Translate',back:'Back',quotes:'Quote',products:'Product',newQ:'New Quotation',editQ:'Edit Quotation',
+  en:{files:'File',vncost:'VN Cost',crm:'CRM',translate:'Translate',back:'Back',quotes:'Quote',products:'Product',newQ:'New Quotation',editQ:'Edit Quotation',
     all:'All',draft:'Draft',sent:'Sent',
     client:'Client',moqTiers:'Price Tiers',selectProds:'Products',prices:'Unit Prices',
     company:'Company *',attn:'Contact',email:'Email',tel:'Tel',
@@ -1127,7 +1176,7 @@ const UI = {
     avSummaryPh:'One-line summary',avFollowupPh:'e.g. Send sample in 3 days',tkContentPh:'e.g. Follow up on quotation reply',
     syncLiveRates:'🔄 Sync Live Rates',tooling:'Tooling',coo:'COO',material:'Material',confirmDelete:'Delete "%s"?'
   },
-  'zh-TW':{files:'檔案',crm:'CRM',translate:'翻譯',back:'返回',quotes:'報價管理',products:'產品庫',newQ:'新建報價',editQ:'編輯報價',
+  'zh-TW':{files:'檔案',vncost:'越南廠成本',crm:'CRM',translate:'翻譯',back:'返回',quotes:'報價管理',products:'產品庫',newQ:'新建報價',editQ:'編輯報價',
     all:'全部',draft:'草稿',sent:'已發',
     client:'客戶',moqTiers:'價格區間',selectProds:'選擇產品',prices:'單位售價（USD）',
     company:'公司名稱 *',attn:'聯絡人',email:'Email',tel:'電話',
@@ -1185,7 +1234,7 @@ const UI = {
     avSummaryPh:'一句話摘要',avFollowupPh:'e.g. 3 天後寄樣品',tkContentPh:'e.g. 跟進報價回覆',
     syncLiveRates:'🔄 同步匯率',tooling:'模具廠',coo:'生產廠',material:'材質',confirmDelete:'確定刪除「%s」？'
   },
-  'zh-CN':{files:'文件',crm:'CRM',translate:'翻译',back:'返回',quotes:'报价管理',products:'产品库',newQ:'新建报价',editQ:'编辑报价',
+  'zh-CN':{files:'文件',vncost:'越南厂成本',crm:'CRM',translate:'翻译',back:'返回',quotes:'报价管理',products:'产品库',newQ:'新建报价',editQ:'编辑报价',
     all:'全部',draft:'草稿',sent:'已发送',
     client:'客户',moqTiers:'价格区间',selectProds:'选择产品',prices:'单位售价（USD）',
     company:'公司名称 *',attn:'联系人',email:'Email',tel:'电话',
@@ -1243,7 +1292,7 @@ const UI = {
     avSummaryPh:'一句话摘要',avFollowupPh:'e.g. 3 天后寄样品',tkContentPh:'e.g. 跟进报价回复',
     syncLiveRates:'🔄 同步汇率',tooling:'模具厂',coo:'生产厂',material:'材质',confirmDelete:'确定删除「%s」？'
   },
-  vi:{files:'Tệp',crm:'CRM',translate:'Dịch',back:'Quay lại',quotes:'Báo Giá',products:'Sản Phẩm',newQ:'Tạo Báo Giá',editQ:'Sửa Báo Giá',
+  vi:{files:'Tệp',vncost:'Giá thành VN',crm:'CRM',translate:'Dịch',back:'Quay lại',quotes:'Báo Giá',products:'Sản Phẩm',newQ:'Tạo Báo Giá',editQ:'Sửa Báo Giá',
     all:'Tất cả',draft:'Bản nháp',sent:'Đã gửi',
     client:'Khách hàng',moqTiers:'Mức Giá',selectProds:'Chọn Sản phẩm',prices:'Đơn giá (USD)',
     company:'Tên Công ty *',attn:'Người LH',email:'Email',tel:'Điện thoại',
@@ -1301,7 +1350,7 @@ const UI = {
     avSummaryPh:'Tóm tắt ngắn gọn',avFollowupPh:'e.g. Gửi mẫu sau 3 ngày',tkContentPh:'e.g. Theo dõi phản hồi báo giá',
     syncLiveRates:'🔄 Đồng bộ tỷ giá',tooling:'Nhà sản xuất khuôn',coo:'Nhà sản xuất',material:'Vật liệu',confirmDelete:'Xóa "%s"?'
   },
-  ja:{files:'ファイル',crm:'CRM',translate:'翻訳',back:'戻る',quotes:'見積管理',products:'製品一覧',newQ:'新規見積',editQ:'見積編集',
+  ja:{files:'ファイル',vncost:'ベトナム原価',crm:'CRM',translate:'翻訳',back:'戻る',quotes:'見積管理',products:'製品一覧',newQ:'新規見積',editQ:'見積編集',
     all:'すべて',draft:'下書き',sent:'送付済',
     client:'顧客情報',moqTiers:'価格帯',selectProds:'製品選択',prices:'単価（USD）',
     company:'会社名 *',attn:'担当者',email:'Email',tel:'電話',
@@ -2103,7 +2152,7 @@ function applyLang(){
   // 放在 applyLang 而不是 setLang：啟動與切換兩條路都會經過這裡。
   document.documentElement.lang = lang;
   const s=(id,k)=>{const el=document.getElementById(id);if(el)el.textContent=t(k);};
-  s('np-quotes','quotes');s('np-products','products');s('np-categories','categories');s('np-files','files');s('np-crm','crm');
+  s('np-quotes','quotes');s('np-products','products');s('np-categories','categories');s('np-files','files');s('np-crm','crm');s('np-vncost','vncost');
   // AI tab labels removed (AI tab deleted)
   s('backLbl','back');
   // Update form title on lang change
@@ -2139,7 +2188,7 @@ function applyLang(){
   // Quote list filter tabs
   s('qf-all','all');s('qf-draft','draft');s('qf-sent','sent');
   // Nav labels
-  s('np-quotes','quotes');s('np-products','products');s('np-files','files');s('np-crm','crm');s('np-settings','settings');
+  s('np-quotes','quotes');s('np-products','products');s('np-files','files');s('np-crm','crm');s('np-vncost','vncost');s('np-settings','settings');
   // Account modal labels & options
   s('acct-lbl-company','acctCompanyName'); s('acct-lbl-country','acctCountry'); s('acct-lbl-industry','acctIndustry');
   s('acct-lbl-type','acctType'); s('acct-lbl-status','acctStatus'); s('acct-lbl-source','acctSource');
@@ -2193,6 +2242,7 @@ function applyLang(){
   // 🔴 重畫「當前的 CRM 子頁籤」而不是寫死 accounts：管線看板的欄位標題、
   //    任務與互動紀錄都是 JS 畫的，只重畫 accounts 的話停在那幾頁切語言不會有反應。
   if(page==='crm') { if(typeof showCRMTab==='function') showCRMTab(_crmTab); }
+  if(page==='vncost') { vqApplyStatic(); if(vqP) vqAll(); }
 }
 
 // ═══════════════════════════════════════
@@ -2216,9 +2266,11 @@ function switchTab(tab){
   document.getElementById('pageProducts').classList.toggle('active',tab==='products');
   const pfEl = document.getElementById('pageFiles'); if(pfEl) pfEl.classList.toggle('active',tab==='files');
   const pcEl = document.getElementById('pageCRM'); if(pcEl) pcEl.classList.toggle('active',tab==='crm');
+  const pvEl = document.getElementById('pageVNCost'); if(pvEl) pvEl.classList.toggle('active',tab==='vncost');
   if(tab==='products') renderProductList();
   if(tab==='files'){ loadAndRenderFiles(); }
   if(tab==='crm'){ showCRMTab('accounts'); }
+  if(tab==='vncost'){ vqOpen(); }
   // Keep nav visible for all home tabs
   const _la2=document.getElementById('logoArea'); if(_la2) _la2.style.display='flex';
   const _np2=document.getElementById('navPills'); if(_np2) _np2.style.display='flex';
@@ -2231,7 +2283,7 @@ function goPage(pg){
   if(pg==='settings' && page && !['settings','form','detail'].includes(page)){
     _prevPage = page;
   }
-  ['pageQuotes','pageProducts','pageForm','pageDetail','pageSettings','pageFiles','pageCRM','pageProdForm'].forEach(id=>{ const el=document.getElementById(id); if(el) el.classList.remove('active'); });
+  ['pageQuotes','pageProducts','pageForm','pageDetail','pageSettings','pageFiles','pageCRM','pageProdForm','pageVNCost'].forEach(id=>{ const el=document.getElementById(id); if(el) el.classList.remove('active'); });
   const _pgEl=document.getElementById('page'+pg.charAt(0).toUpperCase()+pg.slice(1));
   if(_pgEl) _pgEl.classList.add('active'); else console.warn('goPage: page element not found for', pg);
   // Keep Quote tab active when in form/detail
@@ -7405,12 +7457,969 @@ async function deleteDoc(index){
   toast('Deleted');
 }
 init();
+
+const VQ_I18N = {
+"en": {
+"title": "Vietnam Plant — Part Cost & Tiered Quotation",
+"tabQ": "Quote Lookup",
+"tabA": "Cost Analysis",
+"tabL": "Part List",
+"hsub": "Source: plant production cost (material/labor/overhead) {0} – {1} | {2} parts, {3} valid work orders | Cost in VND",
+"params": "Quotation Parameters",
+"paramsSub": "Recalculates instantly",
+"mgRate": "Admin expense (% of price)",
+"gmRate": "Target gross margin",
+"costBase": "Cost basis",
+"baseAvg": "Period weighted avg.",
+"baseLast": "Latest production month",
+"currency": "Currency",
+"vnd": "VND",
+"usd": "USD",
+"fx": "FX rate VND / USD",
+"elast": "Conversion cost elasticity",
+"bSteps": "Plan B margin by tier %:",
+"searchPh": "Enter part no. or name keyword, e.g. 8SHB130217, MagSafe",
+"emptyQ": "Enter a part number to start",
+"noMatch": "No matching part",
+"listT": "Part List",
+"listSub": "Click a row to open it; unit: ",
+"filter": "Filter",
+"filterPh": "Part no. / name",
+"category": "Category",
+"all": "All",
+"pn": "Part No.",
+"name": "Description",
+"lots": "W/O",
+"totQty": "Total Qty",
+"costPcs": "Mfg cost/pcs",
+"sugPrice": "Suggested price (target GM)",
+"p1k": "1k price",
+"p20k": "20k price",
+"cat_fg": "Finished goods",
+"cat_sf": "Semi-finished",
+"cat_rm": "Raw material (in-house)",
+"info": "{0} | {1} work orders | Total output {2} pcs | Median lot {3} pcs | Latest month {4} | Cost basis: {5}",
+"baseLastM": "latest month {0}",
+"cvHi": "Volatile cost",
+"cvMid": "Some variation",
+"cvLo": "Stable cost",
+"kCost": "Manufacturing cost /pcs",
+"kCostS": "{0} · price floor",
+"kBe": "Break-even price (incl. {0} admin)",
+"kBeS": "Operating loss below this",
+"kTp": "Suggested price (GM {0})",
+"kTpS": "Operating margin {0}",
+"kGp": "Gross profit / Operating profit per pcs",
+"kGpS": "Operating profit {0}",
+"mat": "Material",
+"lab": "Labor",
+"oh": "Overhead",
+"pr": "Processing",
+"range": "Unit cost range (period) {0} – {1}",
+"tierT": "Tiered Quotation",
+"tierS": "{0}/pcs, VND rounded up to 10",
+"qty": "Qty",
+"estCost": "Est. unit cost",
+"planA": "Plan A: Cost curve (fixed GM {0})",
+"planB": "Plan B: Declining margin (flat cost)",
+"quote": "Price",
+"vs1k": "Disc. vs 1k",
+"gmQty": "GM at this qty",
+"gmAct": "GM on actual cost",
+"gmR": "Gross margin",
+"opR": "Op. margin",
+"base": "Base",
+"flagBad": "Below cost",
+"flagOr": "Op. loss",
+"noteA": "Plan A: material cost does not change with volume; labor + overhead are scaled with elasticity {0} from this part's median lot of {1} pcs (adjustment capped at -20% to +25%). \"GM on actual cost\" = margin against current actual manufacturing cost.",
+"noteB": "Plan B: cost held at actual manufacturing cost, margin steps down per the settings above; operating margin = gross margin − admin rate.",
+"bargT": "Counter-offer Check",
+"tgtP": "Customer target price ({0})",
+"useAct": "Actual cost",
+"histT": "Monthly Actual Unit Cost",
+"month": "Month",
+"inQty": "Output qty",
+"unitCost": "Unit cost",
+"refCost": "Reference cost ({0})",
+"refEst": "{0} est.",
+"refAct": "actual",
+"unitGp": "Gross profit / pcs",
+"mgFee": "Admin expense ({0})",
+"opProfit": "Operating profit / margin",
+"gapT": "Gap to target price",
+"reached": "Target met",
+"gap": "Short by {0} ({1})",
+"actGm": "GM on actual cost",
+"floor": "Floors: mfg cost {0}; break-even {1}; target price {2}",
+"stBad": "Below manufacturing cost — do not accept",
+"stOr": "Covers mfg cost but not admin expense (operating loss)",
+"stWarn": "Profitable, but below target margin",
+"stOk": "Target margin achieved",
+"sumT": "Key Findings",
+"s1": "<b>Cost structure: material {0}, labor {1}, overhead {2}</b>. Only labor + overhead (about {3}) vary with volume; material does not get cheaper at higher volume (elasticity {4}).",
+"s2": "<b>Lot size makes no visible difference in the cost report</b>: the ERP allocates cost by monthly weighted average per part, so work orders of different sizes in the same month show almost identical unit cost. Lot size alone cannot reveal economies of scale.",
+"s3": "<b>Comparing monthly output per part shows real but modest economies of scale</b>: elasticity of labor + overhead to monthly volume is {0} — doubling monthly output cuts unit conversion cost by about {1} and total cost by about {2}. At 4× normal volume or more, conversion cost is about {3} lower and total cost about {4} lower.",
+"s4": "<b>Recommended tier discounts (plant average, vs 1k, GM held at {0})</b>: 3k −{1}, 5k −{2}, 10k −{3}, 20k −{4}. This is the maximum discount the cost base supports; each part's own discount depends on its labor/overhead share (Plan A on the lookup page).",
+"s5": "<b>Margin recommendation</b>: with {0} admin expense, a 20% gross margin equals a 12% operating margin. Cost-side scale savings are only about 5–8%, so larger volume discounts must come out of margin (Plan B). Suggest holding 20% at 5k, a 24% premium at 1k (covering mold change, trial runs and packaging MOQ not captured in the cost report), and no lower than 16% at 20k (still 8% operating margin). A gross margin ≤ 8% means an operating loss.",
+"catT": "Cost Structure by Category",
+"convT": "Conversion total",
+"catNote": "Raw material (in-house molded parts) has the highest conversion share and the strongest scale effect; finished goods are material-heavy with less room for volume discounts.",
+"scaleT": "Scale Effect Check",
+"scaleS": "Same part, monthly output vs its normal monthly output",
+"volX": "Volume multiple",
+"samples": "Samples",
+"labOh": "Labor + OH",
+"totCost": "Total cost",
+"scaleNote": "Values are ratios to the part's median unit cost (1.000 = unchanged). Sample: parts produced in ≥3 months.",
+"bk": [
+"≤0.5×",
+"0.5–0.8×",
+"0.8–1.25× (normal)",
+"1.25–2×",
+"2–4×",
+">4×"
+],
+"dataT": "Data Processing Notes",
+"d1": "{0} raw records ({1} – {2} production receipts). Excluded {3}: rework/adjustment orders (flag Y, Z, mostly VM012), zero quantity, negative cost.",
+"d2": "Multiple receipts of the same work order were merged; {0} outlier work orders with unit cost more than 3× off the part median were excluded. Result: {1} parts, {2} work orders.",
+"d3": "Gross margin = (price − mfg cost) ÷ price; admin expense = {0} of price; operating profit = gross profit − admin expense.",
+"d4": "The cost report contains no target prices, so no current-price vs cost comparison was made; enter customer prices on the lookup page.",
+"d5": "Default FX rate of 26,000 VND/USD is for conversion only — update to the actual rate.",
+"d6": "Part descriptions are original ERP text and are not translated.",
+"loading": "Loading Vietnam plant cost data…",
+"loadFail": "Could not load the cost data: ",
+"imported": "Cost data last imported {0}"
+},
+"zh-TW": {
+"title": "越南廠 料號成本 / 階梯報價查詢",
+"tabQ": "報價查詢",
+"tabA": "成本分析與建議",
+"tabL": "料號總表",
+"hsub": "資料：全廠生產料工費 {0} ～ {1}｜{2} 個料號、{3} 張有效工單｜成本單位 VND",
+"params": "報價參數",
+"paramsSub": "修改後即時重算",
+"mgRate": "管理費率（佔售價）",
+"gmRate": "目標毛利率",
+"costBase": "成本基準",
+"baseAvg": "期間加權平均",
+"baseLast": "最近一個生產月",
+"currency": "顯示幣別",
+"vnd": "VND 越南盾",
+"usd": "USD 美元",
+"fx": "匯率 VND / USD",
+"elast": "加工費規模彈性",
+"bSteps": "方案B 各階毛利率 %：",
+"searchPh": "輸入料號或品名關鍵字，例如 8SHB130217、MagSafe、球窝底座",
+"emptyQ": "輸入料號開始查詢",
+"noMatch": "查無符合料號",
+"listT": "料號總表",
+"listSub": "點選列可直接開啟查詢；單位：",
+"filter": "篩選",
+"filterPh": "料號 / 品名",
+"category": "類別",
+"all": "全部",
+"pn": "料號",
+"name": "品名",
+"lots": "工單數",
+"totQty": "生產總量",
+"costPcs": "料工費/pcs",
+"sugPrice": "建議單價(目標毛利)",
+"p1k": "1k價",
+"p20k": "20k價",
+"cat_fg": "成品類",
+"cat_sf": "半成品類",
+"cat_rm": "原物料類(自製件)",
+"info": "{0}｜{1} 張工單｜生產總量 {2} pcs｜工單中位批量 {3} pcs｜最近生產月 {4}｜成本基準：{5}",
+"baseLastM": "最近月 {0}",
+"cvHi": "成本波動大",
+"cvMid": "成本有波動",
+"cvLo": "成本穩定",
+"kCost": "料工費（製造成本）/pcs",
+"kCostS": "{0} · 報價下限",
+"kBe": "損益兩平價（含管理費 {0}）",
+"kBeS": "低於此價營業虧損",
+"kTp": "建議單價（毛利 {0}）",
+"kTpS": "營業利益率 {0}",
+"kGp": "單件毛利 / 營業利益",
+"kGpS": "營業利益 {0}",
+"mat": "材料",
+"lab": "人工",
+"oh": "製費",
+"pr": "加工",
+"range": "全期單位成本區間 {0} ～ {1}",
+"tierT": "階梯報價",
+"tierS": "{0}/pcs，VND 無條件進位至 10",
+"qty": "數量",
+"estCost": "預估單位成本",
+"planA": "方案A：成本曲線法（毛利固定 {0}）",
+"planB": "方案B：毛利遞減法（成本不變）",
+"quote": "報價",
+"vs1k": "vs 1k 折扣",
+"gmQty": "該量毛利",
+"gmAct": "對實際成本毛利",
+"gmR": "毛利率",
+"opR": "營業利益率",
+"base": "基準",
+"flagBad": "低於料工費",
+"flagOr": "營業虧損",
+"noteA": "方案A：材料成本不隨量變動；人工＋製費依規模彈性 {0} 以此料號工單中位批量 {1} pcs 為基準推估（調整幅度限制在 -20%～+25%）。「對實際成本毛利」= 以目前實際料工費計算的毛利。",
+"noteB": "方案B：成本以實際料工費計，各階毛利率依上方設定遞減；營業利益率 = 毛利率 − 管理費率。",
+"bargT": "客戶殺價試算",
+"tgtP": "客戶目標單價（{0}）",
+"useAct": "用實際成本",
+"histT": "每月實際單位成本",
+"month": "月份",
+"inQty": "入庫量",
+"unitCost": "單位成本",
+"refCost": "對照成本（{0}）",
+"refEst": "{0} 預估",
+"refAct": "實際",
+"unitGp": "單件毛利",
+"mgFee": "管理費（{0}）",
+"opProfit": "營業利益 / 率",
+"gapT": "距目標毛利價差",
+"reached": "已達標",
+"gap": "差 {0}（{1}）",
+"actGm": "若以實際成本計毛利率",
+"floor": "底線：料工費 {0}；損益兩平 {1}；目標價 {2}",
+"stBad": "低於料工費 — 不可接單",
+"stOr": "可回收料工費，但不足支付管理費（營業虧損）",
+"stWarn": "有營業利益，但低於目標毛利",
+"stOk": "達成目標毛利",
+"sumT": "結論摘要",
+"s1": "<b>成本結構：材料佔 {0}、人工 {1}、製費 {2}</b>。真正會隨量變動的只有人工＋製費（約 {3}），材料不會因量大而降低（彈性 {4}）。",
+"s2": "<b>同一張工單批量大小，在成本表上看不出差異</b>：ERP 是以「料號×月」加權平均分攤成本，同月不同批量的工單單位成本幾乎相同，所以無法直接用工單批量判斷規模效益。",
+"s3": "<b>改用「料號每月生產量」比較，確實存在規模效益但不大</b>：人工＋製費對月產量的彈性 {0}，即月產量加倍，單位加工費約降 {1}，總成本約降 {2}。月產量達常態 4 倍以上時，加工費約低 {3}、總成本約低 {4}。",
+"s4": "<b>建議階梯折扣（全廠平均，以 1k 為基準，毛利維持 {0}）</b>：3k −{1}、5k −{2}、10k −{3}、20k −{4}。這是「成本面撐得住」的折扣上限；每個料號的實際折扣依其人工製費佔比而不同（查詢頁方案A）。",
+"s5": "<b>毛利建議</b>：管理費 {0} 下，毛利 20% 等於營業利益率 12%。成本面規模效益只有約 5–8%，若要給客戶更大的量價折扣，需靠犧牲毛利（方案B）。建議 5k 守 20%，1k 小量加價到 24%（補換模、試機、包材起訂量等成本表沒反映的小單成本），20k 最低不低於 16%（營業利益率仍有 8%）；毛利 ≤ 8% 即營業虧損。",
+"catT": "各類別成本結構",
+"convT": "加工費合計",
+"catNote": "原物料類（自製射出件）加工費佔比最高，規模效益最明顯；成品類材料佔比高，量價空間較小。",
+"scaleT": "規模效益驗證",
+"scaleS": "同料號、各月產量 vs 該料號常態月產量",
+"volX": "月產量倍數",
+"samples": "樣本數",
+"labOh": "人工+製費",
+"totCost": "總成本",
+"scaleNote": "數值為相對該料號中位單位成本的比值（1.000 = 持平）。樣本：生產 ≥3 個月的料號。",
+"bk": [
+"≤0.5倍",
+"0.5–0.8倍",
+"0.8–1.25倍(常態)",
+"1.25–2倍",
+"2–4倍",
+">4倍"
+],
+"dataT": "資料處理說明",
+"d1": "原始資料 {0} 筆（{1}～{2} 生產入庫）。排除 {3} 筆：重工/調整單（旗標 Y、Z，多為 VM012 工單）、數量為 0、成本為負值。",
+"d2": "同一工單分多筆入庫者合併為一張工單；另排除單位成本偏離該料號中位數 3 倍以上的異常工單 {0} 張。最後 {1} 個料號、{2} 張工單。",
+"d3": "毛利率 =（售價 − 料工費）÷ 售價；管理費以售價的 {0} 計；營業利益 = 毛利 − 管理費。",
+"d4": "成本表中沒有目標報價，所以未做「現行報價 vs 成本」比對；客戶目標價請在查詢頁輸入試算。",
+"d5": "匯率預設 26,000 VND/USD 僅為換算用，請依實際匯率修改。",
+"d6": "品名為 ERP 原始資料，不隨語言切換。",
+"loading": "載入越南廠成本資料中…",
+"loadFail": "成本資料載入失敗：",
+"imported": "成本資料匯入時間 {0}"
+},
+"zh-CN": {
+"title": "越南厂 料号成本 / 阶梯报价查询",
+"tabQ": "报价查询",
+"tabA": "成本分析与建议",
+"tabL": "料号总表",
+"hsub": "资料：全厂生产料工费 {0} ～ {1}｜{2} 个料号、{3} 张有效工单｜成本单位 VND",
+"params": "报价参数",
+"paramsSub": "修改后即时重算",
+"mgRate": "管理费率（占售价）",
+"gmRate": "目标毛利率",
+"costBase": "成本基准",
+"baseAvg": "期间加权平均",
+"baseLast": "最近一个生产月",
+"currency": "显示币别",
+"vnd": "VND 越南盾",
+"usd": "USD 美元",
+"fx": "汇率 VND / USD",
+"elast": "加工费规模弹性",
+"bSteps": "方案B 各阶毛利率 %：",
+"searchPh": "输入料号或品名关键字，例如 8SHB130217、MagSafe、球窝底座",
+"emptyQ": "输入料号开始查询",
+"noMatch": "查无符合料号",
+"listT": "料号总表",
+"listSub": "点选列可直接开启查询；单位：",
+"filter": "筛选",
+"filterPh": "料号 / 品名",
+"category": "类别",
+"all": "全部",
+"pn": "料号",
+"name": "品名",
+"lots": "工单数",
+"totQty": "生产总量",
+"costPcs": "料工费/pcs",
+"sugPrice": "建议单价(目标毛利)",
+"p1k": "1k价",
+"p20k": "20k价",
+"cat_fg": "成品类",
+"cat_sf": "半成品类",
+"cat_rm": "原物料类(自制件)",
+"info": "{0}｜{1} 张工单｜生产总量 {2} pcs｜工单中位批量 {3} pcs｜最近生产月 {4}｜成本基准：{5}",
+"baseLastM": "最近月 {0}",
+"cvHi": "成本波动大",
+"cvMid": "成本有波动",
+"cvLo": "成本稳定",
+"kCost": "料工费（制造成本）/pcs",
+"kCostS": "{0} · 报价下限",
+"kBe": "损益两平价（含管理费 {0}）",
+"kBeS": "低于此价营业亏损",
+"kTp": "建议单价（毛利 {0}）",
+"kTpS": "营业利益率 {0}",
+"kGp": "单件毛利 / 营业利益",
+"kGpS": "营业利益 {0}",
+"mat": "材料",
+"lab": "人工",
+"oh": "制费",
+"pr": "加工",
+"range": "全期单位成本区间 {0} ～ {1}",
+"tierT": "阶梯报价",
+"tierS": "{0}/pcs，VND 无条件进位至 10",
+"qty": "数量",
+"estCost": "预估单位成本",
+"planA": "方案A：成本曲线法（毛利固定 {0}）",
+"planB": "方案B：毛利递减法（成本不变）",
+"quote": "报价",
+"vs1k": "vs 1k 折扣",
+"gmQty": "该量毛利",
+"gmAct": "对实际成本毛利",
+"gmR": "毛利率",
+"opR": "营业利益率",
+"base": "基准",
+"flagBad": "低于料工费",
+"flagOr": "营业亏损",
+"noteA": "方案A：材料成本不随量变动；人工＋制费依规模弹性 {0} 以此料号工单中位批量 {1} pcs 为基准推估（调整幅度限制在 -20%～+25%）。「对实际成本毛利」= 以目前实际料工费计算的毛利。",
+"noteB": "方案B：成本以实际料工费计，各阶毛利率依上方设定递减；营业利益率 = 毛利率 − 管理费率。",
+"bargT": "客户杀价试算",
+"tgtP": "客户目标单价（{0}）",
+"useAct": "用实际成本",
+"histT": "每月实际单位成本",
+"month": "月份",
+"inQty": "入库量",
+"unitCost": "单位成本",
+"refCost": "对照成本（{0}）",
+"refEst": "{0} 预估",
+"refAct": "实际",
+"unitGp": "单件毛利",
+"mgFee": "管理费（{0}）",
+"opProfit": "营业利益 / 率",
+"gapT": "距目标毛利价差",
+"reached": "已达标",
+"gap": "差 {0}（{1}）",
+"actGm": "若以实际成本计毛利率",
+"floor": "底线：料工费 {0}；损益两平 {1}；目标价 {2}",
+"stBad": "低于料工费 — 不可接单",
+"stOr": "可回收料工费，但不足支付管理费（营业亏损）",
+"stWarn": "有营业利益，但低于目标毛利",
+"stOk": "达成目标毛利",
+"sumT": "结论摘要",
+"s1": "<b>成本结构：材料占 {0}、人工 {1}、制费 {2}</b>。真正会随量变动的只有人工＋制费（约 {3}），材料不会因量大而降低（弹性 {4}）。",
+"s2": "<b>同一张工单批量大小，在成本表上看不出差异</b>：ERP 是以「料号×月」加权平均分摊成本，同月不同批量的工单单位成本几乎相同，所以无法直接用工单批量判断规模效益。",
+"s3": "<b>改用「料号每月生产量」比较，确实存在规模效益但不大</b>：人工＋制费对月产量的弹性 {0}，即月产量加倍，单位加工费约降 {1}，总成本约降 {2}。月产量达常态 4 倍以上时，加工费约低 {3}、总成本约低 {4}。",
+"s4": "<b>建议阶梯折扣（全厂平均，以 1k 为基准，毛利维持 {0}）</b>：3k −{1}、5k −{2}、10k −{3}、20k −{4}。这是「成本面撑得住」的折扣上限；每个料号的实际折扣依其人工制费占比而不同（查询页方案A）。",
+"s5": "<b>毛利建议</b>：管理费 {0} 下，毛利 20% 等于营业利益率 12%。成本面规模效益只有约 5–8%，若要给客户更大的量价折扣，需靠牺牲毛利（方案B）。建议 5k 守 20%，1k 小量加价到 24%（补换模、试机、包材起订量等成本表没反映的小单成本），20k 最低不低于 16%（营业利益率仍有 8%）；毛利 ≤ 8% 即营业亏损。",
+"catT": "各类别成本结构",
+"convT": "加工费合计",
+"catNote": "原物料类（自制射出件）加工费占比最高，规模效益最明显；成品类材料占比高，量价空间较小。",
+"scaleT": "规模效益验证",
+"scaleS": "同料号、各月产量 vs 该料号常态月产量",
+"volX": "月产量倍数",
+"samples": "样本数",
+"labOh": "人工+制费",
+"totCost": "总成本",
+"scaleNote": "数值为相对该料号中位单位成本的比值（1.000 = 持平）。样本：生产 ≥3 个月的料号。",
+"bk": [
+"≤0.5倍",
+"0.5–0.8倍",
+"0.8–1.25倍(常态)",
+"1.25–2倍",
+"2–4倍",
+">4倍"
+],
+"dataT": "资料处理说明",
+"d1": "原始资料 {0} 笔（{1}～{2} 生产入库）。排除 {3} 笔：重工/调整单（旗标 Y、Z，多为 VM012 工单）、数量为 0、成本为负值。",
+"d2": "同一工单分多笔入库者合并为一张工单；另排除单位成本偏离该料号中位数 3 倍以上的异常工单 {0} 张。最后 {1} 个料号、{2} 张工单。",
+"d3": "毛利率 =（售价 − 料工费）÷ 售价；管理费以售价的 {0} 计；营业利益 = 毛利 − 管理费。",
+"d4": "成本表中没有目标报价，所以未做「现行报价 vs 成本」比对；客户目标价请在查询页输入试算。",
+"d5": "汇率预设 26,000 VND/USD 仅为换算用，请依实际汇率修改。",
+"d6": "品名为 ERP 原始资料，不随语言切换。",
+"loading": "载入越南厂成本资料中…",
+"loadFail": "成本资料载入失败：",
+"imported": "成本资料汇入时间 {0}"
+},
+"vi": {
+"title": "Nhà máy Việt Nam — Tra cứu giá thành & báo giá bậc thang",
+"tabQ": "Tra cứu báo giá",
+"tabA": "Phân tích chi phí",
+"tabL": "Danh sách mã hàng",
+"hsub": "Nguồn: chi phí NVL/nhân công/SXC toàn nhà máy {0} – {1} | {2} mã hàng, {3} lệnh sản xuất hợp lệ | Đơn vị VND",
+"params": "Tham số báo giá",
+"paramsSub": "Tự động tính lại khi thay đổi",
+"mgRate": "Chi phí quản lý (% giá bán)",
+"gmRate": "Biên lợi nhuận gộp mục tiêu",
+"costBase": "Cơ sở giá thành",
+"baseAvg": "BQ gia quyền cả kỳ",
+"baseLast": "Tháng sản xuất gần nhất",
+"currency": "Tiền tệ",
+"vnd": "VND",
+"usd": "USD",
+"fx": "Tỷ giá VND / USD",
+"elast": "Hệ số co giãn chi phí gia công",
+"bSteps": "Phương án B – biên LN gộp theo bậc %:",
+"searchPh": "Nhập mã hàng hoặc từ khóa tên hàng, vd: 8SHB130217, MagSafe",
+"emptyQ": "Nhập mã hàng để bắt đầu tra cứu",
+"noMatch": "Không tìm thấy mã hàng",
+"listT": "Danh sách mã hàng",
+"listSub": "Nhấn vào dòng để tra cứu; đơn vị: ",
+"filter": "Lọc",
+"filterPh": "Mã hàng / tên hàng",
+"category": "Loại",
+"all": "Tất cả",
+"pn": "Mã hàng",
+"name": "Tên hàng",
+"lots": "Số lệnh SX",
+"totQty": "Tổng SL",
+"costPcs": "Giá thành/pcs",
+"sugPrice": "Giá đề xuất (LN mục tiêu)",
+"p1k": "Giá 1k",
+"p20k": "Giá 20k",
+"cat_fg": "Thành phẩm",
+"cat_sf": "Bán thành phẩm",
+"cat_rm": "Nguyên vật liệu (tự SX)",
+"info": "{0} | {1} lệnh SX | Tổng sản lượng {2} pcs | Lô trung vị {3} pcs | Tháng SX gần nhất {4} | Cơ sở giá thành: {5}",
+"baseLastM": "tháng gần nhất {0}",
+"cvHi": "Giá thành biến động lớn",
+"cvMid": "Giá thành có biến động",
+"cvLo": "Giá thành ổn định",
+"kCost": "Giá thành sản xuất /pcs",
+"kCostS": "{0} · giá sàn",
+"kBe": "Giá hòa vốn (gồm CP quản lý {0})",
+"kBeS": "Dưới mức này là lỗ kinh doanh",
+"kTp": "Giá đề xuất (LN gộp {0})",
+"kTpS": "Biên LN hoạt động {0}",
+"kGp": "LN gộp / LN hoạt động mỗi pcs",
+"kGpS": "LN hoạt động {0}",
+"mat": "NVL",
+"lab": "Nhân công",
+"oh": "SXC",
+"pr": "Gia công",
+"range": "Khoảng giá thành trong kỳ {0} – {1}",
+"tierT": "Báo giá bậc thang",
+"tierS": "{0}/pcs, VND làm tròn lên hàng chục",
+"qty": "Số lượng",
+"estCost": "Giá thành ước tính",
+"planA": "PA A: Theo đường cong chi phí (LN gộp cố định {0})",
+"planB": "PA B: Giảm dần biên LN (giá thành không đổi)",
+"quote": "Giá báo",
+"vs1k": "Chiết khấu so với 1k",
+"gmQty": "LN gộp tại SL này",
+"gmAct": "LN gộp trên giá thành thực tế",
+"gmR": "Biên LN gộp",
+"opR": "Biên LN hoạt động",
+"base": "Gốc",
+"flagBad": "Dưới giá thành",
+"flagOr": "Lỗ KD",
+"noteA": "PA A: chi phí NVL không đổi theo sản lượng; nhân công + SXC được điều chỉnh theo hệ số co giãn {0}, lấy lô trung vị {1} pcs của mã hàng này làm gốc (giới hạn điều chỉnh -20% đến +25%). \"LN gộp trên giá thành thực tế\" = biên lợi nhuận tính trên giá thành sản xuất thực tế hiện tại.",
+"noteB": "PA B: giá thành giữ nguyên theo thực tế, biên LN gộp giảm dần theo thiết lập phía trên; biên LN hoạt động = biên LN gộp − tỷ lệ CP quản lý.",
+"bargT": "Kiểm tra khi khách ép giá",
+"tgtP": "Giá mục tiêu của khách ({0})",
+"useAct": "Giá thành thực tế",
+"histT": "Giá thành thực tế theo tháng",
+"month": "Tháng",
+"inQty": "SL nhập kho",
+"unitCost": "Giá thành",
+"refCost": "Giá thành đối chiếu ({0})",
+"refEst": "ước tính {0}",
+"refAct": "thực tế",
+"unitGp": "LN gộp mỗi pcs",
+"mgFee": "CP quản lý ({0})",
+"opProfit": "LN hoạt động / biên",
+"gapT": "Chênh lệch so với giá mục tiêu",
+"reached": "Đã đạt",
+"gap": "Thiếu {0} ({1})",
+"actGm": "Biên LN gộp trên giá thành thực tế",
+"floor": "Mức sàn: giá thành {0}; hòa vốn {1}; giá mục tiêu {2}",
+"stBad": "Thấp hơn giá thành — không nhận đơn",
+"stOr": "Bù được giá thành nhưng không đủ CP quản lý (lỗ kinh doanh)",
+"stWarn": "Có lãi nhưng thấp hơn biên LN mục tiêu",
+"stOk": "Đạt biên LN mục tiêu",
+"sumT": "Tóm tắt kết luận",
+"s1": "<b>Cơ cấu chi phí: NVL {0}, nhân công {1}, SXC {2}</b>. Chỉ nhân công + SXC (khoảng {3}) thay đổi theo sản lượng; NVL không giảm khi sản lượng lớn (hệ số {4}).",
+"s2": "<b>Quy mô lô sản xuất không tạo khác biệt trên bảng giá thành</b>: ERP phân bổ chi phí theo bình quân gia quyền \"mã hàng × tháng\", các lệnh SX khác quy mô trong cùng tháng có giá thành gần như giống nhau, nên không thể dùng quy mô lô để đánh giá lợi thế quy mô.",
+"s3": "<b>So sánh theo sản lượng tháng của từng mã hàng cho thấy có lợi thế quy mô nhưng không lớn</b>: hệ số co giãn của nhân công + SXC theo sản lượng tháng là {0} — sản lượng tháng tăng gấp đôi thì chi phí gia công/pcs giảm khoảng {1}, tổng giá thành giảm khoảng {2}. Khi sản lượng tháng gấp 4 lần bình thường trở lên, chi phí gia công thấp hơn khoảng {3}, tổng giá thành thấp hơn khoảng {4}.",
+"s4": "<b>Đề xuất chiết khấu theo bậc (bình quân toàn nhà máy, so với 1k, giữ LN gộp {0})</b>: 3k −{1}, 5k −{2}, 10k −{3}, 20k −{4}. Đây là mức chiết khấu tối đa mà giá thành cho phép; chiết khấu thực tế của từng mã tùy theo tỷ trọng nhân công + SXC (PA A trên trang tra cứu).",
+"s5": "<b>Đề xuất biên lợi nhuận</b>: với CP quản lý {0}, LN gộp 20% tương đương biên LN hoạt động 12%. Lợi thế quy mô từ giá thành chỉ khoảng 5–8%, muốn chiết khấu sâu hơn phải giảm biên LN (PA B). Đề xuất giữ 20% ở 5k, 1k tăng lên 24% (bù chi phí thay khuôn, chạy thử, MOQ bao bì không thể hiện trong bảng giá thành), 20k không thấp hơn 16% (vẫn còn 8% LN hoạt động). Biên LN gộp ≤ 8% là lỗ kinh doanh.",
+"catT": "Cơ cấu chi phí theo loại",
+"convT": "Tổng chi phí gia công",
+"catNote": "Nguyên vật liệu (linh kiện ép nhựa tự sản xuất) có tỷ trọng gia công cao nhất, lợi thế quy mô rõ nhất; thành phẩm có tỷ trọng NVL cao, dư địa chiết khấu theo sản lượng nhỏ hơn.",
+"scaleT": "Kiểm chứng lợi thế quy mô",
+"scaleS": "Cùng mã hàng, sản lượng từng tháng so với sản lượng bình thường",
+"volX": "Bội số sản lượng tháng",
+"samples": "Số mẫu",
+"labOh": "NC + SXC",
+"totCost": "Tổng giá thành",
+"scaleNote": "Giá trị là tỷ lệ so với giá thành trung vị của mã hàng (1.000 = không đổi). Mẫu: các mã sản xuất ≥3 tháng.",
+"bk": [
+"≤0,5 lần",
+"0,5–0,8 lần",
+"0,8–1,25 lần (bình thường)",
+"1,25–2 lần",
+"2–4 lần",
+">4 lần"
+],
+"dataT": "Ghi chú xử lý dữ liệu",
+"d1": "Dữ liệu gốc {0} dòng (nhập kho thành phẩm {1} – {2}). Loại bỏ {3} dòng: lệnh làm lại/điều chỉnh (cờ Y, Z, chủ yếu lệnh VM012), số lượng bằng 0, chi phí âm.",
+"d2": "Các lần nhập kho của cùng một lệnh SX được gộp lại; loại bỏ thêm {0} lệnh bất thường có giá thành lệch hơn 3 lần so với trung vị của mã. Kết quả: {1} mã hàng, {2} lệnh SX.",
+"d3": "Biên LN gộp = (giá bán − giá thành SX) ÷ giá bán; CP quản lý = {0} giá bán; LN hoạt động = LN gộp − CP quản lý.",
+"d4": "Bảng giá thành không có giá báo mục tiêu nên chưa so sánh giá hiện hành với giá thành; vui lòng nhập giá của khách tại trang tra cứu.",
+"d5": "Tỷ giá mặc định 26.000 VND/USD chỉ dùng để quy đổi, vui lòng cập nhật theo tỷ giá thực tế.",
+"d6": "Tên hàng là dữ liệu gốc từ ERP, không được dịch.",
+"loading": "Đang tải dữ liệu giá thành nhà máy Việt Nam…",
+"loadFail": "Không tải được dữ liệu giá thành: ",
+"imported": "Dữ liệu giá thành nhập lúc {0}"
+},
+"ja": {
+"title": "ベトナム工場 品番原価 / 数量別見積照会",
+"tabQ": "見積照会",
+"tabA": "原価分析と提案",
+"tabL": "品番一覧",
+"hsub": "データ：工場全体の製造原価（材料・労務・経費）{0} ～ {1}｜{2} 品番、有効製造指図 {3} 件｜原価単位 VND",
+"params": "見積パラメータ",
+"paramsSub": "変更すると即時に再計算",
+"mgRate": "管理費率（売価比）",
+"gmRate": "目標粗利率",
+"costBase": "原価基準",
+"baseAvg": "期間加重平均",
+"baseLast": "直近の生産月",
+"currency": "表示通貨",
+"vnd": "VND ベトナムドン",
+"usd": "USD 米ドル",
+"fx": "為替レート VND / USD",
+"elast": "加工費の規模弾力性",
+"bSteps": "案B 数量帯別粗利率 %：",
+"searchPh": "品番または品名のキーワードを入力（例：8SHB130217、MagSafe）",
+"emptyQ": "品番を入力して照会を開始",
+"noMatch": "該当する品番がありません",
+"listT": "品番一覧",
+"listSub": "行をクリックすると照会画面を開きます；単位：",
+"filter": "絞り込み",
+"filterPh": "品番 / 品名",
+"category": "区分",
+"all": "すべて",
+"pn": "品番",
+"name": "品名",
+"lots": "指図数",
+"totQty": "総生産数",
+"costPcs": "製造原価/pcs",
+"sugPrice": "推奨単価(目標粗利)",
+"p1k": "1k単価",
+"p20k": "20k単価",
+"cat_fg": "完成品",
+"cat_sf": "半製品",
+"cat_rm": "原材料(内製部品)",
+"info": "{0}｜製造指図 {1} 件｜総生産数 {2} pcs｜指図ロット中央値 {3} pcs｜直近生産月 {4}｜原価基準：{5}",
+"baseLastM": "直近月 {0}",
+"cvHi": "原価の変動大",
+"cvMid": "原価にやや変動",
+"cvLo": "原価は安定",
+"kCost": "製造原価（材料・労務・経費）/pcs",
+"kCostS": "{0} · 見積下限",
+"kBe": "損益分岐価格（管理費 {0} 込み）",
+"kBeS": "これを下回ると営業赤字",
+"kTp": "推奨単価（粗利 {0}）",
+"kTpS": "営業利益率 {0}",
+"kGp": "1個あたり粗利 / 営業利益",
+"kGpS": "営業利益 {0}",
+"mat": "材料",
+"lab": "労務",
+"oh": "経費",
+"pr": "加工",
+"range": "期間中の単位原価レンジ {0} ～ {1}",
+"tierT": "数量別見積",
+"tierS": "{0}/pcs、VND は 10 単位で切り上げ",
+"qty": "数量",
+"estCost": "推定単位原価",
+"planA": "案A：原価カーブ法（粗利 {0} 固定）",
+"planB": "案B：粗利逓減法（原価一定）",
+"quote": "見積",
+"vs1k": "1k 比値引",
+"gmQty": "当該数量の粗利",
+"gmAct": "実際原価に対する粗利",
+"gmR": "粗利率",
+"opR": "営業利益率",
+"base": "基準",
+"flagBad": "原価割れ",
+"flagOr": "営業赤字",
+"noteA": "案A：材料費は数量で変わらないものとし、労務費＋経費は規模弾力性 {0} で、この品番の指図ロット中央値 {1} pcs を基準に推定（調整幅は -20%～+25% に制限）。「実際原価に対する粗利」＝現在の実際製造原価で計算した粗利。",
+"noteB": "案B：原価は実際の製造原価のまま、各数量帯の粗利率を上の設定どおり逓減；営業利益率 ＝ 粗利率 − 管理費率。",
+"bargT": "値下げ要求の試算",
+"tgtP": "顧客の希望単価（{0}）",
+"useAct": "実際原価で計算",
+"histT": "月別の実際単位原価",
+"month": "月",
+"inQty": "入庫数",
+"unitCost": "単位原価",
+"refCost": "比較原価（{0}）",
+"refEst": "{0} 推定",
+"refAct": "実際",
+"unitGp": "1個あたり粗利",
+"mgFee": "管理費（{0}）",
+"opProfit": "営業利益 / 率",
+"gapT": "目標粗利価格との差",
+"reached": "達成",
+"gap": "差 {0}（{1}）",
+"actGm": "実際原価で計算した粗利率",
+"floor": "下限：製造原価 {0}；損益分岐 {1}；目標価格 {2}",
+"stBad": "製造原価割れ — 受注不可",
+"stOr": "製造原価は回収できるが管理費を賄えない（営業赤字）",
+"stWarn": "営業利益は出るが目標粗利に届かない",
+"stOk": "目標粗利を達成",
+"sumT": "結論の要約",
+"s1": "<b>原価構成：材料 {0}、労務 {1}、経費 {2}</b>。数量で変動するのは労務＋経費（約 {3}）だけで、材料費は数量が増えても下がらない（弾力性 {4}）。",
+"s2": "<b>同じ指図のロットの大小は原価表に差として表れない</b>：ERP は「品番×月」の加重平均で原価を配賦するため、同じ月ならロットが違っても単位原価はほぼ同じ。指図ロットから規模効果は判断できない。",
+"s3": "<b>「品番ごとの月間生産量」で比べると、規模効果はあるが大きくない</b>：労務＋経費の月産量に対する弾力性は {0}。月産量が倍になると単位加工費は約 {1}、総原価は約 {2} 下がる。月産量が通常の 4 倍以上では加工費が約 {3}、総原価が約 {4} 低い。",
+"s4": "<b>推奨する数量別値引き（工場平均、1k 基準、粗利 {0} 維持）</b>：3k −{1}、5k −{2}、10k −{3}、20k −{4}。これは「原価面で耐えられる」値引きの上限で、品番ごとの実際の値引き幅は労務・経費の比率によって異なる（照会画面の案A）。",
+"s5": "<b>粗利の提案</b>：管理費 {0} の場合、粗利 20% は営業利益率 12% に相当。原価面の規模効果は約 5–8% しかなく、より大きな数量値引きは粗利を削る（案B）しかない。5k は 20% を守り、1k の小ロットは 24% に上乗せ（型替え・試作・梱包材の最小発注量など原価表に出ない小ロットコストを補う）、20k でも 16% を下回らない（営業利益率 8% を確保）ことを推奨。粗利 8% 以下は営業赤字。",
+"catT": "区分別の原価構成",
+"convT": "加工費合計",
+"catNote": "原材料（内製の射出成形部品）は加工費の比率が最も高く規模効果が最も大きい；完成品は材料比率が高く、数量値引きの余地は小さい。",
+"scaleT": "規模効果の検証",
+"scaleS": "同一品番の各月生産量 vs その品番の通常月産量",
+"volX": "月産量の倍率",
+"samples": "サンプル数",
+"labOh": "労務+経費",
+"totCost": "総原価",
+"scaleNote": "数値はその品番の単位原価中央値に対する比率（1.000 = 変化なし）。サンプル：3 か月以上生産した品番。",
+"bk": [
+"≤0.5倍",
+"0.5–0.8倍",
+"0.8–1.25倍(通常)",
+"1.25–2倍",
+"2–4倍",
+">4倍"
+],
+"dataT": "データ処理の説明",
+"d1": "元データ {0} 件（{1}～{2} の生産入庫）。除外 {3} 件：手直し/調整伝票（フラグ Y・Z、主に VM012 指図）、数量 0、原価がマイナスのもの。",
+"d2": "同じ指図の複数回の入庫は 1 件に統合；さらに単位原価が品番の中央値から 3 倍以上離れた異常指図 {0} 件を除外。最終的に {1} 品番、{2} 指図。",
+"d3": "粗利率 =（売価 − 製造原価）÷ 売価；管理費は売価の {0}；営業利益 = 粗利 − 管理費。",
+"d4": "原価表には見積価格がないため「現行見積 vs 原価」の比較はしていない；顧客の希望価格は照会画面で入力して試算してください。",
+"d5": "為替レートの初期値 26,000 VND/USD は換算用の仮の値です。実際のレートに合わせて変更してください。",
+"d6": "品名は ERP の原文で、言語を切り替えても翻訳されません。",
+"loading": "ベトナム工場の原価データを読み込み中…",
+"loadFail": "原価データを読み込めませんでした：",
+"imported": "原価データ取込日時 {0}"
+}
+};
+// ═══════════════════════════════════════
+// 🇻🇳 越南廠成本（vq*）—— 料號料工費、階梯報價、客戶殺價試算（v3.67）
+// ═══════════════════════════════════════
+// 原本是越南廠同仁做的一份獨立 HTML（「越南廠報價查詢.html」），全部料工費直接寫在檔案裡。
+// 🔴 搬進來之後數字只在資料庫（vn_part_costs／vn_cost_meta），經 sb-proxy 讀取，
+//    而 sb-proxy 只放行「業務部 ＋ admin」—— 這是伺服器端的牆，不是只靠這一頁的前端守衛。
+// 🔴 品名是 ERP 原文（別人寫進資料庫的字串），進 innerHTML 一律 escHtml。
+// 計算邏輯逐行照搬原檔（S／cost／tierCost／priceAt／status），只換掉 DOM 與資料來源。
+const VQ_TIERS = [1000, 3000, 5000, 10000, 20000];
+const VQ_C = { mat:'#3b6fc4', lab:'#e0913a', oh:'#8a5bc2', pr:'#9aa3b5' };
+const VQ_CATK = { '成品類':'cat_fg', '半成品類':'cat_sf', '原物料類(自製件)':'cat_rm', '成品类':'cat_fg', '半成品类':'cat_sf', '原物料类':'cat_rm' };
+let vqP = null, vqM = null, vqByPn = {}, vqCur = null, vqSub = 'q', vqHl = -1, vqLoading = null, vqImportedAt = '';
+
+function vt(k, ...a) {
+  const d = VQ_I18N[lang] || VQ_I18N.en;
+  const s = d[k] ?? VQ_I18N['zh-TW'][k] ?? k;
+  return typeof s === 'string' ? s.replace(/\{(\d)\}/g, (_, i) => a[i]) : s;
+}
+const vq$ = s => document.querySelector('#pageVNCost ' + s);
+function vqCatL(c) { return VQ_CATK[c] ? vt(VQ_CATK[c]) : escHtml(c); }
+const vqN = v => Number(v || 0).toLocaleString('en-US');
+
+async function vqOpen() {
+  vqApplyStatic();
+  if (vqP) { vqAll(); return; }
+  if (!vqLoading) vqLoading = vqLoad();
+  await vqLoading;
+}
+async function vqLoad() {
+  const out = vq$('#vq-out');
+  if (out) out.innerHTML = `<div class="vq-card vq-empty">${vt('loading')}</div>`;
+  try {
+    // 755 列 × 每月明細；PostgREST 單次上限 1000 列，超過時要改分頁
+    const [rows, meta] = await Promise.all([
+      SB.get('vn_part_costs', 'select=*&order=pn.asc&limit=5000'),
+      SB.get('vn_cost_meta', 'id=eq.current&select=meta,imported_at'),
+    ]);
+    // SB.get 失敗回 null（含 403：不在業務部），查得到但沒有資料回 []——兩者不可混為一談
+    if (!rows || !meta) throw new Error(rows === null || meta === null ? 'HTTP' : 'empty');
+    if (!meta.length) throw new Error('no meta');
+    vqP = rows.map(r => ({ ...r, mo: Array.isArray(r.mo) ? r.mo : [] }));
+    vqM = meta[0].meta;
+    vqImportedAt = meta[0].imported_at || '';
+    vqByPn = Object.fromEntries(vqP.map(p => [p.pn, p]));
+    vq$('#vq-el').value = vqM.el.conv;
+    vqApplyStatic();
+    vqAll();
+  } catch (e) {
+    vqLoading = null;   // 下次進來再試
+    if (out) out.innerHTML = `<div class="vq-card vq-empty">${vt('loadFail')}${escHtml(e.message || '')}</div>`;
+  }
+}
+
+function vqApplyStatic() {
+  const root = document.getElementById('pageVNCost'); if (!root) return;
+  root.querySelectorAll('[data-vk]').forEach(e => e.textContent = vt(e.dataset.vk));
+  root.querySelectorAll('[data-vkp]').forEach(e => e.placeholder = vt(e.dataset.vkp));
+  root.querySelectorAll('.vq-nav button').forEach(b => b.classList.toggle('on', b.dataset.t === vqSub));
+  if (vqM) {
+    vq$('#vq-hsub').textContent = vt('hsub', vqM.firstmon, vqM.lastmon, vqM.nparts, vqN(vqM.lots))
+      + (vqImportedAt ? '｜' + vt('imported', String(vqImportedAt).slice(0, 10)) : '');
+    const lc = vq$('#vq-lc'), v = lc.value;
+    const cats = [...new Set(vqP.map(p => p.cat))];
+    lc.innerHTML = `<option value="">${vt('all')}</option>` + cats.map(c => `<option value="${escHtml(c)}">${vqCatL(c)}</option>`).join('');
+    lc.value = v;
+  }
+  if (vqCur) vq$('#vq-q').value = vqCur.pn + '  ' + vqCur.nm;
+}
+
+/* ── 計算（照搬原檔）── */
+function vqS() {
+  return { mg: +vq$('#vq-mg').value / 100, gm: +vq$('#vq-gm').value / 100, base: vq$('#vq-base').value,
+    cur: vq$('#vq-cur').value, fx: +vq$('#vq-fx').value || 26000, el: +vq$('#vq-el').value,
+    gs: [...document.querySelectorAll('#pageVNCost .vq-gs')].map(x => +x.value / 100) };
+}
+function vqMoney(v, s, dp) {
+  if (v == null || !isFinite(v)) return '—';
+  if (s.cur === 'USD') { const u = v / s.fx; return '$' + u.toFixed(dp ?? (u < 1 ? 4 : 3)); }
+  return Math.round(v).toLocaleString('en-US');
+}
+function vqPct(v, d = 1) { return isFinite(v) ? (v * 100).toFixed(d) + '%' : '—'; }
+function vqRound(v) { return Math.ceil(v / 10) * 10; }
+function vqCost(p, s) {
+  const L = s.base === 'last';
+  const mat = +(L ? p.lmat : p.mat), lab = +(L ? p.llab : p.lab), oh = +(L ? p.loh : p.oh), pr = +(L ? p.lpr : p.pr);
+  return { mat, lab, oh, pr, conv: lab + oh + pr, tot: mat + lab + oh + pr };
+}
+function vqAnchor(p) { return Math.min(20000, Math.max(500, +p.lot || 1000)); }
+function vqTierCost(p, s, q) {
+  const c = vqCost(p, s);
+  let f = Math.pow(q / vqAnchor(p), s.el); f = Math.min(1.25, Math.max(0.80, f));
+  return c.mat + c.conv * f;
+}
+function vqPriceAt(c, g) { return vqRound(c / (1 - g)); }
+function vqStatus(P_, c, s) {
+  const be = c / (1 - s.mg); const g = (P_ - c) / P_;
+  if (P_ < c) return ['s-bad', vt('stBad'), g];
+  if (P_ < be) return ['s-or', vt('stOr'), g];
+  if (g < s.gm - 1e-9) return ['s-warn', vt('stWarn'), g];
+  return ['s-ok', vt('stOk'), g];
+}
+
+/* ── 搜尋 ── */
+function vqSearchInput(e) {
+  const v = e.target.value.trim().toLowerCase(), box = vq$('#vq-sug'); vqHl = -1;
+  if (!v || !vqP) { box.style.display = 'none'; return; }
+  const r = vqP.filter(p => p.pn.toLowerCase().includes(v) || (p.nm || '').toLowerCase().includes(v)).slice(0, 40);
+  box.innerHTML = r.length
+    ? r.map(p => `<div data-pn="${escHtml(p.pn)}"><b>${escHtml(p.pn)}</b><span>${escHtml(p.nm)}</span></div>`).join('')
+    : `<div><span>${vt('noMatch')}</span></div>`;
+  box.style.display = 'block';
+}
+function vqSearchKey(e) {
+  const it = [...document.querySelectorAll('#vq-sug div[data-pn]')]; if (!it.length) return;
+  if (e.key === 'ArrowDown') { vqHl = Math.min(it.length - 1, vqHl + 1); e.preventDefault(); }
+  else if (e.key === 'ArrowUp') { vqHl = Math.max(0, vqHl - 1); e.preventDefault(); }
+  else if (e.key === 'Enter') { vqPick(it[vqHl < 0 ? 0 : vqHl].dataset.pn); return; }
+  else return;
+  it.forEach((d, i) => d.classList.toggle('hl', i === vqHl)); it[vqHl]?.scrollIntoView({ block: 'nearest' });
+}
+function vqPick(pn) {
+  vqCur = vqByPn[pn]; if (!vqCur) return;
+  vq$('#vq-q').value = pn + '  ' + vqCur.nm; vq$('#vq-sug').style.display = 'none';
+  vqTab('q'); vqRender();
+}
+
+/* ── 單一料號 ── */
+function vqRender() {
+  const out = vq$('#vq-out'); if (!out || !vqP) return;
+  const s = vqS();
+  document.querySelectorAll('#pageVNCost .vq-curU').forEach(x => x.textContent = s.cur);
+  if (!vqCur) { out.innerHTML = `<div class="vq-card vq-empty">${vt('emptyQ')}</div>`; return; }
+  const p = vqCur, c = vqCost(p, s), u = s.cur;
+  const tp = vqPriceAt(c.tot, s.gm), be = vqRound(c.tot / (1 - s.mg));
+  const sh = k => c.tot ? c[k] / c.tot * 100 : 0;
+  const rows = VQ_TIERS.map((q, i) => { const tc = vqTierCost(p, s, q); return { q, tc, pa: vqPriceAt(tc, s.gm), pb: vqPriceAt(c.tot, s.gs[i]) }; });
+  const a1 = rows[0].pa, b1 = rows[0].pb;
+  const trs = rows.map((r, i) => {
+    const gb = s.gs[i]; const opB = gb - s.mg;
+    const fl = r.pb < c.tot ? `<span class="vq-pill s-bad">${vt('flagBad')}</span>` : (opB < 0 ? `<span class="vq-pill s-or">${vt('flagOr')}</span>` : '');
+    return `<tr><td><b>${r.q / 1000}k</b></td><td>${vqMoney(r.tc, s)}</td>
+      <td class="gl"><b>${vqMoney(r.pa, s)}</b></td><td>${i ? '-' + vqPct(1 - r.pa / a1) : vt('base')}</td><td>${vqPct((r.pa - r.tc) / r.pa)}</td><td>${vqPct((r.pa - c.tot) / r.pa)}</td>
+      <td class="gl"><b>${vqMoney(r.pb, s)}</b></td><td>${i ? '-' + vqPct(1 - r.pb / b1) : vt('base')}</td><td>${vqPct(gb)}</td><td>${vqPct(opB)} ${fl}</td></tr>`;
+  }).join('');
+  const mx = Math.max(...p.mo.map(m => +m[2]), 1);
+  const hist = p.mo.map(m => `<tr><td>${escHtml(m[0])}</td><td>${vqN(m[1])}</td><td>${vqMoney(+m[2], s)}</td><td style="text-align:left;width:45%"><div class="vq-hbar" style="width:${(m[2] / mx * 100).toFixed(1)}%"></div></td></tr>`).join('');
+  const cvTag = p.cv > 0.15 ? `<span class="vq-pill s-or">${vt('cvHi')}</span>` : p.cv > 0.07 ? `<span class="vq-pill s-warn">${vt('cvMid')}</span>` : `<span class="vq-pill s-ok">${vt('cvLo')}</span>`;
+  const keep = vq$('#vq-tp')?.value, kq = vq$('#vq-tq')?.value;
+  out.innerHTML = `
+  <div class="vq-card"><h2><span class="vq-mono">${escHtml(p.pn)}</span> ${escHtml(p.nm)}</h2>
+   <div class="vq-note" style="margin:-6px 0 12px">${vt('info', vqCatL(p.cat), p.lots, vqN(p.q), vqN(Math.round(p.lot)), escHtml(p.lmon || ''), s.base === 'last' ? vt('baseLastM', escHtml(p.lmon || '')) : vt('baseAvg'))}　${cvTag}</div>
+   <div class="vq-grid">
+    <div class="vq-kpi"><div class="l">${vt('kCost')}</div><div class="v">${vqMoney(c.tot, s)}</div><div class="s">${vt('kCostS', u)}</div></div>
+    <div class="vq-kpi"><div class="l">${vt('kBe', vqPct(s.mg, 1))}</div><div class="v">${vqMoney(be, s)}</div><div class="s">${vt('kBeS')}</div></div>
+    <div class="vq-kpi hi"><div class="l">${vt('kTp', vqPct(s.gm, 1))}</div><div class="v">${vqMoney(tp, s)}</div><div class="s">${vt('kTpS', vqPct(s.gm - s.mg))}</div></div>
+    <div class="vq-kpi"><div class="l">${vt('kGp')}</div><div class="v">${vqMoney(tp - c.tot, s)}</div><div class="s">${vt('kGpS', vqMoney(tp - c.tot - tp * s.mg, s))}</div></div>
+   </div>
+   <div style="margin-top:14px"><div class="vq-bar">
+    <div style="width:${sh('mat')}%;background:${VQ_C.mat}">${vt('mat')} ${sh('mat').toFixed(0)}%</div>
+    <div style="width:${sh('lab')}%;background:${VQ_C.lab}">${sh('lab') > 8 ? vt('lab') + ' ' + sh('lab').toFixed(0) + '%' : ''}</div>
+    <div style="width:${sh('oh')}%;background:${VQ_C.oh}">${sh('oh') > 8 ? vt('oh') + ' ' + sh('oh').toFixed(0) + '%' : ''}</div>
+    <div style="width:${sh('pr')}%;background:${VQ_C.pr}"></div></div>
+    <div class="vq-legend"><span><i style="background:${VQ_C.mat}"></i>${vt('mat')} ${vqMoney(c.mat, s)}</span><span><i style="background:${VQ_C.lab}"></i>${vt('lab')} ${vqMoney(c.lab, s)}</span><span><i style="background:${VQ_C.oh}"></i>${vt('oh')} ${vqMoney(c.oh, s)}</span>${c.pr > 0 ? `<span><i style="background:${VQ_C.pr}"></i>${vt('pr')} ${vqMoney(c.pr, s)}</span>` : ''}<span>${vt('range', vqMoney(+p.umin, s), vqMoney(+p.umax, s))}</span></div></div>
+  </div>
+  <div class="vq-card"><h2>${vt('tierT')} <small>${vt('tierS', u)}</small></h2>
+   <div class="vq-tw"><table class="vq-t"><thead>
+    <tr><th rowspan="2">${vt('qty')}</th><th rowspan="2">${vt('estCost')}</th><th colspan="4" class="g">${vt('planA', vqPct(s.gm, 0))}</th><th colspan="4" class="g">${vt('planB')}</th></tr>
+    <tr><th class="gl">${vt('quote')}</th><th>${vt('vs1k')}</th><th>${vt('gmQty')}</th><th>${vt('gmAct')}</th><th class="gl">${vt('quote')}</th><th>${vt('vs1k')}</th><th>${vt('gmR')}</th><th>${vt('opR')}</th></tr></thead><tbody>${trs}</tbody></table></div>
+   <div class="vq-note">${vt('noteA', s.el, vqN(Math.round(vqAnchor(p))))}<br>${vt('noteB')}</div>
+  </div>
+  <div class="vq-two">
+   <div class="vq-card"><h2>${vt('bargT')}</h2>
+    <div class="vq-set"><label>${vt('tgtP', u)}<input id="vq-tp" type="number" style="width:150px" step="any"></label>
+     <label>${vt('qty')}<select id="vq-tq">${VQ_TIERS.map(q => `<option value="${q}">${q / 1000}k</option>`).join('')}<option value="0">${vt('useAct')}</option></select></label></div>
+    <div id="vq-tpo"></div>
+   </div>
+   <div class="vq-card"><h2>${vt('histT')} <small>${u}/pcs</small></h2>
+    <div class="vq-tw"><table class="vq-t"><thead><tr><th>${vt('month')}</th><th>${vt('inQty')}</th><th>${vt('unitCost')}</th><th></th></tr></thead><tbody>${hist}</tbody></table></div>
+   </div>
+  </div>`;
+  vq$('#vq-tp').addEventListener('input', vqCalcTP); vq$('#vq-tq').addEventListener('change', vqCalcTP);
+  if (keep) { vq$('#vq-tp').value = keep; vq$('#vq-tq').value = kq; vqCalcTP(); }
+}
+function vqCalcTP() {
+  const s = vqS(), p = vqCur; const raw = +vq$('#vq-tp').value; const q = +vq$('#vq-tq').value;
+  if (!raw) { vq$('#vq-tpo').innerHTML = ''; return; }
+  const P_ = s.cur === 'USD' ? raw * s.fx : raw; const c = q ? vqTierCost(p, s, q) : vqCost(p, s).tot; const act = vqCost(p, s).tot;
+  const [cls, msg, g] = vqStatus(P_, c, s); const op = g - s.mg; const tp = c / (1 - s.gm);
+  vq$('#vq-tpo').innerHTML = `<table class="vq-t" style="margin-top:10px"><tbody>
+   <tr><td>${vt('refCost', q ? vt('refEst', q / 1000 + 'k') : vt('refAct'))}</td><td>${vqMoney(c, s)}</td></tr>
+   <tr><td>${vt('unitGp')}</td><td>${vqMoney(P_ - c, s)}</td></tr>
+   <tr><td>${vt('gmR')}</td><td><b>${vqPct(g)}</b></td></tr>
+   <tr><td>${vt('mgFee', vqPct(s.mg, 1))}</td><td>${vqMoney(P_ * s.mg, s)}</td></tr>
+   <tr><td>${vt('opProfit')}</td><td>${vqMoney(P_ - c - P_ * s.mg, s)}　(${vqPct(op)})</td></tr>
+   <tr><td>${vt('gapT')}</td><td>${P_ >= tp ? vt('reached') : vt('gap', vqMoney(tp - P_, s), vqPct(1 - P_ / tp))}</td></tr>
+   <tr><td>${vt('actGm')}</td><td>${vqPct((P_ - act) / P_)}</td></tr></tbody></table>
+   <div class="vq-verdict ${cls}">${msg}</div>
+   <div class="vq-note">${vt('floor', vqMoney(c, s), vqMoney(c / (1 - s.mg), s), vqMoney(tp, s))}</div>`;
+}
+
+/* ── 全廠分析 ── */
+function vqRenderA() {
+  const el = vq$('#vq-ana'); if (!el || !vqM) return;
+  const s = vqS(); const sh = vqM.share; const conv = sh.lab + sh.oh + sh.proc;
+  const dsc = VQ_TIERS.map(q => 1 - (sh.mat + conv * Math.pow(q / 1000, s.el)) / (sh.mat + conv));
+  const cs = Object.entries(vqM.catshare || {}).map(([k, v]) => `<tr><td>${vqCatL(k)}</td><td>${vqPct(v.mat)}</td><td>${vqPct(v.lab)}</td><td>${vqPct(v.oh)}</td><td>${vqPct(v.lab + v.oh + v.proc)}</td></tr>`).join('');
+  const bk = vt('bk');
+  const bt = (vqM.bt || []).map((r, i) => `<tr><td>${bk[i] || ''}</td><td>${r[1]}</td><td>${(+r[2]).toFixed(3)}</td><td>${(+r[3]).toFixed(3)}</td><td>${(+r[4]).toFixed(3)}</td></tr>`).join('');
+  const b5 = (vqM.bt || [])[5] || [0, 0, 1, 1, 1];
+  el.innerHTML = `
+  <div class="vq-card vq-prose"><h2>${vt('sumT')}</h2><ol>
+   <li>${vt('s1', vqPct(sh.mat), vqPct(sh.lab), vqPct(sh.oh), vqPct(conv, 0), vqM.el.mat)}</li>
+   <li>${vt('s2')}</li>
+   <li>${vt('s3', vqM.el.conv, vqPct(1 - Math.pow(2, vqM.el.conv)), vqPct(1 - Math.pow(2, vqM.el.tot)), vqPct(1 - b5[3], 0), vqPct(1 - b5[4], 1))}</li>
+   <li>${vt('s4', vqPct(s.gm, 0), vqPct(dsc[1]), vqPct(dsc[2]), vqPct(dsc[3]), vqPct(dsc[4]))}</li>
+   <li>${vt('s5', vqPct(s.mg, 0))}</li>
+  </ol></div>
+  <div class="vq-two">
+   <div class="vq-card"><h2>${vt('catT')}</h2><table class="vq-t"><thead><tr><th>${vt('category')}</th><th>${vt('mat')}</th><th>${vt('lab')}</th><th>${vt('oh')}</th><th>${vt('convT')}</th></tr></thead><tbody>${cs}</tbody></table>
+    <div class="vq-note">${vt('catNote')}</div></div>
+   <div class="vq-card"><h2>${vt('scaleT')} <small>${vt('scaleS')}</small></h2><table class="vq-t"><thead><tr><th>${vt('volX')}</th><th>${vt('samples')}</th><th>${vt('mat')}</th><th>${vt('labOh')}</th><th>${vt('totCost')}</th></tr></thead><tbody>${bt}</tbody></table>
+    <div class="vq-note">${vt('scaleNote')}</div></div>
+  </div>
+  <div class="vq-card vq-prose"><h2>${vt('dataT')}</h2><ul>
+   <li>${vt('d1', vqN(vqM.raw), vqM.firstmon, vqM.lastmon, vqM.excl)}</li>
+   <li>${vt('d2', vqM.outl, vqM.nparts, vqN(vqM.lots))}</li>
+   <li>${vt('d3', vqPct(s.mg, 0))}</li><li>${vt('d4')}</li><li>${vt('d5')}</li><li>${vt('d6')}</li></ul></div>`;
+}
+
+/* ── 料號總表 ── */
+function vqRenderL() {
+  const tb = vq$('#vq-tbl tbody'); if (!tb || !vqP) return;
+  const s = vqS(), f = vq$('#vq-lf').value.trim().toLowerCase(), cf = vq$('#vq-lc').value;
+  const r = vqP.filter(p => (!f || p.pn.toLowerCase().includes(f) || (p.nm || '').toLowerCase().includes(f)) && (!cf || p.cat === cf)).slice(0, 800);
+  tb.innerHTML = r.map(p => {
+    const c = vqCost(p, s).tot;
+    return `<tr data-pn="${escHtml(p.pn)}"><td class="vq-mono">${escHtml(p.pn)}</td><td class="vq-nm">${escHtml(p.nm)}</td><td>${vqCatL(p.cat)}</td><td>${p.lots}</td><td>${vqN(p.q)}</td><td>${vqMoney(c, s)}</td><td>${vqMoney(vqPriceAt(c, s.gm), s)}</td><td>${vqMoney(vqPriceAt(vqTierCost(p, s, 1000), s.gm), s)}</td><td>${vqMoney(vqPriceAt(vqTierCost(p, s, 20000), s.gm), s)}</td></tr>`;
+  }).join('');
+}
+
+function vqTab(x) {
+  vqSub = x;
+  document.querySelectorAll('#pageVNCost .vq-nav button').forEach(b => b.classList.toggle('on', b.dataset.t === x));
+  ['q', 'a', 'l'].forEach(y => vq$('#vq-t-' + y).classList.toggle('vq-hide', y !== x));
+}
+function vqAll() { vqRender(); vqRenderA(); vqRenderL(); }
+
+document.addEventListener('DOMContentLoaded', () => {
+  const root = document.getElementById('pageVNCost'); if (!root) return;
+  vq$('#vq-q').addEventListener('input', vqSearchInput);
+  vq$('#vq-q').addEventListener('keydown', vqSearchKey);
+  vq$('#vq-sug').addEventListener('click', e => { const d = e.target.closest('div[data-pn]'); if (d) vqPick(d.dataset.pn); });
+  document.addEventListener('click', e => { if (!e.target.closest('#pageVNCost .vq-search')) { const b = vq$('#vq-sug'); if (b) b.style.display = 'none'; } });
+  vq$('#vq-tbl').addEventListener('click', e => { const x = e.target.closest('tr[data-pn]'); if (x) vqPick(x.dataset.pn); });
+  vq$('#vq-lf').addEventListener('input', vqRenderL); vq$('#vq-lc').addEventListener('change', vqRenderL);
+  root.querySelectorAll('.vq-nav button').forEach(b => b.onclick = () => vqTab(b.dataset.t));
+  root.querySelectorAll('.vq-params input, .vq-params select').forEach(x => x.addEventListener('input', () => { if (vqP) vqAll(); }));
+});
+
 </script>
 
 <!-- ── PAGE: FILES ────────────────────────────────── -->
 
 
 <!-- ── PAGE: TRIP ──────────────────────────────────── -->
+
+<!-- 🇻🇳 越南廠成本（vq*）：資料在 vn_part_costs，經 sb-proxy 只給業務部＋admin -->
+<div class="page" id="pageVNCost">
+  <div class="vq-head">
+    <div><h1 data-vk="title"></h1><div class="sub" id="vq-hsub"></div></div>
+    <div class="vq-nav"><button class="on" data-t="q" data-vk="tabQ"></button><button data-t="a" data-vk="tabA"></button><button data-t="l" data-vk="tabL"></button></div>
+  </div>
+  <div class="vq-card vq-params">
+    <h2><span data-vk="params"></span> <small data-vk="paramsSub"></small></h2>
+    <div class="vq-set">
+      <label><span data-vk="mgRate"></span><span><input class="n" id="vq-mg" type="number" step="0.5" value="8"> %</span></label>
+      <label><span data-vk="gmRate"></span><span><input class="n" id="vq-gm" type="number" step="0.5" value="20"> %</span></label>
+      <label><span data-vk="costBase"></span><select id="vq-base"><option value="avg" data-vk="baseAvg"></option><option value="last" data-vk="baseLast"></option></select></label>
+      <label><span data-vk="currency"></span><select id="vq-cur"><option value="VND" data-vk="vnd"></option><option value="USD" data-vk="usd"></option></select></label>
+      <label><span data-vk="fx"></span><input class="n" id="vq-fx" type="number" step="100" value="26000" style="width:96px"></label>
+      <label><span data-vk="elast"></span><input class="n" id="vq-el" type="number" step="0.01"></label>
+    </div>
+    <div class="vq-set" style="margin-top:10px">
+      <span style="font-size:12px;color:var(--tx3);align-self:center" data-vk="bSteps"></span>
+      <label>1k<input class="n vq-gs" type="number" step="0.5" value="24" style="width:64px"></label>
+      <label>3k<input class="n vq-gs" type="number" step="0.5" value="22" style="width:64px"></label>
+      <label>5k<input class="n vq-gs" type="number" step="0.5" value="20" style="width:64px"></label>
+      <label>10k<input class="n vq-gs" type="number" step="0.5" value="18" style="width:64px"></label>
+      <label>20k<input class="n vq-gs" type="number" step="0.5" value="16" style="width:64px"></label>
+    </div>
+  </div>
+  <section id="vq-t-q">
+    <div class="vq-card"><div class="vq-search"><input id="vq-q" data-vkp="searchPh" autocomplete="off"><div class="vq-sug" id="vq-sug"></div></div></div>
+    <div id="vq-out"></div>
+  </section>
+  <section id="vq-t-a" class="vq-hide"><div id="vq-ana"></div></section>
+  <section id="vq-t-l" class="vq-hide">
+    <div class="vq-card">
+      <h2><span data-vk="listT"></span> <small><span data-vk="listSub"></span><span class="vq-curU"></span>/pcs</small></h2>
+      <div class="vq-set" style="margin-bottom:10px"><label><span data-vk="filter"></span><input id="vq-lf" data-vkp="filterPh" style="width:220px"></label>
+        <label><span data-vk="category"></span><select id="vq-lc"></select></label></div>
+      <div class="vq-tw" style="max-height:640px;overflow:auto"><table class="vq-t" id="vq-tbl"><thead><tr><th data-vk="pn"></th><th style="text-align:left" data-vk="name"></th><th data-vk="category"></th><th data-vk="lots"></th><th data-vk="totQty"></th><th data-vk="costPcs"></th><th data-vk="sugPrice"></th><th data-vk="p1k"></th><th data-vk="p20k"></th></tr></thead><tbody></tbody></table></div>
+    </div>
+  </section>
+</div>
 
 <div class="page" id="pageFiles">
 

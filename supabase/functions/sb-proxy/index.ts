@@ -46,6 +46,7 @@ const ALLOWED_TABLES = new Set([
   "products","quotation_settings","quotes","room_bookings","room_faults",
   "sites","suppliers","trips","users","visit_guests","visit_records","weekly_minutes",
   "woody_reports","airport_bookings",
+  "vn_part_costs","vn_cost_meta",   // 越南廠料工費：只給業務部 ＋ admin 讀（見下方 VN_COST_TABLES）
   "premortem_sessions","premortem_entries","premortem_mitigations",
   // 注意：premortem_summary_log（AI 結論的版本歷史）**刻意不列入**——
   // 稽核紀錄不該能被應用程式讀取或刪除，只能從 Supabase 後台查。
@@ -91,6 +92,7 @@ const CHAT_LOBBY_ID = "lobby"
 const WOODY_READS = "woody_reads"
 const WOODY_EMP = "C00001"
 const KMS_HARMLESS_PATCH = new Set(["view_count", "embedding"])
+const VN_COST_TABLES = new Set(["vn_part_costs", "vn_cost_meta"])
 
 // ── 線上對話：單則訊息的修改與刪除（v2.01）──
 // 三組欄位，三種授權。**分組的依據是「改壞了會怎樣」，不是欄位長得像不像**：
@@ -338,6 +340,17 @@ serve(async (req) => {
     if (!seeAll && req.method !== "POST") {
       restPath = forceOwnRows(restPath, sessEmpId)
     }
+  }
+
+  // ── 越南廠料工費（報價系統「越南廠成本」頁籤）──
+  //    讀：業務部 ＋ admin（Woody 2026-10-06 定案「報價系統所有使用者」——規則與報價系統的部門限制相同，
+  //    但報價系統那一道只是前端守衛，這裡是真的牆：成本是全公司最不該外流的數字）。
+  //    寫：一律不經這裡（目前由本機腳本用 service role 匯入；第二階段的上傳另開路徑）。
+  //    部門與角色重新查資料庫，不讀簽章（調部門後舊 token 還在）；查不到一律拒絕。
+  if (VN_COST_TABLES.has(table)) {
+    if (isWrite) return json({ error: "forbidden", hint: "read only" }, 403)
+    const live = await liveUserOf(SUPABASE_URL, SERVICE_KEY, sessEmpId)
+    if (!(live.role === "admin" || live.dept === "sales")) return json({ error: "forbidden", hint: "sales_or_admin_only" }, 403)
   }
 
   // ── 寫入授權：users/departments/sites 僅限 admin；

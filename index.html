@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>COMART Platform v2.14</title>
+<title>COMART Platform v2.15</title>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=Noto+Serif:wght@400;700&family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script defer src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.js"></script>
 <style>
@@ -431,7 +431,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     <div class="login-logo">
       <div class="login-mark" style="background:transparent"><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="44" height="23"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></div>
       <div class="login-name">COMART Platform</div>
-      <div class="login-sub">Internal Portal · v2.14</div>
+      <div class="login-sub">Internal Portal · v2.15</div>
     </div>
     <form id="loginForm" onsubmit="doLogin();return false;" autocomplete="on">
     <div class="field">
@@ -501,7 +501,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   <div class="topbar">
     <div class="topbar-logo" onclick="switchView('home')">
       <div class="topbar-mark" style="background:transparent"><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="26" height="14"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></div>
-      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v2.14</span></div>
+      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v2.15</span></div>
     </div>
     <div class="topbar-right">
       <div class="lang-switcher">
@@ -699,6 +699,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
               <div style="font-size:14px;font-weight:700;color:var(--tx);">AI Woody</div>
               <div id="aw-sub" style="font-size:11px;color:var(--tx3);margin-top:1px;"></div>
             </div>
+            <button class="lc-btn" id="aw-sync-btn" onclick="awSync()" style="display:none;"></button>
             <button class="lc-btn" id="aw-pdf-btn" onclick="awExportPDF()">📄 PDF</button>
             <button class="lc-btn" id="aw-new-btn" onclick="awReset()"></button>
           </div>
@@ -3199,6 +3200,7 @@ const I18N = {
     um_delete_failed:'Delete failed: ', um_deleted:'User deleted',
     // ai tab
     ai_tab_translate:'Translate', ai_tab_chat:'Claude Chat', ai_tab_skills:'Skills', ai_tab_woody:'AI Woody',
+    aw_sync:'🔄 Update AI Woody', aw_sync_pick:'Choose the "AI Woody" folder (it contains 必讀資料 and 好文分享)', aw_sync_reading:'Reading {n}/{t}…', aw_sync_sending:'Rebuilding…', aw_sync_done:'Updated: {r} weekly reports (latest {d}), {n} documents', aw_sync_failed:'Update failed: {e}', aw_sync_nofolder:'No files found in 必讀資料 or 好文分享 in that folder', aw_sync_skip:'No text could be read, skipped: {n}',
     aw_sub:'AI-generated, not Woody himself · nothing is saved',
     aw_new:'Clear chat',
     aw_send:'Send',
@@ -3363,6 +3365,7 @@ const I18N = {
     um_err_self_delete:'無法刪除自己的帳號', um_confirm_delete:'確定刪除用戶 %s？此操作無法復原。',
     um_delete_failed:'刪除失敗：', um_deleted:'用戶已刪除',
     ai_tab_translate:'翻譯', ai_tab_chat:'Claude Chat', ai_tab_skills:'技能', ai_tab_woody:'AI Woody',
+    aw_sync:'🔄 更新 AI Woody', aw_sync_pick:'請選擇「AI Woody」資料夾（裡面有「必讀資料」「好文分享」）', aw_sync_reading:'讀取中 {n}/{t}…', aw_sync_sending:'彙整中…', aw_sync_done:'已更新：週報 {r} 份（最新 {d}）、文件 {n} 份', aw_sync_failed:'更新失敗：{e}', aw_sync_nofolder:'這個資料夾的「必讀資料」「好文分享」裡沒有檔案', aw_sync_skip:'讀不到文字，已略過：{n}',
     aw_sub:'AI 生成，非 Woody 本人 · 對話不存檔',
     aw_new:'清除對話',
     aw_send:'送出',
@@ -3520,6 +3523,7 @@ const I18N = {
     um_err_self_delete:'无法删除自己的账号', um_confirm_delete:'确定删除用户 %s？此操作无法撤销。',
     um_delete_failed:'删除失败：', um_deleted:'用户已删除',
     ai_tab_translate:'翻译', ai_tab_chat:'Claude Chat', ai_tab_skills:'技能', ai_tab_woody:'AI Woody',
+    aw_sync:'🔄 更新 AI Woody', aw_sync_pick:'请选择“AI Woody”文件夹（里面有“必讀資料”“好文分享”）', aw_sync_reading:'读取中 {n}/{t}…', aw_sync_sending:'汇整中…', aw_sync_done:'已更新：周报 {r} 份（最新 {d}）、文件 {n} 份', aw_sync_failed:'更新失败：{e}', aw_sync_nofolder:'这个文件夹的“必讀資料”“好文分享”里没有文件', aw_sync_skip:'读不到文字，已跳过：{n}',
     aw_sub:'AI 生成，非 Woody 本人 · 对话不存档',
     aw_new:'清除对话',
     aw_send:'发送',
@@ -3677,6 +3681,7 @@ const I18N = {
     um_err_self_delete:'Không thể xóa tài khoản của chính mình', um_confirm_delete:'Xóa người dùng %s? Không thể hoàn tác.',
     um_delete_failed:'Xóa thất bại: ', um_deleted:'Đã xóa người dùng',
     ai_tab_translate:'Dịch thuật', ai_tab_chat:'Claude Chat', ai_tab_skills:'Kỹ năng', ai_tab_woody:'AI Woody',
+    aw_sync:'🔄 Cập nhật AI Woody', aw_sync_pick:'Hãy chọn thư mục "AI Woody" (có 必讀資料 và 好文分享)', aw_sync_reading:'Đang đọc {n}/{t}…', aw_sync_sending:'Đang tổng hợp…', aw_sync_done:'Đã cập nhật: {r} báo cáo tuần (mới nhất {d}), {n} tài liệu', aw_sync_failed:'Cập nhật thất bại: {e}', aw_sync_nofolder:'Không có tệp nào trong 必讀資料 hoặc 好文分享 của thư mục này', aw_sync_skip:'Không đọc được nội dung, đã bỏ qua: {n}',
     aw_sub:'Do AI tạo, không phải chính Woody · không lưu cuộc trò chuyện',
     aw_new:'Xóa cuộc trò chuyện',
     aw_send:'Gửi',
@@ -3832,6 +3837,7 @@ const I18N = {
     um_err_self_delete:'自分自身のアカウントは削除できません', um_confirm_delete:'ユーザー %s を削除しますか？元に戻せません。',
     um_delete_failed:'削除失敗：', um_deleted:'ユーザーを削除しました',
     ai_tab_translate:'翻訳', ai_tab_chat:'Claude Chat', ai_tab_skills:'スキル', ai_tab_woody:'AI Woody',
+    aw_sync:'🔄 AI Woody を更新', aw_sync_pick:'「AI Woody」フォルダを選んでください（「必讀資料」「好文分享」が入っています）', aw_sync_reading:'読み込み中 {n}/{t}…', aw_sync_sending:'まとめています…', aw_sync_done:'更新しました：週報 {r} 件（最新 {d}）、文書 {n} 件', aw_sync_failed:'更新に失敗しました：{e}', aw_sync_nofolder:'このフォルダの「必讀資料」「好文分享」にファイルがありません', aw_sync_skip:'テキストを読み取れずスキップ：{n}',
     aw_sub:'AI生成・Woody本人ではありません・会話は保存されません',
     aw_new:'会話を消去',
     aw_send:'送信',
@@ -4486,6 +4492,9 @@ function awApplyI18n() {
   };
   set('aw-sub', 'aw_sub');
   set('aw-new-btn', 'aw_new');
+  set('aw-sync-btn', 'aw_sync');
+  var sb = document.getElementById('aw-sync-btn');
+  if (sb) sb.style.display = awIsOwner() ? '' : 'none';
   set('aw-send-btn', 'aw_send');
   set('aw-input', 'aw_ph', 'placeholder');
   if (document.getElementById('ptab-content-woody')) awRender(false);
@@ -4725,6 +4734,156 @@ function awRecToggle() {
       el.focus();
     },
   });
+}
+
+// ─── 更新 AI Woody（只有 Woody 本人看得到）──────────────────────────────
+// 按下去：讀「AI Woody」資料夾裡「必讀資料」「好文分享」的檔案 → 在瀏覽器抽成文字 →
+// 送給 ai-woody 的 rebuild；伺服器那邊再從 woody_reports 撈最新的週報，組成新的 system prompt。
+// 🔴 組裝不在這裡（assemble.js 只有一份）。這裡只負責「抽文字、送出去」。
+// 🔴 人格正文不會被這顆按鈕改到 —— 那份要經 Woody 審閱。
+// 🔴 只有 C00001 看得到這顆鈕，伺服器端也只認 C00001（前端隱藏只是省一次白按）。
+// 瀏覽器不能自己讀電腦上的資料夾，所以第一次要選一次；Chrome／Edge 會記住（IndexedDB 存 handle），
+// 之後只需按「允許」。Safari 沒有這個 API，每次都要選。
+const AW_OWNER = 'C00001';
+const AW_DOC_FOLDERS = ['必讀資料', '好文分享'];
+var awSyncing = false;
+
+function awT(k, p) { return String(t(k)).replace(/\{(\w+)\}/g, function (m, x) { return p && p[x] != null ? p[x] : m; }); }
+function awIsOwner() { return !!(SESSION && SESSION.empId === AW_OWNER); }
+
+function awIdb(mode, fn) {
+  return new Promise(function (res, rej) {
+    var op = indexedDB.open('comart-ai-woody', 1);
+    op.onupgradeneeded = function () { op.result.createObjectStore('kv'); };
+    op.onerror = function () { rej(op.error); };
+    op.onsuccess = function () {
+      var tx = op.result.transaction('kv', mode);
+      var r = fn(tx.objectStore('kv'));
+      tx.oncomplete = function () { res(r && r.result); };
+      tx.onerror = function () { rej(tx.error); };
+    };
+  });
+}
+
+async function awPickDir() {
+  var h = null;
+  try { h = await awIdb('readonly', function (st) { return st.get('dir'); }); } catch (e) {}
+  if (h) {
+    try {
+      var p = await h.queryPermission({ mode: 'read' });
+      if (p !== 'granted') p = await h.requestPermission({ mode: 'read' });
+      if (p === 'granted') return h;
+    } catch (e) {}
+  }
+  toast(t('aw_sync_pick'));
+  h = await window.showDirectoryPicker({ id: 'ai-woody', mode: 'read' });
+  try { await awIdb('readwrite', function (st) { return st.put(h, 'dir'); }); } catch (e) {}
+  return h;
+}
+
+// 回傳 [{ folder, name, file }]
+async function awCollectFiles() {
+  var out = [];
+  if (window.showDirectoryPicker) {
+    var root = await awPickDir();
+    for (var i = 0; i < AW_DOC_FOLDERS.length; i++) {
+      var sub;
+      try { sub = await root.getDirectoryHandle(AW_DOC_FOLDERS[i]); } catch (e) { continue; }
+      for await (var entry of sub.values()) {
+        if (entry.kind === 'file' && entry.name.charAt(0) !== '.') out.push({ folder: AW_DOC_FOLDERS[i], name: entry.name, file: await entry.getFile() });
+      }
+    }
+    return out;
+  }
+  // Safari／Firefox：退回 webkitdirectory，每次都要選
+  toast(t('aw_sync_pick'));
+  var files = await new Promise(function (res) {
+    var inp = document.createElement('input');
+    inp.type = 'file'; inp.webkitdirectory = true; inp.multiple = true;
+    inp.onchange = function () { res(Array.from(inp.files || [])); };
+    inp.click();
+  });
+  files.forEach(function (f) {
+    var parts = (f.webkitRelativePath || '').split('/');
+    var folder = parts.length >= 3 ? parts[parts.length - 2] : '';
+    if (AW_DOC_FOLDERS.indexOf(folder) >= 0 && f.name.charAt(0) !== '.') out.push({ folder: folder, name: f.name, file: f });
+  });
+  return out;
+}
+
+function awLoadScript(src) {
+  return new Promise(function (res, rej) {
+    if (document.querySelector('script[src="' + src + '"]')) return res();
+    var sc = document.createElement('script'); sc.src = src;
+    sc.onload = res; sc.onerror = function () { rej(new Error('load ' + src)); };
+    document.head.appendChild(sc);
+  });
+}
+
+// 同 KMS 用的版本（pdf.js 3.11.174、mammoth 1.6.0）
+async function awExtract(file) {
+  var ext = (file.name.match(/\.([^.]+)$/) || [])[1];
+  ext = (ext || '').toLowerCase();
+  if (ext === 'txt' || ext === 'md') return await file.text();
+  if (ext === 'docx') {
+    await awLoadScript('https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js');
+    var r = await window.mammoth.extractRawText({ arrayBuffer: await file.arrayBuffer() });
+    return r.value || '';
+  }
+  if (ext === 'pdf') {
+    await awLoadScript('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js');
+    window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    var pdf = await window.pdfjsLib.getDocument({ data: await file.arrayBuffer() }).promise;
+    var pages = [];
+    for (var i = 1; i <= pdf.numPages; i++) {
+      var tc = await (await pdf.getPage(i)).getTextContent();
+      pages.push(tc.items.map(function (it) { return it.str + (it.hasEOL ? '\n' : ''); }).join(''));
+    }
+    return pages.join('\n');
+  }
+  return '';   // 其他格式（圖片、xlsx…）略過
+}
+
+async function awSync() {
+  if (!awIsOwner() || awSyncing) return;
+  awSyncing = true;
+  var btn = document.getElementById('aw-sync-btn');
+  if (btn) btn.disabled = true;
+  try {
+    var files;
+    try { files = await awCollectFiles(); }
+    catch (e) { if (e && e.name === 'AbortError') return; throw e; }
+    if (!files.length) { toast(t('aw_sync_nofolder'), 'err'); return; }
+    var docs = [], skipped = [];
+    for (var i = 0; i < files.length; i++) {
+      if (btn) btn.textContent = awT('aw_sync_reading', { n: i + 1, t: files.length });
+      var text = '';
+      try { text = String(await awExtract(files[i].file) || '').trim(); } catch (e) { console.warn('[aw] extract ' + files[i].name + ' ' + (e && e.message)); }
+      if (text) docs.push({ folder: files[i].folder, name: files[i].name, text: text });
+      else skipped.push(files[i].name);
+    }
+    if (btn) btn.textContent = t('aw_sync_sending');
+    var res = await fetch(SB_URL + '/functions/v1/ai-woody', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SB_ANON, 'apikey': SB_ANON,
+                 'x-session': (SESSION && SESSION.sig) || (readSession() || {}).sig || '' },
+      body: JSON.stringify({ action: 'rebuild', docs: docs }),
+    });
+    var j = {};
+    try { j = await res.json(); } catch (e) {}
+    if (!res.ok) {
+      if (res.status === 401 && typeof sbNoteAuth === 'function') sbNoteAuth(401);
+      throw new Error(j.error || ('HTTP ' + res.status));
+    }
+    toast(awT('aw_sync_done', { r: j.reports, d: j.latest, n: (j.docs || []).length }));
+    if (skipped.length) toast(awT('aw_sync_skip', { n: skipped.join('、') }), 'err');
+  } catch (e) {
+    console.warn('[aw] sync failed ' + (e && e.message));
+    toast(awT('aw_sync_failed', { e: (e && e.message) || '' }), 'err');
+  } finally {
+    awSyncing = false;
+    if (btn) { btn.disabled = false; btn.textContent = t('aw_sync'); }
+  }
 }
 
 // 匯出 PDF：畫面上看得到的內容（原文＋已經點開的其他語言）。版面固定繁中（同 lcExportPDF）。

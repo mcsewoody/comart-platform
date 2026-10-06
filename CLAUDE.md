@@ -136,7 +136,7 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 
 | File | Version | Purpose | ~Lines |
 |------|---------|---------|--------|
-| `index.html` | v2.14 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
+| `index.html` | v2.15 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
 | `admin/index.html` | v2.52 | Admin System — **機場接送**、公務車、圖書館、會議室、客戶到訪、抽籤 | 8,221 |
 | `kms/index.html` | v2.50 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
 | `quotation/index.html` | v3.66 | Quotation & CRM system | 7,332 |
@@ -774,7 +774,7 @@ python3 scripts/i18n-audit.py         # Portal，key 沒引號：btn_save:'儲�
   強制改密碼畫面的說明段落現在直接寫出「不可使用常見密碼（公司名＋年份、自己的工號）」，
   讓使用者在打字之前就知道，而不是靠錯誤訊息事後補救。
 
-## 🧭 AI Woody —— Woody 的 AI 分身（Portal v2.12，2026-10-05）
+## 🧭 AI Woody —— Woody 的 AI 分身（Portal v2.12，2026-10-05；v2.15 加入必讀資料與更新鈕）
 
 AI 區最右邊的頁籤（`ptab-woody`，在「技能」右邊）。函式前綴 `aw*`，edge function **`ai-woody`**，
 人格檔在資料表 **`ai_personas`**（`id='woody'`）。Woody 2026-10-05 用 grill 逐題定案：
@@ -792,10 +792,22 @@ AI 區最右邊的頁籤（`ptab-woody`，在「技能」右邊）。函式前�
 | 對象 | 全體在職同仁、不限次數 |
 | 模型 | **`claude-opus-5-5`**，`effort: low`，串流；`fallbacks: "default"`（安全分類器誤擋時自動換模型） |
 
-- 🔴 **人格檔不在 repo、不在 HTML**（repo 公開）。正本在 `.local/woody/ai-woody-persona.md`（Woody 審閱的那份），
-  `scripts/ai-woody-push.py` 把它 ＋ 從 `woody_reports` 即時撈出的 **Woody 本人全部週報文字**（約 13 萬字，
-  同仁段落標〔同仁分享〕）組成 system prompt，上傳到 `ai_personas`。`--dry-run` 只輸出到 `.local/woody/ai-woody-system.txt`。
-  **Woody 新寫了週報、要讓 AI Woody 跟上 → 重跑這支腳本**（Woody 定案：他開口時才更新）。function 端快取 5 分鐘。
+- 🔴 **人格檔不在 repo、不在 HTML**（repo 公開）。正本在 `.local/woody/ai-woody-persona.md`（Woody 審閱的那份，第 2 版 2026-10-06）。
+  `ai_personas` 有三列，**只有第一列是人審過的**：
+
+  | id | 內容 | 誰寫 |
+  |---|---|---|
+  | `woody-core` | 人格正文（含 COMART Dos & Don'ts、Woody 補充、必讀書目 —— 這些用「我」的立場講） | `scripts/ai-woody-push.py --core`，**只在 Woody 審過新版後才跑** |
+  | `woody-docs` | `AI Woody/必讀資料`、`AI Woody/好文分享` 抽出的全文 | 重新彙整時寫入 |
+  | `woody` | 實際送給模型的 system＝core ＋ 附錄一（週報，同仁段落標〔同仁分享〕）＋ 附錄二（文章，引用時要講出處作者） | 重新彙整時組出 |
+
+  組裝**只有一份**：`supabase/functions/ai-woody/assemble.js`（`node --test` 6 個；附錄一已與舊 Python 版逐字比對過）。
+- 🔴 **重新彙整有兩個入口，做的是同一件事**（ai-woody 的 `action:'rebuild'`）：
+  ① Portal「AI Woody」頁籤右上的 **🔄 更新 AI Woody**（`awSync`，**只有 C00001 看得到**；伺服器端同樣只認 C00001 或 secret key）。
+  第一次按會要 Woody 選 `AI Woody` 資料夾（File System Access API，handle 存在 IndexedDB；不支援的瀏覽器退回 webkitdirectory），
+  瀏覽器用 mammoth／pdf.js 抽文字送上去；② 本機 `python3 scripts/ai-woody-push.py --rebuild`（textutil／pypdf）。
+  🔴 **重新彙整永遠不動 `woody-core`** —— 人格正文要先給 Woody 看修改的段落、他同意才上線（Woody 2026-10-06 定案）。
+  `AI Woody/` 資料夾在 `.gitignore` 裡（文章有版權、repo 公開）。function 端快取 5 分鐘，彙整完會立即清掉。
 - 🔴 **`ai_personas` 是 RLS 開著 ＋ 零 policy ＋ revoke anon/authenticated**，刻意**不在** sb-proxy 的 `ALLOWED_TABLES` ——
   放進去等於任何登入者都能把整份人格檔撈走。
 - 🔴 **對話歷史每輪由前端整段送**（不存檔的代價），所以 `ai-woody/lib.js` 的 `validateMessages` 逐則驗：

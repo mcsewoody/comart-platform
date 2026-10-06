@@ -9,6 +9,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { verifySession } from "../_shared/session.ts"
 import { namedSecretKey, elevatedApiHeaders } from "../_shared/api-keys.ts"
 import { validateMessages, buildRequest } from "./lib.js"
+import { buildReportsAppendix, normalizeDocs, buildDocsAppendix, assemble } from "./assemble.js"
 
 const CORS = {
   "Access-Control-Allow-Origin": "*",
@@ -35,6 +36,62 @@ async function loadPersona(): Promise<string> {
   return text
 }
 
+// ── 更新（只有 Woody 本人，或本機腳本帶 secret key）──
+// 🔴 按鈕只送「文件抽出來的文字」，組裝一律在這裡（assemble.js）—— 同一件事只有一份實作。
+// 🔴 人格正文（woody-core）按鈕不會動：那是 Woody 審閱過的，要改仍要經他看過。
+const OWNER = "C00001"
+
+function sbUrl() { return Deno.env.get("SB_URL") || Deno.env.get("SUPABASE_URL") || "" }
+async function sbGet(path: string) {
+  const r = await fetch(`${sbUrl()}/rest/v1/${path}`, { headers: elevatedApiHeaders(namedSecretKey("kms_edge")) })
+  if (!r.ok) throw new Error(`db_read_failed ${r.status}`)
+  return r.json()
+}
+async function sbUpsertPersona(id: string, system: string, version: string) {
+  const r = await fetch(`${sbUrl()}/rest/v1/ai_personas`, {
+    method: "POST",
+    headers: { ...elevatedApiHeaders(namedSecretKey("kms_edge")), "Content-Type": "application/json",
+               Prefer: "resolution=merge-duplicates,return=minimal" },
+    body: JSON.stringify({ id, system, version, updated_at: new Date().toISOString() }),
+  })
+  if (!r.ok) throw new Error(`db_write_failed ${r.status}`)
+}
+
+async function isCliKey(req: Request): Promise<boolean> {
+  const k = req.headers.get("apikey") || ""
+  if (!k) return false
+  try {
+    const keys = JSON.parse(Deno.env.get("SUPABASE_SECRET_KEYS") || "{}")
+    return Object.values(keys).some((v) => typeof v === "string" && v && v === k)
+  } catch { return false }
+}
+
+async function rebuild(docsIn: unknown) {
+  const coreRows = await sbGet("ai_personas?id=eq.woody-core&select=system")
+  const core = coreRows?.[0]?.system || ""
+  if (!core) throw new Error("core_missing")
+  const rows = await sbGet("woody_reports?select=report_date,work,plan,reflections,intel,feedback,other" +
+    "&author_id=eq.C00001&order=report_date.asc&limit=2000")
+  let docsAppendix = ""
+  let docNames: string[] = []
+  if (docsIn === undefined) {
+    // 沒送文件 ＝ 沿用上一次的附錄二
+    const d = await sbGet("ai_personas?id=eq.woody-docs&select=system")
+    docsAppendix = d?.[0]?.system || ""
+  } else {
+    const n = normalizeDocs(docsIn)
+    if (n.error) throw new Error(n.error)
+    docsAppendix = buildDocsAppendix(n.docs)
+    docNames = n.docs.map((x: { folder: string; name: string }) => `${x.folder}/${x.name}`)
+    await sbUpsertPersona("woody-docs", docsAppendix, String(n.docs.length))
+  }
+  const system = assemble(core, buildReportsAppendix(rows), docsAppendix)
+  const version = rows.length ? rows[rows.length - 1].report_date : ""
+  await sbUpsertPersona("woody", system, version)
+  personaCache = null
+  return { reports: rows.length, latest: version, docs: docsIn === undefined ? null : docNames, chars: system.length }
+}
+
 function todayTaipei(): string {
   return new Date(Date.now() + 8 * 3600 * 1000).toISOString().slice(0, 10)
 }
@@ -47,10 +104,21 @@ serve(async (req) => {
     if (!CLAUDE_KEY) return json({ error: "CLAUDE_API_KEY not set" }, 500)
 
     const who = await verifySession(req.headers.get("x-session") || "")
-    if (!who) return json({ error: "unauthorized" }, 401)
+    if (!who && !(await isCliKey(req))) return json({ error: "unauthorized" }, 401)
 
     let body: any
     try { body = await req.json() } catch { return json({ error: "bad_json" }, 400) }
+
+    if (body?.action === "rebuild" || body?.action === "status") {
+      if (who?.empId !== OWNER && !(await isCliKey(req))) return json({ error: "forbidden" }, 403)
+      if (body.action === "status") {
+        const r = await sbGet("ai_personas?id=in.(woody,woody-docs)&select=id,version,updated_at")
+        return json({ ok: true, rows: r })
+      }
+      try { return json({ ok: true, ...(await rebuild(body.docs)) }) }
+      catch (e) { return json({ error: (e as Error).message }, 500) }
+    }
+
     const bad = validateMessages(body?.messages)
     if (bad) return json({ error: bad }, 400)
 

@@ -5,7 +5,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#080C14">
-<title>COMART · 公告與會議 v1.94</title>
+<title>COMART · 公告與會議 v1.95</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=Noto+Serif:wght@400;700&family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -369,7 +369,7 @@ body.pm-playing #pm-phasebar{padding:0}
     <a class="logo" href="javascript:void(0)">
       <div class="logo-mark">告</div>
       <div class="logo-text" data-i18n="app_title">公告與會議</div>
-      <span class="logo-ver">v1.94</span>
+      <span class="logo-ver">v1.95</span>
     </a>
     <div class="topbar-right">
       <div id="langChips" style="display:flex;gap:4px"></div>
@@ -2237,7 +2237,7 @@ function BT(k, p) {
 }
 function bInitLang() {
   let l = ''; try { l = localStorage.getItem('comart-lang') || ''; } catch (e) {}
-  if (!B_I18N[l]) l = ({ TW:'zh-TW', CN:'zh-CN', VN:'vi' })[PORTAL_SESSION && PORTAL_SESSION.site] || 'zh-TW';
+  if (!B_I18N[l]) l = ({ TW:'zh-TW', CN:'zh-CN', VN:'vi' })[PORTAL_SESSION && homeSite(PORTAL_SESSION.site)] || 'zh-TW';
   BLANG = l;
   document.documentElement.lang = l;
 }
@@ -2507,6 +2507,9 @@ const SITE_GROUP = 'GRP';
 function isGroupSite(s) { return s === SITE_GROUP || s === 'N/A'; }
 function inSite(userSite, targetSite) { return userSite === targetSite || isGroupSite(userSite); }
 // 我自己是不是集團的人（是的話，每個中心的事我都有份）
+// 集團（GRP，舊值 'N/A'）不是營運中心：凡是「預設帶入哪個地區」的地方一律當成台灣（Woody 2026-10-06 定案）。
+// 只管「預設值」；權限上集團仍屬於每一個中心（inSite／iAmGroup 不變）。
+function homeSite(s){ return (s === 'GRP' || s === 'N/A') ? 'TW' : (s || ''); }
 function iAmGroup() { return !!(PORTAL_SESSION && isGroupSite(PORTAL_SESSION.site)); }
 function siteBadgeHtml(scope, site) {
   if (scope === 'group') return `<span class="site-badge site-group">${escHtml(BT('site_group'))}</span>`;
@@ -2839,7 +2842,7 @@ function wmFreshState(site) {
 function wmNewRecord() {
   _wmEditId = null;
   // 集團不是營運中心，不能當成紀錄的 site：沒指定篩選時退回台灣，主席可在表單裡改
-  const my = PORTAL_SESSION.site || 'TW';
+  const my = homeSite(PORTAL_SESSION.site) || 'TW';
   const site = (_wmFilter && ['TW','CN','VN'].includes(_wmFilter)) ? _wmFilter : (['TW','CN','VN'].includes(my) ? my : 'TW');
   wmState = wmFreshState(site);
   wmOpenEditor();

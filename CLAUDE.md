@@ -136,11 +136,11 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 
 | File | Version | Purpose | ~Lines |
 |------|---------|---------|--------|
-| `index.html` | v2.17 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
-| `admin/index.html` | v2.56 | Admin System — **機場接送**、公務車、圖書館、會議室、客戶到訪、抽籤 | 8,221 |
-| `kms/index.html` | v2.52 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
-| `quotation/index.html` | v3.67 | Quotation & CRM system | 7,332 |
-| `board/index.html` | v1.94 | 公告與會議 Bulletin & Meetings — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍、腦力激盪 | 4,600 |
+| `index.html` | v2.18 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
+| `admin/index.html` | v2.57 | Admin System — **機場接送**、公務車、圖書館、會議室、客戶到訪、抽籤 | 8,221 |
+| `kms/index.html` | v2.53 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
+| `quotation/index.html` | v3.68 | Quotation & CRM system | 7,332 |
+| `board/index.html` | v1.95 | 公告與會議 Bulletin & Meetings — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍、腦力激盪 | 4,600 |
 | `product_dev/` | v2.25 | **產品開發管理 —— 第六個子系統，不遵守單一檔案原則**（見下方專節） | — |
 
 `admin/lottery.html` is a standalone lottery page (separate from the lottery module inside `admin/index.html`).
@@ -497,6 +497,7 @@ The portal supports EN, 繁中, 简中, VI, 日 via `setLang(lang)`. Each langua
   v1.96 之前有三個答案：`toggleCatFilter` 判斷 4、五語的 `cal_max_cats` 訊息寫 4、
   HTML 初始值寫 `1/4`，而 `renderCatSidebar` **寫死 `'/3'`** ——
   集團帳號因此看到「7/3」。改上限時記得五語訊息裡的數字要一起改（那是文案，抽不進常數）。
+- ⚠️（2026-10-06 起集團帳號的行事曆預設改為比照台灣，見〈地點〉一節的 `homeSite`；以下是舊行為的紀錄）
 - 🔴 **`initCalendar` 給集團（GRP）的預設是「集團活動 ＋ 三國假日」＝ 剛好 4 個。**
   原本列了 7 個（連三個中心的行事曆一起開），**超過上限的後果不是「多顯示」而是「鎖死」**：
   `toggleCatFilter` 在 `length >= CAL_MAX_CATS` 時一律拒絕，所以關掉一個之後再也開不回來。
@@ -1514,6 +1515,10 @@ v1.94 只做在 Portal，但**同事被邀請的時候人常常在 KMS 或報價
   | admin 抽籤 | `lottoInit` / `lottoFilterSite` | 選 TW 時集團成員也在抽籤池裡 |
   | admin 會議室邀請人員 | `_invSiteUsers` | 集團的人看得到全部；一般人看自己中心＋集團 |
   | Portal 行事曆預設分類 | `siteMap` | 集團預設顯示三國假日 |
+- 🔴 **「預設帶入哪個地區」一律把集團當成台灣：`homeSite(site)`**（五個系統各一份，2026-10-06 Woody 定案「我和其他 Group 的人都預設 TW」）。
+  用在：介面預設語言、admin 會議室／公務車／圖書館的地區篩選（`_curSite`，**原本是 'GRP'，而沒有任何會議室／車／書標成 GRP，集團帳號一進去清單全空**）、
+  admin 時區、Portal 排行榜預設篩選與**行事曆預設分類**（原本集團是「集團活動＋三國假日」，現在比照台灣）、KMS 分析與專家的預設篩選、board 週會紀錄預設中心。
+  🔴 **只管預設值，不管權限**：`inSite()`／`iAmGroup()` 照舊，集團仍屬於每一個中心、可以切到任何地區。
 - **刻意不併入集團的地方**（這些是「他屬於哪個單位」的統計，不是「誰能參加」）：
   board 投票的分中心統計（`plCenterFilter`，集團自成一格 —— 灌進每個中心會變成重複計算）、
   Portal／KMS 的貢獻排行榜 site 篩選。
@@ -1722,6 +1727,7 @@ naive regex 會誤判成「沒定義」。
   衝突條件與 `doBooking` 相同（半開區間、排除 `editCarBkId`）。
 - 表單一打開的預設「今天 09:00–18:00」不是使用者選的，所以只有 `cwkTouched`（拖過、改過日期時間、從看板帶入、修改既有預約）才畫出來。
 - 每台車固定一條直欄＋固定顏色（`CWK_COLORS` 依站點車輛順序），選中的車其他車變淡；已完成的預約淡化顯示，已取消的不畫。
+- v2.57：拖完不再跳「已選…請填寫目的」提示、也不再捲到目的欄（Woody：一直跳很干擾）；目的留給「確認預約」時檢查。
 - 驗證用模擬資料跑過三個情境：跨日拖拉帶入表單、撞到既有預約時停住、按在已預約格子上提示（headless Chrome，2026-10-06）。
 
 - `cancelCarBk(id)` 公務車取消，`cancelBk(id)` 會議室取消，**不可混用**

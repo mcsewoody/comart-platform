@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART 行政管理平台 v2.56</title>
+<title>COMART 行政管理平台 v2.57</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -833,7 +833,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="logo">
     <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
     <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
-    <span><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="38" height="20" style="display:inline-block;vertical-align:middle;margin-top:-2px"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v2.56</span>
+    <span><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="38" height="20" style="display:inline-block;vertical-align:middle;margin-top:-2px"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v2.57</span>
   </div>
   <div class="trr">
     <div id="global-site-bar" style="display:flex;align-items:center;gap:4px"><span style="font-size:13px;color:var(--text-3);white-space:nowrap;font-weight:500" data-i18n="g.site_label">單位：</span>
@@ -4735,13 +4735,13 @@ async function init(){
   const _rcfg=lo(K.rcfg,DRCFG);ROOM_HOURS={start:_rcfg.hours_start??8,end:_rcfg.hours_end??18};
   // seed 只在 SB 也空的時候執行（兜底）
   chkOv();popCatSel();popUsrSel();
-  const _siteLang = { TW:'zh-TW', CN:'zh-CN', VN:'vi' }[PORTAL_SESSION?.site];
+  const _siteLang = { TW:'zh-TW', CN:'zh-CN', VN:'vi' }[homeSite(PORTAL_SESSION?.site)];
   let savedLang = _siteLang || 'en';
   // 先讀平台共用的那一把，沒有才退回本系統原本的 key（見 setLang 的說明）
   try { savedLang = localStorage.getItem('comart-lang') || localStorage.getItem('admin-lang') || savedLang; } catch(_) {}
   setLang(savedLang);
   // 依登入 site 設定全域過濾
-  _curSite = PORTAL_SESSION?.site || '';
+  _curSite = homeSite(PORTAL_SESSION?.site);   // 集團帳號預設看台灣（原本是 'GRP'，而沒有任何會議室／車／書標成 GRP → 清單全空）
   _roomSite = _curSite; _carSite = _curSite; _libSite = _curSite;
   setGlobalSite(_curSite);
   switchMod('airport');updUsrDisp();updBadges();
@@ -5606,10 +5606,8 @@ function cwkApply(){
   set('bkv',cwkVid); set('bksd',ymdL(s)); set('bkst2',`${_z2(s.getHours())}:${_z2(s.getMinutes())}`);
   set('bked',ymdL(e)); set('bket',`${_z2(e.getHours())}:${_z2(e.getMinutes())}`);
   chkConflict();
-  const v=gVeh(cwkVid);
-  toast(t('car.wk.picked').replace('%s',`${v?.name||''} ${cwkFmt(s).replace('T',' ')}`).replace('%s',cwkFmt(e).replace('T',' ')),'success');
-  const pur=document.getElementById('bkpur');
-  if(pur){ pur.scrollIntoView({behavior:'smooth',block:'center'}); setTimeout(()=>pur.focus({preventScroll:true}),350); }
+  // v2.57：不再每次拖完就跳提示、捲動到「目的」欄（Woody：一直跳很干擾）。
+  // 目的是否填寫，留給按下「確認預約」時的 doBooking 檢查（car.err.need_purpose）。
 }
 
 function cwkRender(){
@@ -6003,6 +6001,9 @@ const roomName  = r => r ? (r.nameK ? t(r.nameK) : (r.name||'')) : '';
 // 固定繁中版，只給「寄出去／存下來」的內容用（同 board 的 siteLabelZ）
 const ROOM_NAME_ZH = {'room.name.big':'大會議室','room.name.small':'小會議室'};
 const roomEquip = r => r ? (r.equipK ? r.equipK.map(t) : (r.equip||[])) : [];
+// 集團（GRP，舊值 'N/A'）不是營運中心：凡是「預設帶入哪個地區」的地方一律當成台灣（Woody 2026-10-06 定案）。
+// 只管「預設值」；權限上集團仍屬於每一個中心（inSite／iAmGroup 不變）。
+function homeSite(s){ return (s === 'GRP' || s === 'N/A') ? 'TW' : (s || ''); }
 const SITEFLAGS={TW:'🇹🇼',CN:'🇨🇳',VN:'🇻🇳'};
 let _roomSite='',_carSite='',_libSite='',_curSite='';
 function visRooms(){return _roomSite?ROOMS.filter(r=>r.site===_roomSite):ROOMS;}
@@ -6297,7 +6298,7 @@ function showBkPopup(id,e){
 
 // ── 依使用者 site 取得當地時間，進位到下一個 30 分 ──
 function _localNow(){
-  const tz={TW:'Asia/Taipei',CN:'Asia/Shanghai',VN:'Asia/Ho_Chi_Minh'}[PORTAL_SESSION?.site]||'Asia/Taipei';
+  const tz={TW:'Asia/Taipei',CN:'Asia/Shanghai',VN:'Asia/Ho_Chi_Minh'}[homeSite(PORTAL_SESSION?.site)]||'Asia/Taipei';
   const pts=new Intl.DateTimeFormat('en-CA',{timeZone:tz,hour:'2-digit',minute:'2-digit',hour12:false}).formatToParts(new Date());
   let h=+pts.find(p=>p.type==='hour').value,m=+pts.find(p=>p.type==='minute').value;
   if(m>0){if(m<=30)m=30;else{m=0;h++;}}

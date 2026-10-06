@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART KMS v2.52</title>
+<title>COMART KMS v2.53</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -398,7 +398,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="38" height="20" style="display:inline-block;vertical-align:middle;margin-right:4px;margin-top:-2px"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg>COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v2.52</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v2.53</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('en')">EN</button>
@@ -2489,7 +2489,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     // 🔴 條件要看「兩個 key 都沒有」：只看舊的話，已經在 Portal 選過語言的人
     //    會在這裡被所屬中心的預設覆蓋掉。
     if (!localStorage.getItem('comart-lang') && !localStorage.getItem('kms-lang')) {
-      const _sl = { TW:'zh-TW', CN:'zh-CN', VN:'vi' }[portalUser?.site];
+      const _sl = { TW:'zh-TW', CN:'zh-CN', VN:'vi' }[homeSite(portalUser?.site)];
       if (_sl) setLang(_sl);
     }
   } catch(_) {} // Safari 封鎖儲存等模式下 getItem 會 throw，不可中斷 init
@@ -4930,6 +4930,9 @@ async function deleteCategory(id, catKey) {
 
 
 // ─── 從 Supabase 載入分類（覆蓋前端 CAT_META）───
+// 集團（GRP，舊值 'N/A'）不是營運中心：凡是「預設帶入哪個地區」的地方一律當成台灣（Woody 2026-10-06 定案）。
+// 只管「預設值」；權限上集團仍屬於每一個中心（inSite／iAmGroup 不變）。
+function homeSite(s){ return (s === 'GRP' || s === 'N/A') ? 'TW' : (s || ''); }
 const KMS_WOODY_READS = 'woody_reads';
 /* 「Woody 推薦閱讀」的兩個子分類：KMS 的分類是一層的，所以子分類存成標籤（「必讀資料」／「好文分享」）——
    AI Woody 也是看這個標籤分必讀與好文（ai-woody 的 kmsToDocs）。下拉只是改標籤的介面。 */
@@ -6413,7 +6416,7 @@ function setLang(lang) {
   const activePanel = document.querySelector('.panel.active')?.id;
   if (activePanel === 'panel-docs')      loadDocs();
   if (activePanel === 'panel-kmap')      loadKmap(null);
-  if (activePanel === 'panel-analytics') loadAnalytics(portalUser?.site || '');
+  if (activePanel === 'panel-analytics') loadAnalytics(homeSite(portalUser?.site));
   if (activePanel === 'panel-review')    { window._reviewAllDocs = null; loadReviewPanel(); }
 }
 
@@ -7248,7 +7251,7 @@ async function loadExperts() {
 
   // 首次載入時，預設篩選登入使用者的 site
   if (!_expertAllUsers.length) {
-    _expertSiteFilter = portalUser?.site || '';
+    _expertSiteFilter = homeSite(portalUser?.site);
   }
 
   try {
@@ -7855,7 +7858,7 @@ window.switchPanel = function(id) {
   _origSwitchPanel(id);
   if (id === 'editor')    { setTimeout(loadVersionHistory, 150); }
   if (id === 'kmap')      setTimeout(() => loadKmap(null), 50);
-  if (id === 'analytics') setTimeout(() => loadAnalytics(portalUser?.site || ''), 50);
+  if (id === 'analytics') setTimeout(() => loadAnalytics(homeSite(portalUser?.site)), 50);
   if (id === 'setting')   setTimeout(loadSettingContent, 50);
   if (id === 'experts')   setTimeout(loadExperts, 50);
   if (id === 'review')    { window._reviewAllDocs = null; window._reviewFilter = 'draft'; setTimeout(loadReviewPanel, 50); }

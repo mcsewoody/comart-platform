@@ -138,7 +138,7 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 |------|---------|---------|--------|
 | `index.html` | v2.17 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
 | `admin/index.html` | v2.52 | Admin System — **機場接送**、公務車、圖書館、會議室、客戶到訪、抽籤 | 8,221 |
-| `kms/index.html` | v2.51 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
+| `kms/index.html` | v2.52 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
 | `quotation/index.html` | v3.66 | Quotation & CRM system | 7,332 |
 | `board/index.html` | v1.94 | 公告與會議 Bulletin & Meetings — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍、腦力激盪 | 4,600 |
 | `product_dev/` | v2.25 | **產品開發管理 —— 第六個子系統，不遵守單一檔案原則**（見下方專節） | — |
@@ -806,6 +806,9 @@ AI 區最右邊的頁籤（`ptab-woody`，在「技能」右邊）。函式前�
   v2.15–v2.16 曾經讀 repo 裡的 `AI Woody/` 資料夾（File System Access API ＋ 伺服器端圖片辨識快取），
   已整套移除：同仁看不到原文、兩台 Mac 要各選一次資料夾、而 KMS 本來就有上傳／辨識／權限／搜尋。
   - 分類 **「Woody 推薦閱讀」**（`woody_reads`，📖）；**標籤含「必讀資料」＝必讀，其餘一律算好文分享**（`kmsToDocs`）。
+    KMS 的分類只有一層，所以**子分類就是那兩個標籤**：編輯器選了這個分類會多出「子分類」下拉（`kmsWrSync`／`kmsWrSetSub`，只改標籤），
+    知識地圖裡這個分類分「必讀資料」「好文分享」兩段。🔴 分類名稱要有 `cat.<key>` 五語 key —— 沒有的話畫面退回
+    `kms_categories.name_en`（英文），Woody 第一次就因此找不到「Woody 推薦閱讀」（v2.52 補，並讓下拉／地圖卡片／閱讀次數都走 `cat.*`）。
     機密等級 1、直接發佈不審核（KMS 本來就能直接選「發佈」）。2026-10-06 匯入 48 份
     （必讀 6 ＋ 何飛鵬商周專欄等 42 張掃描圖，原檔在 `kms-files`，作者欄 Woody Liu，文章作者另放在標籤）。
   - 🔴 **只有 Woody（C00001）能把文件放進這個分類、改、刪** —— 這個分類會直接變成 AI Woody「Woody 推崇的觀念」。

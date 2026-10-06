@@ -38,23 +38,12 @@ test("沒有文件時附錄二是空的，組裝時不留空段", () => {
   assert.equal(assemble("CORE", "APP1", ""), "CORE\n\n---\n\nAPP1");
 });
 
-import { isImageName, ocrKey, validOcrKey, fillOcr } from "./assemble.js";
-test("圖片：key 的格式與驗證", () => {
-  assert.equal(isImageName("IMG_0014.PNG"), true);
-  assert.equal(isImageName("a.pdf"), false);
-  assert.equal(ocrKey("好文分享", "IMG_0014.PNG", 881259), "好文分享/IMG_0014.PNG|881259");
-  assert.equal(validOcrKey("好文分享/IMG_0014.PNG|881259"), true);
-  assert.equal(validOcrKey("其他/IMG_0014.PNG|1"), false);
-  assert.equal(validOcrKey("好文分享/a.pdf|1"), false);
-  assert.equal(validOcrKey("好文分享/a.png"), false);
-});
-test("圖片：用快取補文字，找不到的列出來", () => {
-  const r = fillOcr([
-    { folder: "必讀資料", name: "a.docx", text: "A" },
-    { folder: "好文分享", name: "x.png", size: 10, ocr: true },
-    { folder: "好文分享", name: "y.png", size: 20, ocr: true },
-  ], { "好文分享/x.png|10": "X 文" });
-  assert.deepEqual(r.docs.map((d) => d.text), ["A", "X 文"]);
-  assert.deepEqual(r.missing, ["y.png"]);
-  assert.deepEqual(r.used, ["好文分享/x.png|10", "好文分享/y.png|20"]);
+import { kmsToDocs } from "./assemble.js";
+test("KMS 文件：有「必讀資料」標籤才算必讀，標題當小標", () => {
+  const d = kmsToDocs([
+    { title: "QBQ", body: "Q", tags: ["必讀資料"] },
+    { title: "苦藥", body: "K", tags: ["好文分享", "何飛鵬"] },
+    { title: "", file_name: "x.png", body: "X", tags: null },
+  ]);
+  assert.deepEqual(d.map((x) => x.folder + "/" + x.name), ["必讀資料/QBQ", "好文分享/苦藥", "好文分享/x.png"]);
 });

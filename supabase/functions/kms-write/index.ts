@@ -45,6 +45,14 @@ serve(async (req) => {
       return new Response(JSON.stringify({ error: "table not allowed" }), { status: 403, headers: CORS })
     }
 
+    // 🔴「Woody 推薦閱讀」分類會直接進 AI Woody 的知識（當成 Woody 推崇的觀念引用），
+    //    所以只有 Woody 本人能把文件放進來、改裡面的文件、或把文件移出去。
+    //    前端只是把選項藏起來；這裡才是牆（kms-write 用 service role，什麼都寫得進去）。
+    if (table === "kms_documents") {
+      const deny = await woodyReadsDenied(sb, verified, action, payload, id, filters)
+      if (deny) return new Response(JSON.stringify({ error: deny }), { status: 403, headers: CORS })
+    }
+
     let result, error
 
     if (action === "insert") {
@@ -89,3 +97,25 @@ serve(async (req) => {
     return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: CORS })
   }
 })
+
+const WOODY_READS = "woody_reads"
+const WOODY = "C00001"
+// 回傳拒絕原因；放行回 null。查詢失敗一律拒絕（fail-closed）。
+async function woodyReadsDenied(sb: any, who: any, action: string, payload: any, id: any, filters: any): Promise<string | null> {
+  if (who?.empId === WOODY) return null
+  const rows = Array.isArray(payload) ? payload : [payload]
+  if ((action === "insert" || action === "upsert" || action === "update") &&
+      rows.some((r: any) => r && r.category === WOODY_READS)) return "woody_reads_owner_only"
+  // 既有文件：update／upsert／delete 碰到的那一筆原本在這個分類裡，也不行
+  let ids: string[] = []
+  if (id) ids = [String(id)]
+  else if (action === "upsert") ids = rows.map((r: any) => r?.id).filter(Boolean).map(String)
+  else if (action === "delete" && filters) {
+    // 用 filter 刪 kms_documents：判斷不了範圍，一律不准
+    return "woody_reads_owner_only"
+  }
+  if (!ids.length) return null
+  const { data, error } = await sb.from("kms_documents").select("id").in("id", ids).eq("category", WOODY_READS)
+  if (error) return "woody_reads_check_failed"
+  return data && data.length ? "woody_reads_owner_only" : null
+}

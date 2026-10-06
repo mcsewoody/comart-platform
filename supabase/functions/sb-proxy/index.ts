@@ -87,6 +87,10 @@ const CHAT_JOIN_FIELD = "join_code"
 //    ① 整列不可刪（cascade 會連大廳本身一起消失，而它是回不來的）
 //    ② 「清除對話紀錄」只能清它自己，不能借這條路清掉別人的對話
 const CHAT_LOBBY_ID = "lobby"
+// KMS「Woody 推薦閱讀」：AI Woody 的資料來源（見 kms_documents 分支）
+const WOODY_READS = "woody_reads"
+const WOODY_EMP = "C00001"
+const KMS_HARMLESS_PATCH = new Set(["view_count", "embedding"])
 
 // ── 線上對話：單則訊息的修改與刪除（v2.01）──
 // 三組欄位，三種授權。**分組的依據是「改壞了會怎樣」，不是欄位長得像不像**：
@@ -431,6 +435,28 @@ serve(async (req) => {
         }
         body = JSON.stringify(Array.isArray(parsed) ? parsed.map(scrub) : scrub(parsed))
       } catch { body = rawText }
+    } else if (table === "kms_documents" && sessEmpId !== WOODY_EMP) {
+      // ── 「Woody 推薦閱讀」分類會進 AI Woody 的知識，只有 Woody 本人能放進來、改、刪 ──
+      //    （同一道規則 kms-write 也有；兩條寫入路徑都要擋，少一條等於沒擋）
+      //    其他人對這些文件只准做 KMS 前端本來就會做的兩件事：瀏覽次數、向量。
+      let rows: Record<string, unknown>[] = []
+      if (rawText) {
+        try { const p = JSON.parse(rawText); rows = Array.isArray(p) ? p : [p] } catch { return json({ error: "bad_json" }, 400) }
+      }
+      if (rows.some((r) => r && r.category === WOODY_READS)) return json({ error: "forbidden", hint: "woody_reads_owner_only" }, 403)
+      const harmless = req.method === "PATCH" && rows.length === 1 &&
+        Object.keys(rows[0] || {}).every((k) => KMS_HARMLESS_PATCH.has(k))
+      if (req.method !== "POST" && !harmless) {
+        const q = new URLSearchParams()
+        for (const [k, v] of url.searchParams) if (!["select", "order", "limit", "offset", "on_conflict", "columns"].includes(k)) q.append(k, v)
+        if (![...q.keys()].length) return json({ error: "forbidden", hint: "filter required" }, 403)
+        q.append("category", `eq.${WOODY_READS}`)
+        q.set("select", "id"); q.set("limit", "1")
+        const ck = await fetch(`${SUPABASE_URL}/rest/v1/kms_documents?${q}`, { headers: elevatedApiHeaders(SERVICE_KEY) })
+        if (!ck.ok) return json({ error: "forbidden", hint: "woody_reads_check_failed" }, 403)
+        if ((await ck.json()).length) return json({ error: "forbidden", hint: "woody_reads_owner_only" }, 403)
+      }
+      body = rawText
     } else if (table === "premortem_sessions" && req.method === "PATCH" && rawText) {
       // ── 受保護欄位：必須是該場會議的主席本人 ──
       let parsed: Record<string, unknown>

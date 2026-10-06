@@ -9,9 +9,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { verifySession } from "../_shared/session.ts"
 import { namedSecretKey, elevatedApiHeaders } from "../_shared/api-keys.ts"
 import { validateMessages, buildRequest } from "./lib.js"
-import { buildReportsAppendix, normalizeDocs, buildDocsAppendix, assemble,
-         OCR_PREFIX, validOcrKey, fillOcr, OCR_SYSTEM } from "./assemble.js"
-import { MODEL } from "./lib.js"
+import { buildReportsAppendix, normalizeDocs, buildDocsAppendix, assemble, kmsToDocs, KMS_CATEGORY } from "./assemble.js"
 
 const CORS = {
   "Access-Control-Allow-Origin": "*",
@@ -39,7 +37,7 @@ async function loadPersona(): Promise<string> {
 }
 
 // ── 更新（只有 Woody 本人，或本機腳本帶 secret key）──
-// 🔴 按鈕只送「文件抽出來的文字」，組裝一律在這裡（assemble.js）—— 同一件事只有一份實作。
+// 🔴 文件來源是 KMS「Woody 推薦閱讀」分類（伺服器自己讀），組裝一律在這裡（assemble.js）。
 // 🔴 人格正文（woody-core）按鈕不會動：那是 Woody 審閱過的，要改仍要經他看過。
 const OWNER = "C00001"
 
@@ -59,49 +57,7 @@ async function sbUpsertPersona(id: string, system: string, version: string) {
   if (!r.ok) throw new Error(`db_write_failed ${r.status}`)
 }
 
-// 圖片文字辨識的快取：ai_personas 裡 id 以 'ocr:' 開頭的資料列（一張圖一列）
-async function ocrCache(): Promise<Record<string, string>> {
-  const rows = await sbGet(`ai_personas?id=like.${encodeURIComponent(OCR_PREFIX + "*")}&select=id,system`)
-  const m: Record<string, string> = {}
-  for (const r of rows || []) m[String(r.id).slice(OCR_PREFIX.length)] = r.system
-  return m
-}
-// 清掉已經不在資料夾裡的圖（刪掉或換過內容）。失敗不影響彙整，只是多留幾列。
-async function ocrPrune(keep: string[], cache: Record<string, string>) {
-  const gone = Object.keys(cache).filter((k) => !keep.includes(k))
-  for (const k of gone) {
-    try {
-      await fetch(`${sbUrl()}/rest/v1/ai_personas?id=eq.${encodeURIComponent(OCR_PREFIX + k)}`, {
-        method: "DELETE", headers: elevatedApiHeaders(namedSecretKey("kms_edge")),
-      })
-    } catch { /* ignore */ }
-  }
-}
-const OCR_MIME = ["image/jpeg", "image/png", "image/webp", "image/gif"]
-async function ocrOne(claudeKey: string, key: string, mime: string, data: string): Promise<string> {
-  if (!validOcrKey(key)) throw new Error("bad_key")
-  if (!OCR_MIME.includes(mime)) throw new Error("bad_mime")
-  if (typeof data !== "string" || !data || data.length > 7_000_000) throw new Error("bad_image")
-  const r = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: { "Content-Type": "application/json", "x-api-key": claudeKey, "anthropic-version": "2023-06-01" },
-    body: JSON.stringify({
-      model: MODEL, max_tokens: 12000, output_config: { effort: "low" },
-      system: OCR_SYSTEM,
-      messages: [{ role: "user", content: [
-        { type: "image", source: { type: "base64", media_type: mime, data } },
-        { type: "text", text: "請抄錄這張圖。" },
-      ] }],
-    }),
-  })
-  if (!r.ok) throw new Error("upstream " + r.status)
-  const j = await r.json()
-  const text = (j.content || []).filter((b: { type: string }) => b.type === "text").map((b: { text: string }) => b.text).join("").trim()
-  if (!text) throw new Error("empty")
-  await sbUpsertPersona(OCR_PREFIX + key, text, "ocr")
-  return text
-}
-
+// 本機腳本（scripts/ai-woody-push.py）帶專案的 secret key 呼叫：那把鑰匙本來就有全權
 async function isCliKey(req: Request): Promise<boolean> {
   const k = req.headers.get("apikey") || ""
   if (!k) return false
@@ -111,36 +67,24 @@ async function isCliKey(req: Request): Promise<boolean> {
   } catch { return false }
 }
 
-async function rebuild(docsIn: unknown) {
+async function rebuild() {
   const coreRows = await sbGet("ai_personas?id=eq.woody-core&select=system")
   const core = coreRows?.[0]?.system || ""
   if (!core) throw new Error("core_missing")
   const rows = await sbGet("woody_reports?select=report_date,work,plan,reflections,intel,feedback,other" +
     "&author_id=eq.C00001&order=report_date.asc&limit=2000")
-  let docsAppendix = ""
-  let docNames: string[] = []
-  let ocrMissing: string[] = []
-  if (docsIn === undefined) {
-    // 沒送文件 ＝ 沿用上一次的附錄二
-    const d = await sbGet("ai_personas?id=eq.woody-docs&select=system")
-    docsAppendix = d?.[0]?.system || ""
-  } else {
-    // 圖片：前端只送 { folder, name, size, ocr: true }，文字從快取補
-    const cache = await ocrCache()
-    const f = fillOcr(docsIn, cache)
-    ocrMissing = f.missing
-    await ocrPrune(f.used, cache)
-    const n = normalizeDocs(f.docs)
-    if (n.error) throw new Error(n.error)
-    docsAppendix = buildDocsAppendix(n.docs)
-    docNames = n.docs.map((x: { folder: string; name: string }) => `${x.folder}/${x.name}`)
-    await sbUpsertPersona("woody-docs", docsAppendix, String(n.docs.length))
-  }
+  // 附錄二：KMS「Woody 推薦閱讀」分類裡已發佈的文件（只有 Woody 本人寫得進那個分類，見 kms-write／sb-proxy）
+  const kms = await sbGet(`kms_documents?category=eq.${KMS_CATEGORY}&status=eq.published` +
+    "&select=title,body,tags,file_name&order=created_at.asc&limit=1000")
+  const n = normalizeDocs(kmsToDocs(kms))
+  if (n.error) throw new Error(n.error)
+  const docsAppendix = buildDocsAppendix(n.docs)
+  await sbUpsertPersona("woody-docs", docsAppendix, String(n.docs.length))
   const system = assemble(core, buildReportsAppendix(rows), docsAppendix)
   const version = rows.length ? rows[rows.length - 1].report_date : ""
   await sbUpsertPersona("woody", system, version)
   personaCache = null
-  return { reports: rows.length, latest: version, docs: docsIn === undefined ? null : docNames, ocrMissing, chars: system.length }
+  return { reports: rows.length, latest: version, docs: n.docs.length, chars: system.length }
 }
 
 function todayTaipei(): string {
@@ -160,21 +104,13 @@ serve(async (req) => {
     let body: any
     try { body = await req.json() } catch { return json({ error: "bad_json" }, 400) }
 
-    if (["rebuild", "status", "ocrList", "ocr"].includes(body?.action)) {
+    if (body?.action === "rebuild" || body?.action === "status") {
       if (who?.empId !== OWNER && !(await isCliKey(req))) return json({ error: "forbidden" }, 403)
       if (body.action === "status") {
         const r = await sbGet("ai_personas?id=in.(woody,woody-docs)&select=id,version,updated_at")
         return json({ ok: true, rows: r })
       }
-      if (body.action === "ocrList") {
-        try { return json({ ok: true, keys: Object.keys(await ocrCache()) }) }
-        catch (e) { return json({ error: (e as Error).message }, 500) }
-      }
-      if (body.action === "ocr") {
-        try { const text = await ocrOne(CLAUDE_KEY, body.key, body.mime, body.data); return json({ ok: true, chars: text.length }) }
-        catch (e) { return json({ error: (e as Error).message }, 502) }
-      }
-      try { return json({ ok: true, ...(await rebuild(body.docs)) }) }
+      try { return json({ ok: true, ...(await rebuild()) }) }
       catch (e) { return json({ error: (e as Error).message }, 500) }
     }
 

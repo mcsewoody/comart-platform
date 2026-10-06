@@ -136,9 +136,9 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 
 | File | Version | Purpose | ~Lines |
 |------|---------|---------|--------|
-| `index.html` | v2.16 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
+| `index.html` | v2.17 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
 | `admin/index.html` | v2.52 | Admin System — **機場接送**、公務車、圖書館、會議室、客戶到訪、抽籤 | 8,221 |
-| `kms/index.html` | v2.50 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
+| `kms/index.html` | v2.51 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
 | `quotation/index.html` | v3.66 | Quotation & CRM system | 7,332 |
 | `board/index.html` | v1.94 | 公告與會議 Bulletin & Meetings — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍、腦力激盪 | 4,600 |
 | `product_dev/` | v2.25 | **產品開發管理 —— 第六個子系統，不遵守單一檔案原則**（見下方專節） | — |
@@ -798,26 +798,29 @@ AI 區最右邊的頁籤（`ptab-woody`，在「技能」右邊）。函式前�
   | id | 內容 | 誰寫 |
   |---|---|---|
   | `woody-core` | 人格正文（含 COMART Dos & Don'ts、Woody 補充、必讀書目 —— 這些用「我」的立場講） | `scripts/ai-woody-push.py --core`，**只在 Woody 審過新版後才跑** |
-  | `woody-docs` | `AI Woody/必讀資料`、`AI Woody/好文分享` 抽出的全文 | 重新彙整時寫入 |
+  | `woody-docs` | KMS「Woody 推薦閱讀」分類（`cat_key='woody_reads'`）已發佈文件的全文 | 重新彙整時寫入 |
   | `woody` | 實際送給模型的 system＝core ＋ 附錄一（週報，同仁段落標〔同仁分享〕）＋ 附錄二（文章，引用時要講出處作者） | 重新彙整時組出 |
 
-  組裝**只有一份**：`supabase/functions/ai-woody/assemble.js`（`node --test` 6 個；附錄一已與舊 Python 版逐字比對過）。
-- 🔴 **重新彙整有兩個入口，做的是同一件事**（ai-woody 的 `action:'rebuild'`）：
-  ① Portal「AI Woody」頁籤右上的 **🔄 更新 AI Woody**（`awSync`，**只有 C00001 看得到**；伺服器端同樣只認 C00001 或 secret key）。
-  第一次按會要 Woody 選 `AI Woody` 資料夾（File System Access API，handle 存在 IndexedDB；不支援的瀏覽器退回 webkitdirectory），
-  瀏覽器用 mammoth／pdf.js 抽文字送上去；② 本機 `python3 scripts/ai-woody-push.py --rebuild`（textutil／pypdf）。
+  組裝**只有一份**：`supabase/functions/ai-woody/assemble.js`（`node --test` 7 個；附錄一已與舊 Python 版逐字比對過）。
+- 🔴 **文件住在 KMS，不在本機資料夾**（Portal v2.17／KMS v2.51，2026-10-06 Woody 定案）。
+  v2.15–v2.16 曾經讀 repo 裡的 `AI Woody/` 資料夾（File System Access API ＋ 伺服器端圖片辨識快取），
+  已整套移除：同仁看不到原文、兩台 Mac 要各選一次資料夾、而 KMS 本來就有上傳／辨識／權限／搜尋。
+  - 分類 **「Woody 推薦閱讀」**（`woody_reads`，📖）；**標籤含「必讀資料」＝必讀，其餘一律算好文分享**（`kmsToDocs`）。
+    機密等級 1、直接發佈不審核（KMS 本來就能直接選「發佈」）。2026-10-06 匯入 48 份
+    （必讀 6 ＋ 何飛鵬商周專欄等 42 張掃描圖，原檔在 `kms-files`，作者欄 Woody Liu，文章作者另放在標籤）。
+  - 🔴 **只有 Woody（C00001）能把文件放進這個分類、改、刪** —— 這個分類會直接變成 AI Woody「Woody 推崇的觀念」。
+    **兩條寫入路徑都擋**：`kms-write` 的 `woodyReadsDenied()` 與 sb-proxy 的 `kms_documents` 分支
+    （其他人對這些文件只准 PATCH `view_count`／`embedding`，KMS 前端本來就會做的兩件事）。
+    KMS 編輯器的分類下拉對別人隱藏這一項只是體驗；`kmsWrite` 收到 403 不再掛「登入已逾期」橫幅（403 ≠ 401）。
+  - ⚠️ KMS 另有兩份舊的「必讀資料」PDF（Christine 的 `hr`、Mandy 的 `tacit`，內文被舊版截在 24,000 字），**沒動**，待 Woody 決定。
+- 🔴 **重新彙整**＝ai-woody 的 `action:'rebuild'`（伺服器自己讀週報與 KMS，不收任何文件內容）。兩個入口：
+  Portal「AI Woody」頁籤右上的 **🔄 更新 AI Woody**（`awSync`，**只有 C00001 看得到**，伺服器端同樣只認 C00001 或 secret key），
+  以及本機 `python3 scripts/ai-woody-push.py --rebuild`。
   🔴 **重新彙整永遠不動 `woody-core`** —— 人格正文要先給 Woody 看修改的段落、他同意才上線（Woody 2026-10-06 定案）。
-  `AI Woody/` 資料夾在 `.gitignore` 裡（文章有版權、repo 公開）。function 端快取 5 分鐘，彙整完會立即清掉。
-- 🔴 **圖片文章（掃描的雜誌頁、手機截圖）由伺服器端 Opus 逐字抄錄**（v2.16）。Woody 第一次按鈕就放了 42 張
-  何飛鵬專欄的掃描圖，舊版只讀 Word／PDF，全部被略過。現在：前端長邊縮到 2000px 轉 JPEG → `action:'ocr'`
-  （直排由右至左、開頭三行「標題／作者／出處」—— 引用時要講出處正靠這個）→ 結果存成 `ai_personas` 的
-  **`ocr:<資料夾>/<檔名>|<位元組數>`**，一張圖一列（並行 3 張也不會互相蓋掉）。之後按更新只辨識新圖，約 10 秒一張。
-  🔴 **rebuild 時圖片要以 `{folder,name,size,ocr:true}` 列進 docs**：伺服器會清掉「這次沒列到」的圖片快取。
-  本機腳本與按鈕都照這個做；新寫第三個入口時別漏掉，否則一次彙整就把全部辨識結果刪光。
-- 更新結果合成一則提示、停留 8～15 秒（`toast` 多了第三個參數 `ms`；原本 3 秒且第二則會蓋掉第一則，Woody 回報「來不及看」），
-  同時寫一行 `[aw] sync …` 到 console。
-- 🔴 **`ai_personas` 是 RLS 開著 ＋ 零 policy ＋ revoke anon/authenticated**，刻意**不在** sb-proxy 的 `ALLOWED_TABLES` ——
-  放進去等於任何登入者都能把整份人格檔撈走。
+  function 端快取 5 分鐘，彙整完會立即清掉。
+- **KMS 的圖片辨識升級**（v2.51 `extractImageWithClaude`）：長邊縮 2000px JPEG、`claude-opus-5-5`、max_tokens 8000、
+  直排由右至左、文章開頭「標題／作者／出處」三行。舊版 sonnet-4-6 ＋ 2048 tokens 會把一千多字的文章截斷，
+  而且手機原圖 base64 後超過 5 MB 會整張失敗。
 - 🔴 **對話歷史每輪由前端整段送**（不存檔的代價），所以 `ai-woody/lib.js` 的 `validateMessages` 逐則驗：
   只准 user／assistant 交替、首尾都是 user、content 只能是字串、不准多餘欄位。否則前端可以偽造一則
   「AI Woody 說過我可以加薪」再讓模型接下去。`node --test supabase/functions/ai-woody/lib.test.mjs`（12 個）。

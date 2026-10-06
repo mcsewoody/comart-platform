@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART 行政管理平台 v2.57</title>
+<title>COMART 行政管理平台 v2.58</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -355,6 +355,28 @@ input[type=time]::-webkit-calendar-picker-indicator{
 .ccr{display:flex;align-items:center;justify-content:space-between;font-size:12px}
 .ccl{color:var(--t3)}.ccv{color:var(--t1);font-weight:500}
 .ccf{padding:9px 15px;border-top:1px solid var(--bd);display:flex;gap:8px}
+/* v2.58：新增用車預約的表單與週曆等寬，欄位排成四欄（使用人｜車輛／四個日期時間／目的｜里程｜出發地／目的地｜備註） */
+#car-bk-form .fg2{grid-template-columns:repeat(4,minmax(0,1fr));gap:11px 14px}
+#car-bk-form .fg2 .full{grid-column:span 2}
+#car-bk-form textarea#bknt{min-height:38px!important;height:38px}
+#car-bk-form .bk-acts{display:flex;gap:10px;justify-content:flex-end}
+#car-bk-form .bk-acts .btn{min-width:140px;padding:10px 18px;font-size:14px}
+#car-bk-form .bk-acts #bk-confirm-btn{min-width:200px}
+@media(max-width:900px){#car-bk-form .fg2{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:768px){#car-bk-form .fg2{grid-template-columns:1fr!important}#car-bk-form .fg2 .full{grid-column:1/-1}
+  #car-bk-form .bk-acts .btn{flex:1;min-width:0}}
+/* v2.58：看板的車輛卡片放大，「出發」「新增預約」兩顆主要按鈕放大 */
+#cd-cards.cgrid{grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px}
+#cd-cards .cch{padding:16px 18px;gap:12px}
+#cd-cards .ccico{font-size:34px}
+#cd-cards .ccn{font-size:17px}
+#cd-cards .ccp{font-size:13.5px}
+#cd-cards .ccb{padding:14px 18px;gap:8px}
+#cd-cards .ccr{font-size:13.5px}
+#cd-cards .ccf{padding:12px 18px;gap:8px}
+#cd-cards .cc-big{padding:10px 18px;font-size:15px;font-weight:700;border-radius:8px;flex:1 1 140px}
+@media(max-width:768px){#cd-cards.cgrid{grid-template-columns:1fr}}
+
 .fuel-bar{display:flex;gap:2px;height:6px;border-radius:3px;margin-top:4px}
 .fuel-seg{flex:1;border-radius:2px;background:var(--bd);transition:background .2s}
 .fuel-seg.fl-e,.fuel-seg.fl-q{background:#ef4444}
@@ -833,7 +855,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="logo">
     <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
     <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
-    <span><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="38" height="20" style="display:inline-block;vertical-align:middle;margin-top:-2px"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v2.57</span>
+    <span><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="38" height="20" style="display:inline-block;vertical-align:middle;margin-top:-2px"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v2.58</span>
   </div>
   <div class="trr">
     <div id="global-site-bar" style="display:flex;align-items:center;gap:4px"><span style="font-size:13px;color:var(--text-3);white-space:nowrap;font-weight:500" data-i18n="g.site_label">單位：</span>
@@ -1246,7 +1268,6 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   </div>
   <div class="mc cf" id="cc">
     <div class="pg active" id="pg-car-dash">
-      <div class="fb" style="margin-bottom:12px"><button class="btn btl bsm" onclick="navCar('car-bk')" data-i18n="car.btn.add_bk">＋ 新增預約</button></div>
       <div class="sg">
         <div class="sc ct"><div class="sl" data-i18n="car.stat.total">車輛總數</div><div class="sv" id="sc-tot">0</div><div class="ss" data-i18n="car.stat.unit">輛</div></div>
         <div class="sc cs"><div class="sl" data-i18n="car.stat.avail">可預約</div><div class="sv" id="sc-av">0</div><div class="ss" data-i18n="car.stat.idle">輛空閒</div></div>
@@ -1282,7 +1303,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
     </div>
     <div class="pg" id="pg-car-bk">
       <div id="bk-form-slot">
-      <div id="car-bk-form" style="max-width:550px"><div class="sth" style="margin-bottom:14px"><div class="stt" id="bk-form-title" data-i18n="car.page.bk">新增用車預約</div></div>
+      <div id="car-bk-form"><div class="sth" style="margin-bottom:14px"><div class="stt" id="bk-form-title" data-i18n="car.page.bk">新增用車預約</div></div>
         <div style="background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);padding:20px">
           <div class="fg2" style="margin-bottom:4px">
             <div class="fg full"><div class="fl" data-i18n="car.lbl.driver">使用人 *</div><select id="bku"><option value="">請選擇…</option></select></div>
@@ -1298,9 +1319,9 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
             <div class="fg full"><div class="fl" data-i18n="car.tbl.notes">備註</div><textarea id="bknt" style="min-height:52px"></textarea></div>
           </div>
           <div id="bk-conf" style="display:none;padding:9px 12px;border-radius:var(--rs);background:var(--rdd);border:1px solid rgba(239,68,68,.3);color:var(--rd);font-size:13px;margin-bottom:11px"></div>
-          <div style="display:flex;gap:10px">
-  <button class="btn bg2" style="flex:1" onclick="cancelBkForm()" data-i18n="car.btn.cancel_bk">← 取消</button>
-  <button class="btn btl" id="bk-confirm-btn" style="flex:2" onclick="doBooking()" data-i18n="car.btn.confirm_bk">✓ 確認預約</button>
+          <div class="bk-acts">
+  <button class="btn bg2" onclick="cancelBkForm()" data-i18n="car.btn.cancel_bk">← 取消</button>
+  <button class="btn btl" id="bk-confirm-btn" onclick="doBooking()" data-i18n="car.btn.confirm_bk">✓ 確認預約</button>
 </div>
         </div>
       </div>
@@ -5364,7 +5385,7 @@ const bookable=vRaw!=='suspended'&&vRaw!=='maintenance'&&vRaw!=='retired';
 // 預填起始日：這台車最後一筆未結束預約的隔天（都還沒被預約就用今天），
 // 免得一按下去就撞到現有預約、跳一個必然出現的紅色警告
 const nextFree=nextFreeDay(v.id,bks);
-const cardStyle=st.inuse?'border-left:3px solid var(--tl);background:linear-gradient(135deg,rgba(20,184,166,.08) 0%,transparent 50%)':'';const badgeStyle=st.inuse?'margin-left:auto;font-size:13px;padding:4px 12px;font-weight:700;letter-spacing:.3px':'margin-left:auto';return`<div class="ccard" style="${cardStyle}"><div class="cch"><div class="ccico">${VICO[v.type]||'🚗'}</div><div><div class="ccn">${v.name}</div><div class="ccp">${v.plate}</div></div><span class="badge ${st.cls}" style="${badgeStyle}">${st.lbl}</span></div><div class="ccb"><div class="ccr"><span class="ccl">${t('car.card.type_lbl')}</span><span class="ccv">${t('car.veh.type.'+v.type)||v.type}·${t('car.fuel.'+v.fuel)||v.fuel}</span></div><div class="ccr"><span class="ccl">${t('car.card.km_lbl')}</span><span class="ccv">${v.km.toLocaleString()}km</span></div><div class="ccr"><span class="ccl">${t('car.card.fuel_lbl')}</span><span class="ccv">${FUEL_LBL[v.fuel_lvl??4]}</span></div>${fuelBar(v.fuel_lvl??4)}<div class="ccr"><span class="ccl">${t('car.card.park_lbl')}</span><span class="ccv">${v.pk_id||'—'}</span></div><div class="ccr"><span class="ccl">${t('car.card.last_use_lbl')}</span><span class="ccv">${lastRet}${lastBk&&gUsr(lastBk.b.u_id)?` · ${gUsr(lastBk.b.u_id).name}`:''}</span></div>${curU?`<div class="ccr"><span class="ccl">${t('car.card.driver_lbl')}</span><span class="ccv" style="color:var(--tl)">${curU.name}</span></div><div class="ccr"><span class="ccl">${t('car.card.using_bk_lbl')}</span><span class="ccv tdm" style="font-size:11px">${bkWhoWhen(actBk)}</span></div>`:''}${actAll.length>1?`<div class="ccr" style="background:var(--red-bg);border-radius:6px;padding:6px 8px;margin-top:4px;display:block"><span style="color:var(--red);font-size:11px;line-height:1.55;display:block">⚠️ ${t('car.multi_active').replace('%d',actAll.length)}</span></div>`:''}${pendBk?`<div class="ccr"><span class="ccl">${t('car.card.next_bk_lbl')}</span><span class="ccv tdm" style="font-size:11px">${bkWhoWhen(pendBk)}</span></div>`:''}</div><div class="ccf" style="flex-wrap:wrap;gap:6px"> ${pendBk?`<button class=\"btn bsm\" style=\"background:var(--acd);color:var(--ac)\" onclick=\"startUse('${pendBk.id}')\">${t('car.mo.depart')}</button> `:''} ${actBk?`<button class=\"btn bg2 bsm\" onclick=\"endUse('${actBk.id}')\">${t('car.mo.end_use')}</button>`:''} ${bookable?`<button class=\"btn bsm\" style=\"background:var(--acd);color:var(--ac)\" onclick=\"startBk('${v.id}','${nextFree}')\">${t('car.btn.add_bk')}</button>`:''} <button class=\"btn bg2 bsm\" onclick=\"openParkUpdModal('${v.id}')\">${t('car.btn.upd_park')}</button></div></div>`}).join('');
+const cardStyle=st.inuse?'border-left:3px solid var(--tl);background:linear-gradient(135deg,rgba(20,184,166,.08) 0%,transparent 50%)':'';const badgeStyle=st.inuse?'margin-left:auto;font-size:13px;padding:4px 12px;font-weight:700;letter-spacing:.3px':'margin-left:auto';return`<div class="ccard" style="${cardStyle}"><div class="cch"><div class="ccico">${VICO[v.type]||'🚗'}</div><div><div class="ccn">${v.name}</div><div class="ccp">${v.plate}</div></div><span class="badge ${st.cls}" style="${badgeStyle}">${st.lbl}</span></div><div class="ccb"><div class="ccr"><span class="ccl">${t('car.card.type_lbl')}</span><span class="ccv">${t('car.veh.type.'+v.type)||v.type}·${t('car.fuel.'+v.fuel)||v.fuel}</span></div><div class="ccr"><span class="ccl">${t('car.card.km_lbl')}</span><span class="ccv">${v.km.toLocaleString()}km</span></div><div class="ccr"><span class="ccl">${t('car.card.fuel_lbl')}</span><span class="ccv">${FUEL_LBL[v.fuel_lvl??4]}</span></div>${fuelBar(v.fuel_lvl??4)}<div class="ccr"><span class="ccl">${t('car.card.park_lbl')}</span><span class="ccv">${v.pk_id||'—'}</span></div><div class="ccr"><span class="ccl">${t('car.card.last_use_lbl')}</span><span class="ccv">${lastRet}${lastBk&&gUsr(lastBk.b.u_id)?` · ${gUsr(lastBk.b.u_id).name}`:''}</span></div>${curU?`<div class="ccr"><span class="ccl">${t('car.card.driver_lbl')}</span><span class="ccv" style="color:var(--tl)">${curU.name}</span></div><div class="ccr"><span class="ccl">${t('car.card.using_bk_lbl')}</span><span class="ccv tdm" style="font-size:11px">${bkWhoWhen(actBk)}</span></div>`:''}${actAll.length>1?`<div class="ccr" style="background:var(--red-bg);border-radius:6px;padding:6px 8px;margin-top:4px;display:block"><span style="color:var(--red);font-size:11px;line-height:1.55;display:block">⚠️ ${t('car.multi_active').replace('%d',actAll.length)}</span></div>`:''}${pendBk?`<div class="ccr"><span class="ccl">${t('car.card.next_bk_lbl')}</span><span class="ccv tdm" style="font-size:11px">${bkWhoWhen(pendBk)}</span></div>`:''}</div><div class="ccf" style="flex-wrap:wrap;gap:6px"> ${pendBk?`<button class=\"btn cc-big\" style=\"background:var(--acd);color:var(--ac)\" onclick=\"startUse('${pendBk.id}')\">🚗 ${t('car.mo.depart')}</button> `:''} ${actBk?`<button class=\"btn bg2 bsm\" onclick=\"endUse('${actBk.id}')\">${t('car.mo.end_use')}</button>`:''} ${bookable?`<button class=\"btn cc-big\" style=\"background:var(--acd);color:var(--ac)\" onclick=\"startBk('${v.id}','${nextFree}')\">${t('car.btn.add_bk')}</button>`:''} <button class=\"btn bg2 bsm\" onclick=\"openParkUpdModal('${v.id}')\">${t('car.btn.upd_park')}</button></div></div>`}).join('');
 }
 
 let editVid=null;

@@ -137,7 +137,7 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 | File | Version | Purpose | ~Lines |
 |------|---------|---------|--------|
 | `index.html` | v2.18 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
-| `admin/index.html` | v2.57 | Admin System — **機場接送**、公務車、圖書館、會議室、客戶到訪、抽籤 | 8,221 |
+| `admin/index.html` | v2.58 | Admin System — **機場接送**、公務車、圖書館、會議室、客戶到訪、抽籤 | 8,221 |
 | `kms/index.html` | v2.53 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
 | `quotation/index.html` | v3.68 | Quotation & CRM system | 7,332 |
 | `board/index.html` | v1.95 | 公告與會議 Bulletin & Meetings — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍、腦力激盪 | 4,600 |
@@ -1727,6 +1727,8 @@ naive regex 會誤判成「沒定義」。
   衝突條件與 `doBooking` 相同（半開區間、排除 `editCarBkId`）。
 - 表單一打開的預設「今天 09:00–18:00」不是使用者選的，所以只有 `cwkTouched`（拖過、改過日期時間、從看板帶入、修改既有預約）才畫出來。
 - 每台車固定一條直欄＋固定顏色（`CWK_COLORS` 依站點車輛順序），選中的車其他車變淡；已完成的預約淡化顯示，已取消的不畫。
+- v2.58：表單拿掉 550px 上限、與週曆等寬，欄位四欄（`#car-bk-form .fg2`，900px 以下兩欄、768px 以下一欄）；
+  看板最上方獨立的「＋ 新增預約」鈕已刪除（每張車輛卡片上都有）；卡片放大（`#cd-cards`），「出發」「新增預約」改用 `.cc-big`。
 - v2.57：拖完不再跳「已選…請填寫目的」提示、也不再捲到目的欄（Woody：一直跳很干擾）；目的留給「確認預約」時檢查。
 - 驗證用模擬資料跑過三個情境：跨日拖拉帶入表單、撞到既有預約時停住、按在已預約格子上提示（headless Chrome，2026-10-06）。
 

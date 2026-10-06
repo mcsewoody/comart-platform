@@ -137,7 +137,7 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 | File | Version | Purpose | ~Lines |
 |------|---------|---------|--------|
 | `index.html` | v2.17 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
-| `admin/index.html` | v2.53 | Admin System — **機場接送**、公務車、圖書館、會議室、客戶到訪、抽籤 | 8,221 |
+| `admin/index.html` | v2.54 | Admin System — **機場接送**、公務車、圖書館、會議室、客戶到訪、抽籤 | 8,221 |
 | `kms/index.html` | v2.52 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
 | `quotation/index.html` | v3.67 | Quotation & CRM system | 7,332 |
 | `board/index.html` | v1.94 | 公告與會議 Bulletin & Meetings — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍、腦力激盪 | 4,600 |
@@ -1710,6 +1710,10 @@ naive regex 會誤判成「沒定義」。
 - 🔴 **週曆不寫資料庫，出口只有 `doBooking`**：兩條入口共用同一個送出、權限與衝突檢查，規則才不會分岔。
 - 🔴 **雙向同步靠 `chkConflict`**：表單每一格改動都會呼叫它，它開頭呼叫 `cwkSyncFromForm()` 把表單時段畫回週曆；
   週曆拖完由 `cwkApply()` 寫進表單再呼叫 `chkConflict()`。
+- **四種拖拉**（v2.54，Woody 指定）：空白處拖＝拉出新時段；拖區塊本體＝整塊平移（長度不變）；
+  拖上緣把手＝改開始時間；拖下緣把手＝改結束時間。跨日的選取會切成多段，**上緣把手只在起點那天、下緣只在終點那天**。
+  四種共用 `cwkOk()`（不早於現在、不與同車其他預約重疊）；只點一下沒移動不會重寫表單（`moved` 旗標）。
+  選取區塊 z-index 4，日期表頭是 sticky 要 6 —— 否則跨日的那一段會蓋住表頭。
 - 🔴 **拖不過去，而不是畫出一段送不出去的紅色**：碰到同車未結束的預約或過去的時間，選取停在上一個合法範圍（`cwkMoveEv`）。
   衝突條件與 `doBooking` 相同（半開區間、排除 `editCarBkId`）。
 - 表單一打開的預設「今天 09:00–18:00」不是使用者選的，所以只有 `cwkTouched`（拖過、改過日期時間、從看板帶入、修改既有預約）才畫出來。

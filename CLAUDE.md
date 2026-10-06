@@ -137,7 +137,7 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 | File | Version | Purpose | ~Lines |
 |------|---------|---------|--------|
 | `index.html` | v2.17 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
-| `admin/index.html` | v2.54 | Admin System — **機場接送**、公務車、圖書館、會議室、客戶到訪、抽籤 | 8,221 |
+| `admin/index.html` | v2.55 | Admin System — **機場接送**、公務車、圖書館、會議室、客戶到訪、抽籤 | 8,221 |
 | `kms/index.html` | v2.52 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
 | `quotation/index.html` | v3.67 | Quotation & CRM system | 7,332 |
 | `board/index.html` | v1.94 | 公告與會議 Bulletin & Meetings — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍、腦力激盪 | 4,600 |
@@ -1705,7 +1705,10 @@ naive regex 會誤判成「沒定義」。
 
 ### 公務車「週曆預約」（v2.53，2026-10-06，`cwk*`）
 
-預約頁（`pg-car-bk`）上方是週曆、下方是原本的表單（Woody 要求兩種都保留）。
+**v2.55 起週曆在「週曆／月曆」頁（`pg-car-cal`，看板右邊）**：週曆在上、月曆在下；「新增預約」頁（`pg-car-bk`）只剩表單。
+🔴 **表單只有一份 DOM（`#car-bk-form`），由 `cwkMountForm()` 在 `#cwk-form-slot`／`#bk-form-slot` 之間搬**（同 Portal 的 `lcMountRoom`）——
+複製一份會撞 id（`bkv`／`bksd`… 被 `doBooking`／`chkConflict` 綁死）。在週曆頁表單只在選了時段或修改既有預約時出現（`cwkFormVis`），
+否則月曆會被推到很下面；在週曆頁取消或預約完成都留在週曆頁。（v2.53–v2.54 時週曆放在 `pg-car-bk` 的表單上方。）
 點車輛卡片 → 在週曆上按住拖拉（30 分鐘一格、可跨日）→ 自動帶入下方表單 → 填目的 → 原本的「確認預約」。
 - 🔴 **週曆不寫資料庫，出口只有 `doBooking`**：兩條入口共用同一個送出、權限與衝突檢查，規則才不會分岔。
 - 🔴 **雙向同步靠 `chkConflict`**：表單每一格改動都會呼叫它，它開頭呼叫 `cwkSyncFromForm()` 把表單時段畫回週曆；

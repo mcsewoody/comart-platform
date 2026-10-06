@@ -136,10 +136,10 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 
 | File | Version | Purpose | ~Lines |
 |------|---------|---------|--------|
-| `index.html` | v2.18 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
-| `admin/index.html` | v2.58 | Admin System — **機場接送**、公務車、圖書館、會議室、客戶到訪、抽籤 | 8,221 |
-| `kms/index.html` | v2.53 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
-| `quotation/index.html` | v3.68 | Quotation & CRM system | 7,332 |
+| `index.html` | v2.19 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
+| `admin/index.html` | v2.59 | Admin System — **機場接送**、公務車、圖書館、會議室、客戶到訪、抽籤 | 8,221 |
+| `kms/index.html` | v2.54 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
+| `quotation/index.html` | v3.69 | Quotation & CRM system | 7,332 |
 | `board/index.html` | v1.95 | 公告與會議 Bulletin & Meetings — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍、腦力激盪 | 4,600 |
 | `product_dev/` | v2.25 | **產品開發管理 —— 第六個子系統，不遵守單一檔案原則**（見下方專節） | — |
 
@@ -438,6 +438,11 @@ All apps use a dark theme with CSS custom properties. Two slightly different pal
 - **Product Dev**（2026-09-26 起）：**用 Portal 那一組**（`--bg:#0A0E17`、`--ac:#2D7FF9`、DM Sans）。
   它在這之前是三個畫面三種顏色 —— hub teal `#47d7c9`、devices cyan `#16cee5`、
   Finder 另一套 cyan，而且都不是平台的任何一組。詳見〈Product Dev〉專節。
+
+🔴 **文字色票 2026-10-06 整體調亮、背景不變**（Woody 要求；Portal v2.19／報價 v3.69／KMS v2.54／Admin v2.59）：
+Portal `--tx/2/3` #FFFFFF／#DDE9FF／#BCD2F2；報價 #F8FBFF／#CFDDEF／#9FB5CE（原本第三層 #6A8AAA 最暗）；
+KMS `--text/-2/-3` #FFFFFF／#E6EAFF／#C4CAE6；Admin #FBFCFF／#D9DDEE／#B4B9D6。原值寫在各檔 `:root` 的註解裡。
+**列印／PDF 範本裡寫死的深色字刻意沒動**（那些是白底）。要再調就改 `:root`，不要逐條改規則。
 
 Board 的列印／匯出版面（`.sheet`）刻意反轉為白底黑字（PingFang TC），供 PDF／PNG／Email 輸出使用。
 

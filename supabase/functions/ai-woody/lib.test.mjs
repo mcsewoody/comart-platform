@@ -31,3 +31,32 @@ test("buildRequest：人格檔在第一段且有快取斷點，執行期規則�
   assert.match(r.system[1].text, /Tiếng Việt/);
   assert.equal(r.thinking, undefined); // Opus 5.5 不可關 thinking，不送這個欄位
 });
+
+import { normalizeMode, OWNER_MODES, MODES } from "./lib.js";
+test("模式：只認得定義過的模式，指示放在快取斷點之後", () => {
+  assert.equal(normalizeMode("proposal"), "proposal");
+  assert.equal(normalizeMode("hack"), null);
+  assert.equal(normalizeMode("__proto__"), null);
+  const r = buildRequest("PERSONA", [u("hi")], "2026-10-08", "zh-TW", "rehearsal");
+  assert.equal(r.system[0].text, "PERSONA");
+  assert.ok(r.system[0].cache_control);
+  assert.ok(r.system[1].text.includes("簡報彩排"));
+  assert.ok(!r.system[1].cache_control);
+  // chat 模式不帶任何模式指示
+  assert.ok(!buildRequest("P", [u("hi")], "d", "", "chat").system[1].text.includes("【模式"));
+});
+test("模式：週報草稿只給本人", () => {
+  assert.deepEqual(OWNER_MODES, ["draft"]);
+  assert.ok(MODES.draft.includes("只輸出草稿本文"));
+});
+
+import { parseIntro, introUserText } from "./lib.js";
+test("導讀：五種語言都要有，少一種就不算", () => {
+  const full = "<zh-TW>甲\n乙</zh-TW><zh-CN>甲</zh-CN><en>A</en><vi>V</vi><ja>J</ja>";
+  assert.deepEqual(parseIntro(full), { "zh-TW": "甲\n乙", "zh-CN": "甲", en: "A", vi: "V", ja: "J" });
+  assert.equal(parseIntro("<zh-TW>甲</zh-TW><zh-CN>甲</zh-CN><en>A</en><vi>V</vi>"), null);
+  assert.equal(parseIntro("<zh-TW> </zh-TW><zh-CN>甲</zh-CN><en>A</en><vi>V</vi><ja>J</ja>"), null);
+});
+test("導讀：內文過長截斷", () => {
+  assert.ok(introUserText({ title: "T", tags: ["必讀資料"], body: "字".repeat(40000) }).length < 30100);
+});

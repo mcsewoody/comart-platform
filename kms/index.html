@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART KMS v2.54</title>
+<title>COMART KMS v2.55</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -382,6 +382,12 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
 .reader-btn:hover { background:var(--surface); }
 .reader-btn.primary { background:var(--blue); color:#fff; border-color:var(--blue); }
 .reader-btn.primary:hover { background:#1a4a7a; }
+
+.wr-intro{margin:6px 0 14px;padding:12px 14px;border-radius:10px;border:1px solid rgba(167,139,250,.45);background:rgba(124,58,237,.08)}
+.wr-intro-h{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px;font-weight:700;color:#c4b5fd;margin-bottom:6px}
+.wr-intro-ai{font-size:10.5px;font-weight:600;color:var(--text-3)}
+.wr-intro-btn{margin-left:auto;font-size:11.5px;padding:3px 10px;border-radius:12px;border:1px solid rgba(167,139,250,.6);background:transparent;color:#c4b5fd;cursor:pointer}
+.wr-intro-t{font-size:13.5px;line-height:1.8;color:var(--text);white-space:pre-wrap}
 </style>
 </head>
 <body>
@@ -399,7 +405,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
         ← Portal
       </a>
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="38" height="20" style="display:inline-block;vertical-align:middle;margin-right:4px;margin-top:-2px"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg>COMART <span>KMS</span>
-      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v2.54</span>
+      <span style="font-size:11px;font-weight:400;color:var(--text-3);margin-left:4px;">v2.55</span>
     </div>
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLang('en')">EN</button>
@@ -897,6 +903,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); font
       <button onclick="closeReader()" style="flex-shrink:0;padding:4px 10px;border-radius:6px;border:1px solid var(--border);background:transparent;cursor:pointer;font-size:18px;color:var(--text-3);line-height:1;">✕</button>
     </div>
     <div class="reader-meta" id="reader-meta"></div>
+    <div id="reader-wr-intro" class="wr-intro" style="display:none"></div>
     <div class="reader-body" id="reader-body-content"></div>
       <!-- Discussion 摺疊區 -->
       <div id="reader-discussion-wrap" style="display:none;border-top:1px solid var(--border);padding:16px 20px;max-height:40vh;overflow-y:auto;">
@@ -1066,7 +1073,7 @@ const I18N = {
     'docs.title':'知識庫 — 所有文件', 'docs.new':'＋ 新增文件',
     'kmap.title':'知識地圖 — 分類總覽', 'batch.skip':'跳過','batch.cancel':'取消批次',
     'experts.title':'通訊錄', 'comments.input.placeholder':'輸入留言…', 'status.draft':'草稿', 'status.published':'發佈', 'status.archived':'封存', 'status.withdrawn':'撤回', 'status.template':'範本',
-    'cat.woody_reads':'Woody 推薦閱讀', 'label.wr_sub':'子分類', 'wr.must':'必讀資料', 'wr.share':'好文分享', 'cat.product':'產品開發', 'cat.sales':'客戶資訊', 'cat.industry':'產業新知',
+    'wr.intro_title':'Woody 為什麼推薦這篇','wr.intro_ai':'AI Woody 依 Woody 的觀點生成','wr.intro_gen':'✨ 產生導讀','wr.intro_regen':'↻ 重新產生','wr.intro_running':'產生中…','wr.intro_done':'導讀已更新','wr.intro_fail':'導讀產生失敗','wr.intro_none':'還沒有導讀', 'cat.woody_reads':'Woody 推薦閱讀', 'label.wr_sub':'子分類', 'wr.must':'必讀資料', 'wr.share':'好文分享', 'cat.product':'產品開發', 'cat.sales':'客戶資訊', 'cat.industry':'產業新知',
     'cat.hr':'教育訓練', 'cat.tacit':'知識分享', 'cat.compliance':'智財與法規',
     'cat.supply':'科技發展', 'cat.ai_tech':'AI', 'cat.template':'範本', 'cat.article':'文章',
     'toast.deleted':'已刪除',
@@ -1305,7 +1312,7 @@ const I18N = {
     'docs.title':'知识库 — 所有文档', 'docs.new':'＋ 新建文档',
     'kmap.title':'知识地图 — 分类总览', 'batch.skip':'跳过','batch.cancel':'取消批次',
     'experts.title':'通讯录', 'comments.input.placeholder':'输入留言…', 'status.draft':'草稿', 'status.published':'发布', 'status.archived':'封存', 'status.withdrawn':'撤回', 'status.template':'模板',
-    'cat.woody_reads':'Woody 推荐阅读', 'label.wr_sub':'子分类', 'wr.must':'必读资料', 'wr.share':'好文分享', 'cat.product':'产品开发', 'cat.sales':'客户资讯', 'cat.industry':'产业资讯', 'cat.hr':'教育培训', 'cat.tacit':'知识分享', 'cat.compliance':'知产与法规', 'cat.supply':'科技发展', 'cat.ai_tech':'AI', 'cat.template':'模板', 'cat.article':'文章',
+    'wr.intro_title':'Woody 为什么推荐这篇','wr.intro_ai':'AI Woody 依 Woody 的观点生成','wr.intro_gen':'✨ 生成导读','wr.intro_regen':'↻ 重新生成','wr.intro_running':'生成中…','wr.intro_done':'导读已更新','wr.intro_fail':'导读生成失败','wr.intro_none':'还没有导读', 'cat.woody_reads':'Woody 推荐阅读', 'label.wr_sub':'子分类', 'wr.must':'必读资料', 'wr.share':'好文分享', 'cat.product':'产品开发', 'cat.sales':'客户资讯', 'cat.industry':'产业资讯', 'cat.hr':'教育培训', 'cat.tacit':'知识分享', 'cat.compliance':'知产与法规', 'cat.supply':'科技发展', 'cat.ai_tech':'AI', 'cat.template':'模板', 'cat.article':'文章',
     'toast.deleted':'已删除',
     'sys.storage':'存储: Supabase Postgres',
     'cat.all':'所有分类',
@@ -1545,7 +1552,7 @@ const I18N = {
     'docs.title':'Knowledge Base — All Documents', 'docs.new':'＋ New Document',
     'kmap.title':'Knowledge Map — Categories', 'batch.skip':'Skip','batch.cancel':'Cancel Batch',
     'experts.title':'Directory', 'comments.input.placeholder':'Write a comment…', 'status.draft':'Draft', 'status.published':'Publish', 'status.archived':'Archive', 'status.withdrawn':'Withdraw', 'status.template':'Template',
-    'cat.woody_reads':'Woody\'s Reading List', 'label.wr_sub':'Subcategory', 'wr.must':'Must-read', 'wr.share':'Recommended', 'cat.product':'Product', 'cat.sales':'Customer', 'cat.industry':'Industry',
+    'wr.intro_title':'Why Woody recommends this','wr.intro_ai':'Written by AI Woody from Woody\'s views','wr.intro_gen':'✨ Generate intro','wr.intro_regen':'↻ Regenerate','wr.intro_running':'Generating…','wr.intro_done':'Intro updated','wr.intro_fail':'Could not generate the intro','wr.intro_none':'No intro yet', 'cat.woody_reads':'Woody\'s Reading List', 'label.wr_sub':'Subcategory', 'wr.must':'Must-read', 'wr.share':'Recommended', 'cat.product':'Product', 'cat.sales':'Customer', 'cat.industry':'Industry',
     'cat.hr':'Training', 'cat.tacit':'Sharing', 'cat.compliance':'IPR & Legal',
     'cat.supply':'Technology', 'cat.ai_tech':'AI', 'cat.template':'Template', 'cat.article':'Article',
     'toast.deleted':'Deleted',
@@ -1787,7 +1794,7 @@ const I18N = {
     'docs.title':'Kho kiến thức — Tất cả tài liệu', 'docs.new':'＋ Tài liệu mới',
     'kmap.title':'Bản đồ kiến thức — Tổng quan', 'batch.skip':'Bỏ qua','batch.cancel':'Hủy hàng loạt',
     'experts.title':'Danh bạ', 'comments.input.placeholder':'Viết bình luận…', 'status.draft':'Nháp', 'status.published':'Xuất bản', 'status.archived':'Lưu trữ', 'status.withdrawn':'Thu hồi', 'status.template':'Mẫu',
-    'cat.woody_reads':'Woody giới thiệu', 'label.wr_sub':'Danh mục con', 'wr.must':'Bắt buộc đọc', 'wr.share':'Bài hay chia sẻ', 'cat.product':'Phát triển sản phẩm', 'cat.sales':'Thông tin khách hàng', 'cat.industry':'Tin tức ngành',
+    'wr.intro_title':'Vì sao Woody giới thiệu bài này','wr.intro_ai':'AI Woody viết dựa trên quan điểm của Woody','wr.intro_gen':'✨ Tạo lời giới thiệu','wr.intro_regen':'↻ Tạo lại','wr.intro_running':'Đang tạo…','wr.intro_done':'Đã cập nhật lời giới thiệu','wr.intro_fail':'Không tạo được lời giới thiệu','wr.intro_none':'Chưa có lời giới thiệu', 'cat.woody_reads':'Woody giới thiệu', 'label.wr_sub':'Danh mục con', 'wr.must':'Bắt buộc đọc', 'wr.share':'Bài hay chia sẻ', 'cat.product':'Phát triển sản phẩm', 'cat.sales':'Thông tin khách hàng', 'cat.industry':'Tin tức ngành',
     'cat.hr':'Đào tạo', 'cat.tacit':'Chia sẻ kiến thức', 'cat.compliance':'Sở hữu trí tuệ & Pháp lý',
     'cat.supply':'Phát triển công nghệ', 'cat.ai_tech':'AI', 'cat.template':'Mẫu', 'cat.article':'Bài viết',
     'toast.deleted':'Đã xóa',
@@ -2029,7 +2036,7 @@ const I18N = {
     'docs.title':'ナレッジベース — すべてのドキュメント', 'docs.new':'＋ 新規ドキュメント',
     'kmap.title':'ナレッジマップ — カテゴリ一覧', 'batch.skip':'スキップ','batch.cancel':'一括キャンセル',
     'experts.title':'連絡先', 'comments.input.placeholder':'コメントを入力…', 'status.draft':'下書き', 'status.published':'公開', 'status.archived':'アーカイブ', 'status.withdrawn':'取り下げ', 'status.template':'テンプレート',
-    'cat.woody_reads':'Woody おすすめ', 'label.wr_sub':'サブカテゴリ', 'wr.must':'必読資料', 'wr.share':'おすすめ記事', 'cat.product':'製品開発', 'cat.sales':'顧客情報', 'cat.industry':'業界情報',
+    'wr.intro_title':'Woody がこの記事を勧める理由','wr.intro_ai':'AI Woody が Woody の考えをもとに作成','wr.intro_gen':'✨ 紹介文を作成','wr.intro_regen':'↻ 作り直す','wr.intro_running':'作成中…','wr.intro_done':'紹介文を更新しました','wr.intro_fail':'紹介文を作成できませんでした','wr.intro_none':'まだ紹介文がありません', 'cat.woody_reads':'Woody おすすめ', 'label.wr_sub':'サブカテゴリ', 'wr.must':'必読資料', 'wr.share':'おすすめ記事', 'cat.product':'製品開発', 'cat.sales':'顧客情報', 'cat.industry':'業界情報',
     'cat.hr':'教育・研修', 'cat.tacit':'ナレッジ共有', 'cat.compliance':'知財・法務',
     'cat.supply':'技術動向', 'cat.ai_tech':'AI', 'cat.template':'テンプレート', 'cat.article':'記事',
     'toast.deleted':'削除しました',
@@ -3171,6 +3178,10 @@ async function saveDoc() {
     const _summaryDocId = _savedDocId || editingDocId;
     if (_summaryDocId && body && body.length > 50) {
       generateAndSaveSummary(_summaryDocId, title, body).catch(()=>{});
+    }
+    // 「Woody 推薦閱讀」：Woody 本人存檔後重新產生 AI Woody 導讀（內文可能改了；背景執行，不擋存檔）
+    if (_summaryDocId && category === KMS_WOODY_READS && portalUser?.empId === 'C00001') {
+      kmsWrIntroGen(_summaryDocId, true).then(() => toast(t('wr.intro_done'), 'success')).catch(e => console.warn('[wr-intro] ' + e.message));
     }
     const _reviewer = document.getElementById('doc-reviewer')?.value.trim();
     if (_summaryDocId && _reviewer) {
@@ -4935,6 +4946,49 @@ async function deleteCategory(id, catKey) {
 // 只管「預設值」；權限上集團仍屬於每一個中心（inSite／iAmGroup 不變）。
 function homeSite(s){ return (s === 'GRP' || s === 'N/A') ? 'TW' : (s || ''); }
 const KMS_WOODY_READS = 'woody_reads';
+/* ── 「Woody 推薦閱讀」的 AI Woody 導讀（2026-10-08）──
+   wr_intro 是 { zh-TW, zh-CN, en, vi, ja }，由 ai-woody 的 action:'intro' 產生並寫回（service role）。
+   🔴 只有 Woody 觸發得了產生（伺服器端檢查）；這裡的按鈕只畫給他。導讀依介面語言顯示。 */
+function kmsWrIntroRender(doc) {
+  const box = document.getElementById('reader-wr-intro'); if (!box) return;
+  if (!doc || doc.category !== KMS_WOODY_READS) { box.style.display = 'none'; return; }
+  const owner = portalUser?.empId === 'C00001';
+  const it = doc.wr_intro || null;
+  const txt = it ? (it[currentLang] || it['zh-TW'] || '') : '';
+  if (!txt && !owner) { box.style.display = 'none'; return; }
+  const esc = v => String(v || '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  box.style.display = '';
+  box.innerHTML = `<div class="wr-intro-h">📖 ${esc(t('wr.intro_title'))}<span class="wr-intro-ai">${esc(t('wr.intro_ai'))}</span>`
+    + (owner ? `<button class="wr-intro-btn" id="wr-intro-btn" onclick="kmsWrIntroClick()">${esc(t(txt ? 'wr.intro_regen' : 'wr.intro_gen'))}</button>` : '')
+    + `</div>` + (txt ? `<div class="wr-intro-t">${esc(txt)}</div>` : `<div class="wr-intro-t" style="color:var(--text-3)">${esc(t('wr.intro_none'))}</div>`);
+}
+async function kmsWrIntroGen(id, force) {
+  const base = CFG.supabaseUrl.replace(/\/(rest|auth|storage)\/v\d.*$/, '');
+  const res = await fetch(`${base}/functions/v1/ai-woody`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${CFG.supabaseKey}`, 'apikey': CFG.supabaseKey, 'x-session': kmsSig() },
+    body: JSON.stringify({ action: 'intro', id, force: !!force }),
+  });
+  const j = await res.json().catch(() => ({}));
+  if (res.status === 401) sbAuthLost();
+  if (!res.ok) throw new Error(j.error || ('HTTP ' + res.status));
+  return j.intro;
+}
+async function kmsWrIntroClick() {
+  if (!_readerDoc) return;
+  const btn = document.getElementById('wr-intro-btn');
+  if (btn) { btn.disabled = true; btn.textContent = t('wr.intro_running'); }
+  try {
+    const intro = await kmsWrIntroGen(_readerDoc.id, true);
+    _readerDoc = { ..._readerDoc, wr_intro: intro };
+    kmsWrIntroRender(_readerDoc);
+    toast(t('wr.intro_done'), 'success');
+  } catch (e) {
+    toast(t('wr.intro_fail') + '（' + e.message + '）', 'error');
+    if (btn) { btn.disabled = false; btn.textContent = t('wr.intro_regen'); }
+  }
+}
+
 /* 「Woody 推薦閱讀」的兩個子分類：KMS 的分類是一層的，所以子分類存成標籤（「必讀資料」／「好文分享」）——
    AI Woody 也是看這個標籤分必讀與好文（ai-woody 的 kmsToDocs）。下拉只是改標籤的介面。 */
 const KMS_WR_SUBS = ['必讀資料', '好文分享'];
@@ -6069,6 +6123,7 @@ async function openReader(id) {
     ...(doc.tags||[]).slice(0,5).map(t => `<span style="font-size:11px;padding:2px 7px;border-radius:10px;background:var(--blue-bg);color:var(--blue);">#${t}</span>`),
   ].filter(Boolean);
   document.getElementById('reader-meta').innerHTML = metaParts.join('');
+  kmsWrIntroRender(doc);
 
   // 內文：Markdown → HTML（用 marked.js）
   const body = doc.body || '（此文件無文字內容）';

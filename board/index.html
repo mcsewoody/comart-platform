@@ -5,7 +5,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#080C14">
-<title>COMART · 公告與會議 v1.95</title>
+<title>COMART · 公告與會議 v1.96</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=Noto+Serif:wght@400;700&family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -358,6 +358,13 @@ body.pm-playing #pm-phasebar{padding:0}
 .del-x:hover{color:var(--red);border-color:var(--red)}
 
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+.wr-draft-btn{margin-left:auto;font-size:11.5px;padding:3px 10px;border-radius:12px;border:1px solid rgba(167,139,250,.6);background:rgba(124,58,237,.15);color:#c4b5fd;cursor:pointer;font-family:inherit}
+.wr-draft-btn:hover{background:rgba(124,58,237,.3)}
+.wr-draft{margin-top:8px;border:1px dashed rgba(167,139,250,.6);border-radius:var(--r);padding:10px;background:rgba(124,58,237,.06)}
+.wr-draft-row{display:flex;gap:8px;align-items:flex-start}.wr-draft-row textarea{flex:1}
+.wr-draft-acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.wr-draft-out{margin-top:10px;white-space:pre-wrap;font-size:13.5px;line-height:1.75;background:var(--s2);border:1px solid var(--br);border-radius:var(--r);padding:10px 12px;max-height:420px;overflow:auto}
+.wr-draft-note{margin-top:6px;font-size:11px;color:var(--tx3)}
 </style>
 </head>
 <body>
@@ -369,7 +376,7 @@ body.pm-playing #pm-phasebar{padding:0}
     <a class="logo" href="javascript:void(0)">
       <div class="logo-mark">告</div>
       <div class="logo-text" data-i18n="app_title">公告與會議</div>
-      <span class="logo-ver">v1.95</span>
+      <span class="logo-ver">v1.96</span>
     </a>
     <div class="topbar-right">
       <div id="langChips" style="display:flex;gap:4px"></div>
@@ -999,7 +1006,7 @@ const B_I18N = {
   wr_ph_search:'搜尋週報內容（心得思考／視野情報／團隊回饋）…', wr_new:'＋ 新增週報',
   wr_empty:'尚無週報，點右上角「＋ 新增週報」建立第一筆。', wr_no_match:'查無符合的週報。',
   wr_p_info:'週報資訊', wr_f_date:'週報日期', wr_f_author:'撰寫人',
-  wr_p_keep:'需長期保存（可搜尋）', wr_f_reflections:'心得思考', wr_f_intel:'視野情報',
+  wr_draft_btn:'✨ AI Woody 起草', wr_draft_ph:'這週想寫的關鍵字、一件事，或按 🎙 說一段……', wr_draft_go:'✨ 起草', wr_draft_again:'↻ 重新起草', wr_draft_running:'起草中…', wr_draft_insert:'插入到心得思考', wr_draft_replace:'取代心得思考', wr_draft_replace_confirm:'心得思考已經有內容，確定要用草稿取代嗎？', wr_draft_close:'收起', wr_draft_empty:'先寫幾個關鍵字或說一段話', wr_draft_fail:'起草失敗', wr_draft_done:'已放進心得思考，記得修改後存檔', wr_draft_note:'AI 依你過去的週報與推薦文章起草，只有你看得到這個功能；放進欄位後請自行修改再存檔。', wr_p_keep:'需長期保存（可搜尋）', wr_f_reflections:'心得思考', wr_f_intel:'視野情報',
   wr_f_feedback:'團隊回饋', wr_p_work:'工作與計畫', wr_p_work_sub:'本週工作／下週計畫也會一併存檔',
   wr_f_work:'本週工作', wr_f_plan:'下週計畫', wr_f_other:'其他資訊',
   wr_att_n:'{n} 個附件',
@@ -1208,7 +1215,7 @@ const B_I18N = {
   wr_ph_search:'搜索周报内容（心得思考／视野情报／团队反馈）…', wr_new:'＋ 新增周报',
   wr_empty:'尚无周报，点右上角“＋ 新增周报”建立第一笔。', wr_no_match:'查无符合的周报。',
   wr_p_info:'周报信息', wr_f_date:'周报日期', wr_f_author:'撰写人',
-  wr_p_keep:'需长期保存（可搜索）', wr_f_reflections:'心得思考', wr_f_intel:'视野情报',
+  wr_draft_btn:'✨ AI Woody 起草', wr_draft_ph:'这周想写的关键字、一件事，或按 🎙 说一段……', wr_draft_go:'✨ 起草', wr_draft_again:'↻ 重新起草', wr_draft_running:'起草中…', wr_draft_insert:'插入到心得思考', wr_draft_replace:'取代心得思考', wr_draft_replace_confirm:'心得思考已经有内容，确定要用草稿取代吗？', wr_draft_close:'收起', wr_draft_empty:'先写几个关键字或说一段话', wr_draft_fail:'起草失败', wr_draft_done:'已放进心得思考，记得修改后保存', wr_draft_note:'AI 依你过去的周报与推荐文章起草，只有你看得到这个功能；放进字段后请自行修改再保存。', wr_p_keep:'需长期保存（可搜索）', wr_f_reflections:'心得思考', wr_f_intel:'视野情报',
   wr_f_feedback:'团队反馈', wr_p_work:'工作与计划', wr_p_work_sub:'本周工作／下周计划也会一并存档',
   wr_f_work:'本周工作', wr_f_plan:'下周计划', wr_f_other:'其他信息',
   wr_att_n:'{n} 个附件',
@@ -1417,7 +1424,7 @@ const B_I18N = {
   wr_ph_search:'Search reports (reflections / intel / team feedback)…', wr_new:'＋ New report',
   wr_empty:'No reports yet. Use “＋ New report” at the top right to create the first one.', wr_no_match:'No matching report.',
   wr_p_info:'Report info', wr_f_date:'Report date', wr_f_author:'Author',
-  wr_p_keep:'Long-term record (searchable)', wr_f_reflections:'Reflections', wr_f_intel:'Intel & perspective',
+  wr_draft_btn:'✨ Draft with AI Woody', wr_draft_ph:'Keywords, something that happened this week, or press 🎙 and talk…', wr_draft_go:'✨ Draft', wr_draft_again:'↻ Redraft', wr_draft_running:'Drafting…', wr_draft_insert:'Insert into Reflections', wr_draft_replace:'Replace Reflections', wr_draft_replace_confirm:'Reflections already has text. Replace it with the draft?', wr_draft_close:'Close', wr_draft_empty:'Write a few keywords or say something first', wr_draft_fail:'Drafting failed', wr_draft_done:'Added to Reflections — edit it before saving', wr_draft_note:'Drafted by AI from your past reports and recommended reading. Only you can see this feature; edit before saving.', wr_p_keep:'Long-term record (searchable)', wr_f_reflections:'Reflections', wr_f_intel:'Intel & perspective',
   wr_f_feedback:'Team feedback', wr_p_work:'Work & plans', wr_p_work_sub:'This week’s work and next week’s plan are archived too',
   wr_f_work:'This week', wr_f_plan:'Next week', wr_f_other:'Other notes',
   wr_att_n:'{n} attachment(s)',
@@ -1626,7 +1633,7 @@ const B_I18N = {
   wr_ph_search:'Tìm trong báo cáo (suy ngẫm / thông tin / phản hồi nhóm)…', wr_new:'＋ Thêm báo cáo',
   wr_empty:'Chưa có báo cáo. Bấm “＋ Thêm báo cáo” ở góc trên bên phải để tạo bản đầu tiên.', wr_no_match:'Không tìm thấy báo cáo phù hợp.',
   wr_p_info:'Thông tin báo cáo', wr_f_date:'Ngày báo cáo', wr_f_author:'Người viết',
-  wr_p_keep:'Lưu trữ lâu dài (có thể tìm kiếm)', wr_f_reflections:'Suy ngẫm', wr_f_intel:'Thông tin & tầm nhìn',
+  wr_draft_btn:'✨ AI Woody soạn nháp', wr_draft_ph:'Từ khóa, một việc trong tuần, hoặc bấm 🎙 để nói…', wr_draft_go:'✨ Soạn nháp', wr_draft_again:'↻ Soạn lại', wr_draft_running:'Đang soạn…', wr_draft_insert:'Chèn vào Suy ngẫm', wr_draft_replace:'Thay thế Suy ngẫm', wr_draft_replace_confirm:'Mục Suy ngẫm đã có nội dung. Thay bằng bản nháp?', wr_draft_close:'Thu gọn', wr_draft_empty:'Hãy viết vài từ khóa hoặc nói một đoạn trước', wr_draft_fail:'Soạn nháp thất bại', wr_draft_done:'Đã thêm vào Suy ngẫm — hãy chỉnh sửa trước khi lưu', wr_draft_note:'AI soạn dựa trên các báo cáo tuần và bài viết bạn đã giới thiệu. Chỉ bạn thấy chức năng này; hãy chỉnh sửa trước khi lưu.', wr_p_keep:'Lưu trữ lâu dài (có thể tìm kiếm)', wr_f_reflections:'Suy ngẫm', wr_f_intel:'Thông tin & tầm nhìn',
   wr_f_feedback:'Phản hồi nhóm', wr_p_work:'Công việc & kế hoạch', wr_p_work_sub:'Công việc tuần này và kế hoạch tuần tới cũng được lưu',
   wr_f_work:'Công việc tuần này', wr_f_plan:'Kế hoạch tuần tới', wr_f_other:'Thông tin khác',
   wr_att_n:'{n} tệp đính kèm',
@@ -1835,7 +1842,7 @@ const B_I18N = {
   wr_ph_search:'週報を検索（学びと考察／視野と情報／チームへのフィードバック）…', wr_new:'＋ 週報を追加',
   wr_empty:'週報がありません。右上の「＋ 週報を追加」から作成してください。', wr_no_match:'該当する週報はありません。',
   wr_p_info:'週報情報', wr_f_date:'週報の日付', wr_f_author:'作成者',
-  wr_p_keep:'長期保存（検索可）', wr_f_reflections:'学びと考察', wr_f_intel:'視野と情報',
+  wr_draft_btn:'✨ AI Woody で下書き', wr_draft_ph:'キーワード、今週の出来事、または 🎙 で話してください…', wr_draft_go:'✨ 下書き', wr_draft_again:'↻ 下書きし直す', wr_draft_running:'作成中…', wr_draft_insert:'学びと考察に挿入', wr_draft_replace:'学びと考察を置き換え', wr_draft_replace_confirm:'学びと考察にはすでに内容があります。下書きで置き換えますか？', wr_draft_close:'閉じる', wr_draft_empty:'先にキーワードを書くか、話してください', wr_draft_fail:'下書きに失敗しました', wr_draft_done:'学びと考察に入れました。修正してから保存してください', wr_draft_note:'過去の週報とおすすめ記事をもとに AI が下書きします。この機能はあなたにだけ表示されます。保存前に修正してください。', wr_p_keep:'長期保存（検索可）', wr_f_reflections:'学びと考察', wr_f_intel:'視野と情報',
   wr_f_feedback:'チームへのフィードバック', wr_p_work:'業務と計画', wr_p_work_sub:'今週の業務／来週の計画も併せて保存されます',
   wr_f_work:'今週の業務', wr_f_plan:'来週の計画', wr_f_other:'その他',
   wr_att_n:'添付 {n} 件',
@@ -2271,7 +2278,7 @@ function bApplyI18n(root) {
 // 切換語言後把目前畫面重畫。各頁籤的 render 都是純函式，重跑即可；
 // 未初始化的頁籤（例如還沒點過業務會議）會丟例外，各自 try 包起來即可，不要讓一個壞的擋住其他四個。
 function bRerenderAll() {
-  try { bvAttachAll(); bvRelabel(); } catch (e) {}
+  try { bvAttachAll(); bvRelabel(); wrDraftRelabel(); } catch (e) {}
   try { bbSetupCompose(); bbRender(); } catch (e) {}
   try { wmRenderList(); if (wmState) wmFillForm(); } catch (e) {}
   try { if (window.MeetingMinutes && window.MeetingMinutes.relabel) window.MeetingMinutes.relabel(); } catch (e) {}
@@ -5015,13 +5022,8 @@ function bvRelabel() {
 // 串流版：長輸出必須走這條。非串流時 claude-proxy 要等 Anthropic 全部產完才回應，
 // opus-5 + thinking 的長分析會讓 edge function 逾時回 504（2026-08-08 實際踩到）。
 // onDelta(累積文字) 可即時把內容顯示出來。
-async function pmClaudeStream(system, user, maxTokens, model, onDelta, extra) {
-  const body = { model: model, max_tokens: maxTokens, system, messages: [{ role: 'user', content: user }], stream: true };
-  if (extra) Object.assign(body, extra);        // 例如 output_config:{effort:'low'}
-  const res = await fetch(PM_SB_BASE + '/functions/v1/claude-proxy', {
-    method: 'POST', headers: sbHdrs(), body: JSON.stringify(body)
-  });
-  if (!res.ok) { if (res.status === 401) sbNoteAuth(401); const t = await res.text(); throw new Error('claude-proxy ' + res.status + ': ' + t.slice(0, 120)); }
+// Anthropic SSE → 文字（pmClaudeStream 與週報草稿 wrDraftGo 共用；兩份各自解析遲早分岔）
+async function sseCollect(res, onDelta) {
   if (!res.body) throw new Error('此瀏覽器不支援串流回應');
   const reader = res.body.getReader(), dec = new TextDecoder();
   let buf = '', out = '', stop = '', lastLen = 0;
@@ -5046,6 +5048,95 @@ async function pmClaudeStream(system, user, maxTokens, model, onDelta, extra) {
   if (!out.trim()) throw new Error('AI 回覆為空' + (stop ? '（stop_reason: ' + stop + '）' : ''));
   if (onDelta) onDelta(out);
   return out;
+}
+async function pmClaudeStream(system, user, maxTokens, model, onDelta, extra) {
+  const body = { model: model, max_tokens: maxTokens, system, messages: [{ role: 'user', content: user }], stream: true };
+  if (extra) Object.assign(body, extra);        // 例如 output_config:{effort:'low'}
+  const res = await fetch(PM_SB_BASE + '/functions/v1/claude-proxy', {
+    method: 'POST', headers: sbHdrs(), body: JSON.stringify(body)
+  });
+  if (!res.ok) { if (res.status === 401) sbNoteAuth(401); const t = await res.text(); throw new Error('claude-proxy ' + res.status + ': ' + t.slice(0, 120)); }
+  return sseCollect(res, onDelta);
+}
+
+// ═══ Woody 週報：AI Woody 起草「心得思考」（2026-10-08，只有 Woody 本人）═══
+// 用 ai-woody 的 draft 模式（同一份人格、只換指示）。伺服器端也只認 C00001（OWNER_MODES），這裡只是不畫給別人看。
+// 🔴 草稿先放在預覽框，由 Woody 按「插入」或「取代」才進欄位 —— 直接寫進欄位會蓋掉他已經打好的字。
+// 🔴 寫進欄位後一定要 dispatch input（同語音輸入）：未存檔提醒靠那個事件判斷。
+let _wrDraftBusy = false;
+function wrDraftAttach() {
+  if (!wrIsWoody()) return;
+  const ta = document.getElementById('wr-reflections');
+  if (!ta || document.getElementById('wr-draft-btn')) return;
+  const head = ta.closest('.field') && ta.closest('.field').querySelector(':scope > label');
+  const btn = document.createElement('button');
+  btn.type = 'button'; btn.id = 'wr-draft-btn'; btn.className = 'wr-draft-btn';
+  btn.onclick = wrDraftToggle;
+  if (head) { head.classList.add('bv-head'); head.appendChild(btn); } else ta.parentNode.insertBefore(btn, ta);
+  const panel = document.createElement('div');
+  panel.id = 'wr-draft'; panel.className = 'wr-draft'; panel.style.display = 'none';
+  panel.innerHTML = '<div class="wr-draft-row"><textarea id="wr-draft-notes" rows="3"></textarea>'
+    + '<button type="button" class="bv-mic" id="wr-draft-mic">🎙</button></div>'
+    + '<div class="wr-draft-acts"><button type="button" class="btn primary" id="wr-draft-go"></button>'
+    + '<button type="button" class="btn" id="wr-draft-ins" disabled></button>'
+    + '<button type="button" class="btn" id="wr-draft-rep" disabled></button>'
+    + '<button type="button" class="btn" id="wr-draft-close"></button></div>'
+    + '<div id="wr-draft-out" class="wr-draft-out" style="display:none"></div>'
+    + '<div class="wr-draft-note" id="wr-draft-note"></div>';
+  ta.parentNode.insertBefore(panel, ta.nextSibling);
+  document.getElementById('wr-draft-go').onclick = wrDraftGo;
+  document.getElementById('wr-draft-ins').onclick = function () { wrDraftPut(false); };
+  document.getElementById('wr-draft-rep').onclick = function () { wrDraftPut(true); };
+  document.getElementById('wr-draft-close').onclick = wrDraftToggle;
+  document.getElementById('wr-draft-mic').onclick = function () { bvToggle('wr-draft-notes', 'wr-draft-mic'); };
+  if (!bvOK()) document.getElementById('wr-draft-mic').style.display = 'none';
+  wrDraftRelabel();
+}
+function wrDraftRelabel() {
+  const set = (id, k, attr) => { const el = document.getElementById(id); if (!el) return; if (attr) el.setAttribute(attr, BT(k)); else el.textContent = BT(k); };
+  set('wr-draft-btn', 'wr_draft_btn'); set('wr-draft-notes', 'wr_draft_ph', 'placeholder');
+  if (!_wrDraftBusy) set('wr-draft-go', 'wr_draft_go');
+  set('wr-draft-ins', 'wr_draft_insert'); set('wr-draft-rep', 'wr_draft_replace');
+  set('wr-draft-close', 'wr_draft_close'); set('wr-draft-note', 'wr_draft_note');
+}
+function wrDraftToggle() {
+  const p = document.getElementById('wr-draft'); if (!p) return;
+  const open = p.style.display === 'none';
+  p.style.display = open ? '' : 'none';
+  if (open) { const n = document.getElementById('wr-draft-notes'); if (n) n.focus(); }
+}
+async function wrDraftGo() {
+  if (_wrDraftBusy) return;
+  const notes = (document.getElementById('wr-draft-notes').value || '').trim();
+  if (!notes) { boardToast(BT('wr_draft_empty')); return; }
+  if (!sbSessionAlive()) return;
+  const out = document.getElementById('wr-draft-out'), go = document.getElementById('wr-draft-go');
+  _wrDraftBusy = true; go.disabled = true; go.textContent = BT('wr_draft_running');
+  ['wr-draft-ins', 'wr-draft-rep'].forEach(id => document.getElementById(id).disabled = true);
+  out.style.display = ''; out.textContent = '…';
+  try {
+    const res = await fetch(PM_SB_BASE + '/functions/v1/ai-woody', {
+      method: 'POST', headers: sbHdrs(),
+      body: JSON.stringify({ mode: 'draft', lang: 'zh-TW', messages: [{ role: 'user', content: notes }] }),
+    });
+    if (!res.ok) { if (res.status === 401) sbNoteAuth(401); throw new Error('HTTP ' + res.status); }
+    await sseCollect(res, txt => { out.textContent = txt; });
+    ['wr-draft-ins', 'wr-draft-rep'].forEach(id => document.getElementById(id).disabled = false);
+  } catch (e) {
+    console.warn('[wr-draft] ' + (e && e.message));
+    out.textContent = BT('wr_draft_fail') + '（' + ((e && e.message) || '') + '）';
+  } finally {
+    _wrDraftBusy = false; go.disabled = false; go.textContent = BT('wr_draft_again');
+  }
+}
+function wrDraftPut(replace) {
+  const ta = document.getElementById('wr-reflections'), txt = (document.getElementById('wr-draft-out').textContent || '').trim();
+  if (!ta || !txt) return;
+  if (replace && ta.value.trim() && !confirm(BT('wr_draft_replace_confirm'))) return;
+  ta.value = replace || !ta.value.trim() ? txt : ta.value.replace(/\s+$/, '') + '\n\n' + txt;
+  ta.dispatchEvent(new Event('input', { bubbles: true }));
+  ta.focus();
+  boardToast(BT('wr_draft_done'));
 }
 // ── 條目／欄位翻譯（v1.77 大改）──
 // 🔴 **模型從 haiku 換成 opus-5**：越南同仁反映中文→越南文不精準，根因是這裡一直用最低階模型
@@ -7783,6 +7874,7 @@ async function initBoard() {
   // 麥克風鈕要在這裡掛（bRerenderAll 只有切語言時才跑，初次載入不會經過）。
   // 週報與週會的 textarea 都是靜態 DOM，所以掛一次就夠。
   bvAttachAll();
+  wrDraftAttach();
   if (PORTAL_SESSION) {
     document.getElementById('whoBadge').innerHTML =
       escHtml(PORTAL_SESSION.nameZh || PORTAL_SESSION.nameEn || PORTAL_SESSION.empId) + ' ' + siteBadgeHtml('site', PORTAL_SESSION.site);

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>COMART Platform v2.19</title>
+<title>COMART Platform v2.20</title>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=Noto+Serif:wght@400;700&family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script defer src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.js"></script>
 <style>
@@ -299,6 +299,10 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:
 .lc-empty { font-size:12.5px; color:var(--tx3); padding:14px 2px; }
 .lc-del { flex:0 0 auto; padding:4px 8px; border-radius:7px; border:1px solid var(--br); background:var(--s2); color:var(--tx3); font-size:12px; cursor:pointer; font-family:var(--ff); }
 .lc-del:hover { border-color:#e05260; color:#e05260; }
+.aw-modes { display:flex; gap:6px; padding:8px 14px; border-bottom:1px solid var(--br); overflow-x:auto; flex-shrink:0; }
+.aw-mode { flex:0 0 auto; padding:6px 13px; border-radius:16px; border:1px solid var(--br); background:var(--s1); color:var(--tx2); font-size:12.5px; font-weight:600; cursor:pointer; font-family:var(--ff); white-space:nowrap; }
+.aw-mode:hover { border-color:#7c3aed; color:#c4b5fd; }
+.aw-mode.on { background:#7c3aed; border-color:#7c3aed; color:#fff; }
 .aw-avatar { flex:0 0 32px; height:32px; border-radius:50%; background:linear-gradient(135deg,#7c3aed,#2D7FF9); color:#fff; font-weight:800; display:flex; align-items:center; justify-content:center; font-family:var(--fd,serif); font-size:16px; }
 .aw-welcome { max-width:640px; width:100%; margin:8px auto 0; background:var(--s1); border:1px solid var(--br); border-radius:12px; padding:16px 18px; }
 .aw-welcome p { font-size:13.5px; color:var(--tx2); line-height:1.7; margin:0 0 12px; white-space:pre-wrap; }
@@ -431,7 +435,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     <div class="login-logo">
       <div class="login-mark" style="background:transparent"><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="44" height="23"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></div>
       <div class="login-name">COMART Platform</div>
-      <div class="login-sub">Internal Portal · v2.19</div>
+      <div class="login-sub">Internal Portal · v2.20</div>
     </div>
     <form id="loginForm" onsubmit="doLogin();return false;" autocomplete="on">
     <div class="field">
@@ -501,7 +505,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   <div class="topbar">
     <div class="topbar-logo" onclick="switchView('home')">
       <div class="topbar-mark" style="background:transparent"><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="26" height="14"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></div>
-      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v2.19</span></div>
+      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v2.20</span></div>
     </div>
     <div class="topbar-right">
       <div class="lang-switcher">
@@ -702,6 +706,12 @@ input[type="date"]::-webkit-calendar-picker-indicator {
             <button class="lc-btn" id="aw-sync-btn" onclick="awSync()" style="display:none;"></button>
             <button class="lc-btn" id="aw-pdf-btn" onclick="awExportPDF()">📄 PDF</button>
             <button class="lc-btn" id="aw-new-btn" onclick="awReset()"></button>
+          </div>
+          <div class="aw-modes" id="aw-modes">
+            <button class="aw-mode on" data-mode="chat" onclick="awSetMode('chat')"></button>
+            <button class="aw-mode" data-mode="proposal" onclick="awSetMode('proposal')"></button>
+            <button class="aw-mode" data-mode="rehearsal" onclick="awSetMode('rehearsal')"></button>
+            <button class="aw-mode" data-mode="onboard" onclick="awSetMode('onboard')"></button>
           </div>
           <div id="aw-stream" class="lc-stream"></div>
           <div id="aw-composer" class="lc-composer">
@@ -3209,6 +3219,24 @@ const I18N = {
     aw_send:'Send',
     aw_ph:'Ask in your own language…',
     aw_intro:'Hi, I\'m AI Woody, an AI version of Woody built from his writings.\nAsk me about accountability, teamwork, learning, AI, customers, or where the company is heading. I can\'t make decisions or promises on Woody\'s behalf.\nThis chat isn\'t saved; export it as a PDF if you need a copy.',
+    aw_mode_chat:'💬 Chat',
+    aw_mode_proposal:'📝 Proposal check',
+    aw_mode_rehearsal:'🎤 Rehearsal',
+    aw_mode_onboard:'🎓 Onboarding',
+    aw_mode_busy:'Please wait for the current reply to finish',
+    aw_mi_proposal:'Paste your proposal, report or plan below (up to 20,000 characters).\nI\'ll review it the way Woody reviews proposals: facts vs. opinions, accountability, whether the numbers support the conclusion, the impact on revenue and costs, and the questions he would ask.\nThis is preparation, not approval — final decisions still go to Woody himself.',
+    aw_mi_rehearsal:'Practise your presentation to Woody here.\nTell me the topic, who it\'s for, and what you want Woody to decide. I\'ll ask one tough question at a time, like Woody would in a meeting. Say "done" whenever you want, and I\'ll give you overall feedback.',
+    aw_mi_onboard:'Welcome to COMART! I\'m your onboarding mentor.\nAsk me about the company\'s vision and values, COMART Dos & Don\'ts, Woody\'s recommended reading, or how we work. Every now and then I\'ll ask a small question to check your understanding.',
+    aw_ph_proposal:'Paste your proposal here…',
+    aw_ph_rehearsal:'Topic, audience and what you want decided…',
+    aw_ph_onboard:'Ask about our values, Dos & Don\'ts, recommended reading…',
+    aw_rs1:'Next week I\'ll present our new customer development plan to Woody',
+    aw_rs2:'I need to report why a project is behind schedule',
+    aw_rs3:'I\'ll propose purchasing new equipment',
+    aw_os1:'What are COMART\'s vision and values?',
+    aw_os2:'What are the COMART Dos & Don\'ts?',
+    aw_os3:'Which required reading should I start with?',
+    aw_os4:'Quiz me on what I\'ve learned so far',
     aw_q1:'What does accountability mean to you?',
     aw_q2:'This isn\'t my department\'s job. Why should I handle it?',
     aw_q3:'How should I start using AI in my work?',
@@ -3374,6 +3402,24 @@ const I18N = {
     aw_send:'送出',
     aw_ph:'用你自己的語言提問…',
     aw_intro:'你好，我是 AI Woody，根據 Woody 的著述打造的 AI 分身。\n可以問我當責、團隊、學習、AI、客戶，或是公司的方向。我不能代 Woody 做決定或承諾。\n這段對話不會存檔，需要的話可以匯出 PDF。',
+    aw_mode_chat:'💬 對話',
+    aw_mode_proposal:'📝 提案健檢',
+    aw_mode_rehearsal:'🎤 簡報彩排',
+    aw_mode_onboard:'🎓 入職學習',
+    aw_mode_busy:'請等這一則回答完成再切換',
+    aw_mi_proposal:'把你的提案、報告或計畫貼在下面（最多 20,000 字）。\n我會用 Woody 看提案的標準幫你把關：事實與觀點、當責、數字撐不撐得起結論、對營收與費用的影響，以及 Woody 會追問的問題。\n這是幫你準備，不是核准 —— 最後的決定仍然要找 Woody 本人。',
+    aw_mi_rehearsal:'在這裡練習向 Woody 報告。\n先告訴我主題、對象，以及你希望 Woody 做什麼決定。我會像 Woody 在會議上那樣，一次問你一個問題。隨時說「結束」，我就給你總評。',
+    aw_mi_onboard:'歡迎加入 COMART！我是你的入職導師。\n可以問我公司的願景與價值觀、COMART Dos & Don\'ts、Woody 推薦的必讀資料，或我們做事的方式。我偶爾會出個小問題，確認你真的懂了。',
+    aw_ph_proposal:'把提案內容貼在這裡…',
+    aw_ph_rehearsal:'主題、報告對象、希望 Woody 決定什麼…',
+    aw_ph_onboard:'問我價值觀、Dos & Don\'ts、必讀資料…',
+    aw_rs1:'我下週要向 Woody 報告新客戶開發計畫',
+    aw_rs2:'我要報告一個專案為什麼延遲',
+    aw_rs3:'我要提案採購新設備',
+    aw_os1:'公司的願景和價值觀是什麼？',
+    aw_os2:'COMART Dos & Don\'ts 有哪些？',
+    aw_os3:'必讀資料我該從哪一篇開始讀？',
+    aw_os4:'考考我，看我學得怎麼樣',
     aw_q1:'你怎麼看「當責」？',
     aw_q2:'這件事不是我們部門負責的，為什麼要我處理？',
     aw_q3:'我該怎麼開始在工作上用 AI？',
@@ -3532,6 +3578,24 @@ const I18N = {
     aw_send:'发送',
     aw_ph:'用你自己的语言提问…',
     aw_intro:'你好，我是 AI Woody，根据 Woody 的著述打造的 AI 分身。\n可以问我当责、团队、学习、AI、客户，或是公司的方向。我不能代 Woody 做决定或承诺。\n这段对话不会存档，需要的话可以导出 PDF。',
+    aw_mode_chat:'💬 对话',
+    aw_mode_proposal:'📝 提案健检',
+    aw_mode_rehearsal:'🎤 简报彩排',
+    aw_mode_onboard:'🎓 入职学习',
+    aw_mode_busy:'请等这一则回答完成再切换',
+    aw_mi_proposal:'把你的提案、报告或计划贴在下面（最多 20,000 字）。\n我会用 Woody 看提案的标准帮你把关：事实与观点、当责、数字撑不撑得起结论、对营收与费用的影响，以及 Woody 会追问的问题。\n这是帮你准备，不是核准 —— 最后的决定仍然要找 Woody 本人。',
+    aw_mi_rehearsal:'在这里练习向 Woody 报告。\n先告诉我主题、对象，以及你希望 Woody 做什么决定。我会像 Woody 在会议上那样，一次问你一个问题。随时说“结束”，我就给你总评。',
+    aw_mi_onboard:'欢迎加入 COMART！我是你的入职导师。\n可以问我公司的愿景与价值观、COMART Dos & Don\'ts、Woody 推荐的必读资料，或我们做事的方式。我偶尔会出个小问题，确认你真的懂了。',
+    aw_ph_proposal:'把提案内容贴在这里…',
+    aw_ph_rehearsal:'主题、报告对象、希望 Woody 决定什么…',
+    aw_ph_onboard:'问我价值观、Dos & Don\'ts、必读资料…',
+    aw_rs1:'我下周要向 Woody 报告新客户开发计划',
+    aw_rs2:'我要报告一个项目为什么延迟',
+    aw_rs3:'我要提案采购新设备',
+    aw_os1:'公司的愿景和价值观是什么？',
+    aw_os2:'COMART Dos & Don\'ts 有哪些？',
+    aw_os3:'必读资料我该从哪一篇开始读？',
+    aw_os4:'考考我，看我学得怎么样',
     aw_q1:'你怎么看“当责”？',
     aw_q2:'这件事不是我们部门负责的，为什么要我处理？',
     aw_q3:'我该怎么开始在工作上用 AI？',
@@ -3690,6 +3754,24 @@ const I18N = {
     aw_send:'Gửi',
     aw_ph:'Hỏi bằng ngôn ngữ của bạn…',
     aw_intro:'Xin chào, tôi là AI Woody, phiên bản AI của Woody, được xây dựng từ các bài viết của anh ấy.\nBạn có thể hỏi tôi về tinh thần trách nhiệm, làm việc nhóm, học tập, AI, khách hàng hoặc định hướng của công ty. Tôi không thể thay Woody đưa ra quyết định hay cam kết.\nCuộc trò chuyện này không được lưu; nếu cần, bạn có thể xuất ra PDF.',
+    aw_mode_chat:'💬 Trò chuyện',
+    aw_mode_proposal:'📝 Kiểm tra đề xuất',
+    aw_mode_rehearsal:'🎤 Tập thuyết trình',
+    aw_mode_onboard:'🎓 Hội nhập',
+    aw_mode_busy:'Vui lòng chờ câu trả lời hiện tại hoàn tất',
+    aw_mi_proposal:'Dán đề xuất, báo cáo hoặc kế hoạch của bạn vào bên dưới (tối đa 20.000 ký tự).\nTôi sẽ xem xét theo tiêu chuẩn Woody dùng để đánh giá đề xuất: sự thật và quan điểm, trách nhiệm, số liệu có hỗ trợ kết luận không, tác động đến doanh thu và chi phí, và những câu Woody sẽ hỏi.\nĐây là để chuẩn bị, không phải phê duyệt — quyết định cuối cùng vẫn phải gặp Woody.',
+    aw_mi_rehearsal:'Tập báo cáo với Woody tại đây.\nHãy cho tôi biết chủ đề, đối tượng và điều bạn muốn Woody quyết định. Tôi sẽ hỏi từng câu một, giống như Woody trong cuộc họp. Nói "kết thúc" bất cứ lúc nào để nhận nhận xét tổng thể.',
+    aw_mi_onboard:'Chào mừng bạn đến với COMART! Tôi là người hướng dẫn hội nhập của bạn.\nBạn có thể hỏi về tầm nhìn và giá trị của công ty, COMART Dos & Don\'ts, tài liệu Woody khuyên đọc, hoặc cách chúng tôi làm việc. Thỉnh thoảng tôi sẽ hỏi một câu nhỏ để kiểm tra bạn đã hiểu chưa.',
+    aw_ph_proposal:'Dán nội dung đề xuất vào đây…',
+    aw_ph_rehearsal:'Chủ đề, đối tượng, điều muốn Woody quyết định…',
+    aw_ph_onboard:'Hỏi về giá trị, Dos & Don\'ts, tài liệu nên đọc…',
+    aw_rs1:'Tuần sau tôi sẽ báo cáo kế hoạch phát triển khách hàng mới với Woody',
+    aw_rs2:'Tôi cần báo cáo lý do một dự án bị chậm',
+    aw_rs3:'Tôi sẽ đề xuất mua thiết bị mới',
+    aw_os1:'Tầm nhìn và giá trị của COMART là gì?',
+    aw_os2:'COMART Dos & Don\'ts gồm những gì?',
+    aw_os3:'Tôi nên bắt đầu đọc tài liệu bắt buộc nào trước?',
+    aw_os4:'Hãy kiểm tra xem tôi đã học được gì',
     aw_q1:'Anh hiểu "tinh thần trách nhiệm" như thế nào?',
     aw_q2:'Việc này không thuộc bộ phận của tôi, tại sao tôi phải xử lý?',
     aw_q3:'Tôi nên bắt đầu dùng AI trong công việc như thế nào?',
@@ -3846,6 +3928,24 @@ const I18N = {
     aw_send:'送信',
     aw_ph:'自分の言語で質問してください…',
     aw_intro:'こんにちは、AI Woodyです。Woodyの著述をもとにつくられたAI分身です。\n当事者意識、チームワーク、学び、AI、顧客、会社の方向性などについて質問してください。Woodyに代わって決定や約束をすることはできません。\nこの会話は保存されません。必要ならPDFで書き出せます。',
+    aw_mode_chat:'💬 対話',
+    aw_mode_proposal:'📝 提案チェック',
+    aw_mode_rehearsal:'🎤 プレゼン練習',
+    aw_mode_onboard:'🎓 入社オリエン',
+    aw_mode_busy:'現在の回答が終わってから切り替えてください',
+    aw_mi_proposal:'提案・報告・計画をここに貼り付けてください（最大 20,000 字）。\nWoody が提案を見るときの基準でチェックします：事実と意見、責任の所在、数字が結論を支えているか、売上と費用への影響、そして Woody が聞きそうな質問。\nこれは準備のためで、承認ではありません。最終判断は Woody 本人に相談してください。',
+    aw_mi_rehearsal:'Woody への報告をここで練習しましょう。\nテーマ、相手、Woody に何を決めてほしいかを教えてください。会議の Woody のように、一つずつ質問します。いつでも「終わり」と言えば総評を返します。',
+    aw_mi_onboard:'COMART へようこそ！入社オリエンテーションのメンターです。\n会社のビジョンと価値観、COMART Dos & Don\'ts、Woody のおすすめ必読資料、仕事の進め方について聞いてください。理解できているか、ときどき小さな質問をします。',
+    aw_ph_proposal:'提案内容をここに貼り付け…',
+    aw_ph_rehearsal:'テーマ、相手、Woody に決めてほしいこと…',
+    aw_ph_onboard:'価値観、Dos & Don\'ts、必読資料について…',
+    aw_rs1:'来週、新規顧客開拓計画を Woody に報告します',
+    aw_rs2:'プロジェクトが遅れている理由を報告します',
+    aw_rs3:'新しい設備の購入を提案します',
+    aw_os1:'COMART のビジョンと価値観は？',
+    aw_os2:'COMART Dos & Don\'ts には何がありますか？',
+    aw_os3:'必読資料はどれから読めばいいですか？',
+    aw_os4:'ここまでの理解をテストしてください',
     aw_q1:'「当事者意識（当責）」をどう考えていますか？',
     aw_q2:'自分の部署の担当ではないのに、なぜ私が対応するのですか？',
     aw_q3:'仕事でAIを使い始めるにはどうすればいいですか？',
@@ -4469,6 +4569,13 @@ async function pCallClaude(messages, system, maxTokens, model, timeoutMs) {
 //    不能留在送出的歷史裡（awHistory 只取「問題＋成功回答」成對的部分）。
 // ═══════════════════════════════════════════════════════════════════════
 var awMsgs = [];          // { id, role:'user'|'assistant', text, at, streaming, err, stop, tr, trOpen, trBusy, trErr }
+// 模式（2026-10-08）：對話／提案健檢／簡報彩排／入職學習。每個模式各自一段對話，切換時互不影響；
+// 伺服器端用同一份人格、只換指示（ai-woody 的 MODES）。週報草稿（draft）不在這裡，在 board 的週報編輯器。
+const AW_MODES = ['chat', 'proposal', 'rehearsal', 'onboard'];
+var awMode = 'chat';
+var awConv = { chat: awMsgs, proposal: [], rehearsal: [], onboard: [] };
+const AW_MODE_MAX = { proposal: 20000 };
+const AW_MODE_ZH = { proposal: '提案健檢', rehearsal: '簡報彩排', onboard: '入職學習' };   // PDF 版面固定繁中   // 提案健檢要貼整份提案；其他模式維持 6000
 var awBusy = false;
 var awCtl = null;
 var awRaf = 0;
@@ -4487,6 +4594,18 @@ function awInit() {
   if (el && window.innerWidth > 768) el.focus();
 }
 
+function awSetMode(m) {
+  if (AW_MODES.indexOf(m) < 0 || m === awMode) return;
+  if (awBusy) { toast(t('aw_mode_busy')); return; }
+  awConv[awMode] = awMsgs;
+  awMode = m; awMsgs = awConv[m];
+  document.querySelectorAll('#aw-modes .aw-mode').forEach(function (b) { b.classList.toggle('on', b.dataset.mode === m); });
+  var el = document.getElementById('aw-input');
+  if (el) el.setAttribute('placeholder', t(m === 'chat' ? 'aw_ph' : 'aw_ph_' + m));
+  awRender(true);
+  if (el && window.innerWidth > 768) el.focus();
+}
+
 function awApplyI18n() {
   var set = function (id, k, attr) {
     var el = document.getElementById(id);
@@ -4499,7 +4618,8 @@ function awApplyI18n() {
   var sb = document.getElementById('aw-sync-btn');
   if (sb) sb.style.display = awIsOwner() ? '' : 'none';
   set('aw-send-btn', 'aw_send');
-  set('aw-input', 'aw_ph', 'placeholder');
+  set('aw-input', awMode === 'chat' ? 'aw_ph' : 'aw_ph_' + awMode, 'placeholder');
+  document.querySelectorAll('#aw-modes .aw-mode').forEach(function (b) { b.textContent = t('aw_mode_' + b.dataset.mode); });
   if (document.getElementById('ptab-content-woody')) awRender(false);
 }
 
@@ -4527,7 +4647,8 @@ async function awSend(preset) {
   var el = document.getElementById('aw-input');
   var text = String(preset != null ? preset : (el ? el.value : '')).trim();
   if (!text || awBusy) return;
-  if (text.length > 6000) { toast(t('aw_too_long'), 'err'); return; }
+  var maxLen = AW_MODE_MAX[awMode] || 6000;
+  if (text.length > maxLen) { toast(t('aw_too_long').replace(/6[,.\s]?000/, maxLen.toLocaleString()), 'err'); return; }
   if (typeof sbSessionAlive === 'function' && !sbSessionAlive()) { toast(t('aw_err_auth'), 'err'); return; }
   var history = awHistory(text);
   var q = { id: awId(), role: 'user', text: text, at: new Date().toISOString() };
@@ -4548,7 +4669,7 @@ async function awSend(preset) {
         'apikey': SB_ANON,
         'x-session': (SESSION && SESSION.sig) || (readSession() || {}).sig || '',
       },
-      body: JSON.stringify({ messages: history, lang: LANG }),
+      body: JSON.stringify({ messages: history, lang: LANG, mode: awMode }),
       signal: awCtl ? awCtl.signal : undefined,
     });
     if (!res.ok) {
@@ -4623,7 +4744,7 @@ function awKeydown(ev) {
 function awReset() {
   if (awBusy && awCtl) awCtl.abort();
   if (awMsgs.length && !confirm(t('aw_new_confirm'))) return;
-  awMsgs = []; awBusy = false; awPaintSend();
+  awMsgs = []; awConv[awMode] = awMsgs; awBusy = false; awPaintSend();
   awRender(true);
 }
 
@@ -4637,7 +4758,8 @@ function awRetry(id) {
 
 function awSafeId(id) { return /^aw[a-z0-9]+$/.test(String(id || '')) ? id : ''; }
 
-function awSugs() { return ['aw_q1', 'aw_q2', 'aw_q3', 'aw_q4'].map(function (k) { return t(k); }); }
+var AW_SUG_KEYS = { chat: ['aw_q1', 'aw_q2', 'aw_q3', 'aw_q4'], proposal: [], rehearsal: ['aw_rs1', 'aw_rs2', 'aw_rs3'], onboard: ['aw_os1', 'aw_os2', 'aw_os3', 'aw_os4'] };
+function awSugs() { return (AW_SUG_KEYS[awMode] || []).map(function (k) { return t(k); }); }
 
 function awMsgHtml(m) {
   var ai = m.role === 'assistant';
@@ -4698,7 +4820,7 @@ function awRender(scroll) {
   if (!box) return;
   var nearBottom = box.scrollHeight - box.scrollTop - box.clientHeight < 120;
   if (!awMsgs.length) {
-    box.innerHTML = '<div class="aw-welcome"><p>' + escHtml(t('aw_intro')) + '</p><div class="aw-sugs">'
+    box.innerHTML = '<div class="aw-welcome"><p>' + escHtml(t(awMode === 'chat' ? 'aw_intro' : 'aw_mi_' + awMode)) + '</p><div class="aw-sugs">'
       + awSugs().map(function (q, i) {
           return '<button class="aw-sug" onclick="awSend(awSugs()[' + i + '])">' + escHtml(q) + '</button>';
         }).join('')
@@ -4809,7 +4931,7 @@ function awExportPDF() {
     + '.tr span{display:inline-block;width:34px;color:#888;font-size:11px}@media print{@page{margin:14mm}}';
   w.document.open();
   w.document.write('<!doctype html><html><head><meta charset="utf-8"><title>AI Woody 對話紀錄 ' + stamp + '</title><style>' + css + '</style></head><body>'
-    + '<h1>AI Woody 對話紀錄</h1>'
+    + '<h1>AI Woody 對話紀錄' + (AW_MODE_ZH[awMode] ? '（' + AW_MODE_ZH[awMode] + '）' : '') + '</h1>'
     + '<div class="meta">匯出者：' + escHtml(awMyName()) + '　匯出時間：' + stamp + '　' + escHtml(lcTzLabel()) + '</div>'
     + '<div class="warn">⚠ 本文件中「AI Woody」的回答由 AI 生成，非 Woody 本人發言，不代表 Woody 或公司的正式決定。'
     + '對話未存檔，這是匯出當下的快照。</div>'

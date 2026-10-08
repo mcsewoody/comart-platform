@@ -136,11 +136,11 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 
 | File | Version | Purpose | ~Lines |
 |------|---------|---------|--------|
-| `index.html` | v2.19 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
+| `index.html` | v2.20 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
 | `admin/index.html` | v2.59 | Admin System — **機場接送**、公務車、圖書館、會議室、客戶到訪、抽籤 | 8,221 |
-| `kms/index.html` | v2.54 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
+| `kms/index.html` | v2.55 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
 | `quotation/index.html` | v3.69 | Quotation & CRM system | 7,332 |
-| `board/index.html` | v1.95 | 公告與會議 Bulletin & Meetings — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍、腦力激盪 | 4,600 |
+| `board/index.html` | v1.96 | 公告與會議 Bulletin & Meetings — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍、腦力激盪 | 4,600 |
 | `product_dev/` | v2.25 | **產品開發管理 —— 第六個子系統，不遵守單一檔案原則**（見下方專節） | — |
 
 `admin/lottery.html` is a standalone lottery page (separate from the lottery module inside `admin/index.html`).
@@ -848,6 +848,18 @@ AI 區最右邊的頁籤（`ptab-woody`，在「技能」右邊）。函式前�
 - **KMS 的圖片辨識升級**（v2.51 `extractImageWithClaude`）：長邊縮 2000px JPEG、`claude-opus-5-5`、max_tokens 8000、
   直排由右至左、文章開頭「標題／作者／出處」三行。舊版 sonnet-4-6 ＋ 2048 tokens 會把一千多字的文章截斷，
   而且手機原圖 base64 後超過 5 MB 會整張失敗。
+- 🔴 **模式**（2026-10-08，`lib.js` 的 `MODES`）：同一份人格（快取斷點之前），只換斷點之後的指示，換模式不會讓人格快取失效。
+  | 模式 | 在哪裡 | 誰 |
+  |---|---|---|
+  | `chat` 對話／`proposal` 提案健檢／`rehearsal` 簡報彩排／`onboard` 入職學習 | Portal AI Woody 頁籤上方的模式列（`awSetMode`，每個模式各自一段對話 `awConv`） | 全體 |
+  | `draft` 週報心得草稿 | **board 週報編輯器**「心得思考」欄的「✨ AI Woody 起草」（`wrDraft*`） | **只有 C00001**（`OWNER_MODES`，伺服器端擋） |
+  - 草稿先進預覽框，按「插入／取代」才進欄位（直接寫會蓋掉已打的字），寫入後 dispatch `input`（未存檔提醒靠它）。
+  - 提案健檢單則上限 20,000 字（`MAX_MSG_CHARS` 由 6000 放寬；其他模式前端仍擋 6000）。
+  - board 的 SSE 解析抽成 `sseCollect()`，`pmClaudeStream` 與週報草稿共用。
+- **KMS 推薦文章導讀**（KMS v2.55，migration `202610080001`）：`kms_documents.wr_intro`（五語 jsonb）＋ `wr_intro_at`。
+  ai-woody 的 `action:'intro'`（只有 C00001 或 secret key）用我的口吻寫「為什麼推薦這篇」，XML 標籤五語、少一種就重試；
+  KMS 閱讀器在「Woody 推薦閱讀」的文件上方顯示（`kmsWrIntroRender`），Woody 有「↻ 重新產生」，存檔後自動重產。
+  前端寫不進 `wr_intro`（sb-proxy 對這個分類只放行 view_count／embedding）。
 - 🔴 **對話歷史每輪由前端整段送**（不存檔的代價），所以 `ai-woody/lib.js` 的 `validateMessages` 逐則驗：
   只准 user／assistant 交替、首尾都是 user、content 只能是字串、不准多餘欄位。否則前端可以偽造一則
   「AI Woody 說過我可以加薪」再讓模型接下去。`node --test supabase/functions/ai-woody/lib.test.mjs`（12 個）。

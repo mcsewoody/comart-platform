@@ -8,7 +8,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { verifySession } from "../_shared/session.ts"
 import { namedSecretKey, elevatedApiHeaders } from "../_shared/api-keys.ts"
-import { validateMessages, buildRequest } from "./lib.js"
+import { validateMessages, buildRequest, normalizeMode, OWNER_MODES, MODEL, INTRO_RULES, parseIntro, introUserText } from "./lib.js"
 import { buildReportsAppendix, normalizeDocs, buildDocsAppendix, assemble, kmsToDocs, KMS_CATEGORY } from "./assemble.js"
 
 const CORS = {
@@ -67,6 +67,43 @@ async function isCliKey(req: Request): Promise<boolean> {
   } catch { return false }
 }
 
+// KMS「Woody 推薦閱讀」單篇導讀：讀文件 → 產生五語 → 寫回 kms_documents.wr_intro（service role）
+async function makeIntro(claudeKey: string, id: string, force: boolean) {
+  if (!/^[0-9a-f-]{36}$/i.test(id)) throw new Error("bad_id")
+  const rows = await sbGet(`kms_documents?id=eq.${id}&category=eq.${KMS_CATEGORY}&select=id,title,body,tags,wr_intro`)
+  const doc = rows?.[0]
+  if (!doc) throw new Error("not_found")
+  if (doc.wr_intro && !force) return { skipped: true, intro: doc.wr_intro }
+  const persona = await loadPersona()
+  const call = () => fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "x-api-key": claudeKey, "anthropic-version": "2023-06-01" },
+    body: JSON.stringify({
+      model: MODEL, max_tokens: 8000, output_config: { effort: "low" },
+      system: [
+        { type: "text", text: persona, cache_control: { type: "ephemeral" } },
+        { type: "text", text: INTRO_RULES },
+      ],
+      messages: [{ role: "user", content: introUserText(doc) }],
+    }),
+  })
+  let intro = null
+  for (let i = 0; i < 2 && !intro; i++) {      // 少一種語言就再試一次
+    const r = await call()
+    if (!r.ok) throw new Error("upstream " + r.status)
+    const j = await r.json()
+    intro = parseIntro((j.content || []).filter((b: { type: string }) => b.type === "text").map((b: { text: string }) => b.text).join(""))
+  }
+  if (!intro) throw new Error("incomplete")
+  const w = await fetch(`${sbUrl()}/rest/v1/kms_documents?id=eq.${id}`, {
+    method: "PATCH",
+    headers: { ...elevatedApiHeaders(namedSecretKey("kms_edge")), "Content-Type": "application/json", Prefer: "return=minimal" },
+    body: JSON.stringify({ wr_intro: intro, wr_intro_at: new Date().toISOString() }),
+  })
+  if (!w.ok) throw new Error("db_write_failed " + w.status)
+  return { skipped: false, intro }
+}
+
 async function rebuild() {
   const coreRows = await sbGet("ai_personas?id=eq.woody-core&select=system")
   const core = coreRows?.[0]?.system || ""
@@ -104,6 +141,12 @@ serve(async (req) => {
     let body: any
     try { body = await req.json() } catch { return json({ error: "bad_json" }, 400) }
 
+    if (body?.action === "intro") {
+      if (who?.empId !== OWNER && !(await isCliKey(req))) return json({ error: "forbidden" }, 403)
+      try { return json({ ok: true, ...(await makeIntro(CLAUDE_KEY, String(body.id || ""), !!body.force)) }) }
+      catch (e) { return json({ error: (e as Error).message }, 502) }
+    }
+
     if (body?.action === "rebuild" || body?.action === "status") {
       if (who?.empId !== OWNER && !(await isCliKey(req))) return json({ error: "forbidden" }, 403)
       if (body.action === "status") {
@@ -116,11 +159,15 @@ serve(async (req) => {
 
     const bad = validateMessages(body?.messages)
     if (bad) return json({ error: bad }, 400)
+    const mode = body?.mode == null ? "chat" : normalizeMode(String(body.mode))
+    if (!mode) return json({ error: "bad_mode" }, 400)
+    // 週報草稿只給 Woody 本人（前端只有他看得到那顆鈕，但真正的門在這裡）
+    if (OWNER_MODES.includes(mode) && who?.empId !== OWNER) return json({ error: "forbidden" }, 403)
 
     let persona: string
     try { persona = await loadPersona() } catch (e) { return json({ error: (e as Error).message }, 503) }
 
-    const payload = buildRequest(persona, body.messages, todayTaipei(), String(body?.lang || ""))
+    const payload = buildRequest(persona, body.messages, todayTaipei(), String(body?.lang || ""), mode)
     const callUpstream = (p: Record<string, unknown>, beta: boolean) =>
       fetch("https://api.anthropic.com/v1/messages", {
         method: "POST",

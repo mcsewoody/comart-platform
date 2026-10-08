@@ -98,6 +98,7 @@ async function claudeText(claudeKey: string, body: Record<string, unknown>): Pro
   return (j.content || []).filter((b: { type: string }) => b.type === "text").map((b: { text: string }) => b.text).join("")
 }
 const UUID_RE = /^[0-9a-f-]{36}$/i
+const EXAM_ENABLED = false   // 入職考試已取消（2026-10-08）；恢復前先重新檢討評分方式
 const GRADER_SYS = "你是 COMART 入職考試的評分老師。評分標準是 Woody（執行長）訂的公司價值觀與工作守則，題目附有評分要點。公正、具體、一致；不因文筆或字數加減分。"
 
 // KMS「Woody 推薦閱讀」單篇導讀：讀文件 → 產生五語 → 寫回 kms_documents.wr_intro（service role）
@@ -184,6 +185,8 @@ serve(async (req) => {
         const rows = await sbGet("aw_exam_bank?active=eq.true&select=id")
         return json({ ok: true, ready: (rows || []).length >= EXAM_N, pass: EXAM_PASS, n: EXAM_N })
       }
+      // 2026-10-08 Woody 取消入職考試：不再開考、也不收新的作答（紀錄與題庫保留）
+      if ((a === "examStart" || a === "examSubmit") && !EXAM_ENABLED) return json({ error: "exam_disabled" }, 410)
       if (a === "examStart") {
         const bank = await sbGet("aw_exam_bank?active=eq.true&select=*")
         if ((bank || []).length < EXAM_N) return json({ error: "bank_not_ready" }, 503)

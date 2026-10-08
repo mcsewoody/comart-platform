@@ -136,7 +136,7 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 
 | File | Version | Purpose | ~Lines |
 |------|---------|---------|--------|
-| `index.html` | v2.22 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
+| `index.html` | v2.23 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
 | `admin/index.html` | v2.59 | Admin System — **機場接送**、公務車、圖書館、會議室、客戶到訪、抽籤 | 8,221 |
 | `kms/index.html` | v2.56 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
 | `quotation/index.html` | v3.69 | Quotation & CRM system | 7,332 |
@@ -865,6 +865,9 @@ AI 區最右邊的頁籤（`ptab-woody`，在「技能」右邊）。函式前�
   前端寫不進 `wr_intro`（sb-proxy 對這個分類只放行 view_count／embedding）。
 - **AI Woody 連結**（Portal v2.22）：頁籤右上「🔗 複製連結」＝`?woody=<目前模式>`（同大廳的 `?lobby=1`：不帶身分，
   沒登入的人登入後由 `enterPortal()` 帶過去；模式走 `AW_MODES` 白名單）。給同仁推入職學習用 `?woody=onboard`。
+- ⚠️ **入職考試已取消**（Portal v2.23，2026-10-08 Woody：「我自己都考不及格」——實際 48 分，評分要求逐條答到要點，簡短但方向正確的回答被大扣分）。
+  程式、題庫、成績表都保留：前端 `AW_EXAM_ON=false` 不顯示考試卡，ai-woody 的 `EXAM_ENABLED=false` 讓 `examStart`／`examSubmit` 回 410。
+  **要恢復之前先重新設計評分**（例如看方向對不對而非要點覆蓋率、降低門檻），不要只把旗標改回 true。
 - **入職考試**（Portal v2.21，migration `202610080002`，Woody 2026-10-08 定案）：🎓 入職學習模式下的考試卡片（`awExam*`）。
   題庫 `aw_exam_bank`（Woody 審過才匯入：`scripts/ai-woody-banks.py exam`，內容在 `.local/woody/ai-woody-exam-bank.md`，不進版控），
   每次抽 10 題（10 類各一題，`exam.js` 的 `pickQuestions`）、情境簡答、Opus 依評分要點逐題 0～10 分，**85 分及格**，沒過可重考（重抽）。

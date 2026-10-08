@@ -139,7 +139,7 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 | `index.html` | v2.23 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
 | `admin/index.html` | v2.60 | Admin System — **機場接送**、公務車、圖書館、會議室、客戶到訪、抽籤 | 8,221 |
 | `kms/index.html` | v2.56 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
-| `quotation/index.html` | v3.69 | Quotation & CRM system | 7,332 |
+| `quotation/index.html` | v3.70 | Quotation & CRM system | 7,332 |
 | `board/index.html` | v1.96 | 公告與會議 Bulletin & Meetings — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍、腦力激盪 | 4,600 |
 | `product_dev/` | v2.25 | **產品開發管理 —— 第六個子系統，不遵守單一檔案原則**（見下方專節） | — |
 
@@ -742,6 +742,15 @@ python3 scripts/i18n-audit.py         # Portal，key 沒引號：btn_save:'儲�
   🔴 品名是 ERP 原文，原檔直接進 innerHTML；這裡一律 `escHtml`。
 - ⚠️ 與報價系統產品的連結**刻意沒做**：337 個產品只有 2 個的 `series` 是越南料號（不同料號體系）。
 - 「結論摘要」第 5 點的建議數字（5k 守 20%、1k 24%…）是原作者依 2026-01～09 資料寫的**固定文字**，換資料後要重看。
+
+## 報價系統：產品的 KP／RP 標記（v3.70，2026-10-08，migration 202610080003）
+
+`products.kp`（Key Product）、`products.rp`（Retail Packaging），布林、預設 false。編輯視窗在 Status 旁邊勾選；
+產品清單與報價單的選產品區各有一組 **KP／RP 篩選鈕**（`KPRP_F`／`kprpToggle`／`kprpFilter`，按下＝只留有勾的，兩個都按＝兩者皆有，與其他篩選 AND），
+清單列與選產品卡片顯示 `kprpTags()` 標籤；選產品區的「Select All」本來就只選畫面上看得到的，所以過濾後全選即可。
+- 🔴 **新欄位一定要加進 `saveOneP` 的欄位白名單**（那是唯一的寫入路徑），否則存檔時不會寫進資料庫。
+- ⚠️ 與報價單價格表的 `**`（`formFeatured`，**每張報價單各自勾的**重點產品）是兩件事：KP 是產品本身的屬性，`**` 是這張報價單要強調哪幾項。目前兩者沒有連動。
+- `web_products_public` 是建立時展開欄位的 view，新增欄位不會流到官網公開 API（已實測 anon 查 `kp` 回 42703）。
 
 ## 報價系統：僅限業務部（2026-08-25）
 

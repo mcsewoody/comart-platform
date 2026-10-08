@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#080C14">
-<title>COMART · Quotation System v3.69</title>
+<title>COMART · Quotation System v3.70</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=Noto+Serif:wght@400;700&family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -116,6 +116,15 @@ html[lang="vi"]{--ff:'Be Vietnam Pro','DM Sans',-apple-system,sans-serif;--fd:'N
 .moq-lbl{font-size:11px;color:var(--tx3);font-weight:500;margin-right:2px;white-space:nowrap}
 .moq-chip{padding:5px 12px;border-radius:20px;border:1px solid var(--br);font-size:12px;font-family:var(--fm);font-weight:600;color:var(--tx2);cursor:pointer;transition:all .15s}
 .moq-chip.on{background:var(--ac);border-color:var(--ac);color:#fff}
+/* v3.70 產品 KP（Key Product）／RP（Retail Packaging）：篩選鈕與標籤 */
+.kprp-btn{padding:6px 11px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx2);font-size:12px;font-weight:700;font-family:var(--fm);cursor:pointer;white-space:nowrap;flex-shrink:0}
+.kprp-btn.on{background:var(--ac);border-color:var(--ac);color:#fff}
+.kprp-tag{font-size:9.5px;font-weight:800;font-family:var(--fm);padding:1px 6px;border-radius:5px;letter-spacing:.04em;line-height:1.5}
+.kprp-tag.kp{background:rgba(245,158,11,.16);color:#f5b544;border:1px solid rgba(245,158,11,.35)}
+.kprp-tag.rp{background:rgba(61,214,140,.14);color:#3DD68C;border:1px solid rgba(61,214,140,.35)}
+.kprp-checks{display:flex;gap:14px;align-items:center;min-height:38px}
+.kprp-checks label{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--tx);cursor:pointer;text-transform:none;letter-spacing:0;margin:0}
+.kprp-checks input{width:16px;height:16px;accent-color:var(--ac);cursor:pointer}
 .moq-add-btn{padding:5px 11px;border-radius:20px;border:1px dashed var(--br2);font-size:11px;color:var(--tx3);cursor:pointer;transition:all .15s}
 .moq-add-btn:active{border-color:var(--ac);color:var(--ac)}
 
@@ -318,7 +327,7 @@ html[lang="vi"]{--ff:'Be Vietnam Pro','DM Sans',-apple-system,sans-serif;--fd:'N
       <div class="logo-mark" style="background:transparent"><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="24" height="13"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></div>
       <div>
         <div class="logo-text">COMART</div>
-        <div id="appVersionDiv" style="font-size:10px;color:var(--ac);font-weight:600;letter-spacing:.04em;line-height:1.3">v3.69</div>
+        <div id="appVersionDiv" style="font-size:10px;color:var(--ac);font-weight:600;letter-spacing:.04em;line-height:1.3">v3.70</div>
       </div>
     </div>
     <div class="topbar-right">
@@ -407,6 +416,8 @@ html[lang="vi"]{--ff:'Be Vietnam Pro','DM Sans',-apple-system,sans-serif;--fd:'N
       style="padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;min-width:100px;flex-shrink:0">
       <option value="">All Categories</option>
     </select>
+    <button class="kprp-btn" id="prodKpBtn" onclick="kprpToggle('prod','kp')" title="Key Product">KP</button>
+    <button class="kprp-btn" id="prodRpBtn" onclick="kprpToggle('prod','rp')" title="Retail Packaging">RP</button>
     <select id="prodSort" onchange="renderProductList()"
       style="padding:7px 8px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;min-width:90px;flex-shrink:0">
       <option value="code_asc">Code ↑</option>
@@ -632,6 +643,8 @@ html[lang="vi"]{--ff:'Be Vietnam Pro','DM Sans',-apple-system,sans-serif;--fd:'N
           style="padding:5px 9px;border-radius:7px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12px;min-width:110px">
           <option value="">All Interfaces</option>
         </select>
+        <button class="kprp-btn" id="pickKpBtn" onclick="kprpToggle('pick','kp')" title="Key Product" style="padding:5px 10px">KP</button>
+        <button class="kprp-btn" id="pickRpBtn" onclick="kprpToggle('pick','rp')" title="Retail Packaging" style="padding:5px 10px">RP</button>
         <button onclick="removeAllProds()" style="padding:5px 10px;border-radius:7px;border:1px solid rgba(255,80,80,.3);background:rgba(255,80,80,.08);color:#ff6b6b;font-size:12px;cursor:pointer;white-space:nowrap">Remove All</button>
         <button onclick="selectAllVisibleProds()" style="padding:5px 10px;border-radius:7px;border:1px solid var(--br);background:var(--s2);color:var(--tx2);font-size:12px;cursor:pointer;white-space:nowrap">Select All</button>
       </div>
@@ -896,6 +909,10 @@ html[lang="vi"]{--ff:'Be Vietnam Pro','DM Sans',-apple-system,sans-serif;--fd:'N
           <div class="field"><label>Tooling</label><input id="pm-tooling" placeholder="e.g. COMART Vietnam" autocomplete="off"></div>
           <div class="field"><label>COO</label><input id="pm-coo" placeholder="e.g. 恆群" autocomplete="off"></div>
           <div class="field"><label>Status</label><select id="pm-status" style="width:100%;padding:9px 10px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:13px"><option value="">— None —</option></select></div>
+          <div class="field"><label>KP / RP</label><div class="kprp-checks">
+            <label title="Key Product"><input type="checkbox" id="pm-kp"> KP <span style="color:var(--tx3);font-size:11px">Key Product</span></label>
+            <label title="Retail Packaging"><input type="checkbox" id="pm-rp"> RP <span style="color:var(--tx3);font-size:11px">Retail Packaging</span></label>
+          </div></div>
         </div>
         <div style="margin-bottom:9px">
           <div class="field"><label>Material</label><input id="pm-material" placeholder="e.g. Rubber, Metal" autocomplete="off"></div>
@@ -2007,6 +2024,7 @@ async function saveOneP(idOrObj) {
     tooling: p.tooling, coo: p.coo, dim: p.dim, weight: p.weight,
     pkgdim: p.pkgdim, pkgweight: p.pkgweight, remark: p.remark,
     status: p.status || null,
+    kp: !!p.kp, rp: !!p.rp,
     img: imgUrl, img2: p.img2 || null, img3: p.img3 || null,
     docs: _stripB64(p.docs),
     bomFiles: _stripB64(p.bomFiles),
@@ -2532,6 +2550,8 @@ function copyProd(){
       document.getElementById('pm-ifaceb').value=src.interfaceB||'';
       document.getElementById('pm-tooling').value=src.tooling||'';
       document.getElementById('pm-coo').value=src.coo||'';
+      document.getElementById('pm-kp').checked=!!src.kp;
+      document.getElementById('pm-rp').checked=!!src.rp;
       populateSupplierDropdowns();
       document.getElementById('pm-sup1').value=src.supplier1||'';
       document.getElementById('pm-curr1').value=src.curr1||'';
@@ -2821,6 +2841,8 @@ function renderProductList(){
   else if(_catF) _disp=_disp.filter(p=>p.catId===_catF||p.catId2===_catF);
   // AND: Status filter
   if(_statusF) _disp=_disp.filter(p=>(p.status||'')=== _statusF);
+  // AND: KP／RP（按下才過濾，只留有勾的）
+  _disp=kprpFilter('prod',_disp);
   if(_sq) _disp=_disp.filter(p=>(p.series||'').toLowerCase().includes(_sq)||Object.values(p.name||{}).some(v=>v&&v.toLowerCase().includes(_sq))||Object.values(p.features||{}).some(v=>v&&v.toLowerCase().includes(_sq)));
   const _canEdit = ['admin','dcc'].includes(currentUser?.role);
   if(!_disp.length){el.innerHTML=`<div class="empty-box"><div class="ei">🔍</div><p>No results</p></div>`;return;}
@@ -2832,6 +2854,7 @@ function renderProductList(){
         <div style="display:flex;align-items:center;gap:8px;margin-top:3px;flex-wrap:nowrap;white-space:nowrap">
           <span onclick="event.stopPropagation();showProdQuickView('${p.id}')" style="font-size:13px;font-weight:700;color:var(--ac);font-family:var(--fm);letter-spacing:.03em;cursor:pointer;text-decoration:underline dotted;text-underline-offset:2px" title="Click to view product details">${p.series}</span>
           ${p.status?`<span style="font-size:10px;color:var(--tx2);background:var(--s3);padding:1px 7px;border-radius:5px;border:1px solid var(--br)">${escHtml(p.status)}</span>`:''}
+          ${kprpTags(p)}
           ${(()=>{
             if(!p.defaultPrice) return '';
             const _r={USD:1,NTD:1/(SETTINGS.rateNTD||32.5),RMB:1/(SETTINGS.rateRMB||7.25),VND:1/(SETTINGS.rateVND||25000),JPY:1/(SETTINGS.rateJPY||150)};
@@ -2898,6 +2921,8 @@ function openProdModal(id){
   document.getElementById('pm-coo').value=p?.coo||'';
   _refreshStatusDropdowns();
   document.getElementById('pm-status').value=p?.status||'';
+  document.getElementById('pm-kp').checked=!!p?.kp;
+  document.getElementById('pm-rp').checked=!!p?.rp;
   document.getElementById('pm-dim').value=p?.dim||'';
   document.getElementById('pm-weight').value=p?.weight||'';
   document.getElementById('pm-pkgdim').value=p?.pkgdim||'';
@@ -3511,6 +3536,7 @@ async function saveProd(){
   const tooling=document.getElementById('pm-tooling').value.trim()||null;
   const coo=document.getElementById('pm-coo').value.trim()||null;
   const status=document.getElementById('pm-status')?.value?.trim()||null;
+  const kp=!!document.getElementById('pm-kp')?.checked, rp=!!document.getElementById('pm-rp')?.checked;
   const supplier1=document.getElementById('pm-sup1').value||null;
   const curr1=document.getElementById('pm-curr1').value||null;
   const cost1=parseFloat(document.getElementById('pm-cost1').value)||null;
@@ -3528,7 +3554,7 @@ async function saveProd(){
   const catId2 = document.getElementById('pm-cat2')?.value || null;
   const prod={
     id:prodId,series,name,features,img:imgVal,img2:imgVal2,img3:imgVal3,catId:catId||null,catId2:catId2||null,
-    defaultPrice,material,interfaceA,interfaceB,tooling,coo,status,supplier1,curr1,cost1,supplier2,curr2,cost2,dim,weight,pkgdim,pkgweight,remark,costRef,
+    defaultPrice,material,interfaceA,interfaceB,tooling,coo,status,kp,rp,supplier1,curr1,cost1,supplier2,curr2,cost2,dim,weight,pkgdim,pkgweight,remark,costRef,
     // Preserve file arrays from existing product — never overwrite with undefined
     docs: existing?.docs||[],
     bomFiles: existing?.bomFiles||[],
@@ -3939,6 +3965,21 @@ function addMoq(){
   }
 }
 
+// ── KP（Key Product）／RP（Retail Packaging）篩選（v3.70）──
+// 產品清單與報價單選產品區各自一組狀態；兩個都按下 = 兩者都要有（AND，與其他篩選一致）
+const KPRP_F = { prod:{kp:false,rp:false}, pick:{kp:false,rp:false} };
+function kprpToggle(where, k){
+  KPRP_F[where][k] = !KPRP_F[where][k];
+  const b=document.getElementById(where+(k==='kp'?'KpBtn':'RpBtn')); if(b) b.classList.toggle('on',KPRP_F[where][k]);
+  if(where==='prod') renderProductList(); else renderProdPicker();
+}
+function kprpFilter(where, list){
+  const f=KPRP_F[where];
+  return list.filter(p=>(!f.kp||p.kp)&&(!f.rp||p.rp));
+}
+function kprpTags(p){
+  return (p.kp?'<span class="kprp-tag kp" title="Key Product">KP</span>':'')+(p.rp?'<span class="kprp-tag rp" title="Retail Packaging">RP</span>':'');
+}
 function renderProdPicker(){
   // Populate category filter dropdown
   const _pfSel = document.getElementById('pickerCatFilter');
@@ -3982,6 +4023,7 @@ function renderProdPicker(){
   });
   // AND logic: Status filter
   if(_statusFilter2) _pickSorted=_pickSorted.filter(p=>(p.status||'')===_statusFilter2);
+  _pickSorted=kprpFilter('pick',_pickSorted);
   if(_psq) _pickSorted=_pickSorted.filter(p=>
     (p.series||'').toLowerCase().includes(_psq)||
     Object.values(p.name||{}).some(v=>v&&v.toLowerCase().includes(_psq))||
@@ -3993,7 +4035,7 @@ function renderProdPicker(){
       </div>
       <div class="ppc-body">
         <div class="ppc-name">${lx(p.name)}</div>
-        <div class="ppc-id">📦 ${p.series}</div>
+        <div class="ppc-id">📦 ${p.series}${p.kp||p.rp?` <span style="display:inline-flex;gap:3px;vertical-align:1px">${kprpTags(p)}</span>`:''}</div>
       </div>
     </div>`).join('');
 }

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMART 行政管理平台 v2.59</title>
+<title>COMART 行政管理平台 v2.60</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -143,7 +143,7 @@ html[lang="vi"] body{font-family:'Be Vietnam Pro','Segoe UI','PingFang TC',sans-
 .tbadge{background:var(--rd);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:10px;min-width:18px;text-align:center}
 .trr{margin-left:auto;display:flex;align-items:center;gap:10px}
 #mbody{display:flex;flex:1;min-height:calc(100vh - var(--th) - 48px - 40px)}
-.mpanel{display:none;flex:1;flex-direction:column}.mpanel.active{display:flex}
+.mpanel{display:none;flex:1;flex-direction:column;min-width:0}.mpanel.active{display:flex}
 .msb{width:var(--sw);background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:var(--th);height:calc(100vh - var(--th));overflow-y:auto;flex-shrink:0;padding:12px}
 .sbh{padding:6px 8px 10px;border-bottom:1px solid var(--border);font-size:11px;font-weight:500;letter-spacing:.06em;color:var(--text-3);text-transform:uppercase;margin-bottom:4px}
 .navs{padding:7px 0}
@@ -404,7 +404,7 @@ input[type=time]::-webkit-calendar-picker-indicator{
 .cwk-dh{display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:11px;color:var(--t3);border-left:1px solid var(--bd)}
 .cwk-dh b{font-size:12.5px;color:var(--t2)}.cwk-dh.today b{color:var(--ac)}
 .cwk-times div{font-size:10px;color:var(--t3);text-align:right;padding-right:5px;box-sizing:border-box;transform:translateY(-6px)}
-.cwk-col{position:relative;border-left:1px solid var(--bd);touch-action:none;user-select:none;-webkit-user-select:none;cursor:crosshair;
+.cwk-col{position:relative;border-left:1px solid var(--bd);touch-action:pan-x pan-y;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;cursor:crosshair;
   background-image:linear-gradient(to bottom,rgba(255,255,255,.06) 1px,transparent 1px),linear-gradient(to bottom,rgba(255,255,255,.025) 1px,transparent 1px);
   background-size:100% 36px,100% 18px}
 .cwk-col.today{background-color:rgba(91,155,213,.05)}
@@ -419,13 +419,28 @@ body.cwk-resizing,body.cwk-resizing *{cursor:ns-resize!important}
 .cwk-h::after{content:'';position:absolute;left:50%;width:26px;height:4px;margin-left:-13px;border-radius:2px;background:var(--c);top:3px}
 .cwk-h-top{top:-6px}.cwk-h-bot{bottom:-6px}
 .cwk-sel.bad{border-color:var(--rd);background:rgba(239,68,68,.18)}.cwk-sel.bad .cwk-h::after{background:var(--rd)}
+/* v2.60 手機：選取區塊本身不讓瀏覽器捲動（按在上面就是要拖），把手加大到手指按得到 */
+.cwk-sel{touch-action:none}
+@media(pointer:coarse){.cwk-h{height:24px}.cwk-h-top{top:-12px}.cwk-h-bot{bottom:-12px}.cwk-h::after{top:10px;width:34px;margin-left:-17px;height:5px}}
+#cwk-grid.cwk-n3{grid-template-columns:40px repeat(3,minmax(0,1fr));min-width:0}
+@media(max-width:680px){
+  .cwk{padding:10px}
+  .cwk-hd .stt{flex:1 1 100%}
+  .cwk-nav{margin-left:0;width:100%}
+  .cwk-nav .caltit{flex:1;min-width:0}
+  .cwk-vehs{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .cwk-vehs::-webkit-scrollbar{display:none}
+  .cwk-veh{flex-shrink:0;padding:8px 12px}
+  .cwk-wrap{max-height:62vh}
+  .cwk-bk{font-size:11px}
+}
 
 .calh{background:var(--bg1);padding:11px 15px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--bd)}
 .calnav{background:none;border:1px solid var(--bd);border-radius:var(--rs);color:var(--t2);cursor:pointer;padding:4px 10px;font-size:13px;transition:all var(--tr)}.calnav:hover{background:var(--bgh);color:var(--t1)}
 .caltit{font-size:14px;font-weight:600;min-width:130px;text-align:center}
 .calvt{margin-left:auto;display:flex;gap:4px}
 .calvb{background:none;border:1px solid var(--bd);border-radius:var(--rs);color:var(--t3);cursor:pointer;padding:4px 10px;font-size:12px;transition:all var(--tr)}.calvb.active{background:var(--tld);color:var(--tl);border-color:rgba(6,182,212,.3)}
-.cg7{display:grid;grid-template-columns:repeat(7,1fr)}
+.cg7{display:grid;grid-template-columns:repeat(7,minmax(0,1fr))}
 .cwd{padding:7px 4px;text-align:center;font-size:11px;font-weight:600;color:var(--t3);background:var(--bg1);border-bottom:1px solid var(--bd)}
 .cday{min-height:76px;padding:4px;border-right:1px solid var(--bd);border-bottom:1px solid var(--bd);cursor:pointer}
 .cday:nth-child(7n){border-right:none}.cday:hover{background:var(--bgh)}
@@ -435,7 +450,7 @@ body.cwk-resizing,body.cwk-resizing *{cursor:ns-resize!important}
 .cev{padding:2px 5px;border-radius:3px;font-size:10px;font-weight:600;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer}
 .ev-pending{background:rgba(45,127,249,.2);color:var(--ac)}.ev-active{background:rgba(20,184,166,.25);color:var(--tl)}.ev-done{background:rgba(34,197,94,.15);color:var(--gn);opacity:.75}.ev-cancelled{background:rgba(107,114,128,.18);color:var(--t3);text-decoration:line-through;opacity:.6}.ev-m{background:rgba(249,115,22,.2);color:var(--or)}
 .cmore{font-size:10px;color:var(--t3);padding:1px 4px}
-.wg{display:grid;grid-template-columns:52px repeat(7,1fr)}
+.wg{display:grid;grid-template-columns:52px repeat(7,minmax(0,1fr))}
 .wth{padding:6px 4px;text-align:center;font-size:11px;font-weight:600;background:var(--bg1);border-bottom:1px solid var(--bd)}
 .wtl{padding:2px 5px;text-align:right;font-size:10px;color:var(--t3);height:28px;border-bottom:1px solid var(--bd);border-right:1px solid var(--bd)}
 .wcell{border-right:1px solid var(--bd);border-bottom:1px solid var(--bd);height:28px;position:relative;cursor:pointer;transition:background var(--tr)}.wcell:hover{background:var(--bgh)}
@@ -543,7 +558,7 @@ tr.ovr td{background:rgba(239,68,68,.04)}
   .cday{min-height:52px;padding:2px}
   .cdn{font-size:10px}
   .cev{font-size:9px;padding:1px 3px}
-  .wg{grid-template-columns:40px repeat(7,1fr)}
+  .wg{grid-template-columns:40px repeat(7,minmax(0,1fr))}
   .wtl{font-size:9px;padding:1px 2px}
   .wth{font-size:9px;padding:4px 2px}
   #toastc{right:8px;bottom:12px;left:8px}
@@ -553,6 +568,26 @@ tr.ovr td{background:rgba(239,68,68,.04)}
   .visit-form-grid{grid-template-columns:1fr!important}
 }
 
+/* v2.60 手機：頂端列（單位／語言／使用者）原本整條超出右邊 —— 收掉系統名稱與「單位：」字樣，其餘可左右滑 */
+@media(max-width:680px){
+  .logo>span:nth-child(4),.logo>span:nth-child(5){display:none}
+  .logo{border-right:none;margin-right:0;padding-right:2px}
+  .trr{min-width:0;flex:1 1 auto;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;gap:6px;-webkit-overflow-scrolling:touch}
+  .trr::-webkit-scrollbar{display:none}
+  .trr>*{flex-shrink:0}
+  #global-site-bar>span[data-i18n]{display:none}
+  .admin-lang-sw{margin-right:0}
+  #topbar-user{padding:4px 9px!important}
+  /* 公務車：看板卡片、表單按鈕 */
+  .ccard{min-width:0}
+  #cd-cards .cch{padding:13px 14px}
+  #cd-cards .ccb,#cd-cards .ccf{padding-left:14px;padding-right:14px}
+  #cd-cards .cc-big{flex:1 1 100%;padding:12px;font-size:15px}
+  #car-bk-form>div:last-child{padding:14px!important}
+  #car-bk-form input,#car-bk-form select,#car-bk-form textarea{font-size:16px}
+  .calh{flex-wrap:wrap;padding:9px 10px}
+  .calvt{margin-left:0}
+}
 @media(max-width:400px){
   .sg{grid-template-columns:1fr 1fr}
   .sv{font-size:20px}
@@ -856,7 +891,7 @@ input::placeholder,textarea::placeholder{color:var(--text-3)!important}
   <div class="logo">
     <a href="/" id="portal-back-btn" title="返回 Portal">← Portal</a>
     <span style="width:1px;height:20px;background:var(--border);margin:0 6px"></span>
-    <span><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="38" height="20" style="display:inline-block;vertical-align:middle;margin-top:-2px"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v2.59</span>
+    <span><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="38" height="20" style="display:inline-block;vertical-align:middle;margin-top:-2px"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></span><span>COMART Admin</span><span style="font-size:11px;opacity:.45;font-weight:400;margin-left:4px">v2.60</span>
   </div>
   <div class="trr">
     <div id="global-site-bar" style="display:flex;align-items:center;gap:4px"><span style="font-size:13px;color:var(--text-3);white-space:nowrap;font-weight:500" data-i18n="g.site_label">單位：</span>
@@ -2726,7 +2761,7 @@ const ADMIN_I18N = {
     'car.tbl.km_vol':'Volume(L)','car.tbl.amount':'Amount','car.tbl.price':'Unit Price','car.tbl.fueler':'Fueled By',
     'car.tbl.maint_date':'Maint. Date','car.tbl.cost':'Cost','car.tbl.next_km2':'Next(km)','car.tbl.next_date':'Next Date','car.tbl.vendor':'Vendor',
     'car.tbl.last_insp':'Last Insp.','car.tbl.next_insp':'Next Insp.','car.tbl.remain_days':'Days Left','car.tbl.notes':'Notes',
-    'car.wk.title':'📅 Weekly booking calendar','car.wk.hint_pick':'Pick a vehicle above, then press and drag on the calendar to choose a time slot. Or just fill in the form below.','car.wk.hint_drag':'Drag on empty space to create a slot (across days is fine); drag the block to move it; drag its top or bottom edge to change the start or end. Booked and past slots cannot be selected. Then fill in the purpose below and confirm.','car.wk.pick_first':'Pick a vehicle first','car.wk.taken':'This slot is already booked','car.wk.past':'You cannot book a time that has already passed','car.wk.picked':'Selected %s — %s. Fill in the purpose below and confirm the booking.','car.page.bk':'New Vehicle Booking','car.page.edit_bk':'Edit Vehicle Booking','car.page.insp':'Inspection Mgmt','car.page.cfg':'Fleet Config',
+    'car.wk.title':'📅 Weekly booking calendar','car.wk.hint_pick':'Pick a vehicle above, then press and drag on the calendar to choose a time slot. Or just fill in the form below.','car.wk.hint_drag':'Drag on empty space to create a slot (across days is fine); drag the block to move it; drag its top or bottom edge to change the start or end. Booked and past slots cannot be selected. Then fill in the purpose below and confirm.','car.wk.hint_touch':'Swipe to scroll. Long-press an empty slot, then drag to create a time slot; drag the block to move it, or its top/bottom bar to change the start/end. Then fill in the purpose below.','car.wk.pick_first':'Pick a vehicle first','car.wk.taken':'This slot is already booked','car.wk.past':'You cannot book a time that has already passed','car.wk.picked':'Selected %s — %s. Fill in the purpose below and confirm the booking.','car.page.bk':'New Vehicle Booking','car.page.edit_bk':'Edit Vehicle Booking','car.page.insp':'Inspection Mgmt','car.page.cfg':'Fleet Config',
     'car.lbl.driver':'Driver *','car.lbl.vehicle':'Vehicle *','car.lbl.date_start':'Start Date *','car.lbl.time_start':'Start Time',
     'car.lbl.date_end':'End Date *','car.lbl.time_end':'End Time','car.lbl.purpose':'Purpose *',
     'car.lbl.km_est':'Est. Distance(km)','car.lbl.from':'Departure','car.lbl.to':'Destination','car.btn.add_bk':'＋ New Booking','car.btn.add_fuel':'＋ Fuel Log','car.btn.add_maint':'＋ Maint. Log',
@@ -3122,7 +3157,7 @@ const ADMIN_I18N = {
     'car.tbl.km_vol':'油量L','car.tbl.amount':'金額元','car.tbl.price':'單價','car.tbl.fueler':'加油人',
     'car.tbl.maint_date':'保養日期','car.tbl.cost':'費用','car.tbl.next_km2':'下次km','car.tbl.next_date':'下次日期','car.tbl.vendor':'廠商',
     'car.tbl.last_insp':'上次驗車','car.tbl.next_insp':'下次驗車','car.tbl.remain_days':'剩餘天數','car.tbl.notes':'備註',
-    'car.wk.title':'📅 週曆預約','car.wk.hint_pick':'先點選上方的車輛，再在週曆上按住拖拉選擇時段；也可以直接填寫下方表單。','car.wk.hint_drag':'在空白處拖拉拉出時段（可跨日）；拖動區塊可整塊移動；拖上緣調整開始時間、拖下緣調整結束時間。已被預約與已過去的時段無法選取。選好後在下方填寫目的並確認預約。','car.wk.pick_first':'請先點選車輛','car.wk.taken':'這個時段已有人預約','car.wk.past':'不能預約已經過去的時間','car.wk.picked':'已選 %s — %s，請在下方填寫目的後確認預約','car.page.bk':'新增用車預約','car.page.edit_bk':'修改用車預約','car.page.insp':'驗車管理','car.page.cfg':'公務車設定',
+    'car.wk.title':'📅 週曆預約','car.wk.hint_pick':'先點選上方的車輛，再在週曆上按住拖拉選擇時段；也可以直接填寫下方表單。','car.wk.hint_drag':'在空白處拖拉拉出時段（可跨日）；拖動區塊可整塊移動；拖上緣調整開始時間、拖下緣調整結束時間。已被預約與已過去的時段無法選取。選好後在下方填寫目的並確認預約。','car.wk.hint_touch':'手指滑動可捲動週曆；在空白處長按一下再拖拉，即可拉出時段；拖動區塊可整塊移動，拖上下兩端的把手調整開始與結束時間。選好後在下方填寫目的。','car.wk.pick_first':'請先點選車輛','car.wk.taken':'這個時段已有人預約','car.wk.past':'不能預約已經過去的時間','car.wk.picked':'已選 %s — %s，請在下方填寫目的後確認預約','car.page.bk':'新增用車預約','car.page.edit_bk':'修改用車預約','car.page.insp':'驗車管理','car.page.cfg':'公務車設定',
     'car.lbl.driver':'使用人 *','car.lbl.vehicle':'車輛 *','car.lbl.date_start':'開始日期 *','car.lbl.time_start':'開始時間',
     'car.lbl.date_end':'結束日期 *','car.lbl.time_end':'結束時間','car.lbl.purpose':'出行目的 *',
     'car.lbl.km_est':'預計里程(km)','car.lbl.from':'出發地點','car.lbl.to':'目的地','car.btn.add_bk':'＋ 新增預約','car.btn.add_fuel':'＋ 記錄加油','car.btn.add_maint':'＋ 新增保養記錄',
@@ -3518,7 +3553,7 @@ const ADMIN_I18N = {
     'car.tbl.km_vol':'油量L','car.tbl.amount':'金额元','car.tbl.price':'单价','car.tbl.fueler':'加油人',
     'car.tbl.maint_date':'保养日期','car.tbl.cost':'费用','car.tbl.next_km2':'下次km','car.tbl.next_date':'下次日期','car.tbl.vendor':'厂商',
     'car.tbl.last_insp':'上次验车','car.tbl.next_insp':'下次验车','car.tbl.remain_days':'剩余天数','car.tbl.notes':'备注',
-    'car.wk.title':'📅 周历预约','car.wk.hint_pick':'先点选上方的车辆，再在周历上按住拖拉选择时段；也可以直接填写下方表单。','car.wk.hint_drag':'在空白处拖拉拉出时段（可跨日）；拖动区块可整块移动；拖上缘调整开始时间、拖下缘调整结束时间。已被预约与已过去的时段无法选取。选好后在下方填写目的并确认预约。','car.wk.pick_first':'请先点选车辆','car.wk.taken':'这个时段已有人预约','car.wk.past':'不能预约已经过去的时间','car.wk.picked':'已选 %s — %s，请在下方填写目的后确认预约','car.page.bk':'新增用车预约','car.page.edit_bk':'修改用车预约','car.page.insp':'验车管理','car.page.cfg':'公务车设置',
+    'car.wk.title':'📅 周历预约','car.wk.hint_pick':'先点选上方的车辆，再在周历上按住拖拉选择时段；也可以直接填写下方表单。','car.wk.hint_drag':'在空白处拖拉拉出时段（可跨日）；拖动区块可整块移动；拖上缘调整开始时间、拖下缘调整结束时间。已被预约与已过去的时段无法选取。选好后在下方填写目的并确认预约。','car.wk.hint_touch':'手指滑动可滚动周历；在空白处长按一下再拖拉，即可拉出时段；拖动区块可整块移动，拖上下两端的把手调整开始与结束时间。选好后在下方填写目的。','car.wk.pick_first':'请先点选车辆','car.wk.taken':'这个时段已有人预约','car.wk.past':'不能预约已经过去的时间','car.wk.picked':'已选 %s — %s，请在下方填写目的后确认预约','car.page.bk':'新增用车预约','car.page.edit_bk':'修改用车预约','car.page.insp':'验车管理','car.page.cfg':'公务车设置',
     'car.lbl.driver':'使用人 *','car.lbl.vehicle':'车辆 *','car.lbl.date_start':'开始日期 *','car.lbl.time_start':'开始时间',
     'car.lbl.date_end':'结束日期 *','car.lbl.time_end':'结束时间','car.lbl.purpose':'出行目的 *',
     'car.lbl.km_est':'预计里程(km)','car.lbl.from':'出发地点','car.lbl.to':'目的地','car.btn.add_bk':'＋ 新增预约','car.btn.add_fuel':'＋ 记录加油','car.btn.add_maint':'＋ 新增保养记录',
@@ -3914,7 +3949,7 @@ const ADMIN_I18N = {
     'car.tbl.km_vol':'Thể tích(L)','car.tbl.amount':'Số tiền','car.tbl.price':'Đơn giá','car.tbl.fueler':'Người đổ xăng',
     'car.tbl.maint_date':'Ngày BD','car.tbl.cost':'Chi phí','car.tbl.next_km2':'Tiếp(km)','car.tbl.next_date':'Ngày tiếp','car.tbl.vendor':'Đơn vị',
     'car.tbl.last_insp':'KĐ lần cuối','car.tbl.next_insp':'KĐ tiếp theo','car.tbl.remain_days':'Ngày còn lại','car.tbl.notes':'Ghi chú',
-    'car.wk.title':'📅 Lịch đặt xe theo tuần','car.wk.hint_pick':'Chọn xe ở trên, rồi nhấn giữ và kéo trên lịch để chọn khung giờ. Hoặc điền trực tiếp biểu mẫu bên dưới.','car.wk.hint_drag':'Kéo trên vùng trống để tạo khung giờ (có thể qua nhiều ngày); kéo khối để di chuyển; kéo mép trên hoặc mép dưới để đổi giờ bắt đầu hoặc kết thúc. Khung giờ đã có người đặt hoặc đã qua không thể chọn. Sau đó điền mục đích bên dưới và xác nhận.','car.wk.pick_first':'Vui lòng chọn xe trước','car.wk.taken':'Khung giờ này đã có người đặt','car.wk.past':'Không thể đặt thời gian đã qua','car.wk.picked':'Đã chọn %s — %s. Vui lòng điền mục đích bên dưới và xác nhận đặt xe.','car.page.bk':'Đặt xe mới','car.page.edit_bk':'Sửa đặt xe','car.page.insp':'Quản lý kiểm định','car.page.cfg':'Cấu hình xe',
+    'car.wk.title':'📅 Lịch đặt xe theo tuần','car.wk.hint_pick':'Chọn xe ở trên, rồi nhấn giữ và kéo trên lịch để chọn khung giờ. Hoặc điền trực tiếp biểu mẫu bên dưới.','car.wk.hint_drag':'Kéo trên vùng trống để tạo khung giờ (có thể qua nhiều ngày); kéo khối để di chuyển; kéo mép trên hoặc mép dưới để đổi giờ bắt đầu hoặc kết thúc. Khung giờ đã có người đặt hoặc đã qua không thể chọn. Sau đó điền mục đích bên dưới và xác nhận.','car.wk.hint_touch':'Vuốt để cuộn lịch. Nhấn giữ vào vùng trống rồi kéo để tạo khung giờ; kéo khối để di chuyển, kéo thanh ở mép trên/dưới để đổi giờ bắt đầu/kết thúc. Sau đó điền mục đích bên dưới.','car.wk.pick_first':'Vui lòng chọn xe trước','car.wk.taken':'Khung giờ này đã có người đặt','car.wk.past':'Không thể đặt thời gian đã qua','car.wk.picked':'Đã chọn %s — %s. Vui lòng điền mục đích bên dưới và xác nhận đặt xe.','car.page.bk':'Đặt xe mới','car.page.edit_bk':'Sửa đặt xe','car.page.insp':'Quản lý kiểm định','car.page.cfg':'Cấu hình xe',
     'car.lbl.driver':'Người dùng *','car.lbl.vehicle':'Xe *','car.lbl.date_start':'Ngày bắt đầu *','car.lbl.time_start':'Giờ bắt đầu',
     'car.lbl.date_end':'Ngày kết thúc *','car.lbl.time_end':'Giờ kết thúc','car.lbl.purpose':'Mục đích *',
     'car.lbl.km_est':'KM dự kiến','car.lbl.from':'Điểm xuất phát','car.lbl.to':'Điểm đến','car.btn.add_bk':'＋ Đặt xe','car.btn.add_fuel':'＋ Ghi nhiên liệu','car.btn.add_maint':'＋ Ghi bảo dưỡng',
@@ -4310,7 +4345,7 @@ const ADMIN_I18N = {
     'car.tbl.km_vol':'給油量(L)','car.tbl.amount':'金額','car.tbl.price':'単価','car.tbl.fueler':'給油者',
     'car.tbl.maint_date':'整備日','car.tbl.cost':'費用','car.tbl.next_km2':'次回(km)','car.tbl.next_date':'次回日','car.tbl.vendor':'業者',
     'car.tbl.last_insp':'前回車検','car.tbl.next_insp':'次回車検','car.tbl.remain_days':'残り日数','car.tbl.notes':'備考',
-    'car.wk.title':'📅 週間予約カレンダー','car.wk.hint_pick':'上の車両を選んでから、カレンダー上でドラッグして時間帯を選んでください。下のフォームに直接入力することもできます。','car.wk.hint_drag':'空いている所をドラッグして時間帯を作成（日をまたいでも可）。ブロックをドラッグすると移動、上端・下端をドラッグすると開始・終了時刻を変更できます。予約済み・過去の時間帯は選べません。選んだら下で目的を入力して予約を確定してください。','car.wk.pick_first':'先に車両を選んでください','car.wk.taken':'この時間帯はすでに予約されています','car.wk.past':'過去の時間は予約できません','car.wk.picked':'%s — %s を選択しました。下で目的を入力して予約を確定してください。','car.page.bk':'車両予約','car.page.edit_bk':'予約変更','car.page.insp':'車検管理','car.page.cfg':'車両設定',
+    'car.wk.title':'📅 週間予約カレンダー','car.wk.hint_pick':'上の車両を選んでから、カレンダー上でドラッグして時間帯を選んでください。下のフォームに直接入力することもできます。','car.wk.hint_drag':'空いている所をドラッグして時間帯を作成（日をまたいでも可）。ブロックをドラッグすると移動、上端・下端をドラッグすると開始・終了時刻を変更できます。予約済み・過去の時間帯は選べません。選んだら下で目的を入力して予約を確定してください。','car.wk.hint_touch':'スワイプでスクロールします。空いている所を長押ししてからドラッグすると時間帯を作成できます。ブロックをドラッグで移動、上下のバーで開始・終了時刻を変更。選んだら下で目的を入力してください。','car.wk.pick_first':'先に車両を選んでください','car.wk.taken':'この時間帯はすでに予約されています','car.wk.past':'過去の時間は予約できません','car.wk.picked':'%s — %s を選択しました。下で目的を入力して予約を確定してください。','car.page.bk':'車両予約','car.page.edit_bk':'予約変更','car.page.insp':'車検管理','car.page.cfg':'車両設定',
     'car.lbl.driver':'利用者 *','car.lbl.vehicle':'車両 *','car.lbl.date_start':'開始日 *','car.lbl.time_start':'開始時刻',
     'car.lbl.date_end':'終了日 *','car.lbl.time_end':'終了時刻','car.lbl.purpose':'目的 *',
     'car.lbl.km_est':'予定距離(km)','car.lbl.from':'出発地','car.lbl.to':'目的地','car.btn.add_bk':'＋ 予約追加','car.btn.add_fuel':'＋ 給油記録','car.btn.add_maint':'＋ 整備記録',
@@ -5586,11 +5621,16 @@ let cwkWeek = null, cwkVid = '', cwkSel = null, cwkDrag = null, cwkNoJump = fals
 // 表單一打開就有預設的「今天 09:00–18:00」—— 那不是使用者選的，畫在週曆上只會讓人以為已經選好了。
 // 所以只有使用者真的動過（拖拉、改日期時間、從看板帶入、修改既有預約）才把表單的時段畫出來。
 let cwkTouched = false;
+// v2.60 手機：一次只看 3 天（7 欄擠在手機上每欄不到 50px、還得左右捲），cwkWeek 從「週一」改成「目前畫面的第一天」
+const CWK_MQ = window.matchMedia('(max-width:680px)');
+function cwkN(){ return CWK_MQ.matches ? 3 : 7; }
+function cwkDay0(d){ return new Date(d.getFullYear(),d.getMonth(),d.getDate()); }
+function cwkStartFor(d){ return cwkN()===7 ? cwkMonday(d) : cwkDay0(d); }
 
 function cwkVehs(){ const ids=_siteVehIds(); return ld(K.vh).filter(v=>ids.has(v.id)); }
 function cwkColor(vid){ const i=cwkVehs().findIndex(v=>v.id===vid); return CWK_COLORS[(i<0?0:i)%CWK_COLORS.length]; }
 function cwkMonday(d){ const x=new Date(d.getFullYear(),d.getMonth(),d.getDate()); x.setDate(x.getDate()-((x.getDay()+6)%7)); return x; }
-function cwkDays(){ return [...Array(7)].map((_,i)=>{ const d=new Date(cwkWeek); d.setDate(d.getDate()+i); return d; }); }
+function cwkDays(){ return [...Array(cwkN())].map((_,i)=>{ const d=new Date(cwkWeek); d.setDate(d.getDate()+i); return d; }); }
 // 'YYYY-MM-DDTHH:mm'（或空白分隔）→ 當地時間 Date；格式不對回 null
 function cwkParse(s){ const m=dtn(s).match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/); return m?new Date(+m[1],+m[2]-1,+m[3],+m[4],+m[5]):null; }
 function cwkFmt(d){ return `${ymdL(d)}T${_z2(d.getHours())}:${_z2(d.getMinutes())}`; }
@@ -5601,8 +5641,8 @@ function cwkClash(vid,s,e){
   return ld(K.bks).find(b=>b.vh_id===vid&&b.id!==editCarBkId&&cwkLive(b)&&dtn(b.start)<ne&&dtn(b.end)>ns);
 }
 function cwkMove(n){
-  if(n===0) cwkWeek=cwkMonday(new Date());
-  else { const d=new Date(cwkWeek||cwkMonday(new Date())); d.setDate(d.getDate()+7*n); cwkWeek=d; }
+  if(n===0) cwkWeek=cwkStartFor(new Date());
+  else { const d=new Date(cwkWeek||cwkStartFor(new Date())); d.setDate(d.getDate()+cwkN()*n); cwkWeek=d; }
   cwkRender();
 }
 function cwkPickVeh(vid){
@@ -5618,7 +5658,10 @@ function cwkSyncFromForm(jump){
   cwkVid=g('bkv');
   const s=cwkParse(`${g('bksd')}T${g('bkst2')||'00:00'}`), e=cwkParse(`${g('bked')}T${g('bket')||'23:59'}`);
   cwkSel = (cwkTouched&&s&&e&&e>s) ? {s,e} : null;
-  if(jump&&cwkSel){ const m=cwkMonday(cwkSel.s); if(!cwkWeek||m.getTime()!==cwkWeek.getTime()) cwkWeek=m; }
+  if(jump&&cwkSel){
+    const end=cwkWeek?new Date(cwkWeek.getTime()+cwkN()*864e5):null;
+    if(!cwkWeek||cwkSel.s<cwkWeek||cwkSel.s>=end) cwkWeek=cwkStartFor(cwkSel.s);
+  }
   cwkRender();
 }
 // 週曆 → 表單
@@ -5634,14 +5677,15 @@ function cwkApply(){
 
 function cwkRender(){
   const box=document.getElementById('cwk-grid'); if(!box) return;
-  if(!cwkWeek) cwkWeek=cwkMonday(new Date());
+  if(!cwkWeek) cwkWeek=cwkStartFor(new Date());
   const days=cwkDays(), vehs=cwkVehs(), lanes=Math.max(1,vehs.length), today=tds(), locale=currentAdminLang||'zh-TW';
-  document.getElementById('cwk-tit').textContent=`${ymdL(days[0])} – ${ymdL(days[6])}`;
+  document.getElementById('cwk-tit').textContent=`${ymdL(days[0])} – ${ymdL(days[days.length-1])}`;
+  box.classList.toggle('cwk-n3',days.length===3);
   document.getElementById('cwk-vehs').innerHTML = vehs.length ? vehs.map(v=>
     `<button class="cwk-veh${cwkVid===v.id?' on':''}" style="--c:${cwkColor(v.id)}" data-vid="${escapeHtml(v.id)}" onclick="cwkPickVeh(this.dataset.vid)">
       <i></i>${VICO[v.type]||'🚗'} ${escapeHtml(v.name||'')} <span>${escapeHtml(v.plate||'')}</span></button>`).join('')
     : `<span class="cwk-none">${t('car.no_data')}</span>`;
-  document.getElementById('cwk-hint').textContent = cwkVid ? t('car.wk.hint_drag') : t('car.wk.hint_pick');
+  document.getElementById('cwk-hint').textContent = cwkVid ? t(CWK_TOUCH.matches?'car.wk.hint_touch':'car.wk.hint_drag') : t('car.wk.hint_pick');
 
   const vIdx={}; vehs.forEach((v,i)=>vIdx[v.id]=i);
   const bks=ld(K.bks).filter(b=>vIdx[b.vh_id]!==undefined&&(b.st||b.status)!=='cancelled');
@@ -5700,23 +5744,45 @@ function cwkOk(r){
 }
 function cwkDown(ev){
   if(!ev.target.closest('#cwk-grid .cwk-col')||ev.button>0) return;
-  if(!cwkVid){ toast(t('car.wk.pick_first'),'error'); return; }
-  const p=cwkPoint(ev); if(!p) return;
   const onSel=ev.target.closest('.cwk-sel');
+  // 🔴 手指在空白處：先讓瀏覽器捲動，長按 CWK_LP_MS 不動才開始拉時段（v2.60）。
+  //    原本 .cwk-col 是 touch-action:none，手機上手指放在週曆上就捲不動，只能選時段。
+  if(ev.pointerType==='touch'&&!(onSel&&cwkSel)){
+    cwkLPClear();
+    const x=ev.clientX, y=ev.clientY;
+    cwkLP={id:ev.pointerId, x, y, timer:setTimeout(()=>{
+      cwkLP=null;
+      if(cwkBeginNew({clientX:x, clientY:y})){ try{ navigator.vibrate&&navigator.vibrate(12); }catch(_){} }
+    }, CWK_LP_MS)};
+    return;
+  }
+  if(cwkBeginNew(ev)) ev.preventDefault();
+}
+const CWK_LP_MS = 350;
+let cwkLP = null;
+const CWK_TOUCH = window.matchMedia('(pointer:coarse)');
+function cwkLPClear(){ if(cwkLP){ clearTimeout(cwkLP.timer); cwkLP=null; } }
+// 滑鼠按下／手指長按之後共用：在空白處開始拉新時段，或按在選取區塊上開始移動／調整
+function cwkBeginNew(ev){
+  if(!cwkVid){ toast(t('car.wk.pick_first'),'error'); return false; }
+  const p=cwkPoint(ev); if(!p) return false;
+  const tgt=document.elementFromPoint(ev.clientX,ev.clientY);
+  const onSel=tgt&&tgt.closest('.cwk-sel');
   if(onSel&&cwkSel){
-    ev.preventDefault();
-    const mode=ev.target.closest('.cwk-h-top')?'top':ev.target.closest('.cwk-h-bot')?'bot':'move';
+    const mode=tgt.closest('.cwk-h-top')?'top':tgt.closest('.cwk-h-bot')?'bot':'move';
     cwkDrag={mode, p0:p, s0:new Date(cwkSel.s), e0:new Date(cwkSel.e), moved:false};
     document.body.classList.add(mode==='move'?'cwk-grabbing':'cwk-resizing');
-    cwkRender(); return;
+    cwkRender(); return true;
   }
-  if(new Date(p.getTime()+CWK_MS)<=new Date()){ toast(t('car.wk.past'),'error'); return; }
+  if(new Date(p.getTime()+CWK_MS)<=new Date()){ toast(t('car.wk.past'),'error'); return false; }
   const r=cwkRange(p,p);
-  if(cwkClash(cwkVid,r.s,r.e)){ toast(t('car.wk.taken'),'error'); return; }
-  ev.preventDefault();
+  if(cwkClash(cwkVid,r.s,r.e)){ toast(t('car.wk.taken'),'error'); return false; }
   cwkDrag={mode:'new', anchor:p, moved:true}; cwkSel=r; cwkTouched=true; cwkRender();
+  return true;
 }
 function cwkMoveEv(ev){
+  // 長按還沒成立就移動了 → 那是在捲動，不是要選時段
+  if(cwkLP&&ev.pointerId===cwkLP.id&&Math.hypot(ev.clientX-cwkLP.x,ev.clientY-cwkLP.y)>8) cwkLPClear();
   if(!cwkDrag) return;
   ev.preventDefault();
   // 拖到可視範圍邊緣時自動捲動（一天 48 格放不進一個畫面）
@@ -5734,6 +5800,7 @@ function cwkMoveEv(ev){
   cwkSel=r; D.moved=true; cwkTouched=true; cwkRender();
 }
 function cwkUp(){
+  cwkLPClear();
   if(!cwkDrag) return;
   const moved=cwkDrag.moved;
   cwkDrag=null; document.body.classList.remove('cwk-grabbing','cwk-resizing');
@@ -5743,7 +5810,11 @@ function cwkUp(){
 document.addEventListener('pointerdown',cwkDown);
 document.addEventListener('pointermove',cwkMoveEv,{passive:false});
 document.addEventListener('pointerup',cwkUp);
-document.addEventListener('pointercancel',()=>{ if(cwkDrag){ cwkDrag=null; document.body.classList.remove('cwk-grabbing','cwk-resizing'); cwkRender(); } });
+// 長按成立之後手指再移動，瀏覽器會想捲動頁面 —— 拖拉中一律擋下（document 層的 touch 監聽預設 passive，要明講 false）
+document.addEventListener('touchmove',ev=>{ if(cwkDrag&&ev.cancelable) ev.preventDefault(); },{passive:false});
+// 轉向或視窗寬度跨過手機門檻：3 天 ↔ 7 天，重新對齊起始日
+CWK_MQ.addEventListener&&CWK_MQ.addEventListener('change',()=>{ if(cwkWeek){ cwkWeek=cwkStartFor(cwkSel?cwkSel.s:cwkWeek); cwkRender(); } });
+document.addEventListener('pointercancel',()=>{ cwkLPClear(); if(cwkDrag){ cwkDrag=null; document.body.classList.remove('cwk-grabbing','cwk-resizing'); cwkRender(); } });
 /* v2.55：週曆搬到「週曆／月曆」頁（看板右邊），表單仍是同一份 DOM ——
    在兩頁之間搬（同 Portal 的 lcMountRoom）：複製一份會撞 id（bkv／bksd…被 doBooking、chkConflict 綁死）。
    在週曆頁，表單只在選了時段（或正在修改既有預約）之後才出現，否則月曆會被推到很下面。*/

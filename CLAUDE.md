@@ -137,7 +137,7 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 | File | Version | Purpose | ~Lines |
 |------|---------|---------|--------|
 | `index.html` | v2.23 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
-| `admin/index.html` | v2.59 | Admin System — **機場接送**、公務車、圖書館、會議室、客戶到訪、抽籤 | 8,221 |
+| `admin/index.html` | v2.60 | Admin System — **機場接送**、公務車、圖書館、會議室、客戶到訪、抽籤 | 8,221 |
 | `kms/index.html` | v2.56 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
 | `quotation/index.html` | v3.69 | Quotation & CRM system | 7,332 |
 | `board/index.html` | v1.96 | 公告與會議 Bulletin & Meetings — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍、腦力激盪 | 4,600 |
@@ -1765,6 +1765,13 @@ naive regex 會誤判成「沒定義」。
   看板最上方獨立的「＋ 新增預約」鈕已刪除（每張車輛卡片上都有）；卡片放大（`#cd-cards`），「出發」「新增預約」改用 `.cc-big`。
 - v2.57：拖完不再跳「已選…請填寫目的」提示、也不再捲到目的欄（Woody：一直跳很干擾）；目的留給「確認預約」時檢查。
 - 驗證用模擬資料跑過三個情境：跨日拖拉帶入表單、撞到既有預約時停住、按在已預約格子上提示（headless Chrome，2026-10-06）。
+- 🔴 **手機版（v2.60，Woody：「公務車在手機上都會超出範圍」）**：
+  ① **整頁可以左右滑的根因是 `.mpanel` 少了 `min-width:0`** —— 它是 `#mbody`（flex row）的子項，`min-width:auto` 讓寬表格把整個面板撐開，`.tw` 的 `overflow-x:auto` 因此從來沒有生效；
+  ② 頂端列（單位／語言／使用者）在手機上收掉「COMART Admin」與「單位：」，其餘在列內左右滑；
+  ③ **週曆手機一次 3 天**（`cwkN()`／`CWK_MQ`），`cwkWeek` 的語意因此是「畫面第一天」不是「週一」，起點一律經 `cwkStartFor()`；
+  ④ 🔴 **`.cwk-col` 原本是 `touch-action:none`，手指放在週曆上就捲不動**。現在空白處是 `pan-x pan-y`，**長按 350ms 不動才開始拉時段**（`cwkLP`），移動超過 8px 視為捲動；
+  拖拉中由 document 的 `touchmove`（`passive:false`）擋下頁面捲動。選取區塊本身仍是 `touch-action:none`（按上去就是要拖），把手在 `pointer:coarse` 下加大。觸控的提示文字是 `car.wk.hint_touch`。
+  驗證方式：`scratchpad` 裡用 390px iframe ＋ 假資料逐頁量「右緣超出視窗的元素」，再截圖看。**長按手勢 headless 測不到，要真機確認。**
 
 - `cancelCarBk(id)` 公務車取消，`cancelBk(id)` 會議室取消，**不可混用**
 - localStorage 只是快取，正本在 Supabase

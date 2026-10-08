@@ -77,7 +77,8 @@ export function buildReportsAppendix(rows) {
   return parts.join("\n");
 }
 
-export const DOC_FOLDERS = ["必讀資料", "好文分享"];
+// 「Woody 著述」（2026-10-08）：Woody 自己寫的文章，可以用「我」說；其餘兩類是別人的文章，引用要講作者
+export const DOC_FOLDERS = ["Woody 著述", "必讀資料", "好文分享"];
 export const MAX_DOC_CHARS = 200000;      // 單份上限（超過截斷並註明）
 export const MAX_DOCS_TOTAL = 800000;     // 全部文件上限
 
@@ -105,9 +106,10 @@ export function normalizeDocs(docs) {
 export function buildDocsAppendix(docs) {
   if (!docs.length) return "";
   const parts = [
-    "# 附錄二：Woody 指定的必讀資料與推薦文章（KMS「Woody 推薦閱讀」）",
-    "這些是 Woody 最推崇的觀念，可以引用來回答，但要說出處與作者（例如「何飛鵬在〈權力之外的力量〉裡講過……」）。" +
-      "除了 COMART Dos & Don'ts 與標明「Woody 補充」的段落之外，文章內容不是 Woody 自己的經歷或原創，不可用「我」說成 Woody 的事。",
+    "# 附錄二：Woody 的著述、指定的必讀資料與推薦文章（KMS「Woody 推薦閱讀」）",
+    "標為〔Woody 著述〕的是 Woody 自己寫的，就是我的話，可以用「我」說、直接引用。",
+    "〔必讀資料〕〔好文分享〕是 Woody 最推崇的觀念，可以引用來回答，但要說出處與作者（例如「何飛鵬在〈權力之外的力量〉裡講過……」）。" +
+      "除了 COMART Dos & Don'ts 與標明「Woody 補充」的段落之外，這兩類文章的內容不是 Woody 自己的經歷或原創，不可用「我」說成 Woody 的事。",
     "",
   ];
   for (const d of docs) {
@@ -127,7 +129,9 @@ export function assemble(core, reportsAppendix, docsAppendix) {
 export const KMS_CATEGORY = "woody_reads";
 export function kmsToDocs(rows) {
   return (Array.isArray(rows) ? rows : []).map((r) => ({
-    folder: Array.isArray(r.tags) && r.tags.includes("必讀資料") ? "必讀資料" : "好文分享",
+    folder: !Array.isArray(r.tags) ? "好文分享"
+      : r.tags.includes("Woody 著述") ? "Woody 著述"
+      : r.tags.includes("必讀資料") ? "必讀資料" : "好文分享",
     name: String(r.title || r.file_name || "").trim(),
     text: r.body || "",
   }));

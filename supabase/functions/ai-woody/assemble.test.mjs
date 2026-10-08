@@ -47,3 +47,11 @@ test("KMS 文件：有「必讀資料」標籤才算必讀，標題當小標", (
   ]);
   assert.deepEqual(d.map((x) => x.folder + "/" + x.name), ["必讀資料/QBQ", "好文分享/苦藥", "好文分享/x.png"]);
 });
+
+test("KMS 文件：「Woody 著述」標籤優先，排在最前面", () => {
+  const d = kmsToDocs([{ title: "好", body: "b", tags: ["好文分享"] }, { title: "我寫的", body: "w", tags: ["Woody 著述"] }]);
+  assert.deepEqual(d.map((x) => x.folder), ["好文分享", "Woody 著述"]);
+  const n = normalizeDocs(d).docs;
+  assert.equal(n[0].folder, "Woody 著述");
+  assert.ok(buildDocsAppendix(n).includes("〔Woody 著述〕的是 Woody 自己寫的"));
+});

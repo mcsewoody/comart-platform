@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#080C14">
-<title>COMART · Quotation System v3.70</title>
+<title>COMART · Quotation System v3.71</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=Noto+Serif:wght@400;700&family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -116,6 +116,18 @@ html[lang="vi"]{--ff:'Be Vietnam Pro','DM Sans',-apple-system,sans-serif;--fd:'N
 .moq-lbl{font-size:11px;color:var(--tx3);font-weight:500;margin-right:2px;white-space:nowrap}
 .moq-chip{padding:5px 12px;border-radius:20px;border:1px solid var(--br);font-size:12px;font-family:var(--fm);font-weight:600;color:var(--tx2);cursor:pointer;transition:all .15s}
 .moq-chip.on{background:var(--ac);border-color:var(--ac);color:#fff}
+/* v3.71 名片 */
+.card-thumbs{display:flex;gap:10px;flex-wrap:wrap}
+.card-thumbs .ct-img{position:relative;width:min(300px,100%);border:1px solid var(--br);border-radius:8px;overflow:hidden;background:var(--s2);cursor:zoom-in}
+.card-thumbs img{display:block;width:100%;height:auto}
+.card-thumbs .ct-cap{position:absolute;left:6px;top:6px;font-size:10px;font-weight:700;padding:1px 6px;border-radius:5px;background:rgba(0,0,0,.6);color:#fff}
+.card-rot{display:flex;gap:6px;justify-content:center;padding:6px;border-top:1px solid var(--br)}
+.card-rot button{padding:4px 12px;border-radius:7px;border:1px solid var(--br);background:var(--s1);color:var(--tx);font-size:13px;cursor:pointer}
+.card-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.card-grid .full{grid-column:1/-1}
+.card-sec{font-size:11px;font-weight:800;color:var(--tx3);letter-spacing:.06em;text-transform:uppercase;margin:16px 0 8px;padding-bottom:4px;border-bottom:1px solid var(--br)}
+.card-note{font-size:12px;color:var(--tx2);background:var(--s2);border:1px solid var(--br);border-radius:8px;padding:8px 10px;margin-top:8px}
+@media(max-width:560px){.card-grid{grid-template-columns:1fr}}
 /* v3.70 產品 KP（Key Product）／RP（Retail Packaging）：篩選鈕與標籤 */
 .kprp-btn{padding:6px 11px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx2);font-size:12px;font-weight:700;font-family:var(--fm);cursor:pointer;white-space:nowrap;flex-shrink:0}
 .kprp-btn.on{background:var(--ac);border-color:var(--ac);color:#fff}
@@ -1187,6 +1199,7 @@ const UI = {
     toastDeleteContact:'Delete this contact?',toastDeleteActivity:'Delete this activity?',toastDeleteTask:'Delete this task?',toastDeleteAccount:'Delete this customer? All contacts/activities/tasks will also be deleted.',
     crmAutoCreated:'👥 Auto-created customer: ',contactsCountLabel:'contacts',quotesCountLabel:'quotes',lastActivityLabel:'Last activity: ',newAcctTitle:'New Customer',editAcctDetail:'Customer Detail',
     crmNoAccts:'No customers yet. Click "+ New Customer" to start.',
+    scanCard:'📇 Scan card',scanCardAdd:'📇 Scan card → new contact',cardReading:'Reading the business card…',cardReview:'Business card',cardHint:'Check and edit the details. Use the rotate buttons if a card image is not upright.',cardAcct:'Add to customer',cardNewAcct:'＋ New customer',cardFillEmpty:'Existing customer: only empty fields will be filled; existing data is not overwritten.',cardDup:'This customer already has a contact with the same email — that contact will be updated.',cardSave:'💾 Save to CRM',cardSaved:'Saved to CRM',cardFail:'Could not read the card',cardUploadFail:'Card image upload failed — nothing was saved',cardMax2:'Up to two images at a time (front and back)',cardFront:'Front',cardBack:'Back',cardRotate:'Rotate',secAcct:'Customer',secContact:'Contact',acctCompanyAlt:'Company name (other language)',acctAddress:'Address',acctShipAddress:'Shipping address',acctPhone:'Company phone',acctFax:'Fax',acctTaxId:'Tax ID',acctIncoterm:'Incoterm',acctCurrency:'Currency',acctPayTerms:'Payment terms',ctNameAlt:'Name (other language)',ctDept:'Department',ctMobile:'Mobile',ctFax:'Fax',ctIm:'Messaging (LINE / WeChat / WhatsApp…)',ctCard:'Business card',cardNoPerm:'No permission to view card images',cardOther:'Other info on the card',
     crmNoContacts:'No contacts',crmNoActivities:'No interactions',crmNoAcctQuotes:'No quotation records',crmNoTasks:'No tasks',
     crmNoTasksFilter:'No tasks matching filter',crmNoActivityLog:'No interaction records',
     crmNone:'(None)',
@@ -1245,6 +1258,7 @@ const UI = {
     toastDeleteContact:'刪除此聯絡人？',toastDeleteActivity:'刪除此互動紀錄？',toastDeleteTask:'刪除此任務？',toastDeleteAccount:'確定刪除此客戶？所有聯絡人/互動紀錄/任務也會被刪除。',
     crmAutoCreated:'👥 已自動建立客戶: ',contactsCountLabel:'聯絡人',quotesCountLabel:'報價',lastActivityLabel:'上次互動: ',newAcctTitle:'新增客戶',editAcctDetail:'客戶詳情',
     crmNoAccts:'尚無客戶資料。點右上角「+ 新增客戶」開始。',
+    scanCard:'📇 掃描名片',scanCardAdd:'📇 掃名片新增聯絡人',cardReading:'正在辨識名片…',cardReview:'名片辨識結果',cardHint:'請確認內容，可以直接修改；名片圖方向不對，按旋轉即可。',cardAcct:'加入客戶',cardNewAcct:'＋ 新客戶',cardFillEmpty:'既有客戶：只會補上目前空白的欄位，不會覆蓋已有的資料。',cardDup:'這家客戶已有相同 Email 的聯絡人，將更新該聯絡人。',cardSave:'💾 存入 CRM',cardSaved:'已存入 CRM',cardFail:'名片辨識失敗',cardUploadFail:'名片圖上傳失敗，資料沒有存檔',cardMax2:'一次最多兩張（正面與背面）',cardFront:'正面',cardBack:'背面',cardRotate:'旋轉',secAcct:'客戶資料',secContact:'聯絡人',acctCompanyAlt:'公司名（其他語言）',acctAddress:'地址',acctShipAddress:'送貨地址',acctPhone:'公司電話',acctFax:'傳真',acctTaxId:'統編／稅號',acctIncoterm:'Incoterm',acctCurrency:'幣別',acctPayTerms:'付款條件',ctNameAlt:'姓名（其他語言）',ctDept:'部門',ctMobile:'手機',ctFax:'傳真',ctIm:'通訊軟體（LINE／WeChat／WhatsApp…）',ctCard:'名片',cardNoPerm:'沒有權限查看名片圖',cardOther:'名片上的其他資訊',
     crmNoContacts:'尚無聯絡人',crmNoActivities:'尚無互動紀錄',crmNoAcctQuotes:'尚無報價紀錄',crmNoTasks:'尚無任務',
     crmNoTasksFilter:'沒有符合條件的任務',crmNoActivityLog:'尚無互動紀錄',
     crmNone:'（無）',
@@ -1303,6 +1317,7 @@ const UI = {
     toastDeleteContact:'删除此联系人？',toastDeleteActivity:'删除此互动记录？',toastDeleteTask:'删除此任务？',toastDeleteAccount:'确定删除此客户？所有联系人/互动记录/任务也会被删除。',
     crmAutoCreated:'👥 已自动建立客户: ',contactsCountLabel:'联系人',quotesCountLabel:'报价',lastActivityLabel:'上次互动: ',newAcctTitle:'新增客户',editAcctDetail:'客户详情',
     crmNoAccts:'暂无客户资料。点右上角「+ 新增客户」开始。',
+    scanCard:'📇 扫描名片',scanCardAdd:'📇 扫名片新增联系人',cardReading:'正在识别名片…',cardReview:'名片识别结果',cardHint:'请确认内容，可以直接修改；名片图方向不对，按旋转即可。',cardAcct:'加入客户',cardNewAcct:'＋ 新客户',cardFillEmpty:'既有客户：只会补上目前空白的栏位，不会覆盖已有的资料。',cardDup:'这家客户已有相同 Email 的联系人，将更新该联系人。',cardSave:'💾 存入 CRM',cardSaved:'已存入 CRM',cardFail:'名片识别失败',cardUploadFail:'名片图上传失败，资料没有保存',cardMax2:'一次最多两张（正面与背面）',cardFront:'正面',cardBack:'背面',cardRotate:'旋转',secAcct:'客户资料',secContact:'联系人',acctCompanyAlt:'公司名（其他语言）',acctAddress:'地址',acctShipAddress:'送货地址',acctPhone:'公司电话',acctFax:'传真',acctTaxId:'税号',acctIncoterm:'Incoterm',acctCurrency:'币别',acctPayTerms:'付款条件',ctNameAlt:'姓名（其他语言）',ctDept:'部门',ctMobile:'手机',ctFax:'传真',ctIm:'通讯软件（LINE／WeChat／WhatsApp…）',ctCard:'名片',cardNoPerm:'没有权限查看名片图',cardOther:'名片上的其他信息',
     crmNoContacts:'暂无联系人',crmNoActivities:'暂无互动记录',crmNoAcctQuotes:'暂无报价记录',crmNoTasks:'暂无任务',
     crmNoTasksFilter:'没有符合条件的任务',crmNoActivityLog:'暂无互动记录',
     crmNone:'（无）',
@@ -1361,6 +1376,7 @@ const UI = {
     toastDeleteContact:'Xóa liên hệ này?',toastDeleteActivity:'Xóa hoạt động này?',toastDeleteTask:'Xóa công việc này?',toastDeleteAccount:'Xóa KH này? Tất cả liên hệ/hoạt động/công việc cũng sẽ bị xóa.',
     crmAutoCreated:'👥 Đã tự động tạo KH: ',contactsCountLabel:'liên hệ',quotesCountLabel:'báo giá',lastActivityLabel:'Hoạt động cuối: ',newAcctTitle:'Thêm khách hàng',editAcctDetail:'Chi tiết khách hàng',
     crmNoAccts:'Chưa có khách hàng. Nhấn "+ Thêm khách hàng" để bắt đầu.',
+    scanCard:'📇 Quét danh thiếp',scanCardAdd:'📇 Quét danh thiếp → thêm liên hệ',cardReading:'Đang đọc danh thiếp…',cardReview:'Kết quả đọc danh thiếp',cardHint:'Kiểm tra và sửa nội dung. Nếu ảnh danh thiếp bị ngược, bấm xoay.',cardAcct:'Thêm vào khách hàng',cardNewAcct:'＋ Khách hàng mới',cardFillEmpty:'Khách hàng đã có: chỉ điền các ô còn trống, không ghi đè dữ liệu cũ.',cardDup:'Khách hàng này đã có liên hệ cùng Email — sẽ cập nhật liên hệ đó.',cardSave:'💾 Lưu vào CRM',cardSaved:'Đã lưu vào CRM',cardFail:'Không đọc được danh thiếp',cardUploadFail:'Tải ảnh danh thiếp thất bại — chưa lưu dữ liệu',cardMax2:'Tối đa hai ảnh mỗi lần (mặt trước và mặt sau)',cardFront:'Mặt trước',cardBack:'Mặt sau',cardRotate:'Xoay',secAcct:'Khách hàng',secContact:'Liên hệ',acctCompanyAlt:'Tên công ty (ngôn ngữ khác)',acctAddress:'Địa chỉ',acctShipAddress:'Địa chỉ giao hàng',acctPhone:'Điện thoại công ty',acctFax:'Fax',acctTaxId:'Mã số thuế',acctIncoterm:'Incoterm',acctCurrency:'Tiền tệ',acctPayTerms:'Điều khoản thanh toán',ctNameAlt:'Tên (ngôn ngữ khác)',ctDept:'Phòng ban',ctMobile:'Di động',ctFax:'Fax',ctIm:'Nhắn tin (Zalo / LINE / WeChat / WhatsApp…)',ctCard:'Danh thiếp',cardNoPerm:'Không có quyền xem ảnh danh thiếp',cardOther:'Thông tin khác trên danh thiếp',
     crmNoContacts:'Chưa có liên hệ',crmNoActivities:'Chưa có tương tác',crmNoAcctQuotes:'Chưa có báo giá',crmNoTasks:'Chưa có nhiệm vụ',
     crmNoTasksFilter:'Không có nhiệm vụ phù hợp',crmNoActivityLog:'Chưa có bản ghi tương tác',
     crmNone:'(Không)',
@@ -1419,6 +1435,7 @@ const UI = {
     toastDeleteContact:'この連絡先を削除しますか？',toastDeleteActivity:'この活動記録を削除しますか？',toastDeleteTask:'このタスクを削除しますか？',toastDeleteAccount:'この顧客を削除しますか？連絡先/活動/タスクもすべて削除されます。',
     crmAutoCreated:'👥 顧客を自動作成: ',contactsCountLabel:'連絡先',quotesCountLabel:'見積',lastActivityLabel:'最終活動: ',newAcctTitle:'新規顧客追加',editAcctDetail:'顧客詳細',
     crmNoAccts:'顧客データがありません。右上の「+ 新規顧客追加」から始めてください。',
+    scanCard:'📇 名刺スキャン',scanCardAdd:'📇 名刺から連絡先を追加',cardReading:'名刺を読み取り中…',cardReview:'名刺の読み取り結果',cardHint:'内容を確認し、必要なら修正してください。画像の向きが違う場合は回転ボタンを押してください。',cardAcct:'追加先の顧客',cardNewAcct:'＋ 新規顧客',cardFillEmpty:'既存顧客：空欄のみ補完し、既存データは上書きしません。',cardDup:'この顧客には同じメールの連絡先があります。その連絡先を更新します。',cardSave:'💾 CRM に保存',cardSaved:'CRM に保存しました',cardFail:'名刺を読み取れませんでした',cardUploadFail:'名刺画像のアップロードに失敗しました（保存されていません）',cardMax2:'一度に 2 枚まで（表と裏）',cardFront:'表',cardBack:'裏',cardRotate:'回転',secAcct:'顧客情報',secContact:'連絡先',acctCompanyAlt:'会社名（他言語）',acctAddress:'住所',acctShipAddress:'配送先住所',acctPhone:'会社電話',acctFax:'FAX',acctTaxId:'税番号',acctIncoterm:'Incoterm',acctCurrency:'通貨',acctPayTerms:'支払条件',ctNameAlt:'氏名（他言語）',ctDept:'部署',ctMobile:'携帯',ctFax:'FAX',ctIm:'メッセージアプリ（LINE／WeChat／WhatsApp…）',ctCard:'名刺',cardNoPerm:'名刺画像を見る権限がありません',cardOther:'名刺のその他の情報',
     crmNoContacts:'連絡先なし',crmNoActivities:'インタラクションなし',crmNoAcctQuotes:'見積もり記録なし',crmNoTasks:'タスクなし',
     crmNoTasksFilter:'条件に合うタスクなし',crmNoActivityLog:'インタラクション記録なし',
     crmNone:'（なし）',
@@ -2237,6 +2254,8 @@ function applyLang(){
   const _aac=document.getElementById('acct-add-contact-btn'); if(_aac) _aac.textContent=t('addContact');
   const _aaa=document.getElementById('acct-add-activity-btn'); if(_aaa) _aaa.textContent=t('addActivityBtn');
   const _aat=document.getElementById('acct-add-task-btn'); if(_aat) _aat.textContent=t('addTask');
+  // v3.71：新欄位一律用 data-qk 標記，這裡統一套（不必再逐個 id 加一行）
+  document.querySelectorAll('[data-qk]').forEach(el=>{ el.textContent=t(el.dataset.qk); });
   // Contact modal
   s('ct-modal-title','contactModal');
   s('ct-lbl-name','ctName'); s('ct-lbl-title','ctJobTitle'); s('ct-lbl-role','ctRole'); s('ct-lbl-phone','ctPhone');
@@ -6619,7 +6638,7 @@ function openAccountModal(id){
   const delBtn = document.getElementById('acct-del-btn');
 
   // Reset all fields
-  ['acct-company','acct-country','acct-industry','acct-source','acct-website','acct-owner','acct-notes'].forEach(k=>{
+  ['acct-company','acct-country','acct-industry','acct-source','acct-website','acct-owner','acct-notes',...CRM_ACCT_EXTRA.map(k=>'acct-'+k)].forEach(k=>{
     const el=document.getElementById(k); if(el) el.value='';
   });
   document.getElementById('acct-type').value='';
@@ -6640,6 +6659,7 @@ function openAccountModal(id){
       document.getElementById('acct-website').value = a.website||'';
       document.getElementById('acct-owner').value   = a.owner||'';
       document.getElementById('acct-notes').value   = a.notes||'';
+      CRM_ACCT_EXTRA.forEach(k=>{ const el=document.getElementById('acct-'+k); if(el) el.value=a[k]||''; });
       delBtn.style.display = (currentUser?.role==='admin') ? 'inline-flex' : 'none';
       showAcctTab('contacts');
     }
@@ -6672,6 +6692,7 @@ async function saveAccount(){
     notes:    document.getElementById('acct-notes').value.trim(),
     updatedAt: Date.now(),
   };
+  CRM_ACCT_EXTRA.forEach(k=>{ a[k]=(document.getElementById('acct-'+k)?.value||'').trim(); });
   try {
     if(_editAcctId){
       await SB.upsert('crm_accounts', {...a, id:_editAcctId});
@@ -6725,8 +6746,9 @@ function renderAcctContacts(){
       style="padding:10px 12px;border:1px solid var(--br);border-radius:8px;margin-bottom:6px;background:var(--s2);cursor:pointer;display:flex;align-items:center;gap:10px">
       <div style="flex:1;min-width:0">
         <div style="font-size:13px;font-weight:600;color:var(--tx)">${escHtml(c.name||'')}${c.title?` · <span style="color:var(--tx3);font-weight:normal">${escHtml(c.title)}</span>`:''}</div>
-        <div style="font-size:11px;color:var(--tx3);margin-top:2px">${c.email?escHtml(c.email):''}${c.phone?(' · '+escHtml(c.phone)):''}</div>
+        <div style="font-size:11px;color:var(--tx3);margin-top:2px">${c.email?escHtml(c.email):''}${c.phone?(' · '+escHtml(c.phone)):''}${c.mobile?(' · 📱 '+escHtml(c.mobile)):''}</div>
       </div>
+      ${c.cardFront?'<span title="Business card" style="font-size:16px">📇</span>':''}
     </div>`).join('');
 }
 
@@ -6785,10 +6807,343 @@ function renderAcctTasks(){
   }).join('');
 }
 
+// ═══════════════════════════════════════
+// 名片掃描 → CRM（v3.71，2026-10-08 Woody）
+//   拍照／選照片（正反面最多兩張）→ Claude 讀出全部資訊並判斷每張要順時針轉幾度 →
+//   在瀏覽器裡把圖轉正 → 確認畫面（可改、可再手動轉）→ 存進客戶與聯絡人，圖存私有 bucket crm-cards。
+//   🔴 圖在按下「存入 CRM」時才上傳：使用者可能在確認畫面又轉了一次，先傳的那份就是歪的。
+//   🔴 crm-cards 的讀寫由 sb-proxy 限「業務部 ＋ admin」（名片是個資）。
+// ═══════════════════════════════════════
+const CRM_ACCT_EXTRA = ['companyAlt','address','shipAddress','phone','fax','taxId','incoterm','currency','payTerms'];
+const CRM_CT_EXTRA   = ['nameAlt','dept','mobile','fax','im'];
+const CARD_BUCKET = 'crm-cards';
+const CARD_MAX_EDGE = 1600;
+let _card = null;            // { presetAcct, imgs:[{cur, side}], data:{} }
+
+function crmCardScan(acctId){
+  _card = { presetAcct: acctId || null, imgs: [], data: {} };
+  const f = document.getElementById('card-file'); if (f) f.click();
+}
+
+// 讀檔 → 依 EXIF 擺正（createImageBitmap 預設就會）→ 長邊縮到 1600 → JPEG
+async function crmCardLoad(file){
+  let src;
+  try { src = await createImageBitmap(file, { imageOrientation: 'from-image' }); }
+  catch (_) {
+    src = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = () => rej(new Error('image decode failed')); i.src = URL.createObjectURL(file); });
+  }
+  const w = src.width, h = src.height, k = Math.min(1, CARD_MAX_EDGE / Math.max(w, h));
+  const cv = document.createElement('canvas'); cv.width = Math.round(w * k); cv.height = Math.round(h * k);
+  cv.getContext('2d').drawImage(src, 0, 0, cv.width, cv.height);
+  return cv.toDataURL('image/jpeg', 0.88);
+}
+// 順時針旋轉 deg（90 的倍數）
+function crmCardRotate(dataUrl, deg){
+  deg = ((deg % 360) + 360) % 360;
+  if (!deg) return Promise.resolve(dataUrl);
+  return new Promise((res, rej) => {
+    const i = new Image();
+    i.onload = () => {
+      const cv = document.createElement('canvas'), sw = deg % 180 !== 0;
+      cv.width = sw ? i.height : i.width; cv.height = sw ? i.width : i.height;
+      const g = cv.getContext('2d');
+      g.translate(cv.width / 2, cv.height / 2); g.rotate(deg * Math.PI / 180);
+      g.drawImage(i, -i.width / 2, -i.height / 2);
+      res(cv.toDataURL('image/jpeg', 0.88));
+    };
+    i.onerror = rej; i.src = dataUrl;
+  });
+}
+
+const CARD_TAGS = ['company','company_alt','name','name_alt','title','dept','email','phone','mobile','fax','website',
+  'address','ship_address','country','tax_id','im','linkedin','other'];
+function crmCardPrompt(n){
+  return `You are reading ${n} photo(s) of ONE person's business card (front and/or back) for a CRM. The photos may be rotated or taken at an angle.
+
+First, for EACH image output one line:
+<img n="1" rotate="0" side="front"/>
+where rotate is 0, 90, 180 or 270 = degrees to rotate that photo CLOCKWISE so the main text reads upright, and side is front or back (the side with the person's name/contact details is front; if both have them, the one in the primary/Latin language is front).
+
+Then output every tag below (leave a tag empty if the card does not show it). Copy text exactly as printed — never translate, guess or invent.
+<company>company name; if printed in more than one language, the English/Latin-script version</company>
+<company_alt>the same company name in the other language (Chinese, Japanese, Vietnamese…), else empty</company_alt>
+<name>person's name; Latin-script version if both exist</name>
+<name_alt>the person's name in the other language, else empty</name_alt>
+<title>job title</title>
+<dept>department</dept>
+<email>email (several separated by " / ")</email>
+<phone>office / landline numbers incl. extension (several separated by " / ")</phone>
+<mobile>mobile number(s)</mobile>
+<fax>fax</fax>
+<website>website</website>
+<address>main address, complete, one line</address>
+<ship_address>only if the card explicitly labels a separate factory / warehouse / shipping address</ship_address>
+<country>country in English, from the address or phone country code</country>
+<tax_id>tax / VAT / company registration number, only if printed</tax_id>
+<im>messaging IDs, e.g. "LINE: abc / WeChat: xyz / WhatsApp: +84…"</im>
+<linkedin>LinkedIn URL or handle</linkedin>
+<other>anything else useful that has no tag above (other offices, extra numbers…), one per line; not slogans</other>`;
+}
+function crmCardParse(text, n){
+  const g = tag => { const m = text.match(new RegExp('<' + tag + '>([\\s\\S]*?)</' + tag + '>')); return m ? m[1].trim() : ''; };
+  const data = {}; CARD_TAGS.forEach(k => { data[k] = g(k); });
+  const imgs = [];
+  for (const m of text.matchAll(/<img\s+n="(\d+)"\s+rotate="(\d+)"\s+side="(\w+)"\s*\/?>/g)) {
+    const i = +m[1] - 1; if (i >= 0 && i < n) imgs[i] = { rot: (+m[2]) % 360, side: m[3] === 'back' ? 'back' : 'front' };
+  }
+  return { data, imgs };
+}
+
+async function crmCardPicked(input){
+  const files = [...(input.files || [])]; input.value = '';
+  if (!files.length || !_card) return;
+  if (files.length > 2) toast(t('cardMax2'));
+  const ov = document.getElementById('cardOverlay'), body = document.getElementById('card-body');
+  body.innerHTML = `<div style="padding:40px;text-align:center;color:var(--tx2)">⏳ ${t('cardReading')}</div>`;
+  document.getElementById('card-save-btn').disabled = true;
+  ov.style.display = 'flex';
+  try {
+    const srcs = [];
+    for (const f of files.slice(0, 2)) srcs.push(await crmCardLoad(f));
+    const content = srcs.map(u => ({ type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: u.split(',')[1] } }));
+    content.push({ type: 'text', text: crmCardPrompt(srcs.length) });
+    const resp = await fetch(CLAUDE_PROXY, { method: 'POST', headers: qtHdrs(), body: JSON.stringify({
+      model: 'claude-opus-5-5', max_tokens: 3000, output_config: { effort: 'low' },
+      messages: [{ role: 'user', content }] }) });
+    if (!resp.ok) { qtNoteAuth(resp.status); throw new Error('HTTP ' + resp.status); }
+    const j = await resp.json();
+    const text = (j.content || []).map(b => b.text || '').join('');
+    if (!text.trim()) throw new Error(j.stop_reason || 'empty');
+    const r = crmCardParse(text, srcs.length);
+    const imgs = [];
+    for (let i = 0; i < srcs.length; i++) {
+      const info = r.imgs[i] || { rot: 0, side: i ? 'back' : 'front' };
+      imgs.push({ cur: await crmCardRotate(srcs[i], info.rot), side: info.side });
+    }
+    imgs.sort((a, b) => (a.side === 'front' ? 0 : 1) - (b.side === 'front' ? 0 : 1));
+    if (imgs.length === 2 && imgs[0].side === imgs[1].side) imgs[1].side = 'back';
+    _card.imgs = imgs; _card.data = r.data;
+    crmCardRender();
+  } catch (e) {
+    console.error('[card]', e);
+    body.innerHTML = `<div style="padding:30px;text-align:center;color:#ef4444">${t('cardFail')}：${escHtml(e.message || String(e))}</div>`;
+  }
+}
+
+const CARD_GENERIC_DOMAINS = new Set(['gmail.com','yahoo.com','yahoo.com.tw','hotmail.com','outlook.com','live.com','msn.com','icloud.com','me.com',
+  'qq.com','163.com','126.com','sina.com','foxmail.com','naver.com','hanmail.net','aol.com','proton.me','protonmail.com']);
+function crmCardNorm(s){
+  return String(s || '').toLowerCase()
+    .replace(/股份有限公司|有限公司|有限責任公司|公司|株式会社|công ty|tnhh/g, '')
+    .replace(/\b(co|company|corp|corporation|inc|ltd|limited|llc|gmbh|plc|pte|jsc|sa|ag|bv)\b\.?/g, '')
+    .replace(/[^\p{L}\p{N}]/gu, '');
+}
+// 依 Email 網域 → 官網網域 → 公司名比對既有客戶（只在看得到的客戶裡找）
+function crmCardMatch(d){
+  const accts = CRM_ACCOUNTS.filter(a => canViewCRM(a));
+  const dom = ((d.email || '').split('/')[0].split('@')[1] || '').trim().toLowerCase();
+  if (dom && !CARD_GENERIC_DOMAINS.has(dom)) {
+    const byCt = CRM_CONTACTS.find(c => (c.email || '').toLowerCase().endsWith('@' + dom) && accts.some(a => a.id === c.accountId));
+    if (byCt) return byCt.accountId;
+    const byWeb = accts.find(a => (a.website || '').toLowerCase().includes(dom));
+    if (byWeb) return byWeb.id;
+  }
+  const keys = [crmCardNorm(d.company), crmCardNorm(d.company_alt)].filter(k => k.length >= 2);
+  const hit = accts.find(a => keys.some(k => k === crmCardNorm(a.company) || k === crmCardNorm(a.companyAlt)));
+  return hit ? hit.id : '';
+}
+
+function crmCardRender(){
+  const d = _card.data, body = document.getElementById('card-body');
+  const matched = _card.presetAcct || crmCardMatch(d);
+  const accts = CRM_ACCOUNTS.filter(a => canViewCRM(a)).sort((a, b) => (a.company || '').localeCompare(b.company || ''));
+  const inp = (id, label, v, full) =>
+    `<div class="field${full ? ' full' : ''}"><label>${label}</label><input id="${id}" value="${escHtml(v || '')}" autocomplete="off"></div>`;
+  body.innerHTML = `
+    <div style="font-size:12px;color:var(--tx2);margin-bottom:10px">${t('cardHint')}</div>
+    <div class="card-thumbs">${_card.imgs.map((im, i) => `
+      <div class="ct-img" style="cursor:default"><span class="ct-cap">${t(im.side === 'back' ? 'cardBack' : 'cardFront')}</span>
+        <img src="${im.cur}" alt="">
+        <div class="card-rot"><button onclick="crmCardRot(${i},-90)" title="${t('cardRotate')}">⟲</button><button onclick="crmCardRot(${i},90)" title="${t('cardRotate')}">⟳</button></div>
+      </div>`).join('')}</div>
+    <div class="card-sec">${t('secAcct')}</div>
+    <div class="field"><label>${t('cardAcct')}</label>
+      <select id="cd-acct" onchange="crmCardNotes()">
+        <option value="">${t('cardNewAcct')}</option>
+        ${accts.map(a => `<option value="${escHtml(a.id)}"${a.id === matched ? ' selected' : ''}>${escHtml(a.company || '—')}</option>`).join('')}
+      </select></div>
+    <div id="cd-acct-note"></div>
+    <div class="card-grid" style="margin-top:10px">
+      ${inp('cd-a-company', t('acctCompanyName'), d.company, true)}
+      ${inp('cd-a-companyAlt', t('acctCompanyAlt'), d.company_alt, true)}
+      ${inp('cd-a-country', t('acctCountry'), d.country)}
+      ${inp('cd-a-website', t('acctWebsite'), d.website)}
+      ${inp('cd-a-phone', t('acctPhone'), d.phone)}
+      ${inp('cd-a-fax', t('acctFax'), d.fax)}
+      ${inp('cd-a-address', t('acctAddress'), d.address, true)}
+      ${inp('cd-a-shipAddress', t('acctShipAddress'), d.ship_address, true)}
+      ${inp('cd-a-taxId', t('acctTaxId'), d.tax_id)}
+    </div>
+    <div class="card-sec">${t('secContact')}</div>
+    <div class="card-grid">
+      ${inp('cd-c-name', t('ctName'), d.name)}
+      ${inp('cd-c-nameAlt', t('ctNameAlt'), d.name_alt)}
+      ${inp('cd-c-title', t('ctJobTitle'), d.title)}
+      ${inp('cd-c-dept', t('ctDept'), d.dept)}
+      ${inp('cd-c-email', 'Email', d.email, true)}
+      ${inp('cd-c-phone', t('ctPhone'), d.phone)}
+      ${inp('cd-c-mobile', t('ctMobile'), d.mobile)}
+      ${inp('cd-c-fax', t('ctFax'), d.fax)}
+      ${inp('cd-c-im', t('ctIm'), d.im)}
+      ${inp('cd-c-linkedin', 'LinkedIn', d.linkedin, true)}
+      <div class="field full"><label>${t('cardOther')}</label><textarea id="cd-other" rows="2" style="resize:vertical">${escHtml(d.other || '')}</textarea></div>
+    </div>
+    <div id="cd-ct-note"></div>`;
+  document.getElementById('card-save-btn').disabled = false;
+  crmCardNotes();
+  ['cd-c-email'].forEach(id => document.getElementById(id)?.addEventListener('input', crmCardNotes));
+}
+async function crmCardRot(i, deg){
+  _card.imgs[i].cur = await crmCardRotate(_card.imgs[i].cur, deg);
+  // 只換圖，不重畫整個表單（使用者可能已經改了欄位）
+  const img = document.querySelectorAll('#card-body .ct-img img')[i]; if (img) img.src = _card.imgs[i].cur;
+}
+function crmCardDup(acctId, email){
+  const e = (email || '').split('/')[0].trim().toLowerCase();
+  if (!acctId || !e) return null;
+  return CRM_CONTACTS.find(c => c.accountId === acctId && (c.email || '').split('/')[0].trim().toLowerCase() === e) || null;
+}
+function crmCardNotes(){
+  const acctId = document.getElementById('cd-acct')?.value || '';
+  const an = document.getElementById('cd-acct-note'), cn = document.getElementById('cd-ct-note');
+  if (an) an.innerHTML = acctId ? `<div class="card-note">${t('cardFillEmpty')}</div>` : '';
+  if (cn) cn.innerHTML = crmCardDup(acctId, document.getElementById('cd-c-email')?.value) ? `<div class="card-note">${t('cardDup')}</div>` : '';
+}
+function crmCardClose(){
+  document.getElementById('cardOverlay').style.display = 'none';
+  _card = null;
+}
+
+async function crmCardUpload(path, dataUrl){
+  const blob = await (await fetch(dataUrl)).blob();
+  const up = await fetch(SB_WORKER + '/supabase/storage/v1/object/' + CARD_BUCKET + '/' + path,
+    { method: 'POST', headers: { 'x-session': qtSig(), 'Content-Type': 'image/jpeg', 'x-upsert': 'true' }, body: blob });
+  if (!up.ok) { qtNoteAuth(up.status); throw new Error('HTTP ' + up.status); }
+}
+
+async function crmCardSave(){
+  if (!_card) return;
+  const v = id => (document.getElementById(id)?.value || '').trim();
+  const acctSel = v('cd-acct');
+  const name = v('cd-c-name') || v('cd-c-nameAlt');
+  if (!name) { toast(t('errEnterName')); return; }
+  const card = {}; ['company','companyAlt','country','website','phone','fax','address','shipAddress','taxId'].forEach(k => { card[k] = v('cd-a-' + k); });
+  if (!acctSel && !card.company && !card.companyAlt) { toast(t('errEnterCompany')); return; }
+  const btn = document.getElementById('card-save-btn'); btn.disabled = true;
+  const acctId = acctSel || uid();
+  const dup = crmCardDup(acctSel, v('cd-c-email'));
+  const ctId = dup ? dup.id : uid();
+  const stamp = Date.now(), paths = [];
+  try {
+    // 1. 名片圖（失敗就整個不存：沒有圖的「名片掃描」紀錄只會讓人以為圖不見了）
+    try {
+      for (let i = 0; i < _card.imgs.length; i++) {
+        const path = `cards/${ctId}/${stamp}-${_card.imgs[i].side === 'back' ? 'b' : 'f'}.jpg`;
+        await crmCardUpload(path, _card.imgs[i].cur); paths.push({ path, side: _card.imgs[i].side });
+      }
+    } catch (e) { paths.forEach(p => _deleteStorageFile(p.path, CARD_BUCKET)); throw new Error(t('cardUploadFail') + '（' + e.message + '）'); }
+    const front = (paths.find(p => p.side === 'front') || paths[0] || {}).path || null;
+    const back = (paths.find(p => p.side === 'back' && p.path !== front) || {}).path || null;
+    // 2. 客戶：新的就建立；既有的只補空白欄位
+    if (!acctSel) {
+      const a = { id: acctId, company: card.company || card.companyAlt, companyAlt: card.company ? card.companyAlt : '',
+        country: card.country, website: card.website, phone: card.phone, fax: card.fax, address: card.address,
+        shipAddress: card.shipAddress, taxId: card.taxId, type: '', status: 'lead', factory: 'either', source: 'Business card',
+        owner: currentUser?.empId || '', notes: '', createdAt: Date.now(), createdBy: currentUser?.empId || null, updatedAt: Date.now() };
+      await SB.post('crm_accounts', a);
+      CRM_ACCOUNTS.push(a);
+    } else {
+      const a = CRM_ACCOUNTS.find(x => x.id === acctId) || {};
+      const patch = {};
+      Object.keys(card).forEach(k => { if (card[k] && !String(a[k] || '').trim()) patch[k] = card[k]; });
+      if (Object.keys(patch).length) {
+        patch.updatedAt = Date.now();
+        await SB.patch('crm_accounts', 'id=eq.' + encodeURIComponent(acctId), patch);
+        Object.assign(a, patch);
+      }
+    }
+    // 3. 聯絡人：同一家客戶有相同 Email 就更新那一位（名片是最新的，有值的欄位以名片為準）
+    const c = { accountId: acctId, name, nameAlt: v('cd-c-name') ? v('cd-c-nameAlt') : '', title: v('cd-c-title'), dept: v('cd-c-dept'),
+      email: v('cd-c-email'), phone: v('cd-c-phone'), mobile: v('cd-c-mobile'), fax: v('cd-c-fax'), im: v('cd-c-im'), linkedin: v('cd-c-linkedin'),
+      cardFront: front, cardBack: back,
+      cardData: { ..._card.data, other: v('cd-other'), scannedAt: Date.now(), scannedBy: currentUser?.empId || '' },
+      updatedAt: Date.now() };
+    if (dup) {
+      const upd = { cardFront: front, cardBack: back, cardData: c.cardData, updatedAt: c.updatedAt };
+      ['name','nameAlt','title','dept','email','phone','mobile','fax','im','linkedin'].forEach(k => { if (c[k]) upd[k] = c[k]; });
+      await SB.patch('crm_contacts', 'id=eq.' + encodeURIComponent(ctId), upd);
+      const old = [dup.cardFront, dup.cardBack].filter(p => p && p !== front && p !== back);
+      Object.assign(dup, upd);
+      old.forEach(p => _deleteStorageFile(p, CARD_BUCKET));   // 換新名片：舊圖刪掉（失敗也無妨，只是留著佔空間）
+    } else {
+      Object.assign(c, { id: ctId, role: '', createdAt: Date.now() });
+      await SB.post('crm_contacts', c);
+      CRM_CONTACTS.push(c);
+    }
+    toast(t('cardSaved'));
+    crmCardClose();
+    try { renderCRMAccounts(); } catch (_) {}
+    openAccountModal(acctId);
+  } catch (e) {
+    toast(t('toastSaveFailed') + ': ' + (e.message || e), 5000);
+    btn.disabled = false;
+  }
+}
+
+// 聯絡人視窗裡的名片圖：私有 bucket → 向 sb-proxy 換 1 小時的簽章網址
+const _cardUrlCache = {};
+async function crmCardUrl(path){
+  const hit = _cardUrlCache[path];
+  if (hit && hit.exp > Date.now()) return hit.url;
+  const res = await fetch(SB_WORKER + '/supabase/storage/v1/object/sign/' + CARD_BUCKET + '/' + path,
+    { method: 'POST', headers: qtHdrs(), body: JSON.stringify({ expiresIn: 3600 }) });
+  if (res.status === 403) throw Object.assign(new Error('forbidden'), { forbidden: true });
+  if (!res.ok) { qtNoteAuth(res.status); throw new Error('HTTP ' + res.status); }
+  const j = await res.json(), u = j.signedURL || j.signedUrl;
+  if (!u) throw new Error('no signed url');
+  const url = SB_ORIGIN + '/storage/v1' + u;
+  _cardUrlCache[path] = { url, exp: Date.now() + 50 * 60000 };
+  return url;
+}
+async function crmCardThumbs(c){
+  const wrap = document.getElementById('ct-card-wrap'), box = document.getElementById('ct-card-imgs');
+  if (!wrap || !box) return;
+  const list = c ? [[c.cardFront, 'cardFront'], [c.cardBack, 'cardBack']].filter(x => x[0]) : [];
+  const other = c?.cardData?.other || '';
+  wrap.style.display = (list.length || other) ? '' : 'none';
+  box.innerHTML = '';
+  for (const [path, cap] of list) {
+    const div = document.createElement('div'); div.className = 'ct-img';
+    div.innerHTML = `<span class="ct-cap">${t(cap)}</span><div style="padding:30px;text-align:center;color:var(--tx3)">⏳</div>`;
+    box.appendChild(div);
+    crmCardUrl(path).then(url => {
+      div.innerHTML = `<span class="ct-cap">${t(cap)}</span><img src="${url}" alt="">`;
+      div.onclick = () => window.open(url, '_blank');
+    }).catch(e => { div.innerHTML = `<div style="padding:16px;font-size:12px;color:var(--tx3)">${e.forbidden ? t('cardNoPerm') : '⚠️ ' + escHtml(e.message)}</div>`; });
+  }
+  if (other) {
+    const p = document.createElement('div');
+    p.style.cssText = 'flex-basis:100%;font-size:12px;color:var(--tx2);white-space:pre-wrap';
+    p.textContent = t('cardOther') + '：\n' + other;
+    box.appendChild(p);
+  }
+}
+
 // ── CONTACT MODAL ────────────────────────────
 function openContactModal(id){
   _editContactId = id || null;
-  ['ct-name','ct-title','ct-email','ct-phone','ct-linkedin'].forEach(k=>{ const e=document.getElementById(k); if(e)e.value=''; });
+  ['ct-name','ct-title','ct-email','ct-phone','ct-linkedin',...CRM_CT_EXTRA.map(k=>'ct-'+k)].forEach(k=>{ const e=document.getElementById(k); if(e)e.value=''; });
+  crmCardThumbs(id ? CRM_CONTACTS.find(x=>x.id===id) : null);
   document.getElementById('ct-role').value='';
   if(id){
     const c=CRM_CONTACTS.find(x=>x.id===id);
@@ -6799,6 +7154,7 @@ function openContactModal(id){
       document.getElementById('ct-email').value=c.email||'';
       document.getElementById('ct-phone').value=c.phone||'';
       document.getElementById('ct-linkedin').value=c.linkedin||'';
+      CRM_CT_EXTRA.forEach(k=>{ const el=document.getElementById('ct-'+k); if(el) el.value=c[k]||''; });
       document.getElementById('ct-del-btn').style.display='inline-flex';
     }
   } else {
@@ -6824,6 +7180,7 @@ async function saveContact(){
     linkedin: document.getElementById('ct-linkedin').value.trim(),
     updatedAt: Date.now(),
   };
+  CRM_CT_EXTRA.forEach(k=>{ c[k]=(document.getElementById('ct-'+k)?.value||'').trim(); });
   try {
     if(_editContactId){
       await SB.upsert('crm_contacts', {...c, id:_editContactId});
@@ -8540,8 +8897,9 @@ document.addEventListener('DOMContentLoaded', () => {
     <button class="moq-chip"    id="crmtab-pipeline" onclick="showCRMTab('pipeline')">📊 Pipeline</button>
     <button class="moq-chip"    id="crmtab-tasks"    onclick="showCRMTab('tasks')">✓ <span id="crm-lbl-tasks">任務</span></button>
     <button class="moq-chip"    id="crmtab-activities" onclick="showCRMTab('activities')">📋 <span id="crm-lbl-activities">互動</span></button>
+    <button onclick="crmCardScan(null)" style="margin-left:auto;padding:6px 12px;border-radius:8px;background:var(--s2);color:var(--tx);font-size:12px;font-weight:600;border:1px solid var(--br);cursor:pointer" data-qk="scanCard">📇 掃描名片</button>
     <button id="crm-add-acct-btn" onclick="openAccountModal()"
-      style="margin-left:auto;padding:6px 12px;border-radius:8px;background:#10a37f;color:#fff;font-size:12px;font-weight:600;border:none;cursor:pointer">+ 新增客戶</button>
+      style="padding:6px 12px;border-radius:8px;background:#10a37f;color:#fff;font-size:12px;font-weight:600;border:none;cursor:pointer">+ 新增客戶</button>
   </div>
 
   <!-- Accounts Tab -->
@@ -8618,6 +8976,8 @@ document.addEventListener('DOMContentLoaded', () => {
     <div style="padding:16px;display:grid;grid-template-columns:1fr 1fr;gap:10px">
       <div class="field" style="grid-column:span 2"><label id="acct-lbl-company">公司名稱 *</label>
         <input id="acct-company" autocomplete="off"></div>
+      <div class="field" style="grid-column:span 2"><label data-qk="acctCompanyAlt">公司名（其他語言）</label>
+        <input id="acct-companyAlt" autocomplete="off"></div>
       <div class="field"><label id="acct-lbl-country">國家/地區</label>
         <input id="acct-country" autocomplete="off" placeholder="e.g. USA, Germany"></div>
       <div class="field"><label id="acct-lbl-industry">產業別</label>
@@ -8651,6 +9011,14 @@ document.addEventListener('DOMContentLoaded', () => {
         <input id="acct-website" autocomplete="off" placeholder="https://..."></div>
       <div class="field"><label id="acct-lbl-owner">負責業務 (Owner)</label>
         <input id="acct-owner" autocomplete="off" placeholder="empId"></div>
+      <div class="field"><label data-qk="acctPhone">公司電話</label><input id="acct-phone" autocomplete="off"></div>
+      <div class="field"><label data-qk="acctFax">傳真</label><input id="acct-fax" autocomplete="off"></div>
+      <div class="field" style="grid-column:span 2"><label data-qk="acctAddress">地址</label><input id="acct-address" autocomplete="off"></div>
+      <div class="field" style="grid-column:span 2"><label data-qk="acctShipAddress">送貨地址</label><input id="acct-shipAddress" autocomplete="off"></div>
+      <div class="field"><label data-qk="acctTaxId">統編／稅號</label><input id="acct-taxId" autocomplete="off"></div>
+      <div class="field"><label data-qk="acctCurrency">幣別</label><input id="acct-currency" autocomplete="off" placeholder="USD"></div>
+      <div class="field"><label data-qk="acctIncoterm">Incoterm</label><input id="acct-incoterm" autocomplete="off" placeholder="FOB Taipei"></div>
+      <div class="field"><label data-qk="acctPayTerms">付款條件</label><input id="acct-payTerms" autocomplete="off" placeholder="T/T 30 days"></div>
       <div class="field" style="grid-column:span 2"><label id="acct-lbl-notes">備註 / 客戶需求</label>
         <textarea id="acct-notes" rows="3" style="resize:vertical"></textarea></div>
     </div>
@@ -8662,7 +9030,8 @@ document.addEventListener('DOMContentLoaded', () => {
     </div>
     <div style="padding:0 16px 16px;min-height:140px">
       <div id="acct-tab-contacts"><div id="acct-contacts-list"></div>
-        <button id="acct-add-contact-btn" onclick="openContactModal()" style="margin-top:8px;padding:7px 14px;border-radius:8px;background:var(--s2);color:var(--tx);border:1px solid var(--br);font-size:12px;cursor:pointer">+ 新增聯絡人</button></div>
+        <button id="acct-add-contact-btn" onclick="openContactModal()" style="margin-top:8px;padding:7px 14px;border-radius:8px;background:var(--s2);color:var(--tx);border:1px solid var(--br);font-size:12px;cursor:pointer">+ 新增聯絡人</button>
+        <button onclick="if(_editAcctId) crmCardScan(_editAcctId); else toast(t('errSaveFirst'))" style="margin-top:8px;margin-left:6px;padding:7px 14px;border-radius:8px;background:var(--s2);color:var(--tx);border:1px solid var(--br);font-size:12px;cursor:pointer" data-qk="scanCardAdd">📇 掃名片新增聯絡人</button></div>
       <div id="acct-tab-activities" style="display:none"><div id="acct-activities-list"></div>
         <button id="acct-add-activity-btn" onclick="openActivityModal()" style="margin-top:8px;padding:7px 14px;border-radius:8px;background:var(--s2);color:var(--tx);border:1px solid var(--br);font-size:12px;cursor:pointer">+ 新增互動紀錄</button></div>
       <div id="acct-tab-quotes" style="display:none"><div id="acct-quotes-list"></div></div>
@@ -8704,13 +9073,38 @@ document.addEventListener('DOMContentLoaded', () => {
         <input id="ct-email" type="email" autocomplete="off"></div>
       <div class="field"><label id="ct-lbl-phone">電話</label>
         <input id="ct-phone" autocomplete="off"></div>
+      <div class="field"><label data-qk="ctMobile">手機</label><input id="ct-mobile" autocomplete="off"></div>
+      <div class="field"><label data-qk="ctFax">傳真</label><input id="ct-fax" autocomplete="off"></div>
+      <div class="field"><label data-qk="ctNameAlt">姓名（其他語言）</label><input id="ct-nameAlt" autocomplete="off"></div>
+      <div class="field"><label data-qk="ctDept">部門</label><input id="ct-dept" autocomplete="off"></div>
+      <div class="field" style="grid-column:span 2"><label data-qk="ctIm">通訊軟體</label><input id="ct-im" autocomplete="off"></div>
       <div class="field" style="grid-column:span 2"><label>LinkedIn</label>
         <input id="ct-linkedin" autocomplete="off"></div>
+      <div class="field" id="ct-card-wrap" style="grid-column:span 2;display:none"><label data-qk="ctCard">名片</label>
+        <div id="ct-card-imgs" class="card-thumbs"></div></div>
     </div>
     <div style="padding:12px 14px;border-top:1px solid var(--br);display:flex;gap:8px">
       <button class="btn btn-primary" onclick="saveContact()" id="ct-save-btn">💾 儲存</button>
       <button class="btn btn-ghost" onclick="closeContactModal()" id="ct-cancel-btn">取消</button>
       <button class="btn btn-danger btn-sm" id="ct-del-btn" onclick="deleteContact()" style="margin-left:auto;display:none">🗑 刪除</button>
+    </div>
+  </div>
+</div>
+
+<!-- 名片掃描確認畫面（v3.71） -->
+<input type="file" id="card-file" accept="image/*" multiple style="display:none" onchange="crmCardPicked(this)">
+<div class="overlay" id="cardOverlay" style="display:none">
+  <div class="modal" style="width:100%;max-width:760px">
+    <div class="modal-hdr">
+      <div style="font-size:15px;font-weight:700" data-qk="cardReview">名片辨識結果</div>
+      <button class="icon-btn" onclick="crmCardClose()" style="margin-left:auto">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div id="card-body" style="padding:14px"></div>
+    <div style="padding:12px 14px;border-top:1px solid var(--br);display:flex;gap:8px">
+      <button class="btn btn-primary" id="card-save-btn" onclick="crmCardSave()" data-qk="cardSave">💾 存入 CRM</button>
+      <button class="btn btn-ghost" onclick="crmCardClose()" id="card-cancel-btn" data-qk="cancel">Cancel</button>
     </div>
   </div>
 </div>

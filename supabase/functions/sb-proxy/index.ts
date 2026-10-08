@@ -293,6 +293,14 @@ serve(async (req) => {
     if (segs.includes("kms-files")) {
       return json({ error: "forbidden", hint: "kms-files is served by kms-secure-docs" }, 403)
     }
+    /* 🔴 CRM 名片圖（quotation v3.71）：名片是個資，只給業務部 ＋ admin（與報價系統的部門限制同一條規則，
+       但報價系統那一道只是前端守衛）。部門與角色重新查資料庫，停用／離職者一律拒絕。 */
+    if (segs.includes("crm-cards")) {
+      const live = await liveUserOf(SUPABASE_URL, SERVICE_KEY, sessEmpId)
+      if (!(live.role === "admin" || live.dept === "sales")) {
+        return json({ error: "forbidden", hint: "sales_or_admin_only" }, 403)
+      }
+    }
     if (segs.some((x) => RESTRICTED_BUCKETS.has(x))) {
       // 停用／離職者一律不給，即使 role 還是 admin（判斷在 liveRoleOf 裡）
       const liveRole = await liveRoleOf(SUPABASE_URL, SERVICE_KEY, sessEmpId)

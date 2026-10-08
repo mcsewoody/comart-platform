@@ -139,7 +139,7 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 | `index.html` | v2.23 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
 | `admin/index.html` | v2.60 | Admin System — **機場接送**、公務車、圖書館、會議室、客戶到訪、抽籤 | 8,221 |
 | `kms/index.html` | v2.56 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
-| `quotation/index.html` | v3.70 | Quotation & CRM system | 7,332 |
+| `quotation/index.html` | v3.71 | Quotation & CRM system | 7,332 |
 | `board/index.html` | v1.96 | 公告與會議 Bulletin & Meetings — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍、腦力激盪 | 4,600 |
 | `product_dev/` | v2.25 | **產品開發管理 —— 第六個子系統，不遵守單一檔案原則**（見下方專節） | — |
 
@@ -742,6 +742,21 @@ python3 scripts/i18n-audit.py         # Portal，key 沒引號：btn_save:'儲�
   🔴 品名是 ERP 原文，原檔直接進 innerHTML；這裡一律 `escHtml`。
 - ⚠️ 與報價系統產品的連結**刻意沒做**：337 個產品只有 2 個的 `series` 是越南料號（不同料號體系）。
 - 「結論摘要」第 5 點的建議數字（5k 守 20%、1k 24%…）是原作者依 2026-01～09 資料寫的**固定文字**，換資料後要重看。
+
+## 📇 CRM 名片掃描 ＋ 客戶基本資料（quotation v3.71，2026-10-08，migration 202610080004）
+
+Woody：「拍名片照片，就可以把名片上所有資訊都存入，包含名片圖檔本身，要轉正」「報價單還是保持簡單」。
+- **客戶新欄位**（`CRM_ACCT_EXTRA`）：companyAlt／address／shipAddress／phone／fax／taxId／incoterm／currency／payTerms。
+  **聯絡人新欄位**（`CRM_CT_EXTRA`）：nameAlt／dept／mobile／fax／im，另有 `cardFront`／`cardBack`（storage 路徑）與 `cardData`（AI 讀出的完整結果）。
+  🔴 **報價單刻意沒加欄位，「從 CRM 帶入」也維持原本四項**（公司、聯絡人、Email、電話）。
+- **流程**（`crmCard*`）：CRM 頁頂「📇 掃描名片」或客戶視窗的「📇 掃名片新增聯絡人」→ 最多兩張（正反面）→
+  `crmCardLoad`（依 EXIF 擺正、長邊 1600）→ `claude-opus-5-5`（effort low）用 XML 標籤回傳欄位 ＋ 每張 `rotate`（順時針度數）與 `side` →
+  瀏覽器 canvas 轉正 → 確認畫面（可改、⟲⟳ 手動再轉、選加到哪個客戶）→ 存檔。
+  - 🔴 **圖在按「存入 CRM」時才上傳**（確認畫面可能又轉過）；上傳失敗整筆不存。
+  - 既有客戶比對：Email 網域（排除 gmail 等）→ 官網網域 → 去掉公司後綴的名稱（`crmCardMatch`）。**既有客戶只補空白欄位**；
+    同一客戶有相同 Email 的聯絡人就**更新那一位**（名片有值的欄位以名片為準），舊名片圖刪掉。
+- 🔴 **名片圖在私有 bucket `crm-cards`，sb-proxy 限「業務部 ＋ admin」**（名片是個資；CRM 表本身仍只有前端守衛）。顯示換 1 小時簽章網址（`crmCardUrl`）。
+- 驗證：AI 那一段本機呼叫不到（claude-proxy 只收登入簽章），用假回應在 headless Chrome 跑過整條流程（直拍→轉成橫的、比對到既有客戶、只補空白、同 Email 更新）。**真名片的辨識準確度要實機試。**
 
 ## 報價系統：產品的 KP／RP 標記（v3.70，2026-10-08，migration 202610080003）
 

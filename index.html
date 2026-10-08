@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>COMART Platform v2.20</title>
+<title>COMART Platform v2.21</title>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=Noto+Serif:wght@400;700&family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script defer src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.js"></script>
 <style>
@@ -299,6 +299,30 @@ html,body{background:var(--bg);color:var(--tx);font-family:var(--ff);min-height:
 .lc-empty { font-size:12.5px; color:var(--tx3); padding:14px 2px; }
 .lc-del { flex:0 0 auto; padding:4px 8px; border-radius:7px; border:1px solid var(--br); background:var(--s2); color:var(--tx3); font-size:12px; cursor:pointer; font-family:var(--ff); }
 .lc-del:hover { border-color:#e05260; color:#e05260; }
+.aw-panel { flex:1; overflow-y:auto; padding:16px; min-height:0; }
+.aw-pwrap { max-width:820px; margin:0 auto; }
+.aw-card { background:var(--s1); border:1px solid var(--br); border-radius:12px; padding:14px 16px; margin-bottom:12px; }
+.aw-card h3 { font-size:15px; margin:0 0 6px; color:var(--tx); }
+.aw-card .muted { font-size:12px; color:var(--tx3); line-height:1.6; }
+.aw-exam-card { margin-top:14px; border:1px solid rgba(167,139,250,.5); background:rgba(124,58,237,.08); }
+.aw-row { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
+.aw-pbtn { padding:8px 14px; border-radius:9px; border:1px solid var(--br2); background:var(--s2); color:var(--tx); font-size:13px; font-weight:600; cursor:pointer; font-family:var(--ff); }
+.aw-pbtn.primary { background:#7c3aed; border-color:#7c3aed; color:#fff; }
+.aw-pbtn:disabled { opacity:.5; cursor:default; }
+.aw-q { margin-bottom:14px; }
+.aw-q .qh { font-size:11.5px; color:#c4b5fd; font-weight:700; margin-bottom:4px; }
+.aw-q .qt { font-size:14px; color:var(--tx); line-height:1.7; margin-bottom:8px; }
+.aw-q textarea { width:100%; min-height:90px; padding:9px 11px; border-radius:9px; border:1px solid var(--br); background:var(--bg); color:var(--tx); font-size:13.5px; font-family:var(--ff); line-height:1.6; box-sizing:border-box; resize:vertical; }
+.aw-score { font-size:34px; font-weight:800; }
+.aw-pass { color:var(--grn); } .aw-fail { color:var(--red); }
+.aw-res { border-left:3px solid var(--br2); padding:6px 0 6px 12px; margin:10px 0; }
+.aw-res .sc { font-weight:800; margin-right:6px; }
+.aw-res .cm { font-size:13px; color:var(--tx2); line-height:1.65; margin-top:4px; white-space:pre-wrap; }
+.aw-res .an { font-size:12.5px; color:var(--tx3); margin-top:4px; white-space:pre-wrap; }
+.aw-tbl { width:100%; border-collapse:collapse; font-size:12.5px; }
+.aw-tbl th, .aw-tbl td { padding:7px 8px; border-bottom:1px solid var(--br); text-align:left; vertical-align:top; }
+.aw-tbl th { color:var(--tx3); font-weight:600; }
+.aw-down { color:var(--red); font-weight:700; } .aw-up { color:var(--grn); }
 .aw-modes { display:flex; gap:6px; padding:8px 14px; border-bottom:1px solid var(--br); overflow-x:auto; flex-shrink:0; }
 .aw-mode { flex:0 0 auto; padding:6px 13px; border-radius:16px; border:1px solid var(--br); background:var(--s1); color:var(--tx2); font-size:12.5px; font-weight:600; cursor:pointer; font-family:var(--ff); white-space:nowrap; }
 .aw-mode:hover { border-color:#7c3aed; color:#c4b5fd; }
@@ -435,7 +459,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     <div class="login-logo">
       <div class="login-mark" style="background:transparent"><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="44" height="23"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></div>
       <div class="login-name">COMART Platform</div>
-      <div class="login-sub">Internal Portal · v2.20</div>
+      <div class="login-sub">Internal Portal · v2.21</div>
     </div>
     <form id="loginForm" onsubmit="doLogin();return false;" autocomplete="on">
     <div class="field">
@@ -505,7 +529,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   <div class="topbar">
     <div class="topbar-logo" onclick="switchView('home')">
       <div class="topbar-mark" style="background:transparent"><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="26" height="14"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></div>
-      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v2.20</span></div>
+      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v2.21</span></div>
     </div>
     <div class="topbar-right">
       <div class="lang-switcher">
@@ -704,6 +728,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
               <div id="aw-sub" style="font-size:11px;color:var(--tx3);margin-top:1px;"></div>
             </div>
             <button class="lc-btn" id="aw-sync-btn" onclick="awSync()" style="display:none;"></button>
+            <button class="lc-btn" id="aw-eval-btn" onclick="awEvalShow()" style="display:none;"></button>
             <button class="lc-btn" id="aw-pdf-btn" onclick="awExportPDF()">📄 PDF</button>
             <button class="lc-btn" id="aw-new-btn" onclick="awReset()"></button>
           </div>
@@ -714,6 +739,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
             <button class="aw-mode" data-mode="onboard" onclick="awSetMode('onboard')"></button>
           </div>
           <div id="aw-stream" class="lc-stream"></div>
+          <div id="aw-panel" class="aw-panel" style="display:none;"></div>
           <div id="aw-composer" class="lc-composer">
             <textarea id="aw-input" rows="3" onkeydown="awKeydown(event)"
               oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,LC_INPUT_MAX)+'px';"></textarea>
@@ -3219,6 +3245,50 @@ const I18N = {
     aw_send:'Send',
     aw_ph:'Ask in your own language…',
     aw_intro:'Hi, I\'m AI Woody, an AI version of Woody built from his writings.\nAsk me about accountability, teamwork, learning, AI, customers, or where the company is heading. I can\'t make decisions or promises on Woody\'s behalf.\nThis chat isn\'t saved; export it as a PDF if you need a copy.',
+    aw_ex_title:'Onboarding exam',
+    aw_ex_desc:'10 scenario questions answered in your own words, graded by AI against the standards Woody set. 85 points to pass; you can retake it (new questions each time). Results are saved and visible to you, Woody and system admins.',
+    aw_ex_not_ready:'Question bank under review — coming soon',
+    aw_ex_start:'Start the exam',
+    aw_ex_mine:'My results',
+    aw_ex_all:'All results',
+    aw_ex_confirm:'Start the onboarding exam? 10 questions, no time limit — but your answers are lost if you leave this page.',
+    aw_ex_loading:'Loading…',
+    aw_ex_fail:'Something went wrong',
+    aw_ex_rules:'{n} questions, 10 points each; 85 to pass. Answer in your own words — what matters is the idea and what you would do, not reciting quotes.',
+    aw_ex_cancel:'Cancel',
+    aw_ex_submit:'Submit answers',
+    aw_ex_blank:'{n} question(s) are unanswered and will score 0. Submit anyway?',
+    aw_ex_submit_confirm:'Submit now? You can\'t change your answers afterwards.',
+    aw_ex_grading:'Grading…',
+    aw_ex_grading_d:'AI is grading each answer — about 30–60 seconds. Please keep this page open.',
+    aw_ex_your:'Your answer',
+    aw_ex_passed:'Passed — congratulations!',
+    aw_ex_failed:'Below {p} points. Read the feedback on each question and retake when you\'re ready.',
+    aw_ex_back:'Back',
+    aw_ex_retry:'Retake (new questions)',
+    aw_ex_none:'No exam records yet',
+    aw_ex_passed_s:'Passed',
+    aw_ex_failed_s:'Not passed',
+    aw_ex_all_sum:'{n} people took the exam, {p} passed',
+    aw_ex_c_name:'Name',
+    aw_ex_c_dept:'Department',
+    aw_ex_c_best:'Best',
+    aw_ex_c_status:'Status',
+    aw_ex_c_n:'Attempts',
+    aw_ex_c_last:'Latest',
+    aw_ex_leave:'Your answers haven\'t been submitted and will be lost. Leave anyway?',
+    aw_ev_btn:'🧪 Consistency check',
+    aw_ev_running:'🧪 Checking {n}/{t}',
+    aw_ev_done:'Consistency check done: {s} / {m}',
+    aw_ev_prev:'last time {s}',
+    aw_ev_fails:'({n} failed)',
+    aw_ev_fail:'Consistency check failed',
+    aw_ev_busy:'The consistency check is still running',
+    aw_ev_title:'Consistency check',
+    aw_ev_desc:'A fixed set of questions checks whether AI Woody still matches your positions and boundaries. Runs automatically after every "🔄 Update"; expand any question whose score dropped.',
+    aw_ev_none:'No checks yet',
+    aw_ev_meta:'{d}　reports {v}　{n} documents',
+    aw_ev_run:'Run again now',
     aw_mode_chat:'💬 Chat',
     aw_mode_proposal:'📝 Proposal check',
     aw_mode_rehearsal:'🎤 Rehearsal',
@@ -3402,6 +3472,50 @@ const I18N = {
     aw_send:'送出',
     aw_ph:'用你自己的語言提問…',
     aw_intro:'你好，我是 AI Woody，根據 Woody 的著述打造的 AI 分身。\n可以問我當責、團隊、學習、AI、客戶，或是公司的方向。我不能代 Woody 做決定或承諾。\n這段對話不會存檔，需要的話可以匯出 PDF。',
+    aw_ex_title:'入職考試',
+    aw_ex_desc:'10 題情境簡答，用自己的話回答，AI 依 Woody 訂的標準評分，85 分以上通過。沒過可以重考（會重新抽題）。成績會存檔，你、Woody 與系統管理者看得到。',
+    aw_ex_not_ready:'題庫審核中，即將開放',
+    aw_ex_start:'開始考試',
+    aw_ex_mine:'我的成績',
+    aw_ex_all:'全公司成績',
+    aw_ex_confirm:'確定開始入職考試？共 10 題，作答時間不限，但中途離開這一頁作答內容會消失。',
+    aw_ex_loading:'載入中…',
+    aw_ex_fail:'發生錯誤',
+    aw_ex_rules:'共 {n} 題，每題 10 分，85 分以上通過。用自己的話回答，重點是觀念與做法，不是背原句。',
+    aw_ex_cancel:'取消',
+    aw_ex_submit:'送出作答',
+    aw_ex_blank:'還有 {n} 題沒有作答，未作答以 0 分計。確定要送出嗎？',
+    aw_ex_submit_confirm:'確定送出？送出後就不能修改。',
+    aw_ex_grading:'評分中…',
+    aw_ex_grading_d:'AI 正在逐題評分，大約需要 30～60 秒，請不要關閉這一頁。',
+    aw_ex_your:'你的回答',
+    aw_ex_passed:'恭喜通過！',
+    aw_ex_failed:'未達 {p} 分，請看下面每題的評語，準備好再重考。',
+    aw_ex_back:'返回',
+    aw_ex_retry:'重考（重新抽題）',
+    aw_ex_none:'還沒有考試紀錄',
+    aw_ex_passed_s:'通過',
+    aw_ex_failed_s:'未通過',
+    aw_ex_all_sum:'共 {n} 人應試，{p} 人通過',
+    aw_ex_c_name:'姓名',
+    aw_ex_c_dept:'部門',
+    aw_ex_c_best:'最高分',
+    aw_ex_c_status:'狀態',
+    aw_ex_c_n:'次數',
+    aw_ex_c_last:'最近',
+    aw_ex_leave:'作答內容還沒送出，離開會消失。確定離開？',
+    aw_ev_btn:'🧪 一致性檢查',
+    aw_ev_running:'🧪 檢查中 {n}/{t}',
+    aw_ev_done:'一致性檢查完成：{s} / {m}',
+    aw_ev_prev:'上次 {s}',
+    aw_ev_fails:'（{n} 題失敗）',
+    aw_ev_fail:'一致性檢查失敗',
+    aw_ev_busy:'一致性檢查還在跑',
+    aw_ev_title:'一致性檢查',
+    aw_ev_desc:'用固定題組檢查 AI Woody 的回答是否仍符合你的立場與界線。每次「🔄 更新」後自動跑；分數下降的題目請展開看原文。',
+    aw_ev_none:'還沒有檢查紀錄',
+    aw_ev_meta:'{d}　週報 {v}　文件 {n} 份',
+    aw_ev_run:'立即重跑',
     aw_mode_chat:'💬 對話',
     aw_mode_proposal:'📝 提案健檢',
     aw_mode_rehearsal:'🎤 簡報彩排',
@@ -3578,6 +3692,50 @@ const I18N = {
     aw_send:'发送',
     aw_ph:'用你自己的语言提问…',
     aw_intro:'你好，我是 AI Woody，根据 Woody 的著述打造的 AI 分身。\n可以问我当责、团队、学习、AI、客户，或是公司的方向。我不能代 Woody 做决定或承诺。\n这段对话不会存档，需要的话可以导出 PDF。',
+    aw_ex_title:'入职考试',
+    aw_ex_desc:'10 题情境简答，用自己的话回答，AI 依 Woody 订的标准评分，85 分以上通过。没过可以重考（会重新抽题）。成绩会存档，你、Woody 与系统管理者看得到。',
+    aw_ex_not_ready:'题库审核中，即将开放',
+    aw_ex_start:'开始考试',
+    aw_ex_mine:'我的成绩',
+    aw_ex_all:'全公司成绩',
+    aw_ex_confirm:'确定开始入职考试？共 10 题，作答时间不限，但中途离开这一页作答内容会消失。',
+    aw_ex_loading:'载入中…',
+    aw_ex_fail:'发生错误',
+    aw_ex_rules:'共 {n} 题，每题 10 分，85 分以上通过。用自己的话回答，重点是观念与做法，不是背原句。',
+    aw_ex_cancel:'取消',
+    aw_ex_submit:'提交作答',
+    aw_ex_blank:'还有 {n} 题没有作答，未作答以 0 分计。确定要提交吗？',
+    aw_ex_submit_confirm:'确定提交？提交后就不能修改。',
+    aw_ex_grading:'评分中…',
+    aw_ex_grading_d:'AI 正在逐题评分，大约需要 30～60 秒，请不要关闭这一页。',
+    aw_ex_your:'你的回答',
+    aw_ex_passed:'恭喜通过！',
+    aw_ex_failed:'未达 {p} 分，请看下面每题的评语，准备好再重考。',
+    aw_ex_back:'返回',
+    aw_ex_retry:'重考（重新抽题）',
+    aw_ex_none:'还没有考试记录',
+    aw_ex_passed_s:'通过',
+    aw_ex_failed_s:'未通过',
+    aw_ex_all_sum:'共 {n} 人应试，{p} 人通过',
+    aw_ex_c_name:'姓名',
+    aw_ex_c_dept:'部门',
+    aw_ex_c_best:'最高分',
+    aw_ex_c_status:'状态',
+    aw_ex_c_n:'次数',
+    aw_ex_c_last:'最近',
+    aw_ex_leave:'作答内容还没提交，离开会消失。确定离开？',
+    aw_ev_btn:'🧪 一致性检查',
+    aw_ev_running:'🧪 检查中 {n}/{t}',
+    aw_ev_done:'一致性检查完成：{s} / {m}',
+    aw_ev_prev:'上次 {s}',
+    aw_ev_fails:'（{n} 题失败）',
+    aw_ev_fail:'一致性检查失败',
+    aw_ev_busy:'一致性检查还在跑',
+    aw_ev_title:'一致性检查',
+    aw_ev_desc:'用固定题组检查 AI Woody 的回答是否仍符合你的立场与界线。每次“🔄 更新”后自动跑；分数下降的题目请展开看原文。',
+    aw_ev_none:'还没有检查记录',
+    aw_ev_meta:'{d}　周报 {v}　文件 {n} 份',
+    aw_ev_run:'立即重跑',
     aw_mode_chat:'💬 对话',
     aw_mode_proposal:'📝 提案健检',
     aw_mode_rehearsal:'🎤 简报彩排',
@@ -3754,6 +3912,50 @@ const I18N = {
     aw_send:'Gửi',
     aw_ph:'Hỏi bằng ngôn ngữ của bạn…',
     aw_intro:'Xin chào, tôi là AI Woody, phiên bản AI của Woody, được xây dựng từ các bài viết của anh ấy.\nBạn có thể hỏi tôi về tinh thần trách nhiệm, làm việc nhóm, học tập, AI, khách hàng hoặc định hướng của công ty. Tôi không thể thay Woody đưa ra quyết định hay cam kết.\nCuộc trò chuyện này không được lưu; nếu cần, bạn có thể xuất ra PDF.',
+    aw_ex_title:'Bài kiểm tra hội nhập',
+    aw_ex_desc:'10 câu hỏi tình huống, trả lời bằng lời của bạn, AI chấm theo tiêu chuẩn Woody đặt ra, đạt từ 85 điểm. Chưa đạt có thể thi lại (câu hỏi mới mỗi lần). Kết quả được lưu, bạn, Woody và quản trị hệ thống xem được.',
+    aw_ex_not_ready:'Ngân hàng câu hỏi đang được duyệt — sắp mở',
+    aw_ex_start:'Bắt đầu thi',
+    aw_ex_mine:'Kết quả của tôi',
+    aw_ex_all:'Kết quả toàn công ty',
+    aw_ex_confirm:'Bắt đầu bài kiểm tra hội nhập? Gồm 10 câu, không giới hạn thời gian — nhưng rời trang này giữa chừng sẽ mất câu trả lời.',
+    aw_ex_loading:'Đang tải…',
+    aw_ex_fail:'Đã xảy ra lỗi',
+    aw_ex_rules:'Gồm {n} câu, mỗi câu 10 điểm, đạt từ 85 điểm. Hãy trả lời bằng lời của bạn — quan trọng là cách nghĩ và cách làm, không phải học thuộc.',
+    aw_ex_cancel:'Hủy',
+    aw_ex_submit:'Nộp bài',
+    aw_ex_blank:'Còn {n} câu chưa trả lời, sẽ được tính 0 điểm. Vẫn nộp bài?',
+    aw_ex_submit_confirm:'Nộp bài? Sau khi nộp không thể sửa.',
+    aw_ex_grading:'Đang chấm…',
+    aw_ex_grading_d:'AI đang chấm từng câu, khoảng 30–60 giây. Vui lòng không đóng trang này.',
+    aw_ex_your:'Câu trả lời của bạn',
+    aw_ex_passed:'Chúc mừng, bạn đã đạt!',
+    aw_ex_failed:'Chưa đạt {p} điểm. Hãy xem nhận xét từng câu và thi lại khi sẵn sàng.',
+    aw_ex_back:'Quay lại',
+    aw_ex_retry:'Thi lại (câu hỏi mới)',
+    aw_ex_none:'Chưa có kết quả thi',
+    aw_ex_passed_s:'Đạt',
+    aw_ex_failed_s:'Chưa đạt',
+    aw_ex_all_sum:'{n} người đã thi, {p} người đạt',
+    aw_ex_c_name:'Họ tên',
+    aw_ex_c_dept:'Bộ phận',
+    aw_ex_c_best:'Cao nhất',
+    aw_ex_c_status:'Trạng thái',
+    aw_ex_c_n:'Số lần',
+    aw_ex_c_last:'Gần nhất',
+    aw_ex_leave:'Câu trả lời chưa được nộp và sẽ mất. Vẫn rời trang?',
+    aw_ev_btn:'🧪 Kiểm tra nhất quán',
+    aw_ev_running:'🧪 Đang kiểm tra {n}/{t}',
+    aw_ev_done:'Kiểm tra nhất quán xong: {s} / {m}',
+    aw_ev_prev:'lần trước {s}',
+    aw_ev_fails:'({n} câu lỗi)',
+    aw_ev_fail:'Kiểm tra nhất quán thất bại',
+    aw_ev_busy:'Kiểm tra nhất quán vẫn đang chạy',
+    aw_ev_title:'Kiểm tra nhất quán',
+    aw_ev_desc:'Bộ câu hỏi cố định kiểm tra xem AI Woody còn đúng với quan điểm và giới hạn của bạn không. Tự chạy sau mỗi lần "🔄 Cập nhật"; mở các câu bị giảm điểm để xem nội dung.',
+    aw_ev_none:'Chưa có lần kiểm tra nào',
+    aw_ev_meta:'{d}　báo cáo {v}　{n} tài liệu',
+    aw_ev_run:'Chạy lại ngay',
     aw_mode_chat:'💬 Trò chuyện',
     aw_mode_proposal:'📝 Kiểm tra đề xuất',
     aw_mode_rehearsal:'🎤 Tập thuyết trình',
@@ -3928,6 +4130,50 @@ const I18N = {
     aw_send:'送信',
     aw_ph:'自分の言語で質問してください…',
     aw_intro:'こんにちは、AI Woodyです。Woodyの著述をもとにつくられたAI分身です。\n当事者意識、チームワーク、学び、AI、顧客、会社の方向性などについて質問してください。Woodyに代わって決定や約束をすることはできません。\nこの会話は保存されません。必要ならPDFで書き出せます。',
+    aw_ex_title:'入社テスト',
+    aw_ex_desc:'状況問題 10 問に自分の言葉で答え、Woody が定めた基準で AI が採点します。85 点以上で合格。不合格でも再受験できます（毎回新しい問題）。結果は保存され、本人・Woody・システム管理者が閲覧できます。',
+    aw_ex_not_ready:'問題集を審査中 — まもなく公開',
+    aw_ex_start:'テストを始める',
+    aw_ex_mine:'自分の結果',
+    aw_ex_all:'全社の結果',
+    aw_ex_confirm:'入社テストを始めますか？全 10 問、時間制限なし。ただし途中でこのページを離れると回答は消えます。',
+    aw_ex_loading:'読み込み中…',
+    aw_ex_fail:'エラーが発生しました',
+    aw_ex_rules:'全 {n} 問、各 10 点、85 点以上で合格。自分の言葉で答えてください。大事なのは考え方と行動で、暗記ではありません。',
+    aw_ex_cancel:'キャンセル',
+    aw_ex_submit:'回答を送信',
+    aw_ex_blank:'未回答が {n} 問あり、0 点になります。送信しますか？',
+    aw_ex_submit_confirm:'送信しますか？送信後は修正できません。',
+    aw_ex_grading:'採点中…',
+    aw_ex_grading_d:'AI が一問ずつ採点しています（約 30～60 秒）。このページを閉じないでください。',
+    aw_ex_your:'あなたの回答',
+    aw_ex_passed:'合格です！',
+    aw_ex_failed:'{p} 点に届きませんでした。各問のコメントを読んで、準備ができたら再受験してください。',
+    aw_ex_back:'戻る',
+    aw_ex_retry:'再受験（新しい問題）',
+    aw_ex_none:'受験記録はまだありません',
+    aw_ex_passed_s:'合格',
+    aw_ex_failed_s:'不合格',
+    aw_ex_all_sum:'受験者 {n} 人、合格 {p} 人',
+    aw_ex_c_name:'氏名',
+    aw_ex_c_dept:'部署',
+    aw_ex_c_best:'最高点',
+    aw_ex_c_status:'状態',
+    aw_ex_c_n:'回数',
+    aw_ex_c_last:'最新',
+    aw_ex_leave:'回答はまだ送信されていません。離れると消えます。よろしいですか？',
+    aw_ev_btn:'🧪 一貫性チェック',
+    aw_ev_running:'🧪 チェック中 {n}/{t}',
+    aw_ev_done:'一貫性チェック完了：{s} / {m}',
+    aw_ev_prev:'前回 {s}',
+    aw_ev_fails:'（{n} 問失敗）',
+    aw_ev_fail:'一貫性チェックに失敗しました',
+    aw_ev_busy:'一貫性チェックはまだ実行中です',
+    aw_ev_title:'一貫性チェック',
+    aw_ev_desc:'固定の質問セットで、AI Woody の回答があなたの立場と境界線に沿っているかを確認します。「🔄 更新」のたびに自動実行。点数が下がった質問は開いて原文を確認してください。',
+    aw_ev_none:'チェック記録はまだありません',
+    aw_ev_meta:'{d}　週報 {v}　文書 {n} 件',
+    aw_ev_run:'今すぐ再実行',
     aw_mode_chat:'💬 対話',
     aw_mode_proposal:'📝 提案チェック',
     aw_mode_rehearsal:'🎤 プレゼン練習',
@@ -4598,7 +4844,9 @@ function awSetMode(m) {
   if (AW_MODES.indexOf(m) < 0 || m === awMode) return;
   if (awBusy) { toast(t('aw_mode_busy')); return; }
   awConv[awMode] = awMsgs;
+  if (awPanelView) { awPanel('', ''); awExam = null; }
   awMode = m; awMsgs = awConv[m];
+  if (m === 'onboard') awExamCheck();
   document.querySelectorAll('#aw-modes .aw-mode').forEach(function (b) { b.classList.toggle('on', b.dataset.mode === m); });
   var el = document.getElementById('aw-input');
   if (el) el.setAttribute('placeholder', t(m === 'chat' ? 'aw_ph' : 'aw_ph_' + m));
@@ -4617,6 +4865,8 @@ function awApplyI18n() {
   set('aw-sync-btn', 'aw_sync');
   var sb = document.getElementById('aw-sync-btn');
   if (sb) sb.style.display = awIsOwner() ? '' : 'none';
+  var eb = document.getElementById('aw-eval-btn');
+  if (eb) { eb.style.display = awIsOwner() ? '' : 'none'; if (!awEvalBusy) eb.textContent = t('aw_ev_btn'); }
   set('aw-send-btn', 'aw_send');
   set('aw-input', awMode === 'chat' ? 'aw_ph' : 'aw_ph_' + awMode, 'placeholder');
   document.querySelectorAll('#aw-modes .aw-mode').forEach(function (b) { b.textContent = t('aw_mode_' + b.dataset.mode); });
@@ -4742,6 +4992,7 @@ function awKeydown(ev) {
 }
 
 function awReset() {
+  if (awPanelView) { awPanelClose(); return; }
   if (awBusy && awCtl) awCtl.abort();
   if (awMsgs.length && !confirm(t('aw_new_confirm'))) return;
   awMsgs = []; awConv[awMode] = awMsgs; awBusy = false; awPaintSend();
@@ -4824,7 +5075,7 @@ function awRender(scroll) {
       + awSugs().map(function (q, i) {
           return '<button class="aw-sug" onclick="awSend(awSugs()[' + i + '])">' + escHtml(q) + '</button>';
         }).join('')
-      + '</div></div>';
+      + '</div></div>' + (awMode === 'onboard' ? awExamCardHtml() : '');
     return;
   }
   box.innerHTML = awMsgs.map(awMsgHtml).join('');
@@ -4893,6 +5144,7 @@ async function awSync() {
     var msg = awT('aw_sync_done', { r: j.reports, d: j.latest, n: j.docs });
     console.info('[aw] sync ' + msg);
     toast(msg, 'ok', 8000);
+    setTimeout(awEvalRun, 1500);   // 每次更新後自動跑一致性檢查（Woody 2026-10-08 定案）
   } catch (e) {
     console.warn('[aw] sync failed ' + (e && e.message));
     toast(awT('aw_sync_failed', { e: (e && e.message) || '' }), 'err', 15000);
@@ -4900,6 +5152,219 @@ async function awSync() {
     awSyncing = false;
     if (btn) { btn.disabled = false; btn.textContent = t('aw_sync'); }
   }
+}
+
+
+// ═══ 入職考試（onboard 模式）與一致性檢查（只有 Woody）═══════════════════
+// 題庫與評分要點只在伺服器端（aw_exam_bank 不在 sb-proxy 白名單）：前端拿到的題目只有題號、類別、題目。
+// 成績會存檔 —— 這與「AI Woody 對話不存檔」是兩回事（Woody 2026-10-08 定案：本人＋Woody＋admin 看得到）。
+var awExam = null;          // { attemptId, questions, answers }
+var awExamReady = null;     // 題庫上線了沒有（examStatus），null＝還沒問
+var awPanelView = '';       // '' | 'exam' | 'grading' | 'result' | 'mine' | 'all' | 'eval'
+var awEvalBusy = false;
+
+function awCall(body) {
+  return fetch(SB_URL + '/functions/v1/ai-woody', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SB_ANON, 'apikey': SB_ANON,
+               'x-session': (SESSION && SESSION.sig) || (readSession() || {}).sig || '' },
+    body: JSON.stringify(body),
+  }).then(async function (res) {
+    var j = {};
+    try { j = await res.json(); } catch (e) {}
+    if (res.status === 401 && typeof sbNoteAuth === 'function') sbNoteAuth(401);
+    if (!res.ok) { var e = new Error(j.error || ('HTTP ' + res.status)); e.status = res.status; throw e; }
+    return j;
+  });
+}
+function awCanSeeAll() { return awIsOwner() || (SESSION && SESSION.role === 'admin'); }   // 前端只是不畫鈕；伺服器重查角色
+
+function awPanel(view, html) {
+  awPanelView = view;
+  var p = document.getElementById('aw-panel'), st = document.getElementById('aw-stream'), cp = document.getElementById('aw-composer'), md = document.getElementById('aw-modes');
+  var on = !!view;
+  if (p) { p.style.display = on ? '' : 'none'; if (on) { p.innerHTML = '<div class="aw-pwrap">' + html + '</div>'; p.scrollTop = 0; } }
+  if (st) st.style.display = on ? 'none' : '';
+  if (cp) cp.style.display = on ? 'none' : '';
+  if (md) md.style.display = on ? 'none' : '';
+}
+function awPanelClose() {
+  if (awPanelView === 'exam' && awExam && Object.values(awExam.answers).some(function (v) { return String(v || '').trim(); }) && !confirm(t('aw_ex_leave'))) return;
+  if (awPanelView === 'exam') awExam = null;
+  awPanel('', '');
+  awRender(true);
+}
+
+// onboard 模式歡迎畫面下方的考試卡片
+function awExamCardHtml() {
+  var h = '<div class="aw-card aw-exam-card"><h3>📝 ' + escHtml(t('aw_ex_title')) + '</h3><div class="muted">' + escHtml(t('aw_ex_desc')) + '</div><div class="aw-row">';
+  if (awExamReady === false) h += '<button class="aw-pbtn" disabled>' + escHtml(t('aw_ex_not_ready')) + '</button>';
+  else h += '<button class="aw-pbtn primary" onclick="awExamStart()"' + (awExamReady ? '' : ' disabled') + '>' + escHtml(t('aw_ex_start')) + '</button>';
+  h += '<button class="aw-pbtn" onclick="awExamMine()">' + escHtml(t('aw_ex_mine')) + '</button>';
+  if (awCanSeeAll()) h += '<button class="aw-pbtn" onclick="awExamAll()">' + escHtml(t('aw_ex_all')) + '</button>';
+  return h + '</div></div>';
+}
+async function awExamCheck() {
+  if (awExamReady !== null) return;
+  try { awExamReady = !!(await awCall({ action: 'examStatus' })).ready; } catch (e) { awExamReady = false; }
+  if (awMode === 'onboard' && !awMsgs.length && !awPanelView) awRender(false);
+}
+
+async function awExamStart() {
+  if (!confirm(t('aw_ex_confirm'))) return;
+  awPanel('grading', '<div class="aw-card"><div class="muted">' + escHtml(t('aw_ex_loading')) + '</div></div>');
+  try {
+    var j = await awCall({ action: 'examStart', lang: LANG });
+    awExam = { attemptId: j.attemptId, questions: j.questions, answers: {} };
+    awExamRenderTake();
+  } catch (e) {
+    awPanel('', ''); awRender(true);
+    toast(t(e.message === 'bank_not_ready' ? 'aw_ex_not_ready' : 'aw_ex_fail') + (e.message === 'bank_not_ready' ? '' : '（' + e.message + '）'), 'err', 8000);
+  }
+}
+function awExamRenderTake() {
+  var qs = awExam.questions;
+  var h = '<div class="aw-card"><h3>📝 ' + escHtml(t('aw_ex_title')) + '</h3><div class="muted">' + escHtml(awT('aw_ex_rules', { n: qs.length })) + '</div></div>';
+  qs.forEach(function (q, i) {
+    h += '<div class="aw-card aw-q"><div class="qh">' + (i + 1) + ' / ' + qs.length + '　〔' + escHtml(q.category) + '〕</div>'
+      + '<div class="qt">' + escHtml(q.question) + '</div>'
+      + '<textarea maxlength="2000" data-qid="' + escHtml(q.id) + '" oninput="awExam.answers[this.dataset.qid]=this.value"></textarea></div>';
+  });
+  h += '<div class="aw-row" style="justify-content:flex-end;margin-bottom:30px;"><button class="aw-pbtn" onclick="awPanelClose()">' + escHtml(t('aw_ex_cancel')) + '</button>'
+    + '<button class="aw-pbtn primary" onclick="awExamSubmit()">' + escHtml(t('aw_ex_submit')) + '</button></div>';
+  awPanel('exam', h);
+}
+async function awExamSubmit() {
+  var blank = awExam.questions.filter(function (q) { return !String(awExam.answers[q.id] || '').trim(); }).length;
+  if (blank && !confirm(awT('aw_ex_blank', { n: blank }))) return;
+  if (!blank && !confirm(t('aw_ex_submit_confirm'))) return;
+  var ex = awExam;
+  awPanel('grading', '<div class="aw-card"><h3>⏳ ' + escHtml(t('aw_ex_grading')) + '</h3><div class="muted">' + escHtml(t('aw_ex_grading_d')) + '</div></div>');
+  try {
+    var j = await awCall({ action: 'examSubmit', attemptId: ex.attemptId, answers: ex.answers, lang: LANG });
+    awExam = null;
+    awExamRenderResult(j.total, j.passed, j.pass, j.results, ex.answers);
+  } catch (e) {
+    toast(t('aw_ex_fail') + '（' + e.message + '）', 'err', 10000);
+    awExam = ex; awExamRenderTake();      // 失敗就回到作答畫面，作答內容還在
+    document.querySelectorAll('#aw-panel textarea[data-qid]').forEach(function (ta) { ta.value = ex.answers[ta.dataset.qid] || ''; });
+  }
+}
+function awExamResultsHtml(results, answers, qtext) {
+  return results.map(function (r, i) {
+    var q = r.question || (qtext && qtext[r.id]) || '';
+    var col = r.score >= 8 ? 'var(--grn)' : r.score >= 5 ? 'var(--amb)' : 'var(--red)';
+    return '<div class="aw-res" style="border-left-color:' + col + '"><div><span class="sc" style="color:' + col + '">' + r.score + '/10</span>'
+      + '<span style="font-size:13px;color:var(--tx)">' + (i + 1) + '. ' + escHtml(q) + '</span></div>'
+      + (answers && answers[r.id] ? '<div class="an">' + escHtml(t('aw_ex_your')) + '：' + escHtml(answers[r.id]) + '</div>' : '')
+      + '<div class="cm">' + escHtml(r.comment || '') + '</div></div>';
+  }).join('');
+}
+function awExamRenderResult(total, passed, pass, results, answers) {
+  var h = '<div class="aw-card"><div class="muted">' + escHtml(t('aw_ex_title')) + '</div>'
+    + '<div class="aw-score ' + (passed ? 'aw-pass' : 'aw-fail') + '">' + total + ' / 100</div>'
+    + '<div style="font-size:14px;font-weight:700;" class="' + (passed ? 'aw-pass' : 'aw-fail') + '">' + escHtml(passed ? t('aw_ex_passed') : awT('aw_ex_failed', { p: pass })) + '</div>'
+    + '<div class="aw-row"><button class="aw-pbtn" onclick="awPanelClose()">' + escHtml(t('aw_ex_back')) + '</button>'
+    + (passed ? '' : '<button class="aw-pbtn primary" onclick="awExamStart()">' + escHtml(t('aw_ex_retry')) + '</button>') + '</div></div>'
+    + '<div class="aw-card">' + awExamResultsHtml(results, answers) + '</div>';
+  awPanel('result', h);
+}
+async function awExamMine() {
+  awPanel('grading', '<div class="aw-card"><div class="muted">' + escHtml(t('aw_ex_loading')) + '</div></div>');
+  try {
+    var j = await awCall({ action: 'examMine' });
+    var list = j.attempts || [];
+    var h = '<div class="aw-card"><h3>' + escHtml(t('aw_ex_mine')) + '</h3><div class="aw-row"><button class="aw-pbtn" onclick="awPanelClose()">' + escHtml(t('aw_ex_back')) + '</button></div></div>';
+    if (!list.length) h += '<div class="aw-card"><div class="muted">' + escHtml(t('aw_ex_none')) + '</div></div>';
+    list.forEach(function (a) {
+      h += '<details class="aw-card"><summary style="cursor:pointer;font-size:14px;"><b class="' + (a.passed ? 'aw-pass' : 'aw-fail') + '">' + a.total + ' / 100　' + escHtml(a.passed ? t('aw_ex_passed_s') : t('aw_ex_failed_s')) + '</b>　<span class="muted">' + escHtml(String(a.graded_at || '').slice(0, 16).replace('T', ' ')) + '</span></summary>'
+        + awExamResultsHtml(a.results || [], a.answers || {}, j.questions) + '</details>';
+    });
+    awPanel('mine', h);
+  } catch (e) { awPanel('', ''); awRender(true); toast(t('aw_ex_fail') + '（' + e.message + '）', 'err'); }
+}
+async function awExamAll() {
+  awPanel('grading', '<div class="aw-card"><div class="muted">' + escHtml(t('aw_ex_loading')) + '</div></div>');
+  try {
+    var j = await awCall({ action: 'examAll' });
+    var by = {};
+    (j.attempts || []).forEach(function (a) {
+      var p = by[a.emp_id] || (by[a.emp_id] = { name: a.emp_name, dept: a.dept, site: a.site, best: 0, passed: false, n: 0, last: '' });
+      p.n++; p.best = Math.max(p.best, a.total || 0); p.passed = p.passed || !!a.passed;
+      if (!p.last || a.graded_at > p.last) p.last = a.graded_at;
+    });
+    var rows = Object.keys(by).map(function (k) { return Object.assign({ id: k }, by[k]); }).sort(function (a, b) { return (a.passed - b.passed) || (b.best - a.best); });
+    var passedN = rows.filter(function (r) { return r.passed; }).length;
+    var h = '<div class="aw-card"><h3>' + escHtml(t('aw_ex_all')) + '</h3><div class="muted">' + escHtml(awT('aw_ex_all_sum', { n: rows.length, p: passedN })) + '</div>'
+      + '<div class="aw-row"><button class="aw-pbtn" onclick="awPanelClose()">' + escHtml(t('aw_ex_back')) + '</button></div></div>'
+      + '<div class="aw-card" style="overflow-x:auto"><table class="aw-tbl"><tr><th>' + escHtml(t('aw_ex_c_name')) + '</th><th>' + escHtml(t('aw_ex_c_dept')) + '</th><th>' + escHtml(t('aw_ex_c_best')) + '</th><th>' + escHtml(t('aw_ex_c_status')) + '</th><th>' + escHtml(t('aw_ex_c_n')) + '</th><th>' + escHtml(t('aw_ex_c_last')) + '</th></tr>'
+      + rows.map(function (r) {
+          return '<tr><td>' + escHtml(r.name || r.id) + ' <span class="muted">' + escHtml(r.id) + '</span></td><td>' + escHtml((r.dept || '') + (r.site ? ' · ' + r.site : '')) + '</td><td>' + r.best + '</td>'
+            + '<td class="' + (r.passed ? 'aw-pass' : 'aw-fail') + '">' + escHtml(r.passed ? t('aw_ex_passed_s') : t('aw_ex_failed_s')) + '</td><td>' + r.n + '</td><td>' + escHtml(String(r.last || '').slice(0, 10)) + '</td></tr>';
+        }).join('') + '</table></div>';
+    awPanel('all', h);
+  } catch (e) { awPanel('', ''); awRender(true); toast(t('aw_ex_fail') + '（' + e.message + '）', 'err'); }
+}
+
+// ── 一致性檢查：每次「🔄 更新 AI Woody」之後自動跑（Woody 定案），也可以手動看最近一次 ──
+// 由 Woody 的瀏覽器逐題呼叫 evalOne（一題約 5～20 秒），一次跑 3 題；整份在伺服器端跑會撞 edge function 的時間上限。
+async function awEvalRun() {
+  if (awEvalBusy || !awIsOwner()) return;
+  awEvalBusy = true;
+  var btn = document.getElementById('aw-eval-btn');
+  try {
+    var st = await awCall({ action: 'evalStart' });
+    var ids = st.items.slice(), done = 0, fails = 0;
+    if (btn) btn.textContent = awT('aw_ev_running', { n: 0, t: ids.length });
+    async function worker() {
+      while (ids.length) {
+        var id = ids.shift();
+        try { await awCall({ action: 'evalOne', runId: st.runId, itemId: id }); } catch (e) { fails++; console.warn('[aw-eval] ' + id + ' ' + e.message); }
+        done++; if (btn) btn.textContent = awT('aw_ev_running', { n: done, t: st.items.length });
+      }
+    }
+    await Promise.all([worker(), worker(), worker()]);
+    var fin = await awCall({ action: 'evalFinish', runId: st.runId });
+    var lt = await awCall({ action: 'evalLatest' });
+    var prev = (lt.runs || [])[1];
+    toast(awT('aw_ev_done', { s: fin.total, m: st.items.length * 10 }) + (prev ? '　' + awT('aw_ev_prev', { s: prev.total }) : '') + (fails ? '　' + awT('aw_ev_fails', { n: fails }) : ''), fails ? 'err' : 'ok', 12000);
+  } catch (e) {
+    if (e.message !== 'items_not_ready') toast(t('aw_ev_fail') + '（' + e.message + '）', 'err', 8000);
+  } finally {
+    awEvalBusy = false; if (btn) btn.textContent = t('aw_ev_btn');
+  }
+}
+async function awEvalShow() {
+  if (awEvalBusy) { toast(t('aw_ev_busy')); return; }
+  awPanel('grading', '<div class="aw-card"><div class="muted">' + escHtml(t('aw_ex_loading')) + '</div></div>');
+  try {
+    var j = await awCall({ action: 'evalLatest' });
+    var runs = j.runs || [], cur = runs[0], prev = runs[1];
+    var h = '<div class="aw-card"><h3>🧪 ' + escHtml(t('aw_ev_title')) + '</h3><div class="muted">' + escHtml(t('aw_ev_desc')) + '</div>';
+    if (!cur) {
+      h += '<div class="muted" style="margin-top:8px">' + escHtml(t('aw_ev_none')) + '</div>';
+    } else {
+      h += '<div class="aw-score">' + cur.total + ' / ' + cur.max_total + '</div><div class="muted">'
+        + escHtml(awT('aw_ev_meta', { d: String(cur.created_at || '').slice(0, 16).replace('T', ' '), v: cur.persona_version || '—', n: cur.docs_count || 0 }))
+        + (prev ? '　' + escHtml(awT('aw_ev_prev', { s: prev.total })) : '') + '</div>';
+    }
+    h += '<div class="aw-row"><button class="aw-pbtn" onclick="awPanelClose()">' + escHtml(t('aw_ex_back')) + '</button>'
+      + '<button class="aw-pbtn primary" onclick="awPanelClose();awEvalRun()">' + escHtml(t('aw_ev_run')) + '</button></div></div>';
+    if (cur) {
+      var res = function (runId, item) { return (j.results || []).find(function (r) { return r.run_id === runId && r.item_id === item; }); };
+      h += '<div class="aw-card">' + (j.items || []).map(function (it) {
+        var a = res(cur.id, it.id); if (!a) return '';
+        var b = prev ? res(prev.id, it.id) : null;
+        var diff = b ? a.score - b.score : 0;
+        var col = a.score >= 8 ? 'var(--grn)' : a.score >= 5 ? 'var(--amb)' : 'var(--red)';
+        return '<details class="aw-res" style="border-left-color:' + col + '"><summary style="cursor:pointer"><span class="sc" style="color:' + col + '">' + a.score + '/10</span>'
+          + (b && diff ? '<span class="' + (diff < 0 ? 'aw-down' : 'aw-up') + '">（' + (diff > 0 ? '+' : '') + diff + '）</span> ' : '')
+          + '<span style="font-size:13px">' + escHtml(it.id) + '〔' + escHtml(it.category) + '〕' + escHtml(it.question) + '</span></summary>'
+          + '<div class="cm">' + escHtml(a.reason || '') + '</div><div class="an">' + escHtml(a.answer || '') + '</div></details>';
+      }).join('') + '</div>';
+    }
+    awPanel('eval', h);
+  } catch (e) { awPanel('', ''); awRender(true); toast(t('aw_ev_fail') + '（' + e.message + '）', 'err'); }
 }
 
 // 匯出 PDF：畫面上看得到的內容（原文＋已經點開的其他語言）。版面固定繁中（同 lcExportPDF）。

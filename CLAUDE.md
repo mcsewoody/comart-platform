@@ -136,7 +136,7 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 
 | File | Version | Purpose | ~Lines |
 |------|---------|---------|--------|
-| `index.html` | v2.20 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
+| `index.html` | v2.21 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
 | `admin/index.html` | v2.59 | Admin System — **機場接送**、公務車、圖書館、會議室、客戶到訪、抽籤 | 8,221 |
 | `kms/index.html` | v2.55 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
 | `quotation/index.html` | v3.69 | Quotation & CRM system | 7,332 |
@@ -860,6 +860,15 @@ AI 區最右邊的頁籤（`ptab-woody`，在「技能」右邊）。函式前�
   ai-woody 的 `action:'intro'`（只有 C00001 或 secret key）用我的口吻寫「為什麼推薦這篇」，XML 標籤五語、少一種就重試；
   KMS 閱讀器在「Woody 推薦閱讀」的文件上方顯示（`kmsWrIntroRender`），Woody 有「↻ 重新產生」，存檔後自動重產。
   前端寫不進 `wr_intro`（sb-proxy 對這個分類只放行 view_count／embedding）。
+- **入職考試**（Portal v2.21，migration `202610080002`，Woody 2026-10-08 定案）：🎓 入職學習模式下的考試卡片（`awExam*`）。
+  題庫 `aw_exam_bank`（Woody 審過才匯入：`scripts/ai-woody-banks.py exam`，內容在 `.local/woody/ai-woody-exam-bank.md`，不進版控），
+  每次抽 10 題（10 類各一題，`exam.js` 的 `pickQuestions`）、情境簡答、Opus 依評分要點逐題 0～10 分，**85 分及格**，沒過可重考（重抽）。
+  🔴 **評分要點只在伺服器端**：題庫表不在 sb-proxy 白名單，`examStart` 只回題號／類別／題目（`publicQuestion`）。
+  成績 `aw_exam_attempts`：本人（`examMine`）＋ Woody 與 admin（`examAll`，角色當下重查）。題庫未匯入前顯示「題庫審核中」。
+- **一致性檢查**（同 migration）：題組 `aw_eval_items`（`ai-woody-banks.py eval`，內容在 `.local/woody/ai-woody-eval-set.md`）。
+  每次「🔄 更新」成功後由 **Woody 的瀏覽器** 逐題呼叫 `evalOne`（AI Woody 作答 → 裁判對照「應該包含／不可以出現」打分），一次 3 題，
+  結果一題一列（`aw_eval_results`，並行寫入不互蓋），`evalFinish` 加總；「🧪 一致性檢查」看最近一次與上一次的差異。
+  🔴 不在伺服器端一次跑完：20 題 × 作答＋評審會撞 edge function 的執行時間上限。實測一題約 4～20 秒。
 - 🔴 **對話歷史每輪由前端整段送**（不存檔的代價），所以 `ai-woody/lib.js` 的 `validateMessages` 逐則驗：
   只准 user／assistant 交替、首尾都是 user、content 只能是字串、不准多餘欄位。否則前端可以偽造一則
   「AI Woody 說過我可以加薪」再讓模型接下去。`node --test supabase/functions/ai-woody/lib.test.mjs`（12 個）。

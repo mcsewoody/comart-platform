@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>COMART Platform v2.21</title>
+<title>COMART Platform v2.22</title>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=Noto+Serif:wght@400;700&family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script defer src="https://cdn.jsdelivr.net/npm/lunar-javascript/lunar.js"></script>
 <style>
@@ -459,7 +459,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     <div class="login-logo">
       <div class="login-mark" style="background:transparent"><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="44" height="23"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></div>
       <div class="login-name">COMART Platform</div>
-      <div class="login-sub">Internal Portal · v2.21</div>
+      <div class="login-sub">Internal Portal · v2.22</div>
     </div>
     <form id="loginForm" onsubmit="doLogin();return false;" autocomplete="on">
     <div class="field">
@@ -529,7 +529,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   <div class="topbar">
     <div class="topbar-logo" onclick="switchView('home')">
       <div class="topbar-mark" style="background:transparent"><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="26" height="14"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></div>
-      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v2.21</span></div>
+      <div class="topbar-name">COMART Platform <span style="font-size:11px;opacity:.5;font-style:normal;font-family:var(--fm);">v2.22</span></div>
     </div>
     <div class="topbar-right">
       <div class="lang-switcher">
@@ -729,6 +729,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
             </div>
             <button class="lc-btn" id="aw-sync-btn" onclick="awSync()" style="display:none;"></button>
             <button class="lc-btn" id="aw-eval-btn" onclick="awEvalShow()" style="display:none;"></button>
+            <button class="lc-btn" id="aw-link-btn" onclick="awCopyLink()"></button>
             <button class="lc-btn" id="aw-pdf-btn" onclick="awExportPDF()">📄 PDF</button>
             <button class="lc-btn" id="aw-new-btn" onclick="awReset()"></button>
           </div>
@@ -1660,6 +1661,12 @@ function enterPortal() {
     if (_lcP.get('lobby') === '1') {
       history.replaceState({}, '', window.location.pathname);
       setTimeout(function() { switchView('ai'); switchAITab('lobby'); }, 0);
+    } else if (_lcP.get('woody')) {
+      // ?woody=<模式> —— AI Woody 的連結（2026-10-08）。同 ?lobby=1：不帶身分，只是直接跳到那個頁籤與模式；
+      // 模式走白名單（AW_MODES），不認得的一律當成對話
+      var _awM = _lcP.get('woody');
+      history.replaceState({}, '', window.location.pathname);
+      setTimeout(function() { switchView('ai'); switchAITab('woody'); if (AW_MODES.indexOf(_awM) > 0) awSetMode(_awM); }, 0);
     } else if (_lcQ) {
       history.replaceState({}, '', window.location.pathname);
       setTimeout(function() { lcGoto(_lcQ, _lcJ); }, 0);
@@ -3289,6 +3296,8 @@ const I18N = {
     aw_ev_none:'No checks yet',
     aw_ev_meta:'{d}　reports {v}　{n} documents',
     aw_ev_run:'Run again now',
+    aw_link:'🔗 Copy link',
+    aw_link_copied:'Link copied — anyone who opens it goes straight to AI Woody in this mode',
     aw_mode_chat:'💬 Chat',
     aw_mode_proposal:'📝 Proposal check',
     aw_mode_rehearsal:'🎤 Rehearsal',
@@ -3516,6 +3525,8 @@ const I18N = {
     aw_ev_none:'還沒有檢查紀錄',
     aw_ev_meta:'{d}　週報 {v}　文件 {n} 份',
     aw_ev_run:'立即重跑',
+    aw_link:'🔗 複製連結',
+    aw_link_copied:'已複製連結，同事點開會直接進入 AI Woody 的這個模式',
     aw_mode_chat:'💬 對話',
     aw_mode_proposal:'📝 提案健檢',
     aw_mode_rehearsal:'🎤 簡報彩排',
@@ -3736,6 +3747,8 @@ const I18N = {
     aw_ev_none:'还没有检查记录',
     aw_ev_meta:'{d}　周报 {v}　文件 {n} 份',
     aw_ev_run:'立即重跑',
+    aw_link:'🔗 复制链接',
+    aw_link_copied:'已复制链接，同事点开会直接进入 AI Woody 的这个模式',
     aw_mode_chat:'💬 对话',
     aw_mode_proposal:'📝 提案健检',
     aw_mode_rehearsal:'🎤 简报彩排',
@@ -3956,6 +3969,8 @@ const I18N = {
     aw_ev_none:'Chưa có lần kiểm tra nào',
     aw_ev_meta:'{d}　báo cáo {v}　{n} tài liệu',
     aw_ev_run:'Chạy lại ngay',
+    aw_link:'🔗 Sao chép liên kết',
+    aw_link_copied:'Đã sao chép liên kết — đồng nghiệp mở ra sẽ vào thẳng chế độ này của AI Woody',
     aw_mode_chat:'💬 Trò chuyện',
     aw_mode_proposal:'📝 Kiểm tra đề xuất',
     aw_mode_rehearsal:'🎤 Tập thuyết trình',
@@ -4174,6 +4189,8 @@ const I18N = {
     aw_ev_none:'チェック記録はまだありません',
     aw_ev_meta:'{d}　週報 {v}　文書 {n} 件',
     aw_ev_run:'今すぐ再実行',
+    aw_link:'🔗 リンクをコピー',
+    aw_link_copied:'リンクをコピーしました。開くと AI Woody のこのモードに直接入ります',
     aw_mode_chat:'💬 対話',
     aw_mode_proposal:'📝 提案チェック',
     aw_mode_rehearsal:'🎤 プレゼン練習',
@@ -4854,6 +4871,13 @@ function awSetMode(m) {
   if (el && window.innerWidth > 768) el.focus();
 }
 
+// 複製 AI Woody 的連結（帶目前的模式），給同事直接進來；沒登入的人會先登入再自動跳過來
+async function awCopyLink() {
+  var url = location.origin + location.pathname + '?woody=' + encodeURIComponent(awMode);
+  try { await navigator.clipboard.writeText(url); toast(t('aw_link_copied'), 'ok'); }
+  catch (e) { prompt(t('lc_link_manual'), url); }
+}
+
 function awApplyI18n() {
   var set = function (id, k, attr) {
     var el = document.getElementById(id);
@@ -4862,6 +4886,7 @@ function awApplyI18n() {
   };
   set('aw-sub', 'aw_sub');
   set('aw-new-btn', 'aw_new');
+  set('aw-link-btn', 'aw_link');
   set('aw-sync-btn', 'aw_sync');
   var sb = document.getElementById('aw-sync-btn');
   if (sb) sb.style.display = awIsOwner() ? '' : 'none';
@@ -5206,7 +5231,8 @@ function awExamCardHtml() {
 }
 async function awExamCheck() {
   if (awExamReady !== null) return;
-  try { awExamReady = !!(await awCall({ action: 'examStatus' })).ready; } catch (e) { awExamReady = false; }
+  // 查詢失敗（網路、session）不要說成「題庫審核中」——那是假話；讓按鈕可以按，按下去才講真正的原因
+  try { awExamReady = !!(await awCall({ action: 'examStatus' })).ready; } catch (e) { awExamReady = true; }
   if (awMode === 'onboard' && !awMsgs.length && !awPanelView) awRender(false);
 }
 

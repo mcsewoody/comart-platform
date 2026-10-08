@@ -139,7 +139,7 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 | `index.html` | v2.23 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
 | `admin/index.html` | v2.60 | Admin System — **機場接送**、公務車、圖書館、會議室、客戶到訪、抽籤 | 8,221 |
 | `kms/index.html` | v2.56 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
-| `quotation/index.html` | v3.71 | Quotation & CRM system | 7,332 |
+| `quotation/index.html` | v3.72 | Quotation & CRM system | 7,332 |
 | `board/index.html` | v1.96 | 公告與會議 Bulletin & Meetings — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍、腦力激盪 | 4,600 |
 | `product_dev/` | v2.25 | **產品開發管理 —— 第六個子系統，不遵守單一檔案原則**（見下方專節） | — |
 
@@ -742,6 +742,30 @@ python3 scripts/i18n-audit.py         # Portal，key 沒引號：btn_save:'儲�
   🔴 品名是 ERP 原文，原檔直接進 innerHTML；這裡一律 `escHtml`。
 - ⚠️ 與報價系統產品的連結**刻意沒做**：337 個產品只有 2 個的 `series` 是越南料號（不同料號體系）。
 - 「結論摘要」第 5 點的建議數字（5k 守 20%、1k 24%…）是原作者依 2026-01～09 資料寫的**固定文字**，換資料後要重看。
+
+## 🎪 CRM 展覽模式 ＋ 平台寄信（quotation v3.72，2026-10-08，migration 202610080005，edge function `mail-send`）
+
+Woody：「馬上要展覽了」——①掃名片馬上寄跟進信附邀請函 ②馬上報價並寄出 ③展後感謝信附會場照片。CRM 的「🎪 展覽」子頁籤（`expo*`）。
+| 決策（Woody 2026-10-08） | 結果 |
+|---|---|
+| 誰用、從誰的信箱寄 | 全體業務 ＋ admin，**各自從自己的公司信箱寄** |
+| 跟進信 | **AI 依每張名片客製草稿**（＋現場談話重點），預覽可改再送；語言 AI 依名片判斷，可手動改 |
+| 感謝信照片 | **嵌在內文**（cid inline，長邊 1280／JPEG 0.8，最多 6 張） |
+| 群發確認 | **逐一勾選後群發**（另有「先寄一封給自己」）；每人一封，不用密件副本 |
+
+- 🔴 **寄信走 Microsoft Graph**：租戶裡的應用程式 **`comart-web-mail`**（官網詢價表單也在用，`MS_TENANT_ID`／`MS_CLIENT_ID`／`MS_CLIENT_SECRET`），應用程式權限 **Mail.Send**（2026-10-08 實測 token roles）。
+  **寄件人一律是 `users.email`（伺服器查），前端指定不了** —— Mail.Send 可以代表租戶任何信箱，交給前端就等於任何人都能冒用 Woody。
+  只給業務部 ＋ admin（當下重查）。對方回信回本人，寄件備份在本人 Outlook。每封寫 `crm_mail_log`（成功失敗都寫，sb-proxy 只讀）。
+  附件只能是私有 bucket `crm-expo`／`crm-cards` 的物件（伺服器自己拿）或前端送的檔案（報價 PDF）；合計 > 2.8 MB 改走「草稿 ＋ 上傳工作階段」（邀請函 PDF 常好幾 MB）。
+  本機 `apikey`＝secret key 只准 `kind:'test'`（寄給那個人自己），用來確認 IT 有沒有把 Graph 限縮到特定信箱。`node --test supabase/functions/mail-send/lib.test.mjs`（5 個）。
+- 資料：`crm_exhibitions`（邀請函、AI 指引、感謝信範本、照片）／`crm_expo_visits`（哪個展、誰掃、跟進／報價／感謝信各自的寄出時間、`lang`）／`crm_mail_log`。三張都在 sb-proxy 的 `EXPO_TABLES`（業務 ＋ admin）。業務只看自己掃的來賓，admin 看全部。
+- 流程接點：`crmCardSave` 看到 `_card.expoId` 就改呼叫 `expoAfterScan`（建來賓 → 開跟進信）；`saveQuote` 新報價時 `_expoQuoteVisit` 有值就 `expoQuoteSaved`（連結來賓 → 開「寄出報價」）。
+  🔴 `openQuoteForm` 開頭會清 `_expoQuoteVisit`，所以 `expoQuote` 要在它**之後**才設（第一版順序反了，測出來的）。
+- **報價寄出（附 PDF）對所有報價單都有效**（明細頁「📧 寄出報價」）：`downloadPDF(id,{blob:true})`。英文走 jsPDF；**非英文或含中日文走 `_quoteHtmlPdfBlob`**——
+  把列印用的同一份 HTML（`downloadPDFasHTML(q,{htmlOnly:true})`）用 html2canvas 畫成圖再放進 PDF，不另寫第二套版面。寄出後報價狀態改成 sent。
+- 感謝信範本以英文寫（`{name}`／`{company}`／`{expo}`），來賓跟進信若用其他語言，感謝信 AI 翻成同一語言（每種語言翻一次）。
+- 驗證：headless Chrome（CDP 真實時間；**虛擬時間模式會卡在圖片解碼**）＋假資料跑完整條：建展覽 → 掃名片 → 跟進信（附邀請函）→ 報價存檔 → 寄出（英文 PDF、中文 PDF 都產得出來）→ 感謝信（翻譯 ＋ 照片內嵌）。
+  2026-10-08 用 CLI 測試路徑寄了一封測試信到 woody@comart.com.tw（Graph 回成功）。**AI 草稿品質與實際收信樣子要真機確認。**
 
 ## 📇 CRM 名片掃描 ＋ 客戶基本資料（quotation v3.71，2026-10-08，migration 202610080004）
 

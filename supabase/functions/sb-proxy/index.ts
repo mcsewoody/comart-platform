@@ -46,6 +46,7 @@ const ALLOWED_TABLES = new Set([
   "products","quotation_settings","quotes","room_bookings","room_faults",
   "sites","suppliers","trips","users","visit_guests","visit_records","weekly_minutes",
   "woody_reports","airport_bookings",
+  "crm_exhibitions","crm_expo_visits","crm_mail_log",   // CRM 展覽模式：業務部 ＋ admin（見下方 EXPO_TABLES）
   "vn_part_costs","vn_cost_meta",   // 越南廠料工費：只給業務部 ＋ admin 讀（見下方 VN_COST_TABLES）
   "premortem_sessions","premortem_entries","premortem_mitigations",
   // 注意：premortem_summary_log（AI 結論的版本歷史）**刻意不列入**——
@@ -93,6 +94,7 @@ const WOODY_READS = "woody_reads"
 const WOODY_EMP = "C00001"
 const KMS_HARMLESS_PATCH = new Set(["view_count", "embedding"])
 const VN_COST_TABLES = new Set(["vn_part_costs", "vn_cost_meta"])
+const EXPO_TABLES = new Set(["crm_exhibitions", "crm_expo_visits", "crm_mail_log"])
 
 // ── 線上對話：單則訊息的修改與刪除（v2.01）──
 // 三組欄位，三種授權。**分組的依據是「改壞了會怎樣」，不是欄位長得像不像**：
@@ -295,7 +297,7 @@ serve(async (req) => {
     }
     /* 🔴 CRM 名片圖（quotation v3.71）：名片是個資，只給業務部 ＋ admin（與報價系統的部門限制同一條規則，
        但報價系統那一道只是前端守衛）。部門與角色重新查資料庫，停用／離職者一律拒絕。 */
-    if (segs.includes("crm-cards")) {
+    if (segs.includes("crm-cards") || segs.includes("crm-expo")) {
       const live = await liveUserOf(SUPABASE_URL, SERVICE_KEY, sessEmpId)
       if (!(live.role === "admin" || live.dept === "sales")) {
         return json({ error: "forbidden", hint: "sales_or_admin_only" }, 403)
@@ -348,6 +350,13 @@ serve(async (req) => {
     if (!seeAll && req.method !== "POST") {
       restPath = forceOwnRows(restPath, sessEmpId)
     }
+  }
+
+  // ── CRM 展覽模式：業務部 ＋ admin；寄信紀錄只能讀（由 mail-send 用 service role 寫）──
+  if (EXPO_TABLES.has(table)) {
+    if (table === "crm_mail_log" && isWrite) return json({ error: "forbidden", hint: "read only" }, 403)
+    const live = await liveUserOf(SUPABASE_URL, SERVICE_KEY, sessEmpId)
+    if (!(live.role === "admin" || live.dept === "sales")) return json({ error: "forbidden", hint: "sales_or_admin_only" }, 403)
   }
 
   // ── 越南廠料工費（報價系統「越南廠成本」頁籤）──

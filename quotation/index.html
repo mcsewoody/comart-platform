@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#080C14">
-<title>COMART · Quotation System v3.71</title>
+<title>COMART · Quotation System v3.72</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=Noto+Serif:wght@400;700&family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -116,6 +116,27 @@ html[lang="vi"]{--ff:'Be Vietnam Pro','DM Sans',-apple-system,sans-serif;--fd:'N
 .moq-lbl{font-size:11px;color:var(--tx3);font-weight:500;margin-right:2px;white-space:nowrap}
 .moq-chip{padding:5px 12px;border-radius:20px;border:1px solid var(--br);font-size:12px;font-family:var(--fm);font-weight:600;color:var(--tx2);cursor:pointer;transition:all .15s}
 .moq-chip.on{background:var(--ac);border-color:var(--ac);color:#fff}
+/* v3.72 展覽模式 */
+.expo-card{background:var(--s1);border:1px solid var(--br);border-radius:12px;padding:14px 16px}
+.expo-stats{display:flex;gap:14px;margin-top:10px;font-size:13px;color:var(--tx2);font-family:var(--fm)}
+.expo-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.expo-big{padding:18px 12px;border-radius:12px;border:none;background:#10a37f;color:#fff;font-size:17px;font-weight:800;cursor:pointer}
+.expo-big.alt{background:var(--s2);color:var(--tx);border:1px solid var(--br)}
+.expo-row{display:flex;gap:10px;align-items:center;padding:11px 12px;border:1px solid var(--br);border-radius:10px;margin-bottom:8px;background:var(--s1);flex-wrap:wrap}
+.expo-row>div:first-child{flex:1 1 240px!important}
+.expo-btns{display:flex;gap:6px;flex-wrap:wrap}
+.expo-chip{padding:7px 11px;border-radius:8px;border:1px solid var(--br);background:var(--s2);color:var(--tx);font-size:12.5px;font-weight:600;cursor:pointer;white-space:nowrap}
+.expo-chip.done{border-color:rgba(61,214,140,.45);color:#3DD68C;background:rgba(61,214,140,.08)}
+.expo-empty{padding:26px;text-align:center;color:var(--tx3);font-size:13px}
+.expo-phs{display:flex;gap:8px;flex-wrap:wrap}
+.expo-ph{position:relative;width:110px;height:80px;border-radius:8px;overflow:hidden;background:var(--s2);border:1px solid var(--br)}
+.expo-ph img{width:100%;height:100%;object-fit:cover}
+.expo-ph button{position:absolute;top:3px;right:3px;width:22px;height:22px;border-radius:50%;border:none;background:rgba(0,0,0,.65);color:#fff;font-size:11px;cursor:pointer}
+.th-row{display:flex;gap:10px;align-items:center;padding:8px 6px;border-bottom:1px solid var(--br);font-size:13px;cursor:pointer}
+.th-row.off{opacity:.45;cursor:default}
+.th-row input{width:17px;height:17px;accent-color:var(--ac)}
+.th-st{width:22px;text-align:center}
+@media(max-width:560px){.expo-actions{grid-template-columns:1fr}.expo-row{align-items:flex-start}.expo-btns{width:100%}.expo-chip{flex:1 1 auto;text-align:center;padding:10px 8px;font-size:13px}}
 /* v3.71 名片 */
 .card-thumbs{display:flex;gap:10px;flex-wrap:wrap}
 .card-thumbs .ct-img{position:relative;width:min(300px,100%);border:1px solid var(--br);border-radius:8px;overflow:hidden;background:var(--s2);cursor:zoom-in}
@@ -1200,6 +1221,7 @@ const UI = {
     crmAutoCreated:'👥 Auto-created customer: ',contactsCountLabel:'contacts',quotesCountLabel:'quotes',lastActivityLabel:'Last activity: ',newAcctTitle:'New Customer',editAcctDetail:'Customer Detail',
     crmNoAccts:'No customers yet. Click "+ New Customer" to start.',
     scanCard:'📇 Scan card',scanCardAdd:'📇 Scan card → new contact',cardReading:'Reading the business card…',cardReview:'Business card',cardHint:'Check and edit the details. Use the rotate buttons if a card image is not upright.',cardAcct:'Add to customer',cardNewAcct:'＋ New customer',cardFillEmpty:'Existing customer: only empty fields will be filled; existing data is not overwritten.',cardDup:'This customer already has a contact with the same email — that contact will be updated.',cardSave:'💾 Save to CRM',cardSaved:'Saved to CRM',cardFail:'Could not read the card',cardUploadFail:'Card image upload failed — nothing was saved',cardMax2:'Up to two images at a time (front and back)',cardFront:'Front',cardBack:'Back',cardRotate:'Rotate',secAcct:'Customer',secContact:'Contact',acctCompanyAlt:'Company name (other language)',acctAddress:'Address',acctShipAddress:'Shipping address',acctPhone:'Company phone',acctFax:'Fax',acctTaxId:'Tax ID',acctIncoterm:'Incoterm',acctCurrency:'Currency',acctPayTerms:'Payment terms',ctNameAlt:'Name (other language)',ctDept:'Department',ctMobile:'Mobile',ctFax:'Fax',ctIm:'Messaging (LINE / WeChat / WhatsApp…)',ctCard:'Business card',cardNoPerm:'No permission to view card images',cardOther:'Other info on the card',
+    crmExpo:'Trade show',expoLoadFail:'Could not load trade shows',expoNone:'— No trade show yet —',expoNew:'New show',expoSettings:'Settings',expoCreateFirst:'Create a trade show first (name, dates, invitation, thank-you template, photos).',expoBooth:'Booth',expoNoInvite:'No invitation file yet',expoScan:'Scan card',expoThanks:'Thank-you mail',expoVisitors:'Visitors',expoNoVisitors:'No visitors yet — scan the first business card.',expoNoEmail:'no email',expoBy:'Scanned by',expoSent:'Sent',expoFollowup:'Follow-up',expoQuote:'Quote',expoMaxPhotos:'Up to 6 photos',expoInviteTooBig:'Invitation file must be under 20 MB',expoNeedName:'Enter the show name',expoDrafting:'AI is writing the draft…',expoDraftFail:'AI draft failed',expoNeedText:'Subject and content are required',expoResend:'A follow-up was already sent to this visitor. Send again?',expoSentTo:'Sent to',expoSendFail:'Send failed',expoSend:'Send',expoSentAt:'Sent at',expoSelectAll:'Select all',expoNoPhotos:'No show photos yet (add them in Settings)',expoThxLangs:'Will also be translated into',expoPickSome:'Select at least one visitor',expoThxConfirm:'Send the thank-you mail to {n} visitor(s) from your mailbox?',expoTestSent:'Test mail sent to your own mailbox',expoFailKept:'failed ones stay selected — press Send again to retry',expoThxDone:'Sent {n} thank-you mail(s)',expoName:'Show name',expoVenue:'Venue',expoStart:'Start date',expoEnd:'End date',expoInvite:'Invitation (attached to follow-up mail)',expoGuide:'Guidance for the AI follow-up (products to highlight, tone…)',expoThxSubject:'Thank-you subject',expoThxBody:'Thank-you content ({name} {company} {expo} are filled in)',expoPhotos:'Show photos (embedded in the thank-you mail)',expoUpload:'Choose file',expoAddPhotos:'Add photos',expoMemo:'What you talked about (optional — makes the email personal)',expoLang:'Language',expoAuto:'Auto (from card)',expoRedraft:'✨ Redraft',expoTo:'To',expoSubject:'Subject',expoBody:'Content',expoSendTest:'Send test to myself',expoQuoteMail:'📧 Email quote (PDF)',expoCc:'Cc',
     crmNoContacts:'No contacts',crmNoActivities:'No interactions',crmNoAcctQuotes:'No quotation records',crmNoTasks:'No tasks',
     crmNoTasksFilter:'No tasks matching filter',crmNoActivityLog:'No interaction records',
     crmNone:'(None)',
@@ -1259,6 +1281,7 @@ const UI = {
     crmAutoCreated:'👥 已自動建立客戶: ',contactsCountLabel:'聯絡人',quotesCountLabel:'報價',lastActivityLabel:'上次互動: ',newAcctTitle:'新增客戶',editAcctDetail:'客戶詳情',
     crmNoAccts:'尚無客戶資料。點右上角「+ 新增客戶」開始。',
     scanCard:'📇 掃描名片',scanCardAdd:'📇 掃名片新增聯絡人',cardReading:'正在辨識名片…',cardReview:'名片辨識結果',cardHint:'請確認內容，可以直接修改；名片圖方向不對，按旋轉即可。',cardAcct:'加入客戶',cardNewAcct:'＋ 新客戶',cardFillEmpty:'既有客戶：只會補上目前空白的欄位，不會覆蓋已有的資料。',cardDup:'這家客戶已有相同 Email 的聯絡人，將更新該聯絡人。',cardSave:'💾 存入 CRM',cardSaved:'已存入 CRM',cardFail:'名片辨識失敗',cardUploadFail:'名片圖上傳失敗，資料沒有存檔',cardMax2:'一次最多兩張（正面與背面）',cardFront:'正面',cardBack:'背面',cardRotate:'旋轉',secAcct:'客戶資料',secContact:'聯絡人',acctCompanyAlt:'公司名（其他語言）',acctAddress:'地址',acctShipAddress:'送貨地址',acctPhone:'公司電話',acctFax:'傳真',acctTaxId:'統編／稅號',acctIncoterm:'Incoterm',acctCurrency:'幣別',acctPayTerms:'付款條件',ctNameAlt:'姓名（其他語言）',ctDept:'部門',ctMobile:'手機',ctFax:'傳真',ctIm:'通訊軟體（LINE／WeChat／WhatsApp…）',ctCard:'名片',cardNoPerm:'沒有權限查看名片圖',cardOther:'名片上的其他資訊',
+    crmExpo:'展覽',expoLoadFail:'展覽資料載入失敗',expoNone:'— 尚未建立展覽 —',expoNew:'新展覽',expoSettings:'設定',expoCreateFirst:'請先建立展覽（名稱、日期、邀請函、感謝信範本、會場照片）。',expoBooth:'攤位',expoNoInvite:'尚未上傳邀請函',expoScan:'掃名片',expoThanks:'展後感謝信',expoVisitors:'來賓',expoNoVisitors:'還沒有來賓——掃第一張名片吧。',expoNoEmail:'沒有 Email',expoBy:'掃描者',expoSent:'已寄',expoFollowup:'跟進信',expoQuote:'報價',expoMaxPhotos:'最多 6 張照片',expoInviteTooBig:'邀請函檔案需小於 20 MB',expoNeedName:'請輸入展覽名稱',expoDrafting:'AI 正在寫草稿…',expoDraftFail:'AI 草稿失敗',expoNeedText:'主旨與內容不可空白',expoResend:'這位來賓已寄過跟進信，要再寄一次嗎？',expoSentTo:'已寄給',expoSendFail:'寄送失敗',expoSend:'送出',expoSentAt:'寄出時間',expoSelectAll:'全選',expoNoPhotos:'還沒有會場照片（到「設定」上傳）',expoThxLangs:'另會翻譯成',expoPickSome:'請至少勾選一位來賓',expoThxConfirm:'要用你的信箱寄感謝信給 {n} 位來賓嗎？',expoTestSent:'測試信已寄到你自己的信箱',expoFailKept:'失敗的仍保持勾選，再按一次送出即可重試',expoThxDone:'已寄出 {n} 封感謝信',expoName:'展覽名稱',expoVenue:'地點',expoStart:'開始日期',expoEnd:'結束日期',expoInvite:'邀請函（附在跟進信）',expoGuide:'給 AI 的跟進信指引（要強調的產品、語氣…）',expoThxSubject:'感謝信主旨',expoThxBody:'感謝信內容（{name} {company} {expo} 會自動帶入）',expoPhotos:'會場照片（嵌在感謝信內文）',expoUpload:'選擇檔案',expoAddPhotos:'加入照片',expoMemo:'現場談話重點（可留空；寫了信會更客製）',expoLang:'語言',expoAuto:'自動（依名片判斷）',expoRedraft:'✨ 重新產生',expoTo:'收件人',expoSubject:'主旨',expoBody:'內容',expoSendTest:'先寄一封給自己',expoQuoteMail:'📧 寄出報價（附 PDF）',expoCc:'副本',
     crmNoContacts:'尚無聯絡人',crmNoActivities:'尚無互動紀錄',crmNoAcctQuotes:'尚無報價紀錄',crmNoTasks:'尚無任務',
     crmNoTasksFilter:'沒有符合條件的任務',crmNoActivityLog:'尚無互動紀錄',
     crmNone:'（無）',
@@ -1318,6 +1341,7 @@ const UI = {
     crmAutoCreated:'👥 已自动建立客户: ',contactsCountLabel:'联系人',quotesCountLabel:'报价',lastActivityLabel:'上次互动: ',newAcctTitle:'新增客户',editAcctDetail:'客户详情',
     crmNoAccts:'暂无客户资料。点右上角「+ 新增客户」开始。',
     scanCard:'📇 扫描名片',scanCardAdd:'📇 扫名片新增联系人',cardReading:'正在识别名片…',cardReview:'名片识别结果',cardHint:'请确认内容，可以直接修改；名片图方向不对，按旋转即可。',cardAcct:'加入客户',cardNewAcct:'＋ 新客户',cardFillEmpty:'既有客户：只会补上目前空白的栏位，不会覆盖已有的资料。',cardDup:'这家客户已有相同 Email 的联系人，将更新该联系人。',cardSave:'💾 存入 CRM',cardSaved:'已存入 CRM',cardFail:'名片识别失败',cardUploadFail:'名片图上传失败，资料没有保存',cardMax2:'一次最多两张（正面与背面）',cardFront:'正面',cardBack:'背面',cardRotate:'旋转',secAcct:'客户资料',secContact:'联系人',acctCompanyAlt:'公司名（其他语言）',acctAddress:'地址',acctShipAddress:'送货地址',acctPhone:'公司电话',acctFax:'传真',acctTaxId:'税号',acctIncoterm:'Incoterm',acctCurrency:'币别',acctPayTerms:'付款条件',ctNameAlt:'姓名（其他语言）',ctDept:'部门',ctMobile:'手机',ctFax:'传真',ctIm:'通讯软件（LINE／WeChat／WhatsApp…）',ctCard:'名片',cardNoPerm:'没有权限查看名片图',cardOther:'名片上的其他信息',
+    crmExpo:'展会',expoLoadFail:'展会资料载入失败',expoNone:'— 尚未建立展会 —',expoNew:'新展会',expoSettings:'设置',expoCreateFirst:'请先建立展会（名称、日期、邀请函、感谢信范本、会场照片）。',expoBooth:'展位',expoNoInvite:'尚未上传邀请函',expoScan:'扫名片',expoThanks:'展后感谢信',expoVisitors:'来宾',expoNoVisitors:'还没有来宾——扫第一张名片吧。',expoNoEmail:'没有 Email',expoBy:'扫描者',expoSent:'已寄',expoFollowup:'跟进信',expoQuote:'报价',expoMaxPhotos:'最多 6 张照片',expoInviteTooBig:'邀请函文件需小于 20 MB',expoNeedName:'请输入展会名称',expoDrafting:'AI 正在写草稿…',expoDraftFail:'AI 草稿失败',expoNeedText:'主题与内容不可空白',expoResend:'这位来宾已寄过跟进信，要再寄一次吗？',expoSentTo:'已寄给',expoSendFail:'发送失败',expoSend:'发送',expoSentAt:'发送时间',expoSelectAll:'全选',expoNoPhotos:'还没有会场照片（到「设置」上传）',expoThxLangs:'另会翻译成',expoPickSome:'请至少勾选一位来宾',expoThxConfirm:'要用你的邮箱寄感谢信给 {n} 位来宾吗？',expoTestSent:'测试信已寄到你自己的邮箱',expoFailKept:'失败的仍保持勾选，再按一次发送即可重试',expoThxDone:'已发送 {n} 封感谢信',expoName:'展会名称',expoVenue:'地点',expoStart:'开始日期',expoEnd:'结束日期',expoInvite:'邀请函（附在跟进信）',expoGuide:'给 AI 的跟进信指引（要强调的产品、语气…）',expoThxSubject:'感谢信主题',expoThxBody:'感谢信内容（{name} {company} {expo} 会自动带入）',expoPhotos:'会场照片（嵌在感谢信内文）',expoUpload:'选择文件',expoAddPhotos:'加入照片',expoMemo:'现场谈话重点（可留空；写了信会更客制）',expoLang:'语言',expoAuto:'自动（依名片判断）',expoRedraft:'✨ 重新生成',expoTo:'收件人',expoSubject:'主题',expoBody:'内容',expoSendTest:'先寄一封给自己',expoQuoteMail:'📧 寄出报价（附 PDF）',expoCc:'抄送',
     crmNoContacts:'暂无联系人',crmNoActivities:'暂无互动记录',crmNoAcctQuotes:'暂无报价记录',crmNoTasks:'暂无任务',
     crmNoTasksFilter:'没有符合条件的任务',crmNoActivityLog:'暂无互动记录',
     crmNone:'（无）',
@@ -1377,6 +1401,7 @@ const UI = {
     crmAutoCreated:'👥 Đã tự động tạo KH: ',contactsCountLabel:'liên hệ',quotesCountLabel:'báo giá',lastActivityLabel:'Hoạt động cuối: ',newAcctTitle:'Thêm khách hàng',editAcctDetail:'Chi tiết khách hàng',
     crmNoAccts:'Chưa có khách hàng. Nhấn "+ Thêm khách hàng" để bắt đầu.',
     scanCard:'📇 Quét danh thiếp',scanCardAdd:'📇 Quét danh thiếp → thêm liên hệ',cardReading:'Đang đọc danh thiếp…',cardReview:'Kết quả đọc danh thiếp',cardHint:'Kiểm tra và sửa nội dung. Nếu ảnh danh thiếp bị ngược, bấm xoay.',cardAcct:'Thêm vào khách hàng',cardNewAcct:'＋ Khách hàng mới',cardFillEmpty:'Khách hàng đã có: chỉ điền các ô còn trống, không ghi đè dữ liệu cũ.',cardDup:'Khách hàng này đã có liên hệ cùng Email — sẽ cập nhật liên hệ đó.',cardSave:'💾 Lưu vào CRM',cardSaved:'Đã lưu vào CRM',cardFail:'Không đọc được danh thiếp',cardUploadFail:'Tải ảnh danh thiếp thất bại — chưa lưu dữ liệu',cardMax2:'Tối đa hai ảnh mỗi lần (mặt trước và mặt sau)',cardFront:'Mặt trước',cardBack:'Mặt sau',cardRotate:'Xoay',secAcct:'Khách hàng',secContact:'Liên hệ',acctCompanyAlt:'Tên công ty (ngôn ngữ khác)',acctAddress:'Địa chỉ',acctShipAddress:'Địa chỉ giao hàng',acctPhone:'Điện thoại công ty',acctFax:'Fax',acctTaxId:'Mã số thuế',acctIncoterm:'Incoterm',acctCurrency:'Tiền tệ',acctPayTerms:'Điều khoản thanh toán',ctNameAlt:'Tên (ngôn ngữ khác)',ctDept:'Phòng ban',ctMobile:'Di động',ctFax:'Fax',ctIm:'Nhắn tin (Zalo / LINE / WeChat / WhatsApp…)',ctCard:'Danh thiếp',cardNoPerm:'Không có quyền xem ảnh danh thiếp',cardOther:'Thông tin khác trên danh thiếp',
+    crmExpo:'Triển lãm',expoLoadFail:'Không tải được dữ liệu triển lãm',expoNone:'— Chưa có triển lãm —',expoNew:'Triển lãm mới',expoSettings:'Cài đặt',expoCreateFirst:'Hãy tạo triển lãm trước (tên, ngày, thư mời, mẫu thư cảm ơn, ảnh).',expoBooth:'Gian hàng',expoNoInvite:'Chưa tải thư mời',expoScan:'Quét danh thiếp',expoThanks:'Thư cảm ơn sau triển lãm',expoVisitors:'Khách tham quan',expoNoVisitors:'Chưa có khách — hãy quét danh thiếp đầu tiên.',expoNoEmail:'không có email',expoBy:'Người quét',expoSent:'Đã gửi',expoFollowup:'Thư theo dõi',expoQuote:'Báo giá',expoMaxPhotos:'Tối đa 6 ảnh',expoInviteTooBig:'Thư mời phải nhỏ hơn 20 MB',expoNeedName:'Nhập tên triển lãm',expoDrafting:'AI đang viết bản nháp…',expoDraftFail:'AI viết nháp thất bại',expoNeedText:'Cần có tiêu đề và nội dung',expoResend:'Đã gửi thư theo dõi cho khách này. Gửi lại?',expoSentTo:'Đã gửi đến',expoSendFail:'Gửi thất bại',expoSend:'Gửi',expoSentAt:'Gửi lúc',expoSelectAll:'Chọn tất cả',expoNoPhotos:'Chưa có ảnh triển lãm (thêm trong Cài đặt)',expoThxLangs:'Sẽ dịch thêm sang',expoPickSome:'Chọn ít nhất một khách',expoThxConfirm:'Gửi thư cảm ơn đến {n} khách từ hộp thư của bạn?',expoTestSent:'Đã gửi thư thử vào hộp thư của bạn',expoFailKept:'những thư lỗi vẫn được chọn — bấm Gửi lại để thử lại',expoThxDone:'Đã gửi {n} thư cảm ơn',expoName:'Tên triển lãm',expoVenue:'Địa điểm',expoStart:'Ngày bắt đầu',expoEnd:'Ngày kết thúc',expoInvite:'Thư mời (đính kèm thư theo dõi)',expoGuide:'Hướng dẫn cho AI viết thư theo dõi (sản phẩm cần nhấn mạnh, giọng văn…)',expoThxSubject:'Tiêu đề thư cảm ơn',expoThxBody:'Nội dung thư cảm ơn ({name} {company} {expo} sẽ tự điền)',expoPhotos:'Ảnh triển lãm (chèn vào thư cảm ơn)',expoUpload:'Chọn tệp',expoAddPhotos:'Thêm ảnh',expoMemo:'Nội dung đã trao đổi (có thể bỏ trống; có thì thư sẽ cá nhân hơn)',expoLang:'Ngôn ngữ',expoAuto:'Tự động (theo danh thiếp)',expoRedraft:'✨ Viết lại',expoTo:'Người nhận',expoSubject:'Tiêu đề',expoBody:'Nội dung',expoSendTest:'Gửi thử cho tôi',expoQuoteMail:'📧 Gửi báo giá (PDF)',expoCc:'CC',
     crmNoContacts:'Chưa có liên hệ',crmNoActivities:'Chưa có tương tác',crmNoAcctQuotes:'Chưa có báo giá',crmNoTasks:'Chưa có nhiệm vụ',
     crmNoTasksFilter:'Không có nhiệm vụ phù hợp',crmNoActivityLog:'Chưa có bản ghi tương tác',
     crmNone:'(Không)',
@@ -1436,6 +1461,7 @@ const UI = {
     crmAutoCreated:'👥 顧客を自動作成: ',contactsCountLabel:'連絡先',quotesCountLabel:'見積',lastActivityLabel:'最終活動: ',newAcctTitle:'新規顧客追加',editAcctDetail:'顧客詳細',
     crmNoAccts:'顧客データがありません。右上の「+ 新規顧客追加」から始めてください。',
     scanCard:'📇 名刺スキャン',scanCardAdd:'📇 名刺から連絡先を追加',cardReading:'名刺を読み取り中…',cardReview:'名刺の読み取り結果',cardHint:'内容を確認し、必要なら修正してください。画像の向きが違う場合は回転ボタンを押してください。',cardAcct:'追加先の顧客',cardNewAcct:'＋ 新規顧客',cardFillEmpty:'既存顧客：空欄のみ補完し、既存データは上書きしません。',cardDup:'この顧客には同じメールの連絡先があります。その連絡先を更新します。',cardSave:'💾 CRM に保存',cardSaved:'CRM に保存しました',cardFail:'名刺を読み取れませんでした',cardUploadFail:'名刺画像のアップロードに失敗しました（保存されていません）',cardMax2:'一度に 2 枚まで（表と裏）',cardFront:'表',cardBack:'裏',cardRotate:'回転',secAcct:'顧客情報',secContact:'連絡先',acctCompanyAlt:'会社名（他言語）',acctAddress:'住所',acctShipAddress:'配送先住所',acctPhone:'会社電話',acctFax:'FAX',acctTaxId:'税番号',acctIncoterm:'Incoterm',acctCurrency:'通貨',acctPayTerms:'支払条件',ctNameAlt:'氏名（他言語）',ctDept:'部署',ctMobile:'携帯',ctFax:'FAX',ctIm:'メッセージアプリ（LINE／WeChat／WhatsApp…）',ctCard:'名刺',cardNoPerm:'名刺画像を見る権限がありません',cardOther:'名刺のその他の情報',
+    crmExpo:'展示会',expoLoadFail:'展示会データを読み込めませんでした',expoNone:'— 展示会がまだありません —',expoNew:'新しい展示会',expoSettings:'設定',expoCreateFirst:'まず展示会を作成してください（名称、日程、招待状、お礼メールのテンプレート、写真）。',expoBooth:'ブース',expoNoInvite:'招待状が未登録です',expoScan:'名刺スキャン',expoThanks:'展示会後のお礼メール',expoVisitors:'来場者',expoNoVisitors:'来場者はまだいません — 最初の名刺をスキャンしましょう。',expoNoEmail:'メールなし',expoBy:'スキャン担当',expoSent:'送信済み',expoFollowup:'フォローメール',expoQuote:'見積',expoMaxPhotos:'写真は最大 6 枚',expoInviteTooBig:'招待状は 20 MB 未満にしてください',expoNeedName:'展示会名を入力してください',expoDrafting:'AI が下書きを作成中…',expoDraftFail:'AI 下書きに失敗しました',expoNeedText:'件名と本文は必須です',expoResend:'この来場者にはフォローメールを送信済みです。もう一度送りますか？',expoSentTo:'送信先',expoSendFail:'送信に失敗しました',expoSend:'送信',expoSentAt:'送信日時',expoSelectAll:'すべて選択',expoNoPhotos:'会場写真がまだありません（設定で追加）',expoThxLangs:'次の言語にも翻訳します',expoPickSome:'来場者を 1 人以上選んでください',expoThxConfirm:'{n} 名の来場者に、あなたのメールボックスからお礼メールを送りますか？',expoTestSent:'テストメールを自分宛てに送信しました',expoFailKept:'失敗したものは選択されたままです。もう一度送信すると再試行します',expoThxDone:'{n} 通のお礼メールを送信しました',expoName:'展示会名',expoVenue:'会場',expoStart:'開始日',expoEnd:'終了日',expoInvite:'招待状（フォローメールに添付）',expoGuide:'AI フォローメールへの指示（強調する製品、トーン…）',expoThxSubject:'お礼メールの件名',expoThxBody:'お礼メール本文（{name} {company} {expo} は自動入力）',expoPhotos:'会場写真（お礼メール本文に埋め込み）',expoUpload:'ファイルを選択',expoAddPhotos:'写真を追加',expoMemo:'ブースで話した内容（任意。書くとより個別のメールになります）',expoLang:'言語',expoAuto:'自動（名刺から判断）',expoRedraft:'✨ 再作成',expoTo:'宛先',expoSubject:'件名',expoBody:'本文',expoSendTest:'自分にテスト送信',expoQuoteMail:'📧 見積を送信（PDF）',expoCc:'CC',
     crmNoContacts:'連絡先なし',crmNoActivities:'インタラクションなし',crmNoAcctQuotes:'見積もり記録なし',crmNoTasks:'タスクなし',
     crmNoTasksFilter:'条件に合うタスクなし',crmNoActivityLog:'インタラクション記録なし',
     crmNone:'（なし）',
@@ -3704,6 +3730,7 @@ async function deleteProd(){
 // QUOTE FORM
 // ═══════════════════════════════════════
 function openQuoteForm(id){
+  _expoQuoteVisit = null;   // 展覽來賓的報價：expoQuote 會在這之後才設；其他入口開表單一律清掉，免得別張報價被誤連
   // Sent quotes are read-only
   if(id){
     const _sq=QUOTES.find(x=>x.id===id);
@@ -4256,6 +4283,8 @@ async function saveQuote(){
     const _savedId = q.id;
     renderDetail(_savedId);
     page='detail'; goPage('detail');
+  } else if (_expoQuoteVisit && await expoQuoteSaved(q)) {
+    // 展覽來賓的報價：已連結並開啟「寄出報價」
   } else {
     page='quotes'; switchTab('quotes');
   }
@@ -4379,6 +4408,7 @@ function renderDetail(id){
           ${q.email&&_canAct?`<button class="btn btn-ghost btn-sm" onclick="sendEmailMailto('${id}')" title="Send quote by email">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><path d="M22 2L11 13"/><path d="M22 2L15 22 11 13 2 9l20-7z"/></svg>
             ${t('send')||'Send'}</button>`:''}
+          ${_canAct?`<button class="btn btn-primary btn-sm" onclick="quoteMailOpen('${id}')">${t('expoQuoteMail')}</button>`:''}
           ${q.status==='draft'&&_canAct?`<button class="btn btn-ghost btn-sm" onclick="markSent('${id}')">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><polyline points="20 6 9 17 4 12"/></svg>
             ${t('markSent')}</button>`:''}
@@ -4852,7 +4882,34 @@ async function downloadXLSX(id) {
 // ════════════════════════════════════════════════
 // PDF (HTML) — for non-Latin languages
 // ════════════════════════════════════════════════
-async function downloadPDFasHTML(q) {
+/* 非英文／含中日文的報價單：jsPDF 沒有那些字型，所以把同一份 HTML 版面畫成圖再放進 PDF（寄信附件用）。
+   版面與「列印用 HTML」完全同一份（downloadPDFasHTML 的 htmlOnly），不另寫第二套。 */
+async function _quoteHtmlPdfBlob(q) {
+  const { html, fname } = await downloadPDFasHTML(q, { htmlOnly: true });
+  const jsPDF = window.jspdf?.jsPDF || window.jsPDF;
+  if (!jsPDF || !window.html2canvas) throw new Error('PDF engine not loaded');
+  const ifr = document.createElement('iframe');
+  ifr.style.cssText = 'position:fixed;left:-12000px;top:0;width:1123px;height:800px;border:0';
+  document.body.appendChild(ifr);
+  try {
+    const d = ifr.contentDocument;
+    d.open(); d.write(html.replace(/<div class="no-print">[\s\S]*?<\/div>/, '')); d.close();
+    await new Promise(r => setTimeout(r, 400));
+    try { await d.fonts?.ready; } catch (_) {}
+    await Promise.all([...d.images].map(i => i.complete ? 0 : new Promise(r => { i.onload = i.onerror = r; })));
+    const canvas = await window.html2canvas(d.body, { scale: 2, useCORS: true, backgroundColor: '#ffffff', windowWidth: 1123 });
+    const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+    const m = 8, w = 297 - 2 * m, pxPerMm = canvas.width / w, pageH = Math.floor((210 - 2 * m) * pxPerMm);
+    for (let y = 0, i = 0; y < canvas.height; y += pageH, i++) {
+      const c = document.createElement('canvas'); c.width = canvas.width; c.height = Math.min(pageH, canvas.height - y);
+      c.getContext('2d').drawImage(canvas, 0, -y);
+      if (i) pdf.addPage();
+      pdf.addImage(c.toDataURL('image/jpeg', 0.9), 'JPEG', m, m, w, c.height / pxPerMm);
+    }
+    return { blob: pdf.output('blob'), name: fname + '.pdf' };
+  } finally { ifr.remove(); }
+}
+async function downloadPDFasHTML(q, opts) {
   const ql = q.lang || 'en';
   const fmtM = m => m >= 1000 ? (m/1000)+'K' : String(m);
   const fComp = (q.company||'QUOTE').replace(/\s+/g,'').substring(0,4).toUpperCase();
@@ -4899,6 +4956,7 @@ async function downloadPDFasHTML(q) {
   const googleFont=ql==='ja'?'<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap">':(ql==='zh-TW'||ql==='zh-CN')?'<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC&display=swap">':'';
   const fontFamily=ql==='ja'?"'Noto Sans JP',sans-serif":(ql==='zh-TW'||ql==='zh-CN')?"'Noto Sans TC',sans-serif":"Arial,sans-serif";
   const html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+fname+'</title>'+googleFont+'<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:'+fontFamily+';font-size:12px;color:#222}@media print{.no-print{display:none!important}@page{size:A4 landscape;margin:10mm}}.no-print{background:#1a6fd4;color:#fff;padding:10px 20px;margin-bottom:12px;display:flex;gap:12px;align-items:center}.no-print button{background:#fff;color:#1a6fd4;border:none;padding:6px 16px;border-radius:6px;cursor:pointer;font-weight:bold}table{width:100%;border-collapse:collapse}.it td{padding:4px 8px;font-size:11px;border:1px solid #ddd}</style></head><body><div class="no-print"><span>🖨️ '+_lQTIT+' — '+fname+'.pdf</span><button onclick="window.print()">Print / Save as PDF</button><button onclick="window.close()">Close</button></div>'+hdrImgTag+'<div style="text-align:center;font-size:18px;font-weight:bold;padding:10px 0;border-bottom:2px solid #324d82">'+_lQTIT+'</div><table class="it" style="margin:8px 0"><tr><td style="width:25%"><strong>'+_lTO+':</strong> '+q.company+'</td><td style="width:25%"><strong>'+_lATTN+':</strong> '+(q.attn||'—')+'</td><td style="width:25%"><strong>'+_lDATE+':</strong> '+q.date+'</td><td style="width:25%"><strong>'+_lPAY+':</strong> '+(q.pay||SETTINGS.pay||'')+'</td></tr><tr><td>TEL: '+(q.tel||'—')+'</td><td>EMAIL: '+(q.email||'—')+'</td><td><strong>'+_lINCO+':</strong> '+(q.inco||SETTINGS.inco||'')+'</td><td><strong>'+_lCUR+':</strong> '+(q.outCurrency||q.currency||'USD')+'</td></tr></table><table style="margin-top:8px"><thead><tr><th style="padding:6px 8px;background:#324d82;color:#fff;border:1px solid #2a3f6d;font-size:11px;width:12%">'+_lCode+'</th><th style="padding:6px 8px;background:#324d82;color:#fff;border:1px solid #2a3f6d;font-size:11px;width:14%">'+_lPic+'</th><th style="padding:6px 8px;background:#324d82;color:#fff;border:1px solid #2a3f6d;font-size:11px">'+_lFeat+'</th>'+priceHdrs+'<th style="padding:6px 8px;background:#324d82;color:#fff;border:1px solid #2a3f6d;font-size:11px;width:18%">'+_lRmkH+'</th></tr></thead><tbody>'+prodRows+'</tbody></table><div style="margin-top:12px"><strong>'+_lRMK+':</strong><div style="margin-top:4px;font-size:11px;white-space:pre-line">'+notes+'</div></div></body></html>';
+  if (opts && opts.htmlOnly) return { html, fname };
   const blob=new Blob([html],{type:'text/html;charset=utf-8'});
   const url=URL.createObjectURL(blob);
   const win = window.open(url, '_blank');
@@ -5041,7 +5099,8 @@ function _quoteHasCJK(q) {
 
 // PDF DOWNLOAD — jsPDF (A4 portrait)
 // ════════════════════════════════════════════════
-async function downloadPDF(id) {
+async function downloadPDF(id, opts) {
+  opts = opts || {};
   const q = QUOTES.find(x => x.id === id);
   if (!q) return;
 
@@ -5050,6 +5109,7 @@ async function downloadPDF(id) {
   // For non-English: use HTML export (browser renders CJK fonts via Google Fonts correctly)
   // This avoids the jsPDF font embedding problem entirely
   if (ql !== 'en') {
+    if (opts.blob) return await _quoteHtmlPdfBlob(q);
     await downloadPDFasHTML(q);
     return;
   }
@@ -5057,6 +5117,7 @@ async function downloadPDF(id) {
   // English quote, but user typed CJK somewhere (commonly the Remark): helvetica
   // can't render it → fall back to the HTML export path, which uses browser fonts.
   if (_quoteHasCJK(q)) {
+    if (opts.blob) return await _quoteHtmlPdfBlob(q);
     await downloadPDFasHTML(q);
     return;
   }
@@ -5069,6 +5130,7 @@ async function downloadPDF(id) {
     // jsPDF UMD 可能在不同層：window.jspdf.jsPDF 或 window.jsPDF
     const jsPDF = window.jspdf?.jsPDF || window.jsPDF;
     if (!jsPDF) {
+      if (opts.blob) throw new Error('PDF engine not loaded');
       console.warn('[PDF] jsPDF not available, falling back to HTML');
       await downloadPDFasHTML(q);
       if (btn) { btn.disabled = false; btn.innerHTML = orig; }
@@ -5348,11 +5410,13 @@ async function downloadPDF(id) {
                          .findIndex(x => x.id === q.id) + 1;
     const fSeqStr2 = String(fSeq2).padStart(2,'0');
     const fname2 = fComp2 + '_' + fDate2 + '_' + fSeqStr2;
+    if (opts.blob) return { blob: doc.output('blob'), name: fname2 + '.pdf' };
     doc.save(fname2 + '.pdf');
     toast('✅ PDF downloaded!');
 
   } catch (err) {
     console.error('[PDF]', err);
+    if (opts.blob) return await _quoteHtmlPdfBlob(q);
     // Fallback: use HTML export so user always gets output
     try {
       await downloadPDFasHTML(q);
@@ -6564,7 +6628,7 @@ function _populateCRMSalesFilter(){
 // 留著遲早會有人在裡面呼叫 t() 然後拿到一個字串當函式用。
 function showCRMTab(tab){
   _crmTab = tab;
-  ['accounts','pipeline','tasks','activities'].forEach(x=>{
+  ['accounts','pipeline','tasks','activities','expo'].forEach(x=>{
     const btn=document.getElementById('crmtab-'+x);
     if(btn) btn.classList.toggle('on', x===tab);
     const c=document.getElementById('crmtab-content-'+x);
@@ -6574,6 +6638,7 @@ function showCRMTab(tab){
   if(tab==='pipeline') renderCRMPipeline();
   if(tab==='tasks') renderCRMTasks();
   if(tab==='activities') renderCRMActivities();
+  if(tab==='expo') expoLoad();
 }
 
 // ── ACCOUNT LIST ─────────────────────────────
@@ -7091,8 +7156,10 @@ async function crmCardSave(){
       CRM_CONTACTS.push(c);
     }
     toast(t('cardSaved'));
+    const expoId = _card.expoId;
     crmCardClose();
     try { renderCRMAccounts(); } catch (_) {}
+    if (expoId) { expoAfterScan(expoId, acctId, ctId); return; }
     openAccountModal(acctId);
   } catch (e) {
     toast(t('toastSaveFailed') + ': ' + (e.message || e), 5000);
@@ -7136,6 +7203,466 @@ async function crmCardThumbs(c){
     p.style.cssText = 'flex-basis:100%;font-size:12px;color:var(--tx2);white-space:pre-wrap';
     p.textContent = t('cardOther') + '：\n' + other;
     box.appendChild(p);
+  }
+}
+
+// ═══════════════════════════════════════
+// 🎪 展覽模式（v3.72，2026-10-08 Woody：「馬上要展覽了」）
+//   ① 攤位：掃名片 → 存 CRM → AI 依名片＋談話重點寫客製跟進信 → 預覽 → 從自己的公司信箱寄出（附邀請函）
+//   ② 報價：來賓 → 帶入客戶開報價單 → 存檔 → 📧 寄出報價（附 PDF）
+//   ③ 展後：勾選來賓 → 感謝信（會場照片嵌在內文）→ 逐封寄出
+//   寄信一律經 edge function mail-send（寄件人由伺服器決定＝登入者本人，前端指定不了）。
+// ═══════════════════════════════════════
+const MAIL_SEND = 'https://tcvlnpgpuphdalzvmoyo.supabase.co/functions/v1/mail-send';
+const EXPO_BUCKET = 'crm-expo';
+const EXPO_LANGS = [['en','English'],['zh-TW','繁體中文'],['zh-CN','简体中文'],['vi','Tiếng Việt'],['ja','日本語']];
+const EXPO_MAX_PHOTOS = 6;
+let EXPOS = [], EXPO_VISITS = [], _expoId = '', _expoEditId = null, _fuVisitId = null, _expoQuoteVisit = null;
+
+function expoLangName(k){ return (EXPO_LANGS.find(x => x[0] === k) || [k, k])[1]; }
+function expoCur(){ return EXPOS.find(x => x.id === _expoId) || null; }
+
+async function mailSend(payload){
+  if (!qtSessionAlive()) throw new Error(t('authLost'));
+  const r = await fetch(MAIL_SEND, { method: 'POST', headers: qtHdrs(), body: JSON.stringify(payload) });
+  let j = {}; try { j = await r.json(); } catch (_) {}
+  if (!r.ok) { qtNoteAuth(r.status); throw new Error(j.detail || j.error || ('HTTP ' + r.status)); }
+  return j;
+}
+async function expoUpload(path, blob, mime){
+  const up = await fetch(SB_WORKER + '/supabase/storage/v1/object/' + EXPO_BUCKET + '/' + path,
+    { method: 'POST', headers: { 'x-session': qtSig(), 'Content-Type': mime, 'x-upsert': 'true' }, body: blob });
+  if (!up.ok) { qtNoteAuth(up.status); throw new Error('upload HTTP ' + up.status); }
+}
+async function expoSigned(path){
+  const res = await fetch(SB_WORKER + '/supabase/storage/v1/object/sign/' + EXPO_BUCKET + '/' + path,
+    { method: 'POST', headers: qtHdrs(), body: JSON.stringify({ expiresIn: 3600 }) });
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  const j = await res.json(); return SB_ORIGIN + '/storage/v1' + (j.signedURL || j.signedUrl);
+}
+
+async function expoLoad(){
+  const ex = await SB.get('crm_exhibitions', 'order=start_date.desc.nullslast,created_at.desc');
+  if (!ex) { toast(t('expoLoadFail')); return; }
+  EXPOS = ex;
+  if (!_expoId || !EXPOS.some(x => x.id === _expoId)) {
+    try { _expoId = localStorage.getItem('qi-expo-cur') || ''; } catch (_) {}
+    if (!EXPOS.some(x => x.id === _expoId)) _expoId = EXPOS[0]?.id || '';
+  }
+  await expoLoadVisits();
+}
+async function expoLoadVisits(){
+  if (!_expoId) { EXPO_VISITS = []; expoRender(); return; }
+  const v = await SB.get('crm_expo_visits', 'exhibition_id=eq.' + encodeURIComponent(_expoId) + '&order=created_at.desc');
+  EXPO_VISITS = v || [];
+  expoRender();
+}
+function expoPick(id){
+  _expoId = id; try { localStorage.setItem('qi-expo-cur', id); } catch (_) {}
+  expoLoadVisits();
+}
+// 業務只看自己掃的；admin 看全部
+function expoMyVisits(){
+  return EXPO_VISITS.filter(v => currentUser?.role === 'admin' || v.emp_id === currentUser?.empId);
+}
+function expoUserName(emp){ const u = USERS.find(x => x.empId === emp); return u ? (u.nameZh || u.nameEn || emp) : (emp || ''); }
+
+function expoRender(){
+  const el = document.getElementById('expoBody'); if (!el) return;
+  const sel = `<select onchange="expoPick(this.value)" style="flex:1;min-width:180px;padding:9px 10px;border-radius:8px;border:1px solid var(--br);background:var(--bg);color:var(--tx);font-size:13px">
+      ${EXPOS.length ? '' : `<option value="">${t('expoNone')}</option>`}
+      ${EXPOS.map(x => `<option value="${escHtml(x.id)}"${x.id === _expoId ? ' selected' : ''}>${escHtml(x.name)}${x.start_date ? ' · ' + x.start_date : ''}</option>`).join('')}
+    </select>`;
+  const e = expoCur();
+  let h = `<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">${sel}
+      <button class="btn btn-ghost btn-sm" onclick="expoOpenEdit(null)">＋ ${t('expoNew')}</button>
+      ${e ? `<button class="btn btn-ghost btn-sm" onclick="expoOpenEdit('${escHtml(e.id)}')">⚙️ ${t('expoSettings')}</button>` : ''}</div>`;
+  if (!e) { el.innerHTML = h + `<div class="expo-empty">${t('expoCreateFirst')}</div>`; return; }
+  const mine = expoMyVisits();
+  const nFu = mine.filter(v => v.followup_sent_at).length, nQ = mine.filter(v => v.quote_id).length, nTh = mine.filter(v => v.thanks_sent_at).length;
+  h += `<div class="expo-card">
+      <div style="font-size:16px;font-weight:800">${escHtml(e.name)}</div>
+      <div style="font-size:12px;color:var(--tx2);margin-top:3px">${[e.start_date && (e.start_date + (e.end_date && e.end_date !== e.start_date ? ' – ' + e.end_date : '')), e.venue, e.booth && (t('expoBooth') + ' ' + e.booth)].filter(Boolean).map(escHtml).join(' · ')}</div>
+      <div style="font-size:12px;margin-top:6px;color:${e.invite_path ? 'var(--tx2)' : '#f59e0b'}">📎 ${e.invite_path ? escHtml(e.invite_name || 'invitation') : t('expoNoInvite')}</div>
+      <div class="expo-stats"><span>👥 ${mine.length}</span><span>✉️ ${nFu}</span><span>💰 ${nQ}</span><span>💌 ${nTh}</span></div>
+    </div>
+    <div class="expo-actions">
+      <button class="expo-big" onclick="expoScan()">📇 ${t('expoScan')}</button>
+      <button class="expo-big alt" onclick="expoThanksOpen()">💌 ${t('expoThanks')}</button>
+    </div>
+    <div class="card-sec" style="margin-top:18px">${t('expoVisitors')}（${mine.length}）</div>`;
+  if (!mine.length) h += `<div class="expo-empty">${t('expoNoVisitors')}</div>`;
+  h += mine.map(v => {
+    const c = CRM_CONTACTS.find(x => x.id === v.contact_id) || {}, a = CRM_ACCOUNTS.find(x => x.id === v.account_id) || {};
+    const q = v.quote_id ? QUOTES.find(x => x.id === v.quote_id) : null;
+    const vid = escHtml(v.id);
+    return `<div class="expo-row">
+      <div style="flex:1;min-width:0;cursor:pointer" onclick="openAccountModal('${escHtml(v.account_id || '')}')">
+        <div style="font-weight:700;font-size:14px">${escHtml(c.name || '—')}${c.title ? ` <span style="font-weight:400;color:var(--tx3);font-size:12px">${escHtml(c.title)}</span>` : ''}</div>
+        <div style="font-size:12px;color:var(--tx2)">${escHtml(a.company || '')}${c.email ? ' · ' + escHtml(c.email) : ` · <span style="color:#f59e0b">${t('expoNoEmail')}</span>`}</div>
+        ${currentUser?.role === 'admin' ? `<div style="font-size:10.5px;color:var(--tx3)">${t('expoBy')} ${escHtml(expoUserName(v.emp_id))} · ${String(v.created_at || '').slice(0, 16).replace('T', ' ')}</div>` : ''}
+      </div>
+      <div class="expo-btns">
+        <button class="expo-chip${v.followup_sent_at ? ' done' : ''}" onclick="expoFollowup('${vid}')">✉️ ${v.followup_sent_at ? t('expoSent') : t('expoFollowup')}</button>
+        ${q ? `<button class="expo-chip${v.quote_sent_at ? ' done' : ''}" onclick="openDetail('${escHtml(q.id)}')">💰 ${escHtml(q.ref || '')}${v.quote_sent_at ? ' ✓' : ''}</button>`
+            : `<button class="expo-chip" onclick="expoQuote('${vid}')">💰 ${t('expoQuote')}</button>`}
+        ${v.thanks_sent_at ? `<span class="expo-chip done" style="cursor:default">💌 ✓</span>` : ''}
+      </div></div>`;
+  }).join('');
+  el.innerHTML = h;
+}
+
+// ── 展覽設定 ─────────────────────────────
+function expoOpenEdit(id){
+  _expoEditId = id;
+  const e = id ? EXPOS.find(x => x.id === id) : null;
+  const set = (k, v) => { const el = document.getElementById('ex-' + k); if (el) el.value = v || ''; };
+  ['name','venue','booth','start_date','end_date','followup_guide','thanks_subject','thanks_body'].forEach(k => set(k, e?.[k]));
+  if (!e) {
+    set('thanks_subject', 'Thank you for visiting COMART at {expo}');
+    set('thanks_body', 'Dear {name},\n\nThank you for visiting our booth at {expo}. It was a pleasure meeting you and the {company} team.\n\nAttached are a few photos from the show. Please let me know if there is anything we can prepare for you — samples, quotations or technical details.\n\nLooking forward to working with you.');
+  }
+  _expoEditPhotos = (e?.photos || []).slice();
+  _expoInvite = e?.invite_path ? { path: e.invite_path, name: e.invite_name, mime: e.invite_mime } : null;
+  expoEditPaint();
+  document.getElementById('expoOverlay').style.display = 'flex';
+}
+let _expoEditPhotos = [], _expoInvite = null, _expoNewFiles = [];
+function expoEditPaint(){
+  document.getElementById('ex-invite-cur').textContent = _expoInvite ? '📎 ' + (_expoInvite.name || '') : t('expoNoInvite');
+  const box = document.getElementById('ex-photos');
+  box.innerHTML = '';
+  _expoEditPhotos.forEach((p, i) => {
+    const d = document.createElement('div'); d.className = 'expo-ph';
+    d.innerHTML = `<div style="padding:20px;text-align:center">⏳</div><button onclick="expoPhotoDel(${i})">✕</button>`;
+    box.appendChild(d);
+    const src = p.dataUrl ? Promise.resolve(p.dataUrl) : expoSigned(p.path);
+    src.then(u => { d.querySelector('div').outerHTML = `<img src="${u}" alt="">`; }).catch(() => {});
+  });
+  document.getElementById('ex-photo-cnt').textContent = `${_expoEditPhotos.length} / ${EXPO_MAX_PHOTOS}`;
+}
+function expoPhotoDel(i){ _expoEditPhotos.splice(i, 1); expoEditPaint(); }
+async function expoPhotosPicked(input){
+  const files = [...(input.files || [])]; input.value = '';
+  for (const f of files) {
+    if (_expoEditPhotos.length >= EXPO_MAX_PHOTOS) { toast(t('expoMaxPhotos')); break; }
+    try {
+      // 嵌在信件內文：長邊 1280、JPEG 0.8（一張約 150–300KB），6 張加起來不會讓信被擋
+      let src; try { src = await createImageBitmap(f, { imageOrientation: 'from-image' }); }
+      catch (_) { src = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = URL.createObjectURL(f); }); }
+      const k = Math.min(1, 1280 / Math.max(src.width, src.height));
+      const cv = document.createElement('canvas'); cv.width = Math.round(src.width * k); cv.height = Math.round(src.height * k);
+      cv.getContext('2d').drawImage(src, 0, 0, cv.width, cv.height);
+      _expoEditPhotos.push({ dataUrl: cv.toDataURL('image/jpeg', 0.8), w: cv.width, h: cv.height });
+    } catch (e) { toast('⚠️ ' + f.name); }
+  }
+  expoEditPaint();
+}
+function expoInvitePicked(input){
+  const f = input.files?.[0]; input.value = '';
+  if (!f) return;
+  if (f.size > 20 * 1024 * 1024) { toast(t('expoInviteTooBig')); return; }
+  _expoInvite = { file: f, name: f.name, mime: f.type || 'application/octet-stream' };
+  expoEditPaint();
+}
+async function expoSave(){
+  const v = k => (document.getElementById('ex-' + k)?.value || '').trim();
+  if (!v('name')) { toast(t('expoNeedName')); return; }
+  const btn = document.getElementById('ex-save'); btn.disabled = true;
+  const id = _expoEditId || uid();
+  try {
+    let inv = _expoInvite;
+    if (inv && inv.file) {
+      const ext = (inv.name.match(/\.([A-Za-z0-9]{1,6})$/) || [, 'pdf'])[1].toLowerCase();
+      const path = `expo/${id}/invite-${Date.now()}.${ext}`;   // 🔴 物件鍵純 ASCII（中文檔名會 400），原檔名存 invite_name
+      await expoUpload(path, inv.file, inv.mime);
+      inv = { path, name: inv.name, mime: inv.mime };
+    }
+    const photos = [];
+    for (const p of _expoEditPhotos) {
+      if (p.path) { photos.push({ path: p.path, w: p.w, h: p.h }); continue; }
+      const path = `expo/${id}/photo-${Date.now()}-${photos.length}.jpg`;
+      await expoUpload(path, await (await fetch(p.dataUrl)).blob(), 'image/jpeg');
+      photos.push({ path, w: p.w, h: p.h });
+    }
+    const row = { id, name: v('name'), venue: v('venue'), booth: v('booth'), start_date: v('start_date') || null, end_date: v('end_date') || null,
+      followup_guide: v('followup_guide'), thanks_subject: v('thanks_subject'), thanks_body: v('thanks_body'),
+      invite_path: inv?.path || null, invite_name: inv?.name || null, invite_mime: inv?.mime || null, photos, updated_at: new Date().toISOString() };
+    if (_expoEditId) await SB.patch('crm_exhibitions', 'id=eq.' + encodeURIComponent(id), row);
+    else { row.created_by = currentUser?.empId || null; await SB.post('crm_exhibitions', row); }
+    document.getElementById('expoOverlay').style.display = 'none';
+    _expoId = id; try { localStorage.setItem('qi-expo-cur', id); } catch (_) {}
+    toast(t('toastSaved'));
+    await expoLoad();
+  } catch (e) { toast(t('toastSaveFailed') + ': ' + (e.message || e), 5000); }
+  finally { btn.disabled = false; }
+}
+
+// ── ① 攤位：掃名片 → 跟進信 ─────────────
+function expoScan(){
+  const e = expoCur(); if (!e) { toast(t('expoCreateFirst')); return; }
+  crmCardScan(null); _card.expoId = e.id;
+}
+// crmCardSave 存好之後呼叫（_card.expoId 有值時）
+async function expoAfterScan(expoId, acctId, ctId){
+  const id = uid();
+  const row = { id, exhibition_id: expoId, contact_id: ctId, account_id: acctId, emp_id: currentUser?.empId || '', created_at: new Date().toISOString() };
+  try { await SB.post('crm_expo_visits', row); EXPO_VISITS.unshift(row); }
+  catch (e) { toast(t('toastSaveFailed') + ': ' + e.message, 5000); return; }
+  expoRender();
+  expoFollowup(id);
+}
+
+function expoSignature(){
+  const u = currentUser || {};
+  const lines = [u.nameEn || u.nameZh || '', u.titleEn || '', 'COMART Corporation', u.email ? 'Email: ' + u.email : '', u.mobile ? 'Mobile: ' + u.mobile : ''].filter(Boolean);
+  return lines.join('\n');
+}
+function expoFollowup(visitId){
+  const v = EXPO_VISITS.find(x => x.id === visitId); if (!v) return;
+  _fuVisitId = visitId;
+  const c = CRM_CONTACTS.find(x => x.id === v.contact_id) || {}, a = CRM_ACCOUNTS.find(x => x.id === v.account_id) || {}, e = EXPOS.find(x => x.id === v.exhibition_id) || {};
+  document.getElementById('fu-to').value = c.email || '';
+  document.getElementById('fu-who').textContent = [c.name, a.company].filter(Boolean).join(' · ');
+  document.getElementById('fu-memo').value = v.memo || '';
+  document.getElementById('fu-lang').value = v.lang || '';
+  document.getElementById('fu-subject').value = '';
+  document.getElementById('fu-body').value = '';
+  document.getElementById('fu-att').textContent = e.invite_path ? '📎 ' + (e.invite_name || 'invitation') : t('expoNoInvite');
+  document.getElementById('fu-sent').textContent = v.followup_sent_at ? '✓ ' + t('expoSentAt') + ' ' + String(v.followup_sent_at).slice(0, 16).replace('T', ' ') : '';
+  document.getElementById('fuOverlay').style.display = 'flex';
+  expoDraft();
+}
+function _expoTag(text, tag){ const m = text.match(new RegExp('<' + tag + '>([\\s\\S]*?)</' + tag + '>')); return m ? m[1].trim() : ''; }
+async function expoClaude(prompt, maxTokens){
+  const resp = await fetch(CLAUDE_PROXY, { method: 'POST', headers: qtHdrs(), body: JSON.stringify({
+    model: 'claude-opus-5-5', max_tokens: maxTokens || 2500, output_config: { effort: 'low' },
+    messages: [{ role: 'user', content: prompt }] }) });
+  if (!resp.ok) { qtNoteAuth(resp.status); throw new Error('HTTP ' + resp.status); }
+  const j = await resp.json();
+  return (j.content || []).map(b => b.text || '').join('');
+}
+async function expoDraft(){
+  const v = EXPO_VISITS.find(x => x.id === _fuVisitId); if (!v) return;
+  const c = CRM_CONTACTS.find(x => x.id === v.contact_id) || {}, a = CRM_ACCOUNTS.find(x => x.id === v.account_id) || {}, e = EXPOS.find(x => x.id === v.exhibition_id) || {};
+  const lang = document.getElementById('fu-lang').value;
+  const memo = document.getElementById('fu-memo').value.trim();
+  const bodyEl = document.getElementById('fu-body'), btn = document.getElementById('fu-draft');
+  btn.disabled = true; bodyEl.value = ''; bodyEl.placeholder = '⏳ ' + t('expoDrafting');
+  const card = { name: c.name, name_alt: c.nameAlt, title: c.title, dept: c.dept, company: a.company, company_alt: a.companyAlt,
+    country: a.country, website: a.website, industry: a.industry, card_extra: c.cardData?.other || '' };
+  const prompt = `You are writing a short follow-up email on behalf of a COMART salesperson, sent right after meeting a visitor at a trade show booth.
+COMART Corporation is a manufacturer of mobile and computer accessories (factories in China and Vietnam).
+
+Trade show: ${e.name || ''}${e.start_date ? ' (' + e.start_date + (e.end_date ? ' – ' + e.end_date : '') + ')' : ''}${e.venue ? ', ' + e.venue : ''}${e.booth ? ', booth ' + e.booth : ''}
+${e.invite_path ? 'An invitation file (' + (e.invite_name || 'invitation') + ') is attached to this email — mention it naturally.' : 'No attachment.'}
+Guidance from the salesperson's manager (follow it): ${e.followup_guide || '(none)'}
+What was discussed at the booth (may be empty, may be in Chinese): ${memo || '(nothing recorded)'}
+Visitor's business card (JSON): ${JSON.stringify(card)}
+Sender: ${currentUser?.nameEn || currentUser?.nameZh || ''}${currentUser?.titleEn ? ', ' + currentUser.titleEn : ''}
+
+Language: ${lang ? 'write in ' + expoLangName(lang) : 'choose the language the visitor most likely prefers from the card (Chinese company/name in Taiwan → 繁體中文, China → 简体中文, Vietnam → Tiếng Việt, Japan → 日本語, otherwise English). If unsure, English.'}
+
+Rules: warm, professional, concise (90–160 words). Personalise using the card and the discussion; never invent facts, prices, promises or details that were not given. Address the person appropriately for the language. Do NOT include a signature block (it is appended automatically). Plain text, no markdown.
+Output exactly:
+<lang>one of: en, zh-TW, zh-CN, vi, ja</lang>
+<subject>…</subject>
+<body>…</body>`;
+  try {
+    const text = await expoClaude(prompt, 2000);
+    const sub = _expoTag(text, 'subject'), body = _expoTag(text, 'body'), lg = _expoTag(text, 'lang');
+    if (!body) throw new Error('empty');
+    document.getElementById('fu-subject').value = sub;
+    bodyEl.value = body + '\n\n' + expoSignature();
+    if (EXPO_LANGS.some(x => x[0] === lg)) document.getElementById('fu-lang').value = lg;
+  } catch (e2) {
+    toast(t('expoDraftFail') + '：' + (e2.message || e2));
+  } finally { btn.disabled = false; bodyEl.placeholder = ''; }
+}
+function expoTextHtml(s){ return '<div style="font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:1.6;color:#222">' + escHtml(s).replace(/\n/g, '<br>') + '</div>'; }
+async function expoFuSend(){
+  const v = EXPO_VISITS.find(x => x.id === _fuVisitId); if (!v) return;
+  const e = EXPOS.find(x => x.id === v.exhibition_id) || {};
+  const to = document.getElementById('fu-to').value.trim(), subject = document.getElementById('fu-subject').value.trim(), body = document.getElementById('fu-body').value.trim();
+  if (!to) { toast(t('expoNoEmail')); return; }
+  if (!subject || !body) { toast(t('expoNeedText')); return; }
+  if (v.followup_sent_at && !confirm(t('expoResend'))) return;
+  const btn = document.getElementById('fu-send'); btn.disabled = true; btn.textContent = '⏳';
+  try {
+    await mailSend({ kind: 'followup', to: [to], subject, html: expoTextHtml(body), exhibitionId: v.exhibition_id, visitId: v.id,
+      attach: e.invite_path ? [{ bucket: EXPO_BUCKET, path: e.invite_path, name: e.invite_name || 'invitation', mime: e.invite_mime }] : [] });
+    const patch = { followup_sent_at: new Date().toISOString(), memo: document.getElementById('fu-memo').value.trim(), lang: document.getElementById('fu-lang').value || null };
+    Object.assign(v, patch);
+    SB.patch('crm_expo_visits', 'id=eq.' + encodeURIComponent(v.id), patch).catch(err => console.warn('[expo] visit patch', err));
+    expoLogActivity(v.account_id, 'show', subject, body);
+    toast('✅ ' + t('expoSentTo') + ' ' + to);
+    document.getElementById('fuOverlay').style.display = 'none';
+    expoRender();
+  } catch (err) { toast('❌ ' + t('expoSendFail') + '：' + (err.message || err), 6000); }
+  finally { btn.disabled = false; btn.textContent = t('expoSend'); }
+}
+function expoLogActivity(accountId, type, title, detail){
+  if (!accountId) return;
+  const a = { id: uid(), accountId, type, date: tds2(), title: String(title || '').slice(0, 200), detail: String(detail || '').slice(0, 4000),
+    createdAt: Date.now(), updatedAt: Date.now() };
+  SB.post('crm_activities', a).then(() => { CRM_ACTIVITIES.push(a); }).catch(err => console.warn('[expo] activity', err));
+}
+function tds2(){ const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+
+// ── ② 報價 ─────────────────────────────
+function expoQuote(visitId){
+  const v = EXPO_VISITS.find(x => x.id === visitId); if (!v) return;
+  const c = CRM_CONTACTS.find(x => x.id === v.contact_id) || {}, a = CRM_ACCOUNTS.find(x => x.id === v.account_id) || {};
+  openQuoteForm(null);
+  _expoQuoteVisit = visitId;   // 一定要在 openQuoteForm 之後（它會清掉這個值）
+  const set = (id, val) => { const el = document.getElementById(id); if (el && val) el.value = val; };
+  set('f-company', a.company); set('f-attn', c.name); set('f-email', (c.email || '').split('/')[0].trim()); set('f-tel', c.mobile || c.phone);
+  if (a.incoterm) set('f-inco', a.incoterm);
+  if (a.payTerms) set('f-pay', a.payTerms);
+  toast('💰 ' + (a.company || ''));
+}
+// saveQuote（新報價）存好之後呼叫
+async function expoQuoteSaved(q){
+  const vid = _expoQuoteVisit; _expoQuoteVisit = null;
+  const v = EXPO_VISITS.find(x => x.id === vid); if (!v) return false;
+  v.quote_id = q.id;
+  try { await SB.patch('crm_expo_visits', 'id=eq.' + encodeURIComponent(v.id), { quote_id: q.id }); } catch (e) { console.warn('[expo] link quote', e); }
+  openDetail(q.id);
+  setTimeout(() => quoteMailOpen(q.id), 300);
+  return true;
+}
+
+// 報價單寄出（附 PDF）—— 任何報價單都能用，不限展覽
+let _qmId = null;
+function quoteMailOpen(id){
+  const q = QUOTES.find(x => x.id === id); if (!q) return;
+  _qmId = id;
+  const c = CRM_CONTACTS.find(x => (x.email || '').toLowerCase() === (q.email || '').toLowerCase());
+  const name = q.attn || c?.name || '';
+  document.getElementById('qm-to').value = (q.email || '').split('/')[0].trim();
+  document.getElementById('qm-cc').value = '';
+  document.getElementById('qm-subject').value = 'Quotation – ' + (q.company || '') + ' / COMART CORPORATION';
+  document.getElementById('qm-body').value = `Dear ${name || 'Sir/Madam'},\n\nThank you for your interest in COMART products. Please find attached our quotation ${q.ref || ''} for your review.\n\nPlease feel free to contact me if you have any questions.\n\n` + expoSignature();
+  document.getElementById('qm-att').textContent = '📎 ' + (q.ref || 'quotation') + '.pdf';
+  document.getElementById('qmOverlay').style.display = 'flex';
+}
+async function quoteMailSend(){
+  const q = QUOTES.find(x => x.id === _qmId); if (!q) return;
+  const to = document.getElementById('qm-to').value.trim(), subject = document.getElementById('qm-subject').value.trim(), body = document.getElementById('qm-body').value.trim();
+  if (!to) { toast(t('expoNoEmail')); return; }
+  const btn = document.getElementById('qm-send'); btn.disabled = true; btn.textContent = '⏳ PDF…';
+  try {
+    const pdf = await downloadPDF(q.id, { blob: true });
+    if (!pdf || !pdf.blob) throw new Error('PDF');
+    const b64 = await new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result).split(',')[1]); r.onerror = rej; r.readAsDataURL(pdf.blob); });
+    btn.textContent = '⏳';
+    const v = EXPO_VISITS.find(x => x.quote_id === q.id);
+    await mailSend({ kind: 'quote', to: [to], cc: document.getElementById('qm-cc').value, subject, html: expoTextHtml(body),
+      files: [{ name: pdf.name || ((q.ref || 'quotation') + '.pdf'), mime: 'application/pdf', b64 }],
+      exhibitionId: v?.exhibition_id || null, visitId: v?.id || null });
+    if (v) { v.quote_sent_at = new Date().toISOString(); SB.patch('crm_expo_visits', 'id=eq.' + encodeURIComponent(v.id), { quote_sent_at: v.quote_sent_at }).catch(() => {}); }
+    if (q.status !== 'sent') { q.status = 'sent'; saveOneQ(q).catch(() => {}); }
+    toast('✅ ' + t('expoSentTo') + ' ' + to);
+    document.getElementById('qmOverlay').style.display = 'none';
+    try { renderDetail(q.id); } catch (_) {}
+  } catch (err) { toast('❌ ' + t('expoSendFail') + '：' + (err.message || err), 6000); }
+  finally { btn.disabled = false; btn.textContent = t('expoSend'); }
+}
+
+// ── ③ 展後感謝信 ───────────────────────
+let _thx = null;   // { sel:Set, tr:{lang:{subject,body}}, sending }
+function expoThanksOpen(){
+  const e = expoCur(); if (!e) return;
+  const list = expoMyVisits();
+  _thx = { sel: new Set(list.filter(v => !v.thanks_sent_at && expoVisitEmail(v)).map(v => v.id)), tr: {}, sending: false };
+  document.getElementById('th-subject').value = e.thanks_subject || '';
+  document.getElementById('th-body').value = e.thanks_body || '';
+  expoThanksPaint();
+  document.getElementById('thOverlay').style.display = 'flex';
+}
+function expoVisitEmail(v){ const c = CRM_CONTACTS.find(x => x.id === v.contact_id); return (c?.email || '').split('/')[0].trim(); }
+function expoThanksPaint(){
+  const e = expoCur(), list = expoMyVisits();
+  const box = document.getElementById('th-list');
+  box.innerHTML = `<label class="th-row" style="font-weight:700"><input type="checkbox" ${list.length && list.every(v => _thx.sel.has(v.id) || !expoVisitEmail(v)) ? 'checked' : ''} onchange="expoThanksAll(this.checked)"> ${t('expoSelectAll')}（${_thx.sel.size} / ${list.length}）</label>` +
+    list.map(v => {
+      const c = CRM_CONTACTS.find(x => x.id === v.contact_id) || {}, a = CRM_ACCOUNTS.find(x => x.id === v.account_id) || {}, em = expoVisitEmail(v);
+      return `<label class="th-row${em ? '' : ' off'}"><input type="checkbox" ${_thx.sel.has(v.id) ? 'checked' : ''} ${em ? '' : 'disabled'} onchange="expoThanksTog('${escHtml(v.id)}',this.checked)">
+        <span style="flex:1;min-width:0"><b>${escHtml(c.name || '—')}</b> · ${escHtml(a.company || '')}<br><span style="font-size:11px;color:var(--tx3)">${escHtml(em || t('expoNoEmail'))}${v.lang ? ' · ' + escHtml(expoLangName(v.lang)) : ''}</span></span>
+        ${v.thanks_sent_at ? '<span style="font-size:11px;color:#3DD68C">✓ ' + t('expoSent') + '</span>' : ''}<span class="th-st" id="th-st-${escHtml(v.id)}"></span></label>`;
+    }).join('');
+  const ph = document.getElementById('th-photos'); ph.innerHTML = '';
+  (e.photos || []).forEach(p => { const d = document.createElement('div'); d.className = 'expo-ph'; ph.appendChild(d); expoSigned(p.path).then(u => { d.innerHTML = `<img src="${u}" alt="">`; }).catch(() => {}); });
+  if (!(e.photos || []).length) ph.innerHTML = `<span style="font-size:12px;color:#f59e0b">${t('expoNoPhotos')}</span>`;
+  const langs = [...new Set(list.filter(v => _thx.sel.has(v.id)).map(v => v.lang || 'en'))].filter(l => l !== 'en');
+  document.getElementById('th-langs').textContent = langs.length ? t('expoThxLangs') + '：' + langs.map(expoLangName).join('、') : '';
+  document.getElementById('th-send').textContent = `📤 ${t('expoSend')}（${_thx.sel.size}）`;
+}
+function expoThanksTog(id, on){ if (on) _thx.sel.add(id); else _thx.sel.delete(id); expoThanksPaint(); }
+function expoThanksAll(on){ expoMyVisits().forEach(v => { if (on && expoVisitEmail(v)) _thx.sel.add(v.id); else _thx.sel.delete(v.id); }); expoThanksPaint(); }
+function expoFill(s, v, e){
+  const c = CRM_CONTACTS.find(x => x.id === v.contact_id) || {}, a = CRM_ACCOUNTS.find(x => x.id === v.account_id) || {};
+  return String(s || '').replace(/\{name\}/g, c.name || '').replace(/\{company\}/g, a.company || '').replace(/\{expo\}/g, e.name || '');
+}
+// 範本以英文寫；來賓的跟進信若用其他語言，感謝信同一語言（AI 翻一次、每種語言一次）
+async function expoThanksTr(lang, subject, body){
+  if (lang === 'en') return { subject, body };
+  if (_thx.tr[lang] && _thx.tr[lang].src === subject + '\n' + body) return _thx.tr[lang];
+  const text = await expoClaude(`Translate this email into ${expoLangName(lang)}. Keep the placeholders {name}, {company} and {expo} exactly as they are. Keep the tone warm and professional; address the reader appropriately for the language. Output exactly <subject>…</subject><body>…</body>.\n\n<subject>${subject}</subject>\n<body>${body}</body>`, 2000);
+  const r = { subject: _expoTag(text, 'subject') || subject, body: _expoTag(text, 'body') || body, src: subject + '\n' + body };
+  _thx.tr[lang] = r; return r;
+}
+async function expoThanksTest(){ await expoThanksRun(true); }
+async function expoThanksSend(){
+  if (!_thx.sel.size) { toast(t('expoPickSome')); return; }
+  if (!confirm(t('expoThxConfirm').replace('{n}', _thx.sel.size))) return;
+  await expoThanksRun(false);
+}
+async function expoThanksRun(test){
+  const e = expoCur(); if (!e || _thx.sending) return;
+  const subject = document.getElementById('th-subject').value.trim(), body = document.getElementById('th-body').value.trim();
+  if (!subject || !body) { toast(t('expoNeedText')); return; }
+  // 範本改過就存回展覽，下次打開還在
+  if (subject !== (e.thanks_subject || '') || body !== (e.thanks_body || '')) {
+    e.thanks_subject = subject; e.thanks_body = body;
+    SB.patch('crm_exhibitions', 'id=eq.' + encodeURIComponent(e.id), { thanks_subject: subject, thanks_body: body, updated_at: new Date().toISOString() }).catch(() => {});
+  }
+  const photos = (e.photos || []).slice(0, EXPO_MAX_PHOTOS);
+  const inline = photos.map((p, i) => ({ cid: 'photo' + (i + 1), bucket: EXPO_BUCKET, path: p.path, name: 'photo' + (i + 1) + '.jpg', mime: 'image/jpeg' }));
+  const gallery = photos.map((p, i) => `<img src="cid:photo${i + 1}" alt="" style="display:block;max-width:100%;width:560px;height:auto;margin:10px 0;border-radius:6px">`).join('');
+  const html = txt => expoTextHtml(txt) + (gallery ? '<div style="margin-top:14px">' + gallery + '</div>' : '') + expoTextHtml('\n' + expoSignature());
+  _thx.sending = true;
+  const btn = document.getElementById('th-send'), tbtn = document.getElementById('th-test'); btn.disabled = tbtn.disabled = true;
+  try {
+    if (test) {
+      const any = expoMyVisits().find(v => _thx.sel.has(v.id)) || { contact_id: '', account_id: '' };
+      await mailSend({ kind: 'test', to: [currentUser?.email || 'test@comart.com.tw'], subject: '[TEST] ' + expoFill(subject, any, e), html: html(expoFill(body, any, e)), inline, exhibitionId: e.id });
+      toast('✅ ' + t('expoTestSent'));
+      return;
+    }
+    const ids = [..._thx.sel]; let ok = 0; const fail = [];
+    for (const id of ids) {
+      const v = EXPO_VISITS.find(x => x.id === id); if (!v) continue;
+      const st = document.getElementById('th-st-' + id); if (st) st.textContent = '⏳';
+      try {
+        const tr = await expoThanksTr(v.lang || 'en', subject, body);
+        await mailSend({ kind: 'thanks', to: [expoVisitEmail(v)], subject: expoFill(tr.subject, v, e), html: html(expoFill(tr.body, v, e)), inline, exhibitionId: e.id, visitId: v.id });
+        v.thanks_sent_at = new Date().toISOString();
+        await SB.patch('crm_expo_visits', 'id=eq.' + encodeURIComponent(v.id), { thanks_sent_at: v.thanks_sent_at }).catch(() => {});
+        _thx.sel.delete(id); ok++;
+        if (st) st.textContent = '✅';
+      } catch (err) {
+        fail.push(id);
+        if (st) { st.textContent = '❌'; st.title = String(err.message || err); }
+      }
+      btn.textContent = `📤 ${ok + fail.length} / ${ids.length}`;
+    }
+    toast(fail.length ? `✅ ${ok}　❌ ${fail.length}（${t('expoFailKept')}）` : '✅ ' + t('expoThxDone').replace('{n}', ok), 7000);
+    expoRender();
+  } catch (err) { toast('❌ ' + t('expoSendFail') + '：' + (err.message || err), 6000); }
+  finally {
+    _thx.sending = false; btn.disabled = tbtn.disabled = false;
+    if (!test) { try { expoThanksPaint(); } catch (_) {} }
   }
 }
 
@@ -8897,6 +9424,7 @@ document.addEventListener('DOMContentLoaded', () => {
     <button class="moq-chip"    id="crmtab-pipeline" onclick="showCRMTab('pipeline')">📊 Pipeline</button>
     <button class="moq-chip"    id="crmtab-tasks"    onclick="showCRMTab('tasks')">✓ <span id="crm-lbl-tasks">任務</span></button>
     <button class="moq-chip"    id="crmtab-activities" onclick="showCRMTab('activities')">📋 <span id="crm-lbl-activities">互動</span></button>
+    <button class="moq-chip"    id="crmtab-expo" onclick="showCRMTab('expo')">🎪 <span data-qk="crmExpo">展覽</span></button>
     <button onclick="crmCardScan(null)" style="margin-left:auto;padding:6px 12px;border-radius:8px;background:var(--s2);color:var(--tx);font-size:12px;font-weight:600;border:1px solid var(--br);cursor:pointer" data-qk="scanCard">📇 掃描名片</button>
     <button id="crm-add-acct-btn" onclick="openAccountModal()"
       style="padding:6px 12px;border-radius:8px;background:#10a37f;color:#fff;font-size:12px;font-weight:600;border:none;cursor:pointer">+ 新增客戶</button>
@@ -8932,6 +9460,10 @@ document.addEventListener('DOMContentLoaded', () => {
   </div>
 
   <!-- Pipeline Tab -->
+  <!-- 🎪 展覽模式（v3.72） -->
+  <div id="crmtab-content-expo" style="display:none;flex:1;overflow-y:auto;padding:14px 16px;max-width:760px;margin:0 auto">
+    <div id="expoBody"></div>
+  </div>
   <div id="crmtab-content-pipeline" style="display:none;flex:1;overflow-y:auto;padding:14px 16px">
     <div id="crmPipelineBoard"></div>
   </div>
@@ -9105,6 +9637,100 @@ document.addEventListener('DOMContentLoaded', () => {
     <div style="padding:12px 14px;border-top:1px solid var(--br);display:flex;gap:8px">
       <button class="btn btn-primary" id="card-save-btn" onclick="crmCardSave()" data-qk="cardSave">💾 存入 CRM</button>
       <button class="btn btn-ghost" onclick="crmCardClose()" id="card-cancel-btn" data-qk="cancel">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- 🎪 展覽設定 -->
+<div class="overlay" id="expoOverlay" style="display:none">
+  <div class="modal" style="width:100%;max-width:640px">
+    <div class="modal-hdr"><div style="font-size:15px;font-weight:700">🎪 <span data-qk="expoSettings">設定</span></div>
+      <button class="icon-btn" onclick="document.getElementById('expoOverlay').style.display='none'" style="margin-left:auto">✕</button></div>
+    <div class="card-grid" style="padding:14px">
+      <div class="field full"><label data-qk="expoName">展覽名稱</label><input id="ex-name" autocomplete="off"></div>
+      <div class="field"><label data-qk="expoVenue">地點</label><input id="ex-venue" autocomplete="off"></div>
+      <div class="field"><label data-qk="expoBooth">攤位</label><input id="ex-booth" autocomplete="off"></div>
+      <div class="field"><label data-qk="expoStart">開始日期</label><input id="ex-start_date" type="date"></div>
+      <div class="field"><label data-qk="expoEnd">結束日期</label><input id="ex-end_date" type="date"></div>
+      <div class="field full"><label data-qk="expoInvite">邀請函</label>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span id="ex-invite-cur" style="font-size:12px;color:var(--tx2);flex:1"></span>
+        <label class="btn btn-ghost btn-sm" style="cursor:pointer"><span data-qk="expoUpload">選擇檔案</span><input type="file" accept=".pdf,image/*" style="display:none" onchange="expoInvitePicked(this)"></label></div></div>
+      <div class="field full"><label data-qk="expoGuide">給 AI 的跟進信指引</label><textarea id="ex-followup_guide" rows="3" style="resize:vertical" placeholder="e.g. Highlight our Qi2 magnetic chargers and the new Vietnam factory. Invite them to visit us at booth 1A-23 again."></textarea></div>
+      <div class="field full"><label data-qk="expoThxSubject">感謝信主旨</label><input id="ex-thanks_subject" autocomplete="off"></div>
+      <div class="field full"><label data-qk="expoThxBody">感謝信內容</label><textarea id="ex-thanks_body" rows="6" style="resize:vertical"></textarea></div>
+      <div class="field full"><label><span data-qk="expoPhotos">會場照片</span> <span id="ex-photo-cnt" style="color:var(--tx3);font-weight:400"></span></label>
+        <div id="ex-photos" class="expo-phs"></div>
+        <label class="btn btn-ghost btn-sm" style="cursor:pointer;align-self:flex-start;margin-top:6px">＋ <span data-qk="expoAddPhotos">加入照片</span><input type="file" accept="image/*" multiple style="display:none" onchange="expoPhotosPicked(this)"></label></div>
+    </div>
+    <div style="padding:12px 14px;border-top:1px solid var(--br);display:flex;gap:8px">
+      <button class="btn btn-primary" id="ex-save" onclick="expoSave()">💾 <span data-qk="save">Save</span></button>
+      <button class="btn btn-ghost" onclick="document.getElementById('expoOverlay').style.display='none'" data-qk="cancel">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ✉️ 展覽跟進信 -->
+<div class="overlay" id="fuOverlay" style="display:none">
+  <div class="modal" style="width:100%;max-width:640px">
+    <div class="modal-hdr"><div style="font-size:15px;font-weight:700">✉️ <span data-qk="expoFollowup">跟進信</span></div>
+      <span id="fu-who" style="font-size:12px;color:var(--tx2);margin-left:10px"></span>
+      <button class="icon-btn" onclick="document.getElementById('fuOverlay').style.display='none'" style="margin-left:auto">✕</button></div>
+    <div style="padding:14px;display:flex;flex-direction:column;gap:10px">
+      <div class="field"><label data-qk="expoMemo">現場談話重點</label><textarea id="fu-memo" rows="2" style="resize:vertical"></textarea></div>
+      <div style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap">
+        <div class="field" style="flex:1;min-width:160px"><label data-qk="expoLang">語言</label>
+          <select id="fu-lang"><option value="" data-qk="expoAuto">自動</option><option value="en">English</option><option value="zh-TW">繁體中文</option><option value="zh-CN">简体中文</option><option value="vi">Tiếng Việt</option><option value="ja">日本語</option></select></div>
+        <button class="btn btn-ghost" id="fu-draft" onclick="expoDraft()" data-qk="expoRedraft">✨ 重新產生</button>
+      </div>
+      <div class="field"><label data-qk="expoTo">收件人</label><input id="fu-to" type="email" autocomplete="off"></div>
+      <div class="field"><label data-qk="expoSubject">主旨</label><input id="fu-subject" autocomplete="off"></div>
+      <div class="field"><label data-qk="expoBody">內容</label><textarea id="fu-body" rows="12" style="resize:vertical;font-size:14px;line-height:1.55"></textarea></div>
+      <div id="fu-att" style="font-size:12px;color:var(--tx2)"></div>
+      <div id="fu-sent" style="font-size:12px;color:#3DD68C"></div>
+    </div>
+    <div style="padding:12px 14px;border-top:1px solid var(--br);display:flex;gap:8px">
+      <button class="btn btn-primary" id="fu-send" onclick="expoFuSend()" data-qk="expoSend">送出</button>
+      <button class="btn btn-ghost" onclick="document.getElementById('fuOverlay').style.display='none'" data-qk="cancel">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- 📧 寄出報價 -->
+<div class="overlay" id="qmOverlay" style="display:none">
+  <div class="modal" style="width:100%;max-width:600px">
+    <div class="modal-hdr"><div style="font-size:15px;font-weight:700" data-qk="expoQuoteMail">寄出報價</div>
+      <button class="icon-btn" onclick="document.getElementById('qmOverlay').style.display='none'" style="margin-left:auto">✕</button></div>
+    <div style="padding:14px;display:flex;flex-direction:column;gap:10px">
+      <div class="field"><label data-qk="expoTo">收件人</label><input id="qm-to" type="email" autocomplete="off"></div>
+      <div class="field"><label data-qk="expoCc">副本</label><input id="qm-cc" autocomplete="off"></div>
+      <div class="field"><label data-qk="expoSubject">主旨</label><input id="qm-subject" autocomplete="off"></div>
+      <div class="field"><label data-qk="expoBody">內容</label><textarea id="qm-body" rows="9" style="resize:vertical;font-size:14px;line-height:1.55"></textarea></div>
+      <div id="qm-att" style="font-size:12px;color:var(--tx2)"></div>
+    </div>
+    <div style="padding:12px 14px;border-top:1px solid var(--br);display:flex;gap:8px">
+      <button class="btn btn-primary" id="qm-send" onclick="quoteMailSend()" data-qk="expoSend">送出</button>
+      <button class="btn btn-ghost" onclick="document.getElementById('qmOverlay').style.display='none'" data-qk="cancel">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- 💌 展後感謝信 -->
+<div class="overlay" id="thOverlay" style="display:none">
+  <div class="modal" style="width:100%;max-width:760px">
+    <div class="modal-hdr"><div style="font-size:15px;font-weight:700">💌 <span data-qk="expoThanks">展後感謝信</span></div>
+      <button class="icon-btn" onclick="document.getElementById('thOverlay').style.display='none'" style="margin-left:auto">✕</button></div>
+    <div style="padding:14px;display:flex;flex-direction:column;gap:10px">
+      <div class="field"><label data-qk="expoThxSubject">主旨</label><input id="th-subject" autocomplete="off"></div>
+      <div class="field"><label data-qk="expoThxBody">內容</label><textarea id="th-body" rows="7" style="resize:vertical;font-size:14px;line-height:1.55"></textarea></div>
+      <div id="th-langs" style="font-size:12px;color:var(--tx2)"></div>
+      <div id="th-photos" class="expo-phs"></div>
+      <div class="card-sec" data-qk="expoVisitors">來賓</div>
+      <div id="th-list"></div>
+    </div>
+    <div style="padding:12px 14px;border-top:1px solid var(--br);display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-primary" id="th-send" onclick="expoThanksSend()">送出</button>
+      <button class="btn btn-ghost" id="th-test" onclick="expoThanksTest()" data-qk="expoSendTest">先寄一封給自己</button>
+      <button class="btn btn-ghost" onclick="document.getElementById('thOverlay').style.display='none'" data-qk="cancel" style="margin-left:auto">Cancel</button>
     </div>
   </div>
 </div>

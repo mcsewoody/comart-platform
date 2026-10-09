@@ -140,7 +140,7 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 | `admin/index.html` | v2.60 | Admin System — **機場接送**、公務車、圖書館、會議室、客戶到訪、抽籤 | 8,221 |
 | `kms/index.html` | v2.57 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
 | `quotation/index.html` | v3.75 | Quotation & CRM system | 7,332 |
-| `board/index.html` | v1.98 | 公告與會議 Bulletin & Meetings — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍、腦力激盪 | 4,600 |
+| `board/index.html` | v1.99 | 公告與會議 Bulletin & Meetings — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍、腦力激盪 | 4,600 |
 | `product_dev/` | v2.25 | **產品開發管理 —— 第六個子系統，不遵守單一檔案原則**（見下方專節） | — |
 
 `admin/lottery.html` is a standalone lottery page (separate from the lottery module inside `admin/index.html`).
@@ -2102,6 +2102,18 @@ admin 從 v2.37 就有紅色橫幅與 `SB.write()`，所以過期**不會產生�
 | 腦力激盪 | `pm*`（同一套） | 同上三張表（`kind='brainstorm'`） |
 | 意見徵集 | `pm*`（同一套） | 同上三張表（`kind='collect'`） |
 | 投票 | `pl*` | `poll_sessions`、`poll_options`、`poll_votes`、`poll_comments` |
+
+**Woody 週報閱讀譯文**（board v1.99，2026-10-09 Woody，migration `202610090002`，edge function `wr-translate`）：
+介面語言是 English／Tiếng Việt／简体中文 的人按「閱讀」看到譯文（**日文不翻**），頁頂標「AI 翻譯，以繁中原文為準」並可切回原文；編輯一律繁中。
+- **有人閱讀時才翻**（Woody 選的）：第一位用該語言打開某一期的人觸發，約 30 秒（實測 34 秒）；之後讀快取 0 秒。
+  快取表 `woody_report_tr`（report_id, lang）＋原文六段的 sha256 指紋 —— Woody 改過中文，指紋不同，下次閱讀自動重翻。
+  `__footer__` 列是固定的 OKR 原則／知識學習平台清單的譯文。
+- 🔴 **譯文只由 `wr-translate`（service role）產生與寫入**，表不在 sb-proxy 白名單：同仁的瀏覽器只能「要」譯文、不能「給」，
+  否則任何人都能偽造 Woody 週報的越南文版。
+- 🔴 翻譯規則是 **`import "../../../shared/translate.js"`**（全平台同一份，不複製）。改 `shared/translate.js` 之後要**重新部署 `wr-translate`**。
+  一段一個請求並行（整份一次翻會超過 60 秒）；`claude-opus-5-5` effort low。
+- 🔴 **英文／越南文譯文不用 PingFang 字型**（沒有越南文字集，聲調符號會散掉），改系統字型堆疊。
+- **「寄送」Email 信末附英文與越南文**（Woody 選的）：依**已存檔**的內容取譯文，有未存檔修改時先問；取不到譯文可選只寄中文。仍是 mailto（信件內容會變成約三倍長）。
 
 **「閱讀」按鈕三個頁籤統一**（board v1.98，2026-10-09 Woody）：週會紀錄（`wmOpenRead`）、業務會議記錄（IIFE 內 `readRecord`）、Woody 週報（`wrOpenRead`，原「開啟閱讀 ↗」）
 都叫「閱讀」（`btn_read`，五語），開新分頁顯示**正式版面、唯讀、不自動列印**。

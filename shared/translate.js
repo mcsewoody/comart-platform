@@ -20,6 +20,9 @@
 
    🔴 改這個檔案時，所有載入它的 HTML 的 ?v= 都要 +1（GitHub Pages 快取 4 小時）。
       目前載入者：index.html（Portal）、board/index.html。
+   🔴 edge function wr-translate 也直接 import 這個檔案（Woody 週報譯文，2026-10-09）——
+      改了規則之後要重新部署：supabase functions deploy wr-translate --no-verify-jwt。
+      已快取的譯文不會自動重翻（快取鍵是原文指紋，不含規則版本）。
    ═══════════════════════════════════════════════════════════════════════ */
 (function (global) {
   'use strict';

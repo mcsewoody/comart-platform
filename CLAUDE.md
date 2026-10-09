@@ -140,7 +140,7 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 | `admin/index.html` | v2.62 | Admin System — **機場接送**、公務車、圖書館、會議室、客戶到訪、抽籤 | 8,221 |
 | `kms/index.html` | v2.59 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
 | `quotation/index.html` | v3.77 | Quotation & CRM system | 7,332 |
-| `board/index.html` | v2.03 | 公告與會議 Bulletin & Meetings — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍、腦力激盪 | 4,600 |
+| `board/index.html` | v2.04 | 公告與會議 Bulletin & Meetings — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍、腦力激盪 | 4,600 |
 | `product_dev/` | v2.26 | **產品開發管理 —— 第六個子系統，不遵守單一檔案原則**（見下方專節） | — |
 
 `admin/lottery.html` is a standalone lottery page (separate from the lottery module inside `admin/index.html`).
@@ -2129,7 +2129,10 @@ admin 從 v2.37 就有紅色橫幅與 `SB.write()`，所以過期**不會產生�
   一段一個請求並行（整份一次翻會超過 60 秒）；`claude-opus-5-5` effort low。
 - 🔴 **英文／越南文譯文不用 PingFang 字型**（沒有越南文字集，聲調符號會散掉），改系統字型堆疊。
 - **Email 版面**（board v2.01–v2.02，2026-10-10 Woody 指定）：第一行 `COMART Weekly Report   日期 作者`、第二行 `繁中｜Tiếng Việt｜English`，每段「標題：」下一行 15 個 `-` 再接內文、段落間空兩行；語言順序 **繁中 → 越南文 → 英文**（`wrMailText`／`wrMailTrText`／`WR_MAIL_LANGS`）。
-- 🔴 **按「寄送」＝先存檔（`wrPersist`，留在編輯器）→ 同步翻好越南文與英文（每語最多試三次，`wrTranslateSure`）→ 才開信件**（Woody 2026-10-10）。譯文拿不到就不開信、說明週報已存檔請稍後再按，**不再有「只寄中文」**。
+- 🔴 **按「寄送」＝先存檔（`wrPersist`，留在編輯器）→ 同步翻好越南文與英文（每語最多試三次，`wrTranslateSure`）→ 在 Woody 的 Outlook 建草稿**（board v2.04，Woody 2026-10-10）。
+  走 `mail-send` 的 `kind:'wr'`：**只有 C00001**；**附件由伺服器依 `reportId` 讀那一期 `woody_reports.attachments`、自己去 `woody-attachments` 拿**（前端送的 attach／files 一律拒絕）。
+  HTML 12pt（`wrMailHtml`：字型字級寫在每一行的 style 上、換行用 `<br>` —— Outlook 桌面版是 Word 排版）。版面先組成行清單（`wrMailBlocks`），純文字與 HTML 共用。
+  譯文拿不到就不建草稿（不再有「只寄中文」）；草稿建不起來才問要不要退回 mailto（純文字、無附件）。
 
 **「閱讀」按鈕三個頁籤統一**（board v1.98，2026-10-09 Woody）：週會紀錄（`wmOpenRead`）、業務會議記錄（IIFE 內 `readRecord`）、Woody 週報（`wrOpenRead`，原「開啟閱讀 ↗」）
 都叫「閱讀」（`btn_read`，五語），開新分頁顯示**正式版面、唯讀、不自動列印**。

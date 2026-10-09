@@ -8,7 +8,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { verifySession } from "../_shared/session.ts"
 import { namedSecretKey, elevatedApiHeaders } from "../_shared/api-keys.ts"
-import { validate, cleanEmails, safePath, graphAttachment, graphMessage, chunkRanges, DIRECT_LIMIT } from "./lib.js"
+import { validate, cleanEmails, safePath, graphAttachment, graphMessage, chunkRanges, DIRECT_LIMIT, WR_OWNER, WR_BUCKET } from "./lib.js"
 
 const CORS = {
   "Access-Control-Allow-Origin": "*",
@@ -130,7 +130,9 @@ serve(async (req) => {
   if (!empId) return json({ error: "unauthorized" }, 401)
   const u = await liveUser(empId)
   if (!u) return json({ error: "inactive" }, 403)
-  if (!(u.role === "admin" || u.dept === "sales")) return json({ error: "forbidden", hint: "sales_or_admin_only" }, 403)
+  // Woody 週報只有 Woody 本人能從自己的信箱建草稿；其他種類給業務部 ＋ admin
+  if (body?.kind === "wr") { if (u.emp_id !== WR_OWNER) return json({ error: "forbidden", hint: "woody_only" }, 403) }
+  else if (!(u.role === "admin" || u.dept === "sales")) return json({ error: "forbidden", hint: "sales_or_admin_only" }, 403)
   const from = String(u.email || "").trim().toLowerCase()
   if (!from) return json({ error: "no_sender_email", hint: "這個帳號在 users 沒有 Email" }, 400)
 
@@ -146,6 +148,17 @@ serve(async (req) => {
     for (const i of body.inline || []) {
       if (i.path) { const g = await storageGet(i.bucket, safePath(i.path)); atts.push({ name: String(i.name || i.cid + ".jpg"), mime: i.mime || g.mime, bytes: g.bytes, cid: i.cid }) }
       else atts.push({ name: String(i.name || i.cid + ".jpg"), mime: i.mime || "image/jpeg", bytes: unb64(i.b64), cid: i.cid })
+    }
+    if (body.kind === "wr") {
+      // 附件清單以資料庫裡那一期週報為準（前端指定不了要附哪個檔）
+      const r = await fetch(`${sbUrl()}/rest/v1/woody_reports?id=eq.${encodeURIComponent(body.reportId)}&select=attachments`, { headers: sbHdr() })
+      const row = r.ok ? (await r.json())?.[0] : null
+      if (!row) return json({ error: "report_not_found" }, 404)
+      for (const a of Array.isArray(row.attachments) ? row.attachments : []) {
+        const path = safePath(a?.path); if (!path) continue
+        const g = await storageGet(WR_BUCKET, path)
+        atts.push({ name: String(a.name || path.split("/").pop()), mime: a.mime || g.mime, bytes: g.bytes })
+      }
     }
     for (const f of body.files || []) atts.push({ name: String(f.name || "file"), mime: f.mime || "application/octet-stream", bytes: unb64(f.b64) })
   } catch (e) { return json({ error: "attachment", detail: String((e as Error).message) }, 400) }

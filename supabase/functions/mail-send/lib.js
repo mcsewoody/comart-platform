@@ -3,7 +3,10 @@ export const MAX_TO = 5
 export const MAX_SUBJECT = 300
 export const MAX_HTML = 300_000
 export const ALLOWED_BUCKETS = new Set(["crm-expo", "crm-cards"])
-export const KINDS = new Set(["followup", "quote", "thanks", "test"])
+// wr＝Woody 週報（board v2.04）：只有 C00001，附件由伺服器依 reportId 自己去 woody-attachments 拿，不收前端給的檔案
+export const KINDS = new Set(["followup", "quote", "thanks", "test", "wr"])
+export const WR_OWNER = "C00001"
+export const WR_BUCKET = "woody-attachments"
 // Graph sendMail 單一請求上限約 4 MB（base64 後），留餘裕：原始大小合計超過這個就改走「草稿＋上傳工作階段」
 export const DIRECT_LIMIT = 2_800_000
 export const UPLOAD_CHUNK = 320 * 1024 * 10   // 必須是 320 KiB 的倍數
@@ -33,6 +36,10 @@ export function validate(body) {
   if (!subject || subject.length > MAX_SUBJECT) return "bad_subject"
   const html = String(body.html || "")
   if (!html.trim() || html.length > MAX_HTML) return "bad_html"
+  if (body.kind === "wr") {
+    if (!/^[A-Za-z0-9_-]{1,64}$/.test(String(body.reportId || ""))) return "bad_report"
+    if ((body.attach || []).length || (body.inline || []).length || (body.files || []).length) return "bad_attachment"
+  }
   for (const a of [...(body.attach || []), ...(body.inline || []).filter((x) => x.path)]) {
     if (!ALLOWED_BUCKETS.has(a.bucket) || !safePath(a.path)) return "bad_attachment"
   }

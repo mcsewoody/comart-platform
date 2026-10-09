@@ -32,3 +32,11 @@ test("inline 附件帶 contentId", () => {
   const g = graphAttachment({ name: "p.jpg", mime: "image/jpeg", b64: "AA", cid: "p1" })
   assert.equal(g.isInline, true); assert.equal(g.contentId, "p1")
 })
+test("wr（Woody 週報）要 reportId、不收前端給的附件", () => {
+  const wr = { kind: "wr", to: ["all@comart.com.tw"], subject: "Woody 週報", html: "<p>x</p>", reportId: "abc_1" }
+  assert.equal(validate(wr), null)
+  assert.equal(validate({ ...wr, reportId: "" }), "bad_report")
+  assert.equal(validate({ ...wr, reportId: "a/../b" }), "bad_report")
+  assert.equal(validate({ ...wr, attach: [{ bucket: "crm-expo", path: "a.pdf" }] }), "bad_attachment")
+  assert.equal(validate({ ...wr, files: [{ name: "x", b64: "AA" }] }), "bad_attachment")
+})

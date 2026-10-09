@@ -765,9 +765,11 @@ Woody：「馬上要展覽了」——①掃名片馬上寄跟進信附邀請函
 - 🔴 **2026-10-09 起只建草稿、不寄出**（Woody：「信件放在草稿，不要直接寄出」，quotation v3.75）：`mail-send` 的 `createDraft` 只呼叫
   `POST /users/{寄件人}/messages`（進寄件人 Outlook 的「草稿」），**不再呼叫 sendMail／send**；回傳 `webLink` 給畫面顯示「在 Outlook 開啟草稿」。
   報價單不再因為建了草稿就改成 sent（真的寄出是人在 Outlook 按的，平台不知道）。`crm_mail_log.draft`（migration `202610090001`）區分草稿與之前真的寄出的列。
-  ⚠️ **建草稿需要 Graph 應用程式權限 `Mail.ReadWrite`，`comart-web-mail` 目前只有 `Mail.Send` → 一律 403 ErrorAccessDenied**，
-  畫面會說「Outlook 草稿功能尚未開通」。要 IT 在 Entra ID 加權限（建議同時用 Exchange 的 Application RBAC／Access Policy 限縮到業務部信箱，
-  否則這個 app 讀得到全公司每一個信箱）。開通前**一封信都不會寄出**。
+  ✅ **建草稿需要 Graph 應用程式權限 `Mail.ReadWrite`**：Woody 2026-10-09 在 Entra（應用程式註冊 → comart-web-mail，用戶端識別碼開頭 `f342378c` → API 權限）
+  加上並**按了「授與管理員同意」**（只加不按同意，狀態是「⚠️ 尚未授與」，token 裡不會有這個 role，照樣 403）。實測草稿建立成功、回傳 `webLink`。
+  🔴 **改了 Entra 權限之後要重新部署 `mail-send`**：它在 instance 裡快取 Graph token 最長一小時，舊 token 的 roles 不會變。
+  ⚠️ 尚未限縮：`Mail.ReadWrite`（應用程式）技術上讀寫得到全公司每一個信箱。要用 Exchange 的應用程式存取原則限縮到業務部時，
+  **範圍必須包含官網詢價表單用來寄信的那個信箱**（同一個 app），否則官網寄信會壞。
 - （以下是 v3.72 寄出版的紀錄）🔴 **寄信走 Microsoft Graph**：租戶裡的應用程式 **`comart-web-mail`**（官網詢價表單也在用，`MS_TENANT_ID`／`MS_CLIENT_ID`／`MS_CLIENT_SECRET`），應用程式權限 **Mail.Send**（2026-10-08 實測 token roles）。
   **寄件人一律是 `users.email`（伺服器查），前端指定不了** —— Mail.Send 可以代表租戶任何信箱，交給前端就等於任何人都能冒用 Woody。
   只給業務部 ＋ admin（當下重查）。對方回信回本人，寄件備份在本人 Outlook。每封寫 `crm_mail_log`（成功失敗都寫，sb-proxy 只讀）。

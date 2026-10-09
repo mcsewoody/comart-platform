@@ -139,7 +139,7 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 | `index.html` | v2.25 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
 | `admin/index.html` | v2.62 | Admin System — **機場接送**、公務車、圖書館、會議室、客戶到訪、抽籤 | 8,221 |
 | `kms/index.html` | v2.59 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
-| `quotation/index.html` | v3.77 | Quotation & CRM system | 7,332 |
+| `quotation/index.html` | v3.78 | Quotation & CRM system | 7,332 |
 | `board/index.html` | v2.05 | 公告與會議 Bulletin & Meetings — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍、腦力激盪 | 4,600 |
 | `product_dev/` | v2.26 | **產品開發管理 —— 第六個子系統，不遵守單一檔案原則**（見下方專節） | — |
 
@@ -790,6 +790,9 @@ Woody：「馬上要展覽了」——①掃名片馬上寄跟進信附邀請函
   只給業務部 ＋ admin（當下重查）。對方回信回本人，寄件備份在本人 Outlook。每封寫 `crm_mail_log`（成功失敗都寫，sb-proxy 只讀）。
   附件只能是私有 bucket `crm-expo`／`crm-cards` 的物件（伺服器自己拿）或前端送的檔案（報價 PDF）；合計 > 2.8 MB 改走「草稿 ＋ 上傳工作階段」（邀請函 PDF 常好幾 MB）。
   本機 `apikey`＝secret key 只准 `kind:'test'`（寄給那個人自己），用來確認 IT 有沒有把 Graph 限縮到特定信箱。`node --test supabase/functions/mail-send/lib.test.mjs`（5 個）。
+- 🔴 **跟進信的談話重點常常是開窗之後才打的**（v3.78，2026-10-09 實際發生：掃描後 18 秒就建了草稿，重點沒進信）。草稿開窗即寫，但
+  重點欄位 `change` 時若內文沒手改過就自動重寫（`expoFuMemoChanged`，改過先問）；送出前比對 `_fuMemoUsed`，重點沒用上就問要不要重寫；AI 寫稿中不准送出；晚回來的舊結果用 `_fuDraftSeq` 丟掉。
+- **跟進信一定有官網連結** `https://www.comart.com.tw/`（`EXPO_SITE`）：提示詞要求介紹完 COMART 後邀請客戶上官網；AI 漏掉時依信件語言補一句（`EXPO_SITE_LINE`）。
 - 資料：`crm_exhibitions`（邀請函、AI 指引、感謝信範本、照片）／`crm_expo_visits`（哪個展、誰掃、跟進／報價／感謝信各自的寄出時間、`lang`）／`crm_mail_log`。三張都在 sb-proxy 的 `EXPO_TABLES`（業務 ＋ admin）。業務只看自己掃的來賓，admin 看全部。
 - 流程接點：`crmCardSave` 看到 `_card.expoId` 就改呼叫 `expoAfterScan`（建來賓 → 開跟進信）；`saveQuote` 新報價時 `_expoQuoteVisit` 有值就 `expoQuoteSaved`（連結來賓 → 開「寄出報價」）。
   🔴 `openQuoteForm` 開頭會清 `_expoQuoteVisit`，所以 `expoQuote` 要在它**之後**才設（第一版順序反了，測出來的）。

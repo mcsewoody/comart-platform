@@ -139,7 +139,7 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 | `index.html` | v2.23 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
 | `admin/index.html` | v2.60 | Admin System — **機場接送**、公務車、圖書館、會議室、客戶到訪、抽籤 | 8,221 |
 | `kms/index.html` | v2.57 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
-| `quotation/index.html` | v3.74 | Quotation & CRM system | 7,332 |
+| `quotation/index.html` | v3.75 | Quotation & CRM system | 7,332 |
 | `board/index.html` | v1.97 | 公告與會議 Bulletin & Meetings — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍、腦力激盪 | 4,600 |
 | `product_dev/` | v2.25 | **產品開發管理 —— 第六個子系統，不遵守單一檔案原則**（見下方專節） | — |
 
@@ -762,7 +762,13 @@ Woody：「馬上要展覽了」——①掃名片馬上寄跟進信附邀請函
 | 感謝信照片 | **嵌在內文**（cid inline，長邊 1280／JPEG 0.8，最多 6 張） |
 | 群發確認 | **逐一勾選後群發**（另有「先寄一封給自己」）；每人一封，不用密件副本 |
 
-- 🔴 **寄信走 Microsoft Graph**：租戶裡的應用程式 **`comart-web-mail`**（官網詢價表單也在用，`MS_TENANT_ID`／`MS_CLIENT_ID`／`MS_CLIENT_SECRET`），應用程式權限 **Mail.Send**（2026-10-08 實測 token roles）。
+- 🔴 **2026-10-09 起只建草稿、不寄出**（Woody：「信件放在草稿，不要直接寄出」，quotation v3.75）：`mail-send` 的 `createDraft` 只呼叫
+  `POST /users/{寄件人}/messages`（進寄件人 Outlook 的「草稿」），**不再呼叫 sendMail／send**；回傳 `webLink` 給畫面顯示「在 Outlook 開啟草稿」。
+  報價單不再因為建了草稿就改成 sent（真的寄出是人在 Outlook 按的，平台不知道）。`crm_mail_log.draft`（migration `202610090001`）區分草稿與之前真的寄出的列。
+  ⚠️ **建草稿需要 Graph 應用程式權限 `Mail.ReadWrite`，`comart-web-mail` 目前只有 `Mail.Send` → 一律 403 ErrorAccessDenied**，
+  畫面會說「Outlook 草稿功能尚未開通」。要 IT 在 Entra ID 加權限（建議同時用 Exchange 的 Application RBAC／Access Policy 限縮到業務部信箱，
+  否則這個 app 讀得到全公司每一個信箱）。開通前**一封信都不會寄出**。
+- （以下是 v3.72 寄出版的紀錄）🔴 **寄信走 Microsoft Graph**：租戶裡的應用程式 **`comart-web-mail`**（官網詢價表單也在用，`MS_TENANT_ID`／`MS_CLIENT_ID`／`MS_CLIENT_SECRET`），應用程式權限 **Mail.Send**（2026-10-08 實測 token roles）。
   **寄件人一律是 `users.email`（伺服器查），前端指定不了** —— Mail.Send 可以代表租戶任何信箱，交給前端就等於任何人都能冒用 Woody。
   只給業務部 ＋ admin（當下重查）。對方回信回本人，寄件備份在本人 Outlook。每封寫 `crm_mail_log`（成功失敗都寫，sb-proxy 只讀）。
   附件只能是私有 bucket `crm-expo`／`crm-cards` 的物件（伺服器自己拿）或前端送的檔案（報價 PDF）；合計 > 2.8 MB 改走「草稿 ＋ 上傳工作階段」（邀請函 PDF 常好幾 MB）。
@@ -788,6 +794,12 @@ Woody：「拍名片照片，就可以把名片上所有資訊都存入，包含
   - 🔴 **圖在按「存入 CRM」時才上傳**（確認畫面可能又轉過）；上傳失敗整筆不存。
   - 既有客戶比對：Email 網域（排除 gmail 等）→ 官網網域 → 去掉公司後綴的名稱（`crmCardMatch`）。**既有客戶只補空白欄位**；
     同一客戶有相同 Email 的聯絡人就**更新那一位**（名片有值的欄位以名片為準），舊名片圖刪掉。
+- 🔴 **名片拉正**（v3.75，Woody：「放入名片時，請幫我自動轉正」——實拍照片方向是正的，但帶著桌面背景而且歪斜）：
+  `cardQuadLocal()` 在瀏覽器找四條邊（縮到 400px → 從四邊往內掃「由暗轉亮且之後持續夠亮」的點 → RANSAC 擬合四條直線 → 交點），
+  `cardWarp()` 用單應矩陣拉成矩形（四周留 1.5%）。找不到才用 AI 回報的 `corners`（0–1000 比例），都不行只做 90° 旋轉；拉正後再套 AI 的閱讀方向 `rotate`。
+  🔴 兩道防呆：**名片中央要比畫面四周亮**（白名片放白桌時掃到的「邊」其實在名片內部，會拉出**鏡射**的圖）、**四邊形面積要是正的**（負的＝角的順序顛倒＝鏡射）。
+  門檻壓在背景與名片平均亮度之間的 30%（陰影那一角才不會被切掉——實拍那張的第一版就歪在這裡）。確認畫面有「看原圖／拉正後」切換。
+  實測：實拍名片、斜 15°、斜 −12°、轉 90° 都拉正；白底自動放棄。console 會印 `[card] 拉正 local|ai …`。
 - 🔴 **名片圖在私有 bucket `crm-cards`，sb-proxy 限「業務部 ＋ admin」**（名片是個資；CRM 表本身仍只有前端守衛）。顯示換 1 小時簽章網址（`crmCardUrl`）。
 - 驗證：AI 那一段本機呼叫不到（claude-proxy 只收登入簽章），用假回應在 headless Chrome 跑過整條流程（直拍→轉成橫的、比對到既有客戶、只補空白、同 Email 更新）。**真名片的辨識準確度要實機試。**
 

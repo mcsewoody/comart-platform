@@ -1,4 +1,4 @@
-// mail-send：從「登入者本人的公司信箱」寄信（Microsoft Graph，應用程式 comart-web-mail，Mail.Send）
+// mail-send：在「登入者本人的公司信箱」建立草稿（2026-10-09 起不寄出，見 createDraft）（Microsoft Graph，應用程式 comart-web-mail，Mail.Send）
 //
 // 🔴 寄件人一律是資料庫裡這個人的 users.email —— 不收前端指定的寄件人。
 //    Mail.Send（應用程式權限）可以代表租戶裡任何信箱寄信，前端說了算的話等於任何人都能冒用 Woody 寄信。
@@ -82,17 +82,16 @@ async function logMail(row: Record<string, unknown>) {
 
 type Att = { name: string; mime: string; bytes: Uint8Array; cid?: string }
 
-async function sendViaGraph(from: string, msg: Record<string, unknown>, atts: Att[]) {
+// 🔴 2026-10-09 Woody：「信件放在草稿，不要直接寄出」——一律只建草稿（寄件人 Outlook 的「草稿」資料夾），不呼叫 send。
+//    人在 Outlook 檢查後自己按傳送。所以這支 function 名字雖叫 mail-send，實際上不會寄出任何一封信。
+async function createDraft(from: string, msg: Record<string, unknown>, atts: Att[]): Promise<{ id: string; webLink: string }> {
   const total = atts.reduce((n, a) => n + a.bytes.length, 0)
   const enc = encodeURIComponent(from)
   if (total <= DIRECT_LIMIT) {
-    await graph("POST", `/users/${enc}/sendMail`, {
-      message: { ...msg, attachments: atts.map((a) => graphAttachment({ ...a, b64: b64(a.bytes) })) },
-      saveToSentItems: true,
-    })
-    return
+    const d = await graph("POST", `/users/${enc}/messages`, { ...msg, attachments: atts.map((a) => graphAttachment({ ...a, b64: b64(a.bytes) })) })
+    return { id: d.id, webLink: d.webLink || "" }
   }
-  // 大附件（邀請函 PDF 常常好幾 MB）：先建草稿 → 小的直接附、大的走上傳工作階段 → 寄出
+  // 大附件（邀請函 PDF 常常好幾 MB）：先建草稿 → 小的直接附、大的走上傳工作階段
   const draft = await graph("POST", `/users/${enc}/messages`, msg)
   try {
     for (const a of atts) {
@@ -111,11 +110,12 @@ async function sendViaGraph(from: string, msg: Record<string, unknown>, atts: At
         if (!r.ok && r.status !== 201 && r.status !== 200) throw new Error("upload_failed " + r.status)
       }
     }
-    await graph("POST", `/users/${enc}/messages/${draft.id}/send`)
   } catch (e) {
-    try { await graph("DELETE", `/users/${enc}/messages/${draft.id}`) } catch { /* 草稿留著也無害 */ }
+    // 附件沒放齊的草稿會被人當成完整的信寄出去 —— 刪掉，寧可整封失敗
+    try { await graph("DELETE", `/users/${enc}/messages/${draft.id}`) } catch { /* */ }
     throw e
   }
+  return { id: draft.id, webLink: draft.webLink || "" }
 }
 
 serve(async (req) => {
@@ -154,13 +154,14 @@ serve(async (req) => {
   const subject = String(body.subject).trim()
   const logBase = { kind: body.kind, from_emp: u.emp_id, from_email: from, subject: subject.slice(0, 300),
     exhibition_id: body.exhibitionId || null, visit_id: body.visitId || null }
+  let draft = { id: "", webLink: "" }
   try {
-    await sendViaGraph(from, graphMessage({ subject, html: String(body.html), to, cc }), atts)
+    draft = await createDraft(from, graphMessage({ subject, html: String(body.html), to, cc }), atts)
   } catch (e) {
     const msg = String((e as Error).message)
-    for (const t of to) await logMail({ ...logBase, to_email: t, ok: false, error: msg.slice(0, 500) })
+    for (const t of to) await logMail({ ...logBase, to_email: t, ok: false, draft: true, error: msg.slice(0, 500) })
     return json({ error: "send_failed", detail: msg }, 502)
   }
-  for (const t of to) await logMail({ ...logBase, to_email: t, ok: true })
-  return json({ ok: true, from, to })
+  for (const t of to) await logMail({ ...logBase, to_email: t, ok: true, draft: true })
+  return json({ ok: true, draft: true, from, to, webLink: draft.webLink })
 })

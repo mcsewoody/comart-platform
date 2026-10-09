@@ -43,6 +43,12 @@ function outputText(response: any) {
 }
 function escapeLike(v: string) { return v.replaceAll("%", "\\%").replaceAll("_", "\\_") }
 
+async function isCliKey(req: Request): Promise<boolean> {
+  const k = req.headers.get("apikey") || ""
+  if (!k) return false
+  try { return Object.values(JSON.parse(Deno.env.get("SUPABASE_SECRET_KEYS") || "{}")).some((v) => typeof v === "string" && v && v === k) }
+  catch { return false }
+}
 async function audit(sb: any, sess: any, action: string, assetId: string | null, before: any, after: any, reason?: string, transferId?: string) {
   const { error } = await sb.from("pd_device_audit_log").insert({
     asset_id: assetId, transfer_id: transferId || null, action, actor_emp_id: sess.empId,
@@ -170,12 +176,21 @@ const CURATED_OFFICIAL_PAGES: Record<string,string> = {
   X04: "https://www.apple.com/shop/product/mwvv3am/a/20w-usb-c-power-adapter",
 }
 
-async function findOfficialImage(sb: any, sess: any, asset: any) {
+// pick：管理員指定的官方頁＋圖片網址（自動搜尋挑到系列合照、或同型號分顏色時用）。只收官方網域。
+const OFFICIAL_HOSTS = /^https:\/\/(www\.)?(apple\.com|samsung\.com)\//i
+async function findOfficialImage(sb: any, sess: any, asset: any, pick?: { page: string; image: string } | null) {
   const openaiKey = Deno.env.get("OPENAI_API_KEY") || ""
   if (!asset.brand || !asset.model) return { found: false, reason: "missing_model" }
-  let match: any = CURATED_OFFICIAL_PAGES[asset.asset_code]
-    ? { found: true, official_page_url: CURATED_OFFICIAL_PAGES[asset.asset_code], source_name: asset.brand, reason: "curated_exact_model" }
+  // 🔴 對照表的 key 是 v1.05 之前的三碼（E01），編號改成四碼（E001）後就再也對不到 —— 兩種都查
+  const code3 = /^[A-Z]0\d{2}$/.test(asset.asset_code || "") ? asset.asset_code[0] + asset.asset_code.slice(2) : asset.asset_code
+  const curated = CURATED_OFFICIAL_PAGES[asset.asset_code] || CURATED_OFFICIAL_PAGES[code3]
+  let match: any = curated
+    ? { found: true, official_page_url: curated, source_name: asset.brand, reason: "curated_exact_model" }
     : null
+  if (pick) {
+    if (!OFFICIAL_HOSTS.test(pick.page || "") || !OFFICIAL_HOSTS.test(pick.image || "")) return { found: false, reason: "pick_not_official_domain" }
+    match = { found: true, official_page_url: pick.page, source_name: asset.brand, reason: "admin_pick" }
+  }
   if (!match && !openaiKey) return { found: false, reason: "missing_configuration" }
   if (!match) {
     const response = await fetch("https://api.openai.com/v1/responses", {
@@ -199,13 +214,16 @@ async function findOfficialImage(sb: any, sess: any, asset: any) {
     try { match = JSON.parse(outputText(result)) } catch { return { found: false, reason: "invalid_model_output" } }
   }
   if (!match?.found || !/^https:\/\//i.test(match.official_page_url || "")) return { found: false, reason: match?.reason || "not_found" }
+  let selectedImage: string | undefined = pick?.image
+  if (!selectedImage) {
   const page = await fetch(match.official_page_url, { headers: { "User-Agent": "Mozilla/5.0 COMART-Product-Dev/1.0" } }).catch(() => null)
   if (!page?.ok) return { found: false, reason: "official_page_unavailable", officialPageUrl: match.official_page_url }
   const html = await page.text()
   const newsroomProduct = html.match(/https:\/\/www\.apple\.com\/newsroom\/images\/product\/[^"'\s<>]+?\.large\.(?:jpg|png)/i)
   const og = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i)
     || html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i)
-  const selectedImage = newsroomProduct?.[0] || og?.[1]
+  selectedImage = newsroomProduct?.[0] || og?.[1]
+  }
   if (!selectedImage) return { found: false, reason: "official_page_has_no_image", officialPageUrl: match.official_page_url }
   const imageUrl = new URL(selectedImage.replace(/&amp;/g,"&"), match.official_page_url).toString()
   const image = await fetch(imageUrl).catch(() => null)
@@ -282,7 +300,10 @@ async function findPersonalOfficialImage(sb: any, asset: any) {
 serve(async req => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: CORS })
   if (req.method !== "POST") return json({ error: "method_not_allowed" }, 405)
-  const verified = await verifySession(req.headers.get("x-session") || "")
+  const body = await req.json().catch(() => ({}))
+  let verified: any = await verifySession(req.headers.get("x-session") || "")
+  // 本機腳本帶專案 secret key：只准「補齊缺圖」，並以指定的 admin 身分記稽核（v1.13，匯入的設備沒有經過建立時的找圖）
+  if (!verified?.empId && body?.action === "backfillImages" && body?.asEmp && await isCliKey(req)) verified = { empId: String(body.asEmp), role: "admin" }
   if (!verified?.empId) return json({ error: "unauthorized" }, 401)
   const sess = { empId: String(verified.empId), role: String(verified.role || "user") }
   const sbUrl = Deno.env.get("SB_URL") || Deno.env.get("SUPABASE_URL") || ""
@@ -292,7 +313,6 @@ serve(async req => {
   const { data: user } = await sb.from("users").select("emp_id,name_en,name_zh,email,role,dept,site,active,status").eq("emp_id", sess.empId).maybeSingle()
   if (!activeUser(user)) return json({ error: "account_inactive" }, 403)
   sess.role = user.role
-  const body = await req.json().catch(() => ({}))
   const action = text(body.action, 60)
   const admin = isAdmin(sess, user)
 
@@ -540,6 +560,35 @@ serve(async req => {
     if (custodian !== sess.empId) await notify(sb, [custodian], displayName(user), `設備 ${created.asset_code} 已建立`, `${brand} ${model} 已登錄由你保管。`)
     const imageResult = await findOfficialImage(sb, sess, created)
     return json({ item: presentAsset(created, sess), officialImage: imageResult }, 201)
+  }
+
+  // 尋找官方圖片：建立時只找一次，找不到或資料是匯入的就一直沒有圖（v1.13）
+  if (action === "findImage") {
+    if (!admin) return json({ error: "forbidden" }, 403)
+    const id = text(body.id, 40); if (!UUID.test(id)) return json({ error: "invalid_id" }, 400)
+    const { data: asset } = await sb.from("pd_device_assets").select("*").eq("id", id).maybeSingle()
+    if (!asset) return json({ error: "not_found" }, 404)
+    const r = await findOfficialImage(sb, sess, asset).catch((e: Error) => ({ found: false, reason: String(e?.message || e) }))
+    return json({ officialImage: r })
+  }
+  if (action === "backfillImages") {
+    if (!admin) return json({ error: "forbidden" }, 403)
+    // 一次只做幾件：每件都要 web search ＋ 抓官方頁，十幾件一起跑會撞 edge function 的執行時間上限
+    const picks = (body.picks && typeof body.picks === "object") ? body.picks : null
+    let q = sb.from("pd_device_assets").select("*").neq("status", "retired").order("asset_code")
+    if (picks) q = q.in("asset_code", Object.keys(picks).map((c) => text(c, 8)).slice(0, 10))
+    else {
+      q = q.is("image_storage_path", null)
+      if (Array.isArray(body.codes) && body.codes.length) q = q.in("asset_code", body.codes.map((c: unknown) => text(c, 8)).slice(0, 10))
+    }
+    const { data: list, error } = await q.limit(Math.min(10, Math.max(1, Number(body.limit) || 3)))
+    if (error) return json({ error: error.message }, 500)
+    const results = []
+    for (const a of list || []) {
+      const r: any = await findOfficialImage(sb, sess, a, picks?.[a.asset_code] || null).catch((e: Error) => ({ found: false, reason: String(e?.message || e) }))
+      results.push({ code: a.asset_code, model: a.model, found: !!r?.found, reason: r?.reason || null })
+    }
+    return json({ results })
   }
 
   if (action === "update") {

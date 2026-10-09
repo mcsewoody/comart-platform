@@ -5,7 +5,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#080C14">
-<title>COMART · 公告與會議 v2.02</title>
+<title>COMART · 公告與會議 v2.03</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=Noto+Serif:wght@400;700&family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -382,7 +382,7 @@ input[type=week]::-webkit-calendar-picker-indicator{filter:brightness(0) invert(
     <a class="logo" href="javascript:void(0)">
       <div class="logo-mark">告</div>
       <div class="logo-text" data-i18n="app_title">公告與會議</div>
-      <span class="logo-ver">v2.02</span>
+      <span class="logo-ver">v2.03</span>
     </a>
     <div class="topbar-right">
       <div id="langChips" style="display:flex;gap:4px"></div>
@@ -4215,7 +4215,7 @@ async function wrSave(){
 }
 
 // 週報 Email（純文字，供 mailto 使用）—— 2026-10-10 Woody 指定的版面：
-//   標題一行（COMART Weekly Report   日期 作者   繁中｜Tiếng Việt｜English），段落是「標題：」＋ 15 個 - ＋ 內文，段落之間空兩行；
+//   第一行 COMART Weekly Report   日期 作者，第二行 繁中｜Tiếng Việt｜English，段落是「標題：」＋ 15 個 - ＋ 內文，段落之間空兩行；
 //   語言順序：繁中（正本）→ 越南文 → 英文。
 // 🔴 不用國旗（Woody 2026-10-10：政治衝突考量）——語言一律用文字標示。
 // 🔴 按「寄送」＝ 先存檔 → 同步翻好越南文與英文 → 才開信件。譯文拿不到就不開信（不再有「只寄中文」）。
@@ -4225,7 +4225,8 @@ const WR_MAIL_LANG_TAG = '繁中｜Tiếng Việt｜English';
 function wrMailSec(L, title, lines){ L.push(title); L.push(WR_MAIL_DASH); lines.forEach(x => L.push(x)); L.push(''); L.push(''); }
 function wrMailText(){
   const s = wrState, L = [];
-  L.push('COMART Weekly Report   ' + (s.report_date||'') + (s.author_name ? ' ' + s.author_name : '') + '   ' + WR_MAIL_LANG_TAG);
+  L.push('COMART Weekly Report   ' + (s.report_date||'') + (s.author_name ? ' ' + s.author_name : ''));
+  L.push(WR_MAIL_LANG_TAG);   // 第二行（Woody 2026-10-10）
   L.push(''); L.push('');
   WR_SECTIONS.forEach(sec => { const v = (s[sec.key]||'').trim(); if(v) wrMailSec(L, sec.label + '：', [v]); });
   const atts = wrAttsOf(s);

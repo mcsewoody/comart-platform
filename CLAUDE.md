@@ -138,9 +138,9 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 |------|---------|---------|--------|
 | `index.html` | v2.23 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
 | `admin/index.html` | v2.60 | Admin System — **機場接送**、公務車、圖書館、會議室、客戶到訪、抽籤 | 8,221 |
-| `kms/index.html` | v2.56 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
-| `quotation/index.html` | v3.72 | Quotation & CRM system | 7,332 |
-| `board/index.html` | v1.96 | 公告與會議 Bulletin & Meetings — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍、腦力激盪 | 4,600 |
+| `kms/index.html` | v2.57 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
+| `quotation/index.html` | v3.73 | Quotation & CRM system | 7,332 |
+| `board/index.html` | v1.97 | 公告與會議 Bulletin & Meetings — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍、腦力激盪 | 4,600 |
 | `product_dev/` | v2.25 | **產品開發管理 —— 第六個子系統，不遵守單一檔案原則**（見下方專節） | — |
 
 `admin/lottery.html` is a standalone lottery page (separate from the lottery module inside `admin/index.html`).
@@ -443,6 +443,14 @@ All apps use a dark theme with CSS custom properties. Two slightly different pal
 Portal `--tx/2/3` #FFFFFF／#DDE9FF／#BCD2F2；報價 #F8FBFF／#CFDDEF／#9FB5CE（原本第三層 #6A8AAA 最暗）；
 KMS `--text/-2/-3` #FFFFFF／#E6EAFF／#C4CAE6；Admin #FBFCFF／#D9DDEE／#B4B9D6。原值寫在各檔 `:root` 的註解裡。
 **列印／PDF 範本裡寫死的深色字刻意沒動**（那些是白底）。要再調就改 `:root`，不要逐條改規則。
+
+🔴 **日期／時間欄位的日曆圖示一律純白**（2026-10-09 Woody：「黑底配黑色 icon」）。那個圖示叫 **calendar picker indicator**
+（CSS 偽元素 `::-webkit-calendar-picker-indicator`），瀏覽器預設畫成黑色，貼在深色底上看不見。
+規則：`filter:brightness(0) invert(1)` —— 不管 `color-scheme` 是深或淺都得到純白（只寫 `invert(1)` 的話，遇到深色 color-scheme 會反而變黑）。
+**五種型別都要列**：`date`／`time`／`datetime-local`／`month`／`week`。
+2026-10-09 盤點：Portal 只有 date 欄位、已涵蓋；Admin date＋time 已涵蓋；**報價系統與 KMS 完全沒有規則**（報價 CRM 展覽、互動、任務的日期欄位都是黑色圖示）；
+**Board 只涵蓋 date 與 `.pm-dt`**，週會／業務會議的 4 個 time 欄位與投票截止的 datetime-local 漏掉。三個都補上同一段通用規則（報價 v3.73／KMS v2.57／Board v1.97）。
+**新系統或新頁面照抄這一段，不要只寫 `input[type=date]`。**
 
 Board 的列印／匯出版面（`.sheet`）刻意反轉為白底黑字（PingFang TC），供 PDF／PNG／Email 輸出使用。
 

@@ -5,7 +5,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#080C14">
-<title>COMART · 公告與會議 v1.96</title>
+<title>COMART · 公告與會議 v1.97</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=Noto+Serif:wght@400;700&family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -365,6 +365,12 @@ body.pm-playing #pm-phasebar{padding:0}
 .wr-draft-acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
 .wr-draft-out{margin-top:10px;white-space:pre-wrap;font-size:13.5px;line-height:1.75;background:var(--s2);border:1px solid var(--br);border-radius:var(--r);padding:10px 12px;max-height:420px;overflow:auto}
 .wr-draft-note{margin-top:6px;font-size:11px;color:var(--tx3)}
+/* 🔴 日期／時間欄位右側的日曆圖示（::-webkit-calendar-picker-indicator）一律純白（2026-10-09 Woody）：
+   瀏覽器預設畫成黑色，貼在深色底上看不見。brightness(0) invert(1) 不管 color-scheme 深或淺都得到純白。
+   五種型別都要列 —— 只寫 date 的話 time／datetime-local 會漏（board 就漏過）。新的日期欄位不必再個別處理。 */
+input[type=date]::-webkit-calendar-picker-indicator,input[type=time]::-webkit-calendar-picker-indicator,
+input[type=datetime-local]::-webkit-calendar-picker-indicator,input[type=month]::-webkit-calendar-picker-indicator,
+input[type=week]::-webkit-calendar-picker-indicator{filter:brightness(0) invert(1);opacity:1;cursor:pointer}
 </style>
 </head>
 <body>
@@ -376,7 +382,7 @@ body.pm-playing #pm-phasebar{padding:0}
     <a class="logo" href="javascript:void(0)">
       <div class="logo-mark">告</div>
       <div class="logo-text" data-i18n="app_title">公告與會議</div>
-      <span class="logo-ver">v1.96</span>
+      <span class="logo-ver">v1.97</span>
     </a>
     <div class="topbar-right">
       <div id="langChips" style="display:flex;gap:4px"></div>

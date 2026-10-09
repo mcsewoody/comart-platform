@@ -5,7 +5,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#080C14">
-<title>COMART · 公告與會議 v2.00</title>
+<title>COMART · 公告與會議 v2.01</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=Noto+Serif:wght@400;700&family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -382,7 +382,7 @@ input[type=week]::-webkit-calendar-picker-indicator{filter:brightness(0) invert(
     <a class="logo" href="javascript:void(0)">
       <div class="logo-mark">告</div>
       <div class="logo-text" data-i18n="app_title">公告與會議</div>
-      <span class="logo-ver">v2.00</span>
+      <span class="logo-ver">v2.01</span>
     </a>
     <div class="topbar-right">
       <div id="langChips" style="display:flex;gap:4px"></div>
@@ -4208,60 +4208,54 @@ async function wrSave(){
   wrBackToList();
 }
 
-// 週報內文（純文字，供 mailto 使用）：各段落 + 固定 OKR原則 + 知識學習平台
-function wrMailText(){
+// 週報 Email（純文字，供 mailto 使用）—— 2026-10-10 Woody 指定的版面：
+//   標題一行（COMART Weekly Report   日期 作者   語言旗標），段落是「標題：」＋ 15 個 - ＋ 內文，段落之間空兩行；
+//   語言順序：繁中（正本）→ 越南文 → 英文。旗標只標實際有附上的語言（譯文取不到、只寄中文時就只有 🇹🇼）。
+const WR_MAIL_DASH = '-'.repeat(15);
+const WR_MAIL_FLAG = { zh:'🇹🇼', vi:'🇻🇳', en:'🇬🇧' };
+const WR_MAIL_LANGS = ['vi','en'];
+function wrMailSec(L, title, lines){ L.push(title); L.push(WR_MAIL_DASH); lines.forEach(x => L.push(x)); L.push(''); L.push(''); }
+function wrMailText(langs){
   const s = wrState, L = [];
-  const DIV = '━━━━━━━━━━━━━━━━━━━━━━━━';
-  L.push('COMART Weekly Report');
-  L.push((s.report_date||'') + (s.author_name ? '  ' + s.author_name : ''));
-  L.push('');
-  WR_SECTIONS.forEach(sec => {
-    const v = (s[sec.key]||'').trim(); if(!v) return;
-    L.push(DIV);
-    L.push(sec.label + '：'); L.push(v); L.push('');
-  });
+  const flags = ['zh'].concat(langs || []).map(k => WR_MAIL_FLAG[k]).join(' ');
+  L.push('COMART Weekly Report   ' + (s.report_date||'') + (s.author_name ? ' ' + s.author_name : '') + '   ' + flags);
+  L.push(''); L.push('');
+  WR_SECTIONS.forEach(sec => { const v = (s[sec.key]||'').trim(); if(v) wrMailSec(L, sec.label + '：', [v]); });
   const atts = wrAttsOf(s);
   if(atts.length){
     // mailto 帶不了附件：列出檔名並指回平台，收件人才知道少了什麼、去哪裡看
-    L.push(DIV);
-    L.push('附件（共 ' + atts.length + ' 份，請至平台查看）：');
-    atts.forEach((a,i) => L.push((i+1) + '. ' + (a.name || a.path)));
-    L.push('https://platform.comart.com.tw/board/index.html?tab=woody');
-    L.push('');
+    wrMailSec(L, '附件（共 ' + atts.length + ' 份，請至平台查看）：',
+      atts.map((a,i) => (i+1) + '. ' + (a.name || a.path)).concat(['https://platform.comart.com.tw/board/index.html?tab=woody']));
   }
-  L.push(DIV);
-  L.push('OKR 原則：');
-  WR_OKR.forEach((x,i) => L.push((i+1) + '. ' + x));
-  L.push('');
-  L.push(DIV);
-  L.push('知識學習平台：');
-  WR_LEARN.forEach((x,i) => L.push('＃' + (i+1) + '：' + x));
-  L.push(''); L.push('');   // 結尾留兩行空白，方便寄送時放簽名檔
+  wrMailSec(L, 'OKR 原則：', WR_OKR.map((x,i) => (i+1) + '. ' + x));
+  wrMailSec(L, '知識學習平台：', WR_LEARN.map((x,i) => '＃' + (i+1) + '：' + x));
   return L.join('\n');
 }
-// 信末附英文與越南文（2026-10-09 Woody）。譯文依「已存檔的內容」產生，所以有未存檔的修改時先請他存檔。
+// 信末附越南文與英文（2026-10-09 Woody）。譯文依「已存檔的內容」產生，所以有未存檔的修改時先請他存檔。
 function wrMailTrText(lang, tr){
-  const ui = WR_TR_UI[lang], L = [], DIV = '━━━━━━━━━━━━━━━━━━━━━━━━';
-  L.push(''); L.push('════════ ' + ui.name + '（AI ' + (lang === 'vi' ? 'bản dịch' : 'translation') + '）════════');
-  L.push(ui.banner); L.push('');
-  WR_SECTIONS.forEach(sec => { const v = (tr[sec.key] || '').trim(); if(!v) return; L.push(DIV); L.push(ui[sec.key] + ':'); L.push(v); L.push(''); });
+  const ui = WR_TR_UI[lang], L = [];
+  L.push('════════ ' + WR_MAIL_FLAG[lang] + ' ' + ui.name + ' ════════');
+  L.push(ui.banner); L.push(''); L.push('');
+  WR_SECTIONS.forEach(sec => { const v = (tr[sec.key] || '').trim(); if(v) wrMailSec(L, ui[sec.key] + ':', [v]); });
   return L.join('\n');
 }
 async function wrMail(){
   const subject = 'Woody 週報 ' + (wrState.report_date || '').replace(/-/g, '.');
-  let trText = '';
+  const tr = {};
   if(!wrState.id || _boardDirty){ if(!confirm(BT('wr_tr_mail_save_first'))) return; }
   else {
     boardToast(BT('wr_tr_mail_wait'));
     try{
-      const [en, vi] = await Promise.all([wrTranslate({ id: wrState.id, lang:'en' }), wrTranslate({ id: wrState.id, lang:'vi' })]);
-      trText = (en ? wrMailTrText('en', en) : '') + (vi ? wrMailTrText('vi', vi) : '');
+      const got = await Promise.all(WR_MAIL_LANGS.map(l => wrTranslate({ id: wrState.id, lang: l })));
+      WR_MAIL_LANGS.forEach((l,i) => { if(got[i]) tr[l] = got[i]; });
     }catch(e){
       console.warn('[wr] 信件譯文失敗', e && e.message);
       if(!confirm(BT('wr_tr_mail_fail'))) return;
     }
   }
-  const url = 'mailto:all@comart.com.tw?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(wrMailText() + trText);
+  const langs = WR_MAIL_LANGS.filter(l => tr[l]);
+  const body = wrMailText(langs) + langs.map(l => '\n' + wrMailTrText(l, tr[l])).join('') + '\n';   // 結尾留空行，方便放簽名檔
+  const url = 'mailto:all@comart.com.tw?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
   try{ window.location.href = url; boardToast(BT('wr_mail_ok')); }
   catch(e){ boardToast(BT('t_mail_fail')); }
 }

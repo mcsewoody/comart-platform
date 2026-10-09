@@ -136,10 +136,10 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 
 | File | Version | Purpose | ~Lines |
 |------|---------|---------|--------|
-| `index.html` | v2.24 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
-| `admin/index.html` | v2.61 | Admin System — **機場接送**、公務車、圖書館、會議室、客戶到訪、抽籤 | 8,221 |
-| `kms/index.html` | v2.58 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
-| `quotation/index.html` | v3.76 | Quotation & CRM system | 7,332 |
+| `index.html` | v2.25 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
+| `admin/index.html` | v2.62 | Admin System — **機場接送**、公務車、圖書館、會議室、客戶到訪、抽籤 | 8,221 |
+| `kms/index.html` | v2.59 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
+| `quotation/index.html` | v3.77 | Quotation & CRM system | 7,332 |
 | `board/index.html` | v2.02 | 公告與會議 Bulletin & Meetings — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍、腦力激盪 | 4,600 |
 | `product_dev/` | v2.26 | **產品開發管理 —— 第六個子系統，不遵守單一檔案原則**（見下方專節） | — |
 
@@ -445,6 +445,7 @@ KMS `--text/-2/-3` #FFFFFF／#E6EAFF／#C4CAE6；Admin #FBFCFF／#D9DDEE／#B4B9
 **列印／PDF 範本裡寫死的深色字刻意沒動**（那些是白底）。要再調就改 `:root`，不要逐條改規則。
 
 🔴 **不使用國旗 emoji**（2026-10-10 Woody：政治衝突考量）：語言或地區一律用文字標示（例：`繁中｜Tiếng Việt｜English`）。集團有東莞廠，中國大陸的裝置也不顯示 🇹🇼。
+  2026-10-10 全平台清除：**地點一律寫代碼 `TW`／`CN`／`VN`**（Portal／KMS 排行榜與專家的地點、Portal 行事曆新增選單、Admin 會議室下拉與來賓國別頭像）；**語言一律用該語言自己的文字**（English／繁體中文／简体中文／Tiếng Việt／日本語，Portal 翻譯工具、KMS 閱讀器翻譯選單），報價「越南廠成本」頁籤改 🏭。新程式碼不得再出現國旗（regional indicator U+1F1E6–1F1FF）。
 
 🔴 **日期／時間欄位的日曆圖示一律純白**（2026-10-09 Woody：「黑底配黑色 icon」）。那個圖示叫 **calendar picker indicator**
 （CSS 偽元素 `::-webkit-calendar-picker-indicator`），瀏覽器預設畫成黑色，貼在深色底上看不見。

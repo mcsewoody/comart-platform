@@ -139,7 +139,7 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 | `index.html` | v2.25 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
 | `admin/index.html` | v2.62 | Admin System — **機場接送**、公務車、圖書館、會議室、客戶到訪、抽籤 | 8,221 |
 | `kms/index.html` | v2.59 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
-| `quotation/index.html` | v3.79 | Quotation & CRM system | 7,332 |
+| `quotation/index.html` | v3.80 | Quotation & CRM system | 7,332 |
 | `board/index.html` | v2.05 | 公告與會議 Bulletin & Meetings — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍、腦力激盪 | 4,600 |
 | `product_dev/` | v2.26 | **產品開發管理 —— 第六個子系統，不遵守單一檔案原則**（見下方專節） | — |
 
@@ -792,7 +792,7 @@ Woody：「馬上要展覽了」——①掃名片馬上寄跟進信附邀請函
   本機 `apikey`＝secret key 只准 `kind:'test'`（寄給那個人自己），用來確認 IT 有沒有把 Graph 限縮到特定信箱。`node --test supabase/functions/mail-send/lib.test.mjs`（5 個）。
 - 🔴 **跟進信的談話重點常常是開窗之後才打的**（v3.78，2026-10-09 實際發生：掃描後 18 秒就建了草稿，重點沒進信）。草稿開窗即寫，但
   重點欄位 `change` 時若內文沒手改過就自動重寫（`expoFuMemoChanged`，改過先問）；送出前比對 `_fuMemoUsed`，重點沒用上就問要不要重寫；AI 寫稿中不准送出；晚回來的舊結果用 `_fuDraftSeq` 丟掉。
-- **跟進信一定有官網連結** `https://www.comart.com.tw/`（`EXPO_SITE`）：提示詞要求介紹完 COMART 後邀請客戶上官網；AI 漏掉時依信件語言補一句（`EXPO_SITE_LINE`）。
+- 🔴 **跟進信的公司介紹＋官網是固定文字**（v3.80，Woody 2026-10-10 指定）：AI 只放 `[[COMART_INTRO]]` 佔位，由 `expoPutIntro()` 依信件語言換成 `EXPO_INTRO`（英文原文：「COMART Corporation designs and manufactures mobile and auto accessories since 1994, with factories in China and Vietnam. You're welcome to get to know us better on our website:」＋換行＋`https://www.comart.com.tw/`）。AI 漏放佔位就插在最後一段之前。**改介紹文字只改 `EXPO_INTRO`，五語一起改。**
 - **來賓列表的「🗑 刪除」**（v3.79，`expoDelVisit`）只刪 `crm_expo_visits` 那一列，CRM 客戶／聯絡人／名片／報價單都留著。sb-proxy：業務只刪得到自己掃的（`forceOwnRows`），admin 全部。
 - 跟進信寫作規則（v3.79 Woody）：稱呼行以逗號結尾、不用冒號（「劉總經理您好,」）；**不要假設客戶在哪個市場**，改問「你們的市場策略與具體需求」。信件 HTML 裡的網址一律轉成可點的連結（`expoTextHtml`）。
 - 資料：`crm_exhibitions`（邀請函、AI 指引、感謝信範本、照片）／`crm_expo_visits`（哪個展、誰掃、跟進／報價／感謝信各自的寄出時間、`lang`）／`crm_mail_log`。三張都在 sb-proxy 的 `EXPO_TABLES`（業務 ＋ admin）。業務只看自己掃的來賓，admin 看全部。

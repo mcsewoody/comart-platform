@@ -357,6 +357,8 @@ serve(async (req) => {
     if (table === "crm_mail_log" && isWrite) return json({ error: "forbidden", hint: "read only" }, 403)
     const live = await liveUserOf(SUPABASE_URL, SERVICE_KEY, sessEmpId)
     if (!(live.role === "admin" || live.dept === "sales")) return json({ error: "forbidden", hint: "sales_or_admin_only" }, 403)
+    // 刪除來賓（quotation v3.79）：業務只刪得到自己掃的，admin 全部
+    if (table === "crm_expo_visits" && req.method === "DELETE" && live.role !== "admin") restPath = forceOwnRows(restPath, sessEmpId)
   }
 
   // ── 越南廠料工費（報價系統「越南廠成本」頁籤）──

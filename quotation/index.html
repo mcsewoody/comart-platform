@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#080C14">
-<title>COMART · Quotation System v3.73</title>
+<title>COMART · Quotation System v3.74</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=Noto+Serif:wght@400;700&family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -366,7 +366,7 @@ input[type=week]::-webkit-calendar-picker-indicator{filter:brightness(0) invert(
       <div class="logo-mark" style="background:transparent"><svg xmlns="http://www.w3.org/2000/svg" viewBox="302.53125 269.878906 47.6875 24.714844" width="24" height="13"><path fill="#ad0004" fill-rule="nonzero" d="M336.148438 294.59375 L326.378906 271.554688 L316.542969 294.59375 L302.53125 294.59375 L318.625 269.878906 L334.058594 269.878906 L350.21875 294.59375 Z"/><path fill="#ad0004" fill-rule="nonzero" d="M326.363281 283.351562 L321.265625 294.5625 L331.425781 294.5625 Z"/></svg></div>
       <div>
         <div class="logo-text">COMART</div>
-        <div id="appVersionDiv" style="font-size:10px;color:var(--ac);font-weight:600;letter-spacing:.04em;line-height:1.3">v3.73</div>
+        <div id="appVersionDiv" style="font-size:10px;color:var(--ac);font-weight:600;letter-spacing:.04em;line-height:1.3">v3.74</div>
       </div>
     </div>
     <div class="topbar-right">
@@ -392,6 +392,7 @@ input[type=week]::-webkit-calendar-picker-indicator{filter:brightness(0) invert(
   <div class="nav-pills" id="navPills">
     <button class="npill" data-tab="products" onclick="switchTab('products')"><span id="np-products">Product</span> <span class="badge" id="np-cnt-p">0</span></button>
     <button class="npill" data-tab="quotes" onclick="switchTab('quotes')"><span id="np-quotes">Quote</span> <span class="badge" id="np-cnt-q">0</span></button>
+    <button class="npill" data-tab="expo" onclick="switchTab('expo')">🎪 <span data-qk="crmExpo">展覽</span></button>
     <button class="npill" data-tab="crm" onclick="switchTab('crm')">👥 <span id="np-crm">CRM</span> <span class="badge" id="np-cnt-crm">0</span></button>
     <button class="npill" data-tab="vncost" onclick="switchTab('vncost')">🇻🇳 <span id="np-vncost">VN Cost</span></button>
     <button class="npill" data-tab="files" onclick="switchTab('files')">📁 <span id="np-files">File</span></button>
@@ -2314,6 +2315,7 @@ function applyLang(){
   // 🔴 重畫「當前的 CRM 子頁籤」而不是寫死 accounts：管線看板的欄位標題、
   //    任務與互動紀錄都是 JS 畫的，只重畫 accounts 的話停在那幾頁切語言不會有反應。
   if(page==='crm') { if(typeof showCRMTab==='function') showCRMTab(_crmTab); }
+  if(page==='expo') { try{ expoRender(); }catch(_){} }
   if(page==='vncost') { vqApplyStatic(); if(vqP) vqAll(); }
 }
 
@@ -2338,10 +2340,12 @@ function switchTab(tab){
   document.getElementById('pageProducts').classList.toggle('active',tab==='products');
   const pfEl = document.getElementById('pageFiles'); if(pfEl) pfEl.classList.toggle('active',tab==='files');
   const pcEl = document.getElementById('pageCRM'); if(pcEl) pcEl.classList.toggle('active',tab==='crm');
+  const peEl = document.getElementById('pageExpo'); if(peEl) peEl.classList.toggle('active',tab==='expo');
   const pvEl = document.getElementById('pageVNCost'); if(pvEl) pvEl.classList.toggle('active',tab==='vncost');
   if(tab==='products') renderProductList();
   if(tab==='files'){ loadAndRenderFiles(); }
   if(tab==='crm'){ showCRMTab('accounts'); }
+  if(tab==='expo'){ expoLoad(); }
   if(tab==='vncost'){ vqOpen(); }
   // Keep nav visible for all home tabs
   const _la2=document.getElementById('logoArea'); if(_la2) _la2.style.display='flex';
@@ -2355,7 +2359,7 @@ function goPage(pg){
   if(pg==='settings' && page && !['settings','form','detail'].includes(page)){
     _prevPage = page;
   }
-  ['pageQuotes','pageProducts','pageForm','pageDetail','pageSettings','pageFiles','pageCRM','pageProdForm','pageVNCost'].forEach(id=>{ const el=document.getElementById(id); if(el) el.classList.remove('active'); });
+  ['pageQuotes','pageProducts','pageForm','pageDetail','pageSettings','pageFiles','pageCRM','pageExpo','pageProdForm','pageVNCost'].forEach(id=>{ const el=document.getElementById(id); if(el) el.classList.remove('active'); });
   const _pgEl=document.getElementById('page'+pg.charAt(0).toUpperCase()+pg.slice(1));
   if(_pgEl) _pgEl.classList.add('active'); else console.warn('goPage: page element not found for', pg);
   // Keep Quote tab active when in form/detail
@@ -6634,7 +6638,7 @@ function _populateCRMSalesFilter(){
 // 留著遲早會有人在裡面呼叫 t() 然後拿到一個字串當函式用。
 function showCRMTab(tab){
   _crmTab = tab;
-  ['accounts','pipeline','tasks','activities','expo'].forEach(x=>{
+  ['accounts','pipeline','tasks','activities'].forEach(x=>{
     const btn=document.getElementById('crmtab-'+x);
     if(btn) btn.classList.toggle('on', x===tab);
     const c=document.getElementById('crmtab-content-'+x);
@@ -6644,7 +6648,6 @@ function showCRMTab(tab){
   if(tab==='pipeline') renderCRMPipeline();
   if(tab==='tasks') renderCRMTasks();
   if(tab==='activities') renderCRMActivities();
-  if(tab==='expo') expoLoad();
 }
 
 // ── ACCOUNT LIST ─────────────────────────────
@@ -9422,6 +9425,11 @@ document.addEventListener('DOMContentLoaded', () => {
 <!-- ═══════════════════════════════════════ -->
 <!-- CRM PAGE                                 -->
 <!-- ═══════════════════════════════════════ -->
+<!-- 🎪 展覽（v3.74 由 CRM 子頁籤升為主頁籤，Woody：「拉到上一階，放在 CRM 左邊」） -->
+<div class="page" id="pageExpo" style="max-width:760px;margin:0 auto;padding:14px 16px">
+  <div id="expoBody"></div>
+</div>
+
 <div class="page" id="pageCRM" style="max-width:1200px;margin:0 auto">
   <!-- Sub-tab bar -->
   <div style="display:flex;align-items:center;gap:6px;padding:10px 14px;border-bottom:1px solid var(--br);flex-shrink:0;flex-wrap:wrap">
@@ -9430,7 +9438,6 @@ document.addEventListener('DOMContentLoaded', () => {
     <button class="moq-chip"    id="crmtab-pipeline" onclick="showCRMTab('pipeline')">📊 Pipeline</button>
     <button class="moq-chip"    id="crmtab-tasks"    onclick="showCRMTab('tasks')">✓ <span id="crm-lbl-tasks">任務</span></button>
     <button class="moq-chip"    id="crmtab-activities" onclick="showCRMTab('activities')">📋 <span id="crm-lbl-activities">互動</span></button>
-    <button class="moq-chip"    id="crmtab-expo" onclick="showCRMTab('expo')">🎪 <span data-qk="crmExpo">展覽</span></button>
     <button onclick="crmCardScan(null)" style="margin-left:auto;padding:6px 12px;border-radius:8px;background:var(--s2);color:var(--tx);font-size:12px;font-weight:600;border:1px solid var(--br);cursor:pointer" data-qk="scanCard">📇 掃描名片</button>
     <button id="crm-add-acct-btn" onclick="openAccountModal()"
       style="padding:6px 12px;border-radius:8px;background:#10a37f;color:#fff;font-size:12px;font-weight:600;border:none;cursor:pointer">+ 新增客戶</button>
@@ -9466,10 +9473,6 @@ document.addEventListener('DOMContentLoaded', () => {
   </div>
 
   <!-- Pipeline Tab -->
-  <!-- 🎪 展覽模式（v3.72） -->
-  <div id="crmtab-content-expo" style="display:none;flex:1;overflow-y:auto;padding:14px 16px;max-width:760px;margin:0 auto">
-    <div id="expoBody"></div>
-  </div>
   <div id="crmtab-content-pipeline" style="display:none;flex:1;overflow-y:auto;padding:14px 16px">
     <div id="crmPipelineBoard"></div>
   </div>

@@ -139,7 +139,7 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 | `index.html` | v2.23 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
 | `admin/index.html` | v2.60 | Admin System — **機場接送**、公務車、圖書館、會議室、客戶到訪、抽籤 | 8,221 |
 | `kms/index.html` | v2.57 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
-| `quotation/index.html` | v3.73 | Quotation & CRM system | 7,332 |
+| `quotation/index.html` | v3.74 | Quotation & CRM system | 7,332 |
 | `board/index.html` | v1.97 | 公告與會議 Bulletin & Meetings — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍、腦力激盪 | 4,600 |
 | `product_dev/` | v2.25 | **產品開發管理 —— 第六個子系統，不遵守單一檔案原則**（見下方專節） | — |
 
@@ -753,7 +753,8 @@ python3 scripts/i18n-audit.py         # Portal，key 沒引號：btn_save:'儲�
 
 ## 🎪 CRM 展覽模式 ＋ 平台寄信（quotation v3.72，2026-10-08，migration 202610080005，edge function `mail-send`）
 
-Woody：「馬上要展覽了」——①掃名片馬上寄跟進信附邀請函 ②馬上報價並寄出 ③展後感謝信附會場照片。CRM 的「🎪 展覽」子頁籤（`expo*`）。
+Woody：「馬上要展覽了」——①掃名片馬上寄跟進信附邀請函 ②馬上報價並寄出 ③展後感謝信附會場照片。函式前綴 `expo*`。
+🔴 **v3.74 起是報價系統的主頁籤「🎪 展覽」（`switchTab('expo')`／`#pageExpo`，在 CRM 左邊）**，不再是 CRM 的子頁籤（Woody 2026-10-09：「拉到上一階」）。
 | 決策（Woody 2026-10-08） | 結果 |
 |---|---|
 | 誰用、從誰的信箱寄 | 全體業務 ＋ admin，**各自從自己的公司信箱寄** |

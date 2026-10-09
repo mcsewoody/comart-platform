@@ -140,7 +140,7 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 | `admin/index.html` | v2.60 | Admin System — **機場接送**、公務車、圖書館、會議室、客戶到訪、抽籤 | 8,221 |
 | `kms/index.html` | v2.57 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
 | `quotation/index.html` | v3.75 | Quotation & CRM system | 7,332 |
-| `board/index.html` | v1.97 | 公告與會議 Bulletin & Meetings — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍、腦力激盪 | 4,600 |
+| `board/index.html` | v1.98 | 公告與會議 Bulletin & Meetings — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍、腦力激盪 | 4,600 |
 | `product_dev/` | v2.25 | **產品開發管理 —— 第六個子系統，不遵守單一檔案原則**（見下方專節） | — |
 
 `admin/lottery.html` is a standalone lottery page (separate from the lottery module inside `admin/index.html`).
@@ -2102,6 +2102,12 @@ admin 從 v2.37 就有紅色橫幅與 `SB.write()`，所以過期**不會產生�
 | 腦力激盪 | `pm*`（同一套） | 同上三張表（`kind='brainstorm'`） |
 | 意見徵集 | `pm*`（同一套） | 同上三張表（`kind='collect'`） |
 | 投票 | `pl*` | `poll_sessions`、`poll_options`、`poll_votes`、`poll_comments` |
+
+**「閱讀」按鈕三個頁籤統一**（board v1.98，2026-10-09 Woody）：週會紀錄（`wmOpenRead`）、業務會議記錄（IIFE 內 `readRecord`）、Woody 週報（`wrOpenRead`，原「開啟閱讀 ↗」）
+都叫「閱讀」（`btn_read`，五語），開新分頁顯示**正式版面、唯讀、不自動列印**。
+- 週會：資料列 → state 抽成 `wmStateFromRow()`（編輯與閱讀共用）；`wmSheetTableHTML()` 讀全域 `wmState`，閱讀時暫借再放回。版面 CSS 抽成 `WM_SHEET_CSS`（PDF 與閱讀共用）。
+- 業務會議：PDF 版面抽成 `docLayoutHTML()`（匯出 PDF 與閱讀共用）；閱讀**直接用存檔時留下的 `view`（出席、議程）**組，不經 `hydrate`，所以不會動到正在編的 state。
+- 🔴 三者都是 `window.open` 在任何 await 之前（之後就不算使用者點擊，會被彈出視窗封鎖擋掉）。
 
 **Woody 週報的 2021–2022 歷史資料是補匯入的**（`supabase/migrations/202609280001_import_woody_reports_2021_2022.sql`，
 2026-09-28）。原本平台最早只有 2023-01-01，但 Gmail 寄件備份裡還有 **62 篇**，最早到 2021-09-12。匯入時踩到三件事，

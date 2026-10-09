@@ -20,7 +20,7 @@ function LangChips() {
   const active = getLang();
   return (
     <div className="flex items-center gap-1" aria-label={t("nav_aria")}>
-      {LANGS.map(([code, label]) => (
+      {LANGS.filter(([code]) => code !== "ja").map(([code, label]) => (
         <button
           key={code}
           type="button"

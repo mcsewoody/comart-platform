@@ -5,7 +5,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI5OCAyNTQgNTggNTgiPjxyZWN0IHg9IjI5OCIgeT0iMjU0IiB3aWR0aD0iNTgiIGhlaWdodD0iNTgiIGZpbGw9IndoaXRlIiByeD0iNSIvPjxwYXRoIGZpbGw9IiNhZDAwMDQiIGZpbGwtcnVsZT0ibm9uemVybyIgZD0iTTMzNi4xNDg0MzggMjk0LjU5Mzc1IEwzMjYuMzc4OTA2IDI3MS41NTQ2ODggTDMxNi41NDI5NjkgMjk0LjU5Mzc1IEwzMDIuNTMxMjUgMjk0LjU5Mzc1IEwzMTguNjI1IDI2OS44Nzg5MDYgTDMzNC4wNTg1OTQgMjY5Ljg3ODkwNiBMMzUwLjIxODc1IDI5NC41OTM3NSBaIi8+PHBhdGggZmlsbD0iI2FkMDAwNCIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMzI2LjM2MzI4MSAyODMuMzUxNTYyIEwzMjEuMjY1NjI1IDI5NC41NjI1IEwzMzEuNDI1NzgxIDI5NC41NjI1IFoiLz48L3N2Zz4K">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#080C14">
-<title>COMART · 公告與會議 v1.99</title>
+<title>COMART · 公告與會議 v2.00</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=Noto+Serif:wght@400;700&family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -382,7 +382,7 @@ input[type=week]::-webkit-calendar-picker-indicator{filter:brightness(0) invert(
     <a class="logo" href="javascript:void(0)">
       <div class="logo-mark">告</div>
       <div class="logo-text" data-i18n="app_title">公告與會議</div>
-      <span class="logo-ver">v1.99</span>
+      <span class="logo-ver">v2.00</span>
     </a>
     <div class="topbar-right">
       <div id="langChips" style="display:flex;gap:4px"></div>
@@ -926,7 +926,8 @@ input[type=week]::-webkit-calendar-picker-indicator{filter:brightness(0) invert(
 //    那是公司的存檔格式，同一份紀錄不該因為誰按了匯出鍵就長得不一樣；而且內文本來就是
 //    使用者打的中文，只翻表頭反而變成半中半外的四不像。
 //    因此：介面走 siteLabel()／PMT()／pmPhaseLabel()，輸出走 siteLabelZ()／PMTZ()（固定繁中）。
-const B_LANGS = [['zh-TW','繁中'],['zh-CN','简中'],['en','EN'],['vi','VI'],['ja','日本語']];
+// 2026-10-09 Woody：日文介面停止維護（已翻好的字典留著不刪）：語言列不再出現日本語；B_I18N 的 ja 留著
+const B_LANGS = [['zh-TW','繁中'],['zh-CN','简中'],['en','EN'],['vi','VI']];
 let BLANG = 'zh-TW';
 const B_I18N = {
 'zh-TW': {
@@ -2245,11 +2246,13 @@ function BT(k, p) {
 }
 function bInitLang() {
   let l = ''; try { l = localStorage.getItem('comart-lang') || ''; } catch (e) {}
+  if (l === 'ja') l = 'en';
   if (!B_I18N[l]) l = ({ TW:'zh-TW', CN:'zh-CN', VN:'vi' })[PORTAL_SESSION && homeSite(PORTAL_SESSION.site)] || 'zh-TW';
   BLANG = l;
   document.documentElement.lang = l;
 }
 function bSetLang(l) {
+  if (l === 'ja') l = 'en';
   if (!B_I18N[l] || l === BLANG) return;
   BLANG = l;
   try { localStorage.setItem('comart-lang', l); } catch (e) {}   // 與 Portal 共用同一把鑰匙

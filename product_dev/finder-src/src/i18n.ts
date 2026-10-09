@@ -1831,7 +1831,9 @@ export function initLang(site?: string) {
   } catch {
     /* Safari 封鎖儲存時 getItem 會 throw，不可中斷啟動 */
   }
-  if (isLang(stored)) current = stored;
+  // 2026-10-09 Woody：日文介面停止維護（已翻好的字典留著不刪）：之前選過日文的人改看英文
+  if (stored === "ja") current = "en";
+  else if (isLang(stored)) current = stored;
   else current = ({ TW: "zh-TW", CN: "zh-CN", VN: "vi" } as Record<string, Lang>)[site ?? ""] ?? "zh-TW";
   document.documentElement.lang = current;
 }

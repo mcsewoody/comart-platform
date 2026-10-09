@@ -137,6 +137,8 @@ def assigned_keys(src):
     return set(re.findall(r"\w+\[['\"][\w-]+['\"]\]\.(\w+)\s*=", src))
 
 
+OPTIONAL_LANGS = {'ja'}
+ja_only = []
 bad, total = 0, 0
 defined = set()
 for var in varnames:
@@ -154,8 +156,12 @@ for var in varnames:
             bad += len(dup); print('重複定義  %-8s %-6s : %s' % (var, n, ', '.join(dup)))
     for k in sorted(allk):                     # ② 缺漏（t() 會回傳 key 本身，畫面上直接看到）
         miss = [n for n in segs if per[n].get(k, 0) == 0]
-        if miss:
+        # 2026-10-09 Woody：日文介面停止維護 —— 只缺日文不算問題，只計數（報價系統的報價單 key 仍要補 ja，見 CLAUDE.md）
+        req = [n for n in miss if n not in OPTIONAL_LANGS]
+        if req:
             bad += 1; print('缺漏      %-8s %-26s 缺: %s' % (var, k, ', '.join(miss)))
+        elif miss:
+            ja_only.append(k)
     defined |= allk
     print('%-8s 字典 %s，共 %d 個 key' % (var, list(segs), len(allk)))
 
@@ -166,5 +172,7 @@ if missing:
     bad += len(missing)
     print('未定義    %s' % ', '.join(missing))
 print('---')
+if ja_only:
+    print('（只缺日文、不算問題：%d 個 key）' % len(ja_only))
 print(('❌ 有 %d 個問題' % bad) if bad else '✅ %s：字典完全對齊，無重複、無缺漏（共 %d 個 key）' % (name, total))
 sys.exit(1 if bad else 0)

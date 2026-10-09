@@ -136,12 +136,12 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 
 | File | Version | Purpose | ~Lines |
 |------|---------|---------|--------|
-| `index.html` | v2.23 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
-| `admin/index.html` | v2.60 | Admin System — **機場接送**、公務車、圖書館、會議室、客戶到訪、抽籤 | 8,221 |
-| `kms/index.html` | v2.57 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
-| `quotation/index.html` | v3.75 | Quotation & CRM system | 7,332 |
-| `board/index.html` | v1.99 | 公告與會議 Bulletin & Meetings — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍、腦力激盪 | 4,600 |
-| `product_dev/` | v2.25 | **產品開發管理 —— 第六個子系統，不遵守單一檔案原則**（見下方專節） | — |
+| `index.html` | v2.24 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
+| `admin/index.html` | v2.61 | Admin System — **機場接送**、公務車、圖書館、會議室、客戶到訪、抽籤 | 8,221 |
+| `kms/index.html` | v2.58 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
+| `quotation/index.html` | v3.76 | Quotation & CRM system | 7,332 |
+| `board/index.html` | v2.00 | 公告與會議 Bulletin & Meetings — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍、腦力激盪 | 4,600 |
+| `product_dev/` | v2.26 | **產品開發管理 —— 第六個子系統，不遵守單一檔案原則**（見下方專節） | — |
 
 `admin/lottery.html` is a standalone lottery page (separate from the lottery module inside `admin/index.html`).
 
@@ -533,6 +533,18 @@ The portal supports EN, 繁中, 简中, VI, 日 via `setLang(lang)`. Each langua
   都存在，表也在 sb-proxy 白名單裡，`saveCalEvent()` 的寫入會丟例外並在 toast 顯示錯誤
   （**不是**「改快取就報成功」那一型），所以那是「還沒有人建過活動」，不是壞掉。
   **只有 `admin` 與 `dcc` 建得了活動**（`openCalEventModal` 的 `canEdit`）。
+
+## 🔴 日文介面停止維護（2026-10-09 Woody）
+
+Woody：「所有介面的日文都不需要了，已經翻好的可以留著，但不再維護／新增任何日語介面。」採「**隱藏選項、字典留著**」：
+- **所有系統的語言列都拿掉「日本語」**（Portal／Board／Admin／KMS／報價系統的兩組 lchip／Product Dev 首頁、手機與配件、Finder 2.40）。
+  `setLang('ja')`／初始化讀到舊的 `ja` 一律改成 **en**（之前選過日文的人改看英文）。
+- **各檔的 ja 字典留著不刪**：五個系統逐本精準切字典的風險（本檔記過「總數對不等於分佈對」的事故）大於檔案變小的好處。
+  **新增的 key 不必再寫 ja**。`scripts/i18n-audit.py` 的 `OPTIONAL_LANGS={'ja'}`：只缺日文不算問題，只在最後計數。
+- 🔴 **Portal 與報價系統的 `t()` 原本缺字直接顯示 key 名稱**，已改成退回英文（Board／KMS／Admin 本來就退回繁中）。
+- 🔴 **業務功能的日文全部保留**（Woody 指定）：**報價單日文輸出**（報價單表頭走 `UI[ql]`，所以報價單相關的 key **新增時仍要補 ja**）、
+  產品日文名稱與描述、Portal 翻譯工具的日文、AI 對話（AI Woody／KMS 問答）用日文回答、語音輸入的日文辨識、展覽跟進信可選日文、會議雙語可選日文。
+  Woody 週報譯文本來就不做日文。
 
 ## i18n：改字典一定要逐字典檢查（`scripts/i18n-audit.py`）
 
@@ -2660,9 +2672,9 @@ Portal 入口：APPS 的 `id:'product-dev'`（`roles:[]`，**不限角色，全�
 
 | 部分 | 路徑 | 版本 | 形態 |
 |---|---|---|---|
-| 工作區首頁（hub） | `product_dev/index.html` | **v2.25** | 單檔，只有入口卡片 |
-| Document Finder | `product_dev/finder/`（產物）← `finder-src/`（原始碼） | **2.39** | **React 19 + TypeScript + Vite + Tailwind 4** |
-| 手機與配件（裝置保管） | `product_dev/devices/index.html` | **v1.11** | 單檔，53KB |
+| 工作區首頁（hub） | `product_dev/index.html` | **v2.26** | 單檔，只有入口卡片 |
+| Document Finder | `product_dev/finder/`（產物）← `finder-src/`（原始碼） | **2.40** | **React 19 + TypeScript + Vite + Tailwind 4** |
+| 手機與配件（裝置保管） | `product_dev/devices/index.html` | **v1.15** | 單檔，53KB |
 
 - 🔴 **hub 不再標示另外兩個模組的版本**（v2.20 拿掉）。那是第二份副本，
   而 Finder 那一個已經漂到 `v2.10`／實際 `v2.26`，差 16 個版本 —— **錯的版本號

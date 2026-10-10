@@ -139,7 +139,7 @@ Each sub-application is one self-contained HTML file with all CSS, JS, and HTML 
 | `index.html` | v2.25 | Main portal — login, home, directory, bulletin, calendar, AI tools | 6,910 |
 | `admin/index.html` | v2.62 | Admin System — **機場接送**、公務車、圖書館、會議室、客戶到訪、抽籤 | 8,221 |
 | `kms/index.html` | v2.59 | Knowledge Management System — RAG, document editor, AI Q&A | 7,120 |
-| `quotation/index.html` | v3.81 | Quotation & CRM system | 7,332 |
+| `quotation/index.html` | v3.82 | Quotation & CRM system | 7,332 |
 | `board/index.html` | v2.05 | 公告與會議 Bulletin & Meetings — 公告、週會紀錄、業務會議記錄、Woody 週報、事前驗屍、腦力激盪 | 4,600 |
 | `product_dev/` | v2.26 | **產品開發管理 —— 第六個子系統，不遵守單一檔案原則**（見下方專節） | — |
 
@@ -797,6 +797,9 @@ Woody：「馬上要展覽了」——①掃名片馬上寄跟進信附邀請函
 - 跟進信寫作規則（v3.79 Woody）：稱呼行以逗號結尾、不用冒號（「劉總經理您好,」）；**不要假設客戶在哪個市場**，改問「你們的市場策略與具體需求」。信件 HTML 裡的網址一律轉成可點的連結（`expoTextHtml`）。
 - **產品目錄**（v3.81，Woody 2026-10-10）：跟進信與感謝信視窗各有「📘 附上產品目錄」勾選（每次預設不勾）。勾了就附 `crm-expo/catalog/Comart_2026.pdf`（`EXPO_CATALOG`，9.5 MB，走上傳工作階段），
   並在結尾問候（最後一段）之前加一句 `EXPO_CAT_LINE`（繁中「隨信附上我們的產品目錄，請您查閱。」，五語）。**換新版目錄**：覆蓋同一個 storage 路徑，或改 `EXPO_CATALOG`。
+- **🔎 客製信件**（v3.82，Woody 2026-10-10，參照他的 `post-show-followup` skill）：跟進信勾選後先跑 `expoResearch()`（opus-5.5 ＋ web_search，最多 5 次搜尋，處理 `pause_turn`），
+  把「公司背景／與 COMART 的交集／信件切入點」以繁中顯示在視窗裡讓人確認（`#fu-research`），再寫一段針對這個客戶的合作段落（展位談過的產品優先、越南廠只在相關時提）。
+  🔴 COMART 能做什麼只以 `EXPO_COMART_FACTS`（skill 的 `references/about-comart.md` 濃縮）為準，不准自創能力、認證、價格、MOQ；查不到資料就寫保守版。調查結果只快取在分頁記憶體（`_fuResearch`）。
 - 資料：`crm_exhibitions`（邀請函、AI 指引、感謝信範本、照片）／`crm_expo_visits`（哪個展、誰掃、跟進／報價／感謝信各自的寄出時間、`lang`）／`crm_mail_log`。三張都在 sb-proxy 的 `EXPO_TABLES`（業務 ＋ admin）。業務只看自己掃的來賓，admin 看全部。
 - 流程接點：`crmCardSave` 看到 `_card.expoId` 就改呼叫 `expoAfterScan`（建來賓 → 開跟進信）；`saveQuote` 新報價時 `_expoQuoteVisit` 有值就 `expoQuoteSaved`（連結來賓 → 開「寄出報價」）。
   🔴 `openQuoteForm` 開頭會清 `_expoQuoteVisit`，所以 `expoQuote` 要在它**之後**才設（第一版順序反了，測出來的）。
